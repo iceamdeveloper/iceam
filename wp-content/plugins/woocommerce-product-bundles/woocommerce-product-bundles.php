@@ -1,11 +1,11 @@
 <?php
 /*
 * Plugin Name: WooCommerce Product Bundles
-* Plugin URI: http://www.woothemes.com/products/product-bundles/
+* Plugin URI: http://www.woocommerce.com/products/product-bundles/
 * Description: WooCommerce extension for creating simple product bundles, kits and assemblies.
-* Version: 4.14.6
+* Version: 4.14.7
 * Author: WooThemes
-* Author URI: http://woothemes.com/
+* Author URI: http://woocommerce.com/
 * Developer: SomewhereWarm
 * Developer URI: http://somewherewarm.net/
 *
@@ -55,11 +55,11 @@ if ( ! is_woocommerce_active() ) {
  * To avoid confusion with zero prices in the front end, the extension filters the displayed price strings, cart item meta and markup classes in order to give the impression of a bundling relationship between the container item and the 'children' items.
  *
  * @class 	WC_Bundles
- * @version 4.14.6
+ * @version 4.14.7
  */
 class WC_Bundles {
 
-	public $version     = '4.14.6';
+	public $version     = '4.14.7';
 	public $required    = '2.3.0';
 
 	public $admin;

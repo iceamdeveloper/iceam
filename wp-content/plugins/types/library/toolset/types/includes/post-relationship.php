@@ -14,7 +14,7 @@ function wpcf_post_relationship_init() {
     wp_enqueue_script(
         'wpcf-post-relationship',
         WPCF_EMBEDDED_RELPATH . '/resources/js/post-relationship.js',
-        array('jquery', 'select2'),
+        array('jquery', 'toolset_select2'),
         WPCF_VERSION
     );
     add_filter('wpcf_meta_box_order_defaults', 'wpcf_post_relationship_add_metabox', 10, 2);
@@ -111,7 +111,7 @@ function wpcf_pr_admin_edit_fields( $parent, $child ) {
 
     $post_type_parent = get_post_type_object( $parent );
     $post_type_child = get_post_type_object( $child );
-    if ( empty( $post_type_parent ) || empty( $post_type_child ) ) {
+    if ( null == $post_type_parent || null == $post_type_child ) {
         die( __( 'Wrong post types', 'wpcf' ) );
     }
     $relationships = get_option( 'wpcf_post_relationship', array() );

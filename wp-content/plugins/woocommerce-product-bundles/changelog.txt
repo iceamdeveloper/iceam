@@ -1,5 +1,9 @@
 *** WooCommerce Product Bundles ***
 
+2016.08.16 - version 4.14.7
+ * Fix - Added missing argument to the core 'woocommerce_product_default_attributes' filter, used in 'class-wc-bundled-item.php'.
+ * Tweak - Modified woothemes.com references to woocommerce.com.
+
 2016.07.21 - version 4.14.6
  * Fix - Synced bundled subscription always treated as prorated, resulting in wrong up-front price strings.
  * Fix - Can't pay for failed/pending renewal order that contains subscription products which were part of a Product Bundle in the initial subscription order.

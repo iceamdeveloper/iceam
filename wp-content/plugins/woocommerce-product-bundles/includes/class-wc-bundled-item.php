@@ -5,7 +5,7 @@
  * The bunded item class is a container that initializes and holds all pricing, availability and variation/attribute-related data of a bundled item.
  *
  * @class   WC_Bundled_Item
- * @version 4.14.6
+ * @version 4.14.7
  * @since   4.2.0
  */
 
@@ -967,7 +967,7 @@ class WC_Bundled_Item {
 				}
 			}
 
-			$this->selected_product_attributes = apply_filters( 'woocommerce_product_default_attributes', $selected_product_attributes );
+			$this->selected_product_attributes = apply_filters( 'woocommerce_product_default_attributes', $selected_product_attributes, $this->product );
 
 			return $this->selected_product_attributes;
 		}

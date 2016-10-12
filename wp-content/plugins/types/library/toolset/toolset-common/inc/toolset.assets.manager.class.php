@@ -133,14 +133,25 @@ class Toolset_Assets_Manager
 	protected static $instance;
 	protected $styles		= array();
 	protected $scripts		= array();
+	
+	/**
+	* assets_url
+	*
+	* Base URL for the Toolset Common instance.
+	*
+	* @note Does not have a trailing slash due to untrailingslashit, add it when registering each asset.
+	* @since 2.0
+	*/
 	protected $assets_url	= '';
 
 	protected function __construct() {
+		
 		if ( is_admin() ) {
 			$this->assets_url = TOOLSET_COMMON_URL;
 		} else {
 			$this->assets_url = TOOLSET_COMMON_FRONTEND_URL;
 		}
+		$this->assets_url = untrailingslashit( $this->assets_url );
 		
 		add_action( 'init', 					array( $this, 'init' ), 99 );
 		//be
@@ -176,6 +187,10 @@ class Toolset_Assets_Manager
 	public function init() {
 		$this->__initialize_styles();
 		$this->__initialize_scripts();
+	}
+	
+	public function get_assets_url() {
+		return $this->assets_url;
 	}
 
 	/*
@@ -317,11 +332,20 @@ class Toolset_Assets_Manager
 																				TOOLSET_COMMON_VERSION, 
 																				true
 																			);
-		$this->scripts['select2']											= new Toolset_Script(
-																				'select2', 
-																				$this->assets_url . "/res/lib/select2/select2.min.js", 
+
+        $this->scripts['toolset-select2-compatibility']											= new Toolset_Script(
+																				'toolset-select2-compatibility', 
+																				$this->assets_url . "/res/js/toolset-select2-compatibility.js", 
 																				array( 'jquery' ), 
-																				'3.4.5', 
+																				TOOLSET_COMMON_VERSION, 
+																				true
+																			);
+
+		$this->scripts['toolset_select2']											= new Toolset_Script(
+																				'toolset_select2',
+																				$this->assets_url . "/res/lib/select2/select2.js",
+																				array( 'jquery', "toolset-select2-compatibility" ), 
+																				'4.0.3', 
 																				true
 																			);
 		$this->scripts['toolset-colorbox']									= new Toolset_Script(

@@ -1636,3 +1636,1131 @@ class BB_Install
 			$this->strings[3]['form_errors']['keymaster_user_login'][] = 'userlogin';
 		}
 		$data['keymaster_user_login']['value'] = sanitize_user( $data['keymaster_user_login']['value'], true );
+
+		// Check for a valid email
+		$this->strings[3]['form_errors']['keymaster_user_email'][] = empty( $data['keymaster_user_email']['value'] ) ? 'empty' : false;
+		$this->strings[3]['form_errors']['keymaster_user_email'][] = !is_email( $data['keymaster_user_email']['value'] ) ? 'email' : false;
+
+		// Check for a forum name
+		if ( !$this->database_tables_are_installed() ) {
+			$this->strings[3]['form_errors']['forum_name'][] = empty( $data['forum_name']['value'] ) ? 'empty' : false;
+		}
+
+		// Remove empty values from the error array
+		foreach ( $this->strings[3]['form_errors'] as $input => $types ) {
+			$types = array_filter( $types );
+			if ( !count( $types ) ) {
+				unset( $this->strings[3]['form_errors'][$input] );
+			}
+		}
+
+		// Check for errors and build error messages
+		if ( count( $this->strings[3]['form_errors'] ) ) {
+
+			$this->step_status[3] = 'incomplete';
+			$this->strings[3]['messages']['error'][] = __( 'Your site settings have not been processed due to errors with the items marked below.' );
+
+			foreach ( $this->strings[3]['form_errors'] as $input => $types ) {
+				$errors = array();
+
+				foreach ( $types as $type ) {
+					switch ( $type ) {
+						case 'empty':
+							// Only return this error when empty
+							$errors = array( __( '&bull; This value is required to continue.' ) );
+							break(2);
+						case 'urlparse':
+							$errors[] = __( '&bull; This does not appear to be a valid URL.' );
+							break;
+						case 'urlscheme':
+							$errors[] = __( '&bull; The URL must begin with "http" or "https".' );
+							break;
+						case 'urlhost':
+							$errors[] = __( '&bull; The URL does not contain a host name.' );
+							break;
+						case 'userlogin':
+							$errors[] = __( '&bull; Contains disallowed characters which have been removed.' );
+							break;
+						case 'email':
+							$errors[] = __( '&bull; The user email address appears to be invalid.' );
+							break;
+					}
+				}
+
+				$this->strings[3]['form_errors'][$input] = $errors;
+			}
+
+			return 'incomplete';
+		}
+
+		// Stop here if we are going backwards
+		if ( $_POST['back_3_1'] ) {
+			$this->step_status[3] = 'incomplete';
+			return 'incomplete';
+		}
+
+		// If we make it this far we are good to go
+		$this->step_status[3] = 'complete';
+		$this->strings[3]['messages']['message'][] = __( 'Your site settings have been saved and we are now ready to complete the installation. So what are you waiting for?' );
+		return 'complete';
+	}
+
+	/**
+	 * Finalises the installation by creating the database and writing all the supplied data to the database.
+	 *
+	 * @return void
+	 **/
+	function process_form_finalise_installation()
+	{
+		require_once( BB_PATH . 'bb-admin/includes/functions.bb-upgrade.php' );
+		require_once( BB_PATH . 'bb-admin/includes/functions.bb-admin.php' );
+
+		$this->inject_form_values_into_data( 2 );
+		$this->inject_form_values_into_data( 3 );
+
+		$data2 =& $this->data[2]['form'];
+		$data3 =& $this->data[3]['form'];
+		$data4 =& $this->data[4]['form'];
+
+		$error_log = array();
+		$installation_log = array();
+
+		// Check the referer
+		bb_check_admin_referer( 'bbpress-installer' );
+		$installation_log[] = __( 'Referrer is OK, beginning installation&hellip;' );
+
+		global $bbdb;
+
+		// Setup user table variables and constants if available
+		if ( $data2['toggle_2_2']['value'] ) {
+
+			$installation_log[] = '>>> ' . __( 'Setting up custom user table constants' );
+
+			global $bb;
+			global $bb_table_prefix;
+
+			if ( !empty( $data2['wp_table_prefix']['value'] ) ) {
+				$bb->wp_table_prefix = $data2['wp_table_prefix']['value'];
+			}
+			if ( !empty( $data2['user_bbdb_name']['value'] ) ) {
+				$bb->user_bbdb_name = $data2['user_bbdb_name']['value'];
+			}
+			if ( !empty( $data2['user_bbdb_user']['value'] ) ) {
+				$bb->user_bbdb_user = $data2['user_bbdb_user']['value'];
+			}
+			if ( !empty( $data2['user_bbdb_password']['value'] ) ) {
+				$bb->user_bbdb_password = $data2['user_bbdb_password']['value'];
+			}
+			if ( !empty( $data2['user_bbdb_host']['value'] ) ) {
+				$bb->user_bbdb_host = $data2['user_bbdb_host']['value'];
+			}
+			if ( !empty( $data2['user_bbdb_charset']['value'] ) ) {
+				$bb->user_bbdb_charset = preg_replace( '/[^a-z0-9_-]/i', '', $data2['user_bbdb_charset']['value'] );
+			}
+			if ( !empty( $data2['user_bbdb_collate']['value'] ) ) {
+				$bb->user_bbdb_collate = preg_replace( '/[^a-z0-9_-]/i', '', $data2['user_bbdb_collate']['value'] );
+			}
+
+			bb_set_custom_user_tables();
+
+			// Add custom user database if required
+			if ( isset( $bb->custom_databases['user'] ) ) {
+				$bbdb->add_db_server( 'user', $bb->custom_databases['user'] );
+			}
+
+			// Add custom tables if required
+			if ( isset( $bb->custom_tables ) ) {
+				$bbdb->tables = array_merge( $bbdb->tables, $bb->custom_tables );
+				if ( is_wp_error( $bbdb->set_prefix( $bb_table_prefix ) ) )
+					die( __( 'Your user table prefix may only contain letters, numbers and underscores.' ) );
+			}
+		}
+
+		// Create the database
+		$installation_log[] = "\n" . __( 'Step 1 - Creating database tables' );
+
+		if ( !$this->database_tables_are_installed() ) {
+			// Hide db errors
+			$bbdb->hide_errors();
+			// Install the database
+			$alterations = bb_install();
+			// Show db errors
+			$bbdb->show_errors();
+
+			if ( isset( $alterations['errors'] ) && is_array( $alterations['errors'] ) ) {
+				$error_log = array_merge( $error_log, $alterations['errors'] );
+			}
+			if ( isset( $alterations['messages'] ) && is_array( $alterations['messages'] ) ) {
+				$installation_log = array_merge( $installation_log, $alterations['messages'] );
+			}
+
+			if ( !$this->database_tables_are_installed() ) {
+				$installation_log[] = '>>> ' . __( 'Database installation failed!!!' );
+				$installation_log[] = '>>>>>> ' . __( 'Halting installation!' );
+				$error_log[] = __( 'Database installation failed!!!' );
+
+				$this->step_status[4] = 'incomplete';
+				$this->strings[4]['h2'] = __( 'Installation failed!' );
+				$this->strings[4]['messages']['error'][] = __( 'The database failed to install. You may need to replace bbPress with a fresh copy and start again.' );
+
+				$data4['installation_log']['value'] = join( "\n", $installation_log );
+				$data4['error_log']['value'] = join( "\n", $error_log );
+
+				return 'incomplete';
+			}
+		} else {
+			$installation_log[] = '>>> ' . __( 'Database is already installed!!!' );
+		}
+
+		// Integration settings passed from step 2
+		// These are already validated provided that the referer checks out
+		$installation_log[] = "\n" . __( 'Step 2 - WordPress integration (optional)' );
+		if ( $data2['toggle_2_0']['value'] ) {
+			if ( $data2['toggle_2_1']['value'] ) {
+				bb_update_option( 'wp_siteurl', $data2['wp_siteurl']['value'] );
+				$installation_log[] = '>>> ' . __( 'WordPress address (URL):' ) . ' ' . $data2['wp_siteurl']['value'];
+
+				bb_update_option( 'wp_home', $data2['wp_home']['value'] );
+				$installation_log[] = '>>> ' . __( 'Blog address (URL):' ) . ' ' . $data2['wp_home']['value'];
+
+				$config_result = $this->write_lines_to_file(
+					BB_PATH . 'bb-config.php',
+					false,
+					array(
+						"define( 'BB_AUTH_KEY"  => array( "'" . BB_AUTH_KEY . "'",        "'" . $data2['wp_auth_key']['value'] . "'" ),
+						"define( 'BB_SECURE_A"  => array( "'" . BB_SECURE_AUTH_KEY . "'", "'" . $data2['wp_secure_auth_key']['value'] . "'" ),
+						"define( 'BB_LOGGED_I"  => array( "'" . BB_LOGGED_IN_KEY . "'",   "'" . $data2['wp_logged_in_key']['value'] . "'" ),
+					)
+				);
+
+				switch ( $config_result ) {
+					case 1:
+						$installation_log[] = '>>> ' . __( 'WordPress cookie keys set.' );
+						break;
+					default:
+						$error_log[] = '>>> ' . __( 'WordPress cookie keys not set.' );
+						$error_log[] = '>>>>>> ' . __( 'Your "bb-config.php" file was not writable.' );
+						$error_log[] = '>>>>>> ' . __( 'You will need to manually re-define "BB_AUTH_KEY", "BB_SECURE_AUTH_KEY" and "BB_LOGGED_IN_KEY" in your "bb-config.php" file.' );
+						$installation_log[] = '>>> ' . __( 'WordPress cookie keys not set.' );
+						break;
+				}
+
+				if ( !empty( $data2['wp_auth_salt']['value'] ) ) {
+					bb_update_option( 'bb_auth_salt', $data2['wp_auth_salt']['value'] );
+					$installation_log[] = '>>> ' . __( 'WordPress "auth" cookie salt set from input.' );
+				}
+
+				if ( !empty( $data2['wp_secure_auth_salt']['value'] ) ) {
+					bb_update_option( 'bb_secure_auth_salt', $data2['wp_secure_auth_salt']['value'] );
+					$installation_log[] = '>>> ' . __( 'WordPress "secure auth" cookie salt set from input.' );
+				}
+
+				if ( !empty( $data2['wp_logged_in_salt']['value'] ) ) {
+					bb_update_option( 'bb_logged_in_salt', $data2['wp_logged_in_salt']['value'] );
+					$installation_log[] = '>>> ' . __( 'WordPress "logged in" cookie salt set from input.' );
+				}
+			}
+
+			if ( $data2['toggle_2_2']['value'] ) {
+				if (
+					!bb_get_option( 'bb_auth_salt' ) ||
+					!bb_get_option( 'bb_secure_auth_salt' ) ||
+					!bb_get_option( 'bb_logged_in_salt' )
+				) {
+					$installation_log[] = '>>> ' . __( 'Fetching missing WordPress cookie salts.' );
+
+					$_prefix = $bb->wp_table_prefix;
+					if ( !empty( $data2['wordpress_mu_primary_blog_id']['value'] ) ) {
+						$_prefix .= $data2['wordpress_mu_primary_blog_id']['value'] . '_';
+					}
+
+					if ( isset( $bb->custom_databases['user'] ) ) {
+						$bbdb->tables['options'] = array( 'user', $_prefix . 'options' );
+					} else {
+						$bbdb->tables['options'] = $_prefix . 'options';
+					}
+
+					unset( $_prefix );
+
+					$bbdb->set_prefix( $bb_table_prefix );
+
+					if ( !bb_get_option( 'bb_auth_salt' ) ) {
+						$wp_auth_salt = $bbdb->get_var( "SELECT `option_value` FROM $bbdb->options WHERE `option_name` = 'auth_salt' LIMIT 1" );
+						if ( $wp_auth_salt ) {
+							bb_update_option( 'bb_auth_salt', $wp_auth_salt );
+							$installation_log[] = '>>>>>> ' . __( 'WordPress "auth" cookie salt set.' );
+						} else {
+							$error_log[] = '>>> ' . __( 'WordPress "auth" cookie salt not set.' );
+							$error_log[] = '>>>>>> ' . __( 'Could not fetch "auth" cookie salt from the WordPress options table.' );
+							$error_log[] = '>>>>>> ' . __( 'You will need to manually define the "auth" cookie salt in your database.' );
+							$installation_log[] = '>>>>>> ' . __( 'WordPress "auth" cookie salt not set.' );
+						}
+					}
+
+					if ( !bb_get_option( 'bb_secure_auth_salt' ) ) {
+						$wp_secure_auth_salt = $bbdb->get_var( "SELECT `option_value` FROM $bbdb->options WHERE `option_name` = 'secure_auth_salt' LIMIT 1" );
+						if ( $wp_secure_auth_salt ) {
+							bb_update_option( 'bb_secure_auth_salt', $wp_secure_auth_salt );
+							$installation_log[] = '>>>>>> ' . __( 'WordPress "secure auth" cookie salt set.' );
+						} else {
+							// This cookie salt is sometimes empty so don't error
+							$installation_log[] = '>>>>>> ' . __( 'WordPress "secure auth" cookie salt not set.' );
+						}
+					}
+
+					if ( !bb_get_option( 'bb_logged_in_salt' ) ) {
+						$wp_logged_in_salt = $bbdb->get_var( "SELECT `option_value` FROM $bbdb->options WHERE `option_name` = 'logged_in_salt' LIMIT 1" );
+						if ( $wp_logged_in_salt ) {
+							bb_update_option( 'bb_logged_in_salt', $wp_logged_in_salt );
+							$installation_log[] = '>>>>>> ' . __( 'WordPress "logged in" cookie salt set.' );
+						} else {
+							$error_log[] = '>>> ' . __( 'WordPress "logged in" cookie salt not set.' );
+							$error_log[] = '>>>>>> ' . __( 'Could not fetch "logged in" cookie salt from the WordPress options table.' );
+							$error_log[] = '>>>>>> ' . __( 'You will need to manually define the "logged in" cookie salt in your database.' );
+							$installation_log[] = '>>>>>> ' . __( 'WordPress "logged in" cookie salt not set.' );
+						}
+					}
+				}
+
+				if ( !empty( $data2['wp_table_prefix']['value'] ) ) {
+					bb_update_option( 'wp_table_prefix', $data2['wp_table_prefix']['value'] );
+					$installation_log[] = '>>> ' . __( 'User database table prefix:' ) . ' ' . $data2['wp_table_prefix']['value'];
+				}
+
+				if ( !empty( $data2['wordpress_mu_primary_blog_id']['value'] ) ) {
+					bb_update_option( 'wordpress_mu_primary_blog_id', $data2['wordpress_mu_primary_blog_id']['value'] );
+					$installation_log[] = '>>> ' . __( 'WordPress MU primary blog ID:' ) . ' ' . $data2['wordpress_mu_primary_blog_id']['value'];
+				}
+
+				if ( $data2['toggle_2_3']['value'] ) {
+					if ( !empty( $data2['user_bbdb_name']['value'] ) ) {
+						bb_update_option( 'user_bbdb_name', $data2['user_bbdb_name']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database name:' ) . ' ' . $data2['user_bbdb_name']['value'];
+					}
+					if ( !empty( $data2['user_bbdb_user']['value'] ) ) {
+						bb_update_option( 'user_bbdb_user', $data2['user_bbdb_user']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database user:' ) . ' ' . $data2['user_bbdb_user']['value'];
+					}
+					if ( !empty( $data2['user_bbdb_password']['value'] ) ) {
+						bb_update_option( 'user_bbdb_password', $data2['user_bbdb_password']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database password:' ) . ' ' . $data2['user_bbdb_password']['value'];
+					}
+					if ( !empty( $data2['user_bbdb_host']['value'] ) ) {
+						bb_update_option( 'user_bbdb_host', $data2['user_bbdb_host']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database host:' ) . ' ' . $data2['user_bbdb_host']['value'];
+					}
+					if ( !empty( $data2['user_bbdb_charset']['value'] ) ) {
+						bb_update_option( 'user_bbdb_charset', $data2['user_bbdb_charset']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database character set:' ) . ' ' . $data2['user_bbdb_charset']['value'];
+					}
+					if ( !empty( $data2['user_bbdb_collate']['value'] ) ) {
+						bb_update_option( 'user_bbdb_collate', $data2['user_bbdb_collate']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database collation:' ) . ' ' . $data2['user_bbdb_collate']['value'];
+					}
+					if ( !empty( $data2['custom_user_table']['value'] ) ) {
+						bb_update_option( 'custom_user_table', $data2['custom_user_table']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database "user" table:' ) . ' ' . $data2['custom_user_table']['value'];
+					}
+					if ( !empty( $data2['custom_user_meta_table']['value'] ) ) {
+						bb_update_option( 'custom_user_meta_table', $data2['custom_user_meta_table']['value'] );
+						$installation_log[] = '>>> ' . __( 'User database "user meta" table:' ) . ' ' . $data2['custom_user_meta_table']['value'];
+					}
+				}
+			}
+		} else {
+			$installation_log[] = '>>> ' . __( 'Integration not enabled' );
+		}
+
+		// Site settings passed from step 3
+		// These are already validated provided that the referer checks out
+		$installation_log[] = "\n" . __( 'Step 3 - Site settings' );
+		bb_update_option( 'name', $data3['name']['value'] );
+		$installation_log[] = '>>> ' . __( 'Site name:' ) . ' ' . $data3['name']['value'];
+		bb_update_option( 'uri', $data3['uri']['value'] );
+		$installation_log[] = '>>> ' . __( 'Site address (URL):' ) . ' ' . $data3['uri']['value'];
+		bb_update_option( 'from_email', $data3['keymaster_user_email']['value'] );
+		$installation_log[] = '>>> ' . __( 'From email address:' ) . ' ' . $data3['keymaster_user_email']['value'];
+
+		// Create the key master
+		$keymaster_created = false;
+
+		switch ( $data3['keymaster_user_type']['value'] ) {
+			case 'new':
+
+				// Check to see if the user login already exists
+				if ( $keymaster_user = bb_get_user( $data3['keymaster_user_login']['value'], array( 'by' => 'login' ) ) ) {
+					// The keymaster is an existing bbPress user
+					$installation_log[] = '>>> ' . __( 'Key master could not be created!' );
+					$installation_log[] = '>>>>>> ' . __( 'That login is already taken!' );
+					$error_log[] = __( 'Key master could not be created!' );
+
+					if ( $keymaster_user->bb_capabilities['keymaster'] ) {
+						// The existing user is a key master - continue
+						$bb_current_user = bb_set_current_user( $keymaster_user->ID );
+						$installation_log[] = '>>>>>> ' . __( 'Existing key master entered!' );
+						$data4['keymaster_user_password']['value'] = __( 'Your bbPress password' );
+						$data3['keymaster_user_email']['value'] = $keymaster_user->user_email;
+						bb_update_option( 'from_email', $keymaster_user->user_email);
+						$installation_log[] = '>>>>>> ' . __( 'Re-setting admin email address.' );
+						$keymaster_created = true;
+					} else {
+						// The existing user is a non-key master user - halt installation
+						$installation_log[] = '>>>>>> ' . __( 'Existing user without key master role entered!' );
+						$installation_log[] = '>>>>>>>>> ' . __( 'Halting installation!' );
+						$this->step_status[4] = 'incomplete';
+						$this->strings[4]['h2'] = __( 'Installation failed!' );
+						$this->strings[4]['messages']['error'][] = __( 'The key master could not be created. An existing user was found with that user login.' );
+
+						$data4['installation_log']['value'] = join( "\n", $installation_log );
+						$data4['error_log']['value'] = join( "\n", $error_log );
+
+						return 'incomplete';
+					}
+
+					break;
+				}
+
+				// Helper function to let us know the password that was created
+				global $keymaster_password;
+				function bb_get_keymaster_password( $user_id, $pass ) {
+					global $keymaster_password;
+					$keymaster_password = $pass;
+				}
+				add_action( 'bb_new_user', 'bb_get_keymaster_password', 10, 2 );
+
+				// Create the new user (automattically given key master role when BB_INSTALLING is true)
+				if ( $keymaster_user_id = bb_new_user( $data3['keymaster_user_login']['value'], $data3['keymaster_user_email']['value'], '' ) ) {
+					$bb_current_user = bb_set_current_user( $keymaster_user_id );
+					$data4['keymaster_user_password']['value'] = $keymaster_password;
+					$installation_log[] = '>>> ' . __( 'Key master created' );
+					$installation_log[] = '>>>>>> ' . __( 'Username:' ) . ' ' . $data3['keymaster_user_login']['value'];
+					$installation_log[] = '>>>>>> ' . __( 'Email address:' ) . ' ' . $data3['keymaster_user_email']['value'];
+					$installation_log[] = '>>>>>> ' . __( 'Password:' ) . ' ' . $data4['keymaster_user_password']['value'];
+					$keymaster_created = true;
+				} else {
+					$installation_log[] = '>>> ' . __( 'Key master could not be created!' );
+					$installation_log[] = '>>>>>> ' . __( 'Halting installation!' );
+					$error_log[] = __( 'Key master could not be created!' );
+					$this->step_status[4] = 'incomplete';
+					$this->strings[4]['h2'] = __( 'Installation failed!' );
+					$this->strings[4]['messages']['error'][] = __( 'The key master could not be created. You may need to replace bbPress with a fresh copy and start again.' );
+
+					$data4['installation_log']['value'] = join( "\n", $installation_log );
+					$data4['error_log']['value'] = join( "\n", $error_log );
+
+					return 'incomplete';
+				}
+				break;
+
+			case 'old':
+				if ( $keymaster_user = bb_get_user( $data3['keymaster_user_login']['value'], array( 'by' => 'login' ) ) ) {
+					// The keymaster is an existing bbPress or WordPress user
+					$bb_current_user = bb_set_current_user( $keymaster_user->ID );
+					$bb_current_user->set_role( 'keymaster' );
+					$data4['keymaster_user_password']['value'] = __( 'Your existing password' );
+					$installation_log[] = '>>> ' . __( 'Key master role assigned to existing user' );
+					$installation_log[] = '>>>>>> ' . __( 'Username:' ) . ' ' . $data3['keymaster_user_login']['value'];
+					$installation_log[] = '>>>>>> ' . __( 'Email address:' ) . ' ' . $data3['keymaster_user_email']['value'];
+					$installation_log[] = '>>>>>> ' . __( 'Password:' ) . ' ' . $data4['keymaster_user_password']['value'];
+					$keymaster_created = true;
+				} else {
+					$installation_log[] = '>>> ' . __( 'Key master role could not be assigned to existing user!' );
+					$installation_log[] = '>>>>>> ' . __( 'Halting installation!' );
+					$error_log[] = __( 'Key master could not be created!' );
+					$this->step_status[4] = 'incomplete';
+					$this->strings[4]['h2'] = __( 'Installation failed!' );
+					$this->strings[4]['messages']['error'][] = __( 'The key master could not be assigned. You may need to replace bbPress with a fresh copy and start again.' );
+
+					$data4['installation_log']['value'] = join( "\n", $installation_log );
+					$data4['error_log']['value'] = join( "\n", $error_log );
+
+					return 'incomplete';
+				}
+				break;
+		}
+
+		// Don't create an initial forum if any forums already exist
+		if (!$bbdb->get_results( 'SELECT `forum_id` FROM `' . $bbdb->forums . '` LIMIT 1;' ) ) {
+			if ( $this->language != BB_LANG) {
+				global $locale, $l10n;
+				$locale = BB_LANG;
+				unset( $l10n['default'] );
+				bb_load_default_textdomain();
+			}
+
+			$description = __( 'Just another bbPress community' );
+			bb_update_option( 'description', $description);
+
+			if ( $this->language != BB_LANG) {
+				$locale = $this->language;
+				unset( $l10n['default'] );
+				bb_load_default_textdomain();
+			}
+
+			$installation_log[] = '>>> ' . __( 'Description:' ) . ' ' . $description;
+
+			if ( $forum_id = bb_new_forum( array( 'forum_name' => $data3['forum_name']['value'] ) ) ) {
+				$installation_log[] = '>>> ' . __( 'Forum name:' ) . ' ' . $data3['forum_name']['value'];
+
+				if ( $this->language != BB_LANG) {
+					$locale = BB_LANG;
+					unset( $l10n['default'] );
+					bb_load_default_textdomain();
+				}
+
+				$topic_title = __( 'Your first topic' );
+				$topic_id = bb_insert_topic(
+					array(
+						'topic_title' => $topic_title,
+						'forum_id' => $forum_id,
+						'tags' => 'bbPress'
+					)
+				);
+				$post_text = __( 'First Post!  w00t.' );
+				bb_insert_post(
+					array(
+						'topic_id' => $topic_id,
+						'post_text' => $post_text
+					)
+				);
+
+				if ( $this->language != BB_LANG ) {
+					$locale = $this->language;
+					unset( $l10n['default'] );
+					bb_load_default_textdomain();
+				}
+
+				$installation_log[] = '>>>>>> ' . __( 'Topic:' ) . ' ' . $topic_title;
+				$installation_log[] = '>>>>>>>>> ' . __( 'Post:' ) . ' ' . $post_text;
+			} else {
+				$installation_log[] = '>>> ' . __( 'Forum could not be created!' );
+				$error_log[] = __( 'Forum could not be created!' );
+			}
+		} else {
+			$installation_log[] = '>>> ' . __( 'There are existing forums in this database.' );
+			$installation_log[] = '>>>>>> ' . __( 'No new forum created.' );
+			$error_log[] = __( 'Forums already exist!' );
+		}
+
+		if ( defined( 'BB_PLUGIN_DIR' ) && BB_PLUGIN_DIR && !file_exists( BB_PLUGIN_DIR ) ) {
+			// Just suppress errors as this is not critical
+			if ( @mkdir( BB_PLUGIN_DIR, 0755 ) ) {
+				$installation_log[] = '>>> ' . sprintf( __( 'Making plugin directory at %s.' ),  BB_PLUGIN_DIR );
+			}
+		}
+
+		if ( defined( 'BB_THEME_DIR' ) && BB_THEME_DIR && !file_exists( BB_THEME_DIR ) ) {
+			// Just suppress errors as this is not critical
+			if ( @mkdir( BB_THEME_DIR, 0755 ) ) {
+				$installation_log[] = '>>> ' . sprintf( __( 'Making theme directory at %s.' ),  BB_THEME_DIR );
+			}
+		}
+
+		if ( $keymaster_created ) {
+			$keymaster_email_message = sprintf(
+				__( "Your new bbPress site has been successfully set up at:\n\n%1\$s\n\nYou can log in to the key master account with the following information:\n\nUsername: %2\$s\nPassword: %3\$s\n\nWe hope you enjoy your new forums. Thanks!\n\n--The bbPress Team\nhttp://bbpress.org/" ),
+				bb_get_uri( null, null, BB_URI_CONTEXT_TEXT ),
+				$data3['keymaster_user_login']['value'],
+				$data4['keymaster_user_password']['value']
+			);
+
+			if ( bb_mail( $data3['keymaster_user_email']['value'], __( 'New bbPress installation' ), $keymaster_email_message ) ) {
+				$installation_log[] = '>>> ' . __( 'Key master email sent' );
+			} else {
+				$installation_log[] = '>>> ' . __( 'Key master email not sent!' );
+				$error_log[] = __( 'Key master email not sent!' );
+			}
+		}
+
+		if ( count( $error_log ) ) {
+			$this->strings[4]['h2'] = __( 'Installation completed with some errors!' );
+			$this->strings[4]['messages']['error'][] = __( 'Your installation completed with some minor errors. See the error log below for more specific information.' );
+			$installation_log[] = "\n" . __( 'There were some errors encountered during installation!' );
+		} else {
+			$this->strings[4]['messages']['message'][] = __( 'Your installation completed successfully.' );
+			$installation_log[] = "\n" . __( 'Installation complete!' );
+		}
+
+		$this->step_status[4] = 'complete';
+
+		$data4['installation_log']['value'] = join( "\n", $installation_log );
+		$data4['error_log']['value'] = join( "\n", $error_log );
+
+		return 'complete';
+	}
+
+	/**
+	 * Prints a text input form element.
+	 *
+	 * @param $key string The key of the data to populate the element with.
+	 * @param $direction string Optional. The text direction, only 'ltr' or 'rtl' are acceptable.
+	 * @return void
+	 **/
+	function input_text( $key, $direction = false )
+	{
+		$data = $this->data[$this->step]['form'][$key];
+
+		$class = '';
+		$classes = array();
+		if ( isset( $data['note'] ) ) {
+			$classes[] = 'has-note';
+		}
+		if ( isset( $data['label'] ) ) {
+			$classes[] = 'has-label';
+		}
+
+		if ( isset( $this->data[$this->step]['form'][$key]['type'] ) ) {
+			$type = $this->data[$this->step]['form'][$key]['type'];
+		} else {
+			$type = 'text';
+		}
+		$classes[] = 'for-input-' . $type;
+
+		if ( isset( $this->strings[$this->step]['form_errors'][$key] ) ) {
+			$classes[] = 'error';
+		}
+		if ( count( $classes ) ) {
+			$class = ' class="' . join( ' ', $classes ) . '"';
+		}
+
+		$r = "\t" . '<label id="label-' . esc_attr( $key ) . '" for="' . esc_attr( $key ) . '"' . $class . '>' . "\n";
+
+		if ( isset( $data['label'] ) ) {
+			$r .= "\t\t" . '<span>' . $data['label'] . '</span>' . "\n";
+		}
+
+		if ( isset( $this->strings[$this->step]['form_errors'][$key] ) ) {
+			foreach ( $this->strings[$this->step]['form_errors'][$key] as $error ) {
+				if ( !is_bool( $error ) ) {
+					$r .= "\t\t" . '<span class="error">' . $error . '</span>' . "\n";
+				}
+			}
+		}
+
+		if ( isset( $data['maxlength'] ) && is_integer( $data['maxlength'] ) ) {
+			$maxlength = ' maxlength="' . esc_attr( $data['maxlength'] ) . '"';
+		}
+
+		if ( $direction && in_array( strtolower( $direction ), array( 'ltr', 'rtl' ) ) ) {
+			$direction = ' dir="' . esc_attr( strtolower( $direction ) ) . '"';
+		}
+
+		if ( isset( $data['autocomplete'] ) ) {
+			$autocomplete = ' autocomplete="' . esc_attr( $data['autocomplete'] ) . '"';
+		} else {
+			$autocomplete = '';
+		}
+
+		$this->tabindex++;
+		$r .= "\t\t" . '<input' . $direction . ' type="' . esc_attr( $type ) . '" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" class="text' . $has_note_class . '" value="' . esc_attr( $data['value'] ) . '"' . $maxlength . $autocomplete . ' tabindex="' . $this->tabindex . '" />' . "\n";
+
+		if ( isset( $data['note'] ) ) {
+			$r .= "\t\t" . '<a class="note-toggle" href="javascript:void(0);" onclick="toggleNote(\'note-' . esc_attr( $key ) . '\');">?</a>' . "\n";
+			$r .= "\t\t" . '<p id="note-' . esc_attr( $key ) . '" class="note" style="display:none">' . $data['note'] . '</p>' . "\n";
+		}
+
+		$r .= "\t\t" . '<div class="clear"></div>' . "\n";
+		$r .= "\t" . '</label>' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Prints a hidden input form element.
+	 *
+	 * @param $key string The key of the data to populate the element with.
+	 * @return void
+	 **/
+	function input_hidden( $key )
+	{
+		$r = "\t" . '<input type="hidden" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" value="' . esc_attr( $this->data[$this->step]['form'][$key]['value'] ) . '" />' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Prints a textarea form element.
+	 *
+	 * @param $key string The key of the data to populate the element with.
+	 * @param $direction string Optional. The text direction, only 'ltr' or 'rtl' are acceptable.
+	 * @return void
+	 **/
+	function textarea( $key, $direction = false)
+	{
+		$data = $this->data[$this->step]['form'][$key];
+
+		$class = '';
+		$classes = array( 'for-textarea' );
+		if ( isset( $data['note'] ) ) {
+			$classes[] = 'has-note';
+		}
+		if ( isset( $data['label'] ) ) {
+			$classes[] = 'has-label';
+		}
+		if ( count( $classes ) ) {
+			$class = ' class="' . join( ' ', $classes ) . '"';
+		}
+
+		$r = "\t" . '<label id="label-' . esc_attr( $key ) . '"' . $class . ' for="' . esc_attr( $key ) . '">' . "\n";
+
+		if ( isset( $data['label'] ) ) {
+			$r .= "\t\t" . '<span>' . $data['label'] . '</span>' . "\n";
+		}
+
+		if ( isset( $data['note'] ) ) {
+			$r .= "\t\t" . '<a class="note-toggle" href="javascript:void(0);" onclick="toggleNote(\'note-' . esc_attr( $key ) . '\');">?</a>' . "\n";
+			$r .= "\t\t" . '<p id="note-' . esc_attr( $key ) . '" class="note" style="display:none">' . $data['note'] . '</p>' . "\n";
+		}
+
+		if ( $direction && in_array( strtolower( $direction ), array( 'ltr', 'rtl' ) ) ) {
+			$direction = ' dir="' . esc_attr( strtolower( $direction ) ) . '"';
+		}
+
+		$this->tabindex++;
+		$r .= "\t\t" . '<textarea id="' . esc_attr( $key ) . '" rows="5" cols="30"' . $direction . ' tabindex="' . $this->tabindex . '">' . esc_html( $data['value'] ) . '</textarea>' . "\n";
+
+		$r .= "\t" . '</label>' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Prints a select form element populated with options.
+	 *
+	 * @param $key string The key of the data to populate the element with.
+	 * @return void
+	 **/
+	function select( $key )
+	{
+		$data = $this->data[$this->step]['form'][$key];
+
+		$class = '';
+		$classes = array( 'for-select' );
+		if ( isset( $data['note'] ) ) {
+			$classes[] = 'has-note';
+		}
+		if ( isset( $data['label'] ) ) {
+			$classes[] = 'has-label';
+		}
+		if ( count( $classes ) ) {
+			$class = ' class="' . join( ' ', $classes ) . '"';
+		}
+
+		$r = "\t" . '<label id="label-' . esc_attr( $key ) . '"' . $class . ' for="' . esc_attr( $key ) . '">' . "\n";
+
+		if ( isset( $data['label'] ) ) {
+			$r .= "\t\t" . '<span>' . $data['label'] . '</span>' . "\n";
+		}
+
+		if ( isset( $data['options'] ) ) {
+			$r .= "\t\t" . '<select id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '"';
+			if ( isset( $data['onchange'] ) ) {
+				$r .= ' onchange="' . esc_attr( $data['onchange'] ) . '"';
+			}
+			$this->tabindex++;
+			$r .= ' tabindex="' . $this->tabindex . '">' . "\n";
+
+			foreach ( $data['options'] as $value => $display ) {
+				if ( $data['value'] == $value ) {
+					$selected = ' selected="selected"';
+				} else {
+					$selected = '';
+				}
+
+				$r .= "\t\t\t" . '<option value="' . esc_attr( $value ) . '"' . $selected . '>' . esc_html( $display ) . '</option>' . "\n";
+			}
+
+			$r .= "\t\t" . '</select>';
+		}
+
+		if ( isset( $data['note'] ) ) {
+			$r .= "\t\t" . '<a class="note-toggle" href="javascript:void(0);" onclick="toggleNote(\'note-' . esc_attr( $key ) . '\');">?</a>' . "\n";
+			$r .= "\t\t" . '<p id="note-' . esc_attr( $key ) . '" class="note" style="display:none">' . $data['note'] . '</p>' . "\n";
+		}
+
+		$r .= "\t\t" . '<div class="clear"></div>' . "\n";
+		$r .= "\t" . '</label>' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Prints an appropriate language selection form element if there are any available.
+	 *
+	 * @return void
+	 **/
+	function select_language()
+	{
+		if ( count( $this->languages ) > 1 ) {
+			$this->data[1]['form']['bb_lang']['value'] = $this->language;
+			$this->data[1]['form']['bb_lang']['options'] = $this->languages;
+			$this->select( 'bb_lang' );
+		} else {
+			$this->data[1]['form']['bb_lang']['value'] = 'en_US';
+			$this->input_hidden( 'bb_lang' );
+		}
+	}
+
+	/**
+	 * Prints an input checkbox which controls display of an optional section of settings.
+	 *
+	 * @param string $key The identifier of the area to be toggled.
+	 * @return void
+	 **/
+	function input_toggle( $key )
+	{
+		$data = $this->data[$this->step]['form'][$key];
+
+		$class = '';
+		$classes = array( 'for-toggle' );
+		if ( isset( $data['note'] ) ) {
+			$classes[] = 'has-note';
+		}
+		if ( isset( $data['label'] ) ) {
+			$classes[] = 'has-label';
+		}
+
+		$onclick = 'toggleBlock(this, \'' . esc_js( $key . '_target' ) . '\' );';
+		if ( isset( $data['toggle_value'] ) ) {
+			$onclick .= ' toggleValue(this, \'' . esc_js( $data['toggle_value']['target'] ) . '\', \'' . esc_js( $data['toggle_value']['off_value'] ) . '\', \'' . esc_js( $data['toggle_value']['on_value'] ) . '\' );';
+		}
+
+		$checked = $data['checked'] ? ' ' . trim( $data['checked'] ) : '';
+
+		if ( isset( $this->strings[$this->step]['form_errors'][$key] ) ) {
+			$classes[] = 'error';
+		}
+		if ( count( $classes ) ) {
+			$class = ' class="' . join( ' ', $classes ) . '"';
+		}
+
+		$r = "\t" . '<label id="label-' . esc_attr( $key ) . '"' . $class . ' for="' . esc_attr( $key ) . '">' . "\n";
+
+		$r .= "\t\t" . '<span>' . "\n";
+		$this->tabindex++;
+		$r .= "\t\t\t" . '<input type="checkbox" id="' . esc_attr( $key ) . '" name="' . esc_attr( $key ) . '" class="checkbox" onclick="' . esc_attr( $onclick ) . '"' . $checked . ' value="1" tabindex="' . $this->tabindex . '" />' . "\n";
+		if ( isset( $data['label'] ) ) {
+			$r .= "\t\t\t" . $data['label'] . "\n";
+		}
+		$r .= "\t\t" . '</span>' . "\n";
+
+		if ( isset( $data['note'] ) ) {
+			$r .= "\t\t" . '<a class="note-toggle" href="javascript:void(0);" onclick="toggleNote(\'note-' . esc_attr( $key ) . '\');">?</a>' . "\n";
+			$r .= "\t\t" . '<p id="note-' . esc_attr( $key ) . '" class="note" style="display:none">' . $data['note'] . '</p>' . "\n";
+		}
+
+		$r .= "\t\t" . '<div class="clear"></div>' . "\n";
+		$r .= "\t" . '</label>' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Prints the input buttons which post each step and optionally go back a step.
+	 *
+	 * @param string $forward The HTML element ID of the forward button.
+	 * @param string $back Optional. The HTML element ID of the back button.
+	 * @return void
+	 **/
+	function input_buttons( $forward, $back = false, $step = false )
+	{
+		$data_back = $back ? $this->data[$this->step]['form'][$back] : false;
+		$data_forward = $this->data[$this->step]['form'][$forward];
+
+		$r = '<fieldset class="buttons">' . "\n";
+
+		if ( !$step ) {
+			$step = $this->step;
+		}
+		$r .= "\t" . '<input type="hidden" id="step" name="step" value="' . (int) $step . '" />' . "\n";
+
+		if ( $back) {
+			$r .= "\t" . '<label id="label-' . esc_attr( $back ) . '" for="' . esc_attr( $back ) . '" class="back">' . "\n";
+			$this->tabindex++;
+			$r .= "\t\t" . '<input type="submit" id="' . esc_attr( $back ) . '" name="' . esc_attr( $back ) . '" class="button" value="' . esc_attr( $data_back['value'] ) . '" tabindex="' . $this->tabindex . '" />' . "\n";
+			$r .= "\t" . '</label>' . "\n";
+		}
+
+		$r .= "\t" . '<label id="label-' . esc_attr( $forward ) . '" for="' . esc_attr( $forward ) . '" class="forward">' . "\n";
+		$this->tabindex++;
+		$r .= "\t\t" . '<input type="submit" id="' . esc_attr( $forward ) . '" name="' . esc_attr( $forward ) . '" class="button" value="' . esc_attr( $data_forward['value'] ) . '" tabindex="' . $this->tabindex . '" />' . "\n";
+		$r .= "\t" . '</label>' . "\n";
+
+		$r .= '</fieldset>' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Prints hidden input elements containing the data inputted in a given step.
+	 *
+	 * @param integer $step Optional. The number of the step whose hidden inputs should be printed.
+	 * @return void
+	 **/
+	function hidden_step_inputs( $step = false )
+	{
+		if ( !$step ) {
+			$step = $this->step;
+		} elseif ( $step !== $this->step ) {
+			$this->inject_form_values_into_data( $step );
+		}
+
+		$data = $this->data[$step]['form'];
+
+		$r = '<fieldset>' . "\n";
+
+		foreach ( $data as $key => $value ) {
+			if ( 'forward_' !== substr( $key, 0, 8 ) && 'back_' !== substr( $key, 0, 5 ) ) {
+				$r .= "\t" . '<input type="hidden" name="' . esc_attr( $key ) . '" value="' . esc_attr( $value['value'] ) . '" />' . "\n";
+			}
+		}
+
+		$r .= '</fieldset>' . "\n";
+
+		echo $r;
+	}
+
+	/**
+	 * Rewrites the admin user input into a select element containing existing WordPress administrators.
+	 *
+	 * @return boolean True if the select element was created, otherwise false.
+	 **/
+	function populate_keymaster_user_login_from_user_tables()
+	{
+		$data =& $this->data[3]['form']['keymaster_user_login'];
+
+		// Get the existing WordPress admin users
+
+		// Setup variables and constants if available
+		global $bb;
+		if ( !empty( $this->data[2]['form']['wp_table_prefix']['value'] ) ) {
+			$bb->wp_table_prefix = $this->data[2]['form']['wp_table_prefix']['value'];
+		}
+		if ( !empty( $this->data[2]['form']['user_bbdb_name']['value'] ) ) {
+			$bb->user_bbdb_name = $this->data[2]['form']['user_bbdb_name']['value'];
+		}
+		if ( !empty( $this->data[2]['form']['user_bbdb_user']['value'] ) ) {
+			$bb->user_bbdb_user = $this->data[2]['form']['user_bbdb_user']['value'];
+		}
+		if ( !empty( $this->data[2]['form']['user_bbdb_password']['value'] ) ) {
+			$bb->user_bbdb_password = $this->data[2]['form']['user_bbdb_password']['value'];
+		}
+		if ( !empty( $this->data[2]['form']['user_bbdb_host']['value'] ) ) {
+			$bb->user_bbdb_host = $this->data[2]['form']['user_bbdb_host']['value'];
+		}
+		if ( !empty( $this->data[2]['form']['user_bbdb_charset']['value'] ) ) {
+			$bb->user_bbdb_charset = preg_replace( '/[^a-z0-9_-]/i', '', $this->data[2]['form']['user_bbdb_charset']['value'] );
+		}
+		if ( !empty( $this->data[2]['form']['user_bbdb_collate']['value'] ) ) {
+			$bb->user_bbdb_charset = preg_replace( '/[^a-z0-9_-]/i', '', $this->data[2]['form']['user_bbdb_collate']['value'] );
+		}
+		if ( !empty( $this->data[2]['form']['custom_user_table']['value'] ) ) {
+			$bb->custom_user_table = preg_replace( '/[^a-z0-9_-]/i', '', $this->data[2]['form']['custom_user_table']['value'] );
+		}
+		if ( !empty( $this->data[2]['form']['custom_user_meta_table']['value'] ) ) {
+			$bb->custom_user_meta_table = preg_replace( '/[^a-z0-9_-]/i', '', $this->data[2]['form']['custom_user_meta_table']['value'] );
+		}
+
+		global $bbdb;
+		global $bb_table_prefix;
+
+		// Resolve the custom user tables for bpdb
+		bb_set_custom_user_tables();
+
+		if ( isset( $bb->custom_databases ) && isset( $bb->custom_databases['user'] ) ) {
+			$bbdb->add_db_server( 'user', $bb->custom_databases['user'] );
+		}
+
+		// Add custom tables if required
+		if ( isset( $bb->custom_tables['users'] ) || isset( $bb->custom_tables['usermeta'] ) ) {
+			$bbdb->tables = array_merge( $bbdb->tables, $bb->custom_tables );
+			if ( is_wp_error( $bbdb->set_prefix( $bb_table_prefix ) ) ) {
+				die( __( 'Your user table prefix may only contain letters, numbers and underscores.' ) );
+			}
+		}
+
+		$bb_keymaster_meta_key       = $bbdb->escape( $bb_table_prefix . 'capabilities' );
+		$wp_administrator_meta_key   = $bbdb->escape( $bb->wp_table_prefix . 'capabilities' );
+		if ( !empty( $this->data[2]['form']['wordpress_mu_primary_blog_id']['value'] ) ) {
+			$wp_administrator_meta_key = $bb->wp_table_prefix . $this->data[2]['form']['wordpress_mu_primary_blog_id']['value'] . '_capabilities';
+		}
+
+		$keymaster_query = <<<EOQ
+			SELECT
+				user_login, user_email, display_name
+			FROM
+				$bbdb->users
+			LEFT JOIN
+				$bbdb->usermeta ON
+				$bbdb->users.ID = $bbdb->usermeta.user_id
+			WHERE
+				(
+					(
+						meta_key = '$wp_administrator_meta_key' AND
+						meta_value LIKE '%administrator%'
+					) OR
+					(
+						meta_key = '$bb_keymaster_meta_key' AND
+						meta_value LIKE '%keymaster%'
+					)
+				) AND
+				user_email IS NOT NULL AND
+				user_email != ''
+			ORDER BY
+				user_login;
+EOQ;
+		$bbdb->suppress_errors();
+
+		if ( $keymasters = $bbdb->get_results( $keymaster_query, ARRAY_A ) ) {
+
+			$bbdb->suppress_errors( false );
+
+			if ( count( $keymasters ) ) {
+				$email_maps = '';
+				$data['options']  = array();
+				$data['onchange'] = 'changeKeymasterEmail( this, \'keymaster_user_email\' );';
+				$data['note']     = __( 'Please select an existing bbPress Keymaster or WordPress administrator.' );
+
+				$data['options'][''] = '';
+				foreach ( $keymasters as $keymaster ) {
+					$email_maps .= 'emailMap[\'' . $keymaster['user_login'] . '\'] = \'' . $keymaster['user_email'] . '\';' . "\n\t\t\t\t\t\t\t\t";
+					if ( $keymaster['display_name'] ) {
+						$data['options'][$keymaster['user_login']] = $keymaster['user_login'] . ' (' . $keymaster['display_name'] . ')';
+					} else {
+						$data['options'][$keymaster['user_login']] = $keymaster['user_login'];
+					}
+				}
+
+				$this->strings[3]['scripts']['changeKeymasterEmail'] = <<<EOS
+						<script type="text/javascript" charset="utf-8">
+							function changeKeymasterEmail( selectObj, target ) {
+								var emailMap = new Array;
+								emailMap[''] = '';
+								$email_maps
+								var targetObj = document.getElementById( target );
+								var selectedAdmin = selectObj.options[selectObj.selectedIndex].value;
+								targetObj.value = emailMap[selectedAdmin];
+							}
+						</script>
+EOS;
+
+				$this->data[3]['form']['keymaster_user_type']['value'] = 'old';
+
+				return true;
+			}
+		}
+
+		$bbdb->suppress_errors( false );
+
+		return false;
+	}
+
+	/**
+	 * Sends HTTP headers and prints the page header.
+	 *
+	 * @return void
+	 **/
+	function header()
+	{
+		nocache_headers();
+
+		bb_install_header( $this->strings[$this->step]['title'], $this->strings[$this->step]['h1'], true );
+	}
+
+	/**
+	 * Prints the page footer.
+	 *
+	 * @return void
+	 **/
+	function footer()
+	{
+		bb_install_footer();
+	}
+
+	/**
+	 * Prints the returned messages for the current step.
+	 *
+	 * @return void
+	 **/
+	function messages()
+	{
+		if ( isset( $this->strings[$this->step]['messages'] ) ) {
+			$messages = $this->strings[$this->step]['messages'];
+
+			// This count works as long as $messages is only two-dimensional
+			$count = ( count( $messages, COUNT_RECURSIVE ) - count( $messages ) );
+			$i = 0;
+			$r = '';
+			foreach ( $messages as $type => $paragraphs ) {
+				$class = $type ? $type : '';
+
+				foreach ( $paragraphs as $paragraph ) {
+					$i++;
+					$class = ( $i === $count ) ? ( $class . ' last' ) : $class;
+					$r .= '<p class="' . esc_attr( $class ) . '">' . $paragraph . '</p>' . "\n";
+				}
+			}
+			echo $r;
+		}
+	}
+
+	/**
+	 * Prints the introduction paragraphs for the current step.
+	 *
+	 * @return void
+	 **/
+	function intro()
+	{
+		if ( 'incomplete' == $this->step_status[$this->step] && isset( $this->strings[$this->step]['intro'] ) ) {
+			$messages = $this->strings[$this->step]['intro'];
+			$count = count( $messages );
+			$i = 0;
+			$r = '';
+			foreach ( $messages as $paragraph ) {
+				$i++;
+				$class = ( $i === $count ) ? 'intro last' : 'intro';
+				$r .= '<p class="' . $class . '">' . $paragraph . '</p>' . "\n";
+			}
+			echo $r;
+		}
+	}
+
+	/**
+	 * Prints the standard header for each step.
+	 *
+	 * @param integer $step The number of the step whose header should be printed.
+	 * @return void
+	 **/
+	function step_header( $step )
+	{
+		$class = ( $step == $this->step ) ? 'open' : 'closed';
+
+		$r = '<div id="' . esc_attr( 'step' . $step ) . '" class="' . $class . '">' . "\n";
+		$r .= '<h2 class="' . $class . '">' . $this->strings[$step]['h2'] . '</h2>' . "\n";
+		$r .= '<div>' . "\n";
+
+		if ( $step < $this->step && $this->strings[$step]['status'] ) {
+			$r .= '<p class="status">' . $this->strings[$step]['status'] . '</p>' . "\n";
+		}
+
+		echo $r;
+
+		if ( $step == $this->step ) {
+			$this->intro();
+		}
+
+		$this->tabindex = 0;
+	}
+
+	/**
+	 * Prints the standard step footer.
+	 *
+	 * @return void
+	 **/
+	function step_footer()
+	{
+		$r = '</div></div>' . "\n";
+
+		echo $r;
+	}
+} // END class BB_Install

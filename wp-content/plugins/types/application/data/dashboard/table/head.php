@@ -1,21 +1,9 @@
 <?php
-return array(
+$question_marks = array(
 
 	'type' => array(
 		'id'            => 'type',
 		'title'         => __( 'Post Type', 'types' ),
-		'description'   => array(
-			array(
-				'type' => 'paragraph',
-				'content' => __( 'A list of all Post Types available in your site.', 'types' )
-			),
-			array(
-				'type'   => 'link',
-				'external' => true,
-				'label'  => __( 'Learn more', 'types' ),
-				'target' => Types_Helper_Url::get_url( 'learn-how-post-types', 'tooltip' )
-			),
-		)
 	),
 
 	'fields' => array(
@@ -124,3 +112,18 @@ return array(
 		)
 	)
 );
+
+// Visual Composer
+if( defined( 'WPB_VC_VERSION' ) ) {
+	$question_marks['template']['description'][1]['label'] = __( 'Creating templates with Visual Composer', 'types' );
+}
+// Beaver Builder
+else if( class_exists( 'FLBuilderLoader' ) ) {
+	$question_marks['template']['description'][1]['label'] = __( 'Creating templates with Beaver Builder', 'types' );
+}
+// Layouts
+else if( defined( 'WPDDL_DEVELOPMENT' ) || defined( 'WPDDL_PRODUCTION' ) ) {
+	$question_marks['template']['description'][1]['label'] = __( 'Creating templates with Layouts', 'types' );
+}
+
+return $question_marks;

@@ -1,35 +1,31 @@
 <?php
 
-@ini_set('upload_max_size', '64M');
-@ini_set('post_max_size', '64M');
-@ini_set('max_execution_time', '300');
-
-function _pre($v) {
-    echo "<pre>";
-    print_r($v);
-    echo "</pre>";
-}
-
-function find_wp_config_path() {
-    $dir = dirname(__FILE__);
-    do {
-        if (file_exists($dir . "/wp-config.php")) {
-            return $dir . '/';
+function cred_find_wp_config_path($dir, $file2search) {
+    if (file_exists($dir . "/" . $file2search)) {
+        return $dir . "/";
+    }
+    $list = scandir($dir, 1);
+    foreach ($list as $ele) {
+        if ($ele == '.' || $ele == '..')
+            continue;
+        $newdir = $dir . "/" . $ele;
+        if (is_dir($newdir)) {
+            return cred_find_wp_config_path($newdir, $file2search);
         }
-    } while ($dir = realpath("$dir/.."));
-    return null;
+    }
+    return "";
 }
 
-function get_root_path() {
-    return find_wp_config_path();
+function cred_get_root_path() {
+    return cred_find_wp_config_path($_SERVER['DOCUMENT_ROOT'], "wp-load.php");
 }
 
-function get_local($url) {
+function cred_get_local($url) {
     $urlParts = parse_url($url);
-    return get_root_path() . $urlParts['path'];
+    return cred_get_root_path() . $urlParts['path'];
 }
 
-function clean($string) {
+function cred_clean($string) {
     $string = str_replace(' ', '-', $string); // Replaces all spaces with hyphens.
     return preg_replace('/[^A-Za-z0-9\-]/', '', $string); // Removes special chars.
 }
@@ -45,10 +41,10 @@ define('DOING_AJAX', true);
 //    define('WP_ADMIN', true);
 //}
 
-require_once( get_root_path() . 'wp-load.php' );
-require_once( get_root_path() . 'wp-admin/includes/file.php' );
-require_once( get_root_path() . 'wp-admin/includes/media.php' );
-require_once( get_root_path() . 'wp-admin/includes/image.php' );
+require_once( cred_get_root_path() . 'wp-load.php' );
+require_once( cred_get_root_path() . 'wp-admin/includes/file.php' );
+require_once( cred_get_root_path() . 'wp-admin/includes/media.php' );
+require_once( cred_get_root_path() . 'wp-admin/includes/image.php' );
 
 /** Allow for cross-domain requests (from the frontend). */
 send_origin_headers();
@@ -59,11 +55,11 @@ if (isset($_REQUEST['nonce']) && check_ajax_referer('ajax_nonce', 'nonce', false
 
     if (isset($_POST['action']) && $_POST['action'] == 'delete' && isset($_POST['file'])) {
         $file = $_POST['file'];
-		$id = isset( $_POST['id'] ) ? (int) $_POST['id'] : 0;
+        $id = isset($_POST['id']) ? (int) $_POST['id'] : 0;
 
         $data = array('result' => true);
 
-        $local_file = get_local($file);
+        $local_file = cred_get_local($file);
 
 //get all image attachments
         $attachments = get_children(
@@ -118,77 +114,90 @@ if (isset($_REQUEST['nonce']) && check_ajax_referer('ajax_nonce', 'nonce', false
             $upload_overrides = array('test_form' => false);
             if (!empty($_FILES)) {
 
-                $fields = array();
-                foreach ($_FILES as $name => $v) {
-                    $fields[$name]['field_data'] = $v;
-                }
-
-                $errors = array();
-
-                list($fields, $errors) = apply_filters('cred_form_validate_form_' . $form_slug, array($fields, $errors), $thisform);
-                list($fields, $errors) = apply_filters('cred_form_validate_' . $form_id, array($fields, $errors), $thisform);
-                list($fields, $errors) = apply_filters('cred_form_validate', array($fields, $errors), $thisform);
-
-                if (!empty($errors)) {
-                    foreach ($errors as $fname => $err) {
-                        $data = array('result' => false, 'error' => $fname . ': ' . $err);
+                //Control file size wp_max_upload_size()
+                foreach ($_FILES as $uploaded_file) {
+                    if (filesize($uploaded_file["tmp_name"]) > wp_max_upload_size()) {
+                        $data = array('result' => false, 'error' => __('Error: Files is too big, Max upload size is', 'wpv-views') . ': ' . number_format((wp_max_upload_size() / 1048576), 2) . " MB");
+                        break;
                     }
-                    echo json_encode($data);
-                    die;
-                } else {
-                    foreach ($_FILES as $file) {
-                        //For repetitive
-                        foreach ($file as &$f) {
-                            if (is_array($f)) {
-                                foreach ($f as $p) {
-                                    $f = $p;
-                                    break;
+                }
+                
+                //If no size errors
+                if (empty($data)) {
+
+                    $fields = array();
+                    foreach ($_FILES as $name => $v) {
+                        $fields[$name]['field_data'] = $v;
+                    }
+
+                    $errors = array();
+
+                    list($fields, $errors) = apply_filters('cred_form_ajax_upload_validate_' . $form_slug, array($fields, $errors), $thisform);
+                    list($fields, $errors) = apply_filters('cred_form_ajax_upload_validate_' . $form_id, array($fields, $errors), $thisform);
+                    list($fields, $errors) = apply_filters('cred_form_ajax_upload_validate', array($fields, $errors), $thisform);
+
+                    if (!empty($errors)) {
+                        foreach ($errors as $fname => $err) {
+                            $data = array('result' => false, 'error' => $fname . ': ' . $err);
+                        }
+                        echo json_encode($data);
+                        die;
+                    } else {
+                        foreach ($_FILES as $file) {
+                            //For repetitive
+                            foreach ($file as &$f) {
+                                if (is_array($f)) {
+                                    foreach ($f as $p) {
+                                        $f = $p;
+                                        break;
+                                    }
                                 }
                             }
-                        }
 
-                        $res = wp_handle_upload($file, $upload_overrides);
+                            $res = wp_handle_upload($file, $upload_overrides);
 
-                        if (!isset($res['error'])) {
-                            //StaticClass::_pre($res);
+                            if (!isset($res['error'])) {
+                                //StaticClass::_pre($res);
 
-                            $bname = basename($res['file']);
-                            $attachment = array(
-                                'post_mime_type' => $res['type'],
-                                'post_title' => $bname,
-                                'post_content' => '',
-                                'post_status' => 'inherit',
-                                'post_parent' => $post_id,
-                                'post_type' => 'attachment',
-                                'guid' => $res['url'],
-                            );
-                            $attach_id = wp_insert_attachment($attachment, $res['file']);
-                            $attach_data = wp_generate_attachment_metadata($attach_id, $res['file']);
-                            wp_update_attachment_metadata($attach_id, $attach_data);
+                                $bname = basename($res['file']);
+                                $attachment = array(
+                                    'post_mime_type' => $res['type'],
+                                    'post_title' => $bname,
+                                    'post_content' => '',
+                                    'post_status' => 'inherit',
+                                    'post_parent' => $post_id,
+                                    'post_type' => 'attachment',
+                                    'guid' => $res['url'],
+                                );
+                                $attach_id = wp_insert_attachment($attachment, $res['file']);
+                                $attach_data = wp_generate_attachment_metadata($attach_id, $res['file']);
+                                wp_update_attachment_metadata($attach_id, $attach_data);
 
-                            //Fixing S3 Amazon rewriting compatibility
-                            if (wp_attachment_is_image($attach_id)) {
-                                $_rewrited_url = wp_get_attachment_image_src($attach_id, 'full');
-                                $_rewrited_url_prw = wp_get_attachment_image_src($attach_id);
+                                //Fixing S3 Amazon rewriting compatibility
+                                if (wp_attachment_is_image($attach_id)) {
+                                    $_rewrited_url = wp_get_attachment_image_src($attach_id, 'full');
+                                    $_rewrited_url_prw = wp_get_attachment_image_src($attach_id);
+                                    $attach_data = wp_generate_attachment_metadata($attach_id, $_rewrited_url);
+                                } else {
+                                    $_rewrited_url = wp_get_attachment_url($attach_id);
+                                }
+
+                                if (isset($_rewrited_url)) {
+                                    $files[] = (is_array($_rewrited_url) && isset($_rewrited_url[0])) ? $_rewrited_url[0] : $_rewrited_url; //$res['url'];
+                                    $attaches[] = $attach_id;
+                                    if (isset($_rewrited_url_prw))
+                                        $previews[] = (is_array($_rewrited_url_prw) && isset($_rewrited_url_prw[0])) ? $_rewrited_url_prw[0] : $_rewrited_url_prw; //$res['url'];
+                                } else {
+                                    $files[] = $res['url'];
+                                    $attaches[] = $attach_id;
+                                }
                             } else {
-                                $_rewrited_url = wp_get_attachment_url($attach_id);
+                                $error = true;
                             }
-                            $attach_data = wp_generate_attachment_metadata($attach_id, $_rewrited_url);
-
-                            if (isset($_rewrited_url) && isset($_rewrited_url_prw)) {
-                                $files[] = (is_array($_rewrited_url) && isset($_rewrited_url[0])) ? $_rewrited_url[0] : $_rewrited_url; //$res['url'];
-                                $attaches[] = $attach_id;
-                                $previews[] = (is_array($_rewrited_url_prw) && isset($_rewrited_url_prw[0])) ? $_rewrited_url_prw[0] : $_rewrited_url_prw; //$res['url'];
-                            } else {
-                                $files[] = $res['url'];
-                                $attaches[] = $attach_id;
-                            }
-                        } else {
-                            $error = true;
                         }
                     }
+                    $data = ($error) ? array('result' => false, 'error' => __('There was an error uploading your files', 'wpv-views') . ': ' . $res['error']) : array('files' => $files, 'attaches' => $attaches, 'previews' => $previews, 'delete_nonce' => time());
                 }
-                $data = ($error) ? array('result' => false, 'error' => __('There was an error uploading your files', 'wpv-views') . ': ' . $res['error']) : array('files' => $files, 'attaches' => $attaches, 'previews' => $previews, 'delete_nonce' => time());
             } else {
                 $data = array('result' => false, 'error' => __('Error: Files is too big, Max upload size is', 'wpv-views') . ': ' . ini_get('post_max_size'));
             }

@@ -149,6 +149,24 @@ function woo_custom_deregister_bbpress_template_stack ( $stack ) {
 
 
 
+// Allow iframe tags within editor
+function allow_kses_iframe_tags( $tags ){
+    $tags['iframe'] = array(
+        'src' => true,
+        'width' => true,
+        'height' => true,
+        'align' => true,
+        'class' => true,
+        'name' => true,
+        'id' => true,
+        'frameborder' => true,
+        'allowfullscreen' => true
+    );
+    return $tags;
+}
+add_filter('wp_kses_allowed_html','allow_kses_iframe_tags', 1);
+
+
 /***********************************************************************
  *
  *	

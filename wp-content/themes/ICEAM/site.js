@@ -144,7 +144,7 @@ jQuery(document).ready(function(){
 	});
 	
 
-/* */
+/* *
 	var checkStatus;
 	var element = new Image();
 	var elementWithHiddenContent = document.querySelector(".course-video");
@@ -158,12 +158,12 @@ jQuery(document).ready(function(){
 		setInterval(function() {
 		    checkStatus = 'off';
 		    console.log(element);
-		    console.clear();
+		    //console.clear();
 		    
 		    if (checkStatus=="on") {
-			elementWithHiddenContent.innerHTML = "";
+				elementWithHiddenContent.innerHTML = "";
 		    } else if (checkStatus == "off" && elementWithHiddenContent.innerHTML == ""){
-			elementWithHiddenContent.innerHTML = innerHtml;
+				elementWithHiddenContent.innerHTML = innerHtml;
 		    }
 		}, 1000)
 	}
