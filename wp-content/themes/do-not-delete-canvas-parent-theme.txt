@@ -1,0 +1,1 @@
+Canvas is the parent theme. Deleting it will cause major problems in the ICEAM theme.

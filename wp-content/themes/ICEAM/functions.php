@@ -1,0 +1,625 @@
+<?php
+
+
+/***********************************************************************
+ *
+ *	LOAD WIDGETS
+ *
+ **********************************************************************/
+
+locate_template( 'widget-course-events.php', TRUE, TRUE );
+locate_template( 'widget-course-signup.php', TRUE, TRUE );
+
+
+/***********************************************************************
+ *
+ *	REMOVE WORDPRESS EMOJI
+ *
+ **********************************************************************/
+
+remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+remove_action( 'wp_print_styles', 'print_emoji_styles' );
+remove_action( 'admin_print_styles', 'print_emoji_styles' );
+
+
+/***********************************************************************
+ *
+ *	ENQUEUE STYLESHEET(S)
+ *
+ **********************************************************************/
+
+add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
+function theme_enqueue_styles() {
+    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css' );
+}
+
+
+/***********************************************************************
+ *
+ *	CHANGE EXCERPT LENGTH
+ *
+ **********************************************************************/
+
+function custom_excerpt_length( $length ) {
+	return 200;
+}
+add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
+
+
+/***********************************************************************
+ *
+ *	HIDE EVENT COST (WHICH PAGE IS THIS UTILIZED ON?)
+ *
+ **********************************************************************/
+
+function hide_tribe_get_cost( $cost, $postId, $withCurrencySymbol ) {
+	return '';
+}
+add_filter( 'tribe_get_cost', 'hide_tribe_get_cost', 10, 3 );
+
+
+/***********************************************************************
+ *
+ *	REMOVE TOP NAV FROM WOO_TOP,
+ *	CREATE IT MANAULLY SO THAT WE CAN INSERT CURRENCY SELECTOR
+ *
+ **********************************************************************/
+
+add_action( 'init', 'remove_canvas_top_navigation', 10 );
+function remove_canvas_top_navigation () {
+ // Remove top nav from the woo_top hook
+ remove_action( 'woo_top', 'woo_top_navigation', 10 );
+}
+
+function create_top_nav(){
+?>
+	<div id="top">
+		<div class="col-full">
+			<div id="currency-selector">
+				<?php echo do_shortcode('[aelia_currency_selector_widget title="" widget_type="buttons"]'); ?>
+			</div>
+			<?php
+				$args = array(
+					'menu' => 'utility-nav',
+					'container' => '',
+					'container_class' => '',
+					'menu_class' => 'nav top-navigation fl',
+					'menu_id' => 'top-nav',
+					'depth' => ( is_user_logged_in() ? 0 : 1),
+				);
+				wp_nav_menu( $args );
+			?>
+		</div>
+	</div>
+<?php	
+}
+add_action("woo_top","create_top_nav",10);
+
+
+
+/****************************************************************************
+ *
+ *	REMOVE "Private: Private:" FROM FORUM TITLES (WHY IT'S DUPLICATED?)
+ *
+ ***************************************************************************/
+
+add_filter('protected_title_format', 'remove_protected_title');
+add_filter('private_title_format', 'remove_private_title');
+
+//removes 'private' and protected prefix for forums
+function remove_private_title($title) {
+	return '%s';
+}
+
+function remove_protected_title($title) {
+	return '%s';
+}
+
+
+/***********************************************************************
+ *
+ *	FROM "PootlePress" CANVAS CHILD THEME TO FIX BBPRESS ISSUES
+ *
+ **********************************************************************/
+
+add_filter( 'template_include', 'woo_custom_maybe_load_bbpress_tpl', 99 );
+ 
+function woo_custom_maybe_load_bbpress_tpl ( $tpl ) {
+	if ( function_exists( 'is_bbpress' ) && is_bbpress() ) {
+		$tpl = locate_template( 'bbpress.php' );
+	}
+	return $tpl;
+} // End woo_custom_maybe_load_bbpress_tpl()
+ 
+add_filter( 'bbp_get_template_stack', 'woo_custom_deregister_bbpress_template_stack' );
+ 
+function woo_custom_deregister_bbpress_template_stack ( $stack ) {
+	if ( 0 < count( $stack ) ) {
+		$stylesheet_dir = get_stylesheet_directory();
+		$template_dir = get_template_directory();
+		foreach ( $stack as $k => $v ) {
+			if ( $stylesheet_dir == $v || $template_dir == $v ) {
+				unset( $stack[$k] );
+			}
+		}
+	}
+	return $stack;
+} // End woo_custom_deregister_bbpress_template_stack()
+
+
+
+/***********************************************************************
+ *
+ *	
+ *
+ **********************************************************************/
+
+global $woothemes_sensei;
+//remove_action( 'sensei_login_form', array( $woothemes_sensei->frontend, 'sensei_login_form' ), 10 );
+
+//add_action( 'sensei_login_form', 'custom_sensei_login_form' , 10 );
+
+function custom_sensei_login_form() {
+	global $woothemes_sensei;
+
+	?>
+	<div id="my-courses">
+	    <?php $woothemes_sensei->notices->maybe_print_notices(); ?>
+	    <?php
+		// output the actul form markup
+		$woothemes_sensei->frontend->sensei_get_template( 'user/login-form.php');
+	    ?>
+	</div>
+	
+	<?php
+} // End custom_sensei_login_form()
+
+
+/***********************************************************************
+ *
+ *	HIDE DIPLOMATES TAB IF USER IS NOT A DIPLOMATE OR ADMIN
+ *
+ **********************************************************************/
+
+function hide_diplomates_tab($tabs,$groups, $group_name){
+    $member_info = get_userdata(bp_displayed_user_id());
+    $new_array = array();
+    
+    foreach ( (array) $tabs as $key=>$tab ){
+	if($groups[$key]->name == "Diplomate Fields"){
+		if(in_array('diplomate',$member_info->roles) || in_array('administrator',$member_info->roles)){
+			$new_array[] = $tab;
+		}
+	} else {
+		$new_array[] = $tab;
+	}
+    }
+    return $new_array;
+}
+add_filter('xprofile_filter_profile_group_tabs','hide_diplomates_tab',10,3);
+
+
+/***********************************************************************
+ *
+ *	
+ *
+ **********************************************************************/
+
+function woo_custom_move_navigation () {
+    // Remove main nav from the woo_header_after hook
+    remove_action( 'woo_header_after','woo_nav', 10 );
+    // Add main nav to the woo_header_inside hook
+    add_action( 'woo_header_inside','woo_nav', 10 );
+}
+add_action( 'init', 'woo_custom_move_navigation', 10 );
+
+
+/***********************************************************************
+ *
+ *	CHANGE THE THANK YOU MSG DISPLAYED ON ORDER CONFIRMATION PAGE
+ *
+ **********************************************************************/
+
+function rewrite_thankyou() {
+	$thanks_str = "Thank you. Your order has been received. </p><p>If you have not already, please complete your student profile!</p><p><a href='" . bp_loggedin_user_domain() . "/profile/edit/group/1/' class='btn btn-primary'>Update My Profile Now</a>";
+	
+	return $thanks_str;
+}
+add_filter('woocommerce_thankyou_order_received_text', 'rewrite_thankyou', 10, 1);
+
+
+
+
+/***********************************************************************
+ *
+ *	ADD STUDENT / PRACTITIONER FIELDS TO THE CHECKOUT PROCESS UNDER ORDER NOTES
+ *
+ **********************************************************************/
+
+add_action( 'woocommerce_after_order_notes', 'add_custom_checkout_fields' );
+
+function add_custom_checkout_fields( $checkout ) {
+	$user_id = get_current_user_id();
+	$current_status = xprofile_get_field_data('Current Status', $user_id);
+
+	echo '<div id="iceam_user_info"><h3>' . __('Additional Information') . '</h3>';
+	echo "<!-- current status: $current_status -->";
+
+	woocommerce_form_field( 'user_type_select', array(
+		'type'          => 'select',
+		'class'         => array('iceam-user-type-select form-row form-row-first'),
+		'label'         => __('Current Status'),
+		'options'     => array(
+			'Practitioner' => __('Practitioner', 'woocommerce' ),
+			'Student' => __('Student', 'woocommerce' )
+	        ),
+		'default'	=> $current_status
+	), $checkout->get_value( 'user_type_select' ));
+
+		$showhide = ($current_status == "Practitioner" || $current_status == "" ? "visible" : "hidden" );
+		echo "<div id='iceam-practitioner' class='$showhide clearfix'>";
+		
+		woocommerce_form_field( 'license_number', array(
+			'type'          => 'text',
+			'class'         => array('form-row form-row-wide'),
+			'label'         => __('Practitioner License Number'),
+			'default'	=> xprofile_get_field_data('Practitioner License Number', $user_id)
+		), $checkout->get_value( 'license_number' ));
+		
+		
+		woocommerce_form_field( 'license_state', array(
+			'type'          => 'text',
+			'class'         => array('form-row form-row-wide'),
+			'label'         => __('Licensing State'),
+			'default'	=> xprofile_get_field_data('Licensing State', $user_id),
+		), $checkout->get_value( 'license_state' ));
+		
+	
+		echo '</div>'; // end iceam-practitioner
+		
+		
+		/********************/
+		
+		$showhide = ($current_status == "Student" ? "visible" : "hidden" );
+		echo "<div id='iceam-student' class='$showhide clearfix'>";
+	
+		woocommerce_form_field( 'student_id', array(
+			'type'          => 'text',
+			'class'         => array('form-row form-row-wide'),
+			'label'         => __('Student ID Number'),
+			'default'	=> xprofile_get_field_data('Student ID Number', $user_id)
+		), $checkout->get_value( 'student_id' ));
+		
+		
+		woocommerce_form_field( 'student_university', array(
+			'type'          => 'text',
+			'class'         => array('form-row form-row-wide'),
+			'label'         => __('School Name'),
+			'default'	=> xprofile_get_field_data('School Name', $user_id)
+		), $checkout->get_value( 'student_university' ));
+		
+	
+		echo '</div>'; // end iceam-student
+
+	echo '</div>';
+}
+
+
+
+/**
+ * Update the order meta with field values
+ */
+add_action( 'woocommerce_checkout_update_order_meta', 'custom_checkout_field_update_order_meta' );
+
+function custom_checkout_field_update_order_meta( $order_id ) {
+	
+	if ( !empty( $_POST['user_type_select'] ) ) {
+		update_post_meta( $order_id, 'Current Status', sanitize_text_field( $_POST['user_type_select'] ) );
+	}
+	
+	if ( !empty( $_POST['license_number'] ) ) {
+		update_post_meta( $order_id, 'Practitioner License Number', sanitize_text_field( $_POST['license_number'] ) );
+	}
+	
+	if ( !empty( $_POST['license_state'] ) ) {
+		update_post_meta( $order_id, 'Licensing State', sanitize_text_field( $_POST['license_state'] ) );
+	}
+	
+	if ( !empty( $_POST['student_id'] ) ) {
+		update_post_meta( $order_id, 'Student ID Number', sanitize_text_field( $_POST['student_id'] ) );
+	}
+	
+	if ( !empty( $_POST['student_university'] ) ) {
+		update_post_meta( $order_id, 'School Name', sanitize_text_field( $_POST['student_university'] ) );
+	}
+}
+
+
+/**
+ * Update the user meta with field values
+ */
+
+add_action( 'woocommerce_checkout_update_user_meta', 'custom_checkout_update_order_meta' );
+
+function custom_checkout_update_order_meta(){
+	do_action('bp_init');
+	$user_id = get_current_user_id();
+	
+	xprofile_set_field_data('Current Status', $user_id, sanitize_text_field( $_POST['user_type_select'] ));
+	
+	xprofile_set_field_data('Practitioner License Number', $user_id, sanitize_text_field( $_POST['license_number'] ));
+	
+	xprofile_set_field_data('Licensing State', $user_id, sanitize_text_field( $_POST['license_state'] ));
+	
+	xprofile_set_field_data('Student ID Number', $user_id, sanitize_text_field( $_POST['student_id'] ));
+	
+	xprofile_set_field_data('School Name', $user_id, sanitize_text_field( $_POST['student_university'] ));
+	
+	$userdata = get_userdata($user_id);
+	$roles = ($userdata->roles ? $userdata->roles : []);
+	
+	if($_POST['user_type_select'] == "Practitioner" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
+		wp_update_user( array( 'ID' => $user_id, 'role' => strtolower($_POST['user_type_select']) ) );
+	}
+}
+
+
+/**
+ * Display field values on the order edit page
+ */
+add_action( 'woocommerce_admin_order_data_after_billing_address', 'custom_checkout_field_display_admin_order_meta', 10, 1 );
+
+function custom_checkout_field_display_admin_order_meta($order){
+	$status = get_post_meta( $order->id, 'Current Status', true );
+	echo '<p><strong>'.__('Current Status').':</strong>'.$status.'</p>';
+	
+	if($status == 'practitioner'){
+		echo '<p><strong>'.__('Practitioner License Number').':</strong> ' . get_post_meta( $order->id, 'Practitioner License Number', true ) . '</p>';
+	
+		echo '<p><strong>'.__('Licensing State').':</strong> ' . get_post_meta( $order->id, 'Licensing State', true ) . '</p>';
+	} else if ($status == 'student'){
+		echo '<p><strong>'.__('Student ID Number').':</strong> ' . get_post_meta( $order->id, 'Student ID Number', true ) . '</p>';
+		
+		echo '<p><strong>'.__('School Name').':</strong> ' . get_post_meta( $order->id, 'School Name', true ) . '</p>';
+	}
+}
+
+
+
+/***********************************************************************
+ *
+ *	ADD LEGAL DISCLAIMER TO LESSON PAGES, REQUIRE SIGNATURE
+ *
+ **********************************************************************/
+
+add_action( 'loop_end', 'add_disclaimer_to_single_lessons' );
+function add_disclaimer_to_single_lessons() {
+	$signature = get_user_meta(get_current_user_id(), 'wpcf-disclaimer-signature', true);
+	
+	if ( is_singular('lesson') && $signature == '' ) {
+?>
+
+<div class="modal fade" id="signature-form" tabindex="-1" role="dialog" aria-labelledby="signatureForm">
+	<div class="modal-dialog modal-lg">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title">Online Course Terms & Conditions</h2>
+			</div>
+			<div class="modal-body">
+				
+				<h3>Proprietary Information</h3>
+				
+				<p>Participant acknowledges that all information provided during this continuing education course training series is proprietary information and shall continue to be the exclusive property of Dr. Arnaud Versluys and ICEAM, LLC. </p>
+				
+				<p>Participant agrees not to disclose the proprietary information, directly or indirectly, under any circumstances or by any means, to any third person without the express written consent of Dr. Arnaud Versluys. </p>
+				
+				<p>Participant may use the proprietary information for their own personal practice, but shall not copy, transmit, teach, reproduce, summarize, quote, or make any commercial use whatsoever of proprietary information, with or without financial gain, without the express written consent of Dr. Arnaud Versluys.</p>
+				
+				<hr/>
+				
+				<p>To accept these terms please provide your digital signature by typing in your full name below. The name we have on file is: <strong><?php echo get_user_meta(get_current_user_id(), "billing_first_name", true) . " " . get_user_meta(get_current_user_id(), "billing_last_name", true); ?></strong>. (You will only need to do this once.)</p>
+				
+				<form>
+					<p>
+						<label for="signature">Full Name</label>
+						<input type="text" name="signature" id="signature" />
+						<input type="hidden" name="name-on-file" id="name-on-file" value="<?php echo get_user_meta(get_current_user_id(), "billing_first_name", true) . " " . get_user_meta(get_current_user_id(), "billing_last_name", true); ?>" />
+					</p>
+					<p>
+						<input type="button" value="Cancel" class="btn-primary" id="signature-cancel" />
+						<input type="button" value="Accept" class="btn-default" id="signature-accept" />
+					</p>
+				</form>
+			</div>
+		</div>
+	</div>
+</div>
+
+<script>
+	jQuery(window).load(function(){
+		var form = jQuery( "#signature-form form" );
+		form.validate({
+			rules: {
+				signature: {
+					required: true,
+					equalTo: "#name-on-file"
+				}
+			},
+			messages: {
+				signature: {
+					required: "This field is required",
+					equalTo: "Your name should match the name we have on file"
+				}
+			}
+		});
+		
+		
+		jQuery('#signature-form').modal({backdrop:'static', keyboard:false,show:true});
+		
+		jQuery("#signature-cancel").on('click', function(){
+			jQuery(this).addClass('disabled');
+			jQuery("#signature-accept").addClass('disabled');
+			
+			window.location.href = "/terms-conditions";
+		});
+		
+		jQuery("#signature-accept").on('click', function(){
+			if (form.valid()) {
+				jQuery(this).addClass('disabled');
+				jQuery("#signature-cancel").addClass('disabled');
+				
+				var val = jQuery("#signature").val();
+				<?php
+				echo "var uid = " . get_current_user_id() . ",";
+				echo "ajaxurl = '" . admin_url( 'admin-ajax.php' ) . "';";
+				?>
+				
+				data =  {uid:uid, signature: val, action:'disclaimer_signature'};
+				jQuery.post(ajaxurl, data, function (response) {
+					console.log (response);
+					jQuery(".modal-body").html(response);
+					
+					setTimeout(function(){
+						jQuery("#signature-form").modal('hide');
+					}, 2000);
+				});
+			}
+		});
+	});
+</script>
+
+<?php
+	}
+}
+
+
+add_action( 'wp_ajax_disclaimer_signature', 'disclaimer_signature_callback' );
+
+function disclaimer_signature_callback() {
+	global $wpdb; // this is how you get access to the database
+
+	if (isset($_POST['uid']) && isset($_POST['signature'])) {
+	    add_user_meta( $_POST['uid'], 'wpcf-disclaimer-signature', $_POST['signature']);
+	}
+	
+	echo "<h2>Thank you " . $_POST['signature'] . "!</h2>";
+
+	die(); // this is required to terminate immediately and return a proper response
+}
+
+
+/***********************************************************************
+ *
+ *	DON'T DISPLAY MEDIA ATTACHMENTS OR COURSE LIST ON COURSE PAGE
+ *	IF USER HASN'T SIGNED UP FOR THE COURSE
+ *
+ **********************************************************************/
+
+add_action('sensei_single_course_content_inside_after','display_course_media_to_registered_students', 1);
+function display_course_media_to_registered_students(){
+	global $post, $current_user, $sensei_media_attachments;
+	
+	$member_info = get_userdata($current_user->ID);
+	
+	$started_course = WooThemes_Sensei_Utils::user_started_course( $post->ID, $current_user->ID );
+	$roles = ($member_info->roles ? $member_info->roles : []);
+	
+	if(!in_array('administrator',$roles)){
+		if(!$started_course){
+			remove_action( 'sensei_course_single_lessons', array($sensei_media_attachments, 'display_attached_media' ), 9);
+			//add_filter("sensei_single_course_lessons_before",'remove_unregistered_course_lessons',10);
+			
+			remove_action( 'sensei_single_course_content_inside_after' , array( 'Sensei_Course','the_course_lessons_title'), 9 );
+			remove_action( 'sensei_single_course_content_inside_after', 'course_single_lessons', 10 );
+			
+		}
+	}
+}
+
+
+function remove_unregistered_course_lessons(){
+	echo "<!-- now i'm in here -->";
+	// replaces $lessons array with empty array
+	return [];
+}
+
+
+
+/***********************************************************************
+ *
+ *	Obscure the Course & Lesson videos in View Source
+ *
+ **********************************************************************/
+
+add_action( 'sensei_single_course_content_inside_after', 'add_base64_youtube_uri' );
+add_action( 'sensei_single_lesson_content_inside_after', 'add_base64_youtube_uri' );
+function add_base64_youtube_uri() {
+	global $post;
+	
+	$yturi = get_post_meta($post->ID, "wpcf-video-uri-base-64", true);
+	
+	if ( is_singular('course') && $yturi || is_singular('lesson') && $yturi) {	
+?>
+		<div class="hidden" id="ytv" data-yturi="<?php echo $yturi ?>"></div>
+		<script>var ytv = eval(atob("YXRvYg=="));</script>
+<?php	
+	}
+}
+
+
+
+/***********************************************************************
+ *
+ *	AUTOMATICALLY UPDATE VIRTUAL ORDERS FROM PROCESSING TO COMPLETE
+ *
+ *	This circumvents requiring an admin
+ *	to complete online course orders manually.
+ *
+ **********************************************************************/
+
+add_filter( 'woocommerce_payment_complete_order_status', 'virtual_order_payment_complete_order_status', 10, 2 );
+ 
+function virtual_order_payment_complete_order_status( $order_status, $order_id ) {
+	$order = new WC_Order( $order_id );
+ 
+	if ( 'processing' == $order_status && ( 'on-hold' == $order->status || 'pending' == $order->status || 'failed' == $order->status ) ) {
+ 
+		$virtual_order = null;
+ 
+		if ( count( $order->get_items() ) > 0 ) {
+ 
+			foreach( $order->get_items() as $item ) {
+ 
+				if ( 'line_item' == $item['type'] ) {
+ 
+					$_product = $order->get_product_from_item( $item );
+ 
+					if ( ! $_product->is_virtual() ) {
+						// once we've found one non-virtual product we know we're done, break out of the loop
+						$virtual_order = false;
+						break;
+					} else {
+						$virtual_order = true;
+					}
+				}
+			}
+		}
+ 
+		// virtual order, mark as completed
+		if ( $virtual_order ) {
+			return 'completed';
+		}
+	}
+ 
+	// non-virtual order, return original status
+	return $order_status;
+}
+
+
+/***********************************************************************
+ *
+ *	THE END
+ *
+ **********************************************************************/
+?>
