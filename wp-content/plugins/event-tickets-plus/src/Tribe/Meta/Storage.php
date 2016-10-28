@@ -93,6 +93,11 @@ class Tribe__Tickets_Plus__Meta__Storage {
 
 		$stored_ticket_meta = get_transient( $transient );
 
+		// Prevents Catchable Fatal when it doesn't exist or is a scallar
+		if ( empty( $stored_ticket_meta ) || is_scalar( $stored_ticket_meta ) ) {
+			$stored_ticket_meta = array();
+		}
+
 		delete_transient( $transient );
 		$ticket_meta = tribe_array_merge_recursive( $stored_ticket_meta, $ticket_meta );
 		$set         = set_transient( $transient, $ticket_meta, $this->ticket_meta_expire_time );

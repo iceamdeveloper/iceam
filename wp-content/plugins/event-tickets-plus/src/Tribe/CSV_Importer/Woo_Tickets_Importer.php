@@ -35,4 +35,5 @@ class Tribe__Tickets_Plus__CSV_Importer__Woo_Tickets_Importer extends Tribe__Tic
 
 		return $data;
 	}
+
 }

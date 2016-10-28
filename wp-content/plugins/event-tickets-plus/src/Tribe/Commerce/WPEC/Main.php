@@ -125,7 +125,7 @@ class Tribe__Tickets_Plus__Commerce__WPEC__Main extends Tribe__Tickets_Plus__Tic
 	public function __construct() {
 
 		/* Set up some parent's vars */
-		$this->pluginName = 'WPEC';
+		$this->pluginName = _x( 'WPEC', 'ticket provider', 'event-tickets-plus' );
 		$this->pluginSlug = 'wpec';
 		$this->pluginPath = trailingslashit( EVENT_TICKETS_PLUS_DIR );
 		$this->pluginDir  = trailingslashit( basename( $this->pluginPath ) );

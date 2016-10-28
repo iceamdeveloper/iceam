@@ -5,7 +5,7 @@ Tags: events, calendar, event, venue, organizer, dates, date, google maps, confe
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
 Tested up to: 4.6.1
-Stable tag: 4.2.6
+Stable tag: 4.3.1.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -203,18 +203,41 @@ Our Premium Plugins:
 
 == Changelog ==
 
+= [4.3.1.1] 2016-10-21 =
+
+* Fix - Resolved a Fatal using function return value in write context (5.2 compatibility) [68387]
+
+= [4.3.1] 2016-10-20 =
+
+* Fix - Pagination links on Week view are updating correctly [67977]
+* Tweak - Only load This Week Widget Resources when the widget or shortcode is on a page (props to @stratejusinc) [63921]
+* Tweak - Added AJAX on Select2 for Widgets, improving performance. [66130]
+* Tweak - Added plugin file path constant.
+* Tweak - Registered plugin as active with Tribe Common. [66657]
+* Fix - Allow pagination and control over the posts per page on the single venue view (thanks to @R for reporting this one) [62857]
+* Tweak - Open recurrence exclusion rules by default on reload of admin[64289]
+
+= [4.3] 2016-10-13 =
+
+* Feature - Added the [tribe_events] shortcode to allow for the rendering of event views anywhere shortcodes are allowed! [44800]
+* Feature - Introduces support for enhanced logging [36047]
+* Tweak - Added the "All Events" link on top of all recurring events view
+* Tweak - Made the redirect URL used when a recurring event cannot be found filterable (props: @logoscreative) [64106]
+* Deprecated - Deprecated various disused functions that were built around the Meta Factory [39905]
+* Deprecated - `Tribe__Events__Pro__Templates__Single_Organizer::setup_upcoming_events()` has been deprecated
+
 = [4.2.6] 2016-09-15 =
 
 * Fix - When a queue of recurring events is being processed, ensure the queue status can be detected from other requests (Thanks to our community user  @integrity for getting this issue in front of us in the support forums.)
 
-= [4.2.5] 2016-08-31 =
+= [4.2.5] 2016-08-17 =
 
-* Fix - Fixed an issue that would misplace recurrence exclusions when using UTC based timezones (A big thank you to @Ryan for getting this report to us via the support forums.)
-* Fix - Fixed recurring events misplacement or missing creation when using more than one recurrence pattern
+* Fix - Fixed inconsistent template filtering logic for single event template [62525]
+* Tweak - Restored preview for published events [64874]
 
 = [4.2.4] 2016-08-17 =
 
-* Fix - PHP notice when importing events from iCal importer
+Fix - PHP notice when importing events from iCal importer [64747]
 
 = [4.2.3] 2016-07-20 =
 

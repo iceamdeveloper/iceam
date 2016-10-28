@@ -157,6 +157,32 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		abstract public function get_ticket( $event_id, $ticket_id );
 
 		/**
+		 * Attempts to load the specified ticket type post object.
+		 *
+		 * @param int $ticket_id
+		 *
+		 * @return Tribe__Tickets__Ticket_Object|null
+		 */
+		public static function load_ticket_object( $ticket_id ) {
+			foreach ( Tribe__Tickets__Tickets::modules() as $provider_class => $name ) {
+				$provider = call_user_func( array( $provider_class, 'get_instance' ) );
+				$event    = $provider->get_event_for_ticket( $ticket_id );
+
+				if ( ! $event ) {
+					continue;
+				}
+
+				$ticket_object = $provider->get_ticket( $event->ID, $ticket_id );
+
+				if ( $ticket_object ) {
+					return $ticket_object;
+				}
+			}
+
+			return null;
+		}
+
+		/**
 		 * Returns the event post corresponding to the possible ticket object/ticket ID.
 		 *
 		 * This is used to help differentiate between products which act as tickets for an
@@ -518,8 +544,10 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 
 			// Pass the control to the child object
 			$did_uncheckin = $this->uncheckin( $order_id );
-		
-			$this->maybe_update_attendees_cache( $did_uncheckin );
+
+			if ( class_exists( 'Tribe__Events__Main' ) ) {
+				$this->maybe_update_attendees_cache( $did_uncheckin );
+			}
 
 			$this->ajax_ok( $did_uncheckin );
 		}
@@ -692,12 +720,35 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 				$attendees = array_merge( $attendees, $obj->get_attendees( $event_id ) );
 			}
 
+			// Set the `ticket_exists` flag on attendees if the ticket they are associated with
+			// does not exist.
+			foreach ( $attendees as &$attendee ) {
+				$attendee['ticket_exists'] = !empty( $attendee['product_id'] ) && get_post( $attendee['product_id'] );
+			}
+
 			if ( ! is_admin() ) {
 				$expire = apply_filters( 'tribe_tickets_attendees_expire', HOUR_IN_SECONDS );
 				$post_transient->set( $event_id, self::ATTENDEES_CACHE, $attendees, $expire );
 			}
 
 			return $attendees;
+		}
+
+		/**
+		 * Returns an array of attendees for the specified event, in relation to
+		 * this ticketing provider.
+		 *
+		 * Implementation note: this is just a public wrapper around the get_attendees() method.
+		 * The reason we don't simply make that same method public is to avoid breakages in other
+		 * ticket provider plugins which have already implemented that method with protected
+		 * accessibility.
+		 *
+		 * @param $event_id
+		 *
+		 * @return array
+		 */
+		public function get_attendees_array( $event_id ) {
+			return $this->get_attendees( $event_id );
 		}
 
 		/**
@@ -1226,6 +1277,25 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		}
 
 		/**
+		 * Returns the meta key used to link ticket types with the base event.
+		 *
+		 * If the meta key cannot be determined the returned string will be empty.
+		 * Subclasses can override this if they use a key other than 'event_key'
+		 * for this purpose.
+		 *
+		 * @internal
+		 *
+		 * @return string
+		 */
+		public function get_event_key() {
+			if ( property_exists( $this, 'event_key' ) ) {
+				return $this->event_key;
+			}
+
+			return '';
+		}
+
+		/**
 		 * Returns an availability slug based on all tickets in the provided collection
 		 *
 		 * The availability slug is used for CSS class names and filter helper strings
@@ -1526,7 +1596,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 * @param $operation_did_complete
 		 */
 		private function maybe_update_attendees_cache( $operation_did_complete ) {
-			if ( $operation_did_complete && ! empty( $_POST['event_ID'] ) && tribe_is_event( $_POST['event_ID'] ) ) {
+			if ( $operation_did_complete && ! empty( $_POST['event_ID'] ) ) {
 				$post_transient = Tribe__Post_Transient::instance();
 				$post_transient->delete( $_POST['event_ID'], self::ATTENDEES_CACHE );
 			}

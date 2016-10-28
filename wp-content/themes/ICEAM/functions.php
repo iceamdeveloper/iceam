@@ -149,22 +149,18 @@ function woo_custom_deregister_bbpress_template_stack ( $stack ) {
 
 
 
-// Allow iframe tags within editor
-function allow_kses_iframe_tags( $tags ){
-    $tags['iframe'] = array(
-        'src' => true,
-        'width' => true,
-        'height' => true,
-        'align' => true,
-        'class' => true,
-        'name' => true,
-        'id' => true,
-        'frameborder' => true,
-        'allowfullscreen' => true
-    );
-    return $tags;
+add_filter('woocommerce_available_payment_gateways','filter_gateways',1);
+function filter_gateways($gateways){
+    global $woocommerce;        
+    //Remove a specific payment option
+    //unset($gateways['paypal']);
+	//print_r($gateways);
+	
+	// if the current product is not a subscription product, disable paypal
+	// what do we do if there are subscription and non-subscription products in the cart?
+	
+    return $gateways;
 }
-add_filter('wp_kses_allowed_html','allow_kses_iframe_tags', 1);
 
 
 /***********************************************************************

@@ -61,8 +61,6 @@ class Tribe__Events__Pro__Recurrence__Meta {
 
 		add_action( 'load-edit.php', array( __CLASS__, 'combineRecurringRequestIds' ) );
 
-		add_action( 'load-post.php', array( __CLASS__, 'enqueue_post_editor_notices' ), 10, 1 );
-
 		add_action( 'updated_post_meta', array( __CLASS__, 'update_child_thumbnails' ), 4, 40 );
 		add_action( 'added_post_meta', array( __CLASS__, 'update_child_thumbnails' ), 4, 40 );
 		add_action( 'deleted_post_meta', array( __CLASS__, 'remove_child_thumbnails' ), 4, 40 );
@@ -82,6 +80,53 @@ class Tribe__Events__Pro__Recurrence__Meta {
 		}
 
 		self::reset_scheduler();
+
+		/**
+		 * Register Notices
+		 */
+		Tribe__Admin__Notices::instance()->register( 'editing-all-recurrences', array( __CLASS__, 'render_notice_editing_all_recurrences' ), 'type=success' );
+		Tribe__Admin__Notices::instance()->register( 'created-recurrences', array( __CLASS__, 'render_notice_created_recurrences' ), 'type=success' );
+	}
+
+	/**
+	 * Displays a message informing the user she is editing all of the recurrences in the series.
+	 */
+	public static function render_notice_editing_all_recurrences() {
+		if ( ! Tribe__Admin__Helpers::instance()->is_post_type_screen( Tribe__Events__Main::POSTTYPE ) ) {
+			return false;
+		}
+
+		if ( empty( $_REQUEST['post'] ) || ! tribe_is_recurring_event( $_REQUEST['post'] ) ) {
+			return false;
+		}
+
+		$message = '<p>' . esc_html__( 'You are currently editing all events in a recurring series.', 'tribe-events-calendar-pro' ) . '</p>';
+
+		return Tribe__Admin__Notices::instance()->render( 'editing-all-recurrences', $message );
+	}
+
+	public static function render_notice_created_recurrences() {
+		if ( ! Tribe__Admin__Helpers::instance()->is_post_type_screen( Tribe__Events__Main::POSTTYPE ) ) {
+			return false;
+		}
+
+		if ( empty( $_REQUEST['post'] ) || ! tribe_is_recurring_event( $_REQUEST['post'] ) ) {
+			return false;
+		}
+
+		$pending = get_post_meta( get_the_ID(), '_EventNextPendingRecurrence', true );
+
+		if ( ! $pending ) {
+			return false;
+		}
+
+		$start_dates     = tribe_get_recurrence_start_dates( get_the_ID() );
+		$count           = count( $start_dates );
+		$last            = end( $start_dates );
+		$pending_message = __( '%d instances of this event have been created through %s. <a href="%s">Learn more.</a>', 'tribe-events-calendar-pro' );
+		$pending_message = '<p>' . sprintf( $pending_message, $count, date_i18n( tribe_get_date_format( true ), strtotime( $last ) ), 'http://m.tri.be/lq' ) . '</p>';
+
+		return Tribe__Admin__Notices::instance()->render( 'created-recurrences', $pending_message );
 	}
 
 	public static function filter_edit_post_link( $url, $post_id, $context ) {
@@ -849,8 +894,21 @@ class Tribe__Events__Pro__Recurrence__Meta {
 		global $wpdb;
 		$ancestors = get_post_ancestors( $post_id );
 		$post_id   = empty( $ancestors ) ? $post_id : end( $ancestors );
-		$sql       = "SELECT meta_value FROM {$wpdb->postmeta} m INNER JOIN {$wpdb->posts} p ON p.ID=m.post_id AND (p.post_parent=%d OR p.ID=%d) WHERE meta_key='_EventStartDate' ORDER BY meta_value ASC";
-		$sql       = $wpdb->prepare( $sql, $post_id, $post_id );
+
+		$sql       = "
+			SELECT     meta_value
+			FROM       {$wpdb->postmeta} m
+			INNER JOIN {$wpdb->posts} p ON p.ID=m.post_id 
+			           AND ( p.post_parent=%d OR p.ID=%d )
+		
+			WHERE meta_key = '_EventStartDate' 
+			      AND post_type = %s 
+			      AND post_status NOT IN ( 'inherit', 'auto-draft', 'trash' )
+			
+			ORDER BY meta_value ASC
+		";
+
+		$sql       = $wpdb->prepare( $sql, $post_id, $post_id, Tribe__Events__Main::POSTTYPE );
 		$result    = $wpdb->get_col( $sql );
 		$cache->set( 'recurrence_start_dates_' . $post_id, $result, Tribe__Cache::NO_EXPIRATION, 'save_post' );
 
@@ -1757,13 +1815,6 @@ class Tribe__Events__Pro__Recurrence__Meta {
 			delete_post_meta( $child_id, $meta_key, $meta_value );
 		}
 		$recursing = false;
-	}
-
-	public static function enqueue_post_editor_notices() {
-		if ( ! empty( $_REQUEST['post'] ) && tribe_is_recurring_event( $_REQUEST['post'] ) ) {
-			add_action( 'admin_notices', array( Tribe__Events__Pro__Recurrence__Admin_Notices::instance(), 'display_editing_all_recurrences_notice' ), 10, 0 );
-			add_action( 'admin_notices', array( Tribe__Events__Pro__Recurrence__Admin_Notices::instance(), 'display_created_recurrences_notice' ), 10, 0 );
-		}
 	}
 
 	/**

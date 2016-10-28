@@ -102,6 +102,11 @@ abstract class Tribe__Tickets_Plus__CSV_Importer__Tickets_Importer extends Tribe
 	 */
 	public function update_post( $post_id, array $record ) {
 		// nothing is updated in existing tickets
+		$engine = $this->get_commerce_engine_instance();
+
+		if ( $this->is_aggregator && ! empty( $this->aggregator_record ) ) {
+			$this->aggregator_record->meta['activity']->add( $engine->ticket_object, 'skipped', $post_id );
+		}
 	}
 
 	/**
@@ -119,6 +124,11 @@ abstract class Tribe__Tickets_Plus__CSV_Importer__Tickets_Importer extends Tribe
 		$cache_key   = $ticket_name . '-' . $event->ID;
 
 		self::$ticket_name_cache[ $cache_key ] = true;
+
+		$engine = $this->get_commerce_engine_instance();
+		if ( $this->is_aggregator && ! empty( $this->aggregator_record ) ) {
+			$this->aggregator_record->meta['activity']->add( $engine->ticket_object, 'created', $ticket_id );
+		}
 
 		return $ticket_id;
 	}

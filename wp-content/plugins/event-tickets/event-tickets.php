@@ -2,7 +2,7 @@
 /*
 Plugin Name: Event Tickets
 Description: Event Tickets allows your guests to RSVP from any post, page, or event.
-Version: 4.2.7
+Version: 4.3.1.1
 Author: Modern Tribe, Inc.
 Author URI: http://m.tri.be/28
 License: GPLv2 or later
@@ -33,6 +33,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 define( 'EVENT_TICKETS_DIR', dirname( __FILE__ ) );
+define( 'EVENT_TICKETS_MAIN_PLUGIN_FILE', __FILE__ );
 
 // the main plugin class
 require_once EVENT_TICKETS_DIR . '/src/Tribe/Main.php';

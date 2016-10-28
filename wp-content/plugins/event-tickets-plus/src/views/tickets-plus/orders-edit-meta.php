@@ -2,11 +2,20 @@
 /**
  * Renders the meta fields for order editing
  *
- * @version 4.2
+ * @version 4.3
  *
  */
-$meta = Tribe__Tickets_Plus__Main::instance()->meta();
 $ticket = get_post( $attendee['product_id'] );
+
+if ( empty( $ticket ) ) {
+	?>
+		<p><?php esc_html_e( 'Ticket deleted: attendee info cannot be updated.', 'event-tickets-plus' ); ?></p>
+	<?php
+
+	return;
+}
+
+$meta = Tribe__Tickets_Plus__Main::instance()->meta();
 if ( $meta->meta_enabled( $ticket->ID ) ) {
 	?>
 	<div class="tribe-event-tickets-plus-meta" id="tribe-event-tickets-plus-meta-<?php echo esc_attr( $ticket->ID ); ?>" data-ticket-id="<?php echo esc_attr( $ticket->ID ); ?>">

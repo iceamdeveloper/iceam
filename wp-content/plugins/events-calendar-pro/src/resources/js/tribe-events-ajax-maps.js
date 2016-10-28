@@ -356,7 +356,7 @@
 
 					$( '#tribe-events-content' ).replaceWith( $the_content );
 
-					//If no events are returned, then hide Header 
+					//If no events are returned, then hide Header
 					if ( response.total_count == 0 ) {
 						$( '#tribe-events-header' ).hide();
 					}
@@ -371,10 +371,13 @@
 						document.title = ts.page_title;
 
 						if ( ts.do_string ) {
+							// strip the baseurl from the push state URL
+							var params = ts.params.replace( /&?baseurl=[^&]*/i, '' );
+
 							history.pushState( {
 								"tribe_paged" : ts.paged,
 								"tribe_params": ts.params
-							}, ts.page_title, td.cur_url + '?' + ts.params );
+							}, ts.page_title, td.cur_url + '?' + params );
 						}
 
 						if ( ts.pushstate ) {

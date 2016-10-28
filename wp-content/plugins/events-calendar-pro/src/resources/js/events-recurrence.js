@@ -159,6 +159,9 @@ tribe_events_pro_admin.recurrence = {
 
 		var $rule = this.$exclusion_staging.find( '.tribe-event-recurrence' );
 
+		//add open class so rules display on reload
+		$rule.addClass( 'tribe-open' );
+
 		// replace all of the recurrence[] instances with recurrence[x] where x is a number
 		$rule.find( '[name*="recurrence[exclusions][]"]' ).each( function() {
 			var $field = $( this );

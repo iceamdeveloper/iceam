@@ -198,7 +198,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 */
 	public function __construct() {
 		/* Set up some parent's vars */
-		$this->pluginName = 'WooCommerce';
+		$this->pluginName = _x( 'WooCommerce', 'ticket provider', 'event-tickets-plus' );
 		$this->pluginSlug = 'wootickets';
 		$this->pluginPath = trailingslashit( EVENT_TICKETS_PLUS_DIR );
 		$this->pluginDir  = trailingslashit( basename( $this->pluginPath ) );
@@ -1509,7 +1509,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		$status             = get_post_status( $order_id );
 		$order_status       = 'wc-' === substr( $status, 0, 3 ) ? substr( $status, 3 ) : $status;
-		$order_status_label = __( $order_status, 'woocommerce' );
+		$order_status_label = wc_get_order_status_name( $order_status );
 		$order_warning      = false;
 
 		// Warning flag for refunded, cancelled and failed orders

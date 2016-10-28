@@ -172,7 +172,8 @@ class Tribe__Tickets_Plus__Commerce__Shopp__Main extends Tribe__Tickets_Plus__Ti
 	 * Class constructor
 	 */
 	public function __construct() {
-		$this->pluginName = 'Shopp'; // This string is used for form a link to the product editor
+		// This string is used for form a link to the product editor
+		$this->pluginName = _x( 'Shopp', 'ticket provider', 'event-tickets-plus' );
 		$this->pluginSlug = 'shopptickets';
 		$this->pluginPath = trailingslashit( EVENT_TICKETS_PLUS_DIR );
 		$this->pluginDir  = trailingslashit( basename( $this->pluginPath ) );

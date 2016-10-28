@@ -4,7 +4,7 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
 Tested up to: 4.6.1
-Stable tag: 4.2.7.1
+Stable tag: 4.3.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,16 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.3.1] 2016-10-20 =
+
+* Fix - Prevents fatal around transients for Cart usage (thanks for the report @Port) [66468]
+* Tweak - Registered plugin as active with Tribe Common. [66657]
+
+= [4.3] 2016-10-13 =
+
+* Tweak - Improved integration with the attendee screen and enhanced options for customizing same [61992]
+* Fix - Fix issue where custom attendee meta fields sometimes failed to render the meta field templates [67235]
 
 = [4.2.7.1] 2016-09-21 =
 

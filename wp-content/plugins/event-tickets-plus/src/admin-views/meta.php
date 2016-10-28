@@ -3,7 +3,7 @@ if ( empty( $fieldset_form ) ) {
 	?>
 	<tr class="tribe-tickets-show-attendee-info ticket_advanced ticket_advanced_meta">
 		<td style="width: 20%;">
-			<?php _e( 'Attendee Information:', 'tribe-events-calendar' ); ?>
+			<?php esc_html_e( 'Attendee Information:', 'event-tickets-plus' ); ?>
 		</td>
 		<td>
 			<?php /* save as checked if the ticket has attendee info */ ?>
@@ -12,7 +12,7 @@ if ( empty( $fieldset_form ) ) {
 				<?php esc_html_e( 'Request information for each attendee during registration', 'event-tickets-plus' ); ?>
 			</label>
 			<p class="detailed description">
-				<?php esc_html_e( 'The name and contact info of the person acquiring tickets is collected by default' ); ?>
+				<?php esc_html_e( 'The name and contact info of the person acquiring tickets is collected by default', 'event-tickets-plus' ); ?>
 			</p>
 		</td>
 	</tr>

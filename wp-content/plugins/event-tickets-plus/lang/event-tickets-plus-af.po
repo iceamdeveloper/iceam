@@ -10,6 +10,50 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/Tribe/Commerce/Attendance_Totals.php:35
+msgctxt "attendee summary"
+msgid "Total Tickets Sold:"
+msgstr ""
+
+#: src/Tribe/Commerce/Attendance_Totals.php:36
+msgctxt "attendee summary"
+msgid "Paid/Complete:"
+msgstr ""
+
+#: src/Tribe/Commerce/Attendance_Totals.php:37
+msgctxt "attendee summary"
+msgid "Pending Action:"
+msgstr ""
+
+#: src/Tribe/Commerce/EDD/Main.php:155
+msgctxt "ticket provider"
+msgid "Easy Digital Downloads"
+msgstr ""
+
+#: src/Tribe/Commerce/Shopp/Main.php:176
+msgctxt "ticket provider"
+msgid "Shopp"
+msgstr ""
+
+#: src/Tribe/Commerce/WPEC/Main.php:128
+msgctxt "ticket provider"
+msgid "WPEC"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:201
+msgctxt "ticket provider"
+msgid "WooCommerce"
+msgstr ""
+
+#: src/Tribe/Meta/Render.php:90
+msgctxt "orphaned attendee meta data"
+msgid "Other attendee data:"
+msgstr ""
+
+#: src/views/tickets-plus/orders-edit-meta.php:12
+msgid "Ticket deleted: attendee info cannot be updated."
+msgstr ""
+
 #: event-tickets-plus.php:133
 msgid "To begin using Event Tickets Plus, please install and activate the latest version of %1$s%2$s%3$s and ensure its own requirements have been met."
 msgstr "Om Event Ticket Pro te begin gebruik moet jy asseblief die nuuste weergawe van %1$s%2$s%3$s installeer en seker maak daar is aan die weergawe se eie vereistes voldoen"
@@ -50,11 +94,11 @@ msgstr "Kaartjie Prys"
 msgid "Ticket SKU"
 msgstr "Kaartjie RVE"
 
-#: src/Tribe/CSV_Importer/Tickets_Importer.php:223
+#: src/Tribe/CSV_Importer/Tickets_Importer.php:233
 msgid "Recurring event tickets are not supported, event %d."
 msgstr "Herhalende geleentheid kaartjies word nie ondersteun nie, geleentheid %d"
 
-#: src/Tribe/Main.php:289
+#: src/Tribe/Main.php:339
 msgid "Require users to log in before they purchase tickets"
 msgstr "Vereis gebruikers om in te teken voor hulle kaartjies kan koop."
 
@@ -62,7 +106,7 @@ msgstr "Vereis gebruikers om in te teken voor hulle kaartjies kan koop."
 msgid "Login to purchase"
 msgstr "Teken in om te kan koop"
 
-#: src/views/tickets-plus/orders-edit-meta.php:13
+#: src/views/tickets-plus/orders-edit-meta.php:22
 msgid "Toggle attendee info"
 msgstr "Skakel deelnemer inligting"
 
@@ -145,15 +189,7 @@ msgstr "Opgelaai na hierdie kaartjie veldstel"
 msgid "Custom Ticket Fields"
 msgstr "Persoonlike Kaartjie Veld"
 
-#: src/Tribe/Meta/Render.php:19
-msgid "View details"
-msgstr "Besigtig besonderhede"
-
-#: src/Tribe/Meta/Render.php:20
-msgid "Hide details"
-msgstr "Steek besonderhede weg"
-
-#: src/Tribe/Meta/Render.php:97 src/admin-views/meta.php:30
+#: src/Tribe/Meta/Render.php:127 src/admin-views/meta.php:30
 msgid "Attendee Information"
 msgstr "Deelnemer Informasie"
 
@@ -169,10 +205,10 @@ msgstr "Skandeer hierdie QR kode by die geleentheid om in te boek."
 msgid "Hide attendees list on event page"
 msgstr "Steek die deelnemerslys op die geleentheid bladsy weg."
 
-#: src/admin-views/edd-metabox-advanced.php:60
-#: src/admin-views/shopp-metabox-advanced.php:33
-#: src/admin-views/woocommerce-metabox-advanced.php:73
-#: src/admin-views/wpec-metabox-advanced.php:34
+#: src/admin-views/edd-metabox-advanced.php:52
+#: src/admin-views/shopp-metabox-advanced.php:25
+#: src/admin-views/woocommerce-metabox-advanced.php:65
+#: src/admin-views/wpec-metabox-advanced.php:26
 msgid "If you are creating a recurring event, Tickets will only show up once per Event Series, meaning that the same ticket will apper across all events. Please configure your events accordingly."
 msgstr ""
 
@@ -493,10 +529,10 @@ msgstr "%1$s deur %2$s"
 msgid "Check in for this event"
 msgstr "Boek in vir hierdie geleentheid"
 
-#: src/admin-views/edd-metabox-advanced.php:53
-#: src/admin-views/shopp-metabox-advanced.php:26
-#: src/admin-views/woocommerce-metabox-advanced.php:66
-#: src/admin-views/wpec-metabox-advanced.php:27
+#: src/admin-views/edd-metabox-advanced.php:59
+#: src/admin-views/shopp-metabox-advanced.php:31
+#: src/admin-views/woocommerce-metabox-advanced.php:71
+#: src/admin-views/wpec-metabox-advanced.php:32
 msgid "Selling tickets for recurring events"
 msgstr "Verkoop kaartjies vir herhalende geleenthede"
 
@@ -528,8 +564,7 @@ msgstr "Kaartjie E-pos Onderwerp"
 msgid "Enter the subject line for the tickets receipt email"
 msgstr "Tik die onderwerp lyn in vir die kaartjie ontvangs e-pos"
 
-#: src/Tribe/Commerce/EDD/Main.php:155 src/Tribe/Commerce/Loader.php:105
-#: src/Tribe/Commerce/Loader.php:120
+#: src/Tribe/Commerce/Loader.php:105 src/Tribe/Commerce/Loader.php:120
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
@@ -548,7 +583,7 @@ msgstr "(geskrap)"
 msgid "Event sales report"
 msgstr "Geleentheid verkope verslag"
 
-#: src/Tribe/Commerce/EDD/Main.php:1149 src/Tribe/Commerce/Shopp/Main.php:1122
+#: src/Tribe/Commerce/EDD/Main.php:1149 src/Tribe/Commerce/Shopp/Main.php:1123
 #: src/Tribe/Commerce/WPEC/Main.php:1028
 #: src/Tribe/Commerce/WooCommerce/Main.php:1753
 msgid "This is a ticket for the event:"
@@ -582,23 +617,23 @@ msgstr "Shopp"
 msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 msgstr ""
 
-#: src/Tribe/Commerce/Shopp/Main.php:997
+#: src/Tribe/Commerce/Shopp/Main.php:998
 msgid "Unknown item"
 msgstr "Onbekende item"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1112
+#: src/Tribe/Commerce/Shopp/Main.php:1113
 msgid "Event"
 msgstr "Geleentheid"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1193 src/Tribe/Commerce/WPEC/Main.php:1087
+#: src/Tribe/Commerce/Shopp/Main.php:1194 src/Tribe/Commerce/WPEC/Main.php:1087
 msgid "Resend Tickets"
 msgstr "Stuur Kaartjies Weer"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1231
+#: src/Tribe/Commerce/Shopp/Main.php:1232
 msgid "Email containing tickets (sent by ShoppTickets)"
 msgstr "Eposs het kaartjies in (gestuur deur Shopp Kaartjies)"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1273
+#: src/Tribe/Commerce/Shopp/Main.php:1274
 msgid "Your tickets from %s"
 msgstr "Jou kaartjies van %s"
 
@@ -630,7 +665,7 @@ msgid "&nbsp; [Sent]"
 msgstr "&nbsp; [Stuur]"
 
 #: src/Tribe/CSV_Importer/Column_Names.php:68
-#: src/Tribe/CSV_Importer/Rows.php:52
+#: src/Tribe/CSV_Importer/Rows.php:52 src/Tribe/CSV_Importer/Rows.php:71
 #: src/Tribe/Commerce/WooCommerce/Email.php:15
 #: src/views/eddtickets/tickets.php:18 src/views/shopptickets/tickets.php:82
 #: src/views/wootickets/tickets.php:19 src/views/wpectickets/tickets.php:96
@@ -683,7 +718,7 @@ msgstr "RVE (Rekordhouding van voorraad Eenheid)"
 msgid "(A unique identifying code for each ticket type you're selling)"
 msgstr "(Jedinečný identifikační kód pro každý typ prodávané vstupenky)"
 
-#: src/admin-views/edd-metabox-advanced.php:58
+#: src/admin-views/edd-metabox-advanced.php:50
 msgid "Currently, eddTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
 msgstr ""
 
@@ -695,15 +730,15 @@ msgstr ""
 msgid "A unique identifying code for each ticket type you're selling"
 msgstr "'n Unieke identifieserende kode vir elke kaartjie tipe wat jy verkoop"
 
-#: src/admin-views/shopp-metabox-advanced.php:31
+#: src/admin-views/shopp-metabox-advanced.php:23
 msgid "Currently, ShoppTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
 msgstr ""
 
-#: src/admin-views/woocommerce-metabox-advanced.php:71
+#: src/admin-views/woocommerce-metabox-advanced.php:63
 msgid "Currently, WooTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
 msgstr ""
 
-#: src/admin-views/wpec-metabox-advanced.php:32
+#: src/admin-views/wpec-metabox-advanced.php:24
 msgid "Currently, WPECTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
 msgstr "Tans sal WPECTickets slegs een keer op die voorkant van elke gebeurtenis wys. Vir Pro-gebruikers beteken dit dat dieselfde kaartjie reg oor al die gebeure in die reeks sal verskyn. Stel jou gebeurtenisse dienooreenkomstig."
 

@@ -152,7 +152,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	public function __construct() {
 
 		/* Set up some parent's vars */
-		$this->pluginName = __( 'Easy Digital Downloads', 'edd' );
+		$this->pluginName = _x( 'Easy Digital Downloads', 'ticket provider', 'event-tickets-plus' );
 		$this->pluginSlug = 'eddtickets';
 		$this->pluginPath = trailingslashit( EVENT_TICKETS_PLUS_DIR );
 		$this->pluginDir  = trailingslashit( basename( $this->pluginPath ) );

@@ -257,7 +257,7 @@
 	display: inline;
 }
 
-.event-tickets-meta-toggle-open + tr {
+tr.event-tickets-meta-toggle-open {
 	display: table-row;
 }
 

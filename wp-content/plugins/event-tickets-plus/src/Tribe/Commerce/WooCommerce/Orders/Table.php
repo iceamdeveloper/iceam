@@ -370,7 +370,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 			),
 			'meta_query' => array(
 				array(
-					'key' => '_tribe_wooticket_event',
+					'key' => Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_EVENT_KEY,
 					'value' => $event_id,
 				),
 			),
@@ -379,7 +379,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		$orders = array();
 		$query = new WP_Query( $args );
 		foreach ( $query->posts as &$item ) {
-			$order_id = get_post_meta( $item->ID, '_tribe_wooticket_order', true );
+			$order_id = get_post_meta( $item->ID, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_ORDER_KEY, true );
 
 			if ( isset( $orders[ $order_id ] ) ) {
 				continue;
@@ -405,7 +405,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 			foreach ( $order['line_items'] as $line_item ) {
 				$ticket_id = $line_item['product_id'];
-				$ticket_event_id = absint( get_post_meta( $ticket_id, '_tribe_wooticket_for_event', true ) );
+				$ticket_event_id = absint( get_post_meta( $ticket_id, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->event_key, true ) );
 
 				// if the ticket isn't for the currently viewed event, skip it
 				if ( $ticket_event_id !== $event_id ) {

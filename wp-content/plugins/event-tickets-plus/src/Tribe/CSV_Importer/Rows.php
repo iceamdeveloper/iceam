@@ -54,4 +54,22 @@ class Tribe__Tickets_Plus__CSV_Importer__Rows {
 
 		return $import_options;
 	}
+
+	/**
+	 * Filters the CSV post types to add Woo tickets
+	 *
+	 * @param array $post_types Array of post type objects
+	 *
+	 * @return array
+	 */
+	public function filter_csv_post_types( array $post_types ) {
+		if ( ! $this->commerce_loader->is_woocommerce_active() ) {
+			return $post_types;
+		}
+
+		$post_type = get_post_type_object( Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->ticket_object );
+		$post_type->labels->name = __( 'Tickets', 'event-tickets-plus' );
+		$post_types[] = $post_type;
+		return $post_types;
+	}
 }

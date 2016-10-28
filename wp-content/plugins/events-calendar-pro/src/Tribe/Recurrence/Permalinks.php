@@ -97,5 +97,26 @@ class Tribe__Events__Pro__Recurrence__Permalinks {
 
 		return $permastruct;
 	}
+
+	/**
+	 * Filters the sample permalink to show a link to the first instance of recurring events.
+	 *
+	 * This is to match the real link pointing to a recurring events series first instance.
+	 *
+	 * @param string  $permalink Sample permalink.
+	 * @param int     $post_id   Post ID.
+	 *
+	 * @return string The permalink to the first recurring event instance if the the event
+	 *                is a recurring one, the original permalink otherwise.
+	 */
+	public function filter_sample_permalink( $permalink, $post_id ) {
+		if ( ! empty( $post_id ) && tribe_is_recurring_event( $post_id ) ) {
+			// fetch the real post permalink, recurring event filters down the road will
+			// append the date to it
+			$permalink = get_post_permalink( $post_id );
+		}
+
+		return $permalink;
+	}
 }
 

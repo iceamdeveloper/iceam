@@ -46,21 +46,21 @@ include dirname( __FILE__ ) . '/price-fields.php';
 </tr>
 <?php
 if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
+	if ( is_admin() ) {
+		$bumpdown = __( 'Currently, eddTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly.', 'event-tickets-plus' );
+	} else {
+		$bumpdown = __( 'If you are creating a recurring event, Tickets will only show up once per Event Series, meaning that the same ticket will apper across all events. Please configure your events accordingly.', 'event-tickets-plus' );
+	}
+
 	?>
 	<tr class="<?php $this->tr_class(); ?>">
 		<td colspan="2" class="tribe_sectionheader updated">
 			<p>
-				<?php esc_html_e( 'Selling tickets for recurring events', 'event-tickets-plus' ); ?> <span id="selling-tickets-info" class="target dashicons dashicons-editor-help bumpdown-trigger"></span>
+				<?php esc_html_e( 'Selling tickets for recurring events', 'event-tickets-plus' ); ?>
+				<span class="dashicons dashicons-editor-help tribe-bumpdown-trigger"
+				      data-bumpdown="<?php echo esc_attr( $bumpdown ); ?>"
+				      data-bumpdown-class="<?php echo esc_attr( $this->tr_class() ); ?>"></span>
 			</p>
-			<div class="bumpdown" data-trigger="selling-tickets-info">
-				<?php
-					if ( is_admin() ) {
-						esc_html_e( 'Currently, eddTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly.', 'event-tickets-plus' );
-					} else {
-						esc_html_e( 'If you are creating a recurring event, Tickets will only show up once per Event Series, meaning that the same ticket will apper across all events. Please configure your events accordingly.', 'event-tickets-plus' );
-					}
-				?>
-			</div>
 		</td>
 	</tr>
 	<?php

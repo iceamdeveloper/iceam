@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.2.7.1';
+		const VERSION = '4.3.1';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.2.2';
+		const REQUIRED_TICKETS_VERSION = '4.3';
 
 		/**
 		 * Directory of the plugin
@@ -39,6 +39,11 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 * @var Tribe__Tickets_Plus__PUE
 		 */
 		public $pue;
+
+		/**
+		 * @var Tribe__Tickets_Plus__Commerce__Attendance_Totals
+		 */
+		protected $attendance_totals;
 
 		/**
 		 * Holds an instance of Tribe__Tickets_Plus__Commerce__Loader
@@ -89,12 +94,16 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			add_action( 'init', array( $this, 'init' ), 9 );
 
+			// Register the plugin as active after the tribe autoloader runs
+			$this->register_active_plugin();
+
 			$this->apm_filters();
 
 			add_action( 'init', array( $this, 'csv_import_support' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 			add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
 			add_filter( 'tribe_tickets_settings_systems_supporting_login_requirements', array( $this, 'register_login_setting' ) );
+			add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ), 5 );
 
 			// Unique ticket identifiers
 			add_action( 'event_tickets_rsvp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
@@ -112,6 +121,20 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->qr();
 			$this->attendees_list();
 		}
+
+		/**
+		 * Registers this plugin as being active for other tribe plugins and extensions
+		 *
+		 * @return bool Indicates if Tribe Common wants the plugin to run
+		 */
+		public function register_active_plugin() {
+			if ( ! function_exists( 'tribe_register_plugin' ) ) {
+				return true;
+			}
+
+			return tribe_register_plugin( EVENT_TICKETS_PLUS_FILE, __CLASS__, self::VERSION );
+		}
+
 
 		public function register_resources() {
 			wp_register_style( 'event-tickets-plus-tickets', plugins_url( 'resources/css/tickets.css', dirname( __FILE__ ) ), array( 'dashicons' ),
@@ -204,6 +227,28 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		}
 
 		/**
+		 * Adds ticket attendance totals to the summary box of the attendance
+		 * screen.
+		 *
+		 * Expects to fire during 'tribe_tickets_attendees_page_inside', ie
+		 * before the attendee screen is rendered.
+		 */
+		public function setup_attendance_totals() {
+			$this->attendance_totals()->integrate_with_attendee_screen();
+		}
+
+		/**
+		 * @return Tribe__Tickets_Plus__Commerce__Attendance_Totals
+		 */
+		public function attendance_totals() {
+			if ( empty( $this->attendance_totals ) ) {
+				$this->attendance_totals = new Tribe__Tickets_Plus__Commerce__Attendance_Totals;
+			}
+
+			return $this->attendance_totals;
+		}
+
+		/**
 		 * Setup integration with The Events Calendar's CSV import facilities.
 		 *
 		 * Expects to run during the init action - we don't want to set this up
@@ -226,10 +271,15 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$importer_rows_filter = Tribe__Tickets_Plus__CSV_Importer__Rows::instance( $commerce_loader );
 
 			add_filter( 'tribe_events_import_options_rows', array( $importer_rows_filter, 'filter_import_options_rows' ) );
+			add_filter( 'tribe_aggregator_csv_post_types', array( $importer_rows_filter, 'filter_csv_post_types' ) );
 
 			if ( $commerce_loader->is_woocommerce_active() ) {
-				add_filter( 'tribe_event_import_tickets_woo_column_names', array( $column_names_filter, 'filter_tickets_woo_column_names' ) );
+				Tribe__Tickets_Plus__CSV_Importer__Woo::instance();
+
+				add_filter( 'tribe_event_import_product_column_names', array( $column_names_filter, 'filter_tickets_woo_column_names' ) );
+
 				add_filter( 'tribe_events_import_tickets_woo_importer', array( 'Tribe__Tickets_Plus__CSV_Importer__Tickets_Importer', 'woo_instance' ), 10, 2 );
+				add_filter( 'tribe_event_import_tickets_woo_column_names', array( $column_names_filter, 'filter_tickets_woo_column_names' ) );
 			}
 
 			add_filter( 'tribe_events_import_type_titles_map', array( $column_names_filter, 'filter_import_type_titles_map' ) );

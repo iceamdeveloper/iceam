@@ -210,7 +210,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 	public function render_field( $field, $value = null, $attendee_id = null ) {
 		ob_start();
 
-		$template = sanitize_file_name( $field->type );
+		$template = sanitize_file_name( "{$field->type}.php" );
 		$required = isset( $field->required ) && 'on' === $field->required ? true : false;
 
 		$field = (array) $field;
@@ -219,7 +219,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 			return;
 		}
 
-		include Tribe__Tickets_Plus__Main::instance()->plugin_path . "src/views/meta/{$template}.php";
+		include Tribe__Tickets_Plus__Main::instance()->plugin_path . "src/views/meta/{$template}";
 
 		return ob_get_clean();
 	}
