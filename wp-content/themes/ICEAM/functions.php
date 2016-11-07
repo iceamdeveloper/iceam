@@ -1,5 +1,57 @@
 <?php
 
+/*
+*
+*
+*	Known Issues:
+*
+*	SENSEI:
+*	Latest Sensei update broke video display. There is a newer update that may fix this issue,
+*	but it has not been tested yet. I believe this is in files:
+*
+*		/woothemes-sensei/includes/class-sensei-course.php line 2950
+*		/woothemes-sensei/includes/class-sensei-frontend.php line 898
+*
+*
+*	DYNAMIC PRICING:
+*	Variable $matched is set to true before all conditions are tested.
+*	Changing line 64 from } to } else { $matched = false; } solves this issue for
+*	Advanced Order Totals rules based on Category Totals.
+*
+*	 	/woocommerce-dynamic-pricing/classes/modules/class-wc-dynamic-pricing-advanced-totals.php
+*
+*
+ */
+
+ 
+
+/***********************************************************************
+ *
+ * Events Tickets Plus - WooCommerce Tickets - Prevent Ticket Email from being sent.
+ * @ Version 4.0
+ *
+ **********************************************************************/
+
+add_action( 'init', 'wootickets_stop_sending_email' );
+function wootickets_stop_sending_email() {
+	if ( class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' ) ) {
+		$woo = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
+		remove_filter( 'woocommerce_email_classes', array( $woo, 'add_email_class_to_woocommerce' ) );
+		add_action( 'woocommerce_email_after_order_table', array( $woo, 'add_tickets_msg_to_email' ) );
+	}
+}
+
+/*
+* Events Tickets Plus - WooCommerce Tickets - Hide You'll receive your tickets in another email.
+* @ Version 4.0
+*/
+add_filter( 'wootickets_email_message', 'woo_tickets_filter_completed_order', 10 );
+function woo_tickets_filter_completed_order( $text ) {
+	$text = "";
+
+	return $text;
+}
+
 
 /***********************************************************************
  *
