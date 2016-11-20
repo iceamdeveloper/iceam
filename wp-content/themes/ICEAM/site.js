@@ -133,7 +133,7 @@ jQuery(document).ready(function(){
 	});
 
 	
-	$("iframe.ytv").each(function(){
+	$(".course-video iframe").each(function(){
 		//$(document).on("contextmenu", function(){return false;});
 		var yturi = "https://www.youtube.com/embed/" + ytv($("#ytv").data("yturi")) + "?autohide=1&modestbranding=1&rel=0&showinfo=0&enablejsapi=1";
 		

@@ -64,11 +64,7 @@ class Sensei_Course {
 				'frameborder'     => array(),
 				'allowfullscreen' => array(),
 			),
-			'video'  => array(
-				'width'  => array(),
-				'height' => array(),
-				'src'    => array(),
-			),
+			'video'  => Sensei_Wp_Kses::get_video_html_tag_allowed_attributes()
 		);
 
 		// Update course completion upon completion of a lesson
@@ -385,7 +381,7 @@ class Sensei_Course {
 		$html = '';
 
 		$html .= '<label class="screen-reader-text" for="course_video_embed">' . __( 'Video Embed Code', 'woothemes-sensei' ) . '</label>';
-		$html .= '<textarea rows="5" cols="50" name="course_video_embed" tabindex="6" id="course-video-embed">' . wp_kses( $course_video_embed, self::$allowed_html ) . '</textarea>';
+		$html .= '<textarea rows="5" cols="50" name="course_video_embed" tabindex="6" id="course-video-embed">' . Sensei_Wp_Kses::wp_kses( $course_video_embed, self::$allowed_html ) . '</textarea>';
 		$html .= '<p>' .  __( 'Paste the embed code for your video (e.g. YouTube, Vimeo etc.) in the box above.', 'woothemes-sensei' ) . '</p>';
 
 		echo $html;
@@ -2947,7 +2943,7 @@ class Sensei_Course {
         if ( '' != $course_video_embed ) { ?>
 
             <div class="course-video">
-                <?php echo do_shortcode( html_entity_decode( $course_video_embed ) ); ?>
+                <?php echo Sensei_Wp_Kses::wp_kses( do_shortcode( $course_video_embed ), self::$allowed_html ); ?>
             </div>
 
         <?php } // End If Statement
@@ -3101,8 +3097,8 @@ class Sensei_Course {
 	 */
 	function allow_course_archive_on_front_page( $query ) {
 		// Bail if it's clear we're not looking at a static front page or if the $running flag is
-		// set @see https://github.com/Automattic/sensei/issues/1438
-		if ( ! $query->is_main_query() || ! is_page() || is_admin() ) {
+		// set @see https://github.com/Automattic/sensei/issues/1438 and https://github.com/Automattic/sensei/issues/1491
+		if ( is_admin() || false === $query->is_main_query() || false === $this->is_front_page( $query ) ) {
 			return;
 		}
 
@@ -3143,6 +3139,32 @@ class Sensei_Course {
 		$query->is_singular          = 0;
 		$query->is_post_type_archive = 1;
 		$query->is_archive           = 1;
+	}
+
+	/**
+	 * Workaround for determining if this is the front page.
+	 * We cannot use is_front_page() on pre_get_posts, or it will throw notices.
+	 * See https://core.trac.wordpress.org/ticket/21790
+	 *
+	 * @param WP_Query $query
+	 * @return bool
+	 */
+	private function is_front_page( $query ) {
+		if ( 'page' != get_option( 'show_on_front' ) ) {
+			return false;
+		}
+
+		$page_on_front = get_option( 'page_on_front', '' );
+		if ( empty( $page_on_front ) ) {
+			return false;
+		}
+
+		$page_id = $query->get( 'page_id', '' );
+		if ( empty( $page_id ) ) {
+			return false;
+		}
+
+		return $page_on_front == $page_id;
 	}
 
 

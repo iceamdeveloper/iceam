@@ -2331,7 +2331,6 @@ class Sensei_Utils {
 
         return $merged_array;
     }
-
 } // End Class
 
 /**
