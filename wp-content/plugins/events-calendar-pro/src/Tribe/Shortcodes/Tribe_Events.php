@@ -519,6 +519,8 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 	 * For default supported views, performs rendering and returns the result.
 	 */
 	public function render_view() {
+		$attributes = array();
+
 		/**
 		 * Fires before the embedded view is rendered.
 		 *
@@ -529,8 +531,15 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 		ob_start();
 
 		$this->get_template_object()->add_input_hash();
+		$attributes[] = 'id="tribe-events"';
+		$attributes[] = 'class="' . $this->get_wrapper_classes() . '"';
 
-		echo '<div id="tribe-events" class="' . $this->get_wrapper_classes() . '">';
+		if ( ! empty( $this->query_args['tribe_events_cat'] ) ) {
+			$attributes[] = 'data-category="' . esc_attr( $this->query_args['tribe_events_cat'] ) . '"';
+		}
+
+		// Creates id='tribe-events' container
+		echo '<div ' . implode( ' ', $attributes ) . '>';
 
 		// Include the tribe bar HTML if required
 		if ( $this->is_attribute_truthy( 'tribe-bar', true ) ) {

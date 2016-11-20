@@ -3,8 +3,8 @@
 Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tribe, faction23, geoffgraham, ggwicz, jazbek, jbrinley, joshlimecuda, leahkoerper, lucatume, mastromktg, neillmcshea, nicosantos, peterchester, reid.peifer, roblagatta, shane.pearlman, thatdudebutch,  zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
-Tested up to: 4.6.1
-Stable tag: 4.3.1
+Tested up to: 4.6
+Stable tag: 4.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,25 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.3.3] 2016-11-16 =
+
+* Tweak - Included a New Filter `tribe_events_tickets_woo_get_ticket` for better ticket control on WooCommerce [69144] (Props to @helgatheviking)
+* Tweak - Included a New Filter `tribe_events_tickets_edd_get_ticket` for better ticket control on EDD [69144] (Props to @helgatheviking)
+* Tweak - Included a New Filter `tribe_events_tickets_shopp_get_ticket` for better ticket control on Shopp [69144] (Props to @helgatheviking)
+* Tweak - Included a New Filter `tribe_events_tickets_wpec_get_ticket` for better ticket control on WPEC [69144] (Props to @helgatheviking)
+
+= [4.3.2] 2016-11-02 =
+
+* Tweak - Included a New Filter `tribe_events_wootickets_ticket_price_html` to allow control over Price HTML for WooCommerce [68555] (Props to @helgatheviking)
+* Tweak - Included a New Filter `eddtickets_ticket_price_html` to allow control over Price HTML for EDD [68555] (Props to @helgatheviking)
+* Tweak - Included a New Filter `wpectickets_ticket_price_html` to allow control over Price HTML for WPEC [68555] (Props to @helgatheviking)
+* Tweak - Included a New Filter `shopptickets_ticket_price_html` to allow control over Price HTML for Shopp [68555] (Props to @helgatheviking)
+* Tweak - Now WooCommerce Attendees and the Orders are linked via a Metabox [68555] (Props to @helgatheviking)
+* Tweak - Included a New Filter `tribe_events_tickets_woo_cart_class` to allow Classes customization for the tickets form on Woo [68556] (Props to @helgatheviking)
+* Tweak - Included a New Filter `tribe_events_tickets_woo_quantity_column_class` to allow Classes customization for the tickets price column on Woo [68556] (Props to @helgatheviking)
+* Fix - Hide on Attendees List does not show if option checked in admin for EDD, WPEC, and Shopp tickets [46708]
+* Fix - Enable custom meta in all ticket emails [66751]
 
 = [4.3.1] 2016-10-20 =
 

@@ -1,16 +1,23 @@
 <?php
 /**
+ * WC_PB_Core_Compatibility class
+ *
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.7.6
+ */
+
+// Exit if accessed directly.
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
+
+/**
  * Functions for WC core back-compatibility.
  *
  * @class  WC_PB_Core_Compatibility
  * @since  4.7.6
  */
-
-// Exit if accessed directly
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 class WC_PB_Core_Compatibility {
 
 	/**
@@ -26,7 +33,29 @@ class WC_PB_Core_Compatibility {
 	}
 
 	/**
-	 * Returns true if the installed version of WooCommerce is 2.4 or greater.
+	 * Returns true if the installed version of WooCommerce is 2.7 or greater.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @return boolean
+	 */
+	public static function is_wc_version_gte_2_7() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.7', '>=' );
+	}
+
+	/**
+	 * Returns true if the installed version of WooCommerce is 2.6 or greater.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @return boolean
+	 */
+	public static function is_wc_version_gte_2_6() {
+		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.6', '>=' );
+	}
+
+	/**
+	 * Returns true if the installed version of WooCommerce is 2.5 or greater.
 	 *
 	 * @since  4.10.2
 	 *
@@ -85,8 +114,8 @@ class WC_PB_Core_Compatibility {
 	 *
 	 * @since  4.7.6
 	 *
-	 * @param  string  $version
-	 * @return boolean
+	 * @param  string  $version the version to compare
+	 * @return boolean true if the installed version of WooCommerce is > $version
 	 */
 	public static function is_wc_version_gt( $version ) {
 		return self::get_wc_version() && version_compare( self::get_wc_version(), $version, '>' );
@@ -97,7 +126,7 @@ class WC_PB_Core_Compatibility {
 	 *
 	 * get_product() is soft-deprecated in WC 2.2
 	 *
-	 * @since  4.7.6
+	 * @since 4.7.6
 	 *
 	 * @param  bool|int|string|WP_Post  $the_product
 	 * @param  array                    $args
@@ -174,6 +203,20 @@ class WC_PB_Core_Compatibility {
 	}
 
 	/**
+	 * Get rounding precision.
+	 *
+	 * @since  4.14.6
+	 *
+	 * @return int
+	 */
+	public static function wc_get_rounding_precision( $price_decimals = false ) {
+		if ( false === $price_decimals ) {
+			$price_decimals = wc_get_price_decimals();
+		}
+		return absint( $price_decimals ) + 2;
+	}
+
+	/**
 	 * Return the number of decimals after the decimal point.
 	 *
 	 * @since  4.13.1
@@ -190,20 +233,6 @@ class WC_PB_Core_Compatibility {
 	}
 
 	/**
-	 * Get rounding precision.
-	 *
-	 * @since  4.14.6
-	 *
-	 * @return int
-	 */
-	public static function wc_get_rounding_precision( $price_decimals = false ) {
-		if ( false === $price_decimals ) {
-			$price_decimals = wc_get_price_decimals();
-		}
-		return absint( $price_decimals ) + 2;
-	}
-
-	/**
 	 * Output a list of variation attributes for use in the cart forms.
 	 *
 	 * @since 4.13.1
@@ -211,58 +240,7 @@ class WC_PB_Core_Compatibility {
 	 * @param array  $args
 	 */
 	public static function wc_dropdown_variation_attribute_options( $args = array() ) {
-
-		if ( self::is_wc_version_gte_2_4() ) {
-			return wc_dropdown_variation_attribute_options( $args );
-		} else {
-
-			$args = wp_parse_args( $args, array(
-				'options'          => false,
-				'attribute'        => false,
-				'product'          => false,
-				'selected' 	       => false,
-				'name'             => '',
-				'id'               => '',
-				'show_option_none' => __( 'Choose an option', 'woocommerce' )
-			) );
-
-			$options   = $args[ 'options' ];
-			$product   = $args[ 'product' ];
-			$attribute = $args[ 'attribute' ];
-			$name      = $args[ 'name' ] ? $args[ 'name' ] : 'attribute_' . sanitize_title( $attribute );
-			$id        = $args[ 'id' ] ? $args[ 'id' ] : sanitize_title( $attribute );
-
-			if ( empty( $options ) && ! empty( $product ) && ! empty( $attribute ) ) {
-				$attributes = $product->get_variation_attributes();
-				$options    = $attributes[ $attribute ];
-			}
-
-			echo '<select id="' . esc_attr( $id ) . '" name="' . esc_attr( $name ) . '" data-attribute_name="attribute_' . esc_attr( sanitize_title( $attribute ) ) . '">';
-
-			if ( $args[ 'show_option_none' ] ) {
-				echo '<option value="">' . esc_html( $args[ 'show_option_none' ] ) . '</option>';
-			}
-
-			if ( ! empty( $options ) ) {
-				if ( $product && taxonomy_exists( $attribute ) ) {
-
-					// Get terms if this is a taxonomy - ordered. We need the names too.
-					$terms = self::wc_get_product_terms( $product->id, $attribute, array( 'fields' => 'all' ) );
-
-					foreach ( $terms as $term ) {
-						if ( in_array( $term->slug, $options ) ) {
-							echo '<option value="' . esc_attr( $term->slug ) . '" ' . selected( sanitize_title( $args[ 'selected' ] ), $term->slug, false ) . '>' . apply_filters( 'woocommerce_variation_option_name', $term->name ) . '</option>';
-						}
-					}
-				} else {
-					foreach ( $options as $option ) {
-						echo '<option value="' . esc_attr( sanitize_title( $option ) ) . '" ' . selected( $args[ 'selected' ], sanitize_title( $option ), false ) . '>' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) ) . '</option>';
-					}
-				}
-			}
-
-			echo '</select>';
-		}
+		return wc_dropdown_variation_attribute_options( $args );
 	}
 
 	/**
@@ -270,7 +248,7 @@ class WC_PB_Core_Compatibility {
 	 *
 	 * @since  4.14.0
 	 *
-	 * @param  string $tip        Help tip text
+	 * @param  string  $tip
 	 * @return string
 	 */
 	public static function wc_help_tip( $tip ) {
@@ -279,6 +257,46 @@ class WC_PB_Core_Compatibility {
 			return wc_help_tip( $tip );
 		} else {
 			return '<img class="help_tip woocommerce-help-tip" data-tip="' . $tip . '" src="' . WC()->plugin_url() . '/assets/images/help.png" />';
+		}
+	}
+
+	/**
+	 * Get prefix for use with wp_cache_set. Allows all cache in a group to be invalidated at once..
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param  string  $group
+	 * @return string
+	 */
+	public static function wc_cache_helper_get_cache_prefix( $group ) {
+
+		if ( self::is_wc_version_gte_2_5() ) {
+			return WC_Cache_Helper::get_cache_prefix( $group );
+		} else {
+			// Get cache key - uses cache key wc_orders_cache_prefix to invalidate when needed
+			$prefix = wp_cache_get( 'wc_' . $group . '_cache_prefix', $group );
+
+			if ( false === $prefix ) {
+				$prefix = 1;
+				wp_cache_set( 'wc_' . $group . '_cache_prefix', $prefix, $group );
+			}
+
+			return 'wc_cache_' . $prefix . '_';
+		}
+	}
+
+	/**
+	 * Increment group cache prefix (invalidates cache).
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param  string  $group
+	 */
+	public static function wc_cache_helper_incr_cache_prefix( $group ) {
+		if ( self::is_wc_version_gte_2_5() ) {
+			WC_Cache_Helper::incr_cache_prefix( $group );
+		} else {
+			wp_cache_incr( 'wc_' . $group . '_cache_prefix', 1, $group );
 		}
 	}
 }

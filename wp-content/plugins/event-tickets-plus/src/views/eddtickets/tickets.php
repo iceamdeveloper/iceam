@@ -2,7 +2,7 @@
 /**
  * Renders the EDD tickets table/form
  *
- * @version 4.2.7
+ * @version 4.3.3
  *
  * @var bool $must_login
  */
@@ -21,6 +21,10 @@ ob_start();
 	<table width="100%" class="tribe-events-tickets">
 			<?php
 			foreach ( $tickets as $ticket ) {
+				/**
+				 * Changing any HTML to the `$ticket` Arguments you will need apply filters
+				 * on the `eddtickets_get_ticket` hook.
+				 */
 
 				$product = edd_get_download( $ticket->ID );
 
@@ -72,30 +76,25 @@ ob_start();
 
 					echo '</td>';
 
-					echo '<td class="tickets_name">';
-					echo $ticket->name;
-					echo '</td>';
+					echo '<td class="tickets_name">' . $ticket->name . '</td>';
 
-					echo '<td class="tickets_price">';
-					echo edd_price( $product->ID );
-					echo '</td>';
+					echo '<td class="tickets_price">' . $this->get_price_html( $product ) . '</td>';
 
-					echo '<td class="tickets_description">';
-					echo $ticket->description;
-					echo '</td>';
+					echo '<td class="tickets_description">' . $ticket->description . '</td>';
 
 					echo '</tr>';
 
-					echo
-					'<tr class="tribe-tickets-attendees-list-optout">' .
-						'<td colspan="4">' .
-							'<input type="checkbox" name="optout_'  . esc_attr( $ticket->ID ) . '" id="tribe-tickets-attendees-list-optout-edd">' .
-							'<label for="tribe-tickets-attendees-list-optout-edd">' .
-								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
-							'</label>' .
-						'</td>' .
-					'</tr>';
-
+					if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
+						echo
+						'<tr class="tribe-tickets-attendees-list-optout">' .
+							'<td colspan="4">' .
+								'<input type="checkbox" name="optout_'  . esc_attr( $ticket->ID ) . '" id="tribe-tickets-attendees-list-optout-edd">' .
+								'<label for="tribe-tickets-attendees-list-optout-edd">' .
+									esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
+								'</label>' .
+							'</td>' .
+						'</tr>';
+					}
 					include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 				}
 			}

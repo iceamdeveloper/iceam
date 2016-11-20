@@ -629,7 +629,7 @@ function wpcf_pr_admin_wpcf_relationship_check($keys_to_check = array())
             die(__('Sorry, something went wrong. The requested can not be completed.', 'wpcf'));
         }
     }
-    $id = esc_attr(sprintf('wpcf_pr_belongs_%d_%s', $_REQUEST['post_id'], $_REQUEST['post_type']));
+    $id = esc_attr(sprintf('wpcf_pr_belongs_%d_%s', (int) $_REQUEST['post_id'], sanitize_text_field( $_REQUEST['post_type'] )));
     if ( !wp_verify_nonce($_REQUEST['nounce'], $id) ) {
         die(__('Sorry, something went wrong. The requested can not be completed.', 'wpcf'));
     }
@@ -712,7 +712,7 @@ function wpcf_pr_admin_wpcf_relationship_search()
 function wpcf_pr_admin_wpcf_relationship_entry()
 {
     wpcf_pr_admin_wpcf_relationship_check(array('p'));
-    $wpcf_post = get_post($_REQUEST['p'], ARRAY_A);
+    $wpcf_post = get_post( (int) $_REQUEST['p'], ARRAY_A);
     /**
      * remove unnecessary data and add some necessary
      */
@@ -732,10 +732,10 @@ function wpcf_pr_admin_wpcf_relationship_entry()
 function wpcf_pr_admin_wpcf_relationship_delete()
 {
     wpcf_pr_admin_wpcf_relationship_check();
-    delete_post_meta( $_REQUEST['post_id'], sprintf('_wpcf_belongs_%s_id', $_REQUEST['post_type']));
+    delete_post_meta( (int) $_REQUEST['post_id'], sprintf('_wpcf_belongs_%s_id', sanitize_text_field( $_REQUEST['post_type'] )));
     echo json_encode(
         array(
-            'target' => sprintf('#wpcf_pr_belongs_%d_%s-wrapper', $_REQUEST['post_id'], $_REQUEST['post_type']),
+            'target' => sprintf('#wpcf_pr_belongs_%d_%s-wrapper', (int) $_REQUEST['post_id'], sanitize_text_field( $_REQUEST['post_type'] )),
         )
     );
     die;
@@ -745,7 +745,7 @@ function wpcf_pr_admin_wpcf_relationship_delete()
 function wpcf_pr_admin_wpcf_relationship_save()
 {
     wpcf_pr_admin_wpcf_relationship_check(array('p'));
-    update_post_meta( $_REQUEST['post_id'], sprintf('_wpcf_belongs_%s_id', $_REQUEST['post_type']), intval($_REQUEST['p']));
+    update_post_meta( (int) $_REQUEST['post_id'], sprintf('_wpcf_belongs_%s_id', sanitize_text_field( $_REQUEST['post_type'] )), intval($_REQUEST['p']));
     die;
 }
 

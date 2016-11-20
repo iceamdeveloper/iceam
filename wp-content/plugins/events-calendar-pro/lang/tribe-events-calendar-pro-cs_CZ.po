@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Events Calendar Pro package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2016-10-13 12:47:47+0000\n"
+"PO-Revision-Date: 2016-10-26 17:09:06+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,45 +14,45 @@ msgstr ""
 #: src/admin-views/widget-admin-this-week.php:147
 #: src/admin-views/widget-calendar.php:74
 msgid "Select a Taxonomy Term"
-msgstr ""
+msgstr "Vyberte položku taxonomie"
 
 #: src/views/pro/list/venue-nav.php:34
 msgid "Previous %s"
-msgstr ""
+msgstr "Předchozí %s"
 
 #: src/views/pro/list/venue-nav.php:42
 msgid "Next %s"
-msgstr ""
+msgstr "Další %s"
 
 #: src/Tribe/Geo_Loc.php:454
 msgctxt "debug geodata"
 msgid "Geocode request failed ($1%s - $2%s)"
-msgstr ""
+msgstr "Požadavek na geokódování se nezdařil ($1%s - $2%s)"
 
 #: src/Tribe/Geo_Loc.php:455
 msgctxt "debug geodata"
 msgid "empty response"
-msgstr ""
+msgstr "prázdná odpověď"
 
 #: src/Tribe/Main.php:485
 msgctxt "debug recurrence"
 msgid "Unknown"
-msgstr ""
+msgstr "Neznámá"
 
 #: src/Tribe/Main.php:499
 msgctxt "debug recurrence"
 msgid "invalid date"
-msgstr ""
+msgstr "neplatné datum"
 
 #: src/Tribe/Main.php:512
 msgctxt "debug recurrence"
 msgid "incorrect slug"
-msgstr ""
+msgstr "neplatný název  v URL"
 
 #: src/Tribe/Main.php:534
 msgctxt "debug recurrence"
 msgid "Invalid instance of a recurring event was requested ($1%s) redirecting to $2%s"
-msgstr ""
+msgstr "Požadovaná instance opakující se akce je neplatná ($1%s). Probíhá přesměrování na $2%s"
 
 #: src/Tribe/Main.php:1563 src/Tribe/Main.php:1634
 msgid "all"
@@ -60,7 +60,7 @@ msgstr "vse"
 
 #: src/Tribe/Shortcodes/Tribe_Events.php:487
 msgid "$template_object is expected to be an actual object"
-msgstr ""
+msgstr "$template_object by měl být skutečný objekt"
 
 #: src/Tribe/Templates/Mods/List_View.php:10
 msgid "All %s"
@@ -68,15 +68,15 @@ msgstr "Celkem %s"
 
 #: src/admin-views/tribe-options-mobile.php:19
 msgid "Use Default View"
-msgstr ""
+msgstr "Použít výchozí zobrazení"
 
 #: src/admin-views/tribe-options-mobile.php:32
 msgid "Default mobile view"
-msgstr ""
+msgstr "Výchozí mobilní zobrazení"
 
 #: src/admin-views/tribe-options-mobile.php:33
 msgid "Change the default view for Mobile users."
-msgstr ""
+msgstr "Můžete změnit výchozí zobrazení pro uživatele mobilních zařízení."
 
 #: src/admin-views/widget-admin-advanced-list.php:128
 #: src/admin-views/widget-admin-countdown.php:51
@@ -84,7 +84,7 @@ msgstr ""
 #: src/admin-views/widget-admin-venue.php:43
 #: src/admin-views/widget-calendar.php:87
 msgid "Generate JSON-LD data"
-msgstr ""
+msgstr "Vygenerovat data JSON-LD"
 
 #: src/Tribe/CSV_Importer/Fields.php:25
 msgid "Venue Latitude"
@@ -1839,7 +1839,7 @@ msgstr "Pořadatel"
 
 #: src/Tribe/Geo_Loc.php:164
 msgid "You have %d venues for which we don't have geolocation data. We need to use the Google Maps API to get that information. Doing this may take a while (approximately 1 minute for every 200 venues)."
-msgstr ""
+msgstr "U %d míst konání nejsou k dispozici geolokační informace. Pro jejich získání musíme použít Google Maps API. To může chvíli trvat (asi 1 minutu na každých 200 míst)."
 
 #: src/admin-views/tribe-options-defaults.php:55
 msgid "Default organizer"

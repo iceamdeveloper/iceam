@@ -1,6 +1,6 @@
 <?php
 /**
- * Bundled Item Title Template.
+ * Bundled Item Title template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-item-title.php'.
  *

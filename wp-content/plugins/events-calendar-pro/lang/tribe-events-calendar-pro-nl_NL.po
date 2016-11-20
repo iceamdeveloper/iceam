@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Events Calendar Pro package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2016-10-13 12:47:47+0000\n"
+"PO-Revision-Date: 2016-11-01 13:15:35+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,45 +14,45 @@ msgstr ""
 #: src/admin-views/widget-admin-this-week.php:147
 #: src/admin-views/widget-calendar.php:74
 msgid "Select a Taxonomy Term"
-msgstr ""
+msgstr "Selecteer een taxonomieterm"
 
 #: src/views/pro/list/venue-nav.php:34
 msgid "Previous %s"
-msgstr ""
+msgstr "Vorige %s"
 
 #: src/views/pro/list/venue-nav.php:42
 msgid "Next %s"
-msgstr ""
+msgstr "Volgende %s"
 
 #: src/Tribe/Geo_Loc.php:454
 msgctxt "debug geodata"
 msgid "Geocode request failed ($1%s - $2%s)"
-msgstr ""
+msgstr "Geocode aanvraag mislukt ($1%s - $2%s)"
 
 #: src/Tribe/Geo_Loc.php:455
 msgctxt "debug geodata"
 msgid "empty response"
-msgstr ""
+msgstr "leeg antwoord"
 
 #: src/Tribe/Main.php:485
 msgctxt "debug recurrence"
 msgid "Unknown"
-msgstr ""
+msgstr "Onbekend"
 
 #: src/Tribe/Main.php:499
 msgctxt "debug recurrence"
 msgid "invalid date"
-msgstr ""
+msgstr "ongeldige datum"
 
 #: src/Tribe/Main.php:512
 msgctxt "debug recurrence"
 msgid "incorrect slug"
-msgstr ""
+msgstr "verkeerde slug"
 
 #: src/Tribe/Main.php:534
 msgctxt "debug recurrence"
 msgid "Invalid instance of a recurring event was requested ($1%s) redirecting to $2%s"
-msgstr ""
+msgstr "Ongeldige intantie van een terugkerend evenement was aangevraagd ($1%s) verwijzend naar $2%s"
 
 #: src/Tribe/Main.php:1563 src/Tribe/Main.php:1634
 msgid "all"
@@ -60,7 +60,7 @@ msgstr "alle"
 
 #: src/Tribe/Shortcodes/Tribe_Events.php:487
 msgid "$template_object is expected to be an actual object"
-msgstr ""
+msgstr "$template_object is expected to be an actual object"
 
 #: src/Tribe/Templates/Mods/List_View.php:10
 msgid "All %s"
@@ -68,15 +68,15 @@ msgstr "Alle %s"
 
 #: src/admin-views/tribe-options-mobile.php:19
 msgid "Use Default View"
-msgstr ""
+msgstr "Gebruik de standaard weergave"
 
 #: src/admin-views/tribe-options-mobile.php:32
 msgid "Default mobile view"
-msgstr ""
+msgstr "Standaard mobiele weergave"
 
 #: src/admin-views/tribe-options-mobile.php:33
 msgid "Change the default view for Mobile users."
-msgstr ""
+msgstr "Verander de standaard weergave voor mobiele gebruikers."
 
 #: src/admin-views/widget-admin-advanced-list.php:128
 #: src/admin-views/widget-admin-countdown.php:51
@@ -84,7 +84,7 @@ msgstr ""
 #: src/admin-views/widget-admin-venue.php:43
 #: src/admin-views/widget-calendar.php:87
 msgid "Generate JSON-LD data"
-msgstr ""
+msgstr "Genereer JSON-LD data"
 
 #: src/Tribe/CSV_Importer/Fields.php:25
 msgid "Venue Latitude"
@@ -100,7 +100,7 @@ msgstr "Download gratis"
 
 #: src/Tribe/APM_Filters/APM_Filters.php:167
 msgid "Dismiss"
-msgstr ""
+msgstr "Dismiss"
 
 #: src/Tribe/APM_Filters/APM_Filters.php:171
 msgid "Pssst! Looking for the filters? They live in a separate plugin now | %s | %s"
@@ -112,7 +112,7 @@ msgstr "kaart"
 
 #: src/Tribe/Geo_Loc.php:151
 msgid "Distance unit"
-msgstr ""
+msgstr "Afstandseenheid"
 
 #: src/Tribe/Geo_Loc.php:506
 msgid "The latitude and longitude for your venue could not be fetched. The Google Maps API daily query limit has been reached!"
@@ -397,7 +397,7 @@ msgstr "Geen evenementen vandaag"
 
 #: src/views/pro/widgets/this-week/nav.php:15
 msgid "This Week Navigation"
-msgstr ""
+msgstr "Deze week"
 
 #: src/Tribe/Main.php:423
 msgid "All %1$s for %2$s"
@@ -430,11 +430,11 @@ msgstr "Een event elke dag dst duurt %1$s dag(en) en %2$s uur(en), de laatste er
 
 #: src/Tribe/Recurrence/Strings.php:27
 msgid "An event every day that lasts %1$s day(s) and %2$s hour(s), but only create %3$s event(s)"
-msgstr "Een event elke dag dat duurt %1$s dag(en) en %2$s uur(en), maar maakt alleen %3$s Event (s)"
+msgstr "Een event elke dag dat duurt %1$s dag(en) en %2$s uur(en) en komt %3$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:28
 msgid "An event every day that lasts %1$s day(s) and %2$s hour(s) with no end date"
-msgstr "Een event elke dag die %1$s dag(en) en %2$s uur(en) duurt met geen einddatum "
+msgstr "Een event elke dag die %1$s dag(en) en %2$s uur(en) duurt zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:29
 msgid "An event every week on the same day that lasts %1$s day(s) and %2$s hour(s), the last of which will begin on %3$s"
@@ -442,11 +442,11 @@ msgstr "Een event elke week op dezelfde dag dat %1$s dag(en) duurt en %2$s uur(e
 
 #: src/Tribe/Recurrence/Strings.php:30
 msgid "An event every week on the same day that lasts %1$s day(s) and %2$s hour(s), but only create %3$s event(s)"
-msgstr "Een event elke week op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en), maar maakt alleen %3$s event(s)"
+msgstr "Een event elke week op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en), en komt %3$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:31
 msgid "An event every week on the same day that lasts %1$s day(s) and %2$s hour(s) with no end date"
-msgstr "Een event elke week op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en) met geen einddatum"
+msgstr "Een event elke week op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en) zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:32
 msgid "An event every month on the same day that lasts %1$s day(s) and %2$s hour(s), the last of which will begin on %3$s"
@@ -454,11 +454,11 @@ msgstr "Een event elke maand op dezelfde dag dat %1$s dag(en) duurt en %2$s uur(
 
 #: src/Tribe/Recurrence/Strings.php:33
 msgid "An event every month on the same day that lasts %1$s day(s) and %2$s hour(s), but only create %3$s event(s)"
-msgstr "Een event elke maand op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en), maar maakt alleen %3$s event(s)"
+msgstr "Een event elke maand op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en), en komt %3$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:34
 msgid "An event every month on the same day that lasts %1$s day(s) and %2$s hour(s) with no end date"
-msgstr "Een event elke maand op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en) met geen einddatum"
+msgstr "Een event elke maand op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en) zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:35
 msgid "An event every year on the same date that lasts %1$s day(s) and %2$s hour(s), the last of which will begin on %3$s"
@@ -466,7 +466,7 @@ msgstr "Een event elk jaar op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en
 
 #: src/Tribe/Recurrence/Strings.php:36
 msgid "An event every year on the same date that lasts %1$s day(s) and %2$s hour(s), but only create %3$s event(s)"
-msgstr "Een event elk jaar op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en), maar maakt alleen %3$s event(s)"
+msgstr "Een event elk jaar op dezelfde dag dat duurt %1$s dag(en) en %2$s uur(en), en komt %3$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:37
 msgid "An event every year on the same date that lasts %1$s day(s) and %2$s hour(s) with no end date"
@@ -478,143 +478,143 @@ msgstr "Een evenement van %2$s dag(en) en %3$s uur/uren welke elke %1$s dag(en) 
 
 #: src/Tribe/Recurrence/Strings.php:39
 msgid "An event every %1$s day(s) that lasts %2$s day(s) and %3$s hour(s), but only create %4$s event(s)"
-msgstr ""
+msgstr "Een evenement van %2$s dag(en) en %3$s uur/uren welke elke %1$s dag(en) plaats vindt, en komt %4$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:40
 msgid "An event every %1$s day(s) that lasts %2$s day(s) and %3$s hour(s) with no end date"
-msgstr "Een event elke %1$s dag(en) die duurt %2$s dag(en) en %3$s uur(en) met geen einddatum"
+msgstr "Een evenement elke %1$s dag(en) die duurt %2$s dag(en) en %3$s uur(en) zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:41
 msgid "An event every %1$s day(s) that begins at %2$s and lasts %3$s day(s) and %4$s hour(s), the last of which will begin on %5$s"
-msgstr ""
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren dat begint om %2$s, die elke %1$s dag(en) voorkomt en waarvan de laatst begint op %5$s"
 
 #: src/Tribe/Recurrence/Strings.php:42
 msgid "An event every %1$s day(s) that begins at %2$s and lasts %3$s day(s) and %4$s hour(s), but only create %5$s event(s)"
-msgstr ""
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren dat begint om %2$s, die elke %1$s dag(en) voorkomt, komt totaal %5$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:43
 msgid "An event every %1$s day(s) that begins at %2$s and lasts %3$s day(s) and %4$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren dat begint om %2$s, die elke %1$s dag(en) voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:44
 msgid "An event every %1$s week(s) on %2$s that lasts %3$s day(s) and %4$s hour(s), the last of which will begin on %5$s"
-msgstr ""
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op %2$s, die elke %1$s week/weken voorkomt, waarvan de laatste begint op %5$s"
 
 #: src/Tribe/Recurrence/Strings.php:45
 msgid "An event every %1$s week(s) on %2$s that lasts %3$s day(s) and %4$s hour(s), but only create %5$s event(s)"
-msgstr ""
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op %2$s, die elke %1$s week/weken voorkomt, komt totaal %5$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:46
 msgid "An event every %1$s week(s) on %2$s that lasts %3$s day(s) and %4$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op %2$s, die elke %1$s week/weken voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:47
 msgid "An event every %1$s week(s) on %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s), the last of which will begin on %6$s"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op %2$s dat begint om %3$s, die elke %1$s week/weken voorkomt, waarvan de laatste begint op %6$s"
 
 #: src/Tribe/Recurrence/Strings.php:48
 msgid "An event every %1$s week(s) on %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s), but only create %6$s event(s)"
-msgstr "Een event elke %1$s week(en) op %2$s die begint op %3$s en duurt %4$s dag(en) en %5$s uur(en), maar maakt alleen %6$s Event(s)"
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op %2$s dat begint om %3$s, die elke %1$s week/weken voorkomt, komt totaal %6$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:49
 msgid "An event every %1$s week(s) on %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s) with no end date"
-msgstr "Een event elke %1$s week(en) op %2$s dat begint op %3$s en duurt %4$s dag(en) en %5$s uur(en) zonder einddatum"
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op %2$s dat begint om %3$s, die elke %1$s week/weken voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:50
 msgid "An event every %1$s month(s) on day %2$s that lasts %3$s day(s) and %4$s hour(s), the last of which will begin on %5$s"
-msgstr "Een event elke %1$s maand(en) op dag %2$s dat duurt %3$s dag(en) en %4$s uur(en), de laatste ervan begint om  %5$s"
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op dag %2$s, die elke %1$s maand(en) voorkomt, waarvan de laatste begint op %5$s"
 
 #: src/Tribe/Recurrence/Strings.php:51
 msgid "An event every %1$s month(s) on day %2$s that lasts %3$s day(s) and %4$s hour(s), but only create %5$s event(s)"
-msgstr "Een event elke %1$s maand(en) op dag  %2$s dat duurt %3$s dag(en) en %4$s uur(en), maar maakt alleen %5$s event(s)"
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op dag %2$s, die elke %1$s maand(en) voorkomt, komt totaal %5$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:52
 msgid "An event every %1$s month(s) on day %2$s that lasts %3$s day(s) and %4$s hour(s) with no end date"
-msgstr "Een event elke %1$s maand(en) op dag %2$s dat duurt %3$s dag(en) en %4$s uur(en) zonder einddatum"
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op dag %2$s, die elke %1$s maand(en) voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:53
 msgid "An event every %1$s month(s) on day %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s), the last of which will begin on %6$s"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op dag %2$s dat begint om %3$s, die elke %1$s maand(en) voorkomt, waarvan de laatste begint op %6$s"
 
 #: src/Tribe/Recurrence/Strings.php:54
 msgid "An event every %1$s month(s) on day %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s), but only create %6$s event(s)"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op dag %2$s dat begint om %3$s, die elke %1$s maand(en) voorkomt, komt totaal %6$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:55
 msgid "An event every %1$s month(s) on day %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op dag %2$s dat begint om %3$s, die elke %1$s maand(en) voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:56
 msgid "An event every %1$s month(s) on %2$s that lasts %3$s day(s) and %4$s hour(s), the last of which will begin on %5$s"
-msgstr "Een event elke %1$s maand(en) op dag %2$s dat duurt %3$s dag(en) en %4$s uur(en), de laatste van deze begint op %5$s"
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op %2$s, die elke %1$s maand(en) voorkomt, waarvan de laatste begint op %5$s"
 
 #: src/Tribe/Recurrence/Strings.php:57
 msgid "An event every %1$s month(s) on %2$s that lasts %3$s day(s) and %4$s hour(s), but only create %5$s event(s)"
-msgstr "Een event elke %1$s maand(en) op  %2$s dat duurt %3$s dag(en) en %4$s uur(en), maar maakt alleen %5$s event(s)"
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op %2$s, die elke %1$s maand(en) voorkomt, komt totaal %5$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:58
 msgid "An event every %1$s month(s) on %2$s that lasts %3$s day(s) and %4$s hour(s) with no end date"
-msgstr "Een event elke %1$s maand(en) op %2$s dat duurt %3$s dag(en) en %4$s uur(en), zonder einddatum"
+msgstr "Een evenement van %3$s dag(en) en %4$s uur/uren op %2$s, die elke %1$s maand(en) voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:59
 msgid "An event every %1$s month(s) on %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s), the last of which will begin on %6$s"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op %2$s dat begint om %3$s, die elke %1$s maand(en) voorkomt, waarvan de laatste begint op %6$s"
 
 #: src/Tribe/Recurrence/Strings.php:60
 msgid "An event every %1$s month(s) on %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s), but only create %6$s event(s)"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op %2$s dat begint om %3$s, die elke %1$s maand(en) voorkomt, komt totaal %6$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:61
 msgid "An event every %1$s month(s) on %2$s that begins at %3$s and lasts %4$s day(s) and %5$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren op %2$s dat begint om %3$s, die elke %1$s maand(en) voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:62
 msgid "An event every %1$s year(s) in %2$s on day %3$s that lasts %4$s day(s) and %5$s hour(s), the last of which will begin on %6$s"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren die elk(e) %1$s jaar in %2$s op dag %3$s, waarvan de laatste begint op %6$s"
 
 #: src/Tribe/Recurrence/Strings.php:63
 msgid "An event every %1$s year(s) in %2$s on day %3$s that lasts %4$s day(s) and %5$s hour(s), but only create %6$s event(s)"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren die elk(e) %1$s jaar in %2$s op dag %3$s, komt totaal %6$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:64
 msgid "An event every %1$s year(s) in %2$s on day %3$s that lasts %4$s day(s) and %5$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren die elk(e) %1$s jaar in %2$s op dag %3$s, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:65
 msgid "An event every %1$s year(s) in %2$s on day %3$s that begins at %4$s and lasts %5$s day(s) and %6$s hour(s), the last of which will begin on %7$s"
-msgstr ""
+msgstr "Een evenement van %5$s dag(en) en %6$s uur/uren die elk(e) %1$s jaar in %2$s op dag %3$s dat begint om %4$s, waarvan de laatste begint op %7$s"
 
 #: src/Tribe/Recurrence/Strings.php:66
 msgid "An event every %1$s year(s) in %2$s on day %3$s that begins at %4$s and lasts %5$s day(s) and %6$s hour(s), but only create %7$s event(s)"
-msgstr ""
+msgstr "Een evenement van %5$s dag(en) en %6$s uur/uren die elk(e) %1$s jaar in %2$s op dag %3$s dat begint om %4$s, komt totaal %7$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:67
 msgid "An event every %1$s year(s) in %2$s on day %3$s that begins at %4$s and lasts %5$s day(s) and %6$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %5$s dag(en) en %6$s uur/uren die elk(e) %1$s jaar in %2$s op dag %3$s dat begint om %4$s, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:68
 msgid "An event every %1$s year(s) in %2$s on %3$s that lasts %4$s day(s) and %5$s hour(s), the last of which will begin on %6$s"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren die elk(e) %1$s jaar in %2$s op %3$s voorkomt, waarvan de laatste begint op %6$s"
 
 #: src/Tribe/Recurrence/Strings.php:69
 msgid "An event every %1$s year(s) in %2$s on %3$s that lasts %4$s day(s) and %5$s hour(s), but only create %6$s event(s)"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren die elk(e) %1$s jaar in %2$s op %3$s voorkomt, komt totaal %6$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:70
 msgid "An event every %1$s year(s) in %2$s on %3$s that lasts %4$s day(s) and %5$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %4$s dag(en) en %5$s uur/uren die elk(e) %1$s jaar in %2$s op %3$s voorkomt, zonder einddatum"
 
 #: src/Tribe/Recurrence/Strings.php:71
 msgid "An event every %1$s year(s) in %2$s on %3$s that begins at %4$s and lasts %5$s day(s) and %6$s hour(s), the last of which will begin on %7$s"
-msgstr ""
+msgstr "Een evenement van %5$s dag(en) en %6$s uur/uren die elk(e) %1$s jaar in %2$s op %3$s dat begint om %4$s, waarvan de laatste begint op %7$s"
 
 #: src/Tribe/Recurrence/Strings.php:72
 msgid "An event every %1$s year(s) in %2$s on %3$s that begins at %4$s and lasts %5$s day(s) and %6$s hour(s), but only create %7$s event(s)"
-msgstr ""
+msgstr "Een evenement van %5$s dag(en) en %6$s uur/uren die elk(e) %1$s jaar in %2$s op %3$s dat begint om %4$s, komt totaal %7$s keer voor"
 
 #: src/Tribe/Recurrence/Strings.php:73
 msgid "An event every %1$s year(s) in %2$s on %3$s that begins at %4$s and lasts %5$s day(s) and %6$s hour(s) with no end date"
-msgstr ""
+msgstr "Een evenement van %5$s dag(en) en %6$s uur/uren die elk(e) %1$s jaar in %2$s op %3$s dat begint om %4$s, zonder einddatum"
 
 #: src/Tribe/Recurrence/Meta.php:1169
 msgctxt "Joins the last item in a list of items (i.e. the \"and\" in Monday, Tuesday, and Wednesday)"
@@ -971,7 +971,7 @@ msgstr "Organisator gepubliceerd. <a href=\"%s\">Bekijk organisator</a>"
 
 #: src/functions/template-tags/general.php:753
 msgid "(See all)"
-msgstr "(Bekijk allemaal)"
+msgstr "(Bekijk alle)"
 
 #: src/Tribe/Main.php:1440
 msgid "Organizer submitted. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
@@ -1838,7 +1838,7 @@ msgstr "Organisator"
 
 #: src/Tribe/Geo_Loc.php:164
 msgid "You have %d venues for which we don't have geolocation data. We need to use the Google Maps API to get that information. Doing this may take a while (approximately 1 minute for every 200 venues)."
-msgstr ""
+msgstr "Je hebt %d locaties waarvoor géén geolocatie-informatie aanwezig is. We gebruiken de Google Maps API om deze informatie te vinden. Dit kan een tijdje duren (ongeveer 1 minuut per 200 locaties)."
 
 #: src/admin-views/tribe-options-defaults.php:55
 msgid "Default organizer"

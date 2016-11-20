@@ -672,7 +672,16 @@ class Tribe__Tickets_Plus__Commerce__WPEC__Main extends Tribe__Tickets_Plus__Tic
 		$return->qty_sold( $qty );
 		$return->qty_pending( $pending );
 
-		return $return;
+		/**
+		 * Use this Filter to change any information you want about this ticket
+		 *
+		 * @param object $ticket
+		 * @param int    $event_id
+		 * @param int    $ticket_id
+		 */
+		$ticket = apply_filters( 'tribe_tickets_plus_wpec_get_ticket', $return, $event_id, $ticket_id );
+
+		return $ticket;
 	}
 
 	/**
@@ -1033,10 +1042,11 @@ class Tribe__Tickets_Plus__Commerce__WPEC__Main extends Tribe__Tickets_Plus__Tic
 	 * Get's the product price html
 	 *
 	 * @param int|object $product
+	 * @param array $attendee
 	 *
 	 * @return string
 	 */
-	public function get_price_html( $product ) {
+	public function get_price_html( $product, $attendee = false ) {
 		if ( is_numeric( $product ) ) {
 			$product = new WPSC_Product( $product );
 		}
@@ -1045,7 +1055,8 @@ class Tribe__Tickets_Plus__Commerce__WPEC__Main extends Tribe__Tickets_Plus__Tic
 			return null;
 		}
 
-		return $product->is_on_sale ? $product->sale_price : $product->price;
+		$price_html= $product->is_on_sale ? $product->sale_price : $product->price;
+		return apply_filters( 'wpectickets_ticket_price_html', $price_html, $product, $attendee );
 	}
 
 	private function _get_tickets_ids( $event_id ) {

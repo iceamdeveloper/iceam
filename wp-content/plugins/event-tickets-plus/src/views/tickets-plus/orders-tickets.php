@@ -5,7 +5,7 @@
  * Override this template in your own theme by creating a file at [your-theme]/tribe-events/tickets-plus/orders-tickets.php
  *
  * @package TribeEventsCalendar
- * @version 4.3.1
+ * @version 4.3.2
  *
  */
 
@@ -75,7 +75,7 @@ $order = array_values( $orders );
 
 								if ( class_exists( $attendee['provider'] ) ) {
 									$provider = new $attendee['provider'];
-									$price = $provider->get_price_html( $attendee['product_id'] );
+									$price = $provider->get_price_html( $attendee['product_id'], $attendee );
 								}
 								?>
 

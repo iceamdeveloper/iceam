@@ -1,6 +1,6 @@
 <?php
 /**
- * Bundled Product Image Template.
+ * Bundled Product Image template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-item-image.php'.
  *
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 		$image_title = esc_attr( get_the_title( get_post_thumbnail_id( $post_id ) ) );
 		$image_link  = wp_get_attachment_url( get_post_thumbnail_id( $post_id ) );
-		$image       = get_the_post_thumbnail( $post_id, apply_filters( 'bundled_product_large_thumbnail_size', 'shop_thumbnail' ), array(
+		$image       = get_the_post_thumbnail( $post_id, apply_filters( 'bundled_product_large_thumbnail_size', 'shop_catalog' ), array(
 			'title' => $image_title
 		) );
 

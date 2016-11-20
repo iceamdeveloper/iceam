@@ -1,6 +1,6 @@
 <?php
 /**
- * Bundled Item Price.
+ * Bundled Item Price template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-item-price.php'.
  *
@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 4.7.0
+ * @version 5.0.0
  */
 
 // Exit if accessed directly.
@@ -16,6 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-if ( $bundled_item->is_priced_per_product() ) {
+if ( $bundled_item->is_priced_individually() ) {
 	?><p class="price"><?php echo $bundled_item->product->get_price_html(); ?></p><?php
 }

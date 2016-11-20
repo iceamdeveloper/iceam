@@ -1,8 +1,10 @@
 <?php
 /**
- * Shipstation Integration.
+ * WC_PB_Shipstation_Compatibility class
  *
- * @since  4.11.4
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.11.4
  */
 
 // Exit if accessed directly.
@@ -10,31 +12,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Shipstation Integration.
+ *
+ * @version  5.0.0
+ */
 class WC_PB_Shipstation_Compatibility {
 
 	public static function init() {
 
 		// Shipstation compatibility.
-		add_filter( 'woocommerce_bundles_filter_product_from_item', array( __CLASS__, 'filter_order_data' ), 10, 2 );
-		add_filter( 'woocommerce_bundles_filter_order_items_part_of_meta', array( __CLASS__, 'filter_order_data' ), 10, 2 );
+		add_action( 'woocommerce_api_wc_shipstation', array( __CLASS__, 'add_filters' ), 9 );
 	}
 
 	/**
-	 * Use the Order API Modifications in WC_PB_Order to return the correct items/weights/values for shipping.
-	 *
-	 * @param  boolean   $filter
-	 * @param  WC_Order  $order
-	 * @return boolean
+	 * Modify the returned order items and products to return the correct items/weights/values for shipping.
 	 */
-	public static function filter_order_data( $filter, $order ) {
+	public static function add_filters() {
 
-		global $wp;
-
-		if ( isset( $wp->query_vars[ 'wc-api' ] ) && $wp->query_vars[ 'wc-api' ] === 'wc_shipstation' ) {
-			$filter = true;
-		}
-
-		return $filter;
+		add_filter( 'woocommerce_order_get_items', array( WC_PB()->order, 'get_order_items' ), 10, 2 );
+		add_filter( 'woocommerce_get_product_from_item', array( WC_PB()->order, 'get_product_from_item' ), 10, 3 );
 	}
 }
 

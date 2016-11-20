@@ -1,6 +1,6 @@
 <?php
 /**
- * Bundle quantity input template.
+ * Bundle quantity input template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/add-to-cart/bundle-quantity-input.php'.
  *

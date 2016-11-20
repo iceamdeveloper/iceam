@@ -1,6 +1,6 @@
 <?php
 /**
- * Bundled Product Quantity Template.
+ * Bundled Product Quantity template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-item-quantity.php'.
  *
@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 4.14.1
+ * @version 5.0.0
  */
 
 // Exit if accessed directly.
@@ -16,16 +16,18 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-$quantity_min = $bundled_item->get_quantity();
-$quantity_max = $bundled_item->get_quantity( 'max', true );
+if ( $hide_input ) {
 
-if ( $quantity_min === $quantity_max || $bundled_item->is_out_of_stock() ) {
+	?><div class="quantity">
+		<input class="qty bundled_qty" type="hidden" name="<?php echo $input_name; ?>" value="<?php echo $quantity_min; ?>" /><?php
 
-	?><div class="quantity quantity_hidden" style="display:none;"><input class="qty bundled_qty" type="hidden" name="<?php echo $bundle_fields_prefix; ?>bundle_quantity_<?php echo $bundled_item->item_id; ?>" value="<?php echo $quantity_min; ?>" /></div><?php
+		if ( 'tabular' === $layout ) {
+			echo $quantity_min;
+		}
+
+	?></div><?php
 
 } else {
-
-	$input_name = $bundle_fields_prefix . 'bundle_quantity_' . $bundled_item->item_id;
 
 	ob_start();
 

@@ -1,6 +1,6 @@
 <?php
 /**
- * Product Bundle add-to-cart template.
+ * Product Bundle single-product template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/add-to-cart/bundle.php'.
  *
@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version  4.12.0
+ * @version 5.0.0
  */
 
 // Exit if accessed directly.
@@ -20,33 +20,46 @@ global $woocommerce, $product;
 
 do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
-<form method="post" enctype="multipart/form-data" class="bundle_form" ><?php
+<form method="post" enctype="multipart/form-data" class="cart cart_group bundle_form <?php echo 'layout_' . $product->get_layout(); ?>"><?php
 
-	do_action( 'woocommerce_before_bundled_items' );
+	/**
+	 * 'woocommerce_before_bundled_items' action.
+	 *
+	 * @param WC_Product_Bundle $product
+	 */
+	do_action( 'woocommerce_before_bundled_items', $product );
 
 	foreach ( $bundled_items as $bundled_item ) {
 
 		/**
-		 * wc_bundles_bundled_item_details hook
+		 * 'woocommerce_bundled_item_details' hook
 		 *
-		 * @hooked wc_bundles_bundled_item_details_wrapper_open  -   0
-		 * @hooked wc_bundles_bundled_item_thumbnail             -   5
-		 * @hooked wc_bundles_bundled_item_details_open          -  10
-		 * @hooked wc_bundles_bundled_item_title                 -  15
-		 * @hooked wc_bundles_bundled_item_description           -  20
-		 * @hooked wc_bundles_bundled_item_product_details       -  25
-		 * @hooked wc_bundles_bundled_item_details_close         -  30
-		 * @hooked wc_bundles_bundled_item_details_wrapper_close - 100
+		 * @hooked wc_pb_template_bundled_item_details_wrapper_open  -   0
+		 * @hooked wc_pb_template_bundled_item_thumbnail             -   5
+		 * @hooked wc_pb_template_bundled_item_details_open          -  10
+		 * @hooked wc_pb_template_bundled_item_title                 -  15
+		 * @hooked wc_pb_template_bundled_item_description           -  20
+		 * @hooked wc_pb_template_bundled_item_product_details       -  25
+		 * @hooked wc_pb_template_bundled_item_details_close         -  30
+		 * @hooked wc_pb_template_bundled_item_details_wrapper_close - 100
 		 */
-		do_action( 'wc_bundles_bundled_item_details', $bundled_item, $product );
+		do_action( 'woocommerce_bundled_item_details', $bundled_item, $product );
 	}
 
-	do_action( 'woocommerce_after_bundled_items' ); ?>
+	/**
+	 * 'woocommerce_after_bundled_items' action.
+	 *
+	 * @param WC_Product_Bundle $product
+	 */
+	do_action( 'woocommerce_after_bundled_items', $product ); ?>
 
 	<div class="cart bundle_data bundle_data_<?php echo $product->id; ?>" data-bundle_price_data="<?php echo esc_attr( json_encode( $bundle_price_data ) ); ?>" data-bundle_id="<?php echo $product->id; ?>"><?php
 
 		if ( $product->is_purchasable() ) {
 
+			/**
+			 * 'woocommerce_before_add_to_cart_button' action.
+			 */
 			do_action( 'woocommerce_before_add_to_cart_button' );
 
 			?><div class="bundle_wrap">
@@ -63,7 +76,7 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 					/**
 					 * woocommerce_bundles_add_to_cart_button hook.
 					 *
-					 * @hooked wc_bundles_add_to_cart_button - 10
+					 * @hooked wc_pb_template_add_to_cart_button - 10
 					 */
 					do_action( 'woocommerce_bundles_add_to_cart_button' );
 
@@ -71,7 +84,8 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 				<input type="hidden" name="add-to-cart" value="<?php echo $product->id; ?>" />
 			</div><?php
 
-			 do_action( 'woocommerce_after_add_to_cart_button' );
+			/** WC Core action. */
+			do_action( 'woocommerce_after_add_to_cart_button' );
 
 		} else {
 
@@ -82,6 +96,7 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
 	?></div><?php
 
-?></form>
-
-<?php do_action( 'woocommerce_after_add_to_cart_form' ); ?>
+?></form><?php
+	/** WC Core action. */
+	do_action( 'woocommerce_after_add_to_cart_form' );
+?>

@@ -109,7 +109,7 @@ class Tribe__Tickets_Plus__Meta__Render {
 	 * @param array $item Attendee data
 	 */
 	public function ticket_email_meta( $item ) {
-		if ( ! isset( $item['product_id'] ) || ! isset( $item['attendee_id'] ) ) {
+		if ( ! isset( $item['product_id'] ) ) {
 			return;
 		}
 

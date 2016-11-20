@@ -127,6 +127,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 		this.refreshing_addons_totals = false;
 
+		this.dirty_subtotals          = false;
+
 		this.api                      = {
 
 			/**
@@ -240,16 +242,6 @@ jQuery.fn.wc_get_bundle_script = function() {
 				} );
 
 				return bundle_config;
-			},
-
-			/**
-			 * True if the bundle is priced per product.
-			 *
-			 * @return boolean
-			 */
-			is_priced_per_product: function() {
-
-				return bundle.price_data[ 'per_product_pricing' ] === 'yes';
 			}
 		};
 
@@ -351,7 +343,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 			/**
 			 * If priced per product, replace 'i18n_total' string with 'i18n_subtotal'.
 			 */
-			if ( this.composite_data.composite.api.is_priced_per_product() ) {
+			if ( this.composite_data.composite.api.is_component_priced_individually( this.composite_data.component.step_id ) ) {
 				wc_bundle_params.i18n_total = wc_bundle_params.i18n_subtotal;
 			}
 
@@ -366,7 +358,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 		 */
 		this.component_scripts_initialized_action = function() {
 
-			if ( parseInt( this.composite_data.component.find_selected_product_param( 'id' ) ) === parseInt( this.bundle_id ) ) {
+			if ( parseInt( this.composite_data.component.component_selection_model.selected_product ) === parseInt( this.bundle_id ) ) {
 				this.add_composite_hooks();
 			} else {
 				this.remove_composite_hooks();
@@ -478,7 +470,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 				if ( component.is_static() ) {
 					if ( bundled_products_count === 0 ) {
-						formatted_title = wc_composite_params.i18n_none;
+						formatted_title = wc_composite_params.i18n_no_selection;
 					} else {
 
 						var contents = this.cp_get_formatted_contents( component );
@@ -528,6 +520,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 		this.cp_get_formatted_contents = function( component ) {
 
 			var formatted_contents = '',
+				formatted_titles   = [],
 				bundle_qty         = component.get_selected_quantity();
 
 			$.each( this.bundled_items, function( index, bundled_item ) {
@@ -540,18 +533,38 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 					var formatted_item_title    = bundled_item.$bundled_item_cart.data( 'title' ),
 						item_quantity           = parseInt( bundled_item.$bundled_item_cart.data( 'quantity' ) * bundle_qty ),
+						item_meta               = wc_cp_get_variation_data( bundled_item.$bundled_item_cart.find( '.variations' ) ),
 						formatted_item_quantity = item_quantity > 1 ? '<strong>' + wc_composite_params.i18n_qty_string.replace( '%s', item_quantity ) + '</strong>' : '',
-						formatted_item_meta     = wc_cp_get_variation_data( bundled_item.$bundled_item_cart.find( '.variations' ), true );
+						formatted_item_meta     = '';
+
+					if ( item_meta.length > 0 ) {
+
+						$.each( item_meta, function( index, meta ) {
+							formatted_item_meta = formatted_item_meta + '<span class="bundled_meta_element"><span class="bundled_meta_key">' + meta.meta_key + ':</span> <span class="bundled_meta_value">' + meta.meta_value + '</span>';
+							if ( index !== item_meta.length - 1 ) {
+								formatted_item_meta = formatted_item_meta + '<span class="bundled_meta_value_sep">, </span>';
+							}
+							formatted_item_meta = formatted_item_meta + '</span>';
+						} );
+
+						formatted_item_title = wc_bundle_params.i18n_composite_summary_title_string.replace( '%t', formatted_item_title ).replace( '%m', '<span class="content_bundled_product_meta">' + formatted_item_meta + '</span>' );
+					}
 
 					formatted_item_title = wc_composite_params.i18n_title_string.replace( '%t', formatted_item_title ).replace( '%q', formatted_item_quantity ).replace( '%p', '' );
 
-					if ( formatted_item_meta ) {
-						formatted_item_title = wc_composite_params.i18n_selected_product_string.replace( '%t', formatted_item_title ).replace( '%m', '<span class="content_product_meta">' + formatted_item_meta + '</span>' );
-					}
-
-					formatted_contents = formatted_contents + '<span class="content_bundled_product_title content_product_title">' + formatted_item_title + '</span>';
+					formatted_titles.push(  formatted_item_title );
 				}
 			} );
+
+			if ( formatted_titles.length > 0 ) {
+				$.each( formatted_titles, function( index, formatted_title ) {
+					formatted_contents = formatted_contents + '<span class="content_bundled_product_title">' + formatted_title;
+					if ( index !== formatted_titles.length - 1 ) {
+						formatted_contents = formatted_contents + '<span class="bundled_product_title_sep">, </span>';
+					}
+					formatted_contents = formatted_contents + '</span>';
+				} );
+			}
 
 			return formatted_contents;
 		};
@@ -650,6 +663,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 						bundle.price_data[ 'base_price' ] = nyp.data( 'price' );
 
 						if ( bundle.is_initialized ) {
+							bundle.dirty_subtotals = true;
 							bundle.update_totals();
 						}
 					}
@@ -898,7 +912,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 				// Check variable products.
 				if ( ( bundled_item.get_product_type() === 'variable' || bundled_item.get_product_type() === 'variable-subscription' ) && bundled_item.get_variation_id() === '' ) {
-					if ( bundled_item.is_selected() ) {
+					if ( bundled_item.is_selected() && bundled_item.get_quantity() > 0 ) {
 						all_set = false;
 					}
 				}
@@ -1090,6 +1104,11 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 			this.update_price_data();
 			this.calculate_subtotals( triggered_by );
+
+			if ( bundle.dirty_subtotals  || false === bundle.is_initialized ) {
+				bundle.dirty_subtotals = false;
+				bundle.$bundle_data.triggerHandler( 'woocommerce-product-bundle-calculate-totals', [ bundle ] );
+			}
 		};
 
 		/**
@@ -1107,20 +1126,18 @@ jQuery.fn.wc_get_bundle_script = function() {
 					return true;
 				}
 
-				var totals_changed          = false,
-
-					totals                  = {
-					price:          0.0,
-					regular_price:  0.0,
-					price_incl_tax: 0.0,
-					price_excl_tax: 0.0
+				var totals                  = {
+						price:          0.0,
+						regular_price:  0.0,
+						price_incl_tax: 0.0,
+						price_excl_tax: 0.0
 					},
 
 					recurring_totals        = {
-					price:          0.0,
-					regular_price:  0.0,
-					price_incl_tax: 0.0,
-					price_excl_tax: 0.0
+						price:          0.0,
+						regular_price:  0.0,
+						price_incl_tax: 0.0,
+						price_excl_tax: 0.0
 					},
 
 					qty                     = price_data[ 'quantities' ][ bundled_item.bundled_item_id ],
@@ -1162,20 +1179,15 @@ jQuery.fn.wc_get_bundle_script = function() {
 				}
 
 				if ( bundle.totals_changed( price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ], totals ) ) {
-					totals_changed = true;
+					bundle.dirty_subtotals = true;
 					price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ] = totals;
 				}
 
 				if ( bundle.totals_changed( price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_recurring_totals' ], recurring_totals ) ) {
-					totals_changed = true;
+					bundle.dirty_subtotals = true;
 					price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_recurring_totals' ] = recurring_totals;
 				}
 
-				if ( totals_changed || false === bundle.is_initialized ) {
-					if ( typeof( price_data_array ) === 'undefined' ) {
-						bundle.$bundle_data.triggerHandler( 'woocommerce-product-bundle-calculate-totals', [ bundle ] );
-					}
-				}
 			} );
 
 			if ( typeof( price_data_array ) !== 'undefined' ) {
@@ -1349,9 +1361,10 @@ jQuery.fn.wc_get_bundle_script = function() {
 		 */
 		this.get_price_html = function( price_data_array ) {
 
-			var price_data = typeof( price_data_array ) === 'undefined' ? bundle.price_data : price_data_array;
-
-			var bundle_price_html = '';
+			var price_data        = typeof( price_data_array ) === 'undefined' ? bundle.price_data : price_data_array,
+				bundle_price_html = '',
+				show_total_string = price_data[ 'totals' ].price !== price_data[ 'base_price_totals' ].price && false === bundle.get_bundled_subscriptions(),
+				total_string      = show_total_string ? '<span class="total">' + wc_bundle_params.i18n_total + '</span>' : '';
 
 			// Non-recurring price html data.
 			var formatted_price         = price_data[ 'totals' ].price === 0.0 && price_data[ 'show_free_string' ] === 'yes' ? wc_bundle_params.i18n_free : wc_pb_woocommerce_number_format( wc_pb_number_format( price_data[ 'totals' ].price ) ),
@@ -1376,9 +1389,9 @@ jQuery.fn.wc_get_bundle_script = function() {
 			}
 
 			if ( price_data[ 'totals' ].regular_price > price_data[ 'totals' ].price ) {
-				bundle_price_html = '<p class="price">' + price_data[ 'price_string' ].replace( '%s', '<span class="total">' + wc_bundle_params.i18n_total + '</span><del>' + formatted_regular_price + '</del> <ins>' + formatted_price + '</ins>' + formatted_suffix ) + '</p>';
+				bundle_price_html = '<p class="price">' + price_data[ 'price_string' ].replace( '%s', total_string + '<del>' + formatted_regular_price + '</del> <ins>' + formatted_price + '</ins>' + formatted_suffix ) + '</p>';
 			} else {
-				bundle_price_html = '<p class="price">' + price_data[ 'price_string' ].replace( '%s', '<span class="total">' + wc_bundle_params.i18n_total + '</span>' + formatted_price + formatted_suffix ) + '</p>';
+				bundle_price_html = '<p class="price">' + price_data[ 'price_string' ].replace( '%s', total_string + formatted_price + formatted_suffix ) + '</p>';
 			}
 
 			return bundle_price_html;
@@ -1437,11 +1450,20 @@ jQuery.fn.wc_get_bundle_script = function() {
 		 */
 		this.updated_totals_task = function() {
 
-			var show_price = bundle.price_data[ 'per_product_pricing' ] === 'yes' || ( bundle.price_data[ 'totals' ].price !== bundle.price_data[ 'base_price_totals' ].price );
+			var show_price = bundle.price_data[ 'totals' ].price !== bundle.price_data[ 'base_price_totals' ].price;
 
-			if ( ! show_price && bundle.is_composited() ) {
-				if ( bundle.composite_data.composite.api.is_priced_per_product() ) {
-					show_price = true;
+			if ( bundle.is_composited() ) {
+
+				if ( ! show_price ) {
+					if ( bundle.composite_data.composite.api.is_component_priced_individually( this.composite_data.component.step_id ) ) {
+						show_price = true;
+					}
+				}
+
+				if ( show_price ) {
+					if ( false === this.composite_data.component.is_selected_product_price_visible() ) {
+						show_price = false;
+					}
 				}
 			}
 
@@ -1681,8 +1703,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 			}
 
 			var selection_title           = this.bundled_item_title,
-				selection_qty_string      = ( this.is_selected() && bundled_item_qty_val > 1 ) ? wc_bundle_params.i18n_qty_string.replace( '%s', bundled_item_qty_val ) : '',
-				selection_optional_string = ( this.is_optional() && ! this.is_selected() && this.get_optional_suffix() !== '' ) ? wc_bundle_params.i18n_optional_string.replace( '%s', this.get_optional_suffix() ) : '',
+				selection_qty_string      = bundled_item_qty_val > 1 ? wc_bundle_params.i18n_qty_string.replace( '%s', bundled_item_qty_val ) : '',
+				selection_optional_string = ( this.is_optional() && this.get_optional_suffix() !== '' ) ? wc_bundle_params.i18n_optional_string.replace( '%s', this.get_optional_suffix() ) : '',
 				selection_title_incl_qty  = wc_bundle_params.i18n_title_string.replace( '%t', selection_title ).replace( '%q', selection_qty_string ).replace( '%o', selection_optional_string );
 
 			this.$bundled_item_title.html( selection_title_incl_qty );

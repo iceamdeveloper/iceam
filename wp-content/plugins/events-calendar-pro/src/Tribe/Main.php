@@ -50,7 +50,7 @@
 			public $shortcodes;
 
 			const REQUIRED_TEC_VERSION = '4.3';
-			const VERSION = '4.3.1.1';
+			const VERSION = '4.3.3';
 
 
 			private function __construct() {
@@ -157,6 +157,7 @@
 				$this->permalink_editor = apply_filters( 'tribe_events_permalink_editor', new Tribe__Events__Pro__Recurrence__Permalinks() );
 				add_filter( 'post_type_link', array( $this->permalink_editor, 'filter_recurring_event_permalinks' ), 10, 4 );
 				add_filter( 'get_sample_permalink', array( $this->permalink_editor, 'filter_sample_permalink' ), 10, 2 );
+				add_filter( 'get_sample_permalink_html', array( $this->permalink_editor, 'filter_sample_permalink_html' ), 10, 2 );
 
 				add_filter( 'tribe_events_register_venue_type_args', array( $this, 'addSupportsThumbnail' ), 10, 1 );
 				add_filter( 'tribe_events_register_organizer_type_args', array( $this, 'addSupportsThumbnail' ), 10, 1 );
@@ -466,6 +467,13 @@
 				$this->plural_event_label = tribe_get_event_label_plural();
 				$this->singular_event_label_lowercase = tribe_get_event_label_singular_lowercase();
 				$this->plural_event_label_lowercase = tribe_get_event_label_plural_lowercase();
+
+				// if enabled views have never been set then set those to all PRO views
+				if ( false === tribe_get_option( 'tribeEnableViews', false ) ) {
+					tribe_update_option( 'tribeEnableViews', array( 'list', 'month', 'day', 'photo', 'map', 'week' ) );
+					// After setting the enabled view we Flush the rewrite rules
+					flush_rewrite_rules();
+				}
 			}
 
 			/**
@@ -1229,7 +1237,7 @@
 				}
 
 				Tribe__Events__Template_Factory::asset_package( 'select2' );
-				wp_enqueue_script( 'tribe-admin-widget', tribe_events_pro_resource_url( 'admin-widget.js' ), array( 'jquery' ), apply_filters( 'tribe_events_pro_js_version', self::VERSION ) );
+				wp_enqueue_script( 'tribe-admin-widget', tribe_events_pro_resource_url( 'admin-widget.js' ), array( 'jquery', 'underscore' ), apply_filters( 'tribe_events_pro_js_version', self::VERSION ) );
 			}
 
 			public function admin_enqueue_styles() {

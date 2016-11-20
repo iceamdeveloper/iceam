@@ -1,8 +1,10 @@
 <?php
 /**
- * Product Bundles Compatibility.
+ * WC_PB_CP_Compatibility class
  *
- * @since  4.14.3
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.14.3
  */
 
 // Exit if accessed directly.
@@ -10,8 +12,19 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Composite Products Compatibility.
+ *
+ * @version  5.0.0
+ * @since    4.14.3
+ */
 class WC_PB_CP_Compatibility {
 
+	private static $current_component = false;
+
+	/**
+	 * Add hooks.
+	 */
 	public static function init() {
 
 		/*--------------------*/
@@ -43,7 +56,7 @@ class WC_PB_CP_Compatibility {
 		/*--------------------*/
 
 		// Validate bundle type component selections.
-		add_filter( 'woocommerce_composite_component_add_to_cart_validation', array( __CLASS__, 'composite_validate_bundle_data' ), 10, 6 );
+		add_filter( 'woocommerce_composite_component_add_to_cart_validation', array( __CLASS__, 'composite_validate_bundle_data' ), 10, 7 );
 
 		// Add bundle identifier to composited item stamp.
 		add_filter( 'woocommerce_composite_component_cart_item_identifier', array( __CLASS__, 'composite_bundle_cart_item_stamp' ), 10, 2 );
@@ -66,6 +79,40 @@ class WC_PB_CP_Compatibility {
 		add_filter( 'woocommerce_order_item_visible', array( __CLASS__, 'composited_bundle_order_item_visible' ), 10, 2 );
 		add_filter( 'woocommerce_order_item_name', array( __CLASS__, 'composited_bundle_order_table_item_title' ), 9, 2 );
 		add_filter( 'woocommerce_composited_order_item_quantity_html', array( __CLASS__, 'composited_bundle_order_table_item_quantity' ), 11, 2 );
+
+		// Disable edit-in-cart feature if part of a composite.
+		add_filter( 'woocommerce_bundle_is_editable_in_cart', array( __CLASS__, 'composited_bundle_not_editable_in_cart' ), 10, 3 );
+	}
+
+	/**
+	 * Bundles are not directly editable in cart if part of a composite.
+	 * They inherit the setting of their container and can only be edited within that scope of their container - @see 'composited_bundle_permalink_args()'.
+	 *
+	 * @param  boolean            $editable
+	 * @param  WC_Product_Bundle  $bundle
+	 * @param  array              $cart_item
+	 * @return boolean
+	 */
+	public static function composited_bundle_not_editable_in_cart( $editable, $bundle, $cart_item ) {
+		if ( is_array( $cart_item ) && wc_cp_is_composited_cart_item( $cart_item ) ) {
+			$editable = false;
+		}
+		return $editable;
+	}
+
+	/**
+	 * Add some contextual info to bundle validation messages.
+	 *
+	 * @param  string $message
+	 * @return string
+	 */
+	public static function component_bundle_error_message_context( $message ) {
+
+		if ( false !== self::$current_component ) {
+			$message = sprintf( __( 'Please check your &quot;%1$s&quot; configuration: %2$s', 'woocommerce-composite-products' ), self::$current_component->get_title( true ), $message );
+		}
+
+		return $message;
 	}
 
 	/**
@@ -124,10 +171,10 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Composited bundle price.
 	 *
-	 * @param  double        $price
-	 * @param  string        $min_or_max
-	 * @param  boolean       $display
-	 * @param  WC_CP_Product $composited_product
+	 * @param  double         $price
+	 * @param  string         $min_or_max
+	 * @param  boolean        $display
+	 * @param  WC_CP_Product  $composited_product
 	 * @return double
 	 */
 	public static function composited_bundle_price( $price, $min_or_max, $display, $composited_product ) {
@@ -146,10 +193,10 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Composited bundle regular price.
 	 *
-	 * @param  double        $price
-	 * @param  string        $min_or_max
-	 * @param  boolean       $display
-	 * @param  WC_CP_Product $composited_product
+	 * @param  double         $price
+	 * @param  string         $min_or_max
+	 * @param  boolean        $display
+	 * @param  WC_CP_Product  $composited_product
 	 * @return double
 	 */
 	public static function composited_bundle_reg_price( $price, $min_or_max, $display, $composited_product ) {
@@ -168,9 +215,9 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Composited bundle price including tax.
 	 *
-	 * @param  double        $price
-	 * @param  string        $min_or_max
-	 * @param  WC_CP_Product $composited_product
+	 * @param  double         $price
+	 * @param  string         $min_or_max
+	 * @param  WC_CP_Product  $composited_product
 	 * @return double
 	 */
 	public static function composited_bundle_price_incl_tax( $price, $min_or_max, $composited_product, $qty ) {
@@ -189,9 +236,9 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Composited bundle price excluding tax.
 	 *
-	 * @param  double        $price
-	 * @param  string        $min_or_max
-	 * @param  WC_CP_Product $composited_product
+	 * @param  double         $price
+	 * @param  string         $min_or_max
+	 * @param  WC_CP_Product  $composited_product
 	 * @return double
 	 */
 	public static function composited_bundle_price_excl_tax( $price, $min_or_max, $composited_product, $qty ) {
@@ -210,8 +257,8 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * True if a composited bundle is seen as a NYP product.
 	 *
-	 * @param  boolean       $is_nyp
-	 * @param  WC_CP_Product $composited_product
+	 * @param  boolean        $is_nyp
+	 * @param  WC_CP_Product  $composited_product
 	 * @return double
 	 */
 	public static function composited_bundle_is_nyp( $is_nyp, $composited_product ) {
@@ -219,7 +266,7 @@ class WC_PB_CP_Compatibility {
 		$product = $composited_product->get_product();
 
 		if ( $product->product_type === 'bundle' ) {
-			if ( $product->is_nyp() || $product->contains_nyp() ) {
+			if ( $product->is_nyp() || $product->contains( 'nyp' ) ) {
 				$is_nyp = true;
 			}
 		}
@@ -237,7 +284,7 @@ class WC_PB_CP_Compatibility {
 	 */
 	public static function composite_show_product_bundle( $product, $component_id, $composite ) {
 
-		if ( $product->contains_sub() ) {
+		if ( $product->contains( 'subscriptions' ) ) {
 
 			?><div class="woocommerce-error"><?php
 				echo __( 'This item cannot be purchased at the moment.', 'woocommerce-product-bundles' );
@@ -249,40 +296,36 @@ class WC_PB_CP_Compatibility {
 		WC_PB_Compatibility::$compat_product = $product;
 		WC_PB_Compatibility::$bundle_prefix  = $component_id;
 
-		$component_data = $composite->get_component_data( $component_id );
+		$component          = $composite->get_component( $component_id );
+		$composited_product = $component->get_option( $product->id );
+		$quantity_min       = $composited_product->get_quantity_min();
+		$quantity_max       = $composited_product->get_quantity_max( true );
+		$availability       = $composited_product->get_availability();
 
-		$quantity_min = $component_data[ 'quantity_min' ];
-		$quantity_max = $component_data[ 'quantity_max' ];
-
-		if ( $product->sold_individually == 'yes' ) {
- 			$quantity_max = 1;
- 			$quantity_min = min( $quantity_min, 1 );
- 		}
-
-		WC_PB_Helpers::extend_price_display_precision();
+		WC_PB_Product_Prices::extend_price_display_precision();
 
 		$base_price_incl_tax = $product->get_price_including_tax( 1, 1000 );
 		$base_price_excl_tax = $product->get_price_excluding_tax( 1, 1000 );
 		$tax_ratio           = $base_price_incl_tax / $base_price_excl_tax;
 
-		WC_PB_Helpers::reset_price_display_precision();
+		WC_PB_Product_Prices::reset_price_display_precision();
 
-		$custom_data = apply_filters( 'woocommerce_composited_product_custom_data', array( 'price_tax' => $tax_ratio ), $product, $component_id, $component_data, $composite );
+		/** Filter documented in CP file 'includes/wc-cp-template-functions.php'. */
+		$custom_data = apply_filters( 'woocommerce_composited_product_custom_data', array( 'price_tax' => $tax_ratio, 'image_data' => $composited_product->get_image_data() ), $product, $component_id, $component, $composite );
 
  		wc_get_template( 'composited-product/bundle-product.php', array(
-			'product'              => $product,
-			'composite_id'         => $composite->id,
-			'quantity_min'         => $quantity_min,
-			'quantity_max'         => $quantity_max,
-			'available_variations' => $product->get_available_bundle_variations(),
-			'attributes'           => $product->get_bundle_variation_attributes(),
-			'selected_attributes'  => $product->get_selected_bundle_variation_attributes(),
-			'custom_data'          => $custom_data,
-			'bundle_price_data'    => $product->get_bundle_price_data(),
-			'bundled_items'        => $product->get_bundled_items(),
-			'component_id'         => $component_id,
-			'composite_product'    => $composite
-		), false, WC_PB()->woo_bundles_plugin_path() . '/templates/' );
+			'product'            => $product,
+			'composite_id'       => $composite->id,
+			'quantity_min'       => $quantity_min,
+			'quantity_max'       => $quantity_max,
+			'custom_data'        => $custom_data,
+			'bundle_price_data'  => $product->get_bundle_price_data(),
+			'bundled_items'      => $product->get_bundled_items(),
+			'component_id'       => $component_id,
+			'availability'       => $availability,
+			'composited_product' => $composited_product,
+			'composite_product'  => $composite
+		), false, WC_PB()->plugin_path() . '/templates/' );
 
 		WC_PB_Compatibility::$compat_product = '';
 		WC_PB_Compatibility::$bundle_prefix  = '';
@@ -291,34 +334,43 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Hook into 'woocommerce_composite_component_add_to_cart_validation' to validate composited bundles.
 	 *
-	 * @param  boolean  $result
-	 * @param  int      $composite_id
-	 * @param  string   $component_id
-	 * @param  int      $bundle_id
-	 * @param  int      $quantity
+	 * @param  boolean               $result
+	 * @param  int                   $composite_id
+	 * @param  string                $component_id
+	 * @param  int                   $bundle_id
+	 * @param  int                   $quantity
+	 * @param  array                 $cart_item_data
+	 * @param  WC_Product_Composite  $composite
 	 * @return boolean
 	 */
-	public static function composite_validate_bundle_data( $result, $composite_id, $component_id, $bundle_id, $quantity, $cart_item_data ) {
+	public static function composite_validate_bundle_data( $result, $composite_id, $component_id, $bundle_id, $quantity, $cart_item_data, $composite = false ) {
 
 		// Get product type.
 		$terms 			= get_the_terms( $bundle_id, 'product_type' );
 		$product_type 	= ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
 
-		if ( $product_type == 'bundle' ) {
+		if ( 'bundle' === $product_type ) {
 
 			// Present only when re-ordering.
-			if ( isset( $cart_item_data[ 'composite_data' ][ $component_id ][ 'stamp' ] ) )
+			if ( isset( $cart_item_data[ 'composite_data' ][ $component_id ][ 'stamp' ] ) ) {
 				$cart_item_data [ 'stamp' ] = $cart_item_data[ 'composite_data' ][ $component_id ][ 'stamp' ];
+			}
 
 			WC_PB_Compatibility::$bundle_prefix = $component_id;
 
 			add_filter( 'woocommerce_bundle_before_validation', array( __CLASS__, 'disallow_bundled_item_subs' ), 10, 2 );
 
-			$result = WC_PB()->cart->woo_bundles_validation( true, $bundle_id, $quantity, '', array(), $cart_item_data );
+			add_filter( 'woocommerce_add_error', array( __CLASS__, 'component_bundle_error_message_context' ) );
+			self::$current_component = $composite->get_component( $component_id );
 
-			WC_PB_Compatibility::$bundle_prefix = '';
+			$result = WC_PB()->cart->validate_add_to_cart( true, $bundle_id, $quantity, '', array(), $cart_item_data );
+
+			remove_filter( 'woocommerce_add_error', array( __CLASS__, 'component_bundle_error_message_context' ) );
+			self::$current_component = false;
 
 			remove_filter( 'woocommerce_bundle_before_validation', array( __CLASS__, 'disallow_bundled_item_subs' ), 10, 2 );
+
+			WC_PB_Compatibility::$bundle_prefix = '';
 
 			// Add filter to return stock manager items from bundle.
 			if ( class_exists( 'WC_CP_Stock_Manager' ) ) {
@@ -338,10 +390,9 @@ class WC_PB_CP_Compatibility {
 	 */
 	public static function disallow_bundled_item_subs( $passed, $bundle ) {
 
-		if ( $bundle->contains_sub() ) {
-
+		if ( $bundle->contains( 'subscriptions' ) ) {
 			wc_add_notice( sprintf( __( 'The configuration you have selected cannot be added to the cart. &quot;%s&quot; cannot be purchased.', 'woocommerce-product-bundles' ), $bundle->get_title() ), 'error' );
-			return false;
+			$passed = false;
 		}
 
 		return $passed;
@@ -373,17 +424,17 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Hook into 'woocommerce_composite_component_cart_item_identifier' to add stamp data for bundles.
 	 *
-	 * @param  array  $composited_item_identifier
-	 * @param  string $composited_item_id
+	 * @param  array   $composited_item_identifier
+	 * @param  string  $component_id
 	 * @return array
 	 */
-	public static function composite_bundle_cart_item_stamp( $composited_item_identifier, $composited_item_id ) {
+	public static function composite_bundle_cart_item_stamp( $composited_item_identifier, $component_id ) {
 
 		if ( isset( $composited_item_identifier[ 'type' ] ) && $composited_item_identifier[ 'type' ] === 'bundle' ) {
 
-			WC_PB_Compatibility::$bundle_prefix = $composited_item_id;
+			WC_PB_Compatibility::$bundle_prefix = $component_id;
 
-			$bundle_cart_data = WC_PB()->cart->woo_bundles_add_cart_item_data( array(), $composited_item_identifier[ 'product_id' ] );
+			$bundle_cart_data = WC_PB()->cart->add_cart_item_data( array(), $composited_item_identifier[ 'product_id' ] );
 
 			$composited_item_identifier[ 'stamp' ] = $bundle_cart_data[ 'stamp' ];
 
@@ -396,50 +447,47 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Sets a prefix for unique bundles.
 	 *
-	 * @param  string 	$prefix
-	 * @param  int 		$product_id
+	 * @param  string  $prefix
+	 * @param  int     $product_id
 	 * @return string
 	 */
 	public static function bundle_field_prefix( $prefix, $product_id ) {
 
 		if ( ! empty( WC_PB_Compatibility::$bundle_prefix ) ) {
-			return 'component_' . WC_PB_Compatibility::$bundle_prefix . '_';
+			$prefix = 'component_' . WC_PB_Compatibility::$bundle_prefix . '_';
 		}
 
 		return $prefix;
 	}
 
 	/**
-	 * Hook into 'woocommerce_composited_add_to_cart' to trigger 'woo_bundles_add_bundle_to_cart'.
+	 * Hook into 'woocommerce_composited_add_to_cart' to trigger 'WC_PB()->cart->bundle_add_to_cart()'.
 	 *
-	 * @param string  $cart_item_key
-	 * @param int     $product_id
-	 * @param int     $quantity
-	 * @param int     $variation_id
-	 * @param array   $variation
-	 * @param array   $cart_item_data
+	 * @param  string  $cart_item_key
+	 * @param  int     $product_id
+	 * @param  int     $quantity
+	 * @param  int     $variation_id
+	 * @param  array   $variation
+	 * @param  array   $cart_item_data
 	 */
 	public static function add_bundle_to_cart( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data ) {
-		WC_PB()->cart->woo_bundles_add_bundle_to_cart( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data );
+		WC_PB()->cart->bundle_add_to_cart( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data );
 	}
 
 	/**
 	 * Used to link bundled order items with the composite container product.
 	 *
-	 * @param  boolean  $is_child
-	 * @param  array    $order_item
-	 * @param  array    $composite_item
-	 * @param  WC_Order $order
+	 * @param  boolean   $is_child
+	 * @param  array     $order_item
+	 * @param  array     $composite_item
+	 * @param  WC_Order  $order
 	 * @return boolean
 	 */
 	public static function bundled_order_item_is_child_of_composite( $is_child, $order_item, $composite_item, $order ) {
 
-		if ( ! empty( $order_item[ 'bundled_by' ] ) ) {
-
-			$parent = WC_PB_Order::get_bundle_parent( $order_item, $order );
-
-			if ( $parent && isset( $parent[ 'composite_parent' ] ) && $parent[ 'composite_parent' ] === $composite_item[ 'composite_cart_key' ] ) {
-				return true;
+		if ( $parent = wc_pb_get_bundled_order_item_container( $order_item, $order ) ) {
+			if ( isset( $parent[ 'composite_parent' ] ) && $parent[ 'composite_parent' ] === $composite_item[ 'composite_cart_key' ] ) {
+				$is_child = true;
 			}
 		}
 
@@ -458,17 +506,9 @@ class WC_PB_CP_Compatibility {
 	 */
 	public static function bundled_cart_item_is_child_of_composite( $is_child, $cart_item_key, $cart_item_data, $composite_key, $composite_data ) {
 
-		if ( ! empty( $cart_item_data[ 'bundled_by' ] ) ) {
-
-			$parent_key = $cart_item_data[ 'bundled_by' ];
-
-			if ( isset( WC()->cart->cart_contents[ $parent_key ] ) ) {
-
-				$parent = WC()->cart->cart_contents[ $parent_key ];
-
-				if ( isset( $parent[ 'composite_parent' ] ) && $parent[ 'composite_parent' ] == $composite_key ) {
-					return true;
-				}
+		if ( $parent = wc_pb_get_bundled_cart_item_container( $cart_item_data ) ) {
+			if ( isset( $parent[ 'composite_parent' ] ) && $parent[ 'composite_parent' ] === $composite_key ) {
+				$is_child = true;
 			}
 		}
 
@@ -478,20 +518,17 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Edit composited bundle container cart title.
 	 *
-	 * @param  string   $content
-	 * @param  array    $cart_item_values
-	 * @param  string   $cart_item_key
+	 * @param  string  $content
+	 * @param  array   $cart_item_values
+	 * @param  string  $cart_item_key
 	 * @return string
 	 */
 	public static function composited_bundle_in_cart_item_title( $content, $cart_item_values, $cart_item_key ) {
 
-		if ( isset( $cart_item_values[ 'bundled_items' ] ) && ! empty( $cart_item_values[ 'composite_parent' ] ) ) {
-
-			if ( ! empty( $cart_item_values[ 'stamp' ] ) ) {
-
-				if ( empty( $cart_item_values[ 'bundled_items' ] ) && $cart_item_values[ 'data' ]->get_price() == 0 ) {
-					$content = __( 'None', 'woocommerce-product-bundles' );
-				}
+		if ( wc_pb_is_bundle_container_cart_item( $cart_item_values ) && wc_cp_is_composited_cart_item( $cart_item_values ) ) {
+			$bundled_cart_items = wc_pb_get_bundled_cart_items( $cart_item_values );
+			if ( empty( $bundled_cart_items ) && $cart_item_values[ 'data' ]->get_price() == 0 ) {
+				$content = __( 'No selection', 'woocommerce-product-bundles' );
 			}
 		}
 
@@ -501,35 +538,48 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Hide composited bundle container cart title.
 	 *
-	 * @param  string   $content
-	 * @param  array    $cart_item_values
-	 * @param  string   $cart_item_key
+	 * @param  string  $content
+	 * @param  array   $cart_item_values
+	 * @param  string  $cart_item_key
 	 * @return string
 	 */
 	public static function composited_bundle_remove_in_cart_item_title( $title, $cart_item_values, $cart_item_key ) {
 
-		if ( isset( $cart_item_values[ 'bundled_items' ] ) && ! empty( $cart_item_values[ 'composite_parent' ] ) ) {
+		if ( wc_pb_is_bundle_container_cart_item( $cart_item_values ) && wc_cp_is_composited_cart_item( $cart_item_values ) ) {
 
-			if ( ! empty( $cart_item_values[ 'stamp' ] ) ) {
+			$bundled_cart_items = wc_pb_get_bundled_cart_items( $cart_item_values );
 
-				if ( ! empty( $cart_item_values[ 'bundled_items' ] ) ) {
+			if ( ! empty( $bundled_cart_items ) ) {
 
-					$hide_title = false;
+				$hide_title = false;
 
-					if ( ! empty( $cart_item_values[ 'composite_data' ] ) && ! empty( $cart_item_values[ 'composite_item' ] ) ) {
+				if ( ! empty( $cart_item_values[ 'composite_data' ] ) && ! empty( $cart_item_values[ 'composite_item' ] ) ) {
 
-						$component_id = $cart_item_values[ 'composite_item' ];
+					$component_id = $cart_item_values[ 'composite_item' ];
 
-						if ( isset( $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] ) && $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] === 'yes' ) {
-							$hide_title = true;
-						}
+					if ( isset( $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] ) && $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] === 'yes' ) {
+						$hide_title = true;
 					}
+				}
 
-					if ( apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_title', $hide_title, $cart_item_values, $cart_item_key ) ) {
+				/**
+				 * 'woocommerce_composited_bundle_container_cart_item_hide_title' filter.
+				 *
+				 * @param  boolean  $hide_title
+				 * @param  array    $cart_item_values
+				 * @param  string   $cart_item_key
+				 */
+				if ( apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_title', $hide_title, $cart_item_values, $cart_item_key ) ) {
+					ob_start();
 
-						$composite_id = ! empty( $cart_item_values[ 'composite_data' ][ $component_id ][ 'composite_id' ] ) ? $cart_item_values[ 'composite_data' ][ $component_id ][ 'composite_id' ] : '';
-						$title        = '<strong>' . apply_filters( 'woocommerce_composite_component_title', $cart_item_values[ 'composite_data' ][ $component_id ][ 'title' ], $component_id, $composite_id ) . ':</strong>';
-					}
+					wc_get_template( 'component-item.php', array(
+						'component_data' => array(
+							'key'   => $cart_item_values[ 'composite_data' ][ $component_id ][ 'title' ],
+							'value' => ''
+						)
+					), '', WC_CP()->plugin_path() . '/templates/' );
+
+					$title = ob_get_clean();
 				}
 			}
 		}
@@ -540,60 +590,21 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Edit composited bundle container cart qty.
 	 *
-	 * @param  int      $quantity
-	 * @param  string   $cart_item_key
+	 * @param  int     $quantity
+	 * @param  string  $cart_item_key
 	 * @return int
 	 */
 	public static function composited_bundle_in_cart_item_quantity( $quantity, $cart_item_key ) {
 
 		if ( isset( WC()->cart->cart_contents[ $cart_item_key ] ) ) {
-			 $cart_item_values = WC()->cart->cart_contents[ $cart_item_key ];
 
-			if ( isset( $cart_item_values[ 'bundled_items' ] ) && ! empty( $cart_item_values[ 'composite_parent' ] ) ) {
+			$cart_item_values = WC()->cart->cart_contents[ $cart_item_key ];
 
-				if ( ! empty( $cart_item_values[ 'stamp' ] ) ) {
+			if ( wc_pb_is_bundle_container_cart_item( $cart_item_values ) && wc_cp_is_composited_cart_item( $cart_item_values ) ) {
 
-					if ( empty( $cart_item_values[ 'bundled_items' ] ) && $cart_item_values[ 'data' ]->get_price() == 0 ) {
-						$quantity = '';
-					} else {
+				$bundled_cart_items = wc_pb_get_bundled_cart_items( $cart_item_values );
 
-						$hide_qty = false;
-
-						if ( ! empty( $cart_item_values[ 'composite_data' ] ) && ! empty( $cart_item_values[ 'composite_item' ] ) ) {
-
-							$component_id = $cart_item_values[ 'composite_item' ];
-
-							if ( isset( $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] ) && $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] === 'yes' && $cart_item_values[ 'composite_data' ][ $component_id ][ 'quantity_min' ] == 1 && $cart_item_values[ 'composite_data' ][ $component_id ][ 'quantity_max' ] == 1 ) {
-								$hide_qty = true;
-							}
-						}
-
-						if ( apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_quantity', $hide_qty, $cart_item_values, $cart_item_key ) ) {
-							$quantity = '';
-						}
-					}
-				}
-			}
-		}
-
-		return $quantity;
-	}
-
-	/**
-	 * Edit composited bundle container cart qty.
-	 *
-	 * @param  int      $quantity
-	 * @param  string   $cart_item_values
-	 * @param  string   $cart_item_key
-	 * @return int
-	 */
-	public static function composited_bundle_checkout_item_quantity( $quantity, $cart_item_values, $cart_item_key = false ) {
-
-		if ( isset( $cart_item_values[ 'bundled_items' ] ) && ! empty( $cart_item_values[ 'composite_parent' ] ) ) {
-
-			if ( ! empty( $cart_item_values[ 'stamp' ] ) ) {
-
-				if ( empty( $cart_item_values[ 'bundled_items' ] ) && $cart_item_values[ 'data' ]->get_price() == 0  ) {
+				if ( empty( $bundled_cart_items ) && $cart_item_values[ 'data' ]->get_price() == 0 ) {
 					$quantity = '';
 				} else {
 
@@ -608,6 +619,13 @@ class WC_PB_CP_Compatibility {
 						}
 					}
 
+					/**
+					 * 'woocommerce_composited_bundle_container_cart_item_hide_quantity' filter.
+					 *
+					 * @param  boolean  $hide_qty
+					 * @param  array    $cart_item_values
+					 * @param  string   $cart_item_key
+					 */
 					if ( apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_quantity', $hide_qty, $cart_item_values, $cart_item_key ) ) {
 						$quantity = '';
 					}
@@ -619,16 +637,55 @@ class WC_PB_CP_Compatibility {
 	}
 
 	/**
+	 * Edit composited bundle container cart qty.
+	 *
+	 * @param  int     $quantity
+	 * @param  string  $cart_item_values
+	 * @param  string  $cart_item_key
+	 * @return int
+	 */
+	public static function composited_bundle_checkout_item_quantity( $quantity, $cart_item_values, $cart_item_key = false ) {
+
+		if ( wc_pb_is_bundle_container_cart_item( $cart_item_values ) && wc_cp_is_composited_cart_item( $cart_item_values ) ) {
+
+			$bundled_cart_items = wc_pb_get_bundled_cart_items( $cart_item_values );
+
+			if ( empty( $bundled_cart_items ) && $cart_item_values[ 'data' ]->get_price() == 0  ) {
+				$quantity = '';
+			} else {
+
+				$hide_qty = false;
+
+				if ( ! empty( $cart_item_values[ 'composite_data' ] ) && ! empty( $cart_item_values[ 'composite_item' ] ) ) {
+
+					$component_id = $cart_item_values[ 'composite_item' ];
+
+					if ( isset( $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] ) && $cart_item_values[ 'composite_data' ][ $component_id ][ 'static' ] === 'yes' && $cart_item_values[ 'composite_data' ][ $component_id ][ 'quantity_min' ] == 1 && $cart_item_values[ 'composite_data' ][ $component_id ][ 'quantity_max' ] == 1 ) {
+						$hide_qty = true;
+					}
+				}
+
+				/** Documented in method 'composited_bundle_in_cart_item_quantity'. */
+				if ( apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_quantity', $hide_qty, $cart_item_values, $cart_item_key ) ) {
+					$quantity = '';
+				}
+			}
+		}
+
+		return $quantity;
+	}
+
+	/**
 	 * Visibility of composited bundle container in orders.
 	 * Hide containers without children and a zero price (all optional).
 	 *
-	 * @param  boolean $visible
-	 * @param  array   $order_item
+	 * @param  boolean  $visible
+	 * @param  array    $order_item
 	 * @return boolean
 	 */
 	public static function composited_bundle_order_item_visible( $visible, $order_item ) {
 
-		if ( isset( $order_item[ 'bundled_items' ] ) && ! empty( $order_item[ 'composite_parent' ] ) ) {
+		if ( wc_pb_is_bundle_container_order_item( $order_item ) && wc_cp_maybe_is_composited_order_item( $order_item ) ) {
 
 			$bundled_items = maybe_unserialize( $order_item[ 'bundled_items' ] );
 
@@ -643,43 +700,46 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Edit composited bundle container order item title.
 	 *
-	 * @param  string   $content
-	 * @param  array 	$order_item
+	 * @param  string  $content
+	 * @param  array   $order_item
 	 * @return string
 	 */
 	public static function composited_bundle_order_table_item_title( $content, $order_item ) {
 
-		if ( isset( $order_item[ 'bundled_items' ] ) && ! empty( $order_item[ 'composite_parent' ] ) ) {
+		if ( wc_pb_is_bundle_container_order_item( $order_item ) && wc_cp_maybe_is_composited_order_item( $order_item ) ) {
 
-			if ( ! empty( $order_item[ 'stamp' ] ) ) {
+			$bundled_items = maybe_unserialize( $order_item[ 'bundled_items' ] );
 
-				$bundled_items = maybe_unserialize( $order_item[ 'bundled_items' ] );
+			if ( empty( $bundled_items ) && $order_item[ 'line_subtotal' ] == 0 ) {
+				$content = __( 'No selection', 'woocommerce-product-bundles' );
 
-				if ( empty( $bundled_items ) && $order_item[ 'line_subtotal' ] == 0 ) {
-					$content = __( 'None', 'woocommerce-product-bundles' );
+				if ( did_action( 'wc_pip_header' ) ) {
+					$content = '<span class="product product-name composited-product">' . $content . '</span>';
+				}
+			}
 
-					if ( did_action( 'wc_pip_header' ) && isset( $order_item[ 'composite_parent' ] ) ) {
-						$content = '<span class="product product-name composited-product">' . $content . '</span>';
+			if ( ! empty( $bundled_items ) ) {
+
+				$hide_title = false;
+
+				if ( ! empty( $order_item[ 'composite_data' ] ) && ! empty( $order_item[ 'composite_item' ] ) ) {
+
+					$component_id   = $order_item[ 'composite_item' ];
+					$composite_data = maybe_unserialize( $order_item[ 'composite_data' ] );
+
+					if ( isset( $composite_data[ $component_id ][ 'static' ] ) && $composite_data[ $component_id ][ 'static' ] === 'yes' && $composite_data[ $component_id ][ 'quantity_min' ] == 1 && $composite_data[ $component_id ][ 'quantity_max' ] == 1 ) {
+						$hide_title = true;
 					}
 				}
 
-				if ( ! empty( $bundled_items ) ) {
-
-					$hide_title = false;
-
-					if ( ! empty( $order_item[ 'composite_data' ] ) && ! empty( $order_item[ 'composite_item' ] ) ) {
-
-						$component_id   = $order_item[ 'composite_item' ];
-						$composite_data = maybe_unserialize( $order_item[ 'composite_data' ] );
-
-						if ( isset( $composite_data[ $component_id ][ 'static' ] ) && $composite_data[ $component_id ][ 'static' ] === 'yes' && $composite_data[ $component_id ][ 'quantity_min' ] == 1 && $composite_data[ $component_id ][ 'quantity_max' ] == 1 ) {
-							$hide_title = true;
-						}
-					}
-
-					if ( apply_filters( 'woocommerce_composited_bundle_container_order_item_hide_title', $hide_title, $order_item ) ) {
-						$content = '';
-					}
+				/**
+				 * 'woocommerce_composited_bundle_container_order_item_hide_title' filter.
+				 *
+				 * @param  boolean  $hide_title
+				 * @param  array    $order_item
+				 */
+				if ( apply_filters( 'woocommerce_composited_bundle_container_order_item_hide_title', $hide_title, $order_item ) ) {
+					$content = '';
 				}
 			}
 		}
@@ -690,37 +750,40 @@ class WC_PB_CP_Compatibility {
 	/**
 	 * Edit composited bundle container order item qty.
 	 *
-	 * @param  string   $content
-	 * @param  array 	$order_item
+	 * @param  string  $content
+	 * @param  array   $order_item
 	 * @return string
 	 */
 	public static function composited_bundle_order_table_item_quantity( $quantity, $order_item ) {
 
-		if ( isset( $order_item[ 'bundled_items' ] ) && ! empty( $order_item[ 'composite_parent' ] ) ) {
+		if ( wc_pb_is_bundle_container_order_item( $order_item ) && wc_cp_maybe_is_composited_order_item( $order_item ) ) {
 
-			if ( ! empty( $order_item[ 'stamp' ] ) ) {
+			$bundled_items = maybe_unserialize( $order_item[ 'bundled_items' ] );
 
-				$bundled_items = maybe_unserialize( $order_item[ 'bundled_items' ] );
+			if ( empty( $bundled_items ) && $order_item[ 'line_subtotal' ] == 0  ) {
+				$quantity = '';
+			} else {
 
-				if ( empty( $bundled_items ) && $order_item[ 'line_subtotal' ] == 0  ) {
+				$hide_qty = false;
+
+				if ( ! empty( $order_item[ 'composite_data' ] ) && ! empty( $order_item[ 'composite_item' ] ) ) {
+
+					$component_id   = $order_item[ 'composite_item' ];
+					$composite_data = maybe_unserialize( $order_item[ 'composite_data' ] );
+
+					if ( isset( $composite_data[ $component_id ][ 'static' ] ) && $composite_data[ $component_id ][ 'static' ] === 'yes' && $composite_data[ $component_id ][ 'quantity_min' ] == 1 && $composite_data[ $component_id ][ 'quantity_max' ] == 1 ) {
+						$hide_qty = true;
+					}
+				}
+
+				/**
+				 * 'woocommerce_composited_bundle_container_order_item_hide_quantity' filter.
+				 *
+				 * @param  boolean  $hide_qty
+				 * @param  array    $order_item
+				 */
+				if ( apply_filters( 'woocommerce_composited_bundle_container_order_item_hide_quantity', $hide_qty, $order_item ) ) {
 					$quantity = '';
-				} else {
-
-					$hide_qty = false;
-
-					if ( ! empty( $order_item[ 'composite_data' ] ) && ! empty( $order_item[ 'composite_item' ] ) ) {
-
-						$component_id   = $order_item[ 'composite_item' ];
-						$composite_data = maybe_unserialize( $order_item[ 'composite_data' ] );
-
-						if ( isset( $composite_data[ $component_id ][ 'static' ] ) && $composite_data[ $component_id ][ 'static' ] === 'yes' && $composite_data[ $component_id ][ 'quantity_min' ] == 1 && $composite_data[ $component_id ][ 'quantity_max' ] == 1 ) {
-							$hide_qty = true;
-						}
-					}
-
-					if ( apply_filters( 'woocommerce_composited_bundle_container_order_item_hide_title', $hide_qty, $order_item ) ) {
-						$quantity = '';
-					}
 				}
 			}
 		}

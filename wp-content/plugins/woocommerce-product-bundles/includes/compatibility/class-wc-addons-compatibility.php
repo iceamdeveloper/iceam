@@ -1,8 +1,10 @@
 <?php
 /**
- * Product Addons and NYP Compatibility.
+ * WC_PB_Addons_Compatibility class
  *
- * @since 4.11.4
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.11.4
  */
 
 // Exit if accessed directly.
@@ -10,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Product Addons and NYP Compatibility.
+ *
+ * @since 4.11.4
+ */
 class WC_PB_Addons_Compatibility {
 
 	public static function init() {
@@ -44,8 +51,8 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Support for bundled item addons.
 	 *
-	 * @param  int               $product_id    the product id
-	 * @param  WC_Bundled_Item   $item          the bundled item
+	 * @param  int              $product_id
+	 * @param  WC_Bundled_Item  $item
 	 * @return void
 	 */
 	public static function addons_support( $product_id, $item ) {
@@ -108,8 +115,8 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Support for bundled item NYP.
 	 *
-	 * @param  int               $product_id     the product id
-	 * @param  WC_Bundled_Item   $item           the bundled item
+	 * @param  int              $product_id
+	 * @param  WC_Bundled_Item  $item
 	 * @return void
 	 */
 	public static function nyp_price_input_support( $product_id, $item ) {
@@ -118,11 +125,11 @@ class WC_PB_Addons_Compatibility {
 
 		$the_product = ! empty( WC_PB_Compatibility::$compat_product ) ? WC_PB_Compatibility::$compat_product : $product;
 
-		if ( $the_product->product_type === 'bundle' && $the_product->is_priced_per_product() == false ) {
+		if ( 'bundle' === $the_product->product_type && false === $item->is_priced_individually() ) {
 			return;
 		}
 
-		if ( function_exists( 'WC_Name_Your_Price' ) && $item->product->product_type == 'simple' ) {
+		if ( function_exists( 'WC_Name_Your_Price' ) && 'simple' === $item->product->product_type ) {
 
 			WC_PB_Compatibility::$nyp_prefix = $item->item_id;
 
@@ -135,9 +142,9 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Sets a unique prefix for unique NYP products. The prefix is set and re-set globally before validating and adding to cart.
 	 *
-	 * @param  string   $prefix         unique prefix
-	 * @param  int      $product_id     the product id
-	 * @return string                   a unique prefix
+	 * @param  string  $prefix
+	 * @param  int     $product_id
+	 * @return string
 	 */
 	public static function nyp_cart_prefix( $prefix, $product_id ) {
 
@@ -155,8 +162,8 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Add addons identifier to bundled item stamp, in order to generate new cart ids for bundles with different addons configurations.
 	 *
-	 * @param  array  $bundled_item_stamp
-	 * @param  string $bundled_item_id
+	 * @param  array   $bundled_item_stamp
+	 * @param  string  $bundled_item_id
 	 * @return array
 	 */
 	public static function bundled_item_addons_stamp( $bundled_item_stamp, $bundled_item_id ) {
@@ -189,8 +196,8 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Add nyp identifier to bundled item stamp, in order to generate new cart ids for bundles with different nyp configurations.
 	 *
-	 * @param  array  $bundled_item_stamp
-	 * @param  string $bundled_item_id
+	 * @param  array   $bundled_item_stamp
+	 * @param  string  $bundled_item_id
 	 * @return array
 	 */
 	public static function bundled_item_nyp_stamp( $bundled_item_stamp, $bundled_item_id ) {
@@ -220,9 +227,9 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Validate bundled item NYP and Addons.
 	 *
-	 * @param  bool   $add
-	 * @param  int    $product_id
-	 * @param  int    $quantity
+	 * @param  bool  $add
+	 * @param  int   $product_id
+	 * @param  int   $quantity
 	 * @return bool
 	 */
 	public static function validate_bundled_item_nyp_and_addons( $add, $bundle, $bundled_item, $quantity, $variation_id ) {
@@ -251,14 +258,7 @@ class WC_PB_Addons_Compatibility {
 			WC_PB_Compatibility::$addons_prefix = '';
 		}
 
-		// Validate nyp.
-		if ( WC_PB_Compatibility::$bundle_prefix ) {
-			$has_parent_priced_statically = get_post_meta( WC_PB_Compatibility::$bundle_prefix, '_per_product_pricing_bto', true ) === 'yes' ? false : true;
-		} else {
-			$has_parent_priced_statically = false;
-		}
-
-		if ( $bundled_item->is_priced_per_product() && ( ! $has_parent_priced_statically ) && function_exists( 'WC_Name_Your_Price' ) ) {
+		if ( $bundled_item->is_priced_individually() && function_exists( 'WC_Name_Your_Price' ) ) {
 
 			WC_PB_Compatibility::$nyp_prefix = $bundled_item_id;
 
@@ -275,11 +275,11 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Runs before adding a bundled item to the cart.
 	 *
-	 * @param  int                $product_id
-	 * @param  int                $quantity
-	 * @param  int                $variation_id
-	 * @param  array              $variations
-	 * @param  array              $bundled_item_cart_data
+	 * @param  int    $product_id
+	 * @param  int    $quantity
+	 * @param  int    $variation_id
+	 * @param  array  $variations
+	 * @param  array  $bundled_item_cart_data
 	 * @return void
 	 */
 	public static function after_bundled_add_to_cart( $product_id, $quantity, $variation_id, $variations, $bundled_item_cart_data ) {
@@ -302,11 +302,11 @@ class WC_PB_Addons_Compatibility {
 	/**
 	 * Runs after adding a bundled item to the cart.
 	 *
-	 * @param  int                $product_id
-	 * @param  int                $quantity
-	 * @param  int                $variation_id
-	 * @param  array              $variations
-	 * @param  array              $bundled_item_cart_data
+	 * @param  int    $product_id
+	 * @param  int    $quantity
+	 * @param  int    $variation_id
+	 * @param  array  $variations
+	 * @param  array  $bundled_item_cart_data
 	 * @return void
 	 */
 	public static function before_bundled_add_to_cart( $product_id, $quantity, $variation_id, $variations, $bundled_item_cart_data ) {

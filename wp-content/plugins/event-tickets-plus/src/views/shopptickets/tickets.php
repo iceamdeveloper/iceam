@@ -2,7 +2,7 @@
 /**
  * Renders the Shopp tickets table/form
  *
- * @version 4.2.7
+ * @version 4.3.3
  *
  * @var bool $must_login
  */
@@ -16,6 +16,11 @@ ob_start();
 	<table width="100%" class="tribe-events-tickets">
 		<?php
 		foreach ( $tickets as $ticket ) {
+			/**
+			 * Changing any HTML to the `$ticket` Arguments you will need apply filters
+			 * on the `shopptickets_get_ticket` hook.
+			 */
+
 			$product = shopp_product( $ticket->ID );
 			$in_stock = ( 'off' === $product->inventory || $product->stock > $product->qty_sold ) ? true : false;
 
@@ -49,21 +54,16 @@ ob_start();
 				}
 				echo '</td>';
 
-				echo '<td class="tickets_name">';
-				echo $ticket->name;
-				echo '</td>';
+				echo '<td class="tickets_name">' . $ticket->name . '</td>';
 
-				echo '<td class="tickets_price">';
-				echo $this->get_price_html( $product->id );
-				echo '</td>';
+				echo '<td class="tickets_price">' . $this->get_price_html( $product->id ) . '</td>';
 
-				echo '<td class="tickets_description">';
-				echo $ticket->description;
-				echo '</td>';
+				echo '<td class="tickets_description">' . $ticket->description . '</td>';
 
 				echo '</tr>';
 
-				echo
+				if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
+					echo
 					'<tr class="tribe-tickets-attendees-list-optout">' .
 						'<td colspan="4">' .
 							'<input type="checkbox" name="tribe_shopp_optout" id="tribe-tickets-attendees-list-optout-shopp">' .
@@ -72,6 +72,7 @@ ob_start();
 							'</label>' .
 						'</td>' .
 					'</tr>';
+				}
 
 				include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 			}

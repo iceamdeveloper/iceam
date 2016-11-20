@@ -66,6 +66,7 @@ if ( empty( $instance['filters'] ) ) {
 	       value='<?php echo esc_attr( maybe_serialize( $instance['filters'] ) ); ?>' />
 	<div class="calendar-widget-filter-list">
 		<?php
+		$disabled = array();
 		if ( ! empty( $instance['filters'] ) ) {
 
 			echo '<ul>';

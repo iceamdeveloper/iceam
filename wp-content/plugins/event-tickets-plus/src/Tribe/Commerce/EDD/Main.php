@@ -787,7 +787,16 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$return->qty_sold( $purchased );
 		$return->qty_pending( $pending );
 
-		return $return;
+		/**
+		 * Use this Filter to change any information you want about this ticket
+		 *
+		 * @param object $ticket
+		 * @param int    $event_id
+		 * @param int    $ticket_id
+		 */
+		$ticket = apply_filters( 'tribe_tickets_plus_edd_get_ticket', $return, $event_id, $ticket_id );
+
+		return $ticket;
 	}
 
 	/**
@@ -1154,11 +1163,13 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * Get's the product price html
 	 *
 	 * @param int|object $product
+	 * @param array $attendee
 	 *
 	 * @return string
 	 */
-	public function get_price_html( $product ) {
-		return edd_price( $product, false );
+	public function get_price_html( $product, $attendee = false ) {
+		$price_html = edd_price( $product, false );
+		return apply_filters( 'eddtickets_ticket_price_html', $price_html, $product, $attendee );
 	}
 
 	/**

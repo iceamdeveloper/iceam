@@ -1586,7 +1586,7 @@ function wpcf_admin_post_get_post_groups_fields( $post = false, $context = 'grou
         if ( !isset( $_GET['post_type'] ) ) {
             $post_type = 'post';
         } else if ( in_array( $_GET['post_type'], get_post_types( array('show_ui' => true) ) ) ) {
-            $post_type = $_GET['post_type'];
+            $post_type = sanitize_text_field( $_GET['post_type'] );
         } else {
             $post_type = 'post';
         }

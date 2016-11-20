@@ -16,7 +16,7 @@
  *
  * @package TribeEventsCalendarPro
  *
- * @version 4.3.1
+ * @version 4.3.2
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -49,7 +49,7 @@ global $wp_query;
 			</div><!-- .tribe-events-map-wrap -->
 		<?php endif; ?>
 
-		<span class="tribe-events-event-meta">
+		<div class="tribe-events-event-meta">
 
 			<?php if ( tribe_show_google_map_link() && tribe_address_exists() ) : ?>
 				<!-- Google Map Link -->
@@ -59,7 +59,7 @@ global $wp_query;
 			<!-- Venue Meta -->
 			<?php do_action( 'tribe_events_single_venue_before_the_meta' ) ?>
 
-			<address class="venue-address">
+			<div class="venue-address">
 
 				<?php if ( $full_address ) : ?>
 				<address class="tribe-events-address">
@@ -81,7 +81,7 @@ global $wp_query;
 					</span>
 				<?php endif; ?>
 
-			</address>
+			</div><!-- .venue-address -->
 
 			<?php do_action( 'tribe_events_single_venue_after_the_meta' ) ?>
 
@@ -97,7 +97,7 @@ global $wp_query;
 		<!-- Venue Featured Image -->
 		<?php echo tribe_event_featured_image( null, 'full' ) ?>
 
-	</div><!-- .tribe-events-event-meta -->
+	</div><!-- .tribe-events-venue-meta -->
 
 	<!-- Upcoming event list -->
 	<?php do_action( 'tribe_events_single_venue_before_upcoming_events' ) ?>

@@ -1,8 +1,10 @@
 <?php
 /**
- * Subscriptions Integration.
+ * WC_PB_Subscriptions_Compatibility class
  *
- * @since 4.14.4
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.11.4
  */
 
 // Exit if accessed directly.
@@ -10,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Subscriptions Integration.
+ *
+ * @since 4.14.4
+ */
 class WC_PB_Subscriptions_Compatibility {
 
 	public static function init() {
@@ -33,12 +40,12 @@ class WC_PB_Subscriptions_Compatibility {
 	 *
 	 * Note that this "cleaning up" should not be done for renewal orders, since these do not include the container item.
 	 *
-	 * @param  string   $cart_item_key
-	 * @param  int      $product_id
-	 * @param  int      $quantity
-	 * @param  int      $variation_id
-	 * @param  array    $variation
-	 * @param  array    $cart_item_data
+	 * @param  string  $cart_item_key
+	 * @param  int     $product_id
+	 * @param  int     $quantity
+	 * @param  int     $variation_id
+	 * @param  array   $variation
+	 * @param  array   $cart_item_data
 	 * @return void
 	 */
 	public static function remove_orphaned_bundled_cart_item( $cart_item_key, $product_id, $quantity, $variation_id, $variation, $cart_item_data ) {

@@ -1,5 +1,41 @@
 *** WooCommerce Product Bundles ***
 
+2016.11.16 - version 5.0.1
+ * Fix - Calculation of subtotals in Composite Products app.
+
+2016.11.09 - version 5.0.0
+ * Dev - New database structure for storing and retrieving bundled item data based on custom tables for: i) bundled items and ii) bundled item meta. The new structure is very performant while allowing complex data queries, such as getting all bundles that contain a specific product.
+ * Dev - Introduced 'WC_Bundled_Item_Data' class to represent bundled item data objects and handle all bundled item data CRUD operations - see 'class-wc-bundled-item-data.php'.
+ * Dev - Introduced APIs for querying bundled items and retrieving, modifying and destroying bundled item data - see 'WC_PB_DB' class in 'class-wc-pb-db.php'.
+ * Dev - New 'wc_pb_get_bundled_product_map' function to facilitate quick retrieval of bundle data (bundled item IDs, product bundle IDs key/value pairs) associated with any product.
+ * Dev - New cart/order functions for establishing bundle parent/child item relationships and bundle parent/child item status - see 'wc-pb-functions.php'.
+ * Dev - Added detailed bundle data in REST API order/product GET responses (WP REST API, WC 2.6+ only) - see 'class-wc-pb-rest-api.php' and/or details product/order response schemas.
+ * Dev - Validate and add bundle configurations to the cart programmatically - see 'class-wc-pb-cart.php'.
+ * Dev - Validate and add bundle configurations to orders programmatically - see 'class-wc-pb-order.php'.
+ * Dev - Min/max bundled item quantities used in bundle availability/pricing calculations are now filterable. Useful for developing plugins associated with configuration constraints.
+ * Dev - It is now possible to reconstruct an accurate shipping representation of a bundle from order data. Useful when exporting order data to Shipping Fulfilment services - see 'class-wc-pb-order.php'. Bundle container SKUs are also filterable to allow building a kit SKU from contents "packaged" in bundle containers ("Shipped Individually" option unchecked).
+ * Fix - WP Import/Export Tools support.
+ * Fix - WC Product CSV Import/Export Suite support - requires version 1.10.11.
+ * Fix - Ability to fetch bundled variable product variations data via AJAX using the core WC script - requires WC 2.6.2+, see 'WC_Bundled_Item::use_ajax_for_product_variations' in 'class-wc-bundled-item.php' for details.
+ * Fix - Issue with Composite Product prices not updating properly in the single-product app when selecting a bundle.
+ * Feature - New "Priced Individually" and "Shipped Individually" options at bundled item level. The new options replace the "Per-Item Pricing" and "Per-Item Shipping" options to provide greater pricing and shipping flexibility.
+ * Feature - Bundles can now be saved as virtual or physical items at will. Bundled items can be freely defined as "Shipped Individually" without being coupled to the "Virtual" status of their container, making very complex shipping configurations easily possible.
+ * Feature - New "Layout" option for choosing a 'Tabular' vs 'Default' single-product template layout for Bundles. Integrates functionality previously available in the free "Tabular Layout" mini-extension.
+ * Feature - Added new "Insufficient stock" section under WooCommerce > Reports > Stock, to allow monitoring bundled products with insufficient stock. Detailed availability data is also available when viewing bundles in the Products section of the Dashboard.
+ * Feature - Bundles are now editable from the cart by enabling the "Allow editing in cart" option under the "Advanced" edit-product panel tab.
+ * Feature - Bundles can now be marked as Downloadable, making it possible to add downloadable content at both: i) bundled product level and ii) bundle level.
+ * Feature - Added context to the "Sold Individually" option found in the "Inventory" edit-product panel tab, to prevent multiple bundles from being bought in a single order unconditionally, or conditionally when their configuration is identical.
+ * Tweak - The Base Price fields and associated metadata are no longer used and have been removed in favour of the Regular and Sale Price fields.
+ * Tweak - Hide attribute dropdown if only a single, well-defined variation is allowed in the Variation Filtering list, and show the attribute value as text.
+ * Tweak - Helper functions converted to static. Helper class no longer accessible as property of the main plugin class.
+ * Tweak - Restructured admin classes. Main admin class methods are now static. Admin class no longer accessible as property of the main plugin class.
+ * Tweak - Removed the 'woo_bundles_' prefix from all class methods. Old methods deprecated where applicable.
+ * Important - Template functions are now prefixed with 'wc_pb_template_'. Please review your customizations if you are unhooking any functions from template action hooks.
+ * Important - Template action 'wc_bundles_bundled_item_details' renamed to 'woocommerce_bundled_item_details' for consistency.
+ * Important - WooCommerce 2.3 support dropped.
+ * Important - All product post meta fields created by the plugin are now prefixed with 'wc_pb_'.
+ * Important - Data exported to Shipstation will now reconstruct an accurate physical representation of a bundle based on its shipping configuration. Bundled items that are "packaged" in a bundle ("Shipped Individually" option unchecked) are no longer exported as individual items to Shipstation. Instead, their value (and optionally, weight) is added to the value of the container (assuming it is shipped/non-virtual). Bundle container SKUs are now filterable to allow building a kit SKU from contents "packaged" in bundle containers.
+
 2016.08.16 - version 4.14.7
  * Fix - Added missing argument to the core 'woocommerce_product_default_attributes' filter, used in 'class-wc-bundled-item.php'.
  * Tweak - Modified woothemes.com references to woocommerce.com.
@@ -27,7 +63,7 @@
  * Fix - Trigger 'woocommerce-product-bundle-initializing' event.
  * Fix - JS console error when unavailable bundled item exists with minimum bundled quantity equal to 0.
  * Fix - Added support for the WooCommerce Print Invoices and Packing Lists extension.
- * Fix - Bundled subscription products are duplicated when paying for an order (order-pay endpoint). 
+ * Fix - Bundled subscription products are duplicated when paying for an order (order-pay endpoint).
 
 2016.04.21 - version 4.14.2
  * Fix - Bundled cart item 'product_id' value now correctly cast to the integer type, as required by WooCommerce core.

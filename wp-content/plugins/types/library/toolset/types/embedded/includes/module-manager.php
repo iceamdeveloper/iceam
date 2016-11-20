@@ -27,7 +27,7 @@ function wpcf_module_inline_table_fields()
         _e('There is a problem with Module Manager', 'wpcf');
         return;
     }
-    $group = wpcf_admin_fields_get_group($_GET['group_id']);
+    $group = wpcf_admin_fields_get_group( (int) $_GET['group_id'] );
     if ( empty($group) ) {
         _e('Wrong group id.', 'wpcf');
         return;

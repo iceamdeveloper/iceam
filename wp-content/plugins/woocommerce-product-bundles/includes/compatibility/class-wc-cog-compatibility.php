@@ -1,8 +1,10 @@
 <?php
 /**
- * Cost of Goods Compatibility.
+ * WC_PB_COG_Compatibility class
  *
- * @since  4.11.4
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.11.4
  */
 
 // Exit if accessed directly.
@@ -10,72 +12,39 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Cost of Goods Compatibility.
+ *
+ * @since  4.11.4
+ */
 class WC_PB_COG_Compatibility {
 
 	public static function init() {
 
 		// Cost of Goods support.
-		add_filter( 'wc_cost_of_goods_save_checkout_order_item_meta_item_cost', array( __CLASS__, 'cost_of_goods_checkout_order_bundled_item_cost' ), 10, 3 );
-		add_filter( 'wc_cost_of_goods_save_checkout_order_meta_item_cost', array( __CLASS__, 'cost_of_goods_checkout_order_bundled_item_cost' ), 10, 3 );
 		add_filter( 'wc_cost_of_goods_set_order_item_cost_meta_item_cost', array( __CLASS__, 'cost_of_goods_set_order_item_bundled_item_cost' ), 10, 3 );
 	}
 
 	/**
 	 * Cost of goods compatibility: Zero order item cost for bundled products that belong to statically priced bundles.
 	 *
-	 * @param  double $cost
-	 * @param  array  $values
-	 * @param  string $cart_item_key
-	 * @return double
-	 */
-	public static function cost_of_goods_checkout_order_bundled_item_cost( $cost, $values, $cart_item_key ) {
-
-		if ( ! empty( $values[ 'bundled_by' ] ) ) {
-
-			$cart_contents   = WC()->cart->get_cart();
-			$bundle_cart_key = $values[ 'bundled_by' ];
-
-			if ( isset( $cart_contents[ $bundle_cart_key ] ) ) {
-				if ( ! $cart_contents[ $bundle_cart_key ][ 'data' ]->is_priced_per_product() ) {
-					return 0;
-				}
-			}
-
-		} elseif ( ! empty( $values[ 'bundled_items' ] ) ) {
-			if ( $values[ 'data' ]->is_priced_per_product() ) {
-				return 0;
-			}
-		}
-
-		return $cost;
-	}
-
-	/**
-	 * Cost of goods compatibility: Zero order item cost for bundled products that belong to statically priced bundles.
-	 *
-	 * @param  double   $cost
-	 * @param  array    $item
-	 * @param  WC_Order $order
+	 * @param  double    $cost
+	 * @param  array     $item
+	 * @param  WC_Order  $order
 	 * @return double
 	 */
 	public static function cost_of_goods_set_order_item_bundled_item_cost( $cost, $item, $order ) {
 
-		if ( ! empty( $item[ 'bundled_by' ] ) ) {
+		if ( $parent_item = wc_pb_get_bundled_order_item_container( $item, $order ) ) {
 
-			// Find bundle parent.
-			$parent_item = WC_PB_Order::get_bundle_parent( $item, $order );
+			$bundled_item_priced_individually = isset( $item[ 'bundled_item_priced_individually' ] ) ? $item[ 'bundled_item_priced_individually' ] : false;
 
-			$per_product_pricing = ! empty( $parent_item ) && isset( $parent_item[ 'per_product_pricing' ] ) ? $parent_item[ 'per_product_pricing' ] : get_post_meta( $parent_item[ 'product_id' ], '_per_product_pricing_active', true );
-
-			if ( $per_product_pricing === 'no' ) {
-				return 0;
+			// Back-compat.
+			if ( false === $bundled_item_priced_individually ) {
+				$bundled_item_priced_individually = isset( $parent_item[ 'per_product_pricing' ] ) ? $parent_item[ 'per_product_pricing' ] : get_post_meta( $parent_item[ 'product_id' ], '_wc_pb_v4_per_product_pricing', true );
 			}
 
-		} elseif ( ! isset( $item[ 'bundled_by' ] ) && isset( $item[ 'stamp' ] ) ) {
-
-			$per_product_pricing = isset( $item[ 'per_product_pricing' ] ) ? $item[ 'per_product_pricing' ] : get_post_meta( $item[ 'product_id' ], '_per_product_pricing_active', true );
-
-			if ( $per_product_pricing === 'yes' ) {
+			if ( 'no' === $bundled_item_priced_individually ) {
 				return 0;
 			}
 		}

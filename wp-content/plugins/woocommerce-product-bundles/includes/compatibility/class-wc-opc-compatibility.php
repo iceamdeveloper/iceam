@@ -1,8 +1,10 @@
 <?php
 /**
- * One Page Checkout Compatibility.
+ * WC_PB_OPC_Compatibility class
  *
- * @since  4.11.4
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.11.4
  */
 
 // Exit if accessed directly.
@@ -10,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * One Page Checkout Compatibility.
+ *
+ * @since  4.11.4
+ */
 class WC_PB_OPC_Compatibility {
 
 	public static function init() {
@@ -38,12 +45,9 @@ class WC_PB_OPC_Compatibility {
 			ob_start();
 
 			wc_get_template( 'single-product/add-to-cart/bundle.php', array(
-				'available_variations' 		=> $product->get_available_bundle_variations(),
-				'attributes'   				=> $product->get_bundle_variation_attributes(),
-				'selected_attributes' 		=> $product->get_selected_bundle_variation_attributes(),
-				'bundle_price_data' 		=> $product->get_bundle_price_data(),
-				'bundled_items' 			=> $product->get_bundled_items()
-			), false, WC_PB()->woo_bundles_plugin_path() . '/templates/' );
+				'bundle_price_data' => $product->get_bundle_price_data(),
+				'bundled_items'     => $product->get_bundled_items()
+			), false, WC_PB()->plugin_path() . '/templates/' );
 
 			echo str_replace( array( '<form method="post" enctype="multipart/form-data"', '</form>' ), array( '<div', '</div>' ), ob_get_clean() );
 		}
@@ -52,18 +56,16 @@ class WC_PB_OPC_Compatibility {
 	/**
 	 * Prevent OPC from managing bundled items.
 	 *
-	 * @param  bool   $allow
-	 * @param  array  $cart_item
-	 * @param  string $cart_item_key
-	 * @param  string $opc_id
+	 * @param  bool    $allow
+	 * @param  array   $cart_item
+	 * @param  string  $cart_item_key
+	 * @param  string  $opc_id
 	 * @return bool
 	 */
 	public static function opc_disallow_bundled_cart_item_modification( $allow, $cart_item, $cart_item_key, $opc_id ) {
-
-		if ( ! empty( $cart_item[ 'bundled_by' ] ) ) {
-			return false;
+		if ( wc_pb_is_bundled_cart_item( $cart_item ) ) {
+			$allow = false;
 		}
-
 		return $allow;
 	}
 }

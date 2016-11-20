@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Events Calendar Pro package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2016-10-13 12:47:47+0000\n"
+"PO-Revision-Date: 2016-11-14 10:20:46+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -14,45 +14,45 @@ msgstr ""
 #: src/admin-views/widget-admin-this-week.php:147
 #: src/admin-views/widget-calendar.php:74
 msgid "Select a Taxonomy Term"
-msgstr ""
+msgstr "Wähle einen Taxonomy Terminus aus"
 
 #: src/views/pro/list/venue-nav.php:34
 msgid "Previous %s"
-msgstr ""
+msgstr "Vorheriger %s"
 
 #: src/views/pro/list/venue-nav.php:42
 msgid "Next %s"
-msgstr ""
+msgstr "Nächster %s"
 
 #: src/Tribe/Geo_Loc.php:454
 msgctxt "debug geodata"
 msgid "Geocode request failed ($1%s - $2%s)"
-msgstr ""
+msgstr "Geocode Anfrage fehlgeschlagen ($1%s - $2%s)"
 
 #: src/Tribe/Geo_Loc.php:455
 msgctxt "debug geodata"
 msgid "empty response"
-msgstr ""
+msgstr "leere Antwort"
 
 #: src/Tribe/Main.php:485
 msgctxt "debug recurrence"
 msgid "Unknown"
-msgstr ""
+msgstr "Unbekannt"
 
 #: src/Tribe/Main.php:499
 msgctxt "debug recurrence"
 msgid "invalid date"
-msgstr ""
+msgstr "Ungültiges Datum"
 
 #: src/Tribe/Main.php:512
 msgctxt "debug recurrence"
 msgid "incorrect slug"
-msgstr ""
+msgstr "Falscher Slug"
 
 #: src/Tribe/Main.php:534
 msgctxt "debug recurrence"
 msgid "Invalid instance of a recurring event was requested ($1%s) redirecting to $2%s"
-msgstr ""
+msgstr "Es wurde eine ungültige Instanz eines Serientermins angefragt ($1%s). Weiterleitung zu $2%s"
 
 #: src/Tribe/Main.php:1563 src/Tribe/Main.php:1634
 msgid "all"
@@ -60,7 +60,7 @@ msgstr "alle"
 
 #: src/Tribe/Shortcodes/Tribe_Events.php:487
 msgid "$template_object is expected to be an actual object"
-msgstr ""
+msgstr "$template_object sollte ein aktuelles Objekt sein"
 
 #: src/Tribe/Templates/Mods/List_View.php:10
 msgid "All %s"
@@ -68,15 +68,15 @@ msgstr "Alle %s"
 
 #: src/admin-views/tribe-options-mobile.php:19
 msgid "Use Default View"
-msgstr ""
+msgstr "Standardansicht benutzen"
 
 #: src/admin-views/tribe-options-mobile.php:32
 msgid "Default mobile view"
-msgstr ""
+msgstr "Standardansicht für mobile Geräte"
 
 #: src/admin-views/tribe-options-mobile.php:33
 msgid "Change the default view for Mobile users."
-msgstr ""
+msgstr "Die Standardansicht für mobile Nutzer ändern."
 
 #: src/admin-views/widget-admin-advanced-list.php:128
 #: src/admin-views/widget-admin-countdown.php:51
@@ -84,7 +84,7 @@ msgstr ""
 #: src/admin-views/widget-admin-venue.php:43
 #: src/admin-views/widget-calendar.php:87
 msgid "Generate JSON-LD data"
-msgstr ""
+msgstr "JSON-LD Daten generieren"
 
 #: src/Tribe/CSV_Importer/Fields.php:25
 msgid "Venue Latitude"
@@ -848,7 +848,7 @@ msgstr "Schriftliche Unterlagen sind oft hilfreich, können aber nicht immer die
 
 #: src/admin-views/widget-admin-venue.php:17
 msgid "Venue:"
-msgstr "Veranstaltungsort:"
+msgstr "Ort:"
 
 #: src/Tribe/Main.php:763
 msgid "Users who have purchased an Events Calendar PRO license are granted total access to our %spremium support forums%s. Unlike at the %sWordPress.org support forum%s, where our involvement is limited to identifying and patching bugs, we have a dedicated support team for PRO users. We're on the PRO forums daily throughout the business week, and no thread should go more than 24-hours without a response."
@@ -1838,7 +1838,7 @@ msgstr "Veranstalter"
 
 #: src/Tribe/Geo_Loc.php:164
 msgid "You have %d venues for which we don't have geolocation data. We need to use the Google Maps API to get that information. Doing this may take a while (approximately 1 minute for every 200 venues)."
-msgstr ""
+msgstr "Es gibt %d Veranstaltungsorte, für die keine Geo-Daten vorhanden sind. Die Google Maps API wird verwendet, um diese Informationen zu erhalten. Die Durchführung kann eine Weile dauern (etwa 1 Minute für 200 Veranstaltungsorte)."
 
 #: src/admin-views/tribe-options-defaults.php:55
 msgid "Default organizer"

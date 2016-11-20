@@ -1,8 +1,10 @@
 <?php
 /**
- * Print Invoices & Packing Lists Integration.
+ * WC_PB_PIP_Compatibility class
  *
- * @since  4.14.3
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.14.3
  */
 
 // Exit if accessed directly.
@@ -10,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * Print Invoices & Packing Lists Integration.
+ *
+ * @since  4.14.3
+ */
 class WC_PB_PIP_Compatibility {
 
 	public static function init() {
@@ -17,7 +24,7 @@ class WC_PB_PIP_Compatibility {
 		add_filter( 'wc_pip_document_table_row_item_data', array( __CLASS__, 'filter_pip_row_item_data' ), 10, 5 );
 		add_filter( 'wc_pip_document_table_rows', array( __CLASS__, 'filter_pip_table_rows' ), 52, 4 );
 		add_filter( 'wc_pip_document_table_product_class', array( __CLASS__, 'filter_pip_document_table_bundled_item_class' ), 10, 4 );
-		add_filter( 'wc_pip_order_item_name', array( WC_PB()->display, 'woo_bundles_order_table_item_title' ), 10, 2 );
+		add_filter( 'wc_pip_order_item_name', array( WC_PB()->display, 'order_table_item_title' ), 10, 2 );
 
 		add_filter( 'wc_pip_packing_list_hide_virtual_item', array( __CLASS__, 'filter_pip_hide_virtual_item' ), 10, 4 );
 
@@ -31,10 +38,10 @@ class WC_PB_PIP_Compatibility {
 	/**
 	 * Ensure bundle container line items are always dislpayed.
 	 *
-	 * @param  boolean    $hide
-	 * @param  WC_Product $product
-	 * @param  array      $item
-	 * @param  WC_Order   $order
+	 * @param  boolean     $hide
+	 * @param  WC_Product  $product
+	 * @param  array       $item
+	 * @param  WC_Order    $order
 	 * @return boolean
 	 */
 	public static function filter_pip_hide_virtual_item( $hide, $product, $item, $order ) {
@@ -61,10 +68,10 @@ class WC_PB_PIP_Compatibility {
 	/**
 	 * Add 'bundled-product' class to pip row classes.
 	 *
-	 * @param  array      $classes
-	 * @param  WC_Product $product
-	 * @param  array      $item
-	 * @param  string     $type
+	 * @param  array       $classes
+	 * @param  WC_Product  $product
+	 * @param  array       $item
+	 * @param  string      $type
 	 * @return array
 	 */
 	public static function filter_pip_document_table_bundled_item_class( $classes, $product, $item, $type ) {
@@ -79,11 +86,11 @@ class WC_PB_PIP_Compatibility {
 	/**
 	 * Temporarily add order item data to array.
 	 *
-	 * @param  array      $item_data
-	 * @param  array      $item
-	 * @param  WC_Product $product
-	 * @param  string     $order_id
-	 * @param  string     $type
+	 * @param  array       $item_data
+	 * @param  array       $item
+	 * @param  WC_Product  $product
+	 * @param  string      $order_id
+	 * @param  string      $type
 	 * @return array
 	 */
 	public static function filter_pip_row_item_data( $item_data, $item, $product, $order_id, $type ) {
@@ -96,10 +103,10 @@ class WC_PB_PIP_Compatibility {
 	/**
 	 * Re-sort PIP table rows so that bundled items are always below their container.
 	 *
-	 * @param  array  $table_rows
-	 * @param  array  $items
-	 * @param  string $order_id
-	 * @param  string $type
+	 * @param  array   $table_rows
+	 * @param  array   $items
+	 * @param  string  $order_id
+	 * @param  string  $type
 	 * @return array
 	 */
 	public static function filter_pip_table_rows( $table_rows, $items, $order_id, $type ) {

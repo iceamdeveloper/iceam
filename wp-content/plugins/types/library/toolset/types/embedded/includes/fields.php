@@ -940,7 +940,7 @@ function wpcf_get_all_field_slugs_except_current_group( $current_group = false )
         }
     }
     if( !$current_group && isset( $_REQUEST['group_id'] ) )
-        $current_group = $_REQUEST['group_id'];
+        $current_group = (int) $_REQUEST['group_id'];
 
     // if no new group
     if( $current_group && !empty( $all_fields ) ) {

@@ -213,7 +213,7 @@ abstract class Tribe__Events__Pro__Customizer__Section {
 		if ( count( $search ) === 1 ) {
 			$settings = $this->create_ghost_settings( $settings );
 		} else {
-			$settings[ $this->ID ] = $this->create_ghost_settings( $settings[ $this->ID ] );
+			$settings[ $this->ID ] = $this->create_ghost_settings( empty( $settings[ $this->ID ] ) ? array() : $settings[ $this->ID ] );
 		}
 
 		return $settings;

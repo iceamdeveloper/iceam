@@ -2,7 +2,7 @@
 /**
  * Renders the WPEC tickets table/form
  *
- * @version 4.2.7
+ * @version 4.3.3
  *
  * @var bool $must_login
  */
@@ -13,6 +13,10 @@ $is_there_any_product_to_sell = false;
 $unavailability_messaging     = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
 
 foreach ( $tickets as $ticket ) {
+	/**
+	 * Changing any HTML to the `$ticket` Arguments you will need apply filters
+	 * on the `wpectickets_get_ticket` hook.
+	 */
 
 	if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
 
@@ -55,21 +59,16 @@ foreach ( $tickets as $ticket ) {
 		}
 		echo '</td>';
 
-		echo '<td class="tickets_name">';
-		echo esc_html( $ticket->name );
-		echo '</td>';
+		echo '<td class="tickets_name">' . $ticket->name . '</td>';
 
-		echo '<td class="tickets_price">';
-		echo $this->get_price_html( $ticket->ID );
-		echo '</td>';
+		echo '<td class="tickets_price">' . $this->get_price_html( $ticket->ID ) . '</td>';
 
-		echo '<td class="tickets_description">';
-		echo $ticket->description;
-		echo '</td>';
+		echo '<td class="tickets_description">' . $ticket->description . '</td>';
 
 		echo '</tr>';
 
-		echo
+		if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
+			echo
 			'<tr class="tribe-tickets-attendees-list-optout">' .
 				'<td colspan="4">' .
 					'<input type="checkbox" name="wpec_tickets_attendees_optout[]" id="tribe-tickets-attendees-list-optout-wpec">' .
@@ -78,6 +77,7 @@ foreach ( $tickets as $ticket ) {
 					'</label>' .
 				'</td>' .
 			'</tr>';
+		}
 
 		include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 	}

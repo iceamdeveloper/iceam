@@ -1,8 +1,10 @@
 <?php
 /**
- * QuickView Compatibility.
+ * WC_PB_QV_Compatibility class
  *
- * @since  4.11.4
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
+ * @since    4.11.4
  */
 
 // Exit if accessed directly.
@@ -10,6 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/**
+ * QuickView Compatibility.
+ *
+ * @since  4.11.4
+ */
 class WC_PB_QV_Compatibility {
 
 	public static function init() {
@@ -21,14 +28,12 @@ class WC_PB_QV_Compatibility {
 
 	/**
 	 * Load scripts for use by QV on non-product pages.
-	 *
-	 * @return  void
 	 */
 	public static function load_scripts() {
 
 		if ( ! is_product() ) {
 
-			WC_PB()->display->woo_bundles_frontend_scripts();
+			WC_PB()->display->frontend_scripts();
 
 			wp_enqueue_script( 'wc-add-to-cart-bundle' );
 			wp_enqueue_style( 'wc-bundle-css' );
@@ -38,7 +43,7 @@ class WC_PB_QV_Compatibility {
 	/**
 	 * Fixes QuickView support for Bundles when ajax add-to-cart is active and QuickView operates without a separate button.
 	 *
-	 * @param   string $selector
+	 * @param   string  $selector
 	 * @return  void
 	 */
 	public static function qv_selector( $selector ) {

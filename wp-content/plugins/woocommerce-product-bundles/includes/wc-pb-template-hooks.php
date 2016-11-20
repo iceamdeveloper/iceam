@@ -1,8 +1,9 @@
 <?php
 /**
- * Product Bundles Single Product Template Hooks.
+ * Product Bundles template hooks
  *
- * @version  4.12.0
+ * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @package  WooCommerce Product Bundles
  * @since    4.11.0
  */
 
@@ -12,34 +13,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 // Single product template for Product Bundles.
-add_action( 'woocommerce_bundle_add_to_cart', 'wc_bundles_add_to_cart' );
+add_action( 'woocommerce_bundle_add_to_cart', 'wc_pb_template_add_to_cart' );
 
 // Single product add-to-cart button template for Product Bundles.
-add_action( 'woocommerce_bundles_add_to_cart_button', 'wc_bundles_add_to_cart_button' );
+add_action( 'woocommerce_bundles_add_to_cart_button', 'wc_pb_template_add_to_cart_button' );
 
 // Bundled item wrapper open.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_details_wrapper_open', 0, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_details_wrapper_open', 0, 2 );
 
 // Bundled item image.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_thumbnail', 5, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_thumbnail', 5, 2 );
 
 // Bundled item details container open.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_details_open', 10, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_details_open', 10, 2 );
 
 // Bundled item title.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_title', 15, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_title', 15, 2 );
 
 // Bundled item description.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_description', 20, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_description', 20, 2 );
 
 // Bundled product details template.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_product_details', 25, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_product_details', 25, 2 );
 
 // Bundled item details container close.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_details_close', 30, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_details_close', 30, 2 );
+
+// Bundled item qty template in tabular layout.
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_tabular_bundled_item_qty', 35, 2 );
 
 // Bundled item wrapper close.
-add_action( 'wc_bundles_bundled_item_details', 'wc_bundles_bundled_item_details_wrapper_close', 100, 2 );
+add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_details_wrapper_close', 100, 2 );
+
+// Bundled item qty.
+add_action( 'woocommerce_after_bundled_item_cart_details', 'wc_pb_template_default_bundled_item_qty' );
 
 // Bundled variation template.
-add_action( 'woocommerce_bundled_single_variation', 'wc_bundles_single_variation', 100, 2 );
+add_action( 'woocommerce_bundled_single_variation', 'wc_pb_template_single_variation', 100, 2 );
+
+// Open and close table.
+add_action( 'woocommerce_before_bundled_items', 'wc_pb_template_before_bundled_items', 100 );
+add_action( 'woocommerce_after_bundled_items', 'wc_pb_template_after_bundled_items', 0 );

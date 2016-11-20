@@ -1,6 +1,6 @@
 <?php
 /**
- * Optional Bundled Item Checkbox.
+ * Optional Bundled Item Checkbox template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-item-optional.php'.
  *
@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 4.9.5
+ * @version 5.0.0
  */
 
 // Exit if accessed directly.
@@ -17,14 +17,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?><label class="bundled_product_optional_checkbox">
-	<input class="bundled_product_checkbox" type="checkbox" name="<?php echo $bundle_fields_prefix; ?>bundle_selected_optional_<?php echo $bundled_item->item_id; ?>" value="" <?php checked( $bundled_item->is_optional_checked() && ! $bundled_item->is_out_of_stock(), true ); echo $bundled_item->is_out_of_stock() ? 'disabled="disabled"' : '' ; ?> /> <?php
+	<input class="bundled_product_checkbox" type="checkbox" name="<?php echo $bundle_fields_prefix; ?>bundle_selected_optional_<?php echo $bundled_item->item_id; ?>" value="" <?php checked( $bundled_item->is_optional_checked() && $bundled_item->is_in_stock(), true ); echo $bundled_item->is_in_stock() ? '' : 'disabled="disabled"' ; ?> /> <?php
 
 	$price_html         = $bundled_item->product->get_price_html();
-	$label_price        = $bundled_item->is_priced_per_product() && $price_html ? sprintf( __( ' for %s', 'woocommerce-product-bundles' ), $price_html ) : '';
+	$label_price        = $bundled_item->is_priced_individually() && $price_html ? sprintf( __( ' for %s', 'woocommerce-product-bundles' ), '<span class="price">' . $price_html . '</span>' ) : '';
 	$label_title        = $bundled_item->get_title() === '' ? sprintf( __( ' &quot;%s&quot;', 'woocommerce-product-bundles' ), WC_PB_Helpers::format_product_shop_title( $bundled_item->get_raw_title(), ( $quantity > 1 && $bundled_item->get_quantity( 'max' ) === $quantity ) ? $quantity : '' ) ) : '';
 	$label_stock_status = '';
 
-	if ( $bundled_item->is_out_of_stock() ) {
+	if ( false === $bundled_item->is_in_stock() ) {
 
 		$availability       = $bundled_item->get_availability();
 		$availability_html  = empty( $availability[ 'availability' ] ) ? '' : esc_html( $availability[ 'availability' ] );

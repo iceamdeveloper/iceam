@@ -5,7 +5,7 @@ Tags: events, calendar, event, venue, organizer, dates, date, google maps, confe
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
 Tested up to: 4.6.1
-Stable tag: 4.3.1.1
+Stable tag: 4.3.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -202,6 +202,21 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.3.3] 2016-11-16 =
+
+* Fix - Fresh install now have fully functional Week, Photo and Map permalinks [67696]
+* Fix - Category Filter on [tribe_events] shortcode is fully functional [68010]
+* Fix - Widgets Selector for Term Filtering is working again for new Widgets [68541]
+* Fix - Resolve Private Recurring Events Sample Permalink and ALL Page Visibility (thanks @brian for reporting this one in the forums) [68778]
+* Fix - Enable ampersand character in mobile week view titles (thanks @kate for this report) [45409]
+
+= [4.3.2] 2016-11-02 =
+
+* Fix - Prevent notices on wp-login.php page from Customizer Code
+* Fix - Now Tooltip are showing on Week view for Shortcode (thanks to @jacob for this report)[68094]
+* Fix - Make the "Find out more" string in the week mobile view translatable (thanks @saloni for highlighting this in our forums) [67322]
+* Fix - Changes to ensure valid HTML is output from the single venue page (Thanks @Reinhard!)[68440]
 
 = [4.3.1.1] 2016-10-21 =
 

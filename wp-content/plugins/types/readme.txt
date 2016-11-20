@@ -7,7 +7,7 @@ Domain Path: /embedded/locale
 License: GPLv2
 Requires at least: 3.7
 Tested up to: 4.6
-Stable tag: 2.2.1
+Stable tag: 2.2.3
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
@@ -150,6 +150,9 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 9. Bulk editing child content using Field Tables
 
 == Changelog ==
+
+= 2.2.3 =
+* Fixed several security issues.
 
 = 2.2.2 =
 

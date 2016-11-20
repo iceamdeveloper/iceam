@@ -2,7 +2,7 @@
 /**
  * Renders the WooCommerce tickets table/form
  *
- * @version 4.2.7
+ * @version 4.3.3
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -14,13 +14,28 @@ $is_there_any_product_to_sell = false;
 $unavailability_messaging     = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
 
 ob_start();
+
+
+/**
+ * Filter classes on the Cart Form
+ *
+ * @since  4.3.2
+ *
+ * @param array $cart_classes
+ */
+$cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', array( 'cart' ) );
 ?>
-<form action="<?php echo esc_url( $woocommerce->cart->get_cart_url() ) ?>" class="cart" method="post" enctype='multipart/form-data'>
+<form action="<?php echo esc_url( $woocommerce->cart->get_cart_url() ) ?>" class="<?php echo implode( ' ', $cart_classes ); ?>" method="post" enctype='multipart/form-data'>
 	<h2 class="tribe-events-tickets-title"><?php esc_html_e( 'Tickets', 'event-tickets-plus' ) ?></h2>
 
 	<table width="100%" class="tribe-events-tickets">
 		<?php
 		foreach ( $tickets as $ticket ) {
+			/**
+			 * Changing any HTML to the `$ticket` Arguments you will need apply filters
+			 * on the `wootickets_get_ticket` hook.
+			 */
+
 			/**
 			 * @var Tribe__Tickets__Ticket_Object $ticket
 			 * @var WC_Product $product
@@ -41,7 +56,16 @@ ob_start();
 				echo sprintf( '<input type="hidden" name="product_id[]" value="%d">', esc_attr( $ticket->ID ) );
 
 				echo '<tr>';
-				echo '<td class="woocommerce" ' . $data_product_id . '>';
+
+				/**
+				 * Filter classes on the Price column
+				 *
+				 * @since  4.3.2
+				 *
+				 * @param array $column_classes
+				 */
+				$column_classes = (array) apply_filters( 'tribe_events_tickets_woo_quantity_column_class', array( 'woocommerce' ) );
+				echo '<td class="' . implode( ' ', $column_classes ) . '" ' . $data_product_id . '>';
 
 				if ( $product->is_in_stock() ) {
 					// Max quantity will be left open if backorders allowed, restricted to 1 if the product is
@@ -86,17 +110,11 @@ ob_start();
 				}
 				echo '</td>';
 
-				echo '<td class="tickets_name">';
-				echo $ticket->name;
-				echo '</td>';
+				echo '<td class="tickets_name">' . $ticket->name . '</td>';
 
-				echo '<td class="tickets_price">';
-				echo $this->get_price_html( $product );
-				echo '</td>';
+				echo '<td class="tickets_price">' . $this->get_price_html( $product ) . '</td>';
 
-				echo '<td class="tickets_description">';
-				echo $ticket->description;
-				echo '</td>';
+				echo '<td class="tickets_description">' . $ticket->description . '</td>';
 
 				echo '</tr>';
 

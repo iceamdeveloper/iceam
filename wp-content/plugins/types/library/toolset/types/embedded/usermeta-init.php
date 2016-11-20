@@ -111,7 +111,7 @@ function wpcf_admin_menu_edit_user_fields()
     $post_type = current_filter();
     $title = __('View User Field Group', 'wpcf');
     if ( isset( $_GET['group_id'] ) ) {
-        $item = wpcf_admin_get_user_field_group_by_id($_GET['group_id']);
+        $item = wpcf_admin_get_user_field_group_by_id( (int) $_GET['group_id'] );
         if ( WPCF_Roles::user_can_edit('user-meta-field', $item) ) {
             $title = __( 'Edit User Field Group', 'wpcf' );
             $add_new = array(
@@ -238,7 +238,7 @@ if ( !isset( $_GET['post_type'] ) && isset( $_GET['post'] ) ) {
     isset( $_GET['post_type'] )
     && in_array( $_GET['post_type'], get_post_types( array('show_ui' => true) ) ) 
 ) {
-    $post_type = $_GET['post_type'];
+    $post_type = sanitize_text_field( $_GET['post_type'] );
 }
 
 /*

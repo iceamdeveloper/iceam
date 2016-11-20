@@ -1,6 +1,6 @@
 <?php
 /**
- * Simple Bundled Product Template.
+ * Simple Bundled Product template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-product-simple.php'.
  *
@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 4.9.4
+ * @version 5.0.0
  */
 
 // Exit if accessed directly.
@@ -24,7 +24,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				if ( ! $bundled_item->is_optional() ) {
 					wc_get_template( 'single-product/bundled-item-price.php', array(
 						'bundled_item' => $bundled_item
-					), false, WC_PB()->woo_bundles_plugin_path() . '/templates/' );
+					), false, WC_PB()->plugin_path() . '/templates/' );
 				}
 
 				$availability_html = empty( $availability[ 'availability' ] ) ? '' : '<p class="stock ' . esc_attr( $availability[ 'class' ] ) . '">' . esc_html( $availability[ 'availability' ] ) . '</p>';
@@ -32,19 +32,28 @@ if ( ! defined( 'ABSPATH' ) ) {
 				echo apply_filters( 'woocommerce_stock_html', $availability_html, $availability[ 'availability' ], $bundled_product );
 
 				/**
-				 * woocommerce_bundled_product_add_to_cart hook.
+				 * 'woocommerce_bundled_product_add_to_cart' hook.
 				 *
 				 * Used to output content normally hooked to 'woocommerce_before_add_to_cart_button'.
+				 *
+				 * @param mixed           $bundled_product_id
+				 * @param WC_Bundled_Item $bundled_item
 				 */
 				do_action( 'woocommerce_bundled_product_add_to_cart', $bundled_product->id, $bundled_item );
 
 			?></div>
-			<div class="bundled_item_button"><?php
+			<div class="bundled_item_after_cart_details bundled_item_button"><?php
 
-				wc_get_template( 'single-product/bundled-item-quantity.php', array(
-					'bundled_item'         => $bundled_item,
-					'bundle_fields_prefix' => $bundle_fields_prefix
-				), false, WC_PB()->woo_bundles_plugin_path() . '/templates/' );
+				/**
+				 * 'woocommerce_after_bundled_item_cart_details' hook.
+				 *
+				 * @since 5.0.0
+				 *
+				 * @param WC_Bundled_Item $bundled_item
+				 *
+				 * @hooked wc_pb_template_default_bundled_item_qty - 10
+				 */
+				do_action( 'woocommerce_after_bundled_item_cart_details', $bundled_item );
 
 			?></div>
 		</div>

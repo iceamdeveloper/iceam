@@ -716,11 +716,11 @@ class Tribe__Tickets_Plus__Commerce__Shopp__Main extends Tribe__Tickets_Plus__Ti
 	/**
 	 * Gets an individual ticket
 	 *
-	 * @param $unused_event_id
+	 * @param $event_id
 	 * @param $ticket_id
 	 * @return null|Tribe__Tickets__Ticket_Object
 	 */
-	public function get_ticket( $unused_event_id, $ticket_id ) {
+	public function get_ticket( $event_id, $ticket_id ) {
 		$product = shopp_product( $ticket_id );
 
 		if ( ! $product ) {
@@ -753,7 +753,16 @@ class Tribe__Tickets_Plus__Commerce__Shopp__Main extends Tribe__Tickets_Plus__Ti
 		$return->qty_sold( $sold - $pending );
 		$return->qty_pending( $pending );
 
-		return $return;
+		/**
+		 * Use this Filter to change any information you want about this ticket
+		 *
+		 * @param object $ticket
+		 * @param int    $event_id
+		 * @param int    $ticket_id
+		 */
+		$ticket = apply_filters( 'tribe_tickets_plus_shopp_get_ticket', $return, $event_id, $ticket_id );
+
+		return $ticket;
 	}
 
 	/**
@@ -1128,15 +1137,17 @@ class Tribe__Tickets_Plus__Commerce__Shopp__Main extends Tribe__Tickets_Plus__Ti
 	 * Gets the product price in the correct money format per store settings.
 	 *
 	 * @param int|object $product
+	 * @param array $attendee
 	 * @return string
 	 */
-	public function get_price_html( $product ) {
+	public function get_price_html( $product, $attendee = false ) {
 		$product = shopp_product( $product );
 		if ( false === $product ) {
 			return '';
 		}
 
-		return Shopp::money( $this->get_single_price( $product ) );
+		$price_html = Shopp::money( $this->get_single_price( $product ) );
+		return apply_filters( 'shopptickets_ticket_price_html', $price_html, $product, $attendee );
 	}
 
 	protected function get_single_price( ShoppProduct $product ) {

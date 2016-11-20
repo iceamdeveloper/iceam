@@ -23,6 +23,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	const ATTENDEE_ORDER_KEY = '_tribe_wooticket_order';
 
 	/**
+	 * Meta key that relates Attendees and Order Items.
+	 *
+	 * @since 4.3.2
+	 * @var   string
+	 */
+	public static $attendee_order_item_key = '_tribe_wooticket_order_item';
+
+	/**
 	 * Meta key that relates Attendees and Events.
 	 */
 	const ATTENDEE_EVENT_KEY = '_tribe_wooticket_event';
@@ -633,6 +641,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 					if ( $attendee_id = wp_insert_post( $attendee ) ) {
 						update_post_meta( $attendee_id, self::ATTENDEE_PRODUCT_KEY, $product_id );
 						update_post_meta( $attendee_id, self::ATTENDEE_ORDER_KEY, $order_id );
+						update_post_meta( $attendee_id, self::$attendee_order_item_key, $item_id );
 						update_post_meta( $attendee_id, self::ATTENDEE_EVENT_KEY, $event_id );
 						update_post_meta( $attendee_id, self::ATTENDEE_OPTOUT_KEY, $optout );
 						update_post_meta( $attendee_id, $this->security_code, $this->generate_security_code( $order_id, $attendee_id ) );
@@ -1167,7 +1176,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$return->purchase_limit = apply_filters( 'tribe_tickets_default_purchase_limit', 0 );
 		}
 
-		return apply_filters( 'wootickets_get_ticket', $return, $event_id, $ticket_id );
+		/**
+		 * Use this Filter to change any information you want about this ticket
+		 *
+		 * @param object $ticket
+		 * @param int    $event_id
+		 * @param int    $ticket_id
+		 */
+		$ticket = apply_filters( 'tribe_tickets_plus_woo_get_ticket', $return, $event_id, $ticket_id );
+
+		return $ticket;
 	}
 
 	/**
@@ -1443,6 +1461,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		foreach ( $attendees_query->posts as $attendee ) {
 			$order_id   = get_post_meta( $attendee->ID, self::ATTENDEE_ORDER_KEY, true );
+			$order_item_id   = get_post_meta( $attendee->ID, self::$attendee_order_item_key, true );
 			$checkin    = get_post_meta( $attendee->ID, $this->checkin_key, true );
 			$optout     = (bool) get_post_meta( $attendee->ID, self::ATTENDEE_OPTOUT_KEY, true );
 			$security   = get_post_meta( $attendee->ID, $this->security_code, true );
@@ -1460,6 +1479,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$attendee_data = array_merge( $this->get_order_data( $order_id ), array(
 					'ticket'      => $product_title,
 					'attendee_id' => $attendee->ID,
+					'order_item_id' => $order_item_id,
 					'security'    => $security,
 					'product_id'  => $product_id,
 					'check_in'    => $checkin,
@@ -1814,10 +1834,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Get's the WC product price html
 	 *
 	 * @param int|object $product
+	 * @param array $attendee
 	 *
 	 * @return string
 	 */
-	public function get_price_html( $product ) {
+	public function get_price_html( $product, $attendee = false ) {
 		if ( is_numeric( $product ) ) {
 			if ( class_exists( 'WC_Product_Simple' ) ) {
 				$product = new WC_Product_Simple( $product );
@@ -1837,7 +1858,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$price_html = $product->get_price_html();
 		}
 
-		return $price_html;
+		/**
+		 * Allow filtering of the Price HTML
+		 *
+		 * @since 4.3.2
+		 *
+		 * @param string $price_html
+		 * @param mixed  $product
+		 * @param mixed  $attendee
+		 *
+		 */
+		return apply_filters( 'tribe_events_wootickets_ticket_price_html', $price_html, $product, $attendee );
 	}
 
 	public function get_tickets_ids( $event_id ) {

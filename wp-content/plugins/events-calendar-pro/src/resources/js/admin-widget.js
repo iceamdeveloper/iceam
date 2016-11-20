@@ -1,4 +1,4 @@
-( function( $ ) {
+( function( $, _ ) {
 	'use strict';
 
 	var tribeWidget = {},
@@ -53,7 +53,8 @@
 			args = {};
 
 		if ( $select.hasClass( 'select2-container' ) ) {
-			return;
+			$select.select2( 'destroy' );
+
 		}
 
 		if ( $( 'body' ).hasClass( 'wp-customizer' ) ) {
@@ -231,15 +232,12 @@
 			return;
 		}
 
-		// Bail when it was not off screen
-		if ( $widget.find( '.select2-container' ).length !== 0 && ! $widget.find( '.select2-container' ).hasClass( 'select2-offscreen' ) ) {
+		// We are dealing with a non-widget yet
+		if ( $widget.is( '[id*="__i__"]' )  ) {
 			return;
 		}
 
-		$widget.find( '.tribe-widget-select2' ).each( tribeWidget.select2 )
-		.on( 'change', function() {
-
-		} );
+		$widget.find( '.tribe-widget-select2' ).each( tribeWidget.select2 ).trigger( 'change' );
 
 		$widget.on( 'change', '.js-tribe-condition', function(){
 			var $this = $( this ),
@@ -280,20 +278,20 @@
 		}
 	};
 
-	$( document ).on( {
+	$( document )
+	// Configure the Widgets by default
+	.ready( function( event ){
+		// Prevents problems on Customizer
+		if ( $( 'body' ).hasClass( 'wp-customizer' ) ){
+			return;
+		}
+
+		// This ensures that we setup corretly the widgets that are already in place
+		$( '.widget[id*="tribe-"]' ).each( tribeWidget.setup );
+	} )
+	.on( {
 		// On the Widget Actions try to re-configure
 		'widget-added widget-synced widget-updated': tribeWidget.setup,
-
-		// Configure the Widgets by default
-		'ready': function( event ){
-			// Prevents problems on Customizer
-			if ( $( 'body' ).hasClass( 'wp-customizer' ) ){
-				return;
-			}
-
-			// This ensures that we setup corretly the widgets that are already in place
-			$( '[id*="tribe-"]' ).each( tribeWidget.setup );
-		}
 	} )
 	.on( 'change', '.calendar-widget-add-filter', function( e ) {
 		var $select = $( this ),
@@ -304,6 +302,10 @@
 			values = $field.val() ? $.parseJSON( $field.val() ) : {},
 			term = e.added,
 			disabled = $select.data( 'disabled' ) ? $select.data( 'disabled' ) : [];
+
+		if ( 'undefined' === typeof term ) {
+			return;
+		}
 
 		// If we don't have the given Taxonomy
 		if ( ! values[ term.taxonomy.name ] ) {
@@ -330,7 +332,7 @@
 				'href': '#',
 			} ).text( '(remove)' ),
 			$remove = $( '<span/>' ).append( $link ),
-			$li = $( '<li/>' ).append( 'p' ).html( term.taxonomy.labels.name + ': ' + term.text + '   ' ).append( $remove );
+			$li = $( '<li/>' ).append( 'p' ).html( term.taxonomy.labels.name + ': ' + term.text ).append( $remove );
 
 		$list.append( $li );
 
@@ -346,20 +348,24 @@
 		e.preventDefault();
 		var $link = $( this ),
 			$widget = $link.parents( '.widget[id*="tribe-"]' ),
+			$select = $widget.find( '.calendar-widget-add-filter' ).not( '.select2-container' ),
 			$filters = $widget.find( '.calendar-widget-filters-container' ),
 			$list = $widget.find( '.calendar-widget-filter-list' ),
 			$field = $widget.find( '.calendar-widget-added-filters' ),
 			values = $field.val() ? $.parseJSON( $field.val() ) : {},
 			term_id = $link.data( 'term' ),
-			taxonomy = $link.data( 'tax' );
+			taxonomy = $link.data( 'tax' ),
+			disabled = $select.data( 'disabled' ) ? $select.data( 'disabled' ) : [];
 
 		if ( values[ taxonomy ] ) {
-			values[ taxonomy ] = $.grep( values[ taxonomy ], function ( value ) {
-				return value != term_id;
-			} );
+			values[ taxonomy ] = _.without( values[ taxonomy ], term_id.toString() );
 		}
 
+		// Updates the HTML field
 		$field.val( JSON.stringify( values ) );
+
+		// Updates the Select2 Exclusion
+		$select.data( 'disabled', _.without( disabled, term_id.toString() ) );
 
 		$link.closest( 'li' ).remove();
 
@@ -372,4 +378,4 @@
 
 	// Open the Widget
 	$body.on( 'click.widgets-toggle', tribeWidget.setup );
-}( jQuery.noConflict() ) );
+}( jQuery.noConflict(), _ ) );

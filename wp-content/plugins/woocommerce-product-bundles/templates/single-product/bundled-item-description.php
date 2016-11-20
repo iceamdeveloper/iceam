@@ -1,6 +1,6 @@
 <?php
 /**
- * Bundled Item Short Description Template.
+ * Bundled Item Short Description template
  *
  * Override this template by copying it to 'yourtheme/woocommerce/single-product/bundled-item-description.php'.
  *

@@ -118,5 +118,39 @@ class Tribe__Events__Pro__Recurrence__Permalinks {
 
 		return $permalink;
 	}
+
+	/**
+	 * Filters the sample permalink html to show a link to the first instance of recurring events.
+	 * This filter runs on private recurring events to fix a broken link that was being created in get_sample_permalink_html()
+	 *
+	 * This is to match the real link pointing to a recurring events series first instance.
+	 *
+	 * @param string $permalink_html Sample permalink html.
+	 * @param int    $post_id        Post ID.
+	 *
+	 * @return string The label and permalink html to the first recurring event instance if the the event
+	 *                is a recurring one, the original permalink otherwise.
+	 */
+	public function filter_sample_permalink_html( $permalink_html, $post_id ) {
+
+		if ( ! empty( $post_id ) && 'private' == get_post_status( $post_id ) && tribe_is_recurring_event( $post_id ) ) {
+
+			//Break up the html to remove the broken link from the label
+			$permalink_html = explode( '</strong>', $permalink_html, 2 );
+
+			//set html as label
+			$permalink_html = isset( $permalink_html[0] ) ? $permalink_html[0] : '';
+
+			// fetch the real post permalink, recurring event filters down the road will
+			// append the date to it
+			$url = get_post_permalink( $post_id );
+
+			//rebuild the link
+			$permalink_html = $permalink_html . sprintf( ' <a id="sample-permalink" href="%1s">%2s</a>', $url, $url );
+
+		}
+
+		return $permalink_html;
+	}
 }
 
