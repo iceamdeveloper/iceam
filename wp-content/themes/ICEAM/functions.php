@@ -105,6 +105,32 @@ add_filter( 'tribe_get_cost', 'hide_tribe_get_cost', 10, 3 );
 
 /***********************************************************************
  *
+ *	FIX "PURCHASE THIS COURSE" BUTTON ON SUBSCRIPTION COURSES
+ *
+ **********************************************************************/
+
+function fix_course_purchase_label( $subscription_string, $product, $include ) {
+	return "<nobr>$" . $product->subscription_sign_up_fee . " Sign-up Fee *</nobr>";
+}
+add_filter( 'woocommerce_subscriptions_product_price_string', 'fix_course_purchase_label', 999, 3 );
+
+
+
+/***********************************************************************
+ *
+ *	FIX "Quiz Quiz" IN QUIZ TITLES
+ *
+ **********************************************************************/
+
+function replace_quiz_quiz($title,$post){
+	return str_replace("Quiz Quiz", "Quiz", $title);
+}
+add_filter( 'sensei_single_title', 'replace_quiz_quiz', 10, 2 );
+
+
+
+/***********************************************************************
+ *
  *	REMOVE TOP NAV FROM WOO_TOP,
  *	CREATE IT MANAULLY SO THAT WE CAN INSERT CURRENCY SELECTOR
  *
@@ -300,6 +326,27 @@ add_action('woocommerce_my_subscriptions_after_subscription_id','display_subscri
 
 
 
+
+/***********************************************************************
+ *
+ *	SET DEFAULT USER TO PRACTITIONER
+ *
+ **********************************************************************/
+
+function do_this($customer_data){
+	if($_POST['user_type_select'] == "Student"){
+		$customer_data['role'] = "customer";
+	} else {
+		$customer_data['role'] = "practitioner";
+	}
+	
+	return $customer_data;
+}
+add_action('woocommerce_new_customer_data','do_this',10,1);
+
+
+
+
 /***********************************************************************
  *
  *	ADD STUDENT / PRACTITIONER FIELDS TO THE CHECKOUT PROCESS UNDER ORDER NOTES
@@ -409,7 +456,7 @@ function custom_checkout_field_update_order_meta( $order_id ) {
  * Update the user meta with field values
  */
 
-add_action( 'woocommerce_checkout_update_user_meta', 'custom_checkout_update_order_meta' );
+add_action( 'woocommerce_checkout_update_user_meta', 'custom_checkout_update_order_meta',1 );
 
 function custom_checkout_update_order_meta(){
 	do_action('bp_init');
@@ -430,6 +477,8 @@ function custom_checkout_update_order_meta(){
 	
 	if($_POST['user_type_select'] == "Practitioner" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
 		wp_update_user( array( 'ID' => $user_id, 'role' => strtolower($_POST['user_type_select']) ) );
+	} else if($_POST['user_type_select'] == "Student" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
+		wp_update_user( array( 'ID' => $user_id, 'role' => 'customer' ) );
 	}
 }
 

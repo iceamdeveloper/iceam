@@ -905,7 +905,7 @@ Class Sensei_WC{
 
 			<?php } ?>
 
-			<button type="submit" class="single_add_to_cart_button button alt">
+			<button type="submit" class="single_add_to_cart_button button alt omg">
 				<?php $button_text = $product->get_price_html() . ' - ' . __( 'Purchase this Course', 'woothemes-sensei' ); ?>
 				<?php
 				/**

@@ -94,9 +94,10 @@
                                     <?php } ?>
                                 <?php } ?>
                             <?php } ?>
-                            <button type="submit" class="single_add_to_cart_button button alt"><?php echo $product->get_price_html(); ?> - <?php echo apply_filters('single_add_to_cart_text', __('<nobr>Purchase this Course</nobr>', 'woothemes-sensei'), $product->product_type); ?></button>
+                            <button type="submit" class="single_add_to_cart_button button alt"><?php echo $product->get_price_html(); ?><br/><?php echo apply_filters('single_add_to_cart_text', __('<nobr>Purchase this Course</nobr>', 'woothemes-sensei'), $product->product_type); ?></button>
                         </form>
-                    <?php } // End If Statement 
+                    <?php } // End If Statement
+					echo "<h5 style='margin-top:15px'>* Read about <a href='/pricing'>online course pricing</a>.</h5>";
                   } // End If Statement
             } // End If Statement
         } // End If Statement
