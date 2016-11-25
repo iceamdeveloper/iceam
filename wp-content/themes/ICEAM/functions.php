@@ -13,15 +13,9 @@
 *		/woothemes-sensei/includes/class-sensei-frontend.php line 898
 *
 *
-*	DYNAMIC PRICING:
-*	Variable $matched is set to true before all conditions are tested.
-*	Changing line 64 from } to } else { $matched = false; } solves this issue for
-*	Advanced Order Totals rules based on Category Totals.
-*
-*	 	/woocommerce-dynamic-pricing/classes/modules/class-wc-dynamic-pricing-advanced-totals.php
-*
-*
  */
+
+ 
 
 /***********************************************************************
  *
@@ -107,6 +101,32 @@ function hide_tribe_get_cost( $cost, $postId, $withCurrencySymbol ) {
 	return '';
 }
 add_filter( 'tribe_get_cost', 'hide_tribe_get_cost', 10, 3 );
+
+
+/***********************************************************************
+ *
+ *	FIX "PURCHASE THIS COURSE" BUTTON ON SUBSCRIPTION COURSES
+ *
+ **********************************************************************/
+
+function fix_course_purchase_label( $subscription_string, $product, $include ) {
+	return "<nobr>$" . $product->subscription_sign_up_fee . " Sign-up Fee *</nobr>";
+}
+add_filter( 'woocommerce_subscriptions_product_price_string', 'fix_course_purchase_label', 999, 3 );
+
+
+
+/***********************************************************************
+ *
+ *	FIX "Quiz Quiz" IN QUIZ TITLES
+ *
+ **********************************************************************/
+
+function replace_quiz_quiz($title,$post){
+	return str_replace("Quiz Quiz", "Quiz", $title);
+}
+add_filter( 'sensei_single_title', 'replace_quiz_quiz', 10, 2 );
+
 
 
 /***********************************************************************
@@ -199,22 +219,18 @@ function woo_custom_deregister_bbpress_template_stack ( $stack ) {
 
 
 
-// Allow iframe tags within editor
-function allow_kses_iframe_tags( $tags ){
-    $tags['iframe'] = array(
-        'src' => true,
-        'width' => true,
-        'height' => true,
-        'align' => true,
-        'class' => true,
-        'name' => true,
-        'id' => true,
-        'frameborder' => true,
-        'allowfullscreen' => true
-    );
-    return $tags;
+add_filter('woocommerce_available_payment_gateways','filter_gateways',1);
+function filter_gateways($gateways){
+    global $woocommerce;        
+    //Remove a specific payment option
+    //unset($gateways['paypal']);
+	//print_r($gateways);
+	
+	// if the current product is not a subscription product, disable paypal
+	// what do we do if there are subscription and non-subscription products in the cart?
+	
+    return $gateways;
 }
-add_filter('wp_kses_allowed_html','allow_kses_iframe_tags', 1);
 
 
 /***********************************************************************
@@ -295,6 +311,38 @@ function rewrite_thankyou() {
 	return $thanks_str;
 }
 add_filter('woocommerce_thankyou_order_received_text', 'rewrite_thankyou', 10, 1);
+
+
+
+function display_subscription_title($subscription){
+	$order = new WC_Order();
+	$order->populate($subscription->order->post);
+	
+	foreach($order->get_items() as $item) {
+		echo $item['name'];
+	}
+}
+add_action('woocommerce_my_subscriptions_after_subscription_id','display_subscription_title',10);
+
+
+
+
+/***********************************************************************
+ *
+ *	SET DEFAULT USER TO PRACTITIONER
+ *
+ **********************************************************************/
+
+function do_this($customer_data){
+	if($_POST['user_type_select'] == "Student"){
+		$customer_data['role'] = "customer";
+	} else {
+		$customer_data['role'] = "practitioner";
+	}
+	
+	return $customer_data;
+}
+add_action('woocommerce_new_customer_data','do_this',10,1);
 
 
 
@@ -408,7 +456,7 @@ function custom_checkout_field_update_order_meta( $order_id ) {
  * Update the user meta with field values
  */
 
-add_action( 'woocommerce_checkout_update_user_meta', 'custom_checkout_update_order_meta' );
+add_action( 'woocommerce_checkout_update_user_meta', 'custom_checkout_update_order_meta',1 );
 
 function custom_checkout_update_order_meta(){
 	do_action('bp_init');
@@ -429,6 +477,8 @@ function custom_checkout_update_order_meta(){
 	
 	if($_POST['user_type_select'] == "Practitioner" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
 		wp_update_user( array( 'ID' => $user_id, 'role' => strtolower($_POST['user_type_select']) ) );
+	} else if($_POST['user_type_select'] == "Student" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
+		wp_update_user( array( 'ID' => $user_id, 'role' => 'customer' ) );
 	}
 }
 
@@ -685,9 +735,17 @@ function virtual_order_payment_complete_order_status( $order_status, $order_id )
 }
 
 
+function change_btn_text($text){
+	echo $text;
+	return $text;
+}
+add_filter('sensei_wc_single_add_to_cart_button_text','change_btn_text',9999,1);
+
+
 /***********************************************************************
  *
  *	THE END
  *
  **********************************************************************/
+
 ?>
