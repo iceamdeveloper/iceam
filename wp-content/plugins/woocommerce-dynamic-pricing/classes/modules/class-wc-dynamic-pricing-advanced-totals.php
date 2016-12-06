@@ -52,7 +52,7 @@ class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Bas
 							$matched = true;
 
 							//Adjust the cart items. 
-							foreach ( $temp_cart as $cart_item_key => $cart_item ) {								
+							foreach ( $temp_cart as $cart_item_key => $cart_item ) {
 								if ( $collector['type'] == 'cat' ) {
 									$process_discounts = false;
 
