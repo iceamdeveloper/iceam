@@ -1,5 +1,13 @@
 *** WooCommerce Product Bundles ***
 
+2016.11.30 - version 5.0.2
+ * Fix - Sanitization of overridden bundled product titles.
+ * Fix - Bundled items not merged properly when merging product data with the WooCommerce Product CSV Import/Export Suite.
+ * Fix - Incorrect use of 'wc_variation_attribute_name' function with WooCommerce versions earlier than 2.6.
+ * Fix - Adding Bundles to Grouped products is unsupported but "Product Data > Linked Products > Grouping" is visible.
+ * Fix - Inaccurate optional variable bundled product price strings (displayed next to checkbox) when filtering variations.
+ * Fix - Inaccurate optional variable bundled product availability (displayed next to checkbox if product unavailable).
+
 2016.11.16 - version 5.0.1
  * Fix - Calculation of subtotals in Composite Products app.
 

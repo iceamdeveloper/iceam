@@ -76,6 +76,9 @@ jQuery( function($) {
 	// Hide the default "Sold Individually" field.
 	$( '#_sold_individually' ).closest( '.form-field' ).addClass( 'hide_if_bundle' );
 
+	// Hide the "Grouping" field.
+	$( '#linked_product_data .grouping.show_if_simple, #linked_product_data .form-field.show_if_grouped' ).addClass( 'hide_if_bundle' );
+
 	// Simple type options are valid for bundles.
 	$( '.show_if_simple:not(.hide_if_bundle)' ).addClass( 'show_if_bundle' );
 

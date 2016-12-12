@@ -113,19 +113,31 @@ class WC_PB_WC_IE_Compatibility {
 
 		if ( ! empty( $bundle_data ) ) {
 
-			foreach ( $bundle_data as $bundled_item_id => $bundled_item_data ) {
-				if ( $merging ) {
-					WC_PB_DB::update_bundled_item( $bundled_item_id, $bundled_item_data );
-					WC_PB_DB_Sync::delete_bundle_transients( $imported_id );
-				} else {
-					WC_PB_DB::add_bundled_item( array(
-						'bundle_id'  => $imported_id,                       // Use the new bundle id.
-						'product_id' => $bundled_item_data[ 'product_id' ], // May get modified during import - @see 'csv_import_end().
-						'menu_order' => $bundled_item_data[ 'menu_order' ],
-						'meta_data'  => $bundled_item_data[ 'meta_data' ],
-						'force_add'  => true                                // Bundled product may not exist in the DB yet, but get created later during import.
-					) );
+			if ( $merging ) {
+
+				// Delete existing bundled items.
+				$args = array(
+					'bundle_id' => $imported_id,
+					'return'    => 'ids',
+				);
+
+				$delete_items = WC_PB_DB::query_bundled_items( $args );
+
+				if ( ! empty( $delete_items ) ) {
+					foreach ( $delete_items as $delete_item ) {
+						WC_PB_DB::delete_bundled_item( $delete_item );
+					}
 				}
+			}
+
+			foreach ( $bundle_data as $bundled_item_id => $bundled_item_data ) {
+				WC_PB_DB::add_bundled_item( array(
+					'bundle_id'  => $imported_id,                       // Use the new bundle id.
+					'product_id' => $bundled_item_data[ 'product_id' ], // May get modified during import - @see 'csv_import_end().
+					'menu_order' => $bundled_item_data[ 'menu_order' ],
+					'meta_data'  => $bundled_item_data[ 'meta_data' ],
+					'force_add'  => true                                // Bundled product may not exist in the DB yet, but get created later during import.
+				) );
 			}
 
 			// Flush bundle transients.

@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The bunded item class is a product container that initializes and holds pricing, availability and variation/attribute-related data of a bundled product.
  *
  * @class    WC_Bundled_Item
- * @version  5.0.0
+ * @version  5.0.2
  * @since    4.2.0
  */
 class WC_Bundled_Item {
@@ -1711,15 +1711,16 @@ class WC_Bundled_Item {
 	 */
 	private function get_availability_text( $product ) {
 
-		$total_stock = $product->get_total_stock();
-		$quantity    = $this->get_quantity();
+		$total_stock  = $product->is_type( 'variable' ) ? $this->get_max_stock() : $product->get_total_stock();
+		$quantity     = $this->get_quantity();
+		$stock_format = get_option( 'woocommerce_stock_format' );
 
 		if ( ! $product->is_in_stock() ) {
 			$availability = __( 'Out of stock', 'woocommerce' );
 		} elseif ( $product->managing_stock() && $product->is_on_backorder( $quantity ) ) {
 
 			if ( $product->backorders_require_notification() ) {
-				switch ( get_option( 'woocommerce_stock_format' ) ) {
+				switch ( $stock_format ) {
 					case 'no_amount' :
 						$availability = __( 'Available on backorder', 'woocommerce' );
 					break;
@@ -1739,12 +1740,12 @@ class WC_Bundled_Item {
 
 			if ( $total_stock >= $quantity ) {
 
-				switch ( get_option( 'woocommerce_stock_format' ) ) {
+				switch ( $stock_format ) {
 					case 'no_amount' :
 						$availability = __( 'In stock', 'woocommerce' );
 					break;
 					case 'low_amount' :
-						if ( $total_stock <= get_option( 'woocommerce_notify_low_stock_amount' ) ) {
+						if ( $total_stock <= get_option( 'woocommerce_notify_low_stock_amount' ) && false === $product->is_type( 'variable' ) ) {
 							$availability = sprintf( __( 'Only %s left in stock', 'woocommerce' ), $total_stock );
 
 							if ( $product->backorders_allowed() && $product->backorders_require_notification() ) {
@@ -1755,7 +1756,12 @@ class WC_Bundled_Item {
 						}
 					break;
 					default :
-						$availability = sprintf( __( '%s in stock', 'woocommerce' ), $total_stock );
+
+						if ( false === $product->is_type( 'variable' ) ) {
+							$availability = sprintf( __( '%s in stock', 'woocommerce' ), $total_stock );
+						} else {
+							$availability = __( 'In stock', 'woocommerce' );
+						}
 
 						if ( $product->backorders_allowed() && $product->backorders_require_notification() ) {
 							$availability .= ' ' . __( '(also available on backorder)', 'woocommerce' );
@@ -1765,13 +1771,16 @@ class WC_Bundled_Item {
 
 			} else {
 
-				switch ( get_option( 'woocommerce_stock_format' ) ) {
+				switch ( $stock_format ) {
 					case 'no_amount' :
 						$availability = __( 'Insufficient stock', 'woocommerce-product-bundles' );
 					break;
 					default :
 						$availability = __( 'Insufficient stock', 'woocommerce-product-bundles' );
-						$availability .= ' ' . sprintf( __( '(only %s left in stock)', 'woocommerce-product-bundles' ), $total_stock );
+
+						if ( false === $product->is_type( 'variable' ) ) {
+							$availability .= ' ' . sprintf( __( '(only %s left in stock)', 'woocommerce-product-bundles' ), $total_stock );
+						}
 					break;
 				}
 			}
@@ -1902,7 +1911,7 @@ class WC_Bundled_Item {
 				return $output;
 			}
 
-			$attribute_key = 'attribute_' . sanitize_title( $attribute[ 'name' ] );
+			$attribute_key = WC_PB_Core_Compatibility::wc_variation_attribute_name( $attribute[ 'name' ] );
 
 			// Find active attribute values from the bundled item variation data.
 			foreach ( $bundled_item_variations as $variation_data ) {

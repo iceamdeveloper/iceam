@@ -132,11 +132,17 @@ jQuery(document).ready(function(){
 		}
 	});
 
+<<<<<<< HEAD
 	console.log('here');
 	$(".video iframe, .course-video iframe").each(function(){
 		
+=======
+	
+	$(".video iframe").each(function(){
+>>>>>>> db9de59425770dd06186bc25671ed54939a17e4e
 		//$(document).on("contextmenu", function(){return false;});
 		var yturi = "https://www.youtube.com/embed/" + ytv($("#ytv").data("yturi")) + "?autohide=1&modestbranding=1&rel=0&showinfo=0&enablejsapi=1";
+		console.log("yturi: " + yturi);
 		
 		console.log(ytv($("#ytv").data("yturi")));
 		$(this).attr("src",yturi);

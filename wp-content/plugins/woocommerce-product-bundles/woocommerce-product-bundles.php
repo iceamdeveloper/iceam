@@ -3,7 +3,7 @@
 * Plugin Name: WooCommerce Product Bundles
 * Plugin URI: http://woocommerce.com/products/product-bundles/
 * Description: WooCommerce extension for creating simple product bundles, kits and assemblies.
-* Version: 5.0.1
+* Version: 5.0.2
 * Author: WooThemes
 * Author URI: http://woocommerce.com/
 * Developer: SomewhereWarm
@@ -48,11 +48,11 @@ if ( ! is_woocommerce_active() ) {
  * Main plugin class.
  *
  * @class    WC_Bundles
- * @version  5.0.1
+ * @version  5.0.2
  */
 class WC_Bundles {
 
-	public $version  = '5.0.1';
+	public $version  = '5.0.2';
 	public $required = '2.4.0';
 
 	/**

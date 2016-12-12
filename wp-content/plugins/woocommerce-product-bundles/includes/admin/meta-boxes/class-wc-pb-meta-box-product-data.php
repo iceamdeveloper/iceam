@@ -418,7 +418,7 @@ class WC_PB_Meta_Box_Product_Data {
 					// Save title preferences.
 					if ( isset( $data[ 'override_title' ] ) ) {
 						$item_data[ 'override_title' ] = 'yes';
-						$item_data[ 'title' ]          = isset( $data[ 'title' ] ) ? $data[ 'title' ] : '';
+						$item_data[ 'title' ]          = isset( $data[ 'title' ] ) ? stripslashes( $data[ 'title' ] ) : '';
 					} else {
 						$item_data[ 'override_title' ] = 'no';
 					}

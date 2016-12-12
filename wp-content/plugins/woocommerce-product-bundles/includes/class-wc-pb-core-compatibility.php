@@ -261,6 +261,22 @@ class WC_PB_Core_Compatibility {
 	}
 
 	/**
+	 * Back-compat wrapper for 'wc_variation_attribute_name'.
+	 *
+	 * @since  5.0.2
+	 *
+	 * @param  string  $attribute_name
+	 * @return string
+	 */
+	public static function wc_variation_attribute_name( $attribute_name ) {
+		if ( self::is_wc_version_gte_2_6() ) {
+			return wc_variation_attribute_name( $attribute_name );
+		} else {
+			return 'attribute_' . sanitize_title( $attribute_name );
+		}
+	}
+
+	/**
 	 * Get prefix for use with wp_cache_set. Allows all cache in a group to be invalidated at once..
 	 *
 	 * @since  5.0.0

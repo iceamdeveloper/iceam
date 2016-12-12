@@ -422,16 +422,16 @@ function wc_pb_template_bundled_variation_attribute_options( $args ) {
 			$variation      = $bundled_item->product->get_child( $variation_id );
 			$variation_data = $variation->get_variation_attributes();
 
-			if ( isset( $variation_data[ wc_variation_attribute_name( $variation_attribute_name ) ] ) ) {
-				$variation_attribute_value = $variation_data[ wc_variation_attribute_name( $variation_attribute_name ) ];
+			if ( isset( $variation_data[ WC_PB_Core_Compatibility::wc_variation_attribute_name( $variation_attribute_name ) ] ) ) {
+				$variation_attribute_value = $variation_data[ WC_PB_Core_Compatibility::wc_variation_attribute_name( $variation_attribute_name ) ];
 			}
 
 			$hide_dropdowns = true;
 
 			// Make sure all attributes of the single active variation have a value.
 			foreach ( $variation_attributes as $attribute_name => $options ) {
-				if ( isset( $variation_data[ wc_variation_attribute_name( $attribute_name ) ] ) ) {
-					$value = $variation_data[ wc_variation_attribute_name( $attribute_name ) ];
+				if ( isset( $variation_data[ WC_PB_Core_Compatibility::wc_variation_attribute_name( $attribute_name ) ] ) ) {
+					$value = $variation_data[ WC_PB_Core_Compatibility::wc_variation_attribute_name( $attribute_name ) ];
 					if ( '' === $value || '' === $bundled_item->get_selected_product_variation_attribute( $attribute_name ) ) {
 						$hide_dropdowns = false;
 						break;
