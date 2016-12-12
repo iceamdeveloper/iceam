@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 5.0.0
+ * @version 5.0.2
  */
 
 // Exit if accessed directly.
@@ -26,9 +26,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 	if ( false === $bundled_item->is_in_stock() ) {
 
-		$availability       = $bundled_item->get_availability();
-		$availability_html  = empty( $availability[ 'availability' ] ) ? '' : esc_html( $availability[ 'availability' ] );
-		$label_stock_status = sprintf( _x( ' &mdash; %s', 'optional label stock status', 'woocommerce-product-bundles' ), '<span class="bundled_item_stock_label">' . $availability_html . '</span>' );
+		$availability      = $bundled_item->get_availability();
+		$availability_html = empty( $availability[ 'availability' ] ) ? '' : esc_html( $availability[ 'availability' ] );
+		if ( $availability_html ) {
+			$label_stock_status = sprintf( _x( ' &mdash; %s', 'optional label stock status', 'woocommerce-product-bundles' ), '<span class="bundled_item_stock_label stock out-of-stock">' . $availability_html . '</span>' );
+		}
 	}
 
 	echo sprintf( __( 'Add%1$s%2$s%3$s', 'woocommerce-product-bundles' ), $label_title, $label_price, $label_stock_status );

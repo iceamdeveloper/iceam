@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle cart functions and filters.
  *
  * @class    WC_PB_Cart
- * @version  5.0.0
+ * @version  5.0.2
  * @since    4.5.0
  */
 class WC_PB_Cart {
@@ -307,7 +307,7 @@ class WC_PB_Cart {
 								continue;
 							}
 
-							$taxonomy = 'attribute_' . sanitize_title( $attribute[ 'name' ] );
+							$taxonomy = WC_PB_Core_Compatibility::wc_variation_attribute_name( $attribute[ 'name' ] );
 
 							/** Documented in method 'get_posted_bundle_configuration'. */
 							$bundled_item_taxonomy_request_key = apply_filters( 'woocommerce_product_bundle_field_prefix', '', $product_id ) . 'bundle_' . $taxonomy . '_' . $bundled_item_id;
@@ -466,7 +466,7 @@ class WC_PB_Cart {
 							    	continue;
 							    }
 
-							    $taxonomy = 'attribute_' . sanitize_title( $attribute[ 'name' ] );
+							    $taxonomy = WC_PB_Core_Compatibility::wc_variation_attribute_name( $attribute[ 'name' ] );
 
 							    if ( isset( $configuration[ $bundled_item_id ][ 'attributes' ][ $taxonomy ] ) && isset( $configuration[ $bundled_item_id ][ 'variation_id' ] ) ) {
 

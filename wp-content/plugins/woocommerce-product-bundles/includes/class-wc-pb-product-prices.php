@@ -153,9 +153,15 @@ class WC_PB_Product_Prices {
 			$discount_from_regular = apply_filters( 'woocommerce_bundled_item_discount_from_regular', true, $bundled_item );
 			$discount              = $bundled_item->get_discount();
 			$priced_per_product    = $bundled_item->is_priced_individually();
+			$valid_children        = $bundled_item->get_children();
 
 			// Filter regular prices.
 			foreach ( $prices_array[ 'regular_price' ] as $variation_id => $regular_price ) {
+
+				if ( ! in_array( $variation_id, $valid_children ) ) {
+					continue;
+				}
+
 				if ( $priced_per_product ) {
 					$regular_prices[ $variation_id ] = $regular_price === '' ? $prices_array[ 'price' ][ $variation_id ] : $regular_price;
 				} else {
@@ -165,6 +171,11 @@ class WC_PB_Product_Prices {
 
 			// Filter prices.
 			foreach ( $prices_array[ 'price' ] as $variation_id => $price ) {
+
+				if ( ! in_array( $variation_id, $valid_children ) ) {
+					continue;
+				}
+
 				if ( $priced_per_product ) {
 					if ( $discount_from_regular ) {
 						$regular_price = $regular_prices[ $variation_id ];
@@ -180,6 +191,11 @@ class WC_PB_Product_Prices {
 
 			// Filter sale prices.
 			foreach ( $prices_array[ 'sale_price' ] as $variation_id => $sale_price ) {
+
+				if ( ! in_array( $variation_id, $valid_children ) ) {
+					continue;
+				}
+
 				if ( $priced_per_product ) {
 					$sale_prices[ $variation_id ] = empty( $discount ) ? $sale_price : $prices[ $variation_id ];
 				} else {
@@ -330,6 +346,7 @@ class WC_PB_Product_Prices {
 			}
 
 			$quantity = $bundled_item->get_quantity();
+
 			/**
 			 * 'woocommerce_bundled_item_price_html' filter.
 			 *

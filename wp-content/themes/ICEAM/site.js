@@ -133,9 +133,10 @@ jQuery(document).ready(function(){
 	});
 
 	
-	$(".course-video iframe").each(function(){
+	$(".video iframe").each(function(){
 		//$(document).on("contextmenu", function(){return false;});
 		var yturi = "https://www.youtube.com/embed/" + ytv($("#ytv").data("yturi")) + "?autohide=1&modestbranding=1&rel=0&showinfo=0&enablejsapi=1";
+		console.log("yturi: " + yturi);
 		
 		console.log(ytv($("#ytv").data("yturi")));
 		$(this).attr("src",yturi);
@@ -172,7 +173,9 @@ jQuery(document).ready(function(){
 
 
 	// REMOVE THE REGISTER FORM ON THE MY COURSES PAGE
-	$("#my-courses .col-2").remove();
+	if ($("#my-courses .col-2").length) {
+		$("#my-courses .col-2").remove();
+	}
 
 	
 });

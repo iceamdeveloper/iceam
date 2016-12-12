@@ -2,7 +2,7 @@
 /**
  * Renders the EDD tickets table/form
  *
- * @version 4.3.3
+ * @version 4.3.4
  *
  * @var bool $must_login
  */
@@ -19,86 +19,87 @@ ob_start();
 
 <form action="<?php echo esc_url( add_query_arg( 'eddtickets_process', 1, edd_get_checkout_uri() ) ); ?>" class="cart" method="post" enctype='multipart/form-data'>
 	<table width="100%" class="tribe-events-tickets">
-			<?php
-			foreach ( $tickets as $ticket ) {
-				/**
-				 * Changing any HTML to the `$ticket` Arguments you will need apply filters
-				 * on the `eddtickets_get_ticket` hook.
-				 */
+		<?php
+		foreach ( $tickets as $ticket ) {
+			/**
+			 * Changing any HTML to the `$ticket` Arguments you will need apply filters
+			 * on the `eddtickets_get_ticket` hook.
+			 */
 
-				$product = edd_get_download( $ticket->ID );
+			$product = edd_get_download( $ticket->ID );
 
-				if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
+			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
 
-					$is_there_any_product = true;
-					$data_product_id = 'data-product-id="' . esc_attr( $ticket->ID ) . '"';
+				$is_there_any_product = true;
+				$data_product_id = 'data-product-id="' . esc_attr( $ticket->ID ) . '"';
 
-					echo sprintf( '<input type="hidden" name="product_id[]"" value="%d">', esc_attr( $ticket->ID ) );
+				echo sprintf( '<input type="hidden" name="product_id[]"" value="%d">', esc_attr( $ticket->ID ) );
 
-					echo '<tr>';
-					echo '<td width="75" class="edd quantity" data-product-id="' . esc_attr( $ticket->ID ) . '">';
+				echo '<tr>';
+				echo '<td width="75" class="edd quantity" data-product-id="' . esc_attr( $ticket->ID ) . '">';
 
 
-					if ( $stock->available_units( $product->ID ) ) {
+				if ( $stock->available_units( $product->ID ) ) {
 
-						// For global stock enabled tickets with a cap, use the cap as the max quantity
-						if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode()) {
-							$remaining = $ticket->global_stock_cap();
-						}
-						else {
-							$remaining = $ticket->remaining();
-						}
-
-						$max = '';
-						if ( $ticket->managing_stock() ) {
-							$max = 'max="' . absint( $remaining ) . '"';
-						}
-
-						echo '<input type="number" class="edd-input" min="0" ' . $max . ' name="quantity_' . esc_attr( $ticket->ID ) . '" value="0" ' . disabled( $must_login, true, false ) . '/>';
-
-						$is_there_any_product_to_sell = true;
-
-						if ( $remaining ) {
-							?>
-							<span class="tribe-tickets-remaining">
-								<?php
-								echo sprintf( esc_html__( '%1$s available', 'event-tickets-plus' ),
-									'<span class="available-stock" ' . $data_product_id . '>' . esc_html( $remaining ) . '</span>'
-								);
-								?>
-							</span>
-							<?php
-						}
+					// For global stock enabled tickets with a cap, use the cap as the max quantity
+					if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode()) {
+						$remaining = $ticket->global_stock_cap();
 					}
 					else {
-						echo '<span class="tickets_nostock">' . esc_html__( 'Out of stock!', 'event-tickets-plus' ) . '</span>';
+						$remaining = $ticket->remaining();
 					}
 
-					echo '</td>';
-
-					echo '<td class="tickets_name">' . $ticket->name . '</td>';
-
-					echo '<td class="tickets_price">' . $this->get_price_html( $product ) . '</td>';
-
-					echo '<td class="tickets_description">' . $ticket->description . '</td>';
-
-					echo '</tr>';
-
-					if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
-						echo
-						'<tr class="tribe-tickets-attendees-list-optout">' .
-							'<td colspan="4">' .
-								'<input type="checkbox" name="optout_'  . esc_attr( $ticket->ID ) . '" id="tribe-tickets-attendees-list-optout-edd">' .
-								'<label for="tribe-tickets-attendees-list-optout-edd">' .
-									esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
-								'</label>' .
-							'</td>' .
-						'</tr>';
+					$max = '';
+					if ( $ticket->managing_stock() ) {
+						$max = 'max="' . absint( $remaining ) . '"';
 					}
-					include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
+
+					echo '<input type="number" class="edd-input" min="0" ' . $max . ' name="quantity_' . esc_attr( $ticket->ID ) . '" value="0" ' . disabled( $must_login, true, false ) . '/>';
+
+					$is_there_any_product_to_sell = true;
+
+					if ( $remaining ) {
+						?>
+						<span class="tribe-tickets-remaining">
+							<?php
+							echo sprintf( esc_html__( '%1$s available', 'event-tickets-plus' ),
+								'<span class="available-stock" ' . $data_product_id . '>' . esc_html( $remaining ) . '</span>'
+							);
+							?>
+						</span>
+						<?php
+					}
 				}
+				else {
+					echo '<span class="tickets_nostock">' . esc_html__( 'Out of stock!', 'event-tickets-plus' ) . '</span>';
+				}
+
+				echo '</td>';
+
+				echo '<td class="tickets_name">' . $ticket->name . '</td>';
+
+				echo '<td class="tickets_price">' . $this->get_price_html( $product ) . '</td>';
+
+				echo '<td class="tickets_description">' . $ticket->description . '</td>';
+
+				echo '</tr>';
+
+				if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
+					echo
+					'<tr class="tribe-tickets-attendees-list-optout">' .
+						'<td colspan="4">' .
+							'<input type="checkbox" name="optout_'  . esc_attr( $ticket->ID ) . '" id="tribe-tickets-attendees-list-optout-edd">' .
+							'<label for="tribe-tickets-attendees-list-optout-edd">' .
+								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
+							'</label>' .
+						'</td>' .
+					'</tr>';
+				}
+
+				include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 			}
-			?>
+		}
+		?>
 
 		<?php if ( $is_there_any_product_to_sell ) :
 			$color = isset( $edd_options[ 'checkout_color' ] ) ? $edd_options[ 'checkout_color' ] : 'gray';

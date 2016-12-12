@@ -23,6 +23,6 @@ if ( $title === '' ) {
 }
 
 ?><h4 class="bundled_product_title product_title"><?php
-		$optional = $optional ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ), $bundled_item, $bundle ) : '';
+		$optional = $optional && $bundle->contains( 'mandatory' ) ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ), $bundled_item, $bundle ) : '';
 		echo '<span class="bundled_product_title_inner">' . WC_PB_Helpers::format_product_shop_title( $title, $quantity, '', $optional ) . '</span>';
 ?></h4>

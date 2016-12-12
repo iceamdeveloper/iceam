@@ -15,14 +15,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Shipstation Integration.
  *
- * @version  5.0.0
+ * @version  5.0.2
  */
 class WC_PB_Shipstation_Compatibility {
 
 	public static function init() {
 
 		// Shipstation compatibility.
-		add_action( 'woocommerce_api_wc_shipstation', array( __CLASS__, 'add_filters' ), 9 );
+		add_action( 'woocommerce_api_wc_shipstation', array( __CLASS__, 'add_filters' ), 5 );
 	}
 
 	/**
