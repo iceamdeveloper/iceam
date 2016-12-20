@@ -74,6 +74,7 @@ class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Bas
 									}
 								}
 
+								//print_r($cart_item);
 
 								$original_price = $this->get_price_to_discount( $cart_item, $cart_item_key, apply_filters( 'wc_dynamic_pricing_stack_order_totals', false ) );
 								

@@ -2,10 +2,10 @@
 # This file is distributed under the same license as the WooCommerce Subscriptions package.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Subscriptions 2.1.1\n"
+"Project-Id-Version: WooCommerce Subscriptions 2.1.2\n"
 "Report-Msgid-Bugs-To: "
 "https://github.com/Prospress/woocommerce-subscriptions/issues\n"
-"POT-Creation-Date: 2016-11-25 22:40:36+00:00\n"
+"POT-Creation-Date: 2016-12-14 00:21:05+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -188,8 +188,8 @@ msgstr ""
 #: includes/admin/class-wc-subscriptions-admin.php:975
 #: includes/admin/class-wcs-admin-reports.php:55
 #: includes/admin/reports/class-wcs-report-subscription-events-by-date.php:654
-#: includes/class-wcs-query.php:93 includes/class-wcs-query.php:113
-#: includes/class-wcs-query.php:115 woocommerce-subscriptions.php:205
+#: includes/class-wcs-query.php:95 includes/class-wcs-query.php:115
+#: includes/class-wcs-query.php:117 woocommerce-subscriptions.php:205
 #: woocommerce-subscriptions.php:218
 msgid "Subscriptions"
 msgstr ""
@@ -286,8 +286,9 @@ msgstr ""
 #: includes/admin/class-wc-subscriptions-admin.php:1104
 #. translators: placeholders are opening and closing link tags
 msgid ""
-"If you never want a customer to be automatically charged for a subscription "
-"renewal payment, you can turn off automatic payments completely. %sLearn "
+"If you don't want new subscription purchases to automatically charge "
+"renewal payments, you can turn off automatic payments. Existing automatic "
+"subscriptions will continue to charge customers automatically. %sLearn "
 "more%s."
 msgstr ""
 
@@ -416,8 +417,8 @@ msgstr ""
 
 #: includes/admin/class-wc-subscriptions-admin.php:1520
 #. translators: $1-$2: opening and closing tags. Link to documents->payment
-#. gateways, 3$-4$: opening and closing tags. Link to woothemes extensions shop
-#. page
+#. gateways, 3$-4$: opening and closing tags. Link to WooCommerce extensions
+#. shop page
 msgid ""
 "Find new gateways that %1$ssupport automatic subscription payments%2$s in "
 "the official %3$sWooCommerce Marketplace%4$s."
@@ -1404,73 +1405,73 @@ msgstr ""
 msgid "Not cancelled"
 msgstr ""
 
-#: includes/class-wc-subscription.php:753
-msgid "Invalid format. First parameter needs to be an array."
-msgstr ""
-
-#: includes/class-wc-subscription.php:757
-msgid "Invalid data. First parameter was empty when passed to update_dates()."
-msgstr ""
-
-#: includes/class-wc-subscription.php:764
-msgid ""
-"Invalid data. First parameter has a date that is not in the registered date "
-"types."
-msgstr ""
-
-#: includes/class-wc-subscription.php:812
-msgid "The %s date must occur after the cancellation date."
-msgstr ""
-
-#: includes/class-wc-subscription.php:817
-msgid "The %s date must occur after the last payment date."
-msgstr ""
-
-#: includes/class-wc-subscription.php:821
-msgid "The %s date must occur after the next payment date."
-msgstr ""
-
-#: includes/class-wc-subscription.php:826
-msgid "The %s date must occur after the trial end date."
-msgstr ""
-
-#: includes/class-wc-subscription.php:830
-msgid "The %s date must occur after the start date."
-msgstr ""
-
-#: includes/class-wc-subscription.php:883
+#: includes/class-wc-subscription.php:806
 msgid "The start date of a subscription can not be deleted, only updated."
 msgstr ""
 
-#: includes/class-wc-subscription.php:886
+#: includes/class-wc-subscription.php:809
 msgid ""
 "The last payment date of a subscription can not be deleted. You must delete "
 "the order."
 msgstr ""
 
-#: includes/class-wc-subscription.php:1293
+#: includes/class-wc-subscription.php:1216
 msgid "Sign-up complete."
 msgstr ""
 
-#: includes/class-wc-subscription.php:1295
+#: includes/class-wc-subscription.php:1218
 msgid "Payment received."
 msgstr ""
 
-#: includes/class-wc-subscription.php:1326
+#: includes/class-wc-subscription.php:1249
 msgid "Payment failed."
 msgstr ""
 
-#: includes/class-wc-subscription.php:1330
+#: includes/class-wc-subscription.php:1253
 msgid "Subscription Cancelled: maximum number of failed payments reached."
 msgstr ""
 
-#: includes/class-wc-subscription.php:1525
+#: includes/class-wc-subscription.php:1448
 #: includes/class-wcs-change-payment-method-admin.php:155
 msgid "Manual Renewal"
 msgstr ""
 
-#: includes/class-wc-subscription.php:1590
+#: includes/class-wc-subscription.php:1513
 msgid "Payment method meta must be an array."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1736
+msgid "Invalid format. First parameter needs to be an array."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1740
+msgid "Invalid data. First parameter was empty when passed to update_dates()."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1748
+msgid ""
+"Invalid data. First parameter has a date that is not in the registered date "
+"types."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1800
+msgid "The %s date must occur after the cancellation date."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1805
+msgid "The %s date must occur after the last payment date."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1809
+msgid "The %s date must occur after the next payment date."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1814
+msgid "The %s date must occur after the trial end date."
+msgstr ""
+
+#: includes/class-wc-subscription.php:1818
+msgid "The %s date must occur after the start date."
 msgstr ""
 
 #: includes/class-wc-subscriptions-addresses.php:46
@@ -1752,11 +1753,11 @@ msgstr ""
 msgid "Parent Order"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:685
+#: includes/class-wc-subscriptions-order.php:686
 msgid "All orders types"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:952
+#: includes/class-wc-subscriptions-order.php:953
 #. translators: $1: opening link tag, $2: order number, $3: closing link tag
 msgid "Subscription cancelled for refunded order %1$s#%2$s%3$s."
 msgstr ""
@@ -1855,12 +1856,12 @@ msgstr ""
 msgid "%1$s and a %2$s sign-up fee"
 msgstr ""
 
-#: includes/class-wc-subscriptions-renewal-order.php:140
+#: includes/class-wc-subscriptions-renewal-order.php:141
 #. translators: placeholder is order ID
 msgid "Order %s created to record renewal."
 msgstr ""
 
-#: includes/class-wc-subscriptions-renewal-order.php:160
+#: includes/class-wc-subscriptions-renewal-order.php:161
 msgid "Subscription renewal orders cannot be cancelled."
 msgstr ""
 
@@ -1875,7 +1876,7 @@ msgid "Choose a new subscription."
 msgstr ""
 
 #: includes/class-wc-subscriptions-switcher.php:178
-#: includes/class-wc-subscriptions-switcher.php:902
+#: includes/class-wc-subscriptions-switcher.php:896
 msgid ""
 "Your cart contained an invalid subscription switch request. It has been "
 "removed."
@@ -1967,49 +1968,54 @@ msgstr ""
 
 #: includes/class-wc-subscriptions-switcher.php:388
 #: includes/class-wc-subscriptions-switcher.php:414
-#: includes/class-wc-subscriptions-switcher.php:2112
+#: includes/class-wc-subscriptions-switcher.php:2176
 msgid "Upgrade or Downgrade"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:765
+#: includes/class-wc-subscriptions-switcher.php:762
 msgid "Switch order cancelled due to a new switch order being created #%s."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:855
+#: includes/class-wc-subscriptions-switcher.php:849
 msgid "Switch Order"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:870
+#: includes/class-wc-subscriptions-switcher.php:864
 msgid "Switched Subscription"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:969
+#: includes/class-wc-subscriptions-switcher.php:963
 msgid "You can only switch to a subscription product."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:975
+#: includes/class-wc-subscriptions-switcher.php:969
 msgid "We can not find your old subscription item."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:997
+#: includes/class-wc-subscriptions-switcher.php:991
 msgid "You can not switch to the same subscription."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1044
+#: includes/class-wc-subscriptions-switcher.php:1038
 msgid ""
 "You can not switch this subscription. It appears you do not own the "
 "subscription."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1079
+#: includes/class-wc-subscriptions-switcher.php:1073
 msgid "There was an error locating the switch details."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1814
+#: includes/class-wc-subscriptions-switcher.php:1797
+#: includes/class-wc-subscriptions-switcher.php:2082
 msgid "The original subscription item being switched cannot be found."
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1867
+#: includes/class-wc-subscriptions-switcher.php:1799
+msgid "The item on the switch order cannot be found."
+msgstr ""
+
+#: includes/class-wc-subscriptions-switcher.php:2120
 msgid "Failed to update the subscription shipping method."
 msgstr ""
 
@@ -2154,7 +2160,7 @@ msgstr ""
 msgid "Complete checkout to resubscribe."
 msgstr ""
 
-#: includes/class-wcs-cart-resubscribe.php:310
+#: includes/class-wcs-cart-resubscribe.php:311
 msgid "Customer resubscribed in order #%s"
 msgstr ""
 
@@ -2541,7 +2547,7 @@ msgstr ""
 
 #: includes/gateways/paypal/includes/admin/class-wcs-paypal-admin.php:109
 #. translators: placeholders are opening and closing link tags. 1$-2$: to docs
-#. on woothemes, 3$-4$ to gateway settings on the site
+#. on woocommerce, 3$-4$ to gateway settings on the site
 msgid ""
 "PayPal is inactive for subscription transactions. Please %1$sset up the "
 "PayPal IPN%2$s and %3$senter your API credentials%4$s to enable PayPal for "
@@ -2550,7 +2556,7 @@ msgstr ""
 
 #: includes/gateways/paypal/includes/admin/class-wcs-paypal-admin.php:122
 #. translators: placeholders are opening and closing strong and link tags.
-#. 1$-2$: strong tags, 3$-8$ link to docs on woothemes
+#. 1$-2$: strong tags, 3$-8$ link to docs on woocommerce
 msgid ""
 "%1$sPayPal Reference Transactions are not enabled on your account%2$s, some "
 "subscription management features are not enabled. Please contact PayPal and "
@@ -2575,7 +2581,7 @@ msgstr ""
 
 #: includes/gateways/paypal/includes/admin/class-wcs-paypal-admin.php:164
 #. translators: placeholders are opening and closing link tags. 1$-2$: docs on
-#. woothemes, 3$-4$: dismiss link
+#. woocommerce, 3$-4$: dismiss link
 msgid ""
 "There is a problem with PayPal. Your PayPal account is issuing out-of-date "
 "subscription IDs. %1$sLearn more%2$s. %3$sDismiss%4$s."
@@ -2584,10 +2590,10 @@ msgstr ""
 #: includes/gateways/paypal/includes/admin/class-wcs-paypal-admin.php:178
 msgid ""
 "%sA fatal error has occurred when processing a recent subscription payment "
-"with PayPal. Please %sopen a new ticket at WooThemes Support%s immediately "
-"to get this resolved.%sIn order to get the quickest possible response "
-"please attach a %sTemporary Admin Login%s and a copy of your PHP error logs "
-"to your support ticket.%sLast recorded error: %s"
+"with PayPal. Please %sopen a new ticket at WooCommerce Support%s "
+"immediately to get this resolved.%sIn order to get the quickest possible "
+"response please attach a %sTemporary Admin Login%s and a copy of your PHP "
+"error logs to your support ticket.%sLast recorded error: %s"
 msgstr ""
 
 #: includes/gateways/paypal/includes/admin/class-wcs-paypal-admin.php:186
@@ -2628,24 +2634,24 @@ msgstr ""
 msgid "IPN subscription sign up completed."
 msgstr ""
 
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:299
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:376
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:302
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:379
 msgid "IPN subscription payment completed."
 msgstr ""
 
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:338
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:341
 msgid "IPN subscription failing payment method changed."
 msgstr ""
 
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:416
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:423
 msgid "IPN subscription suspended."
 msgstr ""
 
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:439
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:446
 msgid "IPN subscription cancelled."
 msgstr ""
 
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:455
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:462
 msgid "IPN subscription payment failure."
 msgstr ""
 
@@ -2869,7 +2875,7 @@ msgstr ""
 
 #: includes/upgrades/templates/wcs-about-2-0.php:76
 #. translators: placeholers are link tags: 1$-2$ new subscription page, 3$-4$:
-#. docs on woothemes
+#. docs on woocommerce.com
 msgid ""
 "%1$sAdd a subscription%2$s now or %3$slearn more%4$s about the new "
 "interface."
@@ -4240,7 +4246,7 @@ msgid "Gateway ID: [%s]"
 msgstr ""
 
 #: includes/admin/meta-boxes/views/html-related-orders-row.php:15
-#: includes/class-wc-subscriptions-renewal-order.php:137
+#: includes/class-wc-subscriptions-renewal-order.php:138
 #: templates/myaccount/my-subscriptions.php:37
 #: templates/myaccount/related-orders.php:38
 #: templates/myaccount/related-subscriptions.php:32
@@ -4248,7 +4254,7 @@ msgctxt "hash before order number"
 msgid "#%s"
 msgstr ""
 
-#: includes/class-wcs-query.php:90
+#: includes/class-wcs-query.php:92
 msgctxt "hash before order number"
 msgid "Subscription #%s"
 msgstr ""
@@ -4269,7 +4275,7 @@ msgctxt "table heading"
 msgid "Total"
 msgstr ""
 
-#: includes/class-wcs-retry-manager.php:95
+#: includes/class-wcs-retry-manager.php:117
 msgctxt "table heading"
 msgid "Renewal Payment Retry"
 msgstr ""
@@ -4347,7 +4353,7 @@ msgctxt "original denotes there is no date to display"
 msgid "-"
 msgstr ""
 
-#: includes/class-wc-subscription.php:771
+#: includes/class-wc-subscription.php:1763
 #. translators: placeholder is date type (e.g. "end", "next_payment"...)
 msgctxt "appears in an error message if date is wrong format"
 msgid "Invalid %s date. The date must be of the format: \"Y-m-d H:i:s\"."
@@ -4377,7 +4383,7 @@ msgctxt "used in order note as reason for why subscription status changed"
 msgid "Subscription renewal payment due:"
 msgstr ""
 
-#: includes/class-wcs-retry-manager.php:250
+#: includes/class-wcs-retry-manager.php:272
 msgctxt "used in order note as reason for why subscription status changed"
 msgid "Subscription renewal payment retry:"
 msgstr ""
@@ -4412,7 +4418,7 @@ msgctxt "Subscription status"
 msgid "On-hold"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:2253 wcs-functions.php:210
+#: includes/class-wc-subscriptions-switcher.php:2317 wcs-functions.php:210
 msgctxt "Subscription status"
 msgid "Switched"
 msgstr ""
@@ -4434,32 +4440,32 @@ msgctxt "used in a select box"
 msgid "%1$s-%2$s"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:688
+#: includes/class-wc-subscriptions-order.php:689
 msgctxt "An order type"
 msgid "Original"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:689
+#: includes/class-wc-subscriptions-order.php:690
 msgctxt "An order type"
 msgid "Subscription Parent"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:690
+#: includes/class-wc-subscriptions-order.php:691
 msgctxt "An order type"
 msgid "Subscription Renewal"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:691
+#: includes/class-wc-subscriptions-order.php:692
 msgctxt "An order type"
 msgid "Subscription Resubscribe"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:692
+#: includes/class-wc-subscriptions-order.php:693
 msgctxt "An order type"
 msgid "Subscription Switch"
 msgstr ""
 
-#: includes/class-wc-subscriptions-order.php:693
+#: includes/class-wc-subscriptions-order.php:694
 msgctxt "An order type"
 msgid "Non-subscription"
 msgstr ""
@@ -4534,29 +4540,30 @@ msgctxt "when to prorate first payment / subscription length"
 msgid "For All Subscription Products"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1688
+#: includes/class-wc-subscriptions-switcher.php:1682
 msgctxt "a switch order"
 msgid "Downgrade"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1691
+#: includes/class-wc-subscriptions-switcher.php:1685
 msgctxt "a switch order"
 msgid "Upgrade"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1694
+#: includes/class-wc-subscriptions-switcher.php:1688
 msgctxt "a switch order"
 msgid "Crossgrade"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1699
+#: includes/class-wc-subscriptions-switcher.php:1693
 #. translators: %1: product subtotal, %2: HTML span tag, %3: direction
 #. (upgrade, downgrade, crossgrade), %4: closing HTML span tag
 msgctxt "product subtotal string"
 msgid "%1$s %2$s(%3$s)%4$s"
 msgstr ""
 
-#: includes/class-wc-subscriptions-switcher.php:1825
+#: includes/class-wc-subscriptions-switcher.php:1810
+#: includes/class-wc-subscriptions-switcher.php:2093
 #. translators: 1$: old item, 2$: new item when switching
 msgctxt "used in order notes"
 msgid "Customer switched from: %1$s to %2$s."
@@ -4611,14 +4618,20 @@ msgctxt "used in order note"
 msgid "Customer removed \"%1$s\" (Product ID: #%2$d) via the My Account page."
 msgstr ""
 
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:386
-#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:393
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:389
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:398
 #. translators: placeholder is payment status (e.g. "completed")
 msgctxt "used in order note"
 msgid "IPN subscription payment %s."
 msgstr ""
 
-#: includes/class-wcs-retry-manager.php:182
+#: includes/gateways/paypal/includes/class-wcs-paypal-standard-ipn-handler.php:402
+#. translators: placeholder is payment status (e.g. "completed")
+msgctxt "used in order note"
+msgid "IPN subscription payment %s for reason: %s."
+msgstr ""
+
+#: includes/class-wcs-retry-manager.php:204
 msgctxt "used in order note as reason for why status changed"
 msgid "Retry rule applied:"
 msgstr ""
@@ -5003,44 +5016,44 @@ msgid_plural "%s years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/wcs-time-functions.php:81
+#: includes/wcs-time-functions.php:80
 msgctxt "Subscription length"
 msgid "Never expire"
 msgstr ""
 
-#: includes/wcs-time-functions.php:86
+#: includes/wcs-time-functions.php:85
 msgctxt "Subscription lengths. e.g. \"For 1 day...\""
 msgid "1 day"
 msgstr ""
 
-#: includes/wcs-time-functions.php:90
+#: includes/wcs-time-functions.php:89
 msgctxt "Subscription lengths. e.g. \"For 1 week...\""
 msgid "1 week"
 msgstr ""
 
-#: includes/wcs-time-functions.php:94
+#: includes/wcs-time-functions.php:93
 msgctxt "Subscription lengths. e.g. \"For 1 month...\""
 msgid "1 month"
 msgstr ""
 
-#: includes/wcs-time-functions.php:98
+#: includes/wcs-time-functions.php:97
 msgctxt "Subscription lengths. e.g. \"For 1 year...\""
 msgid "1 year"
 msgstr ""
 
-#: includes/wcs-time-functions.php:148
+#: includes/wcs-time-functions.php:147
 msgctxt "period interval (eg \"$10 _every_ 2 weeks\")"
 msgid "every"
 msgstr ""
 
-#: includes/wcs-time-functions.php:152
+#: includes/wcs-time-functions.php:151
 #. translators: period interval, placeholder is ordinal (eg "$10 every
 #. _2nd/3rd/4th_", etc)
 msgctxt "period interval with ordinal number (e.g. \"every 2nd\""
 msgid "every %s"
 msgstr ""
 
-#: includes/wcs-time-functions.php:176
+#: includes/wcs-time-functions.php:175
 msgctxt ""
 "Used in the trial period dropdown. Number is in text field. 0, 2+ will need "
 "plural, 1 will need singular."
@@ -5049,7 +5062,7 @@ msgid_plural "days"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/wcs-time-functions.php:177
+#: includes/wcs-time-functions.php:176
 msgctxt ""
 "Used in the trial period dropdown. Number is in text field. 0, 2+ will need "
 "plural, 1 will need singular."
@@ -5058,7 +5071,7 @@ msgid_plural "weeks"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/wcs-time-functions.php:178
+#: includes/wcs-time-functions.php:177
 msgctxt ""
 "Used in the trial period dropdown. Number is in text field. 0, 2+ will need "
 "plural, 1 will need singular."
@@ -5067,7 +5080,7 @@ msgid_plural "months"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/wcs-time-functions.php:179
+#: includes/wcs-time-functions.php:178
 msgctxt ""
 "Used in the trial period dropdown. Number is in text field. 0, 2+ will need "
 "plural, 1 will need singular."
@@ -5076,7 +5089,7 @@ msgid_plural "years"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/wcs-time-functions.php:197
+#: includes/wcs-time-functions.php:196
 msgctxt "no trial period"
 msgid "no"
 msgstr ""

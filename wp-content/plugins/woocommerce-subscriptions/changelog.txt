@@ -1,5 +1,16 @@
 *** WooCommerce Subscriptions Changelog ***
 
+2016.12.12 - version 2.1.2
+* Tweak: Reword the description on the Disable Automatic Payments option to make it clear it does not change existing subscriptions. (PR#1771)
+* Fix: Renewal issues with servers running Memcached, which does not handle expiration times greater than 30 days, by no longer using TLC transients, which sets all transient expiration dates to 1 year in future. (PR#1776)
+* Fix: Do not require InnoDB/SQL transactions for switching. Fixes "The original subscription item being switched cannot be found" errors when a customer attempts to upgrade or downgrade on servers without InnoDB active. (PR#1779)
+* Fix: Pass entire product object from cart to check whether it is a subscription when removing subscription products from the cart. Fixes compatibility with 3rd party extensions with custom subscription product types. (PR#1778)
+* Fix: Make sure all 'woocommerce_valid_order_statuses_for_payment' calls include an order object as the 2nd parameter for callbacks to match current WooCommerce behaviour. (PR#1789)
+* Fix: Incorrect template displayed when browsing to a page with URL /subscriptions/ when using WooCommerce prior to version 2.6. (PR#1660)
+* Fix: Do not add '_synced' to recurring cart keys if 3rd party code is calling calculate totals again, only add it once. (PR#1780)
+* Fix: Display "Retry Payment" option in the "Order Actions" menu if the payment is due, even if the order has a status applied by customer Retry Rules. (PR#1767)
+* Fix: Compatibility with switching and WPML. (PR#1780)
+
 2016.11.26 - version 2.1.1
 * Tweak: Delete Subscriptions transients when using the "Clear Transients" tool via the WooCommerce > System Status > Tools administration screen. (PR#1758)
 * Tweak: Avoid infinite loops with old versions of the Shipping Multiple Addresses extension and potentially other extension that may manually instantiate the WC_Checkout object, which is normally a singleton accessed via WC()->checkout, WC()->checkout or WC_Checkout::instance(). (PR#1757)
@@ -694,10 +705,10 @@
  * Tweak: Reinstate enctype='multipart/form-data' on the subscription add to cart form to fix compatibilty with file uploads via Product Addons extension (related to http://docs.woocommerce.com/document/subscriptions/faq/#section-45)
  * Tweak: Only output P tags for product meta on My Subscriptions table when product has meta
  * Tweak: add enable/disable field for the Customer Renewal Invoice email
- * Fix: set correct order date and ID in renewal order emails' subject & heading when sending more than one email in the same request (workaround until woothemes/woocommerce#5168 is implemented in WC 2.2)
+ * Fix: set correct order date and ID in renewal order emails' subject & heading when sending more than one email in the same request (workaround until woocommerce/woocommerce#5168 is implemented in WC 2.2)
  * Fix: correctly close P tag when display product meta data on the My Subscriptions table
  * Fix: display correct tax and shipping total on cart page when using Local Pickup shipping method and estimating shipping with the "Calculate Shipping" method
- * Fix: display correct tax string when the "Display Tax Totals" setting is set to "As a single total" - requires new 'woocommerce_cart_totals_taxes_total_html' filter introduced with WC 2.1. See woothemes/woocommerce#5184 for details.
+ * Fix: display correct tax string when the "Display Tax Totals" setting is set to "As a single total" - requires new 'woocommerce_cart_totals_taxes_total_html' filter introduced with WC 2.1. See woocommerce/woocommerce#5184 for details.
  * Fix: capitalise custom attribute names in the product meta section of the My Subscriptions table
  * Fix: allow standard products variations to be deleted (but still prevent subscription variations from being permanently deleted)
  * Fix: Maximum execution time error when attempting to switch from a paid subscription to a free subscription

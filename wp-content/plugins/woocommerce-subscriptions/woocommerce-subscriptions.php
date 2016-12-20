@@ -5,7 +5,7 @@
  * Description: Sell products and services with recurring payments in your WooCommerce Store.
  * Author: Prospress Inc.
  * Author URI: http://prospress.com/
- * Version: 2.1.1
+ * Version: 2.1.2
  *
  * Copyright 2016 Prospress, Inc.  (email : freedoms@prospress.com)
  *
@@ -95,7 +95,7 @@ require_once( 'includes/class-wcs-action-scheduler.php' );
 
 require_once( 'includes/abstracts/abstract-wcs-cache-manager.php' );
 
-require_once( 'includes/class-wcs-cache-manager-tlc.php' );
+require_once( 'includes/class-wcs-cached-data-manager.php' );
 
 require_once( 'includes/class-wcs-cart-renewal.php' );
 
@@ -126,7 +126,7 @@ class WC_Subscriptions {
 
 	public static $plugin_file = __FILE__;
 
-	public static $version = '2.1.1';
+	public static $version = '2.1.2';
 
 	private static $total_subscription_count = null;
 
@@ -411,7 +411,7 @@ class WC_Subscriptions {
 	public static function remove_subscriptions_from_cart() {
 
 		foreach ( WC()->cart->cart_contents as $cart_item_key => $cart_item ) {
-			if ( WC_Subscriptions_Product::is_subscription( $cart_item['product_id'] ) ) {
+			if ( WC_Subscriptions_Product::is_subscription( $cart_item['data'] ) ) {
 				WC()->cart->set_quantity( $cart_item_key, 0 );
 			}
 		}
