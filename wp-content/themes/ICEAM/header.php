@@ -35,7 +35,7 @@
 
 <script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/js/bootstrap.min.js"></script>
 <script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/js/jquery.validate.min.js"></script>
-<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/site.js"></script>
+<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/site.js?v=1"></script>
 
 </head>
 <body <?php body_class(); ?>>
