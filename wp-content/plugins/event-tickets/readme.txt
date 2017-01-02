@@ -4,7 +4,7 @@ Contributors: ModernTribe, borkweb, zbtirrell, barry.hughes, bordoni, brianjesse
 Tags: events, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Event Tickets, Event Tickets Plus
 Requires at least: 3.9
 Tested up to: 4.7
-Stable tag: 4.3.4.1
+Stable tag: 4.3.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -206,6 +206,14 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/18v2" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.3.5] 2016-12-20 =
+
+* Tweak - Updated the template override instructions in a number of templates [68229]
+* Tweak - Allow better filtering for Attendees (Props to @jtsternberg) [69886]
+* Fix - Prevent JavaScript Notices related to Bumpdown [69886]
+* Fix - Assets URL on Windows Servers are fully operational again [68377]
+* Fix - JavaScript and CSS files will respect HTTPS on all pages [69561]
 
 = [4.3.4.1] 2016-12-09 =
 

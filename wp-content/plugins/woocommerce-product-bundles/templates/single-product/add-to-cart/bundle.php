@@ -16,8 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-global $woocommerce, $product;
-
 do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
 <form method="post" enctype="multipart/form-data" class="cart cart_group bundle_form <?php echo 'layout_' . $product->get_layout(); ?>"><?php
@@ -53,7 +51,7 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 	 */
 	do_action( 'woocommerce_after_bundled_items', $product ); ?>
 
-	<div class="cart bundle_data bundle_data_<?php echo $product->id; ?>" data-bundle_price_data="<?php echo esc_attr( json_encode( $bundle_price_data ) ); ?>" data-bundle_id="<?php echo $product->id; ?>"><?php
+	<div class="cart bundle_data bundle_data_<?php echo $product_id; ?>" data-bundle_price_data="<?php echo esc_attr( json_encode( $bundle_price_data ) ); ?>" data-bundle_id="<?php echo $product_id; ?>"><?php
 
 		if ( $product->is_purchasable() ) {
 
@@ -81,7 +79,7 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 					do_action( 'woocommerce_bundles_add_to_cart_button' );
 
 				?></div>
-				<input type="hidden" name="add-to-cart" value="<?php echo $product->id; ?>" />
+				<input type="hidden" name="add-to-cart" value="<?php echo $product_id; ?>" />
 			</div><?php
 
 			/** WC Core action. */

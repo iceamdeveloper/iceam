@@ -3,7 +3,7 @@
 * Plugin Name: WooCommerce Product Bundles
 * Plugin URI: http://woocommerce.com/products/product-bundles/
 * Description: WooCommerce extension for creating simple product bundles, kits and assemblies.
-* Version: 5.0.2
+* Version: 5.1.1
 * Author: WooThemes
 * Author URI: http://woocommerce.com/
 * Developer: SomewhereWarm
@@ -13,7 +13,7 @@
 * Domain Path: /languages/
 *
 * Requires at least: 4.1
-* Tested up to: 4.6
+* Tested up to: 4.7
 *
 * Copyright: © 2009-2015 Emmanouil Psychogyiopoulos.
 * License: GNU General Public License v3.0
@@ -48,11 +48,11 @@ if ( ! is_woocommerce_active() ) {
  * Main plugin class.
  *
  * @class    WC_Bundles
- * @version  5.0.2
+ * @version  5.1.1
  */
 class WC_Bundles {
 
-	public $version  = '5.0.2';
+	public $version  = '5.1.1';
 	public $required = '2.4.0';
 
 	/**
@@ -197,17 +197,14 @@ class WC_Bundles {
 	 */
 	public function includes() {
 
-		// DB API for custom PB tables.
-		require_once( 'includes/class-wc-pb-db.php' );
+		// Core compatibility functions and hooks.
+		require_once( 'includes/class-wc-pb-core-compatibility.php' );
 
-		// Bundled Item Data CRUD class.
-		require_once( 'includes/class-wc-bundled-item-data.php' );
+		// Data classes.
+		require_once( 'includes/data/class-wc-pb-data.php' );
 
 		// Install.
 		require_once( 'includes/class-wc-pb-install.php' );
-
-		// Core compatibility functions and hooks.
-		require_once( 'includes/class-wc-pb-core-compatibility.php' );
 
 		// Functions (incl deprecated).
 		require_once( 'includes/wc-pb-functions.php' );
@@ -225,8 +222,10 @@ class WC_Bundles {
 		// Product price filters and price-related functions.
 		require_once( 'includes/class-wc-pb-product-prices.php' );
 
-		// Bundled item and Bundle classes.
+		// Bundled Item class.
 		require_once( 'includes/class-wc-bundled-item.php' );
+
+		// Product Bundle class.
 		require_once( 'includes/class-wc-product-bundle.php' );
 
 		// Stock mgr class.

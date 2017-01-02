@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Add custom REST API fields.
  *
  * @class    WC_PB_REST_API
- * @version  5.0.0
+ * @version  5.1.0
  */
 class WC_PB_REST_API {
 
@@ -335,8 +335,8 @@ class WC_PB_REST_API {
 			$terms        = get_the_terms( $product_id, 'product_type' );
 			$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
 		} elseif ( $response instanceof WC_Product ) {
-			$product_id   = absint( $response->id );
-			$product_type = $response->product_type;
+			$product_id   = WC_PB_Core_Compatibility::get_id( $response );
+			$product_type = $response->get_type();
 		}
 
 		// Only possible to set fields of 'bundle' type products.
@@ -358,7 +358,8 @@ class WC_PB_REST_API {
 	 */
 	private static function get_product_field( $key, $product ) {
 
-		$product_type = $product->product_type;
+		$product_type = $product->get_type();
+		$product_id   = WC_PB_Core_Compatibility::get_id( $product );
 
 		switch ( $key ) {
 
@@ -367,8 +368,8 @@ class WC_PB_REST_API {
 				$value = array();
 
 				if ( 'bundle' !== $product_type ) {
-					$bundle_ids = array_values( wc_pb_get_bundled_product_map( $product->id ) );
-					$value = ! empty( $bundle_ids ) ? $bundle_ids : array();
+					$bundle_ids = array_values( wc_pb_get_bundled_product_map( $product_id ) );
+					$value      = ! empty( $bundle_ids ) ? $bundle_ids : array();
 				}
 
 			break;
@@ -379,7 +380,7 @@ class WC_PB_REST_API {
 				if ( 'bundle' === $product_type ) {
 
 					$args = array(
-						'bundle_id' => $product->id,
+						'bundle_id' => $product_id,
 						'return'    => 'objects',
 						'order_by'  => array( 'menu_order' => 'ASC' )
 					);
@@ -676,8 +677,8 @@ class WC_PB_REST_API {
 			$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
 
 			if ( false === in_array( $product_type, array( 'bundle', 'composite' ) ) ) {
-				delete_post_meta( $post_id, '_wc_sw_min_price' );
 				delete_post_meta( $post_id, '_wc_sw_max_price' );
+				delete_post_meta( $post_id, '_wc_sw_max_regular_price' );
 			}
 		}
 	}

@@ -22,3 +22,9 @@
 dt.bundled_title_meta, .bundled_notice {
 	margin: 12px 0 5px;
 }
+
+a.edit_bundle_in_cart_text {
+	color: #888;
+	font-weight: normal;
+	text-decoration: none;
+}

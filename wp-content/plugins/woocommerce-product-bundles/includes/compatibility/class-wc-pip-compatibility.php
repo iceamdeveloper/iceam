@@ -15,24 +15,47 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Print Invoices & Packing Lists Integration.
  *
- * @since  4.14.3
+ * @version  5.1.0
  */
 class WC_PB_PIP_Compatibility {
 
 	public static function init() {
 
+		// Temporarily add order item data to array.
 		add_filter( 'wc_pip_document_table_row_item_data', array( __CLASS__, 'filter_pip_row_item_data' ), 10, 5 );
-		add_filter( 'wc_pip_document_table_rows', array( __CLASS__, 'filter_pip_table_rows' ), 52, 4 );
+		// Re-sort PIP table rows so that bundled items are always below their container.
+		add_filter( 'wc_pip_document_table_rows', array( __CLASS__, 'filter_pip_table_rows' ), 52, 5 );
+		// Add 'bundled-product' class to pip row classes.
 		add_filter( 'wc_pip_document_table_product_class', array( __CLASS__, 'filter_pip_document_table_bundled_item_class' ), 10, 4 );
+		// Filter PIP item titles.
 		add_filter( 'wc_pip_order_item_name', array( WC_PB()->display, 'order_table_item_title' ), 10, 2 );
-
+		// Ensure bundle container line items are always dislpayed.
 		add_filter( 'wc_pip_packing_list_hide_virtual_item', array( __CLASS__, 'filter_pip_hide_virtual_item' ), 10, 4 );
+		// Prevent bundled order items from being sorted/categorized.
+		add_filter( 'wc_pip_packing_list_group_item_as_uncategorized', array( __CLASS__, 'group_bundled_items_as_uncategorized' ), 10, 3 );
 
 		if ( class_exists( 'WC_PB_CP_Compatibility' ) ) {
 			add_filter( 'wc_pip_order_item_name', array( 'WC_PB_CP_Compatibility', 'composited_bundle_order_table_item_title' ), 9, 2 );
 		}
-
+		// Add bundled item class CSS rule.
 		add_action( 'wc_pip_styles', array( __CLASS__, 'add_pip_bundled_item_styles' ) );
+	}
+
+	/**
+	 * Prevent bundled order items from being sorted/categorized.
+	 *
+	 * @param  boolean   $uncategorize
+	 * @param  array     $order_item
+	 * @param  WC_Order  $order
+	 * @return boolean
+	 */
+	public static function group_bundled_items_as_uncategorized( $uncategorize, $order_item, $order ) {
+
+		if ( wc_pb_is_bundled_order_item( $order_item, $order ) ) {
+			$uncategorize = true;
+		}
+
+		return $uncategorize;
 	}
 
 	/**
@@ -109,8 +132,9 @@ class WC_PB_PIP_Compatibility {
 	 * @param  string  $type
 	 * @return array
 	 */
-	public static function filter_pip_table_rows( $table_rows, $items, $order_id, $type ) {
+	public static function filter_pip_table_rows( $table_rows, $items, $order_id, $type, $pip_document = null ) {
 
+		$order               = is_null( $pip_document ) ? wc_get_order( $order_id ) : $pip_document->order;
 		$filtered_table_rows = array();
 
 		if ( ! empty( $table_rows ) ) {
@@ -129,20 +153,30 @@ class WC_PB_PIP_Compatibility {
 
 						$sorted_rows[] = $row_item;
 
-						$children_keys = unserialize( $row_item[ 'wc_pb_item_data' ][ 'bundled_items' ] );
+						$children = wc_pb_get_bundled_order_items( $row_item[ 'wc_pb_item_data' ], $order );
 
-						// Look for the child in all table rows and bring it over.
-						foreach ( $table_rows as $table_row_key_inner => $table_row_data_inner ) {
-							foreach ( $table_row_data_inner[ 'items' ] as $row_item_inner ) {
+						// Look for its children in all table rows and bring them over in the original order.
+						if ( ! empty( $children ) ) {
+							foreach ( $children as $child_order_item ) {
 
-								$is_child = false;
-
-								if ( isset( $row_item_inner[ 'wc_pb_item_data' ] ) && isset( $row_item_inner[ 'wc_pb_item_data' ][ 'bundle_cart_key' ] ) ) {
-									$is_child = in_array( $row_item_inner[ 'wc_pb_item_data' ][ 'bundle_cart_key' ], $children_keys );
+								if ( empty( $child_order_item[ 'bundle_cart_key' ] ) ) {
+									continue;
 								}
 
-								if ( $is_child ) {
-									$sorted_rows[] = $row_item_inner;
+								// Look for the child in all table rows and bring it over.
+								foreach ( $table_rows as $table_row_key_inner => $table_row_data_inner ) {
+									foreach ( $table_row_data_inner[ 'items' ] as $row_item_inner ) {
+
+										$is_child = false;
+
+										if ( isset( $row_item_inner[ 'wc_pb_item_data' ] ) && isset( $row_item_inner[ 'wc_pb_item_data' ][ 'bundle_cart_key' ] ) ) {
+											$is_child = $row_item_inner[ 'wc_pb_item_data' ][ 'bundle_cart_key' ] === $child_order_item[ 'bundle_cart_key' ];
+										}
+
+										if ( $is_child ) {
+											$sorted_rows[] = $row_item_inner;
+										}
+									}
 								}
 							}
 						}

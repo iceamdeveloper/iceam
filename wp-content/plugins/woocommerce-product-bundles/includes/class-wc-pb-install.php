@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles installation and updating tasks.
  *
  * @class    WC_PB_Install
- * @version  5.0.0
- * @since    5.0.0
+ * @version  5.1.0
  */
 class WC_PB_Install {
 
@@ -29,6 +28,10 @@ class WC_PB_Install {
 		'5.0.0' => array(
 			'wc_pb_update_500_main',
 			'wc_pb_update_500_delete_unused_meta'
+		),
+		'5.1.0' => array(
+			'wc_pb_update_510_main',
+			'wc_pb_update_510_delete_unused_meta'
 		)
 	);
 
@@ -270,8 +273,13 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 	 * @param  string  $version
 	 */
 	private static function update_db_version( $version = null ) {
+		$logger  = new WC_Logger();
+		$version = is_null( $version ) ? WC_PB()->version : $version;
+
 		delete_option( 'woocommerce_product_bundles_db_version' );
-		add_option( 'woocommerce_product_bundles_db_version', is_null( $version ) ? WC_PB()->version : $version );
+		add_option( 'woocommerce_product_bundles_db_version', $version );
+
+		$logger->add( 'wc_pb_db_updates', sprintf( 'Database version is %s.', get_option( 'woocommerce_product_bundles_db_version', 'unknown' ) ) );
 	}
 
 	/**
@@ -285,7 +293,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 
 		if ( $file == WC_PB()->plugin_basename() ) {
 			$row_meta = array(
-				'docs'    => '<a href="https://docs.woocommerce.com/document/bundles/">' . __( 'Docs', 'woocommerce-product-bundles' ) . '</a>',
+				'docs'    => '<a href="https://docs.woocommerce.com/document/bundles/">' . __( 'Documentation', 'woocommerce-product-bundles' ) . '</a>',
 				'support' => '<a href="https://support.woocommerce.com/">' . __( 'Support', 'woocommerce-product-bundles' ) . '</a>',
 			);
 

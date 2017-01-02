@@ -81,7 +81,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 */
 	do_action( 'woocommerce_after_composited_bundled_items', $product, $component_id, $composite_product );
 
-	?><div class="cart bundle_data bundle_data_<?php echo $product->id; ?>" data-bundle_price_data="<?php echo esc_attr( json_encode( $bundle_price_data ) ); ?>" data-bundle_id="<?php echo $product->id; ?>"><?php
+	?><div class="cart bundle_data bundle_data_<?php echo $product_id; ?>" data-bundle_price_data="<?php echo esc_attr( json_encode( $bundle_price_data ) ); ?>" data-bundle_id="<?php echo $product_id; ?>"><?php
 
 		do_action( 'woocommerce_composited_product_add_to_cart', $product, $component_id, $composite_product );
 

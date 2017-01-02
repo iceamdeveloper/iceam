@@ -2,7 +2,11 @@
 /**
  * Renders the Shopp tickets table/form
  *
- * @version 4.3.3
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/shopptickets/tickets.php
+ *
+ * @version 4.3.5
  *
  * @var bool $must_login
  */

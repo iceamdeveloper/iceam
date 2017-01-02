@@ -17,8 +17,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * Product Bundles DB API for manipulating bundled item data in the database.
  *
- * @class  WC_PB_DB
- * @since  5.0.0
+ * @class    WC_PB_DB
+ * @version  5.1.0
  */
 class WC_PB_DB {
 
@@ -338,6 +338,43 @@ class WC_PB_DB {
 			return true;
 		}
 		return false;
+	}
+
+
+	/*----------------------*/
+	/*  Item Meta Helpers   */
+	/*----------------------*/
+
+	/**
+	 * Clears the 'stock_status' and 'max_stock' meta.
+	 *
+	 * @param  mixed  $where
+	 */
+	public static function flush_stock_cache( $where = '' ) {
+
+		global $wpdb;
+
+		if ( empty( $where ) ) {
+
+			$wpdb->query( "
+				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
+				WHERE meta_key IN ( 'stock_status', 'max_stock' )
+			" );
+
+		} else {
+
+			if ( is_array( $where ) ) {
+				$bundled_item_ids = array_map( 'absint' , $where );
+			} else {
+				$bundled_item_ids = array( absint( $where ) );
+			}
+
+			$wpdb->query( "
+				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
+				WHERE meta_key IN ( 'stock_status', 'max_stock' )
+				AND bundled_item_id IN (" . implode( ',', $bundled_item_ids ) . ")
+			" );
+		}
 	}
 }
 

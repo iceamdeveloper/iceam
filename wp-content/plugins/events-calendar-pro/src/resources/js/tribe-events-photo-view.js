@@ -118,7 +118,7 @@
 						tribe_apply_photo_cols( $container );
 						clearTimeout( resize_timer );
 						resize_timer = setTimeout( function() {
-							$container.isotope( 'reLayout' );
+							$container.isotope( 'reloadItems' );
 						}, 400 );
 					} );
 				} );

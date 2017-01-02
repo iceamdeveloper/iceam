@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Points and Rewards Compatibility.
  *
- * @since  4.11.4
+ * @version  5.1.0
  */
 class WC_PB_PnR_Compatibility {
 
@@ -104,7 +104,7 @@ class WC_PB_PnR_Compatibility {
 
 		global $product;
 
-		if ( $product->product_type === 'bundle' ) {
+		if ( 'bundle' === $product->get_type() ) {
 
 			if ( false === $product->contains( 'priced_individually' ) ) {
 				return $message;

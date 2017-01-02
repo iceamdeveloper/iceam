@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-?><div class="cart bundled_item_cart_content" data-title="<?php echo esc_attr( $bundled_item->get_raw_title() ); ?>" data-optional_suffix="<?php echo $bundled_item->is_optional() && $bundle->contains( 'mandatory' ) ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ), $bundled_item, $bundle ) : ''; ?>" data-optional="<?php echo $bundled_item->is_optional() ? 'yes' : 'no'; ?>" data-type="<?php echo $bundled_product->product_type; ?>" data-product_variations="<?php echo htmlspecialchars( json_encode( $bundled_product_variations ) ); ?>" data-bundled_item_id="<?php echo $bundled_item->item_id; ?>" data-custom_data="<?php echo esc_attr( json_encode( $custom_product_data ) ); ?>" data-product_id="<?php echo $bundled_item->product->id; ?>" data-bundle_id="<?php echo $bundle->id; ?>">
+?><div class="cart bundled_item_cart_content" data-title="<?php echo esc_attr( $bundled_item->get_raw_title() ); ?>" data-optional_suffix="<?php echo $bundled_item->is_optional() && $bundle->contains( 'mandatory' ) ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ), $bundled_item, $bundle ) : ''; ?>" data-optional="<?php echo $bundled_item->is_optional() ? 'yes' : 'no'; ?>" data-type="<?php echo $bundled_product->get_type(); ?>" data-product_variations="<?php echo htmlspecialchars( json_encode( $bundled_product_variations ) ); ?>" data-bundled_item_id="<?php echo $bundled_item->item_id; ?>" data-custom_data="<?php echo esc_attr( json_encode( $custom_product_data ) ); ?>" data-product_id="<?php echo $bundled_product_id; ?>" data-bundle_id="<?php echo $bundle_id; ?>">
 	<table class="variations" cellspacing="0">
 		<tbody><?php
 
@@ -49,7 +49,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	 * @param $mixed          $bundled_product_id
 	 * @param WC_Bundled_Item $bundled_item
 	 */
-	do_action( 'woocommerce_bundled_product_add_to_cart', $bundled_product->id, $bundled_item );
+	do_action( 'woocommerce_bundled_product_add_to_cart', $bundled_product_id, $bundled_item );
 
 	?><div class="single_variation_wrap bundled_item_wrap"><?php
 
@@ -64,7 +64,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		 *
 		 * @hooked wc_bundles_single_variation - 10
 		 */
-		do_action( 'woocommerce_bundled_single_variation', $bundled_product->id, $bundled_item );
+		do_action( 'woocommerce_bundled_single_variation', $bundled_product_id, $bundled_item );
 
 	?></div>
 </div>

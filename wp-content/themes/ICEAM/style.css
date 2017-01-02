@@ -101,6 +101,8 @@ h4,
     font-weight: bold;
     font-size: 14px;
     text-transform: uppercase;
+	line-height: 1.6em;
+	margin-bottom: 20px;
 }
 
 strong{

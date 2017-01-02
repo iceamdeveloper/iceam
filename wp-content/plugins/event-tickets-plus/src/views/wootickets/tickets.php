@@ -2,7 +2,11 @@
 /**
  * Renders the WooCommerce tickets table/form
  *
- * @version 4.3.3
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/wootickets/tickets.php
+ *
+ * @version 4.3.5
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login

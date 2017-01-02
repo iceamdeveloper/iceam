@@ -2,7 +2,11 @@
 /**
  * Renders the attendee list for an event
  *
- * @version 4.1
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/attendees-list.php
+ *
+ * @version 4.3.5
  *
  */
 ?>

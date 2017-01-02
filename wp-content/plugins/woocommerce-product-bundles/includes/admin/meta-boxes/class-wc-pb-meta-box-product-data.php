@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product meta-box data for the 'Bundle' type.
  *
  * @class     WC_PB_Meta_Box_Product_Data
- * @version   5.0.0
- * @since     5.0.0
+ * @version   5.1.1
  */
 class WC_PB_Meta_Box_Product_Data {
 
@@ -31,6 +30,9 @@ class WC_PB_Meta_Box_Product_Data {
 
 		// Creates the panel for selecting bundled product options.
 		add_action( 'woocommerce_product_write_panels', array( __CLASS__, 'product_write_panel' ) );
+
+		// Adds the Base Price fields.
+		add_action( 'woocommerce_product_options_general_product_data', array( __CLASS__, 'base_price_fields' ) );
 
 		// Adds a tooltip to the Manage Stock option.
 		add_action( 'woocommerce_product_options_stock', array( __CLASS__, 'stock_note' ) );
@@ -62,6 +64,22 @@ class WC_PB_Meta_Box_Product_Data {
 
 		// Extended "Sold Individually" option.
 		add_action( 'woocommerce_product_options_sold_individually', array( __CLASS__, 'sold_individually_option' ) );
+	}
+
+	/**
+	 * Hidden Base Price fields.
+	 */
+	public static function base_price_fields() {
+
+		global $thepostid;
+
+		$base_regular_price = get_post_meta( $thepostid, '_wc_pb_base_regular_price', true );
+		$base_sale_price    = get_post_meta( $thepostid, '_wc_pb_base_sale_price', true );
+
+		?><div class="wc_pb_price_fields" style="display:none">
+			<input type="hidden" id="_wc_pb_base_regular_price" name="wc_pb_base_regular_price_flip" value="<?php echo wc_format_localized_price( $base_regular_price ); ?>"/>
+			<input type="hidden" id="_wc_pb_base_sale_price" name="wc_pb_base_sale_price_flip" value="<?php echo wc_format_localized_price( $base_sale_price ); ?>"/>
+		</div><?php
 	}
 
 	/**
@@ -190,8 +208,8 @@ class WC_PB_Meta_Box_Product_Data {
 		$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
 
 		if ( false === in_array( $product_type, array( 'bundle', 'composite' ) ) ) {
-			delete_post_meta( $post_id, '_wc_sw_min_price' );
 			delete_post_meta( $post_id, '_wc_sw_max_price' );
+			delete_post_meta( $post_id, '_wc_sw_max_regular_price' );
 		}
 	}
 
@@ -204,6 +222,35 @@ class WC_PB_Meta_Box_Product_Data {
 	public static function process_bundle_meta( $post_id ) {
 
 		global $wpdb;
+
+		/*
+		 * Base Prices.
+		 */
+
+		$date_from     = (string) isset( $_POST[ '_sale_price_dates_from' ] ) ? wc_clean( $_POST[ '_sale_price_dates_from' ] ) : '';
+		$date_to       = (string) isset( $_POST[ '_sale_price_dates_to' ] ) ? wc_clean( $_POST[ '_sale_price_dates_to' ] )     : '';
+		$regular_price = (string) isset( $_POST[ '_regular_price' ] ) ? wc_clean( $_POST[ '_regular_price' ] )                 : '';
+		$sale_price    = (string) isset( $_POST[ '_sale_price' ] ) ? wc_clean( $_POST[ '_sale_price' ] )                       : '';
+
+		update_post_meta( $post_id, '_wc_pb_base_regular_price', '' === $regular_price ? '' : wc_format_decimal( $regular_price ) );
+		update_post_meta( $post_id, '_wc_pb_base_sale_price', '' === $sale_price ? '' : wc_format_decimal( $sale_price ) );
+
+		if ( $date_to && ! $date_from ) {
+			$date_from = date( 'Y-m-d' );
+		}
+
+		if ( '' !== $sale_price && '' === $date_to && '' === $date_from ) {
+			update_post_meta( $post_id, '_wc_pb_base_price', wc_format_decimal( $sale_price ) );
+		} elseif ( '' !== $sale_price && $date_from && strtotime( $date_from ) <= strtotime( 'NOW', current_time( 'timestamp' ) ) ) {
+			update_post_meta( $post_id, '_wc_pb_base_price', wc_format_decimal( $sale_price ) );
+		} else {
+			update_post_meta( $post_id, '_wc_pb_base_price', '' === $regular_price ? '' : wc_format_decimal( $regular_price ) );
+		}
+
+		if ( $date_to && strtotime( $date_to ) < strtotime( 'NOW', current_time( 'timestamp' ) ) ) {
+			update_post_meta( $post_id, '_wc_pb_base_price', '' === $regular_price ? '' : wc_format_decimal( $regular_price ) );
+			update_post_meta( $post_id, '_wc_pb_base_sale_price', '' );
+		}
 
 		/*
 		 * Layout.
@@ -317,9 +364,8 @@ class WC_PB_Meta_Box_Product_Data {
 					continue;
 				}
 
-				// Delete stock data cache.
-				WC_PB_DB::delete_bundled_item_meta( $item_id, 'stock_status' );
-				WC_PB_DB::delete_bundled_item_meta( $item_id, 'max_stock' );
+				// Flush stock cache.
+				WC_PB_DB::flush_stock_cache( $item_id );
 
 				$loop++;
 			}
@@ -354,8 +400,6 @@ class WC_PB_Meta_Box_Product_Data {
 
 		if ( ! empty( $posted_bundle_data ) ) {
 
-			wp_cache_delete( $post_id, 'post_meta' );
-
 			$sold_individually_notices = array();
 			$times                     = array();
 			$loop                      = 0;
@@ -368,20 +412,22 @@ class WC_PB_Meta_Box_Product_Data {
 				$product_id = isset( $data[ 'product_id' ] ) ? absint( $data[ 'product_id' ] ) : false;
 				$item_id    = isset( $data[ 'item_id' ] ) ? absint( $data[ 'item_id' ] ) : false;
 
-				if ( ! $product_id ) {
+				$product = wc_get_product( $product_id );
+
+				if ( ! $product ) {
 					continue;
 				}
 
-				$terms        = get_the_terms( $product_id, 'product_type' );
-				$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
-				$is_sub       = in_array( $product_type, array( 'subscription', 'variable-subscription' ) );
+				$product_type  = $product->get_type();
+				$product_title = $product->get_title();
+				$is_sub        = in_array( $product_type, array( 'subscription', 'variable-subscription' ) );
 
-				if ( $product_id && $product_id > 0 && in_array( $product_type, array( 'simple', 'variable', 'subscription', 'variable-subscription' ) ) && ( $post_id != $product_id ) && ! isset( $sold_individually_notices[ $product_id ] ) ) {
+				if ( in_array( $product_type, array( 'simple', 'variable', 'subscription', 'variable-subscription' ) ) && ( $post_id != $product_id ) && ! isset( $sold_individually_notices[ $product_id ] ) ) {
 
 					// Bundling subscription products requires Subs v2.0+.
 					if ( $is_sub ) {
 						if ( ! class_exists( 'WC_Subscriptions' ) || version_compare( WC_Subscriptions::$version, '2.0.0', '<' ) ) {
-							self::add_admin_error( sprintf( __( '<strong>%s</strong> was not saved. WooCommerce Subscriptions version 2.0 or higher is required in order to bundle Subscription products.', 'woocommerce-product-bundles' ), get_the_title( $product_id ) ) );
+							self::add_admin_error( sprintf( __( '<strong>%s</strong> was not saved. WooCommerce Subscriptions version 2.0 or higher is required in order to bundle Subscription products.', 'woocommerce-product-bundles' ), $product_title ) );
 							continue;
 						}
 					}
@@ -390,8 +436,8 @@ class WC_PB_Meta_Box_Product_Data {
 					if ( ! isset( $times[ $product_id ] ) ) {
 						$times[ $product_id ] = 1;
 					} else {
-						if ( 'yes' === get_post_meta( $product_id, '_sold_individually', true ) ) {
-							self::add_admin_error( sprintf( __( '<strong>%s</strong> is sold individually and cannot be bundled more than once.', 'woocommerce-product-bundles' ), get_the_title( $product_id ) ) );
+						if ( $product->is_sold_individually() ) {
+							self::add_admin_error( sprintf( __( '<strong>%s</strong> is sold individually and cannot be bundled more than once.', 'woocommerce-product-bundles' ), $product_title ) );
 							// Make sure we only display the notice once for every id.
 							$sold_individually_notices[ $product_id ] = 'yes';
 							continue;
@@ -403,7 +449,7 @@ class WC_PB_Meta_Box_Product_Data {
 					$loop++;
 
 					$item_data  = array();
-					$item_title = get_the_title( $product_id );
+					$item_title = $product_title;
 
 					$item_data[ 'product_id' ] = $product_id;
 					$item_data[ 'item_id' ]    = $item_id;
@@ -461,7 +507,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 							if ( $quantity >= 0 && $data[ 'quantity_min' ] - $quantity == 0 ) {
 
-								if ( $quantity !== 1 && 'yes' === get_post_meta( $product_id, '_sold_individually', true ) ) {
+								if ( $quantity !== 1 && $product->is_sold_individually() ) {
 									self::add_admin_error( sprintf( __( 'Item <strong>#%1$s: %2$s</strong> is sold individually &ndash; its minimum quantity cannot be higher than 1.', 'woocommerce-product-bundles' ), $loop, $item_title ) );
 									$item_data[ 'quantity_min' ] = 1;
 								} else {
@@ -487,7 +533,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 						if ( '' === $quantity || ( $quantity > 0 && $quantity >= $quantity_min && $data[ 'quantity_max' ] - $quantity == 0 ) ) {
 
-							if ( $quantity !== 1 && 'yes' === get_post_meta( $product_id, '_sold_individually', true ) ) {
+							if ( $quantity !== 1 && $product->is_sold_individually() ) {
 								self::add_admin_error( sprintf( __( 'Item <strong>#%1$s: %2$s</strong> is sold individually &ndash; its maximum quantity cannot be higher than 1.', 'woocommerce-product-bundles' ), $loop, $item_title ) );
 								$item_data[ 'quantity_max' ] = 1;
 							} else {
@@ -581,28 +627,28 @@ class WC_PB_Meta_Box_Product_Data {
 										foreach ( $variation_data as $name => $value ) {
 
 											$attribute_name  = substr( $name, strlen( 'attribute_' ) );
-											$attribute_value = sanitize_title( $value );
+											$attribute_value = $value;
 
 											// Populate array.
-											if ( ! isset( $filtered_attributes[ sanitize_title( $attribute_name ) ] ) ) {
-												$filtered_attributes[ sanitize_title( $attribute_name ) ][] = $attribute_value;
-											} elseif ( ! in_array( $attribute_value, $filtered_attributes[ sanitize_title( $attribute_name ) ] ) ) {
-												$filtered_attributes[ sanitize_title( $attribute_name ) ][] = $attribute_value;
+											if ( ! isset( $filtered_attributes[ $attribute_name ] ) ) {
+												$filtered_attributes[ $attribute_name ][] = $attribute_value;
+											} elseif ( ! in_array( $attribute_value, $filtered_attributes[ $attribute_name ] ) ) {
+												$filtered_attributes[ $attribute_name ][] = $attribute_value;
 											}
 										}
 
 									}
 
 									// Check validity.
-									foreach ( $data[ 'default_variation_attributes' ] as $sanitized_name => $value ) {
+									foreach ( $data[ 'default_variation_attributes' ] as $name => $value ) {
 
 										if ( '' === $value ) {
 											continue;
 										}
 
-										if ( ! in_array( sanitize_title( $value ), $filtered_attributes[ $sanitized_name ] ) && ! in_array( '', $filtered_attributes[ $sanitized_name ] ) ) {
+										if ( ! in_array( $value, $filtered_attributes[ $name ] ) && ! in_array( '', $filtered_attributes[ $name ] ) ) {
 											// Set option to "Any".
-											$data[ 'default_variation_attributes' ][ $sanitized_name ] = '';
+											$data[ 'default_variation_attributes' ][ $name ] = '';
 											// Show an error.
 											self::add_admin_error( sprintf( __( 'The attribute defaults of item <strong>#%1$s: %2$s</strong> are inconsistent with the set of active variations and have been reset.', 'woocommerce-product-bundles' ), $loop, $item_title ) );
 											continue;
@@ -611,8 +657,8 @@ class WC_PB_Meta_Box_Product_Data {
 								}
 
 								// Save.
-								foreach ( $data[ 'default_variation_attributes' ] as $sanitized_name => $value ) {
-									$item_data[ 'default_variation_attributes' ][ $sanitized_name ] = $value;
+								foreach ( $data[ 'default_variation_attributes' ] as $name => $value ) {
+									$item_data[ 'default_variation_attributes' ][ $name ] = $value;
 								}
 
 								$item_data[ 'override_default_variation_attributes' ] = 'yes';
@@ -713,7 +759,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 		$bundled_product = isset( $item_data[ 'bundled_item' ] ) ? $item_data[ 'bundled_item' ]->product : wc_get_product( $product_id );
 
-		if ( 'variable' === $bundled_product->product_type ) {
+		if ( 'variable' === $bundled_product->get_type() ) {
 
 			$allowed_variations  = isset( $item_data[ 'allowed_variations' ] ) ? $item_data[ 'allowed_variations' ] : '';
 			$default_attributes  = isset( $item_data[ 'default_variation_attributes' ] ) ? $item_data[ 'default_variation_attributes' ] : '';
@@ -735,8 +781,8 @@ class WC_PB_Meta_Box_Product_Data {
 			<div class="allowed_variations">
 				<div class="form-field"><?php
 
-					$variations = WC_PB_Helpers::get_product_variations( $product_id );
-					$attributes = maybe_unserialize( get_post_meta( $product_id, '_product_attributes', true ) );
+					$variations = $bundled_product->get_children();
+					$attributes = $bundled_product->get_attributes();
 
 					if ( sizeof( $variations ) < 100 || ! WC_PB_Core_Compatibility::is_wc_version_gte_2_5() ) {
 
@@ -831,7 +877,7 @@ class WC_PB_Meta_Box_Product_Data {
 							sort( $options );
 
 							foreach ( $options as $option ) {
-								echo '<option ' . selected( sanitize_title( $variation_selected_value ), sanitize_title( $option ), false ) . ' value="' . esc_attr( sanitize_title( $option ) ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) ) . '</option>';
+								echo '<option ' . selected( sanitize_title( $variation_selected_value ), sanitize_title( $option ), false ) . ' value="' . esc_attr( $option ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) ) . '</option>';
 							}
 						}
 
@@ -1082,7 +1128,6 @@ class WC_PB_Meta_Box_Product_Data {
 
 							$item_data                   = $item->get_data();
 							$item_data[ 'bundled_item' ] = $item;
-
 							$item_availability           = '';
 
 							if ( false === $item->is_in_stock() ) {
@@ -1093,12 +1138,11 @@ class WC_PB_Meta_Box_Product_Data {
 								}
 							}
 
-							$product_id                  = $item->product->id;
-							$title                       = $item->product->get_title();
-							$sku                         = $item->product->get_sku();
-							$suffix                      = sprintf( _x( '#%s', 'product identifier', 'woocommerce-product-bundles' ), $product_id );
-
-							$title                       = WC_PB_Helpers::format_product_title( $title, $sku, $suffix, true );
+							$product_id = $item->product_id;
+							$title      = $item->product->get_title();
+							$sku        = $item->product->get_sku();
+							$suffix     = sprintf( _x( '#%s', 'product identifier', 'woocommerce-product-bundles' ), $product_id );
+							$title      = WC_PB_Helpers::format_product_title( $title, $sku, $suffix, true );
 
 							include( 'views/html-bundled-product-admin.php' );
 

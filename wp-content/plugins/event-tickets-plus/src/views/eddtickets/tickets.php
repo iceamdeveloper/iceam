@@ -2,7 +2,11 @@
 /**
  * Renders the EDD tickets table/form
  *
- * @version 4.3.4
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/eddtickets/tickets.php
+ *
+ * @version 4.3.5
  *
  * @var bool $must_login
  */

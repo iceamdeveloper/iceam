@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle cart functions and filters.
  *
  * @class    WC_PB_Cart
- * @version  5.0.2
+ * @version  5.1.0
  * @since    4.5.0
  */
 class WC_PB_Cart {
@@ -238,9 +238,9 @@ class WC_PB_Cart {
 			$product = wc_get_product( $product );
 		}
 
-		if ( is_object( $product ) && 'bundle' === $product->product_type ) {
+		if ( is_object( $product ) && 'bundle' === $product->get_type() ) {
 
-			$product_id    = $product->id;
+			$product_id    = WC_PB_Core_Compatibility::get_id( $product );
 			$bundled_items = $product->get_bundled_items();
 
 			if ( ! empty( $bundled_items ) ) {
@@ -260,8 +260,8 @@ class WC_PB_Cart {
 
 					$posted_config[ $bundled_item_id ] = array();
 
-					$id                   = $bundled_item->product_id;
-					$bundled_product_type = $bundled_item->product->product_type;
+					$bundled_product_id   = $bundled_item->product_id;
+					$bundled_product_type = $bundled_item->product->get_type();
 					$is_optional          = $bundled_item->is_optional();
 
 					/**
@@ -275,7 +275,7 @@ class WC_PB_Cart {
 					$bundled_item_quantity_request_key = apply_filters( 'woocommerce_product_bundle_field_prefix', '', $product_id ) . 'bundle_quantity_' . $bundled_item_id;
 					$bundled_product_qty               = isset( $posted_data[ $bundled_item_quantity_request_key ] ) ? absint( $posted_data[ $bundled_item_quantity_request_key ] ) : $bundled_item->get_quantity();
 
-					$posted_config[ $bundled_item_id ][ 'product_id' ] = $id;
+					$posted_config[ $bundled_item_id ][ 'product_id' ] = $bundled_product_id;
 
 					if ( $bundled_item->has_title_override() ) {
 						$posted_config[ $bundled_item_id ][ 'title' ] = $bundled_item->get_raw_title();
@@ -299,7 +299,7 @@ class WC_PB_Cart {
 					if ( 'variable' === $bundled_product_type || 'variable-subscription' === $bundled_product_type ) {
 
 						$attr_stamp = array();
-						$attributes = (array) maybe_unserialize( get_post_meta( $id, '_product_attributes', true ) );
+						$attributes = $bundled_item->product->get_attributes();
 
 						foreach ( $attributes as $attribute ) {
 
@@ -355,9 +355,9 @@ class WC_PB_Cart {
 			$product = wc_get_product( $product );
 		}
 
-		if ( is_object( $product ) && 'bundle' === $product->product_type ) {
+		if ( is_object( $product ) && 'bundle' === $product->get_type() ) {
 
-			$product_id = $product->id;
+			$product_id = WC_PB_Core_Compatibility::get_id( $product );
 
 			// If a stock-managed product / variation exists in the bundle multiple times, its stock will be checked only once for the sum of all bundled quantities.
 			// The stock manager class keeps a record of stock-managed product / variation ids.
@@ -370,14 +370,15 @@ class WC_PB_Cart {
 
 				foreach ( $bundled_items as $bundled_item_id => $bundled_item ) {
 
-					$id                   = $bundled_item->product_id;
-					$variation_id         = '';
+					$bundled_product_id   = $bundled_item->product_id;
+					$bundled_variation_id = '';
 
-					$bundled_product_type = $bundled_item->product->product_type;
+					$bundled_product_type  = $bundled_item->product->get_type();
+					$bundled_product_title = $bundled_item->product->get_title();
 
 					// Optional.
-					$is_optional          = $bundled_item->is_optional();
-					$is_optional_selected = $is_optional && isset( $configuration[ $bundled_item_id ][ 'optional_selected' ] ) && 'yes' === $configuration[ $bundled_item_id ][ 'optional_selected' ];
+					$is_optional           = $bundled_item->is_optional();
+					$is_optional_selected  = $is_optional && isset( $configuration[ $bundled_item_id ][ 'optional_selected' ] ) && 'yes' === $configuration[ $bundled_item_id ][ 'optional_selected' ];
 
 					if ( $is_optional && ! $is_optional_selected ) {
 						continue;
@@ -386,10 +387,10 @@ class WC_PB_Cart {
 					// Check existence.
 					if ( 'cart' === $context ) {
 						if ( ! isset( $configuration[ $bundled_item_id ] ) || empty( $configuration[ $bundled_item_id ][ 'product_id' ] ) ) {
-							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased &ndash; some of its contents are missing from your cart.', 'woocommerce-product-bundles' ), get_the_title( $product_id ) ), 'error' );
+							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased &ndash; some of its contents are missing from your cart.', 'woocommerce-product-bundles' ), $bundled_product_title ), 'error' );
 							return false;
 						} elseif ( isset( $configuration[ $bundled_item_id ][ 'optional_selected' ] ) && 'no' === $configuration[ $bundled_item_id ][ 'optional_selected' ] ) {
-							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased &ndash; some of its contents are missing from your cart.', 'woocommerce-product-bundles' ), get_the_title( $product_id ) ), 'error' );
+							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased &ndash; some of its contents are missing from your cart.', 'woocommerce-product-bundles' ), $bundled_product_title ), 'error' );
 							return false;
 						}
 					}
@@ -406,16 +407,16 @@ class WC_PB_Cart {
 
 					if ( $item_quantity < $item_quantity_min ) {
 						if ( 'add-to-cart' === $context ) {
-							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The quantity of &quot;%2$s&quot; cannot be lower than %3$d.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title(), $item_quantity_min ), 'error' );
+							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The quantity of &quot;%2$s&quot; cannot be lower than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_min ), 'error' );
 						} elseif ( 'cart' === $context ) {
-							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased. The quantity of &quot;%2$s&quot; cannot be lower than %3$d.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title(), $item_quantity_min ), 'error' );
+							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased. The quantity of &quot;%2$s&quot; cannot be lower than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_min ), 'error' );
 						}
 						return false;
 					} elseif ( $item_quantity_max && $item_quantity > $item_quantity_max ) {
 						if ( 'add-to-cart' === $context ) {
-							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The quantity of &quot;%2$s&quot; cannot be higher than %3$d.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title(), $item_quantity_max ), 'error' );
+							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The quantity of &quot;%2$s&quot; cannot be higher than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_max ), 'error' );
 						} elseif ( 'cart' === $context ) {
-							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased. The quantity of &quot;%2$s&quot; cannot be higher than %3$d.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title(), $item_quantity_max ), 'error' );
+							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased. The quantity of &quot;%2$s&quot; cannot be higher than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_max ), 'error' );
 						}
 						return false;
 					}
@@ -429,35 +430,36 @@ class WC_PB_Cart {
 
 					// Purchasable?
 					if ( false === $bundled_item->is_purchasable() ) {
-						wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart &ndash; &quot;%2$s&quot; cannot be purchased at the moment.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title() ), 'error' );
+						wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart &ndash; &quot;%2$s&quot; cannot be purchased at the moment.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title() ), 'error' );
 						return false;
 					}
 
 					// Validate variation id.
 					if ( 'variable' === $bundled_product_type || 'variable-subscription' === $bundled_product_type ) {
 
-						$variation_id = isset( $configuration[ $bundled_item_id ][ 'variation_id' ] ) ? $configuration[ $bundled_item_id ][ 'variation_id' ] : '';
+						$bundled_variation_id = isset( $configuration[ $bundled_item_id ][ 'variation_id' ] ) ? $configuration[ $bundled_item_id ][ 'variation_id' ] : '';
+						$bundled_variation    = $bundled_variation_id ? wc_get_product( $bundled_variation_id ) : false;
 
-						if ( $variation_id && is_numeric( $variation_id ) && $variation_id > 1 ) {
-							if ( '' === get_post_meta( $variation_id, '_price', true ) ) {
-								wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The chosen &quot;%2$s&quot; variation cannot be purchased.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title() ), 'error' );
+						if ( $bundled_variation ) {
+
+							if ( ! $bundled_variation || WC_PB_Core_Compatibility::get_parent_id( $bundled_variation ) !== absint( $bundled_product_id ) || false === $bundled_variation->is_purchasable() ) {
+								wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The chosen &quot;%2$s&quot; variation cannot be purchased.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title() ), 'error' );
 								return false;
 							}
 
 							// Add item for validation.
-							$bundled_stock->add_item( $id, $variation_id, $quantity, array( 'bundled_item' => $bundled_item ) );
+							$bundled_stock->add_item( $bundled_product_id, $bundled_variation, $quantity, array( 'bundled_item' => $bundled_item ) );
 						}
 
 						// Verify all attributes for the variable product were set.
-						$bundled_variation  = wc_get_product( $variation_id );
-						$attributes         = (array) maybe_unserialize( get_post_meta( $id, '_product_attributes', true ) );
+						$attributes         = $bundled_item->product->get_attributes();
 						$variation_data     = array();
 						$missing_attributes = array();
 						$all_set            = true;
 
 						if ( $bundled_variation ) {
 
-							$variation_data = $bundled_variation->variation_data;
+							$variation_data = wc_get_product_variation_attributes( $bundled_variation_id );
 
 							// Verify all attributes.
 							foreach ( $attributes as $attribute ) {
@@ -492,10 +494,10 @@ class WC_PB_Cart {
 						if ( ! $all_set ) {
 							if ( $missing_attributes && WC_PB_Core_Compatibility::is_wc_version_gte_2_3() ) {
 								$required_fields_notice = sprintf( _n( '%1$s is a required &quot;%2$s&quot; field', '%1$s are required &quot;%2$s&quot; fields', sizeof( $missing_attributes ), 'woocommerce-product-bundles' ), wc_format_list_of_items( $missing_attributes ), $bundled_item->get_raw_title() );
-	    						wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. %2$s.', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $required_fields_notice ), 'error' );
+	    						wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. %2$s.', 'woocommerce-product-bundles' ), $bundled_product_title, $required_fields_notice ), 'error' );
 	    						return false;
 							} else {
-								wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. Please choose &quot;%2$s&quot; options&hellip;', 'woocommerce-product-bundles' ), get_the_title( $product_id ), $bundled_item->get_raw_title() ), 'error' );
+								wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. Please choose &quot;%2$s&quot; options&hellip;', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title() ), 'error' );
 								return false;
 							}
 						}
@@ -503,7 +505,7 @@ class WC_PB_Cart {
 					} elseif ( 'simple' === $bundled_product_type || 'subscription' === $bundled_product_type ) {
 
 						// Add item for validation.
-						$bundled_stock->add_item( $id, false, $quantity, array( 'bundled_item' => $bundled_item ) );
+						$bundled_stock->add_item( $bundled_product_id, false, $quantity, array( 'bundled_item' => $bundled_item ) );
 					}
 
 					if ( 'add-to-cart' === $context ) {
@@ -516,10 +518,10 @@ class WC_PB_Cart {
 						 * @param  WC_Product       $product
 						 * @param  WC_Bundled_Item  $bundled_item
 						 * @param  int              $quantity
-						 * @param  mixed            $variation_id
+						 * @param  mixed            $bundled_variation_id
 						 * @param  array            $configuration
 						 */
-						if ( false === apply_filters( 'woocommerce_bundled_item_add_to_cart_validation', true, $product, $bundled_item, $quantity, $variation_id, $configuration ) ) {
+						if ( false === apply_filters( 'woocommerce_bundled_item_add_to_cart_validation', true, $product, $bundled_item, $quantity, $bundled_variation_id, $configuration ) ) {
 							return false;
 						}
 					}
@@ -623,7 +625,7 @@ class WC_PB_Cart {
 				}
 
 			} else {
-				$cart_item[ 'data' ]->price = $bundled_item->get_raw_price( $cart_item[ 'data' ] );
+				$cart_item[ 'data' ]->price = $bundled_item->get_raw_price( $cart_item[ 'data' ], 'cart' );
 			}
 		}
 
@@ -672,12 +674,6 @@ class WC_PB_Cart {
 	private function set_bundle_container_cart_item( $cart_item ) {
 
 		$bundle = $cart_item[ 'data' ];
-
-		if ( $bundle->contains( 'priced_individually' ) ) {
-			$cart_item[ 'data' ]->price         = $bundle->get_base_price();
-			$cart_item[ 'data' ]->sale_price    = $bundle->get_base_sale_price();
-			$cart_item[ 'data' ]->regular_price = $bundle->get_base_regular_price();
-		}
 
 		/**
 		 * 'woocommerce_bundle_container_cart_item' filter.
@@ -1042,7 +1038,7 @@ class WC_PB_Cart {
 				$item_quantity        = isset( $bundled_item_stamp[ 'quantity' ] ) ? absint( $bundled_item_stamp[ 'quantity' ] ) : $bundled_item->get_quantity();
 				$quantity             = $item_quantity * $bundle_quantity;
 				$product_id           = $bundled_item->product_id;
-				$bundled_product_type = $bundled_item->product->product_type;
+				$bundled_product_type = $bundled_item->product->get_type();
 
 				if ( 'simple' === $bundled_product_type || 'subscription' === $bundled_product_type ) {
 
@@ -1146,7 +1142,7 @@ class WC_PB_Cart {
 
 		if ( wc_pb_is_bundle_container_cart_item( $item_session_values ) ) {
 
-			if ( 'bundle' === $cart_item[ 'data' ]->product_type ) {
+			if ( 'bundle' === $cart_item[ 'data' ]->get_type() ) {
 
 				if ( ! isset( $cart_item[ 'bundled_items' ] ) ) {
 					$cart_item[ 'bundled_items' ] = $item_session_values[ 'bundled_items' ];
@@ -1177,7 +1173,7 @@ class WC_PB_Cart {
 
 				$bundle = $bundle_container_item[ 'data' ];
 
-				if ( 'bundle' === $bundle->product_type && $bundle->has_bundled_item( $cart_item[ 'bundled_item_id' ] ) ) {
+				if ( 'bundle' === $bundle->get_type() && $bundle->has_bundled_item( $cart_item[ 'bundled_item_id' ] ) ) {
 					$cart_item = $this->set_bundled_cart_item( $cart_item, $bundle );
 				}
 			}
@@ -1203,7 +1199,7 @@ class WC_PB_Cart {
 					$container_item = wc_pb_get_bundled_cart_item_container( $cart_item_values );
 					if ( ! $container_item || ! isset( $container_item[ 'bundled_items' ] ) || ! is_array( $container_item[ 'bundled_items' ] ) || ! in_array( $cart_item_key, $container_item[ 'bundled_items' ] ) ) {
 						unset( WC()->cart->cart_contents[ $cart_item_key ] );
-					} elseif ( isset( $cart_item_values[ 'bundled_item_id' ] ) && 'bundle' === $container_item[ 'data' ]->product_type && ! $container_item[ 'data' ]->has_bundled_item( $cart_item_values[ 'bundled_item_id' ] ) ) {
+					} elseif ( isset( $cart_item_values[ 'bundled_item_id' ] ) && 'bundle' === $container_item[ 'data' ]->get_type() && ! $container_item[ 'data' ]->has_bundled_item( $cart_item_values[ 'bundled_item_id' ] ) ) {
 						unset( WC()->cart->cart_contents[ $cart_item_key ] );
 					}
 				}
@@ -1568,13 +1564,12 @@ class WC_PB_Cart {
 			foreach ( $packages as $package_key => $package ) {
 
 				if ( ! empty( $package[ 'contents' ] ) ) {
-
 					foreach ( $package[ 'contents' ] as $cart_item_key => $cart_item_data ) {
 
 						if ( wc_pb_is_bundle_container_cart_item( $cart_item_data ) ) {
 
 							$bundle     = unserialize( serialize( $cart_item_data[ 'data' ] ) );
-							$bundle_obj = wc_get_product( $bundle->id );
+							$bundle_obj = wc_get_product( $cart_item_data[ 'product_id' ] );
 							$bundle_qty = $cart_item_data[ 'quantity' ];
 
 							/*
@@ -1599,9 +1594,9 @@ class WC_PB_Cart {
 									'line_tax_data'     => $cart_item_data[ 'line_tax_data' ]
 								);
 
-								foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, $package[ 'contents' ], true ) as $child_item_key ) {
+								foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, WC()->cart->cart_contents, true ) as $child_item_key ) {
 
-									$child_cart_item_data = $package[ 'contents' ][ $child_item_key ];
+									$child_cart_item_data = WC()->cart->cart_contents[ $child_item_key ];
 									$bundled_product      = unserialize( serialize( $child_cart_item_data[ 'data' ] ) );
 									$bundled_product_qty  = $child_cart_item_data[ 'quantity' ];
 
@@ -1680,7 +1675,7 @@ class WC_PB_Cart {
 			if ( $container_cart_item = wc_pb_get_bundled_cart_item_container( $cart_item ) ) {
 
 				$bundle    = $container_cart_item[ 'data' ];
-				$bundle_id = $bundle->id;
+				$bundle_id = $container_cart_item[ 'product_id' ];
 
 				/**
 				 * 'woocommerce_bundles_inherit_coupon_validity' filter.
@@ -1694,6 +1689,9 @@ class WC_PB_Cart {
 				 * @param  array       $container_cart_item
 				 */
 				if ( apply_filters( 'woocommerce_bundles_inherit_coupon_validity', true, $product, $coupon, $cart_item, $container_cart_item ) ) {
+
+					$product_id = WC_PB_Core_Compatibility::get_id( $product );
+					$parent_id  = WC_PB_Core_Compatibility::get_parent_id( $product );
 
 					if ( $valid ) {
 
@@ -1735,7 +1733,7 @@ class WC_PB_Cart {
 
 						// Bundled product ID excluded from the discount.
 						if ( sizeof( $coupon->exclude_product_ids ) > 0 ) {
-							if ( in_array( $product->id, $coupon->exclude_product_ids ) || ( isset( $product->variation_id ) && in_array( $product->variation_id, $coupon->exclude_product_ids ) ) || in_array( $product->get_parent(), $coupon->exclude_product_ids ) ) {
+							if ( in_array( $product_id, $coupon->exclude_product_ids ) || ( $parent_id && in_array( $parent_id, $coupon->exclude_product_ids ) ) ) {
 								$bundled_product_excluded = true;
 							}
 						}
@@ -1743,7 +1741,7 @@ class WC_PB_Cart {
 						// Bundled product category excluded from the discount.
 						if ( sizeof( $coupon->exclude_product_categories ) > 0 ) {
 
-							$product_cats = WC_PB_Core_Compatibility::wc_get_product_cat_ids( $product->id );
+							$product_cats = $parent_id ? WC_PB_Core_Compatibility::wc_get_product_cat_ids( $parent_id ) : WC_PB_Core_Compatibility::wc_get_product_cat_ids( $product_id );
 
 							if ( sizeof( array_intersect( $product_cats, $coupon->exclude_product_categories ) ) > 0 ) {
 								$bundled_product_excluded = true;
@@ -1754,11 +1752,7 @@ class WC_PB_Cart {
 						if ( 'yes' === $coupon->exclude_sale_items ) {
 							$product_ids_on_sale = wc_get_product_ids_on_sale();
 
-							if ( isset( $product->variation_id ) ) {
-								if ( in_array( $product->variation_id, $product_ids_on_sale, true ) ) {
-									$bundled_product_excluded = true;
-								}
-							} elseif ( in_array( $product->id, $product_ids_on_sale, true ) ) {
+							if ( in_array( $product_id, $product_ids_on_sale ) || ( $parent_id && in_array( $parent_id, $product_ids_on_sale ) ) ) {
 								$bundled_product_excluded = true;
 							}
 						}

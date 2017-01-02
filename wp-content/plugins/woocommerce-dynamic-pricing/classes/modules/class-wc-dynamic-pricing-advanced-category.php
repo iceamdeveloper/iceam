@@ -34,7 +34,6 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 			}
 
 			foreach ( $temp_cart as $cart_item_key => $values ) {
-				$temp_cart[$cart_item_key] = $values;
 				$temp_cart[$cart_item_key]['available_quantity'] = $values['quantity'];
 			}
 

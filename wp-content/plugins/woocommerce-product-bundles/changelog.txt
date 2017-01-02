@@ -1,5 +1,21 @@
 *** WooCommerce Product Bundles ***
 
+2016.12.29 - version 5.1.1
+ * Fix - Values in Regular and Sale Price fields missing decimal separator if other than '.'.
+
+2016.12.17 - version 5.1.0
+ * Important: The update to version 5.1.0 is irreversible. Please test the update on a local/staging environment first and - as always - backup your website!
+ * Dev - Price methods 'get_[regular_/sale_]price' now always return the base prices defined under 'Product Data > General'. To ensure that product sorting and product price filtering in the shop catalog work without issues, meta fields '_[regular_/sale_]price' hold the cheapest raw configuration price.
+ * Dev - Base price filters no longer used in order to simplify compatibility with third-party discount plugins.
+ * Dev - Refactored 'WC_Product_Bundle' class initialization to minimize queries.
+ * Fix - Product Bundles not sorted by price in the catalog correctly.
+ * Fix - Wrong discount calculations affecting Bundles contained in Composites under specific circumstances.
+ * Fix - Maintain original order of bundled items in 'Print Invoices and Packing Lists' lists.
+ * Fix - Data exported to Shipwire now contains accurate physical representations of product bundles, based on their shipping configuration. Note that Shipwire-managed bundled products that are physically packaged in their bundle containers are not included in exports as individual line items.
+ * Fix - Name Your Price compatibility: Price strings of NYP Bundles that contain individually-priced items now show up correctly.
+ * Tweak - Edit-in-cart UX: Show notice when editing a Bundle in the cart.
+ * Tweak - Edit-in-cart UX: 'Click to edit' is now also clickable.
+
 2016.11.30 - version 5.0.2
  * Fix - Sanitization of overridden bundled product titles.
  * Fix - Bundled items not merged properly when merging product data with the WooCommerce Product CSV Import/Export Suite.
@@ -33,7 +49,7 @@
  * Feature - Bundles are now editable from the cart by enabling the "Allow editing in cart" option under the "Advanced" edit-product panel tab.
  * Feature - Bundles can now be marked as Downloadable, making it possible to add downloadable content at both: i) bundled product level and ii) bundle level.
  * Feature - Added context to the "Sold Individually" option found in the "Inventory" edit-product panel tab, to prevent multiple bundles from being bought in a single order unconditionally, or conditionally when their configuration is identical.
- * Tweak - The Base Price fields and associated metadata are no longer used and have been removed in favour of the Regular and Sale Price fields.
+ * Tweak - The Base Price fields and associated metadata are no longer used and have been removed in favor of the Regular and Sale Price fields.
  * Tweak - Hide attribute dropdown if only a single, well-defined variation is allowed in the Variation Filtering list, and show the attribute value as text.
  * Tweak - Helper functions converted to static. Helper class no longer accessible as property of the main plugin class.
  * Tweak - Restructured admin classes. Main admin class methods are now static. Admin class no longer accessible as property of the main plugin class.
@@ -42,7 +58,7 @@
  * Important - Template action 'wc_bundles_bundled_item_details' renamed to 'woocommerce_bundled_item_details' for consistency.
  * Important - WooCommerce 2.3 support dropped.
  * Important - All product post meta fields created by the plugin are now prefixed with 'wc_pb_'.
- * Important - Data exported to Shipstation will now reconstruct an accurate physical representation of a bundle based on its shipping configuration. Bundled items that are "packaged" in a bundle ("Shipped Individually" option unchecked) are no longer exported as individual items to Shipstation. Instead, their value (and optionally, weight) is added to the value of the container (assuming it is shipped/non-virtual). Bundle container SKUs are now filterable to allow building a kit SKU from contents "packaged" in bundle containers.
+ * Important - Data exported to Shipstation now contain accurate physical representations of product bundles, based on their shipping configuration. Bundled items that are physically "packaged" in a bundle ("Shipped Individually" option unchecked) are no longer exported as individual items to Shipstation. Instead, their value (and optionally, weight) is added to the value of the container (assuming it is shipped/non-virtual). Bundle container SKUs are now filterable to allow building a kit SKU from contents "packaged" in bundle containers.
 
 2016.08.16 - version 4.14.7
  * Fix - Added missing argument to the core 'woocommerce_product_default_attributes' filter, used in 'class-wc-bundled-item.php'.

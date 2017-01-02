@@ -15,8 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Composite Products Compatibility.
  *
- * @version  5.0.0
- * @since    4.14.3
+ * @version  5.1.0
  */
 class WC_PB_CP_Compatibility {
 
@@ -43,6 +42,7 @@ class WC_PB_CP_Compatibility {
 		add_filter( 'woocommerce_composited_product_get_price_including_tax', array( __CLASS__, 'composited_bundle_price_incl_tax' ), 10, 4 );
 		add_filter( 'woocommerce_composited_product_get_price_excluding_tax', array( __CLASS__, 'composited_bundle_price_excl_tax' ), 10, 4 );
 		add_filter( 'woocommerce_composited_product_is_nyp', array( __CLASS__, 'composited_bundle_is_nyp' ), 10, 2 );
+		add_filter( 'woocommerce_composited_product_raw_price', array( __CLASS__, 'composited_bundle_raw_price' ), 10, 4 );
 
 		/*--------------------*/
 		/*  Templates         */
@@ -181,7 +181,7 @@ class WC_PB_CP_Compatibility {
 
 		$product = $composited_product->get_product();
 
-		if ( $product->product_type === 'bundle' ) {
+		if ( 'bundle' === $product->get_type() ) {
 			$composited_product->add_filters();
 			$price = $product->get_bundle_price( $min_or_max, $display );
 			$composited_product->remove_filters();
@@ -203,7 +203,7 @@ class WC_PB_CP_Compatibility {
 
 		$product = $composited_product->get_product();
 
-		if ( $product->product_type === 'bundle' ) {
+		if ( 'bundle' === $product->get_type() ) {
 			$composited_product->add_filters();
 			$price = $product->get_bundle_regular_price( $min_or_max, $display );
 			$composited_product->remove_filters();
@@ -224,7 +224,7 @@ class WC_PB_CP_Compatibility {
 
 		$product = $composited_product->get_product();
 
-		if ( $product->product_type === 'bundle' ) {
+		if ( 'bundle' === $product->get_type() ) {
 			$composited_product->add_filters();
 			$price = $product->get_bundle_price_including_tax( $min_or_max, $qty );
 			$composited_product->remove_filters();
@@ -245,7 +245,7 @@ class WC_PB_CP_Compatibility {
 
 		$product = $composited_product->get_product();
 
-		if ( $product->product_type === 'bundle' ) {
+		if ( 'bundle' === $product->get_type() ) {
 			$composited_product->add_filters();
 			$price = $product->get_bundle_price_excluding_tax( $min_or_max, $qty );
 			$composited_product->remove_filters();
@@ -265,13 +265,53 @@ class WC_PB_CP_Compatibility {
 
 		$product = $composited_product->get_product();
 
-		if ( $product->product_type === 'bundle' ) {
+		if ( 'bundle' === $product->get_type() ) {
 			if ( $product->is_nyp() || $product->contains( 'nyp' ) ) {
 				$is_nyp = true;
 			}
 		}
 
 		return $is_nyp;
+	}
+
+	/**
+	 * Composited bundle raw price.
+	 *
+	 * @since  5.0.3
+	 *
+	 * @param  double         $price
+	 * @param  WC_Product     $product
+	 * @param  mixed          $discount
+	 * @param  WC_CP_Product  $composited_product
+	 * @return double
+	 */
+	public static function composited_bundle_raw_price( $price, $product, $discount, $composited_product ) {
+
+		$product    = $composited_product->get_product();
+		$product_id = WC_PB_Core_Compatibility::get_id( $product );
+
+		if ( 'bundle' === $product->get_type() ) {
+
+			$composited_product->add_filters();
+
+			$product = wc_get_product( $product_id );
+
+			$product->maybe_sync_bundle();
+
+			if ( false === $composited_product->is_discount_allowed_on_sale_price() ) {
+				$regular_price = $product->min_bundle_regular_price;
+			} else {
+				$regular_price = $product->min_bundle_price;
+			}
+
+			if ( $discount = $composited_product->get_discount() ) {
+				$price = empty( $regular_price ) ? $regular_price : round( (double) $regular_price * ( 100 - $discount ) / 100, wc_cp_price_num_decimals() );
+			}
+
+			$composited_product->remove_filters();
+		}
+
+		return $price;
 	}
 
 	/**
@@ -293,11 +333,14 @@ class WC_PB_CP_Compatibility {
 			return false;
 		}
 
+		$product_id   = WC_PB_Core_Compatibility::get_id( $product );
+		$composite_id = WC_PB_Core_Compatibility::get_id( $composite );
+
 		WC_PB_Compatibility::$compat_product = $product;
 		WC_PB_Compatibility::$bundle_prefix  = $component_id;
 
 		$component          = $composite->get_component( $component_id );
-		$composited_product = $component->get_option( $product->id );
+		$composited_product = $component->get_option( $product_id );
 		$quantity_min       = $composited_product->get_quantity_min();
 		$quantity_max       = $composited_product->get_quantity_max( true );
 		$availability       = $composited_product->get_availability();
@@ -314,8 +357,9 @@ class WC_PB_CP_Compatibility {
 		$custom_data = apply_filters( 'woocommerce_composited_product_custom_data', array( 'price_tax' => $tax_ratio, 'image_data' => $composited_product->get_image_data() ), $product, $component_id, $component, $composite );
 
  		wc_get_template( 'composited-product/bundle-product.php', array(
+			'product_id'         => $product_id,
 			'product'            => $product,
-			'composite_id'       => $composite->id,
+			'composite_id'       => $composite_id,
 			'quantity_min'       => $quantity_min,
 			'quantity_max'       => $quantity_max,
 			'custom_data'        => $custom_data,

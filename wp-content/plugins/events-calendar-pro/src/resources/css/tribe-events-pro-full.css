@@ -411,8 +411,8 @@
 
 #tribe-events-photo-events {
 	margin: 18px -4.5% 18px 0;
-	-webkit-transition-property: height, width;
-	        transition-property: height, width;
+	-webkit-transition-property: height;
+	transition-property: height;
 }
 
 #tribe-events-photo-events.isotope {
@@ -469,7 +469,7 @@
 	padding: 4%;
 	position: relative;
 	-webkit-transition: .1s ease-in;
-	        transition: .1s ease-in;
+	transition: .1s ease-in;
 }
 
 .tribe-events-photo-event-wrap {

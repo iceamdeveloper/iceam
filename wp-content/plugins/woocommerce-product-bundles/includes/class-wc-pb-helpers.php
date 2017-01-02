@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Helper Functions.
  *
  * @class    WC_PB_Helpers
- * @version  5.0.0
- * @since    4.0.0
+ * @version  5.1.0
  */
 class WC_PB_Helpers {
 
@@ -64,33 +63,22 @@ class WC_PB_Helpers {
 	}
 
 	/**
-	 * Loads variation ids for a given variable product.
+	 * Loads variation IDs for a given variable product.
 	 *
-	 * @param  int  $item_id
+	 * @param  WC_Product_Variable|int  $product
 	 * @return array
 	 */
-	public static function get_product_variations( $item_id ) {
+	public static function get_product_variations( $product ) {
 
-		$transient_name = 'wc_product_children_' . $item_id;
-		$transient      = get_transient( $transient_name );
-		$variations     = isset( $transient[ 'all' ] ) && is_array( $transient[ 'all' ] ) ? $transient[ 'all' ] : false;
-
-        if ( false === $variations ) {
-
-			$args = array(
-				'post_type'   => 'product_variation',
-				'post_status' => array( 'publish' ),
-				'numberposts' => -1,
-				'orderby'     => 'menu_order',
-				'order'       => 'asc',
-				'post_parent' => $item_id,
-				'fields'      => 'ids'
-			);
-
-			$variations = get_posts( $args );
+		if ( ! is_object( $product ) ) {
+			$product = wc_get_product( $product );
 		}
 
-		return $variations;
+		if ( ! $product ) {
+			return false;
+		}
+
+		return $product->get_children();
 	}
 
 	/**
@@ -99,27 +87,27 @@ class WC_PB_Helpers {
 	 * @param  mixed  $product_id
 	 * @return string
 	 */
-	public static function get_product_title( $product, $suffix = '' ) {
+	public static function get_product_title( $product ) {
 
-		if ( is_object( $product ) ) {
-			$title = $product->get_title();
-			$sku   = $product->get_sku();
-		} else {
-			$title = get_the_title( $product );
-			$sku   = get_post_meta( $product, '_sku', true );
+		if ( ! is_object( $product ) ) {
+			$product = wc_get_product( $product );
 		}
 
-		if ( $suffix ) {
-			$title = sprintf( _x( '%1$s %2$s', 'product title followed by suffix', 'woocommerce-product-bundles' ), $title, $suffix );
+		if ( ! $product ) {
+			return false;
 		}
+
+		$title = $product->get_title();
+		$sku   = $product->get_sku();
+		$id    = WC_PB_Core_Compatibility::get_id( $product );
 
 		if ( $sku ) {
-			$sku = sprintf( __( 'SKU: %s', 'woocommerce-product-bundles' ), $sku );
+			$identifier = $sku;
 		} else {
-			$sku = '';
+			$identifier = '#' . $id;
 		}
 
-		return self::format_product_title( $title, $sku, '', true );
+		return self::format_product_title( $title, $identifier );
 	}
 
 	/**
@@ -128,31 +116,26 @@ class WC_PB_Helpers {
 	 * @param  int  $item_id
 	 * @return string
 	 */
-	public static function get_product_variation_title( $variation_id ) {
+	public static function get_product_variation_title( $variation ) {
 
-		if ( is_object( $variation_id ) ) {
-			$variation = $variation_id;
-		} else {
-			$variation = wc_get_product( $variation_id );
+		if ( ! is_object( $variation ) ) {
+			$variation = wc_get_product( $variation );
 		}
 
 		if ( ! $variation ) {
 			return false;
 		}
 
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_5() ) {
-			$description = $variation->get_formatted_variation_attributes( true );
-		} else {
-			$description = wc_get_formatted_variation( $variation->get_variation_attributes(), true );
-		}
+		$description = WC_PB_Core_Compatibility::wc_get_formatted_variation( $variation, true );
 
 		$title = $variation->get_title();
 		$sku   = $variation->get_sku();
+		$id    = WC_PB_Core_Compatibility::get_id( $variation );
 
 		if ( $sku ) {
 			$identifier = $sku;
 		} else {
-			$identifier = '#' . $variation->variation_id;
+			$identifier = '#' . $id;
 		}
 
 		return self::format_product_title( $title, $identifier, $description );

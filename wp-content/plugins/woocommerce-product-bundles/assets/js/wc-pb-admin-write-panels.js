@@ -93,6 +93,9 @@ jQuery( function($) {
 			$( 'input#_manage_stock' ).change();
 
 			$( '#_nyp' ).change();
+
+			$( '#_regular_price' ).val( $( '#_wc_pb_base_regular_price' ).val() ).change();
+			$( '#_sale_price' ).val( $( '#_wc_pb_base_sale_price' ).val() ).change();
 		}
 
 	} );
