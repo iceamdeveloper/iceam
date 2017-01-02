@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Uses a dedicated CSV column to export bundle data using the 'get_data()' method of the WC_Bundled_Item_Data CRUD class.
  * Data is imported again using the WC_Bundled_Item_Data class.
  *
- * @since 5.0.0
+ * @version  5.1.0
  */
 class WC_PB_WC_IE_Compatibility {
 
@@ -51,13 +51,13 @@ class WC_PB_WC_IE_Compatibility {
 		$columns[ '_wc_pb_sold_individually_context' ] = 'meta:_wc_pb_sold_individually_context';
 
 		if ( ! isset( $columns[ 'base_price' ] ) ) {
-			$columns[ '_base_price' ] = 'meta:_base_price';
+			$columns[ '_wc_pb_base_price' ] = 'meta:_wc_pb_base_price';
 		}
 		if ( ! isset( $columns[ 'base_regular_price' ] ) ) {
-			$columns[ '_base_regular_price' ] = 'meta:_base_regular_price';
+			$columns[ '_wc_pb_base_regular_price' ] = 'meta:_wc_pb_base_regular_price';
 		}
 		if ( ! isset( $columns[ 'base_sale_price' ] ) ) {
-			$columns[ '_base_sale_price' ] = 'meta:_base_sale_price';
+			$columns[ '_wc_pb_base_sale_price' ] = 'meta:_wc_pb_base_sale_price';
 		}
 
 		return $columns;
@@ -178,10 +178,7 @@ class WC_PB_WC_IE_Compatibility {
 			}
 
 			// Flush stock cache.
-			$wpdb->query( "
-				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
-				WHERE meta_key IN ( 'stock_status', 'max_stock' )
-			" );
+			WC_PB_DB::flush_stock_cache();
 		}
 	}
 }

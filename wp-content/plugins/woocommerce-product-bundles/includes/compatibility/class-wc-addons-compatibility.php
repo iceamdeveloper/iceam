@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product Addons and NYP Compatibility.
  *
- * @since 4.11.4
+ * @version  5.1.0
  */
 class WC_PB_Addons_Compatibility {
 
@@ -125,11 +125,11 @@ class WC_PB_Addons_Compatibility {
 
 		$the_product = ! empty( WC_PB_Compatibility::$compat_product ) ? WC_PB_Compatibility::$compat_product : $product;
 
-		if ( 'bundle' === $the_product->product_type && false === $item->is_priced_individually() ) {
+		if ( 'bundle' === $the_product->get_type() && false === $item->is_priced_individually() ) {
 			return;
 		}
 
-		if ( function_exists( 'WC_Name_Your_Price' ) && 'simple' === $item->product->product_type ) {
+		if ( function_exists( 'WC_Name_Your_Price' ) && 'simple' === $item->product->get_type() ) {
 
 			WC_PB_Compatibility::$nyp_prefix = $item->item_id;
 

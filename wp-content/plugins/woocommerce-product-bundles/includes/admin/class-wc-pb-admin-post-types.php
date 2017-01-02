@@ -39,7 +39,7 @@ class WC_PB_Admin_Post_Types {
 	 */
 	public static function admin_stock_html( $stock_status, $product ) {
 
-		if ( 'bundle' === $product->product_type ) {
+		if ( 'bundle' === $product->get_type() ) {
 			if ( $product->is_parent_in_stock() && $product->contains( 'out_of_stock_strict' ) ) {
 
 				$stock_status             = '<mark class="outofstock insufficient_stock">' . __( 'Insufficient stock', 'woocommerce-product-bundles' ) . '</mark>';

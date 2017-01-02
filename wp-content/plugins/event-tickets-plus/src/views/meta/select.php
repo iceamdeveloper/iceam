@@ -2,7 +2,11 @@
 /**
  * Renders select field
  *
- * @version 4.2.5
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/meta/select.php
+ *
+ * @version 4.3.5
  *
  */
 $options = null;

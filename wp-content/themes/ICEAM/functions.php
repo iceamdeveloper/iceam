@@ -16,6 +16,89 @@
  */
 
  
+ 
+
+/***********************************************************************
+ *
+ *	COLLAPSE COURSE DESCRIPTION DISPLAY FOR USERS WITH AN ACTIVE SUBSCRIPTION
+ *
+ **********************************************************************/
+ 
+
+
+//add_action('the_content','maybe_collapse_course_content');
+function maybe_collapse_course_content(){
+	global $product;
+	$user_ID = get_current_user_id();
+	
+	if($user_ID==0 || !$product) return;
+	
+	if (wcs_user_has_subscription($user_ID, $product->id, 'active')){
+		add_action( 'sensei_single_course_content_inside_before', 'maybe_make_course_contents_collapse_before', 100, 1);
+		function course_contents_collapse_before($the_id){
+			echo "<hr/>";
+			echo "<div class='collapse' id='courseDescription'>";
+		}
+		
+		 
+		add_action( 'sensei_single_course_content_inside_after', 'maybe_make_course_contents_collapse_after', 0, 1);
+		function course_contents_collapse_after($the_id){
+			echo "</div>";
+			echo "<p><a href='#courseDescription' class='btn btn-default' data-toggle='collapse'>Course Description <span class='fa fa-plus'></span></a></p>";
+			echo "<hr/>";
+		}
+	}
+}
+
+
+
+
+/***********************************************************************
+ *
+ *	DISABLE SUBSCRIPTIONS FROM CHANGING USER ROLES
+ *
+ **********************************************************************/
+ 
+add_filter( 'woocommerce_subscriptions_update_users_role', '__return_false', 100 );
+
+ 
+ 
+/***********************************************************************
+ *
+ *	AUTOMATICALLY APPLY COUPON TO SUBSCRIPTION SIGNUP PRODUCT
+ *
+ **********************************************************************/
+ 
+add_action( 'woocommerce_before_cart', 'apply_signup_coupons' );
+
+function apply_signup_coupons() {
+    global $woocommerce;
+	
+	// if there is no subscription product in the cart, stop
+	$has_subscription = WC_Subscriptions_Cart::cart_contains_subscription();
+	if(!$has_subscription) return;
+
+	// get the current user's info
+	$user_ID = get_current_user_id();
+	$member_info = get_userdata($user_ID);
+	
+	// apply the correct coupon, based on role
+	// remember that in the system a 'student' (role) is a 'customer'
+	$coupon_code = "";
+	if ($user_ID != 0 && in_array('customer',$member_info->roles)){
+		$coupon_code = 'studentonlinesignup';
+	} else if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) ){
+		$coupon_code = 'diplomateonlinesignup';
+	}
+		
+	// if no coupon, or this coupon is already applied, stop
+    if ( $coupon_code == "" || $woocommerce->cart->has_discount( $coupon_code ) ) return;
+
+    // if you get this far, apply the coupon
+    $woocommerce->cart->add_discount( $coupon_code );
+}
+
+ 
 
 /***********************************************************************
  *
@@ -110,7 +193,9 @@ add_filter( 'tribe_get_cost', 'hide_tribe_get_cost', 10, 3 );
  **********************************************************************/
 
 function fix_course_purchase_label( $subscription_string, $product, $include ) {
-	return "<nobr>$" . $product->subscription_sign_up_fee . " Sign-up Fee *</nobr>";
+	$price = $product->subscription_price + $product->subscription_sign_up_fee;
+	
+	return "<nobr>$" . $price . " Sign-up Fee *</nobr>";
 }
 add_filter( 'woocommerce_subscriptions_product_price_string', 'fix_course_purchase_label', 999, 3 );
 
@@ -219,19 +304,6 @@ function woo_custom_deregister_bbpress_template_stack ( $stack ) {
 
 
 
-add_filter('woocommerce_available_payment_gateways','filter_gateways',1);
-function filter_gateways($gateways){
-    global $woocommerce;        
-    //Remove a specific payment option
-    //unset($gateways['paypal']);
-	//print_r($gateways);
-	
-	// if the current product is not a subscription product, disable paypal
-	// what do we do if there are subscription and non-subscription products in the cart?
-	
-    return $gateways;
-}
-
 
 /***********************************************************************
  *
@@ -263,6 +335,7 @@ function custom_sensei_login_form() {
 /***********************************************************************
  *
  *	HIDE DIPLOMATES TAB IF USER IS NOT A DIPLOMATE OR ADMIN
+ *	TODO: ADD PAGE REFERENCE TO THIS COMMENT
  *
  **********************************************************************/
 

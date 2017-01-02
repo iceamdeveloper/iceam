@@ -71,7 +71,7 @@ class WC_PB_Admin_Ajax {
 
 		if ( $product ) {
 
-			if ( in_array( $product->product_type, array( 'simple', 'variable', 'subscription', 'variable-subscription' ) ) ) {
+			if ( in_array( $product->get_type(), array( 'simple', 'variable', 'subscription', 'variable-subscription' ) ) ) {
 
 				if ( ! $product->is_in_stock() ) {
 					$item_availability = '<mark class="outofstock">' . __( 'Out of stock', 'woocommerce' ) . '</mark>';

@@ -3,7 +3,11 @@
  * Renders a link displayed to customers when they must first login
  * before being able to purchase tickets.
  *
- * @version 4.2
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/login-to-purchase.php
+ *
+ * @version 4.3.5
  */
 
 $login_url = Tribe__Tickets__Tickets::get_login_url();

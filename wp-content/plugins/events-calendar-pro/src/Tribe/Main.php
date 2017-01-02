@@ -50,7 +50,7 @@
 			public $shortcodes;
 
 			const REQUIRED_TEC_VERSION = '4.3';
-			const VERSION = '4.3.3';
+			const VERSION = '4.3.4';
 
 
 			private function __construct() {
@@ -205,7 +205,7 @@
 			 * @return void
 			 */
 			public function ajax_widget_get_terms() {
-				$disabled = $_POST['disabled'];
+				$disabled = isset( $_POST['disabled'] ) ? $_POST['disabled'] : array();
 
 				$taxonomies = get_object_taxonomies( Tribe__Events__Main::POSTTYPE, 'objects' );
 				$taxonomies = array_reverse( $taxonomies );

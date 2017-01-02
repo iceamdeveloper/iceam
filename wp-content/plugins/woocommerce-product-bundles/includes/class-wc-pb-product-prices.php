@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Price functions and hooks.
  *
  * @class    WC_PB_Product_Prices
- * @version  5.0.0
- * @since    5.0.0
+ * @version  5.1.1
  */
 class WC_PB_Product_Prices {
 
@@ -95,10 +94,11 @@ class WC_PB_Product_Prices {
 		add_filter( 'woocommerce_get_price', array( __CLASS__, 'filter_get_price' ), 15, 2 );
 		add_filter( 'woocommerce_get_sale_price', array( __CLASS__, 'filter_get_sale_price' ), 15, 2 );
 		add_filter( 'woocommerce_get_regular_price', array( __CLASS__, 'filter_get_regular_price' ), 15, 2 );
+		add_filter( 'woocommerce_variation_prices', array( __CLASS__, 'filter_get_variation_prices' ), 15, 3 );
+
 		add_filter( 'woocommerce_get_price_html', array( __CLASS__, 'filter_get_price_html' ), 10, 2 );
 		add_filter( 'woocommerce_show_variation_price', array( __CLASS__, 'filter_show_variation_price' ), 10, 3 );
 		add_filter( 'woocommerce_get_variation_price_html', array( __CLASS__, 'filter_get_price_html' ), 10, 2 );
-		add_filter( 'woocommerce_variation_prices', array( __CLASS__, 'filter_get_variation_prices' ), 10, 3 );
 
 		/**
 		 * 'woocommerce_bundled_product_price_filters_added' hook.
@@ -116,13 +116,14 @@ class WC_PB_Product_Prices {
 		remove_filter( 'woocommerce_get_price', array( __CLASS__, 'filter_get_price' ), 15, 2 );
 		remove_filter( 'woocommerce_get_sale_price', array( __CLASS__, 'filter_get_sale_price' ), 15, 2 );
 		remove_filter( 'woocommerce_get_regular_price', array( __CLASS__, 'filter_get_regular_price' ), 15, 2 );
+		remove_filter( 'woocommerce_variation_prices', array( __CLASS__, 'filter_get_variation_prices' ), 15, 3 );
+
 		remove_filter( 'woocommerce_get_price_html', array( __CLASS__, 'filter_get_price_html' ), 10, 2 );
 		remove_filter( 'woocommerce_show_variation_price', array( __CLASS__, 'filter_show_variation_price' ), 10, 3 );
 		remove_filter( 'woocommerce_get_variation_price_html', array( __CLASS__, 'filter_get_price_html' ), 10, 2 );
-		remove_filter( 'woocommerce_variation_prices', array( __CLASS__, 'filter_get_variation_prices' ), 10, 3 );
 
 		/**
-		 * 'woocommerce_bundled_product_price_filters_added' hook.
+		 * 'woocommerce_bundled_product_price_filters_removed' hook.
 		 *
 		 * @param  WC_Bundled_Item  $bundled_item
 		 */
@@ -149,11 +150,9 @@ class WC_PB_Product_Prices {
 			$regular_prices = array();
 			$sale_prices    = array();
 
-			/** @var Documented in 'WC_Bundled_Item::sync_price'. */
-			$discount_from_regular = apply_filters( 'woocommerce_bundled_item_discount_from_regular', true, $bundled_item );
-			$discount              = $bundled_item->get_discount();
-			$priced_per_product    = $bundled_item->is_priced_individually();
-			$valid_children        = $bundled_item->get_children();
+			$discount           = $bundled_item->get_discount();
+			$priced_per_product = $bundled_item->is_priced_individually();
+			$valid_children     = $bundled_item->get_children();
 
 			// Filter regular prices.
 			foreach ( $prices_array[ 'regular_price' ] as $variation_id => $regular_price ) {
@@ -177,7 +176,7 @@ class WC_PB_Product_Prices {
 				}
 
 				if ( $priced_per_product ) {
-					if ( $discount_from_regular ) {
+					if ( false === $bundled_item->is_discount_allowed_on_sale_price() ) {
 						$regular_price = $regular_prices[ $variation_id ];
 					} else {
 						$regular_price = $price;
@@ -258,8 +257,7 @@ class WC_PB_Product_Prices {
 				return 0;
 			}
 
-			/** Documented in 'WC_Bundled_Item::sync_prices()'. */
-			if ( apply_filters( 'woocommerce_bundled_item_discount_from_regular', true, $bundled_item ) ) {
+			if ( false === $bundled_item->is_discount_allowed_on_sale_price() ) {
 				$regular_price = $product->get_regular_price();
 			} else {
 				$regular_price = $price;
@@ -294,7 +292,11 @@ class WC_PB_Product_Prices {
 				return 0;
 			}
 
-			$regular_price = empty( $regular_price ) ? $product->price : $regular_price;
+			if ( empty( $regular_price ) ) {
+				self::$bundled_item = false;
+				$regular_price = $product->get_price();
+				self::$bundled_item = $bundled_item;
+			}
 		}
 
 		return $regular_price;
@@ -317,8 +319,11 @@ class WC_PB_Product_Prices {
 				return 0;
 			}
 
-			$discount   = $bundled_item->get_discount();
-			$sale_price = empty( $discount ) ? $sale_price : self::filter_get_price( $product->price, $product );
+			$discount = $bundled_item->get_discount();
+
+			if ( ! empty( $discount ) ) {
+				$sale_price = $product->get_price();
+			}
 		}
 
 		return $sale_price;

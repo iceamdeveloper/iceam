@@ -370,3 +370,59 @@ function wc_pb_update_v4_meta_to_v5( $bundled_item_data, $args = array() ) {
 
 	return array_filter( $bundled_item_meta );
 }
+
+function wc_pb_update_510_main( $updater ) {
+
+	global $wpdb;
+
+	$bundle_term = get_term_by( 'slug', 'bundle', 'product_type' );
+
+	if ( $bundle_term ) {
+
+		$bundles = $wpdb->get_results( $wpdb->prepare( "
+			SELECT DISTINCT posts.ID AS bundle_id FROM {$wpdb->posts} AS posts
+			LEFT JOIN {$wpdb->term_relationships} AS rel ON ( posts.ID = rel.object_id )
+			WHERE rel.term_taxonomy_id = %d
+			AND posts.post_type = 'product'
+		", $bundle_term->term_taxonomy_id ) );
+
+		if ( ! empty( $bundles ) ) {
+			foreach ( $bundles as $index => $bundle ) {
+
+				// Make sure we are nowhere close to memory & PHP timeout limits - check state every 20 migrated products.
+				if ( $index % 20 === 19 ) {
+					if ( $updater->time_exceeded() || $updater->memory_exceeded() ) {
+						return -1;
+					}
+				}
+
+				$bundle_id = (int) $bundle->bundle_id;
+
+				$price         = get_post_meta( $bundle_id, '_price', true );
+				$regular_price = get_post_meta( $bundle_id, '_regular_price', true );
+				$sale_price    = get_post_meta( $bundle_id, '_sale_price', true );
+
+				if ( false !== $price ) {
+					update_post_meta( $bundle_id, '_wc_pb_base_price', $price );
+				}
+				if ( false !== $regular_price ) {
+					update_post_meta( $bundle_id, '_wc_pb_base_regular_price', $regular_price );
+				}
+				if ( false !== $sale_price ) {
+					update_post_meta( $bundle_id, '_wc_pb_base_sale_price', $sale_price );
+				}
+			}
+		}
+	}
+}
+
+function wc_pb_update_510_delete_unused_meta() {
+
+	global $wpdb;
+
+	// Delete unused meta.
+	$wpdb->query( "
+		DELETE FROM {$wpdb->postmeta}
+		WHERE meta_key = '_wc_sw_min_price'
+	" );
+}

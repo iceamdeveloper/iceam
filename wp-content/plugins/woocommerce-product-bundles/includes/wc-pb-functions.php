@@ -58,9 +58,9 @@ function wc_pb_get_bundled_item( $item, $parent = false ) {
 function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 
 	if ( is_object( $product ) ) {
-		$product = absint( $product->id );
+		$product_id = $product->is_type( 'variation' ) ? WC_PB_Core_Compatibility::get_parent_id( $product ) : WC_PB_Core_Compatibility::get_id( $product );
 	} else {
-		$product = absint( $product );
+		$product_id = absint( $product );
 	}
 
 	$allow_cache = $allow_cache && ! defined( 'WC_PB_DEBUG_TRANSIENTS' ) && ! defined( 'WC_PB_UPDATING' );
@@ -69,23 +69,23 @@ function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 	$bundled_product_data_array = get_transient( $transient_name );
 	$bundled_product_data       = false;
 
-	if ( $allow_cache && false !== $bundled_product_data_array && is_array( $bundled_product_data_array ) && isset( $bundled_product_data_array[ $product ] ) && is_array( $bundled_product_data_array[ $product ] ) ) {
-		$bundled_product_data = $bundled_product_data_array[ $product ];
+	if ( $allow_cache && false !== $bundled_product_data_array && is_array( $bundled_product_data_array ) && isset( $bundled_product_data_array[ $product_id ] ) && is_array( $bundled_product_data_array[ $product_id ] ) ) {
+		$bundled_product_data = $bundled_product_data_array[ $product_id ];
 	}
 
 	if ( false === $bundled_product_data ) {
 
 		$args = array(
-			'product_id' => $product,
+			'product_id' => $product_id,
 			'return'     => 'id=>bundle_id'
 		);
 
 		$bundled_product_data = WC_PB_DB::query_bundled_items( $args );
 
 		if ( is_array( $bundled_product_data_array ) ) {
-			$bundled_product_data_array[ $product ] = $bundled_product_data;
+			$bundled_product_data_array[ $product_id ] = $bundled_product_data;
 		} else {
-			$bundled_product_data_array = array( $product => $bundled_product_data );
+			$bundled_product_data_array = array( $product_id => $bundled_product_data );
 		}
 
 		if ( ! defined( 'WC_PB_UPDATING' ) ) {

@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product hooks for bundled items and bundled item meta db lifecycle management.
  *
  * @class    WC_PB_DB_Sync
- * @version  5.0.0
- * @since    5.0.0
+ * @version  5.1.0
  */
 class WC_PB_DB_Sync {
 
@@ -45,7 +44,8 @@ class WC_PB_DB_Sync {
 			add_action( 'woocommerce_variation_set_stock', array( __CLASS__, 'product_stock_changed' ), 100 );
 
 			// Delete bundled item stock meta cache when stock status changes.
-			add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'product_stock_status_changed' ), 100 );
+			add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'product_stock_status_changed' ), 100, 3 );
+			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'product_stock_status_changed' ), 100, 3 );
 		}
 	}
 
@@ -140,11 +140,8 @@ class WC_PB_DB_Sync {
 
 		if ( ! empty( $bundled_item_ids ) ) {
 
-			$wpdb->query( "
-				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
-				WHERE meta_key IN ( 'stock_status', 'max_stock' )
-				AND bundled_item_id IN (" . implode( ',', $bundled_item_ids ) . ")
-			" );
+			// Flush stock cache.
+			WC_PB_DB::flush_stock_cache( $bundled_item_ids );
 
 			do_action( 'woocommerce_delete_bundled_items_stock_cache', $product_id, $bundled_item_ids );
 
@@ -180,11 +177,20 @@ class WC_PB_DB_Sync {
 	/**
 	 * Delete bundled item stock meta cache when an associated product stock changes.
 	 *
-	 * @param  WC_Product  $product
+	 * @param  mixed   $product_id
+	 * @param  string  $stock_status
+	 * @param  mixed   $product
 	 * @return void
 	 */
-	public static function product_stock_status_changed( $product_id ) {
-		self::delete_bundled_items_stock_cache( $product_id );
+	public static function product_stock_status_changed( $product_id, $stock_status, $product = null ) {
+
+		if ( is_null( $product ) ) {
+			$product = wc_get_product( $product_id );
+		}
+
+		$bundled_product_id = $product->is_type( 'variation' ) ? WC_PB_Core_Compatibility::get_parent_id( $product ) : WC_PB_Core_Compatibility::get_id( $product );
+
+		self::delete_bundled_items_stock_cache( $bundled_product_id );
 	}
 
 	/**
@@ -194,7 +200,10 @@ class WC_PB_DB_Sync {
 	 * @return void
 	 */
 	public static function product_stock_changed( $product ) {
-		self::delete_bundled_items_stock_cache( $product->id );
+
+		$bundled_product_id = $product->is_type( 'variation' ) ? WC_PB_Core_Compatibility::get_parent_id( $product ) : WC_PB_Core_Compatibility::get_id( $product );
+
+		self::delete_bundled_items_stock_cache( $bundled_product_id );
 	}
 
 	/**

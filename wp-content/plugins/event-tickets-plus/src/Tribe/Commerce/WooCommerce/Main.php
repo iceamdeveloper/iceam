@@ -483,8 +483,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$contains_ticket = false;
 
 		// Search through order to see if it contains a ticket product
-		foreach ( $order->get_items() as $product_id ) {
-			if ( tribe_events_product_is_ticket( $product_id ) ) {
+		foreach ( $order->get_items() as $order_item ) {
+			if ( tribe_events_product_is_ticket( $order_item['product_id'] ) ) {
 				$contains_ticket = true;
 				break;
 			}

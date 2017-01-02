@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  5.0.0
- * @since    4.6.4
+ * @version  5.1.0
  */
 class WC_PB_Compatibility {
 
@@ -84,7 +83,7 @@ class WC_PB_Compatibility {
 	protected function __construct() {
 
 		$this->required = array(
-			'cp'     => '3.7.0',
+			'cp'     => '3.8.0',
 			'addons' => '2.7.16',
 			'minmax' => '1.0.6'
 		);
@@ -174,6 +173,11 @@ class WC_PB_Compatibility {
 		// WP Import/Export support.
 		require_once( 'compatibility/class-wp-ie-compatibility.php' );
 
+		// Shipwire integration.
+		if ( class_exists( 'WC_Shipwire' ) ) {
+			require_once( 'compatibility/class-wc-shipwire-compatibility.php' );
+		}
+
 		// Shipstation integration.
 		require_once( 'compatibility/class-wc-shipstation-compatibility.php' );
 	}
@@ -189,7 +193,7 @@ class WC_PB_Compatibility {
 
 		// PB version check.
 		if ( ! empty( $woocommerce_composite_products ) && version_compare( $woocommerce_composite_products->version, $this->required[ 'cp' ] ) < 0 ) {
-			$notice = sprintf( __( '<strong>WooCommerce Product Bundles</strong> is not compatible with the <strong>WooCommerce Composite Products</strong> version found on your system. Please update <strong>WooCommerce Composite Products</strong> to version <strong>%s</strong> or higher.', 'woocommerce-product-bundles' ), $this->required[ 'cp' ] );
+			$notice = sprintf( __( '<strong>WooCommerce Product Bundles</strong> is not compatible with the version of <strong>WooCommerce Composite Products</strong> found on your system. Please update <strong>WooCommerce Composite Products</strong> to version <strong>%s</strong> or higher.', 'woocommerce-product-bundles' ), $this->required[ 'cp' ] );
 			WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 		}
 
@@ -200,7 +204,7 @@ class WC_PB_Compatibility {
 			$addons_data = get_plugin_data( $file, false, false );
 			$version     = $addons_data[ 'Version' ];
 			if ( version_compare( $version, $this->required[ 'addons' ] ) < 0 ) {
-				$notice = sprintf( __( '<strong>WooCommerce Product Bundles</strong> is not compatible with the <strong>WooCommerce Product Addons</strong> version found on your system. Please update <strong>WooCommerce Product Addons</strong> to version <strong>%s</strong> or higher.', 'woocommerce-product-bundles' ), $this->required[ 'addons' ] );
+				$notice = sprintf( __( '<strong>WooCommerce Product Bundles</strong> is not compatible with the version of <strong>WooCommerce Product Addons</strong> found on your system. Please update <strong>WooCommerce Product Addons</strong> to version <strong>%s</strong> or higher.', 'woocommerce-product-bundles' ), $this->required[ 'addons' ] );
 				WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 			}
 		}

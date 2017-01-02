@@ -2,7 +2,11 @@
 /**
  * Renders meta fields in the ticket form
  *
- * @version 4.1
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/meta.php
+ *
+ * @version 4.3.5
  *
  */
 $meta = Tribe__Tickets_Plus__Main::instance()->meta();

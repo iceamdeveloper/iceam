@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle front-end functions and filters.
  *
  * @class    WC_PB_Display
- * @version  5.0.0
- * @since    4.5.0
+ * @version  5.1.0
  */
 class WC_PB_Display {
 
@@ -115,6 +114,9 @@ class WC_PB_Display {
 
 		// Indent bundled items in emails.
 		add_action( 'woocommerce_email_styles', array( $this, 'email_styles' ) );
+
+		// Display info notice when editing a bundle from the cart. Notices are rendered at priority 10.
+		add_action( 'woocommerce_before_single_product', array( $this, 'add_edit_in_cart_notice' ), 0 );
 
 		// Modify price filter query results.
 		add_filter( 'woocommerce_product_query_meta_query', array( $this, 'price_filter_query_params' ), 10, 2 );
@@ -222,9 +224,9 @@ class WC_PB_Display {
 
 			$product = $cart_item_values[ 'data' ];
 
-			if ( function_exists( 'is_cart' ) && is_cart() && ! did_action( 'woocommerce_before_mini_cart' ) && 'bundle' === $product->product_type ) {
+			if ( function_exists( 'is_cart' ) && is_cart() && ! did_action( 'woocommerce_before_mini_cart' ) && 'bundle' === $product->get_type() ) {
 				if ( $product->is_editable_in_cart( $cart_item_values ) ) {
-					$content = sprintf( __( '%s <span class="edit_in_cart_text"><small>(click to edit)</small></span>', 'woocommerce-product-bundles' ), $content );
+					$content = sprintf( _x( '%1$s<br/><a class="edit_bundle_in_cart_text edit_in_cart_text" href="%2$s"><small>%3$s</small></a>', 'edit in cart text', 'woocommerce-product-bundles' ), $content, $product->get_permalink( $cart_item_values ), __( '(click to edit)', 'woocommerce-product-bundles' ) );
 				}
 			}
 		}
@@ -444,7 +446,13 @@ class WC_PB_Display {
 
 			foreach ( $item[ 'stamp' ] as $bundled_item_id => $bundled_item_data ) {
 
-				echo '<dt class="bundled_title_meta wishlist_bundled_title_meta">' . get_the_title( $bundled_item_data[ 'product_id' ] ) . ' <strong class="bundled_quantity_meta wishlist_bundled_quantity_meta product-quantity">&times; ' . $bundled_item_data[ 'quantity' ] . '</strong></dt>';
+				$bundled_product = wc_get_product( $bundled_item_data[ 'product_id' ] );
+
+				if ( empty( $bundled_product ) ) {
+					continue;
+				}
+
+				echo '<dt class="bundled_title_meta wishlist_bundled_title_meta">' . $bundled_product->get_title() . ' <strong class="bundled_quantity_meta wishlist_bundled_quantity_meta product-quantity">&times; ' . $bundled_item_data[ 'quantity' ] . '</strong></dt>';
 
 				if ( ! empty ( $bundled_item_data[ 'attributes' ] ) ) {
 
@@ -469,7 +477,6 @@ class WC_PB_Display {
 			            } else {
 
 							$attribute_value    = apply_filters( 'woocommerce_variation_option_name', $attribute_value );
-							$bundled_product    = wc_get_product( $bundled_item_data[ 'product_id' ] );
 							$product_attributes = $bundled_product->get_attributes();
 
 							if ( isset( $product_attributes[ str_replace( 'attribute_', '', $attribute_name ) ] ) ) {
@@ -556,6 +563,22 @@ class WC_PB_Display {
 	}
 
 	/**
+	 * Display info notice when editing a bundle from the cart.
+	 */
+	public function add_edit_in_cart_notice() {
+
+		global $product;
+
+		if ( $product->is_type( 'bundle' ) && isset( $_GET[ 'update-bundle' ] ) ) {
+			$updating_cart_key = wc_clean( $_GET[ 'update-bundle' ] );
+			if ( isset( WC()->cart->cart_contents[ $updating_cart_key ] ) ) {
+				$notice = sprintf ( __( 'You are currently editing &quot;%1$s&quot;. When finished, click the <strong>Update Cart</strong> button.', 'woocommerce-product-bundles' ), $product->get_title() );
+				wc_add_notice( $notice, 'notice' );
+			}
+		}
+	}
+
+	/**
 	 * Filter price filter widget meta keys used in min/max range calculation.
 	 *
 	 * @param  array  $meta_keys
@@ -588,7 +611,7 @@ class WC_PB_Display {
 				'relation' => 'AND',
 				$price_meta_query,
 				array(
-					'key' => '_wc_sw_min_price',
+					'key' => '_wc_sw_max_price',
 					'compare'  => 'NOT EXISTS'
 				)
 			);
@@ -601,7 +624,7 @@ class WC_PB_Display {
 				array(
 					'relation' => 'AND',
 					array(
-						'key'     => '_wc_sw_min_price',
+						'key'     => '_price',
 						'compare' => '<=',
 						'type'    => 'DECIMAL',
 						'value'   => $max

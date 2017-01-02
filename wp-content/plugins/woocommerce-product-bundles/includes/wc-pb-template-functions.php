@@ -33,7 +33,9 @@ function wc_pb_template_add_to_cart() {
 	if ( ! empty( $bundled_items ) ) {
 		wc_get_template( 'single-product/add-to-cart/bundle.php', array(
 			'bundle_price_data' => $product->get_bundle_price_data(),
-			'bundled_items'     => $bundled_items
+			'bundled_items'     => $bundled_items,
+			'product'           => $product,
+			'product_id'        => WC_PB_Core_Compatibility::get_id( $product )
 		), false, WC_PB()->plugin_path() . '/templates/' );
 	}
 }
@@ -92,8 +94,7 @@ function wc_pb_template_bundled_item_thumbnail( $bundled_item, $bundle ) {
 
 	if ( $bundled_item->is_visible() ) {
 		if ( $bundled_item->is_thumbnail_visible() ) {
-			$bundled_product = $bundled_item->product;
-			wc_get_template( 'single-product/bundled-item-image.php', array( 'post_id' => $bundled_product->id ), false, WC_PB()->plugin_path() . '/templates/' );
+			wc_get_template( 'single-product/bundled-item-image.php', array( 'post_id' => $bundled_item->product_id ), false, WC_PB()->plugin_path() . '/templates/' );
 		}
 	}
 
@@ -150,7 +151,7 @@ function wc_pb_template_tabular_bundled_item_qty( $bundled_item, $bundle ) {
 	if ( 'tabular' === $layout ) {
 
 		/** Documented in 'WC_PB_Cart::get_posted_bundle_configuration'. */
-		$bundle_fields_prefix = apply_filters( 'woocommerce_product_bundle_field_prefix', '', $bundle->id );
+		$bundle_fields_prefix = apply_filters( 'woocommerce_product_bundle_field_prefix', '', WC_PB_Core_Compatibility::get_id( $bundle ) );
 
 		$quantity_min = $bundled_item->get_quantity();
 		$quantity_max = $bundled_item->get_quantity( 'max', true );
@@ -185,7 +186,7 @@ function wc_pb_template_default_bundled_item_qty( $bundled_item ) {
 	if ( 'default' === $layout ) {
 
 		/** Documented in 'WC_PB_Cart::get_posted_bundle_configuration'. */
-		$bundle_fields_prefix = apply_filters( 'woocommerce_product_bundle_field_prefix', '', $bundle->id );
+		$bundle_fields_prefix = apply_filters( 'woocommerce_product_bundle_field_prefix', '', WC_PB_Core_Compatibility::get_id( $bundle ) );
 
 		$quantity_min = $bundled_item->get_quantity();
 		$quantity_max = $bundled_item->get_quantity( 'max', true );
@@ -268,11 +269,13 @@ function wc_pb_template_bundled_item_product_details( $bundled_item, $bundle ) {
 
 	if ( $bundled_item->is_purchasable() ) {
 
-		$bundled_product = $bundled_item->product;
-		$availability    = $bundled_item->get_availability();
+		$bundle_id          = WC_PB_Core_Compatibility::get_id( $bundle );
+		$bundled_product    = $bundled_item->product;
+		$bundled_product_id = WC_PB_Core_Compatibility::get_id( $bundled_product );
+		$availability       = $bundled_item->get_availability();
 
 		/** Documented in 'WC_PB_Cart::get_posted_bundle_configuration'. */
-		$bundle_fields_prefix = apply_filters( 'woocommerce_product_bundle_field_prefix', '', $bundle->id );
+		$bundle_fields_prefix = apply_filters( 'woocommerce_product_bundle_field_prefix', '', $bundle_id );
 
 		$bundled_item->add_price_filters();
 
@@ -282,22 +285,24 @@ function wc_pb_template_bundled_item_product_details( $bundled_item, $bundle ) {
 			wc_get_template( 'single-product/bundled-item-optional.php', array(
 				'quantity'             => $bundled_item->get_quantity(),
 				'bundled_item'         => $bundled_item,
-				'bundle_fields_prefix' => $bundle_fields_prefix,
+				'bundle_fields_prefix' => $bundle_fields_prefix
 			), false, WC_PB()->plugin_path() . '/templates/' );
 		}
 
-		if ( $bundled_product->product_type === 'simple' || $bundled_product->product_type === 'subscription' ) {
+		if ( $bundled_product->get_type() === 'simple' || $bundled_product->get_type() === 'subscription' ) {
 
 			// Simple Product template.
 			wc_get_template( 'single-product/bundled-product-simple.php', array(
+				'bundled_product_id'   => $bundled_product_id,
 				'bundled_product'      => $bundled_product,
 				'bundled_item'         => $bundled_item,
+				'bundle_id'            => $bundle_id,
 				'bundle'               => $bundle,
 				'bundle_fields_prefix' => $bundle_fields_prefix,
-				'availability'         => $availability,
+				'availability'         => $availability
 			), false, WC_PB()->plugin_path() . '/templates/' );
 
-		} elseif ( $bundled_product->product_type === 'variable' || $bundled_product->product_type === 'variable-subscription' ) {
+		} elseif ( $bundled_product->get_type() === 'variable' || $bundled_product->get_type() === 'variable-subscription' ) {
 
 			$do_ajax                       = $bundled_item->use_ajax_for_product_variations();
 			$variations                    = $do_ajax ? false : $bundled_item->get_product_variations();
@@ -310,8 +315,10 @@ function wc_pb_template_bundled_item_product_details( $bundled_item, $bundle ) {
 
 				// Variable Product template.
 				wc_get_template( 'single-product/bundled-product-variable.php', array(
+					'bundled_product_id'                  => $bundled_product_id,
 					'bundled_product'                     => $bundled_product,
 					'bundled_item'                        => $bundled_item,
+					'bundle_id'                           => $bundle_id,
 					'bundle'                              => $bundle,
 					'bundle_fields_prefix'                => $bundle_fields_prefix,
 					'availability'                        => $availability,
@@ -319,7 +326,7 @@ function wc_pb_template_bundled_item_product_details( $bundled_item, $bundle ) {
 					'bundled_product_variations'          => $variations,
 					'bundled_product_selected_attributes' => $selected_variation_attributes,
 					'custom_product_data'                 => array(
-						'bundle_id'       => $bundle->id,
+						'bundle_id'       => $bundle_id,
 						'bundled_item_id' => $bundled_item->item_id
 					)
 				), false, WC_PB()->plugin_path() . '/templates/' );
@@ -419,7 +426,7 @@ function wc_pb_template_bundled_variation_attribute_options( $args ) {
 		if ( 1 === sizeof( $variations ) ) {
 
 			$variation_id   = current( $variations );
-			$variation      = $bundled_item->product->get_child( $variation_id );
+			$variation      = wc_get_product( $variation_id );
 			$variation_data = $variation->get_variation_attributes();
 
 			if ( isset( $variation_data[ WC_PB_Core_Compatibility::wc_variation_attribute_name( $variation_attribute_name ) ] ) ) {

@@ -2,7 +2,11 @@
 /**
  * Renders the meta fields for order editing
  *
- * @version 4.3
+ * Override this template in your own theme by creating a file at:
+ *
+ *     [your-theme]/tribe-events/tickets-plus/orders-edit-meta.php
+ *
+ * @version 4.3.5
  *
  */
 $ticket = get_post( $attendee['product_id'] );

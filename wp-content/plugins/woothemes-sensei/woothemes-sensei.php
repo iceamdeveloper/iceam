@@ -3,12 +3,12 @@
 Plugin Name: Sensei
 Plugin URI: http://www.woothemes.com/products/sensei/
 Description: A course management plugin that offers the smoothest platform for helping you teach anything.
-Version: 1.9.10
+Version: 1.9.9
 Author: WooThemes
 Author URI: http://www.woothemes.com/
 License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 Requires at least: 4.1
-Tested up to: 4.7
+Tested up to: 4.6.1
 Text Domain: woothemes-sensei
 Domain path: /lang/
 */
@@ -57,7 +57,7 @@ Domain path: /lang/
     }
 
 	// set the sensei version number
-    Sensei()->version = '1.9.10';
+    Sensei()->version = '1.9.9';
 
     //backwards compatibility
     global $woothemes_sensei;
@@ -67,6 +67,11 @@ Domain path: /lang/
     * Hook in WooCommerce functionality
     */
 	add_action('init', array( 'Sensei_WC', 'load_woocommerce_integration_hooks' ) );
+
+    /**
+     * Hook in WooCommerce Memberships functionality
+     */
+    add_action('init', array( 'Sensei_WC_Memberships', 'load_wc_memberships_integration_hooks' ) );
 
     /**
      * Load all Template hooks

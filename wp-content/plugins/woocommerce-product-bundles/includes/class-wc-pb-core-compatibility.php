@@ -15,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Functions for WC core back-compatibility.
  *
- * @class  WC_PB_Core_Compatibility
- * @since  4.7.6
+ * @class    WC_PB_Core_Compatibility
+ * @version  5.1.0
  */
 class WC_PB_Core_Compatibility {
 
@@ -28,7 +28,6 @@ class WC_PB_Core_Compatibility {
 	 * @return string
 	 */
 	private static function get_wc_version() {
-
 		return defined( 'WC_VERSION' ) && WC_VERSION ? WC_VERSION : null;
 	}
 
@@ -133,7 +132,6 @@ class WC_PB_Core_Compatibility {
 	 * @return WC_Product
 	 */
 	public static function wc_get_product( $the_product = false, $args = array() ) {
-
 		if ( self::is_wc_version_gte_2_2() ) {
 			return wc_get_product( $the_product, $args );
 		} else {
@@ -151,7 +149,6 @@ class WC_PB_Core_Compatibility {
 	 * @return array
 	 */
 	public static function wc_get_product_cat_ids( $product_id ) {
-
 		if ( self::is_wc_version_gte_2_5() ) {
 			$product_cats = wc_get_product_cat_ids( $product_id );
 		} else {
@@ -177,7 +174,6 @@ class WC_PB_Core_Compatibility {
 	 * @return array
 	 */
 	public static function wc_get_product_terms( $product_id, $attribute_name, $args ) {
-
 		if ( self::is_wc_version_gte_2_3() ) {
 			return wc_get_product_terms( $product_id, $attribute_name, $args );
 		} else {
@@ -224,7 +220,6 @@ class WC_PB_Core_Compatibility {
 	 * @return int
 	 */
 	public static function wc_get_price_decimals() {
-
 		if ( self::is_wc_version_gte_2_3() ) {
 			return wc_get_price_decimals();
 		} else {
@@ -277,6 +272,104 @@ class WC_PB_Core_Compatibility {
 	}
 
 	/**
+	 * Back-compat wrapper for 'get_parent_id'.
+	 *
+	 * @since  5.1.0
+	 *
+	 * @param  WC_Product  $product
+	 * @return mixed
+	 */
+	public static function get_parent_id( $product ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return $product->get_parent_id();
+		} else {
+			return $product->is_type( 'variation' ) ? absint( $product->id ) : 0;
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for 'get_id'.
+	 *
+	 * @since  5.1.0
+	 *
+	 * @param  WC_Product  $product
+	 * @return mixed
+	 */
+	public static function get_id( $product ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return $product->get_id();
+		} else {
+			return $product->is_type( 'variation' ) ? absint( $product->variation_id ) : absint( $product->id );
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for getting CRUD object props directly.
+	 *
+	 * @since  5.1.0
+	 *
+	 * @param  object  $obj
+	 * @param  string  $name
+	 * @param  string  $context
+	 * @return mixed
+	 */
+	public static function get_prop( $obj, $name, $context = 'view' ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			$get_fn = 'get_' . $name;
+			return is_callable( array( $obj, $get_fn ) ) ? $obj->$get_fn( $context ) : null;
+		} else {
+
+			if ( 'status' === $name ) {
+				$value = isset( $obj->post->post_status ) ? $obj->post->post_status : null;
+			} elseif ( 'short_description' === $name ) {
+				$value = isset( $obj->post->post_excerpt ) ? $obj->post->post_excerpt : null;
+			} else {
+				$value = $obj->$name;
+			}
+
+			return $value;
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for setting CRUD object props directly.
+	 *
+	 * @since  5.1.0
+	 *
+	 * @param  WC_Product  $product
+	 * @param  string      $name
+	 * @param  mixed       $value
+	 * @return void
+	 */
+	public static function set_prop( $obj, $name, $value ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			$set_fn = 'set_' . $name;
+			$obj->$set_fn( $value );
+		} else {
+			$obj->$prop = $value;
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for 'wc_get_formatted_variation'.
+	 *
+	 * @since  5.1.0
+	 *
+	 * @param  WC_Product_Variation  $variation
+	 * @param  boolean               $flat
+	 * @return string
+	 */
+	public static function wc_get_formatted_variation( $variation, $flat ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return wc_get_formatted_variation( $variation, $flat );
+		} elseif ( self::is_wc_version_gte_2_5() ) {
+			return $variation->get_formatted_variation_attributes( $flat );
+		} else {
+			return wc_get_formatted_variation( $variation->get_variation_attributes(), $flat );
+		}
+	}
+
+	/**
 	 * Get prefix for use with wp_cache_set. Allows all cache in a group to be invalidated at once..
 	 *
 	 * @since  5.0.0
@@ -285,7 +378,6 @@ class WC_PB_Core_Compatibility {
 	 * @return string
 	 */
 	public static function wc_cache_helper_get_cache_prefix( $group ) {
-
 		if ( self::is_wc_version_gte_2_5() ) {
 			return WC_Cache_Helper::get_cache_prefix( $group );
 		} else {

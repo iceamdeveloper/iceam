@@ -1168,7 +1168,14 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return string
 	 */
 	public function get_price_html( $product, $attendee = false ) {
-		$price_html = edd_price( $product, false );
+		$product_id = $product;
+
+		// Avoid Catchable Fatal on EDD for using product_id as a possible string
+		if ( $product instanceof WP_Post ) {
+			$product_id = $product->ID;
+		}
+
+		$price_html = edd_price( $product_id, false );
 		return apply_filters( 'eddtickets_ticket_price_html', $price_html, $product, $attendee );
 	}
 
