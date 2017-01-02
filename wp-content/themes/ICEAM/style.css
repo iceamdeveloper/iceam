@@ -111,6 +111,10 @@ small{
 	font-size: 85%;
 }
 
+blockquote{
+	padding-left: 30px;
+}
+
 hr.lg{
   background-color: #f36557;
   height: 5px;
@@ -302,6 +306,10 @@ body.single-tribe_events #sidebar .widget_wc_aelia_currencyswitcher_widget,
 body.single-course #sidebar .widget_wc_aelia_currencyswitcher_widget{
 	display: block;
 	margin-top: 60px;
+}
+
+body.single-tribe_events aside#sidebar .tickets_name {
+    display: none;
 }
 
 input.button.ed_button{
