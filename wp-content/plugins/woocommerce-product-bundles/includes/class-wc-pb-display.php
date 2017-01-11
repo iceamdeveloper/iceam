@@ -569,7 +569,7 @@ class WC_PB_Display {
 
 		global $product;
 
-		if ( $product->is_type( 'bundle' ) && isset( $_GET[ 'update-bundle' ] ) ) {
+		if ( $product && $product->is_type( 'bundle' ) && isset( $_GET[ 'update-bundle' ] ) ) {
 			$updating_cart_key = wc_clean( $_GET[ 'update-bundle' ] );
 			if ( isset( WC()->cart->cart_contents[ $updating_cart_key ] ) ) {
 				$notice = sprintf ( __( 'You are currently editing &quot;%1$s&quot;. When finished, click the <strong>Update Cart</strong> button.', 'woocommerce-product-bundles' ), $product->get_title() );
