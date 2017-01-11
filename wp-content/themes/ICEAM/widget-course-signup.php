@@ -37,7 +37,7 @@
 		
 		$resubscribe_link = wcs_get_users_resubscribe_link_for_product( $product->id );
 		$can_resubscribe = wcs_user_has_subscription( $user_id, $product->id, 'on-hold' ) || wcs_user_has_subscription( $user_id, $product->id, 'expired' );
-		echo "<p>can resubscribe: $can_resubscribe - ". $product->id."</p>";
+		//echo "<p>can resubscribe: $can_resubscribe - ". $product->id."</p>";
 		
 		// having trouble getting the resubscribe link
 		// renewal order was on-hold for some reason
