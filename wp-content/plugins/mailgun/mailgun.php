@@ -4,7 +4,7 @@
  * Plugin Name:  Mailgun
  * Plugin URI:   http://wordpress.org/extend/plugins/mailgun/
  * Description:  Mailgun integration for WordPress
- * Version:      1.5.6
+ * Version:      1.5.8
  * Author:       Mailgun
  * Author URI:   http://www.mailgun.com/
  * License:      GPLv2 or later
@@ -31,6 +31,13 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
+/**
+ * Entrypoint for the Mailgun plugin. Sets up the mailing "strategy" -
+ * either API or SMTP.
+ *
+ * Registers handlers for later actions and sets up config variables with
+ * Wordpress.
+ */
 class Mailgun
 {
     /**
@@ -49,14 +56,24 @@ class Mailgun
 
         // Either override the wp_mail function or configure PHPMailer to use the
         // Mailgun SMTP servers
+        // When using SMTP, we also need to inject a `wp_mail` filter to make "from" settings
+        // work properly. Fixes issues with 1.5.7+
         if ($this->get_option('useAPI') || (defined('MAILGUN_USEAPI') && MAILGUN_USEAPI)) {
             if (!function_exists('wp_mail')) {
-                if (!@include dirname(__FILE__).'/includes/wp-mail.php') {
-                    self::deactivate_and_die(dirname(__FILE__).'/includes/wp-mail.php');
+                if (!include dirname(__FILE__).'/includes/wp-mail-api.php') {
+                    self::deactivate_and_die(dirname(__FILE__).'/includes/wp-mail-api.php');
                 }
             }
         } else {
+            // Using SMTP, include the SMTP filter
+            if (!function_exists('mg_smtp_mail_filter')) {
+                if (!include dirname(__FILE__).'/includes/wp-mail-smtp.php') {
+                    self::deactivate_and_die(dirname(__FILE__).'/includes/wp-mail-smtp.php');
+                }
+            }
+            add_filter('wp_mail', 'mg_smtp_mail_filter');
             add_action('phpmailer_init', array(&$this, 'phpmailer_init'));
+            add_action('wp_mail_failed', 'wp_mail_failed');
         }
     }
 
@@ -100,12 +117,16 @@ class Mailgun
         $password = (defined('MAILGUN_PASSWORD') && MAILGUN_PASSWORD) ? MAILGUN_PASSWORD : $this->get_option('password');
 
         $phpmailer->Mailer = 'smtp';
-        $phpmailer->SMTPSecure = (bool) $secure ? 'ssl' : 'none';
         $phpmailer->Host = 'smtp.mailgun.org';
         $phpmailer->Port = (bool) $secure ? 465 : 587;
         $phpmailer->SMTPAuth = true;
         $phpmailer->Username = $username;
         $phpmailer->Password = $password;
+
+        $phpmailer->SMTPSecure = (bool) $secure ? 'ssl' : 'none';
+        // Without this line... wp_mail for SMTP-only will always return false. But why? :(
+        $phpmailer->Debugoutput = 'mg_smtp_debug_output';
+        $phpmailer->SMTPDebug = 2;
     }
 
     /**
@@ -146,7 +167,7 @@ class Mailgun
         $time = time();
         $url = $this->api_endpoint.$uri;
         $headers = array(
-            'Authorization' => 'Basic '.base64_encode("api:{$apiKey}")
+            'Authorization' => 'Basic '.base64_encode("api:{$apiKey}"),
         );
 
         switch ($method) {

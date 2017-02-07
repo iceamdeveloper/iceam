@@ -346,7 +346,7 @@ class WC_PB_Core_Compatibility {
 			$set_fn = 'set_' . $name;
 			$obj->$set_fn( $value );
 		} else {
-			$obj->$prop = $value;
+			$obj->$name = $value;
 		}
 	}
 

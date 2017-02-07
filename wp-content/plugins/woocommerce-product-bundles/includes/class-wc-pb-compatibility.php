@@ -180,6 +180,11 @@ class WC_PB_Compatibility {
 
 		// Shipstation integration.
 		require_once( 'compatibility/class-wc-shipstation-compatibility.php' );
+
+		// WooCommerce Give Products support.
+		if ( class_exists( 'WC_Give_Products' ) ) {
+			require_once( 'compatibility/class-wc-give-products-compatibility.php' );
+		}
 	}
 
 	/**

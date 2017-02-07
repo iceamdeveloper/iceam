@@ -36,8 +36,8 @@
         $product = $woothemes_sensei->sensei_get_woocommerce_product_object( $wc_post_id );
 		
 		$resubscribe_link = wcs_get_users_resubscribe_link_for_product( $product->id );
-		$can_resubscribe = wcs_user_has_subscription( $user_id, $product->id, 'on-hold' ) || wcs_user_has_subscription( $user_id, $product->id, 'expired' );
-		//echo "<p>can resubscribe: $can_resubscribe - ". $product->id."</p>";
+		$can_resubscribe = (wcs_user_has_subscription( $user_id, $product->id, 'on-hold' ) == true || wcs_user_has_subscription( $user_id, $product->id, 'expired' ) == true ? true : false);
+		//echo "<p>can resubscribe: ". ($can_resubscribe ? "true" : "false") . " - ". $product->id."</p>";
 		
 		// having trouble getting the resubscribe link
 		// renewal order was on-hold for some reason
@@ -117,6 +117,7 @@
 				echo "<p><a href='$resubscribe_link' class='btn btn-primary'>Subscription is Expired <br/>Renew Now for $$price</a></p>";
 			
 			} else if ($can_resubscribe){
+				echo '<h4>Your subscription requires renewal.</h4>';
 				echo '<p><a href="/my-account/subscriptions/" class="btn btn-primary">View Your Subscriptions</a></p>';
 			
 			// once all online courses are subscriptions this should be unnecessary

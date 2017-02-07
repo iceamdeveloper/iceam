@@ -22,6 +22,11 @@
 class MailgunAdmin extends Mailgun
 {
     /**
+     * @var array Array of "safe" option defaults.
+     */
+    private $defaults;
+
+    /**
      * Setup backend functionality in WordPress.
      *
      * @return none
@@ -64,7 +69,7 @@ class MailgunAdmin extends Mailgun
             $sitename = substr($sitename, 4);
         }
 
-        $defaults = array(
+        $this->defaults = array(
             'useAPI'            => '1',
             'apiKey'            => '',
             'domain'            => '',
@@ -78,7 +83,7 @@ class MailgunAdmin extends Mailgun
             'tag'               => $sitename,
         );
         if (!$this->options) {
-            $this->options = $defaults;
+            $this->options = $this->defaults;
             add_option('mailgun', $this->options);
         }
     }
@@ -275,6 +280,16 @@ class MailgunAdmin extends Mailgun
             $options[$key] = trim($value);
         }
 
+        if (empty($options['override-from'])) {
+            $options['override-from'] = $this->defaults['override-from'];
+        }
+        // alternatively:
+        // foreach ($defaults as $key => $value) {
+        //   if (empty($options[$key])) {
+        //     $options[$key] = $value;
+        //   }
+        // }
+
         $this->options = $options;
 
         return $options;
@@ -297,20 +312,23 @@ class MailgunAdmin extends Mailgun
 
         if ((!$this->get_option('apiKey') && $this->get_option('useAPI') === '1')
             || (!$this->get_option('password') && $this->get_option('useAPI') === '0')
-        ) { ?>
+        ) {
+            ?>
             <div id='mailgun-warning' class='updated fade'><p><strong><?php _e('Mailgun is almost ready. ', 'mailgun'); ?></strong><?php printf(__('You must <a href="%1$s">configure Mailgun</a> for it to work.', 'mailgun'), menu_page_url('mailgun', false)); ?></p></div>
 <?php
+
         }
 
         if ($this->get_option('override-from') === '1'
             && (!$this->get_option('from-name')
             || !$this->get_option('from-address'))
-        ) { ?>
+        ) {
+            ?>
             <div id='mailgun-warning' class='updated fade'><p><strong><?php _e('Mailgun is almost ready. ', 'mailgun'); ?></strong><?php printf(__('"Override From" option requires that "From Name" and "From Address" be set to work properly! <a href="%1$s">Configure Mailgun now</a>.', 'mailgun'), menu_page_url('mailgun', false)); ?></p></div>
 <?php
+
         }
     }
-
 
     /**
      * Add a settings link to the plugin actions.
@@ -347,6 +365,7 @@ class MailgunAdmin extends Mailgun
                     array(
                         'message' => __('Unauthorized', 'mailgun'),
                         'method'  => null,
+                        'error'   => __('Unauthorized', 'mailgun'),
                     )
                 )
             );
@@ -368,6 +387,12 @@ class MailgunAdmin extends Mailgun
             array('Content-Type: text/plain')
         );
 
+        if ((bool) $useAPI) {
+            $error_msg = mg_api_last_error();
+        } else {
+            $error_msg = mg_smtp_last_error();
+        }
+
         if ($result) {
             die(
                 json_encode(
@@ -384,7 +409,7 @@ class MailgunAdmin extends Mailgun
                     array(
                         'message' => __('Failure', 'mailgun'),
                         'method'  => $method,
-                        'error'   => mg_api_last_error(),
+                        'error'   => $error_msg,
                     )
                 )
             );

@@ -4,8 +4,8 @@ Mailgun for WordPress
 Contributors: Mailgun, sivel, lookahead.io, m35dev
 Tags: mailgun, smtp, http, api, mail, email
 Requires at least: 3.3
-Tested up to: 4.7
-Stable tag: 1.5.6
+Tested up to: 4.7.1
+Stable tag: 1.5.8
 License: GPLv2 or later
 
 
@@ -42,17 +42,25 @@ Your web server may not allow outbound HTTP connections. Set `Use HTTP API` to "
 
 Your web server may not allow outbound SMTP connections on port 465 for secure connections or 587 for unsecured connections. Try changing `Use Secure SMTP` to "No" or "Yes" depending on your current configuration and testing again. If both fail, try setting `Use HTTP API` to "Yes" and testing again.
 
+If you *have* to use SMTP and something is still going horribly wrong, enable debug mode in WordPress and also add the `MG_DEBUG_SMTP` constant to your `wp-config.php`, like so:
+
+`
+define( 'MG_DEBUG_SMTP', true );
+`
+
 - Can this be configured globally for WordPress Multisite?
 
 Yes, using the following constants that can be placed in wp-config.php:
 
 `
-MAILGUN_USEAPI   Type: boolean
-MAILGUN_APIKEY   Type: string
-MAILGUN_DOMAIN   Type: string
-MAILGUN_USERNAME Type: string
-MAILGUN_PASSWORD Type: string
-MAILGUN_SECURE   Type: boolean
+MAILGUN_USEAPI       Type: boolean
+MAILGUN_APIKEY       Type: string
+MAILGUN_DOMAIN       Type: string
+MAILGUN_USERNAME     Type: string
+MAILGUN_PASSWORD     Type: string
+MAILGUN_SECURE       Type: boolean
+MAILGUN_FROM_NAME    Type: string
+MAILGUN_FROM_ADDRESS Type: string
 `
 
 
@@ -67,6 +75,23 @@ MAILGUN_SECURE   Type: boolean
 
 
 == Changelog ==
+
+= 1.5.8 (2017-01-23): =
+* Rewrite a large chunk of old SMTP code
+* Fix a bug with SMTP + "override from" that was introduced in 1.5.7
+* SMTP debug logging is now controlled by `MG_DEBUG_SMTP` constant
+
+= 1.5.7.1 (2017-01-18): =
+* Fix an odd `Undefined property: MailgunAdmin::$defaults` when saving config
+* Fix strict mode notice for using `$mailgun['override-from']` without checking `isset`
+
+= 1.5.7 (2017-01-04): =
+* Add better support for using recipient variables for batch mailing.
+* Clarify wording on `From Address` note
+* Detect from name and address for `phpmailer_init` / SMTP now will honour Mailgun "From Name / From Addr" settings
+* SMTP configuration test will now provide the error message, if the send fails
+* Fix `undefined variable: content_type` error in `wp-mail.php` (https://wordpress.org/support/topic/minor-bug-on-version-version-1-5-6/#post-8634762)
+* Fix `undefined index: override-from` error in `wp-mail.php` (https://wordpress.org/support/topic/php-notice-undefined-index-override-from/)
 
 = 1.5.6 (2016-12-30): =
 * Fix a very subtle bug causing fatal errors with older PHP versions < 5.5

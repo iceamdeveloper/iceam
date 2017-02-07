@@ -657,7 +657,7 @@ class Types_Admin_Edit_Custom_Fields_Group extends Types_Admin_Edit_Fields {
 		if( isset( $this->update['admin_styles'] ) ) {
 			$admin_styles_value = $this->update['admin_styles'];
 		}
-		$temp = '';
+		$temp = array();
 
 		if( $this->update ) {
 			require_once WPCF_EMBEDDED_INC_ABSPATH . '/fields.php';
@@ -673,7 +673,7 @@ class Types_Admin_Edit_Custom_Fields_Group extends Types_Admin_Edit_Fields {
 			}
 			$preview_profile = wpcf_admin_post_meta_box_preview( $post, $this->update, 1 );
 			$group           = $this->update;
-			$group['fields'] = wpcf_admin_post_process_fields( $post, $group['fields'], true, false );
+			$group['fields'] = wpcf_admin_post_process_fields( $post, wpcf_getarr( $group, 'fields', array() ), true, false );
 			$edit_profile    = wpcf_admin_post_meta_box( $post, $group, 1, true );
 			add_action( 'admin_enqueue_scripts', 'wpcf_admin_fields_form_fix_styles', PHP_INT_MAX );
 		}
