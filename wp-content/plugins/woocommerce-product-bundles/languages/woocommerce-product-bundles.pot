@@ -1,14 +1,14 @@
-# Copyright (C) 2016 WooThemes
+# Copyright (C) 2017 WooThemes
 # This file is distributed under the GNU General Public License v3.0.
 msgid ""
 msgstr ""
-"Project-Id-Version: WooCommerce Product Bundles 5.1.1\n"
+"Project-Id-Version: WooCommerce Product Bundles 5.1.2\n"
 "Report-Msgid-Bugs-To: https://woocommerce.com/my-account/create-a-ticket/\n"
-"POT-Creation-Date: 2016-12-29 06:01:44+00:00\n"
+"POT-Creation-Date: 2017-01-19 10:11:37+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2016-MO-DA HO:MI+ZONE\n"
+"PO-Revision-Date: 2017-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <EMAIL@ADDRESS>\n"
 "X-Generator: grunt-wp-i18n 0.5.4\n"
@@ -66,7 +66,7 @@ msgstr ""
 #: includes/admin/meta-boxes/class-wc-pb-meta-box-product-data.php:1135
 #: includes/class-wc-bundled-item.php:1780
 #: includes/class-wc-bundled-item.php:1783 includes/class-wc-pb-display.php:149
-#: includes/class-wc-product-bundle.php:1293
+#: includes/class-wc-product-bundle.php:1277
 msgid "Insufficient stock"
 msgstr ""
 
@@ -241,7 +241,7 @@ msgid "Quantity Min"
 msgstr ""
 
 #: includes/admin/meta-boxes/class-wc-pb-meta-box-product-data.php:918
-msgid "The minumum/default quantity of this bundled product."
+msgid "The minimum/default quantity of this bundled product."
 msgstr ""
 
 #: includes/admin/meta-boxes/class-wc-pb-meta-box-product-data.php:924
@@ -441,7 +441,7 @@ msgstr ""
 
 #: includes/class-wc-bundled-item.php:1729
 #: includes/class-wc-bundled-item.php:1732 includes/class-wc-pb-display.php:150
-#: includes/class-wc-product-bundle.php:1298
+#: includes/class-wc-product-bundle.php:1282
 msgid "Available on backorder"
 msgstr ""
 
@@ -573,7 +573,7 @@ msgid ""
 msgstr ""
 
 #: includes/class-wc-pb-cart.php:1441 includes/class-wc-pb-display.php:148
-#: includes/class-wc-pb-order.php:623
+#: includes/class-wc-pb-order.php:631
 msgid "Subtotal"
 msgstr ""
 
@@ -581,7 +581,7 @@ msgstr ""
 msgid " now <small>(recurring totals listed below)</small>"
 msgstr ""
 
-#: includes/class-wc-pb-compatibility.php:196
+#: includes/class-wc-pb-compatibility.php:201
 msgid ""
 "<strong>WooCommerce Product Bundles</strong> is not compatible with the "
 "version of <strong>WooCommerce Composite Products</strong> found on your "
@@ -589,7 +589,7 @@ msgid ""
 "version <strong>%s</strong> or higher."
 msgstr ""
 
-#: includes/class-wc-pb-compatibility.php:207
+#: includes/class-wc-pb-compatibility.php:212
 msgid ""
 "<strong>WooCommerce Product Bundles</strong> is not compatible with the "
 "version of <strong>WooCommerce Product Addons</strong> found on your "
@@ -597,7 +597,7 @@ msgid ""
 "version <strong>%s</strong> or higher."
 msgstr ""
 
-#: includes/class-wc-pb-compatibility.php:214
+#: includes/class-wc-pb-compatibility.php:219
 msgid ""
 "The <strong>WooCommerce Product Bundles - Tabular Layout</strong> "
 "mini-extension is now part of <strong>WooCommerce Product Bundles</strong>. "
@@ -605,7 +605,7 @@ msgid ""
 "Tabular Layout</strong> plugin."
 msgstr ""
 
-#: includes/class-wc-pb-compatibility.php:221
+#: includes/class-wc-pb-compatibility.php:226
 msgid ""
 "The <strong>WooCommerce Product Bundles - Min/Max Items</strong> version "
 "found on your system is not compatible with the installed version of "
@@ -615,9 +615,9 @@ msgid ""
 msgstr ""
 
 #: includes/class-wc-pb-display.php:146
-#: includes/class-wc-product-bundle.php:1021
-#: includes/class-wc-product-bundle.php:1107
-#: includes/class-wc-product-bundle.php:1148
+#: includes/class-wc-product-bundle.php:1005
+#: includes/class-wc-product-bundle.php:1091
+#: includes/class-wc-product-bundle.php:1132
 msgid "Free!"
 msgstr ""
 
@@ -636,7 +636,7 @@ msgstr ""
 msgid "optional"
 msgstr ""
 
-#: includes/class-wc-pb-display.php:155 includes/class-wc-pb-order.php:332
+#: includes/class-wc-pb-display.php:155
 msgid "Contents"
 msgstr ""
 
@@ -675,7 +675,11 @@ msgstr ""
 msgid "The submitted bundle configuration could not be added to this order."
 msgstr ""
 
-#: includes/class-wc-pb-order.php:702
+#: includes/class-wc-pb-order.php:380
+msgid "Quantity: %1$s, SKU: %2$s"
+msgstr ""
+
+#: includes/class-wc-pb-order.php:710
 msgid "%1$s, %2$s bundled"
 msgstr ""
 
@@ -898,32 +902,32 @@ msgid ""
 "currently unavailable."
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:683
+#: includes/class-wc-product-bundle.php:667
 msgid "Standard"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:684
+#: includes/class-wc-product-bundle.php:668
 msgid "Tabular"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1598
+#: includes/class-wc-product-bundle.php:1582
 msgid "Read more"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1605
+#: includes/class-wc-product-bundle.php:1589
 msgid "View contents"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1607
+#: includes/class-wc-product-bundle.php:1591
 msgid "Select options"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1611
-#: includes/class-wc-product-bundle.php:1631
+#: includes/class-wc-product-bundle.php:1595
+#: includes/class-wc-product-bundle.php:1615
 msgid "Add to cart"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1638
+#: includes/class-wc-product-bundle.php:1622
 msgid "Update Cart"
 msgstr ""
 
@@ -1158,40 +1162,40 @@ msgctxt "price suffix"
 msgid " &ndash; %s"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:656
+#: includes/class-wc-product-bundle.php:640
 msgctxt "subscription price html suffix"
 msgid ""
 "%1$s<span class=\"bundled_subscriptions_price_html\" "
 "style=\"display:none\"> now,</br>then %2$s</span>"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1036
+#: includes/class-wc-product-bundle.php:1020
 msgctxt "subscription price html suffix"
 msgid ""
 "%1$s<span class=\"bundled_subscriptions_price_html\" %2$s> now,</br>then "
 "%3$s</span>"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1003
+#: includes/class-wc-product-bundle.php:987
 msgctxt "min-price"
 msgid "<span class=\"from\">from </span>"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1003
+#: includes/class-wc-product-bundle.php:987
 msgctxt "min-price"
 msgid "<span class=\"from\">From: </span>"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1015
-#: includes/class-wc-product-bundle.php:1024
-#: includes/class-wc-product-bundle.php:1092
-#: includes/class-wc-product-bundle.php:1113
+#: includes/class-wc-product-bundle.php:999
+#: includes/class-wc-product-bundle.php:1008
+#: includes/class-wc-product-bundle.php:1076
+#: includes/class-wc-product-bundle.php:1097
 msgctxt "Price range: from"
 msgid "%1$s%2$s"
 msgstr ""
 
-#: includes/class-wc-product-bundle.php:1130
-#: includes/class-wc-product-bundle.php:1138
+#: includes/class-wc-product-bundle.php:1114
+#: includes/class-wc-product-bundle.php:1122
 msgctxt "Price range: from-to"
 msgid "%1$s&ndash;%2$s"
 msgstr ""

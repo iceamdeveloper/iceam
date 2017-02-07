@@ -153,7 +153,7 @@ class WC_PB_Order {
 
 			$configuration = $args[ 'configuration' ];
 
-			if ( WC_PB()->cart->validate_bundle_configuration( $bundle, $quantity, $configuration, 'add-to-cart' ) ) {
+			if ( WC_PB()->cart->validate_bundle_configuration( $bundle, $quantity, $configuration, 'add-to-order' ) ) {
 
 				// Add container item.
 				$container_order_item_id = $order->add_product( $bundle, $quantity, $args );
@@ -329,8 +329,7 @@ class WC_PB_Order {
 					if ( ! empty( $child_items ) ) {
 
 						// Aggregate contents.
-						$contents_meta_key    = __( 'Contents', 'woocommerce-product-bundles' );
-						$contents_meta_values = array();
+						$contents = array();
 
 						// Aggregate prices.
 						$bundle_totals = array(
@@ -346,7 +345,8 @@ class WC_PB_Order {
 							// If the child is "packaged" in its parent...
 							if ( isset( $child_item[ 'bundled_item_needs_shipping' ] ) && 'no' === $child_item[ 'bundled_item_needs_shipping' ] ) {
 
-								$child = wc_get_product( $child_item[ 'product_id' ] );
+								$child_id = ! empty( $child_item[ 'variation_id' ] ) ? $child_item[ 'variation_id' ] : $child_item[ 'product_id' ];
+								$child    = wc_get_product( $child_id );
 
 								if ( ! $child || ! $child->needs_shipping() ) {
 									continue;
@@ -359,7 +359,7 @@ class WC_PB_Order {
 								$sku = $child->get_sku();
 
 								if ( ! $sku ) {
-									$sku = '#' . WC_PB_Core_Compatibility::get_id( $child );
+									$sku = '#' . $child_id;
 								}
 
 								$meta = '';
@@ -374,8 +374,11 @@ class WC_PB_Order {
 									}
 								}
 
-								$title                  = WC_PB_Helpers::format_product_shop_title( $child_item[ 'name' ] . ' [' . $sku . ']', $child_item[ 'qty' ] );
-								$contents_meta_values[] = WC_PB_Helpers::format_product_title( $title, '', $meta, true );
+								$bundled_item_title = WC_PB_Helpers::format_product_title( ! empty( $child_item[ 'bundled_item_title' ] ) ? $child_item[ 'bundled_item_title' ] : $child_item[ 'name' ], '', $meta, true );
+								$contents[]         = array(
+									'title'       => $bundled_item_title,
+									'description' => sprintf( __( 'Quantity: %1$s, SKU: %2$s', 'woocommerce-product-bundles' ), $child_item[ 'qty' ], $sku )
+								);
 
 								/*
 								 * Add item totals to the container totals.
@@ -396,17 +399,22 @@ class WC_PB_Order {
 						$item[ 'line_tax_data' ] = serialize( $bundle_totals[ 'line_tax_data' ] );
 						$item                    = array_merge( $item, $bundle_totals );
 
-						if ( ! empty( $contents_meta_values ) ) {
+						// Create a meta field for each bundled item.
+						if ( ! empty( $contents ) ) {
 
-							$keys         = array_keys( $item[ 'item_meta_array' ] );
-							$last_key     = end( $keys );
+							$keys     = array_keys( $item[ 'item_meta_array' ] );
+							$last_key = end( $keys );
+							$loop     = 1;
 
-							$entry        = new stdClass();
-							$entry->key   = $contents_meta_key;
-							$entry->value = implode( ', ', $contents_meta_values );
+							foreach ( $contents as $contained ) {
+								$entry        = new stdClass();
+								$entry->key   = $contained[ 'title' ];
+								$entry->value = $contained[ 'description' ];
 
-							$item[ 'item_meta_array' ][ $last_key + 1 ] = $entry;
-							$item[ 'item_meta' ][ $contents_meta_key ]  = implode( ', ', $contents_meta_values );
+								$item[ 'item_meta_array' ][ $last_key + $loop ] = $entry;
+								$item[ 'item_meta' ][ $contained[ 'title' ] ]   = $contained[ 'description' ];
+								$loop++;
+							}
 						}
 					}
 				}

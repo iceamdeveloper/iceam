@@ -1,10 +1,17 @@
 *** WooCommerce Product Bundles ***
 
+2017.01.19 - version 5.1.2
+ * Fix - Empty price string showing up when a bundle without a base price contains optional-only, individually-priced items. Price string is now correctly showing up as "From: $0.00".
+ * Fix - Give Products support for bundles with static contents.
+ * Fix - Database upgrade from v5.0.x unable to complete when migrating thousands of bundles on some systems.
+ * Dev Fix - Prevent stock validation when adding bundles to orders using 'WC_PB_Order::add_bundle_to_order'.
+ * Tweak - Bundled products that are physically packaged in their bundle container now show up as individual options of their parent in Shipstation packing slips. Previously, they were listed in a single "Contents" option of their parent.
+
 2016.12.29 - version 5.1.1
  * Fix - Values in Regular and Sale Price fields missing decimal separator if other than '.'.
 
 2016.12.17 - version 5.1.0
- * Important: The update to version 5.1.0 is irreversible. Please test the update on a local/staging environment first and - as always - backup your website!
+ * Important - The update to version 5.1.0 is irreversible. Please test the update on a local/staging environment first and - as always - backup your website!
  * Dev - Price methods 'get_[regular_/sale_]price' now always return the base prices defined under 'Product Data > General'. To ensure that product sorting and product price filtering in the shop catalog work without issues, meta fields '_[regular_/sale_]price' hold the cheapest raw configuration price.
  * Dev - Base price filters no longer used in order to simplify compatibility with third-party discount plugins.
  * Dev - Refactored 'WC_Product_Bundle' class initialization to minimize queries.

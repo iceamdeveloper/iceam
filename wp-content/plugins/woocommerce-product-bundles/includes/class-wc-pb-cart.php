@@ -406,14 +406,14 @@ class WC_PB_Cart {
 					}
 
 					if ( $item_quantity < $item_quantity_min ) {
-						if ( 'add-to-cart' === $context ) {
+						if ( in_array( $context, array( 'add-to-cart', 'add-to-order' ) ) ) {
 							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The quantity of &quot;%2$s&quot; cannot be lower than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_min ), 'error' );
 						} elseif ( 'cart' === $context ) {
 							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased. The quantity of &quot;%2$s&quot; cannot be lower than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_min ), 'error' );
 						}
 						return false;
 					} elseif ( $item_quantity_max && $item_quantity > $item_quantity_max ) {
-						if ( 'add-to-cart' === $context ) {
+						if ( in_array( $context, array( 'add-to-cart', 'add-to-order' ) ) ) {
 							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. The quantity of &quot;%2$s&quot; cannot be higher than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_max ), 'error' );
 						} elseif ( 'cart' === $context ) {
 							wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be purchased. The quantity of &quot;%2$s&quot; cannot be higher than %3$d.', 'woocommerce-product-bundles' ), $bundled_product_title, $bundled_item->get_raw_title(), $item_quantity_max ), 'error' );
@@ -508,7 +508,7 @@ class WC_PB_Cart {
 						$bundled_stock->add_item( $bundled_product_id, false, $quantity, array( 'bundled_item' => $bundled_item ) );
 					}
 
-					if ( 'add-to-cart' === $context ) {
+					if ( in_array( $context, array( 'add-to-cart', 'add-to-order' ) ) ) {
 						/**
 						 * 'woocommerce_bundled_item_add_to_cart_validation' filter.
 						 *

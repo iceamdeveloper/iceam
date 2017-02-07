@@ -294,7 +294,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 		if ( $file == WC_PB()->plugin_basename() ) {
 			$row_meta = array(
 				'docs'    => '<a href="https://docs.woocommerce.com/document/bundles/">' . __( 'Documentation', 'woocommerce-product-bundles' ) . '</a>',
-				'support' => '<a href="https://support.woocommerce.com/">' . __( 'Support', 'woocommerce-product-bundles' ) . '</a>',
+				'support' => '<a href="https://woocommerce.com/my-account/tickets/">' . __( 'Support', 'woocommerce-product-bundles' ) . '</a>',
 			);
 
 			return array_merge( $links, $row_meta );

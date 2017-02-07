@@ -156,6 +156,11 @@ class WC_Product_Bundle extends WC_Product {
 		$this->max_raw_price         = $this->max_bundle_price         = get_post_meta( $this->id, '_wc_sw_max_price', true );
 		$this->max_raw_regular_price = $this->max_bundle_regular_price = get_post_meta( $this->id, '_wc_sw_max_regular_price', true );
 
+		$this->min_raw_price         = $this->contains( 'priced_individually' ) && '' !== $this->min_raw_price ? (double) $this->min_raw_price : $this->min_raw_price;
+		$this->min_raw_regular_price = $this->contains( 'priced_individually' ) && '' !== $this->min_raw_regular_price ? (double) $this->min_raw_regular_price : $this->min_raw_regular_price;
+		$this->max_raw_price         = $this->contains( 'priced_individually' ) && '' !== $this->max_raw_price ? (double) $this->max_raw_price : $this->max_raw_price;
+		$this->max_raw_regular_price = $this->contains( 'priced_individually' ) && '' !== $this->max_raw_regular_price ? (double) $this->max_raw_regular_price : $this->max_raw_regular_price;
+
 		// Is this a NYP product?
 		if ( WC_PB()->compatibility->is_nyp( $this ) ) {
 			$this->is_nyp = true;
@@ -287,10 +292,10 @@ class WC_Product_Bundle extends WC_Product {
 			return;
 		}
 
-		$min_raw_price         = '';
-		$max_raw_price         = '';
-		$min_raw_regular_price = '';
-		$max_raw_regular_price = '';
+		$min_raw_price         = $this->price;
+		$min_raw_regular_price = $this->regular_price;
+		$max_raw_price         = $this->price;
+		$max_raw_regular_price = $this->regular_price;
 
 		$has_infinite_max_price = $this->is_nyp();
 
@@ -419,7 +424,6 @@ class WC_Product_Bundle extends WC_Product {
 
 		// Sync min/max prices.
 		foreach ( $bundled_items as $bundled_item ) {
-
 			if ( $bundled_item->is_priced_individually() ) {
 
 				$bundled_item_qty_min = $this->bundled_item_quantities[ 'optimal' ][ 'min' ][ $bundled_item->item_id ];
@@ -432,41 +436,19 @@ class WC_Product_Bundle extends WC_Product {
 				$min_raw_price         = $min_raw_price + $bundled_item_qty_min * (double) $bundled_item->min_price;
 				$min_raw_regular_price = $min_raw_regular_price + $bundled_item_qty_min * (double) $bundled_item->min_regular_price;
 
-				if ( ! $has_infinite_max_price && $bundled_item_qty_max ) {
+				if ( ! $bundled_item_qty_max ) {
+					$has_infinite_max_price = true;
+				}
+
+				if ( ! $has_infinite_max_price ) {
 					$max_raw_price         = $max_raw_price + $bundled_item_qty_max * (double) $bundled_item->max_price;
 					$max_raw_regular_price = $max_raw_regular_price + $bundled_item_qty_max * (double) $bundled_item->max_regular_price;
-				} else {
-					$has_infinite_max_price = true;
 				}
 			}
 		}
 
-		if ( $this->contains( 'priced_individually' ) ) {
-
-			$bundle_base_price     = $this->price;
-			$bundle_base_reg_price = $this->regular_price;
-
-			$min_raw_price         += $bundle_base_price;
-			$min_raw_regular_price += $bundle_base_reg_price;
-
-			if ( $has_infinite_max_price ) {
-				$max_raw_price = $max_raw_regular_price = 9999999999;
-			} else {
-				$max_raw_price         += $bundle_base_price;
-				$max_raw_regular_price += $bundle_base_reg_price;
-			}
-
-		} else {
-
-			$min_raw_price         = $this->price;
-			$min_raw_regular_price = $this->regular_price;
-
-			if ( $has_infinite_max_price ) {
-				$max_raw_price = $max_raw_regular_price = 9999999999;
-			} else {
-				$max_raw_price         = $min_raw_price;
-				$max_raw_regular_price = $min_raw_regular_price;
-			}
+		if ( $has_infinite_max_price ) {
+			$max_raw_price = $max_raw_regular_price = 9999999999.0;
 		}
 
 		$this->is_synced = true;
@@ -496,8 +478,7 @@ class WC_Product_Bundle extends WC_Product {
 		/*
 		 * Set min/max raw (regular) prices.
 		 */
-		if ( $this->min_raw_price != $min_raw_price ) {
-			$this->min_raw_price = $min_raw_price;
+		if ( $this->min_raw_price !== $min_raw_price ) {
 			if ( $save ) {
 				update_post_meta( $this->id, '_price', $min_raw_price );
 				if ( $this->is_on_sale() ) {
@@ -508,32 +489,35 @@ class WC_Product_Bundle extends WC_Product {
 			}
 		}
 
-		if ( $this->min_raw_regular_price != $min_raw_regular_price ) {
-			$this->min_raw_regular_price = $min_raw_regular_price;
+		if ( $this->min_raw_regular_price !== $min_raw_regular_price ) {
 			if ( $save ) {
 				update_post_meta( $this->id, '_regular_price', $min_raw_regular_price );
 			}
 		}
 
-		if ( $this->max_raw_price != $max_raw_price ) {
-			$this->max_raw_price = $max_raw_price;
+		if ( $this->max_raw_price !== $max_raw_price ) {
 			if ( $save ) {
 				update_post_meta( $this->id, '_wc_sw_max_price', $max_raw_price );
 			}
 		}
 
-		if ( $this->max_raw_regular_price != $max_raw_regular_price ) {
-			$this->max_raw_regular_price = $max_raw_regular_price;
+		if ( $this->max_raw_regular_price !== $max_raw_regular_price ) {
 			if ( $save ) {
 				update_post_meta( $this->id, '_wc_sw_max_regular_price', $max_raw_regular_price );
 			}
 		}
 
+		// Update raw price props.
+		$this->min_raw_price         = $min_raw_price;
+		$this->min_raw_regular_price = $min_raw_regular_price;
+		$this->max_raw_regular_price = 9999999999.0 === $max_raw_regular_price ? '' : $max_raw_regular_price;
+		$this->max_raw_price         = 9999999999.0 === $max_raw_price ? '' : $max_raw_price;
+
 		// Update these for back-compat.
-		$this->min_bundle_price         = $min_raw_price;
-		$this->min_bundle_regular_price = $min_raw_regular_price;
-		$this->max_bundle_price         = $max_raw_price;
-		$this->max_bundle_regular_price = $max_raw_regular_price;
+		$this->min_bundle_price         = $this->min_raw_price;
+		$this->min_bundle_regular_price = $this->min_raw_regular_price;
+		$this->max_bundle_price         = $this->max_raw_price;
+		$this->max_bundle_regular_price = $this->max_raw_regular_price;
 	}
 
 	/**

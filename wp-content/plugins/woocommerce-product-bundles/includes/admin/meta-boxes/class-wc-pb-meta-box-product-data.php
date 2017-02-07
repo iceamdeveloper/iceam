@@ -915,7 +915,7 @@ class WC_PB_Meta_Box_Product_Data {
 			<div class="form-field">
 				<label><?php echo __( 'Quantity Min', 'woocommerce' ); ?></label>
 				<input type="number" class="item_quantity" size="6" name="bundle_data[<?php echo $loop; ?>][quantity_min]" value="<?php echo $item_quantity; ?>" step="any" min="0" />
-				<?php echo WC_PB_Core_Compatibility::wc_help_tip( __( 'The minumum/default quantity of this bundled product.', 'woocommerce-product-bundles' ) ); ?>
+				<?php echo WC_PB_Core_Compatibility::wc_help_tip( __( 'The minimum/default quantity of this bundled product.', 'woocommerce-product-bundles' ) ); ?>
 			</div>
 		</div>
 

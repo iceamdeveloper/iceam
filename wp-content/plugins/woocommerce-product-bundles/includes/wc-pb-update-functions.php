@@ -382,8 +382,10 @@ function wc_pb_update_510_main( $updater ) {
 		$bundles = $wpdb->get_results( $wpdb->prepare( "
 			SELECT DISTINCT posts.ID AS bundle_id FROM {$wpdb->posts} AS posts
 			LEFT JOIN {$wpdb->term_relationships} AS rel ON ( posts.ID = rel.object_id )
+			LEFT JOIN {$wpdb->postmeta} AS postmeta ON posts.ID = postmeta.post_id AND postmeta.meta_key = '_wc_pb_base_price'
 			WHERE rel.term_taxonomy_id = %d
 			AND posts.post_type = 'product'
+			AND postmeta.meta_value IS NULL
 		", $bundle_term->term_taxonomy_id ) );
 
 		if ( ! empty( $bundles ) ) {
@@ -402,15 +404,9 @@ function wc_pb_update_510_main( $updater ) {
 				$regular_price = get_post_meta( $bundle_id, '_regular_price', true );
 				$sale_price    = get_post_meta( $bundle_id, '_sale_price', true );
 
-				if ( false !== $price ) {
-					update_post_meta( $bundle_id, '_wc_pb_base_price', $price );
-				}
-				if ( false !== $regular_price ) {
-					update_post_meta( $bundle_id, '_wc_pb_base_regular_price', $regular_price );
-				}
-				if ( false !== $sale_price ) {
-					update_post_meta( $bundle_id, '_wc_pb_base_sale_price', $sale_price );
-				}
+				update_post_meta( $bundle_id, '_wc_pb_base_price', false !== $price ? $price : '' );
+				update_post_meta( $bundle_id, '_wc_pb_base_regular_price', false !== $regular_price ? $regular_price : '' );
+				update_post_meta( $bundle_id, '_wc_pb_base_sale_price', false !== $sale_price ? $sale_price : '' );
 			}
 		}
 	}
