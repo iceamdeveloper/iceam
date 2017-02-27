@@ -966,9 +966,10 @@ body.home-page #promo-announcement a:hover:not(.btn) {
 	border-bottom: 1px solid transparent;
 }
 
-body.home-page #promo-announcement a img {
+body.home-page #promo-announcement a img.img-responsive {
 	border: 1px solid #fff;
 	padding: 1px;
+  display: inline-block;
 }
 
 #wrapper #promo-announcement .container {
