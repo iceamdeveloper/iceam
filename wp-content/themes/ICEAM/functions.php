@@ -387,13 +387,17 @@ add_filter('woocommerce_thankyou_order_received_text', 'rewrite_thankyou', 10, 1
 
 
 
+
+
+
 function display_subscription_title($subscription){
-	$order = new WC_Order();
-	$order->populate($subscription->order->post);
-	
-	foreach($order->get_items() as $item) {
-		echo $item['name'];
-	}
+    foreach ( $subscription->get_items() as $item_id => $item ) {
+        $_product  = apply_filters( 'woocommerce_subscriptions_order_item_product', $subscription->get_product_from_item( $item ), $item );
+		
+        if ( apply_filters( 'woocommerce_order_item_visible', true, $item ) ) {
+            echo wp_kses_post( apply_filters( 'woocommerce_order_item_name', $item['name'], $item ) );
+        }
+    }
 }
 add_action('woocommerce_my_subscriptions_after_subscription_id','display_subscription_title',10);
 
