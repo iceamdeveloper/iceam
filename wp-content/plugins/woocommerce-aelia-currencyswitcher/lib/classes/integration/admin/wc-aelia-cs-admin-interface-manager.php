@@ -6,6 +6,9 @@
 class WC_Aelia_CS_Admin_Interface_Manager {
 	protected $admin_views_path;
 
+	// @var Aelia_Order The order being displayed. Used to determine the currency to be used
+	protected $current_order;
+
 	/**
 	 * Returns the currency of the order currently being displayed.
 	 *
@@ -90,6 +93,10 @@ class WC_Aelia_CS_Admin_Interface_Manager {
 		// Use the Aelia_Order class, which provides additional methods
 		$order = new Aelia_Order($post->ID);
 
+		// Keep track of the order being displayed. This information will be used to
+		// use the correct formatting for the currency
+		$this->current_order = $order;
+
 		switch($column) {
 			case 'order_total':
 			case 'total_cost':
@@ -117,33 +124,54 @@ class WC_Aelia_CS_Admin_Interface_Manager {
 	}
 
 	/**
+	 * Resets the current order after the "order total" column is displayed,
+	 * to prevent it from changing the active currency.
+	 *
+	 * @param string column The column being displayed.
+	 */
+	public function after_manage_shop_order_posts_custom_column($column) {
+		$this->current_order = null;
+	}
+
+	/**
 	 * Overrides the active currency, depending on the Admin page being rendered.
 	 *
 	 * @param string currency The currency passed to the filter.
 	 * @return string
 	 */
 	public function woocommerce_currency($currency) {
-		if(is_admin() && !defined('DOING_AJAX') && function_exists('get_current_screen')) {
-			$screen = get_current_screen();
+		// If we know which order we are handling, we can take its currency immediately
+		if(is_object($this->current_order)) {
+			$order_currency = $this->current_order->get_order_currency();
 
-			// WooCommerce 2.1
-			// When viewing an existing order, override the currency and force it to the
-			// currency in which the order was placed
-			if(is_object($screen) && $screen->base == 'post') {
-				global $post;
+			if(!empty($order_currency)) {
+				$currency = $order_currency;
+			}
+		}
+		else {
+			if(is_admin() && !defined('DOING_AJAX') && function_exists('get_current_screen')) {
+				$screen = get_current_screen();
 
-				if(get_value('post_type', $post) == 'shop_order') {
-					$order = new Aelia_Order($post->ID);
-					$order_currency = $order->get_order_currency();
+				// WooCommerce 2.1
+				// When viewing an existing order, override the currency and force it to the
+				// currency in which the order was placed
+				if(is_object($screen) && $screen->base == 'post') {
+					global $post;
 
-					// New orders don't have a currency associated to them until they are
-					// saved. In such case, keep using the active one
-					if(!empty($order_currency)) {
-						$currency = $order_currency;
+					if(get_value('post_type', $post) == 'shop_order') {
+						$order = new Aelia_Order($post->ID);
+						$order_currency = $order->get_order_currency();
+
+						// New orders don't have a currency associated to them until they are
+						// saved. In such case, keep using the active one
+						if(!empty($order_currency)) {
+							$currency = $order_currency;
+						}
 					}
 				}
 			}
 		}
+
 		return $currency;
 	}
 
@@ -155,6 +183,7 @@ class WC_Aelia_CS_Admin_Interface_Manager {
 
 		add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
 		add_action('manage_shop_order_posts_custom_column', array($this, 'manage_shop_order_posts_custom_column'), 1);
+		add_action('manage_shop_order_posts_custom_column', array($this, 'after_manage_shop_order_posts_custom_column'), 50);
 		add_filter('woocommerce_currency', array($this, 'woocommerce_currency'), 20, 1);
 
 		// Coupons UI

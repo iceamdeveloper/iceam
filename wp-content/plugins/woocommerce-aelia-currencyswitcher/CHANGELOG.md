@@ -1,6 +1,15 @@
 # Aelia Currency Switcher - Change Log
 
 ## Version 3.x
+####3.9.13.161104
+* Fixed bug in Yahoo Finance integration. The bug prevented the exchange rates from being retrieved correctly in some circumstances.
+
+####3.9.12.161028
+* Improved installation process. The installation script that processes past orders can now handle better edge cases such as a site with many orders and a low memory limit.
+
+####3.9.11.160928
+* Fixed display of on sale/discounted prices with the Dynamic Pricing plugin is installed. Fix backported from Currency Switcher 4.x.
+
 ####3.9.10.160722
 * Added workaround for logging issue introduced by WooCommerce 2.6. WC 2.6 may trigger "loggable" events too early, when the required WordPress functions are not yet loaded. The workaround will prevent the logger from crashing.
 * Added workaround for caching of variable product prices, to ensure that the correct prices are displayed when the exchange rates are updated.

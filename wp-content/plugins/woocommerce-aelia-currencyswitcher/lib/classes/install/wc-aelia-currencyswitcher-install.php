@@ -239,77 +239,93 @@ class WC_Aelia_CurrencySwitcher_Install extends WC_Aelia_Install {
 
 		// Retrieve the exchange rates for the orders whose data already got
 		// partially converted
+		$last_order_id = 0;
 		$last_year = date('Y') - 1;
-		$SQL = "
-			SELECT
-				posts.ID AS order_id
-				,posts.post_date AS post_date
-				,meta_order.meta_key
-				,meta_order.meta_value
-				-- ,meta_order_base_currency.meta_key AS meta_key_base_currency
-				,meta_order_base_currency.meta_value AS meta_value_base_currency
-				,meta_order_currency.meta_value AS currency
-			FROM
-				{$this->wpdb->posts} AS posts
-			JOIN
-				{$this->wpdb->postmeta} AS meta_order ON
-					(meta_order.post_id = posts.ID) AND
-					(meta_order.meta_key IN ('_order_total', '_order_discount', '_cart_discount', '_order_shipping', '_order_tax', '_order_shipping_tax', '_refund_amount'))
-			LEFT JOIN
-				{$this->wpdb->postmeta} AS meta_order_base_currency ON
-					(meta_order_base_currency.post_id = posts.ID) AND
-					(meta_order_base_currency.meta_key = CONCAT(meta_order.meta_key, '_base_currency')) AND
-					(meta_order_base_currency.meta_value > 0)
-			LEFT JOIN
-				{$this->wpdb->postmeta} AS meta_order_currency ON
-					(meta_order_currency.post_id = posts.ID) AND
-					(meta_order_currency.meta_key = '_order_currency')
-			WHERE
-				(posts.post_type = 'shop_order') AND
-				(meta_order.meta_value IS NOT NULL) AND
-				(meta_order_base_currency.meta_value IS NULL) AND
-				(post_date >= '{$last_year}-01-01 00:00:00')
-		";
+		$process_loop = true;
 
-		$orders_to_update = $this->select($SQL);
-		// Debug
-		//var_dump($orders_to_update); die();
+		while($process_loop) {
+			$SQL = "
+				SELECT
+					posts.ID AS order_id
+					,posts.post_date AS post_date
+					,meta_order.meta_key
+					,meta_order.meta_value
+					-- ,meta_order_base_currency.meta_key AS meta_key_base_currency
+					,meta_order_base_currency.meta_value AS meta_value_base_currency
+					,meta_order_currency.meta_value AS currency
+				FROM
+					{$this->wpdb->posts} AS posts
+				JOIN
+					{$this->wpdb->postmeta} AS meta_order ON
+						(meta_order.post_id = posts.ID) AND
+						(meta_order.meta_key IN ('_order_total', '_order_discount', '_cart_discount', '_order_shipping', '_order_tax', '_order_shipping_tax', '_refund_amount'))
+				LEFT JOIN
+					{$this->wpdb->postmeta} AS meta_order_base_currency ON
+						(meta_order_base_currency.post_id = posts.ID) AND
+						(meta_order_base_currency.meta_key = CONCAT(meta_order.meta_key, '_base_currency')) AND
+						(meta_order_base_currency.meta_value > 0)
+				LEFT JOIN
+					{$this->wpdb->postmeta} AS meta_order_currency ON
+						(meta_order_currency.post_id = posts.ID) AND
+						(meta_order_currency.meta_key = '_order_currency')
+				WHERE
+					(posts.post_type = 'shop_order') AND
+					(meta_order.meta_value IS NOT NULL) AND
+					(meta_order_base_currency.meta_value IS NULL) AND
+					(post_date >= '{$last_year}-01-01 00:00:00') AND
+					(posts.ID > {$last_order_id})
+				ORDER BY
+					posts.ID ASC
+				LIMIT 1000
+			";
 
-		foreach($orders_to_update as $order) {
-			// If order currency is empty, for whatever reason, no conversion can be
-			// performed (it's not possible to assume that a specific currency was
-			// used)
-			if(empty($order->currency)) {
-				Logger::log(sprintf(__('Order %s does not have a currency associated, therefore ' .
-															 'it is not possible to determine its value in base currency (%s). ' .
-															 'This may lead to imprecise results in the reports.', AELIA_CS_PLUGIN_TEXTDOMAIN),
-														$order->order_id,
-														$base_currency));
-
-				continue;
+			$orders_to_update = $this->select($SQL);
+			if(empty($orders_to_update)) {
+				$process_loop = false;
 			}
+			// Debug
+			//var_dump($orders_to_update); die();
 
-			// Try to retrieve the exchange rate used when the order was placed
-			$value_in_base_currency = $this->convert($order->meta_value,
-																							 $order->currency,
-																							 $base_currency,
-																							 $order);
-			$value_in_base_currency = WC_Aelia_CurrencySwitcher::instance()->float_to_string($value_in_base_currency);
+			$cs = WC_Aelia_CurrencySwitcher::instance();
+			foreach($orders_to_update as $order) {
+				// If order currency is empty, for whatever reason, no conversion can be
+				// performed (it's not possible to assume that a specific currency was
+				// used)
+				if(empty($order->currency)) {
+					Logger::log(sprintf(__('Order %s does not have a currency associated, therefore ' .
+																 'it is not possible to determine its value in base currency (%s). ' .
+																 'This may lead to imprecise results in the reports.', AELIA_CS_PLUGIN_TEXTDOMAIN),
+															$order->order_id,
+															$base_currency));
 
-			try {
-				update_post_meta($order->order_id,
-												 $order->meta_key . '_base_currency',
-												 $value_in_base_currency);
+					continue;
+				}
+
+				// Try to retrieve the exchange rate used when the order was placed
+				$value_in_base_currency = $this->convert($order->meta_value,
+																								 $order->currency,
+																								 $base_currency,
+																								 $order);
+				$value_in_base_currency = $cs->float_to_string($value_in_base_currency);
+
+				try {
+					update_post_meta($order->order_id,
+													 $order->meta_key . '_base_currency',
+													 $value_in_base_currency);
+				}
+				catch(Exception $e) {
+					$this->add_message(E_USER_ERROR,
+														 sprintf(__('Exception occurred updating base currency values for order %s. ' .
+																				'Error: %s.'),
+																		 $order->order_id,
+																		 $e->getMessage()));
+					return false;
+				}
+				$last_order_id = $order->order_id;
 			}
-			catch(Exception $e) {
-				$this->add_message(E_USER_ERROR,
-													 sprintf(__('Exception occurred updating base currency values for order %s. ' .
-																			'Error: %s.'),
-																	 $order->order_id,
-																	 $e->getMessage()));
-				return false;
-			}
+			wp_cache_flush();
 		}
+
 		return true;
 	}
 

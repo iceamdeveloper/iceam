@@ -53,10 +53,10 @@ jQuery(document).ready(function($) {
 
 	// Add event handler on "Set All to Manual" checkbox
 	var $exchange_rates_settings_table = $('#exchange_rates_settings');
-	$exchange_rates_settings_table.delegate('#set_manually_all', 'click', function() {
+	$exchange_rates_settings_table.on('click', '#set_manually_all', function() {
 		var checked = ($(this).attr('checked') == 'checked');
 		$exchange_rates_settings_table
-			.find('.exchange_rate_set_manually')
+			.find('.exchange_rate_set_manually input')
 			.attr('checked', checked);
 	});
 

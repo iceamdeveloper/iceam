@@ -573,7 +573,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		// WooCommerce 2.3+
 		global $woocommerce;
 		if(version_compare($woocommerce->version, '2.3', '>=')) {
-			add_filter('woocommerce_product_is_on_sale', array($this, 'woocommerce_product_is_on_sale'), 20, 2);
+			add_filter('woocommerce_product_is_on_sale', array($this, 'woocommerce_product_is_on_sale'), 7, 2);
 		}
 
 		// Bulk pricing for variable products
@@ -703,7 +703,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		if(($currency != $product_base_currency) && !is_numeric($product->regular_price)) {
 			$product->regular_price = $this->convert_product_price_from_base($product_base_regular_price, $currency, $product_base_currency, $product, 'regular_price');
 		}
-																				;
+
 		$product->sale_price = get_value($currency, $product_sale_prices_in_currency);
 		if(($currency != $product_base_currency) && !is_numeric($product->sale_price)) {
 			$product->sale_price = $this->convert_product_price_from_base($product_base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
@@ -740,7 +740,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		// Since WooCommerce 2.1, this method can be triggered recursively due to
 		// a (not so wise) change in WC architecture. It's therefore necessary to keep
 		// track of when the conversion started, to prevent infinite recursion
-		if($product->aelia_cs_conversion_in_progress) {
+		if(!empty($product->aelia_cs_conversion_in_progress)) {
 			return $product;
 		}
 

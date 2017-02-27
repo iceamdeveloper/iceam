@@ -9,7 +9,7 @@ Plugin URI: http://aelia.co/shop/currency-switcher-woocommerce/
 Description: WooCommerce Currency Switcher. Allows to switch currency on the fly and perform all transactions in such currency.
 Author: Aelia
 Author URI: http://aelia.co
-Version: 3.9.10.160722
+Version: 3.9.13.161104
 License: GPLv3 (http://www.gnu.org/licenses/gpl-3.0.html)
 Text Domain: woocommerce-aelia-currencyswitcher
 Domain Path: /languages
@@ -56,7 +56,7 @@ interface IWC_Aelia_CurrencySwitcher {
  */
 class WC_Aelia_CurrencySwitcher implements IWC_Aelia_CurrencySwitcher {
 	// @var string The plugin version
-	const VERSION = '3.9.10.160722';
+	const VERSION = '3.9.13.161104';
 
 	// @var string The plugin slug
 	public static $plugin_slug = AELIA_CS_PLUGIN_SLUG;
@@ -776,7 +776,7 @@ class WC_Aelia_CurrencySwitcher implements IWC_Aelia_CurrencySwitcher {
 	 * @return int
 	 */
 	public function pre_option_woocommerce_price_num_decimals($decimals) {
-		return $this->price_decimals($this->get_selected_currency());
+		return $this->price_decimals(get_woocommerce_currency());
 	}
 
 	/**

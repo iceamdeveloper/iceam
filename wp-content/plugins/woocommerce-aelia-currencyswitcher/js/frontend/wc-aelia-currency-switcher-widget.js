@@ -4,7 +4,7 @@ jQuery(document).ready(function($) {
 	supports_html5_storage = ('sessionStorage' in window && window['sessionStorage'] !== null);
 
 	if(supports_html5_storage) {
-		$('.widget_wc_aelia_currencyswitcher_widget, .widget_wc_aelia_billing_country_selector_widget').delegate('form', 'submit', function() {
+		$('.widget_wc_aelia_currencyswitcher_widget, .widget_wc_aelia_billing_country_selector_widget').on('submit', 'form', function() {
 			sessionStorage.removeItem('wc_fragments', '');
 		});
 	}
@@ -15,7 +15,7 @@ jQuery(document).ready(function($) {
 		.find('.change_currency')
 		.hide()
 		.end()
-		.delegate('#aelia_cs_currencies', 'change', function(event) {
+		.on('change', '#aelia_cs_currencies', function(event) {
 			var currency_widget_form = $(this).closest('form');
 			$(currency_widget_form).submit();
 			event.stopPropagation();
@@ -28,7 +28,7 @@ jQuery(document).ready(function($) {
 		.find('.change_country')
 		.hide()
 		.end()
-		.delegate('.countries', 'change', function(event) {
+		.on('change', '.countries', function(event) {
 			var widget_form = $(this).closest('form');
 			$(widget_form).submit();
 			event.stopPropagation();

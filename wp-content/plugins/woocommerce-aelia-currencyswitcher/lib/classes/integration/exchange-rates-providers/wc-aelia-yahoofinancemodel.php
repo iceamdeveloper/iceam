@@ -1,7 +1,7 @@
 <?php if(!defined('ABSPATH')) exit; // Exit if accessed directly
 
 /**
- * Retrieves the Exchange Rates from WebServiceEx.
+ * Retrieves the Exchange Rates from Yahoo Finance.
  *
  * @link https://developer.yahoo.com/yql/console/
  */
@@ -31,6 +31,14 @@ class WC_Aelia_YahooFinanceModel extends WC_Aelia_ExchangeRatesModel {
 	 */
 	protected function decode_rates($yahoo_rates) {
 		$exchange_rates = array();
+
+		// Yahoo Finance is "smart" and doesn't return an array when the result
+		// contains only one exchange rate. In such case, we need to fix the result,
+		// so that it's always an array
+		if(!is_array($yahoo_rates->query->results->rate)) {
+			$yahoo_rates->query->results->rate = array($yahoo_rates->query->results->rate);
+		}
+
 		foreach($yahoo_rates->query->results->rate as $rate) {
 			$currency = str_ireplace($this->_base_currency, '', $rate->id);
 			$exchange_rates[$currency] = (float)$rate->Rate;
@@ -63,6 +71,7 @@ class WC_Aelia_YahooFinanceModel extends WC_Aelia_ExchangeRatesModel {
 		$query_args = $this->query_args;
 		$query_args['q'] = sprintf($query_args['q'], implode('","', $rates_to_request));
 		$query_url = $this->yahoo_finance_url . '?' . http_build_query($query_args);
+
 		try {
 			$response = \Httpful\Request::get($query_url)
 				->expectsJson()
@@ -107,6 +116,9 @@ class WC_Aelia_YahooFinanceModel extends WC_Aelia_ExchangeRatesModel {
 		if(empty($this->_current_rates) ||
 			 $this->_base_currency != $base_currency) {
 
+			// Set the base currency for which to retrieve the exchange rates
+			$this->_base_currency = $base_currency;
+
 			// Fetch exchange rates
 			$yahoo_exchange_rates = $this->fetch_all_rates();
 			if(!is_object($yahoo_exchange_rates)) {
@@ -131,46 +143,9 @@ class WC_Aelia_YahooFinanceModel extends WC_Aelia_ExchangeRatesModel {
 				return array();
 			}
 
-			// Since we didn't get the exchange rates related to the base currency,
-			// but in the default base currency used by OpenExchange, we need to
-			// recalculate them against the base currency we would like to use
-			$this->_current_rates = $this->rebase_rates($exchange_rates, $base_currency);
-			$this->_base_currency = $base_currency;
+			$this->_current_rates = $exchange_rates;
 		}
 		return $this->_current_rates;
-	}
-
-	/**
-	 * Recaculates the exchange rates using another base currency. This method
-	 * is invoked because the rates fetched from Yahoo Finance are relative to US
-	 * Dollars,  but another currency may be used by WooCommerce.
-	 *
-	 * @param array exchange_rates The exchange rates retrieved from Yahoo Finance.
-	 * @param string base_currency The base currency against which the rates should
-	 * be recalculated.
-	 * @return array An array of currency => exchange rate pairs.
-	 */
-	private function rebase_rates(array $exchange_rates, $base_currency) {
-		$recalc_rate = get_value($base_currency, $exchange_rates);
-		//var_dump($base_currency, $exchange_rates);
-
-		if(empty($recalc_rate)) {
-			$this->add_error(self::ERR_BASE_CURRENCY_NOT_FOUND,
-											 sprintf(__('Could not rebase rates against base currency "%s". ' .
-																	'Currency not found in data returned by Yahoo Finance.',
-																	AELIA_CS_PLUGIN_TEXTDOMAIN),
-															 $base_currency));
-			return null;
-		}
-
-		$result = array();
-		foreach($exchange_rates as $currency => $rate) {
-			$result[$currency] = $rate / $recalc_rate;
-		}
-
-		// Debug
-		//var_dump($result); die();
-		return $result;
 	}
 
 	/**
