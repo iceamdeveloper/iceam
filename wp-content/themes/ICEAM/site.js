@@ -28,7 +28,7 @@ jQuery(document).ready(function(){
                 'onStateChange': onPlayerStateChange
             }
         });
-    }
+    };
 	
 	function onPlayerReady(event) {
 		$(".video").prepend("<div class='yt-screen'></div>");
@@ -39,9 +39,9 @@ jQuery(document).ready(function(){
 		}
 		
 		$(".yt-screen").on("click", function(){
-			if (isiOS && !isVideoStarted) {
+			/*if (isiOS && !isVideoStarted) {
 				return;
-			}
+			}*/
 			
 			if (event.target.getPlayerState() == YT.PlayerState.PAUSED || event.target.getPlayerState() == YT.PlayerState.CUED) {
 				event.target.playVideo();
@@ -49,7 +49,7 @@ jQuery(document).ready(function(){
 				event.target.pauseVideo();
 			}
 			$(".yt-screen").css("height", $(".video").height() - 45 + "px");
-		})
+		});
     }
 	
 	$(window).on("resize", setVideoScreenSize);
@@ -58,9 +58,12 @@ jQuery(document).ready(function(){
 		$(".yt-screen").css("height", $(".video").height() + "px");
 		$(".yt-screen").css("width", $(".video").width() + "px");
 		
+		/*
 		if (isiOS && !isVideoStarted) {
-			$(".yt-screen").css({"height": "25%", "backgroundColor":"rgba(100,150,200,0.4)", "bottom": "0px", "top": "auto"});
-		}
+			$(".yt-screen").css({"height": "25%", "bottom": "0px", "top": "auto"});
+		} else if(isiOS && isVideoStarted){
+			$(".yt-screen").css({"height":$(".video").height() - 45 + "px", "bottom": "auto", "top": "0px"});
+		}*/
 	}
 
 	function onPlayerStateChange(event) {
