@@ -280,3 +280,21 @@ if(!function_exists('aelia_wc_registered_order_types')) {
 		return $result;
 	}
 }
+
+if(!function_exists('aelia_wp_version_is')) {
+	/**
+	 * Indicates if the WordPress version is greater or equal to the one passed
+	 * as a parameter.
+	 *
+	 * @param string $comparison_operator The operator to use for version comparison.
+	 * Any of the operators supported by the version_compare function can be used.
+	 * @param string version The version to which WooCommerce version will be compare.
+	 * @return bool The result of the version comparison.
+	 * @link http://php.net/manual/en/function.version-compare.php
+	 * @since 1.8.4.170307
+	 */
+	function aelia_wp_version_is($comparison_operator, $version) {
+		global $wp_version;
+		return version_compare($wp_version, $version, $comparison_operator);
+	}
+}

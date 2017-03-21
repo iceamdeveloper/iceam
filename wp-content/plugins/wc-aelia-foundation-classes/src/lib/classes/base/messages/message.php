@@ -33,10 +33,10 @@ if(!class_exists('Aelia\WC\Message')) {
 		 */
 		protected static $message_css_classes = array(
 			E_USER_ERROR => 'error',
-			E_USER_WARNING => 'updated', // "updated" is the WordPress style that shows update messages and warnings
+			E_USER_WARNING => 'updated warning', // "updated" is the WordPress style that shows update messages and warnings
 			E_USER_NOTICE => 'updated',
 			E_ERROR => 'error',
-			E_WARNING => 'updated', // "updated" is the WordPress style that shows update messages and warnings
+			E_WARNING => 'updated warning', // "updated" is the WordPress style that shows update messages and warnings
 			E_NOTICE => 'updated',
 		);
 
@@ -77,7 +77,13 @@ if(!class_exists('Aelia\WC\Message')) {
 		 * @return string
 		 * @since 1.6.9.151103
 		 */
-		protected static function get_message_header($level) {
+		protected function get_message_header($level) {
+			// If a header was specified for this message, use it insteaf of the default
+			// one
+			if(!empty($this->message_header)) {
+				return $this->message_header;
+			}
+
 			return isset(self::$message_headers[$level]) ? self::$message_headers[$level] : '';
 		}
 
@@ -105,6 +111,7 @@ if(!class_exists('Aelia\WC\Message')) {
 				$params['permissions'] = array($params['permissions']);
 			}
 			$this->permissions = $params['permissions'];
+			$this->message_header = !empty($params['message_header']) ? $params['message_header'] : '';
 		}
 
 		/**
@@ -194,10 +201,12 @@ if(!class_exists('Aelia\WC\Message')) {
 			$message_id = $this->get_message_id();
 			$output = '<div id="' . $message_id . '" class="wc_aelia message ' . $css_class . '">';
 
-			$message_header = self::get_message_header($this->level);
+			$message_header = $this->get_message_header($this->level);
+			$message_header .= '<span class="message_id">';
 			$message_header .= sprintf(' [%s - %s]',
 																 $this->sender_id,
 																 (empty($this->code) ? 'no-code-specified' : $this->code));
+			$message_header .= '</span>';
 			$output .= '<h4 class="message_header">';
 			$output .= $message_header;
 

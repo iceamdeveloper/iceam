@@ -65,6 +65,10 @@ For more information about installation and management of plugins, please refer 
 
 == Changelog ==
 
+= 1.8.4.170307 =
+* Improved Admin Messages. Added support for custom headers and improved look.
+* Added new function `aelia_wp_version_is`. The function allows to check the WordPress version.
+
 = 1.8.3.170202 =
 * Improved compatibility with WooCommerce 2.7:
 	* Added method `Order::get_currency()`.

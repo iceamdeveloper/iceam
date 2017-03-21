@@ -1,3 +1,69 @@
-.toplevel_page_sensei a{
+#adminmenu .toplevel_page_sensei > a,
+#adminmenu .menu-icon-course > a,
+#adminmenu .menu-icon-certificate > a,
+#adminmenu .menu-icon-question > a,
+#adminmenu .menu-icon-lesson > a {
+	background: #3c78d8; /* blue */
+	color: #fff;
+}
+
+
+#adminmenu .toplevel_page_sensei.opensub > a.menu-top,
+#adminmenu .toplevel_page_sensei > a.menu-top:focus,
+#adminmenu .menu-icon-course.opensub > a.menu-top,
+#adminmenu .menu-icon-course > a.menu-top:focus,
+#adminmenu .menu-icon-certificate.opensub > a.menu-top,
+#adminmenu .menu-icon-certificate > a.menu-top:focus,
+#adminmenu .menu-icon-question.opensub > a.menu-top,
+#adminmenu .menu-icon-question > a.menu-top:focus,
+#adminmenu .menu-icon-lesson.opensub > a.menu-top,
+#adminmenu .menu-icon-lesson > a.menu-top:focus{
 	background: #3c78d8;
+}
+
+
+#adminmenu .menu-icon-tribe_events > a{
+	background: #FF7200; /* orange */
+	color: #fff;
+}
+
+#adminmenu .menu-icon-tribe_events.opensub > a.menu-top,
+#adminmenu .menu-icon-tribe_events > a.menu-top:focus{
+	background: #FF7200;
+}
+
+
+
+#adminmenu .toplevel_page_woocommerce > a,
+#adminmenu .menu-icon-product > a{
+	background: green;
+	color: #fff;
+}
+
+
+#adminmenu .toplevel_page_woocommerce.opensub > a.menu-top,
+#adminmenu .toplevel_page_woocommerce > a.menu-top:focus,
+#adminmenu .menu-icon-product.opensub > a.menu-top,
+#adminmenu .menu-icon-product > a.menu-top:focus{
+	background: green;
+}
+
+
+#adminmenu .menu-icon-forum > a,
+#adminmenu .menu-icon-topic > a,
+#adminmenu .menu-icon-reply > a,
+#adminmenu .menu-icon-bp-email > a{
+	background: purple;
+	color: #fff;
+}
+
+#adminmenu .menu-icon-forum.opensub > a.menu-top,
+#adminmenu .menu-icon-forum > a.menu-top:focus,
+#adminmenu .menu-icon-topic.opensub > a.menu-top,
+#adminmenu .menu-icon-topic > a.menu-top:focus,
+#adminmenu .menu-icon-reply.opensub > a.menu-top,
+#adminmenu .menu-icon-reply > a.menu-top:focus,
+#adminmenu .menu-icon-bp-email.opensub > a.menu-top,
+#adminmenu .menu-icon-bp-email > a.menu-top:focus{
+	background: purple;
 }

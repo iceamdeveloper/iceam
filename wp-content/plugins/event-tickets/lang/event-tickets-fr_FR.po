@@ -404,17 +404,17 @@ msgctxt "attendee table"
 msgid "Status"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:290
+#: src/Tribe/Attendees_Table.php:286
 msgctxt "row action"
 msgid "Undo Check In"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:291
+#: src/Tribe/Attendees_Table.php:285
 msgctxt "row action"
 msgid "Check In"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:304
+#: src/Tribe/Attendees_Table.php:295
 msgctxt "row action"
 msgid "Move"
 msgstr ""

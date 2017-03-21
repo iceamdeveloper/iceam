@@ -4,11 +4,20 @@
 	margin: 1em 0 0 0;
 }
 
+.wc_aelia .message_header .message_id {
+	font-weight: normal;
+}
+
+.aelia.message_actions,
 .wc_aelia .message_actions {
 	float: right;
 }
 
-.wc_aelia.message.updated {
+.aelia.message_actions .message_action {
+	font-weight: normal;
+}
+
+.wc_aelia.message.updated.warning {
 	border-left: 4px solid #ffba00;
 }
 
