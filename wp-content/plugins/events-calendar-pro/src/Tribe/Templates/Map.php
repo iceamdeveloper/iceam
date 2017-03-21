@@ -72,6 +72,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Map' ) ) {
 				'post_status'    => $post_status,
 				'eventDisplay'   => 'map',
 				'tribe_geoloc'   => true,
+				'featured'       => tribe( 'tec.featured_events' )->featured_events_requested(),
 			);
 
 			$view_state = 'map';

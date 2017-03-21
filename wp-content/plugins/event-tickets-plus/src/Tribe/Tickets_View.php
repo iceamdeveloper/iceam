@@ -157,7 +157,7 @@ class Tribe__Tickets_Plus__Tickets_View {
 				}
 			}
 
-			// Actually Updates
+			// Updates the meta information associated with individual attendees
 			update_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, $data );
 		}
 	}

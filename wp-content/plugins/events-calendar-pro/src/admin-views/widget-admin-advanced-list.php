@@ -28,15 +28,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 <p><?php esc_html_e( 'Display:', 'tribe-events-calendar-pro' ); ?><br />
 
 	<?php $displayoptions = array(
+		'cost'      => __( 'Price', 'tribe-events-calendar-pro' ),
 		'venue'     => __( 'Venue', 'tribe-events-calendar-pro' ),
-		'organizer' => __( 'Organizer', 'tribe-events-calendar-pro' ),
 		'address'   => __( 'Address', 'tribe-events-calendar-pro' ),
 		'city'      => __( 'City', 'tribe-events-calendar-pro' ),
 		'region'    => __( 'State (US) Or Province (Int)', 'tribe-events-calendar-pro' ),
 		'zip'       => __( 'Postal Code', 'tribe-events-calendar-pro' ),
 		'country'   => __( 'Country', 'tribe-events-calendar-pro' ),
 		'phone'     => __( 'Phone', 'tribe-events-calendar-pro' ),
-		'cost'      => __( 'Price', 'tribe-events-calendar-pro' ),
+		'organizer' => __( 'Organizer', 'tribe-events-calendar-pro' ),
 	);
 	foreach ( $displayoptions as $option => $label ) {
 		?>
@@ -121,6 +121,10 @@ if ( empty( $instance['filters'] ) ) {
 <p>
 	<input id="<?php echo esc_attr( $this->get_field_id( 'no_upcoming_events' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'no_upcoming_events' ) ); ?>" type="checkbox" <?php checked( $instance['no_upcoming_events'], 1 ); ?> value="1" />
 	<label for="<?php echo esc_attr( $this->get_field_id( 'no_upcoming_events' ) ); ?>"><?php esc_html_e( 'Hide this widget if there are no upcoming events:', 'tribe-events-calendar-pro' ); ?></label>
+</p>
+<p>
+	<input id="<?php echo esc_attr( $this->get_field_id( 'featured_events_only' ) ); ?>" name="<?php echo esc_attr( $this->get_field_name( 'featured_events_only' ) ); ?>" type="checkbox" <?php checked( $instance['featured_events_only'], 1 ); ?> value="1" />
+	<label for="<?php echo esc_attr( $this->get_field_id( 'featured_events_only' ) ); ?>"><?php echo esc_html_x( 'Limit to featured events only', 'events list widget setting', 'tribe-events-calendar-pro' ); ?></label>
 </p>
 <p>
 	<?php $jsonld_enable = ( isset( $instance['jsonld_enable'] ) && $instance['jsonld_enable'] ) || false === $this->updated; ?>

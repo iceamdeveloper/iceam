@@ -2,26 +2,61 @@
 
 class Tribe__Tickets_Plus__Meta__Render {
 	public function __construct() {
+		add_filter( 'tribe_tickets_attendee_table_columns', array( $this, 'insert_details_column' ), 20 );
+		add_filter( 'tribe_events_tickets_attendees_table_column', array( $this, 'populate_details_column' ), 10, 3 );
 		add_action( 'tribe_tickets_ticket_email_ticket_bottom', array( $this, 'ticket_email_meta' ) );
 		add_action( 'event_tickets_attendees_table_after_row', array( $this, 'table_meta_data' ) );
-		add_filter( 'event_tickets_attendees_table_row_actions', array( $this, 'add_meta_toggle_to_ticket_column' ), 10, 2 );
 	}
 
-	public function add_meta_toggle_to_ticket_column( array $row_actions, array $item ) {
+	/**
+	 * Register an additional column, to be added next to 'primary_info' column,
+	 * to allow access to attendee meta details.
+	 *
+	 * @param array $columns
+	 *
+	 * @return array
+	 */
+	public function insert_details_column( array $columns ) {
+		return Tribe__Main::array_insert_after_key( 'primary_info', $columns, array(
+			'meta_details' => esc_html_x( 'Details', 'attendee table meta', 'event-tickets-plus' ),
+		) );
+	}
+
+	/**
+	 * Populates the meta details column.
+	 *
+	 * @param string $value
+	 * @param array  $item
+	 * @param string $column
+	 *
+	 * @return string
+	 */
+	public function populate_details_column( $value, $item, $column ) {
+		if ( 'meta_details' !== $column ) {
+			return $value;
+		}
+
+		$toggle = $this->get_meta_toggle( $item );
+		return $toggle;
+	}
+
+	public function get_meta_toggle( array $item ) {
 		$meta_data = get_post_meta( $item['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
 
 		if ( ! $meta_data ) {
-			return $row_actions;
+			return '<span class="event-tickets-no-meta-toggle">&ndash;</span>';
 		}
 
-		$row_actions[] = '
+
+		$view_details = sprintf( esc_html__( 'View details %s', 'event-tickets-plus' ), '&#9660;' ); // "&#9660;" := downward arrow
+		$hide_details = sprintf( esc_html__( 'Hide details %s', 'event-tickets-plus' ), '&#9650;' ); // "&#9650;" := upward arrow
+
+		return '
 			<a href="" class="event-tickets-meta-toggle">
-				<span class="event-tickets-meta-toggle-view">' . esc_html( 'View details', 'event-tickets-plus' ) . '</span>
-				<span class="event-tickets-meta-toggle-hide">' . esc_html( 'Hide details', 'event-tickets-plus' ) . '</span>
+				<span class="event-tickets-meta-toggle-view">' . $view_details . '</span>
+				<span class="event-tickets-meta-toggle-hide">' . $hide_details . '</span>
 			</a>
 		';
-
-		 return $row_actions;
 	}
 
 	public function table_meta_data( $item ) {
@@ -92,15 +127,15 @@ class Tribe__Tickets_Plus__Meta__Render {
 			';
 		}
 
-		echo "
-			<tr class='event-tickets-meta-row'>
-				<th></th>
-				<td colspan='6'>
-					$valid_meta_html
-					$orphaned_meta_html
-				</td>
-			</tr>
-		";
+		?>
+		<tr class="event-tickets-meta-row">
+			<th></th>
+			<td colspan="6">
+				<?php echo $valid_meta_html; ?>
+				<?php echo $orphaned_meta_html; ?>
+			</td>
+		</tr>
+		<?php
 	}
 
 	/**

@@ -3,8 +3,15 @@
 class Tribe__Tickets_Plus__Meta {
 
 	const ENABLE_META_KEY = '_tribe_tickets_meta_enabled';
-	const META_KEY = '_tribe_tickets_meta';
 
+	/**
+	 * This meta key is used for 3 slightly different purposes depending on post_type
+	 *
+	 * product - the meta fields configuration for ticket
+	 * shop_order - the meta values at the time of the order, not updated on future edits
+	 * tribe_wooticket - the current meta values for each attendee
+	 */
+	const META_KEY = '_tribe_tickets_meta';
 
 	private $path;
 	private $meta_fieldset;
@@ -175,7 +182,6 @@ class Tribe__Tickets_Plus__Meta {
 		}
 
 		$field_meta = get_post_meta( $ticket_id, self::META_KEY, true );
-
 		$fields = array();
 
 		if ( $field_meta ) {
@@ -299,6 +305,7 @@ class Tribe__Tickets_Plus__Meta {
 			$meta = $this->build_field_array( $ticket->ID, $data );
 		}
 
+		// this is for the meta fields configuration associated with the "product" post type
 		update_post_meta( $ticket->ID, self::META_KEY, $meta );
 
 		if ( ! $meta ) {
@@ -313,6 +320,7 @@ class Tribe__Tickets_Plus__Meta {
 				'post_status' => 'publish',
 			) );
 
+			// this is for the meta fields template
 			update_post_meta( $fieldset, Tribe__Tickets_Plus__Meta__Fieldset::META_KEY, $meta );
 		}
 

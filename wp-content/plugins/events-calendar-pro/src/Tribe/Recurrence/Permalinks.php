@@ -99,23 +99,27 @@ class Tribe__Events__Pro__Recurrence__Permalinks {
 	}
 
 	/**
-	 * Filters the sample permalink to show a link to the first instance of recurring events.
+	 * Filters the sample permalink for recurring events.
 	 *
-	 * This is to match the real link pointing to a recurring events series first instance.
+	 * Returns a permalink array for the specific instance being edited, with a %postname%
+	 * placeholder (so as to allow editing of the slug).
 	 *
-	 * @param string  $permalink Sample permalink.
-	 * @param int     $post_id   Post ID.
+	 * @param array $permalink
+	 * @param int   $post_id
 	 *
-	 * @return string The permalink to the first recurring event instance if the the event
-	 *                is a recurring one, the original permalink otherwise.
+	 * @return array
 	 */
 	public function filter_sample_permalink( $permalink, $post_id ) {
-		if ( ! empty( $post_id ) && tribe_is_recurring_event( $post_id ) ) {
-			// fetch the real post permalink, recurring event filters down the road will
-			// append the date to it
-			$permalink = get_post_permalink( $post_id );
+		// Do not interfere if the post ID is unknown, or if this is not a recurring event
+		if ( empty( $post_id ) || ! tribe_is_recurring_event( $post_id ) || ! is_array( $permalink ) ) {
+			return $permalink;
 		}
 
+		$post_url  = get_post_permalink( $post_id );
+		$post_slug = get_post( $post_id )->post_name;
+
+		// Replace the slug with the %postname% placeholder (if it matches the expected pattern)
+		$permalink[ 0 ] = preg_replace( "#($post_slug)/([0-9]{4}-[0-9]{2}-[0-9]{2})#", '%postname%/$2', $post_url );
 		return $permalink;
 	}
 

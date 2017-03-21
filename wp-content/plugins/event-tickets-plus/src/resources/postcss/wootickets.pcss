@@ -1,5 +1,5 @@
 /**
- * WooTickets Stylesheet
+ * ProTickets Stylesheet
  * (Some of these styles may override your current theme's styles)
  *
  * To add your own custom styles, create a stylesheet with the name
@@ -12,7 +12,7 @@
  *
  */
 
-/* = WooTickets Skeleton Styles
+/* = Pro Tickets Admin/Skeleton Styles
 =============================================*/
 .tribe-events-tickets .tickets_price {
 	color: #000;
@@ -64,30 +64,6 @@ h2.tribe-events-tickets-title {
 	margin: 20px 0 15px;
 }
 
-/* = WooTickets Full Styles
-=============================================*/
-.tribe-events-style-full .single-tribe_events #tribe-events-content form.cart,
-.tribe-events-style-full .single-tribe_events #tribe-events-content div.cart {
-	background: #fafafa;
-	border: 1px solid #eee;
-	padding: 0 4% 3%;
-}
-
-.tribe-events-style-full .tribe-events-tickets td {
-	border-bottom: 1px solid #ddd;
-}
-
-.tribe-events-style-full .tribe-events-tickets td fieldset {
-	border: 0;
-	margin-top: 8px;
-	padding: 14px .625em 4px;
-}
-
-/* = WooTickets Tribe Styles
-=============================================*/
-.tribe-events-style-full.tribe-events-style-theme h2.tribe-events-tickets-title {
-	font-size: 17px;
-}
 
 /* = WooTickets Mobile Styles (max-width: 600px)
 =============================================*/
@@ -202,7 +178,7 @@ h2.tribe-events-tickets-title {
 	background-attachment: local, local, scroll, scroll;
 	background-color: white;
 	background-image: -webkit-linear-gradient(left, #fff, rgba(255, 255, 255, 0)), -webkit-linear-gradient(right, #fff, rgba(255, 255, 255, 0)), -webkit-linear-gradient(left, #f5f5f5, rgba(195, 195, 197, 0)), -webkit-linear-gradient(right, #f5f5f5, rgba(195, 195, 197, 0));
-	background-image:         linear-gradient(left, #fff, rgba(255, 255, 255, 0)), linear-gradient(right, #fff, rgba(255, 255, 255, 0)), linear-gradient(left, #f5f5f5, rgba(195, 195, 197, 0)), linear-gradient(right, #f5f5f5, rgba(195, 195, 197, 0));
+	background:         linear-gradient(left, #fff, rgba(255, 255, 255, 0)), linear-gradient(right, #fff, rgba(255, 255, 255, 0)), linear-gradient(left, #f5f5f5, rgba(195, 195, 197, 0)), linear-gradient(right, #f5f5f5, rgba(195, 195, 197, 0));
 	background-image:      -o-linear-gradient(left, #fff, rgba(255, 255, 255, 0)), -o-linear-gradient(right, #fff, rgba(255, 255, 255, 0)), -o-linear-gradient(left, #f5f5f5, rgba(195, 195, 197, 0)), -o-linear-gradient(right, #f5f5f5, rgba(195, 195, 197, 0));
 	background-image:    -moz-linear-gradient(left, #fff, rgba(255, 255, 255, 0)), -moz-linear-gradient(right, #fff, rgba(255, 255, 255, 0)), -moz-linear-gradient(left, #f5f5f5, rgba(195, 195, 197, 0)), -moz-linear-gradient(right, #f5f5f5, rgba(195, 195, 197, 0));
 	background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #fff), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, #fff), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #f5f5f5), color-stop(100%, rgba(195, 195, 197, 0))), -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, #f5f5f5), color-stop(100%, rgba(195, 195, 197, 0)));
@@ -223,4 +199,138 @@ h2.tribe-events-tickets-title {
 }
 #tribe-events-report tfoot {
 	display: none;
+}
+
+.orders {
+	#the-list {
+		.cancelled, .refunded {
+			font-style: italic;
+		}
+	}
+}
+
+
+/* = Pro Tickets Front End Styles
+=============================================*/
+
+.tribe-events-style-full {
+
+	.tribe-events-tickets-title {
+		font-family: sans-serif;
+	}
+
+	.tribe-events-tickets {
+		background: #f8f8f8;
+		border-radius: 3px;
+
+		.woocommerce {
+			border-bottom: 1px solid #dfdfdf;
+		}
+
+		.woocommerce.add-to-cart {
+			border-bottom: 0;
+			padding: 0 10px 16px;
+		}
+	}
+
+	table,
+	th,
+	td {
+		border: 0;
+	}
+
+	.woocommerce {
+		.quantity {
+			input {
+				background-color: #fff;
+				border-radius: 3px;
+				margin-bottom: 5px;
+				padding: 5px 10px;
+				text-align: left;
+				width: 4.375em;
+			}
+		}
+	}
+
+	.tribe-tickets-remaining {
+		color: #777;
+		display: block;
+		font-size: 11px;
+	}
+
+	.tribe-tickets-attendees-list-optout label {
+		color: #777;
+		font-size: 13px;
+	}
+
+	.tickets_name,
+	.tickets_name p,
+	.tickets_description,
+	.tickets_price {
+		border-bottom: 1px solid #dfdfdf;
+		color: #464646;
+		font-size: 15px;
+		padding: 16px 10px 8px 10px;
+	}
+}
+
+.tribe-events-style-full.tribe-events-style-theme {
+	h2.tribe-events-tickets-title {
+		font-size: 17px;
+	}
+}
+
+#tribe-events {
+	.button {
+		border: 0;
+		border-radius: 3px;
+		background: linear-gradient( to bottom, #009FF1, #0080DB);
+		cursor: pointer;
+		color: #fff;
+		display: inline-block;
+		font-size: 14px;
+		font-weight: 400;
+		font-family: sans-serif;
+		letter-spacing: 1px;
+		line-height: 1;
+		height: auto;
+		margin-top: 1rem;
+		padding: 10px;
+		text-align: center;
+		transition: all .15s ease-in-out;
+		-webkit-font-smoothing: subpixel-antialiased;
+	}
+}
+
+.clear {
+	*zoom: 1;
+
+	&:before,
+	&:after {
+		content: '';
+		display: table;
+	}
+
+	&:after {
+		clear: both;
+	}
+}
+
+.tribe-event-tickets {
+	input[type="date"],
+	input[type="time"],
+	input[type="datetime-local"],
+	input[type="week"],
+	input[type="month"],
+	input[type="text"],
+	input[type="email"],
+	input[type="url"],
+	input[type="password"],
+	input[type="search"],
+	input[type="tel"],
+	input[type="number"],
+	textarea,
+	select {
+		background: #fff;
+	}
 }

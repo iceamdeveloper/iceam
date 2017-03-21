@@ -4,8 +4,8 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, modern tribe, tribe, widget, pro
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
-Tested up to: 4.6.1
-Stable tag: 4.3.4
+Tested up to: 4.7.3
+Stable tag: 4.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -202,6 +202,42 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.4] 2017-03-08 =
+
+* Fix - Photo View - resolved issue with photo view layouts when paging.(Thanks to @martha for the report in our forums) [73731]
+
+= [4.4.3] 2017-02-22 =
+
+* Fix - Ensure that the region and zip/postal code display as expected within the advanced events list widget (thank to @Nick for the original report) [72134]
+* Fix - The /all/ view should now consistently list events in ascending order by start date (thank you @Jim for your forum report) [72605]
+* Fix - Allow editing of recurring event slugs (this one was initialy reported by @brian) [68385]
+* Fix - Improve localization by using WordPress as the source of translated weekday abbreviations [70068]
+
+= [4.4.2] 2017-02-09 =
+
+* Polish - Photo View - Update Isotope for photo view (thanks for @WPExplorer on Twitter) [65542]
+* Fix - Photo View - Fix issue where page doesn't scroll to top after initial load (Thank you @jazzinconcert in our forums) [65341]
+* Fix - Photo View -  Fix Layout Issue in Safari for iOS (Cheersto user: @Pau) [64376]
+* Fix - Prevent PHP 5.2 Strict mode from throwing notices due to usage of `is_a` [72812]
+
+= [4.4.1] 2017-01-26 =
+
+* Tweak - Improve recurrence User Experience, easier interface for types of Rule [71501]
+* Fix - Single Event recurrency on the same day as the original Event will be created properly [68496]
+* Fix - Prevent legacy recurrent events to trigger Notices on front-end
+
+= [4.4] 2017-01-09 =
+
+* Feature - Added the [tribe_event_inline] shortcode to allow rendering of single event data anywhere shortcodes are allowed! [44803]
+* Feature - Add support for featured events [65898]
+* Feature - Allow deleting recurrences and exclusions [67110]
+* Feature - Make it possible to adjust map pins via the theme customizer [65889]
+* Tweak - Improvements to event-related aspects of the theme customizer [67485]
+* Tweak - Consolidated and simplified the UI when creating recurring events [67110, 66713-66716, 67122, 67123, 67143]
+* Tweak - Improved ordering of information in the advanced events list widget [36589]
+* Tweak - Cleanup of the plugin CSS to help make customization easier [33842]
+* Tweak - Added support for featured events to the [tribe_events] shortcode (using featured="on" type syntax) [65901]
 
 = [4.3.4] 2016-12-20 =
 
@@ -848,6 +884,10 @@ Still not happy? Shoot us an email to pro@tri.be or tweet to @moderntribeinc and
 
 == Upgrade Notice ==
 
+= 4.4.3 =
+
+To minimize disruption, please update The Events Calendar to at least version 4.4.3 *before* you update Events Calendar PRO.
+
 = 3.11 and higher =
 
 Please see the changelog for the complete list of changes in this release. Remember to always make a backup of your database and files before updating!
@@ -903,3 +943,4 @@ Please see the changelog for the complete list of changes in this release. Remem
 = 3.0 =
 
 3.x is a HUGE upgrade from Events Calendar PRO 2.x. If you're upgrading from 1.3.3 or any release between 2.0 and 2.0.10, make sure to upgrade to Events Calendar PRO 2.0.11 first. If you're upgrading from Events Calendar PRO 2.0.11, please back up your data BEFORE initiating, and be prepared to manually update your customizations based on changes to the plugin's tempting structure.
+

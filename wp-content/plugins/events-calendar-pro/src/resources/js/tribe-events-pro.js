@@ -1,6 +1,6 @@
 /**
  * @file The core file for the pro events calendar plugin javascript.
- * This file must load on all front facing events pages and be the first file loaded after treibe-events.js.
+ * This file must load on all front facing events pages and be the first file loaded after tribe-events.js.
  * @version 3.0
  */
 
@@ -165,8 +165,11 @@ if ( Object.prototype.hasOwnProperty.call( window, 'tribe_ev' ) ) {
 
 							if ( ! $tip.length ) {
 								var data = $this.data( 'tribejson' );
+								var tooltip_template = $this.hasClass( 'tribe-event-featured' )
+									? 'tribe_tmpl_tooltip_featured'
+									: 'tribe_tmpl_tooltip';
 
-								$this.append( tribe_tmpl( 'tribe_tmpl_tooltip', data ) );
+								$this.append( tribe_tmpl( tooltip_template, data ) );
 
 								$tip = $this.find( '.tribe-events-tooltip' );
 							}
@@ -238,8 +241,11 @@ if ( Object.prototype.hasOwnProperty.call( window, 'tribe_ev' ) ) {
 
 							if ( !$tip.length ) {
 								var data = $this.data( 'tribejson' );
+								var tooltip_template = $this.hasClass( 'tribe-event-featured' )
+									? 'tribe_tmpl_tooltip_featured'
+									: 'tribe_tmpl_tooltip';
 
-								$this.append( tribe_tmpl( 'tribe_tmpl_tooltip', data ) );
+								$this.append( tribe_tmpl( tooltip_template, data ) );
 
 								$tip = $this.find( '.tribe-events-tooltip' );
 							}
