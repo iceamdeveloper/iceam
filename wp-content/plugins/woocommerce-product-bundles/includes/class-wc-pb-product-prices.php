@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Price functions and hooks.
  *
  * @class    WC_PB_Product_Prices
- * @version  5.1.1
+ * @version  5.1.4
  */
 class WC_PB_Product_Prices {
 
@@ -64,6 +64,24 @@ class WC_PB_Product_Prices {
 	}
 
 	/**
+	 * Discounted price getter.
+	 *
+	 * @param  mixed  $price
+	 * @param  mixed  $discount
+	 * @return mixed
+	 */
+	public static function get_discounted_price( $price, $discount ) {
+
+		$discounted_price = $price;
+
+		if ( ! empty( $price ) && ! empty( $discount ) ) {
+			$discounted_price = round( ( double ) $price * ( 100 - $discount ) / 100, wc_get_price_decimals() );
+		}
+
+		return $discounted_price;
+	}
+
+	/**
 	 * Returns the recurring price component of a subscription product.
 	 *
 	 * @param  WC_Product  $product
@@ -80,7 +98,6 @@ class WC_PB_Product_Prices {
 
 		return $sub_price_html;
 	}
-
 
 	/**
 	 * Add price filters to modify child product prices depending on the bundled item pricing setup.
@@ -319,11 +336,17 @@ class WC_PB_Product_Prices {
 				return 0;
 			}
 
-			$discount = $bundled_item->get_discount();
-
-			if ( ! empty( $discount ) ) {
-				$sale_price = $product->get_price();
+			if ( '' === $sale_price || false === $bundled_item->is_discount_allowed_on_sale_price() ) {
+				$regular_price = $product->get_regular_price();
+			} else {
+				$regular_price = $sale_price;
 			}
+
+			$discount   = $bundled_item->get_discount();
+			$sale_price = empty( $discount ) ? $sale_price : self::get_discounted_price( $regular_price, $discount );
+
+			/** Documented in 'WC_Bundled_Item::get_raw_price()'. */
+			$sale_price = apply_filters( 'woocommerce_bundled_item_price', $sale_price, $product, $discount, $bundled_item );
 		}
 
 		return $sale_price;

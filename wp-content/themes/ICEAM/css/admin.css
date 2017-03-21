@@ -8,14 +8,19 @@
 }
 
 
+#adminmenu .toplevel_page_sensei.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .toplevel_page_sensei.opensub > a.menu-top,
 #adminmenu .toplevel_page_sensei > a.menu-top:focus,
+#adminmenu .menu-icon-course.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-course.opensub > a.menu-top,
 #adminmenu .menu-icon-course > a.menu-top:focus,
+#adminmenu .menu-icon-certificate.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-certificate.opensub > a.menu-top,
 #adminmenu .menu-icon-certificate > a.menu-top:focus,
+#adminmenu .menu-icon-question.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-question.opensub > a.menu-top,
 #adminmenu .menu-icon-question > a.menu-top:focus,
+#adminmenu .menu-icon-lesson.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-lesson.opensub > a.menu-top,
 #adminmenu .menu-icon-lesson > a.menu-top:focus{
 	background: #3c78d8;
@@ -23,13 +28,15 @@
 
 
 #adminmenu .menu-icon-tribe_events > a{
-	background: #FF7200; /* orange */
+	background: #0DBF7B; /* olive */
 	color: #fff;
 }
 
+#adminmenu .menu-icon-tribe_events.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-tribe_events.opensub > a.menu-top,
 #adminmenu .menu-icon-tribe_events > a.menu-top:focus{
-	background: #FF7200;
+	background: #0DBF7B;
+	color: #fff;
 }
 
 
@@ -40,9 +47,10 @@
 	color: #fff;
 }
 
-
+#adminmenu .toplevel_page_woocommerce.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .toplevel_page_woocommerce.opensub > a.menu-top,
 #adminmenu .toplevel_page_woocommerce > a.menu-top:focus,
+#adminmenu .menu-icon-product.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-product.opensub > a.menu-top,
 #adminmenu .menu-icon-product > a.menu-top:focus{
 	background: green;
@@ -57,12 +65,16 @@
 	color: #fff;
 }
 
+#adminmenu .menu-icon-forum.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-forum.opensub > a.menu-top,
 #adminmenu .menu-icon-forum > a.menu-top:focus,
+#adminmenu .menu-icon-topic.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-topic.opensub > a.menu-top,
 #adminmenu .menu-icon-topic > a.menu-top:focus,
+#adminmenu .menu-icon-reply.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-reply.opensub > a.menu-top,
 #adminmenu .menu-icon-reply > a.menu-top:focus,
+#adminmenu .menu-icon-bp-email.wp-has-current-submenu a.wp-has-current-submenu,
 #adminmenu .menu-icon-bp-email.opensub > a.menu-top,
 #adminmenu .menu-icon-bp-email > a.menu-top:focus{
 	background: purple;

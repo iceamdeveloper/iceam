@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundles DB API for manipulating bundled item data in the database.
  *
  * @class    WC_PB_DB
- * @version  5.1.0
+ * @version  5.1.3
  */
 class WC_PB_DB {
 
@@ -285,13 +285,19 @@ class WC_PB_DB {
 	 * Add bundled item meta to the DB. Unique only.
 	 *
 	 * @access public
-	 * @param  mixed    $item_id
-	 * @param  mixed    $meta_key
-	 * @param  mixed    $meta_value
+	 * @param  mixed  $item_id
+	 * @param  mixed  $meta_key
+	 * @param  mixed  $meta_value
 	 * @return int
 	 */
 	public static function add_bundled_item_meta( $item_id, $meta_key, $meta_value ) {
 		if ( $meta_id = add_metadata( 'bundled_item', $item_id, $meta_key, $meta_value, true ) ) {
+
+			$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $item_id;
+			wp_cache_delete( $cache_key, 'bundled_item_meta' );
+
+			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+
 			return $meta_id;
 		}
 		return 0;
@@ -319,6 +325,12 @@ class WC_PB_DB {
 	 */
 	public static function update_bundled_item_meta( $item_id, $meta_key, $meta_value, $prev_value = '' ) {
 		if ( update_metadata( 'bundled_item', $item_id, $meta_key, $meta_value, $prev_value ) ) {
+
+			$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $item_id;
+			wp_cache_delete( $cache_key, 'bundled_item_meta' );
+
+			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+
 			return true;
 		}
 		return false;
@@ -335,6 +347,12 @@ class WC_PB_DB {
 	 */
 	public static function delete_bundled_item_meta( $item_id, $meta_key, $meta_value = '', $delete_all = false ) {
 		if ( delete_metadata( 'bundled_item', $item_id, $meta_key, $meta_value, $delete_all ) ) {
+
+			$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $item_id;
+			wp_cache_delete( $cache_key, 'bundled_item_meta' );
+
+			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+
 			return true;
 		}
 		return false;
@@ -361,12 +379,18 @@ class WC_PB_DB {
 				WHERE meta_key IN ( 'stock_status', 'max_stock' )
 			" );
 
+			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_item_meta' );
+
 		} else {
 
 			if ( is_array( $where ) ) {
 				$bundled_item_ids = array_map( 'absint' , $where );
+				WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_item_meta' );
 			} else {
-				$bundled_item_ids = array( absint( $where ) );
+				$where            = absint( $where );
+				$bundled_item_ids = array( $where );
+				$cache_key        = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $where;
+				wp_cache_delete( $cache_key, 'bundled_item_meta' );
 			}
 
 			$wpdb->query( "
@@ -375,6 +399,8 @@ class WC_PB_DB {
 				AND bundled_item_id IN (" . implode( ',', $bundled_item_ids ) . ")
 			" );
 		}
+
+		WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
 	}
 }
 

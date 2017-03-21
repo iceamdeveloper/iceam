@@ -401,6 +401,12 @@ class WC_Subscription extends WC_Order {
 				$this->add_order_note( trim( sprintf( __( '%1$s Status changed from %2$s to %3$s.', 'woocommerce-subscriptions' ), $note, wcs_get_subscription_status_name( $old_status ), wcs_get_subscription_status_name( $new_status ) ) ), 0, $manual );
 
 			} catch ( Exception $e ) {
+				// Log any exceptions to a WC logger
+				$log        = new WC_Logger();
+				$log_entry  = print_r( $e, true );
+				$log_entry .= 'Exception Trace: ' . print_r( $e->getTraceAsString(), true );
+
+				$log->add( 'wcs-update-status-failures', $log_entry );
 
 				// Make sure the old status is restored
 				wp_update_post( array( 'ID' => $this->id, 'post_status' => $old_status_key ) );
@@ -942,7 +948,7 @@ class WC_Subscription extends WC_Order {
 
 			// Make sure the next payment is more than 2 hours in the future, this ensures changes to the site's timezone because of daylight savings will never cause a 2nd renewal payment to be processed on the same day
 			$i = 1;
-			while ( $next_payment_timestamp < ( current_time( 'timestamp', true ) + 2 * HOUR_IN_SECONDS ) && $i < 30 ) {
+			while ( $next_payment_timestamp < ( current_time( 'timestamp', true ) + 2 * HOUR_IN_SECONDS ) && $i < 3000 ) {
 				$next_payment_timestamp = wcs_add_time( $this->billing_interval, $this->billing_period, $next_payment_timestamp );
 				$i += 1;
 			}
@@ -1194,6 +1200,10 @@ class WC_Subscription extends WC_Order {
 	 * @param $transaction_id string Optional transaction id to store in post meta
 	 */
 	public function payment_complete( $transaction_id = '' ) {
+
+		if ( WC_Subscriptions_Change_Payment_Gateway::$is_request_to_change_payment ) {
+			return;
+		}
 
 		// Clear the cached completed payment count
 		$this->cached_completed_payment_count = false;
@@ -1827,5 +1837,25 @@ class WC_Subscription extends WC_Order {
 		}
 
 		return array_merge( $dates, $delete_date_types );
+	}
+
+	/**
+	 * Add a product line item to the subscription.
+	 *
+	 * @since 2.1.4
+	 * @param WC_Product product
+	 * @param int line item quantity.
+	 * @param array args
+	 * @return int|bool Item ID or false.
+	 */
+	public function add_product( $product, $qty = 1, $args = array() ) {
+		$item_id = parent::add_product( $product, $qty, $args );
+
+		// Remove backordered meta if it has been added
+		if ( $item_id && $product->backorders_require_notification() && $product->is_on_backorder( $qty ) ) {
+			wc_delete_order_item_meta( $item_id, apply_filters( 'woocommerce_backordered_item_meta_name', __( 'Backordered', 'woocommerce-subscriptions' ) ) );
+		}
+
+		return $item_id;
 	}
 }

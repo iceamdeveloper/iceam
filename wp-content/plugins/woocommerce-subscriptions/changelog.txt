@@ -1,5 +1,22 @@
 *** WooCommerce Subscriptions Changelog ***
 
+2017.03.06 - version 2.1.4
+* Tweak: Lengthen PayPal IPN lock to 5 days to prevent creating duplicate renewal orders when a fatal error occurs in processing the IPN. Prevoiusly the lock was set to 5 minutes, meaning on the 2nd IPN would be ignored. Given fatal errors will rarely be fixed within 5 minutes, Subscriptions will now ignore 5 days worth of IPN retries.(PR#1838
+* Tweak: Log exceptions caught while updating subscription statuses to make it easier to diagnose issues with 3rd party code and hosting environment that occur during status transitions. PR#1842
+* Tweak: Remove lingering compatibility code for WooCommerce prior to version 2.4 as version 2.3 and older have not been supported since v2.1. PR#1750
+* Fix: Changing payment method on manually added subscriptions. When manually creating a subscription via the WooCommerce > Add Subscription administration screen, make sure the order key meta data is set so its available when changing payment methods on that subscription. PR#1849
+* Fix: Make sure customer and admin retry emails are always sent after the initial retry by making sure the WooCommerce mailer has be setup. PR#1840
+* Fix: Do not suspend subscriptions using PayPal Standard as the payment method when switching using PayPal Reference Transactions as the payment method. PR#1831
+* Fix: Calculate correct next payment date for subscriptions suspended for more than 30 billing periods e.g. 1 month for a daily subscription, 2.5 years for a month subscription etc. PR#1846
+* Fix: Do not update the status of a failed or pending renewal order when changing the payment method on a subscription. PR#1720
+* Fix: Make sure free shipping is available as a recurring shipping method for subscription products with a free trial or synced to a date in the future if the recurring total exceeds the Minimum Order Amount required for free shipping. PR#1830
+* Fix: Do not incorrectly double slash some JavaScript file URLs. Fixes JavaScript on the WooCommerce > Edit Subscription administration screen with some hosts. PR#1853
+* Fix: Do not copy backorder line item meta data to subscriptions or renewal orders for in-stock products. PR#1855
+* Fix: Do not apply dynamic discounts from the WooCommerce Dynamic Pricing extension to renewal or resubcribe carts to avoid discounts being compounded when manually renewing or resubscribing. PR#1852
+* Fix: Do not switch to staging mode when site is using the WP_SITEURL constant to set the site URL to a value that differs to the URL stored in the database. Uses WP_SITEURL constant now for site url when it is set, and get_site_url() only its not set. PR#1717
+* Fix: Correct typo on the Customer Suspensions tooltip on the WooCommerce > Settings > Subscriptions > Miscellaneous administration screen. PR#1868
+* Fix: Only setup automatic payments after switching if automatic payments are enabled. PR#1865
+
 2017.01.24 - version 2.1.3
 * Tweak: Set renewal order's status to 'pending' before payment retry to make sure that the status change hooks are triggered by WC_Order::update_status(). Fixes compatibility with custom retry rules that use an order status other than pending. (PR#1818)
 * Tweak: Automatically transition resubscribe orders for $0 to 'complete' rather than 'processing', because the existing subscription had the pending-cancellation status and the new subscriptions first renewal will be when the first shipment is due to be sent. (PR#1796)

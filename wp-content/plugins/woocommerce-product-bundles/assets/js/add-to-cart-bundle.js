@@ -434,17 +434,17 @@ jQuery.fn.wc_get_bundle_script = function() {
 				var bundle_addons_price  = Number( component.component_selection_model.get( 'selected_addons' ) ),
 					bundle_addons_totals = bundle.get_taxed_totals( bundle_addons_price, bundle_addons_price, bundle.price_data[ 'base_price_tax' ] );
 
-				totals.price          = bundle_addons_totals.price + this.price_data[ 'totals' ].price * this.get_quantity();
-				totals.regular_price  = bundle_addons_totals.regular_price + this.price_data[ 'totals' ].regular_price * this.get_quantity();
-				totals.price_incl_tax = bundle_addons_totals.price_incl_tax + this.price_data[ 'totals' ].price_incl_tax * this.get_quantity();
-				totals.price_excl_tax = bundle_addons_totals.price_excl_tax + this.price_data[ 'totals' ].price_excl_tax * this.get_quantity();
+				totals.price          = bundle_addons_totals.price + this.price_data[ 'totals' ].price * component.get_selected_quantity();
+				totals.regular_price  = bundle_addons_totals.regular_price + this.price_data[ 'totals' ].regular_price * component.get_selected_quantity();
+				totals.price_incl_tax = bundle_addons_totals.price_incl_tax + this.price_data[ 'totals' ].price_incl_tax * component.get_selected_quantity();
+				totals.price_excl_tax = bundle_addons_totals.price_excl_tax + this.price_data[ 'totals' ].price_excl_tax * component.get_selected_quantity();
 
 				$.each( bundle.bundled_items, function( index, bundled_item ) {
-					if ( bundled_item.is_sold_individually() ) {
-						totals.price          = totals.price - ( bundle.get_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].price;
-						totals.regular_price  = totals.regular_price - ( bundle.get_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].regular_price;
-						totals.price_incl_tax = totals.price_incl_tax - ( bundle.get_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].price_incl_tax;
-						totals.price_excl_tax = totals.price_excl_tax - ( bundle.get_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].price_excl_tax;
+					if ( bundled_item.is_sold_individually() && component.get_selected_quantity() > 1 ) {
+						totals.price          = totals.price - ( component.get_selected_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].price;
+						totals.regular_price  = totals.regular_price - ( component.get_selected_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].regular_price;
+						totals.price_incl_tax = totals.price_incl_tax - ( component.get_selected_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].price_incl_tax;
+						totals.price_excl_tax = totals.price_excl_tax - ( component.get_selected_quantity() - 1 ) * bundle.price_data[ 'bundled_item_' + bundled_item.bundled_item_id + '_totals' ].price_excl_tax;
 					}
 				} );
 			}

@@ -132,8 +132,8 @@ class WCS_PayPal_Standard_IPN_Handler extends WC_Gateway_Paypal_IPN_Handler {
 				exit;
 			}
 
-			// Set a transient to block IPNs with this transaction ID for the next 5 minutes
-			set_transient( $ipn_lock_transient_name, 'in-progress', apply_filters( 'woocommerce_subscriptions_paypal_ipn_request_lock_time', 5 * MINUTE_IN_SECONDS ) );
+			// Set a transient to block IPNs with this transaction ID for the next 4 days (An IPN message may be present in PayPal up to 4 days after the original was sent)
+			set_transient( $ipn_lock_transient_name, 'in-progress', apply_filters( 'woocommerce_subscriptions_paypal_ipn_request_lock_time', 4 * DAY_IN_SECONDS ) );
 
 		}
 
@@ -415,7 +415,12 @@ class WCS_PayPal_Standard_IPN_Handler extends WC_Gateway_Paypal_IPN_Handler {
 			// Admins can suspend subscription at PayPal triggering this IPN
 			case 'recurring_payment_suspended':
 
-				if ( $subscription->has_status( 'active' ) ) {
+				// Make sure subscription hasn't been linked to a new payment method
+				if ( wcs_get_paypal_id( $subscription ) != $transaction_details['subscr_id'] ) {
+
+					WC_Gateway_Paypal::log( sprintf( 'IPN "recurring_payment_suspended" ignored for subscription %d - PayPal profile ID has changed', $subscription->id ) );
+
+				} else if ( $subscription->has_status( 'active' ) ) {
 
 					// We don't need to suspend the subscription at PayPal because it's already on-hold there
 					remove_action( 'woocommerce_subscription_on-hold_paypal', 'WCS_PayPal_Status_Manager::suspend_subscription' );

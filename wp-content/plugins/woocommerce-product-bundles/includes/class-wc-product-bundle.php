@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Class.
  *
  * @class    WC_Product_Bundle
- * @version  5.1.0
+ * @version  5.1.3
  */
 class WC_Product_Bundle extends WC_Product {
 
@@ -1340,20 +1340,32 @@ class WC_Product_Bundle extends WC_Product {
 	 *
 	 * @return array
 	 */
-	public function get_bundled_data_items( $context = 'any' ) {
+	public function get_bundled_data_items( $context = 'view' ) {
 
 		if ( ! is_array( $this->bundled_data_items ) ) {
 
-			$args = array(
-				'bundle_id' => $this->id,
-				'return'    => 'objects',
-				'order_by'  => array( 'menu_order' => 'ASC' )
-			);
+			$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_data_items' ) . $this->get_id();
+			$cached_data = wp_cache_get( $cache_key, 'bundled_data_items' );
 
-			$this->bundled_data_items = WC_PB_DB::query_bundled_items( $args );
+			if ( false !== $cached_data ) {
+				$this->bundled_data_items = $cached_data;
+			}
+
+			if ( ! is_array( $this->bundled_data_items ) ) {
+
+				$args = array(
+					'bundle_id' => $this->get_id(),
+					'return'    => 'objects',
+					'order_by'  => array( 'menu_order' => 'ASC' )
+				);
+
+				$this->bundled_data_items = WC_PB_DB::query_bundled_items( $args );
+
+				wp_cache_set( $cache_key, $this->bundled_data_items, 'bundled_data_items' );
+			}
 		}
 
-		return $this->bundled_data_items;
+		return 'view' === $context ? apply_filters( 'woocommerce_bundled_data_items', $this->bundled_data_items, $this ) : $this->bundled_data_items;
 	}
 
 	/**

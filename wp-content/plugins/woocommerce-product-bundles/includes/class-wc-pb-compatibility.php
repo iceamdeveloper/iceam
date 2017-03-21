@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  5.1.0
+ * @version  5.1.4
  */
 class WC_PB_Compatibility {
 
@@ -122,8 +122,15 @@ class WC_PB_Compatibility {
 	 */
 	public function init() {
 
-		// Addons and NYP support.
-		require_once( 'compatibility/class-wc-addons-compatibility.php' );
+		// Addons support.
+		if ( class_exists( 'WC_Product_Addons' ) ) {
+			require_once( 'compatibility/class-wc-addons-compatibility.php' );
+		}
+
+		// NYP support.
+		if ( function_exists( 'WC_Name_Your_Price' ) ) {
+			require_once( 'compatibility/class-wc-nyp-compatibility.php' );
+		}
 
 		// Points and Rewards support.
 		if ( class_exists( 'WC_Points_Rewards_Product' ) ) {

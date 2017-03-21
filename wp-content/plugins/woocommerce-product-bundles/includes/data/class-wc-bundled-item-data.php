@@ -18,8 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * A container that represents a bundled item and handles CRUD - @see WC_PB_Install::get_schema(). Simplified version of @see WC_Data.
  * Could be modified to extend WC_Data in the future. For now, all required functionality is self-contained to maintain WC back-compat.
  *
- * @class  WC_Bundled_Item_Data
- * @since  5.0.0
+ * @class    WC_Bundled_Item_Data
+ * @version  5.1.3
  */
 
 class WC_Bundled_Item_Data {
@@ -445,8 +445,8 @@ class WC_Bundled_Item_Data {
 			return;
 		}
 
-		$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_itemmeta' ) . $this->get_id();
-		$cached_meta = wp_cache_get( $cache_key, 'bundled_itemmeta' );
+		$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
+		$cached_meta = wp_cache_get( $cache_key, 'bundled_item_meta' );
 
 		if ( false !== $cached_meta ) {
 			$this->meta_data = $cached_meta;
@@ -465,7 +465,7 @@ class WC_Bundled_Item_Data {
 				$this->meta_data[ $meta->meta_key ] = $this->sanitize_meta_value( $meta->meta_value, $meta->meta_key ) ;
 			}
 
-			wp_cache_set( $cache_key, $this->meta_data, 'bundled_itemmeta' );
+			wp_cache_set( $cache_key, $this->meta_data, 'bundled_item_meta' );
 		}
 	}
 
@@ -505,7 +505,10 @@ class WC_Bundled_Item_Data {
 			}
 		}
 
-		WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_itemmeta' );
+		$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
+		wp_cache_delete( $cache_key, 'bundled_item_meta' );
+
+		WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
 
 		$this->read_meta_data();
 	}

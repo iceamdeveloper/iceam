@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle front-end functions and filters.
  *
  * @class    WC_PB_Display
- * @version  5.1.0
+ * @version  5.1.4
  */
 class WC_PB_Display {
 
@@ -284,7 +284,7 @@ class WC_PB_Display {
 			wc_enqueue_js( "
 				var wc_pb_wrap_bundled_table_item = function() {
 					jQuery( '.bundled_table_item td.product-name' ).wrapInner( '<div class=\"bundled_table_item_indent\"></div>' );
-				}
+				};
 
 				jQuery( 'body' ).on( 'updated_checkout', function() {
 					wc_pb_wrap_bundled_table_item();
@@ -589,10 +589,7 @@ class WC_PB_Display {
 	}
 
 	/**
-	 * Modify price filter widget meta query:
-	 *
-	 * - Exclude bundles from the original meta query.
-	 * - Enhance it to include results based on min/max price meta.
+	 * Enhance price filter widget meta query to include results based on max '_wc_sw_max_price' meta.
 	 *
 	 * @param  array     $meta_query
 	 * @param  WC_Query  $wc_query
@@ -606,16 +603,6 @@ class WC_PB_Display {
 			$max = isset( $_GET[ 'max_price' ] ) ? floatval( $_GET[ 'max_price' ] ) : 9999999999;
 
 			$price_meta_query = $meta_query[ 'price_filter' ];
-
-			$price_meta_query = array(
-				'relation' => 'AND',
-				$price_meta_query,
-				array(
-					'key' => '_wc_sw_max_price',
-					'compare'  => 'NOT EXISTS'
-				)
-			);
-
 			$price_meta_query = array(
 				'sw_price_filter' => true,
 				'price_filter'    => true,

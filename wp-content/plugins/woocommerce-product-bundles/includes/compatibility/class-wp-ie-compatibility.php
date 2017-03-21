@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Data is imported again using the WC_Bundled_Item_Data class.
  * Supports import of existing v4 data from post meta.
  *
- * @since 5.0.0
+ * @version  5.1.3
  */
 class WC_PB_WP_IE_Compatibility {
 
@@ -148,10 +148,7 @@ class WC_PB_WP_IE_Compatibility {
 			}
 
 			// Flush stock cache.
-			$wpdb->query( "
-				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
-				WHERE meta_key IN ( 'stock_status', 'max_stock' )
-			" );
+			WC_PB_DB::flush_stock_cache();
 		}
 	}
 }

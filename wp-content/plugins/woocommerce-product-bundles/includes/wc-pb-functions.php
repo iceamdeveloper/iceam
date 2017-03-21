@@ -65,12 +65,15 @@ function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 
 	$allow_cache = $allow_cache && ! defined( 'WC_PB_DEBUG_TRANSIENTS' ) && ! defined( 'WC_PB_UPDATING' );
 
-	$transient_name             = 'wc_bundled_product_data_' . WC_Cache_Helper::get_transient_version( 'product' );
+	$transient_name             = 'wc_bundled_product_data';
+	$transient_version          = WC_Cache_Helper::get_transient_version( 'product' );
 	$bundled_product_data_array = get_transient( $transient_name );
 	$bundled_product_data       = false;
 
-	if ( $allow_cache && false !== $bundled_product_data_array && is_array( $bundled_product_data_array ) && isset( $bundled_product_data_array[ $product_id ] ) && is_array( $bundled_product_data_array[ $product_id ] ) ) {
-		$bundled_product_data = $bundled_product_data_array[ $product_id ];
+	if ( $allow_cache && is_array( $bundled_product_data_array ) && isset( $bundled_product_data_array[ $product_id ] ) && is_array( $bundled_product_data_array[ $product_id ] ) && isset( $bundled_product_data_array[ $product_id ][ 'bundle_ids' ] ) && is_array( $bundled_product_data_array[ $product_id ][ 'bundle_ids' ] ) ) {
+		if ( isset( $bundled_product_data_array[ $product_id ][ 'version' ] ) && $transient_version === $bundled_product_data_array[ $product_id ][ 'version' ] ) {
+			$bundled_product_data = $bundled_product_data_array[ $product_id ][ 'bundle_ids' ];
+		}
 	}
 
 	if ( false === $bundled_product_data ) {
@@ -83,9 +86,20 @@ function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 		$bundled_product_data = WC_PB_DB::query_bundled_items( $args );
 
 		if ( is_array( $bundled_product_data_array ) ) {
-			$bundled_product_data_array[ $product_id ] = $bundled_product_data;
+
+			$bundled_product_data_array[ $product_id ] = array(
+				'bundle_ids' => $bundled_product_data,
+				'version'    => $transient_version
+			);
+
 		} else {
-			$bundled_product_data_array = array( $product_id => $bundled_product_data );
+
+			$bundled_product_data_array = array(
+				$product_id => array(
+					'bundle_ids' => $bundled_product_data,
+					'version'    => $transient_version
+				)
+			);
 		}
 
 		if ( ! defined( 'WC_PB_UPDATING' ) ) {

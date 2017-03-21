@@ -903,6 +903,11 @@ class WC_PB_Meta_Box_Product_Data {
 		$item_discount           = isset( $item_data[ 'discount' ] ) && (double) $item_data[ 'discount' ] > 0 ? $item_data[ 'discount' ] : '';
 		$is_optional             = isset( $item_data[ 'optional' ] ) ? $item_data[ 'optional' ] : '';
 
+		// When adding a subscription-type product for the first time, enable "Priced Individually" by default.
+		if ( did_action( 'wp_ajax_woocommerce_add_bundled_product' ) && $bundled_product->is_type( array( 'subscription', 'variable-subscription' ) ) && ! isset( $item_data[ 'priced_individually' ] ) ) {
+			$is_priced_individually = 'yes';
+		}
+
 		?><div class="optional">
 			<div class="form-field optional">
 				<label for="optional"><?php echo __( 'Optional', 'woocommerce-product-bundles' ) ?></label>
