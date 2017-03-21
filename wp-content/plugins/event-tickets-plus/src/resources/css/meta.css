@@ -133,7 +133,7 @@
 
 .meta-postbox {
 	border: 1px solid #e5e5e5;
-	box-shadow: 0 1px 1px rgba( 0, 0, 0, .04 );
+	box-shadow: 0 1px 1px rgba(0, 0, 0, .04);
 	min-width: 255px;
 }
 
@@ -230,19 +230,6 @@
 .event-tickets-ticket-purchaser {
 	color: #999;
 	font-size: .9em;
-}
-
-.attendees td.column-order_status {
-	font-size: 13px;
-	width: 80px;
-}
-
-.attendees .column-security {
-	width: 120px;
-}
-
-.attendees .column-check_in {
-	width: 80px;
 }
 
 .event-tickets-meta-toggle-hide {

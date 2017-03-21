@@ -11,13 +11,14 @@ if ( ! class_exists( 'WP_List_Table' ) ) {
  * See documentation for WP_List_Table
  */
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_Table {
-	public $event_id;
-	public $total_purchased = 0;
-	public $overall_total = 0;
-	public $valid_order_items = array();
+
+	public        $event_id;
+	public        $total_purchased   = 0;
+	public        $overall_total     = 0;
+	public        $valid_order_items = array();
 	public static $pass_fees_to_user = true;
-	public static $fee_percent = 0;
-	public static $fee_flat = 0;
+	public static $fee_percent       = 0;
+	public static $fee_flat          = 0;
 
 	/**
 	 * In-memory cache of orders per event, where each key represents the event ID
@@ -33,8 +34,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	public function __construct() {
 		$args = array(
 			'singular' => 'order',
-			'plural' => 'orders',
-			'ajax' => true,
+			'plural'   => 'orders',
+			'ajax'     => true,
 		);
 
 		parent::__construct( $args );
@@ -77,10 +78,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 */
 	public function get_columns() {
 		$columns = array(
-			'order'      => __( 'Order', 'event-tickets' ),
-			'purchased'  => __( 'Purchased', 'event-tickets' ),
-			'ship_to'    => __( 'Ship to', 'event-tickets' ),
-			'date'       => __( 'Date', 'event-tickets' ),
+			'order'     => __( 'Order', 'event-tickets' ),
+			'purchaser' => __( 'Purchaser', 'event-tickets' ),
+			'email'     => __( 'Email', 'event-tickets' ),
+			'purchased' => __( 'Purchased', 'event-tickets' ),
+			'address'   => __( 'Address', 'event-tickets' ),
+			'date'      => __( 'Date', 'event-tickets' ),
+			'status'    => __( 'Status', 'event-tickets' ),
 		);
 
 		if ( self::event_fees( $this->event_id ) ) {
@@ -125,12 +129,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 *
 	 * @return string
 	 */
-	public function column_ship_to( $item ) {
+	public function column_address( $item ) {
 		$shipping = $item['shipping_address'];
 
-		if (
-			empty( $shipping['address_1'] )
-			|| empty( $shipping['city'] )
+		if ( empty( $shipping['address_1'] )
+		     || empty( $shipping['city'] )
 		) {
 			return '';
 		}
@@ -166,7 +169,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		}
 
 		return $address;
-	}//end column_ship_to
+	}//end column_address
 
 	/**
 	 * Handler for the purchased column
@@ -177,7 +180,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 */
 	public function column_purchased( $item ) {
 
-		$tickets = array();
+		$tickets   = array();
 		$num_items = 0;
 
 		foreach ( $item['line_items'] as $line_item ) {
@@ -222,48 +225,26 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		$warning = false;
 
 		$order_number = $item['order_number'];
-		$customer = $item['customer'];
-		$customer_email = $customer['email'];
-		$customer_name = '';
-
-		if ( empty( $customer['first_name'] ) && empty( $customer['last_name'] ) ) {
-			$customer_name = "{$item['billing_address']['first_name']} {$item['billing_address']['last_name']}";
-		} else {
-			$customer_name = empty( $customer['first_name'] ) ? '' : $customer['first_name'];
-			$customer_name .= empty( $customer['last_name'] ) ? '' : ' ' . $customer['last_name'];
-		}
-
-		$customer_name = trim( $customer_name );
 
 		$order_url = add_query_arg(
 			array(
-				'post' => $order_number,
+				'post'   => $order_number,
 				'action' => 'edit',
-			),
-			admin_url( 'post.php' )
+			), admin_url( 'post.php' )
 		);
 
 		$order_number_link = '<a href="' . esc_url( $order_url ) . '">#' . absint( $order_number ) . '</a>';
 
 		$output = sprintf(
 			esc_html__(
-				'%1$s by %2$s',
-				'the-events-calendar'
-			),
-			$order_number_link,
-			esc_html( $customer_name )
+				'%1$s', 'the-events-calendar'
+			), $order_number_link
 		);
 
-		if ( $customer_email ) {
-			$output .= sprintf(
-				'<br><a href="mailto:%1$s">%2$s</a>',
-				esc_attr( $customer_email ),
-				esc_html( $customer_email )
-			);
-		}
-
 		if ( 'completed' !== $item['status'] ) {
-			$output .= '<div class="order-status order-status-' . esc_attr( $item['status'] ) . '">' . esc_html( ucwords( $item['status'] ) ) . '</div>';
+			$output .= '<div class="order-status order-status-' . esc_attr( $item['status'] ) . '">' . esc_html(
+					ucwords( $item['status'] )
+				) . '</div>';
 		}
 
 		return $output;
@@ -334,10 +315,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * @param object $item The current item
 	 */
 	public function single_row( $item ) {
-		static $row_class = '';
-		$row_class = ( $row_class == '' ? ' alternate ' : '' );
-
-		echo '<tr class="' . sanitize_html_class( $row_class ) . '">';
+		echo '<tr class="' . esc_attr( $item['status'] ) . '">';
 		$this->single_row_columns( $item );
 		echo '</tr>';
 	}//end single_row
@@ -359,25 +337,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		$tickets = $main->get_tickets( $event_id );
 
 		$args = array(
-			'post_type' => 'tribe_wooticket',
-			'posts_per_page' => -1,
-			'post_status' => array(
+			'post_type'      => 'tribe_wooticket',
+			'posts_per_page' => - 1,
+			'post_status'    => array(
 				'wc-pending',
 				'wc-processing',
 				'wc-on-hold',
 				'wc-completed',
 				'publish',
 			),
-			'meta_query' => array(
+			'meta_query'     => array(
 				array(
-					'key' => Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_EVENT_KEY,
+					'key'   => Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_EVENT_KEY,
 					'value' => $event_id,
 				),
 			),
 		);
 
 		$orders = array();
-		$query = new WP_Query( $args );
+		$query  = new WP_Query( $args );
 		foreach ( $query->posts as &$item ) {
 			$order_id = get_post_meta( $item->ID, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_ORDER_KEY, true );
 
@@ -385,11 +363,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 				continue;
 			}
 
-			$order = WC()->api->WC_API_Orders->get_order( $order_id );
-			$orders[ $order_id ] = $order['order'];
+			$order               = WC()->api->WC_API_Orders->get_order( $order_id );
+			//prevent fatal error if no orders
+			if ( ! is_wp_error( $order ) ) {
+				$orders[ $order_id ] = $order['order'];
+			}
 		}
 
 		self::$orders[ $event_id ] = $orders;
+
 		return $orders;
 	}
 
@@ -404,8 +386,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 			}
 
 			foreach ( $order['line_items'] as $line_item ) {
-				$ticket_id = $line_item['product_id'];
-				$ticket_event_id = absint( get_post_meta( $ticket_id, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->event_key, true ) );
+				$ticket_id       = $line_item['product_id'];
+				$ticket_event_id = absint(
+					get_post_meta( $ticket_id, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->event_key, true )
+				);
 
 				// if the ticket isn't for the currently viewed event, skip it
 				if ( $ticket_event_id !== $event_id ) {
@@ -432,11 +416,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		$this->valid_order_items = self::get_valid_order_items_for_event( $this->event_id, $this->items );
 
 		$this->set_pagination_args(
-			 array(
+			array(
 				'total_items' => $total_items,
 				'per_page'    => $per_page,
 				'total_pages' => 1,
-			 )
+			)
 		);
 	}//end prepare_items
 
@@ -448,16 +432,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * @return float
 	 */
 	public static function event_sales( $event_id ) {
-		$orders = self::get_orders( $event_id );
+		$orders            = self::get_orders( $event_id );
 		$valid_order_items = self::get_valid_order_items_for_event( $event_id, $orders );
 
 		$total = 0;
 
 		foreach ( $valid_order_items as $order_id => $order ) {
-			if (
-				'cancelled' === $orders[ $order_id ]['status']
-				|| 'refunded' === $orders[ $order_id ]['status']
-				|| 'failed' === $orders[ $order_id ]['status']
+			if ( 'cancelled' === $orders[ $order_id ]['status']
+			     || 'refunded' === $orders[ $order_id ]['status']
+			     || 'failed' === $orders[ $order_id ]['status']
 			) {
 				continue;
 			}
@@ -486,16 +469,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * @return float
 	 */
 	public static function event_fees( $event_id ) {
-		$orders = self::get_orders( $event_id );
+		$orders            = self::get_orders( $event_id );
 		$valid_order_items = self::get_valid_order_items_for_event( $event_id, $orders );
 
 		$fees = 0;
 
 		foreach ( $valid_order_items as $order_id => $order ) {
-			if (
-				'cancelled' === $orders[ $order_id ]['status']
-				|| 'refunded' === $orders[ $order_id ]['status']
-				|| 'failed' === $orders[ $order_id ]['status']
+			if ( 'cancelled' === $orders[ $order_id ]['status']
+			     || 'refunded' === $orders[ $order_id ]['status']
+			     || 'failed' === $orders[ $order_id ]['status']
 			) {
 				continue;
 			}
@@ -532,5 +514,46 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 */
 	public static function calc_site_fee( $amount ) {
 		return round( $amount * ( self::$fee_percent / 100 ), 2 ) + self::$fee_flat;
+	}
+
+	/**
+	 * Echoes the customer name.
+	 *
+	 * @param object $item The current item.
+	 *
+	 * @return string
+	 */
+	public function column_purchaser( $item ) {
+		$customer = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Customer::make_from_item( $item );
+		return $customer->get_name();
+	}
+
+	/**
+	 * Echoes the customer email.
+	 *
+	 * @param object $item The current item.
+	 *
+	 * @return string
+	 */
+	public function column_email( $item ) {
+		$customer = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Customer::make_from_item( $item );
+		return $customer->get_email();
+	}
+
+	/**
+	 * Echoes the order status.
+	 *
+	 * @param object $item
+	 *
+	 * @return string
+	 */
+	public function column_status( $item ) {
+		$order = wc_get_order( $item['id'] );
+
+		if ( empty( $order ) ) {
+			return '';
+		}
+
+		return wc_get_order_status_name( $order->get_status() );
 	}
 }//end class

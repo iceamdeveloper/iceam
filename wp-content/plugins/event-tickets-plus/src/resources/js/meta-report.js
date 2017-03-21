@@ -11,6 +11,8 @@ tribe_event_tickets_plus.meta.report.event = tribe_event_tickets_plus.meta.repor
 	 */
 	my.init = function() {
 		$( '.wp-list-table.attendees' ).on( 'click', '.event-tickets-meta-toggle', this.event.toggle_meta_view );
+		$( window ).on( 'attendees-report-before-print.tribe-tickets', this.toggle_meta_rows );
+		$( window ).on( 'attendees-report-before-print.tribe-tickets', this.toggle_meta_rows );
 	};
 
 	/**
@@ -54,6 +56,16 @@ tribe_event_tickets_plus.meta.report.event = tribe_event_tickets_plus.meta.repor
 
 		my.toggle_meta_view( $closest_row );
 		my.toggle_meta_row( $closest_row, $next_meta_rows.first() );
+	};
+
+	my.toggle_meta_rows = function () {
+		var $rows = $( 'table.wp-list-table.attendees' ).find( 'tr' ).has( 'a.event-tickets-meta-toggle' );
+		// show all details
+		$rows.each( function () {
+			var $this = $( this );
+			my.toggle_meta_view( $this );
+			my.toggle_meta_row( $this, $this.next( 'tr.event-tickets-meta-row' ).first() );
+		} );
 	};
 
 	$( function() {

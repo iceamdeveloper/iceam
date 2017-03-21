@@ -3,8 +3,8 @@
 Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tribe, faction23, geoffgraham, ggwicz, jazbek, jbrinley, joshlimecuda, leahkoerper, lucatume, mastromktg, neillmcshea, nicosantos, peterchester, reid.peifer, roblagatta, shane.pearlman, thatdudebutch,  zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
-Tested up to: 4.7
-Stable tag: 4.3.5
+Tested up to: 4.7.3
+Stable tag: 4.4.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -142,6 +142,28 @@ Our Premium Plugins:
 
 == Changelog ==
 
+= [4.4.3] 2017-03-08 =
+
+* Fix - Prevent fatal when attempting to render QR codes when gzuncompress() is unavailable [73498]
+* Fix - Fixed a bug that meant the Attendee Meta info didn't work on multiple tickets purchased at same time (thanks to @robertstaddon for the report) [74036]
+
+= [4.4.2] 2017-02-09 =
+
+* Fix - Replaced WooCommerce autocomplete feature with order status based controls to regulate the generation of attendees and emails (thats for the report @Bryan) [71893]
+* Fix - Added license file [72529]
+
+= [4.4.1] 2017-01-26 =
+
+* Fix - Prevent throwing fatals for Global Stock when only RSVP tickets exists (Thanks for Reporting Scott) [65888]
+* Tweak - Improvements to the Front End Tickets UX Styles [71378]
+
+= [4.4] 2017-01-09 =
+
+* Tweak - Various improvements to ticket order reports [65888]
+* Tweak - Update the WooCommerce Orders Tab with better descriptions and breakdown of tickets sold by order status [66012]
+* Tweak - Ensures the manage_stock property of EDD tickets is not false when tickets have no inventory left [67176]
+* Tweak - Adds tabbed view support [66015]
+
 = [4.3.5] 2016-12-20 =
 
 * Tweak - Updated the template override instructions in a number of templates [68229]
@@ -178,7 +200,7 @@ Our Premium Plugins:
 
 = [4.3] 2016-10-13 =
 
-* Tweak - Improved integration with the attendee screen and enhanced options for customizing same [61992]
+* Tweak - Improved integration with the attendee screen and enhanced options for customizing same [61992, 66004]
 * Fix - Fix issue where custom attendee meta fields sometimes failed to render the meta field templates [67235]
 
 = [4.2.7.1] 2016-09-21 =

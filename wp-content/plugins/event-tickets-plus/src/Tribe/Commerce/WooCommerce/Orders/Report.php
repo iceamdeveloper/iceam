@@ -3,9 +3,17 @@
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	/**
 	 * Slug of the admin page for orders
+	 *
 	 * @var string
 	 */
 	public static $orders_slug = 'tickets-orders';
+
+	/**
+	 * Slug of the orders tab.
+	 *
+	 * @var string
+	 */
+	public static $tab_slug = 'tribe-tickets-plus-woocommerce-orders-report';
 
 	/**
 	 * Constructor!
@@ -31,10 +39,23 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 			)
 		);
 
-		add_action( 'admin_enqueue_scripts', array( Tribe__Tickets__Tickets_Handler::instance(), 'attendees_page_load_css_js' ) );
-		add_action( 'admin_enqueue_scripts', array( Tribe__Tickets__Tickets_Handler::instance(), 'attendees_page_load_pointers' ) );
+		add_filter( 'tribe_filter_attendee_page_slug', array( $this, 'add_attendee_resources_page_slug' ) );
+		add_action( 'admin_enqueue_scripts', array( tribe( 'tickets.handler' ), 'attendees_page_load_css_js' ) );
+		add_action( 'admin_enqueue_scripts', array( tribe( 'tickets.handler' ), 'attendees_page_load_pointers' ) );
 		add_action( "load-$this->orders_page", array( $this, 'orders_page_screen_setup' ) );
 
+	}
+
+	/**
+	 * Filter the page slugs that the attendee resources will load to add the order page
+	 *
+	 * @param $page_slugs
+	 *
+	 * @return array
+	 */
+	public function add_attendee_resources_page_slug( $slugs ) {
+		$slugs[] = $this->orders_page;
+		return $slugs;
 	}
 
 	/**
@@ -56,14 +77,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 			return $actions;
 		}
 
-		$url = add_query_arg(
-			array(
-				'post_type' => $post->post_type,
-				'page'      => self::$orders_slug,
-				'event_id'  => $post->ID,
-			),
-			admin_url( 'edit.php' )
-		);
+		$has_tickets = count( (array) Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->get_tickets( $post->ID ) );
+
+		if ( ! $has_tickets ) {
+			return $actions;
+		}
+
+		$url = self::get_tickets_report_link( $post );
 
 		$actions['tickets_orders'] = sprintf(
 			'<a title="%s" href="%s">%s</a>',
@@ -145,13 +165,30 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		$event_sales = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_sales( $event_id );
 		$event_fees = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_fees( $event_id );
 
-		$tickets_sold = array();
+		$tickets_sold = $tickets_breakdown = array();
 		$total_sold = 0;
 		$total_pending = 0;
-		$total_profit = 0;
 		$total_completed = 0;
 
+		//Setup the ticket breakdown
+		$order_statuses = array(
+			'wc-completed',
+			'wc-pending',
+			'wc-processing',
+			'wc-cancelled',
+		);
+		foreach ( $order_statuses as $status ) {
+			$tickets_breakdown[ $status ]['_qty']        = 0;
+			$tickets_breakdown[ $status ]['_line_total'] = 0;
+		}
+
 		foreach ( $tickets as $ticket ) {
+
+			//Only Display if a WooCommerce Ticket otherwise kick out
+			if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' != $ticket->provider_class ) {
+				continue;
+			}
+
 			if ( empty( $tickets_sold[ $ticket->name ] ) ) {
 				$tickets_sold[ $ticket->name ] = array(
 					'ticket' => $ticket,
@@ -175,13 +212,92 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 			$tickets_sold[ $ticket->name ]['pending'] += absint( $ticket->qty_pending() );
 			$tickets_sold[ $ticket->name ]['completed'] += absint( $tickets_sold[ $ticket->name ]['sold'] ) - absint( $tickets_sold[ $ticket->name ]['pending'] );
 
-
 			$total_sold += $net_sold;
 			$total_pending += absint( $ticket->qty_pending() );
+
+			$tickets_sold[ $ticket->name ]['product_sales'] = $this->get_total_sales_per_productby_status( $ticket->ID );
+
+			//update ticket item counts by order status
+			foreach ( $tickets_sold[ $ticket->name ]['product_sales'] as $status => $product ) {
+				if ( $status && isset( $product[0] ) && is_object( $product[0] ) ) {
+					$tickets_breakdown[ $status ]['_qty'] += $product[0]->_qty;
+					$tickets_breakdown[ $status ]['_line_total'] += $product[0]->_line_total;
+				}
+			}
+
 		}
 
 		$total_completed += absint( $total_sold ) - absint( $total_pending );
 
+		$tabbed_view = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View( $event_id );
+		$tabbed_view->render( self::$tab_slug );
+
 		include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/woocommerce-orders.php';
+	}
+
+	/**
+	 * Returns the link to the "Orders" report for this post.
+	 *
+	 * @param WP_Post $post
+	 *
+	 * @return string The absolute URL.
+	 */
+	public static function get_tickets_report_link( $post ) {
+		$url = add_query_arg( array(
+			'post_type' => $post->post_type,
+			'page'      => self::$orders_slug,
+			'event_id'  => $post->ID,
+		), admin_url( 'edit.php' ) );
+
+		return $url;
+	}
+
+	public static function get_total_sales_per_productby_status( $product_id ) {
+		global $wpdb;
+
+		if ( ! $product_id ) {
+			return false;
+		}
+
+		$order_items = array();
+
+		$order_statuses = array(
+			'wc-completed',
+			'wc-pending',
+			'wc-processing',
+			'wc-cancelled',
+		);
+
+		foreach ( $order_statuses as $order_status ) {
+
+			$sql = $wpdb->prepare( "
+ 						SELECT SUM( order_item_meta.meta_value ) as _qty,
+ 						SUM( order_item_meta_3.meta_value ) as _line_total
+ 						FROM {$wpdb->prefix}woocommerce_order_items as order_items
+
+						LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta ON order_items.order_item_id = order_item_meta.order_item_id
+						LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta_2 ON order_items.order_item_id = order_item_meta_2.order_item_id
+						LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta_3 ON order_items.order_item_id = order_item_meta_3.order_item_id
+						LEFT JOIN {$wpdb->posts} AS posts ON order_items.order_id = posts.ID
+
+						WHERE posts.post_type = 'shop_order'
+						AND posts.post_status IN ( '$order_status' )
+						AND order_items.order_item_type = 'line_item'
+						AND order_item_meta.meta_key = '_qty'
+						AND order_item_meta_2.meta_key = '_product_id'
+						AND order_item_meta_2.meta_value = %s
+						AND order_item_meta_3.meta_key = '_line_total'
+
+						GROUP BY order_item_meta_2.meta_value
+					",
+					$product_id
+				);
+
+			$order_items[ $order_status ] = $wpdb->get_results( $sql );
+
+		}
+
+		return $order_items;
+
 	}
 }

@@ -666,6 +666,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Week' ) ) {
 					'post_status'  => $post_status,
 					'eventDate'    => $_POST['eventDate'],
 					'eventDisplay' => 'week',
+					'featured'     => tribe( 'tec.featured_events' )->featured_events_requested(),
 				);
 
 				if ( isset( $_POST['tribe_event_category'] ) ) {

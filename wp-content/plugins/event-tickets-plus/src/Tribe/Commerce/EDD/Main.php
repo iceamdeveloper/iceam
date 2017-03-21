@@ -779,7 +779,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		// ...With some exceptions for global stock tickets
 		$stock = $this->set_stock_level_for_global_stock_tickets( $stock, $event_id, $ticket_id );
 
-		$return->manage_stock( (boolean) $stock );
+		$return->manage_stock( is_numeric( $product->_stock ) );
 		$return->global_stock_mode( get_post_meta( $ticket_id, '_global_stock_mode', true ) );
 		$return->global_stock_cap( get_post_meta( $ticket_id, '_global_stock_cap', true ) );
 
@@ -1174,7 +1174,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		if ( $product instanceof WP_Post ) {
 			$product_id = $product->ID;
 		}
-
 		$price_html = edd_price( $product_id, false );
 		return apply_filters( 'eddtickets_ticket_price_html', $price_html, $product, $attendee );
 	}

@@ -2,7 +2,7 @@
 /*
 Plugin Name: Event Tickets Plus
 Description: Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!
-Version: 4.3.5
+Version: 4.4.3
 Author: Modern Tribe, Inc.
 Author URI: http://m.tri.be/28
 License: GPLv2 or later
@@ -44,7 +44,13 @@ add_action( 'tribe_tickets_plugin_failed_to_load', 'event_tickets_plus_setup_fai
 add_action( 'plugins_loaded', 'event_tickets_plus_check_for_init_failure', 9 );
 
 function event_tickets_plus_init() {
+	tribe_init_tickets_plus_autoloading();
 	event_tickets_plus_setup_textdomain();
+
+	if ( event_tickets_plus_is_incompatible_tickets_core_installed() ) {
+		do_action( 'tribe_tickets_plugin_failed_to_load' );
+		return;
+	}
 
 	Tribe__Tickets_Plus__Main::instance();
 }
@@ -53,7 +59,9 @@ function event_tickets_plus_init() {
  * Sets up the textdomain stuff
  */
 function event_tickets_plus_setup_textdomain() {
-	tribe_init_tickets_plus_autoloading();
+	if ( defined( 'EVENT_TICKETS_PLUS_TEXTDOMAIN_LOADED' ) && EVENT_TICKETS_PLUS_TEXTDOMAIN_LOADED ) {
+		return;
+	}
 
 	$mopath = trailingslashit( basename( dirname( __FILE__ ) ) ) . 'lang/';
 	$domain = 'event-tickets-plus';
@@ -81,13 +89,15 @@ function tribe_init_tickets_plus_autoloading() {
 	$autoloader = Tribe__Autoloader::instance();
 	$autoloader->register_prefix( 'Tribe__Tickets_Plus__', dirname( __FILE__ ) . '/src/Tribe' );
 	$autoloader->register_autoloader();
+
+	tribe_singleton( 'tickets-plus.main', 'Tribe__Tickets_Plus__Main' );
 }
 
 /**
  * Whether the current version is incompatible with the installed and active The Events Calendar
  * @return bool
  */
-function event_tickets_plus_is_incompatible_tickets_core_installed () {
+function event_tickets_plus_is_incompatible_tickets_core_installed() {
 	if ( ! class_exists( 'Tribe__Tickets__Main' ) ) {
 		return true;
 	}

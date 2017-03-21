@@ -72,6 +72,7 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 			'view'      => '',
 			'category'  => '',
 			'cat'       => '',
+			'featured'  => 'false',
 		);
 
 		$this->atts = shortcode_atts( $defaults, $atts, 'tribe_events' );
@@ -252,6 +253,7 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 			'eventDate'         => $this->get_attribute( 'date', $this->get_url_param( 'date' ) ),
 			'eventDisplay'      => $this->get_attribute( 'view' ),
 			'tribe_events_cat'  => $this->atts[ 'category' ],
+			'featured'          => $this->is_attribute_truthy( 'featured' ),
 		) );
 	}
 

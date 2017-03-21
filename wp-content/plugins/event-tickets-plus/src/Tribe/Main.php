@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.3.5';
+		const VERSION = '4.4.3';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.3';
+		const REQUIRED_TICKETS_VERSION = '4.4';
 
 		/**
 		 * Directory of the plugin
@@ -78,13 +78,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 * @return Tribe__Tickets_Plus__Main
 		 */
 		public static function instance() {
-			static $instance;
-
-			if ( ! $instance instanceof self ) {
-				$instance = new self;
-			}
-
-			return $instance;
+			return tribe( 'tickets-plus.main' );
 		}
 
 		public function __construct() {

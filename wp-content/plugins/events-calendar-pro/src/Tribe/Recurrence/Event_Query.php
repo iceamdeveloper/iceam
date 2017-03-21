@@ -67,14 +67,15 @@ class Tribe__Events__Pro__Recurrence__Event_Query {
 			$this->query->set( 'post_parent', $this->parent_event->ID );
 			$this->query->set( 'post_status', $status );
 			$this->query->set( 'posts_per_page', tribe_get_option( 'postsPerPage', 10 ) );
+			$this->query->set( 'tribe_remove_date_filters', true );
 
 			// Configure what this page actually is
 			$this->query->is_singular = false;
-
 			$this->query->is_archive = true;
 			$this->query->is_post_type_archive = true;
 
 			add_filter( 'posts_where', array( $this, 'include_parent_event' ) );
+			add_filter( 'posts_orderby', array( $this, 'orderby_event_date' ), 100 );
 			add_action( 'wp', array( $this, 'verify_all_page' ) );
 		}
 	}
@@ -123,5 +124,51 @@ class Tribe__Events__Pro__Recurrence__Event_Query {
 		$where_either   = " ( $where_children OR $where_parent ) ";
 
 		return str_replace( $where_children, $where_either, $where_sql );
+	}
+
+	/**
+	 * Ensure the query orders by event start date rather than post date.
+	 *
+	 * Without this step the results may be in an unexpected order, particularly for more
+	 * complicated recurrence patterns or patterns that have been amended (and the post date
+	 * does not reflect the true date order).
+	 *
+	 * @param string $orderby_sql
+	 *
+	 * @return string
+	 */
+	public function orderby_event_date( $orderby_sql ) {
+		global $wpdb;
+
+		// Run once only!
+		remove_filter( 'posts_orderby', array( $this, 'orderby_event_date' ), 100 );
+
+		// Check if a meta query is set and grab the first query
+		$first_meta_query = Tribe__Utils__Array::get( $this->query->meta_query->queries, array( 0 ), false );
+
+		// If not set or it does not relate to the EventStartDate, bail
+		if ( ! $first_meta_query || '_EventStartDate' !== $first_meta_query['key'] ) {
+			return $orderby_sql;
+		}
+
+		$original_orderby_sql = $orderby_sql;
+		$expected_orderby = $wpdb->postmeta . '.meta_value ASC';
+
+		// Only modify the orderby fragment if necessary
+		if (
+			! empty( $original_orderby_sql )
+			&& $original_orderby_sql !== $expected_orderby
+		) {
+			$orderby_sql = $expected_orderby . ', ' . $original_orderby_sql;
+		}
+
+		/**
+		 * Provides an opportunity to override the orderby-SQL fragment for the /all/ page.
+		 *
+		 * @param string   $orderby_sql
+		 * @param string   $original_orderby_sql
+		 * @param WP_Query $query
+		 */
+		return apply_filters( 'tribe_events_pro_all_event_query_orderby_sql', $orderby_sql, $original_orderby_sql, $this->query );
 	}
 }

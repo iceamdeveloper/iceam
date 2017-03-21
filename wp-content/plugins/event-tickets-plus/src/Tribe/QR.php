@@ -98,6 +98,11 @@ class Tribe__Tickets_Plus__QR {
 	 * @return string
 	 */
 	public function inject_qr( $ticket ) {
+		// if gzuncompress doesn't exist, we can't render QR codes
+		if ( ! function_exists( 'gzuncompress' ) ) {
+			Tribe__Main::instance()->log_warning( __( 'Could not render QR code because gzuncompress() is not available', 'event-tickets-plus' ), __CLASS__ );
+			return;
+		}
 
 		$link = $this->_get_link( $ticket['qr_ticket_id'], $ticket['event_id'] );
 		$qr   = $this->_get_image( $link );

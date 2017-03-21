@@ -17,10 +17,14 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	protected $total_pending = 0;
 
 	/**
-	 * Calculate total RSVP attendance for the current event.
+	 * Calculate totals for the current event.
 	 */
 	protected function calculate_totals() {
 		foreach ( Tribe__Tickets__Tickets::get_event_tickets( $this->event_id ) as $ticket ) {
+			if ( ! $this->should_count( $ticket ) ) {
+				continue;
+			}
+
 			$this->total_sold += $ticket->qty_sold();
 			$this->total_pending += $ticket->qty_pending();
 		}
@@ -29,22 +33,42 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	}
 
 	/**
+	 * Indicates if the ticket should be factored into our sales counts.
+	 *
+	 * @param Tribe__Tickets__Ticket_Object $ticket
+	 *
+	 * @return bool
+	 */
+	protected function should_count( Tribe__Tickets__Ticket_Object $ticket ) {
+		$should_count = 'Tribe__Tickets__RSVP' !== $ticket->provider_class;
+
+		/**
+		 * Determine if the provided ticket object should be used when building
+		 * sales counts.
+		 *
+		 * By default, tickets belonging to the Tribe__Tickets__RSVP provider
+		 * are not to be counted.
+		 *
+		 * @param bool $should_count
+		 * @param Tribe__Tickets__Ticket_Object $ticket
+		 */
+		return (bool) apply_filters( 'tribe_tickets_plus_should_use_ticket_in_sales_counts', $should_count, $ticket );
+	}
+
+	/**
 	 * Prints an HTML (unordered) list of attendance totals.
 	 */
 	public function print_totals() {
 		$total_sold_label = esc_html_x( 'Total Tickets Sold:', 'attendee summary', 'event-tickets-plus' );
-		$total_paid_label = esc_html_x( 'Paid/Complete:', 'attendee summary', 'event-tickets-plus' );
-		$total_pending_label = esc_html_x( 'Pending Action:', 'attendee summary', 'event-tickets-plus' );
+		$total_paid_label = esc_html_x( 'Complete:', 'attendee summary', 'event-tickets-plus' );
 
 		$total_sold = $this->get_total_sold();
 		$total_paid = $this->get_total_complete();
-		$total_pending = $this->get_total_pending();
 
 		echo "
 			<ul>
 				<li> <strong>$total_sold_label</strong> $total_sold </li>
-				<li> <strong>$total_paid_label</strong> $total_paid </li>
-				<li> <strong>$total_pending_label</strong> $total_pending </li>
+				<li> $total_paid_label $total_paid </li>
 			</ul>
 		";
 	}

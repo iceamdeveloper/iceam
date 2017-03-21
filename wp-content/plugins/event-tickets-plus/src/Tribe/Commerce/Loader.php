@@ -9,7 +9,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		public $nag_data = array();
 
 		/**
-		 * @var Tribe__Tickets__Tickets[] 
+		 * @var Tribe__Tickets__Tickets[]
 		 */
 		protected $commerce_providers = array();
 
@@ -28,7 +28,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		 * @return void
 		 */
 		public function maybe_nagit() {
-			if ( ! is_array( $this->nag_data ) ){
+			if ( ! is_array( $this->nag_data ) ) {
 				return;
 			}
 
@@ -44,12 +44,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		public function woocommerce() {
 			// Check if the legacy plugin exists
 			if ( class_exists( 'Tribe__Events__Tickets__Woo__Main' ) ) {
-				$args = array(
-					'action' => 'deactivate',
-					'plugin' => $this->get_plugin_file( 'The Events Calendar: WooCommerce Tickets' ),
+				$args           = array(
+					'action'        => 'deactivate',
+					'plugin'        => $this->get_plugin_file( 'The Events Calendar: WooCommerce Tickets' ),
 					'plugin_status' => 'all',
-					'paged' => 1,
-					's' => '',
+					'paged'         => 1,
+					's'             => '',
 				);
 				$deactivate_url = wp_nonce_url( add_query_arg( $args, 'plugins.php' ), 'deactivate-plugin_' . $args['plugin'] );
 
@@ -92,12 +92,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		public function easy_digital_downloads() {
 			// Check if the legacy plugin exists
 			if ( class_exists( 'Tribe__Events__Tickets__EDD__Main' ) ) {
-				$args = array(
-					'action' => 'deactivate',
-					'plugin' => $this->get_plugin_file( 'The Events Calendar: EDD Tickets' ),
+				$args           = array(
+					'action'        => 'deactivate',
+					'plugin'        => $this->get_plugin_file( 'The Events Calendar: EDD Tickets' ),
 					'plugin_status' => 'all',
-					'paged' => 1,
-					's' => '',
+					'paged'         => 1,
+					's'             => '',
 				);
 				$deactivate_url = wp_nonce_url( add_query_arg( $args, 'plugins.php' ), 'deactivate-plugin_' . $args['plugin'] );
 
@@ -139,12 +139,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		public function wpecommerce() {
 			// Check if the legacy plugin exists
 			if ( class_exists( 'Tribe__Events__Tickets__Wpec__Main' ) ) {
-				$args = array(
-					'action' => 'deactivate',
-					'plugin' => $this->get_plugin_file( 'The Events Calendar: WPEC Tickets' ),
+				$args           = array(
+					'action'        => 'deactivate',
+					'plugin'        => $this->get_plugin_file( 'The Events Calendar: WPEC Tickets' ),
 					'plugin_status' => 'all',
-					'paged' => 1,
-					's' => '',
+					'paged'         => 1,
+					's'             => '',
 				);
 				$deactivate_url = wp_nonce_url( add_query_arg( $args, 'plugins.php' ), 'deactivate-plugin_' . $args['plugin'] );
 
@@ -162,7 +162,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 			}
 
 			// Here we will check for Comptibility problems
-			if ( ! version_compare( WPSC_VERSION, Tribe__Tickets_Plus__Commerce__WPEC__Main::REQUIRED_WPEC_VERSION, '>=' )  ) {
+			if ( ! version_compare( WPSC_VERSION, Tribe__Tickets_Plus__Commerce__WPEC__Main::REQUIRED_WPEC_VERSION, '>=' ) ) {
 				$this->nag_data['wpecommerce'] = array(
 					__( 'WP eCommerce', 'event-tickets-plus' ),
 					add_query_arg( array(
@@ -186,12 +186,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		public function shopp() {
 			// Check if the legacy plugin exists
 			if ( class_exists( 'Tribe__Events__Tickets__Shopp__Main' ) ) {
-				$args = array(
-					'action' => 'deactivate',
-					'plugin' => $this->get_plugin_file( 'The Events Calendar: Shopp Tickets' ),
+				$args           = array(
+					'action'        => 'deactivate',
+					'plugin'        => $this->get_plugin_file( 'The Events Calendar: Shopp Tickets' ),
 					'plugin_status' => 'all',
-					'paged' => 1,
-					's' => '',
+					'paged'         => 1,
+					's'             => '',
 				);
 				$deactivate_url = wp_nonce_url( add_query_arg( $args, 'plugins.php' ), 'deactivate-plugin_' . $args['plugin'] );
 
@@ -239,6 +239,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		 * We need a way to fetch the file so that we can provide a Deactivate the link
 		 *
 		 * @param  string $plugin_name The plugin name as it's on the legacy Plugin
+		 *
 		 * @return string|null
 		 */
 		protected function get_plugin_file( $plugin_name ) {
@@ -247,7 +248,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 			}
 			$plugins = get_plugins();
 			foreach ( $plugins as $plugin_file => $plugin_info ) {
-				if ( $plugin_info['Name'] == $plugin_name ){
+				if ( $plugin_info['Name'] == $plugin_name ) {
 					return $plugin_file;
 				}
 			}
@@ -270,6 +271,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 		 * @param  string $plugin Name of the plugin
 		 * @param  string $url    The url we are using
 		 * @param  string $type   Currently only have 'incompatible' or 'legacy-plugin' types
+		 *
 		 * @return void
 		 */
 		protected function nag( $plugin, $url, $type = 'incompatible' ) {
@@ -281,7 +283,8 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 						return;
 					}
 
-					$nag = __( 'To begin using Tickets Plus with %3$s, you need to <a href="%1$s" title="Deactivate the legacy addon for %2$s">deactivate the old legacy plugin</a>.', 'event-tickets-plus' );
+					$nag = __( 'To begin using Tickets Plus with %3$s, you need to <a href="%1$s" title="Deactivate the legacy addon for %2$s">deactivate the old legacy plugin</a>.',
+						'event-tickets-plus' );
 					break;
 
 				case 'incompatible':
@@ -291,7 +294,8 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 						return;
 					}
 
-					$nag = __( 'To begin using Tickets Plus, please install and activate the latest version of <a href="%s" class="thickbox" title="%s">%s</a>.', 'event-tickets-plus' );
+					$nag = __( 'To begin using Tickets Plus, please install and activate the latest version of <a href="%s" class="thickbox" title="%s">%s</a>.',
+						'event-tickets-plus' );
 					break;
 			}
 
@@ -305,6 +309,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 
 		/**
 		 * Whether the WooCommerce plugin is installed and activated.
+		 *
 		 * @return bool
 		 */
 		public function is_woocommerce_active() {
