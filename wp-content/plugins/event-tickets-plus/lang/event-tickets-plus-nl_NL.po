@@ -10,6 +10,33 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/admin-views/meta-fields/_field.php:9
+msgctxt "Attendee information fields"
+msgid "Label:"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:17
+msgctxt "Attendee information fields"
+msgid "Required?"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:21
+msgctxt "Attendee information fields"
+msgid "Delete this field"
+msgstr ""
+
+#: src/admin-views/meta-fields/checkbox.php:11
+#: src/admin-views/meta-fields/radio.php:11
+#: src/admin-views/meta-fields/select.php:11
+msgctxt "Attendee information fields"
+msgid "Options (one per line)"
+msgstr ""
+
+#: src/admin-views/meta-fields/text.php:13
+msgctxt "Attendee information fields"
+msgid "Multi-line text field?"
+msgstr ""
+
 #: src/Tribe/QR.php:103
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
@@ -217,7 +244,7 @@ msgstr "Event Tickets Plus stelt je in staat om tickets te verkopen voor eveneme
 #: src/views/eddtickets/tickets.php:97 src/views/shopptickets/tickets.php:75
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/wootickets/tickets.php:128 src/views/wpectickets/tickets.php:80
+#: src/views/wootickets/tickets.php:129 src/views/wpectickets/tickets.php:80
 msgid "Don't list me on the public attendee list"
 msgstr "Laat mij niet zien op de publieke deelnemerslijst"
 
@@ -293,10 +320,6 @@ msgstr "Scan deze QR-code bij het evenement om in te checken."
 msgid "Hide attendees list on event page"
 msgstr "Verberg deelnemerslijst op de evenementpagina"
 
-#: src/admin-views/meta-fields/text.php:13
-msgid "Multi-line text field?"
-msgstr "Tekstveld met meerdere lijnen?"
-
 #: src/admin-views/meta.php:6
 msgid "Attendee Information:"
 msgstr "Deelnemersinformatie:"
@@ -370,7 +393,7 @@ msgstr "Vul alstublieft alle verplichte velden in"
 msgid "Attendee"
 msgstr "Deelnemer"
 
-#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:103
+#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:104
 msgid "%1$s available"
 msgstr "%1$s beschikbaar"
 
@@ -611,18 +634,18 @@ msgid "You'll receive your tickets in another email."
 msgstr "Let op: je krijgt je tickets in een andere mail, zodra de bestelling in onze systemen afgerond is."
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1435
+#: src/Tribe/Commerce/WooCommerce/Main.php:1443
 msgid "(deleted)"
 msgstr "(verwijderd)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:1692
 msgid "Event sales report"
 msgstr "Evenement verkooprapport"
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1732
+#: src/Tribe/Commerce/WooCommerce/Main.php:1740
 msgid "This is a ticket for the event:"
 msgstr "Dit is een ticket voor het evenement:"
 
@@ -683,17 +706,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr "Het spijt ons, maar er was onvoldoende voorraad om uw volledig bestelling te vervullen! We hebben zoveel mogelijk tickets toegevoegd als we konden, maar wij adviseren uw bestelling na te kijken (zie hieronder) voor het geval  dat u aanpassingen aan wil brengen."
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1505
+#: src/Tribe/Commerce/WooCommerce/Main.php:1513
 msgid "In trash (was %s)"
 msgstr "In de prullemand (was %s)"
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1511
+#: src/Tribe/Commerce/WooCommerce/Main.php:1519
 msgid "Deleted"
 msgstr "Verwijderd"
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1560
+#: src/Tribe/Commerce/WooCommerce/Main.php:1568
 msgid "Unknown"
 msgstr "Onbekend "
 
@@ -721,7 +744,7 @@ msgstr "Onderwerp"
 msgid "Defaults to <code>%s</code>"
 msgstr "Wordt automatisch omgezet in <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1709
+#: src/Tribe/Commerce/WooCommerce/Main.php:1717
 msgid "Report"
 msgstr "Rapporteer "
 
@@ -784,12 +807,12 @@ msgid "%1$s out of %2$s available"
 msgstr "%1$s van %2$s beschikbaar"
 
 #: src/views/eddtickets/tickets.php:78 src/views/shopptickets/tickets.php:57
-#: src/views/wootickets/tickets.php:113
+#: src/views/wootickets/tickets.php:114
 msgid "Out of stock!"
 msgstr "Niet op voorraad!"
 
 #: src/views/eddtickets/tickets.php:117 src/views/shopptickets/tickets.php:95
-#: src/views/wootickets/tickets.php:144 src/views/wpectickets/tickets.php:113
+#: src/views/wootickets/tickets.php:145 src/views/wpectickets/tickets.php:113
 msgid "Add to cart"
 msgstr "Toevoegen aan winkelwagen"
 

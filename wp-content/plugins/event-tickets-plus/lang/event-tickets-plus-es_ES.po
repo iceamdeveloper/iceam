@@ -10,6 +10,33 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/admin-views/meta-fields/_field.php:9
+msgctxt "Attendee information fields"
+msgid "Label:"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:17
+msgctxt "Attendee information fields"
+msgid "Required?"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:21
+msgctxt "Attendee information fields"
+msgid "Delete this field"
+msgstr ""
+
+#: src/admin-views/meta-fields/checkbox.php:11
+#: src/admin-views/meta-fields/radio.php:11
+#: src/admin-views/meta-fields/select.php:11
+msgctxt "Attendee information fields"
+msgid "Options (one per line)"
+msgstr ""
+
+#: src/admin-views/meta-fields/text.php:13
+msgctxt "Attendee information fields"
+msgid "Multi-line text field?"
+msgstr ""
+
 #: src/Tribe/QR.php:103
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
@@ -217,7 +244,7 @@ msgstr ""
 #: src/views/eddtickets/tickets.php:97 src/views/shopptickets/tickets.php:75
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/wootickets/tickets.php:128 src/views/wpectickets/tickets.php:80
+#: src/views/wootickets/tickets.php:129 src/views/wpectickets/tickets.php:80
 msgid "Don't list me on the public attendee list"
 msgstr "No listarme en la lista pública de asistentes"
 
@@ -293,10 +320,6 @@ msgstr "Escanea este código QR en el evento para el check in."
 msgid "Hide attendees list on event page"
 msgstr "Ocultar lista de asistentes en la página del evento"
 
-#: src/admin-views/meta-fields/text.php:13
-msgid "Multi-line text field?"
-msgstr ""
-
 #: src/admin-views/meta.php:6
 msgid "Attendee Information:"
 msgstr "Información del Asistente:"
@@ -370,7 +393,7 @@ msgstr "Por favor rellena todos los campos requeridos"
 msgid "Attendee"
 msgstr "Asistente"
 
-#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:103
+#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:104
 msgid "%1$s available"
 msgstr "%1$s disponible"
 
@@ -611,18 +634,18 @@ msgid "You'll receive your tickets in another email."
 msgstr "Recibirás tus tickets en otro correo electrónico."
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1435
+#: src/Tribe/Commerce/WooCommerce/Main.php:1443
 msgid "(deleted)"
 msgstr "(eliminado)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:1692
 msgid "Event sales report"
 msgstr "Reporte de ventas por evento"
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1732
+#: src/Tribe/Commerce/WooCommerce/Main.php:1740
 msgid "This is a ticket for the event:"
 msgstr "Este es un tíquet para el evento:"
 
@@ -683,17 +706,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr "Lo sentimos pero no hay suficiente inventario para completar tu pedido. Hemos añadido tantos tickets como podemos, recomendamos revisar tu pedido (más abajo) por si necesitas modificar algo."
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1505
+#: src/Tribe/Commerce/WooCommerce/Main.php:1513
 msgid "In trash (was %s)"
 msgstr "En la papelera (era %s)"
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1511
+#: src/Tribe/Commerce/WooCommerce/Main.php:1519
 msgid "Deleted"
 msgstr "Eliminado"
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1560
+#: src/Tribe/Commerce/WooCommerce/Main.php:1568
 msgid "Unknown"
 msgstr "Desconocido"
 
@@ -721,7 +744,7 @@ msgstr "Asunto"
 msgid "Defaults to <code>%s</code>"
 msgstr "El valor predeterminado es <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1709
+#: src/Tribe/Commerce/WooCommerce/Main.php:1717
 msgid "Report"
 msgstr "Informe"
 
@@ -784,12 +807,12 @@ msgid "%1$s out of %2$s available"
 msgstr "Disponible %1$s de %2$s"
 
 #: src/views/eddtickets/tickets.php:78 src/views/shopptickets/tickets.php:57
-#: src/views/wootickets/tickets.php:113
+#: src/views/wootickets/tickets.php:114
 msgid "Out of stock!"
 msgstr "¡Agotado!"
 
 #: src/views/eddtickets/tickets.php:117 src/views/shopptickets/tickets.php:95
-#: src/views/wootickets/tickets.php:144 src/views/wpectickets/tickets.php:113
+#: src/views/wootickets/tickets.php:145 src/views/wpectickets/tickets.php:113
 msgid "Add to cart"
 msgstr "Agrega al carrito"
 

@@ -4,7 +4,7 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
 Tested up to: 4.7.3
-Stable tag: 4.4.3
+Stable tag: 4.4.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,11 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.4] 2017-03-23 =
+
+* Fix - Ensure additional attendee meta data is stored regardless of attendee record generation settings (Thanks for the report @hans) [75140]
+* Fix - Improve handling of unlimited ticket stock in relation to WooCommerce tickets (Thank you @jtsternberg for the Pull Request fix via github) [74123]
 
 = [4.4.3] 2017-03-08 =
 

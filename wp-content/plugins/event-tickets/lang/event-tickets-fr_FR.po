@@ -10,12 +10,12 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets\n"
 
-#: src/template-tags/tickets.php:278
+#: src/template-tags/tickets.php:280
 msgctxt "ticket stock message (remaining stock)"
 msgid "%1$d Remaining"
 msgstr ""
 
-#: src/template-tags/tickets.php:281
+#: src/template-tags/tickets.php:283
 msgctxt "ticket stock message (pending stock)"
 msgid "%1$d Awaiting Review"
 msgstr ""
@@ -100,20 +100,20 @@ msgstr ""
 msgid "Location of Tickets form"
 msgstr ""
 
-#: src/template-tags/tickets.php:263
+#: src/template-tags/tickets.php:265
 msgid "Sold"
 msgstr "Vendu"
 
-#: src/template-tags/tickets.php:265
+#: src/template-tags/tickets.php:267
 msgctxt "separate going and remain RSVPs"
 msgid "RSVP'd Going"
 msgstr ""
 
-#: src/template-tags/tickets.php:270
+#: src/template-tags/tickets.php:272
 msgid "%s %d"
 msgstr ""
 
-#: src/template-tags/tickets.php:276
+#: src/template-tags/tickets.php:278
 msgctxt "ticket global stock message (remaining stock)"
 msgid "%1$d Remaining of the global stock"
 msgstr ""
@@ -547,11 +547,11 @@ msgstr ""
 msgid "You can require that users log into your site before they are able to RSVP (or buy tickets). Please review your WordPress Membership option (via the General Settings admin screen) before adjusting this setting."
 msgstr ""
 
-#: src/template-tags/tickets.php:260
+#: src/template-tags/tickets.php:262
 msgid "global inventory"
 msgstr ""
 
-#: src/template-tags/tickets.php:283
+#: src/template-tags/tickets.php:285
 msgctxt "ticket stock message (cancelled stock)"
 msgid "%1$d Cancelled"
 msgstr ""

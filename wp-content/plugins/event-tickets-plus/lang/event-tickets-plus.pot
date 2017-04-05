@@ -2,13 +2,13 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Event Tickets Plus 4.4.3dev1\n"
+"Project-Id-Version: Event Tickets Plus 4.4.4\n"
 "Report-Msgid-Bugs-To: http://m.tri.be/191x\n"
-"POT-Creation-Date: 2017-03-08 16:35:53+00:00\n"
+"POT-Creation-Date: 2017-03-23 18:30:46+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-03-08 16:35\n"
+"PO-Revision-Date: 2017-03-23 18:30\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
@@ -173,18 +173,18 @@ msgid "You'll receive your tickets in another email."
 msgstr ""
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1435
+#: src/Tribe/Commerce/WooCommerce/Main.php:1443
 msgid "(deleted)"
 msgstr ""
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:1692
 msgid "Event sales report"
 msgstr ""
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1732
+#: src/Tribe/Commerce/WooCommerce/Main.php:1740
 msgid "This is a ticket for the event:"
 msgstr ""
 
@@ -263,17 +263,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr ""
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1505
+#: src/Tribe/Commerce/WooCommerce/Main.php:1513
 msgid "In trash (was %s)"
 msgstr ""
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1511
+#: src/Tribe/Commerce/WooCommerce/Main.php:1519
 msgid "Deleted"
 msgstr ""
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1560
+#: src/Tribe/Commerce/WooCommerce/Main.php:1568
 msgid "Unknown"
 msgstr ""
 
@@ -302,7 +302,7 @@ msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1709
+#: src/Tribe/Commerce/WooCommerce/Main.php:1717
 msgid "Report"
 msgstr ""
 
@@ -580,7 +580,30 @@ msgstr ""
 msgid "Selling tickets for recurring events"
 msgstr ""
 
+#: src/admin-views/meta-fields/_field.php:9
+msgctxt "Attendee information fields"
+msgid "Label:"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:17
+msgctxt "Attendee information fields"
+msgid "Required?"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:21
+msgctxt "Attendee information fields"
+msgid "Delete this field"
+msgstr ""
+
+#: src/admin-views/meta-fields/checkbox.php:11
+#: src/admin-views/meta-fields/radio.php:11
+#: src/admin-views/meta-fields/select.php:11
+msgctxt "Attendee information fields"
+msgid "Options (one per line)"
+msgstr ""
+
 #: src/admin-views/meta-fields/text.php:13
+msgctxt "Attendee information fields"
 msgid "Multi-line text field?"
 msgstr ""
 
@@ -738,24 +761,24 @@ msgid_plural "%d people are attending %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:103
+#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:104
 msgid "%1$s available"
 msgstr ""
 
 #: src/views/eddtickets/tickets.php:78 src/views/shopptickets/tickets.php:57
-#: src/views/wootickets/tickets.php:113
+#: src/views/wootickets/tickets.php:114
 msgid "Out of stock!"
 msgstr ""
 
 #: src/views/eddtickets/tickets.php:97 src/views/shopptickets/tickets.php:75
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/wootickets/tickets.php:128 src/views/wpectickets/tickets.php:80
+#: src/views/wootickets/tickets.php:129 src/views/wpectickets/tickets.php:80
 msgid "Don't list me on the public attendee list"
 msgstr ""
 
 #: src/views/eddtickets/tickets.php:117 src/views/shopptickets/tickets.php:95
-#: src/views/wootickets/tickets.php:144 src/views/wpectickets/tickets.php:113
+#: src/views/wootickets/tickets.php:145 src/views/wpectickets/tickets.php:113
 msgid "Add to cart"
 msgstr ""
 

@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.3.5
+ * @version 4.4.4
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -55,6 +55,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
 
 				$is_there_any_product = true;
+				$ticket_stock = $ticket->stock();
 				$data_product_id = 'data-product-id="' . esc_attr( $ticket->ID ) . '"';
 
 				echo sprintf( '<input type="hidden" name="product_id[]" value="%d">', esc_attr( $ticket->ID ) );
@@ -71,7 +72,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 				$column_classes = (array) apply_filters( 'tribe_events_tickets_woo_quantity_column_class', array( 'woocommerce' ) );
 				echo '<td class="' . implode( ' ', $column_classes ) . '" ' . $data_product_id . '>';
 
-				if ( $product->is_in_stock() ) {
+				if ( $ticket_stock || $ticket_stock === Tribe__Tickets__Ticket_Object::UNLIMITED_STOCK ) {
 					// Max quantity will be left open if backorders allowed, restricted to 1 if the product is
 					// constrained to be sold individually or else set to the available stock quantity
 					$max_quantity = $product->backorders_allowed() ? '' : $product->get_stock_quantity();

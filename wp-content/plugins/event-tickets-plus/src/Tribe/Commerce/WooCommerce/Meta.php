@@ -7,19 +7,19 @@
  */
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	public function __construct() {
-		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_attendee_meta_to_order' ), 10, 2 );
+		add_action( 'woocommerce_order_status_changed', array( $this, 'save_attendee_meta_to_order' ), 5 );
+		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_attendee_meta_to_order' ), 5 );
 		add_action( 'event_tickets_woocommerce_ticket_created', array( $this, 'save_attendee_meta_to_ticket' ), 10, 4 );
 	}
 
 	/**
-	 * Sets attendee data on order posts
+	 * Sets attendee data on order posts.
 	 *
 	 * @since 4.1
 	 *
 	 * @param int $order_id WooCommerce Order ID
-	 * @param array $post_data Data submitted via POST during checkout
 	 */
-	public function save_attendee_meta_to_order( $order_id, $post_data ) {
+	public function save_attendee_meta_to_order( $order_id ) {
 		$order       = new WC_Order( $order_id );
 		$order_items = $order->get_items();
 

@@ -843,7 +843,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			update_post_meta( $ticket->ID, '_manage_stock', 'yes' );
 			delete_transient( 'wc_product_total_stock_' . $ticket->ID );
 		} else {
+			// Besides setting _manage_stock to "no" we should remove the _stock_status and _stock fields if set previously
 			update_post_meta( $ticket->ID, '_manage_stock', 'no' );
+			delete_post_meta( $ticket->ID, '_stock_status' );
+			delete_post_meta( $ticket->ID, '_stock' );
 		}
 
 		if ( isset( $raw_data['ticket_woo_sku'] ) ) {
@@ -1113,6 +1116,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		// ...With some exceptions for global stock tickets
 		$stock = $this->set_stock_level_for_global_stock_tickets( $stock, $event_id, $ticket_id );
+
+		// If we don't have a stock value, then stock should be considered 'unlimited'
+		if ( null === $stock ) {
+			$stock = Tribe__Tickets__Ticket_Object::UNLIMITED_STOCK;
+		}
 
 		$return->manage_stock( $product->managing_stock() );
 		$return->stock( $stock );

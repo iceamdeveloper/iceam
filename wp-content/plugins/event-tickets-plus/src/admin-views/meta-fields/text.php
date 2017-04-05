@@ -10,6 +10,6 @@ $multiline = isset( $extra['multiline'] ) ? $extra['multiline'] : '';
 			value="yes"
 			<?php checked( 'yes', $multiline ); ?>
 		>
-		<?php echo esc_html_e( 'Multi-line text field?', 'events-tickets-plus' ); ?>
+		<?php echo esc_html_x( 'Multi-line text field?', 'Attendee information fields', 'event-tickets-plus' ); ?>
 	</label>
 </div>
