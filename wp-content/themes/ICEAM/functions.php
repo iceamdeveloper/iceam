@@ -18,6 +18,11 @@
  
  
  
+/***********************************************************************
+ *
+ *	ADD COLOR TO THE ADMIN LEFT NAV FOR SCANNABILITY
+ *
+ **********************************************************************/
  
  
 function admin_style() {
@@ -396,6 +401,11 @@ add_filter('woocommerce_thankyou_order_received_text', 'rewrite_thankyou', 10, 1
 
 
 
+/***********************************************************************
+ *
+ *	DISPLAY SUBSCRIPTION TITLES IN 'MY SUBSCRIPTIONS'
+ *
+ **********************************************************************/
 
 
 function display_subscription_title($subscription){
