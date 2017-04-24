@@ -265,6 +265,8 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	protected function init_logger() {
+		// TODO Check that the target log file is writable. If not, raise a PHP warning
+
 		$this->log_handlers = apply_filters('wc_aelia_log_handlers', array(
 			new StreamHandler(self::get_log_file_name($this->log_id), \Monolog\Logger::NOTICE),
 		), $this->log_id, $this);

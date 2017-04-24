@@ -56,4 +56,14 @@ class Base_Class {
 	public function __construct() {
 		$this->logger = new Logger(get_class());
 	}
+
+	/**
+	 * Assigns a logger to the instance.
+	 *
+	 * @param \Aelia\WC\Logger logger The logger to assign to the instance.
+	 * @since 1.8.5.170317
+	 */
+	protected function set_logger(\Aelia\WC\Logger $logger) {
+		$this->logger = $logger;
+	}
 }

@@ -65,6 +65,14 @@ For more information about installation and management of plugins, please refer 
 
 == Changelog ==
 
+= 1.8.6.170405 =
+* Improved support for WooCommerce 3.0:
+	* Extended `Aelia\WC\Order` class with getter methods, to allow accessing order meta transparently in WooCommerce 3.0 and earlier.
+
+= 1.8.5.170317 =
+* Improved Logger:
+	* Cleaned up logging logic to avoid the creation of spurious log files.
+
 = 1.8.4.170307 =
 * Improved Admin Messages. Added support for custom headers and improved look.
 * Added new function `aelia_wp_version_is`. The function allows to check the WordPress version.

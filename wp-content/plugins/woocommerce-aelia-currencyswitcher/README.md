@@ -1,7 +1,9 @@
 #WooCommerce Currency Switcher
 **Tags**: woocommerce, currency switcher, multiple currencies
 **Requires at least**: 3.6
-**Tested up to**: 3.8.1
+**Tested up to**: 4.7
+WC requires at least: 2.4
+WC tested up to: 3.0
 
 Allows to set prices in multiple currencies. The plugin allows customers to see prices and place orders in any of the enabled currencies, thus avoiding conversion fees.
 
@@ -17,11 +19,10 @@ This product includes GeoLite data created by MaxMind, available from http://www
 
 ##Requirements
 
-* WordPress 3.6+
-* PHP 5.3+
-* PHP Extensions
-    * CURL
-* WooCommerce 2.0.x/2.1.x/2.2.x/2.3.x/2.4.x
+* WordPress 4.0 or newer.
+* PHP 5.3 or newer.
+* WooCommerce 2.4.x to 2.7.x.
+* **Free** [Aelia Foundation Classes framework](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or newer (the plugin can install the framework automatically).
 
 ##Installation
 

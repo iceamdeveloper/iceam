@@ -1,274 +1,380 @@
 # Aelia Currency Switcher - Change Log
 
-## Version 3.x
-####3.9.13.161104
-* Fixed bug in Yahoo Finance integration. The bug prevented the exchange rates from being retrieved correctly in some circumstances.
+## Version 4.x
+####4.4.15.170421
+* Fixed issue of stale data displayed in the mini-cart. Added logic to refresh the mini-cart when the currency is selected via the URL.
 
-####3.9.12.161028
-* Improved installation process. The installation script that processes past orders can now handle better edge cases such as a site with many orders and a low memory limit.
+####4.4.15.170420
+* Improved compatibility with WooCommerce 3.0.3:
+	* Added logic to ensure that orders are created in the correct currency in the backend.
+* Improved backward compatibility of requirement checking class. Added check to ensure that the parent constructor exists before calling it.
 
-####3.9.11.160928
-* Fixed display of on sale/discounted prices with the Dynamic Pricing plugin is installed. Fix backported from Currency Switcher 4.x.
+####4.4.14.170415
+* Improved performance of reports and dashboard.
 
-####3.9.10.160722
-* Added workaround for logging issue introduced by WooCommerce 2.6. WC 2.6 may trigger "loggable" events too early, when the required WordPress functions are not yet loaded. The workaround will prevent the logger from crashing.
+####4.4.13.170408
+* Fixed bug in logic used to retrieve exchange rates. When the configured exchange rate provider could not be determined, the original logic tried to load an invalid class.
+* Set default provider to Yahoo! Finance, to replace the unreliable WebServiceX.
+
+####4.4.12.170407
+* Improved compatibility with WooCommerce 3.0.1:
+	* Fixed bug caused by WooCommerce 3.0.1 returning dates as objects, instead of timestamps.
+
+####4.4.11.170405
+* Improved compatibility with WooCommerce 3.0:
+	* Fixed deprecation notice in Edit Order page.
+* Fixed logic used to retrieve customer's country when the "force currency by country" option is active.
+
+####4.4.10.170316
+* Added new filter `wc_aelia_currencyswitcher_product_base_currency`.
+* Changed permission to access the Currency Switcher options to "manage_woocommerce".
+
+####4.4.9.170308
+* Fixed minor warning on Product Edit pages.
+
+####4.4.8.170306
+* Improved compatibility with WooCommerce 2.7:
+	* Replaced call to `WC_Customer::get_country()` with `WC_Customer::get_billing_country()` in WC 2.7 and newer.
+* Updated requirement checking class.
+* Improved user experience. Added links and information to configure the Currency Switcher.
+* Improved Admin UI. Added possibility to sort the currencies from the Currency Switcher Admin page.
+
+####4.4.8.170210
+* Improved compatibility with WooCommerce 2.7 and 3rd party plugins:
+	* Improved currency conversion logic to prevent affecting plugins that use `$product->set_price()` to override a product price.
+
+####4.4.7.170202
+* Improved compatibility with WooCommerce 2.7:
+	* Fixed infinite recursion caused by the premature loading of order properties in the new DataStore class.
+	* Added caching of orders, for optimised performance.
+* Removed obsolete code.
+* Improved logic to determine if a product is on sale. The new logic can fix incompatibility issues with 3rd party plugins, such as Bundles.
+
+####4.4.6.170120
+* Optimised performance of logic used for conversion of product prices.
+* Removed integration with Dynamic Pricing plugin. The integration has been moved to a separate plugin.
+
+####4.4.5.170118
+* Updated integration with BE Table Rates Shipping plugin.
+
+####4.4.2.170117
+* Improved logger. Replaced basic WooCommerce logger with the more flexible Monolog logger provided by the AFC.
+
+####4.4.1.170108
+* Improved compatibility with WooCommerce 2.7:
+	* Refactored currency conversion logic to follow the new guidelines.
+	* Replaced obsolete filters.
+	* Added support for the new logic for the conversion of variable products.
+
+####4.4.0.161221
+* Added compatibility with WooCommerce 2.7:
+	* Added logic to use the new methods to access properties of products, orders and coupons.
+* Updated logic used to force the currency depending on customer's country.
+* Added new `wc_aelia_cs_default_selected_currency` filter, to allow overriding the currency used by default when the active currency cannot be determined.
 * Added workaround for caching of variable product prices, to ensure that the correct prices are displayed when the exchange rates are updated.
 
-####3.9.9.160617
+####4.3.9.161104
+* Fixed bug in Yahoo Finance integration. The bug prevented the exchange rates from being retrieved correctly in some circumstances.
+* Replaced calls to jQuery.delegate() with jQuery.on().
+
+####4.3.8.161028
+* Improved installation process. The installation script that processes past orders can now handle better edge cases such as a site with many orders and a low memory limit.
+
+####4.3.7.160816
+* Fixed display of on sale/discounted prices with the Dynamic Pricing plugin is installed.
+
+####4.3.6.160628
+* Updated logger for compatibility with the new Monolog logger.
+
+####4.3.5.160617
 * Added handling of new exceptions introduced in WooCommerce 2.6. The new logic prevents WooCommerce from throwing a fatal error when an orphaned product variation is found.
 
-####3.9.8.160530
+####4.3.5.160610
+* Added support for bulk edit of products' currency prices.
+
+####4.3.5.160530
 * Improved performance. Removed `woocommerce_get_children` filter.
 
-####3.9.7.160527
-* Improved compatibility with Table Rates Shipping by BolderElements. Added handling of the new "shipping_free" attribute (minimum cart amount for free shipping).
-* Updated GeoIP database.
-* Updated dependencies.
+####4.3.4.160527
+* Improved compatibility with Table Rates Shipping by BolderElements. Added conversion of free shipping, minimun purchase and maximum purchase thresholds.
 * Fixed bug in currency conversion function. The bug caused the conversion to use currency's default decimals when zero decimals were specified.
 
-####3.9.6.160408
-* Improved checks for invalid exchange rates during plugin installation procedure.
+####4.3.3.160527
+* Improved compatibility with Table Rates Shipping by BolderElements. Added handling of the new "shipping_free" attribute.
+* Added new filter `wc_aelia_cs_shortcode_currency_amount`. The filter will allow to tweak the output of the `aelia_cs_currency_amount` shortcode.
 
-####3.9.5.160328
+####4.3.2.160408
+* Improved checks for invalid exchange rates during plugin installation procedure.
+* Fixed text domain reference.
+
+####4.3.1.160328
 * Fixed bug with minicart and "force currency by country". The bug prevented the minicart from updating automatically when the "force currency by country" option was selected and the customer changed country using the selector widget.
 * Optimised processing of past orders. Now the processing only takes into account the orders from the beginning of last year, instead of the 01/01/2014.
-* Fixed bug caused by CloudFlare geolocation passing lowercase country codes.
 
-####3.9.4.160210
+####4.3.0.160302
+* Added new `aelia_cs_currency_amount` shortcode. The shortcode will allow to convert any arbitrary amount displayed on a page.
+* Added new `aelia_cs_pp_shortcode_price` filter. The filter will allow 3rd parties to alter the price displayed using the `aelia_cs_product_price` shortcode.
+
+####4.2.22.160210
 * WC 2.6 Compatibility - Added support for the new shipping logic. Leveraged new `woocommerce_shipping_zone_shipping_methods` filter to ensure that shipping methods' parameters are loaded in the correct currency.
 
-####3.9.3.160202
+####4.2.21.160202
 * Fixed bug in handling of coupons' minimum and maximum prices. The bug prevented the limits from being converted properly, in some circumstances.
 
-####3.9.2.160130
+####4.2.20.160130
 * Improved WooCommerce version detection in reporting manager class. The class now uses a different logic to find out which reports to use, and returns more information if an unsupported version is found.
 
-####3.9.1.160118
+####4.2.19.160118
 * Fixed edge condition in handling of variable product prices. The condition caused the "from" price to appear as zero if a variation was set to use a base currency for which no prices were specified.
 
-####3.9.0.160114
+####4.2.18.160114
 * Improved compatibility with WooCommerce 2.5:
 	* Added logic to ensure the correct calculation of shipping formulas when they depend on cart total.
 * Updated clearfix CSS for better compatibility with 3rd party plugins.
 
-####3.8.15.151221
+####4.2.17.160105
+* Restored currency conversion logic (it was disabled for a test).
+
+####4.2.16.151221
 * Fixed bug in Yahoo Finance exchange rates provider. The bug caused some currency codes to be misinterpreted and prevented the related FX rates from being fetched.
 
-####3.8.14.151214
+####4.2.15.151214
 * Removed integration with Bundles plugin. The integration is now available as a separate download from Aelia website (http://aelia.co/shop/bundles-integration-currency-switcher/).
 * Extended `WC_Aelia_CurrencyPrices_Manager::convert_product_price_from_base()` method. The method now accepts a product and a price type, which are passed to the `wc_aelia_cs_convert_product_price` filter.
 * Fixed rendering of prices for grouped products.
 * Updated language files.
 
-####3.8.13.151208
+####4.2.14.151208
 * Fixed currency code for Bulgarian Lev.
 * Optimised currency prices manager. Added caching of base currency.
 
-####3.8.12.151116
+####4.2.13.151116
 * Removed redundant code. The code was used to set customer's currency when viewing an existing order, but it's no longer required by current architecture.
-* Refactored method `Order::get_order_currency()` to be compatible with parent class' method signature.
+* Refactored calls to `Aelia\WC\Order::get_order_currency()`. The method doesn't accept arguments anymore, for compatibility with parent class' method signature. Calls to the method have been updated to reflect such change.
 
-####3.8.11.151107
+####4.2.12.151105
+* Added new `aelia_cs_product_price` shortcode. The shortcode allows to display a product price in a currency of choice.
 * Optimised logic used to handle coupons. Coupon processing is now skipped when the base currency is active (the conversion would be ineffective, anyway).
 * Added new `WC_Aelia_CurrencyPrices_Manager::convert_product_price_from_base()` method. The new method will be used exclusively to convert product prices, and it uses a filter to allow 3rd parties to modify the result of the conversion.
-* Prevented loading of frontend JavaScript in Admin section.
 
-####3.8.11.151028
+
+####4.2.11.151028
 * Optimised performance of currency conversion logic. The conversion callbacks are now invoked directly, instead of using `call_user_func()`.
+* Fixed UI conflicts with EU VAT Assistant (JavaScript and CSS).
 
-####3.8.10.151026
+####4.2.10.151026
 * Improved robustness of `WC_Aelia_CurrencySwitcher::currencyprices_manager()` method. The method can now initialise the currency prices manager class automatically.
 * Modified coupon handling hook to handle edge conditions. In some cases (e.g. customisation, 3rd party plugins, etc), the coupon hook could be triggered before the `woocommerce_loaded` event. The new logic handles such case, initialising the pricing manager on the fly.
 
-####3.8.9.150930
+####4.2.9.150930
 * Fixed bug in notification emails. The bug caused order notification emails to display the wrong currency symbol, in some circumstances.
 
-####3.8.8.150917
+####4.2.8.150917
 * Improved support for caching in WooCommerce 2.4.7:
 	* Added logic to clear products cache when Currency Switcher settings are saved. This will ensure that the product prices will be recalculated using the latest settings.
 
-####3.8.7.150914
+####4.2.7.150914
 * Fixed caching issue caused by WooCommerce 2.4.7:
 	* Added logic to ensure that the variation prices are loaded and cached in the correct currency.
 
-####3.8.6.150911
+####4.2.6.150911
 * Fixed caching issue caused by WooCommerce 2.4:
 	* Added logic to clear product cache when exchange rates are updated. This will ensure that product prices are calculated using the new rates.
 
-####3.8.5.150907
+####4.2.5.150907
 * Fixed bug caused by WooCommerce 2.4:
-	* Fixed bulk edit of variations. Implemented brand new logic to bulk edit variations' currency prices.
+	* Implemented brand new logic to bulk edit variations' currency prices.
 
-####3.8.4.150824
+####4.2.4.150824
 * Fixed bug caused by WooCommerce 2.4:
 	* Altered code to handle the new Ajax action triggered when the order is reviewed at checkout.
 * Improved compatibility with Dynamic Pricing plugin. Added support for new logic used to handle Role based discounts.
 
-####3.8.3.150818
+####4.2.3.150818
 * Added missing localisation string for world currencies.
 
-####3.8.2.150815
+####4.2.2.150815
 * Fixed issue caused by new Variable Products logic in WC2.4. Added new method to determine when the plugin is running on a frontend page.
 * Fixed edge condition in recalculation of mini-cart totals. The condition was caused by an incorrect chain of events triggered by an Ajax call, which prevented the mini-cart total from being calculated correctly.
+* Updated requirements. Plugin now requires AFC 1.6.3.15815 or newer.
 * Added new `wc_aelia_cs_exchange_rates_updated` action.
 * Replaced currency symbols with currency codes in Product Edit page.
 
-####3.8.1.150813
+####4.2.1.150813
 * Fixed issue caused by new Variable Products logic in WC2.4. The new logic added to variable products discards variations when their price in base currency is empty. This caused products with a different base currency to show up without prices.
+* Replaced all WooCommerce version checks with calls to `aelia_wc_version_is()`.
 
-####3.8.0.150813
+####4.2.0.150813
+* Fixed bug in logic used to determine if a product is on sale. The bug caused sale's start date to be ignored, putting products on sale prematurely.
 * New feature: per-currency coupon options. It's now possible to set coupon parameters for each currency.
 * Fixed bug in Yahoo! Finance provider. The bug cause the exchange rates not to be updated in some circumstances.
-* Updated language files.
 
-####3.7.9.150813
-* Fixed bug in logic used to determine if a product is on sale. The bug caused sale's start date to be ignored, putting products on sale prematurely.
-
-####3.7.8.150810
+####4.1.4.150810
 * Added new `wc_aelia_cs_product_base_currency` filter. The filter allows to retrieve the base currency associated to a product.
 * Added new filter for variable product prices transient key. The filter ensures that the transient key takes the currency into account, and fixes the issue which caused variable product prices to be displayed incorrectly.
 
-####3.7.7.150806
-* Updated jQuery Chosen library.
-
-####3.7.6.150731
-* Improved compatibility with Bundled Products plugin. Removed recalculation of product prices when "per item pricing" option is enabled.
-
-####3.7.5.150730
+####4.1.3.150730
 * Improved support for WooCommerce 2.4:
 	* Added support for the new logic used to save variations.
-* Fixed minor bug in Bundles integration.
+* Fixed minor bug in Bundles integration. Removed recalculation of product prices when "per item pricing" option is enabled.
 * Added recalculation of mini cart totals on Ajax requests for the cart widget.
 
-####3.7.4.150729
+####4.1.2.150729
 * Fixed issue caused by Bundled Products plugin. The Bundles plugin was changed in a non-backward compatible way, causing some product prices to show as zero.
 
-####3.7.3.150706
-* Added new `wc_aelia_cs_converted_amount` filter.
+####4.1.1.150706
+* Added new Added new `wc_aelia_cs_converted_amount` filter.
 
-####3.7.2.150630
+####4.1.0.150701
+* Implemented reports by currency in WooCommerce 2.2 and 2.3:
+	* Added new UI elements to select the currency.
+	* Implemented logic to only retrieve data for the selected currency.
+
+####4.0.11.150625
 * Added new `wc_aelia_cs_convert_product_price` filter.
 * Added new `wc_aelia_cs_selected_currency` filter.
 
-####3.7.1.150619
+####4.0.10.150625
 * Fixed logic to determine the active currency on Order Edit page. The currency was incorrectly changed to the one in user's profile when the "Force currency by billing country" was active.
 
-####3.7.0.150619
+####4.0.9.150619
 * Fixed logic to determine if a product in on sale. The new logic correctly determines the "on sale" state for variable products.
 * Improved Admin UI in WooCommerce 2.3.
 * Fixed minor bug in the dashboard widget in WooCommerce 2.3.
 
-####3.6.39.150618
-* Removed redundant *use* call in billing country selector widget.
-
-####3.6.38.150613
-* Fixed bug in recalculation of refund metadata in base currency on refund creation.
-
-####3.6.37.150610
+####4.0.8.150610
 * Fixed bug in Yahoo Finance provider class. The bug caused the fetching process to halt if the provider was used when only the base currency was enabled.
 * Fixed table prefixes in auto-update method `WC_Aelia_CurrencySwitcher_Install::update_to_3_6_36_150603`.
 * Added logic to prevent conversion of a zero amount.
 
-####3.6.36.150603
-* Fixed calculation of refund data for reports.
+####4.0.7.150604
+* Added recalculation of refund total in base currency for refunds during auto-update process.
 
-####3.6.35.150603
+####4.0.6.150604
+* Fixed calculation of refund data for reports.
 * Fixed reports in WooCommerce 2.2 and 2.3.
 * Fixed calculation in base currency of `discount_amount` for order items meta.
 * Replaced session variables with cookies.
 
-####3.6.34.150521
+####4.0.5.150522
 * Modified text explaining why the *product base currency* feature is disabled in WC 2.2 and earlier.
 
-####3.6.33.150514
-* Fixed reference to `WC_Aelia_CurrencySwitcher_Settings::$_price_decimals` property.
-
-####3.6.32.150507
+####4.0.4.150507
 * Added logic to store of selected currency in a cookie.
-* Optimised performance of currency conversion process for variable products.
 
-####3.6.31.150504
-* Added support for CloudFlare. The IP2Location class can now use the country detect by CloudFlare and skips its internal detection logic.
-* Added new *wc_aelia_ip2location_before_get_country_code* filter. This new filter will allow 3rd parties to set the country code as they wish, skipping the geolocation detection logic.
-
-####3.6.30.150429
-* Added check to avoid starting a WooCommerce session when one already exists.
-* Added new method to check if a WooCommerce session was started.
-
-####3.6.29.150424
-* Removed redundant filter for `woocommerce_cart_loaded_from_session` hook.
-
-####3.6.28.150421
+####4.0.3.150420
+* Fixed bug with WooCommerce 2.3. The bug prevented the cart from being restored when a customer logged out and then logged back in.
+* Fixed bug in saving of the selected currency between user sessions. The bug caused the selected currency to be overwritten by the geo-detected one when a customer logged in.
+* Fixed incompatibility with Quick View feature of Flatsome theme. The feature loads the products in a way that prevented the Currency Switcher from converting the prices correctly for variable products.
 * Improved support for coupons:
 	* Added support for *maximum_amount* property.
 	* Added support for legacy *amount* property.
 
-####3.6.27.150421
-* Fixed incompatibility with Quick View feature of Flatsome theme. The feature loads the products in a way that prevented the Currency Switcher from converting the prices correctly for variable products.
-
-####3.6.26.150420
-* Fixed bug with WooCommerce 2.3. The bug prevented the cart from being restored when a customer logged out and then logged back in.
-* Fixed bug in saving of the selected currency between user sessions. The bug caused the selected currency to be overwritten by the geo-detected one when a customer logged in.
-
-####3.6.25.150417
+####4.0.2.150417
 * Fixed XSS vulnerability that affected the plugin when used with WooCommerce 2.1.
 
-####3.6.24.150408
-* Added check to determine if visitor is a bot before starting a session.
+####4.0.1.150405
+* Fixed bug in rendering of currency and customer country selector widgets.
 
-####3.6.23.150313
+####4.0.2.150324
+* Removed action for `woocommerce_cart_loaded_from_session` hook.
+
+####4.0.1.150318
+* Modified error codes to prevent conflicts.
+* Improved plugin settings UI.
+* Added thousand and decimal separator settings for each currency.
+
+####4.0.0.150311
+* Added possibility to force the currency based on shipping price.
 * Removed filter for `woocommerce_get_formatted_order_total` hook.
 
-####3.6.22.140305
-* Fixed notice in `WC_Aelia_CS_Admin_Interface_Manager::woocommerce_currency()`.
+## Version 3.x
 
-####3.6.21.140227
+####3.7.22.140227
 * Enabled *product base currency* feature on variable products (WooCommerce 2.3 and later).
 
-####3.6.20.140217
+####3.7.21.150217
 * Improved compatibility with WooCommerce 2.3:
 	* Added logic to fix undocumented breaking change in `WC_Coupon` class.
 
-####3.6.19.140213
-* Improved compatibility with WooCommerce 2.3:
-	* Added logic to work around the removal of `woocommerce_available_shipping_methods` filter.
+####3.7.20.150204
+* Removed Google Analytics integration. The GA plugin provided by WooThemes now keeps track of the currency.
 
-####3.6.18.140204
-* Disabled override of Google Analytics integration in WooCommerce 2.1 and later. The Google Analytics plugin required by those versions already passes the correct currency information.
-
-####3.6.17.140201
+####3.7.19.150201
 * Fixed warning in the integration with Dynamic Pricing plugin.
 
-####3.6.16.140128
+####3.7.18.150128
 * Improved installation process. The processing of past orders placed in shop base currency is now faster.
 
-####3.6.15.140126
+####3.7.17.150126
+* Merged changes from v3.6.14.140122:
+	* Fixed bug in loading of product pricing metadata, introduced by an incorrect patch in v3.6.13.140122.
+	* Added new `wc_aelia_currencyswitcher_prices_type_field_map` filter.
+	* Added filter for `woocommerce_get_variation_price` hook.
+	* Removed *Product Base Currency* feature from Variable Products. Ref. http://aelia.co/2015/01/21/important-bug-product-base-currency-feature/
+* Removed calls to functions and filters deprecated in WooCommerce 2.1 and later:
+	* Replaced deprecated filter `woocommerce_available_shipping_methods` with `woocommerce_package_rates`.
+	* Removed call to `woocommerce_get_page_id()`.
 * Added exchange rates provider for Turkey Central Bank.
 
-####3.6.14.140122
-* Fixed bug in loading of product pricing metadata, introduced by an incorrect patch in v3.6.13.140122.
-
-####3.6.13.140122
-* Fixed bug in loading of product pricing metadata.
-* Added new `wc_aelia_currencyswitcher_prices_type_field_map` filter.
-
-####3.6.12.140121
-* Added filter for `woocommerce_get_variation_price` hook.
-* Removed *Product Base Currency* feature from Variable Products. Ref. http://aelia.co/2015/01/21/important-bug-product-base-currency-feature/
-
-####3.6.11.140120
+####3.7.16.150120
 * Fixed bug related to Prices by Country. The bug caused the prices specified for a region to be discarded and overwritten by the base ones in some circumstances.
 
-####3.6.10.140119
+####3.7.15.150119
 * Fixed bug related to "product base currency" feature and handling of product sale prices. The bug caused the product not to be considered "on sale", even when it was, when a product base currency was set to one different from shop base currency.
 * Fixed bug in loading of decimal places setting for base currency. WooCommerce default decimals were always used instead of the ones set in Currency Switcher Options.
 
-####3.6.9.140115
+####3.7.14.150115
 * Added Yahoo! Finance to the available providers of exchange rates.
 
-####3.6.8.140115
-* Rewritten `Semaphore` class to use MySQL `GET_LOCK` function.
-* Added error suppression on `set_time_limit()` call.
+####3.7.13.150114
+* Fixed bugs in "product base currency" feature:
+	* Fixed rendering of product pricing UI.
+	* Fixed logic used to calculate product prices from product base prices.
+
+####3.7.12.141230
+* Removed Httpful library, now included in the AFC plugin.
+
+####3.7.11.141224
+* Refactored settings renderer. Class now used convenience methods to render the fields.
+
+####3.7.10.141218
+* Fixed bug in rendering of plugin's settings page.
+
+####3.7.9.141208
+* Moved base Exchange Rates Model class to Aelia Foundation Classes.
+* Updated dependencies.
+* Fixed calls to logger in `Aelia\WC\CurrencySwitcher\WC21\Reports` class.
+
+####3.7.8.141103
+* Fixed namespace of `Reports` class for WooCommerce 2.2.x.
+* Removed WC1.6 legacy code.
+
+####3.7.7.141021
+* Improved performance of conversion of variable product prices.
+* Removed support for WooCommerce 2.0.
+
+####3.7.6.141017
+* Improved logic used to initialise WooCommerce session. The new logic prevents redundant re-initialisations.
+
+####3.7.5.141008
+* Added tweaks to maintain backward compatibility with legacy 3rd party code and integrations.
+
+####3.7.4.140908
+* Replaced `WC_Aelia_CurrencySwitcher::VERSION` constant with static variable.
+
+####3.7.3.140828
+* Fixed plugin name and text domain definitions.
+
+####3.7.2.140819
+* Updated logic used to for requirements checking.
+
+####3.7.1.140805
+* Fixed bug in handling of exchange rate providers classes.
+* Fixed namespace references.
+
+####3.7.0.140731
+* Major refactoring of the plugin to use the Aelia Foundation Classes.
 
 ####3.6.7.140114
 * Improved admin UI. The message stating importance of entering proper exchange rates is now more prominent.
@@ -317,13 +423,12 @@
 ####3.5.12.141209
 * Improved semaphore logic used during auto-updates to reduce race conditions.
 * Fixed error message for "invalid destination currency" error.
-* Fixed rendering error on orders list page in the admin section on WooCommerce 2.2.
+* Fixed rendering error on orders list page in the admin section on WooCommerce 2
 * Added new `wc_aelia_currencyswitcher_settings_saved` action, triggered when plugin settings are saved.
 
 ####3.5.11.141205
 * Rewritten logic used to render the currency symbol on the Order Edit page.
-* Fixed minor notice in WC_Aelia_CurrencySwitcher_Settings::set_exchange_rates_update_schedule().
-* Fixed scope of CSS for Chosen elements in Admin section.
+* Fixed minor notice in `Settings::set_exchange_rates_update_schedule()`.
 
 ####3.5.10.141203
 * Fixed bug with conversion of product variations' prices. The bug caused variation prices to be hidden in some edge cases.
@@ -341,7 +446,6 @@
 ####3.5.6.141023
 * Fixed bug in logic used to update exchange rates. The bug caused the symbol for base currency to be reset when "Save and update exchange rates" button was clicked.
 * Modified Admin CSS to make section labels more legible.
-* Improved checks in `WC_Aelia_Settings::load()`. Method can now detect and ignore corrupt settings.
 
 ####3.5.5.141017
 * Improved Admin UI. Clarified the function of the "currency by billing country" option.
@@ -349,7 +453,6 @@
 
 ####3.5.4.141002
 * Fixed bug in handling of minimum order amount for free shipping.
-* Updated GeoIP database.
 
 ####3.5.3.141001
 * Added check to prevent mathematical conversion of empty product prices.
@@ -399,13 +502,9 @@
 ####3.4.9.140806
 * Fixed bug in payment of existing orders. Bug caused the wrong currency to be picked, in some conditions.
 
-####3.4.8.140804
-* Improved user interface:
-	* Improved tooltip that explains the effect of the settings entered in the "*Decimals*" column.
-* Updated language files.
-
 ####3.4.7.140803
 * Fixed method `WC_Aelia_CurrencySwitcher::load_order_currency_settings()`, which failed to return the localisation parameters for JS scripts.
+* Updated language files.
 
 ####3.4.6.140720
 * Fixed bug in display of variation prices (regular and sale) in WooCommerce 2.1.12.
@@ -683,329 +782,3 @@
 ####3.0.0.140206-Beta
 * Improved compatibility with WooCommerce 2.1:
 	* Added check for existence of WC_Google_Analytics.
-
-## Version 2.x
-####2.6.3.140208
-* Fixed CSS for admin pages.
-* Fixed bug in price conversion for product bundles.
-* Fixed minor bug in accessing an order property in "pay" page.
-
-####2.6.2.140205
-* Optimised data retrieval from Open Exchange Rates.
-* Overridden WooCommerce dashboard sales report widget to display totals in base currency.
-* Overridden WooCommerce recent orders report widget to display totals in both order currency and base currency.
-
-####2.6.1.140204
-* Fixed bug in rendering of currency selector widget.
-* Fixed bug in retrieval of currently selected currency.
-
-####2.6.0.140131
-* Implemented shortcode for currency selector widget.
-* Implemented dynamically loaded templates for the currency selector widget.
-* Improved documentation in both README file and Currency Switcher options page.
-
-####2.5.11.140129
-* Improved loading of JavaScript and CSS files to reduce clashes with other plugins
-
-####2.5.10.140124
-* Fixed logic used to load the code to update the price filter widget when the selected currency changes
-
-####2.5.9.140122
-* Removed filter "wc_aelia_cs_get_selected_currency" as it's redundant. Filter "woocommerce_currency" can be used instead
-
-####2.5.8.140117
-* Fixed bug in logic selecting the default currency for geolocation
-
-####2.5.7.140115
-* Added wc_aelia_cs_get_selected_currency filter, to allow 3rd parties to retrieve and/or alter the selected currency
-* Improved compatibility with Opulence theme
-
-####2.5.6.140113
-* Added wc_aelia_cs_enabled_currencies filter, to allow 3rd parties to retrieve the list of enabled currencies
-
-####2.5.5.140110
-* Fixed rendering bug in WC_Aelia_CurrencySwitcher::get_shipping_to_display()
-* Updated GeoIP database
-
-####2.5.4.140107
-* Improved code that renders plugin settings page to reduce clashes with other plugins
-
-####2.5.3.131228
-* Removed debugging code from class WC_Aelia_Google_Analytics_Integration
-
-####2.5.2.131227
-* Added new filter: wc_aelia_currencyswitcher_visitor_ip
-
-####2.5.1.131219
-* Fixed minor bug that caused WC_Aelia_CurrencySwitcher_Settings::get_enabled_currencies() not to return an array in some edge conditions
-
-####2.5.0.131211
-* Added integration with WooCommerce Bundles plugin
-
-####2.4.12.131125
-* Added integration with SkyVerge KISSMetrics plugin
-
-####2.4.10.131118
-* Added default geolocation currency setting. It's used to specify which currency should be used by default when the one detected by geolocation feature is not available
-
-####2.4.8.131110
-* Fixed minor bug introduced in v2.4.8.131108, which caused products to be displayed as "free" when they were put on sale
-
-####2.4.7.131108
-* Fixed minor bug that caused the incorrect original price to be displayed when a product was on sale with a sale price of zero
-
-####2.4.6.131103
-* Improved compatibility with category discounts introduced by Dynamic Pricing Plugin
-
-####2.4.5.131102
-* Relaxed check used to determine if a payment plugin is enabled. This increases compatibility with 3rd party payment plugins, such as MercadoPago
-
-####2.4.4.131029
-* Modified Google Analytics order tracking to ensure that order currency is recorded correctly
-* Improved error handling in price filter JS file
-
-####2.4.3.131028
-* Removed unused hook handler
-* Improved hint for exchange rate markup field
-
-####2.4.2.131026
-* Fixed bug in loading the price filter override script, which caused other scripts to fail during load in some circumstances
-
-####2.4.1.131023
-* Fixed bug in conversion of prices for external products
-* Corrected labels in plugin configuration page
-
-####2.4.0.131022
-* Fixed bug in detection of payment step when paying a past order
-
-####2.3.9.131022
-* Fixed bug that caused the currently selected currency, instead of the order currency, to be retrieved by the payment gateway when paying for an order placed in the past and left unpaid
-
-####2.3.8.131021
-* Updated GeoIP library to v1.24
-
-####2.3.7.131017
-* Corrected checking of JavaScript variables
-
-####2.3.6.131016
-* Updated GeoIP library to v1.22
-* Corrected loading of JavaScript files used by the currency selector widget
-
-####2.3.5.131016
-* Updated GeoIP library to v1.21
-
-####2.3.4.131016
-* Updated GeoIP library to v1.20
-
-####2.3.3.131016
-* Improved checking of plugin requirements to prevent fatal errors upon activation
-
-####2.3.2.131015
-* Improved handling of errors while fetching exchange rates from remote providers
-
-####2.3.0.131015
-* Fixed bug in calculation of shipping taxes
-
-####2.2.17.131014
-* Fixed minor bug that prevented the price filter widget from working properly
-
-####2.2.15.131011
-* Fixed minor bug in rendering of minimum price for grouped products
-
-####2.2.14.131008
-* Improved detection of visitor's IP address when site is behind a reverse proxy
-
-####2.2.13.131003
-* Corrected bug that a warning to be raised when some prices were left empty on Variable Products
-
-####2.2.12.131002
-* Corrected bug that caused Product Search field not to work properly in Order Add/Edit page
-
-####2.2.11.131002
-* Handled edge case in which a product is on sale and no regular price is specified
-
-####2.2.10.131001
-* Fixed minor bug that caused a warning to be raised when product prices were left empty
-
-####2.2.8.130927
-* Fixed minor bug that caused a warning to be raised when the number of decimals for a currency set in Currency Switcher configuration was not valid
-
-####2.2.7.130927
-* Rewritten code that handles compatibility with Cart Notices plugin
-* Added code to handle absolute discounts generated by Dynamic Pricing plugin
-
-####2.2.6.130926
-* Fixed bug that caused an error to be thrown, in some circumstances, when the Currency Switcher plugin was installed on a site which already contained several products
-
-####2.2.5.130925
-* Rewritten price conversion logic to improve performance, stability and compatibility
-* Improved compatibility with Dynamic Pricing plugin
-* Fixed bug that caused manually entered prices to be ignored, in some circumstances, for variable products
-
-####2.1.0.130915
-* First official release of version 2.x
-
-####2.0.24.130903-Beta
-* Merged fixes and improvements from version 1.9.24.130903
-
-####2.0.0.130820-Beta
-* Implemented support for currency pricing for each product
-
-## Version 1.x
-
-####1.9.30.130915
-* Refactored settings classes
-
-####1.9.29.130914
-* Fixed minor bug related to the display of the schedule for automatic update of exchange rates
-
-####1.9.28.130912
-* Fixed minor bug that caused a warning to be displayed when plugin settings page was loaded
-* Fixed error in rendering the Support section in plugin settings page which caused the Save buttons to be linked to dev.pathtoenlightement.net contact page
-
-####1.9.27.130911
-* Added Support section in plugin settings page, to make it more convenient for the User to contact us
-
-####1.9.26.130908
-* Fixed minor bug that interfered with the "enhanced country select boxes" feature of WooCommerce
-
-####1.9.25.130905
-* Improved compatibility with Cart Notices plugin
-
-####1.9.24.130903
-* Fixed bug that caused shipping details to be displayed incorrectly in order review page and confirmation email
-* Updated GeoIP library
-* Optimised code that retrieves the currency used to place an order
-
-####1.9.23.130829
-* Added support for markup to be added to an exchange rate
-* Refactored Settings class to simplify maintenance and increase flexibility
-* Renamed WC_Aelia_CurrencySwitcher::set_currency_symbol() to WC_Aelia_CurrencySwitcher::woocommerce_currency
-
-####1.9.22.130827
-* Improved handling of unexpected conditions when exchange rates cannot be retrieved from provider
-
-####1.9.21.130823
-* Added hiding of database errors unrelated to the Currency Switcher when WP_DEBUG is not enabled
-
-####1.9.20.130821
-* Fixed minor bug that caused the PayPal Pro payment gateway not to be displayed when the Admin area was accessed without using HTTPS protocol
-
-####1.9.19.130820
-* Fixed issue with formatting of Shipping and Tax Totals when displaying past orders
-
-####1.9.18.130816
-* Implemented support for decimals for each currency
-
-####1.9.17.130814
-* Implemented filtering of payment gateways based on selected currency
-
-####1.9.16.130814
-* Implemented tabbed interface for plugin settings
-
-####1.9.15.130809
-* Improved compatibility with WPMU
-* Fixed minor bug that caused update functions to be called when not necessary
-
-####1.9.14.130731
-* Fixed minor incompatibility with WPML and WooCommerce Multilingual that caused minicart totals not to be updated correctly
-
-####1.9.13.130729
-* Fixed minor bug that caused a warning to appear in certain circumstances when placing a new order
-
-####1.9.12.130726
-* Fixed incompatibility with WooCommerce 1.6 related to price formatting
-* Rewritten logic used to format prices on product pages
-* Updated GeoIP library to v1.16, modified to prevent clashes with PHP geoip extension
-
-####1.9.11.130724
-* Fixed bug that caused prices to be formatted incorrectly when WooCommerce was set to display the currency symbol on the right of the price
-
-####1.9.10.190713
-* Improved logic to display messages generated by the plugin to make it more polished and user friendly
-
-####1.9.9.190713
-* Fixed bug that caused currency selection not to work in some circumstances
-
-####1.9.8.170713
-* Improved error handling during currency conversion. New handler displays more details about currency conversion errors that may eventually occur
-* Fixed bug that caused an error to be raised when a new order was placed
-
-####1.9.7.170713
-* Improved error handling during calculation of past orders' totals in base currency
-
-####1.9.6.160713
-* Fixed minor bug with currency symbols in generation of order receipts
-
-####1.9.5.150713
-* Rewritten Geolocation feature using MaxMind GeoIP library and GeoLite database
-* Improved validation of plugin options upon Save
-* Fixed bug in Exchange Rates retrieval that occurred occasionally when "Save and Update Exchange Rates" was clicked and Open Exchange Rates was selected as a provider
-* Improved requirement checking
-
-####1.9.3.130712
-* Fixed bug in calculation of minimum requirements for shipping methods
-
-####1.9.2.130711
-* Added requirement checking when plugin is activated
-* Added mechanism to automatically apply updates required by new plugin versions
-* Fixed minor bug in currency display on Order Edit page
-
-####1.9.1.130626
-* Fixed minor bug that caused a warning to be displayed when using the Currency Switcher in some configurations
-* Fixed bug in validation of Currency Geolocation parameters
-
-####1.9.130624
-* Added automatic selection of Currency based on Visitors' Country (detected using their IP Address)
-
-####1.8.7.130613
-* Fixed minor bug that caused a warning to be raised when viewing past orders, depending on environment configuration
-
-####1.8.6.130610
-* Fixed incompatibility with Menu Cart Plugin and Wootique theme
-
-####1.8.5.130602
-* Fixed bug in calculation of shipping charges
-
-####1.8.3.130601
-* Improved support for coupons in WooCommerce 1.6
-
-####1.8.2.130601
-* Fixed bug in currency conversion which occurred during some Ajax calls
-* Improved support for coupons in WooCommerce 2.0
-
-####1.8.130601
-* Fixed bug in currency conversion during cart update on Checkout page
-
-####1.7.130531
-* Removed woocommerce_price_filter hook (no longer needed)
-
-####1.6.130530
-* Added support for Variable Products
-* Corrected handling of formatted prices over the value of 999.99
-
-####1.5.130529
-* Fixed bug that prevented the Mini Cart widget from displaying prices in correct currency in WooCommerce 2.0+
-
-####1.4.130529
-* Fixed bug that caused Sale prices to be displayed in base currency, rather than the one selected by the User
-
-####1.3.130528
-* Fixed bug that prevented WooCommerce's Price Filter Slider widget from working correctly when switching currency
-
-####1.2.130526
-* Optimised code and improved documentation
-
-####1.2.130523
-* Ensured that prices are not converted when managing products in the Admin section
-
-####1.1.130522
-* Bug fixes
-
-####1.0.130518
-* Improved handling of misconfigured Currencies
-* Fixed bug in Open Exchange Rates model, which prevented the rates from being retrieved in certain conditions
-* Improved UI
-
-####1.0.130517
-* Initial Release

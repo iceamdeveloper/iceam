@@ -228,4 +228,55 @@ class Order extends \WC_Order {
 		// Fall back to legacy method in WooCommerce 2.6 and earlier
 		return $this->id;
 	}
+
+	/**
+	 * Returns an order's property. This method is used to access "native" order
+	 * properties, such as billing country, shipping country, and so on. For
+	 * other properties, the get_meta() method should be used.
+	 *
+	 * @param string property The property name.
+	 * @param string context
+	 * @return string
+	 * @since 1.8.6.170405
+	 */
+	public function get_property($property, $context) {
+		if(method_exists('\WC_Order', 'get_' . $property)) {
+			$method = "get_{$property}";
+			return parent::$method();
+		}
+		return $this->$property;
+	}
+
+	/**
+	 * Get customer_ip_address.
+	 *
+	 * @param string context
+	 * @return string
+	 * @since 1.8.6.170405
+	 */
+	public function get_customer_ip_address($context = 'view') {
+		return $this->get_property('customer_ip_address', $context);
+	}
+
+	/**
+	 * Get billing_country.
+	 *
+	 * @param string context
+	 * @return string
+	 * @since 1.8.6.170405
+	 */
+	public function get_billing_country($context = 'view') {
+		return $this->get_property('billing_country', $context);
+	}
+
+	/**
+	 * Get shipping_country.
+	 *
+	 * @param string context
+	 * @return string
+	 * @since 1.8.6.170405
+	 */
+	public function get_shipping_country($context = 'view') {
+		return $this->get_property('shipping_country', $context);
+	}
 }

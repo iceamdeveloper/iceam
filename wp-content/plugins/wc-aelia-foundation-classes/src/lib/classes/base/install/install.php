@@ -382,6 +382,7 @@ if(!class_exists('Aelia\WC\Aelia_Install')) {
 
 			// Initialize the semaphore that will be used to prevent race conditions
 			$this->semaphore = new Semaphore($this->lock_name);
+			$this->semaphore->set_logger($this->logger);
 			$this->semaphore->initialize();
 			if(!$this->semaphore->lock()) {
 				$this->log(sprintf(__('%s Plugin Autoupdate - Could not obtain semaphore lock. ' .

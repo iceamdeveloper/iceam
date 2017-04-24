@@ -731,7 +731,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		public static function editing_order() {
 			if(!empty($_GET['action']) && ($_GET['action'] == 'edit') && !empty($_GET['post'])) {
 				global $post;
-				if(!empty($post) && ($post->type == 'shop_order')) {
+				if(!empty($post) && ($post->post_type == 'shop_order')) {
 					return $post->ID;
 				}
 			}

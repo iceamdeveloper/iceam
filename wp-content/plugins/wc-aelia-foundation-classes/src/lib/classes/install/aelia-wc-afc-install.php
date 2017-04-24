@@ -12,6 +12,14 @@ class WC_AeliaFoundationClasses_Install extends Aelia_Install {
 	protected $lock_name = 'WC_AELIA_AFC';
 
 	/**
+	 * Class constructor.
+	 */
+	public function __construct() {
+		parent::__construct();
+		$this->logger = WC_AeliaFoundationClasses::instance()->get_logger();
+	}
+
+	/**
 	 * Runs plugin updates required by version 1.6.1.150728:
 	 * - Automatic update of GeoIP database.
 	 *
