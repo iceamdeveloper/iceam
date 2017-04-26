@@ -129,27 +129,33 @@
 			
 			<?php
 				
-				echo "<p>price" . wc_price($product->get_price() ) . "</p>";
+				$the_price = $product->get_price();
+				$the_signup_fee = wcs_get_price_excluding_tax( $product, array( "price" => WC_Subscriptions_Product::get_sign_up_fee( $product ) ) );
+				$total_price = $the_price + $the_signup_fee;
+				$the_period = WC_Subscriptions_Product::get_interval( $product ) . " " . WC_Subscriptions_Product::get_period( $product ) . "s";
 				
-				echo "<p>signup fee: " . wc_price(wcs_get_price_excluding_tax( $product, array( "qty" => '1', "price" => WC_Subscriptions_Product::get_sign_up_fee( $product ) ) ) ) . "</p>";
-			
+				echo "<h4>Register for " . wc_price( $total_price ) . "</h4>";
+				
+				
 			?>
-				
-				
-				
 				
 				<form action="<?php echo esc_url( $product->add_to_cart_url() ); ?>" class="cart" method="post" enctype="multipart/form-data">
 					<input type="hidden" name="product_id" value="<?php echo esc_attr( $wc_post_id ); ?>" />
 					<input type="hidden" name="quantity" value="1" />
 					<button type="submit" name="add-to-cart" value="<?php echo esc_attr( $product->get_id() ); ?>" class="single_add_to_cart_button button alt"><?php echo esc_html( $product->single_add_to_cart_text() ); ?></button>
-					<!--button type="submit" class="single_add_to_cart_button button alt"><?php echo $product->get_price_html(); ?><br/><?php echo apply_filters('single_add_to_cart_text', __('<nobr>Purchase this Course</nobr>', 'woothemes-sensei'), $product->product_type); ?></button-->
 				</form>
 				
-            <?php } // End If Statement ?>
+            <?php
+			
+				echo "<p style='margin-top:15px'><strong>Optional course renewal for " . wc_price($the_price) . " <nobr>after $the_period</nobr></strong></p>";
+			
+			} // End If Statement ?>
 			
 			<h5 style='margin-top:15px'>* Read about <a href='/pricing'>online course pricing</a>.</h5>
 			
-        <?php } // End If Statement
+		<?php
+		
+		} // End If Statement
 		
 		echo $args['after_widget'];
 	}

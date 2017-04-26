@@ -206,15 +206,15 @@ add_filter( 'tribe_get_cost', 'hide_tribe_get_cost', 10, 3 );
  *
  **********************************************************************/
 
-function fix_course_purchase_label( $subscription_string, $product, $include ) {
+function fix_course_purchase_label( $subscription_string, $product ) {
 	$subscription_price = $product->get_price();
 	$sign_up_fee = wcs_get_price_excluding_tax( $product, array( "qty" => '1', "price" => WC_Subscriptions_Product::get_sign_up_fee( $product ) ) );
 	
 	$price = $subscription_price + $sign_up_fee;
 	
-	return "<nobr>$" . $price . " Sign-up Fee *</nobr>";
+	return "Sign Up Now for $" . $price . "*";
 }
-//add_filter( 'woocommerce_subscriptions_product_price_string', 'fix_course_purchase_label', 999, 3 );
+//add_filter( 'woocommerce_product_single_add_to_cart_text', 'fix_course_purchase_label', 999, 3 );
 
 
 
