@@ -87,9 +87,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 		$actions['tickets_orders'] = sprintf(
 			'<a title="%s" href="%s">%s</a>',
-			esc_html__( 'See purchases for this event', 'event-tickets' ),
+			esc_html__( 'See purchases for this event', 'event-tickets-plus' ),
 			esc_url( $url ),
-			esc_html__( 'Orders', 'event-tickets' )
+			esc_html__( 'Orders', 'event-tickets-plus' )
 		);
 
 		return $actions;
@@ -117,7 +117,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	public function orders_admin_title( $admin_title, $title ) {
 		if ( ! empty( $_GET['event_id'] ) ) {
 			$event       = get_post( $_GET['event_id'] );
-			$admin_title = sprintf( esc_html__( '%s - Order list', 'event-tickets' ), $event->post_title );
+			$admin_title = sprintf( esc_html_x( '%s - Order list', 'Browser title', 'event-tickets-plus' ), $event->post_title );
 		}
 
 		return $admin_title;

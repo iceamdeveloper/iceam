@@ -7,15 +7,14 @@
  */
 .fa {
   display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
 .fa-fw {
-  width: 1.28571em;
+  width: 1.2857142857em;
   text-align: center; }
 
 .widget_woothemes_testimonials .quote {
@@ -61,14 +60,14 @@
       font-weight: 400; }
 
 @media only screen and (min-width: 980px) {
-  #main .widget_woothemes_testimonials .columns-2:after,
-  #main .widget_woothemes_testimonials .columns-3:after,
-  #main .widget_woothemes_testimonials .columns-4:after,
-  #main .widget_woothemes_testimonials .columns-5:after,
-  #main .widget_woothemes_testimonials .columns-6:after {
+  #main .widget_woothemes_testimonials .columns-2::after,
+  #main .widget_woothemes_testimonials .columns-3::after,
+  #main .widget_woothemes_testimonials .columns-4::after,
+  #main .widget_woothemes_testimonials .columns-5::after,
+  #main .widget_woothemes_testimonials .columns-6::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: block; }
   #main .widget_woothemes_testimonials .columns-2 .quote,
   #main .widget_woothemes_testimonials .columns-3 .quote,
   #main .widget_woothemes_testimonials .columns-4 .quote,

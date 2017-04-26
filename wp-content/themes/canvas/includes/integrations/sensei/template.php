@@ -71,12 +71,12 @@ if ( ! function_exists( 'woo_sensei_pagination' ) ) {
 
 		if ( ( is_post_type_archive( 'course' ) || ( is_page( $course_page_id ) ) ) && ( isset( $paged ) && 0 == $paged ) ) {
 			// Silence
-		} elseif( is_singular( 'course' ) ) {
-			$woothemes_sensei->frontend->sensei_get_template( 'wrappers/pagination-posts.php' );
-		} elseif( is_singular( 'lesson' ) ) {
-			$woothemes_sensei->frontend->sensei_get_template( 'wrappers/pagination-lesson.php' );
-		} elseif( is_singular( 'quiz' ) ) {
-			$woothemes_sensei->frontend->sensei_get_template( 'wrappers/pagination-quiz.php' );
+		} elseif( is_singular( 'course' ) && class_exists( 'Sensei_Templates' ) ) {
+			Sensei_Templates::get_template( 'wrappers/pagination-posts.php' );
+		} elseif( is_singular( 'lesson' ) && class_exists( 'Sensei_Templates' )) {
+			Sensei_Templates::get_template( 'wrappers/pagination-lesson.php' );
+		} elseif( is_singular( 'quiz' ) && class_exists( 'Sensei_Templates' )) {
+			Sensei_Templates::get_template( 'wrappers/pagination-quiz.php' );
 		} else {
 			woo_pagination();
 		}

@@ -89,12 +89,6 @@ add_filter( 'get_product_search_form', 'woo_custom_wc_search' );
 add_action( 'woo_nav_inside', 'woo_add_nav_cart_link', 20);
 
 /**
- * HTML5
- * Adds HTML5 shiv
- */
-add_action('wp_head', 'woocommerce_html5');
-
-/**
  * PrettyPhoto
  * Disable the WooCommerce lightbox and make product images prettyPhoto galleries
  */

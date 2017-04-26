@@ -31,12 +31,12 @@ if ( $hide_input ) {
 
 	ob_start();
 
- 	woocommerce_quantity_input( array(
- 		'input_name'  => $input_name,
- 		'min_value'   => $quantity_min,
+	woocommerce_quantity_input( array(
+		'input_name'  => $input_name,
+		'min_value'   => $quantity_min,
 		'max_value'   => $quantity_max,
- 		'input_value' => isset( $_REQUEST[ $input_name ] ) ? $_REQUEST[ $input_name ] : apply_filters( 'woocommerce_bundled_product_quantity', $quantity_min, $quantity_min, $quantity_max, $bundled_item )
- 	), $bundled_item->product );
+		'input_value' => isset( $_REQUEST[ $input_name ] ) ? $_REQUEST[ $input_name ] : apply_filters( 'woocommerce_bundled_product_quantity', $quantity_min, $quantity_min, $quantity_max, $bundled_item )
+	), $bundled_item->product );
 
- 	echo str_replace( 'qty text', 'qty text bundled_qty', ob_get_clean() );
+	echo preg_replace( '/(class=\"[^\"]*qty)([\"\ ])/', '$1 bundled_qty$2', ob_get_clean() );
 }

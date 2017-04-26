@@ -451,11 +451,13 @@ class Sensei_Question {
          * hook document in class-woothemes-sensei-message.php the_title()
          */
         $title = apply_filters( 'sensei_single_title', $title, 'question');
+		
+		$question_grade = Sensei()->question->get_question_grade( $question_id );
 
         $title_html  = '<span class="question question-title">';
         $title_html .= $title;
-        $title_html .= '<span class="grade">' . Sensei()->question->get_question_grade( $question_id ) . '</span>';
-        $title_html .='</span>';
+		$title_html .= Sensei()->view_helper->format_question_points( $question_grade );
+		$title_html .='</span>';
 
         return $title_html;
     }

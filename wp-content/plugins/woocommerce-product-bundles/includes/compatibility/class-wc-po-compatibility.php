@@ -2,7 +2,7 @@
 /**
  * WC_PB_PO_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.11.4
  */
@@ -49,7 +49,7 @@ class WC_PB_PO_Compatibility {
 	 * @return array
 	 */
 	public static function remove_bundled_pre_orders_order_item_meta( $pre_order_meta, $order_item, $order ) {
-		if ( wc_pb_is_bundled_order_item( $order_item, $order ) ) {
+		if ( wc_pb_maybe_is_bundled_order_item( $order_item, $order ) ) {
 			$pre_order_meta = array();
 		}
 		return $pre_order_meta;

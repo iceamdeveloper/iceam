@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 5.0.0
+ * @version 5.2.0
  */
 
 // Exit if accessed directly.
@@ -17,9 +17,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<h4><?php echo $title; ?></h4>
+<h4 class="bundled_product_attributes_title"><?php echo $title; ?></h4>
 <?php
 
 wc_get_template( 'single-product/product-attributes.php', array(
-	'product' => $product
-), '', '' );
+	'product'            => $product,
+	'attributes'         => $attributes,
+	'display_dimensions' => $display_dimensions
+) );

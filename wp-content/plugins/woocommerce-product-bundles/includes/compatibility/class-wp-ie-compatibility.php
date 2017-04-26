@@ -2,7 +2,7 @@
 /**
  * WC_PB_WP_IE_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Data is imported again using the WC_Bundled_Item_Data class.
  * Supports import of existing v4 data from post meta.
  *
- * @version  5.1.3
+ * @since 5.0.0
  */
 class WC_PB_WP_IE_Compatibility {
 

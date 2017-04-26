@@ -2,7 +2,7 @@
 /**
  * WC_PB_Helpers class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.0.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Helper Functions.
  *
  * @class    WC_PB_Helpers
- * @version  5.1.0
+ * @version  5.2.0
  */
 class WC_PB_Helpers {
 
@@ -50,6 +50,19 @@ class WC_PB_Helpers {
 	 */
 	public static function cache_set( $key, $value ) {
 		self::$cache[ $key ] = $value;
+	}
+
+	/**
+	 * Simple runtime cache unsetter.
+	 *
+	 * @param  string  $key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public static function cache_delete( $key ) {
+		if ( isset( self::$cache[ $key ] ) ) {
+			unset( self::$cache[ $key ] );
+		}
 	}
 
 	/**
@@ -113,10 +126,11 @@ class WC_PB_Helpers {
 	/**
 	 * Return a formatted product title based on variation id.
 	 *
-	 * @param  int  $item_id
+	 * @param  int   $item_id
+	 * @param  bool  $use_name
 	 * @return string
 	 */
-	public static function get_product_variation_title( $variation ) {
+	public static function get_product_variation_title( $variation, $use_name = false ) {
 
 		if ( ! is_object( $variation ) ) {
 			$variation = wc_get_product( $variation );
@@ -126,19 +140,28 @@ class WC_PB_Helpers {
 			return false;
 		}
 
-		$description = WC_PB_Core_Compatibility::wc_get_formatted_variation( $variation, true );
+		if ( $use_name ) {
 
-		$title = $variation->get_title();
-		$sku   = $variation->get_sku();
-		$id    = WC_PB_Core_Compatibility::get_id( $variation );
+			$title = $variation->get_formatted_name();
 
-		if ( $sku ) {
-			$identifier = $sku;
 		} else {
-			$identifier = '#' . $id;
+
+			$description = WC_PB_Core_Compatibility::wc_get_formatted_variation( $variation, true );
+
+			$title = $variation->get_title();
+			$sku   = $variation->get_sku();
+			$id    = WC_PB_Core_Compatibility::get_id( $variation );
+
+			if ( $sku ) {
+				$identifier = $sku;
+			} else {
+				$identifier = '#' . $id;
+			}
+
+			$title = self::format_product_title( $title, $identifier, $description, WC_PB_Core_Compatibility::is_wc_version_gte_2_7() );
 		}
 
-		return self::format_product_title( $title, $identifier, $description );
+		return $title;
 	}
 
 	/**
@@ -154,9 +177,9 @@ class WC_PB_Helpers {
 
 		if ( $sku && $meta ) {
 			if ( $paren ) {
-				$title = sprintf( _x( '%1$s &mdash; %2$s (%3$s)', 'product title followed by meta and sku in parenthesis', 'woocommerce-product-bundles' ), $title, $meta, $sku );
+				$title = sprintf( _x( '%1$s &ndash; %2$s (%3$s)', 'product title followed by meta and sku in parenthesis', 'woocommerce-product-bundles' ), $title, $meta, $sku );
 			} else {
-				$title = sprintf( _x( '%1$s &ndash; %2$s &mdash; %3$s', 'sku followed by product title and meta', 'woocommerce-product-bundles' ), $sku, $title, $meta );
+				$title = sprintf( _x( '%1$s &ndash; %2$s &ndash; %3$s', 'sku followed by product title and meta', 'woocommerce-product-bundles' ), $sku, $title, $meta );
 			}
 		} elseif ( $sku ) {
 			if ( $paren ) {
@@ -168,7 +191,7 @@ class WC_PB_Helpers {
 			if ( $paren ) {
 				$title = sprintf( _x( '%1$s (%2$s)', 'product title followed by meta in parenthesis', 'woocommerce-product-bundles' ), $title, $meta );
 			} else {
-				$title = sprintf( _x( '%1$s &mdash; %2$s', 'product title followed by meta', 'woocommerce-product-bundles' ), $title, $meta );
+				$title = sprintf( _x( '%1$s &ndash; %2$s', 'product title followed by meta', 'woocommerce-product-bundles' ), $title, $meta );
 			}
 		}
 

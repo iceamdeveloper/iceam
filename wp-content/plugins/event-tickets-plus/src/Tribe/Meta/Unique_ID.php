@@ -89,7 +89,9 @@ class Tribe__Tickets_Plus__Meta__Unique_ID {
 	}
 
 	/**
-	 * @param $event_id
+	 * @param int $event_id
+	 *
+	 * @return string
 	 */
 	protected function get_event_root( $event_id ) {
 		$event_root = get_post_meta( $event_id, $this->root_meta_key, true );
@@ -115,7 +117,19 @@ class Tribe__Tickets_Plus__Meta__Unique_ID {
 		$wpdb->query( 'BEGIN WORK' );
 
 		if ( '' === ( $number = get_post_meta( $event_id, $this->progressive_ticket_number_event_meta_key, true ) ) ) {
-			$number = 0;
+			/**
+			 * Sets the initial value used to start a sequence of ticket numbers.
+			 *
+			 * By default this is zero and so the first number in the sequence will be 1, however
+			 * it could be changed to 999 if it was desirable to have 1000 as the first generated
+			 * number.
+			 *
+			 * The number must be an absolute integer and it will be passed through absint() to
+			 * enforce this.
+			 *
+			 * @param integer $initial_ticket_number
+			 */
+			$number = absint( apply_filters( 'tribe_tickets_plus_inital_ticket_number', 0 ) );
 		}
 		$number += 1;
 		update_post_meta( $event_id, $this->progressive_ticket_number_event_meta_key, $number );

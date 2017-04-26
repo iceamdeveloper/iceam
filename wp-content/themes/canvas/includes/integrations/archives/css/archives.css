@@ -1,3 +1,4 @@
+@charset "UTF-8";
 /**
  * Archives
  *
@@ -7,15 +8,14 @@
  */
 .fa, #timeline .archives_list .comments a:before {
   display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
 .fa-fw, #timeline .archives_list .comments a:before {
-  width: 1.28571em;
+  width: 1.2857142857em;
   text-align: center; }
 
 #timeline {
@@ -43,7 +43,7 @@
       font-style: normal;
       list-style: none; }
     #timeline .archives_list .date {
-      color: #6e6e6e;
+      color: #6f6e6e;
       position: relative;
       width: 40%;
       font-style: italic;
@@ -82,7 +82,7 @@
         font-size: 1.4em;
         border-radius: 100%; }
         #timeline .archives_list .comments a:before {
-          content: "\f075";
+          content: "";
           font-size: .7em;
           position: relative;
           top: -2px;

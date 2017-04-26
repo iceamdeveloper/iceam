@@ -64,7 +64,8 @@ class Sensei_Course {
 				'frameborder'     => array(),
 				'allowfullscreen' => array(),
 			),
-			'video'  => Sensei_Wp_Kses::get_video_html_tag_allowed_attributes()
+			'video'  => Sensei_Wp_Kses::get_video_html_tag_allowed_attributes(),
+			'source' => Sensei_Wp_Kses::get_source_html_tag_allowed_attributes()
 		);
 
 		// Update course completion upon completion of a lesson
@@ -237,25 +238,28 @@ class Sensei_Course {
 
 					if ( 'product_variation' == $post_item->post_type ) {
 
-						$product_object = get_product( $post_item->ID );
+						$product_object = Sensei_WC_Utils::get_product( $post_item->ID );
+
+						if ( empty( $product_object ) ) {
+							// Product variation has been orphaned. Treat it like it has also been deleted.
+							continue;
+						}
+
 						$parent_id = wp_get_post_parent_id( $post_item->ID );
 
                         if( sensei_check_woocommerce_version( '2.1' ) ) {
-							$formatted_variation = wc_get_formatted_variation( $product_object->variation_data, true );
+							$formatted_variation = wc_get_formatted_variation( Sensei_WC_Utils::get_variation_data( $product_object ), true );
 
 						} else {
                             // fall back to pre wc 2.1
-							$formatted_variation = woocommerce_get_formatted_variation( $product_object->variation_data, true );
+							$formatted_variation = woocommerce_get_formatted_variation( Sensei_WC_Utils::get_variation_data( $product_object ), true );
 
 						}
 
                         $product_name = ucwords( $formatted_variation );
-                        if( empty( $product_name ) ){
-
-                            $product_name = __( 'Variation #', 'woothemes-sensei' ) . $product_object->variation_id;
-
+                        if ( empty( $product_name ) ) {
+                            $product_name = __( 'Variation #', 'woothemes-sensei' ) . Sensei_WC_Utils::get_product_variation_id( $product_object );
                         }
-
 					} else {
 
 						$parent_id = false;
@@ -604,14 +608,15 @@ class Sensei_Course {
 					$course_woocommerce_product_id = get_post_meta( $id, '_course_woocommerce_product', true);
 					if ( 0 < absint( $course_woocommerce_product_id ) ) {
 						if ( 'product_variation' == get_post_type( $course_woocommerce_product_id ) ) {
-							$product_object = get_product( $course_woocommerce_product_id );
+							$product_object = Sensei_WC_Utils::get_product( $course_woocommerce_product_id );
 							if( sensei_check_woocommerce_version( '2.1' ) ) {
-								$formatted_variation = wc_get_formatted_variation( $product_object->variation_data, true );
+								$formatted_variation = wc_get_formatted_variation( Sensei_WC_Utils::get_product_variation_data( $product_object ), true );
 							} else {
-								$formatted_variation = woocommerce_get_formatted_variation( $product_object->variation_data, true );
+								$formatted_variation = Sensei_WC_Utils::get_formatted_variation( Sensei_WC_Utils::get_product_variation_data( $product_object ), true );
 							}
-							$course_woocommerce_product_id = $product_object->parent->post->ID;
-							$product_name = $product_object->parent->post->post_title . '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . ucwords( $formatted_variation );
+							$course_woocommerce_product_id = Sensei_WC_Utils::get_product_id( $product_object );
+							$parent = Sensei_WC_Utils::get_parent_product( $product_object );
+							$product_name = $parent->get_title() . '<br/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;' . ucwords( $formatted_variation );
 						} else {
 							$product_name = get_the_title( absint( $course_woocommerce_product_id ) );
 						} // End If Statement
@@ -2645,8 +2650,8 @@ class Sensei_Course {
         // title should be Other Lessons if there are lessons belonging to models.
         $title = __('Other Lessons', 'woothemes-sensei');
 
-        // show lessons if the number of lesson in the course is the same as those that isn't assigned to a module
-        if( count( $course_lessons ) == count( $none_module_lessons )  ){
+        // show header if there are lessons the number of lesson in the course is the same as those that isn't assigned to a module
+        if ( ! empty( $course_lessons ) && count( $course_lessons ) == count( $none_module_lessons ) ) {
 
             $title = __('Lessons', 'woothemes-sensei');
 
@@ -3045,7 +3050,7 @@ class Sensei_Course {
      */
     public static function alter_course_category_order( $query ){
 
-        if( ! is_tax( 'course-category' ) || ! $query->is_main_query() ){
+        if( ! $query->is_main_query() || ! is_tax( 'course-category' ) ) {
             return $query;
         }
 

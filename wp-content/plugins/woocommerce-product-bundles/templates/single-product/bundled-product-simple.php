@@ -27,9 +27,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 					), false, WC_PB()->plugin_path() . '/templates/' );
 				}
 
-				$availability_html = empty( $availability[ 'availability' ] ) ? '' : '<p class="stock ' . esc_attr( $availability[ 'class' ] ) . '">' . esc_html( $availability[ 'availability' ] ) . '</p>';
-
-				echo apply_filters( 'woocommerce_stock_html', $availability_html, $availability[ 'availability' ], $bundled_product );
+				// Availability html.
+				echo $bundled_item->get_availability_html();
 
 				/**
 				 * 'woocommerce_bundled_product_add_to_cart' hook.

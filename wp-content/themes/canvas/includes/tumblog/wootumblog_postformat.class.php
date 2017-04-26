@@ -19,34 +19,34 @@ TABLE OF CONTENTS
 /*-----------------------------------------------------------------------------------*/
 /* WooTumblogPostFormat Class */
 /*-----------------------------------------------------------------------------------*/
-	
+
 class WooTumblogPostFormat {
-	
+
 	/*-----------------------------------------------------------------------------------*/
 	/* Constructor */
 	/*-----------------------------------------------------------------------------------*/
-	function WooTumblogPostFormat() {
-		
+	function __construct() {
+
 		// Add Theme Support
 		add_theme_support( 'post-formats', array( 'aside', 'image', 'audio', 'video', 'quote', 'link' ) );
-									
+
 		// Custom Taxonomy Filters
 		add_action('restrict_manage_posts', array(&$this, 'woo_tumblog_restrict_manage_posts'));
 		add_filter('posts_where', array(&$this, 'woo_tumblog_posts_where'));
-							
+
 	}
-	
+
 	/*-----------------------------------------------------------------------------------*/
 	/* Upgrade Existing Taxonomy Posts */
 	/*-----------------------------------------------------------------------------------*/
-	
+
 	function woo_tumblog_upgrade_existing_taxonomy_posts_to_post_formats() {
-		
+
 		// Test if upgrade performed already
 		if (get_option('woo_tumblog_post_formats_upgraded') == 'true') {
 			return false;
-		} 
-		
+		}
+
 		$tumblog_items = array(	'articles'	=> get_option('woo_articles_term_id'),
 								'images' 	=> get_option('woo_images_term_id'),
 								'audio' 	=> get_option('woo_audio_term_id'),
@@ -54,18 +54,18 @@ class WooTumblogPostFormat {
 								'quotes'	=> get_option('woo_quotes_term_id'),
 								'links' 	=> get_option('woo_links_term_id')
 								);
-		
+
 		$tumblog_posts = get_posts( array('posts_per_page' => -1) );
-		
+
 		foreach ($tumblog_posts as $tumblog_post) {
-		                  
+
           	$post_id = $tumblog_post->ID;
- 	   	              	
+
            	//switch between tumblog taxonomies
 			$tumblog_list = $this->woo_get_the_term_list( $post_id, 'tumblog', '' , '|' , ''  );
 			$tumblog_list = strip_tags($tumblog_list);
 			$tumblog_array = explode('|', $tumblog_list);
-			
+
 			$tumblog_results = '';
 			$sentinel = false;
 			foreach ($tumblog_array as $location_item) {
@@ -89,23 +89,23 @@ class WooTumblogPostFormat {
 	    			$tumblog_results = 'link';
 	    			$sentinel = true;
 	    		} else {
-	    			// Do Nothing	
+	    			// Do Nothing
 	    			$tumblog_results = 'default';
 	    			$sentinel = false;
-	    		}	    		
-	    	}    
-	    	
+	    		}
+	    	}
+
 	    	// SET POST FORMATS
-	    	if ($tumblog_results == 'article') {  
+	    	if ($tumblog_results == 'article') {
     			// ARTICLE POST -->
     			set_post_format( $post_id, 'aside' );
-    		} elseif ($tumblog_results == 'image') { 
+    		} elseif ($tumblog_results == 'image') {
     			// IMAGE POST -->
        			set_post_format( $post_id, 'image' );
-       		} elseif ($tumblog_results == 'video') { 
+       		} elseif ($tumblog_results == 'video') {
     			// VIDEO POST -->
        			set_post_format( $post_id, 'video' );
-       		} elseif ($tumblog_results == 'link') { 
+       		} elseif ($tumblog_results == 'link') {
     			// LINK POST -->
        			set_post_format( $post_id, 'link' );
        		} elseif ($tumblog_results == 'audio') {
@@ -117,24 +117,24 @@ class WooTumblogPostFormat {
 	    	} else {
 	    		// DO NOTHING
 	    	}
-	       		    	
+
         }
-        
+
         return true;
-		
+
 	}
-	
+
 	/*-----------------------------------------------------------------------------------*/
 	/* Woo Customized WordPress functions - necessary to upgrade non registered taxonomy */
 	/*-----------------------------------------------------------------------------------*/
-	
+
 	// get_term_by
 	function woo_get_term_by($field, $value, $taxonomy, $output = OBJECT, $filter = 'raw') {
 		global $wpdb;
-		
+
 		//if ( ! taxonomy_exists($taxonomy) )
 		//	return false;
-		
+
 		if ( 'slug' == $field ) {
 			$field = 't.slug';
 			$value = sanitize_title_for_query($value);
@@ -147,17 +147,17 @@ class WooTumblogPostFormat {
 		} else {
 			return get_term( (int) $value, $taxonomy, $output, $filter);
 		}
-		
+
 		$term = $wpdb->get_row( $wpdb->prepare( "SELECT t.*, tt.* FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON t.term_id = tt.term_id WHERE tt.taxonomy = %s AND $field = %s LIMIT 1", $taxonomy, $value) );
 		if ( !$term )
 			return false;
-		
+
 		wp_cache_add($term->term_id, $term, $taxonomy);
-		
+
 		$term = apply_filters('get_term', $term, $taxonomy);
 		$term = apply_filters("get_$taxonomy", $term, $taxonomy);
 		$term = sanitize_term($term, $taxonomy, $filter);
-		
+
 		if ( $output == OBJECT ) {
 			return $term;
 		} elseif ( $output == ARRAY_A ) {
@@ -167,8 +167,8 @@ class WooTumblogPostFormat {
 		} else {
 			return $term;
 		}
-	}		
-	
+	}
+
 	// get_the_term_list
 	function woo_get_the_term_list( $id = 0, $taxonomy, $before = '', $sep = '', $after = '' ) {
 		$terms = $this->woo_get_the_terms( $id, $taxonomy );
@@ -190,55 +190,55 @@ class WooTumblogPostFormat {
 
 		return $before . join( $sep, $term_links ) . $after;
 	}
-	
+
 	// get_the_terms
 	function woo_get_the_terms( $id = 0, $taxonomy ) {
 		global $post;
-	
+
 	 	$id = (int) $id;
-	
+
 		if ( !$id ) {
 			if ( !$post->ID )
 				return false;
 			else
 				$id = (int) $post->ID;
 		}
-	
+
 		//$terms = get_object_term_cache( $id, $taxonomy );
 		//if ( false === $terms ) {
 			$terms = $this->woo_wp_get_object_terms( $id, $taxonomy );
 		//	wp_cache_add($id, $terms, $taxonomy . '_relationships');
 		//}
-	
+
 		$terms = apply_filters( 'get_the_terms', $terms, $id, $taxonomy );
-	
+
 		if ( empty( $terms ) )
 			return false;
-	
+
 		return $terms;
 	}
-	
+
 	// wp_get_object_terms
 	function woo_wp_get_object_terms($object_ids, $taxonomies, $args = array()) {
 		global $wpdb;
-	
+
 		if ( !is_array($taxonomies) )
 			$taxonomies = array($taxonomies);
-	
+
 		/*
 		foreach ( (array) $taxonomies as $taxonomy ) {
 			if ( ! taxonomy_exists($taxonomy) )
 				return new WP_Error('invalid_taxonomy', __('Invalid Taxonomy'));
 		}
 		*/
-	
+
 		if ( !is_array($object_ids) )
 			$object_ids = array($object_ids);
 		$object_ids = array_map('intval', $object_ids);
-	
+
 		$defaults = array('orderby' => 'name', 'order' => 'ASC', 'fields' => 'all');
 		$args = wp_parse_args( $args, $defaults );
-	
+
 		$terms = array();
 		if ( count($taxonomies) > 1 ) {
 			foreach ( $taxonomies as $index => $taxonomy ) {
@@ -253,9 +253,9 @@ class WooTumblogPostFormat {
 			if ( isset($t->args) && is_array($t->args) )
 				$args = array_merge($args, $t->args);
 		}
-	
+
 		extract($args, EXTR_SKIP);
-	
+
 		if ( 'count' == $orderby )
 			$orderby = 'tt.count';
 		else if ( 'name' == $orderby )
@@ -272,17 +272,17 @@ class WooTumblogPostFormat {
 		} else {
 			$orderby = 't.term_id';
 		}
-	
+
 		// tt_ids queries can only be none or tr.term_taxonomy_id
 		if ( ('tt_ids' == $fields) && !empty($orderby) )
 			$orderby = 'tr.term_taxonomy_id';
-	
+
 		if ( !empty($orderby) )
 			$orderby = "ORDER BY $orderby";
-	
+
 		$taxonomies = "'" . implode("', '", $taxonomies) . "'";
 		$object_ids = implode(', ', $object_ids);
-	
+
 		$select_this = '';
 		if ( 'all' == $fields )
 			$select_this = 't.*, tt.*';
@@ -292,9 +292,9 @@ class WooTumblogPostFormat {
 			$select_this = 't.name';
 		else if ( 'all_with_object_id' == $fields )
 			$select_this = 't.*, tt.*, tr.object_id';
-	
+
 		$query = "SELECT $select_this FROM $wpdb->terms AS t INNER JOIN $wpdb->term_taxonomy AS tt ON tt.term_id = t.term_id INNER JOIN $wpdb->term_relationships AS tr ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tt.taxonomy IN ($taxonomies) AND tr.object_id IN ($object_ids) $orderby $order";
-	
+
 		if ( 'all' == $fields || 'all_with_object_id' == $fields ) {
 			$terms = array_merge($terms, $wpdb->get_results($query));
 			update_term_cache($terms);
@@ -303,20 +303,20 @@ class WooTumblogPostFormat {
 		} else if ( 'tt_ids' == $fields ) {
 			$terms = $wpdb->get_col("SELECT tr.term_taxonomy_id FROM $wpdb->term_relationships AS tr INNER JOIN $wpdb->term_taxonomy AS tt ON tr.term_taxonomy_id = tt.term_taxonomy_id WHERE tr.object_id IN ($object_ids) AND tt.taxonomy IN ($taxonomies) $orderby $order");
 		}
-	
+
 		if ( ! $terms )
 			$terms = array();
-	
+
 		return apply_filters('wp_get_object_terms', $terms, $object_ids, $taxonomies, $args);
 	}
 
 	/*-----------------------------------------------------------------------------------*/
 	/* Manage Posts Custom Filter Drop Down */
 	/*-----------------------------------------------------------------------------------*/
-	
+
 	function woo_tumblog_restrict_manage_posts() {
     ?>
-        
+
             <fieldset>
             <?php
 				//Tumblogs
@@ -326,20 +326,20 @@ class WooTumblogPostFormat {
             	} else {
             		$category_ID = 0;
             	}
-            	$dropdown_options = array	(	
-            								'show_option_all'	=> __( 'View all Tumblogs', 'woothemes' ), 
-            								'hide_empty' 		=> 0, 
+            	$dropdown_options = array	(
+            								'show_option_all'	=> __( 'View all Tumblogs', 'woothemes' ),
+            								'hide_empty' 		=> 0,
             								'hide_if_empty'		=> 1,
             								'hierarchical' 		=> 1,
-											'show_count' 		=> 0, 
+											'show_count' 		=> 0,
 											'orderby' 			=> 'name',
 											'name' 				=> 'post_format_names',
 											'id' 				=> 'post_format_names',
-											'taxonomy' 			=> 'post_format', 
+											'taxonomy' 			=> 'post_format',
 											'selected' 			=> $category_ID
 											);
 				$post_formats = get_terms( 'post_format' );
-				
+
             ?>
             <select class="" name="post_format_names" id="post_format_names">
             	<option value="0"><?php _e( 'View all Tumblogs', 'woothemes' ); ?></option>
@@ -349,14 +349,14 @@ class WooTumblogPostFormat {
             </select>
             <input type="submit" name="submit" value="<?php _e( 'Filter', 'woothemes' ); ?>" class="button" />
         </fieldset>
-        
+
     <?php
 	}
 
 	/*-----------------------------------------------------------------------------------*/
 	/* Manage Posts Custom Filter Query Addon */
 	/*-----------------------------------------------------------------------------------*/
-	
+
 	function woo_tumblog_posts_where($where) {
     	if( is_admin() ) {
         	global $wpdb;
@@ -380,14 +380,14 @@ class WooTumblogPostFormat {
 						}
 					}
 				}
-			
+
  				$string_post_ids = chop($string_post_ids,',');
    				$where .= "AND ID IN (" . $string_post_ids . ")";
 			}
     	}
     	return $where;
 	}
-	
+
 }
 
 ?>

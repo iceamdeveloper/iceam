@@ -10,6 +10,11 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
+msgctxt "Browser title"
+msgid "%s - Order list"
+msgstr ""
+
 #: src/admin-views/meta-fields/_field.php:9
 msgctxt "Attendee information fields"
 msgid "Label:"
@@ -557,10 +562,6 @@ msgstr ""
 msgid "Orders"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
-msgid "%s - Order list"
-msgstr ""
-
 #: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
 msgid "Order"
 msgstr ""
@@ -629,23 +630,23 @@ msgid "Easy Digital Downloads"
 msgstr "Nemme digitale downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:728
+#: src/Tribe/Commerce/WooCommerce/Main.php:756
 msgid "You'll receive your tickets in another email."
 msgstr "Du vil modtage dine billetter i en anden e-mail"
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1443
+#: src/Tribe/Commerce/WooCommerce/Main.php:1475
 msgid "(deleted)"
 msgstr "(slettet)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1692
+#: src/Tribe/Commerce/WooCommerce/Main.php:1724
 msgid "Event sales report"
 msgstr "Begivenheds salgsrapport"
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1740
+#: src/Tribe/Commerce/WooCommerce/Main.php:1772
 msgid "This is a ticket for the event:"
 msgstr "Dette er en billet til begivenheden:"
 
@@ -706,17 +707,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr ""
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1513
+#: src/Tribe/Commerce/WooCommerce/Main.php:1545
 msgid "In trash (was %s)"
 msgstr "I papirkurven (var %s)"
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1519
+#: src/Tribe/Commerce/WooCommerce/Main.php:1551
 msgid "Deleted"
 msgstr "Slettet"
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1568
+#: src/Tribe/Commerce/WooCommerce/Main.php:1600
 msgid "Unknown"
 msgstr ""
 
@@ -744,7 +745,7 @@ msgstr "Emne"
 msgid "Defaults to <code>%s</code>"
 msgstr "Standard installinger for <code>%s>/code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1717
+#: src/Tribe/Commerce/WooCommerce/Main.php:1749
 msgid "Report"
 msgstr ""
 

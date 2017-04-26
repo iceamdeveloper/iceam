@@ -69,12 +69,5 @@ woo_footer_before();
 
 </script>
 
-<?php
-		$product = wc_get_product("215");
-		echo "<pre><code>";
-		print_r($product);
-		echo "</pre></code>";
-?>
-
 </body>
 </html>

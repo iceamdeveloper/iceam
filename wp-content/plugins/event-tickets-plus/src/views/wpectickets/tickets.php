@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wpectickets/tickets.php
  *
- * @version 4.3.5
+ * @version 4.4.6
  *
  * @var bool $must_login
  */
@@ -77,7 +77,7 @@ foreach ( $tickets as $ticket ) {
 				'<td colspan="4">' .
 					'<input type="checkbox" name="wpec_tickets_attendees_optout[]" id="tribe-tickets-attendees-list-optout-wpec">' .
 					'<label for="tribe-tickets-attendees-list-optout-wpec">' .
-						esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
+						esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets-plus' ) .
 					'</label>' .
 				'</td>' .
 			'</tr>';

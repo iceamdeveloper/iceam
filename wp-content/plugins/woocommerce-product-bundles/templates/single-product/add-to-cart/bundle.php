@@ -62,14 +62,14 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
 			?><div class="bundle_wrap">
 				<div class="bundle_price"></div>
-				<div class="bundle_error" style="display:none"><ul class="msg woocommerce-info"></ul></div><?php
+				<div class="bundle_error" style="display:none"><ul class="msg woocommerce-info"></ul></div>
+				<div class="bundle_availability"><?php
 
-				$availability      = $product->get_availability();
-				$availability_html = empty( $availability[ 'availability' ] ) ? '' : '<p class="stock ' . esc_attr( $availability[ 'class' ] ) . '">' . esc_html( $availability[ 'availability' ] ) . '</p>';
+					// Availability html.
+					echo $availability_html;
 
-				echo apply_filters( 'woocommerce_stock_html', $availability_html, $availability[ 'availability' ], $product );
-
-				?><div class="bundle_button"><?php
+				?></div>
+				<div class="bundle_button"><?php
 
 					/**
 					 * woocommerce_bundles_add_to_cart_button hook.

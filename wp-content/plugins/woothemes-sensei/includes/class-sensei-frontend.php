@@ -131,11 +131,8 @@ class Sensei_Frontend {
 	 * @return void
 	 */
 	public function enqueue_scripts () {
+		$disable_js = Sensei_Utils::get_setting_as_flag( 'js_disable', 'sensei_settings_js_disable' );
 
-		$disable_js = false;
-		if ( isset( Sensei()->settings->settings[ 'js_disable' ] ) ) {
-			$disable_js = Sensei()->settings->settings[ 'js_disable' ];
-		} // End If Statement
 		if ( ! $disable_js ) {
 
 			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
@@ -168,13 +165,7 @@ class Sensei_Frontend {
 	 */
 	public function enqueue_styles () {
 
-		$disable_styles = false;
-		if ( isset( Sensei()->settings->settings[ 'styles_disable' ] ) ) {
-			$disable_styles = Sensei()->settings->settings[ 'styles_disable' ];
-		} // End If Statement
-
-		// Add filter for theme overrides
-		$disable_styles = apply_filters( 'sensei_disable_styles', $disable_styles );
+		$disable_styles = Sensei_Utils::get_setting_as_flag( 'styles_disable', 'sensei_disable_styles' );
 
 		if ( ! $disable_styles ) {
 
@@ -735,7 +726,7 @@ class Sensei_Frontend {
      * @param WP_Query $query
      */
 	public function lesson_tag_archive_filter( $query ) {
-    	if( is_tax( 'lesson-tag' ) && $query->is_main_query() ) {
+    	if( $query->is_main_query() && is_tax( 'lesson-tag' ) ) {
     		// Limit to lessons only
     		$query->set( 'post_type', 'lesson' );
 
@@ -1493,22 +1484,20 @@ class Sensei_Frontend {
 
 				$items = $order->get_items();
 				foreach( $items as $item ) {
-
-                    $product = wc_get_product( $item['product_id'] );
+					$product_id = Sensei_WC_Utils::get_item_id_from_item( $item );
+                    $product = wc_get_product( $product_id );
 
                     // handle product bundles
-                    if( is_object( $product ) &&  $product->is_type('bundle') ){
+                    if( is_object( $product ) &&  $product->is_type('bundle') ) {
 
-                        $bundled_product = new WC_Product_Bundle( $product->id );
+                        $bundled_product = new WC_Product_Bundle( Sensei_WC_Utils::get_product_id( $product ) );
                         $bundled_items = $bundled_product->get_bundled_items();
 
-                        foreach( $bundled_items as $bundled_item ){
-
+                        foreach ( $bundled_items as $bundled_item ) {
                             if( $bundled_item->product_id == $course_product_id ) {
                                 Sensei_Utils::user_start_course( $user_id, $course_id );
                                 return;
                             }
-
                         }
 
                     } else {
@@ -1593,8 +1582,16 @@ class Sensei_Frontend {
 
 		    	// check if the requests login is an email address
 		    	if( is_email(  trim( $_REQUEST['log'] ) )  ){
-		    		// query wordpress for the users details
-		    		$user =	get_user_by( 'email', sanitize_email( $_REQUEST['log'] )  );
+		    		$login = sanitize_email( $_REQUEST['log'] );
+
+	    			// Occasionally a user's username IS an email,
+	    			// but they have changed their actual email, so check for this case.
+	    			$user = get_user_by( 'login', $login );
+
+		    		if( ! $user ) {
+		    			// Ok, fallback to checking by email.
+		    			$user = get_user_by( 'email', $login );
+		    		}
 
 		    		// validate the user object
 		    		if( !$user ){
@@ -1616,7 +1613,7 @@ class Sensei_Frontend {
 		    	}
 
 				// get setup the rest of the creds array
-				$creds['user_password'] = sanitize_text_field( $_REQUEST['pwd'] );
+				$creds['user_password'] = $_REQUEST['pwd'];
 				$creds['remember'] = isset( $_REQUEST['rememberme'] ) ? true : false ;
 
 				//attempt logging in with the given details

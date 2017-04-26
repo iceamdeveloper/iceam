@@ -1793,6 +1793,12 @@ $options[] = array( "name" => __( 'Enable Subscribe and Connect', 'woothemes' ),
 $options[] = array( 'name' => __( 'Maps', 'woothemes' ),
 					'type' => 'subheading');
 
+$options[] = array( 'name' => __( 'Map API Key', 'woothemes' ),
+					'desc' => __( 'API Key required by Google Maps API.', 'woothemes' ),
+					'id' => $shortname . '_maps_api_key',
+					'std' => "",
+					'type' => 'text');
+
 $options[] = array( 'name' => __( 'Contact Form Google Maps Coordinates', 'woothemes' ),
 					'desc' => sprintf( __( 'Enter your Google Map coordinates to display a map on the Contact Form page template. You can get these details from %sGoogle Maps%s', 'woothemes' ), '<a href="' . esc_url( 'http://itouchmap.com/latlong.html' ) . '" target="_blank">', '</a>' ),
 					'id' => $shortname . '_contactform_map_coords',

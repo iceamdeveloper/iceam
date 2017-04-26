@@ -2,7 +2,7 @@
 /**
  * Product Bundles template functions
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.11.0
  */
@@ -32,6 +32,7 @@ function wc_pb_template_add_to_cart() {
 
 	if ( ! empty( $bundled_items ) ) {
 		wc_get_template( 'single-product/add-to-cart/bundle.php', array(
+			'availability_html' => WC_PB_Core_Compatibility::wc_get_stock_html( $product ),
 			'bundle_price_data' => $product->get_bundle_price_data(),
 			'bundled_items'     => $bundled_items,
 			'product'           => $product,
@@ -86,7 +87,8 @@ function wc_pb_template_bundled_item_title( $bundled_item, $bundle ) {
  */
 function wc_pb_template_bundled_item_thumbnail( $bundled_item, $bundle ) {
 
-	$layout = $bundle->get_layout();
+	$layout     = $bundle->get_layout();
+	$product_id = $bundled_item->product_id;
 
 	if ( 'tabular' === $layout ) {
 		echo '<td class="bundled_item_col bundled_item_images_col">';
@@ -94,7 +96,22 @@ function wc_pb_template_bundled_item_thumbnail( $bundled_item, $bundle ) {
 
 	if ( $bundled_item->is_visible() ) {
 		if ( $bundled_item->is_thumbnail_visible() ) {
-			wc_get_template( 'single-product/bundled-item-image.php', array( 'post_id' => $bundled_item->product_id ), false, WC_PB()->plugin_path() . '/templates/' );
+
+			/**
+			 * 'woocommerce_bundled_product_gallery_classes' filter.
+			 *
+			 * @param  array            $classes
+			 * @param  WC_Bundled_Item  $bundled_item
+			 */
+			$gallery_classes = apply_filters( 'woocommerce_bundled_product_gallery_classes', array( 'bundled_product_images' ), $bundled_item );
+
+			wc_get_template( 'single-product/bundled-item-image.php', array(
+				'post_id'         => $product_id,
+				'product_id'      => $product_id,
+				'bundled_item'    => $bundled_item,
+				'gallery_classes' => $gallery_classes,
+				'image_rel'       => WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? 'photoSwipe' : 'prettyPhoto'
+			), false, WC_PB()->plugin_path() . '/templates/' );
 		}
 	}
 
@@ -386,6 +403,49 @@ function wc_pb_template_after_bundled_items( $bundle ) {
 
 	if ( 'tabular' === $layout ) {
 		echo '</tbody></table>';
+	}
+}
+
+/**
+ * Display bundled product attributes.
+ *
+ * @param  WC_Product  $product
+ */
+function wc_pb_template_bundled_item_attributes( $product ) {
+
+	if ( $product->is_type( 'bundle' ) ) {
+
+		$bundled_items = $product->get_bundled_items();
+
+		if ( ! empty( $bundled_items ) ) {
+
+			foreach ( $bundled_items as $bundled_item ) {
+
+				/** Documented in 'WC_Product_Bundle::has_attributes()'. */
+				$show_bundled_product_attributes = apply_filters( 'woocommerce_bundle_show_bundled_product_attributes', $bundled_item->is_visible(), $product, $bundled_item );
+
+				if ( ! $show_bundled_product_attributes ) {
+					continue;
+				}
+
+				$bundled_product = $bundled_item->product;
+
+				if ( $bundled_product->has_attributes() ) {
+
+					// Filter bundled item attributes based on active variation filters.
+					add_filter( 'woocommerce_attribute', array( $bundled_item, 'filter_bundled_item_attribute' ), 10, 3 );
+
+					wc_get_template( 'single-product/bundled-item-attributes.php', array(
+						'title'              => $bundled_item->get_title(),
+						'product'            => $bundled_product,
+						'attributes'         => array_filter( $bundled_product->get_attributes(), 'wc_attributes_array_filter_visible' ),
+						'display_dimensions' => $bundled_item->is_shipped_individually() && apply_filters( 'wc_product_enable_dimensions_display', $product->has_weight() || $product->has_dimensions() )
+					), false, WC_PB()->plugin_path() . '/templates/' );
+
+					remove_filter( 'woocommerce_attribute', array( $bundled_item, 'filter_bundled_item_attribute' ), 10, 3 );
+				}
+			}
+		}
 	}
 }
 

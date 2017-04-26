@@ -25,6 +25,9 @@ class Subscriptions_Integration {
 	// @var WC_Aelia_CurrencyPrices_Manager The object that handles currency prices for the products.
 	private $currencyprices_manager;
 
+	// @var Shop's base currency. Used for caching.
+	protected static $_base_currency;
+
 	/**
 	 * Logs a message.
 	 *
@@ -140,8 +143,20 @@ class Subscriptions_Integration {
 	 * @param string default_value
 	 * @since 1.3.1.170405
 	 */
-	protected function get_subscription_meta($product, $meta_key, $default_value = null) {
-		return WC_Subscriptions_Product::get_meta_data($product, $meta_key, $default_value);
+	protected function get_subscription_meta($product, $meta_key, $default_value = '') {
+		return WC_Subscriptions_Product::get_meta_data($product, $meta_key, $default_value, 'use_default_value');
+	}
+
+	/**
+	 * Convenience method. Returns WooCommerce base currency.
+	 *
+	 * @return string
+	 */
+	public function base_currency() {
+		if(empty(self::$_base_currency)) {
+			self::$_base_currency = WC_Aelia_CurrencySwitcher::settings()->base_currency();
+		}
+		return self::$_base_currency;
 	}
 
 	/**
@@ -164,16 +179,63 @@ class Subscriptions_Integration {
 		// @since 1.3.1.170405
 		$product_id = aelia_wc_version_is('>=', '3.0') ? $product->get_id() : $product->id;
 		$product_base_currency = $this->currencyprices_manager()->get_product_base_currency($product_id);
+		$shop_base_currency = $this->base_currency();
 
-		$base_subscription_price = $this->get_subscription_meta($product, 'subscription_price');
-		$base_sale_price = $this->get_subscription_meta($product, 'sale_price');
-		$base_subscription_sign_up_fee = $this->get_subscription_meta($product, 'subscription_sign_up_fee');
+		// If subscription price and signup fee in shop's base currency were not passed,
+		// retrieve them using the Subscription plugin's function. The sale price uses
+		// a standard field, and it's always passed by WooCommerce
+		// @since 1.3.5.170425
+		if(!isset($product_regular_prices_in_currency[$shop_base_currency])) {
+			$product_regular_prices_in_currency[$shop_base_currency] = $this->get_subscription_meta($product, 'subscription_price');
+		}
+		if(!isset($product_signup_prices_in_currency[$shop_base_currency])) {
+			$product_signup_prices_in_currency[$shop_base_currency] = $this->get_subscription_meta($product, 'subscription_sign_up_fee', 0);
+		}
+
+		// Take subscription price in the specific product base currency
+		$base_subscription_price = isset($product_regular_prices_in_currency[$product_base_currency]) ? $product_regular_prices_in_currency[$product_base_currency] : null;
+		// If a subscription price was not entered for the selected product base currency,
+		// take the one in shop base currency
+		if(!is_numeric($base_subscription_price)) {
+			$base_subscription_price = isset($product_regular_prices_in_currency[$shop_base_currency]) ? $product_regular_prices_in_currency[$shop_base_currency] : null;
+
+			// If a product doesn't have a price in the product-specific base currency,
+			// then that base currency is not valid. In such case, shop's base currency
+			// should be used instead
+			$product_base_currency = $shop_base_currency;
+		}
+
+		// Take sale price in the specific product base currency
+		$base_sale_price = isset($product_sale_prices_in_currency[$product_base_currency]) ? $product_sale_prices_in_currency[$product_base_currency] : null;
+		// If a sale price was not entered for the selected product base currency,
+		// take the one in shop base currency
+		if(!is_numeric($base_sale_price)) {
+			$base_sale_price = isset($product_sale_prices_in_currency[$shop_base_currency]) ? $product_sale_prices_in_currency[$shop_base_currency] : null;
+		}
+
+		// Take signup fee in the specific product base currency
+		$base_subscription_sign_up_fee = isset($product_signup_prices_in_currency[$product_base_currency]) ? $product_signup_prices_in_currency[$product_base_currency] : null;
+		// If a signup fee was not entered for the selected product base currency,
+		// take the one in shop base currency
+		if(!is_numeric($base_subscription_sign_up_fee)) {
+			$base_subscription_sign_up_fee = isset($product_signup_prices_in_currency[$shop_base_currency]) ? $product_signup_prices_in_currency[$shop_base_currency] : null;
+		}
 
 		$product->regular_price = isset($product_regular_prices_in_currency[$currency]) ? $product_regular_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'regular_price');
+		$product->sale_price = isset($product_sale_prices_in_currency[$currency]) ? $product_sale_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
+		$product->subscription_sign_up_fee = isset($product_signup_prices_in_currency[$currency]) ? $product_signup_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_sign_up_fee, $currency, $product_base_currency, $product, 'signup_fee');
 
-		$product->sale_price = isset($product_sale_prices_in_currency[$currency]) ? $product_sale_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'sale_price');
-
-		$product->subscription_sign_up_fee = isset($product_signup_prices_in_currency[$currency]) ? $product_signup_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'signup_fee');
+		// Debug
+		//var_dump(
+		//	"BASE",
+		//	$base_subscription_price,
+		//	$base_sale_price,
+		//	$base_subscription_sign_up_fee,
+		//	"CONVERTED",
+		//	$product->regular_price,
+		//	$product->sale_price,
+		//	$product->subscription_sign_up_fee
+		//);
 
 		if(is_numeric($product->sale_price) && $product->is_on_sale()) {
 			$product->price = $product->sale_price;
@@ -190,9 +252,7 @@ class Subscriptions_Integration {
 			$product->set_price($product->price);
 		}
 
-		wcs_set_objects_property($product, 'subscription_sign_up_fee', $product->subscription_sign_up_fee, 'set_prop_only' );
-		wcs_set_objects_property($product, 'subscription_price', $product->subscription_price, 'set_prop_only' );
-
+		// Debug
 		//var_dump(
 		//	$product->subscription_price,
 		//	$product->sale_price,
@@ -301,7 +361,6 @@ class Subscriptions_Integration {
 			// Price conversion
 			add_filter('wc_aelia_currencyswitcher_product_convert_callback', array($this, 'wc_aelia_currencyswitcher_product_convert_callback'), 10, 2);
 			add_filter('woocommerce_subscriptions_product_price', array($this, 'woocommerce_subscriptions_product_price'), 10, 2);
-			//add_filter('woocommerce_subscriptions_product_price_string_inclusions', array($this, 'woocommerce_subscriptions_product_price_string_inclusions'), 10, 2);
 			add_filter('woocommerce_subscriptions_product_sign_up_fee', array($this, 'woocommerce_subscriptions_product_sign_up_fee'), 10, 2);
 
 			// Coupon types
@@ -321,6 +380,8 @@ class Subscriptions_Integration {
 
 		// Cart hooks
 		add_action('wc_aelia_currencyswitcher_recalculate_cart_totals_before', array($this, 'wc_aelia_currencyswitcher_recalculate_cart_totals_before'), 10);
+
+		add_filter('wc_aelia_currencyswitcher_prices_type_field_map', array($this, 'wc_aelia_currencyswitcher_prices_type_field_map'), 10, 2);
 		//add_action('wc_aelia_currencyswitcher_recalculate_cart_totals_after', array($this, 'wc_aelia_currencyswitcher_recalculate_cart_totals_after'), 10);
 
 
@@ -569,26 +630,6 @@ class Subscriptions_Integration {
 	}
 
 	/**
-	 * Processes the string inclusions associated with a product, removing and/or
-	 * converting them appropriately.
-	 *
-	 * @param array inclusions The inclusions to be processed.
-	 * @param WC_Subscription_Product product The subscription product.
-	 * @return array
-	 *
-	 * @deprecated since 1.1.5.140331-beta
-	 */
-	//public function woocommerce_subscriptions_product_price_string_inclusions($inclusions, $product) {
-	//	// Remove formatted price. The Subscriptions plugin will re-format it,
-	//	// using the converted price
-	//	if(isset($inclusions['price'])) {
-	//		unset($inclusions['price']);
-	//	}
-	//
-	//	return $inclusions;
-	//}
-
-	/**
 	 * Returns the path where the Admin Views can be found.
 	 *
 	 * @return string
@@ -800,5 +841,20 @@ class Subscriptions_Integration {
 		if(WC_Subscriptions_Product::is_subscription($product_id)) {
 			$this->woocommerce_process_product_meta_variable_subscription($product_id);
 		}
+	}
+
+	/**
+	 * Alters the map of currency pricing fields to inform the Currency Switcher
+	 * how to retrieve the prices in shop's base currency.
+	 *
+	 * @param array prices_type_field_map
+	 * @return array
+	 * @since 1.3.5.170425
+	 */
+	public function wc_aelia_currencyswitcher_prices_type_field_map($prices_type_field_map, $post_id = null) {
+		// Subscription sign up fee
+		$prices_type_field_map[self::FIELD_SIGNUP_FEE_CURRENCY_PRICES] = '_subscription_sign_up_fee';
+
+		return $prices_type_field_map;
 	}
 }

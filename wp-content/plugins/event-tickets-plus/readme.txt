@@ -4,7 +4,7 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
 Tested up to: 4.7.3
-Stable tag: 4.4.4
+Stable tag: 4.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,17 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.6] 2017-04-19 =
+
+* Fix - Improvements to ensure attendee list optout functionality works with WooCommerce 3.x (thanks to @jtsternberg for highlighting these issues) [77012]
+* Fix - Fixed a number of text domains for proper string translation (Thanks to @websource and @Frank) [76084] [76964]
+* Tweak - Add a hook making it possible to override the initial ticket number (props @cliffordp) [74942]
+
+= [4.4.5] 2017-04-10 =
+
+* Fix - Changes to support WooCommerce 3.0 [76308]
+* Tweak - Raises the minimum support version of WooCommerce to 2.2 [76535]
 
 = [4.4.4] 2017-03-23 =
 

@@ -2,7 +2,7 @@
 /**
  * WC_PB_Display class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.5.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle front-end functions and filters.
  *
  * @class    WC_PB_Display
- * @version  5.1.4
+ * @version  5.2.0
  */
 class WC_PB_Display {
 
@@ -120,7 +120,9 @@ class WC_PB_Display {
 
 		// Modify price filter query results.
 		add_filter( 'woocommerce_product_query_meta_query', array( $this, 'price_filter_query_params' ), 10, 2 );
-		add_filter( 'woocommerce_price_filter_meta_keys', array( $this, 'price_filter_meta_keys' ) );
+
+		// Modify bundles structured data.
+		add_filter( 'woocommerce_structured_data_product_offer', array( $this, 'structured_product_data' ), 10, 2 );
 	}
 
 	/**
@@ -133,8 +135,13 @@ class WC_PB_Display {
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
 		wp_register_script( 'wc-add-to-cart-bundle', WC_PB()->plugin_url() . '/assets/js/add-to-cart-bundle' . $suffix . '.js', array( 'jquery', 'wc-add-to-cart-variation' ), WC_PB()->version, true );
+
 		wp_register_style( 'wc-bundle-css', WC_PB()->plugin_url() . '/assets/css/wc-pb-single-product.css', false, WC_PB()->version );
+		wp_style_add_data( 'wc-bundle-css', 'rtl', 'replace' );
+
 		wp_register_style( 'wc-bundle-style', WC_PB()->plugin_url() . '/assets/css/wc-pb-frontend.css', false, WC_PB()->version );
+		wp_style_add_data( 'wc-bundle-style', 'rtl', 'replace' );
+
 		wp_enqueue_style( 'wc-bundle-style' );
 
 		/**
@@ -153,7 +160,7 @@ class WC_PB_Display {
 			'i18n_optional_string'                => _x( ' &mdash; %s', 'suffix', 'woocommerce-product-bundles' ),
 			'i18n_optional'                       => __( 'optional', 'woocommerce-product-bundles' ),
 			'i18n_contents'                       => __( 'Contents', 'woocommerce-product-bundles' ),
-			'i18n_composite_summary_title_string' => sprintf( _x( '%1$s (%2$s)', 'bundled product title in composite summary', 'woocommerce-product-bundles' ), '%t', '%m' ),
+			'i18n_title_meta_string'              => sprintf( _x( '%1$s &ndash; %2$s', 'title followed by meta', 'woocommerce-product-bundles' ), '%t', '%m' ),
 			'i18n_title_string'                   => sprintf( _x( '%1$s%2$s%3$s%4$s', 'title, quantity, price, suffix', 'woocommerce-product-bundles' ), '<span class="item_title">%t</span>', '<span class="item_qty">%q</span>', '', '<span class="item_suffix">%o</span>' ),
 			'i18n_unavailable_text'               => __( 'This product is currently unavailable.', 'woocommerce-product-bundles' ),
 			'currency_symbol'                     => get_woocommerce_currency_symbol(),
@@ -166,6 +173,7 @@ class WC_PB_Display {
 			'prices_include_tax'                  => esc_attr( get_option( 'woocommerce_prices_include_tax' ) ),
 			'tax_display_shop'                    => esc_attr( get_option( 'woocommerce_tax_display_shop' ) ),
 			'calc_taxes'                          => esc_attr( get_option( 'woocommerce_calc_taxes' ) ),
+			'photoswipe_enabled'                  => WC_PB_Core_Compatibility::is_wc_version_gte_2_7() && current_theme_supports( 'wc-product-gallery-lightbox' ) ? 'yes' : 'no'
 		) );
 
 		wp_localize_script( 'wc-add-to-cart-bundle', 'wc_bundle_params', $params );
@@ -263,10 +271,6 @@ class WC_PB_Display {
 
 			if ( did_action( 'woocommerce_view_order' ) || did_action( 'woocommerce_thankyou' ) || did_action( 'before_woocommerce_pay' ) ) {
 				$this->enqueue_bundled_table_item_js();
-
-			// Use of > ensures that if multiple e-mails are sent in one go, then the filter is being called between the two actions.
-			} elseif ( did_action( 'wc_pip_header' ) || ( did_action( 'woocommerce_email_before_order_table' ) > did_action( 'woocommerce_email_after_order_table' ) ) ) {
-				$content = '<small>' . $content . '</small>';
 			}
 		}
 
@@ -283,10 +287,15 @@ class WC_PB_Display {
 		if ( ! $this->enqueued_bundled_table_item_js ) {
 			wc_enqueue_js( "
 				var wc_pb_wrap_bundled_table_item = function() {
-					jQuery( '.bundled_table_item td.product-name' ).wrapInner( '<div class=\"bundled_table_item_indent\"></div>' );
+					jQuery( '.bundled_table_item td.product-name' ).each( function() {
+						var el = jQuery( this );
+						if ( el.find( '.bundled-product-name' ).length === 0 ) {
+							el.wrapInner( '<div class=\"bundled-product-name bundled_table_item_indent\"></div>' );
+						}
+					} );
 				};
 
-				jQuery( 'body' ).on( 'updated_checkout', function() {
+				jQuery( 'body' ).on( 'updated_checkout updated_cart_totals', function() {
 					wc_pb_wrap_bundled_table_item();
 				} );
 
@@ -558,7 +567,7 @@ class WC_PB_Display {
 	 * @return string
 	 */
 	public function email_styles( $css ) {
-		$css = $css . ".bundled_table_item td:nth-child(1) { padding-left: 35px !important; } .bundled_table_item td { border-top: none; }";
+		$css = $css . ".bundled_table_item td:nth-child(1) { padding-left: 2.5em !important; } .bundled_table_item td { border-top: none; font-size: 0.875em; } #body_content table tr.bundled_table_item td ul.wc-item-meta { font-size: inherit; }";
 		return $css;
 	}
 
@@ -569,23 +578,13 @@ class WC_PB_Display {
 
 		global $product;
 
-		if ( $product && $product->is_type( 'bundle' ) && isset( $_GET[ 'update-bundle' ] ) ) {
+		if ( $product->is_type( 'bundle' ) && isset( $_GET[ 'update-bundle' ] ) ) {
 			$updating_cart_key = wc_clean( $_GET[ 'update-bundle' ] );
 			if ( isset( WC()->cart->cart_contents[ $updating_cart_key ] ) ) {
 				$notice = sprintf ( __( 'You are currently editing &quot;%1$s&quot;. When finished, click the <strong>Update Cart</strong> button.', 'woocommerce-product-bundles' ), $product->get_title() );
 				wc_add_notice( $notice, 'notice' );
 			}
 		}
-	}
-
-	/**
-	 * Filter price filter widget meta keys used in min/max range calculation.
-	 *
-	 * @param  array  $meta_keys
-	 * @return array
-	 */
-	public function price_filter_meta_keys( $meta_keys ) {
-		return array_merge( $meta_keys, array( '_wc_sw_min_price' ) );
 	}
 
 	/**
@@ -629,6 +628,22 @@ class WC_PB_Display {
 		}
 
 		return $meta_query;
+	}
+
+	/**
+	 * Modify structured data for bundle-type products.
+	 *
+	 * @param  array       $data
+	 * @param  WC_Product  $product
+	 * @return array
+	 */
+	public function structured_product_data( $data, $product ) {
+
+		if ( is_object( $product ) && $product->is_type( 'bundle' ) ) {
+			$data[ 'price' ] = $product->get_bundle_price();
+		}
+
+		return $data;
 	}
 
 	/*

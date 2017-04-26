@@ -10,12 +10,12 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets\n"
 
-#: src/template-tags/tickets.php:280
+#: src/template-tags/tickets.php:240
 msgctxt "ticket stock message (remaining stock)"
 msgid "%1$d Remaining"
 msgstr ""
 
-#: src/template-tags/tickets.php:283
+#: src/template-tags/tickets.php:243
 msgctxt "ticket stock message (pending stock)"
 msgid "%1$d Awaiting Review"
 msgstr ""
@@ -43,12 +43,12 @@ msgctxt "attendee table"
 msgid "Check in"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:393 src/Tribe/Attendees_Table.php:402
-#: src/Tribe/Attendees_Table.php:413 src/Tribe/Attendees_Table.php:422
+#: src/Tribe/Attendees_Table.php:393, src/Tribe/Attendees_Table.php:402,
+#: src/Tribe/Attendees_Table.php:413, src/Tribe/Attendees_Table.php:422
 msgid "Check In"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:401 src/Tribe/Attendees_Table.php:421
+#: src/Tribe/Attendees_Table.php:401, src/Tribe/Attendees_Table.php:421
 msgid "Undo"
 msgstr ""
 
@@ -100,22 +100,26 @@ msgstr ""
 msgid "Location of Tickets form"
 msgstr ""
 
-#: src/template-tags/tickets.php:265
+#: src/template-tags/tickets.php:225
 msgid "Sold"
 msgstr "Verkauft"
 
-#: src/template-tags/tickets.php:267
+#: src/template-tags/tickets.php:227
 msgctxt "separate going and remain RSVPs"
 msgid "RSVP'd Going"
 msgstr ""
 
-#: src/template-tags/tickets.php:272
+#: src/template-tags/tickets.php:232
 msgid "%s %d"
 msgstr ""
 
-#: src/template-tags/tickets.php:278
+#: src/template-tags/tickets.php:238
 msgctxt "ticket global stock message (remaining stock)"
 msgid "%1$d Remaining of the global stock"
+msgstr ""
+
+#: src/views/tickets/email.php:365
+msgid "$venue_label"
 msgstr ""
 
 #: src/admin-views/ticket-type-history.php:9
@@ -130,7 +134,7 @@ msgstr ""
 msgid "Click to hide history"
 msgstr ""
 
-#: src/views/tickets/email-ticket-type-moved.php:97
+#: src/views/tickets/email-ticket-type-moved.php:97,
 #: src/views/tickets/email-tickets-moved.php:99
 msgid "Important changes to your tickets"
 msgstr ""
@@ -141,7 +145,7 @@ msgid_plural "We wanted to let you know that your %1$s tickets for %2$s have bee
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/tickets/email-ticket-type-moved.php:115
+#: src/views/tickets/email-ticket-type-moved.php:115,
 #: src/views/tickets/email-tickets-moved.php:117
 msgid " (taking place on %s)"
 msgstr ""
@@ -157,12 +161,12 @@ msgctxt "order status label"
 msgid "RSVP: "
 msgstr ""
 
-#: src/views/tickets/rsvp.php:24
+#: src/views/tickets/rsvp.php:23
 msgctxt "form heading"
 msgid "RSVP"
 msgstr ""
 
-#: src/views/tickets/rsvp.php:127
+#: src/views/tickets/rsvp.php:122
 msgctxt "order status label"
 msgid "RSVP"
 msgstr ""
@@ -304,7 +308,7 @@ msgstr ""
 msgid "Ticket type was moved to <a href=\"%1$s\" target=\"_blank\">%2$s</a> from <a href=\"%3$s\" target=\"_blank\">%4$s</a>"
 msgstr ""
 
-#: src/Tribe/Admin/Move_Ticket_Types.php:267
+#: src/Tribe/Admin/Move_Ticket_Types.php:267,
 #: src/Tribe/Admin/Move_Tickets.php:651
 msgid "Changes to your tickets from %s"
 msgstr ""
@@ -404,17 +408,17 @@ msgctxt "attendee table"
 msgid "Status"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:286
+#: src/Tribe/Attendees_Table.php:290
 msgctxt "row action"
 msgid "Undo Check In"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:285
+#: src/Tribe/Attendees_Table.php:291
 msgctxt "row action"
 msgid "Check In"
 msgstr ""
 
-#: src/Tribe/Attendees_Table.php:295
+#: src/Tribe/Attendees_Table.php:304
 msgctxt "row action"
 msgid "Move"
 msgstr ""
@@ -434,11 +438,11 @@ msgctxt "post type label"
 msgid "RSVPs"
 msgstr ""
 
-#: src/Tribe/Main.php:578
+#: src/Tribe/Main.php:568
 msgid "Welcome to Event Tickets"
 msgstr ""
 
-#: src/Tribe/Main.php:713
+#: src/Tribe/Main.php:703
 msgctxt "button text"
 msgid "RSVP"
 msgstr ""
@@ -485,10 +489,6 @@ msgctxt "attendee event actions"
 msgid "View"
 msgstr ""
 
-#: src/Tribe/Tickets_Handler.php:84
-msgid "Post type"
-msgstr ""
-
 #: src/Tribe/Tickets_Handler.php:206
 msgid "You must first select one or more tickets before you can move them!"
 msgstr ""
@@ -530,11 +530,6 @@ msgstr ""
 msgid "Move Ticket Types"
 msgstr ""
 
-#: src/Tribe/Admin/Move_Ticket_Types.php:72
-#: src/Tribe/Admin/Move_Tickets.php:250
-msgid "All supported types"
-msgstr ""
-
 #: src/Tribe/Admin/Move_Ticket_Types.php:102
 msgid "Ticket type could not be moved: the ticket type or destination post was invalid."
 msgstr ""
@@ -547,11 +542,11 @@ msgstr ""
 msgid "You can require that users log into your site before they are able to RSVP (or buy tickets). Please review your WordPress Membership option (via the General Settings admin screen) before adjusting this setting."
 msgstr ""
 
-#: src/template-tags/tickets.php:262
+#: src/template-tags/tickets.php:222
 msgid "global inventory"
 msgstr ""
 
-#: src/template-tags/tickets.php:285
+#: src/template-tags/tickets.php:245
 msgctxt "ticket stock message (cancelled stock)"
 msgid "%1$d Cancelled"
 msgstr ""
@@ -616,27 +611,23 @@ msgstr "%s anschauen"
 msgid "Update %s"
 msgstr "%s aktualisieren"
 
-#: src/views/tickets/rsvp.php:38
+#: src/views/tickets/rsvp.php:37
 msgid "Please fill in the RSVP confirmation name and email fields."
 msgstr ""
 
-#: src/views/tickets/rsvp.php:98
+#: src/views/tickets/rsvp.php:93
 msgid "Send RSVP confirmation to:"
 msgstr ""
 
-#: src/views/tickets/rsvp.php:138
+#: src/views/tickets/rsvp.php:133
 msgid "Don't list me on the public attendee list"
 msgstr "Zeige mich nicht auf der öffentlichen Teilnehmerliste"
 
-#: src/views/tickets/rsvp.php:148
+#: src/views/tickets/rsvp.php:143
 msgid "Login to RSVP"
 msgstr ""
 
-#. Description of the plugin/theme
-msgid "Event Tickets allows your guests to RSVP from any post, page, or event."
-msgstr ""
-
-#: src/Tribe/Main.php:713
+#: src/Tribe/Main.php:703
 msgid "Buy"
 msgstr ""
 
@@ -652,47 +643,47 @@ msgstr ""
 msgid "You confirmed you will not be attending %s"
 msgstr ""
 
-#: src/Tribe/Tickets.php:931
+#: src/Tribe/Tickets.php:924
 msgid "Use global stock"
 msgstr ""
 
-#: src/Tribe/Tickets.php:932
+#: src/Tribe/Tickets.php:925
 msgid "Use global stock but cap sales"
 msgstr ""
 
-#: src/Tribe/Tickets.php:933
+#: src/Tribe/Tickets.php:926
 msgid "Independent (do not use global stock)"
 msgstr ""
 
-#: src/Tribe/Tickets.php:1399
+#: src/Tribe/Tickets.php:1392
 msgid "Tickets are not available as this %s has passed."
 msgstr ""
 
-#: src/Tribe/Tickets.php:1401
+#: src/Tribe/Tickets.php:1394
 msgid "Tickets are not yet available."
 msgstr ""
 
-#: src/Tribe/Tickets.php:1403
+#: src/Tribe/Tickets.php:1396
 msgid "Tickets are no longer available."
 msgstr ""
 
-#: src/Tribe/Tickets.php:1405
+#: src/Tribe/Tickets.php:1398
 msgid "There are no tickets available at this time."
 msgstr ""
 
-#: src/Tribe/Tickets_View.php:518
+#: src/Tribe/Tickets_View.php:513
 msgid "Going"
 msgstr ""
 
-#: src/Tribe/Tickets_View.php:519
+#: src/Tribe/Tickets_View.php:514
 msgid "Not Going"
 msgstr ""
 
-#: src/Tribe/Tickets_View.php:631
+#: src/Tribe/Tickets_View.php:626
 msgid "Ticket"
 msgstr "Ticket"
 
-#: src/Tribe/Tickets_View.php:697
+#: src/Tribe/Tickets_View.php:692
 msgid "This RSVP is no longer active."
 msgstr ""
 
@@ -758,15 +749,11 @@ msgstr "Ticketbestand"
 msgid "Recurring event tickets are not supported, event %s."
 msgstr ""
 
-#: src/Tribe/Tickets_View.php:627
+#: src/Tribe/Tickets_View.php:622
 msgid "RSVPs"
 msgstr ""
 
-#: src/Tribe/JSON_LD/Order.php:106
-msgid "Free"
-msgstr "Kostenlos"
-
-#: src/Tribe/Main.php:477
+#: src/Tribe/Main.php:467
 msgid "If you have a valid license for one of our paid plugins, you can %s in our premium support forums. Our support team monitors the forums and will respond to your thread within 24-48 hours (during the week)."
 msgstr ""
 
@@ -818,7 +805,7 @@ msgstr ""
 msgid "Invalid Email"
 msgstr ""
 
-#: src/Tribe/Tickets_Handler.php:535 src/Tribe/Tickets_Handler.php:551
+#: src/Tribe/Tickets_Handler.php:535, src/Tribe/Tickets_Handler.php:551
 msgid "Invalid User ID"
 msgstr ""
 
@@ -846,67 +833,67 @@ msgstr ""
 msgid "Cancel"
 msgstr "Abbrechen"
 
-#: src/Tribe/Main.php:241
+#: src/Tribe/Main.php:231
 msgid "When The Events Calendar and Event Tickets are both activated, The Events Calendar must be running version %1$s or greater. Please %2$supdate now.%3$s"
 msgstr ""
 
-#: src/Tribe/Main.php:423
+#: src/Tribe/Main.php:413
 msgid "Support for Event Tickets"
 msgstr ""
 
-#: src/Tribe/Main.php:425
+#: src/Tribe/Main.php:415
 msgid "Settings overview"
 msgstr ""
 
-#: src/Tribe/Main.php:426
+#: src/Tribe/Main.php:416
 msgid "Features overview"
 msgstr ""
 
-#: src/Tribe/Main.php:427
+#: src/Tribe/Main.php:417
 msgid "Troubleshooting common problems"
 msgstr ""
 
-#: src/Tribe/Main.php:428
+#: src/Tribe/Main.php:418
 msgid "Customizing Event Tickets"
 msgstr ""
 
-#: src/Tribe/Main.php:445
+#: src/Tribe/Main.php:435
 msgid "New User Primer"
 msgstr ""
 
-#: src/Tribe/Main.php:447
+#: src/Tribe/Main.php:437
 msgid "We are committed to helping you sell tickets for your event. Check out our handy %s to get started."
 msgstr ""
 
-#: src/Tribe/Main.php:464
+#: src/Tribe/Main.php:454
 msgid "open-source forum on WordPress.org"
 msgstr ""
 
-#: src/Tribe/Main.php:465
+#: src/Tribe/Main.php:455
 msgid "If you have tried the above steps and are still having trouble, you can post a new thread to our %s. Our support staff monitors these forums once a week and would be happy to assist you there."
 msgstr ""
 
-#: src/Tribe/Main.php:467
+#: src/Tribe/Main.php:457
 msgid "premium support on our website"
 msgstr ""
 
-#: src/Tribe/Main.php:468
+#: src/Tribe/Main.php:458
 msgid "Events Tickets Plus"
 msgstr ""
 
-#: src/Tribe/Main.php:469
+#: src/Tribe/Main.php:459
 msgid "Looking for more immediate support? We offer %1$s with the purchase of any of our premium plugins (like %2$s). Pick up a license and you can post there directly and expect a response within 24-48 hours during weekdays."
 msgstr ""
 
-#: src/Tribe/Main.php:471 src/Tribe/Main.php:476
+#: src/Tribe/Main.php:461, src/Tribe/Main.php:466
 msgid "post a thread"
 msgstr ""
 
-#: src/Tribe/Main.php:472
+#: src/Tribe/Main.php:462
 msgid "Already have Events Tickets Plus? You can %s in our premium support forums. Our support team monitors the forums and will respond to your thread within 24-48 hours (during the week)."
 msgstr ""
 
-#: src/Tribe/Tickets_View.php:639 src/views/tickets/orders-link.php:45
+#: src/Tribe/Tickets_View.php:634, src/views/tickets/orders-link.php:45
 msgid " and "
 msgstr ", und "
 
@@ -914,16 +901,16 @@ msgstr ", und "
 msgid "Getting Started"
 msgstr "Schnellstart"
 
-#: src/Tribe/Admin/Ticket_Settings.php:22 src/Tribe/Metabox.php:31
-#: src/Tribe/Tickets_View.php:631
+#: src/Tribe/Admin/Ticket_Settings.php:22, src/Tribe/Metabox.php:31,
+#: src/Tribe/Tickets_View.php:626
 msgid "Tickets"
 msgstr "Karten"
 
-#: src/views/tickets/email.php:360
+#: src/views/tickets/email.php:332
 msgid "Ticket #"
 msgstr "Kartennummer"
 
-#: src/views/tickets/email.php:372
+#: src/views/tickets/email.php:344
 msgid "Security Code"
 msgstr "Sicherheitscode"
 
@@ -939,8 +926,8 @@ msgstr "einchecken rückgängig machen"
 msgid "Print"
 msgstr "Drucken"
 
-#: src/Tribe/Attendees_Table.php:490
-#: src/admin-views/admin-welcome-message.php:36 src/views/tickets/rsvp.php:118
+#: src/Tribe/Attendees_Table.php:490,
+#: src/admin-views/admin-welcome-message.php:36, src/views/tickets/rsvp.php:113
 msgid "Email"
 msgstr "E-Mail"
 
@@ -952,7 +939,7 @@ msgstr "Export"
 msgid "Filter by purchaser name, ticket #, order # or security code"
 msgstr "Filtern Sie über Käufername, Ticketnummer, Auftragsnummer oder den Sicherheitscode"
 
-#: src/Tribe/Attendees_Table.php:518 src/admin-views/list.php:43
+#: src/Tribe/Attendees_Table.php:518, src/admin-views/list.php:43
 msgid "Delete"
 msgstr "Löschen"
 
@@ -993,13 +980,13 @@ msgstr "Ihre Karte wurde gespeichert."
 msgid "Your ticket has been deleted."
 msgstr "Ihre Karte wurde gelöscht."
 
-#: src/Tribe/Tickets_Handler.php:140 src/admin-views/list.php:90
+#: src/Tribe/Tickets_Handler.php:140, src/admin-views/list.php:90
 msgid "See who purchased tickets to this event"
 msgstr "Anzeigen wer Karten für die Veranstaltung gekauft hat"
 
-#: src/Tribe/Admin/Columns/Tickets.php:39
-#: src/Tribe/Tabbed_View/Attendee_Report_Tab.php:22
-#: src/Tribe/Tickets_Handler.php:140 src/admin-views/attendees.php:11
+#: src/Tribe/Admin/Columns/Tickets.php:39,
+#: src/Tribe/Tabbed_View/Attendee_Report_Tab.php:22,
+#: src/Tribe/Tickets_Handler.php:140, src/admin-views/attendees.php:11,
 #: src/admin-views/list.php:92
 msgid "Attendees"
 msgstr "Teilnehmer"
@@ -1084,7 +1071,7 @@ msgstr "Ein Bild auswählen"
 msgid "Remove"
 msgstr "Entfernen"
 
-#: src/admin-views/meta-box.php:112 src/admin-views/meta-box.php:122
+#: src/admin-views/meta-box.php:112, src/admin-views/meta-box.php:122
 msgid "Add new ticket"
 msgstr "Eine neue Karte erstellen"
 
@@ -1160,48 +1147,40 @@ msgstr ""
 msgid "Attendee List"
 msgstr "Teilnehmerliste"
 
-#: src/views/tickets/email-non-attendance.php:24
-#: src/views/tickets/email-ticket-type-moved.php:25
-#: src/views/tickets/email-tickets-moved.php:26 src/views/tickets/email.php:27
+#: src/views/tickets/email-non-attendance.php:24,
+#: src/views/tickets/email-ticket-type-moved.php:25,
+#: src/views/tickets/email-tickets-moved.php:26, src/views/tickets/email.php:26
 msgid "Your tickets"
 msgstr "Ihre Karten"
 
-#: src/views/tickets/email.php:364
+#: src/views/tickets/email.php:336
 msgid "Ticket Type"
 msgstr "Kartenart"
 
-#: src/views/tickets/email.php:368
+#: src/views/tickets/email.php:340
 msgid "Purchaser"
 msgstr "Käufer"
 
-#: src/Tribe/Tickets_View.php:627
+#: src/Tribe/Tickets_View.php:622
 msgid "RSVP"
 msgstr "RSVP"
 
-#: src/views/tickets/rsvp.php:68
+#: src/views/tickets/rsvp.php:63
 msgid "%1$s out of %2$s available"
 msgstr "%1$s von %2$s verfügbar"
 
-#: src/views/tickets/rsvp.php:72
+#: src/views/tickets/rsvp.php:67
 msgid "Out of stock!"
 msgstr "Ausverkauft!"
 
-#: src/views/tickets/rsvp.php:110
+#: src/views/tickets/rsvp.php:105
 msgid "Full Name"
 msgstr ""
 
-#: src/views/tickets/rsvp.php:150
+#: src/views/tickets/rsvp.php:145
 msgid "Confirm RSVP"
 msgstr "RSVP bestätigen"
 
-#. Plugin Name of the plugin/theme
+#: src/Tribe/Main.php:481
 msgid "Event Tickets"
 msgstr "Veranstaltungstickets"
-
-#. Author of the plugin/theme
-msgid "Modern Tribe, Inc."
-msgstr "Modern Tribe, Inc."
-
-#. Author URI of the plugin/theme
-msgid "http://m.tri.be/28"
-msgstr "http://m.tri.be/28"

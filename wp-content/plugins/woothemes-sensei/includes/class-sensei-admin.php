@@ -53,6 +53,9 @@ class Sensei_Admin {
 
 		// Add notices to WP dashboard
 		add_action( 'admin_notices', array( $this, 'theme_compatibility_notices' ) );
+		// warn users in case admin_email is not a real WP_User
+		add_action( 'admin_notices', array( $this, 'notify_if_admin_email_not_real_admin_user' ) );
+
 
 		// Reset theme notices when switching themes
 		add_action( 'switch_theme', array( $this, 'reset_theme_check_notices' ) );
@@ -265,9 +268,10 @@ class Sensei_Admin {
 		// Global Styles for icons and menu items
 		wp_register_style( 'woothemes-sensei-global', Sensei()->plugin_url . 'assets/css/global.css', '', Sensei()->version, 'screen' );
 		wp_enqueue_style( 'woothemes-sensei-global' );
+		$select_two_location = '/assets/vendor/select2-4.0.3/dist/css/select2.css';
 
         // Select 2 styles
-        wp_enqueue_style( 'sensei-core-select2', Sensei()->plugin_url . 'assets/css/select2/select2.css', '', Sensei()->version, 'screen' );
+        wp_enqueue_style( 'sensei-core-select2', Sensei()->plugin_url . $select_two_location, '', Sensei()->version, 'screen' );
 
 		// Test for Write Panel Pages
 		if ( ( ( isset( $post_type ) && in_array( $post_type, $allowed_post_types ) ) && ( isset( $hook ) && in_array( $hook, $allowed_post_type_pages ) ) ) || ( isset( $_GET['page'] ) && in_array( $_GET['page'], $allowed_pages ) ) ) {
@@ -294,9 +298,10 @@ class Sensei_Admin {
 
         // Allow developers to load non-minified versions of scripts
         $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$select_two_location = '/assets/vendor/select2-4.0.3/dist/js/select2.full';
 
         // Select2 script used to enhance all select boxes
-        wp_register_script( 'sensei-core-select2', Sensei()->plugin_url . '/assets/js/select2/select2' . $suffix . '.js', array( 'jquery' ), Sensei()->version );
+        wp_register_script( 'sensei-core-select2', Sensei()->plugin_url . $select_two_location . $suffix . '.js', array( 'jquery' ), Sensei()->version );
 
         // load edit module scripts
         if( 'edit-module' ==  $screen->id ){
@@ -1498,11 +1503,10 @@ class Sensei_Admin {
 
                         </strong> &#8211;
 
-                        <?php esc_html_e( 'if you encounter layout issues please read our integration guide or choose a ', 'woothemes-sensei' ); ?>
-
-                        <a href="http://www.woothemes.com/product-category/themes/sensei-themes/"> <?php esc_html_e( 'Sensei theme', 'woothemes-sensei' ) ?> </a>
-
-                        :)
+                        <?php printf( /* translator: %s theme name */
+                            esc_html__( 'if you encounter layout issues please read our integration guide or choose a %s :)', 'woothemes-sensei' ),
+                            '<a href="http://www.woothemes.com/product-category/themes/sensei-themes/">'. esc_html__( 'Sensei theme', 'woothemes-sensei' ) . '</a>'
+                        ); ?>
 
                     </p>
                     <p class="submit">
@@ -1630,6 +1634,22 @@ class Sensei_Admin {
 					$this->save_course_order( implode( ',', $ordered_course_ids ) );
 				}
 			}
+		}
+	}
+
+	public function notify_if_admin_email_not_real_admin_user() {
+		$maybe_admin = get_user_by( 'email', get_bloginfo( 'admin_email' ) );
+
+		if ( false === $maybe_admin || false === user_can( $maybe_admin, 'manage_options' ) ) {
+			$general_settings_url = '<a href="' . esc_attr( esc_url( admin_url( 'options-general.php' ) ) ) . '">' . __( 'setting', 'woothemes-sensei' ) . '</a>';
+			$current_setting = esc_html__( get_bloginfo( 'admin_email' ) );
+			?><div id="message" class="error sensei-message sensei-connect">
+				<p>
+					<strong>
+						<?php printf( esc_html__( 'For Sensei to work correctly, your Email Address %s needs to belong to an existing Administrator email (currently set to: %s).', 'woothemes-sensei' ), $general_settings_url, $current_setting ); ?>
+					</strong>
+				</p>
+			</div><?php
 		}
 	}
 

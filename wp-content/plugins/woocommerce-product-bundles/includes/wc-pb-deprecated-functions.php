@@ -2,7 +2,7 @@
 /**
  * Product Bundles deprecated global functions
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    1.0.0
  */

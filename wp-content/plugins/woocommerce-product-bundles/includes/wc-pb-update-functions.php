@@ -2,7 +2,7 @@
 /**
  * Product Bundles DB update functions
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -156,8 +156,7 @@ function wc_pb_update_500_main( $updater ) {
 
 				// Get product type.
 
-				$terms        = get_the_terms( $bundle_id, 'product_type' );
-				$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
+				$product_type = WC_PB_Core_Compatibility::get_product_type( $bundle_id );
 
 				// Delete existing data left over from previous runs.
 
@@ -210,7 +209,7 @@ function wc_pb_update_500_main( $updater ) {
 
 				// Create layout field.
 
-				if ( false === get_post_meta( $bundle_id, '_wc_pb_layout_style', true ) ) {
+				if ( '' === get_post_meta( $bundle_id, '_wc_pb_layout_style', true ) ) {
 					update_post_meta( $bundle_id, '_wc_pb_layout_style', 'default' );
 				}
 
@@ -226,15 +225,9 @@ function wc_pb_update_500_main( $updater ) {
 					$base_regular_price = get_post_meta( $bundle_id, '_base_regular_price', true );
 					$base_sale_price    = get_post_meta( $bundle_id, '_base_sale_price', true );
 
-					if ( false !== $base_price ) {
-						update_post_meta( $bundle_id, '_price', $base_price );
-					}
-					if ( false !== $base_regular_price ) {
-						update_post_meta( $bundle_id, '_regular_price', $base_regular_price );
-					}
-					if ( false !== $base_sale_price ) {
-						update_post_meta( $bundle_id, '_sale_price', $base_sale_price );
-					}
+					update_post_meta( $bundle_id, '_price', $base_price );
+					update_post_meta( $bundle_id, '_regular_price', $base_regular_price );
+					update_post_meta( $bundle_id, '_sale_price', $base_sale_price );
 				}
 
 				// Delete product transients.
@@ -404,9 +397,9 @@ function wc_pb_update_510_main( $updater ) {
 				$regular_price = get_post_meta( $bundle_id, '_regular_price', true );
 				$sale_price    = get_post_meta( $bundle_id, '_sale_price', true );
 
-				update_post_meta( $bundle_id, '_wc_pb_base_price', false !== $price ? $price : '' );
-				update_post_meta( $bundle_id, '_wc_pb_base_regular_price', false !== $regular_price ? $regular_price : '' );
-				update_post_meta( $bundle_id, '_wc_pb_base_sale_price', false !== $sale_price ? $sale_price : '' );
+				update_post_meta( $bundle_id, '_wc_pb_base_price', $price );
+				update_post_meta( $bundle_id, '_wc_pb_base_regular_price', $regular_price );
+				update_post_meta( $bundle_id, '_wc_pb_base_sale_price', $sale_price );
 			}
 		}
 	}

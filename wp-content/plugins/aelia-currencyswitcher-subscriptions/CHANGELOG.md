@@ -1,6 +1,10 @@
 # WooCommerce Currency Switcher - Subscriptions Integration
 
 ## Version 1.x
+####1.3.5.170425
+* Improved compatibility with Subscriptions 2.2.5.
+* Fixed handling of subscriptions sale prices.
+
 ####1.3.4.170422
 * Refactored logic used to calculate final subscription price. The new logic fixes the conversion in calls to static method WC_Subscriptions_Product::get_price_string() and the new functions `wcs_get_price_including_tax` and `wcs_get_price_excluding_tax`.
 

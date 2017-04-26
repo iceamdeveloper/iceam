@@ -5,7 +5,7 @@ Tags: events, calendar, event, venue, organizer, dates, date, google maps, confe
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
 Tested up to: 4.7.3
-Stable tag: 4.4.5
+Stable tag: 4.4.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -202,6 +202,16 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.6] 2017-04-19 =
+
+* Fix - Ensure '0' can be passed to prevent events being listed below the mini calendar shortcode (thanks @Laurier) [46193]
+* Fix - Support permalinks of recurring events that take place on the same day as other events from the same sequence (reported by @Christopher in our forums) [74727]
+* Fix - Ensure feature venue shortcode arguments are respected (props to @Lorie Ann) [61879]
+* Fix - Ensure multi-day "all-day" events are not reduced to only one day in length when made recurring.(initial report from @Corinna) [69304]
+* Tweak - Adds support for 'limit' as a mini calendar shortcode argument [61349]
+* Tweak - Remove reference that was triggering an extra HTTP request for a .min.map.js asset [37983]
+* Tweak - Always enqueue the Google Maps API script using the HTTPS protocol [67747]
 
 = [4.4.5] 2017-03-23 =
 

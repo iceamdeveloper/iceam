@@ -1,5 +1,62 @@
 <?php
-if ( ! defined( 'ABSPATH' ) ) exit; // security check, don't load file outside WP
+if ( ! defined( 'ABSPATH' ) ) {
+    exit; // security check, don't load file outside WP
+}
+
+class Sensei_Autoloader_Bundle {
+    /**
+     * @var path to the includes directory within Sensei.
+     */
+    private $include_path = 'includes';
+    private $bundle_identifier = 'sensei';
+
+    /**
+     * Sensei_Autoloader_Bundle constructor.
+     * @param string $bundle_identifier
+     * @param string $namespace_path path relative to includes
+     */
+    public function __construct( $bundle_identifier = 'sensei', $bundle_identifier_path = '' ) {
+        $this->bundle_identifier = $bundle_identifier;
+        // setup a relative path for the current autoload instance
+        $this->include_path = trailingslashit( trailingslashit(untrailingslashit(dirname(__FILE__))) . $bundle_identifier_path );
+    }
+
+    private function format_namespace() {
+        return strtolower( $this->bundle_identifier );
+    }
+
+    /**
+     * @param $class string
+     * @return bool
+     */
+    public function load_class( $class ) {
+
+        if( ! is_numeric( strpos ( strtolower( $class ), $this->format_namespace() ) ) ) {
+            return false;
+        }
+
+        // check for file in the main includes directory
+        $class_file_path = $this->include_path . 'class-'.str_replace( '_','-', strtolower( $class ) ) . '.php';
+        if( file_exists( $class_file_path ) ){
+
+            require_once( $class_file_path );
+            return true;
+        }
+
+        // lastly check legacy types
+        $stripped_woothemes_from_class = str_replace( 'woothemes_','', strtolower( $class ) ); // remove woothemes
+        $legacy_class_file_path = $this->include_path . 'class-'.str_replace( '_','-', strtolower( $stripped_woothemes_from_class ) ) . '.php';
+        if( file_exists( $legacy_class_file_path ) ){
+
+            require_once( $legacy_class_file_path );
+            return true;
+        }
+
+        return false;
+
+    }// end autoload
+}
+
 /**
  * Loading all class files within the Sensei/includes directory
  *
@@ -21,6 +78,8 @@ class Sensei_Autoloader {
      */
     private $class_file_map = array();
 
+    private $autoloader_bundles = array();
+
     /**
      * Constructor
      * @since 1.9.0
@@ -37,6 +96,13 @@ class Sensei_Autoloader {
 
         //setup the class file map
         $this->initialize_class_file_map();
+
+
+        $this->autoloader_bundles = array(
+            new Sensei_Autoloader_Bundle( 'Sensei_REST_API'     , 'rest-api'      ),
+            new Sensei_Autoloader_Bundle( 'Sensei_Domain_Models', 'domain-models' ),
+            new Sensei_Autoloader_Bundle( 'Sensei'              , ''              )
+        );
 
         // add Sensei custom auto loader
         spl_autoload_register( array( $this, 'autoload' )  );
@@ -132,21 +198,10 @@ class Sensei_Autoloader {
 
         }
 
-        // check for file in the main includes directory
-        $class_file_path = $this->include_path . 'class-'.str_replace( '_','-', strtolower( $class ) ) . '.php';
-        if( file_exists( $class_file_path ) ){
-
-            require_once( $class_file_path );
-            return;
-        }
-
-        // lastly check legacy types
-        $stripped_woothemes_from_class = str_replace( 'woothemes_','', strtolower( $class ) ); // remove woothemes
-        $legacy_class_file_path = $this->include_path . 'class-'.str_replace( '_','-', strtolower( $stripped_woothemes_from_class ) ) . '.php';
-        if( file_exists( $legacy_class_file_path ) ){
-
-            require_once( $legacy_class_file_path );
-            return;
+        foreach ($this->autoloader_bundles as $bundle ) {
+            if (true === $bundle->load_class( $class ) ) {
+                return;
+            }
         }
 
         return;
@@ -154,4 +209,3 @@ class Sensei_Autoloader {
     }// end autoload
 
 }
-new Sensei_Autoloader();

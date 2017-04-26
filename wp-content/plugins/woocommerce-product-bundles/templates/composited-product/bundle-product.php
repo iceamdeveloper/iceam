@@ -86,13 +86,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 		do_action( 'woocommerce_composited_product_add_to_cart', $product, $component_id, $composite_product );
 
 		?><div class="bundle_wrap component_wrap">
-			<div class="bundle_price"></div><?php
+			<div class="bundle_price"></div>
+			<div class="bundle_availability"><?php
 
-			$availability_html = empty( $availability[ 'availability' ] ) ? '' : '<p class="stock ' . esc_attr( $availability[ 'class' ] ) . '">' . esc_html( $availability[ 'availability' ] ) . '</p>';
+				// Availability html.
+				echo $composited_product->get_availability_html();
 
-			echo apply_filters( 'woocommerce_stock_html', $availability_html, $availability[ 'availability' ], $product );
-
-			?><div class="bundle_button"><?php
+			?></div>
+			<div class="bundle_button"><?php
 
 				wc_get_template( 'composited-product/quantity.php', array(
 					'quantity_min'      => $quantity_min,

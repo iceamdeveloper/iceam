@@ -103,4 +103,56 @@ class Sensei_WC_Utils {
 
         return $product_id;
     }
+
+    /**
+     * @param $post_or_id WP_Post|int
+     * @return null|WC_Product
+     */
+    public static function get_product( $post_or_id ) {
+        return self::wc_version_less_than('2.7') ? get_product( $post_or_id ) : wc_get_product( $post_or_id );
+    }
+
+    /**
+     * @param $product WC_Product
+     * @return null|WC_Product
+     */
+    public static function get_parent_product($product ) {
+        return self::get_product( self::get_product_id( $product ) );
+    }
+
+    /**
+     * @param $product WC_Abstract_Legacy_Product
+     * @return mixed
+     */
+    public static function get_variation_data( $product ) {
+        if ( self::wc_version_less_than('2.7') ) {
+            return $product->variation_data;
+        }
+        return $product->is_type( 'variation' ) ? wc_get_product_variation_attributes( $product->get_id() ) : '';
+    }
+
+    /**
+     * @param string $variation
+     * @param bool $flat
+     * @return string
+     */
+    public static function get_formatted_variation( $variation = '', $flat = false ) {
+        if ( self::wc_version_less_than('2.7') ) {
+            return woocommerce_get_formatted_variation( $variation, $flat );
+        }
+
+        return wc_get_formatted_variation( $variation, $flat );
+    }
+
+    /*
+     * @param $product WC_Product|WC_Abstract_Legacy_Product
+     * @return array|mixed|string
+     */
+    public static function get_product_variation_data( $product ) {
+        if ( self::wc_version_less_than('3.0.0') ) {
+            return ( isset( $product->variation_data ) && is_array( $product->variation_data ) ) ? $product->variation_data : array();
+        }
+
+        return self::is_product_variation( $product ) ? wc_get_product_variation_attributes( $product->get_id() ) : '';
+    }
 }

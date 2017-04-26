@@ -3,11 +3,9 @@
 * Plugin Name: WooCommerce Product Bundles
 * Plugin URI: http://woocommerce.com/products/product-bundles/
 * Description: WooCommerce extension for creating simple product bundles, kits and assemblies.
-* Version: 5.1.4
-* Author: WooThemes
-* Author URI: http://woocommerce.com/
-* Developer: SomewhereWarm
-* Developer URI: http://somewherewarm.net/
+* Version: 5.2.2
+* Author: SomewhereWarm
+* Author URI: http://somewherewarm.gr/
 *
 * Text Domain: woocommerce-product-bundles
 * Domain Path: /languages/
@@ -15,7 +13,7 @@
 * Requires at least: 4.1
 * Tested up to: 4.7
 *
-* Copyright: © 2009-2015 Emmanouil Psychogyiopoulos.
+* Copyright: © 2017 SomewhereWarm SMPC.
 * License: GNU General Public License v3.0
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
 */
@@ -48,11 +46,11 @@ if ( ! is_woocommerce_active() ) {
  * Main plugin class.
  *
  * @class    WC_Bundles
- * @version  5.1.4
+ * @version  5.2.2
  */
 class WC_Bundles {
 
-	public $version  = '5.1.4';
+	public $version  = '5.2.2';
 	public $required = '2.4.0';
 
 	/**
@@ -190,6 +188,24 @@ class WC_Bundles {
 			 */
 			define( 'WC_PB_DEBUG_TRANSIENTS', true );
 		}
+
+		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_object_cache', null ) ) {
+			/**
+			 * 'WC_PB_DEBUG_OBJECT_CACHE' constant.
+			 *
+			 * Used to disable object caching at plugin level.
+			 */
+			define( 'WC_PB_DEBUG_OBJECT_CACHE', true );
+		}
+
+		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_runtime_cache', null ) ) {
+			/**
+			 * 'WC_PB_DEBUG_RUNTIME_CACHE' constant.
+			 *
+			 * Used to disable runtime object caching at plugin level.
+			 */
+			define( 'WC_PB_DEBUG_RUNTIME_CACHE', true );
+		}
 	}
 
 	/**
@@ -226,7 +242,11 @@ class WC_Bundles {
 		require_once( 'includes/class-wc-bundled-item.php' );
 
 		// Product Bundle class.
-		require_once( 'includes/class-wc-product-bundle.php' );
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			require_once( 'includes/class-wc-product-bundle.php' );
+		} else {
+			require_once( 'includes/legacy/class-wc-product-bundle.php' );
+		}
 
 		// Stock mgr class.
 		require_once( 'includes/class-wc-pb-stock-manager.php' );
@@ -235,7 +255,11 @@ class WC_Bundles {
 		require_once( 'includes/class-wc-pb-cart.php' );
 
 		// Order-related bundle functions and hooks.
-		require_once( 'includes/class-wc-pb-order.php' );
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			require_once( 'includes/class-wc-pb-order.php' );
+		} else {
+			require_once( 'includes/legacy/class-wc-pb-order.php' );
+		}
 
 		// Front-end filters and templates.
 		require_once( 'includes/class-wc-pb-display.php' );

@@ -38,6 +38,11 @@ if ( ! function_exists( 'woothemes_add_javascript' ) ) {
 			$load_portfolio_js = true;
 		}
 
+		if ( is_page_template( 'template-contact.php' ) ) {
+			$google_maps_api_key = get_option( 'woo_maps_api_key' );
+			wp_enqueue_script( 'google-maps', '//maps.googleapis.com/maps/api/js?key=' . $google_maps_api_key . '', array(), '5.11.2', true );
+		}
+
 		// Allow child themes/plugins to load the slider and portfolio JavaScript when they need it.
 		$load_slider_js = apply_filters( 'woo_load_slider_js', $load_slider_js );
 		$load_portfolio_js = apply_filters( 'woo_load_portfolio_js', $load_portfolio_js );

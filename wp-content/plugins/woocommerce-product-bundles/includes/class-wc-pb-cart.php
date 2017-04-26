@@ -2,7 +2,7 @@
 /**
  * WC_PB_Cart class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.5.0
  */
@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle cart functions and filters.
  *
  * @class    WC_PB_Cart
- * @version  5.1.0
- * @since    4.5.0
+ * @version  5.2.2
  */
 class WC_PB_Cart {
 
@@ -492,7 +491,7 @@ class WC_PB_Cart {
 						}
 
 						if ( ! $all_set ) {
-							if ( $missing_attributes && WC_PB_Core_Compatibility::is_wc_version_gte_2_3() ) {
+							if ( $missing_attributes ) {
 								$required_fields_notice = sprintf( _n( '%1$s is a required &quot;%2$s&quot; field', '%1$s are required &quot;%2$s&quot; fields', sizeof( $missing_attributes ), 'woocommerce-product-bundles' ), wc_format_list_of_items( $missing_attributes ), $bundled_item->get_raw_title() );
 	    						wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart. %2$s.', 'woocommerce-product-bundles' ), $bundled_product_title, $required_fields_notice ), 'error' );
 	    						return false;
@@ -573,7 +572,7 @@ class WC_PB_Cart {
 		// Taxable.
 		if ( $taxable ) {
 
-			if ( 'excl' === $cart->tax_display_cart ) {
+			if ( 'excl' === get_option( 'woocommerce_tax_display_cart' ) ) {
 
 				$product_subtotal = wc_price( $subtotal );
 
@@ -615,9 +614,9 @@ class WC_PB_Cart {
 		if ( $bundled_item ) {
 			if ( false === $bundled_item->is_priced_individually() ) {
 
-				$cart_item[ 'data' ]->regular_price = 0;
-				$cart_item[ 'data' ]->price         = 0;
-				$cart_item[ 'data' ]->sale_price    = '';
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'regular_price', 0 );
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'price', 0 );
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'sale_price', '' );
 
 				if ( WC_PB()->compatibility->is_subscription( $cart_item[ 'data' ] ) ) {
 					$cart_item[ 'data' ]->subscription_sign_up_fee = 0;
@@ -625,7 +624,7 @@ class WC_PB_Cart {
 				}
 
 			} else {
-				$cart_item[ 'data' ]->price = $bundled_item->get_raw_price( $cart_item[ 'data' ], 'cart' );
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'price', $bundled_item->get_raw_price( $cart_item[ 'data' ], 'cart' ) );
 			}
 		}
 
@@ -645,11 +644,13 @@ class WC_PB_Cart {
 				 * @param  WC_Product_Bundle  $bundle
 				 */
 				if ( apply_filters( 'woocommerce_bundled_item_has_bundled_weight', false, $cart_item[ 'data' ], $bundled_item_id, $bundle ) ) {
-					$cart_item[ 'data' ]->bundled_weight = $cart_item[ 'data' ]->get_weight();
+					$cart_item[ 'data' ]->bundled_weight = (double) $cart_item[ 'data' ]->get_weight( 'edit' );
 				}
 
-				$cart_item[ 'data' ]->bundled_value = $cart_item[ 'data' ]->price;
-				$cart_item[ 'data' ]->virtual       = 'yes';
+				$cart_item[ 'data' ]->bundled_value = (double) WC_PB_Core_Compatibility::get_prop( $cart_item[ 'data' ], 'price', 'edit' );
+
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'virtual', 'yes' );
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'weight', '' );
 			}
 		}
 
@@ -827,8 +828,7 @@ class WC_PB_Cart {
 	public function validate_add_to_cart( $add, $product_id, $product_quantity, $variation_id = '', $variations = array(), $cart_item_data = array() ) {
 
 		// Get product type.
-		$terms        = get_the_terms( $product_id, 'product_type' );
-		$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
+		$product_type = WC_PB_Core_Compatibility::get_product_type( $product_id );
 
 		// Ordering again?
 		$order_again  = isset( $_GET[ 'order_again' ] ) && isset( $_GET[ '_wpnonce' ] ) && wp_verify_nonce( $_GET[ '_wpnonce' ], 'woocommerce-order_again' );
@@ -845,54 +845,24 @@ class WC_PB_Cart {
 
 			$product = wc_get_product( $product_id );
 
-			// Check 'sold_individually' context.
-			if ( $product->is_sold_individually() ) {
-				foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
-					if ( $product_id === $cart_item[ 'product_id' ] ) {
-
-						$item_found_in_cart = true;
-
-						if ( isset( $_POST[ 'update-bundle' ] ) ) {
-							$editing_key = wc_clean( $_POST[ 'update-bundle' ] );
-							if ( $editing_key === $cart_item_key ) {
-								$item_found_in_cart = false;
-								break;
-							}
-						}
-
-						if ( $item_found_in_cart ) {
-							if ( 'configuration' === $product->get_sold_individually_context() ) {
-								wc_add_notice( sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', WC()->cart->get_cart_url(), __( 'View Cart', 'woocommerce' ), sprintf( __( 'You have already added an identical &quot;%s&quot; to your cart. You cannot add another one.', 'woocommerce-product-bundles' ), $product->get_title() ) ), 'error' );
-							} else {
-								wc_add_notice( sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', WC()->cart->get_cart_url(), __( 'View Cart', 'woocommerce' ), sprintf( __( 'You cannot add another &quot;%s&quot; to your cart.', 'woocommerce' ), $product->get_title() ) ), 'error' );
-							}
-							return false;
-						}
-					}
-				}
-			}
-
-			if ( ! $product ) {
-				$add = false;
-			}
-
 			/**
 			 * 'woocommerce_bundle_before_validation' filter.
 			 *
 			 * Early chance to stop/bypass any further validation.
 			 *
-			 * @param  boolean     $true
-			 * @param  WC_Product  $product
+			 * @param  boolean            $true
+			 * @param  WC_Product_Bundle  $product
 			 */
-			if ( false === apply_filters( 'woocommerce_bundle_before_validation', $add, $product ) ) {
-				$add = false;
-			}
+			if ( $product && apply_filters( 'woocommerce_bundle_before_validation', true, $product ) ) {
 
-			if ( $add ) {
 				$configuration = isset( $cart_item_data[ 'stamp' ] ) ? $cart_item_data[ 'stamp' ] : $this->get_posted_bundle_configuration( $product );
+
 				if ( ! $this->validate_bundle_configuration( $product, $product_quantity, $configuration ) ) {
 					$add = false;
 				}
+
+			} else {
+				$add = false;
 			}
 		}
 
@@ -932,10 +902,11 @@ class WC_PB_Cart {
 	public function add_cart_item_data( $cart_item_data, $product_id ) {
 
 		// Get product type.
-		$terms        = get_the_terms( $product_id, 'product_type' );
-		$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
+		$product_type = WC_PB_Core_Compatibility::get_product_type( $product_id );
 
 		if ( 'bundle' === $product_type ) {
+
+			$updating_bundle_in_cart = false;
 
 			// Updating bundle in cart?
 			if ( isset( $_POST[ 'update-bundle' ] ) ) {
@@ -944,6 +915,8 @@ class WC_PB_Cart {
 
 				if ( isset( WC()->cart->cart_contents[ $updating_cart_key ] ) ) {
 
+					$updating_bundle_in_cart = true;
+
 					// Remove.
 					WC()->cart->remove_cart_item( $updating_cart_key );
 
@@ -951,7 +924,7 @@ class WC_PB_Cart {
 					add_filter( 'woocommerce_add_to_cart_redirect', array( $this, 'edit_in_cart_redirect' ) );
 
 					// Edit notice.
-					add_filter( 'wc_add_to_cart_message', array( $this, 'edit_in_cart_redirect_message' ) );
+					add_filter( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? 'wc_add_to_cart_message_html' : 'wc_add_to_cart_message', array( $this, 'edit_in_cart_redirect_message' ) );
 				}
 			}
 
@@ -975,6 +948,17 @@ class WC_PB_Cart {
 				}
 
 				$cart_item_data[ 'stamp' ] = $configuration;
+
+				// Check "Sold Individually" option context.
+				if ( false === $updating_bundle_in_cart && ( $product = wc_get_product( $product_id ) ) && $product->is_sold_individually() ) {
+					foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+						if ( $product_id === $cart_item[ 'product_id' ] && 'product' === $product->get_sold_individually_context() ) {
+							throw new Exception( sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', WC()->cart->get_cart_url(), __( 'View Cart', 'woocommerce' ), sprintf( __( 'You cannot add another &quot;%s&quot; to your cart.', 'woocommerce' ), $product->get_title() ) ) );
+						} elseif ( wc_pb_is_bundle_container_cart_item( $cart_item ) && $configuration === $cart_item[ 'stamp' ] ) {
+							throw new Exception( sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', WC()->cart->get_cart_url(), __( 'View Cart', 'woocommerce' ), sprintf( __( 'You have already added an identical &quot;%s&quot; to your cart. You cannot add another one.', 'woocommerce-product-bundles' ), $product->get_title() ) ) );
+						}
+					}
+				}
 			}
 
 			// Prepare additional data for later use.
@@ -1438,8 +1422,10 @@ class WC_PB_Cart {
 					 * @param  string   $container_cart_item_key
 					 */
 					if ( apply_filters( 'woocommerce_add_bundled_cart_item_subtotals', true, $bundle_container_item, $bundle_container_item_key ) ) {
-						$subtotal = __( 'Subtotal', 'woocommerce-product-bundles' ) . ': ' . $subtotal;
+						$subtotal = sprintf( _x( '%1$s: %2$s', 'bundled product subtotal', 'woocommerce-product-bundles' ), __( 'Subtotal', 'woocommerce-product-bundles' ), $subtotal );
 					}
+
+					$subtotal = '<span class="bundled-product-subtotal">' . $subtotal . '</span>';
 				}
 			}
 
@@ -1449,9 +1435,9 @@ class WC_PB_Cart {
 			if ( apply_filters( 'woocommerce_add_bundled_cart_item_subtotals', true, $values, $cart_item_key ) ) {
 
 				$bundled_item_keys       = wc_pb_get_bundled_cart_items( $values, WC()->cart->cart_contents, true );
-				$bundled_items_price     = 0;
+				$bundled_items_price     = 0.0;
 				$contains_recurring_fees = false;
-				$bundle_price            = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? $values[ 'data' ]->get_price_excluding_tax( $values[ 'quantity' ] ) : $values[ 'data' ]->get_price_including_tax( $values[ 'quantity' ] );
+				$bundle_price            = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $values[ 'data' ], array( 'qty' => $values[ 'quantity' ] ) ) : WC_PB_Core_Compatibility::wc_get_price_including_tax( $values[ 'data' ], array( 'qty' => $values[ 'quantity' ] ) );
 
 				foreach ( $bundled_item_keys as $bundled_item_key ) {
 
@@ -1463,7 +1449,7 @@ class WC_PB_Cart {
 					$item_id     = $item_values[ 'bundled_item_id' ];
 					$product     = $item_values[ 'data' ];
 
-					$bundled_item_price = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? $product->get_price_excluding_tax( $item_values[ 'quantity' ] ) : $product->get_price_including_tax( $item_values[ 'quantity' ] );
+					$bundled_item_price = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $product, array( 'qty' => $item_values[ 'quantity' ] ) ) : WC_PB_Core_Compatibility::wc_get_price_including_tax( $product, array( 'qty' => $item_values[ 'quantity' ] ) );
 
 					/*------------------------------------------------------------*/
 					/*	If a bundled item is a sub, then add sign up fee.         */
@@ -1473,22 +1459,20 @@ class WC_PB_Cart {
 
 					if ( $bundled_item && $bundled_item->is_subscription() ) {
 
-						$bundled_items_recurring_price = $bundled_item_price;
+						$bundled_item_recurring_fee = $bundled_item_price;
 
-						if ( $bundled_items_recurring_price > 0 ) {
+						if ( $bundled_item_recurring_fee > 0 ) {
 							$contains_recurring_fees = true;
 						}
 
-						$bundled_item_sign_up_fee   = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? $product->get_sign_up_fee_excluding_tax( $item_values[ 'quantity' ] ) : $product->get_sign_up_fee_including_tax( $item_values[ 'quantity' ] );
-						$bundled_item_recurring_fee = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? $product->get_price_excluding_tax( $item_values[ 'quantity' ], $product->get_price(), $product ) : $product->get_price_including_tax( $item_values[ 'quantity' ], $product->get_price(), $product );
-
-						$bundled_item_price = $bundled_item->get_up_front_subscription_price( $bundled_item_recurring_fee, $bundled_item_sign_up_fee, $product );
+						$bundled_item_sign_up_fee = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $product, array( 'qty' => $item_values[ 'quantity' ], 'price' => (double) WC_Subscriptions_Product::get_sign_up_fee( $product ) ) ) : WC_PB_Core_Compatibility::wc_get_price_including_tax( $product, array( 'qty' => $item_values[ 'quantity' ], 'price' => (double) WC_Subscriptions_Product::get_sign_up_fee( $product ) ) );
+						$bundled_item_price       = $bundled_item->get_up_front_subscription_price( $bundled_item_recurring_fee, $bundled_item_sign_up_fee, $product );
 					}
 
-					$bundled_items_price += $bundled_item_price;
+					$bundled_items_price += (double) $bundled_item_price;
 				}
 
-				$subtotal = $this->format_product_subtotal( $values[ 'data' ], $bundle_price + $bundled_items_price );
+				$subtotal = $this->format_product_subtotal( $values[ 'data' ], (double) $bundle_price + $bundled_items_price );
 
 				if ( $contains_recurring_fees ) {
 					$subtotal .= __( ' now <small>(recurring totals listed below)</small>', 'woocommerce-product-bundles' );
@@ -1569,22 +1553,16 @@ class WC_PB_Cart {
 						if ( wc_pb_is_bundle_container_cart_item( $cart_item_data ) ) {
 
 							$bundle     = unserialize( serialize( $cart_item_data[ 'data' ] ) );
-							$bundle_obj = wc_get_product( $cart_item_data[ 'product_id' ] );
 							$bundle_qty = $cart_item_data[ 'quantity' ];
 
 							/*
-							 * Container needs shipping: Sum the prices of any children that are not shipped individually into the parent and, optionally, add their weight to the parent weight.
+							 * Container needs shipping: Aggregate the prices of any children that are physically packaged in their parent and, optionally, aggregate their weights into the parent, as well.
 							 */
 
-							if ( $bundle_obj->needs_shipping() ) {
+							if ( $bundle->needs_shipping() ) {
 
-								// Aggregate weights.
-
-								$bundled_weight = 0;
-
-								// Aggregate prices.
-
-								$bundled_value = 0;
+								$bundled_weight = 0.0;
+								$bundled_value  = 0.0;
 
 								$bundle_totals = array(
 									'line_subtotal'     => $cart_item_data[ 'line_subtotal' ],
@@ -1597,14 +1575,14 @@ class WC_PB_Cart {
 								foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, WC()->cart->cart_contents, true ) as $child_item_key ) {
 
 									$child_cart_item_data = WC()->cart->cart_contents[ $child_item_key ];
-									$bundled_product      = unserialize( serialize( $child_cart_item_data[ 'data' ] ) );
+									$bundled_product      = $child_cart_item_data[ 'data' ];
 									$bundled_product_qty  = $child_cart_item_data[ 'quantity' ];
 
-									// Aggregate price.
+									// Aggregate price of physically packaged child item - already converted to virtual.
+
 									if ( isset( $bundled_product->bundled_value ) ) {
+
 										$bundled_value += $bundled_product->bundled_value * $bundled_product_qty;
-										$bundled_product->price = 0;
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'data' ] = $bundled_product;
 
 										$bundle_totals[ 'line_subtotal' ]     += $child_cart_item_data[ 'line_subtotal' ];
 										$bundle_totals[ 'line_total' ]        += $child_cart_item_data[ 'line_total' ];
@@ -1617,32 +1595,27 @@ class WC_PB_Cart {
 
 										$bundle_totals[ 'line_tax_data' ][ 'total' ]    = array_merge( $bundle_totals[ 'line_tax_data' ][ 'total' ], $child_item_line_tax_data[ 'total' ] );
 										$bundle_totals[ 'line_tax_data' ][ 'subtotal' ] = array_merge( $bundle_totals[ 'line_tax_data' ][ 'subtotal' ], $child_item_line_tax_data[ 'subtotal' ] );
-
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'line_subtotal' ]               = 0;
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'line_total' ]                  = 0;
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'line_subtotal_tax' ]           = 0;
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'line_tax' ]                    = 0;
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'line_tax_data' ][ 'total' ]    = array();
-										$packages[ $package_key ][ 'contents' ][ $child_item_key ][ 'line_tax_data' ][ 'subtotal' ] = array();
 									}
 
-									// Aggregate weight.
+									// Aggregate weight of physically packaged child item - already converted to virtual.
+
 									if ( isset( $bundled_product->bundled_weight ) ) {
 										$bundled_weight += $bundled_product->bundled_weight * $bundled_product_qty;
 									}
 								}
 
-								$bundle->adjust_price( $bundled_value / $bundle_qty );
-								$packages[ $package_key ][ 'contents' ][ $cart_item_key ] = array_merge( $cart_item_data, $bundle_totals );
+								$bundle_price = WC_PB_Core_Compatibility::get_prop( $bundle, 'price', 'edit' );
 
-								$bundle->weight += $bundled_weight / $bundle_qty;
-
-								if ( isset( $bundle->bundled_weight ) ) {
-									$bundle->bundled_weight += $bundled_weight / $bundle_qty;
+								if ( $bundled_value > 0 ) {
+									WC_PB_Core_Compatibility::set_prop( $bundle, 'price', (double) $bundle_price + $bundled_value / $bundle_qty );
 								}
 
-								if ( isset( $bundle->bundled_value ) ) {
-									$bundle->bundled_value += $bundled_value / $bundle_qty;
+								$packages[ $package_key ][ 'contents' ][ $cart_item_key ] = array_merge( $cart_item_data, $bundle_totals );
+
+								$bundle_weight = WC_PB_Core_Compatibility::get_prop( $bundle, 'weight', 'edit' );
+
+								if ( $bundle_weight > 0 ) {
+									WC_PB_Core_Compatibility::set_prop( $bundle, 'weight', (double) $bundle_weight + $bundled_weight / $bundle_qty );
 								}
 
 								$packages[ $package_key ][ 'contents' ][ $cart_item_key ][ 'data' ] = $bundle;

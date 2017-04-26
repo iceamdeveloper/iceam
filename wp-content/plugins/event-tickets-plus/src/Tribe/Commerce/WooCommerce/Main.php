@@ -175,7 +175,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Min required WooCommerce version
 	 */
-	const REQUIRED_WC_VERSION = '2.1';
+	const REQUIRED_WC_VERSION = '2.2';
 
 	/**
 	 * Creates the instance of the class
@@ -233,12 +233,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'generate_tickets' ) );
 		add_action( 'woocommerce_order_status_changed', array( $this, 'generate_tickets' ), 12 );
 		add_action( 'woocommerce_email_after_order_table', array( $this, 'add_tickets_msg_to_email' ), 10, 2 );
-		add_action( 'woocommerce_add_order_item_meta', array( $this, 'set_attendee_optout_choice' ), 15, 2 );
 		add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'hide_attendee_optout_choice' ), 15 );
 
 		if ( class_exists( 'Tribe__Events__API' ) ) {
 			add_action( 'woocommerce_product_quick_edit_save', array( $this, 'syncronize_product_editor_changes' ) );
 			add_action( 'woocommerce_process_product_meta_simple', array( $this, 'syncronize_product_editor_changes' ) );
+		}
+
+		if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+			add_action( 'woocommerce_checkout_create_order_line_item', array( $this, 'set_attendee_optout_value' ), 10, 3 );
+		} else {
+			add_action( 'woocommerce_add_order_item_meta', array( $this, 'set_attendee_optout_choice' ), 15, 2 );
 		}
 
 		// Enqueue styles
@@ -278,7 +283,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * After placing the Order make sure we store the users option to show the Attendee Optout
+	 * After placing the Order make sure we store the users option to show the Attendee Optout.
+	 *
+	 * This method should only be used if a version of WooCommerce lower than 3.0 is in use.
 	 *
 	 * @param int   $item_id
 	 * @param array $item
@@ -288,9 +295,27 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		if ( ! isset( $item['attendee_optout'] ) ) {
 			return;
 		}
+
 		wc_add_order_item_meta( $item_id, self::ATTENDEE_OPTOUT_KEY, $item['attendee_optout'] );
 	}
 
+	/**
+	 * Store the attendee optout value for each order item.
+	 *
+	 * This method should only be used if a version of WooCommerce greater than or equal
+	 * to 3.0 is in use.
+	 *
+	 * @since 4.4.6
+	 *
+	 * @param WC_Order_Item $item
+	 * @param string        $cart_item_key
+	 * @param array         $values
+	 */
+	public function set_attendee_optout_value( $item, $cart_item_key, $values ) {
+		if ( isset( $values[ 'attendee_optout' ] ) ) {
+			$item->add_meta_data( self::ATTENDEE_OPTOUT_KEY, $values['attendee_optout'] );
+		}
+	}
 
 	/**
 	 * Hide the Attendee Output Choice in the Order Page
@@ -568,17 +593,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			// order attendee IDs in the meta are per ticket type
 			$order_attendee_id = 0;
 
-			$product_id        = isset( $item['product_id'] ) ? $item['product_id'] : $item['id'];
+			$product    = $this->get_product_from_item( $order, $item );
+			$product_id = $this->get_product_id( $product );
 
-			// Store the Optout in the Attendee, from the Order Item
-			if ( isset( $item['item_meta'][ self::ATTENDEE_OPTOUT_KEY ] ) ) {
-				$optout = (bool) reset( $item['item_meta'][ self::ATTENDEE_OPTOUT_KEY ] );
-			} else {
-				$optout = false;
-			}
+			// Check if the order item contains attendee optout information
+			$optout_data = isset( $item['item_meta'][ self::ATTENDEE_OPTOUT_KEY ] )
+				? $item['item_meta'][ self::ATTENDEE_OPTOUT_KEY ]
+				: false;
 
-			// Get the event this tickets is for
-			$event_id = get_post_meta( $product_id, $this->event_key, true );
+			$optout = is_array( $optout_data )
+				? (bool) reset( $optout_data ) // WC 2.x
+				: (bool) $optout_data;         // WC 3.x
+
+			// Get the event this ticket is for
+			$event_id = (int) get_post_meta( $product_id, $this->event_key, true );
 
 			if ( ! empty( $event_id ) ) {
 
@@ -695,7 +723,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Adds a message to WooCommerce's order email confirmation.
 	 *
-	 * @param $order
+	 * @param WC_Order $order
 	 */
 	public function add_tickets_msg_to_email( $order ) {
 		$order_items = $order->get_items();
@@ -966,8 +994,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			return false;
 		}
 
-		// set_stock() returns the new inventory or null on failure
-		return null !== $product->set_stock( (int) $product->stock + $increment_by );
+		// WooCommerce 3.x
+		if ( function_exists( 'wc_update_product_stock' ) ) {
+			$success = wc_update_product_stock( $product, (int) $product->get_stock_quantity() + $increment_by );
+		}
+		// WooCommerce 2.x
+		else {
+			$success = $product->set_stock( (int) $product->stock + $increment_by );
+		}
+
+		return null !== $success;
 	}
 
 	/**
@@ -1079,21 +1115,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return null|Tribe__Tickets__Ticket_Object
 	 */
 	public function get_ticket( $event_id, $ticket_id ) {
-		if ( class_exists( 'WC_Product_Simple' ) ) {
-			$product = new WC_Product_Simple( $ticket_id );
-		} else {
-			$product = new WC_Product( $ticket_id );
-		}
+		$product = wc_get_product( $ticket_id );
 
 		if ( ! $product ) {
 			return null;
 		}
 
 		$return       = new Tribe__Tickets__Ticket_Object();
-		$product_data = $product->get_post_data();
+		$product_post = get_post( $this->get_product_id( $product ) );
 		$qty          = get_post_meta( $ticket_id, 'total_sales', true );
 
-		$return->description    = $product_data->post_excerpt;
+		$return->description    = $product_post->post_excerpt;
 		$return->frontend_link  = get_permalink( $ticket_id );
 		$return->ID             = $ticket_id;
 		$return->name           = $product->get_title();
@@ -1101,7 +1133,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->regular_price  = $product->get_regular_price();
 		$return->on_sale        = (bool) $product->is_on_sale();
 		$return->provider_class = get_class( $this );
-		$return->admin_link     = admin_url( sprintf( get_post_type_object( $product_data->post_type )->_edit_link . '&action=edit', $ticket_id ) );
+		$return->admin_link     = admin_url( sprintf( get_post_type_object( $product_post->post_type )->_edit_link . '&action=edit', $ticket_id ) );
 		$return->start_date     = get_post_meta( $ticket_id, '_ticket_start_date', true );
 		$return->end_date       = get_post_meta( $ticket_id, '_ticket_end_date', true );
 		$return->purchase_limit = get_post_meta( $ticket_id, '_ticket_purchase_limit', true );
@@ -1974,32 +2006,41 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * @param $product
+	 * @param WC_Product $product
 	 *
 	 * @return mixed
 	 */
 	protected function get_regular_price_html( $product ) {
 		$this->product = $product;
 
-		add_filter( 'woocommerce_get_price', array( $this, 'get_regular_price' ), 99, 2 );
+		// The hook names are slightly different in WC 3.x vs WC 2.x
+		$filter_prefix = 'woocommerce';
+
+		if ( version_compare( WC()->version, '3.0', '>=' ) ) {
+			$filter_prefix .= '_product';
+		}
+
+		add_filter( "{$filter_prefix}_get_price", array( $this, 'get_regular_price' ), 99, 2 );
 
 		$price_html = $product->get_price_html();
 
-		remove_filter( 'woocommerce_get_price', array( $this, 'get_regular_price' ), 99 );
+		remove_filter( "{$filter_prefix}_get_price", array( $this, 'get_regular_price' ), 99 );
 
 		return $price_html;
 	}
 
 	/**
-	 * @param int        $price
+	 * @param mixed      $price
 	 * @param WC_Product $product
+	 *
+	 * @return string
 	 */
 	public function get_regular_price( $price, $product ) {
 		if ( ! $product instanceof WC_Product ) {
 			return $price;
 		}
 
-		if ( $product->id == $this->product->id ) {
+		if ( $this->get_product_id( $product ) == $this->get_product_id( $this->product ) ) {
 			return $product->get_regular_price();
 		}
 
@@ -2023,5 +2064,38 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		$tabbed_view = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View( $post->ID );
 		$tabbed_view->render();
+	}
+
+	/**
+	 * Given a WooCommerce product object, returns the product ID.
+	 *
+	 * This helper allows us to support both WooCommerce 2.x and 3.x, which allow access to
+	 * the product ID in slightly different ways.
+	 *
+	 * @param WC_Data|WC_Product $product
+	 *
+	 * @return int
+	 */
+	public function get_product_id( $product ) {
+		return method_exists( $product, 'get_id' )
+			? (int) $product->get_id()
+			: (int) $product->id;
+	}
+
+	/**
+	 * Given an order and an order item, returns the product associated with the item.
+	 *
+	 * This helper allows us to support both WooCommerce 2.x and 3.x, which each have different
+	 * ways of providing access to that information.
+	 *
+	 * @param WC_Order      $order
+	 * @param WC_Order_Item $item
+	 *
+	 * @return WC_Product
+	 */
+	public function get_product_from_item( $order, $item ) {
+		return method_exists( $item, 'get_product' )
+			? $item->get_product()
+			: $order->get_product_from_item( $item );
 	}
 }

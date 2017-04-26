@@ -168,10 +168,17 @@ if ( ! function_exists( 'woothemes_setup' ) ) {
 			) )
 		);
 
+		$custom_header_width = 960;
+
+		// In case a custom Layouts width is set
+		if( null != get_option('woo_layout_width') ) {
+			$custom_header_width = get_option('woo_layout_width');
+		}
+
 		// Custom Header
 		add_theme_support( 'custom-header', apply_filters( 'woo_custom_header_args', array(
 			'default-text-color'     => 'fff',
-			'width'                  => 980,
+			'width'                  => $custom_header_width,
 			'height'                 => 200,
 			'flex-height'            => true,
 			'wp-head-callback'       => 'woo_custom_header_style',
@@ -397,24 +404,6 @@ if ( ! function_exists( 'woo_conditionals' ) ) {
 }
 
 /*-----------------------------------------------------------------------------------*/
-/* Add Google Maps to HEAD */
-/*-----------------------------------------------------------------------------------*/
-
-add_action( 'woo_head', 'woo_google_maps', 10 ); // Add custom styling to HEAD
-
-if ( ! function_exists( 'woo_google_maps' ) ) {
-	function woo_google_maps() {
-		if ( is_page_template( 'template-contact.php' ) ) {
-			$maps_url = 'http://maps.google.com/maps/api/js?sensor=false';
-			if ( is_ssl() ) $maps_url = str_replace( 'http://', 'https://', $maps_url );
-		?>
-			<script type="text/javascript" src="<?php echo esc_url( $maps_url ); ?>"></script>
-		<?php
-		}
-	} // End woo_google_maps()
-}
-
-/*-----------------------------------------------------------------------------------*/
 /* Load style.css in the <head> */
 /*-----------------------------------------------------------------------------------*/
 
@@ -444,7 +433,7 @@ function woo_load_responsive_meta_tags () {
 
 	/* Remove this if not responsive design */
 	$html .= "\n" . '<!--  Mobile viewport scale -->' . "\n";
-	$html .= '<meta content="initial-scale=1.0, maximum-scale=1.0, user-scalable=yes" name="viewport"/>' . "\n";
+	$html .= '<meta name="viewport" content="width=device-width, initial-scale=1"/>' . "\n";
 
 	echo $html;
 } // End woo_load_responsive_meta_tags()
@@ -979,6 +968,13 @@ if ( ! function_exists( 'woo_get_layout' ) ) {
 			}
 		}
 
+		// Blog Page - Get layout setting from single post Custom Settings panel
+		if ( is_home() ) {
+		  	if ( '' != get_post_meta( $post->ID, 'layout', true ) ) {
+				$layout = get_post_meta( $post->ID, 'layout', true );
+			}
+		}
+
 		return $layout;
 
 	} // End woo_get_layout()
@@ -1190,7 +1186,7 @@ if ( ! function_exists( 'woo_slider_magazine' ) ) {
 		$excerpt_length = $woo_options['woo_slider_magazine_excerpt_length'];
 		if ( $excerpt_length != '' ) { $defaults['excerpt_length'] = $excerpt_length; }
 
-		if ( $width > 0 && $args['width'] == '' ) { $defaults['width'] = $width; }
+		if ( $width > 0 && ( isset( $args['width'] ) || empty( $args['width'] ) ) ) { $defaults['width'] = $width; }
 
 		// Merge the arguments with defaults.
 		$args = wp_parse_args( $args, $defaults );
@@ -1362,12 +1358,18 @@ if ( ! function_exists( 'woo_slider_biz' ) ) {
 		}
 
 		// Setup the number of posts to show.
-		$posts_per_page = $woo_options['woo_slider_biz_number'];
-		if ( $posts_per_page != '' ) { $defaults['posts_per_page'] = $posts_per_page; }
+		$posts_per_page = '';
+		if ( isset( $woo_options['woo_slider_biz_number'] ) && $woo_options['woo_slider_biz_number'] != '' ) {
+			$posts_per_page = $woo_options['woo_slider_biz_number'];
+			$defaults['posts_per_page'] = $posts_per_page;
+		}
 
 		// Setup the order of posts.
-		$post_order = $woo_options['woo_slider_biz_order'];
-		if ( $post_order != '' ) { $defaults['order'] = $post_order; }
+		$post_order = '';
+		if ( isset( $woo_options['woo_slider_biz_order'] ) && $woo_options['woo_slider_biz_order'] != '' ) {
+			$post_order = $woo_options['woo_slider_biz_order'];
+			$defaults['order'] = $post_order;
+		}
 
 		if ( ( 0 < $width ) && !isset( $args['width'] ) ) { $defaults['width'] = $width; }
 
@@ -1484,12 +1486,12 @@ if ( ! function_exists( 'woo_slider_biz_view' ) ) {
 	<div id="<?php echo esc_attr( $args['id'] ); ?>"<?php if ( '' != $args['container_css'] ): ?> class="<?php echo esc_attr( $args['container_css'] ); ?>"<?php endif; ?><?php if ( !apply_filters( 'woo_slider_autoheight', true ) ): ?> style="height: <?php echo apply_filters( 'woo_slider_height', 350 ); ?>px;"<?php endif; ?>>
 
 		<ul class="slides"<?php if ( !apply_filters( 'woo_slider_autoheight', true ) ): ?> style="height: <?php echo apply_filters( 'woo_slider_height', 350 ); ?>px;"<?php endif; ?>>
-
+			<?php $original_slide_styles = $args['slide_styles']; ?>
 			<?php foreach ( $slides as $k => $post ) { setup_postdata( $post ); $count++; ?>
 
 			<?php
 				// Slide Styles
-				if ( $count >= 2 ) { $args['slide_styles'] .= ' display:none;'; } else { $args['slide_styles'] = ''; }
+				if ( $count >= 2 ) { $args['slide_styles'] = $original_slide_styles . ' display:none;'; } else { $args['slide_styles'] = ''; }
 			?>
 
 			<li id="slide-<?php echo esc_attr( $post->ID ); ?>" class="slide slide-number-<?php echo esc_attr( $count ); ?>" <?php if ( '' != $args['slide_styles'] ): ?>style="<?php echo esc_attr( $args['slide_styles'] ); ?>"<?php endif; ?>>
@@ -1504,10 +1506,10 @@ if ( ! function_exists( 'woo_slider_biz_view' ) ) {
 					<?php woo_image( 'width=' . $args['width'] . '&link=img&noheight=true' ); ?>
 					<?php if ( '' != $url ): ?></a><?php endif; ?>
 
-					<?php if ( 'true' == $woo_options['woo_slider_biz_title'] || '' != get_the_content() ): ?>
+					<?php if ( ( isset( $woo_options['woo_slider_biz_title'] ) && 'true' == $woo_options['woo_slider_biz_title'] ) || '' != get_the_content() ): ?>
 					<div class="content">
 
-						<?php if ( 'true' == $woo_options['woo_slider_biz_title'] ): ?>
+						<?php if ( isset( $woo_options['woo_slider_biz_title'] ) && 'true' == $woo_options['woo_slider_biz_title'] ): ?>
 						<div class="title">
 							<h2 class="title">
 								<?php if ( '' != $url ): ?><a href="<?php echo esc_url( $url ); ?>" title="<?php the_title_attribute(); ?>"><?php endif; ?>

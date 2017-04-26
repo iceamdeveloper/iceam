@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.3.5
+ * @version 4.4.6
  *
  * @var bool $must_login
  */
@@ -94,7 +94,7 @@ ob_start();
 						'<td colspan="4">' .
 							'<input type="checkbox" name="optout_'  . esc_attr( $ticket->ID ) . '" id="tribe-tickets-attendees-list-optout-edd">' .
 							'<label for="tribe-tickets-attendees-list-optout-edd">' .
-								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
+								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets-plus' ) .
 							'</label>' .
 						'</td>' .
 					'</tr>';

@@ -10,6 +10,11 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
+msgctxt "Browser title"
+msgid "%s - Order list"
+msgstr ""
+
 #: src/admin-views/meta-fields/_field.php:9
 msgctxt "Attendee information fields"
 msgid "Label:"
@@ -557,10 +562,6 @@ msgstr ""
 msgid "Orders"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
-msgid "%s - Order list"
-msgstr ""
-
 #: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
 msgid "Order"
 msgstr ""
@@ -629,23 +630,23 @@ msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:728
+#: src/Tribe/Commerce/WooCommerce/Main.php:756
 msgid "You'll receive your tickets in another email."
 msgstr "Rebràs els teus tiquets en un altre correu electrònic."
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1443
+#: src/Tribe/Commerce/WooCommerce/Main.php:1475
 msgid "(deleted)"
 msgstr "(eliminat)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1692
+#: src/Tribe/Commerce/WooCommerce/Main.php:1724
 msgid "Event sales report"
 msgstr "Informe de vendes d'esdeveniments"
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1740
+#: src/Tribe/Commerce/WooCommerce/Main.php:1772
 msgid "This is a ticket for the event:"
 msgstr "Tiquet per a l'esdeveniment:"
 
@@ -706,17 +707,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr "Ho sentim, però no hi havia inventari suficient per satisfer la teva comanda al complet! Hem afegit tants tiquets com hem pogut, però et recomanem que revisis la teva comanda (a baix) en cas que necessitis fer alguns ajustos addicionals."
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1513
+#: src/Tribe/Commerce/WooCommerce/Main.php:1545
 msgid "In trash (was %s)"
 msgstr "A la paperera (era %s)"
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1519
+#: src/Tribe/Commerce/WooCommerce/Main.php:1551
 msgid "Deleted"
 msgstr "Eliminat"
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1568
+#: src/Tribe/Commerce/WooCommerce/Main.php:1600
 msgid "Unknown"
 msgstr "Desconegut"
 
@@ -744,7 +745,7 @@ msgstr "Assumpte"
 msgid "Defaults to <code>%s</code>"
 msgstr "El valor predeterminat és <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1717
+#: src/Tribe/Commerce/WooCommerce/Main.php:1749
 msgid "Report"
 msgstr "Informe"
 

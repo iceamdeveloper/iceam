@@ -2,7 +2,7 @@
 /**
  * WC_PB_PIP_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.14.3
  */
@@ -83,7 +83,12 @@ class WC_PB_PIP_Compatibility {
 	public static function add_pip_bundled_item_styles() {
 		?>
 		.bundled-product {
-			padding-left: 35px;
+			padding-left: 2.5em;
+		}
+		.bundled-product-subtotal {
+			font-size: 0.875em;
+			padding-right: 2em;
+			display: block;
 		}
 		<?php
 	}

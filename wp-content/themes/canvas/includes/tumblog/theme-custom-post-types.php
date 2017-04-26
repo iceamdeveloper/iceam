@@ -17,7 +17,7 @@ TABLE OF CONTENTS
 
 class WooTumblog {
 
-	function WooTumblog()
+	function __construct()
 	{
 
 		// Register custom taxonomy

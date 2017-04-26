@@ -2,7 +2,7 @@
 /**
  * WC_PB_OPC_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.11.4
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * One Page Checkout Compatibility.
  *
- * @since  4.11.4
+ * @since  5.2.2
  */
 class WC_PB_OPC_Compatibility {
 
@@ -42,14 +42,22 @@ class WC_PB_OPC_Compatibility {
 
 		if ( $product->is_purchasable() ) {
 
-			ob_start();
+			$bundled_items = $product->get_bundled_items();
 
-			wc_get_template( 'single-product/add-to-cart/bundle.php', array(
-				'bundle_price_data' => $product->get_bundle_price_data(),
-				'bundled_items'     => $product->get_bundled_items()
-			), false, WC_PB()->plugin_path() . '/templates/' );
+			if ( ! empty( $bundled_items ) ) {
 
-			echo str_replace( array( '<form method="post" enctype="multipart/form-data"', '</form>' ), array( '<div', '</div>' ), ob_get_clean() );
+				ob_start();
+
+				wc_get_template( 'single-product/add-to-cart/bundle.php', array(
+					'availability_html' => WC_PB_Core_Compatibility::wc_get_stock_html( $product ),
+					'bundle_price_data' => $product->get_bundle_price_data(),
+					'bundled_items'     => $bundled_items,
+					'product'           => $product,
+					'product_id'        => WC_PB_Core_Compatibility::get_id( $product )
+				), false, WC_PB()->plugin_path() . '/templates/' );
+
+				echo str_replace( array( '<form method="post" enctype="multipart/form-data"', '</form>' ), array( '<div', '</div>' ), ob_get_clean() );
+			}
 		}
 	}
 

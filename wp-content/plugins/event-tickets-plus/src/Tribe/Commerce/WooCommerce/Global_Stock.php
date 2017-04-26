@@ -88,7 +88,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 
 		foreach ( $cart->get_cart() as $cart_item ) {
 			$product = $cart_item['data'];
-			$event   = $woo_tickets->get_event_for_ticket( $product->id );
+			$event   = $woo_tickets->get_event_for_ticket( $woo_tickets->get_product_id( $product ) );
 
 			// Skip non-tickets or tickets that do not utilize global stock
 			if ( ! $event || ! $woo_tickets->uses_global_stock( $event->ID ) || ! $product->managing_stock() ) {
@@ -220,8 +220,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 
 		// Get the total quantity of global stock ordered per event
 		foreach ( $order->get_items() as $item ) {
-			$product      = $order->get_product_from_item( $item );
-			$event        = $woo_tickets->get_event_for_ticket( $product->id );
+			$product      = $woo_tickets->get_product_from_item( $order, $item );
+			$product_id   = $woo_tickets->get_product_id( $product );
+			$event        = $woo_tickets->get_event_for_ticket( $product_id );
 			$global_stock = new Tribe__Tickets__Global_Stock( $event->ID );
 
 			// Skip non-tickets or tickets that do not utilize global stock
@@ -229,11 +230,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 				continue;
 			}
 
-			$ticket = $woo_tickets->get_ticket( $event->ID, $product->id );
+			$ticket = $woo_tickets->get_ticket( $event->ID, $product_id );
 
 			switch ( $ticket->global_stock_mode() ) {
 				case Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE:
-					$capped_tickets[ $product->id ] = (int) $item['qty'];
+					$capped_tickets[ $product_id ] = (int) $item['qty'];
 
 				// Deliberate fallthrough - $total_ordered should accumulate capped *and* global quantities
 				case Tribe__Tickets__Global_Stock::GLOBAL_STOCK_MODE:

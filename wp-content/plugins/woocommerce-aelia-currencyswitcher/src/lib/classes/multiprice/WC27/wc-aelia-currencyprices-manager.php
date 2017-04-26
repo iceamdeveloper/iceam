@@ -846,6 +846,9 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 
 		// Get the method to use to process the product
 		$convert_callback = $this->get_convert_callback($product);
+		
+		
+		
 		if(!empty($convert_callback) && is_callable($convert_callback)) {
 			// Invoke the callback directly, rather than using call_user_func(), for
 			// better performance
@@ -853,6 +856,10 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 			if(is_array($convert_callback)) {
 				$object = array_shift($convert_callback);
 				$method = array_shift($convert_callback);
+				
+				// $object = Aelia\WC\CurrencySwitcher\Subscriptions\Subscriptions_Integration Object
+				// $method = "convert_subscription_product_prices"
+				
 				$product = $object->$method($product, $currency);
 			}
 			else {
@@ -864,7 +871,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 			// If no conversion function is found, use the generic one
 			$product = $this->convert_generic_product_prices($product, $currency);
 		}
-
+		
 		// Assign the original product to the processed one
 		//$product->currencyswitcher_original_product = $original_product;
 		//// Remove "conversion is in progress" flag from the original product, in case
@@ -1602,8 +1609,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @since 4.4.8.170210
 	 */
 	protected function product_requires_conversion($product, $currency) {
-		// If the product is already in the target currency, it doesn't require
-		// conversion
+		// If the product is already in the target currency, it doesn't require conversion
 		return empty($product->currency) || ($product->currency != $currency);
 	}
 
@@ -1616,10 +1622,12 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 */
 	public function woocommerce_product_get_price($price, $product = null) {
 		$selected_currency = $this->get_selected_currency();
+		
 		if($this->product_requires_conversion($product, $selected_currency)) {
-			$product = $this->convert_product_prices($product, $selected_currency);
+			$product = $this->convert_product_prices($product, $selected_currency); // line ~850
 			$price = $product->price;
 		}
+		
 		return $price;
 	}
 

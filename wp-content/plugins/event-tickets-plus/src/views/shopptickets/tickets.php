@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/shopptickets/tickets.php
  *
- * @version 4.3.5
+ * @version 4.4.6
  *
  * @var bool $must_login
  */
@@ -72,7 +72,7 @@ ob_start();
 						'<td colspan="4">' .
 							'<input type="checkbox" name="tribe_shopp_optout" id="tribe-tickets-attendees-list-optout-shopp">' .
 							'<label for="tribe-tickets-attendees-list-optout-shopp">' .
-								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) .
+								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets-plus' ) .
 							'</label>' .
 						'</td>' .
 					'</tr>';

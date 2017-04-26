@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin_Notices class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */

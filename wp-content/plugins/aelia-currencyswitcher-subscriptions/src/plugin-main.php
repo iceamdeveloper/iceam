@@ -13,7 +13,7 @@ use Aelia\WC\Logger;
  * Aelia Currency Switcher Subscriptions Integration plugin.
  **/
 class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
-	public static $version = '1.3.4.170422';
+	public static $version = '1.3.5.170425';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;

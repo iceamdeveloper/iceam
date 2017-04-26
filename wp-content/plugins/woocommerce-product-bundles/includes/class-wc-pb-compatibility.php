@@ -2,7 +2,7 @@
 /**
  * WC_PB_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.6.4
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  5.1.4
+ * @version  5.2.0
  */
 class WC_PB_Compatibility {
 
@@ -83,7 +83,7 @@ class WC_PB_Compatibility {
 	protected function __construct() {
 
 		$this->required = array(
-			'cp'     => '3.8.0',
+			'cp'     => '3.9.0',
 			'addons' => '2.7.16',
 			'minmax' => '1.0.6'
 		);
@@ -180,6 +180,11 @@ class WC_PB_Compatibility {
 		// WP Import/Export support.
 		require_once( 'compatibility/class-wp-ie-compatibility.php' );
 
+		// WooCommerce Give Products support.
+		if ( class_exists( 'WC_Give_Products' ) ) {
+			require_once( 'compatibility/class-wc-give-products-compatibility.php' );
+		}
+
 		// Shipwire integration.
 		if ( class_exists( 'WC_Shipwire' ) ) {
 			require_once( 'compatibility/class-wc-shipwire-compatibility.php' );
@@ -187,11 +192,6 @@ class WC_PB_Compatibility {
 
 		// Shipstation integration.
 		require_once( 'compatibility/class-wc-shipstation-compatibility.php' );
-
-		// WooCommerce Give Products support.
-		if ( class_exists( 'WC_Give_Products' ) ) {
-			require_once( 'compatibility/class-wc-give-products-compatibility.php' );
-		}
 	}
 
 	/**

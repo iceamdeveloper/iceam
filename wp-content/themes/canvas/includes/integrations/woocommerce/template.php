@@ -181,17 +181,6 @@ function woo_add_nav_cart_link () {
 }
 
 /**
- * Inserts HTML5 shiv
- * @since  5.7.0
- * @return void
- */
-if ( ! function_exists( 'woocommerce_html5' ) ) {
-	function woocommerce_html5() {
-		echo '<!--[if lt IE 9]><script src="https://html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->';
-	}
-}
-
-/**
  * If theme lightbox is enabled, disable the WooCommerce lightbox and make product images prettyPhoto galleries
  * @since  5.7.0
  * @return void

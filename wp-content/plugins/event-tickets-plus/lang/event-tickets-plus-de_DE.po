@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-03-09 11:07:36+0000\n"
+"PO-Revision-Date: 2017-03-31 13:07:33+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -10,32 +10,37 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
+msgctxt "Browser title"
+msgid "%s - Order list"
+msgstr ""
+
 #: src/admin-views/meta-fields/_field.php:9
 msgctxt "Attendee information fields"
 msgid "Label:"
-msgstr ""
+msgstr "Beschriftung:"
 
 #: src/admin-views/meta-fields/_field.php:17
 msgctxt "Attendee information fields"
 msgid "Required?"
-msgstr ""
+msgstr "Erforderlich?"
 
 #: src/admin-views/meta-fields/_field.php:21
 msgctxt "Attendee information fields"
 msgid "Delete this field"
-msgstr ""
+msgstr "Lösche dieses Feld"
 
 #: src/admin-views/meta-fields/checkbox.php:11
 #: src/admin-views/meta-fields/radio.php:11
 #: src/admin-views/meta-fields/select.php:11
 msgctxt "Attendee information fields"
 msgid "Options (one per line)"
-msgstr ""
+msgstr "Optionen (eine per Linie)"
 
 #: src/admin-views/meta-fields/text.php:13
 msgctxt "Attendee information fields"
 msgid "Multi-line text field?"
-msgstr ""
+msgstr "Mehrzeiliges Textfeld?"
 
 #: src/Tribe/QR.php:103
 msgid "Could not render QR code because gzuncompress() is not available"
@@ -557,10 +562,6 @@ msgstr "Verkäufe für diese Veranstaltung einsehen"
 msgid "Orders"
 msgstr "Bestellungen:"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
-msgid "%s - Order list"
-msgstr "%s - Bestellliste"
-
 #: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
 msgid "Order"
 msgstr "Bestellung"
@@ -629,23 +630,23 @@ msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:728
+#: src/Tribe/Commerce/WooCommerce/Main.php:756
 msgid "You'll receive your tickets in another email."
 msgstr "Sie erhalten Ihre Tickets in einem gesonderten E-Mail."
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1443
+#: src/Tribe/Commerce/WooCommerce/Main.php:1475
 msgid "(deleted)"
 msgstr "(gelöscht)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1692
+#: src/Tribe/Commerce/WooCommerce/Main.php:1724
 msgid "Event sales report"
 msgstr "Event-Umsatzbericht"
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1740
+#: src/Tribe/Commerce/WooCommerce/Main.php:1772
 msgid "This is a ticket for the event:"
 msgstr "Dies ist ein Ticket für das Event:"
 
@@ -706,17 +707,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr "Es tut uns leid, aber es gab nicht genügend Bestand um Ihre Bestellung vollständig zu erfüllen! Wir haben so viele Tickets wie wir konnten, aber lesen Sie Ihre Bestellung (siehe unten bitte) für den Fall, dass Sie einige weiteren Anpassungen vornehmen müssen hinzugefügt."
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1513
+#: src/Tribe/Commerce/WooCommerce/Main.php:1545
 msgid "In trash (was %s)"
 msgstr "im Papioerkorb (war %s)"
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1519
+#: src/Tribe/Commerce/WooCommerce/Main.php:1551
 msgid "Deleted"
 msgstr "Gelöscht"
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1568
+#: src/Tribe/Commerce/WooCommerce/Main.php:1600
 msgid "Unknown"
 msgstr "Unbekannt"
 
@@ -744,7 +745,7 @@ msgstr "Betreff"
 msgid "Defaults to <code>%s</code>"
 msgstr "Standards zu <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1717
+#: src/Tribe/Commerce/WooCommerce/Main.php:1749
 msgid "Report"
 msgstr "Bericht"
 

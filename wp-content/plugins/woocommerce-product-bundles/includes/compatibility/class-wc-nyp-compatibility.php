@@ -2,7 +2,7 @@
 /**
  * WC_PB_NYP_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.1.4
  */

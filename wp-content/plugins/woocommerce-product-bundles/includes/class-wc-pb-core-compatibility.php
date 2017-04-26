@@ -2,7 +2,7 @@
 /**
  * WC_PB_Core_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.7.6
  */
@@ -16,9 +16,21 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Functions for WC core back-compatibility.
  *
  * @class    WC_PB_Core_Compatibility
- * @version  5.1.0
+ * @version  5.2.0
  */
 class WC_PB_Core_Compatibility {
+
+	/**
+	 * Cache 'gte' comparison results.
+	 * @var array
+	 */
+	private static $is_wc_version_gte = array();
+
+	/**
+	 * Cache 'gt' comparison results.
+	 * @var array
+	 */
+	private static $is_wc_version_gt = array();
 
 	/**
 	 * Helper method to get the version of the currently installed WooCommerce.
@@ -39,7 +51,7 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean
 	 */
 	public static function is_wc_version_gte_2_7() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.7', '>=' );
+		return self::is_wc_version_gte( '2.7' );
 	}
 
 	/**
@@ -50,7 +62,7 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean
 	 */
 	public static function is_wc_version_gte_2_6() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.6', '>=' );
+		return self::is_wc_version_gte( '2.6' );
 	}
 
 	/**
@@ -61,7 +73,7 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean
 	 */
 	public static function is_wc_version_gte_2_5() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.5', '>=' );
+		return self::is_wc_version_gte( '2.5' );
 	}
 
 	/**
@@ -72,7 +84,7 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean
 	 */
 	public static function is_wc_version_gte_2_4() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.4', '>=' );
+		return self::is_wc_version_gte( '2.4' );
 	}
 
 	/**
@@ -83,7 +95,7 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean
 	 */
 	public static function is_wc_version_gte_2_3() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.3', '>=' );
+		return self::is_wc_version_gte( '2.3' );
 	}
 
 	/**
@@ -94,18 +106,22 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean
 	 */
 	public static function is_wc_version_gte_2_2() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.2', '>=' );
+		return self::is_wc_version_gte( '2.2' );
 	}
 
 	/**
-	 * Returns true if the installed version of WooCommerce is less than 2.2.
+	 * Returns true if the installed version of WooCommerce is greater than or equal to $version.
 	 *
-	 * @since  4.7.6
+	 * @since  5.2.0
 	 *
-	 * @return boolean
+	 * @param  string  $version the version to compare
+	 * @return boolean true if the installed version of WooCommerce is > $version
 	 */
-	public static function is_wc_version_lt_2_2() {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), '2.2', '<' );
+	public static function is_wc_version_gte( $version ) {
+		if ( ! isset( self::$is_wc_version_gte[ $version ] ) ) {
+			self::$is_wc_version_gte[ $version ] = self::get_wc_version() && version_compare( self::get_wc_version(), $version, '>=' );
+		}
+		return self::$is_wc_version_gte[ $version ];
 	}
 
 	/**
@@ -117,7 +133,10 @@ class WC_PB_Core_Compatibility {
 	 * @return boolean true if the installed version of WooCommerce is > $version
 	 */
 	public static function is_wc_version_gt( $version ) {
-		return self::get_wc_version() && version_compare( self::get_wc_version(), $version, '>' );
+		if ( ! isset( self::$is_wc_version_gt[ $version ] ) ) {
+			self::$is_wc_version_gt[ $version ] = self::get_wc_version() && version_compare( self::get_wc_version(), $version, '>' );
+		}
+		return self::$is_wc_version_gt[ $version ];
 	}
 
 	/**
@@ -135,7 +154,6 @@ class WC_PB_Core_Compatibility {
 		if ( self::is_wc_version_gte_2_2() ) {
 			return wc_get_product( $the_product, $args );
 		} else {
-
 			return get_product( $the_product, $args );
 		}
 	}
@@ -272,6 +290,27 @@ class WC_PB_Core_Compatibility {
 	}
 
 	/**
+	 * Back-compat wrapper for 'WC_Product_Factory::get_product_type'.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  mixed  $product_id
+	 * @return mixed
+	 */
+	public static function get_product_type( $product_id ) {
+		$product_type = false;
+		if ( $product_id ) {
+			if ( self::is_wc_version_gte_2_7() ) {
+				$product_type = WC_Product_Factory::get_product_type( $product_id );
+			} else {
+				$terms        = get_the_terms( $product_id, 'product_type' );
+				$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
+			}
+		}
+		return $product_type;
+	}
+
+	/**
 	 * Back-compat wrapper for 'get_parent_id'.
 	 *
 	 * @since  5.1.0
@@ -308,15 +347,15 @@ class WC_PB_Core_Compatibility {
 	 *
 	 * @since  5.1.0
 	 *
-	 * @param  object  $obj
-	 * @param  string  $name
-	 * @param  string  $context
+	 * @param  WC_Data  $obj
+	 * @param  string   $name
+	 * @param  string   $context
 	 * @return mixed
 	 */
-	public static function get_prop( $obj, $name, $context = 'view' ) {
+	public static function get_prop( $obj, $name, $context = 'edit' ) {
 		if ( self::is_wc_version_gte_2_7() ) {
 			$get_fn = 'get_' . $name;
-			return is_callable( array( $obj, $get_fn ) ) ? $obj->$get_fn( $context ) : null;
+			return is_callable( array( $obj, $get_fn ) ) ? $obj->$get_fn( $context ) : $obj->get_meta( '_' . $name, true );
 		} else {
 
 			if ( 'status' === $name ) {
@@ -336,18 +375,116 @@ class WC_PB_Core_Compatibility {
 	 *
 	 * @since  5.1.0
 	 *
-	 * @param  WC_Product  $product
-	 * @param  string      $name
-	 * @param  mixed       $value
+	 * @param  WC_Data  $obj
+	 * @param  string   $name
+	 * @param  mixed    $value
 	 * @return void
 	 */
 	public static function set_prop( $obj, $name, $value ) {
 		if ( self::is_wc_version_gte_2_7() ) {
 			$set_fn = 'set_' . $name;
-			$obj->$set_fn( $value );
+			if ( is_callable( array( $obj, $set_fn ) ) ) {
+				$obj->$set_fn( $value );
+			} else {
+				$obj->add_meta_data( '_' . $name, $value, true );
+			}
 		} else {
 			$obj->$name = $value;
 		}
+	}
+
+	/**
+	 * Back-compat wrapper for getting CRUD object meta.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  WC_Data  $obj
+	 * @param  string   $key
+	 * @return mixed
+	 */
+	public static function get_meta( $obj, $key ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return $obj->get_meta( $key, true );
+		} else {
+			return get_post_meta( $obj->id, $key, true );
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for 'wc_get_price_including_tax'.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  WC_Product  $product
+	 * @param  array       $args
+	 * @return mixed
+	 */
+	public static function wc_get_price_including_tax( $product, $args ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return wc_get_price_including_tax( $product, $args );
+		} else {
+
+			$qty   = isset( $args[ 'qty' ] ) ? $args[ 'qty' ] : 1;
+			$price = isset( $args[ 'price' ] ) ? $args[ 'price' ] : '';
+
+			return $product->get_price_including_tax( $qty, $price );
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for 'wc_get_price_excluding_tax'.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  WC_Product  $product
+	 * @param  array       $args
+	 * @return mixed
+	 */
+	public static function wc_get_price_excluding_tax( $product, $args ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return wc_get_price_excluding_tax( $product, $args );
+		} else {
+
+			$qty   = isset( $args[ 'qty' ] ) ? $args[ 'qty' ] : 1;
+			$price = isset( $args[ 'price' ] ) ? $args[ 'price' ] : '';
+
+			return $product->get_price_excluding_tax( $qty, $price );
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for 'get_default_attributes'.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  WC_Product  $product
+	 * @return mixed
+	 */
+	public static function get_default_attributes( $product, $context = 'view' ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			return $product->get_default_attributes( $context );
+		} else {
+			return $product->get_variation_default_attributes();
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for 'wc_get_stock_html'.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  WC_Product  $product
+	 * @return mixed
+	 */
+	public static function wc_get_stock_html( $product ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			$html = wc_get_stock_html( $product );
+		} else {
+			$availability      = $product->get_availability();
+			$availability_html = empty( $availability[ 'availability' ] ) ? '' : '<p class="stock ' . esc_attr( $availability[ 'class' ] ) . '">' . esc_html( $availability[ 'availability' ] ) . '</p>';
+			$html              = apply_filters( 'woocommerce_stock_html', $availability_html, $availability[ 'availability' ], $product );
+		}
+		return $html;
 	}
 
 	/**
@@ -405,6 +542,25 @@ class WC_PB_Core_Compatibility {
 			WC_Cache_Helper::incr_cache_prefix( $group );
 		} else {
 			wp_cache_incr( 'wc_' . $group . '_cache_prefix', 1, $group );
+		}
+	}
+
+	/**
+	 * Backwards compatible logging using 'WC_Logger' class.
+	 *
+	 * @since  5.2.0
+	 *
+	 * @param  string  $message
+	 * @param  string  $level
+	 * @param  string  $context
+	 */
+	public static function log( $message, $level, $context ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			$logger = wc_get_logger();
+			$logger->log( $level, $message, array( 'source' => $context ) );
+		} else {
+			$logger = new WC_Logger();
+			$logger->add( $context, $message );
 		}
 	}
 }

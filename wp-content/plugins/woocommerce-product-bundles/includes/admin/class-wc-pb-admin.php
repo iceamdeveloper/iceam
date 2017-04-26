@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    1.0.0
  */
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Loads admin scripts, includes admin classes and adds admin hooks.
  *
  * @class    WC_PB_Admin
- * @version  5.0.0
+ * @version  5.2.0
  */
 class WC_PB_Admin {
 
@@ -51,8 +51,13 @@ class WC_PB_Admin {
 	 */
 	public static function includes() {
 
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			require_once( 'meta-boxes/class-wc-pb-meta-box-product-data.php' );
+		} else {
+			require_once( 'meta-boxes/legacy/class-wc-pb-meta-box-product-data.php' );
+		}
+
 		require_once( 'class-wc-pb-admin-post-types.php' );
-		require_once( 'meta-boxes/class-wc-pb-meta-box-product-data.php' );
 		require_once( 'class-wc-pb-admin-ajax.php' );
 	}
 
@@ -63,16 +68,16 @@ class WC_PB_Admin {
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_2() ) {
-			$writepanel_dependency = 'wc-admin-meta-boxes';
-		} else {
-			$writepanel_dependency = 'woocommerce_admin_meta_boxes';
-		}
+		wp_register_script( 'wc-pb-admin-product-panel', WC_PB()->plugin_url() . '/assets/js/wc-pb-admin-write-panels' . $suffix . '.js', array( 'jquery', 'jquery-ui-datepicker', 'wc-admin-meta-boxes' ), WC_PB()->version );
 
-		wp_register_script( 'wc-pb-admin-product-panel', WC_PB()->plugin_url() . '/assets/js/wc-pb-admin-write-panels' . $suffix . '.js', array( 'jquery', 'jquery-ui-datepicker', $writepanel_dependency ), WC_PB()->version );
 		wp_register_style( 'wc-pb-admin-css', WC_PB()->plugin_url() . '/assets/css/wc-pb-admin.css', array(), WC_PB()->version );
+		wp_style_add_data( 'wc-pb-admin-css', 'rtl', 'replace' );
+
 		wp_register_style( 'wc-pb-admin-product-css', WC_PB()->plugin_url() . '/assets/css/wc-pb-admin-write-panels.css', array( 'woocommerce_admin_styles' ), WC_PB()->version );
+		wp_style_add_data( 'wc-pb-admin-product-css', 'rtl', 'replace' );
+
 		wp_register_style( 'wc-pb-admin-edit-order-css', WC_PB()->plugin_url() . '/assets/css/wc-pb-admin-edit-order.css', array( 'woocommerce_admin_styles' ), WC_PB()->version );
+		wp_style_add_data( 'wc-pb-admin-edit-order-css', 'rtl', 'replace' );
 
 		wp_enqueue_style( 'wc-pb-admin-css' );
 
@@ -87,18 +92,7 @@ class WC_PB_Admin {
 			$params = array(
 				'add_bundled_product_nonce' => wp_create_nonce( 'wc_bundles_add_bundled_product' ),
 				'is_wc_version_gte_2_3'     => WC_PB_Core_Compatibility::is_wc_version_gte_2_3() ? 'yes' : 'no',
-				'i18n_matches_1'            => _x( 'One result is available, press enter to select it.', 'enhanced select', 'woocommerce' ),
-				'i18n_matches_n'            => _x( '%qty% results are available, use up and down arrow keys to navigate.', 'enhanced select', 'woocommerce' ),
-				'i18n_no_matches'           => _x( 'No matches found', 'enhanced select', 'woocommerce' ),
-				'i18n_ajax_error'           => _x( 'Loading failed', 'enhanced select', 'woocommerce' ),
-				'i18n_input_too_short_1'    => _x( 'Please enter 1 or more characters', 'enhanced select', 'woocommerce' ),
-				'i18n_input_too_short_n'    => _x( 'Please enter %qty% or more characters', 'enhanced select', 'woocommerce' ),
-				'i18n_input_too_long_1'     => _x( 'Please delete 1 character', 'enhanced select', 'woocommerce' ),
-				'i18n_input_too_long_n'     => _x( 'Please delete %qty% characters', 'enhanced select', 'woocommerce' ),
-				'i18n_selection_too_long_1' => _x( 'You can only select 1 item', 'enhanced select', 'woocommerce' ),
-				'i18n_selection_too_long_n' => _x( 'You can only select %qty% items', 'enhanced select', 'woocommerce' ),
-				'i18n_load_more'            => _x( 'Loading more results&hellip;', 'enhanced select', 'woocommerce' ),
-				'i18n_searching'            => _x( 'Searching&hellip;', 'enhanced select', 'woocommerce' ),
+				'is_wc_version_gte_2_7'     => WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? 'yes' : 'no'
 			);
 
 			wp_localize_script( 'wc-pb-admin-product-panel', 'wc_bundles_admin_params', $params );

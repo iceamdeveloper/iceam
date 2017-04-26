@@ -321,20 +321,22 @@ class WooThemes_Sensei_Certificates {
 	 * @return void
 	 */
 	public function post_type_custom_column_content( $column_name, $post_ID ) {
-
 		$user_id = get_post_meta( $post_ID, 'learner_id', true );
 		$course_id = get_post_meta( $post_ID, 'course_id', true );
+		if ( empty( $user_id ) || empty( $course_id ) ) {
+			echo '-';
+			return;
+		}
 		$user = get_userdata( $user_id );
 		$course = get_post( $course_id );
 		$course_end_date = WooThemes_Sensei_Utils::sensei_get_activity_value( array( 'post_id' => $course_id, 'user_id' => $user_id, 'type' => 'sensei_course_status', 'field' => 'comment_date' ) );
-		$certificate_hash = esc_html( substr( md5( $course_id . $user_id ), -8 ) );
 
 		switch ( $column_name ) {
 			case "learner" :
-				echo '<a href="' . add_query_arg( array( 'page' => 'sensei_analysis', 'user' => intval( $user_id ), 'course_id' => intval( $course_id ) ), admin_url( 'edit.php?post_type=lesson' ) ) . '">'.$user->user_login.'</a>';
+				echo '<a href="' . add_query_arg( array( 'page' => 'sensei_analysis', 'user_id' => intval( $user_id ), 'course_id' => intval( $course_id ) ), admin_url( 'admin.php' ) ) . '">' . $user->display_name . ' (' . $user->user_login . ')</a>';
 				break;
 			case "course" :
-				echo '<a href="' . add_query_arg( array( 'page' => 'sensei_analysis', 'course_id' => intval( $course_id ) ), admin_url( 'edit.php?post_type=lesson' ) ) . '">'.$course->post_title.'</a>';
+				echo '<a href="' . add_query_arg( array( 'page' => 'sensei_analysis', 'course_id' => intval( $course_id ) ), admin_url( 'admin.php' ) ) . '">' . $course->post_title . '</a>';
 				break;
 			case "date_completed" :
 				echo $course_end_date;
@@ -358,30 +360,22 @@ class WooThemes_Sensei_Certificates {
 	 */
 	public function generate_certificate_number( $user_id = 0, $course_id = 0 ) {
 
-		if( ! $user_id || ! $course_id ) {
+		if( ! $user_id || ! $course_id || !is_int( $user_id ) || !is_int( $course_id ) ) {
 			return;
 		}
+		$user_id = absint( $user_id );
+		$course_id = absint( $course_id );
+		$data_store = new Woothemes_Sensei_Certificate_Data_Store();
 
-		$cert_args = array(
-			'post_author' => intval( $user_id ),
-			'post_title' => esc_html( substr( md5( $course_id . $user_id ), -8 ) ),
-			'post_name' => esc_html( substr( md5( $course_id . $user_id ), -8 ) ),
-			'post_type' => 'certificate',
-			'post_status'   => 'publish'
-		);
-		$post_id = wp_insert_post( $cert_args, $wp_error = false );
+		$certificate_id = $data_store->insert( $user_id, $course_id );
 
-		if ( ! is_wp_error( $post_id ) ) {
-
-            add_post_meta($post_id, 'course_id', intval($course_id));
-            add_post_meta($post_id, 'learner_id', intval($user_id));
-            add_post_meta($post_id, 'certificate_hash', esc_html(substr(md5($course_id . $user_id), -8)));
+		if ( ! is_wp_error( $certificate_id ) ) {
 
             $data = array(
-                'post_id' => intval($post_id),
-                'data' => esc_html(substr(md5($course_id . $user_id), -8)),
+                'post_id' => absint( $certificate_id ),
+                'data' => Woothemes_Sensei_Certificates_Utils::get_certificate_hash( $course_id, $user_id ),
                 'type' => 'sensei_certificate',
-                'user_id' => intval($user_id)
+                'user_id' => intval( $user_id )
             );
 
             WooThemes_Sensei_Utils::sensei_log_activity( $data );
@@ -679,7 +673,7 @@ class WooThemes_Sensei_Certificates {
 		} // End If Statement
 
 		// Logo image
-		if ( is_numeric( $this->image_id  ) && isset( $this->image_id ) && 0 < intval( $this->image_id ) ) {
+		if ( isset( $this->image_id ) && is_numeric( $this->image_id  ) && 0 < intval( $this->image_id ) ) {
 			$image_src = wp_get_attachment_url( $this->image_id );
 
 			// Use image path instead of URL

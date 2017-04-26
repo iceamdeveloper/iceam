@@ -8,6 +8,7 @@
  * @subpackage Template
  */
 
+ 
 global $post, $wp_query, $woo_options;
 
 $settings = array(
@@ -33,6 +34,7 @@ if ( 'one-col' != $layout ) {
 <aside id="sidebar">
 
 <?php
+
 	woo_sidebar_inside_before();
 	woo_sidebar( 'primary' );
 	woo_sidebar_inside_after();

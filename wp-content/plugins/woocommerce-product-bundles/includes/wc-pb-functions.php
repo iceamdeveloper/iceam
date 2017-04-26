@@ -2,7 +2,7 @@
 /**
  * Product Bundles API functions
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    1.0.0
  */
@@ -297,7 +297,7 @@ function wc_pb_get_bundled_order_items( $container_order_item, $order, $return_i
 
 	if ( wc_pb_is_bundle_container_order_item( $container_order_item ) ) {
 
-		$bundled_cart_keys = unserialize( $container_order_item[ 'bundled_items' ] );
+		$bundled_cart_keys = maybe_unserialize( $container_order_item[ 'bundled_items' ] );
 
 		if ( ! empty( $bundled_cart_keys ) && is_array( $bundled_cart_keys ) ) {
 

@@ -1041,6 +1041,10 @@ class Tribe__Events__Pro__Recurrence__Meta {
 			'exclusions' => array(),
 		);
 
+		// Used in generating all-day durations below.
+		$parent_start_date = strtotime( get_post_meta( $event_id, '_EventStartDate', true ) );
+		$parent_end_date   = strtotime( get_post_meta( $event_id, '_EventEndDate', true ) );
+
 		if ( ! $recurrence_meta['rules'] ) {
 			$recurrences[] = new Tribe__Events__Pro__Null_Recurrence();
 
@@ -1095,8 +1099,13 @@ class Tribe__Events__Pro__Recurrence__Meta {
 					&& 'yes' === $recurrence['custom']['same-time']
 					&& tribe_event_is_all_day( $event_id )
 				) {
-					// In the current implementation, all days events are 1 sec short of being 24hrs in duration
-					$duration = DAY_IN_SECONDS - 1;
+					// In the current implementation, events are considered "all day"
+					// when their length is 1 second short of being 24hrs in duration.
+					// We need to factor this in as follows to preserve duration
+					// of multiday all-day events
+					$diff       = $parent_end_date - $parent_start_date;
+					$num_days   = absint( $diff / DAY_IN_SECONDS ) + 1;
+					$duration   = ( $num_days * DAY_IN_SECONDS ) - 1;
 				}
 
 				$start = strtotime( get_post_meta( $event_id, '_EventStartDate', true ) . '+00:00' );

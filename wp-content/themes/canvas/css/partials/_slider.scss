@@ -37,6 +37,7 @@ html[xmlns] #loopedSlider .slides {display: block;}
 
 body.ie7 #loopedSlider .pagination li { display: inline; zoom: 1; }
 
+div.widget #loopedSlider ul.flex-direction-nav { list-style:none !important; }
 #loopedSlider a.flex-prev { position:absolute; top:0; left:0; height: 100%; width: 5%; }
 #loopedSlider a.flex-next { position:absolute; top:0; right:0; height: 100%; width: 5%; }
 #loopedSlider a.flex-prev, #loopedSlider a.flex-next { opacity:0; background:none; color: rgba(0,0,0,.5); @include transition( 200ms, ease-out ); z-index:99; }

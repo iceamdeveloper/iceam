@@ -2,7 +2,7 @@
 /**
  * WC_PB_Background_Updater class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -12,8 +12,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-include_once( 'libraries/wp-async-request.php' );
-include_once( 'libraries/wp-background-process.php' );
+if ( ! class_exists( 'WP_Async_Request', false ) ) {
+	include_once( 'libraries/wp-async-request.php' );
+}
+
+if ( ! class_exists( 'WP_Background_Process', false ) ) {
+	include_once( 'libraries/wp-background-process.php' );
+}
 
 /**
  * Background Updater.
@@ -23,7 +28,6 @@ include_once( 'libraries/wp-background-process.php' );
  *
  * @class    WC_PB_Background_Updater
  * @version  5.0.0
- * @since    5.0.0
  */
 class WC_PB_Background_Updater extends WP_Background_Process {
 
@@ -38,10 +42,9 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 	public function dispatch() {
 
 		$dispatched = parent::dispatch();
-		$logger     = new WC_Logger();
 
 		if ( is_wp_error( $dispatched ) ) {
-			$logger->add( 'wc_pb_db_updates', sprintf( 'Unable to dispatch WooCommerce Product Bundles updater: %s', $dispatched->get_error_message() ) );
+			WC_PB_Core_Compatibility::log( sprintf( 'Unable to dispatch WooCommerce Product Bundles updater: %s', $dispatched->get_error_message() ), 'error', 'wc_pb_db_updates' );
 		}
 	}
 
@@ -126,13 +129,11 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 	 */
 	protected function task( $callback ) {
 
-		$logger = new WC_Logger();
-
 		include_once( 'wc-pb-update-functions.php' );
 
 		if ( is_callable( $callback ) ) {
 
-			$logger->add( 'wc_pb_db_updates', sprintf( '- Running %s callback...', $callback ) );
+			WC_PB_Core_Compatibility::log( sprintf( '- Running %s callback...', $callback ), 'info', 'wc_pb_db_updates' );
 
 			$result = call_user_func_array( $callback, array( $this ) );
 
@@ -146,10 +147,10 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 				$message = sprintf( '- Finished %s callback.', $callback );
 			}
 
-			$logger->add( 'wc_pb_db_updates', $message );
+			WC_PB_Core_Compatibility::log( $message, 'info', 'wc_pb_db_updates' );
 
 		} else {
-			$logger->add( 'wc_pb_db_updates', sprintf( '- Could not find %s callback.', $callback ) );
+			WC_PB_Core_Compatibility::log( sprintf( '- Could not find %s callback.', $callback ), 'notice', 'wc_pb_db_updates' );
 		}
 
 		return in_array( $result, array( -1, -2 ) ) ? $callback : false;

@@ -1,4 +1,35 @@
 *** Dynamic Pricing Changelog ***
+2017.04.26 - version 3.0.7
+    * Update:  Better compatibility with Product Bundles.
+
+2017.04.21 - version 3.0.6
+    * Fix:  Patch to correct for error in WC < 3.0 where $product->get_parent() does not actually return the parent.
+
+2017.04.18 - version 3.0.5
+    * Fix:  Correct fatal error on variable products for older WooCommerce versions less than 3.0.0
+
+2017.04.17 - version 3.0.4
+    * Update: Switch context to use spl_object_hash
+    * Fix:  Call get_price on cart items in edit mode to prevent extensions from applying duplicate modifications to the cart item price.
+    * Fix:  Call get_price in get price to discount in edit mode to prevent subscriptions from applying the subscription price twice.
+    
+2017.04.10 - version 3.0.3
+    * Fix:  Fixes and issue with Composite products displaying incorrect cart line item totals.
+
+2017.04.05 - version 3.0.2
+    * Fix:  Correct issue where 0 based discounts for variable products where not properly reflected in the catalog or single product page.
+
+2017.04.04 - version 3.0.1
+    * Fix:  Correct issue with invalid WC 3.0 delete_meta method.
+    * Fix:  Correct issue with invalid WC 3.0 update_meta method.
+    * Fix:  Correct deprecated get_product warning in admin.
+    
+2017.03.28 - version 3.0.0
+    * Update:  Front End WC 2.7 Ready
+
+2017.02.15 - version 2.12.3
+    * Fix:  Fix issue where Product Brand discounts would not calculate when using advanced rules and having more than one quantity in the cart.
+
 2016.12.29 - version 2.12.2
     * Fix:  Fix issue when using multiple rules, with role selection and selecting a label from one rule set selected the role from another.  #23
     * Fix:  Fix issue where the dates for advanced category rules were not respected in the shop page.

@@ -1,5 +1,31 @@
 *** WooCommerce Product Bundles ***
 
+2017.04.20 - version 5.2.2
+ * Fix - One Page Checkout integration.
+ * Fix - Workaround for "Request-URI Too Long" error when configuring the "Filter Variations" option of bundled variable products with more than 100 variations.
+ * Fix - Some warnings when using PHP 7.1.
+ * Fix - Added RTL styles.
+
+2017.04.11 - version 5.2.1
+ * Fix - Infinite loop when exporting order data to Shipstation/Shipwire under WC 3.0. Triggered when 'WC_PB_Order::get_order_items' is used as a 'woocommerce_order_get_items' filter callback.
+ * Fix - Bundled variable product image not updating when choosing variations if the featured post image is undefined.
+
+2017.03.24 - version 5.2.0
+ * Important - WooCommerce 3.0 support added.
+ * Dev - 'WC_Product_Bundle' refactored based on the core CRUD pattern (WC 3.0+ only). Type-specific data is now handled using getters/setters and a dedicated data store class, 'WC_Product_Bundle_Data_Store_CPT'.
+ * Dev - It is now possible to create bundled items directly on 'WC_Product_Bundle' objects using 'WC_Product_Bundle::set_bundled_data_items' (WC 3.0+ only).
+ * Dev - Introduce unit tests for 'WC_PB_Order' and 'WC_Product_Bundle' classes.
+ * Feature - Create bundles using the REST API '/products/' endpoint (WC 3.0+ only). Read more at https://docs.woocommerce.com/document/bundles/bundles-rest-api-reference/ .
+ * Feature - Add bundles to orders using the REST API '/orders/' endpoint (WC 3.0+ only). Read more at https://docs.woocommerce.com/document/bundles/bundles-rest-api-reference/ .
+ * Feature - New REST API 'bundle_layout' field with get/update support.
+ * Feature - Allow variations filtering of bundled Variable Subscriptions (WC 3.0+ only).
+ * Fix - Weight of composite products in shipping packages does not include the weight of bundled products physically packaged in a bundle that is itself physically packaged in its parent composite.
+ * Fix - Infinite loop when viewing an order that contains a bundle set to be preordered using the WooCommerce Pre-Orders extension.
+ * Fix - Strip slashes when validating and saving overridden attribute default values.
+ * Fix - Sold Individually > "Matching configurations only" option not working correctly.
+ * Fix - Bundled product indentation in cart is not preserved after refreshing cart contents.
+ * Tweak - Renamed Sold Individually > "Identical configurations only" option to "Matching configurations only".
+
 2017.02.23 - version 5.1.4
  * Feature - Disable bundled Product Add-Ons. New "Disable Add-Ons" option found under the "Advanced Settings" tab of each bundled item.
  * Tweak - Simplify price filter widget meta query.

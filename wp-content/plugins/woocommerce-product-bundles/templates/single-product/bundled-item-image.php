@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 4.10.2
+ * @version 5.2.0
  */
 
 // Exit if accessed directly.
@@ -16,19 +16,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-?><div class="bundled_product_images"><?php
+?><div class="<?php echo esc_attr( implode( ' ', $gallery_classes ) ); ?>"><?php
 
-	if ( has_post_thumbnail( $post_id ) ) {
+	if ( has_post_thumbnail( $product_id ) ) {
 
-		$image_title = esc_attr( get_the_title( get_post_thumbnail_id( $post_id ) ) );
-		$image_link  = wp_get_attachment_url( get_post_thumbnail_id( $post_id ) );
-		$image       = get_the_post_thumbnail( $post_id, apply_filters( 'bundled_product_large_thumbnail_size', 'shop_catalog' ), array(
-			'title' => $image_title
+		$image_post_id = get_post_thumbnail_id( $product_id );
+		$image_title   = esc_attr( get_the_title( $image_post_id ) );
+		$image_data    = wp_get_attachment_image_src( $image_post_id, 'full' );
+		$image_link    = $image_data[ 0 ];
+		$image         = get_the_post_thumbnail( $product_id, apply_filters( 'bundled_product_large_thumbnail_size', 'shop_catalog' ), array(
+			'title'                   => $image_title,
+			'data-large_image'        => $image_link,
+			'data-large_image_width'  => $image_data[ 1 ],
+			'data-large_image_height' => $image_data[ 2 ],
 		) );
 
-		echo apply_filters( 'woocommerce_bundled_product_image_html', sprintf( '<a href="%s" class="bundled_product_image zoom" title="%s" data-rel="prettyPhoto">%s</a>', $image_link, $image_title, $image ), $post_id );
+		$html  = '<figure class="bundled_product_image woocommerce-product-gallery__image">';
+		$html .= sprintf( '<a href="%1$s" class="image zoom" title="%2$s" data-rel="%3$s">%4$s</a>', $image_link, $image_title, $image_rel, $image );
+		$html .= '</figure>';
+
 	} else {
-		echo apply_filters( 'woocommerce_bundled_product_image_html', sprintf( '<a href="%1$s" class="bundled_product_image zoom" title="%2$s" data-rel="prettyPhoto"><img src="%1$s" alt="%2$s" /></a>', wc_placeholder_img_src(), __( 'Placeholder', 'woocommerce' ) ), $post_id );
+
+		$html  = '<figure class="bundled_product_image woocommerce-product-gallery__image--placeholder">';
+		$html .= sprintf( '<a href="%1$s" class="placeholder_image zoom" data-rel="%3$s"><img class="wp-post-image" src="%1$s" alt="%2$s"/></a>', wc_placeholder_img_src(), __( 'Bundled product placeholder image', 'woocommerce-composite-products' ), $image_rel );
+		$html .= '</figure>';
 	}
+
+	echo apply_filters( 'woocommerce_bundled_product_image_html', $html, $product_id, $bundled_item );
 
 ?></div>

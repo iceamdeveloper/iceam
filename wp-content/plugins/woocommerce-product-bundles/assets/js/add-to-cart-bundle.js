@@ -33,14 +33,15 @@ function wc_pb_woocommerce_number_format( price ) {
 
 	var price_format = '';
 
-	if ( position == 'left' )
+	if ( position == 'left' ) {
 		price_format = '<span class="amount">' + symbol + price + '</span>';
-	else if ( position == 'right' )
+	} else if ( position == 'right' ) {
 		price_format = '<span class="amount">' + price + symbol +  '</span>';
-	else if ( position == 'left_space' )
+	} else if ( position == 'left_space' ) {
 		price_format = '<span class="amount">' + symbol + ' ' + price + '</span>';
-	else if ( position == 'right_space' )
+	} else if ( position == 'right_space' ) {
 		price_format = '<span class="amount">' + price + ' ' + symbol +  '</span>';
+	}
 
 	return price_format;
 }
@@ -550,7 +551,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 							formatted_item_meta = formatted_item_meta + '</span>';
 						} );
 
-						formatted_item_title = wc_bundle_params.i18n_composite_summary_title_string.replace( '%t', formatted_item_title ).replace( '%m', '<span class="content_bundled_product_meta">' + formatted_item_meta + '</span>' );
+						formatted_item_title = wc_bundle_params.i18n_title_meta_string.replace( '%t', formatted_item_title ).replace( '%m', '<span class="content_bundled_product_meta">' + formatted_item_meta + '</span>' );
 					}
 
 					formatted_item_title = wc_composite_params.i18n_title_string.replace( '%t', formatted_item_title ).replace( '%q', formatted_item_quantity ).replace( '%p', '' );
@@ -742,9 +743,9 @@ jQuery.fn.wc_get_bundle_script = function() {
 						bundled_item.$self.find( '.bundled_item_qty_col .quantity' ).addClass( 'quantity_hidden' );
 
 						// Reset image in bundled_product_images div
-						bundled_item.$bundled_item_image.addClass( 'images' );
+						bundled_item.add_wc_core_gallery_class();
 						bundled_item.$self.find( '.variations_form' ).trigger( 'reset_image' );
-						bundled_item.$bundled_item_image.removeClass( 'images' );
+						bundled_item.remove_wc_core_gallery_class();
 					}
 
 					bundled_item.update_selection_title();
@@ -771,7 +772,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 					bundle.price_data[ 'recurring_keys' ][ bundled_item.bundled_item_id ]           = variation.recurring_key;
 
 					// Remove .images class from bundled_product_images div in order to avoid styling issues.
-					bundled_item.$bundled_item_image.removeClass( 'images' );
+					bundled_item.remove_wc_core_gallery_class();
 
 					// Tabular mini-extension compat.
 					var $tabular_qty = bundled_item.$self.find( '.bundled_item_qty_col .quantity input' );
@@ -792,7 +793,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 				.on( 'reset_image', function() {
 
 					// Remove .images class from bundled_product_images div in order to avoid styling issues.
-					bundled_item.$bundled_item_image.removeClass( 'images' );
+					bundled_item.remove_wc_core_gallery_class();
 
 				} )
 
@@ -814,7 +815,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 					// Add .images class to bundled_product_images div ( required by the variations script to flip images ).
 					if ( bundled_item.is_selected() ) {
-						bundled_item.$bundled_item_image.addClass( 'images' );
+						bundled_item.add_wc_core_gallery_class();
 					}
 
 					$( this ).find( '.variations .attribute-options select' ).each( function() {
@@ -1637,6 +1638,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 		this.sold_individually            = typeof( bundle.price_data[ 'product_ids' ][ this.bundled_item_id ] ) === 'undefined' ? false : bundle.price_data[ 'is_sold_individually' ][ this.bundled_item_id ] === 'yes';
 		this.variation_id                 = '';
 
+		this.has_wc_core_gallery_class    = this.$bundled_item_image.hasClass( 'images' );
+
 		if ( typeof( this.bundled_item_id ) === 'undefined' ) {
 			this.bundled_item_id = this.$bundled_item_cart.attr( 'data-bundled-item-id' );
 		}
@@ -1698,11 +1701,17 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 		this.init_scripts = function() {
 
+			// Init PhotoSwipe if present.
+			if ( typeof PhotoSwipe !== 'undefined' && 'yes' === wc_bundle_params.photoswipe_enabled ) {
+				this.init_photoswipe();
+			}
+
+			// Init dependencies.
 			this.$self.find( '.bundled_product_optional_checkbox input' ).change();
 
 			if ( ( this.product_type === 'variable' || this.product_type === 'variable-subscription' ) && ! this.$bundled_item_cart.hasClass( 'variations_form' ) ) {
 
-				// Initialize variations script
+				// Initialize variations script.
 				this.$bundled_item_cart.addClass( 'variations_form' ).wc_variation_form();
 
 				this.$bundled_item_cart.find( '.variations select:eq(0)' ).change();
@@ -1710,6 +1719,19 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 			this.$self.find( 'div' ).stop( true, true );
 			this.update_selection_title();
+		};
+
+		this.init_photoswipe = function() {
+
+			this.$bundled_item_image.wc_product_gallery( { zoom_enabled: false, flexslider_enabled: false } );
+
+			var $placeholder = this.$bundled_item_image.find( 'a.placeholder_image' );
+
+			if ( $placeholder.length > 0 ) {
+				$placeholder.on( 'click', function() {
+					return false;
+				} );
+			}
 		};
 
 		this.update_selection_title = function( reset ) {
@@ -1763,7 +1785,22 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 			return this.sold_individually;
 		};
+
+		this.add_wc_core_gallery_class = function() {
+
+			if ( ! this.has_wc_core_gallery_class ) {
+				this.$bundled_item_image.addClass( 'images' );
+			}
+		};
+
+		this.remove_wc_core_gallery_class = function() {
+
+			if ( ! this.has_wc_core_gallery_class ) {
+				this.$bundled_item_image.removeClass( 'images' );
+			}
+		};
 	}
+
 
 	/*-----------------------------------------------------------------*/
 	/*  Initialization.                                                */

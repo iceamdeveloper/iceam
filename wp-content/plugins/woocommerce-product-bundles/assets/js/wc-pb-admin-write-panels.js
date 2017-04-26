@@ -3,71 +3,11 @@
 
 jQuery( function($) {
 
-	var $bundled_products_panel = $( '#bundled_product_data' ),
-		$bundled_product_input  = $( '#bundled_product', $bundled_products_panel );
-
-	function getEnhancedSelectFormatString() {
-		var formatString = {
-			formatMatches: function( matches ) {
-				if ( 1 === matches ) {
-					return wc_bundles_admin_params.i18n_matches_1;
-				}
-
-				return wc_bundles_admin_params.i18n_matches_n.replace( '%qty%', matches );
-			},
-			formatNoMatches: function() {
-				return wc_bundles_admin_params.i18n_no_matches;
-			},
-			formatAjaxError: function( jqXHR, textStatus, errorThrown ) {
-				return wc_bundles_admin_params.i18n_ajax_error;
-			},
-			formatInputTooShort: function( input, min ) {
-				var number = min - input.length;
-
-				if ( 1 === number ) {
-					return wc_bundles_admin_params.i18n_input_too_short_1;
-				}
-
-				return wc_bundles_admin_params.i18n_input_too_short_n.replace( '%qty%', number );
-			},
-			formatInputTooLong: function( input, max ) {
-				var number = input.length - max;
-
-				if ( 1 === number ) {
-					return wc_bundles_admin_params.i18n_input_too_long_1;
-				}
-
-				return wc_bundles_admin_params.i18n_input_too_long_n.replace( '%qty%', number );
-			},
-			formatSelectionTooBig: function( limit ) {
-				if ( 1 === limit ) {
-					return wc_bundles_admin_params.i18n_selection_too_long_1;
-				}
-
-				return wc_bundles_admin_params.i18n_selection_too_long_n.replace( '%qty%', limit );
-			},
-			formatLoadMore: function( pageNumber ) {
-				return wc_bundles_admin_params.i18n_load_more;
-			},
-			formatSearching: function() {
-				return wc_bundles_admin_params.i18n_searching;
-			}
-		};
-
-		return formatString;
-	}
+	var $bundled_products_panel       = $( '#bundled_product_data' ),
+		$bundled_product_input        = $( '#bundled_product', $bundled_products_panel );
 
 	$.fn.wc_bundles_select2 = function() {
-
-		$( this ).find( ':input.wc-enhanced-select' ).filter( ':not(.enhanced)' ).each( function() {
-			var select2_args = $.extend({
-				minimumResultsForSearch: 10,
-				allowClear:  $( this ).data( 'allow_clear' ) ? true : false,
-				placeholder: $( this ).data( 'placeholder' )
-			}, getEnhancedSelectFormatString() );
-
-			$( this ).select2( select2_args ).addClass( 'enhanced' );
-		} );
+		$( document.body ).trigger( 'wc-enhanced-select-init' );
 	};
 
 	// Bundle type move stock msg up.
@@ -94,8 +34,10 @@ jQuery( function($) {
 
 			$( '#_nyp' ).change();
 
-			$( '#_regular_price' ).val( $( '#_wc_pb_base_regular_price' ).val() ).change();
-			$( '#_sale_price' ).val( $( '#_wc_pb_base_sale_price' ).val() ).change();
+			if ( wc_bundles_admin_params.is_wc_version_gte_2_7 === 'no' ) {
+				$( '#_regular_price' ).val( $( '#_wc_pb_base_regular_price' ).val() ).change();
+				$( '#_sale_price' ).val( $( '#_wc_pb_base_sale_price' ).val() ).change();
+			}
 		}
 
 	} );
@@ -127,7 +69,6 @@ jQuery( function($) {
 
 	function index_bundled_product_rows() {
 		$( '.wc-bundled-items .wc-bundled-item' ).each( function( index, el ) {
-			$( '.item_index', el ).text( index + 1 );
 			$( '.item_menu_order', el ).val( index );
 		} );
 	}
@@ -247,10 +188,10 @@ jQuery( function($) {
 			helper: 'clone',
 			opacity: 0.65,
 			placeholder: 'wc-metabox-sortable-placeholder',
-			start:function(event,ui){
+			start:function( event, ui ){
 				ui.item.css( 'background-color','#f6f6f6' );
 			},
-			stop:function(event,ui){
+			stop:function( event, ui ){
 				ui.item.removeAttr( 'style' );
 				index_bundled_product_rows();
 			}
@@ -259,7 +200,7 @@ jQuery( function($) {
 		index_bundled_product_rows();
 
 		// Remove.
-		$( '.wc-bundle-metaboxes-wrapper', $bundled_products_panel ).on( 'click', 'button.remove_row', function() {
+		$( '.wc-bundle-metaboxes-wrapper', $bundled_products_panel ).on( 'click', 'a.remove_row', function( e ) {
 
 			var $parent = $( this ).closest( '.wc-bundled-item' );
 
@@ -267,6 +208,7 @@ jQuery( function($) {
 			$parent.remove();
 			index_bundled_product_rows();
 
+			e.preventDefault();
 		} );
 
 		// Expand & Close.
@@ -282,44 +224,27 @@ jQuery( function($) {
 	}
 
 	// Add Product.
-	var bundle_metabox_count = $( '.wc-bundled-items .wc-bundled-item', $bundled_products_panel ).size();
-	var block_params         = {};
-
-	if ( wc_bundles_admin_params.is_wc_version_gte_2_3 == 'yes' ) {
-		block_params = {
+	var bundle_metabox_count = $( '.wc-bundled-items .wc-bundled-item', $bundled_products_panel ).length;
+	var block_params         = {
 			message: 	null,
 			overlayCSS: {
 				background: '#fff',
 				opacity: 	0.6
 			}
 		};
-	} else {
-		block_params = {
-			message: 	null,
-			overlayCSS: {
-				background: '#fff url(' + woocommerce_admin_meta_boxes.plugin_url + '/assets/images/ajax-loader.gif) no-repeat center',
-				opacity: 	0.6
-			}
-		};
-	}
 
 	$bundled_products_panel.on( 'click', 'button.add_bundled_product', function() {
 
 		var bundled_product_id = $bundled_product_input.val();
 
 		if ( ! bundled_product_id > 0 ) {
-
-			if ( wc_bundles_admin_params.is_wc_version_gte_2_3 === 'yes' ) {
-				$( '.bundled_product_selector .wc-product-search', $bundled_products_panel ).select2( 'open' );
-			} else {
-				$( '.bundled_product_selector .ajax_chosen_select_products', $bundled_products_panel ).trigger( 'chosen:open.chosen' );
-			}
-
+			$bundled_product_input.select2( 'open' );
 			return false;
-
 		} else {
-			if ( wc_bundles_admin_params.is_wc_version_gte_2_3 === 'yes' ) {
-				$( '.bundled_product_selector .wc-product-search', $bundled_products_panel ).select2( 'val', '' );
+			if ( wc_bundles_admin_params.is_wc_version_gte_2_7 === 'yes' ) {
+				$bundled_product_input.val( '' ).change();
+			} else {
+				$bundled_product_input.select2( 'val', '' );
 			}
 		}
 
@@ -344,12 +269,6 @@ jQuery( function($) {
 
 				var $added = $( '.wc-bundled-items .wc-bundled-item', $bundled_products_panel ).last();
 
-				if ( wc_bundles_admin_params.is_wc_version_gte_2_3 == 'yes' ) {
-					$added.wc_bundles_select2();
-				} else {
-					$added.find( '.chosen_select' ).chosen();
-				}
-
 				$added.find( '.override_variations input' ).change();
 				$added.find( '.override_default_variation_attributes input' ).change();
 				$added.find( '.override_title input' ).change();
@@ -364,11 +283,9 @@ jQuery( function($) {
 					'delay' : 200
 				} );
 
-				$bundled_products_panel.trigger( 'wc-bundles-added-bundled-product' );
+				$added.wc_bundles_select2();
 
-				if ( $added.find( '.wc-product-search' ).length > 0 ) {
-					$( document.body ).trigger( 'wc-enhanced-select-init' );
-				}
+				$bundled_products_panel.trigger( 'wc-bundles-added-bundled-product' );
 
 			} else if ( response.message !== '' ) {
 				window.alert( response.message );

@@ -2,7 +2,7 @@
 /**
  * Product Bundles template hooks
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.11.0
  */
@@ -54,3 +54,6 @@ add_action( 'woocommerce_bundled_single_variation', 'wc_pb_template_single_varia
 // Open and close table.
 add_action( 'woocommerce_before_bundled_items', 'wc_pb_template_before_bundled_items', 100 );
 add_action( 'woocommerce_after_bundled_items', 'wc_pb_template_after_bundled_items', 0 );
+
+// Bundled item attributes.
+add_action( 'woocommerce_product_additional_information', 'wc_pb_template_bundled_item_attributes', 11 );

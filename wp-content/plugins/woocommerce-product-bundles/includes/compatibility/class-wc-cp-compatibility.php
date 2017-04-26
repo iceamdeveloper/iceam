@@ -2,7 +2,7 @@
 /**
  * WC_PB_CP_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.14.3
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Composite Products Compatibility.
  *
- * @version  5.1.0
+ * @version  5.2.0
  */
 class WC_PB_CP_Compatibility {
 
@@ -41,8 +41,6 @@ class WC_PB_CP_Compatibility {
 		add_filter( 'woocommerce_composited_product_get_regular_price', array( __CLASS__, 'composited_bundle_reg_price' ), 10, 4 );
 		add_filter( 'woocommerce_composited_product_get_price_including_tax', array( __CLASS__, 'composited_bundle_price_incl_tax' ), 10, 4 );
 		add_filter( 'woocommerce_composited_product_get_price_excluding_tax', array( __CLASS__, 'composited_bundle_price_excl_tax' ), 10, 4 );
-		add_filter( 'woocommerce_composited_product_is_nyp', array( __CLASS__, 'composited_bundle_is_nyp' ), 10, 2 );
-		add_filter( 'woocommerce_composited_product_raw_price', array( __CLASS__, 'composited_bundle_raw_price' ), 10, 4 );
 
 		/*--------------------*/
 		/*  Templates         */
@@ -71,7 +69,7 @@ class WC_PB_CP_Compatibility {
 		add_filter( 'woocommerce_cart_item_is_child_of_composite', array( __CLASS__, 'bundled_cart_item_is_child_of_composite' ), 10, 5 );
 		add_filter( 'woocommerce_order_item_is_child_of_composite', array( __CLASS__, 'bundled_order_item_is_child_of_composite' ), 10, 4 );
 
-		// Tweak bundle container items appearance in various templates.
+		// Tweak the appearance of bundle container items in various templates.
 		add_filter( 'woocommerce_cart_item_name', array( __CLASS__, 'composited_bundle_in_cart_item_title' ), 9, 3 );
 		add_filter( 'woocommerce_cart_item_name', array( __CLASS__, 'composited_bundle_remove_in_cart_item_title' ), 11, 3 );
 		add_filter( 'woocommerce_cart_item_quantity', array( __CLASS__, 'composited_bundle_in_cart_item_quantity' ), 11, 2 );
@@ -82,6 +80,85 @@ class WC_PB_CP_Compatibility {
 
 		// Disable edit-in-cart feature if part of a composite.
 		add_filter( 'woocommerce_bundle_is_editable_in_cart', array( __CLASS__, 'composited_bundle_not_editable_in_cart' ), 10, 3 );
+
+		// Value & weight aggregation in packages.
+		add_filter( 'woocommerce_composited_package_item', array( __CLASS__, 'composited_bundle_container_package_item' ), 10, 3 );
+	}
+
+	/**
+	 * Aggregate value and weight of bundled items in shipping packages when a bundle is composited.
+	 *
+	 * @param  array   $cart_item_data
+	 * @param  string  $cart_item_key
+	 * @param  string  $container_cart_item_key
+	 * @return array
+	 */
+	public static function composited_bundle_container_package_item( $cart_item_data, $cart_item_key, $container_cart_item_key ) {
+
+		if ( wc_pb_is_bundle_container_cart_item( $cart_item_data ) ) {
+
+			if ( isset( $cart_item_data[ 'data' ]->composited_value ) ) {
+
+				$bundle     = unserialize( serialize( $cart_item_data[ 'data' ] ) );
+				$bundle_qty = $cart_item_data[ 'quantity' ];
+
+				// Aggregate weights.
+
+				$bundled_weight = 0;
+
+				// Aggregate prices.
+
+				$bundled_value = 0;
+
+				$bundle_totals = array(
+					'line_subtotal'     => $cart_item_data[ 'line_subtotal' ],
+					'line_total'        => $cart_item_data[ 'line_total' ],
+					'line_subtotal_tax' => $cart_item_data[ 'line_subtotal_tax' ],
+					'line_tax'          => $cart_item_data[ 'line_tax' ],
+					'line_tax_data'     => $cart_item_data[ 'line_tax_data' ]
+				);
+
+				foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, WC()->cart->cart_contents, true ) as $child_item_key ) {
+
+					$child_cart_item_data = WC()->cart->cart_contents[ $child_item_key ];
+					$bundled_product      = $child_cart_item_data[ 'data' ];
+					$bundled_product_qty  = $child_cart_item_data[ 'quantity' ];
+
+					// Aggregate price.
+					if ( isset( $bundled_product->bundled_value ) ) {
+
+						$bundled_value += $bundled_product->bundled_value * $bundled_product_qty;
+
+						$bundle_totals[ 'line_subtotal' ]     += $child_cart_item_data[ 'line_subtotal' ];
+						$bundle_totals[ 'line_total' ]        += $child_cart_item_data[ 'line_total' ];
+						$bundle_totals[ 'line_subtotal_tax' ] += $child_cart_item_data[ 'line_subtotal_tax' ];
+						$bundle_totals[ 'line_tax' ]          += $child_cart_item_data[ 'line_tax' ];
+
+						$child_item_line_tax_data = $child_cart_item_data[ 'line_tax_data' ];
+
+						$bundle_totals[ 'line_tax_data' ][ 'total' ]    = array_merge( $bundle_totals[ 'line_tax_data' ][ 'total' ], $child_item_line_tax_data[ 'total' ] );
+						$bundle_totals[ 'line_tax_data' ][ 'subtotal' ] = array_merge( $bundle_totals[ 'line_tax_data' ][ 'subtotal' ], $child_item_line_tax_data[ 'subtotal' ] );
+					}
+
+					// Aggregate weight.
+					if ( isset( $bundled_product->bundled_weight ) ) {
+						$bundled_weight += $bundled_product->bundled_weight * $bundled_product_qty;
+					}
+				}
+
+				$cart_item_data = array_merge( $cart_item_data, $bundle_totals );
+
+				$bundle->composited_value += $bundled_value / $bundle_qty;
+
+				if ( isset( $bundle->composited_weight ) ) {
+					$bundle->composited_weight += $bundled_weight / $bundle_qty;
+				}
+
+				$cart_item_data[ 'data' ] = $bundle;
+			}
+		}
+
+		return $cart_item_data;
 	}
 
 	/**
@@ -255,66 +332,6 @@ class WC_PB_CP_Compatibility {
 	}
 
 	/**
-	 * True if a composited bundle is seen as a NYP product.
-	 *
-	 * @param  boolean        $is_nyp
-	 * @param  WC_CP_Product  $composited_product
-	 * @return double
-	 */
-	public static function composited_bundle_is_nyp( $is_nyp, $composited_product ) {
-
-		$product = $composited_product->get_product();
-
-		if ( 'bundle' === $product->get_type() ) {
-			if ( $product->is_nyp() || $product->contains( 'nyp' ) ) {
-				$is_nyp = true;
-			}
-		}
-
-		return $is_nyp;
-	}
-
-	/**
-	 * Composited bundle raw price.
-	 *
-	 * @since  5.0.3
-	 *
-	 * @param  double         $price
-	 * @param  WC_Product     $product
-	 * @param  mixed          $discount
-	 * @param  WC_CP_Product  $composited_product
-	 * @return double
-	 */
-	public static function composited_bundle_raw_price( $price, $product, $discount, $composited_product ) {
-
-		$product    = $composited_product->get_product();
-		$product_id = WC_PB_Core_Compatibility::get_id( $product );
-
-		if ( 'bundle' === $product->get_type() ) {
-
-			$composited_product->add_filters();
-
-			$product = wc_get_product( $product_id );
-
-			$product->maybe_sync_bundle();
-
-			if ( false === $composited_product->is_discount_allowed_on_sale_price() ) {
-				$regular_price = $product->min_bundle_regular_price;
-			} else {
-				$regular_price = $product->min_bundle_price;
-			}
-
-			if ( $discount = $composited_product->get_discount() ) {
-				$price = empty( $regular_price ) ? $regular_price : round( (double) $regular_price * ( 100 - $discount ) / 100, wc_cp_price_num_decimals() );
-			}
-
-			$composited_product->remove_filters();
-		}
-
-		return $price;
-	}
-
-	/**
 	 * Hook into 'woocommerce_composite_show_composited_product_bundle' to show bundle type product content.
 	 *
 	 * @param  WC_Product  $product
@@ -347,8 +364,8 @@ class WC_PB_CP_Compatibility {
 
 		WC_PB_Product_Prices::extend_price_display_precision();
 
-		$base_price_incl_tax = $product->get_price_including_tax( 1, 1000 );
-		$base_price_excl_tax = $product->get_price_excluding_tax( 1, 1000 );
+		$base_price_incl_tax = WC_PB_Core_Compatibility::wc_get_price_including_tax( $product, array( 'qty' => 1, 'price' => 1000 ) );
+		$base_price_excl_tax = WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $product, array( 'qty' => 1, 'price' => 1000 ) );
 		$tax_ratio           = $base_price_incl_tax / $base_price_excl_tax;
 
 		WC_PB_Product_Prices::reset_price_display_precision();
@@ -390,8 +407,7 @@ class WC_PB_CP_Compatibility {
 	public static function composite_validate_bundle_data( $result, $composite_id, $component_id, $bundle_id, $quantity, $cart_item_data, $composite = false ) {
 
 		// Get product type.
-		$terms 			= get_the_terms( $bundle_id, 'product_type' );
-		$product_type 	= ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
+		$product_type = WC_PB_Core_Compatibility::get_product_type( $bundle_id );
 
 		if ( 'bundle' === $product_type ) {
 

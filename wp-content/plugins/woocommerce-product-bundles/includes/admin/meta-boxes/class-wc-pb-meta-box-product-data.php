@@ -2,7 +2,7 @@
 /**
  * WC_PB_Meta_Box_Product_Data class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -15,8 +15,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product meta-box data for the 'Bundle' type.
  *
- * @class     WC_PB_Meta_Box_Product_Data
- * @version   5.1.1
+ * @class    WC_PB_Meta_Box_Product_Data
+ * @version  5.2.0
  */
 class WC_PB_Meta_Box_Product_Data {
 
@@ -29,10 +29,7 @@ class WC_PB_Meta_Box_Product_Data {
 		add_action( 'woocommerce_product_data_tabs', array( __CLASS__, 'product_data_tabs' ) );
 
 		// Creates the panel for selecting bundled product options.
-		add_action( 'woocommerce_product_write_panels', array( __CLASS__, 'product_write_panel' ) );
-
-		// Adds the Base Price fields.
-		add_action( 'woocommerce_product_options_general_product_data', array( __CLASS__, 'base_price_fields' ) );
+		add_action( 'woocommerce_product_data_panels', array( __CLASS__, 'product_data_panel' ) );
 
 		// Adds a tooltip to the Manage Stock option.
 		add_action( 'woocommerce_product_options_stock', array( __CLASS__, 'stock_note' ) );
@@ -40,9 +37,8 @@ class WC_PB_Meta_Box_Product_Data {
 		// Add type-specific options.
 		add_filter( 'product_type_options', array( __CLASS__, 'bundle_type_options' ) );
 
-		// Processes and saves the necessary post metas from the selections made above.
-		add_action( 'woocommerce_process_product_meta_bundle', array( __CLASS__, 'process_bundle_meta' ) );
-		add_action( 'woocommerce_process_product_meta', array( __CLASS__, 'delete_reserved_price_meta' ) );
+		// Processes and saves type-specific data.
+		add_action( 'woocommerce_admin_process_product_object', array( __CLASS__, 'process_bundle_data' ) );
 
 		// Allows the selection of the Bundle type.
 		add_filter( 'product_type_selector', array( __CLASS__, 'product_selector_filter' ) );
@@ -57,29 +53,10 @@ class WC_PB_Meta_Box_Product_Data {
 		add_action( 'woocommerce_bundled_products_admin_config', array( __CLASS__, 'bundled_products_admin_config' ) );
 
 		// Cart editing option.
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_5() ) {
-			// Cart editing utilizes the '->supports' property, available since WC 2.5.
-			add_action( 'woocommerce_product_options_advanced', array( __CLASS__, 'edit_in_cart_option' ) );
-		}
+		add_action( 'woocommerce_product_options_advanced', array( __CLASS__, 'edit_in_cart_option' ) );
 
 		// Extended "Sold Individually" option.
 		add_action( 'woocommerce_product_options_sold_individually', array( __CLASS__, 'sold_individually_option' ) );
-	}
-
-	/**
-	 * Hidden Base Price fields.
-	 */
-	public static function base_price_fields() {
-
-		global $thepostid;
-
-		$base_regular_price = get_post_meta( $thepostid, '_wc_pb_base_regular_price', true );
-		$base_sale_price    = get_post_meta( $thepostid, '_wc_pb_base_sale_price', true );
-
-		?><div class="wc_pb_price_fields" style="display:none">
-			<input type="hidden" id="_wc_pb_base_regular_price" name="wc_pb_base_regular_price_flip" value="<?php echo wc_format_localized_price( $base_regular_price ); ?>"/>
-			<input type="hidden" id="_wc_pb_base_sale_price" name="wc_pb_base_sale_price_flip" value="<?php echo wc_format_localized_price( $base_sale_price ); ?>"/>
-		</div><?php
 	}
 
 	/**
@@ -89,14 +66,14 @@ class WC_PB_Meta_Box_Product_Data {
 	 */
 	public static function sold_individually_option() {
 
-		global $thepostid;
+		global $product_bundle_object;
 
-		$sold_individually         = get_post_meta( $thepostid, '_sold_individually', true );
-		$sold_individually_context = get_post_meta( $thepostid, '_wc_pb_sold_individually_context', true );
+		$sold_individually         = $product_bundle_object->get_sold_individually( 'edit' );
+		$sold_individually_context = $product_bundle_object->get_sold_individually_context( 'edit' );
 
 		$value = 'no';
 
-		if ( 'yes' === $sold_individually ) {
+		if ( $sold_individually ) {
 			if ( ! in_array( $sold_individually_context, array( 'configuration', 'product' ) ) ) {
 				$value = 'product';
 			} else {
@@ -108,30 +85,36 @@ class WC_PB_Meta_Box_Product_Data {
 		woocommerce_wp_select( array(
 			'id'            => '_wc_pb_sold_individually',
 			'wrapper_class' => 'show_if_bundle',
-			'label'         => __( 'Sold Individually', 'woocommerce' ),
+			'label'         => __( 'Sold individually', 'woocommerce' ),
 			'options'       => array(
 				'no'            => __( 'No', 'woocommerce-product-bundles' ),
 				'product'       => __( 'Yes', 'woocommerce-product-bundles' ),
-				'configuration' => __( 'Identical configurations only', 'woocommerce-product-bundles' )
+				'configuration' => __( 'Matching configurations only', 'woocommerce-product-bundles' )
 			),
 			'value'         => $value,
 			'desc_tip'      => 'true',
-			'description'   => __( 'Allow only one of this bundle to be bought in a single order. Choose the <strong>Identical configurations only</strong> option to only prevent <strong>identically configured</strong> bundles from being purchased together.', 'woocommerce-product-bundles' )
+			'description'   => __( 'Allow only one of this bundle to be bought in a single order. Choose the <strong>Matching configurations only</strong> option to only prevent <strong>identically configured</strong> bundles from being purchased together.', 'woocommerce-product-bundles' )
 		) );
 	}
 
 	/**
-	 * Enables the "Edit in Cart".
+	 * Renders the "Edit in Cart" option.
 	 *
 	 * @return void
 	 */
 	public static function edit_in_cart_option() {
 
-		global $thepostid;
+		global $product_bundle_object;
 
 		echo '<div class="options_group bundle_edit_in_cart_options show_if_bundle">';
 
-		woocommerce_wp_checkbox( array( 'id' => '_wc_pb_edit_in_cart', 'label' => __( 'Allow editing in cart', 'woocommerce-product-bundles' ), 'desc_tip' => true, 'description' => __( 'Enable to allow editing this bundle in the cart.', 'woocommerce-product-bundles' ) ) );
+		woocommerce_wp_checkbox( array(
+			'id'          => '_wc_pb_edit_in_cart',
+			'label'       => __( 'Editing in cart', 'woocommerce-product-bundles' ),
+			'value'       => $product_bundle_object->get_editable_in_cart( 'edit' ) ? 'yes' : 'no',
+			'description' => __( 'Allow modifications to the configuration of this Bundle after it has been added to the cart.', 'woocommerce-product-bundles' ),
+			'desc_tip'    => true
+		) );
 
 		echo '</div>';
 	}
@@ -141,12 +124,24 @@ class WC_PB_Meta_Box_Product_Data {
 	 */
 	public static function product_data_tabs( $tabs ) {
 
-		$wc_version_class = WC_PB_Core_Compatibility::is_wc_version_gte_2_6() ? 'wc_gte_26' : 'wc_lte_25';
+		global $post, $product_object, $product_bundle_object;
+
+		/*
+		 * Create a global bundle-type object to use for populating fields.
+		 */
+
+		$post_id = $post->ID;
+
+		if ( empty( $product_object ) || false === $product_object->is_type( 'bundle' ) ) {
+			$product_bundle_object = $post_id ? new WC_Product_Bundle( $post_id ) : new WC_Product_Bundle();
+		} else {
+			$product_bundle_object = $product_object;
+		}
 
 		$tabs[ 'bundled_products' ] = array(
 			'label'  => __( 'Bundled Products', 'woocommerce-product-bundles' ),
 			'target' => 'bundled_product_data',
-			'class'  => array( 'show_if_bundle', $wc_version_class, 'bundled_product_options', 'bundled_product_tab' )
+			'class'  => array( 'show_if_bundle', 'wc_gte_26', 'bundled_product_options', 'bundled_product_tab' )
 		);
 
 		$tabs[ 'inventory' ][ 'class' ][] = 'show_if_bundle';
@@ -155,9 +150,9 @@ class WC_PB_Meta_Box_Product_Data {
 	}
 
 	/**
-	 * Write panel for Product Bundles.
+	 * Data panels for Product Bundles.
 	 */
-	public static function product_write_panel() {
+	public static function product_data_panel() {
 
 		?><div id="bundled_product_data" class="panel woocommerce_options_panel">
 			<?php
@@ -196,178 +191,81 @@ class WC_PB_Meta_Box_Product_Data {
 	}
 
 	/**
-	 * Delete price meta reserved to bundles/composites.
-	 *
-	 * @param  int  $post_id
-	 * @return void
-	 */
-	public static function delete_reserved_price_meta( $post_id ) {
-
-		// Get product type.
-		$terms        = get_the_terms( $post_id, 'product_type' );
-		$product_type = ! empty( $terms ) && isset( current( $terms )->name ) ? sanitize_title( current( $terms )->name ) : 'simple';
-
-		if ( false === in_array( $product_type, array( 'bundle', 'composite' ) ) ) {
-			delete_post_meta( $post_id, '_wc_sw_max_price' );
-			delete_post_meta( $post_id, '_wc_sw_max_regular_price' );
-		}
-	}
-
-	/**
 	 * Process, verify and save bundle type product data.
 	 *
-	 * @param  int  $post_id
+	 * @param  WC_Product  $product
 	 * @return void
 	 */
-	public static function process_bundle_meta( $post_id ) {
+	public static function process_bundle_data( $product ) {
 
-		global $wpdb;
+		if ( $product->is_type( 'bundle' ) ) {
 
-		/*
-		 * Base Prices.
-		 */
+			$props = array(
+				'layout'                    => 'default',
+				'editable_in_cart'          => false,
+				'sold_individually'         => false,
+				'sold_individually_context' => 'product'
+			);
 
-		$date_from     = (string) isset( $_POST[ '_sale_price_dates_from' ] ) ? wc_clean( $_POST[ '_sale_price_dates_from' ] ) : '';
-		$date_to       = (string) isset( $_POST[ '_sale_price_dates_to' ] ) ? wc_clean( $_POST[ '_sale_price_dates_to' ] )     : '';
-		$regular_price = (string) isset( $_POST[ '_regular_price' ] ) ? wc_clean( $_POST[ '_regular_price' ] )                 : '';
-		$sale_price    = (string) isset( $_POST[ '_sale_price' ] ) ? wc_clean( $_POST[ '_sale_price' ] )                       : '';
+			/*
+			 * Layout.
+			 */
 
-		update_post_meta( $post_id, '_wc_pb_base_regular_price', '' === $regular_price ? '' : wc_format_decimal( $regular_price ) );
-		update_post_meta( $post_id, '_wc_pb_base_sale_price', '' === $sale_price ? '' : wc_format_decimal( $sale_price ) );
-
-		if ( $date_to && ! $date_from ) {
-			$date_from = date( 'Y-m-d' );
-		}
-
-		if ( '' !== $sale_price && '' === $date_to && '' === $date_from ) {
-			update_post_meta( $post_id, '_wc_pb_base_price', wc_format_decimal( $sale_price ) );
-		} elseif ( '' !== $sale_price && $date_from && strtotime( $date_from ) <= strtotime( 'NOW', current_time( 'timestamp' ) ) ) {
-			update_post_meta( $post_id, '_wc_pb_base_price', wc_format_decimal( $sale_price ) );
-		} else {
-			update_post_meta( $post_id, '_wc_pb_base_price', '' === $regular_price ? '' : wc_format_decimal( $regular_price ) );
-		}
-
-		if ( $date_to && strtotime( $date_to ) < strtotime( 'NOW', current_time( 'timestamp' ) ) ) {
-			update_post_meta( $post_id, '_wc_pb_base_price', '' === $regular_price ? '' : wc_format_decimal( $regular_price ) );
-			update_post_meta( $post_id, '_wc_pb_base_sale_price', '' );
-		}
-
-		/*
-		 * Layout.
-		 */
-
-		$layout = ! empty( $_POST[ '_wc_pb_layout_style' ] ) ? wc_clean( $_POST[ '_wc_pb_layout_style' ] ) : 'default';
-		update_post_meta( $post_id, '_wc_pb_layout_style', $layout );
-
-		/*
-		 * Extended "Sold Individually" option.
-		 */
-
-		if ( ! empty( $_POST[ '_wc_pb_sold_individually' ] ) ) {
-
-			$sold_individually = wc_clean( $_POST[ '_wc_pb_sold_individually' ] );
-
-			if ( 'no' === $sold_individually ) {
-				update_post_meta( $post_id, '_sold_individually', 'no' );
-				delete_post_meta( $post_id, '_wc_pb_sold_individually_context' );
-			} elseif ( in_array( $sold_individually, array( 'product', 'configuration' ) ) ) {
-				update_post_meta( $post_id, '_sold_individually', 'yes' );
-				update_post_meta( $post_id, '_wc_pb_sold_individually_context', $sold_individually );
+			if ( ! empty( $_POST[ '_wc_pb_layout_style' ] ) ) {
+				$props[ 'layout' ] = wc_clean( $_POST[ '_wc_pb_layout_style' ] );
 			}
 
-		} else {
-			delete_post_meta( $post_id, '_wc_pb_sold_individually_context' );
-		}
+			/*
+			 * Cart editing option.
+			 */
 
-		/*
-		 * Cart editing option.
-		 */
-
-		if ( ! empty( $_POST[ '_wc_pb_edit_in_cart' ] ) ) {
-			update_post_meta( $post_id, '_wc_pb_edit_in_cart', 'yes' );
-		} else {
-			update_post_meta( $post_id, '_wc_pb_edit_in_cart', 'no' );
-		}
-
-		if ( ! defined( 'WC_PB_UPDATING' ) ) {
-
-			$posted_bundle_data    = isset( $_POST[ 'bundle_data' ] ) ? $_POST[ 'bundle_data' ] : false;
-			$processed_bundle_data = self::process_posted_bundle_data( $posted_bundle_data, $post_id );
-
-			if ( empty( $processed_bundle_data ) ) {
-				self::add_admin_error( __( 'Please add at least one product to the bundle before publishing. To add products, click on the <strong>Bundled Products</strong> tab.', 'woocommerce-product-bundles' ) );
-				$wpdb->update( $wpdb->posts, array( 'post_status' => 'draft' ), array( 'ID' => $post_id ) );
+			if ( ! empty( $_POST[ '_wc_pb_edit_in_cart' ] ) ) {
+				$props[ 'editable_in_cart' ] = true;
 			}
 
-			self::save_bundled_products( $processed_bundle_data, $post_id );
+			/*
+			 * Extended "Sold Individually" option.
+			 */
 
-		} else {
-			self::add_admin_error( __( 'Your changes have not been saved &ndash; please wait for the <strong>WooCommerce Product Bundles Data Update</strong> routine to complete before creating new bundles or making changes to existing ones.', 'woocommerce-product-bundles' ) );
-		}
-	}
+			if ( ! empty( $_POST[ '_wc_pb_sold_individually' ] ) ) {
 
-	/**
-	 * Creates/updates/deletes bundled items in the DB based on processed bundle post data.
-	 *
-	 * @param  array  $data
-	 * @param  int    $bundle_post_id
-	 */
-	public static function save_bundled_products( $data, $bundle_post_id ) {
+				$sold_individually_context = wc_clean( $_POST[ '_wc_pb_sold_individually' ] );
 
-		global $wpdb;
-
-		// Get existing bundled item ids.
-		$args = array(
-			'bundle_id' => $bundle_post_id,
-			'return'    => 'ids',
-		);
-
-		$existing_items = WC_PB_DB::query_bundled_items( $args );
-
-		// Find existing items to update/delete.
-		$update_items = array_filter( wp_list_pluck( $data, 'item_id' ) );
-		$delete_items = array_diff( $existing_items, $update_items );
-
-		// Delete items no longer in bundle.
-		if ( ! empty( $delete_items ) ) {
-			foreach ( $delete_items as $delete_item ) {
-				WC_PB_DB::delete_bundled_item( $delete_item );
+				if ( in_array( $sold_individually_context, array( 'product', 'configuration' ) ) ) {
+					$props[ 'sold_individually' ]         = true;
+					$props[ 'sold_individually_context' ] = $sold_individually_context;
+				}
 			}
-		}
 
-		// Create/update items as needed.
-		if ( ! empty( $data ) ) {
+			if ( ! defined( 'WC_PB_UPDATING' ) ) {
 
-			$loop = 1;
+				$posted_bundle_data    = isset( $_POST[ 'bundle_data' ] ) ? $_POST[ 'bundle_data' ] : false;
+				$processed_bundle_data = self::process_posted_bundle_data( $posted_bundle_data, $product->get_id() );
 
-			foreach ( $data as $item_data ) {
+				if ( empty( $processed_bundle_data ) ) {
 
-				if ( empty( $item_data[ 'item_id' ] ) ) {
-
-					$item_id = WC_PB_DB::add_bundled_item( array(
-						'bundle_id'  => $bundle_post_id,
-						'product_id' => $item_data[ 'product_id' ],
-						'menu_order' => $item_data[ 'menu_order' ],
-						'meta_data'  => array_diff_key( $item_data, array( 'item_id' => 1, 'product_id' => 1, 'menu_order' => 1 ) )
-					) );
+					self::add_admin_error( __( 'Please add at least one product to the bundle before publishing. To add products, click on the <strong>Bundled Products</strong> tab.', 'woocommerce-product-bundles' ) );
+					$props[ 'bundled_data_items' ] = array();
 
 				} else {
 
-					$item_id = WC_PB_DB::update_bundled_item( $item_data[ 'item_id' ], array(
-						'menu_order' => $item_data[ 'menu_order' ],
-						'meta_data'  => array_diff_key( $item_data, array( 'item_id' => 1, 'product_id' => 1, 'menu_order' => 1 ) )
-					) );
+					foreach ( $processed_bundle_data as $key => $data ) {
+						$processed_bundle_data[ $key ] = array(
+							'bundled_item_id' => $data[ 'item_id' ],
+							'bundle_id'       => $product->get_id(),
+							'product_id'      => $data[ 'product_id' ],
+							'menu_order'      => $data[ 'menu_order' ],
+							'meta_data'       => array_diff_key( $data, array( 'item_id' => 1, 'product_id' => 1, 'menu_order' => 1 ) )
+						);
+					}
+
+					$props[ 'bundled_data_items' ] = $processed_bundle_data;
 				}
 
-				// Only continue if we have a valid id.
-				if ( ! $item_id ) {
-					continue;
-				}
+				$product->set( $props );
 
-				// Flush stock cache.
-				WC_PB_DB::flush_stock_cache( $item_id );
-
-				$loop++;
+			} else {
+				self::add_admin_error( __( 'Your changes have not been saved &ndash; please wait for the <strong>WooCommerce Product Bundles Data Update</strong> routine to complete before creating new bundles or making changes to existing ones.', 'woocommerce-product-bundles' ) );
 			}
 		}
 	}
@@ -570,7 +468,7 @@ class WC_PB_Meta_Box_Product_Data {
 					}
 
 					// Save data related to variable items.
-					if ( 'variable' === $product_type ) {
+					if ( in_array( $product_type, array( 'variable', 'variable-subscription' ) ) ) {
 
 						$allowed_variations = array();
 
@@ -646,7 +544,7 @@ class WC_PB_Meta_Box_Product_Data {
 											continue;
 										}
 
-										if ( ! in_array( $value, $filtered_attributes[ $name ] ) && ! in_array( '', $filtered_attributes[ $name ] ) ) {
+										if ( ! in_array( stripslashes( $value ), $filtered_attributes[ $name ] ) && ! in_array( '', $filtered_attributes[ $name ] ) ) {
 											// Set option to "Any".
 											$data[ 'default_variation_attributes' ][ $name ] = '';
 											// Show an error.
@@ -658,7 +556,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 								// Save.
 								foreach ( $data[ 'default_variation_attributes' ] as $name => $value ) {
-									$item_data[ 'default_variation_attributes' ][ $name ] = $value;
+									$item_data[ 'default_variation_attributes' ][ $name ] = stripslashes( $value );
 								}
 
 								$item_data[ 'override_default_variation_attributes' ] = 'yes';
@@ -678,7 +576,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 					if ( 'hidden' === $visibility[ 'product' ] ) {
 
-						if ( 'variable' === $product_type ) {
+						if ( in_array( $product_type, array( 'variable', 'variable-subscription' ) ) ) {
 
 							if ( 'yes' === $item_data[ 'override_default_variation_attributes' ] ) {
 
@@ -759,7 +657,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 		$bundled_product = isset( $item_data[ 'bundled_item' ] ) ? $item_data[ 'bundled_item' ]->product : wc_get_product( $product_id );
 
-		if ( 'variable' === $bundled_product->get_type() ) {
+		if ( in_array( $bundled_product->get_type(), array( 'variable', 'variable-subscription' ) ) ) {
 
 			$allowed_variations  = isset( $item_data[ 'allowed_variations' ] ) ? $item_data[ 'allowed_variations' ] : '';
 			$default_attributes  = isset( $item_data[ 'default_variation_attributes' ] ) ? $item_data[ 'default_variation_attributes' ] : '';
@@ -784,9 +682,9 @@ class WC_PB_Meta_Box_Product_Data {
 					$variations = $bundled_product->get_children();
 					$attributes = $bundled_product->get_attributes();
 
-					if ( sizeof( $variations ) < 100 || ! WC_PB_Core_Compatibility::is_wc_version_gte_2_5() ) {
+					if ( sizeof( $variations ) < 100 ) {
 
-						?><select multiple="multiple" name="bundle_data[<?php echo $loop; ?>][allowed_variations][]" style="width: 95%;" data-placeholder="<?php _e( 'Choose variations&hellip;', 'woocommerce-product-bundles' ); ?>" class="<?php echo WC_PB_Core_Compatibility::is_wc_version_gte_2_3() ? 'wc-enhanced-select' : 'chosen_select'; ?>" > <?php
+						?><select multiple="multiple" name="bundle_data[<?php echo $loop; ?>][allowed_variations][]" style="width: 95%;" data-placeholder="<?php _e( 'Choose variations&hellip;', 'woocommerce-product-bundles' ); ?>" class="wc-enhanced-select" > <?php
 
 							foreach ( $variations as $variation_id ) {
 
@@ -815,7 +713,7 @@ class WC_PB_Meta_Box_Product_Data {
 
 							foreach ( $allowed_variations as $allowed_variation_id ) {
 
-								$variation_description = WC_PB_Helpers::get_product_variation_title( $allowed_variation_id );
+								$variation_description = WC_PB_Helpers::get_product_variation_title( $allowed_variation_id, true );
 
 								if ( ! $variation_description ) {
 									continue;
@@ -825,11 +723,11 @@ class WC_PB_Meta_Box_Product_Data {
 							}
 						}
 
-						?><input type="hidden" name="bundle_data[<?php echo $loop; ?>][allowed_variations]" class="wc-product-search" style="width: 95%;" data-placeholder="<?php _e( 'Search for variations&hellip;', 'woocommerce-product-bundles' ); ?>" data-limit="100" data-include="<?php echo esc_attr( implode( ', ', $variations ) ); ?>" data-action="woocommerce_search_bundled_variations" data-multiple="true" data-selected="<?php
-
-							echo esc_attr( json_encode( $allowed_variations_descriptions ) );
-
-						?>" value="<?php echo implode( ',', array_keys( $allowed_variations_descriptions ) ); ?>" /><?php
+						?><select class="wc-product-search" multiple="multiple" style="width: 95%;" name="bundle_data[<?php echo $loop; ?>][allowed_variations][]" data-placeholder="<?php _e( 'Search for variations&hellip;', 'woocommerce-product-bundles' ); ?>" data-action="woocommerce_search_bundled_variations" data-limit="1000" data-include="<?php echo $product_id; ?>"><?php
+							foreach ( $allowed_variations_descriptions as $allowed_variation_id => $allowed_variation_description ) {
+								echo '<option value="' . esc_attr( $allowed_variation_id ) . '"' . selected( true, true, false ) . '>' . wp_kses_post( $allowed_variation_description ) . '</option>';
+							}
+						?></select><?php
 					}
 
 				?></div>
@@ -848,41 +746,25 @@ class WC_PB_Meta_Box_Product_Data {
 
 					foreach ( $attributes as $attribute ) {
 
-						// Only deal with attributes that are variations.
-						if ( ! $attribute[ 'is_variation' ] ) {
-							continue;
-						}
+						$selected_value = isset( $default_attributes[ sanitize_title( $attribute->get_name() ) ] ) ? $default_attributes[ sanitize_title( $attribute->get_name() ) ] : '';
 
-						// Get current value for variation (if set).
-						$variation_selected_value = ( isset( $default_attributes[ sanitize_title( $attribute[ 'name' ] ) ] ) ) ? $default_attributes[ sanitize_title( $attribute[ 'name' ] ) ] : '';
+						?><select name="bundle_data[<?php echo $loop; ?>][default_variation_attributes][<?php echo sanitize_title( $attribute->get_name() ); ?>]" data-current="<?php echo esc_attr( $selected_value ); ?>">
 
-						// Name will be something like attribute_pa_color.
-						echo '<select name="bundle_data[' . $loop . '][default_variation_attributes][' . sanitize_title( $attribute[ 'name' ] ) .']"><option value="">' . __( 'No default', 'woocommerce' ) . ' ' . wc_attribute_label( $attribute[ 'name' ] ) . '&hellip;</option>';
+							<option value=""><?php echo esc_html( sprintf( __( 'No default %s&hellip;', 'woocommerce' ), wc_attribute_label( $attribute->get_name() ) ) ); ?></option><?php
 
-						// Get terms for attribute taxonomy or value if its a custom attribute.
-						if ( $attribute[ 'is_taxonomy' ] ) {
-
-							$post_terms = wp_get_post_terms( $product_id, $attribute[ 'name' ] );
-
-							sort( $post_terms );
-
-							foreach ( $post_terms as $term ) {
-								echo '<option ' . selected( $variation_selected_value, $term->slug, false ) . ' value="' . esc_attr( $term->slug ) . '">' . apply_filters( 'woocommerce_variation_option_name', esc_html( $term->name ) ) . '</option>';
+							if ( $attribute->is_taxonomy() ) {
+								foreach ( $attribute->get_terms() as $option ) {
+									?><option <?php selected( $selected_value, $option->slug ); ?> value="<?php echo esc_attr( $option->slug ); ?>"><?php echo esc_html( apply_filters( 'woocommerce_variation_option_name', $option->name ) ); ?></option><?php
+								}
+							} else {
+								foreach ( $attribute->get_options() as $option ) {
+									?><option <?php selected( $selected_value, $option ); ?> value="<?php echo esc_attr( $option ); ?>"><?php echo esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) ); ?></option><?php
+								}
 							}
 
-						} else {
-
-							$options = array_map( 'trim', explode( WC_DELIMITER, $attribute[ 'value' ] ) );
-
-							sort( $options );
-
-							foreach ( $options as $option ) {
-								echo '<option ' . selected( sanitize_title( $variation_selected_value ), sanitize_title( $option ), false ) . ' value="' . esc_attr( $option ) . '">' . esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) ) . '</option>';
-							}
-						}
-
-						echo '</select>';
+						?></select><?php
 					}
+
 				?></div>
 			</div><?php
 		}
@@ -1073,46 +955,32 @@ class WC_PB_Meta_Box_Product_Data {
 	 */
 	public static function bundled_products_admin_config() {
 
-		global $post;
+		global $product_bundle_object;
+
+		$post_id = WC_PB_Core_Compatibility::get_id( $product_bundle_object );
 
 		/*
 		 * Layout options.
 		 */
 
 		?><div class="options_group"><?php
-			woocommerce_wp_select( array( 'id' => '_wc_pb_layout_style', 'label' => __( 'Layout', 'woocommerce-product-bundles' ), 'description' => __( 'Select the <strong>Tabular</strong> option to have the thumbnails, descriptions and quantities of bundled products arranged in a table. Recommended for displaying multiple bundled products with configurable quantities.', 'woocommerce-product-bundles' ), 'desc_tip' => true, 'options' => WC_Product_Bundle::get_supported_layouts() ) );
+			woocommerce_wp_select( array(
+				'id'          => '_wc_pb_layout_style',
+				'value'       => $product_bundle_object->get_layout( 'edit' ),
+				'label'       => __( 'Layout', 'woocommerce-product-bundles' ),
+				'description' => __( 'Select the <strong>Tabular</strong> option to have the thumbnails, descriptions and quantities of bundled products arranged in a table. Recommended for displaying multiple bundled products with configurable quantities.', 'woocommerce-product-bundles' ),
+				'desc_tip'    => true,
+				'options'     => WC_Product_Bundle::get_supported_layouts()
+			) );
 		?></div><?php
 
 		/*
 		 * Bundled products options.
 		 */
 
-		$post_id       = $post->ID;
-		$bundle        = wc_get_product( $post->ID );
-		$bundled_items = array();
+		$bundled_items = $product_bundle_object->get_bundled_items( 'edit' );
 		$tabs          = self::get_bundled_product_tabs();
 		$toggle        = 'closed';
-
-		/**
-		 * 'woocommerce_bundled_items_admin_args' filter.
-		 *
-		 * @param  array  $args
-		 */
-		$args = apply_filters( 'woocommerce_bundled_items_admin_args', array(
-			'bundle_id' => $post_id,
-			'return'    => 'objects',
-			'order_by'  => array( 'menu_order' => 'ASC' )
-		), $post->ID );
-
-		$data_items = WC_PB_DB::query_bundled_items( $args );
-
-		if ( $data_items ) {
-			foreach ( $data_items as $data_item ) {
-				if ( $bundled_item = wc_pb_get_bundled_item( $data_item, $bundle ) ) {
-					$bundled_items[ $bundled_item->item_id ] = $bundled_item;
-				}
-			}
-		}
 
 		?><div class="options_group wc-metaboxes-wrapper wc-bundle-metaboxes-wrapper">
 
@@ -1131,9 +999,9 @@ class WC_PB_Meta_Box_Product_Data {
 
 						foreach ( $bundled_items as $item_id => $item ) {
 
+							$item_availability           = '';
 							$item_data                   = $item->get_data();
 							$item_data[ 'bundled_item' ] = $item;
-							$item_availability           = '';
 
 							if ( false === $item->is_in_stock() ) {
 								if ( $item->product->is_in_stock() ) {
@@ -1146,8 +1014,8 @@ class WC_PB_Meta_Box_Product_Data {
 							$product_id = $item->product_id;
 							$title      = $item->product->get_title();
 							$sku        = $item->product->get_sku();
-							$suffix     = sprintf( _x( '#%s', 'product identifier', 'woocommerce-product-bundles' ), $product_id );
-							$title      = WC_PB_Helpers::format_product_title( $title, $sku, $suffix, true );
+							$title      = WC_PB_Helpers::format_product_title( $title, $sku, '', true );
+							$title      = sprintf( _x( '#%1$s: %2$s', 'bundled product admin title', 'woocommerce-product-bundles' ), $product_id, $title );
 
 							include( 'views/html-bundled-product-admin.php' );
 
@@ -1159,20 +1027,11 @@ class WC_PB_Meta_Box_Product_Data {
 		</div>
 		<p class="bundled_products_toolbar toolbar">
 			<span class="bundled_products_toolbar_wrapper">
-				<span class="bundled_product_selector"><?php
-
-					if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_3() ) {
-
-						?><input type="hidden" class="wc-product-search" style="width: 250px;" id="bundled_product" name="bundled_product" data-placeholder="<?php _e( 'Search for a product&hellip;', 'woocommerce' ); ?>" data-action="woocommerce_json_search_products" data-multiple="false" data-selected="" value="" /><?php
-
-					} else {
-
-						?><select id="bundled_product" name="bundled_product" class="ajax_chosen_select_products" data-placeholder="<?php _e( 'Search for a product&hellip;', 'woocommerce' ); ?>">
-							<option></option>
-						</select><?php
-					}
-
-				?></span>
+				<span class="bundled_product_selector">
+					<select class="wc-product-search" id="bundled_product" style="width: 250px;" name="bundled_product" data-placeholder="<?php _e( 'Search for a product&hellip;', 'woocommerce' ); ?>" data-action="woocommerce_json_search_products" data-limit="1000" >
+						<option></option>
+					</select>
+				</span>
 				<button type="button" class="button button-primary add_bundled_product"><?php _e( 'Add Product', 'woocommerce-product-bundles' ); ?></button>
 			</span>
 		</p><?php

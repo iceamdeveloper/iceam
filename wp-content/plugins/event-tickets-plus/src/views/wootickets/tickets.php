@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.4.4
+ * @version 4.4.6
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -126,7 +126,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 				if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
 					echo '<tr class="tribe-tickets-attendees-list-optout">' . '<td colspan="4">' .
 						 '<input type="checkbox" name="optout_' . $ticket->ID . '" id="tribe-tickets-attendees-list-optout-woo">' .
-						 '<label for="tribe-tickets-attendees-list-optout-woo">' . esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets' ) . '</label>' . '</td>' .
+						 '<label for="tribe-tickets-attendees-list-optout-woo">' . esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets-plus' ) . '</label>' . '</td>' .
 						 '</tr>';
 				}
 

@@ -2,7 +2,7 @@
 /**
  * WC_PB_PnR_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    4.11.4
  */
@@ -15,10 +15,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Points and Rewards Compatibility.
  *
- * @version  5.1.0
+ * @version  5.2.0
  */
 class WC_PB_PnR_Compatibility {
 
+	/**
+	 * Bundle points - @see 'WC_PB_PnR_Compatibility::replace_points'.
+	 * @var boolean
+	 */
+	private static $bundle_price_max = false;
+	private static $bundle_price_min = false;
+
+	/**
+	 * Bypass 'wc_points_rewards_single_product_message' filter.
+	 * @var boolean
+	 */
+	private static $single_product_message_filter_active = true;
+
+	/**
+	 * Initialize.
+	 */
 	public static function init() {
 
 		// Points earned filters.
@@ -33,7 +49,7 @@ class WC_PB_PnR_Compatibility {
 	}
 
 	/**
-	 * Return zero points for bundled cart items if container item has product level points.
+	 * Return zero points for bundled cart items if container item has product- or category-level points or bundled item is not priced individually.
 	 *
 	 * @param  int     $points
 	 * @param  string  $cart_item_key
@@ -48,12 +64,10 @@ class WC_PB_PnR_Compatibility {
 			$bundled_item_id = $cart_item_values[ 'bundled_item_id' ];
 			$bundled_item    = $bundle->get_bundled_item( $bundled_item_id );
 
-			// Check if earned points are set at product-level.
-			$bundle_points     = WC_Points_Rewards_Product::get_product_points( $bundle );
-			$has_bundle_points = is_numeric( $bundle_points );
-
-			if ( $has_bundle_points || false === $bundled_item->is_priced_individually() ) {
+			if ( self::has_fixed_points( $bundle ) || false === $bundled_item->is_priced_individually() ) {
 				$points = 0;
+			} else {
+				$points = WC_Points_Rewards_Manager::calculate_points( $cart_item_values[ 'data' ]->get_price() );
 			}
 		}
 
@@ -61,7 +75,7 @@ class WC_PB_PnR_Compatibility {
 	}
 
 	/**
-	 * Return zero points for bundled cart items if container item has product level points.
+	 * Return zero points for bundled order items if container item has product- or category-level points or bundled item is not priced individually.
 	 *
 	 * @param  int       $points
 	 * @param  string    $item_key
@@ -73,20 +87,26 @@ class WC_PB_PnR_Compatibility {
 
 		if ( $parent_item = wc_pb_get_bundled_order_item_container( $item, $order ) ) {
 
-			$bundle_product_id = $parent_item[ 'product_id' ];
+			$bundled_item_priced_individually = isset( $item[ 'bundled_item_priced_individually' ] ) ? 'yes' === $item[ 'bundled_item_priced_individually' ] : null;
 
-			// Check if earned points are set at product-level.
-			$bundled_item_priced_individually = isset( $item[ 'bundled_item_priced_individually' ] ) ? $item[ 'bundled_item_priced_individually' ] : false;
+			if ( $bundle = wc_get_product( $parent_item[ 'product_id' ] ) ) {
 
-			// Back-compat.
-			if ( false === $bundled_item_priced_individually ) {
-				$bundled_item_priced_individually = isset( $parent_item[ 'per_product_pricing' ] ) ? $parent_item[ 'per_product_pricing' ] : get_post_meta( $parent_item[ 'product_id' ], '_wc_pb_v4_per_product_pricing', true );
-			}
+				// Back-compat.
+				if ( null === $bundled_item_priced_individually ) {
+					if ( isset( $parent_item[ 'per_product_pricing' ] ) ) {
+						$bundled_item_priced_individually = 'yes' === $parent_item[ 'per_product_pricing' ];
+					} elseif ( isset( $item[ 'bundled_item_id' ] ) ) {
+						$bundled_item_id                  = $item[ 'bundled_item_id' ];
+						$bundled_item                     = $bundle->get_bundled_item( $bundled_item_id );
+						$bundled_item_priced_individually = is_a( $bundled_item, 'WC_Bundled_Item' ) ? $bundled_item->is_priced_individually() : false;
+					}
+				}
 
-			$bundle_points = get_post_meta( $bundle_product_id, '_wc_points_earned', true );
-
-			if ( ! empty( $bundle_points ) || 'no' === $bundled_item_priced_individually ) {
-				$points = 0;
+				if ( self::has_fixed_points( $bundle ) || false === $bundled_item_priced_individually ) {
+					$points = 0;
+				} else {
+					$points = WC_Points_Rewards_Manager::calculate_points( $product->get_price() );
+				}
 			}
 		}
 
@@ -94,7 +114,7 @@ class WC_PB_PnR_Compatibility {
 	}
 
 	/**
-	 * Points and Rewards single product message for Bundles that contain individually-priced items.
+	 * Points and Rewards single product message for Bundles.
 	 *
 	 * @param  string                     $message
 	 * @param  WC_Points_Rewards_Product  $points_n_rewards
@@ -104,14 +124,42 @@ class WC_PB_PnR_Compatibility {
 
 		global $product;
 
-		if ( 'bundle' === $product->get_type() ) {
+		if ( $product->is_type( 'bundle' ) && self::$single_product_message_filter_active ) {
 
-			if ( false === $product->contains( 'priced_individually' ) ) {
-				return $message;
+			if ( false === self::has_fixed_points( $product ) && $product->contains( 'priced_individually' ) ) {
+
+				$max_bundle_price = $product->get_bundle_price( 'max' );
+				$min_bundle_price = $product->get_bundle_price( 'min' );
+
+				if ( '' !== $max_bundle_price ) {
+					self::$bundle_price_max = $max_bundle_price;
+				} else {
+					self::$bundle_price_min = $min_bundle_price;
+				}
+
+				// 'WC_Points_Rewards_Product' relies on 'get_price', which only returns the base price of a bundle.
+				add_filter( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? 'woocommerce_product_get_price' : 'woocommerce_get_price', array( __CLASS__, 'replace_price' ), 9999, 2 );
+
+				$bundle_points = WC_Points_Rewards_Product::get_points_earned_for_product_purchase( $product );
+
+				if ( '' !== $max_bundle_price ) {
+
+					if ( $max_bundle_price === $min_bundle_price ) {
+						self::$single_product_message_filter_active = false;
+						$message = $points_n_rewards->render_product_message();
+						self::$single_product_message_filter_active = true;
+					} else {
+						$message = $points_n_rewards->create_variation_message_to_product_summary( $bundle_points );
+					}
+
+				} else {
+					$message = $points_n_rewards->create_at_least_message_to_product_summary( $bundle_points );
+				}
+
+				remove_filter( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? 'woocommerce_product_get_price' : 'woocommerce_get_price', array( __CLASS__, 'replace_price' ), 9999, 2 );
+
+				self::$bundle_price_min = self::$bundle_price_max = false;
 			}
-
-			$bundle_points = WC_Points_Rewards_Product::get_points_earned_for_product_purchase( $product );
-			$message       = $points_n_rewards->create_at_least_message_to_product_summary( $bundle_points );
 		}
 
 		return $message;
@@ -128,6 +176,36 @@ class WC_PB_PnR_Compatibility {
 			$message = false;
 		}
 		return $message;
+	}
+
+	/**
+	 * Filter bundle price returned by 'get_price' to return the min/max bundle price.
+	 *
+	 * @param  mixed              $price
+	 * @param  WC_Product_Bundle  $product
+	 * @return mixed
+	 */
+	public static function replace_price( $price, $product ) {
+		if ( false !== self::$bundle_price_max ) {
+			$price = self::$bundle_price_max;
+		} elseif ( false !== self::$bundle_price_min ) {
+			$price = self::$bundle_price_min;
+		}
+		return $price;
+	}
+
+	/**
+	 * True if the bundle has fixed product- or category-level points.
+	 *
+	 * @param  WC_Product_Bundle  $bundle
+	 * @return boolean
+	 */
+	private static function has_fixed_points( $bundle ) {
+
+		$bundle_product_points  = WC_Points_Rewards_Product::get_product_points( $bundle );
+		$bundle_category_points = is_callable( array( 'WC_Points_Rewards_Product', 'get_category_points' ) ) ? WC_Points_Rewards_Product::get_category_points( $bundle ) : '';
+
+		return is_numeric( $bundle_product_points ) || is_numeric( $bundle_category_points );
 	}
 }
 

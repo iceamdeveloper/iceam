@@ -2,7 +2,7 @@
 /**
  * WC_Bundled_Item_Data class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Could be modified to extend WC_Data in the future. For now, all required functionality is self-contained to maintain WC back-compat.
  *
  * @class    WC_Bundled_Item_Data
- * @version  5.1.3
+ * @version  5.2.0
  */
 
 class WC_Bundled_Item_Data {
@@ -351,11 +351,28 @@ class WC_Bundled_Item_Data {
 	}
 
 	/**
+	 * Validates before saving for sanity.
+	 *
+	 * @since  5.2.0
+	 */
+	public function validate() {
+
+		$quantity_min = $this->get_meta( 'quantity_min' );
+		$quantity_max = $this->get_meta( 'quantity_max' );
+
+		if ( $quantity_min > $quantity_max && '' !== $quantity_max ) {
+			$this->update_meta( 'quantity_max', $quantity_min );
+		}
+	}
+
+	/**
 	 * Save data to the database.
 	 *
 	 * @return int
 	 */
 	public function save() {
+
+		$this->validate();
 
 		if ( ! $this->get_id() ) {
 			$this->create();
@@ -395,6 +412,7 @@ class WC_Bundled_Item_Data {
 	 * @return mixed
 	 */
 	public function get_meta( $key ) {
+
 		$value = null;
 
 		if ( isset( $this->meta_data[ $key ] ) ) {
@@ -446,7 +464,7 @@ class WC_Bundled_Item_Data {
 		}
 
 		$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
-		$cached_meta = wp_cache_get( $cache_key, 'bundled_item_meta' );
+		$cached_meta = ! defined( 'WC_PB_DEBUG_OBJECT_CACHE' ) ? wp_cache_get( $cache_key, 'bundled_item_meta' ) : false;
 
 		if ( false !== $cached_meta ) {
 			$this->meta_data = $cached_meta;
@@ -528,7 +546,11 @@ class WC_Bundled_Item_Data {
 
 			if ( 'yes_or_no' === $fn ) {
 				// 'no' by default.
-				$meta_value = 'yes' === $meta_value ? 'yes' : 'no';
+				if ( is_bool( $meta_value ) ) {
+					$meta_value = true === $meta_value ? 'yes' : 'no';
+				} else {
+					$meta_value = 'yes' === $meta_value ? 'yes' : 'no';
+				}
 			} elseif ( 'visible_or_hidden' === $fn ) {
 				// 'visible' by default.
 				$meta_value = 'hidden' === $meta_value ? 'hidden' : 'visible';

@@ -1,5 +1,69 @@
 *** Canvas Changelog ***
 
+2017.04.05 - version 5.11.4
+* Fix - Fixes the WooCommerce 3.0.0 compatibility for the new product gallery.
+  style.css,
+  rtl.css,
+  includes/integrations/woocommerce/css/woocommerce.css
+* Fix - Fixes problem with using WC shortcodes inside Canvas shortcodes.
+  style.css
+* Tweak - Adds Sensei Module styles to Canvas that were being overriden.
+  includes/integrations/sensei/template.php,
+  includes/integrations/sensei/css/sensei.css
+
+2016.10.21 - version 5.11.3
+* Fix - Fixes the homepage business slider widget styling for Flexslider nav when use Woo Component.
+  style.css
+* Fix - Fixes conflict with events calendar plugin.
+  content-page.php
+
+2016.08.25 - version 5.11.2
+* Fix - Fixes the compatibility of the Customizer's "Custom Header" and the Layouts setting.
+  includes/theme-actions.php
+* Fix - removes deprecated Google Maps API params, fixes console errors.
+* Fix - IE fieldset styles
+* Fix - fixes unitialized string warning for Magazine Slider.
+
+2016.08.12 - version 5.11.1
+* Fix - Google Maps API key fix.
+  includes/theme-actions.php,
+  includes/theme-js.php,
+  includes/theme-options.php
+* Fix - WooCommerce Cart dropdown styling.
+  includes/integrations/woocommerce/css/woocommerce.css
+
+2016.08.04 - version 5.11.0
+* Fix - PHP 7 compatibility fixes
+  includes/tumblog/theme-custom-post-types.php,
+  includes/tumblog/wootumblog_postformat.class.php
+* Fix - fixes string offset notice for Magazine Slider on homepage
+  includes/theme-actions.php
+* Update - updates logic for layouts using a static page as the "Blog" page
+  includes/theme-actions.php
+
+2016.07.01 - version 5.10.1
+* Fix - Removes WooThemes metaboxes from WC Bookings Extension post type admin interfaces.
+  includes/integrations/woocommerce/functions.php
+* Fix - Fixes WooSlider empty variable value.
+  includes/integrations/wooslider/wooslider.php
+* Fix - Replaces deprecated functions.
+  includes/theme-shortcodes.php,
+  includes/woo-hoooks/screens/admin.php,
+  includes/woo-layout/screens/admin.php,
+  includes/woo-meta/screens/admin.php
+
+2016.05.05 - version 5.10.0
+* New - Adds support for new WooCommerce tabbed My Account page.
+  includes/integrations/woocommerce/css/woocommerce.css
+  includes/integrations/woocommerce/css/woocommerce.scss
+* Fix - Increase width of side nav when cart total is displayed, to allow for larger numbers.
+  css/partials/_navigation.scss
+* Fix - FlexSlider to v2.6.1.
+  includes/js/jquery.flexslider.js
+  includes/js/jquery.flexslider.min.js
+* Fix - duplicate display:none; markup in slider styles attribute.
+  includes/theme-actions.php
+
 2016.04.29 - version 5.9.22
  * Fix - Removes custom function for related products output in WooCommerce.
    includes/integrations/woocommerce/setup.php,

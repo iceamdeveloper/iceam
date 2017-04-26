@@ -2,7 +2,7 @@
 /**
  * WC_PB_DB_Sync class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -13,10 +13,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Product hooks for bundled items and bundled item meta db lifecycle management.
+ * Product hooks for DB lifecycle management of products, bundled items and their meta.
  *
  * @class    WC_PB_DB_Sync
- * @version  5.1.0
+ * @version  5.2.0
  */
 class WC_PB_DB_Sync {
 
@@ -30,12 +30,23 @@ class WC_PB_DB_Sync {
 
 		// Delete bundled item DB entries when: i) the container bundle is deleted, or ii) the associated product is deleted.
 		add_action( 'delete_post', array( __CLASS__, 'delete_post' ), 11 );
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			add_action( 'woocommerce_delete_product', array( __CLASS__, 'delete_product' ), 11 );
+		}
 
 		// When deleting a bundled item from the DB, clear the transients of the container bundle (also invalidates product transients, including 'wc_bundled_product_data').
 		add_action( 'woocommerce_delete_bundled_item', array( __CLASS__, 'delete_bundled_item' ) );
 
-		// Delete bundle-specific transients.
+		// Delete associated bundled items stock cache when clearing product transients.
 		add_action( 'woocommerce_delete_product_transients', array( __CLASS__, 'delete_bundle_transients' ) );
+
+		// Delete meta reserved to the bundle type.
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			add_action( 'woocommerce_before_product_object_save', array( __CLASS__, 'delete_reserved_price_meta' ) );
+		} else {
+			add_action( 'save_post_product', array( __CLASS__, 'delete_reserved_price_post_meta' ) );
+			add_action( 'save_post_product_variation', array( __CLASS__, 'delete_reserved_price_post_meta' ) );
+		}
 
 		if ( ! defined( 'WC_PB_DEBUG_STOCK_CACHE' ) ) {
 
@@ -92,27 +103,36 @@ class WC_PB_DB_Sync {
 			$post_type = get_post_type( $id );
 
 			if ( 'product' === $post_type ) {
+				self::delete_product( $id );
+			}
+		}
+	}
 
-				// Delete bundled item DB entries and meta when deleting a bundle.
-				$bundled_items = WC_PB_DB::query_bundled_items( array(
-					'bundle_id' => $id,
-					'return'    => 'objects'
-				) );
+	/**
+	 * Deletes bundled item DB entries when: i) their container product bundle is deleted, or ii) the associated bundled product is deleted.
+	 *
+	 * @param  mixed  $id  ID of product being deleted.
+	 */
+	public static function delete_product( $id ) {
 
-				if ( ! empty( $bundled_items ) ) {
-					foreach ( $bundled_items as $bundled_item ) {
-						$bundled_item->delete();
-					}
-				}
+		// Delete bundled item DB entries and meta when deleting a bundle.
+		$bundled_items = WC_PB_DB::query_bundled_items( array(
+			'bundle_id' => $id,
+			'return'    => 'objects'
+		) );
 
-				// Delete bundled item DB entries and meta when deleting an associated product.
-				$bundled_item_ids = array_keys( wc_pb_get_bundled_product_map( $id, false ) );
+		if ( ! empty( $bundled_items ) ) {
+			foreach ( $bundled_items as $bundled_item ) {
+				$bundled_item->delete();
+			}
+		}
 
-				if ( ! empty( $bundled_item_ids ) ) {
-					foreach ( $bundled_item_ids as $bundled_item_id ) {
-						WC_PB_DB::delete_bundled_item( $bundled_item_id );
-					}
-				}
+		// Delete bundled item DB entries and meta when deleting an associated product.
+		$bundled_item_ids = array_keys( wc_pb_get_bundled_product_map( $id, false ) );
+
+		if ( ! empty( $bundled_item_ids ) ) {
+			foreach ( $bundled_item_ids as $bundled_item_id ) {
+				WC_PB_DB::delete_bundled_item( $bundled_item_id );
 			}
 		}
 	}
@@ -125,6 +145,37 @@ class WC_PB_DB_Sync {
 	public static function delete_bundled_item( $item ) {
 		$bundle_id = $item->get_bundle_id();
 		wc_delete_product_transients( $bundle_id );
+	}
+
+	/**
+	 * Delete price meta reserved to bundles/composites (legacy).
+	 *
+	 * @param  int  $post_id
+	 * @return void
+	 */
+	public static function delete_reserved_price_post_meta( $post_id ) {
+
+		// Get product type.
+		$product_type = WC_PB_Core_Compatibility::get_product_type( $post_id );
+
+		if ( false === in_array( $product_type, array( 'bundle', 'composite' ) ) ) {
+			delete_post_meta( $post_id, '_wc_sw_max_price' );
+			delete_post_meta( $post_id, '_wc_sw_max_regular_price' );
+		}
+	}
+
+	/**
+	 * Delete price meta reserved to bundles/composites.
+	 *
+	 * @param  WC_Product  $product
+	 * @return void
+	 */
+	public static function delete_reserved_price_meta( $product ) {
+
+		if ( false === in_array( $product->get_type(), array( 'bundle', 'composite' ) ) ) {
+			$product->delete_meta_data( '_wc_sw_max_price' );
+			$product->delete_meta_data( '_wc_sw_max_regular_price' );
+		}
 	}
 
 	/**
@@ -207,16 +258,13 @@ class WC_PB_DB_Sync {
 	}
 
 	/**
-	 * Ensure bundle-specific transients are cleared when the core ones are cleared.
+	 * Delete associated bundled items stock cache when clearing product transients.
 	 *
 	 * @param  mixed  $post_id
 	 * @return void
 	 */
 	public static function delete_bundle_transients( $post_id ) {
 		if ( $post_id > 0 ) {
-
-			// Delete bundled items cache.
-			delete_transient( 'wc_bundled_items_' . $post_id );
 
 			/*
 			 * Delete associated bundled items stock cache when clearing product transients.

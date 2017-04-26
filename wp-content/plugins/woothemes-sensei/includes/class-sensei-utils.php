@@ -568,7 +568,7 @@ class Sensei_Utils {
 	/**
 	 * Grade question automatically
      *
-     * This function checks the question typ and then grades it accordingly.
+     * This function checks the question type and then grades it accordingly.
      *
      * @deprecated since 1.7.4 use WooThemes_Sensei_Grading::grade_question_auto instead
      *
@@ -2392,6 +2392,32 @@ class Sensei_Utils {
 
 		$plugin_present_and_activated = in_array( $plugin_registered_path, $active_plugins ) || array_key_exists( $plugin_registered_path, $active_plugins );
 		return class_exists( $plugin_class_to_look_for ) || $plugin_present_and_activated;
+	}
+
+	/**
+	 * Hard - Resets a Learner's Course Progress
+	 * @param $course_id int
+	 * @param $user_id int
+	 * @return mixed
+	 */
+	public static function reset_course_for_user( $course_id, $user_id ) {
+		self::sensei_remove_user_from_course( $course_id, $user_id );
+		return self::user_start_course( $user_id, $course_id );
+	}
+
+	/**
+	 * @param $setting_name string
+	 * @param null|string $filter_to_apply
+	 * @return bool
+	 */
+	public static function get_setting_as_flag($setting_name, $filter_to_apply = null ) {
+		$setting_on = false;
+
+		if ( isset( Sensei()->settings->settings[ $setting_name ] ) ) {
+			$setting_on = (bool)Sensei()->settings->settings[ $setting_name ];
+		}
+
+		return ( null !== $filter_to_apply ) ? (bool)apply_filters($filter_to_apply, $setting_on) : $setting_on;
 	}
 } // End Class
 

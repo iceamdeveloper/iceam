@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin_Ajax class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,8 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin AJAX meta-box handlers.
  *
  * @class     WC_PB_Admin_Ajax
- * @version   5.0.0
- * @since     5.0.0
+ * @version   5.2.2
  */
 class WC_PB_Admin_Ajax {
 
@@ -38,7 +37,19 @@ class WC_PB_Admin_Ajax {
 	 */
 	public static function ajax_search_bundled_variations() {
 
-		WC_AJAX::json_search_products( '', array( 'product_variation' ) );
+		if ( ! empty( $_GET[ 'include' ] ) ) {
+			if ( $bundle = wc_get_product( absint( $_GET[ 'include' ] ) ) ) {
+				$_GET[ 'include' ] = WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? $bundle->get_children() : implode( ', ', $bundle->get_children() );
+			} else {
+				$_GET[ 'include' ] = WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? array() : '';
+			}
+		}
+
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			WC_AJAX::json_search_products( '', true );
+		} else {
+			WC_AJAX::json_search_products( '', array( 'product_variation' ) );
+		}
 	}
 
 	/**
@@ -48,20 +59,19 @@ class WC_PB_Admin_Ajax {
 
 		check_ajax_referer( 'wc_bundles_add_bundled_product', 'security' );
 
-		$loop              = intval( $_POST[ 'id' ] );
-		$post_id           = intval( $_POST[ 'post_id' ] );
-		$product_id        = intval( $_POST[ 'product_id' ] );
-		$item_id           = false;
-		$toggle            = 'open';
-		$tabs              = WC_PB_Meta_Box_Product_Data::get_bundled_product_tabs();
+		$loop       = intval( $_POST[ 'id' ] );
+		$post_id    = intval( $_POST[ 'post_id' ] );
+		$product_id = intval( $_POST[ 'product_id' ] );
+		$item_id    = false;
+		$toggle     = 'open';
+		$tabs       = WC_PB_Meta_Box_Product_Data::get_bundled_product_tabs();
+		$product    = wc_get_product( $product_id );
+		$title      = $product->get_title();
+		$sku        = $product->get_sku();
+		$title      = WC_PB_Helpers::format_product_title( $title, $sku, '', true );
+		$title      = sprintf( _x( '#%1$s: %2$s', 'bundled product admin title', 'woocommerce-product-bundles' ), $product_id, $title );
 
 		$item_data         = array();
-
-		$product           = wc_get_product( $product_id );
-		$title             = $product->get_title();
-		$sku               = $product->get_sku();
-		$suffix            = sprintf( _x( '#%s', 'product identifier', 'woocommerce-product-bundles' ), $product_id );
-		$title             = WC_PB_Helpers::format_product_title( $title, $sku, $suffix, true );
 		$item_availability = '';
 
 		$response          = array(

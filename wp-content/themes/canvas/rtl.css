@@ -19,15 +19,14 @@ INDEX
 */
 .fa {
   display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
 .fa-fw {
-  width: 1.28571em;
+  width: 1.2857142857em;
   text-align: center; }
 
 .fl {
@@ -75,13 +74,10 @@ INDEX
   ul.nav {
     margin-right: 0;
     margin-left: 1em; }
-
   ul.nav li {
     float: right; }
-
   ul.nav ul {
     right: 0; }
-
   /* 3. MAIN NAVIGATION DROPDOWN MENUS (Add main navigation presentational styles here) */
   #navigation {
     right: auto; }
@@ -94,37 +90,26 @@ INDEX
         margin-left: .5em; }
     #navigation ul ul {
       margin-right: 0; }
-
   #navigation ul.nav ul {
     right: -1px; }
-
   #navigation ul.nav ul ul {
     right: 100%; }
-
   #nav-container #navigation ul#main-nav > li:first-child {
     border-left: 0; }
-
   #top .nav li.parent > a {
     padding-left: 2em; }
-
   #top .nav li.parent > a:after {
     left: .8751em; }
-
   #top .nav li ul li.parent a:after {
     left: .8751em; }
-
   #navigation .nav li ul li.parent a {
     padding-left: 0; }
-
   #navigation .nav li ul li.parent a:after {
     left: 0; }
-
   #navigation .nav li.parent > a {
     padding-left: 2em; }
-
   #navigation .nav li ul li.parent a {
     padding-left: 0; }
-
   #navigation .nav li ul li.parent a::before {
     content: "";
     display: block;
@@ -133,78 +118,58 @@ INDEX
     border-color: transparent rgba(0, 0, 0, 0.1) transparent transparent;
     left: 0.8751em;
     top: 42%; }
-
   #navigation .nav li ul li.parent a::after {
     border-color: transparent;
     border: none;
     content: ''; }
-
   #navigation .menus.nav-icons #main-nav {
     margin-right: 0; }
   #navigation .menus.nav-icons .side-nav {
     right: auto;
     left: 0; }
-
   /* Cart dropdown */
   #navigation ul.cart > li > ul > li > div {
     left: 0; }
-
   #navigation ul.cart .total {
      text-align: left; }
-
   #navigation ul.cart a.cart-contents, #navigation ul.cart a.search-contents, #navigation ul.nav-search a.cart-contents, #navigation ul.nav-search a.search-contents {
     left: auto;
     right: 0; }
-
   /* Search dropdown */
   #navigation ul.nav-search {
     float: left;
     clear: none; }
-
   body #navigation ul.nav-search > li > ul > li > div {
     left: 0;
     right: auto; }
-
   #navigation ul.nav-search li:hover ul > li > div {
     display: block; }
-
   #navigation ul.nav-search .widget_woo_search .searchform button.submit {
     left: 11px; }
-
   #navigation ul.nav-search #searchform .submit, #navigation ul.nav-search .searchform .submit {
     right: auto; }
-
   /* 4. GENERAL LAYOUT RELATED TWEAKS */
   /* Header */
   #logo {
     float: right; }
-
   .header-widget {
     float: left; }
-
   /* Columns & Containers */
   .col-left {
     float: right; }
-
   .col-right {
     float: left; }
-
   .magazine .block {
     float: right; }
-
   .magazine .block.last {
     float: left; }
-
   /* Sliders */
   #loopedSlider .content {
     right: 0px; }
-
   #loopedSlider .content h2 {
     float: right; }
-
   #loopedSlider .content p {
     float: right; }
-
   /* 	Widgets */
   #main .widget_woothemes_features .columns-1 .feature {
     text-align: right; }
@@ -219,19 +184,15 @@ INDEX
     margin-left: 5%; }
     #main .widget_woothemes_features .feature.last {
       margin-left: 0; }
-
   /* Footer */
   #footer-widgets .block {
     margin-left: 3.8%;
     float: right; }
-
   /* 210 / 940 */
   #footer-widgets.col-1 .block {
     margin-left: 0; }
-
   #footer-widgets.col-2 .footer-widget-2, #footer-widgets.col-3 .footer-widget-3, #footer-widgets.col-4 .footer-widget-4 {
     margin-left: 0; }
-
   /* Column Floating */
   .two-col-left #main-sidebar-container #main,
   .two-col-right #main-sidebar-container #sidebar,
@@ -242,7 +203,6 @@ INDEX
   .three-col-right #main-sidebar-container #sidebar,
   .three-col-right #sidebar-alt {
     float: right; }
-
   .two-col-left #main-sidebar-container #sidebar,
   .two-col-right #main-sidebar-container #main,
   .three-col-left #main-sidebar-container #sidebar,
@@ -252,25 +212,19 @@ INDEX
   .three-col-right #main-sidebar-container,
   .three-col-right #main-sidebar-container #main {
     float: left; }
-
   /* Contact Page */
   .page-template-template-contact-php .location-twitter .col-left {
     float: right; }
-
   .page-template-template-contact-php .location-twitter .contact-social {
     float: right; }
-
   /* Subcribe & Connect */
   #main #connect .col-left {
     float: right; }
-
   #connect .col-right {
     float: left; }
-
   #connect .related-posts {
     border-right: 1px solid #e6e6e6;
     padding-right: 15px; }
-
   /* Boxed Layout */
   .boxed-layout #header,
   .boxed-layout #content,

@@ -2,7 +2,7 @@
 /**
  * WC_PB_Install class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -187,14 +187,13 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 	 */
 	private static function update() {
 
-		$logger        = new WC_Logger();
 		$update_queued = false;
 
 		foreach ( self::$db_updates as $version => $update_callbacks ) {
 			if ( version_compare( self::$current_db_version, $version, '<' ) ) {
-				$logger->add( 'wc_pb_db_updates', sprintf( 'Updating to version %s.', $version ) );
+				WC_PB_Core_Compatibility::log( sprintf( 'Updating to version %s.', $version ), 'info', 'wc_pb_db_updates' );
 				foreach ( $update_callbacks as $update_callback ) {
-					$logger->add( 'wc_pb_db_updates', sprintf( '- Queuing %s callback.', $update_callback ) );
+					WC_PB_Core_Compatibility::log( sprintf( '- Queuing %s callback.', $update_callback ), 'info', 'wc_pb_db_updates' );
 					self::$background_updater->push_to_queue( $update_callback );
 					$update_queued = true;
 				}
@@ -233,11 +232,10 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 	 */
 	public static function update_complete() {
 
-		$logger = new WC_Logger();
-
-		$logger->add( 'wc_pb_db_updates', 'Data update complete.' );
+		WC_PB_Core_Compatibility::log( 'Data update complete.', 'info', 'wc_pb_db_updates' );
 		self::update_db_version();
 		delete_option( 'wc_pb_update_init' );
+		wp_cache_flush();
 	}
 
 	/**
@@ -273,13 +271,13 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 	 * @param  string  $version
 	 */
 	private static function update_db_version( $version = null ) {
-		$logger  = new WC_Logger();
+
 		$version = is_null( $version ) ? WC_PB()->version : $version;
 
 		delete_option( 'woocommerce_product_bundles_db_version' );
 		add_option( 'woocommerce_product_bundles_db_version', $version );
 
-		$logger->add( 'wc_pb_db_updates', sprintf( 'Database version is %s.', get_option( 'woocommerce_product_bundles_db_version', 'unknown' ) ) );
+		WC_PB_Core_Compatibility::log( sprintf( 'Database version is %s.', get_option( 'woocommerce_product_bundles_db_version', 'unknown' ) ), 'info', 'wc_pb_db_updates' );
 	}
 
 	/**

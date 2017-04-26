@@ -8,10 +8,9 @@
  */
 .fa, .widget_projects_categories li:before, .widget_projects_categories ul.children li:before {
   display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
@@ -56,29 +55,36 @@
       margin-right: 0;
       float: right;
       clear: none; }
+
 .projects .project h2,
 .projects-page .project h2 {
   margin: 0 0 .5em; }
+
 .projects .project img,
 .projects-page .project img {
   height: auto; }
+
 .projects .single-featured,
 .projects-page .single-featured {
   margin-bottom: 1.618em; }
+
 .projects.has-gallery .gallery img,
 .projects-page.has-gallery .gallery img {
   height: auto;
   margin-bottom: 1.618em; }
-.projects .project-meta:after,
-.projects-page .project-meta:after {
+
+.projects .project-meta::after,
+.projects-page .project-meta::after {
+  clear: both;
   content: "";
-  display: table;
-  clear: both; }
+  display: block; }
+
 .projects .project-meta h3,
 .projects-page .project-meta h3 {
   font-size: 15px;
   color: #555;
   margin: 0 0 5px; }
+
 .projects .project-meta .categories,
 .projects .project-meta .client,
 .projects .project-meta .url,
@@ -86,6 +92,7 @@
 .projects-page .project-meta .client,
 .projects-page .project-meta .url {
   margin-bottom: 1.618em; }
+
 .projects .project-meta .single-project-categories,
 .projects-page .project-meta .single-project-categories {
   list-style: none;
@@ -94,6 +101,7 @@
   .projects .project-meta .single-project-categories li,
   .projects-page .project-meta .single-project-categories li {
     list-style: none; }
+
 .projects .project-testimonial,
 .projects-page .project-testimonial {
   padding-top: 1.618em;
@@ -107,11 +115,11 @@
   padding-bottom: 1em;
   margin-bottom: 1em;
   border-bottom: 1px solid #e6e6e6; }
-  .widget_projects_items li:after,
-  .widget_projects_categories li:after {
+  .widget_projects_items li::after,
+  .widget_projects_categories li::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: block; }
   .widget_projects_items li:last-child,
   .widget_projects_categories li:last-child {
     padding-bottom: 0;
@@ -127,6 +135,7 @@
   list-style: none; }
   .widget_projects_categories li:before {
     content: ""; }
+
 .widget_projects_categories ul.children {
   padding-top: 1em; }
   .widget_projects_categories ul.children li:before {
@@ -156,23 +165,26 @@
         .old-portfolio-look .projects-category-nav ul li a:hover, .old-portfolio-look .projects-category-nav ul li a.current {
           text-decoration: none;
           background: #eee; }
+
 .old-portfolio-look .project-permalink .project-thumbnail {
   background-position: 50% 50%; }
   .old-portfolio-look .project-permalink .project-thumbnail img {
-    -webkit-transition: opacity 0.3s ease-in-out;
-    -moz-transition: opacity 0.3s ease-in-out;
-    transition: opacity 0.3s ease-in-out; }
+    -webkit-transition: opacity 0.3s ease-in-out ease-in-out 0.2s;
+    -moz-transition: opacity 0.3s ease-in-out ease-in-out 0.2s;
+    -ms-transition: opacity 0.3s ease-in-out ease-in-out 0.2s;
+    -o-transition: opacity 0.3s ease-in-out ease-in-out 0.2s;
+    transition: opacity 0.3s ease-in-out ease-in-out 0.2s; }
   .old-portfolio-look .project-permalink .project-thumbnail:hover {
     background: url("../../../../images/portfolio-hover.png") no-repeat 50% 50%; }
     .old-portfolio-look .project-permalink .project-thumbnail:hover img {
       opacity: .5; }
 
 @media only screen and (min-width: 980px) {
-  .projects.no-gallery .summary:after,
-  .projects-page.no-gallery .summary:after {
+  .projects.no-gallery .summary::after,
+  .projects-page.no-gallery .summary::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: block; }
   .projects.no-gallery .project-meta > div,
   .projects-page.no-gallery .project-meta > div {
     width: auto;
@@ -184,11 +196,11 @@
   .projects.no-gallery.no-cover-image .entry-summary,
   .projects-page.no-gallery.no-cover-image .entry-summary {
     width: 100%; }
-  .projects.has-gallery .project:after,
-  .projects-page.has-gallery .project:after {
+  .projects.has-gallery .project::after,
+  .projects-page.has-gallery .project::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: block; }
   .projects.one-col .entry-media,
   .projects-page.one-col .entry-media {
     width: 57%;
@@ -197,11 +209,10 @@
   .projects-page.one-col .entry-summary {
     width: 40%;
     float: right; }
-
-  .projects.columns-2:after, .projects.columns-3:after, .projects.columns-4:after, .projects.columns-5:after, .projects.columns-6:after {
+  .projects.columns-2::after, .projects.columns-3::after, .projects.columns-4::after, .projects.columns-5::after, .projects.columns-6::after {
+    clear: both;
     content: "";
-    display: table;
-    clear: both; }
+    display: block; }
   .projects.columns-2 ul.projects li.project, .projects.columns-3 ul.projects li.project, .projects.columns-4 ul.projects li.project, .projects.columns-5 ul.projects li.project, .projects.columns-6 ul.projects li.project {
     float: left;
     margin-right: 3.8%;

@@ -78,21 +78,21 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 */
 	public function get_columns() {
 		$columns = array(
-			'order'     => __( 'Order', 'event-tickets' ),
-			'purchaser' => __( 'Purchaser', 'event-tickets' ),
-			'email'     => __( 'Email', 'event-tickets' ),
-			'purchased' => __( 'Purchased', 'event-tickets' ),
-			'address'   => __( 'Address', 'event-tickets' ),
-			'date'      => __( 'Date', 'event-tickets' ),
-			'status'    => __( 'Status', 'event-tickets' ),
+			'order'     => __( 'Order', 'event-tickets-plus' ),
+			'purchaser' => __( 'Purchaser', 'event-tickets-plus' ),
+			'email'     => __( 'Email', 'event-tickets-plus' ),
+			'purchased' => __( 'Purchased', 'event-tickets-plus' ),
+			'address'   => __( 'Address', 'event-tickets-plus' ),
+			'date'      => __( 'Date', 'event-tickets-plus' ),
+			'status'    => __( 'Status', 'event-tickets-plus' ),
 		);
 
 		if ( self::event_fees( $this->event_id ) ) {
-			$columns['subtotal'] = __( 'Subtotal', 'event-tickets' );
-			$columns['site_fee'] = __( 'Site Fee', 'event-tickets' );
+			$columns['subtotal'] = __( 'Subtotal', 'event-tickets-plus' );
+			$columns['site_fee'] = __( 'Site Fee', 'event-tickets-plus' );
 		}
 
-		$columns['total'] = __( 'Total', 'event-tickets' );
+		$columns['total'] = __( 'Total', 'event-tickets-plus' );
 
 		return $columns;
 	}//end get_columns

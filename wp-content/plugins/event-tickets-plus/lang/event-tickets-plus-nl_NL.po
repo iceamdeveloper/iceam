@@ -10,6 +10,11 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
+msgctxt "Browser title"
+msgid "%s - Order list"
+msgstr ""
+
 #: src/admin-views/meta-fields/_field.php:9
 msgctxt "Attendee information fields"
 msgid "Label:"
@@ -557,10 +562,6 @@ msgstr "Bekijk de verkopen van dit evenement"
 msgid "Orders"
 msgstr "Orders"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
-msgid "%s - Order list"
-msgstr "%s - Orderlijst"
-
 #: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
 msgid "Order"
 msgstr "Bestelling"
@@ -629,23 +630,23 @@ msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:728
+#: src/Tribe/Commerce/WooCommerce/Main.php:756
 msgid "You'll receive your tickets in another email."
 msgstr "Let op: je krijgt je tickets in een andere mail, zodra de bestelling in onze systemen afgerond is."
 
 #: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1443
+#: src/Tribe/Commerce/WooCommerce/Main.php:1475
 msgid "(deleted)"
 msgstr "(verwijderd)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1692
+#: src/Tribe/Commerce/WooCommerce/Main.php:1724
 msgid "Event sales report"
 msgstr "Evenement verkooprapport"
 
 #: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
 #: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1740
+#: src/Tribe/Commerce/WooCommerce/Main.php:1772
 msgid "This is a ticket for the event:"
 msgstr "Dit is een ticket voor het evenement:"
 
@@ -706,17 +707,17 @@ msgid "We're sorry but there was insufficient inventory to completely fulfill yo
 msgstr "Het spijt ons, maar er was onvoldoende voorraad om uw volledig bestelling te vervullen! We hebben zoveel mogelijk tickets toegevoegd als we konden, maar wij adviseren uw bestelling na te kijken (zie hieronder) voor het geval  dat u aanpassingen aan wil brengen."
 
 #: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1513
+#: src/Tribe/Commerce/WooCommerce/Main.php:1545
 msgid "In trash (was %s)"
 msgstr "In de prullemand (was %s)"
 
 #: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1519
+#: src/Tribe/Commerce/WooCommerce/Main.php:1551
 msgid "Deleted"
 msgstr "Verwijderd"
 
 #: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1568
+#: src/Tribe/Commerce/WooCommerce/Main.php:1600
 msgid "Unknown"
 msgstr "Onbekend "
 
@@ -744,7 +745,7 @@ msgstr "Onderwerp"
 msgid "Defaults to <code>%s</code>"
 msgstr "Wordt automatisch omgezet in <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1717
+#: src/Tribe/Commerce/WooCommerce/Main.php:1749
 msgid "Report"
 msgstr "Rapporteer "
 

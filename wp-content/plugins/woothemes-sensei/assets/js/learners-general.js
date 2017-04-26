@@ -42,7 +42,7 @@ jQuery(document).ready( function($) {
         );
     });
 
-    jQuery( '.remove-learner' ).click( function() {
+    jQuery( '.remove-learner, .reset-learner' ).click( function( event ) {
         var dataToPost = '';
 
         var user_id = jQuery( this ).attr( 'data-user_id' );
@@ -51,21 +51,34 @@ jQuery(document).ready( function($) {
 
         var confirm_message = woo_learners_general_data.remove_generic_confirm;
 
-        switch( post_type ) {
-            case 'lesson': confirm_message = woo_learners_general_data.remove_from_lesson_confirm; break;
-            case 'course': confirm_message = woo_learners_general_data.remove_from_course_confirm; break;
+        var actions = {
+            reset: {
+                lesson : woo_learners_general_data.reset_lesson_confirm,
+                course : woo_learners_general_data.reset_course_confirm,
+                action : 'reset_user_post'
+            },
+            remove: {
+                lesson : woo_learners_general_data.remove_from_lesson_confirm,
+                course : woo_learners_general_data.remove_from_course_confirm,
+                action : 'remove_user_from_post'
+            }
+        };
+
+        var current_action = jQuery( event.target ).hasClass( 'remove-learner' ) ? 'remove' : 'reset';
+
+        confirm_message = actions[current_action][post_type];
+
+        if ( ! confirm( confirm_message ) ) {
+            return;
         }
-
-        var confirm_remove = confirm( confirm_message );
-
-        if( ! confirm_remove ) return;
 
         var table_row = jQuery( this ).closest( 'tr' );
 
-        table_row.fadeTo( 'fast', 0.33 );
+        if ( 'remove' === current_action ) {
+            table_row.fadeTo( 'fast', 0.33 );
+        }
 
-        if( user_id && post_id && post_type ) {
-
+        if ( user_id && post_id && post_type ) {
             dataToPost += 'user_id=' + user_id;
             dataToPost += '&post_id=' + post_id;
             dataToPost += '&post_type=' + post_type;
@@ -73,13 +86,21 @@ jQuery(document).ready( function($) {
             jQuery.post(
                 ajaxurl,
                 {
-                    action : 'remove_user_from_post',
-                    remove_user_from_post_nonce : woo_learners_general_data.remove_user_from_post_nonce,
+                    action : actions[current_action].action,
+                    modify_user_post_nonce : woo_learners_general_data.modify_user_post_nonce,
                     data : dataToPost
                 },
                 function( response ) {
-                    if( response ) {
-                        table_row.remove();
+                    if ( response ) {
+                        switch ( current_action ) {
+                            case 'remove':
+                                table_row.remove();
+                            break;
+
+                            case 'reset':
+                                table_row.find( '.graded' ).html( slgL10n.inprogress ).removeClass( 'graded' ).addClass( 'in-progress' );
+                            break
+                        }
                     }
                 }
             );
@@ -97,7 +118,7 @@ jQuery(document).ready( function($) {
     };
 
 
-    jQuery('input#add_learner_search').select2({
+    jQuery('select#add_learner_search').select2({
         minimumInputLength: 3,
         placeholder: woo_learners_general_data.selectplaceholder,
         width:'300px',
@@ -108,36 +129,30 @@ jQuery(document).ready( function($) {
             dataType: 'json',
             cache: true,
             id: function(user){ return bond._id; },
-            data: function (input, page) { // page is the one-based page number tracked by Select2
+            data: function (params) { // page is the one-based page number tracked by Select2
                 return {
-                    term: input, //search term
-                    page: page || 1,
+                    term: params.term, //search term
+                    page: params.page || 1,
                     action: 'sensei_json_search_users',
                     security: 	woo_learners_general_data.search_users_nonce,
                     default: ''
                 };
             },
-            results: function (users, page) {
+            processResults: function (users, page) {
+
                 var validUsers = [];
                 jQuery.each( users, function (i, val) {
                     if( ! jQuery.isEmptyObject( val )  ){
-                        validUser = { id: i , details: val  };
+                        validUser = { id: i , text: val  };
                         validUsers.push( validUser );
                     }
                 });
                 // wrap the users inside results for select 2 usage
-                return {  results: validUsers };
+                return {
+                    results: validUsers,
+                    page: page
+                };
             }
-        },
-
-        initSelection: function (element, callback) {
-            //callback();
-        },
-        formatResult: function( user ){
-            return  user.details ;
-        },
-        formatSelection: function( user ){
-            return user.details;
         }
     }); // end select2
 

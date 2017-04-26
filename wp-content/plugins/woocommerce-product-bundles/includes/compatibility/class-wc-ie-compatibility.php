@@ -2,7 +2,7 @@
 /**
  * WC_PB_WC_IE_Compatibility class
  *
- * @author   SomewhereWarm <sw@somewherewarm.net>
+ * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Uses a dedicated CSV column to export bundle data using the 'get_data()' method of the WC_Bundled_Item_Data CRUD class.
  * Data is imported again using the WC_Bundled_Item_Data class.
  *
- * @version  5.1.0
+ * @version  5.1.3
  */
 class WC_PB_WC_IE_Compatibility {
 

@@ -47,7 +47,8 @@ class Sensei_Wp_Kses {
                 ),
                 'span' => array(
                     'class' => array()
-                )
+                ),
+                'source' => self::get_source_html_tag_allowed_attributes()
             );
         }
         return self::$allowed_html;
@@ -55,6 +56,7 @@ class Sensei_Wp_Kses {
 
     public static function get_video_html_tag_allowed_attributes() {
         return array(
+            'source'   => array(),
             'autoplay' => array(),
             'controls' => array(),
             'height'   => array(),
@@ -64,6 +66,16 @@ class Sensei_Wp_Kses {
             'preload'  => array(),
             'src'      => array(),
             'width'    => array(),
+        );
+    }
+
+    public static function get_source_html_tag_allowed_attributes() {
+        return array(
+            'src'    => array(),
+            'type'   => array(),
+            'srcset' => array(),
+            'sizes'  => array(),
+            'media'  => array()
         );
     }
 

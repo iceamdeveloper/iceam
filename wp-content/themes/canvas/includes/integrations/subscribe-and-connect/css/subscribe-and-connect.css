@@ -7,15 +7,14 @@
  */
 .fa {
   display: inline-block;
-  font-family: FontAwesome;
-  font-style: normal;
-  font-weight: normal;
-  line-height: 1;
+  font: normal normal normal 14px/1 FontAwesome;
+  font-size: inherit;
+  text-rendering: auto;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale; }
 
 .fa-fw {
-  width: 1.28571em;
+  width: 1.2857142857em;
   text-align: center; }
 
 .subscribe-and-connect-connect {
@@ -25,7 +24,7 @@
   border-radius: 5px;
   background-color: #fafafa; }
   .subscribe-and-connect-connect h2 {
-    font: bold 16px/1.2em "Helvetica Neue", Helvetica, Roboto, Arial, sans-serif;
+    font: bold 16px/1.2em '"Helvetica Neue", "Helvetica", "Roboto", "Arial", sans-serif';
     margin-bottom: 0.4em; }
   .subscribe-and-connect-connect .description p {
     margin: 0 0 1.5em; }
