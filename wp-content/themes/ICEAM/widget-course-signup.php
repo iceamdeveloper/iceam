@@ -134,9 +134,6 @@
 				$total_price = $the_price + $the_signup_fee;
 				$the_period = WC_Subscriptions_Product::get_interval( $product ) . " " . WC_Subscriptions_Product::get_period( $product ) . "s";
 				
-				echo "<h4>Register for " . wc_price( $total_price ) . "</h4>";
-				
-				
 			?>
 				
 				<form action="<?php echo esc_url( $product->add_to_cart_url() ); ?>" class="cart" method="post" enctype="multipart/form-data">
@@ -147,6 +144,7 @@
 				
             <?php
 			
+				echo "<h4 style='margin: 30px 0px 0px;'>Register for " . wc_price( $total_price ) . "</h4>";			
 				echo "<p style='margin-top:15px'><strong>Optional course renewal for " . wc_price($the_price) . " <nobr>after $the_period</nobr></strong></p>";
 			
 			} // End If Statement ?>
