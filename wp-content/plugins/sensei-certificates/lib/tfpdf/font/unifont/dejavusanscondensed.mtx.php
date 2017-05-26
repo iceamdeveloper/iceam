@@ -13,7 +13,7 @@ $desc=array (
 );
 $up=-63;
 $ut=44;
-$ttffile='/Users/pgk/Sites/wplocal.dev/web/app/plugins/sensei-certificates/lib/tfpdf/font/unifont/DejaVuSansCondensed.ttf';
+$ttffile='/nfs/c12/h08/mnt/217167/domains/iceam.org/html/wp-content/plugins/sensei-certificates/lib/tfpdf/font/unifont/DejaVuSansCondensed.ttf';
 $originalsize=643852;
 $fontkey='dejavu';
 ?>
