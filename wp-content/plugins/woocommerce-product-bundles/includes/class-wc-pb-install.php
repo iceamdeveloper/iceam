@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles installation and updating tasks.
  *
  * @class    WC_PB_Install
- * @version  5.1.0
+ * @version  5.3.0
  */
 class WC_PB_Install {
 
@@ -49,16 +49,35 @@ class WC_PB_Install {
 	 */
 	public static function init() {
 
+		// Installation and DB updates handling.
 		add_action( 'init', array( __CLASS__, 'init_background_updater' ), 5 );
 		add_action( 'init', array( __CLASS__, 'check_updating' ) );
 		add_action( 'admin_init', array( __CLASS__, 'check_version' ) );
+
+		// Show row meta on the plugin screen.
 		add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 2 );
+
+		// Adds support for the Bundle type - added here instead of 'WC_PB_Meta_Box_Product_Data' as it's used in REST context.
+		add_filter( 'product_type_selector', array( __CLASS__, 'product_selector_filter' ) );
 
 		// Get PB plugin and plugin DB versions.
 		self::$current_version    = get_option( 'woocommerce_product_bundles_version', null );
 		self::$current_db_version = get_option( 'woocommerce_product_bundles_db_version', null );
 
 		include_once( 'class-wc-pb-background-updater.php' );
+	}
+
+	/**
+	 * Add support for the 'bundle' product type.
+	 *
+	 * @param  array  $options
+	 * @return array
+	 */
+	public static function product_selector_filter( $options ) {
+
+		$options[ 'bundle' ] = __( 'Product bundle', 'woocommerce-product-bundles' );
+
+		return $options;
 	}
 
 	/**

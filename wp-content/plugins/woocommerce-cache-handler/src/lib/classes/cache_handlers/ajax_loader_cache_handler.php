@@ -110,7 +110,7 @@ class Ajax_Loader_Cache_Handler extends Base_Cache_Handler {
 	 */
 	public function woocommerce_get_price_html($price_html, $product) {
 		if(self::$wrap_amounts) {
-			$price_html = '<span class="aelia_product_price" data-product_id="' . $product->id . '">' .
+			$price_html = '<span class="aelia_product_price" data-product_id="' . aelia_get_product_id($product) . '">' .
 										$price_html .
 										'</span>';
 		}

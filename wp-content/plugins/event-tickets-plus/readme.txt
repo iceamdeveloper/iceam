@@ -3,8 +3,8 @@
 Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tribe, faction23, geoffgraham, ggwicz, jazbek, jbrinley, joshlimecuda, leahkoerper, lucatume, mastromktg, neillmcshea, nicosantos, peterchester, reid.peifer, roblagatta, shane.pearlman, thatdudebutch,  zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
-Tested up to: 4.7.3
-Stable tag: 4.4.6
+Tested up to: 4.7.5
+Stable tag: 4.4.9
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,25 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.9] 2017-06-01 =
+
+* Feature - Overlay over ticket fields when javascript is disabled to prevent ticket orders [63912]
+* Performance - Remove unnecessary ticket stock queries and avoid running some where unnecessary (our thanks to @mindshare for highlighting some of these issues) [79683]
+* Tweak - Included a New Filter `tribe_tickets_plus_qr_handle_redirects` to give the chance to modify the QR checkin redirect URL [78677]
+
+= [4.4.8] 2017-05-17 =
+
+* Fix - Do not add "you will received your tickets in another email" messaging to refund notices (our thanks to Shadi Habbal for highlighting this) [73561]
+* Tweak - Shopp and WP E-Commerce integrations have been deprecated prior to removal in a future release [71909]
+* Tweak - Further adjustments made to our plugin licensing system [78506]
+
+= [4.4.7] 2017-05-04 =
+
+* Fix - Ensure catalog visibility and other product attributes for WooCommerce-driven tickets are set as expected [77092]
+* Fix - Ensure attendee infomation is retained in a WooCommerce session for the user to prevent loss of data [65181]
+* Fix - On refund of WooCommerce Tickets, add stock back to global and capped stock if enabled [66803]
+* Tweak - adjustments made to our plugin licensing system
 
 = [4.4.6] 2017-04-19 =
 

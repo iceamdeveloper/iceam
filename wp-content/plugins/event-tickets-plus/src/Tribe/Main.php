@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.4.6';
+		const VERSION = '4.4.9';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.4';
+		const REQUIRED_TICKETS_VERSION = '4.4.7';
 
 		/**
 		 * Directory of the plugin
@@ -108,6 +108,10 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		}
 
 		public function init() {
+			if ( class_exists( 'Tribe__Main' ) && ! is_admin() && ! class_exists( 'Tribe__Tickets_Plus__PUE__Helper' ) ) {
+				tribe_main_pue_helper();
+			}
+
 			$this->register_resources();
 			$this->commerce_loader();
 			$this->meta();

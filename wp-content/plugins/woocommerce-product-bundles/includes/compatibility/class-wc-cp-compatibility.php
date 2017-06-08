@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Composite Products Compatibility.
  *
- * @version  5.2.0
+ * @version  5.3.0
  */
 class WC_PB_CP_Compatibility {
 
@@ -97,7 +97,10 @@ class WC_PB_CP_Compatibility {
 
 		if ( wc_pb_is_bundle_container_cart_item( $cart_item_data ) ) {
 
-			if ( isset( $cart_item_data[ 'data' ]->composited_value ) ) {
+			if ( WC_CP_Core_Compatibility::prop_exists( $cart_item_data[ 'data' ], 'composited_value' ) ) {
+
+				$composited_bundle_value  = WC_CP_Core_Compatibility::get_prop( $cart_item_data[ 'data' ], 'composited_value', 'shipping' );
+				$composited_bundle_weight = WC_CP_Core_Compatibility::get_prop( $cart_item_data[ 'data' ], 'composited_weight', 'shipping' );
 
 				$bundle     = unserialize( serialize( $cart_item_data[ 'data' ] ) );
 				$bundle_qty = $cart_item_data[ 'quantity' ];
@@ -120,14 +123,16 @@ class WC_PB_CP_Compatibility {
 
 				foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, WC()->cart->cart_contents, true ) as $child_item_key ) {
 
-					$child_cart_item_data = WC()->cart->cart_contents[ $child_item_key ];
-					$bundled_product      = $child_cart_item_data[ 'data' ];
-					$bundled_product_qty  = $child_cart_item_data[ 'quantity' ];
+					$child_cart_item_data   = WC()->cart->cart_contents[ $child_item_key ];
+					$bundled_product        = $child_cart_item_data[ 'data' ];
+					$bundled_product_qty    = $child_cart_item_data[ 'quantity' ];
+					$bundled_product_value  = WC_PB_Core_Compatibility::get_prop( $bundled_product, 'bundled_value', 'shipping' );
+					$bundled_product_weight = WC_PB_Core_Compatibility::get_prop( $bundled_product, 'bundled_weight', 'shipping' );
 
 					// Aggregate price.
-					if ( isset( $bundled_product->bundled_value ) ) {
+					if ( $bundled_product_value ) {
 
-						$bundled_value += $bundled_product->bundled_value * $bundled_product_qty;
+						$bundled_value += $bundled_product_value * $bundled_product_qty;
 
 						$bundle_totals[ 'line_subtotal' ]     += $child_cart_item_data[ 'line_subtotal' ];
 						$bundle_totals[ 'line_total' ]        += $child_cart_item_data[ 'line_total' ];
@@ -141,17 +146,19 @@ class WC_PB_CP_Compatibility {
 					}
 
 					// Aggregate weight.
-					if ( isset( $bundled_product->bundled_weight ) ) {
-						$bundled_weight += $bundled_product->bundled_weight * $bundled_product_qty;
+					if ( $bundled_product_weight ) {
+						$bundled_weight += $bundled_product_weight * $bundled_product_qty;
 					}
 				}
 
 				$cart_item_data = array_merge( $cart_item_data, $bundle_totals );
 
-				$bundle->composited_value += $bundled_value / $bundle_qty;
+				if ( $bundled_value > 0 ) {
+					WC_CP_Core_Compatibility::set_prop( $bundle, 'composited_value', (double) $composited_bundle_value + $bundled_value / $bundle_qty );
+				}
 
-				if ( isset( $bundle->composited_weight ) ) {
-					$bundle->composited_weight += $bundled_weight / $bundle_qty;
+				if ( $bundled_weight > 0 ) {
+					WC_CP_Core_Compatibility::set_prop( $bundle, 'composited_weight', (double) $composited_bundle_weight + $bundled_weight / $bundle_qty );
 				}
 
 				$cart_item_data[ 'data' ] = $bundle;

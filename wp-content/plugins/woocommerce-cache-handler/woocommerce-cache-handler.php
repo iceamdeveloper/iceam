@@ -3,7 +3,7 @@
 Plugin Name: WooCommerce Cache Handler
 Description: Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 Plugin URI: https://aelia.co
-Version: 1.0.4.161003
+Version: 1.0.6.170520
 Author: Aelia
 Author URI: https://aelia.co
 Text Domain: wc-cache-handler

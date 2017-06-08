@@ -36,6 +36,9 @@ class Tribe__Tickets_Plus__QR {
 			return;
 		}
 
+		// See if the user had access or not to the checkin process
+		$user_had_access = false;
+
 		// If the user is the site owner (or similar), Check in the user to the event
 		if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 
@@ -47,17 +50,30 @@ class Tribe__Tickets_Plus__QR {
 				return;
 			}
 
+			$user_had_access = true;
+
 			$url = add_query_arg( array(
 				'post_type'     => $post->post_type,
 				'page'          => Tribe__Tickets__Tickets_Handler::$attendees_slug,
 				'event_id'      => $_GET['event_id'],
 				'qr_checked_in' => $_GET['ticket_id'],
 			), admin_url( 'edit.php' ) );
+
 		} else { // Probably just the ticket holder, redirect to the event front end single
 			$url = get_permalink( $_GET['event_id'] );
 		}
 
-		wp_redirect( $url );
+		/**
+		 * Filters the redirect URL if the user can access the QR checkin
+		 *
+		 * @param string  $url
+		 * @param int     $event_id
+		 * @param int     $ticket_id
+		 * @param bool    $user_had_access
+		 */
+		$url = apply_filters( 'tribe_tickets_plus_qr_handle_redirects', $url, (int) $event_id, (int) $ticket_id, $user_had_access );
+
+		wp_redirect( esc_url_raw( $url ) );
 		exit;
 	}
 

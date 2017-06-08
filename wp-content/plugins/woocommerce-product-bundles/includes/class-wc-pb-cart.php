@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle cart functions and filters.
  *
  * @class    WC_PB_Cart
- * @version  5.2.2
+ * @version  5.3.1
  */
 class WC_PB_Cart {
 
@@ -626,6 +626,10 @@ class WC_PB_Cart {
 			} else {
 				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'price', $bundled_item->get_raw_price( $cart_item[ 'data' ], 'cart' ) );
 			}
+
+			if ( $bundled_item->has_title_override() ) {
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'name', $bundled_item->get_raw_title() );
+			}
 		}
 
 		if ( $cart_item[ 'data' ]->needs_shipping() ) {
@@ -644,10 +648,10 @@ class WC_PB_Cart {
 				 * @param  WC_Product_Bundle  $bundle
 				 */
 				if ( apply_filters( 'woocommerce_bundled_item_has_bundled_weight', false, $cart_item[ 'data' ], $bundled_item_id, $bundle ) ) {
-					$cart_item[ 'data' ]->bundled_weight = (double) $cart_item[ 'data' ]->get_weight( 'edit' );
+					WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'bundled_weight', $cart_item[ 'data' ]->get_weight( 'edit' ) );
 				}
 
-				$cart_item[ 'data' ]->bundled_value = (double) WC_PB_Core_Compatibility::get_prop( $cart_item[ 'data' ], 'price', 'edit' );
+				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'bundled_value', WC_PB_Core_Compatibility::get_prop( $cart_item[ 'data' ], 'price', 'edit' ) );
 
 				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'virtual', 'yes' );
 				WC_PB_Core_Compatibility::set_prop( $cart_item[ 'data' ], 'weight', '' );
@@ -1434,10 +1438,10 @@ class WC_PB_Cart {
 			/** Documented right above. Look up. See? */
 			if ( apply_filters( 'woocommerce_add_bundled_cart_item_subtotals', true, $values, $cart_item_key ) ) {
 
-				$bundled_item_keys       = wc_pb_get_bundled_cart_items( $values, WC()->cart->cart_contents, true );
-				$bundled_items_price     = 0.0;
-				$contains_recurring_fees = false;
-				$bundle_price            = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $values[ 'data' ], array( 'qty' => $values[ 'quantity' ] ) ) : WC_PB_Core_Compatibility::wc_get_price_including_tax( $values[ 'data' ], array( 'qty' => $values[ 'quantity' ] ) );
+				$tax_display_cart    = get_option( 'woocommerce_tax_display_cart' );
+				$bundled_item_keys   = wc_pb_get_bundled_cart_items( $values, WC()->cart->cart_contents, true );
+				$bundled_items_price = 0.0;
+				$bundle_price        = 'excl' === $tax_display_cart ? $values[ 'line_total' ] : $values[ 'line_total' ] + $values[ 'line_tax' ];
 
 				foreach ( $bundled_item_keys as $bundled_item_key ) {
 
@@ -1449,34 +1453,11 @@ class WC_PB_Cart {
 					$item_id     = $item_values[ 'bundled_item_id' ];
 					$product     = $item_values[ 'data' ];
 
-					$bundled_item_price = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $product, array( 'qty' => $item_values[ 'quantity' ] ) ) : WC_PB_Core_Compatibility::wc_get_price_including_tax( $product, array( 'qty' => $item_values[ 'quantity' ] ) );
-
-					/*------------------------------------------------------------*/
-					/*	If a bundled item is a sub, then add sign up fee.         */
-					/*------------------------------------------------------------*/
-
-					$bundled_item = $values[ 'data' ]->get_bundled_item( $item_id );
-
-					if ( $bundled_item && $bundled_item->is_subscription() ) {
-
-						$bundled_item_recurring_fee = $bundled_item_price;
-
-						if ( $bundled_item_recurring_fee > 0 ) {
-							$contains_recurring_fees = true;
-						}
-
-						$bundled_item_sign_up_fee = 'excl' === get_option( 'woocommerce_tax_display_cart' ) ? WC_PB_Core_Compatibility::wc_get_price_excluding_tax( $product, array( 'qty' => $item_values[ 'quantity' ], 'price' => (double) WC_Subscriptions_Product::get_sign_up_fee( $product ) ) ) : WC_PB_Core_Compatibility::wc_get_price_including_tax( $product, array( 'qty' => $item_values[ 'quantity' ], 'price' => (double) WC_Subscriptions_Product::get_sign_up_fee( $product ) ) );
-						$bundled_item_price       = $bundled_item->get_up_front_subscription_price( $bundled_item_recurring_fee, $bundled_item_sign_up_fee, $product );
-					}
-
+					$bundled_item_price   = 'excl' === $tax_display_cart ? $item_values[ 'line_total' ] : $item_values[ 'line_total' ] + $item_values[ 'line_tax' ];
 					$bundled_items_price += (double) $bundled_item_price;
 				}
 
 				$subtotal = $this->format_product_subtotal( $values[ 'data' ], (double) $bundle_price + $bundled_items_price );
-
-				if ( $contains_recurring_fees ) {
-					$subtotal .= __( ' now <small>(recurring totals listed below)</small>', 'woocommerce-product-bundles' );
-				}
 			}
 		}
 
@@ -1574,15 +1555,17 @@ class WC_PB_Cart {
 
 								foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, WC()->cart->cart_contents, true ) as $child_item_key ) {
 
-									$child_cart_item_data = WC()->cart->cart_contents[ $child_item_key ];
-									$bundled_product      = $child_cart_item_data[ 'data' ];
-									$bundled_product_qty  = $child_cart_item_data[ 'quantity' ];
+									$child_cart_item_data   = WC()->cart->cart_contents[ $child_item_key ];
+									$bundled_product        = $child_cart_item_data[ 'data' ];
+									$bundled_product_qty    = $child_cart_item_data[ 'quantity' ];
+									$bundled_product_value  = WC_PB_Core_Compatibility::get_prop( $bundled_product, 'bundled_value', 'shipping' );
+									$bundled_product_weight = WC_PB_Core_Compatibility::get_prop( $bundled_product, 'bundled_weight', 'shipping' );
 
 									// Aggregate price of physically packaged child item - already converted to virtual.
 
-									if ( isset( $bundled_product->bundled_value ) ) {
+									if ( $bundled_product_value ) {
 
-										$bundled_value += $bundled_product->bundled_value * $bundled_product_qty;
+										$bundled_value += $bundled_product_value * $bundled_product_qty;
 
 										$bundle_totals[ 'line_subtotal' ]     += $child_cart_item_data[ 'line_subtotal' ];
 										$bundle_totals[ 'line_total' ]        += $child_cart_item_data[ 'line_total' ];
@@ -1599,22 +1582,20 @@ class WC_PB_Cart {
 
 									// Aggregate weight of physically packaged child item - already converted to virtual.
 
-									if ( isset( $bundled_product->bundled_weight ) ) {
-										$bundled_weight += $bundled_product->bundled_weight * $bundled_product_qty;
+									if ( $bundled_product_weight ) {
+										$bundled_weight += $bundled_product_weight * $bundled_product_qty;
 									}
 								}
 
-								$bundle_price = WC_PB_Core_Compatibility::get_prop( $bundle, 'price', 'edit' );
-
 								if ( $bundled_value > 0 ) {
+									$bundle_price = WC_PB_Core_Compatibility::get_prop( $bundle, 'price', 'edit' );
 									WC_PB_Core_Compatibility::set_prop( $bundle, 'price', (double) $bundle_price + $bundled_value / $bundle_qty );
 								}
 
 								$packages[ $package_key ][ 'contents' ][ $cart_item_key ] = array_merge( $cart_item_data, $bundle_totals );
 
-								$bundle_weight = WC_PB_Core_Compatibility::get_prop( $bundle, 'weight', 'edit' );
-
-								if ( $bundle_weight > 0 ) {
+								if ( $bundled_weight > 0 ) {
+									$bundle_weight = WC_PB_Core_Compatibility::get_prop( $bundle, 'weight', 'edit' );
 									WC_PB_Core_Compatibility::set_prop( $bundle, 'weight', (double) $bundle_weight + $bundled_weight / $bundle_qty );
 								}
 
@@ -1666,29 +1647,34 @@ class WC_PB_Cart {
 					$product_id = WC_PB_Core_Compatibility::get_id( $product );
 					$parent_id  = WC_PB_Core_Compatibility::get_parent_id( $product );
 
+					$excluded_product_ids        = WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? $coupon->get_excluded_product_ids() : $coupon->exclude_product_ids;
+					$excluded_product_categories = WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? $coupon->get_excluded_product_categories() : $coupon->exclude_product_categories;
+					$excludes_sale_items         = WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? $coupon->get_exclude_sale_items() : ( 'yes' === $coupon->exclude_sale_items );
+
 					if ( $valid ) {
 
 						$parent_excluded = false;
 
 						// Parent ID excluded from the discount.
-						if ( sizeof( $coupon->exclude_product_ids ) > 0 ) {
-							if ( in_array( $bundle_id, $coupon->exclude_product_ids ) ) {
+						if ( sizeof( $excluded_product_ids ) > 0 ) {
+							if ( in_array( $bundle_id, $excluded_product_ids ) ) {
 								$parent_excluded = true;
 							}
 						}
 
 						// Parent category excluded from the discount.
-						if ( sizeof( $coupon->exclude_product_categories ) > 0 ) {
+						if ( sizeof( $excluded_product_categories ) > 0 ) {
 
 							$product_cats = WC_PB_Core_Compatibility::wc_get_product_cat_ids( $bundle_id );
 
-							if ( sizeof( array_intersect( $product_cats, $coupon->exclude_product_categories ) ) > 0 ) {
+							if ( sizeof( array_intersect( $product_cats, $excluded_product_categories ) ) > 0 ) {
 								$parent_excluded = true;
 							}
 						}
 
 						// Sale Items excluded from discount and parent on sale.
-						if ( 'yes' === $coupon->exclude_sale_items ) {
+						if ( $excludes_sale_items ) {
+
 							$product_ids_on_sale = wc_get_product_ids_on_sale();
 
 							if ( in_array( $bundle_id, $product_ids_on_sale, true ) ) {
@@ -1705,24 +1691,25 @@ class WC_PB_Cart {
 						$bundled_product_excluded = false;
 
 						// Bundled product ID excluded from the discount.
-						if ( sizeof( $coupon->exclude_product_ids ) > 0 ) {
-							if ( in_array( $product_id, $coupon->exclude_product_ids ) || ( $parent_id && in_array( $parent_id, $coupon->exclude_product_ids ) ) ) {
+						if ( sizeof( $excluded_product_ids ) > 0 ) {
+							if ( in_array( $product_id, $excluded_product_ids ) || ( $parent_id && in_array( $parent_id, $excluded_product_ids ) ) ) {
 								$bundled_product_excluded = true;
 							}
 						}
 
 						// Bundled product category excluded from the discount.
-						if ( sizeof( $coupon->exclude_product_categories ) > 0 ) {
+						if ( sizeof( $excluded_product_categories ) > 0 ) {
 
 							$product_cats = $parent_id ? WC_PB_Core_Compatibility::wc_get_product_cat_ids( $parent_id ) : WC_PB_Core_Compatibility::wc_get_product_cat_ids( $product_id );
 
-							if ( sizeof( array_intersect( $product_cats, $coupon->exclude_product_categories ) ) > 0 ) {
+							if ( sizeof( array_intersect( $product_cats, $excluded_product_categories ) ) > 0 ) {
 								$bundled_product_excluded = true;
 							}
 						}
 
 						// Bundled product on sale and sale items excluded from discount.
-						if ( 'yes' === $coupon->exclude_sale_items ) {
+						if ( $excludes_sale_items ) {
+
 							$product_ids_on_sale = wc_get_product_ids_on_sale();
 
 							if ( in_array( $product_id, $product_ids_on_sale ) || ( $parent_id && in_array( $parent_id, $product_ids_on_sale ) ) ) {

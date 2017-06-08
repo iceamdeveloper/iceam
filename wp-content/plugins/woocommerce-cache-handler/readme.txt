@@ -1,7 +1,6 @@
 === WooCommerce Cache Handler ===
-Requires at least: 3.6
-Tested up to: 4.6
-Stable tag: 1.0.4.161003
+Requires at least: 4.0
+Tested up to: 4.7
 Tags: woocommerce, multi-currency, multiple currency, caching
 License: GPL-3.0
 
@@ -15,10 +14,10 @@ Implements a workaround to allow plugins to work with caching systems that don't
 
 *** Describe requirements here ***
 
-* WordPress 3.6 or later.
-* PHP 5.3 or later.
-* WooCommerce 2.1.x/2.2.x/2.3.x.
-* [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.4.9.150111 or later.
+* WordPress 4.0 or newer.
+* PHP 5.3 or newer.
+* WooCommerce 2.4.x to 3.0.x.
+* [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or later.
 
 == Frequently Asked Questions ==
 
@@ -37,6 +36,13 @@ For more information about installation and management of plugins, please refer 
 1. **Settings > Options**. Miscellaneous options.
 
 == Changelog ==
+
+= 1.0.6.170520 =
+* Code cleanup.
+
+= 1.0.5.170420 =
+* Improved compatibility with WooCommerce 3.0.x:
+	* Fixed notice due to a direct call to `$product->id`.
 
 = 1.0.4.161003 =
 * Improved handling of Ajax calls in cache handlers:

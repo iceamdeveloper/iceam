@@ -380,8 +380,9 @@ class WC_PB_Order {
 									}
 								}
 
-								$bundled_item_title = WC_PB_Helpers::format_product_title( ! empty( $child_item[ 'bundled_item_title' ] ) ? $child_item[ 'bundled_item_title' ] : $child_item[ 'name' ], '', $meta, true );
-								$contents[]         = array(
+								$bundled_item_title = WC_PB_Helpers::format_product_title( $child_item[ 'name' ], '', $meta, true );
+
+								$contents[] = array(
 									'title'       => $bundled_item_title,
 									'description' => sprintf( __( 'Quantity: %1$s, SKU: %2$s', 'woocommerce-product-bundles' ), $child_item[ 'qty' ], $sku )
 								);

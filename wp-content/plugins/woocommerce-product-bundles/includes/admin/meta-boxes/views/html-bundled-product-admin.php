@@ -13,13 +13,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 ?><div class="wc-bundled-item wc-metabox <?php echo $toggle; ?>" rel="<?php echo $loop; ?>">
 	<h3>
-		<a href="#" class="remove_row delete"><?php echo __( 'Remove', 'woocommerce' ); ?></a>
-		<div class="handlediv" title="<?php echo __( 'Click to toggle', 'woocommerce' ); ?>"></div>
 		<strong class="item-title"><?php echo $title; ?></strong>
 		<?php
 			echo '' !== $item_availability ? '<span class="item-availability">' . $item_availability . '</span>' : '';
-			echo false !== $item_id ? ( '<small class="item-id" title="' . __( 'Bundled item ID', 'woocommerce-product-bundles' ) . '">' . sprintf( _x( '#%s', 'bundled product identifier', 'woocommerce-product-bundles' ), $item_id ) . '</small>' ) : '';
 		?>
+		<div class="handle">
+			<?php
+				echo false !== $item_id ? ( '<small class="item-id" title="' . __( 'Bundled item ID', 'woocommerce-product-bundles' ) . '">' . sprintf( _x( 'ID: %s', 'bundled product identifier', 'woocommerce-product-bundles' ), $item_id ) . '</small>' ) : '';
+			?>
+			<a href="#" class="remove_row delete"><?php echo __( 'Remove', 'woocommerce' ); ?></a>
+			<div class="handlediv" title="<?php echo __( 'Click to toggle', 'woocommerce' ); ?>"></div>
+		</div>
 	</h3>
 	<div class="item-data wc-metabox-content">
 		<input type="hidden" name="bundle_data[<?php echo $loop; ?>][menu_order]" class="item_menu_order" value="<?php echo $loop; ?>" /><?php

@@ -204,7 +204,10 @@ class Settings {
 	 * @since 1.6.12.160120
 	 */
 	public function get_plugin_settings_required_capability($capability = 'manage_options') {
-		return $capability;
+		// The "manage_woocommerce" permission should be strict enough for most
+		// WooCommerce plugins
+		// @since 1.8.7.170426
+		return 'manage_woocommerce';
 	}
 
 	/**

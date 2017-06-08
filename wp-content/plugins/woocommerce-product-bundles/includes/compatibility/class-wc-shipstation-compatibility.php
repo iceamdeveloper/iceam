@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Shipstation Integration.
  *
- * @version  5.0.2
+ * @version  5.3.0
  */
 class WC_PB_Shipstation_Compatibility {
 
@@ -31,7 +31,12 @@ class WC_PB_Shipstation_Compatibility {
 	public static function add_filters() {
 
 		add_filter( 'woocommerce_order_get_items', array( WC_PB()->order, 'get_order_items' ), 10, 2 );
-		add_filter( 'woocommerce_get_product_from_item', array( WC_PB()->order, 'get_product_from_item' ), 10, 3 );
+
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			add_filter( 'woocommerce_order_item_product', array( WC_PB()->order, 'get_product_from_item' ), 10, 2 );
+		} else {
+			add_filter( 'woocommerce_get_product_from_item', array( WC_PB()->order, 'get_product_from_item' ), 10, 3 );
+		}
 	}
 }
 

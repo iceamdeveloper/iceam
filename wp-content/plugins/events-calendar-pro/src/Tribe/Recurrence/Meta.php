@@ -580,7 +580,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 		wp_enqueue_style(
 			Tribe__Events__Main::POSTTYPE . '-recurrence',
 			tribe_events_pro_resource_url( 'events-recurrence.css' ),
-			array( 'tribe-common-admin' ),
+			array( 'tribe-select2-css', 'tribe-common-admin' ),
 			apply_filters( 'tribe_events_pro_css_version', Tribe__Events__Pro__Main::VERSION )
 		);
 

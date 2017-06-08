@@ -16,16 +16,23 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle order-related functions and filters.
  *
  * @class    WC_PB_Order
- * @version  5.2.1
+ * @version  5.3.0
  */
 class WC_PB_Order {
 
 	/**
-	 * Flag to prevent 'woocommerce_order_get_items' filters from modifying original order line items when calling 'WC_Order::get_items'.
+	 * Flag to short-circuit 'WC_PB_Order::get_order_items'.
 	 *
 	 * @var boolean
 	 */
-	public static $override_order_items_filters = false;
+	public static $override_order_items_filter = false;
+
+	/**
+	 * Flag to short-circuit 'WC_PB_Order::get_product_from_item'.
+	 *
+	 * @var boolean
+	 */
+	public static $override_product_from_item_filter = false;
 
 	/**
 	 * @var WC_PB_Order - the single instance of the class.
@@ -95,9 +102,9 @@ class WC_PB_Order {
 			add_filter( 'woocommerce_admin_order_item_class', array( $this, 'html_order_item_class' ), 10, 3 );
 		}
 
-		// Modify product while completing payment - @see 'get_processing_product_from_item()' and 'container_item_needs_processing()'.
-		add_action( 'woocommerce_pre_payment_complete', array( $this, 'apply_get_product_from_item_filter' ) );
-		add_action( 'woocommerce_payment_complete', array( $this, 'remove_get_product_from_item_filter' ) );
+		// Modify product while completing payment - @see 'get_processing_order_item_product()' and 'container_item_needs_processing()'.
+		add_action( 'woocommerce_pre_payment_complete', array( $this, 'apply_order_item_product_filter' ) );
+		add_action( 'woocommerce_payment_complete', array( $this, 'remove_order_item_product_filter' ) );
 	}
 
 	/*
@@ -335,13 +342,18 @@ class WC_PB_Order {
 	 */
 	public function get_order_items( $items, $order ) {
 
-		// Nobody likes infinite loops.
-		if ( self::$override_order_items_filters ) {
+		// If short circuited, return the unmodified value.
+		if ( self::$override_order_items_filter ) {
 			return $items;
 		}
 
-		// Right?
-		self::$override_order_items_filters = true;
+		// Nobody likes infinite loops.
+		$override_order_items_filter       = self::$override_order_items_filter;
+		self::$override_order_items_filter = true;
+
+		// We have no need for this here.
+		$override_product_from_item_filter       = self::$override_product_from_item_filter;
+		self::$override_product_from_item_filter = true;
 
 		$return_items = array();
 
@@ -375,10 +387,16 @@ class WC_PB_Order {
 							// If the child is "packaged" in its parent...
 							if ( 'no' === $child_item->get_meta( '_bundled_item_needs_shipping', true ) ) {
 
+								$child_item_id      = $child_item->get_id();
 								$child_variation_id = $child_item->get_variation_id();
 								$child_product_id   = $child_item->get_product_id();
 								$child_id           = $child_variation_id ? $child_variation_id : $child_product_id;
-								$child              = wc_get_product( $child_id );
+								$child              = WC_PB_Helpers::cache_get( 'order_item_product_' . $child_item_id );
+
+								if ( null === $child ) {
+									$child = wc_get_product( $child_id );
+									WC_PB_Helpers::cache_set( 'order_item_product_' . $child_item_id, $child );
+								}
 
 								if ( ! $child || ! $child->needs_shipping() ) {
 									continue;
@@ -394,20 +412,35 @@ class WC_PB_Order {
 									$sku = '#' . $child_id;
 								}
 
-								$meta = strip_tags( wc_display_item_meta( $child_item, array(
-									'before'    => '',
-									'separator' => ', ',
-									'after'     => '',
-									'echo'      => false,
-									'autop'     => false,
-								) ) );
+								$meta_data       = $child_item->get_formatted_meta_data();
+								$meta_desc_array = array();
 
-								$overridden_title   = $child_item->get_meta( '_bundled_item_title', true );
-								$bundled_item_title = WC_PB_Helpers::format_product_title( $overridden_title ? $overridden_title : $child->get_title(), '', $meta, true );
+								if ( ! empty( $meta_data ) ) {
+									foreach ( $meta_data as $meta_id => $meta ) {
+										$meta_desc_array[] = array(
+											'key'   => wp_kses_post( $meta->display_key ),
+											'value' => wp_kses_post( trim( strip_tags( $meta->display_value ) ) )
+										);
+									}
+								}
+
+								$meta_desc_array[] = array(
+									'key'   => _x( 'Qty', 'bundled order item qty meta key', 'woocommerce-product-bundles' ),
+									'value' => $child_item->get_quantity()
+								);
+
+								$meta_desc_array[] = array(
+									'key'   => _x( 'SKU', 'bundled order item SKU meta key', 'woocommerce-product-bundles' ),
+									'value' => $sku
+								);
+
+								foreach ( $meta_desc_array as $meta_desc_array_key => $meta_desc_array_value ) {
+									$meta_desc_array[ $meta_desc_array_key ][ 'description' ] = $meta_desc_array_value[ 'key' ] . ' - ' . $meta_desc_array_value [ 'value' ];
+								}
 
 								$contents[] = array(
-									'title'       => $bundled_item_title,
-									'description' => sprintf( __( 'Quantity: %1$s, SKU: %2$s', 'woocommerce-product-bundles' ), $child_item->get_quantity(), $sku )
+									'title'       => apply_filters( 'woocommerce_bundled_order_item_meta_title', $child_item->get_name(), $meta_desc_array, $child_item, $item, $order ),
+									'description' => apply_filters( 'woocommerce_bundled_order_item_meta_description', implode( ', ', wp_list_pluck( $meta_desc_array, 'description' ) ), $meta_desc_array, $child_item, $item, $order )
 								);
 
 								/*
@@ -426,8 +459,34 @@ class WC_PB_Order {
 							}
 						}
 
+						// Back up meta to resolve https://github.com/woocommerce/woocommerce/pull/14851.
+						$item_meta_data = unserialize( serialize( $item->get_meta_data() ) );
+
 						// Create a clone to ensure item totals will not be modified permanently.
-						$item = clone $item;
+						$cloned_item = clone $item;
+
+						// Delete meta without 'id' prop.
+						$cloned_item_meta_data = $cloned_item->get_meta_data();
+
+						foreach ( $cloned_item_meta_data as $cloned_item_meta ) {
+							$cloned_item->delete_meta_data( $cloned_item_meta->key );
+						}
+
+						// Copy back meta with 'id' prop intact.
+						$cloned_item->set_meta_data( $item_meta_data );
+
+						// Replace original with clone.
+						$item = $cloned_item;
+
+						// Find highest 'id'.
+						$max_id = 1;
+						foreach ( $item->get_meta_data() as $item_meta ) {
+							if ( isset( $item_meta->id ) ) {
+								if ( $item_meta->id >= $max_id ) {
+									$max_id = $item_meta->id;
+								}
+							}
+						}
 
 						$item->set_props( $bundle_totals );
 
@@ -435,6 +494,14 @@ class WC_PB_Order {
 						if ( ! empty( $contents ) ) {
 							foreach ( $contents as $contained ) {
 								$item->add_meta_data( $contained[ 'title' ], $contained[ 'description' ] );
+								$added_meta = $item->get_meta( $contained[ 'title' ], true );
+								// Ensure the meta object has an 'id' prop so it can be picked up by 'get_formatted_meta_data'.
+								foreach ( $item->get_meta_data() as $item_meta ) {
+									if ( $item_meta->key === $contained[ 'title' ] && ! isset( $item_meta->id ) ) {
+										$item_meta->id = $max_id + 1;
+										$max_id++;
+									}
+								}
 							}
 						}
 					}
@@ -442,10 +509,16 @@ class WC_PB_Order {
 
 			} elseif ( wc_pb_is_bundled_order_item( $item, $items ) ) {
 
+				$item_id      = $item->get_id();
 				$variation_id = $item->get_variation_id();
 				$product_id   = $item->get_product_id();
 				$id           = $variation_id ? $variation_id : $product_id;
-				$product      = wc_get_product( $id );
+				$product        = WC_PB_Helpers::cache_get( 'order_item_product_' . $item_id );
+
+				if ( null === $product ) {
+					$product = wc_get_product( $id );
+					WC_PB_Helpers::cache_set( 'order_item_product_' . $item_id, $product );
+				}
 
 				if ( $product && $product->needs_shipping() && 'no' === $item->get_meta( '_bundled_item_needs_shipping', true ) ) {
 
@@ -468,7 +541,10 @@ class WC_PB_Order {
 		}
 
 		// End of my awesome infinite looping prevention mechanism.
-		self::$override_order_items_filters = false;
+		self::$override_order_items_filter = $override_order_items_filter;
+
+		// Undo 'WC_PB_Order::get_product_from_item' short circuit.
+		self::$override_product_from_item_filter = $override_product_from_item_filter;
 
 		return $return_items;
 	}
@@ -486,7 +562,24 @@ class WC_PB_Order {
 	 * @param  WC_Order    $order
 	 * @return WC_Product
 	 */
-	public function get_product_from_item( $product, $item, $order ) {
+	public function get_product_from_item( $product, $item, $order = false ) {
+
+		if ( ! $product ) {
+			return $product;
+		}
+
+		// If short circuited, return the unmodified value.
+		if ( self::$override_product_from_item_filter ) {
+			return $product;
+		}
+
+		// Nobody likes infinite loops.
+		$override_product_from_item_filter       = self::$override_product_from_item_filter;
+		self::$override_product_from_item_filter = true;
+
+		// We have no need for this here.
+		$override_order_items_filter       = self::$override_order_items_filter;
+		self::$override_order_items_filter = true;
 
 		// If it's a container item...
 		if ( wc_pb_is_bundle_container_order_item( $item ) ) {
@@ -508,11 +601,16 @@ class WC_PB_Order {
 
 					if ( 'no' === $child_item->get_meta( '_bundled_item_needs_shipping', true ) ) {
 
+						$child_item_id      = $child_item->get_id();
 						$child_variation_id = $child_item->get_variation_id();
 						$child_product_id   = $child_item->get_product_id();
 						$child_id           = $child_variation_id ? $child_variation_id : $child_product_id;
+						$child_product      = WC_PB_Helpers::cache_get( 'order_item_product_' . $child_item_id );
 
-						$child_product    = wc_get_product( $child_id );
+						if ( null === $child_product ) {
+							$child_product = wc_get_product( $child_id );
+							WC_PB_Helpers::cache_set( 'order_item_product_' . $child_item_id, $child_product );
+						}
 
 						if ( ! $child_product || ! $child_product->needs_shipping() ) {
 							continue;
@@ -554,6 +652,12 @@ class WC_PB_Order {
 				}
 			}
 		}
+
+		// End of my awesome infinite looping prevention mechanism.
+		self::$override_product_from_item_filter = $override_product_from_item_filter;
+
+		// Undo 'WC_PB_Order::get_order_items' short circuit.
+		self::$override_order_items_filter = $override_order_items_filter;
 
 		return $product;
 	}
@@ -948,39 +1052,38 @@ class WC_PB_Order {
 	}
 
 	/**
-	 * Activates the 'get_product_from_item' filter below.
+	 * Activates the 'woocommerce_order_item_product' filter below.
 	 *
 	 * @param  string  $order_id
 	 * @return void
 	 */
-	public function apply_get_product_from_item_filter( $order_id ) {
-		add_filter( 'woocommerce_get_product_from_item', array( $this, 'get_processing_product_from_item' ), 10, 3 );
+	public function apply_order_item_product_filter( $order_id ) {
+		add_filter( 'woocommerce_order_item_product', array( $this, 'get_processing_order_item_product' ), 10, 2 );
 	}
 
 	/**
-	 * Deactivates the 'get_product_from_item' filter below.
+	 * Deactivates the 'woocommerce_order_item_product' filter below.
 	 *
 	 * @param  string  $order_id
 	 * @return void
 	 */
-	public function remove_get_product_from_item_filter( $order_id ) {
-		remove_filter( 'woocommerce_get_product_from_item', array( $this, 'get_processing_product_from_item' ), 10, 3 );
+	public function remove_order_item_product_filter( $order_id ) {
+		remove_filter( 'woocommerce_order_item_product', array( $this, 'get_processing_order_item_product' ), 10, 2 );
 	}
 
 	/**
-	 * Filters 'get_product_from_item' to add data used for 'woocommerce_order_item_needs_processing'.
+	 * Filters 'woocommerce_order_item_product' to add data used by 'woocommerce_order_item_needs_processing'.
 	 *
 	 * @param  WC_Product  $product
 	 * @param  array       $item
-	 * @param  WC_Order    $order
 	 * @return WC_Product
 	 */
-	public function get_processing_product_from_item( $product, $item, $order ) {
+	public function get_processing_order_item_product( $product, $item ) {
 
 		if ( ! empty( $product ) && $product->is_virtual() ) {
 
 			// Process container.
-			if ( $child_items = wc_pb_get_bundled_order_items( $item, $order ) ) {
+			if ( $child_items = wc_pb_get_bundled_order_items( $item ) ) {
 
 				// If no child requires processing and the container is virtual, it should not require processing - @see 'container_item_needs_processing()'.
 				if ( $product->is_virtual() && sizeof( $child_items ) > 0 ) {

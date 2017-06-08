@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Functions for WC core back-compatibility.
  *
  * @class    WC_PB_Core_Compatibility
- * @version  5.2.0
+ * @version  5.3.0
  */
 class WC_PB_Core_Compatibility {
 
@@ -355,15 +355,17 @@ class WC_PB_Core_Compatibility {
 	public static function get_prop( $obj, $name, $context = 'edit' ) {
 		if ( self::is_wc_version_gte_2_7() ) {
 			$get_fn = 'get_' . $name;
-			return is_callable( array( $obj, $get_fn ) ) ? $obj->$get_fn( $context ) : $obj->get_meta( '_' . $name, true );
+			return is_callable( array( $obj, $get_fn ) ) ? $obj->$get_fn( $context ) : $obj->get_meta( '_wc_pb_' . $name, true );
 		} else {
 
 			if ( 'status' === $name ) {
 				$value = isset( $obj->post->post_status ) ? $obj->post->post_status : null;
 			} elseif ( 'short_description' === $name ) {
 				$value = isset( $obj->post->post_excerpt ) ? $obj->post->post_excerpt : null;
+			} elseif ( 'name' === $name ) {
+				$value = isset( $obj->post->post_title ) ? $obj->post->post_title : null;
 			} else {
-				$value = $obj->$name;
+				$value = isset( $obj->$name ) ? $obj->$name : '';
 			}
 
 			return $value;
@@ -386,10 +388,34 @@ class WC_PB_Core_Compatibility {
 			if ( is_callable( array( $obj, $set_fn ) ) ) {
 				$obj->$set_fn( $value );
 			} else {
-				$obj->add_meta_data( '_' . $name, $value, true );
+				$obj->add_meta_data( '_wc_pb_' . $name, $value, true );
 			}
 		} else {
-			$obj->$name = $value;
+			if ( 'name' === $name ) {
+				if ( isset( $obj->post->post_title ) ) {
+					$obj->post->post_title = $value;
+				}
+			} else {
+				$obj->$name = $value;
+			}
+		}
+	}
+
+	/**
+	 * Back-compat wrapper for checking if a CRUD object props exists.
+	 *
+	 * @since  5.3.0
+	 *
+	 * @param  object  $obj
+	 * @param  string  $name
+	 * @return mixed
+	 */
+	public static function prop_exists( $obj, $name ) {
+		if ( self::is_wc_version_gte_2_7() ) {
+			$get_fn = 'get_' . $name;
+			return is_callable( array( $obj, $get_fn ) ) ? true : $obj->meta_exists( '_wc_pb_' . $name );
+		} else {
+			return isset( $obj->$name ) || ( isset( $obj->post ) && isset( $obj->post->$name ) );
 		}
 	}
 

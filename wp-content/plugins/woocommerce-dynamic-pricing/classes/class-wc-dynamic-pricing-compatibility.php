@@ -439,6 +439,10 @@ if ( ! class_exists( 'WC_Dynamic_Pricing_Compatibility' ) ) :
 		}
 
 		public static function get_product_category_ids( $product ) {
+			if ( empty( $product ) ) {
+				return array();
+			}
+
 			if ( self::is_wc_version_gte_2_7() ) {
 				if ( $product->is_type( 'variation' ) ) {
 					$parent = wc_get_product( $product->get_parent_id() );

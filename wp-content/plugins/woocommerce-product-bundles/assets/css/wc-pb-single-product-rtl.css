@@ -2,7 +2,7 @@
 
 .bundled_product_summary {
 	padding-right: 115px;
-	padding-bottom: 20px;
+	padding-bottom: 1em;
 }
 
 .bundled_product_summary.thumbnail_hidden {
@@ -52,8 +52,16 @@
 	font-style: italic;
 }
 
-.bundled_product_summary p.stock, .bundled_product_summary .price, .bundled_product_summary p.bundled_item_unavailable {
-	margin-bottom: 20px;
+.bundled_product_summary p.stock, .single-product .bundled_product_summary span.price, .bundled_product_summary p.bundled_item_unavailable {
+	margin-bottom: 1em;
+}
+
+.single-product .bundled_product_summary:not(.bundled_item_optional) span.price {
+	display: block;
+}
+
+.bundled_product_summary.bundled_item_optional span.price {
+	margin-right: 4px;
 }
 
 .bundled_product_summary .quantity_hidden {
@@ -73,14 +81,10 @@
 	opacity: 0.5;
 }
 
-.bundled_item_wrap:after, div.bundled_product_summary:after, div.bundled_product_summary:before, .bundle_data:after, .bundled_product_summary .bundled_product_optional_checkbox:after, .bundle_form .bundle_error:after {
+.bundled_item_wrap:after, div.bundled_product_summary:after, div.bundled_product_summary:before, .bundle_data:after, .bundled_product_summary .bundled_product_optional_checkbox:after {
 	display: table;
 	content: " ";
 	clear: both;
-}
-
-.bundled_product_summary .bundled_item_after_cart_details input {
-	margin-bottom: 1em;
 }
 
 .float_qty_input .details {
@@ -102,14 +106,38 @@
 
 .bundle_error ul.woocommerce-info {
 	list-style: none;
-	margin-bottom: 1em;
+	margin: 0 0 30px;
 }
 
 /* Animations */
 
-.bundle_form .bundle_price, .bundle_form .bundle_error, .bundle_form .bundle_availability, .bundled_product_summary .bundled_item_cart_content {
+.bundle_form .bundle_price, .bundle_form .bundle_error {
 	margin-top: 0 !important;
 	margin-bottom: 0 !important;
+}
+
+.bundle_form .bundle_price:before, .bundle_form .bundle_error:before {
+	display: table;
+	content: " ";
+	clear: both;
+}
+
+.bundle_form .bundle_price:after, .bundle_form .bundle_error:after {
+	display: table;
+	content: " ";
+	clear: both;
+}
+
+.single-product .bundle_form .bundle_price p.price {
+	line-height: 1em;
+	margin: 0 0 30px;
+}
+
+.single-product .bundle_form .bundle_availability p.stock {
+	margin: 0 0 30px;
+}
+
+.bundled_product_summary.thumbnail_hidden .bundled_item_cart_content {
 	padding-right: 2px;
 }
 
@@ -225,6 +253,7 @@ table.bundled_products td.bundled_item_images_col img {
 
 table.bundled_products {
 	border-width: 0 0 1px;
+	margin-bottom: 2em;
 }
 
 table.bundled_products td.bundled_item_details_col .details {

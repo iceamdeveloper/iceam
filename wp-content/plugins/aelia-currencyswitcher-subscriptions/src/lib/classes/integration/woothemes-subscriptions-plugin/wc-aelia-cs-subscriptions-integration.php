@@ -284,6 +284,12 @@ class Subscriptions_Integration {
 				if(isset($cart_item['subscription_renewal'])) {
 					$cart_item['data']->aelia_product_renewal = true;
 				}
+
+				// Tag products being switched
+				// @since 1.3.6.170531
+				if(isset($cart_item['subscription_switch'])) {
+					$cart_item['data']->aelia_product_switch = true;
+				}
 			}
 		}
 	}
@@ -310,7 +316,9 @@ class Subscriptions_Integration {
 		 */
 		$this->tag_cart_resubscribes_and_renewals();
 
-		return !empty($product->aelia_product_renewal) || !empty($product->aelia_product_resubscribe);
+		return !empty($product->aelia_product_renewal) ||
+					 !empty($product->aelia_product_resubscribe) ||
+					 !empty($product->aelia_product_switch);
 	}
 
 	public function __construct() {
@@ -512,6 +520,10 @@ class Subscriptions_Integration {
 		$product->subscription_price = $product->min_variation_price;
 		$product->price = $product->subscription_price;
 		$product->subscription_sign_up_fee = $product->min_subscription_sign_up_fee;
+
+		if(aelia_wc_version_is('>=', '3.0')) {
+			$product->set_price($product->price);
+		}
 
 		if(!isset($product->max_variation_period)) {
 			$product->max_variation_period = '';

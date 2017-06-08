@@ -14,9 +14,9 @@ class Cache_Handler_RequirementsChecks extends Aelia_WC_RequirementsChecks {
 
 	// @var array An array of WordPress plugins (name => version) required by the plugin.
 	protected $required_plugins = array(
-		'WooCommerce' => '2.1',
+		'WooCommerce' => '2.4',
 		'Aelia Foundation Classes for WooCommerce' => array(
-			'version' => '1.7.3.160531',
+			'version' => '1.8.2.161216',
 			'extra_info' => 'You can get the plugin <a href="http://bit.ly/WC_AFC_S3">from our site</a>, free of charge.',
 			'autoload' => true,
 			'url' => 'http://bit.ly/WC_AFC_S3',

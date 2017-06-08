@@ -13,11 +13,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '3.12a1';
+	const VERSION = '4.4.9';
 	/**
 	 * Min required The Events Calendar version
 	 */
-	const REQUIRED_TEC_VERSION = '3.11';
+	const REQUIRED_TEC_VERSION = '4.4';
 	/**
 	 * Min required Easy Digital Downloads version
 	 */

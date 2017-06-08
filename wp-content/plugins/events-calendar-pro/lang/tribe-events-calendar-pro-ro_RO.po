@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Events Calendar Pro package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-01-27 16:27:59+0000\n"
+"PO-Revision-Date: 2017-05-11 05:36:40+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -10,78 +10,83 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Events Calendar Pro\n"
 
-#: src/admin-views/event-recurrence.php:99
-#: src/admin-views/event-recurrence.php:335
-msgid "months"
+#: src/Tribe/Main.php:1326
+msgctxt "Event title map marker prefix"
+msgid "%s: "
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:140
+#: src/admin-views/event-recurrence.php:101
+#: src/admin-views/event-recurrence.php:337
+msgid "months"
+msgstr "luni"
+
+#: src/admin-views/event-recurrence.php:142
 msgctxt "Begins the line indicating when a recurrence time starts"
 msgid "At"
-msgstr ""
+msgstr "La"
 
-#: src/admin-views/event-recurrence.php:150
+#: src/admin-views/event-recurrence.php:152
 msgid "the same time:"
-msgstr ""
+msgstr "același timp"
 
-#: src/admin-views/event-recurrence.php:151
+#: src/admin-views/event-recurrence.php:153
 msgid "a different time:"
-msgstr ""
+msgstr "un timp diferit"
 
-#: src/admin-views/event-recurrence.php:179
-#: src/admin-views/event-recurrence.php:381
+#: src/admin-views/event-recurrence.php:181
+#: src/admin-views/event-recurrence.php:383
 msgid "Series ends"
-msgstr ""
+msgstr "Seria se termină"
 
-#: src/admin-views/event-recurrence.php:188
-#: src/admin-views/event-recurrence.php:391
+#: src/admin-views/event-recurrence.php:190
+#: src/admin-views/event-recurrence.php:393
 msgid "on"
-msgstr ""
+msgstr "pe"
 
-#: src/admin-views/event-recurrence.php:207
+#: src/admin-views/event-recurrence.php:209
 msgid "Series ends on this date"
-msgstr ""
+msgstr "Seria se termină la această dată"
 
-#: src/admin-views/event-recurrence.php:235
-#: src/admin-views/event-recurrence.php:449
+#: src/admin-views/event-recurrence.php:237
+#: src/admin-views/event-recurrence.php:451
 msgid "Show Details"
-msgstr ""
+msgstr "Arată detalii"
 
-#: src/admin-views/event-recurrence.php:236
-#: src/admin-views/event-recurrence.php:450
+#: src/admin-views/event-recurrence.php:238
+#: src/admin-views/event-recurrence.php:452
 msgid "Hide Details"
-msgstr ""
+msgstr "Ascunde detalii"
 
-#: src/admin-views/event-recurrence.php:244
+#: src/admin-views/event-recurrence.php:246
 msgid "Schedule multiple events"
-msgstr ""
+msgstr "Planifică evenimente multiple"
 
-#: src/admin-views/event-recurrence.php:247
+#: src/admin-views/event-recurrence.php:249
 msgid "Add more events"
-msgstr ""
+msgstr "Adaugă mai multe evenimente"
 
-#: src/admin-views/event-recurrence.php:260
+#: src/admin-views/event-recurrence.php:262
 msgid "Event will not occur:"
-msgstr ""
+msgstr "Evenimentul nu va apare:"
 
-#: src/admin-views/event-recurrence.php:463
+#: src/admin-views/event-recurrence.php:465
 msgid "Recurrence Description"
-msgstr ""
+msgstr "Descriere recurentă"
 
 #: src/admin-views/recurrence/months.php:11
 msgid "the same day:"
-msgstr ""
+msgstr "aceiași zi:"
 
 #: src/admin-views/recurrence/months.php:12
 #: src/admin-views/recurrence/years.php:64
 msgid "a different day:"
-msgstr ""
+msgstr "o zi diferită:"
 
 #: src/admin-views/recurrence/months.php:30
 #: src/admin-views/recurrence/years.php:82
 msgctxt "Qualifying the \"different day\". Example: \"day\" in \"day 12 of the month\""
 msgid "day"
-msgstr ""
+msgstr "zi"
 
 #: src/admin-views/recurrence/months.php:37
 #: src/admin-views/recurrence/years.php:89
@@ -92,52 +97,52 @@ msgstr ""
 #: src/admin-views/recurrence/months.php:54
 #: src/admin-views/recurrence/years.php:100
 msgid "Use pattern:"
-msgstr ""
+msgstr "Folosește tipar:"
 
 #: src/admin-views/recurrence/months.php:62
 #: src/admin-views/recurrence/years.php:108
 msgid "Use date:"
-msgstr ""
+msgstr "Folosește data:"
 
 #: src/admin-views/recurrence/months.php:99
 #: src/admin-views/recurrence/years.php:145
 msgctxt "As in: day 12 of the month"
 msgid "of the month"
-msgstr ""
+msgstr "în luna"
 
 #: src/admin-views/recurrence/time.php:10
 #: src/admin-views/recurrence/time.php:84
 msgid "same day"
-msgstr ""
+msgstr "aceiași zi"
 
 #: src/admin-views/recurrence/time.php:12
 msgid "next day"
-msgstr ""
+msgstr "ziua următoare"
 
 #: src/admin-views/recurrence/time.php:15
 msgctxt "number suffix for numbers ending in 1"
 msgid "%1$sst day"
-msgstr ""
+msgstr "%1$s prima zi"
 
 #: src/admin-views/recurrence/time.php:20
 msgctxt "number suffix for numbers ending in 2"
 msgid "%1$snd day"
-msgstr ""
+msgstr "%1$s a doua zi"
 
 #: src/admin-views/recurrence/time.php:25
 msgctxt "number suffix for numbers ending in 3"
 msgid "%1$srd day"
-msgstr ""
+msgstr "%1$s a treia zi"
 
 #: src/admin-views/recurrence/time.php:30
 msgctxt "number suffix for numbers ending in something other than 1, 2, or 3"
 msgid "%1$sth day"
-msgstr ""
+msgstr "%1$s prima zi"
 
 #: src/admin-views/recurrence/time.php:57
 msgctxt "custom recurrence time separator"
 msgid "to"
-msgstr ""
+msgstr "la"
 
 #: src/admin-views/recurrence/time.php:73
 msgctxt "custom recurrence time/date separator"
@@ -146,50 +151,50 @@ msgstr ""
 
 #: src/admin-views/recurrence/weeks.php:5
 msgid "Event Series Recurrence Day of Week"
-msgstr ""
+msgstr "Recurența seriei de evenimente ziua săptămânii"
 
 #: src/admin-views/recurrence/weeks.php:7
 msgctxt "Begins the line indicating what day of the week the event will occur on"
 msgid "On"
-msgstr ""
+msgstr "La"
 
 #: src/admin-views/recurrence/years.php:27
 msgid "year"
-msgstr ""
+msgstr "an"
 
 #: src/admin-views/recurrence/years.php:30
 msgid "years"
-msgstr ""
+msgstr "ani"
 
 #: src/admin-views/recurrence/years.php:36
 msgctxt "Begins the line indicating on which month the event will occur"
 msgid "in"
-msgstr ""
+msgstr "în"
 
 #: src/admin-views/recurrence/years.php:37
 msgid "Which month will the event recur in?"
-msgstr ""
+msgstr "În ce lună va apare evenimentul?"
 
 #: src/admin-views/recurrence/years.php:63
 msgid "the same day"
-msgstr ""
+msgstr "aceiași zi"
 
 #: src/admin-views/widget-admin-advanced-list.php:127
 msgctxt "events list widget setting"
 msgid "Limit to featured events only"
-msgstr ""
+msgstr "Limitat numai la evenimentele promovate"
 
 #: src/Tribe/Recurrence/Strings.php:63
 msgid "An all day event every [interval] day(s), happening [count] times"
-msgstr ""
+msgstr "Un eveniment pe toată durata zilei [interval], care se întâmplă de [count] ori"
 
 #: src/Tribe/Recurrence/Strings.php:64
 msgid "An all day event every [interval] day(s) at [start_time], happening [count] times"
-msgstr ""
+msgstr "Un eveniment pe toată durata zilei care are loc la fiecare [interval] zile, care se întâmplă de [count] ori"
 
 #: src/Tribe/Recurrence/Strings.php:65
 msgid "A multi-day event every [interval] day(s), happening [count] times"
-msgstr ""
+msgstr "Un eveniment de mai multe zile care are loc la fiecare [interval] zile, care se întâmplă de [count] ori"
 
 #: src/Tribe/Recurrence/Strings.php:66
 msgid "A multi-day event every [interval] day(s) at [start_time], happening [count] times"
@@ -535,21 +540,21 @@ msgstr ""
 msgid "Are you sure you want to delete this exclusion?"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:21
+#: src/admin-views/event-recurrence.php:22
 msgid "Event Series:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:26
+#: src/admin-views/event-recurrence.php:28
 msgid "Delete This"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:91
-#: src/admin-views/event-recurrence.php:327
+#: src/admin-views/event-recurrence.php:93
+#: src/admin-views/event-recurrence.php:329
 msgid "weeks"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:96
-#: src/admin-views/event-recurrence.php:332
+#: src/admin-views/event-recurrence.php:98
+#: src/admin-views/event-recurrence.php:334
 msgid "month"
 msgstr "luna"
 
@@ -923,7 +928,7 @@ msgstr ""
 msgid "This Week Events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:466
+#: src/admin-views/event-recurrence.php:468
 msgid "Use this field if you want to override the auto-generated descriptions of event recurrence"
 msgstr ""
 
@@ -1066,12 +1071,12 @@ msgctxt "Used when displaying the word \"day\" in \"the last day\" or \"the firs
 msgid "day"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:47
-#: src/admin-views/event-recurrence.php:285
+#: src/admin-views/event-recurrence.php:49
+#: src/admin-views/event-recurrence.php:287
 msgid "Once"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:456
+#: src/admin-views/event-recurrence.php:458
 msgid "Add Exclusion"
 msgstr ""
 
@@ -1249,10 +1254,6 @@ msgstr "Înainte de a posta un topic nou, efectuați o căutare pentru a vă asi
 #: src/functions/template-tags/general.php:323
 msgid "The current default organizer is: %s"
 msgstr "Organizatorul curent implicit este: %s"
-
-#: src/Tribe/Main.php:1326
-msgid "Event: "
-msgstr ""
 
 #: src/functions/template-tags/general.php:338
 msgid "The current default venue is: %s"
@@ -1432,8 +1433,8 @@ msgstr "Navigare pe Săptămănă"
 msgid "Completed!"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:83
-#: src/admin-views/event-recurrence.php:319
+#: src/admin-views/event-recurrence.php:85
+#: src/admin-views/event-recurrence.php:321
 #: src/views/pro/widgets/countdown-widget.php:20
 msgid "days"
 msgstr "zile"
@@ -1548,10 +1549,10 @@ msgstr "Repetările personalizate lunare nu pot avea stabilite liniuţe ca şi z
 msgid "Yearly custom recurrences cannot have a dash set as the day to occur on."
 msgstr "Repetările personalizate anuale nu pot avea stabilite liniuţe ca şi ziua în care va avea loc."
 
-#: src/admin-views/event-recurrence.php:43
-#: src/admin-views/event-recurrence.php:80
-#: src/admin-views/event-recurrence.php:281
-#: src/admin-views/event-recurrence.php:316
+#: src/admin-views/event-recurrence.php:45
+#: src/admin-views/event-recurrence.php:82
+#: src/admin-views/event-recurrence.php:283
+#: src/admin-views/event-recurrence.php:318
 #: src/admin-views/recurrence/months.php:90
 #: src/admin-views/recurrence/years.php:136
 msgid "day"
@@ -1885,58 +1886,58 @@ msgstr "Activând această opţiune, nu se vor elimina şi datele câmpului pers
 msgid "Are you sure you wish to remove this field and its data from all events? Once you click OK this cannot be undone."
 msgstr "Confirmaţi eliminarea acestui câmp şi a datelor sale, din toate evenimentele? Odată ce apăsaţi OK, nu se mai poate reveni."
 
-#: src/admin-views/event-recurrence.php:39
-#: src/admin-views/event-recurrence.php:277
+#: src/admin-views/event-recurrence.php:41
+#: src/admin-views/event-recurrence.php:279
 msgid "event"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:40
-#: src/admin-views/event-recurrence.php:278
+#: src/admin-views/event-recurrence.php:42
+#: src/admin-views/event-recurrence.php:280
 msgid "events"
 msgstr ""
 
-#: src/admin-views/event-meta.php:28 src/admin-views/event-meta.php:44
+#: src/admin-views/event-meta.php:32 src/admin-views/event-meta.php:48
 msgid "None"
 msgstr "Nimic"
 
-#: src/admin-views/event-recurrence.php:52
-#: src/admin-views/event-recurrence.php:290
+#: src/admin-views/event-recurrence.php:54
+#: src/admin-views/event-recurrence.php:292
 #: src/admin-views/recurrence/months.php:2
 #: src/admin-views/recurrence/years.php:53
 msgid "On"
 msgstr "În"
 
-#: src/admin-views/event-recurrence.php:189
-#: src/admin-views/event-recurrence.php:392
+#: src/admin-views/event-recurrence.php:191
+#: src/admin-views/event-recurrence.php:394
 msgid "after"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:190
-#: src/admin-views/event-recurrence.php:393
+#: src/admin-views/event-recurrence.php:192
+#: src/admin-views/event-recurrence.php:395
 msgid "never"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:223
-#: src/admin-views/event-recurrence.php:425
+#: src/admin-views/event-recurrence.php:225
+#: src/admin-views/event-recurrence.php:427
 msgctxt "occurence count text"
 msgid "events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:226
-#: src/admin-views/event-recurrence.php:428
+#: src/admin-views/event-recurrence.php:228
+#: src/admin-views/event-recurrence.php:430
 msgid "You must select a recurrence end date"
 msgstr "Trebuie să selectaţi data de finalizare a repetării"
 
-#: events-calendar-pro.php:81
+#: events-calendar-pro.php:85
 msgid "The Events Calendar"
 msgstr "The Events Calendar"
 
-#: src/admin-views/event-recurrence.php:43
-#: src/admin-views/event-recurrence.php:281
+#: src/admin-views/event-recurrence.php:45
+#: src/admin-views/event-recurrence.php:283
 msgid "Daily"
 msgstr "Zilnic"
 
-#: events-calendar-pro.php:82
+#: events-calendar-pro.php:86
 msgid "To begin using Events Calendar PRO, please install the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">The Events Calendar</a>."
 msgstr "Pentru a începe să folosiţi Events Calendar PRO, vă rugăm să instalaţi ultima versiune a <a href=\"%s\" class=\"thickbox\" title=\"%s\">The Events Calendar</a>."
 
@@ -1944,8 +1945,8 @@ msgstr "Pentru a începe să folosiţi Events Calendar PRO, vă rugăm să insta
 msgid "Start Date"
 msgstr "Dată Începere"
 
-#: src/admin-views/event-recurrence.php:44
-#: src/admin-views/event-recurrence.php:282
+#: src/admin-views/event-recurrence.php:46
+#: src/admin-views/event-recurrence.php:284
 msgid "Weekly"
 msgstr "Săptămânal"
 
@@ -1957,8 +1958,8 @@ msgstr "Dată Finalizare"
 msgid "Event Cost"
 msgstr "Preţ Eveniment"
 
-#: src/admin-views/event-recurrence.php:45
-#: src/admin-views/event-recurrence.php:283
+#: src/admin-views/event-recurrence.php:47
+#: src/admin-views/event-recurrence.php:285
 msgid "Monthly"
 msgstr "Lunar"
 
@@ -1970,8 +1971,8 @@ msgstr "Categ. Eveniment"
 msgid "Title"
 msgstr "Titlu"
 
-#: src/admin-views/event-recurrence.php:46
-#: src/admin-views/event-recurrence.php:284
+#: src/admin-views/event-recurrence.php:48
+#: src/admin-views/event-recurrence.php:286
 msgid "Yearly"
 msgstr "Anual"
 
@@ -1979,8 +1980,8 @@ msgstr "Anual"
 msgid "Recurring"
 msgstr "Repetare"
 
-#: src/admin-views/event-recurrence.php:65
-#: src/admin-views/event-recurrence.php:302
+#: src/admin-views/event-recurrence.php:67
+#: src/admin-views/event-recurrence.php:304
 #: src/admin-views/recurrence/years.php:12
 msgid "Every"
 msgstr "Fiecare"
@@ -1989,7 +1990,7 @@ msgstr "Fiecare"
 msgid "Description"
 msgstr "Descriere"
 
-#: src/admin-views/event-recurrence.php:436
+#: src/admin-views/event-recurrence.php:438
 msgid "Frequency of recurring event must be a number"
 msgstr "Frecvenţa repetării evenimentului trebuie exprimată printr-un număr"
 
@@ -2084,7 +2085,7 @@ msgstr "Adăugaţi un altul"
 msgid "Remove"
 msgstr "Îndepărtaţi"
 
-#: src/admin-views/event-recurrence.php:461
+#: src/admin-views/event-recurrence.php:463
 msgid "Recurrence Description:"
 msgstr "Descrierea repetării:"
 
@@ -2269,8 +2270,8 @@ msgstr "Butoane Radio"
 msgid "Title:"
 msgstr "Titlu:"
 
-#: src/Tribe/Main.php:63 src/admin-views/event-recurrence.php:88
-#: src/admin-views/event-recurrence.php:324
+#: src/Tribe/Main.php:63 src/admin-views/event-recurrence.php:90
+#: src/admin-views/event-recurrence.php:326
 msgid "week"
 msgstr "săptămâna"
 

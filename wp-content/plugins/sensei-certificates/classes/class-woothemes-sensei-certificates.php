@@ -277,7 +277,8 @@ class WooThemes_Sensei_Certificates {
 		    'show_ui' => true,
 		    'query_var' => true,
 		    'rewrite' => array( 'slug' => esc_attr( apply_filters( 'sensei_certificates_slug', 'certificate' ) ) , 'with_front' => true, 'feeds' => true, 'pages' => true ),
-		    'map_meta_cap' => true,
+			'capability_type' => 'certificate',
+			'map_meta_cap' => true,
 		    'has_archive' => false,
 		    'hierarchical' => false,
 		    'menu_icon' => 'dashicons-awards',
@@ -360,11 +361,18 @@ class WooThemes_Sensei_Certificates {
 	 */
 	public function generate_certificate_number( $user_id = 0, $course_id = 0 ) {
 
-		if( ! $user_id || ! $course_id || !is_int( $user_id ) || !is_int( $course_id ) ) {
+		if( ! $user_id || ! $course_id || !is_numeric( $user_id ) || !is_numeric( $course_id ) ) {
 			return;
 		}
 		$user_id = absint( $user_id );
 		$course_id = absint( $course_id );
+		if ( false === get_user_by( 'id', $user_id ) ) {
+			return;
+		}
+
+		if ( null === get_post( $course_id ) ) {
+			return;
+		}
 		$data_store = new Woothemes_Sensei_Certificate_Data_Store();
 
 		$certificate_id = $data_store->insert( $user_id, $course_id );
@@ -375,7 +383,7 @@ class WooThemes_Sensei_Certificates {
                 'post_id' => absint( $certificate_id ),
                 'data' => Woothemes_Sensei_Certificates_Utils::get_certificate_hash( $course_id, $user_id ),
                 'type' => 'sensei_certificate',
-                'user_id' => intval( $user_id )
+                'user_id' => $user_id
             );
 
             WooThemes_Sensei_Utils::sensei_log_activity( $data );

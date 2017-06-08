@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The bunded item class is a product container that initializes and holds pricing, availability and variation/attribute-related data of a bundled product.
  *
  * @class    WC_Bundled_Item
- * @version  5.2.0
+ * @version  5.3.1
  * @since    4.2.0
  */
 class WC_Bundled_Item {
@@ -383,7 +383,7 @@ class WC_Bundled_Item {
 
 				// Stock quantity might be null if stock management is disabled. Set it to infinite.
 				$stock_quantity  = $bundled_product->get_stock_quantity();
-				$this->max_stock = ! is_null( $stock_quantity ) ? $stock_quantity : '';
+				$this->max_stock = $bundled_product->managing_stock() && ! is_null( $stock_quantity ) ? $stock_quantity : '';
 			}
 
 		/*------------------------------*/
@@ -408,7 +408,6 @@ class WC_Bundled_Item {
 				if ( ! $variation ) {
 					continue;
 				}
-
 
 				if ( false === $variation->is_in_stock() ) {
 
@@ -436,7 +435,7 @@ class WC_Bundled_Item {
 
 					// Stock quantity might be null if stock management is disabled. Set it to infinite.
 					$stock_quantity              = $variation->get_stock_quantity();
-					$variation_stock_qty         = ! is_null( $stock_quantity ) ? $stock_quantity : '';
+					$variation_stock_qty         = $bundled_product->managing_stock() && ! is_null( $stock_quantity ) ? $stock_quantity : '';
 					$variation_in_stock_exists   = true;
 					$all_variations_on_backorder = false;
 				}
@@ -620,7 +619,7 @@ class WC_Bundled_Item {
 	 */
 	public function is_discount_allowed_on_sale_price() {
 
-		$discount_allowed_on_sale_price = $this->product->is_type( 'variable-subscription' );
+		$discount_from_regular = $this->product->is_type( 'variable-subscription' ) ? false : true;
 
 		/**
 		 * 'woocommerce_bundled_item_discount_from_regular' filter.
@@ -630,7 +629,35 @@ class WC_Bundled_Item {
 		 * @param  boolean          $discount_from_regular
 		 * @param  WC_Bundled_Item  $this
 		 */
-		return false === apply_filters( 'woocommerce_bundled_item_discount_from_regular', $discount_allowed_on_sale_price, $this );
+		return false === apply_filters( 'woocommerce_bundled_item_discount_from_regular', $discount_from_regular, $this );
+	}
+
+	/**
+	 * Get bundled product.
+	 *
+	 * @since  5.2.4
+	 *
+	 * @param  array  $args
+	 * @return WC_Product|false
+	 */
+	public function get_product( $args = array() ) {
+		$product = false;
+
+		if ( $this->exists() ) {
+
+			$product = $this->product;
+
+			$what   = isset( $args[ 'what' ] ) && in_array( $args[ 'what' ], array( 'min', 'max' ) ) ? $args[ 'what' ] : '';
+			$having = isset( $args[ 'having' ] ) && in_array( $args[ 'having' ], array( 'price', 'regular_price' ) ) ? $args[ 'having' ] : '';
+			$prop   = $having && $what ? $what . '_' . $having . '_product' : false;
+
+			if ( $prop && isset( $this->$prop ) ) {
+				$product = $this->$prop;
+			}
+
+		}
+
+		return $product;
 	}
 
 	/**
@@ -1697,6 +1724,10 @@ class WC_Bundled_Item {
 			$classes[] = 'bundled_item_hidden';
 		}
 
+		if ( $this->is_optional() ) {
+			$classes[] = 'bundled_item_optional';
+		}
+
 		return implode( ' ', apply_filters( 'woocommerce_bundled_item_classes', $classes, $this ) );
 	}
 
@@ -1718,15 +1749,21 @@ class WC_Bundled_Item {
 
 		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
 
-			ob_start();
+			if ( ! empty( $availability[ 'availability' ] ) ) {
 
-			wc_get_template( 'single-product/stock.php', array(
-				'product'      => $product,
-				'class'        => $availability[ 'class' ],
-				'availability' => $availability[ 'availability' ],
-			) );
+				ob_start();
 
-			$availability_html = ob_get_clean();
+				wc_get_template( 'single-product/stock.php', array(
+					'product'      => $product,
+					'class'        => $availability[ 'class' ],
+					'availability' => $availability[ 'availability' ],
+				) );
+
+				$availability_html = ob_get_clean();
+
+			} else {
+				$availability_html = '';
+			}
 
 		} else {
 			$availability_html = empty( $availability[ 'availability' ] ) ? '' : '<p class="stock ' . esc_attr( $availability[ 'class' ] ) . '">' . esc_html( $availability[ 'availability' ] ) . '</p>';

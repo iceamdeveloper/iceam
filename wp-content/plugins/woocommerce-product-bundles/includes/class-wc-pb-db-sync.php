@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product hooks for DB lifecycle management of products, bundled items and their meta.
  *
  * @class    WC_PB_DB_Sync
- * @version  5.2.0
+ * @version  5.3.0
  */
 class WC_PB_DB_Sync {
 
@@ -26,7 +26,11 @@ class WC_PB_DB_Sync {
 	public static function init() {
 
 		// Duplicate bundled items when duplicating a bundle.
-		add_action( 'woocommerce_duplicate_product', array( __CLASS__, 'duplicate_product' ), 10, 2 );
+		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+			add_action( 'woocommerce_product_duplicate_before_save', array( __CLASS__, 'duplicate_product_before_save' ), 10, 2 );
+		} else {
+			add_action( 'woocommerce_duplicate_product', array( __CLASS__, 'duplicate_product_legacy' ), 10, 2 );
+		}
 
 		// Delete bundled item DB entries when: i) the container bundle is deleted, or ii) the associated product is deleted.
 		add_action( 'delete_post', array( __CLASS__, 'delete_post' ), 11 );
@@ -34,7 +38,7 @@ class WC_PB_DB_Sync {
 			add_action( 'woocommerce_delete_product', array( __CLASS__, 'delete_product' ), 11 );
 		}
 
-		// When deleting a bundled item from the DB, clear the transients of the container bundle (also invalidates product transients, including 'wc_bundled_product_data').
+		// When deleting a bundled item from the DB, clear the transients of the container bundle.
 		add_action( 'woocommerce_delete_bundled_item', array( __CLASS__, 'delete_bundled_item' ) );
 
 		// Delete associated bundled items stock cache when clearing product transients.
@@ -63,10 +67,38 @@ class WC_PB_DB_Sync {
 	/**
 	 * Duplicates bundled items when duplicating a bundle.
 	 *
+	 * @param  WC_Product  $duplicated_product
+	 * @param  WC_Product  $product
+	 */
+	public static function duplicate_product_before_save( $duplicated_product, $product ) {
+
+		if ( $product->is_type( 'bundle' ) ) {
+
+			$bundled_items      = $product->get_bundled_data_items( 'edit' );
+			$bundled_items_data = array();
+
+			if ( ! empty( $bundled_items ) ) {
+				foreach ( $bundled_items as $bundled_item ) {
+
+					$bundled_item_data = $bundled_item->get_data();
+
+					$bundled_item_data[ 'bundled_item_id' ] = 0;
+
+					$bundled_items_data[] = $bundled_item_data;
+				}
+
+				$duplicated_product->set_bundled_data_items( $bundled_items_data );
+			}
+		}
+	}
+
+	/**
+	 * Duplicates bundled items when duplicating a bundle (legacy).
+	 *
 	 * @param  mixed    $new_product_id
 	 * @param  WP_Post  $post
 	 */
-	public static function duplicate_product( $new_product_id, $post ) {
+	public static function duplicate_product_legacy( $new_product_id, $post ) {
 
 		$bundled_items = WC_PB_DB::query_bundled_items( array(
 			'bundle_id' => $post->ID,
@@ -138,7 +170,7 @@ class WC_PB_DB_Sync {
 	}
 
 	/**
-	 * When deleting a bundled item from the DB, clear the transients of the container bundle (also invalidates product transients, including 'wc_bundled_product_data').
+	 * When deleting a bundled item from the DB, clear the transients of the container bundle.
 	 *
 	 * @param  WC_Bundled_Item_Data  $item  The bundled item DB object being deleted.
 	 */
@@ -172,6 +204,9 @@ class WC_PB_DB_Sync {
 	 */
 	public static function delete_reserved_price_meta( $product ) {
 
+		$product->delete_meta_data( '_wc_pb_bundled_value' );
+		$product->delete_meta_data( '_wc_pb_bundled_weight' );
+
 		if ( false === in_array( $product->get_type(), array( 'bundle', 'composite' ) ) ) {
 			$product->delete_meta_data( '_wc_sw_max_price' );
 			$product->delete_meta_data( '_wc_sw_max_regular_price' );
@@ -187,7 +222,7 @@ class WC_PB_DB_Sync {
 	public static function delete_bundled_items_stock_cache( $product_id ) {
 		global $wpdb;
 
-		$bundled_item_ids = array_keys( wc_pb_get_bundled_product_map( $product_id ) );
+		$bundled_item_ids = array_keys( wc_pb_get_bundled_product_map( $product_id, false ) );
 
 		if ( ! empty( $bundled_item_ids ) ) {
 

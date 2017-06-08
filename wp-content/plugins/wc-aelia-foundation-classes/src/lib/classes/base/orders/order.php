@@ -24,7 +24,7 @@ class Order extends \WC_Order {
 	 * @param mixed value The value to set.
 	 */
 	public function set_meta($meta_key, $value) {
-		update_post_meta($this->id, $meta_key, $value);
+		update_post_meta($this->get_id(), $meta_key, $value);
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Order extends \WC_Order {
 			return parent::get_meta($key, $single, $context);
 		}
 
-		return get_post_meta($this->id, $key, $single);
+		return get_post_meta($this->get_id(), $key, $single);
 	}
 
 	/**

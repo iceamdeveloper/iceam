@@ -1,4 +1,5 @@
 <?php
+_deprecated_file( __FILE__, '4.4.8', null, __( 'Event Tickets Plus will discontinue support for Shopp in an upcoming release.', 'event-tickets-plus' ) );
 
 if ( class_exists( 'Tribe__Tickets_Plus__Commerce__Shopp__Main' ) || ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 	return;

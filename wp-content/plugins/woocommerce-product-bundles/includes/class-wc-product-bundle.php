@@ -437,6 +437,9 @@ class WC_Product_Bundle extends WC_Product {
 
 			$bundle_price_data = array();
 
+			$bundle_price_data[ 'raw_bundle_price_min' ]     = $this->get_bundle_price( 'min' );
+			$bundle_price_data[ 'raw_bundle_price_max' ]     = $this->get_bundle_price( 'max' );
+
 			$bundle_price_data[ 'is_purchasable' ]           = $this->is_purchasable() ? 'yes' : 'no';
 			$bundle_price_data[ 'show_free_string' ]         = ( $this->contains( 'priced_individually' ) ? apply_filters( 'woocommerce_bundle_show_free_string', false, $this ) : true ) ? 'yes' : 'no';
 
@@ -1401,15 +1404,20 @@ class WC_Product_Bundle extends WC_Product {
 
 			if ( ! is_array( $this->bundled_data_items ) ) {
 
-				$args = array(
-					'bundle_id' => $this->get_id(),
-					'return'    => 'objects',
-					'order_by'  => array( 'menu_order' => 'ASC' )
-				);
+				$this->bundled_data_items = array();
 
-				$this->bundled_data_items = WC_PB_DB::query_bundled_items( $args );
+				if ( $id = $this->get_id() ) {
 
-				wp_cache_set( $cache_key, $this->bundled_data_items, 'bundled_data_items' );
+					$args = array(
+						'bundle_id' => $id,
+						'return'    => 'objects',
+						'order_by'  => array( 'menu_order' => 'ASC' )
+					);
+
+					$this->bundled_data_items = WC_PB_DB::query_bundled_items( $args );
+
+					wp_cache_set( $cache_key, $this->bundled_data_items, 'bundled_data_items' );
+				}
 			}
 		}
 
@@ -1646,7 +1654,7 @@ class WC_Product_Bundle extends WC_Product {
 			$existing_item_ids = array();
 			$update_item_ids   = array();
 
-			$bundled_data_items = $this->get_bundled_data_items();
+			$bundled_data_items = $this->get_bundled_data_items( 'edit' );
 
 			// Get real IDs.
 			if ( ! empty( $bundled_data_items ) ) {
@@ -2115,12 +2123,15 @@ class WC_Product_Bundle extends WC_Product {
 					// Update.
 					if ( $real_id = $item->get_meta( 'real_id' ) ) {
 						$item->set_id( $real_id );
-						$item->delete_meta( 'real_id' );
 					// Create.
 					} else {
 						$item->set_id( 0 );
 					}
 
+					// Update bundle ID.
+					$item->set_bundle_id( $this->get_id() );
+
+					$item->delete_meta( 'real_id' );
 					$item->save();
 					$item->update_meta( 'real_id', $item->get_id() );
 

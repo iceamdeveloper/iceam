@@ -163,14 +163,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	protected $checkin_stati;
 
 	/**
+	 * For each ticket, stores the total number of pending orders.
+	 *
+	 * Populates lazily and on-demand.
+	 *
+	 * @since 4.4.9
+	 *
+	 * @var array
+	 */
+	protected $pending_orders_by_ticket = array();
+
+	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '3.12a1';
+	const VERSION = '4.4.9';
 
 	/**
 	 * Min required The Events Calendar version
 	 */
-	const REQUIRED_TEC_VERSION = '3.11';
+	const REQUIRED_TEC_VERSION = '4.4';
 
 	/**
 	 * Min required WooCommerce version
@@ -232,7 +243,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_action( 'before_delete_post', array( $this, 'handle_delete_post' ) );
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'generate_tickets' ) );
 		add_action( 'woocommerce_order_status_changed', array( $this, 'generate_tickets' ), 12 );
-		add_action( 'woocommerce_email_after_order_table', array( $this, 'add_tickets_msg_to_email' ), 10, 2 );
+		add_action( 'woocommerce_email_header', array( $this, 'maybe_add_tickets_msg_to_email' ), 10, 2 );
 		add_filter( 'woocommerce_hidden_order_itemmeta', array( $this, 'hide_attendee_optout_choice' ), 15 );
 
 		if ( class_exists( 'Tribe__Events__API' ) ) {
@@ -721,6 +732,28 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
+	 * Watches to see if the email being generated is a customer order email and sets up
+	 * the addition of ticket-specific messaging if it is.
+	 *
+	 * @param string $heading
+	 * @param object $email
+	 */
+	public function maybe_add_tickets_msg_to_email( $heading, $email ) {
+		// Do nothing unless this is a "customer_*" type email
+		if ( ! isset( $email->id ) || 0 !== strpos( $email->id, 'customer_' ) ) {
+			return;
+		}
+
+		// Do nothing if this is a refund notification
+		if ( false !== strpos( $email->id, 'refunded' ) ) {
+			return;
+		}
+
+		// Setup our tickets advisory message
+		add_action( 'woocommerce_email_after_order_table', array( $this, 'add_tickets_msg_to_email' ), 10, 2 );
+	}
+
+	/**
 	 * Adds a message to WooCommerce's order email confirmation.
 	 *
 	 * @param WC_Order $order
@@ -783,21 +816,43 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 			$ticket->ID = wp_insert_post( $args );
 
-			update_post_meta( $ticket->ID, '_visibility', 'hidden' );
-			update_post_meta( $ticket->ID, '_tax_status', 'taxable' );
-			update_post_meta( $ticket->ID, '_tax_class', '' );
-			update_post_meta( $ticket->ID, '_purchase_note', '' );
-			update_post_meta( $ticket->ID, '_weight', '' );
-			update_post_meta( $ticket->ID, '_length', '' );
-			update_post_meta( $ticket->ID, '_width', '' );
-			update_post_meta( $ticket->ID, '_height', '' );
-			update_post_meta( $ticket->ID, '_downloadable', 'no' );
-			update_post_meta( $ticket->ID, '_virtual', 'yes' );
-			update_post_meta( $ticket->ID, '_sale_price_dates_from', '' );
-			update_post_meta( $ticket->ID, '_sale_price_dates_to', '' );
-			update_post_meta( $ticket->ID, '_product_attributes', array() );
-			update_post_meta( $ticket->ID, '_sale_price', '' );
-			update_post_meta( $ticket->ID, 'total_sales', 0 );
+			if ( version_compare( wc()->version, '3.0', '>=' ) && $product = wc_get_product( $ticket->ID ) ) {
+				// WooCommerce 3.x compatibility
+				$product->set_sale_price( '' );
+				$product->set_total_sales( 0 );
+				$product->set_tax_status( 'taxable' );
+				$product->set_tax_class( '' );
+				$product->set_virtual( true );
+				$product->set_catalog_visibility( 'hidden' );
+				$product->set_downloadable( false );
+				$product->set_purchase_note( '' );
+				$product->set_weight( '' );
+				$product->set_length( '' );
+				$product->set_height( '' );
+				$product->set_width( '' );
+				$product->set_attributes( array() );
+				$product->set_props( array(
+					'date_on_sale_from' => '',
+					'date_on_sale_to'   => '',
+				) );
+				$product->save();
+			} else {
+				// Backwards compatibility with earlier supported WooCommerce releases
+				update_post_meta( $ticket->ID, '_tax_status', 'taxable' );
+				update_post_meta( $ticket->ID, '_tax_class', '' );
+				update_post_meta( $ticket->ID, '_purchase_note', '' );
+				update_post_meta( $ticket->ID, '_weight', '' );
+				update_post_meta( $ticket->ID, '_length', '' );
+				update_post_meta( $ticket->ID, '_width', '' );
+				update_post_meta( $ticket->ID, '_height', '' );
+				update_post_meta( $ticket->ID, '_downloadable', 'no' );
+				update_post_meta( $ticket->ID, '_virtual', 'yes' );
+				update_post_meta( $ticket->ID, '_sale_price_dates_from', '' );
+				update_post_meta( $ticket->ID, '_sale_price_dates_to', '' );
+				update_post_meta( $ticket->ID, '_product_attributes', array() );
+				update_post_meta( $ticket->ID, '_sale_price', '' );
+				update_post_meta( $ticket->ID, 'total_sales', 0 );
+			}
 
 			/**
 			 * Toggle filter to allow skipping the automatic SKU generation.
@@ -1123,7 +1178,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		$return       = new Tribe__Tickets__Ticket_Object();
 		$product_post = get_post( $this->get_product_id( $product ) );
-		$qty          = get_post_meta( $ticket_id, 'total_sales', true );
+		$qty_sold     = get_post_meta( $ticket_id, 'total_sales', true );
 
 		$return->description    = $product_post->post_excerpt;
 		$return->frontend_link  = get_permalink( $ticket_id );
@@ -1138,10 +1193,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->end_date       = get_post_meta( $ticket_id, '_ticket_end_date', true );
 		$return->purchase_limit = get_post_meta( $ticket_id, '_ticket_purchase_limit', true );
 
-		$complete_totals = $this->count_order_items_by_status( $ticket_id, 'complete' );
-		$pending_totals  = $this->count_order_items_by_status( $ticket_id, 'incomplete' );
-		$qty             = $qty ? $qty : 0;
-		$pending         = $pending_totals['total'] ? $pending_totals['total'] : 0;
+		// If the quantity sold wasn't set, default to zero
+		$qty_sold = $qty_sold ? $qty_sold : 0;
 
 		// Ticket stock is a simple reflection of remaining inventory for this item...
 		$stock = $product->get_stock_quantity();
@@ -1158,9 +1211,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->stock( $stock );
 		$return->global_stock_mode( get_post_meta( $ticket_id, '_global_stock_mode', true ) );
 		$return->global_stock_cap( get_post_meta( $ticket_id, '_global_stock_cap', true ) );
-		$return->qty_sold( $qty );
-		$return->qty_pending( $pending );
+		$return->qty_sold( $qty_sold );
 		$return->qty_cancelled( $this->get_cancelled( $ticket_id ) );
+
+		// From Event Tickets 4.4.9 onwards we can supply a callback to calculate the number of
+		// pending items per ticket on demand (since determing this is expensive and the data isn't
+		// always required, it makes sense not to do it unless required)
+		if ( version_compare( Tribe__Tickets__Main::VERSION, '4.4.9', '>=' ) ) {
+			$return->qty_pending( array( $this, 'get_qty_pending' ) );
+		}
+		// If an earlier version of Event Tickets is activated we'll need to calculate this upfront
+		else {
+			$pending_totals  = $this->count_order_items_by_status( $ticket_id, 'incomplete' );
+			$return->qty_pending( $pending_totals['total'] ? $pending_totals['total'] : 0 );
+		}
 
 		if ( empty( $return->purchase_limit ) && 0 !== (int) $return->purchase_limit ) {
 			/**
@@ -1183,6 +1247,23 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$ticket = apply_filters( 'tribe_tickets_plus_woo_get_ticket', $return, $event_id, $ticket_id );
 
 		return $ticket;
+	}
+
+	/**
+	 * Lazily calculates the quantity of pending sales for the specified ticket.
+	 *
+	 * @param int  $ticket_id
+	 * @param bool $refresh
+	 *
+	 * @return int
+	 */
+	public function get_qty_pending( $ticket_id, $refresh = false ) {
+		if ( $refresh || empty( $this->pending_orders_by_ticket[ $ticket_id ] ) ) {
+			$pending_totals = $this->count_order_items_by_status( $ticket_id, 'incomplete' );
+			$this->pending_orders_by_ticket[ $ticket_id ] = $pending_totals['total'] ? $pending_totals['total'] : 0;
+		}
+
+		return $this->pending_orders_by_ticket[ $ticket_id ];
 	}
 
 	/**

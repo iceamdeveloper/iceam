@@ -106,6 +106,34 @@ class Cache_Handler_Cache_Handler extends Base_Cache_Handler {
 		return $page_hash_max_length;
 	}
 
+	/**
+	 * Returns customer's country.
+	 *
+	 * @param WC_Customer customer
+	 * @return string
+	 * @since 1.0.6.170520
+	 */
+	protected function get_customer_country($customer) {
+		if(aelia_wc_version_is('<', '3.0')) {
+			return $customer->get_country();
+		}
+		return $customer->get_billing_country();
+	}
+
+	/**
+	 * Returns customer's State/Province.
+	 *
+	 * @param WC_Customer customer
+	 * @return string
+	 * @since 1.0.6.170520
+	 */
+	protected function get_customer_state($customer) {
+		if(aelia_wc_version_is('<', '3.0')) {
+			return $customer->get_state();
+		}
+		return $customer->get_billing_state();
+	}
+
 	public function get_page_hash() {
 		$hash_data = array();
 
@@ -113,8 +141,8 @@ class Cache_Handler_Cache_Handler extends Base_Cache_Handler {
 		$hash_data[] = isset($_COOKIE['aelia_cs_selected_currency']) ? $_COOKIE['aelia_cs_selected_currency'] : get_woocommerce_currency();
 
 		// Store customer's location
-		$hash_data[] = isset($_COOKIE['aelia_customer_country']) ? $_COOKIE['aelia_customer_country'] : wc()->customer->get_country();
-		$hash_data[] = isset($_COOKIE['aelia_customer_state']) ? $_COOKIE['aelia_customer_state'] : wc()->customer->get_state();
+		$hash_data[] = isset($_COOKIE['aelia_customer_country']) ? $_COOKIE['aelia_customer_country'] : $this->get_customer_country(wc()->customer);
+		$hash_data[] = isset($_COOKIE['aelia_customer_state']) ? $_COOKIE['aelia_customer_state'] : $this->get_customer_state(wc()->customer);
 
 		// Store customer's tax exemption
 		$hash_data[] = isset($_COOKIE['aelia_tax_exempt']) ? $_COOKIE['aelia_tax_exempt'] : false;

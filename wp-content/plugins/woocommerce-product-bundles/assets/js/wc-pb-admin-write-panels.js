@@ -3,8 +3,152 @@
 
 jQuery( function($) {
 
+	function Bundled_Item( $el ) {
+
+		var self = this;
+
+		this.$content                        = $el.find( 'div.item-data' );
+		this.$discount                       = this.$content.find( '.discount' );
+		this.$visibility                     = this.$content.find( '.item_visibility' );
+		this.$price_visibility               = this.$content.find( '.price_visibility' );
+		this.$allowed_variations             = this.$content.find( 'div.allowed_variations' );
+		this.$default_variation_attributes   = this.$content.find( 'div.default_variation_attributes' );
+		this.$custom_title                   = this.$content.find( 'div.custom_title' );
+		this.$custom_description             = this.$content.find( 'div.custom_description' );
+		this.$override_title                 = this.$content.find( '.override_title' );
+		this.$override_description           = this.$content.find( '.override_description' );
+		this.$hide_thumbnail                 = this.$content.find( '.hide_thumbnail' );
+
+		this.$section_links                  = this.$content.find( '.subsubsub a' );
+		this.$sections                       = this.$content.find( '.options_group' );
+
+		this.$priced_individually_input      = this.$content.find( '.priced_individually input' );
+		this.$override_variations_input      = this.$content.find( '.override_variations input' );
+		this.$override_defaults_input        = this.$content.find( '.override_default_variation_attributes input' );
+		this.$override_title_input           = this.$override_title.find( 'input' );
+		this.$override_description_input     = this.$override_description.find( 'input' );
+
+		this.$price_visibility_product_input = this.$price_visibility.find( 'input.price_visibility_product' );
+		this.$price_visibility_cart_input    = this.$price_visibility.find( 'input.price_visibility_cart' );
+		this.$price_visibility_order_input   = this.$price_visibility.find( 'input.price_visibility_order' );
+
+		this.$visibility_product_input       = this.$visibility.find( 'input.visibility_product' );
+		this.$visibility_cart_input          = this.$visibility.find( 'input.visibility_cart' );
+		this.$visibility_order_input         = this.$visibility.find( 'input.visibility_order' );
+
+		this.priced_individually_input_changed = function() {
+			if ( self.$priced_individually_input.is( ':checked' ) ) {
+				self.$discount.show();
+				self.$price_visibility.show();
+			} else {
+				self.$discount.hide();
+				self.$price_visibility.hide();
+			}
+		};
+
+		this.override_variations_input_changed = function() {
+			if ( self.$override_variations_input.is( ':checked' ) ) {
+				self.$allowed_variations.show();
+			} else {
+				self.$allowed_variations.hide();
+			}
+		};
+
+		this.override_defaults_input_changed = function() {
+			if ( self.$override_defaults_input.is( ':checked' ) ) {
+				self.$default_variation_attributes.show();
+			} else {
+				self.$default_variation_attributes.hide();
+			}
+		};
+
+		this.override_title_input_changed = function() {
+			if ( self.$override_title_input.is( ':checked' ) ) {
+				self.$custom_title.show();
+			} else {
+				self.$custom_title.hide();
+			}
+		};
+
+		this.override_description_input_changed = function() {
+			if ( self.$override_description_input.is( ':checked' ) ) {
+				self.$custom_description.show();
+			} else {
+				self.$custom_description.hide();
+			}
+		};
+
+		this.visibility_product_input_changed = function() {
+			if ( self.$visibility_product_input.is( ':checked' ) ) {
+
+				self.$override_title.show();
+				self.$override_description.show();
+				self.$hide_thumbnail.show();
+
+				self.override_title_input_changed();
+				self.override_description_input_changed();
+
+			} else {
+
+				self.$override_title.hide();
+				self.$override_description.hide();
+				self.$hide_thumbnail.hide();
+
+				self.$custom_description.hide();
+				self.$custom_title.hide();
+			}
+		};
+
+		this.toggled_visibility = function( visibility_class ) {
+
+			if ( self[ '$visibility_' + visibility_class + '_input' ].is( ':checked' ) ) {
+				self[ '$price_visibility_' + visibility_class + '_input' ].css( 'opacity', 1 );
+			} else {
+				self[ '$price_visibility_' + visibility_class + '_input' ].css( 'opacity', 0.5 );
+			}
+
+		};
+
+		this.section_changed = function( $section_link ) {
+
+			self.$section_links.removeClass( 'current' );
+			$section_link.addClass( 'current' );
+
+			self.$sections.addClass( 'options_group_hidden' );
+			self.$content.find( '.options_group_' + $section_link.data( 'tab' ) ).removeClass( 'options_group_hidden' );
+		};
+
+		this.initialize = function() {
+
+			self.priced_individually_input_changed();
+			self.override_variations_input_changed();
+			self.override_defaults_input_changed();
+			self.override_title_input_changed();
+			self.override_description_input_changed();
+			self.visibility_product_input_changed();
+
+			self.toggled_visibility( 'product' );
+			self.toggled_visibility( 'cart' );
+			self.toggled_visibility( 'order' );
+		};
+
+		this.initialize();
+	}
+
 	var $bundled_products_panel       = $( '#bundled_product_data' ),
-		$bundled_product_input        = $( '#bundled_product', $bundled_products_panel );
+		$bundled_products_toolbar     = $bundled_products_panel.find( '.toolbar' ),
+		$bundled_products_container   = $( '.wc-bundled-items' ),
+		$bundled_products             = $( '.wc-bundled-item', $bundled_products_container ),
+		$bundled_product_search       = $( '#bundled_product', $bundled_products_panel ),
+		bundled_product_objects       = {},
+		bundled_products_add_count    = $bundled_products.length,
+		block_params                  = {
+			message: 	null,
+			overlayCSS: {
+				background: '#fff',
+				opacity: 	0.6
+			}
+		};
 
 	$.fn.wc_bundles_select2 = function() {
 		$( document.body ).trigger( 'wc-enhanced-select-init' );
@@ -23,9 +167,9 @@ jQuery( function($) {
 	$( '.show_if_simple:not(.hide_if_bundle)' ).addClass( 'show_if_bundle' );
 
 	// Bundle type specific options.
-	$( 'body' ).on( 'woocommerce-product-type-change', function( event, select_val, select ) {
+	$( 'body' ).on( 'woocommerce-product-type-change', function( event, select_val ) {
 
-		if ( select_val === 'bundle' ) {
+		if ( 'bundle' === select_val ) {
 
 			$( '.show_if_external' ).hide();
 			$( '.show_if_bundle' ).show();
@@ -34,7 +178,7 @@ jQuery( function($) {
 
 			$( '#_nyp' ).change();
 
-			if ( wc_bundles_admin_params.is_wc_version_gte_2_7 === 'no' ) {
+			if ( 'no' === wc_bundles_admin_params.is_wc_version_gte_2_7 ) {
 				$( '#_regular_price' ).val( $( '#_wc_pb_base_regular_price' ).val() ).change();
 				$( '#_sale_price' ).val( $( '#_wc_pb_base_sale_price' ).val() ).change();
 			}
@@ -47,143 +191,237 @@ jQuery( function($) {
 	// Downloadable support.
 	$( 'input#_downloadable' ).change( function() {
 		$( 'select#product-type' ).change();
-	});
-
-	init_bundled_products_panel();
-
-	// Subsubsub navigation.
-	$( '#wc-bundle-metaboxes-wrapper-inner' ).on( 'click', '.subsubsub a', function() {
-
-		$( this ).closest( '.subsubsub' ).find( 'a' ).removeClass( 'current' );
-		$( this ).addClass( 'current' );
-
-		$( this ).closest( '.wc-bundled-item' ).find( '.options_group' ).addClass( 'options_group_hidden' );
-
-		var tab = $( this ).data( 'tab' );
-
-		$( this ).closest( '.wc-bundled-item' ).find( '.options_group_' + tab ).removeClass( 'options_group_hidden' );
-
-		return false;
-
 	} );
 
-	function index_bundled_product_rows() {
-		$( '.wc-bundled-items .wc-bundled-item' ).each( function( index, el ) {
-			$( '.item_menu_order', el ).val( index );
-		} );
+	init_event_handlers();
+
+	init_bundled_products();
+
+	function init_event_handlers() {
+
+		// Add Product.
+		$bundled_product_search
+
+			.on( 'change', function() {
+
+				var bundled_product_ids = $bundled_product_search.val(),
+					bundled_product_id  = bundled_product_ids && bundled_product_ids.length > 0 ? ( 'yes' === wc_bundles_admin_params.is_wc_version_gte_2_7 ? bundled_product_ids.shift() : bundled_product_ids ) : false;
+
+				if ( ! bundled_product_id ) {
+					return false;
+				}
+
+				if ( 'yes' === wc_bundles_admin_params.is_wc_version_gte_2_7 ) {
+					$bundled_product_search.val( [] ).change();
+				} else {
+					$bundled_product_search.select2( 'val', '' );
+				}
+
+				$bundled_products_panel.block( block_params );
+
+				bundled_products_add_count++;
+
+				var data = {
+					action: 	'woocommerce_add_bundled_product',
+					post_id: 	woocommerce_admin_meta_boxes.post_id,
+					id: 		bundled_products_add_count,
+					product_id: bundled_product_id,
+					security: 	wc_bundles_admin_params.add_bundled_product_nonce
+				};
+
+				setTimeout( function() {
+
+					$.post( woocommerce_admin_meta_boxes.ajax_url, data, function ( response ) {
+
+						if ( '' !== response.markup ) {
+
+							$bundled_products_container.append( response.markup );
+
+							var $added   = $( '.wc-bundled-item', $bundled_products_container ).last(),
+								added_id = 'bundled_item_' + bundled_products_add_count;
+
+							$added.data( 'bundled_item_id', added_id );
+							bundled_product_objects[ added_id ] = new Bundled_Item( $added );
+
+							$bundled_products_panel.triggerHandler( 'wc-bundled-products-changed' );
+
+							$added.find( '.woocommerce-help-tip' ).tipTip( {
+								'attribute' : 'data-tip',
+								'fadeIn' : 50,
+								'fadeOut' : 50,
+								'delay' : 200
+							} );
+
+							$added.wc_bundles_select2();
+
+							$bundled_products_panel.trigger( 'wc-bundles-added-bundled-product' );
+
+						} else if ( response.message !== '' ) {
+							window.alert( response.message );
+						}
+
+						// Open and close to resolve "sticky" modal issue.
+						$bundled_product_search.select2( 'open' );
+						$bundled_product_search.select2( 'close' );
+
+						$bundled_products_panel.unblock();
+
+					} );
+
+				}, 250 );
+
+				return false;
+
+			} );
+
+		$bundled_products_panel
+
+			// Update menu order and toolbar states.
+			.on( 'wc-bundled-products-changed', function() {
+
+				$bundled_products = $( '.wc-bundled-item', $bundled_products_container );
+
+				$bundled_products.each( function( index, el ) {
+					$( '.item_menu_order', el ).val( index );
+				} );
+
+				update_toolbar_state();
+
+			} );
+
+		$bundled_products_container
+
+			// Remove Item.
+			.on( 'click', 'a.remove_row', function( e ) {
+
+				var $el   = $( this ).closest( '.wc-bundled-item' ),
+					el_id = $el.data( 'bundled_item_id' );
+
+				$el.find( '*' ).off();
+				$el.remove();
+
+				delete bundled_product_objects[ el_id ];
+
+				$bundled_products_panel.triggerHandler( 'wc-bundled-products-changed' );
+
+				e.preventDefault();
+
+			} )
+
+			// Priced individually.
+			.on( 'change', '.priced_individually input', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.priced_individually_input_changed();
+			} )
+
+			// Variation filtering options.
+			.on( 'change', '.override_variations input', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.override_variations_input_changed();
+			} )
+
+			// Selection defaults options.
+			.on( 'change', '.override_default_variation_attributes input', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.override_defaults_input_changed();
+			} )
+
+			// Custom title options.
+			.on( 'change', '.override_title input', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.override_title_input_changed();
+			} )
+
+			// Custom description options.
+			.on( 'change', '.override_description input', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.override_description_input_changed();
+			} )
+
+			// Visibility.
+			.on( 'change', 'input.visibility_product', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.visibility_product_input_changed();
+				bundled_product.toggled_visibility( 'product' );
+			} )
+
+			.on( 'change', 'input.visibility_cart', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.toggled_visibility( 'cart' );
+			} )
+
+			.on( 'change', 'input.visibility_order', function() {
+
+				var $el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.toggled_visibility( 'order' );
+			} )
+
+			// Sections.
+			.on( 'click', '.subsubsub a', function( event ) {
+
+				var $section_link   = $( this ),
+					$el             = $( this ).closest( '.wc-bundled-item' ),
+					el_id           = $el.data( 'bundled_item_id' ),
+					bundled_product = bundled_product_objects[ el_id ];
+
+				bundled_product.section_changed( $section_link );
+
+				event.preventDefault();
+
+			} );
+
 	}
 
-	function toggle_item_visibility( $item ) {
+	function init_bundled_products() {
 
-		var visibility_classes = [ 'product', 'cart', 'order' ],
-			visible_exists     = false;
+		// Create objects.
+		$bundled_products.each( function( index ) {
 
-		$.each( visibility_classes, function( index, visibility_class ) {
-			if ( $item.find( 'input.visibility_' + visibility_class ).is( ':checked' ) ) {
-				$item.find( 'input.price_visibility_' + visibility_class ).css( 'opacity', 1 );
-				visible_exists = true;
-			} else {
-				$item.find( 'input.price_visibility_' + visibility_class ).css( 'opacity', 0.5 );
-			}
-		} );
-	}
+			var $el   = $( this ),
+				el_id = 'bundled_item_' + index;
 
-	function init_bundled_products_panel() {
-
-		$( '.wc-bundled-items' )
-
-		// Priced individually.
-		.on( 'change', '.priced_individually input', function() {
-			if ( $( this ).is( ':checked' ) ) {
-				$( this ).closest( 'div.item-data' ).find( '.discount' ).show();
-				$( this ).closest( 'div.item-data' ).find( '.price_visibility' ).show();
-			} else {
-				$( this ).closest( 'div.item-data' ).find( '.discount' ).hide();
-				$( this ).closest( 'div.item-data' ).find( '.price_visibility' ).hide();
-			}
-		} )
-
-		// Variation filtering options.
-		.on( 'change', '.override_variations input', function() {
-			if ( $( this ).is( ':checked' ) ) {
-				$( this ).closest( 'div.item-data' ).find( 'div.allowed_variations' ).show();
-			} else {
-				$( this ).closest( 'div.item-data' ).find( 'div.allowed_variations' ).hide();
-			}
-		} )
-
-		// Selection defaults options.
-		.on( 'change', '.override_default_variation_attributes input', function() {
-			if ( $( this ).is( ':checked' ) ) {
-				$( this ).closest( 'div.item-data' ).find( 'div.default_variation_attributes' ).show();
-			} else {
-				$( this ).closest( 'div.item-data' ).find( 'div.default_variation_attributes' ).hide();
-			}
-		} )
-
-		// Custom title options.
-		.on( 'change', '.override_title input', function() {
-			if ( $( this ).is( ':checked' ) ) {
-				$( this ).closest( 'div.item-data' ).find( 'div.custom_title' ).show();
-			} else {
-				$( this ).closest( 'div.item-data' ).find( 'div.custom_title' ).hide();
-			}
-		} )
-
-		// Custom description options.
-		.on( 'change', '.override_description input', function() {
-			if ( $( this ).is( ':checked' ) ) {
-				$( this ).closest( 'div.item-data' ).find( 'div.custom_description' ).show();
-			} else {
-				$( this ).closest( 'div.item-data' ).find( 'div.custom_description' ).hide();
-			}
-		} )
-
-		// Visibility.
-		.on( 'change', 'input.visibility_product', function() {
-
-			if ( $( this ).is( ':checked' ) ) {
-				$( this ).closest( 'div.item-data' ).find( '.override_title, .override_description, .hide_thumbnail' ).show();
-				$( this ).closest( 'div.item-data' ).find( '.override_title input' ).change();
-				$( this ).closest( 'div.item-data' ).find( '.override_description input' ).change();
-			} else {
-				$( this ).closest( 'div.item-data' ).find( '.override_title, .custom_title, .override_description, .custom_description, .hide_thumbnail' ).hide();
-			}
-
-			toggle_item_visibility( $( this ).closest( 'div.item-data' ) );
-		} )
-
-		.on( 'change', 'input.visibility_cart, input.visibility_order', function() {
-			toggle_item_visibility( $( this ).closest( 'div.item-data' ) );
-		} );
-
-		$( '.wc-bundled-items .priced_individually input' ).change();
-		$( '.wc-bundled-items .override_variations input' ).change();
-		$( '.wc-bundled-items .override_default_variation_attributes input' ).change();
-		$( '.wc-bundled-items .override_title input' ).change();
-		$( '.wc-bundled-items .override_description input' ).change();
-		$( '.wc-bundled-items input.visibility_product' ).change(); // Also calls 'toggle_item_visibility'.
-
-		// Initial order.
-		var bundled_items = $( '.wc-bundled-items' ).find( '.wc-bundled-item' ).get();
-
-		bundled_items.sort( function( a, b ) {
-		   var compA = parseInt( $(a).attr( 'rel' ) );
-		   var compB = parseInt( $(b).attr( 'rel' ) );
-		   return ( compA < compB ) ? -1 : ( compA > compB ) ? 1 : 0;
-		} );
-
-		$( bundled_items ).each( function( idx, itm ) {
-			$( '.wc-bundled-items' ).append( itm );
+			$el.data( 'bundled_item_id', el_id );
+			bundled_product_objects[ el_id ] = new Bundled_Item( $el );
 		} );
 
 		// Item ordering.
-		$( '.wc-bundled-items' ).sortable( {
-			items:'.wc-bundled-item',
-			cursor:'move',
-			axis:'y',
+		$bundled_products_container.sortable( {
+			items: '.wc-bundled-item',
+			cursor: 'move',
+			axis: 'y',
 			handle: 'h3',
-			scrollSensitivity:40,
+			scrollSensitivity: 40,
 			forcePlaceholderSize: true,
 			helper: 'clone',
 			opacity: 0.65,
@@ -193,110 +431,21 @@ jQuery( function($) {
 			},
 			stop:function( event, ui ){
 				ui.item.removeAttr( 'style' );
-				index_bundled_product_rows();
+				$bundled_products_panel.triggerHandler( 'wc-bundled-products-changed' );
 			}
 		} );
 
-		index_bundled_product_rows();
-
-		// Remove.
-		$( '.wc-bundle-metaboxes-wrapper', $bundled_products_panel ).on( 'click', 'a.remove_row', function( e ) {
-
-			var $parent = $( this ).closest( '.wc-bundled-item' );
-
-			$parent.find('*').off();
-			$parent.remove();
-			index_bundled_product_rows();
-
-			e.preventDefault();
-		} );
-
-		// Expand & Close.
-		$( '.expand_all', $bundled_products_panel ).click( function() {
-			$( this ).closest( '.wc-metaboxes-wrapper' ).find( '.wc-metabox > .item-data' ).show();
-			return false;
-		} );
-
-		$( '.close_all', $bundled_products_panel ).click( function() {
-			$( this ).closest( '.wc-metaboxes-wrapper' ).find( '.wc-metabox > .item-data').hide();
-			return false;
-		} );
+		// Expand/collapse toolbar state.
+		update_toolbar_state();
 	}
 
-	// Add Product.
-	var bundle_metabox_count = $( '.wc-bundled-items .wc-bundled-item', $bundled_products_panel ).length;
-	var block_params         = {
-			message: 	null,
-			overlayCSS: {
-				background: '#fff',
-				opacity: 	0.6
-			}
-		};
+	function update_toolbar_state() {
 
-	$bundled_products_panel.on( 'click', 'button.add_bundled_product', function() {
-
-		var bundled_product_id = $bundled_product_input.val();
-
-		if ( ! bundled_product_id > 0 ) {
-			$bundled_product_input.select2( 'open' );
-			return false;
+		if ( $bundled_products.length > 0 ) {
+			$bundled_products_toolbar.removeClass( 'disabled' );
 		} else {
-			if ( wc_bundles_admin_params.is_wc_version_gte_2_7 === 'yes' ) {
-				$bundled_product_input.val( '' ).change();
-			} else {
-				$bundled_product_input.select2( 'val', '' );
-			}
+			$bundled_products_toolbar.addClass( 'disabled' );
 		}
-
-		$bundled_products_panel.block( block_params );
-
-		bundle_metabox_count++;
-
-		var data = {
-			action: 	'woocommerce_add_bundled_product',
-			post_id: 	woocommerce_admin_meta_boxes.post_id,
-			id: 		bundle_metabox_count,
-			product_id: bundled_product_id,
-			security: 	wc_bundles_admin_params.add_bundled_product_nonce
-		};
-
-		$.post( woocommerce_admin_meta_boxes.ajax_url, data, function ( response ) {
-
-			if ( response.markup !== '' ) {
-
-				$( '.wc-bundled-items', $bundled_products_panel ).append( response.markup );
-				index_bundled_product_rows();
-
-				var $added = $( '.wc-bundled-items .wc-bundled-item', $bundled_products_panel ).last();
-
-				$added.find( '.override_variations input' ).change();
-				$added.find( '.override_default_variation_attributes input' ).change();
-				$added.find( '.override_title input' ).change();
-				$added.find( '.override_description input' ).change();
-
-				toggle_item_visibility( $added );
-
-				$added.find( '.woocommerce-help-tip' ).tipTip( {
-					'attribute' : 'data-tip',
-					'fadeIn' : 50,
-					'fadeOut' : 50,
-					'delay' : 200
-				} );
-
-				$added.wc_bundles_select2();
-
-				$bundled_products_panel.trigger( 'wc-bundles-added-bundled-product' );
-
-			} else if ( response.message !== '' ) {
-				window.alert( response.message );
-			}
-
-			$bundled_products_panel.unblock();
-
-		} );
-
-		return false;
-
-	} );
+	}
 
 } );

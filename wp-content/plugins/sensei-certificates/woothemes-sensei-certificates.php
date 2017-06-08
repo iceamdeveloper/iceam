@@ -3,7 +3,7 @@
  * Plugin Name: Sensei Certificates
  * Plugin URI: https://woocommerce.com/products/sensei-certificates/
  * Description: Reward your students by providing them with printable PDF certificates upon course completion.
- * Version: 1.0.14
+ * Version: 1.0.16
  * Author: WooThemes
  * Author URI: https://www.woocommerce.com
  * License: GPLv2+
@@ -197,6 +197,10 @@ function sensei_update_users_certificate_data( $n = 5, $offset = 0 ) {
 	$total_items = $user_count[ 'total_users' ];
 
 	$total_pages = intval( ceil($total_items / $n ) );
+	if ( !class_exists('Woothemes_Sensei_Certificate_Data_Store') ) {
+		include_once( 'classes/class-woothemes-sensei-certificates-data-store.php' );
+	}
+
 	$data_store = new Woothemes_Sensei_Certificate_Data_Store();
 
 	foreach ( $users as $user_key => $user_item ) {

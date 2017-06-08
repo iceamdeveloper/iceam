@@ -10,6 +10,18 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
+#: src/views/eddtickets/tickets.php:126 src/views/wootickets/tickets.php:155
+msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
+msgstr ""
+
+#: src/Tribe/Commerce/Shopp/Main.php:2
+msgid "Event Tickets Plus will discontinue support for Shopp in an upcoming release."
+msgstr ""
+
+#: src/Tribe/Commerce/WPEC/Main.php:2
+msgid "Event Tickets Plus will discontinue support for WP E-Commerce in an upcoming release."
+msgstr ""
+
 #: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
 msgctxt "Browser title"
 msgid "%s - Order list"
@@ -42,7 +54,7 @@ msgctxt "Attendee information fields"
 msgid "Multi-line text field?"
 msgstr ""
 
-#: src/Tribe/QR.php:103
+#: src/Tribe/QR.php:119
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
 
@@ -150,17 +162,17 @@ msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
-#: src/Tribe/Commerce/Shopp/Main.php:176
+#: src/Tribe/Commerce/Shopp/Main.php:177
 msgctxt "ticket provider"
 msgid "Shopp"
 msgstr "Shopp"
 
-#: src/Tribe/Commerce/WPEC/Main.php:128
+#: src/Tribe/Commerce/WPEC/Main.php:129
 msgctxt "ticket provider"
 msgid "WPEC"
 msgstr "WPEC"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:209
+#: src/Tribe/Commerce/WooCommerce/Main.php:220
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
@@ -218,7 +230,7 @@ msgstr "Katalogové číslo vstupenky"
 msgid "Recurring event tickets are not supported, event %d."
 msgstr "Vstupenky na opakující se akce nejsou podporovány. (akce: %d)"
 
-#: src/Tribe/Main.php:333
+#: src/Tribe/Main.php:337
 msgid "Require users to log in before they purchase tickets"
 msgstr "Vyžadovat přihlášení uživatelů před zakoupením vstupenek"
 
@@ -313,11 +325,11 @@ msgstr "Vlastní pole vstupenky"
 msgid "Attendee Information"
 msgstr "Údaje o účastnících"
 
-#: src/Tribe/QR.php:81
+#: src/Tribe/QR.php:97
 msgid "The ticket with ID %s has already been checked in."
 msgstr "Vstupenka s číslem %s již byla zaregistrována."
 
-#: src/Tribe/QR.php:127
+#: src/Tribe/QR.php:143
 msgid "Scan this QR code at the event to check in."
 msgstr "Při vstupu na akci naskenujte tento QR kód pro registraci."
 
@@ -460,7 +472,7 @@ msgid "Your tickets from {site_title}"
 msgstr "Vaše vstupenky z webu {site_title}"
 
 #: src/Tribe/Commerce/EDD/Global_Stock.php:163
-#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:160
+#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:167
 msgid "Sorry, there is insufficient stock to fulfill your order with respect to the tickets you selected in relation to this event: %s"
 msgid_plural "Sorry, there is insufficient stock to fulfill your order with respect to the tickets you selected in relation to these events: %s"
 msgstr[0] "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na vámi zvolené vstupenky a ve vztahu k této akci: %s"
@@ -468,7 +480,7 @@ msgstr[1] "Bohužel nemáme dostatečné množství zásob ke splnění vaší o
 msgstr[2] "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na vámi zvolené vstupenky a ve vztahu k těmto akcím: %s"
 
 #: src/Tribe/Commerce/EDD/Global_Stock.php:195
-#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:192
+#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:199
 msgid "Sorry, there is insufficient stock to fulfill your order with respect to %s"
 msgstr "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na %s"
 
@@ -589,7 +601,7 @@ msgstr "Manipulační poplatek"
 msgid "Total"
 msgstr "Cena celkem"
 
-#: src/Tribe/QR.php:124
+#: src/Tribe/QR.php:140
 msgid "Check in for this event"
 msgstr "Registrace na akci"
 
@@ -633,23 +645,23 @@ msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:756
+#: src/Tribe/Commerce/WooCommerce/Main.php:789
 msgid "You'll receive your tickets in another email."
 msgstr "Vstupenky obdržíte v dalším emailu."
 
-#: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1475
+#: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:767
+#: src/Tribe/Commerce/WooCommerce/Main.php:1556
 msgid "(deleted)"
 msgstr "(smazáno)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1724
+#: src/Tribe/Commerce/WooCommerce/Main.php:1805
 msgid "Event sales report"
 msgstr "Přehled prodejů vstupenek"
 
-#: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
-#: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1772
+#: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1133
+#: src/Tribe/Commerce/WPEC/Main.php:1038
+#: src/Tribe/Commerce/WooCommerce/Main.php:1853
 msgid "This is a ticket for the event:"
 msgstr "Toto je vstupenka na akci:"
 
@@ -681,23 +693,23 @@ msgstr "Shopp"
 msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 msgstr "Než začnete používat plugin Tickets Plus, nainstalujte si a aktivujte aktuální verzi pluginu <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 
-#: src/Tribe/Commerce/Shopp/Main.php:1007
+#: src/Tribe/Commerce/Shopp/Main.php:1008
 msgid "Unknown item"
 msgstr "Neznámá položka"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1122
+#: src/Tribe/Commerce/Shopp/Main.php:1123
 msgid "Event"
 msgstr "Akce"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1205 src/Tribe/Commerce/WPEC/Main.php:1098
+#: src/Tribe/Commerce/Shopp/Main.php:1206 src/Tribe/Commerce/WPEC/Main.php:1099
 msgid "Resend Tickets"
 msgstr "Znovu poslat vstupenky"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1243
+#: src/Tribe/Commerce/Shopp/Main.php:1244
 msgid "Email containing tickets (sent by ShoppTickets)"
 msgstr "Email se vstupenkami (zasílá ShoppTickets)"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1285
+#: src/Tribe/Commerce/Shopp/Main.php:1286
 msgid "Your tickets from %s"
 msgstr "Vaše vstupenky z webu %s"
 
@@ -705,26 +717,26 @@ msgstr "Vaše vstupenky z webu %s"
 msgid "Your tickets"
 msgstr "Vaše vstupenky"
 
-#: src/Tribe/Commerce/WPEC/Main.php:627
+#: src/Tribe/Commerce/WPEC/Main.php:628
 msgid "We're sorry but there was insufficient inventory to completely fulfill your order! We have added as many tickets as we could, but we recommend reviewing your order (below) in case you need to make some further adjustments."
 msgstr "Je nám líto, ale k úplnému splnění vaší objednávky nemáme dostatečné množství zásob. Vložili jsme co nejvíce vstupenek, ale přesto vám doporučujeme si zkontrolovat objednávku (viz níže) a provést její případné úpravy."
 
-#: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1545
+#: src/Tribe/Commerce/WPEC/Main.php:831
+#: src/Tribe/Commerce/WooCommerce/Main.php:1626
 msgid "In trash (was %s)"
 msgstr "V koši (bylo %s)"
 
-#: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1551
+#: src/Tribe/Commerce/WPEC/Main.php:837
+#: src/Tribe/Commerce/WooCommerce/Main.php:1632
 msgid "Deleted"
 msgstr "Smazáno"
 
-#: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1600
+#: src/Tribe/Commerce/WPEC/Main.php:884
+#: src/Tribe/Commerce/WooCommerce/Main.php:1681
 msgid "Unknown"
 msgstr "Neznámý"
 
-#: src/Tribe/Commerce/WPEC/Main.php:1103
+#: src/Tribe/Commerce/WPEC/Main.php:1104
 msgid "&nbsp; [Sent]"
 msgstr "&nbsp; [Odesláno]"
 
@@ -748,11 +760,11 @@ msgstr "Předmět"
 msgid "Defaults to <code>%s</code>"
 msgstr "Výchozí je <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1749
+#: src/Tribe/Commerce/WooCommerce/Main.php:1830
 msgid "Report"
 msgstr "Přehled"
 
-#: src/Tribe/QR.php:85
+#: src/Tribe/QR.php:101
 msgid "The ticket with ID %s was checked in."
 msgstr "Vstupenka s číslem %s byla zaregistrována."
 
@@ -828,7 +840,9 @@ msgstr "Množství"
 msgid "Sold Out"
 msgstr "Vyprodáno"
 
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.4.9)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
+#: src/Tribe/Main.php:297
 msgid "Event Tickets Plus"
 msgstr "Event Tickets Plus"
 

@@ -10,61 +10,66 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Events Calendar Pro\n"
 
-#: src/admin-views/event-recurrence.php:99
-#: src/admin-views/event-recurrence.php:335
+#: src/Tribe/Main.php:1326
+msgctxt "Event title map marker prefix"
+msgid "%s: "
+msgstr ""
+
+#: src/admin-views/event-recurrence.php:101
+#: src/admin-views/event-recurrence.php:337
 msgid "months"
 msgstr "mois"
 
-#: src/admin-views/event-recurrence.php:140
+#: src/admin-views/event-recurrence.php:142
 msgctxt "Begins the line indicating when a recurrence time starts"
 msgid "At"
 msgstr "A"
 
-#: src/admin-views/event-recurrence.php:150
+#: src/admin-views/event-recurrence.php:152
 msgid "the same time:"
 msgstr "la même heure"
 
-#: src/admin-views/event-recurrence.php:151
+#: src/admin-views/event-recurrence.php:153
 msgid "a different time:"
 msgstr "une heure différente"
 
-#: src/admin-views/event-recurrence.php:179
-#: src/admin-views/event-recurrence.php:381
+#: src/admin-views/event-recurrence.php:181
+#: src/admin-views/event-recurrence.php:383
 msgid "Series ends"
 msgstr "Fin de récurrence"
 
-#: src/admin-views/event-recurrence.php:188
-#: src/admin-views/event-recurrence.php:391
+#: src/admin-views/event-recurrence.php:190
+#: src/admin-views/event-recurrence.php:393
 msgid "on"
 msgstr "le"
 
-#: src/admin-views/event-recurrence.php:207
+#: src/admin-views/event-recurrence.php:209
 msgid "Series ends on this date"
 msgstr "Les séries se terminent à cette date"
 
-#: src/admin-views/event-recurrence.php:235
-#: src/admin-views/event-recurrence.php:449
+#: src/admin-views/event-recurrence.php:237
+#: src/admin-views/event-recurrence.php:451
 msgid "Show Details"
 msgstr "Montrer Détails"
 
-#: src/admin-views/event-recurrence.php:236
-#: src/admin-views/event-recurrence.php:450
+#: src/admin-views/event-recurrence.php:238
+#: src/admin-views/event-recurrence.php:452
 msgid "Hide Details"
 msgstr "Masquer Détails"
 
-#: src/admin-views/event-recurrence.php:244
+#: src/admin-views/event-recurrence.php:246
 msgid "Schedule multiple events"
 msgstr "Planifier plusieurs évènements"
 
-#: src/admin-views/event-recurrence.php:247
+#: src/admin-views/event-recurrence.php:249
 msgid "Add more events"
 msgstr "Ajouter plus d'évènements"
 
-#: src/admin-views/event-recurrence.php:260
+#: src/admin-views/event-recurrence.php:262
 msgid "Event will not occur:"
 msgstr "L'évènement n'aura pas lieu :"
 
-#: src/admin-views/event-recurrence.php:463
+#: src/admin-views/event-recurrence.php:465
 msgid "Recurrence Description"
 msgstr "Description de la récurrence"
 
@@ -535,21 +540,21 @@ msgstr "Êtes-vous certain de vouloir effacer ces évènements?"
 msgid "Are you sure you want to delete this exclusion?"
 msgstr "Êtes-vous certain de vouloir effacer cette exclusion?"
 
-#: src/admin-views/event-recurrence.php:21
+#: src/admin-views/event-recurrence.php:22
 msgid "Event Series:"
 msgstr "Séries d'évènement:"
 
-#: src/admin-views/event-recurrence.php:26
+#: src/admin-views/event-recurrence.php:28
 msgid "Delete This"
 msgstr "Effacer ceci"
 
-#: src/admin-views/event-recurrence.php:91
-#: src/admin-views/event-recurrence.php:327
+#: src/admin-views/event-recurrence.php:93
+#: src/admin-views/event-recurrence.php:329
 msgid "weeks"
 msgstr "semaines"
 
-#: src/admin-views/event-recurrence.php:96
-#: src/admin-views/event-recurrence.php:332
+#: src/admin-views/event-recurrence.php:98
+#: src/admin-views/event-recurrence.php:334
 msgid "month"
 msgstr "mois"
 
@@ -923,7 +928,7 @@ msgstr "Affiche les événements par jour pour la semaine ."
 msgid "This Week Events"
 msgstr "Événements de la semaine"
 
-#: src/admin-views/event-recurrence.php:466
+#: src/admin-views/event-recurrence.php:468
 msgid "Use this field if you want to override the auto-generated descriptions of event recurrence"
 msgstr "Utilisez ce champ si vous souhaitez remplacer les descriptions auto- généré des événement de récurrence"
 
@@ -1065,12 +1070,12 @@ msgctxt "Used when displaying the word \"day\" in \"the last day\" or \"the firs
 msgid "day"
 msgstr "jour"
 
-#: src/admin-views/event-recurrence.php:47
-#: src/admin-views/event-recurrence.php:285
+#: src/admin-views/event-recurrence.php:49
+#: src/admin-views/event-recurrence.php:287
 msgid "Once"
 msgstr "Une fois"
 
-#: src/admin-views/event-recurrence.php:456
+#: src/admin-views/event-recurrence.php:458
 msgid "Add Exclusion"
 msgstr "Ajouter une exclusion"
 
@@ -1248,10 +1253,6 @@ msgstr "Avant de soumettre une nouvelle demande, nous vous prions d'utiliser la 
 #: src/functions/template-tags/general.php:323
 msgid "The current default organizer is: %s"
 msgstr "L'organisateur par défaut est : %s"
-
-#: src/Tribe/Main.php:1326
-msgid "Event: "
-msgstr "Événement :"
 
 #: src/functions/template-tags/general.php:338
 msgid "The current default venue is: %s"
@@ -1431,8 +1432,8 @@ msgstr "Navigation hebdomadaire"
 msgid "Completed!"
 msgstr "Terminé !"
 
-#: src/admin-views/event-recurrence.php:83
-#: src/admin-views/event-recurrence.php:319
+#: src/admin-views/event-recurrence.php:85
+#: src/admin-views/event-recurrence.php:321
 #: src/views/pro/widgets/countdown-widget.php:20
 msgid "days"
 msgstr "jours"
@@ -1547,10 +1548,10 @@ msgstr "Les récurrences mensuelles ne peuvent pas avoir de tiret le jour où le
 msgid "Yearly custom recurrences cannot have a dash set as the day to occur on."
 msgstr "Les récurrences annuelles ne peuvent pas avoir de tiret le jour où les événements sont censés se produire."
 
-#: src/admin-views/event-recurrence.php:43
-#: src/admin-views/event-recurrence.php:80
-#: src/admin-views/event-recurrence.php:281
-#: src/admin-views/event-recurrence.php:316
+#: src/admin-views/event-recurrence.php:45
+#: src/admin-views/event-recurrence.php:82
+#: src/admin-views/event-recurrence.php:283
+#: src/admin-views/event-recurrence.php:318
 #: src/admin-views/recurrence/months.php:90
 #: src/admin-views/recurrence/years.php:136
 msgid "day"
@@ -1894,58 +1895,58 @@ msgstr "Activer cette option ne supprimera pas le champs de donnée personnalis�
 msgid "Are you sure you wish to remove this field and its data from all events? Once you click OK this cannot be undone."
 msgstr "Êtes-vous sur de vouloir effacer ce champ et les données lui appartenant dans tous vos événements ? Une fois cliqué OK, vous ne pouvez pas revenir en arrière."
 
-#: src/admin-views/event-recurrence.php:39
-#: src/admin-views/event-recurrence.php:277
+#: src/admin-views/event-recurrence.php:41
+#: src/admin-views/event-recurrence.php:279
 msgid "event"
 msgstr "événement"
 
-#: src/admin-views/event-recurrence.php:40
-#: src/admin-views/event-recurrence.php:278
+#: src/admin-views/event-recurrence.php:42
+#: src/admin-views/event-recurrence.php:280
 msgid "events"
 msgstr "événements"
 
-#: src/admin-views/event-meta.php:28 src/admin-views/event-meta.php:44
+#: src/admin-views/event-meta.php:32 src/admin-views/event-meta.php:48
 msgid "None"
 msgstr "Aucune"
 
-#: src/admin-views/event-recurrence.php:52
-#: src/admin-views/event-recurrence.php:290
+#: src/admin-views/event-recurrence.php:54
+#: src/admin-views/event-recurrence.php:292
 #: src/admin-views/recurrence/months.php:2
 #: src/admin-views/recurrence/years.php:53
 msgid "On"
 msgstr "le"
 
-#: src/admin-views/event-recurrence.php:189
-#: src/admin-views/event-recurrence.php:392
+#: src/admin-views/event-recurrence.php:191
+#: src/admin-views/event-recurrence.php:394
 msgid "after"
 msgstr "après"
 
-#: src/admin-views/event-recurrence.php:190
-#: src/admin-views/event-recurrence.php:393
+#: src/admin-views/event-recurrence.php:192
+#: src/admin-views/event-recurrence.php:395
 msgid "never"
 msgstr "jamais"
 
-#: src/admin-views/event-recurrence.php:223
-#: src/admin-views/event-recurrence.php:425
+#: src/admin-views/event-recurrence.php:225
+#: src/admin-views/event-recurrence.php:427
 msgctxt "occurence count text"
 msgid "events"
 msgstr "événements"
 
-#: src/admin-views/event-recurrence.php:226
-#: src/admin-views/event-recurrence.php:428
+#: src/admin-views/event-recurrence.php:228
+#: src/admin-views/event-recurrence.php:430
 msgid "You must select a recurrence end date"
 msgstr "Vous devez sélectionner une date de fin de récurrence"
 
-#: events-calendar-pro.php:81
+#: events-calendar-pro.php:85
 msgid "The Events Calendar"
 msgstr "The Events Calendar"
 
-#: src/admin-views/event-recurrence.php:43
-#: src/admin-views/event-recurrence.php:281
+#: src/admin-views/event-recurrence.php:45
+#: src/admin-views/event-recurrence.php:283
 msgid "Daily"
 msgstr "Quotidiennement"
 
-#: events-calendar-pro.php:82
+#: events-calendar-pro.php:86
 msgid "To begin using Events Calendar PRO, please install the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">The Events Calendar</a>."
 msgstr "Pour commencer à utiliser Events Calendar PRO, merci d'installer la dernière version de <a href=\"%s\" class=\"thickbox\" title=\"%s\">The Events Calendar</a>."
 
@@ -1953,8 +1954,8 @@ msgstr "Pour commencer à utiliser Events Calendar PRO, merci d'installer la der
 msgid "Start Date"
 msgstr "Date de début"
 
-#: src/admin-views/event-recurrence.php:44
-#: src/admin-views/event-recurrence.php:282
+#: src/admin-views/event-recurrence.php:46
+#: src/admin-views/event-recurrence.php:284
 msgid "Weekly"
 msgstr "Hebdomadaire"
 
@@ -1966,8 +1967,8 @@ msgstr "Date de fin"
 msgid "Event Cost"
 msgstr "Prix de l'entrée de l'événement"
 
-#: src/admin-views/event-recurrence.php:45
-#: src/admin-views/event-recurrence.php:283
+#: src/admin-views/event-recurrence.php:47
+#: src/admin-views/event-recurrence.php:285
 msgid "Monthly"
 msgstr "Mensuel"
 
@@ -1979,8 +1980,8 @@ msgstr "Catégorie de l'événement "
 msgid "Title"
 msgstr "Titre"
 
-#: src/admin-views/event-recurrence.php:46
-#: src/admin-views/event-recurrence.php:284
+#: src/admin-views/event-recurrence.php:48
+#: src/admin-views/event-recurrence.php:286
 msgid "Yearly"
 msgstr "Annuel"
 
@@ -1988,8 +1989,8 @@ msgstr "Annuel"
 msgid "Recurring"
 msgstr "Se répètant"
 
-#: src/admin-views/event-recurrence.php:65
-#: src/admin-views/event-recurrence.php:302
+#: src/admin-views/event-recurrence.php:67
+#: src/admin-views/event-recurrence.php:304
 #: src/admin-views/recurrence/years.php:12
 msgid "Every"
 msgstr "Chaque"
@@ -1998,7 +1999,7 @@ msgstr "Chaque"
 msgid "Description"
 msgstr "Description"
 
-#: src/admin-views/event-recurrence.php:436
+#: src/admin-views/event-recurrence.php:438
 msgid "Frequency of recurring event must be a number"
 msgstr "La fréquence des événements récurrents doit être un nombre"
 
@@ -2093,7 +2094,7 @@ msgstr "Ajouter un autre"
 msgid "Remove"
 msgstr "Enlever"
 
-#: src/admin-views/event-recurrence.php:461
+#: src/admin-views/event-recurrence.php:463
 msgid "Recurrence Description:"
 msgstr "Description de la récurrence :"
 
@@ -2278,8 +2279,8 @@ msgstr "Boutons radios"
 msgid "Title:"
 msgstr "Titre : "
 
-#: src/Tribe/Main.php:63 src/admin-views/event-recurrence.php:88
-#: src/admin-views/event-recurrence.php:324
+#: src/Tribe/Main.php:63 src/admin-views/event-recurrence.php:90
+#: src/admin-views/event-recurrence.php:326
 msgid "week"
 msgstr "semaine"
 

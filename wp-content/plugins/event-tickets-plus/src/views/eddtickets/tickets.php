@@ -6,16 +6,16 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.4.6
+ * @version 4.4.9
  *
  * @var bool $must_login
  */
 global $edd_options;
 
-$is_there_any_product = false;
+$is_there_any_product         = false;
 $is_there_any_product_to_sell = false;
-$unavailability_messaging = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
-$stock = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->stock();
+$unavailability_messaging     = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
+$stock                        = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->stock();
 
 ob_start();
 ?>
@@ -39,7 +39,7 @@ ob_start();
 
 				echo sprintf( '<input type="hidden" name="product_id[]"" value="%d">', esc_attr( $ticket->ID ) );
 
-				echo '<tr>';
+				echo '<tr class="tribe-edd-ticket-row-' . absint( $ticket->ID ) . '">';
 				echo '<td width="75" class="edd quantity" data-product-id="' . esc_attr( $ticket->ID ) . '">';
 
 
@@ -119,6 +119,14 @@ ob_start();
 				</td>
 			</tr>
 		<?php endif ?>
+
+		<noscript>
+			<tr>
+				<td class="tribe-link-tickets-message">
+					<div class="no-javascript-msg"><?php esc_html_e( 'You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser.', 'event-tickets' ); ?></div>
+				</td>
+			</tr>
+		</noscript>
 	</table>
 </form>
 

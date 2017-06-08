@@ -2,7 +2,7 @@
 /*
 Plugin Name: Event Tickets Plus
 Description: Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!
-Version: 4.4.6
+Version: 4.4.9
 Author: Modern Tribe, Inc.
 Author URI: http://m.tri.be/28
 License: GPLv2 or later
@@ -87,7 +87,7 @@ function tribe_init_tickets_plus_autoloading() {
 	}
 
 	$autoloader = Tribe__Autoloader::instance();
-	$autoloader->register_prefix( 'Tribe__Tickets_Plus__', dirname( __FILE__ ) . '/src/Tribe' );
+	$autoloader->register_prefix( 'Tribe__Tickets_Plus__', dirname( __FILE__ ) . '/src/Tribe', 'event-tickets-plus' );
 	$autoloader->register_autoloader();
 
 	tribe_singleton( 'tickets-plus.main', 'Tribe__Tickets_Plus__Main' );

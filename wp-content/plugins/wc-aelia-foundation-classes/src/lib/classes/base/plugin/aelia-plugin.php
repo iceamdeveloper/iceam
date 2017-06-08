@@ -684,6 +684,10 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 					// The following actions are called in the backend. If they are used, then
 					// we are in the backend, regardless of the fact that we are using Ajax
 					'woocommerce_load_variations',
+					'woocommerce_add_variation',
+					'woocommerce_remove_variations',
+					'woocommerce_link_all_variations',
+					'woocommerce_bulk_edit_variations',
 				)));
 		}
 

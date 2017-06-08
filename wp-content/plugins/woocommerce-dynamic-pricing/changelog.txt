@@ -1,4 +1,9 @@
 *** Dynamic Pricing Changelog ***
+2017.05.24 - version 3.0.8
+    * Update:  Fix issue with WC < 3.0 and WooCommerce Membership Discounts
+    * Update:  Fix issue with the transient caching of variable products for different roles.
+    * Update:  Compatibility with Subscribe All The Things 2.0
+
 2017.04.26 - version 3.0.7
     * Update:  Better compatibility with Product Bundles.
 

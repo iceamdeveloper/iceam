@@ -4,8 +4,8 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, modern tribe, tribe, widget, pro
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
-Tested up to: 4.7.3
-Stable tag: 4.4.6
+Stable tag: 4.4.10
+Tested up to: 4.7.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -202,6 +202,26 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.10] 2017-06-06 =
+
+* Tweak - Improve the styles for Custom Fields [76880]
+* Language - 0 new strings added, 38 updated, 0 fuzzied, and 1 obsoleted [events-pro]
+
+= [4.4.9] 2017-06-01 =
+
+* Fix - Countdown widget now respects the 'Generate JSON-LD data' setting [79119]
+
+= [4.4.8] 2017-05-17 =
+
+* Fix - Ensure the /all/ view orders correctly when sitewide timezone mode is in effect (our thanks to Christopher,
+  alzheimesdementiasupport and many other users for flagging this issue) [76231]
+* Tweak - Further adjustments to plugin licensing code [78506]
+* Tweak - Language and translation improvements
+
+= [4.4.7] 2017-05-04 =
+
+* Tweak - Adjustments made to our plugin licensing system
 
 = [4.4.6] 2017-04-19 =
 

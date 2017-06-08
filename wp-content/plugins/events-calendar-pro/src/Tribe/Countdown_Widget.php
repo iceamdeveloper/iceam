@@ -160,7 +160,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Countdown_Widget' ) ) {
 				$ret = $this->generate_countdown_output( $seconds, $instance['complete'], $hourformat, $event );
 			}
 
-			$jsonld_enable = isset( $jsonld_enable ) ? $jsonld_enable : true;
+			$jsonld_enable = isset( $instance['jsonld_enable'] ) ? $instance['jsonld_enable'] : true;
 
 			/**
 			 * Filters whether JSON LD information should be printed to the page or not for this widget type.

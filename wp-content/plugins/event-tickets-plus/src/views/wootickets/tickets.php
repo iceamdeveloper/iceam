@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.4.6
+ * @version 4.4.9
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -60,7 +60,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 
 				echo sprintf( '<input type="hidden" name="product_id[]" value="%d">', esc_attr( $ticket->ID ) );
 
-				echo '<tr>';
+				echo '<tr class="tribe-woocommerce-ticket-row-' . absint( $ticket->ID ) . '">';
 
 				/**
 				 * Filter classes on the Price column
@@ -148,9 +148,16 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 			</tr>
 			<?php
 		} ?>
+
+		<noscript>
+			<tr>
+				<td class="tribe-link-tickets-message">
+					<div class="no-javascript-msg"><?php esc_html_e( 'You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser.', 'event-tickets' ); ?></div>
+				</td>
+			</tr>
+		</noscript>
 	</table>
 </form>
-
 <?php
 $content = ob_get_clean();
 if ( $is_there_any_product ) {

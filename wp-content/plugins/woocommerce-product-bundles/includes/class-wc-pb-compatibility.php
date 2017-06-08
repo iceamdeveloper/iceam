@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  5.2.0
+ * @version  5.3.0
  */
 class WC_PB_Compatibility {
 
@@ -83,9 +83,9 @@ class WC_PB_Compatibility {
 	protected function __construct() {
 
 		$this->required = array(
-			'cp'     => '3.9.0',
+			'cp'     => '3.10',
 			'addons' => '2.7.16',
-			'minmax' => '1.0.6'
+			'minmax' => '1.1'
 		);
 
 		if ( is_admin() ) {

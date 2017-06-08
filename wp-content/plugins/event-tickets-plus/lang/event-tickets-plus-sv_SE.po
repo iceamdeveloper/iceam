@@ -2,13 +2,25 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2017-03-23 00:10:44+0000\n"
+"PO-Revision-Date: 2017-05-10 18:55:43+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=n != 1;\n"
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Event Tickets Plus\n"
+
+#: src/views/eddtickets/tickets.php:126 src/views/wootickets/tickets.php:155
+msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
+msgstr ""
+
+#: src/Tribe/Commerce/Shopp/Main.php:2
+msgid "Event Tickets Plus will discontinue support for Shopp in an upcoming release."
+msgstr ""
+
+#: src/Tribe/Commerce/WPEC/Main.php:2
+msgid "Event Tickets Plus will discontinue support for WP E-Commerce in an upcoming release."
+msgstr ""
 
 #: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
 msgctxt "Browser title"
@@ -42,7 +54,7 @@ msgctxt "Attendee information fields"
 msgid "Multi-line text field?"
 msgstr ""
 
-#: src/Tribe/QR.php:103
+#: src/Tribe/QR.php:119
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
 
@@ -88,7 +100,7 @@ msgstr "Status"
 
 #: src/Tribe/Commerce/WooCommerce/Orders/Table.php:239
 msgid "%1$s"
-msgstr ""
+msgstr "%1$s"
 
 #: src/admin-views/woocommerce-orders.php:125
 msgid "Pending Payment:"
@@ -150,17 +162,17 @@ msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
-#: src/Tribe/Commerce/Shopp/Main.php:176
+#: src/Tribe/Commerce/Shopp/Main.php:177
 msgctxt "ticket provider"
 msgid "Shopp"
 msgstr "Shopp"
 
-#: src/Tribe/Commerce/WPEC/Main.php:128
+#: src/Tribe/Commerce/WPEC/Main.php:129
 msgctxt "ticket provider"
 msgid "WPEC"
 msgstr "WPEC"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:209
+#: src/Tribe/Commerce/WooCommerce/Main.php:220
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
@@ -218,7 +230,7 @@ msgstr "Biljettens SKU"
 msgid "Recurring event tickets are not supported, event %d."
 msgstr "Upprepade evenemangsbiljetter stöds inte, evenemang %d."
 
-#: src/Tribe/Main.php:333
+#: src/Tribe/Main.php:337
 msgid "Require users to log in before they purchase tickets"
 msgstr "Kräv att användare loggar in före de kan köpa biljetter"
 
@@ -313,11 +325,11 @@ msgstr "Anpassade fältuppsättningar till biljetter"
 msgid "Attendee Information"
 msgstr "Deltagarinformation"
 
-#: src/Tribe/QR.php:81
+#: src/Tribe/QR.php:97
 msgid "The ticket with ID %s has already been checked in."
 msgstr " Biljetten med ID %s har redan checkats in."
 
-#: src/Tribe/QR.php:127
+#: src/Tribe/QR.php:143
 msgid "Scan this QR code at the event to check in."
 msgstr "Skanna denna QR koden på evenemanget för att checka in."
 
@@ -459,14 +471,14 @@ msgid "Your tickets from {site_title}"
 msgstr "Dina biljetter från {site_title}"
 
 #: src/Tribe/Commerce/EDD/Global_Stock.php:163
-#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:160
+#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:167
 msgid "Sorry, there is insufficient stock to fulfill your order with respect to the tickets you selected in relation to this event: %s"
 msgid_plural "Sorry, there is insufficient stock to fulfill your order with respect to the tickets you selected in relation to these events: %s"
 msgstr[0] "Ledsen, det kvarvarande biljettantalet är otillräckligt för att genomföra din beställning med tanke på biljetterna du valt som hör till detta evenemang: %s"
 msgstr[1] "Ledsen, det kvarvarande biljettantalet är otillräckligt för att genomföra din beställning med tanke på biljetterna du valt som hör till dessa evenemang: %s"
 
 #: src/Tribe/Commerce/EDD/Global_Stock.php:195
-#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:192
+#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:199
 msgid "Sorry, there is insufficient stock to fulfill your order with respect to %s"
 msgstr "Ledsen, det kvarvarande biljettantalet räcker inte till att genomföra din beställning av %s"
 
@@ -586,7 +598,7 @@ msgstr ""
 msgid "Total"
 msgstr ""
 
-#: src/Tribe/QR.php:124
+#: src/Tribe/QR.php:140
 msgid "Check in for this event"
 msgstr "Incheckning för detta evenemang"
 
@@ -630,23 +642,23 @@ msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:756
+#: src/Tribe/Commerce/WooCommerce/Main.php:789
 msgid "You'll receive your tickets in another email."
 msgstr "Du får dina biljetter i ett annat e-postmeddelande."
 
-#: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:766
-#: src/Tribe/Commerce/WooCommerce/Main.php:1475
+#: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:767
+#: src/Tribe/Commerce/WooCommerce/Main.php:1556
 msgid "(deleted)"
 msgstr "(borttagen)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1724
+#: src/Tribe/Commerce/WooCommerce/Main.php:1805
 msgid "Event sales report"
 msgstr "Försäljningsrapport"
 
-#: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1132
-#: src/Tribe/Commerce/WPEC/Main.php:1037
-#: src/Tribe/Commerce/WooCommerce/Main.php:1772
+#: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1133
+#: src/Tribe/Commerce/WPEC/Main.php:1038
+#: src/Tribe/Commerce/WooCommerce/Main.php:1853
 msgid "This is a ticket for the event:"
 msgstr "Detta är biljett för evenemanget:"
 
@@ -678,23 +690,23 @@ msgstr "Shopp"
 msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 msgstr ""
 
-#: src/Tribe/Commerce/Shopp/Main.php:1007
+#: src/Tribe/Commerce/Shopp/Main.php:1008
 msgid "Unknown item"
 msgstr "Okänd sak"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1122
+#: src/Tribe/Commerce/Shopp/Main.php:1123
 msgid "Event"
 msgstr "Evenemang"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1205 src/Tribe/Commerce/WPEC/Main.php:1098
+#: src/Tribe/Commerce/Shopp/Main.php:1206 src/Tribe/Commerce/WPEC/Main.php:1099
 msgid "Resend Tickets"
 msgstr "Sänd biljetter på nytt"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1243
+#: src/Tribe/Commerce/Shopp/Main.php:1244
 msgid "Email containing tickets (sent by ShoppTickets)"
 msgstr "E-post med biljetter (sänt av ShoppTickets)"
 
-#: src/Tribe/Commerce/Shopp/Main.php:1285
+#: src/Tribe/Commerce/Shopp/Main.php:1286
 msgid "Your tickets from %s"
 msgstr "Dina biljetter från %s"
 
@@ -702,26 +714,26 @@ msgstr "Dina biljetter från %s"
 msgid "Your tickets"
 msgstr "Dina biljetter"
 
-#: src/Tribe/Commerce/WPEC/Main.php:627
+#: src/Tribe/Commerce/WPEC/Main.php:628
 msgid "We're sorry but there was insufficient inventory to completely fulfill your order! We have added as many tickets as we could, but we recommend reviewing your order (below) in case you need to make some further adjustments."
 msgstr "Vi beklagar men det finns tyvärr inte tillräckligt med platser för att slutföra din order! Vi har lagt till så många biljetter vi kan men vi rekommenderar att du ser över din order (nedan) utifall du behöver göra några vidare ändringar."
 
-#: src/Tribe/Commerce/WPEC/Main.php:830
-#: src/Tribe/Commerce/WooCommerce/Main.php:1545
+#: src/Tribe/Commerce/WPEC/Main.php:831
+#: src/Tribe/Commerce/WooCommerce/Main.php:1626
 msgid "In trash (was %s)"
 msgstr "I papperskorgen ( var %s)"
 
-#: src/Tribe/Commerce/WPEC/Main.php:836
-#: src/Tribe/Commerce/WooCommerce/Main.php:1551
+#: src/Tribe/Commerce/WPEC/Main.php:837
+#: src/Tribe/Commerce/WooCommerce/Main.php:1632
 msgid "Deleted"
 msgstr "Borttagen"
 
-#: src/Tribe/Commerce/WPEC/Main.php:883
-#: src/Tribe/Commerce/WooCommerce/Main.php:1600
+#: src/Tribe/Commerce/WPEC/Main.php:884
+#: src/Tribe/Commerce/WooCommerce/Main.php:1681
 msgid "Unknown"
 msgstr "Okänd"
 
-#: src/Tribe/Commerce/WPEC/Main.php:1103
+#: src/Tribe/Commerce/WPEC/Main.php:1104
 msgid "&nbsp; [Sent]"
 msgstr "&nbsp; [Skickad]"
 
@@ -745,11 +757,11 @@ msgstr ""
 msgid "Defaults to <code>%s</code>"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1749
+#: src/Tribe/Commerce/WooCommerce/Main.php:1830
 msgid "Report"
 msgstr "Rapport"
 
-#: src/Tribe/QR.php:85
+#: src/Tribe/QR.php:101
 msgid "The ticket with ID %s was checked in."
 msgstr "Biljetten med ID %s checkades in."
 
@@ -825,13 +837,15 @@ msgstr "Kvantitet"
 msgid "Sold Out"
 msgstr "Slutsåld"
 
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.4.9)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
+#: src/Tribe/Main.php:297
 msgid "Event Tickets Plus"
 msgstr "Event Tickets Plus"
 
 #. Author of the plugin/theme
 msgid "Modern Tribe, Inc."
-msgstr ""
+msgstr "Modern Tribe, Inc."
 
 #. Author URI of the plugin/theme
 msgid "http://m.tri.be/28"

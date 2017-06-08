@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product meta-box data for the 'Bundle' type.
  *
  * @class    WC_PB_Meta_Box_Product_Data
- * @version  5.0.0
+ * @version  5.3.0
  */
 class WC_PB_Meta_Box_Product_Data {
 
@@ -36,9 +36,6 @@ class WC_PB_Meta_Box_Product_Data {
 
 		// Adds a tooltip to the Manage Stock option.
 		add_action( 'woocommerce_product_options_stock', array( __CLASS__, 'stock_note' ) );
-
-		// Add type-specific options.
-		add_filter( 'product_type_options', array( __CLASS__, 'bundle_type_options' ) );
 
 		// Processes and saves the necessary post meta from the selections made above.
 		add_action( 'woocommerce_process_product_meta_bundle', array( __CLASS__, 'process_bundle_meta' ) );
@@ -183,20 +180,6 @@ class WC_PB_Meta_Box_Product_Data {
 		?><span class="bundle_stock_msg show_if_bundle">
 				<?php echo WC_PB_Core_Compatibility::wc_help_tip( __( 'By default, the sale of a product within a bundle has the same effect on its stock as an individual sale. There are no separate inventory settings for bundled items. However, managing stock at bundle level can be very useful for allocating bundle stock quota, or for keeping track of bundled item sales.', 'woocommerce-product-bundles' ) ); ?>
 		</span><?php
-	}
-
-	/**
-	 * Product bundle type-specific options.
-	 *
-	 * @param  array  $options
-	 * @return array
-	 */
-	public static function bundle_type_options( $options ) {
-
-		$options[ 'downloadable' ][ 'wrapper_class' ] .= ' show_if_bundle';
-		$options[ 'virtual' ][ 'wrapper_class' ]      .= ' show_if_bundle';
-
-		return $options;
 	}
 
 	/**
@@ -750,8 +733,8 @@ class WC_PB_Meta_Box_Product_Data {
 			$allowed_variations  = isset( $item_data[ 'allowed_variations' ] ) ? $item_data[ 'allowed_variations' ] : '';
 			$default_attributes  = isset( $item_data[ 'default_variation_attributes' ] ) ? $item_data[ 'default_variation_attributes' ] : '';
 
-			$override_variations = isset( $item_data[ 'override_variations' ] ) ? $item_data[ 'override_variations' ] : '';
-			$override_defaults   = isset( $item_data[ 'override_default_variation_attributes' ] ) ? $item_data[ 'override_default_variation_attributes' ] : '';
+			$override_variations = isset( $item_data[ 'override_variations' ] ) && 'yes' === $item_data[ 'override_variations' ] ? 'yes' : '';
+			$override_defaults   = isset( $item_data[ 'override_default_variation_attributes' ] ) && 'yes' === $item_data[ 'override_default_variation_attributes' ] ? 'yes' : '';
 
 			?><div class="override_variations">
 				<div class="form-field">
@@ -764,7 +747,7 @@ class WC_PB_Meta_Box_Product_Data {
 			</div>
 
 
-			<div class="allowed_variations">
+			<div class="allowed_variations" <?php echo 'yes' === $override_variations ? '' : 'style="display:none;"'; ?>>
 				<div class="form-field"><?php
 
 					$variations = $bundled_product->get_children();
@@ -829,7 +812,7 @@ class WC_PB_Meta_Box_Product_Data {
 				</div>
 			</div>
 
-			<div class="default_variation_attributes">
+			<div class="default_variation_attributes" <?php echo 'yes' === $override_defaults ? '' : 'style="display:none;"'; ?>>
 				<div class="form-field"><?php
 
 					foreach ( $attributes as $attribute ) {
@@ -934,7 +917,7 @@ class WC_PB_Meta_Box_Product_Data {
 			</div>
 		</div>
 
-		<div class="discount" <?php echo $is_priced_individually ? '' : 'style="display:none;"'; ?>>
+		<div class="discount" <?php echo 'yes' === $is_priced_individually ? '' : 'style="display:none;"'; ?>>
 			<div class="form-field">
 				<label><?php echo __( 'Discount %', 'woocommerce' ); ?></label>
 				<input type="text" class="input-text item_discount wc_input_decimal" size="5" name="bundle_data[<?php echo $loop; ?>][discount]" value="<?php echo $item_discount; ?>" />
@@ -1105,6 +1088,7 @@ class WC_PB_Meta_Box_Product_Data {
 			<div id="wc-bundle-metaboxes-wrapper-inner">
 
 				<p class="toolbar">
+					<span class="disabler"></span>
 					<a href="#" class="close_all"><?php _e( 'Close all', 'woocommerce' ); ?></a>
 					<a href="#" class="expand_all"><?php _e( 'Expand all', 'woocommerce' ); ?></a>
 				</p>
@@ -1143,25 +1127,11 @@ class WC_PB_Meta_Box_Product_Data {
 				?></div>
 			</div>
 		</div>
-		<p class="bundled_products_toolbar toolbar">
-			<span class="bundled_products_toolbar_wrapper">
-				<span class="bundled_product_selector"><?php
-
-					if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_3() ) {
-
-						?><input type="hidden" class="wc-product-search" style="width: 250px;" id="bundled_product" name="bundled_product" data-placeholder="<?php _e( 'Search for a product&hellip;', 'woocommerce' ); ?>" data-action="woocommerce_json_search_products" data-limit="1000" data-multiple="false" data-selected="" value="" /><?php
-
-					} else {
-
-						?><select id="bundled_product" name="bundled_product" class="ajax_chosen_select_products" data-placeholder="<?php _e( 'Search for a product&hellip;', 'woocommerce' ); ?>">
-							<option></option>
-						</select><?php
-					}
-
-				?></span>
-				<button type="button" class="button button-primary add_bundled_product"><?php _e( 'Add Product', 'woocommerce-product-bundles' ); ?></button>
-			</span>
-		</p><?php
+		<div class="add_bundled_product form-field">
+			<span class="add_prompt"></span>
+			<input type="hidden" class="wc-product-search" style="width: 250px;" id="bundled_product" name="bundled_product" data-placeholder="<?php _e( 'Search for a product&hellip;', 'woocommerce' ); ?>" data-action="woocommerce_json_search_products" data-limit="1000" data-multiple="true" data-selected="" value="" />
+			<?php echo WC_PB_Core_Compatibility::wc_help_tip( __( 'Search for a product and add it to this bundle by clicking its name in the results list.', 'woocommerce-product-bundles' ) ); ?>
+		</div><?php
 	}
 
 	/**

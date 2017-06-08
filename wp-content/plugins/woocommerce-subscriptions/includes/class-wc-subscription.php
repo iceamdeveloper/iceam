@@ -176,7 +176,6 @@ class WC_Subscription extends WC_Order {
 			if ( ! WC_Subscriptions::is_woocommerce_pre( '3.0' ) ) {
 				wcs_doing_it_wrong( $key, sprintf( 'Subscription properties should not be set directly as WooCommerce 3.0 no longer supports direct property access. Use %s instead.', $function ), '2.2.0' );
 			}
-
 		} else {
 
 			$this->$key = $value;
@@ -459,8 +458,8 @@ class WC_Subscription extends WC_Order {
 						// Recalculate and set next payment date
 						$stored_next_payment = $this->get_time( 'next_payment' );
 
-						// Make sure the next payment date is more than 2 hours in the future
-						if ( $stored_next_payment < ( gmdate( 'U' ) + 2 * HOUR_IN_SECONDS ) ) { // also accounts for a $stored_next_payment of 0, meaning it's not set
+						// Make sure the next payment date is more than 2 hours in the future by default
+						if ( $stored_next_payment < ( gmdate( 'U' ) + apply_filters( 'woocommerce_subscription_activation_next_payment_date_threshold', 2 * HOUR_IN_SECONDS, $stored_next_payment, $old_status, $this ) ) ) { // also accounts for a $stored_next_payment of 0, meaning it's not set
 
 							$calculated_next_payment = $this->calculate_date( 'next_payment' );
 
@@ -469,6 +468,9 @@ class WC_Subscription extends WC_Order {
 							} elseif ( $stored_next_payment < gmdate( 'U' ) ) { // delete the stored date if it's in the past as we're not updating it (the calculated next payment date is 0 or none)
 								$this->delete_date( 'next_payment' );
 							}
+						} else {
+							// In case plugins want to run some code when the subscription was reactivated, but the next payment date was not recalculated.
+							do_action( 'woocommerce_subscription_activation_next_payment_not_recalculated', $stored_next_payment, $old_status, $this );
 						}
 						// Trial end date and end/expiration date don't change at all - they should be set when the subscription is first created
 						wcs_make_user_active( $this->get_user_id() );
@@ -850,7 +852,7 @@ class WC_Subscription extends WC_Order {
 	 * @param int $value
 	 */
 	public function set_billing_interval( $value ) {
-		$this->set_prop( 'billing_interval', absint( $value ) );
+		$this->set_prop( 'billing_interval', (string) absint( $value ) );
 	}
 
 	/**
@@ -1255,8 +1257,8 @@ class WC_Subscription extends WC_Order {
 			}
 
 			if ( $is_updated && true === $this->object_read ) {
+				$this->save_dates();
 				do_action( 'woocommerce_subscription_date_updated', $this, $date_type, $datetime );
-				$this->save();
 			}
 		}
 	}
@@ -1291,8 +1293,8 @@ class WC_Subscription extends WC_Order {
 		$this->set_date_prop( $date_type, 0 );
 
 		if ( true === $this->object_read ) {
+			$this->save_dates();
 			do_action( 'woocommerce_subscription_date_deleted', $this, $date_type );
-			$this->save();
 		}
 	}
 
@@ -1437,6 +1439,24 @@ class WC_Subscription extends WC_Order {
 		}
 
 		return $next_payment_date;
+	}
+
+	/**
+	 * Complete a partial save, saving subscription date changes to the database.
+	 *
+	 * Sometimes it's necessary to only save changes to date properties, for example, when you
+	 * don't want status transitions to be triggered by a full object @see $this->save().
+	 *
+	 * @since 2.2.6
+	 */
+	public function save_dates() {
+		if ( $this->data_store && $this->get_id() ) {
+			$saved_dates = $this->data_store->save_dates( $this );
+
+			// Apply the saved date changes
+			$this->data    = array_replace_recursive( $this->data, $saved_dates );
+			$this->changes = array_diff_key( $this->changes, $saved_dates );
+		}
 	}
 
 	/** Formatted Totals Methods *******************************************************/
@@ -1697,8 +1717,10 @@ class WC_Subscription extends WC_Order {
 
 		// Allow a short circuit for plugins & payment gateways to force max failed payments exceeded
 		if ( 'cancelled' == $new_status || apply_filters( 'woocommerce_subscription_max_failed_payments_exceeded', false, $this ) ) {
-			$this->update_status( 'cancelled', __( 'Subscription Cancelled: maximum number of failed payments reached.', 'woocommerce-subscriptions' ) );
-		} else {
+			if ( $this->can_be_updated_to( 'cancelled' ) ) {
+				$this->update_status( 'cancelled', __( 'Subscription Cancelled: maximum number of failed payments reached.', 'woocommerce-subscriptions' ) );
+			}
+		} elseif ( $this->can_be_updated_to( $new_status ) ) {
 			$this->update_status( $new_status );
 		}
 

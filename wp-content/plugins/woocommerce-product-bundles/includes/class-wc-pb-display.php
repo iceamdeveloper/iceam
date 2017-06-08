@@ -216,16 +216,6 @@ class WC_PB_Display {
 
 		if ( wc_pb_is_bundled_cart_item( $cart_item_values ) ) {
 
-			// Display overridden title.
-			if ( ! empty( $cart_item_values[ 'bundled_item_id' ] ) && ! empty( $cart_item_values[ 'stamp' ][ $cart_item_values[ 'bundled_item_id' ] ][ 'title' ] ) ) {
-
-				$content = $cart_item_values[ 'stamp' ][ $cart_item_values[ 'bundled_item_id' ] ][ 'title' ];
-
-				if ( $cart_item_values[ 'data' ]->is_visible() && ! ( is_checkout() || ( isset( $_REQUEST[ 'action' ] ) && $_REQUEST[ 'action' ] === 'woocommerce_update_order_review' ) || did_action( 'woocommerce_before_mini_cart' ) ) ) {
-					$content = sprintf( '<a href="%s">%s</a>', $cart_item_values[ 'data' ]->get_permalink(), $content );
-				}
-			}
-
 			$this->enqueue_bundled_table_item_js();
 
 		} elseif ( wc_pb_is_bundle_container_cart_item( $cart_item_values ) ) {
@@ -254,20 +244,6 @@ class WC_PB_Display {
 		if ( false !== $this->order_item_order && wc_pb_is_bundled_order_item( $order_item, $this->order_item_order ) ) {
 
 			$this->order_item_order = false;
-
-			// Display overridden title.
-			if ( ! empty( $order_item[ 'bundled_item_title' ] ) ) {
-
-				$content = $order_item[ 'bundled_item_title' ];
-
-				if ( did_action( 'woocommerce_view_order' ) || did_action( 'woocommerce_thankyou' ) || did_action( 'before_woocommerce_pay' ) ) {
-					$product = wc_get_product( ! empty( $order_item[ 'variation_id' ] ) ? $order_item[ 'variation_id' ] : $order_item[ 'product_id' ] );
-
-					if ( $product && $product->is_visible() ) {
-						$content = sprintf( '<a href="%s">%s</a>', $product->get_permalink(), $content );
-					}
-				}
-			}
 
 			if ( did_action( 'woocommerce_view_order' ) || did_action( 'woocommerce_thankyou' ) || did_action( 'before_woocommerce_pay' ) ) {
 				$this->enqueue_bundled_table_item_js();

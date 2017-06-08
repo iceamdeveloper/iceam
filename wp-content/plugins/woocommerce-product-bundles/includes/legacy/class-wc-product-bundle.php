@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Class.
  *
  * @class    WC_Product_Bundle
- * @version  5.1.3
+ * @version  5.3.0
  */
 class WC_Product_Bundle extends WC_Product {
 
@@ -537,6 +537,9 @@ class WC_Product_Bundle extends WC_Product {
 
 			$bundle_price_data = array();
 
+			$bundle_price_data[ 'raw_bundle_price_min' ]     = $this->get_bundle_price( 'min' );
+			$bundle_price_data[ 'raw_bundle_price_max' ]     = $this->get_bundle_price( 'max' );
+
 			$bundle_price_data[ 'is_purchasable' ]           = $this->is_purchasable() ? 'yes' : 'no';
 			$bundle_price_data[ 'show_free_string' ]         = ( $this->contains( 'priced_individually' ) ? apply_filters( 'woocommerce_bundle_show_free_string', false, $this ) : true ) ? 'yes' : 'no';
 
@@ -827,8 +830,8 @@ class WC_Product_Bundle extends WC_Product {
 			if ( isset( $this->bundle_price_cache[ $cache_key ] ) ) {
 				$price = $this->bundle_price_cache[ $cache_key ];
 			} else {
-				$raw_price_fn_name = 'get_' . $min_or_max . '_raw_price';
-				if ( '' === $this->$raw_price_fn_name() || INF === $this->$raw_price_fn_name() ) {
+				$prop = $min_or_max . '_raw_price';
+				if ( '' === $this->$prop || INF === $this->$prop ) {
 					$price = '';
 				} else {
 					$price         = $this->get_price_including_tax( $qty, $this->get_price() );
@@ -873,8 +876,8 @@ class WC_Product_Bundle extends WC_Product {
 			if ( isset( $this->bundle_price_cache[ $cache_key ] ) ) {
 				$price = $this->bundle_price_cache[ $cache_key ];
 			} else {
-				$raw_price_fn_name = 'get_' . $min_or_max . '_raw_price';
-				if ( '' === $this->$raw_price_fn_name() || INF === $this->$raw_price_fn_name() ) {
+				$prop = $min_or_max . '_raw_price';
+				if ( '' === $this->$prop || INF === $this->$prop ) {
 					$price = '';
 				} else {
 					$price         = $this->get_price_excluding_tax( $qty, $this->get_price() );
@@ -1389,7 +1392,7 @@ class WC_Product_Bundle extends WC_Product {
 
 		if ( ! is_array( $this->bundled_data_items ) ) {
 
-			$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_data_items' ) . $this->get_id();
+			$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_data_items' ) . $this->id;
 			$cached_data = ! defined( 'WC_PB_DEBUG_OBJECT_CACHE' ) ? wp_cache_get( $cache_key, 'bundled_data_items' ) : false;
 
 			if ( false !== $cached_data ) {
@@ -1398,15 +1401,20 @@ class WC_Product_Bundle extends WC_Product {
 
 			if ( ! is_array( $this->bundled_data_items ) ) {
 
-				$args = array(
-					'bundle_id' => $this->get_id(),
-					'return'    => 'objects',
-					'order_by'  => array( 'menu_order' => 'ASC' )
-				);
+				$this->bundled_data_items = array();
 
-				$this->bundled_data_items = WC_PB_DB::query_bundled_items( $args );
+				if ( $this->id ) {
 
-				wp_cache_set( $cache_key, $this->bundled_data_items, 'bundled_data_items' );
+					$args = array(
+						'bundle_id' => $this->id,
+						'return'    => 'objects',
+						'order_by'  => array( 'menu_order' => 'ASC' )
+					);
+
+					$this->bundled_data_items = WC_PB_DB::query_bundled_items( $args );
+
+					wp_cache_set( $cache_key, $this->bundled_data_items, 'bundled_data_items' );
+				}
 			}
 		}
 

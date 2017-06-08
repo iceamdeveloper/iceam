@@ -36,6 +36,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 		add_action( 'woocommerce_check_cart_items', array( $this, 'cart_check_stock' ) );
 		add_action( 'woocommerce_reduce_order_stock', array( $this, 'stock_equalize' ) );
 		add_action( 'tribe_tickets_global_stock_level_changed', array( $this, 'stock_update_global_tickets' ), 10, 2 );
+		add_action( 'woocommerce_restock_refunded_item', array( $this, 'increase_global_stock_on_refund' ), 10, 3 );
 	}
 
 	/**
@@ -97,19 +98,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 
 			$tickets = $this->get_event_tickets( $event->ID );
 
-			if ( ! isset( $tickets[ $product->id ] ) ) {
+			if ( version_compare( wc()->version, '3.0', '>=' ) ) {
+				$product_id = $product->get_id();
+			} else {
+				$product_id = $product->id;
+			}
+
+			if ( ! isset( $tickets[ $product_id ] ) ) {
 				continue;
 			}
 
 			// We only need to accumulate the stock quantities of tickets using *global* stock
-			if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE === $tickets[ $product->id ]->global_stock_mode() ) {
+			if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE === $tickets[ $product_id ]->global_stock_mode() ) {
 				continue;
 			}
 
 			// Make sure ticket caps haven't been exceeded
-			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $tickets[ $product->id ]->global_stock_mode() ) {
-				if ( $current[ $product->id ] > $tickets[ $product->id ]->global_stock_cap() ) {
-					$this->cart_flag_capped_stock_error( $product->id );
+			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $tickets[ $product_id ]->global_stock_mode() ) {
+				if ( $current[ $product_id ] > $tickets[ $product_id ]->global_stock_cap() ) {
+					$this->cart_flag_capped_stock_error( $product_id );
 				}
 			}
 
@@ -117,7 +124,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 				$quantities[ $event->ID ] = 0;
 			}
 
-			$quantities[ $event->ID ] += $current[ $product->id ];
+			$quantities[ $event->ID ] += $current[ $product_id ];
 		}
 
 		return $quantities;
@@ -283,6 +290,30 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 			}
 
 			wc_update_product_stock( $ticket->ID, $stock_level );
+		}
+	}
+
+	/**
+	 * Increase Global Stock on Refund and Restocking of WooCommerce Order
+	 *
+	 * @param $product_id
+	 * @param $old_stock
+	 * @param $new_stock
+	 */
+	public function increase_global_stock_on_refund( $product_id, $old_stock, $new_stock ) {
+
+		$post_id = get_post_meta( $product_id, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->event_key, true );
+		$ticket = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->get_ticket( $post_id, $product_id );
+
+		if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE !== $ticket->global_stock_mode() ) {
+			$global_stock_obj = new Tribe__Tickets__Global_Stock( $post_id );
+			$global_stock_obj->set_stock_level( $new_stock );
+
+			if ( 'capped' === $ticket->global_stock_mode() ) {
+				$capped_stock = get_post_meta( $product_id, '_global_stock_cap', true );
+				$new_capped_stock = $capped_stock + ( $new_stock - $old_stock );
+				update_post_meta( $product_id, '_global_stock_cap', $new_capped_stock, $capped_stock );
+			}
 		}
 	}
 }

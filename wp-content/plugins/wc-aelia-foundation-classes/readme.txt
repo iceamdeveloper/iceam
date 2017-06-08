@@ -6,6 +6,8 @@ Requires at least: 3.6
 Tested up to: 4.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
+WC requires at least: 2.4
+WC tested up to: 3.0
 
 Adds a set of convenience classes that can simplify the development of other plugins for WooCommerce.
 
@@ -32,7 +34,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 ##Requirements
 * WordPress 3.6 or later.
 * PHP 5.3 or later.
-* WooCommerce 2.2 or later
+* WooCommerce 2.4 or later
 
 ## Notes
 * This plugin is provided as-is, and it's not automatically covered by free support. See FAQ for more details.
@@ -64,6 +66,16 @@ Should you have any question about this product, please feel free to [contact us
 For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
 == Changelog ==
+
+= 1.8.8.170506 =
+* Improved logic to detect frontend Ajax calls.
+
+= 1.8.7.170426 =
+* Lowered permission required to manage plugin's settings to "manage_woocommerce".
+
+= 1.8.6.170408 =
+* Improved support for WooCommerce 3.0:
+	*Updated Aelia\WC\Order class. Used method `Order::get_id()` instead of direct access to `Order::$id` in WooCommerce 3.0 and later.
 
 = 1.8.6.170405 =
 * Improved support for WooCommerce 3.0:
