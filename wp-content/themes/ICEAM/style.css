@@ -1159,11 +1159,53 @@ body.sensei.page #my-courses .col-2{
 	display: none;
 }
 
+#sensei-user-courses #user-course-status-toggle{
+  margin-bottom: 20px;
+}
+
+#sensei-user-courses #user-course-status-toggle a {
+    padding: 10px 20px;
+    background: #212832;
+    color: #fff;
+    font-weight: bold;
+    border-radius: 4px;
+    display: inline-block;
+    text-transform: uppercase;
+}
+
+#sensei-user-courses #user-course-status-toggle a.active,
+#sensei-user-courses #user-course-status-toggle a:hover {
+    background: #ffa739;
+    color: #fff;
+    text-decoration: none;
+}
+
+#sensei-user-courses .course-container{
+  list-style: none;
+  padding-left: 0px;
+}
+
+#sensei-user-courses .course-container li.course {
+    border: 1px solid #ccc;
+    overflow: hidden;
+    padding: 10px;
+    border-radius: 4px;
+    background: #fff;
+}
+
 /*  COURSES  */
 
 body.sensei.page article.callout.course.post,
 body.page-template-page-course-category article.callout.course.post{
 	margin-top: 20px;
+}
+
+
+body.sensei.single-course .course-lessons article.lesson{
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 4px;
+    padding: 10px;
 }
 
 

@@ -13,7 +13,7 @@ $desc=array (
 );
 $up=-63;
 $ut=44;
-$ttffile='/nfs/c12/h08/mnt/217167/domains/iceam.org/html/wp-content/plugins/sensei-certificates/lib/tfpdf/font/unifont/DejaVuSansCondensed.ttf';
+$ttffile='/nfs/c12/h02/mnt/220845/domains/iceam.org/html/wp-content/plugins/sensei-certificates/lib/tfpdf/font/unifont/DejaVuSansCondensed.ttf';
 $originalsize=643852;
 $fontkey='dejavu';
 ?>
