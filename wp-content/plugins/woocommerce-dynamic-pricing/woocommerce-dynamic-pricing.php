@@ -2,14 +2,16 @@
 
 /*
   Plugin Name: WooCommerce Dynamic Pricing
+  Woo: 18643:9a41775bb33843f52c93c922b0053986
   Plugin URI: https://woocommerce.com/products/dynamic-pricing/
   Description: WooCommerce Dynamic Pricing lets you configure dynamic pricing rules for products, categories and members. For WooCommerce 1.4+
-  Version: 3.0.8
+  Version: 3.0.9
   Author: Lucas Stark
   Author URI: http://lucasstark.com
   Requires at least: 3.3
-  Tested up to: 4.7.4
-
+  Tested up to: 4.8
+  Text Domain: woocommerce-dynamic-pricing
+  Domain Path: /i18n/languages/
   Copyright: © 2009-2017 Lucas Stark.
   License: GNU General Public License v3.0
   License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -29,13 +31,6 @@ if ( ! function_exists( 'woothemes_queue_update' ) ) {
 woothemes_queue_update( plugin_basename( __FILE__ ), '9a41775bb33843f52c93c922b0053986', '18643' );
 
 if ( is_woocommerce_active() ) {
-
-
-	/**
-	 * Localisation
-	 * */
-	load_plugin_textdomain( 'wc_pricing', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
-
 
 	/**
 	 * Boot up dynamic pricing
@@ -74,6 +69,8 @@ class WC_Dynamic_Pricing {
 	public $db_version = '2.1';
 
 	public function __construct() {
+
+		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
 
 		add_filter( 'woocommerce_get_variation_prices_hash', array(
 			$this,
@@ -197,6 +194,17 @@ class WC_Dynamic_Pricing {
 		}
 
 		add_filter( 'woocommerce_dynamic_pricing_get_rule_amount', array( $this, 'convert_decimals' ), 99, 4 );
+	}
+
+	/**
+	 * Localisation
+	 */
+	public function load_plugin_textdomain() {
+		$locale = apply_filters( 'plugin_locale', get_locale(), 'woocommerce-dynamic-pricing' );
+		$dir    = trailingslashit( WP_LANG_DIR );
+
+		load_textdomain( 'woocommerce-dynamic-pricing', $dir . 'woocommerce-dynamic-pricing/woocommerce-dynamic-pricing-' . $locale . '.mo' );
+		load_plugin_textdomain( 'woocommerce-dynamic-pricing', false, dirname( plugin_basename( __FILE__ ) ) . '/i18n/languages/' );
 	}
 
 	public function on_woocommerce_get_variation_prices_hash( $price_hash ) {

@@ -10,66 +10,70 @@ msgstr ""
 "X-Generator: GlotPress/1.0-alpha-1100\n"
 "Project-Id-Version: Events Calendar Pro\n"
 
+#: src/admin-views/widget-admin-venue.php:37
+msgid "Hide this widget if there are no upcoming events"
+msgstr ""
+
 #: src/Tribe/Main.php:1326
 msgctxt "Event title map marker prefix"
 msgid "%s: "
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:101
-#: src/admin-views/event-recurrence.php:337
+#: src/admin-views/event-recurrence.php:106
+#: src/admin-views/event-recurrence.php:342
 msgid "months"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:142
+#: src/admin-views/event-recurrence.php:147
 msgctxt "Begins the line indicating when a recurrence time starts"
 msgid "At"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:152
+#: src/admin-views/event-recurrence.php:157
 msgid "the same time:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:153
+#: src/admin-views/event-recurrence.php:158
 msgid "a different time:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:181
-#: src/admin-views/event-recurrence.php:383
+#: src/admin-views/event-recurrence.php:186
+#: src/admin-views/event-recurrence.php:388
 msgid "Series ends"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:190
-#: src/admin-views/event-recurrence.php:393
+#: src/admin-views/event-recurrence.php:195
+#: src/admin-views/event-recurrence.php:398
 msgid "on"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:209
+#: src/admin-views/event-recurrence.php:214
 msgid "Series ends on this date"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:237
-#: src/admin-views/event-recurrence.php:451
+#: src/admin-views/event-recurrence.php:242
+#: src/admin-views/event-recurrence.php:456
 msgid "Show Details"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:238
-#: src/admin-views/event-recurrence.php:452
+#: src/admin-views/event-recurrence.php:243
+#: src/admin-views/event-recurrence.php:457
 msgid "Hide Details"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:246
+#: src/admin-views/event-recurrence.php:251
 msgid "Schedule multiple events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:249
+#: src/admin-views/event-recurrence.php:254
 msgid "Add more events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:262
+#: src/admin-views/event-recurrence.php:267
 msgid "Event will not occur:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:465
+#: src/admin-views/event-recurrence.php:470
 msgid "Recurrence Description"
 msgstr ""
 
@@ -532,29 +536,29 @@ msgstr "Відміна"
 msgid "Yearly custom recurrences with a different day must have either a date or day specified."
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:16
+#: src/admin-views/event-recurrence.php:17
 msgid "Are you sure you want to delete these events?"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:17
+#: src/admin-views/event-recurrence.php:18
 msgid "Are you sure you want to delete this exclusion?"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:22
+#: src/admin-views/event-recurrence.php:13
 msgid "Event Series:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:28
+#: src/admin-views/event-recurrence.php:33
 msgid "Delete This"
-msgstr ""
-
-#: src/admin-views/event-recurrence.php:93
-#: src/admin-views/event-recurrence.php:329
-msgid "weeks"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:98
 #: src/admin-views/event-recurrence.php:334
+msgid "weeks"
+msgstr ""
+
+#: src/admin-views/event-recurrence.php:103
+#: src/admin-views/event-recurrence.php:339
 msgid "month"
 msgstr "місяць"
 
@@ -718,7 +722,7 @@ msgstr ""
 msgid "An event every [interval] day(s) that begins at [start_time], happening [count] times"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1234
+#: src/Tribe/Recurrence/Meta.php:1238
 msgctxt "placeholder used where the true day of the day is determined dynamically"
 msgid "day"
 msgstr ""
@@ -823,15 +827,15 @@ msgstr ""
 msgid "Venue Longitude"
 msgstr ""
 
-#: src/Tribe/APM_Filters/APM_Filters.php:161
+#: src/Tribe/APM_Filters/APM_Filters.php:165
 msgid "Download for free"
 msgstr ""
 
-#: src/Tribe/APM_Filters/APM_Filters.php:167
+#: src/Tribe/APM_Filters/APM_Filters.php:171
 msgid "Dismiss"
 msgstr ""
 
-#: src/Tribe/APM_Filters/APM_Filters.php:171
+#: src/Tribe/APM_Filters/APM_Filters.php:175
 msgid "Pssst! Looking for the filters? They live in a separate plugin now | %s | %s"
 msgstr ""
 
@@ -891,7 +895,7 @@ msgctxt "additional field update"
 msgid "Working&hellip;"
 msgstr ""
 
-#: src/Tribe/Countdown_Widget.php:53 src/Tribe/Countdown_Widget.php:92
+#: src/Tribe/Countdown_Widget.php:53 src/Tribe/Countdown_Widget.php:102
 msgid "Hooray!"
 msgstr ""
 
@@ -915,7 +919,7 @@ msgstr ""
 msgid "Single Event"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1479
+#: src/Tribe/Recurrence/Meta.php:1491
 msgctxt "An unspecified end date"
 msgid "an unspecified date"
 msgstr ""
@@ -928,7 +932,7 @@ msgstr ""
 msgid "This Week Events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:468
+#: src/admin-views/event-recurrence.php:473
 msgid "Use this field if you want to override the auto-generated descriptions of event recurrence"
 msgstr ""
 
@@ -1008,75 +1012,75 @@ msgstr ""
 msgid "Could not process queue for event %1$d: %2$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:840 src/Tribe/Recurrence/Validator.php:101
+#: src/Tribe/Recurrence/Meta.php:844 src/Tribe/Recurrence/Validator.php:101
 msgid "Custom recurrences must have a type selected."
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:849 src/Tribe/Recurrence/Validator.php:110
+#: src/Tribe/Recurrence/Meta.php:853 src/Tribe/Recurrence/Validator.php:110
 msgid "Custom recurrences must have all data present."
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1250
+#: src/Tribe/Recurrence/Meta.php:1254
 msgctxt "Joins the last item in a list of items (i.e. the \"and\" in Monday, Tuesday, and Wednesday)"
 msgid "and"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1251
+#: src/Tribe/Recurrence/Meta.php:1255
 msgctxt "Placeholder text for a day of the week (or days of the week) before the user has selected any"
 msgid "[day]"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1252
+#: src/Tribe/Recurrence/Meta.php:1256
 msgctxt "Placeholder text for a month (or months) before the user has selected any"
 msgid "[month]"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1253
+#: src/Tribe/Recurrence/Meta.php:1257
 msgctxt "Describes a day of the month (e.g. \"day 5\" or \"day 27\")"
 msgid "day %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1254
+#: src/Tribe/Recurrence/Meta.php:1258
 msgctxt "Used when displaying: \"the first Monday\" or \"the first day\""
 msgid "the first %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1255
+#: src/Tribe/Recurrence/Meta.php:1259
 msgctxt "Used when displaying: \"the second Monday\" or \"the second day\""
 msgid "the second %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1256
+#: src/Tribe/Recurrence/Meta.php:1260
 msgctxt "Used when displaying: \"the third Monday\" or \"the third day\""
 msgid "the third %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1257
+#: src/Tribe/Recurrence/Meta.php:1261
 msgctxt "Used when displaying: \"the fourth Monday\" or \"the fourth day\""
 msgid "the fourth %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1258
+#: src/Tribe/Recurrence/Meta.php:1262
 msgctxt "Used when displaying: \"the fifth Monday\" or \"the fifth day\""
 msgid "the fifth %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1259
+#: src/Tribe/Recurrence/Meta.php:1263
 msgctxt "Used when displaying: \"the last Monday\" or \"the last day\""
 msgid "the last %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1260
+#: src/Tribe/Recurrence/Meta.php:1264
 msgctxt "Used when displaying the word \"day\" in \"the last day\" or \"the first day\""
 msgid "day"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:49
-#: src/admin-views/event-recurrence.php:287
+#: src/admin-views/event-recurrence.php:54
+#: src/admin-views/event-recurrence.php:292
 msgid "Once"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:458
+#: src/admin-views/event-recurrence.php:463
 msgid "Add Exclusion"
 msgstr ""
 
@@ -1187,7 +1191,6 @@ msgid "%sOur New User Primer%s was designed for folks in your exact position. Fe
 msgstr "%sІнструкція нового користувача%s був розроблений для людей, в точному положенні. Завдяки покроковому відео та письмовому покроковому керівництву, що супроводжується скріншотами, інструкція дооможе Вам пройти шлях від нуля до досвідченого користувача."
 
 #: src/admin-views/widget-admin-advanced-list.php:123
-#: src/admin-views/widget-admin-venue.php:37
 msgid "Hide this widget if there are no upcoming events:"
 msgstr "Приховати цей віджет якщо немає майбутніх подій:"
 
@@ -1387,8 +1390,8 @@ msgstr ""
 msgid "Week"
 msgstr "Тиждень"
 
-#: src/views/pro/map/single-event.php:71
-#: src/views/pro/map/single-featured.php:71 src/views/pro/week/mobile.php:24
+#: src/views/pro/map/single-event.php:75
+#: src/views/pro/map/single-featured.php:74 src/views/pro/week/mobile.php:24
 msgid "Find out more"
 msgstr "Дізнатися більше"
 
@@ -1433,8 +1436,8 @@ msgstr "Сортування за тижнями"
 msgid "Completed!"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:85
-#: src/admin-views/event-recurrence.php:321
+#: src/admin-views/event-recurrence.php:90
+#: src/admin-views/event-recurrence.php:326
 #: src/views/pro/widgets/countdown-widget.php:20
 msgid "days"
 msgstr "дні"
@@ -1541,18 +1544,18 @@ msgstr ""
 msgid "Restore Series"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:860 src/Tribe/Recurrence/Validator.php:133
+#: src/Tribe/Recurrence/Meta.php:864 src/Tribe/Recurrence/Validator.php:133
 msgid "Monthly custom recurrences cannot have a dash set as the day to occur on."
 msgstr "Щомісячні користувальницькі рецидиви не може мати тире встановлений як день, щоб відбутися на."
 
-#: src/Tribe/Recurrence/Meta.php:869 src/Tribe/Recurrence/Validator.php:158
+#: src/Tribe/Recurrence/Meta.php:873 src/Tribe/Recurrence/Validator.php:158
 msgid "Yearly custom recurrences cannot have a dash set as the day to occur on."
 msgstr "Щорічні користувальницькі рецидиви не може мати тире встановлений як день, щоб відбутися на. "
 
-#: src/admin-views/event-recurrence.php:45
-#: src/admin-views/event-recurrence.php:82
-#: src/admin-views/event-recurrence.php:283
-#: src/admin-views/event-recurrence.php:318
+#: src/admin-views/event-recurrence.php:50
+#: src/admin-views/event-recurrence.php:87
+#: src/admin-views/event-recurrence.php:288
+#: src/admin-views/event-recurrence.php:323
 #: src/admin-views/recurrence/months.php:90
 #: src/admin-views/recurrence/years.php:136
 msgid "day"
@@ -1563,160 +1566,160 @@ msgstr "день"
 msgid "last"
 msgstr "остання"
 
-#: src/Tribe/Recurrence/Meta.php:1227 src/Tribe/Recurrence/Meta.php:1543
+#: src/Tribe/Recurrence/Meta.php:1231 src/Tribe/Recurrence/Meta.php:1556
 #: src/admin-views/recurrence/months.php:82
 #: src/admin-views/recurrence/weeks.php:19
 #: src/admin-views/recurrence/years.php:128
 msgid "Monday"
 msgstr "Понеділок"
 
-#: src/Tribe/Recurrence/Meta.php:1228 src/Tribe/Recurrence/Meta.php:1544
+#: src/Tribe/Recurrence/Meta.php:1232 src/Tribe/Recurrence/Meta.php:1557
 #: src/admin-views/recurrence/months.php:83
 #: src/admin-views/recurrence/weeks.php:30
 #: src/admin-views/recurrence/years.php:129
 msgid "Tuesday"
 msgstr "Вівторок"
 
-#: src/Tribe/Recurrence/Meta.php:1229 src/Tribe/Recurrence/Meta.php:1545
+#: src/Tribe/Recurrence/Meta.php:1233 src/Tribe/Recurrence/Meta.php:1558
 #: src/admin-views/recurrence/months.php:84
 #: src/admin-views/recurrence/weeks.php:41
 #: src/admin-views/recurrence/years.php:130
 msgid "Wednesday"
 msgstr "Середа"
 
-#: src/Tribe/Recurrence/Meta.php:1230 src/Tribe/Recurrence/Meta.php:1546
+#: src/Tribe/Recurrence/Meta.php:1234 src/Tribe/Recurrence/Meta.php:1559
 #: src/admin-views/recurrence/months.php:85
 #: src/admin-views/recurrence/weeks.php:52
 #: src/admin-views/recurrence/years.php:131
 msgid "Thursday"
 msgstr "Четвер"
 
-#: src/Tribe/Recurrence/Meta.php:1231 src/Tribe/Recurrence/Meta.php:1547
+#: src/Tribe/Recurrence/Meta.php:1235 src/Tribe/Recurrence/Meta.php:1560
 #: src/admin-views/recurrence/months.php:86
 #: src/admin-views/recurrence/weeks.php:63
 #: src/admin-views/recurrence/years.php:132
 msgid "Friday"
 msgstr "П'ятниця"
 
-#: src/Tribe/Recurrence/Meta.php:1232 src/Tribe/Recurrence/Meta.php:1548
+#: src/Tribe/Recurrence/Meta.php:1236 src/Tribe/Recurrence/Meta.php:1561
 #: src/admin-views/recurrence/months.php:87
 #: src/admin-views/recurrence/weeks.php:74
 #: src/admin-views/recurrence/years.php:133
 msgid "Saturday"
 msgstr "Субота"
 
-#: src/Tribe/Recurrence/Meta.php:1233 src/Tribe/Recurrence/Meta.php:1549
+#: src/Tribe/Recurrence/Meta.php:1237 src/Tribe/Recurrence/Meta.php:1562
 #: src/admin-views/recurrence/months.php:88
 #: src/admin-views/recurrence/weeks.php:8
 #: src/admin-views/recurrence/years.php:134
 msgid "Sunday"
 msgstr "Неділя"
 
-#: src/Tribe/Recurrence/Meta.php:1556
+#: src/Tribe/Recurrence/Meta.php:1569
 msgid ", and"
 msgstr ", та"
 
-#: src/Tribe/Recurrence/Meta.php:1558
+#: src/Tribe/Recurrence/Meta.php:1571
 msgid "and"
 msgstr "та"
 
-#: src/Tribe/Recurrence/Meta.php:1560
+#: src/Tribe/Recurrence/Meta.php:1573
 msgid ","
 msgstr ","
 
-#: src/Tribe/Recurrence/Meta.php:1237 src/Tribe/Recurrence/Meta.php:1578
+#: src/Tribe/Recurrence/Meta.php:1241 src/Tribe/Recurrence/Meta.php:1591
 msgid "January"
 msgstr "Січень"
 
-#: src/Tribe/Recurrence/Meta.php:1238 src/Tribe/Recurrence/Meta.php:1579
+#: src/Tribe/Recurrence/Meta.php:1242 src/Tribe/Recurrence/Meta.php:1592
 msgid "February"
 msgstr "Лютий"
 
-#: src/Tribe/Recurrence/Meta.php:1239 src/Tribe/Recurrence/Meta.php:1580
+#: src/Tribe/Recurrence/Meta.php:1243 src/Tribe/Recurrence/Meta.php:1593
 msgid "March"
 msgstr "Березень"
 
-#: src/Tribe/Recurrence/Meta.php:1240 src/Tribe/Recurrence/Meta.php:1581
+#: src/Tribe/Recurrence/Meta.php:1244 src/Tribe/Recurrence/Meta.php:1594
 msgid "April"
 msgstr "Квітень"
 
-#: src/Tribe/Recurrence/Meta.php:1241 src/Tribe/Recurrence/Meta.php:1582
+#: src/Tribe/Recurrence/Meta.php:1245 src/Tribe/Recurrence/Meta.php:1595
 msgid "May"
 msgstr "Трав"
 
-#: src/Tribe/Recurrence/Meta.php:1242 src/Tribe/Recurrence/Meta.php:1583
+#: src/Tribe/Recurrence/Meta.php:1246 src/Tribe/Recurrence/Meta.php:1596
 msgid "June"
 msgstr "Червень"
 
-#: src/Tribe/Recurrence/Meta.php:1243 src/Tribe/Recurrence/Meta.php:1584
+#: src/Tribe/Recurrence/Meta.php:1247 src/Tribe/Recurrence/Meta.php:1597
 msgid "July"
 msgstr "Липень"
 
-#: src/Tribe/Recurrence/Meta.php:1244 src/Tribe/Recurrence/Meta.php:1585
+#: src/Tribe/Recurrence/Meta.php:1248 src/Tribe/Recurrence/Meta.php:1598
 msgid "August"
 msgstr "Серпень"
 
-#: src/Tribe/Recurrence/Meta.php:1245 src/Tribe/Recurrence/Meta.php:1586
+#: src/Tribe/Recurrence/Meta.php:1249 src/Tribe/Recurrence/Meta.php:1599
 msgid "September"
 msgstr "Вересень"
 
-#: src/Tribe/Recurrence/Meta.php:1246 src/Tribe/Recurrence/Meta.php:1587
+#: src/Tribe/Recurrence/Meta.php:1250 src/Tribe/Recurrence/Meta.php:1600
 msgid "October"
 msgstr "Жовтень"
 
-#: src/Tribe/Recurrence/Meta.php:1247 src/Tribe/Recurrence/Meta.php:1588
+#: src/Tribe/Recurrence/Meta.php:1251 src/Tribe/Recurrence/Meta.php:1601
 msgid "November"
 msgstr "Листопад"
 
-#: src/Tribe/Recurrence/Meta.php:1248 src/Tribe/Recurrence/Meta.php:1589
+#: src/Tribe/Recurrence/Meta.php:1252 src/Tribe/Recurrence/Meta.php:1602
 msgid "December"
 msgstr "Грудень"
 
-#: src/Tribe/Recurrence/Meta.php:1596
+#: src/Tribe/Recurrence/Meta.php:1609
 msgid ", and "
 msgstr ", та "
 
-#: src/Tribe/Recurrence/Meta.php:1598
+#: src/Tribe/Recurrence/Meta.php:1611
 msgid " and "
 msgstr " та "
 
-#: src/Tribe/Recurrence/Meta.php:1600
+#: src/Tribe/Recurrence/Meta.php:1613
 msgid ", "
 msgstr ", "
 
-#: src/Tribe/Recurrence/Meta.php:1626
+#: src/Tribe/Recurrence/Meta.php:1639
 msgid "Recurring event instances"
 msgstr "Повторювані випадки подій"
 
-#: src/Tribe/Recurrence/Meta.php:1627
+#: src/Tribe/Recurrence/Meta.php:1640
 msgid "Show only the first instance of each recurring event (only affects list-style views)."
 msgstr "Показати тільки перший примірник кожного повторюваного події (впливає тільки на вигляд список стилі)."
 
-#: src/Tribe/Recurrence/Meta.php:1633
+#: src/Tribe/Recurrence/Meta.php:1646
 msgid "Front-end recurring event instances toggle"
 msgstr "Фронтальний перемикач повторюваних подій"
 
-#: src/Tribe/Recurrence/Meta.php:1634
+#: src/Tribe/Recurrence/Meta.php:1647
 msgid "Allow users to decide whether to show all instances of a recurring event."
 msgstr "Дозволити користувачам вирішити, чи слід показати всі екземпляри повторюваного події."
 
-#: src/Tribe/Recurrence/Meta.php:1641
+#: src/Tribe/Recurrence/Meta.php:1654
 msgid "Clean up recurring events after"
 msgstr "Очищення повторювані події після"
 
-#: src/Tribe/Recurrence/Meta.php:1642
+#: src/Tribe/Recurrence/Meta.php:1655
 msgid "Automatically remove recurring event instances older than this"
 msgstr "Автоматичне видалення повторюваних примірників подій старше, ніж ця"
 
-#: src/Tribe/Recurrence/Meta.php:1649
+#: src/Tribe/Recurrence/Meta.php:1662
 msgid "Create recurring events in advance for"
 msgstr "Створити повторювану подію заздалегідь для"
 
-#: src/Tribe/Recurrence/Meta.php:1650
+#: src/Tribe/Recurrence/Meta.php:1663
 msgid "Recurring events will be created this far in advance"
 msgstr "Повторювані події будуть створені заздалегідь"
 
-#: src/Tribe/Recurrence/Meta.php:1671
+#: src/Tribe/Recurrence/Meta.php:1684
 msgid " months"
 msgstr "місяць"
 
@@ -1886,13 +1889,13 @@ msgstr "Включення цієї опції, це не буде видаля�
 msgid "Are you sure you wish to remove this field and its data from all events? Once you click OK this cannot be undone."
 msgstr "Are you sure you wish to remove this field and its data from all events? Once you click OK this cannot be undone."
 
-#: src/admin-views/event-recurrence.php:41
-#: src/admin-views/event-recurrence.php:279
+#: src/admin-views/event-recurrence.php:46
+#: src/admin-views/event-recurrence.php:284
 msgid "event"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:42
-#: src/admin-views/event-recurrence.php:280
+#: src/admin-views/event-recurrence.php:47
+#: src/admin-views/event-recurrence.php:285
 msgid "events"
 msgstr ""
 
@@ -1900,31 +1903,31 @@ msgstr ""
 msgid "None"
 msgstr "Жоден"
 
-#: src/admin-views/event-recurrence.php:54
-#: src/admin-views/event-recurrence.php:292
+#: src/admin-views/event-recurrence.php:59
+#: src/admin-views/event-recurrence.php:297
 #: src/admin-views/recurrence/months.php:2
 #: src/admin-views/recurrence/years.php:53
 msgid "On"
 msgstr "На"
 
-#: src/admin-views/event-recurrence.php:191
-#: src/admin-views/event-recurrence.php:394
+#: src/admin-views/event-recurrence.php:196
+#: src/admin-views/event-recurrence.php:399
 msgid "after"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:192
-#: src/admin-views/event-recurrence.php:395
+#: src/admin-views/event-recurrence.php:197
+#: src/admin-views/event-recurrence.php:400
 msgid "never"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:225
-#: src/admin-views/event-recurrence.php:427
+#: src/admin-views/event-recurrence.php:230
+#: src/admin-views/event-recurrence.php:432
 msgctxt "occurence count text"
 msgid "events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:228
-#: src/admin-views/event-recurrence.php:430
+#: src/admin-views/event-recurrence.php:233
+#: src/admin-views/event-recurrence.php:435
 msgid "You must select a recurrence end date"
 msgstr "Ви повинні вибрати повторення та кінцеву дату"
 
@@ -1932,8 +1935,8 @@ msgstr "Ви повинні вибрати повторення та кінце�
 msgid "The Events Calendar"
 msgstr "Календар подій"
 
-#: src/admin-views/event-recurrence.php:45
-#: src/admin-views/event-recurrence.php:283
+#: src/admin-views/event-recurrence.php:50
+#: src/admin-views/event-recurrence.php:288
 msgid "Daily"
 msgstr "Щодня"
 
@@ -1945,8 +1948,8 @@ msgstr "Щоб почати використовувати Календар по
 msgid "Start Date"
 msgstr "Дата початку"
 
-#: src/admin-views/event-recurrence.php:46
-#: src/admin-views/event-recurrence.php:284
+#: src/admin-views/event-recurrence.php:51
+#: src/admin-views/event-recurrence.php:289
 msgid "Weekly"
 msgstr "Щотижня"
 
@@ -1958,8 +1961,8 @@ msgstr "Дата закінчення"
 msgid "Event Cost"
 msgstr "Ціна події"
 
-#: src/admin-views/event-recurrence.php:47
-#: src/admin-views/event-recurrence.php:285
+#: src/admin-views/event-recurrence.php:52
+#: src/admin-views/event-recurrence.php:290
 msgid "Monthly"
 msgstr "Щомісяця"
 
@@ -1971,8 +1974,8 @@ msgstr "Умови події"
 msgid "Title"
 msgstr "Назва"
 
-#: src/admin-views/event-recurrence.php:48
-#: src/admin-views/event-recurrence.php:286
+#: src/admin-views/event-recurrence.php:53
+#: src/admin-views/event-recurrence.php:291
 msgid "Yearly"
 msgstr "Щороку"
 
@@ -1980,8 +1983,8 @@ msgstr "Щороку"
 msgid "Recurring"
 msgstr "Періодичне"
 
-#: src/admin-views/event-recurrence.php:67
-#: src/admin-views/event-recurrence.php:304
+#: src/admin-views/event-recurrence.php:72
+#: src/admin-views/event-recurrence.php:309
 #: src/admin-views/recurrence/years.php:12
 msgid "Every"
 msgstr "Кожен"
@@ -1990,7 +1993,7 @@ msgstr "Кожен"
 msgid "Description"
 msgstr "Опис"
 
-#: src/admin-views/event-recurrence.php:438
+#: src/admin-views/event-recurrence.php:443
 msgid "Frequency of recurring event must be a number"
 msgstr "Частота повторюваної події повинна бути числом"
 
@@ -2085,7 +2088,7 @@ msgstr "Додати іншу"
 msgid "Remove"
 msgstr "Видалити"
 
-#: src/admin-views/event-recurrence.php:463
+#: src/admin-views/event-recurrence.php:468
 msgid "Recurrence Description:"
 msgstr "Повторення Опис:"
 
@@ -2270,8 +2273,8 @@ msgstr "Перемикачі"
 msgid "Title:"
 msgstr "Назва:"
 
-#: src/Tribe/Main.php:63 src/admin-views/event-recurrence.php:90
-#: src/admin-views/event-recurrence.php:326
+#: src/Tribe/Main.php:63 src/admin-views/event-recurrence.php:95
+#: src/admin-views/event-recurrence.php:331
 msgid "week"
 msgstr "тиждень"
 

@@ -688,6 +688,10 @@ class Tribe__Events__Pro__Recurrence__Meta {
 			$recurrence_data = get_post_meta( $post_id, '_EventRecurrence', true );
 		}
 
+		// Update the recurrence data if needed (useful for rules created pre-4.4)
+		$rules_updater = new Tribe__Events__Pro__Recurrence__Rule_Updater( $post_id, $recurrence_data );
+		$recurrence_data = $rules_updater->update_if_required();
+
 		if ( is_array( $recurrence_data ) ) {
 			if (
 				isset( $recurrence_data['rules']['custom']['year']['month-number'] )
@@ -1475,8 +1479,17 @@ class Tribe__Events__Pro__Recurrence__Meta {
 			return;
 		}
 
+		// Handle different string conversions based on recurring end type.
 		if ( empty( $rule['end'] ) ) {
-			$series_end = _x( 'an unspecified date', 'An unspecified end date', 'tribe-events-calendar-pro' );
+
+			// If the events are single events, use the dates of those single instances.
+			if ( 'date' === $type && isset( $rule['custom']['date']['date'] ) ) {
+				$series_end = date( tribe_get_date_format( true ), strtotime( $rule['custom']['date']['date'] ) );
+
+			// Otherwise there's no end date specified.
+			} else {
+				$series_end = _x( 'an unspecified date', 'An unspecified end date', 'tribe-events-calendar-pro' );
+			}
 		} else {
 			$series_end = date( tribe_get_date_format( true ), strtotime( $rule['end'] ) );
 		}

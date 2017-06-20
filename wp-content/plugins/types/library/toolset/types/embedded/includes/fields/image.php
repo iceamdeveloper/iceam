@@ -1110,16 +1110,24 @@ class WPCF_Guid_Id {
 	private $wpdb;
 
 	/**
+	 * @var bool
+	 */
+	private $is_table_available = false;
+
+	/**
 	 * Temporary singleton until other parts of image fields are refactored
 	 *
 	 * @param wpdb $wpdb
 	 */
 	private function __construct( wpdb $wpdb) {
 		$this->wpdb = $wpdb;
-		$this->create_table_if_not_exist();
-		add_action( 'add_attachment', array( $this, 'on_attachment_save' ) );
-		add_action( 'edit_attachment', array( $this, 'on_attachment_save' ) );
-		add_action( 'delete_attachment', array( $this, 'delete_by_post_id' ) );
+		$this->is_table_available = $this->create_table_if_not_exist();
+
+		if( $this->is_table_available ) {
+			add_action( 'add_attachment', array( $this, 'on_attachment_save' ) );
+			add_action( 'edit_attachment', array( $this, 'on_attachment_save' ) );
+			add_action( 'delete_attachment', array( $this, 'delete_by_post_id' ) );
+		};
 	}
 
 	/**
@@ -1147,8 +1155,14 @@ class WPCF_Guid_Id {
 	/**
 	 * @param $guid
 	 * @param $post_id
+	 *
+	 * @return bool
 	 */
 	public function insert( $guid, $post_id ) {
+		if( ! $this->is_table_available ) {
+			return false;
+		}
+
 		$table_guid_id = $this->get_table_name();
 
 		$this->wpdb->query(
@@ -1162,8 +1176,14 @@ class WPCF_Guid_Id {
 	/**
 	 * @param $guid
 	 * @param $post_id
+	 *
+	 * @return bool
 	 */
 	public function update( $guid, $post_id ) {
+		if( ! $this->is_table_available ) {
+			return false;
+		}
+
 		$table_guid_id = $this->get_table_name();
 
 		$this->wpdb->query(
@@ -1178,8 +1198,14 @@ class WPCF_Guid_Id {
 	 * Delete a relationship by passing post id
 	 *
 	 * @param $post_id
+	 *
+	 * @return bool
 	 */
 	public function delete_by_post_id( $post_id ) {
+		if( ! $this->is_table_available ) {
+			return false;
+		}
+
 		$table_guid_id = $this->get_table_name();
 
 		$this->wpdb->query(
@@ -1197,6 +1223,10 @@ class WPCF_Guid_Id {
 	 * @return null|string
 	 */
 	public function get_id_by_guid( $guid ) {
+		if( ! $this->is_table_available ) {
+			return false;
+		}
+
 		$table_guid_id = $this->get_table_name();
 
 		return $this->wpdb->get_var(
@@ -1214,6 +1244,10 @@ class WPCF_Guid_Id {
 	 * @return null|string
 	 */
 	public function get_guid_by_id( $post_id ) {
+		if( ! $this->is_table_available ) {
+			return false;
+		}
+
 		$table_guid_id = $this->get_table_name();
 
 		return $this->wpdb->get_var(
@@ -1226,9 +1260,16 @@ class WPCF_Guid_Id {
 
 	/**
 	 * Hooked to 'post_save'
+	 *
 	 * @param $post_id
+	 *
+	 * @return bool|void
 	 */
 	public function on_attachment_save( $post_id  ) {
+		if( ! $this->is_table_available ) {
+			return false;
+		}
+
 		if( ! $post = get_post( $post_id ) ) {
 			// no post found
 			return;
@@ -1265,20 +1306,39 @@ class WPCF_Guid_Id {
 	 */
 	private function create_table_if_not_exist() {
 		$table_guid_id = $this->get_table_name();
+		$option_key_table_could_not_be_created = '_types-error-on-create-table-' . $table_guid_id;
 
 		if( $this->wpdb->get_var( "SHOW TABLES LIKE '$table_guid_id'" ) == $table_guid_id) {
-			return;
+			// table already exists
+			return true;
+		}
+
+		if( get_option( $option_key_table_could_not_be_created, false ) ) {
+			// we already tried to create the table before, but without success
+			return false;
 		}
 
 		$query = "CREATE TABLE {$table_guid_id} (
-				`guid` varchar(255) NOT NULL DEFAULT '',
-				`post_id` bigint(20) NOT NULL,
-				UNIQUE KEY `post_id` (`post_id`),
-				KEY `guid` (`guid`)
-			) " . $this->wpdb->get_charset_collate() . ";";
+			`guid` varchar(190) NOT NULL DEFAULT '',
+			`post_id` bigint(20) NOT NULL,
+			UNIQUE KEY `post_id` (`post_id`),
+			KEY `guid` (`guid`)
+		) " . $this->wpdb->get_charset_collate() . ";";
 
 		require_once( ABSPATH . 'wp-admin/includes/upgrade.php' );
-		return dbDelta( $query );
+		ob_start(); // prevent any error output
+		@dbDelta( $query ); // error on dbDelta not catchable
+		ob_end_clean();
+
+		if( $this->wpdb->get_var( "SHOW TABLES LIKE '$table_guid_id'" ) == $table_guid_id) {
+			// table successfully created
+			return true;
+		}
+
+		// for some reason the table could not be created - save result
+		update_option( $option_key_table_could_not_be_created, '1' );
+
+		return false;
 	}
 }
 

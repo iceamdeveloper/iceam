@@ -65,10 +65,20 @@ if ( ! class_exists( 'Tribe__Events__Pro__Countdown_Widget' ) ) {
 			$limit = apply_filters( 'tribe_events_pro_countdown_widget_limit', 250 );
 			$paged = apply_filters( 'tribe_events_pro_countdown_widget_paged', 1 );
 
+			/**
+			 * Filters which post types are allowed for the widget.
+			 *
+			 * @param array allowed statuses; default `publish`.
+			 *
+			 * @since 4.4.11
+			 */
+			$statuses = apply_filters( 'tribe_events_pro_countdown_widget_allowed_status', array( 'publish' ) );
+
 			$events = tribe_get_events( array(
-				'eventDisplay' => 'list',
+				'eventDisplay'   => 'list',
 				'posts_per_page' => $limit,
-				'paged' => $paged,
+				'post_status'    => $statuses,
+				'paged'          => $paged,
 			) );
 
 			if ( is_numeric( $instance['event'] ) ) {

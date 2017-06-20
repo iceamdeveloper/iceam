@@ -438,6 +438,8 @@ if ( ! class_exists( 'WC_Dynamic_Pricing_Compatibility' ) ) :
 			return false;
 		}
 
+		private static $_cached_category_ids = array();
+
 		public static function get_product_category_ids( $product ) {
 			if ( empty( $product ) ) {
 				return array();
@@ -445,11 +447,18 @@ if ( ! class_exists( 'WC_Dynamic_Pricing_Compatibility' ) ) :
 
 			if ( self::is_wc_version_gte_2_7() ) {
 				if ( $product->is_type( 'variation' ) ) {
-					$parent = wc_get_product( $product->get_parent_id() );
+					if ( ! isset( self::$_cached_category_ids[ $product->get_parent_id() ] ) ) {
+						$parent                                                  = wc_get_product( $product->get_parent_id() );
+						self::$_cached_category_ids[ $product->get_parent_id() ] = $parent->get_category_ids();
+					}
 
-					return $parent->get_category_ids();
+					return self::$_cached_category_ids[ $product->get_parent_id() ];
 				} else {
-					return $product->get_category_ids();
+					if ( ! isset( self::$_cached_category_ids[ $product->get_id() ] ) ) {
+						self::$_cached_category_ids[ $product->get_id() ] = $product->get_category_ids();
+					}
+
+					return self::$_cached_category_ids[ $product->get_id() ];
 				}
 			} else {
 				$id    = isset( $product->variation_id ) ? $product->parent->get_id() : $product->get_id();

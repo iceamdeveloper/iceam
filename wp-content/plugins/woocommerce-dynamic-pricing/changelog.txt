@@ -1,4 +1,9 @@
 *** Dynamic Pricing Changelog ***
+2017.06.08 - version 3.0.9
+    * Update:  Cache loaded product rules for performance improvements.
+    * Update:  Update text domain to woocommerce-dynamic-pricing.
+    * Update:  Localize all strings in the admin interface.
+
 2017.05.24 - version 3.0.8
     * Update:  Fix issue with WC < 3.0 and WooCommerce Membership Discounts
     * Update:  Fix issue with the transient caching of variable products for different roles.
