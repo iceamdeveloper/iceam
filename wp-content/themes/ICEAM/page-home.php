@@ -82,7 +82,7 @@ get_header();
                                                 <li class="<?php echo $extra_classes; ?>"><a href="#testimonial-<?php the_ID(); ?>" data-toggle="tab">
                                                     <?php
                                                         if ( has_post_thumbnail() ) {
-                                                            the_post_thumbnail( 'full', array( 'width' => '64', 'height' => '64' ) );
+                                                            the_post_thumbnail( 'thumbnail', array( 'width' => '64', 'height' => '64' ) );
                                                         } else {
                                                             echo "<img src='/wp-content/uploads/2015/05/placeholder-portrait.jpg' width='64' height='64' alt='placeholder portait' />";
                                                         }
