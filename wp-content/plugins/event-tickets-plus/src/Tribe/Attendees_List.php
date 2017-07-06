@@ -49,9 +49,7 @@ class Tribe__Tickets_Plus__Attendees_List {
 		// @todo: make this a little bit more clean
 		add_action( 'event_tickets_rsvp_ticket_created', array( $myself, 'purge_transient' ), 10, 3 );
 		add_action( 'wootickets_generate_ticket_attendee', array( $myself, 'purge_transient' ), 10, 3 );
-		add_action( 'event_tickets_shopp_ticket_created', array( $myself, 'shopp_purge_transient' ), 10, 2 );
 		add_action( 'event_tickets_edd_ticket_created', array( $myself, 'edd_purge_transient' ), 10, 2 );
-		add_action( 'event_tickets_wpec_ticket_created', array( $myself, 'wpec_purge_transient' ), 10, 5 );
 	}
 
 	/**
@@ -69,9 +67,9 @@ class Tribe__Tickets_Plus__Attendees_List {
 			return;
 		}
 
-		$is_hidden = (int) ( empty( $_POST['tribe-tickets-hide-attendees-list'] ) ? false : (bool) $_POST['tribe-tickets-hide-attendees-list'] );
+		$is_shown = ! empty( $_POST['tribe-tickets-hide-attendees-list'] );
 
-		update_post_meta( $post_id, self::HIDE_META_KEY, $is_hidden );
+		update_post_meta( $post_id, self::HIDE_META_KEY, $is_shown );
 	}
 
 	/**
@@ -93,9 +91,17 @@ class Tribe__Tickets_Plus__Attendees_List {
 
 		// By default non-existent meta will be an empty string
 		if ( '' === $is_hidden ) {
+			/**
+			 * default to hide - which is unchecked but stored as true (1) in the Db for backwards compat.
+			 * @since M17.12
+			 */
 			$is_hidden = true;
 		} else {
-			$is_hidden = (bool) $is_hidden;
+			/**
+			 * invert logic for backwards compat.
+			 * @since M17.12
+			 */
+			$is_hidden = ! $is_hidden;
 		}
 
 		/**
@@ -139,18 +145,6 @@ class Tribe__Tickets_Plus__Attendees_List {
 	}
 
 	/**
-	 * Remove the Post Transients when a Shopp Ticket is bought
-	 *
-	 * @param  int $attendee_id
-	 * @param  int $order_id
-	 * @return void
-	 */
-	public function shopp_purge_transient( $attendee_id, $order_id ) {
-		$event_id = Tribe__Tickets_Plus__Commerce__Shopp__Main::get_instance()->get_event_id_from_order_id( $order_id );
-		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
-	}
-
-	/**
 	 * Remove the Post Transients when a EDD Ticket is bought
 	 *
 	 * @param  int $attendee_id
@@ -159,20 +153,6 @@ class Tribe__Tickets_Plus__Attendees_List {
 	 */
 	public function edd_purge_transient( $attendee_id, $order_id ) {
 		$event_id = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->get_event_id_from_order_id( $order_id );
-		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
-	}
-
-	/**
-	 * Remove the Post Transients when a WPEC Ticket is bought
-	 *
-	 * @param  int $attendee_id
-	 * @param  int $purchase_log
-	 * @param  int $product_id
-	 * @param  int $order_attendee_id
-	 * @param  int $event_id
-	 * @return void
-	 */
-	public function wpec_purge_transient( $attendee_id, $purchase_log, $product_id, $order_attendee_id, $event_id ) {
 		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
 	}
 

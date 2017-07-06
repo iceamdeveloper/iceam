@@ -11,12 +11,12 @@ class Tribe__Tickets_Plus__QR {
 	}
 
 	/**
-	 * Procesess the links coming from QR codes and decides what to do:
+	 * Processes the links coming from QR codes and decides what to do:
 	 *   - If the user is logged in and has proper permissions, it will redirect
 	 *     to the attendees screen for the event, and will automatically check in the user.
 	 *
-	 *   - If the user is not logged in and/or not have proper permissions, it'll redirect
-	 *     to the homepage of the event (front end)
+	 *   - If the user is not logged in and/or does not have proper permissions, it will
+	 *     redirect to the homepage of the event (front end single event view).
 	 */
 	public function handle_redirects() {
 
@@ -39,12 +39,15 @@ class Tribe__Tickets_Plus__QR {
 		// See if the user had access or not to the checkin process
 		$user_had_access = false;
 
+		$event_id = (int) $_GET['event_id'];
+		$ticket_id = (int) $_GET['ticket_id'];
+
 		// If the user is the site owner (or similar), Check in the user to the event
 		if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
 
-			$this->_check_in( $_GET['ticket_id'] );
+			$this->_check_in( $ticket_id );
 
-			$post = get_post( $_GET['event_id'] );
+			$post = get_post( $event_id );
 
 			if ( empty( $post ) ) {
 				return;
@@ -52,26 +55,28 @@ class Tribe__Tickets_Plus__QR {
 
 			$user_had_access = true;
 
-			$url = add_query_arg( array(
-				'post_type'     => $post->post_type,
-				'page'          => Tribe__Tickets__Tickets_Handler::$attendees_slug,
-				'event_id'      => $_GET['event_id'],
-				'qr_checked_in' => $_GET['ticket_id'],
-			), admin_url( 'edit.php' ) );
+			$url = add_query_arg(
+				array(
+					'post_type'     => $post->post_type,
+					'page'          => Tribe__Tickets__Tickets_Handler::$attendees_slug,
+					'event_id'      => $event_id,
+					'qr_checked_in' => $ticket_id,
+				), admin_url( 'edit.php' )
+			);
 
 		} else { // Probably just the ticket holder, redirect to the event front end single
-			$url = get_permalink( $_GET['event_id'] );
+			$url = get_permalink( $event_id );
 		}
 
 		/**
 		 * Filters the redirect URL if the user can access the QR checkin
 		 *
-		 * @param string  $url
-		 * @param int     $event_id
-		 * @param int     $ticket_id
-		 * @param bool    $user_had_access
+		 * @param string $url             URL to redirect to, gets escaped upstream
+		 * @param int    $event_id        Event Post ID
+		 * @param int    $ticket_id       Ticket Post ID
+		 * @param bool   $user_had_access Whether or not the logged-in user has permission to perform check ins
 		 */
-		$url = apply_filters( 'tribe_tickets_plus_qr_handle_redirects', $url, (int) $event_id, (int) $ticket_id, $user_had_access );
+		$url = apply_filters( 'tribe_tickets_plus_qr_handle_redirects', $url, $event_id, $ticket_id, $user_had_access );
 
 		wp_redirect( esc_url_raw( $url ) );
 		exit;

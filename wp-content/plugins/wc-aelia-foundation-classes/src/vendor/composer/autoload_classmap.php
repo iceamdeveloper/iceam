@@ -44,6 +44,7 @@ return array(
     'GeoIp2\\Exception\\OutOfQueriesException' => $vendorDir . '/geoip2/geoip2/src/Exception/OutOfQueriesException.php',
     'GeoIp2\\Model\\AbstractModel' => $vendorDir . '/geoip2/geoip2/src/Model/AbstractModel.php',
     'GeoIp2\\Model\\AnonymousIp' => $vendorDir . '/geoip2/geoip2/src/Model/AnonymousIp.php',
+    'GeoIp2\\Model\\Asn' => $vendorDir . '/geoip2/geoip2/src/Model/Asn.php',
     'GeoIp2\\Model\\City' => $vendorDir . '/geoip2/geoip2/src/Model/City.php',
     'GeoIp2\\Model\\ConnectionType' => $vendorDir . '/geoip2/geoip2/src/Model/ConnectionType.php',
     'GeoIp2\\Model\\Country' => $vendorDir . '/geoip2/geoip2/src/Model/Country.php',

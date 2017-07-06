@@ -6,12 +6,12 @@
  *
  *     [your-theme]/tribe-events/tickets-plus/attendee-list-checkbox-tickets.php
  *
- * @version 4.4.6
+ * @version 4.5
  *
  */
 $view = Tribe__Tickets__Tickets_View::instance();
 ?>
-<div class="tribe-tickets attendees-list-optout">
+<div class="tribe-tickets-attendees-list-optout">
 	<input
 		<?php echo $view->get_restriction_attr( $post_id, esc_attr( $first_attendee['product_id'] ) ); ?>
 		type="checkbox"

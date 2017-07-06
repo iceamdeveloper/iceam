@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.4.9
+ * @version 4.5
  *
  * @var bool $must_login
  */
@@ -19,10 +19,16 @@ $stock                        = Tribe__Tickets_Plus__Commerce__EDD__Main::get_in
 
 ob_start();
 ?>
-<h2 class="tribe-events-tickets-title"><?php esc_html_e( 'Tickets', 'event-tickets-plus' );?></h2>
+<form
+	id="buy-tickets"
+	action="<?php echo esc_url( add_query_arg( 'eddtickets_process', 1, edd_get_checkout_uri() ) ); ?>"
+	class="cart"
+	method="post"
+	enctype='multipart/form-data'
+>
+	<h2 class="tribe-events-tickets-title"><?php esc_html_e( 'Tickets', 'event-tickets-plus' );?></h2>
 
-<form action="<?php echo esc_url( add_query_arg( 'eddtickets_process', 1, edd_get_checkout_uri() ) ); ?>" class="cart" method="post" enctype='multipart/form-data'>
-	<table width="100%" class="tribe-events-tickets">
+	<table class="tribe-events-tickets">
 		<?php
 		foreach ( $tickets as $ticket ) {
 			/**
@@ -35,7 +41,6 @@ ob_start();
 			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
 
 				$is_there_any_product = true;
-				$data_product_id = 'data-product-id="' . esc_attr( $ticket->ID ) . '"';
 
 				echo sprintf( '<input type="hidden" name="product_id[]"" value="%d">', esc_attr( $ticket->ID ) );
 
@@ -46,7 +51,7 @@ ob_start();
 				if ( $stock->available_units( $product->ID ) ) {
 
 					// For global stock enabled tickets with a cap, use the cap as the max quantity
-					if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode()) {
+					if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode() ) {
 						$remaining = $ticket->global_stock_cap();
 					}
 					else {
@@ -67,7 +72,7 @@ ob_start();
 						<span class="tribe-tickets-remaining">
 							<?php
 							echo sprintf( esc_html__( '%1$s available', 'event-tickets-plus' ),
-								'<span class="available-stock" ' . $data_product_id . '>' . esc_html( $remaining ) . '</span>'
+								'<span class="available-stock" data-product-id="' . esc_attr( $ticket->ID ) . '">' . esc_html( $remaining ) . '</span>'
 							);
 							?>
 						</span>
@@ -89,15 +94,18 @@ ob_start();
 				echo '</tr>';
 
 				if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
-					echo
-					'<tr class="tribe-tickets-attendees-list-optout">' .
-						'<td colspan="4">' .
-							'<input type="checkbox" name="optout_'  . esc_attr( $ticket->ID ) . '" id="tribe-tickets-attendees-list-optout-edd">' .
-							'<label for="tribe-tickets-attendees-list-optout-edd">' .
-								esc_html__( 'Don\'t list me on the public attendee list', 'event-tickets-plus' ) .
-							'</label>' .
-						'</td>' .
-					'</tr>';
+					?>
+					<tr class="tribe-tickets-attendees-list-optout">
+						<td colspan="4">
+							<input
+								type="checkbox"
+								name="optout_<?php echo esc_attr( $ticket->ID ); ?>"
+								id="tribe-tickets-attendees-list-optout-edd"
+							>
+							<label for="tribe-tickets-attendees-list-optout-edd"><?php esc_html_e( "Don't list me on the public attendee list", 'event-tickets-plus' ); ?></label>
+						</td>
+					</tr>
+					<?php
 				}
 
 				include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
@@ -114,7 +122,7 @@ ob_start();
 					<?php if ( $must_login ): ?>
 						<?php include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'login-to-purchase' ); ?>
 					<?php else: ?>
-						<button type="submit" class="edd-submit button <?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Add to cart', 'event-tickets-plus' );?></button>
+						<button type="submit" class="edd-submit tribe-button <?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Add to cart', 'event-tickets-plus' );?></button>
 					<?php endif; ?>
 				</td>
 			</tr>

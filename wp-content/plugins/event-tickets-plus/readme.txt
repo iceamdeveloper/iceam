@@ -3,16 +3,16 @@
 Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tribe, faction23, geoffgraham, ggwicz, jazbek, jbrinley, joshlimecuda, leahkoerper, lucatume, mastromktg, neillmcshea, nicosantos, peterchester, reid.peifer, roblagatta, shane.pearlman, thatdudebutch,  zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
 Requires at least: 3.9
-Tested up to: 4.7.5
-Stable tag: 4.4.9
+Tested up to: 4.8
+Stable tag: 4.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Event Tickets Plus allows you to sell tickets to your events using WooCommerce, Shopp, WP eCommerce, or Easy Digital Downloads. Use it on your posts and pages, or add <a href="http://m.tri.be/18vc">The Events Calendar</a> and sell tickets from your events listings.
+Event Tickets Plus allows you to sell tickets to your events using WooCommerce or Easy Digital Downloads. Use it on your posts and pages, or add <a href="http://m.tri.be/18vc">The Events Calendar</a> and sell tickets from your events listings.
 
 == Description ==
 
-Event Tickets Plus adds features and functionality onto the core Event Tickets plugin, so you can sell tickets with WooCommerce, Shopp,  WP eCommerce, or Easy Digital Downloads.  You can sell tickets on any existing post type or use <a href="http://m.tri.be/18vc">The Events Calendar</a> for a full events and ticketing solution.  Event Tickets Plus gives you the power to keep ticket sales contained entirely within your site. This means no more sending buyers to a third-party portal or requiring an outside solution like Eventbrite. Tickets have unique QR codes that make checking in your guests a breeze. Plus, the plugin allows you to take advantage of many of the powerful features already built into your commerce provider (reports, SKU tracking, etc) and apply those specifically to tickets. Whether soliciting free RSVPs to a community gathering or hosting a huge party with multiple price tiers, Event Tickets has got you covered.
+Event Tickets Plus adds features and functionality onto the core Event Tickets plugin, so you can sell tickets with WooCommerce or Easy Digital Downloads.  You can sell tickets on any existing post type or use <a href="http://m.tri.be/18vc">The Events Calendar</a> for a full events and ticketing solution.  Event Tickets Plus gives you the power to keep ticket sales contained entirely within your site. This means no more sending buyers to a third-party portal or requiring an outside solution like Eventbrite. Tickets have unique QR codes that make checking in your guests a breeze. Plus, the plugin allows you to take advantage of many of the powerful features already built into your commerce provider (reports, SKU tracking, etc) and apply those specifically to tickets. Whether soliciting free RSVPs to a community gathering or hosting a huge party with multiple price tiers, Event Tickets has got you covered.
 
 = Event Tickets =
 
@@ -84,7 +84,7 @@ The plugin is produced by <a href="http://m.tri.be/3i">Modern Tribe Inc</a>.
 * <a href="http://profiles.wordpress.org/users/mdbitz">Matthew Denton</a>
 * <a href="http://profiles.wordpress.org/users/neillmcshea">Neill McShea</a>
 * <a href="http://profiles.wordpress.org/users/mastromktg">Nick Mastromattei</a>
-* <a href="http://profiles.wordpress.org/users/nicosantos”>Nico Santo</a>
+* <a href="http://profiles.wordpress.org/users/nicosantos">Nico Santo</a>
 * <a href="http://profiles.wordpress.org/users/peterchester">Peter Chester</a>
 * <a href="http://profiles.wordpress.org/users/roblagatta">Rob La Gatta</a>
 * <a href="http://profiles.wordpress.org/users/reid.peifer">Reid Peifer</a>
@@ -103,7 +103,7 @@ The plugin is produced by <a href="http://m.tri.be/3i">Modern Tribe Inc</a>.
 * <a href="http://profiles.wordpress.org/users/jkudish">Joachim Kudish</a>
 * <a href="http://profiles.wordpress.org/users/jgadbois">John Gadbois</a>
 * <a href="http://profiles.wordpress.org/users/jonahcoyote">Jonah West</a>
-* <a href=“https://profiles.wordpress.org/justinendler/“>Justin Endler</a>
+* <a href="https://profiles.wordpress.org/justinendler/">Justin Endler</a>
 * <a href="http://profiles.wordpress.org/users/kellykathryn">Kelly Groves</a>
 * <a href="http://profiles.wordpress.org/users/kelseydamas">Kelsey Damas</a>
 * <a href="http://profiles.wordpress.org/users/kyleunzicker">Kyle Unzicker</a>
@@ -141,6 +141,26 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.5.1] 2017-06-28 =
+
+* Fix - Ensure the correct user ID is associated with tickets/attendees (props: @Andras) [76305]
+* Fix - Ensure the event_id and ticket_id variables are usable within the tribe_tickets_plus_qr_handle_redirects filter (props: @Cliff) [81333]
+
+= [4.5.0.1] 2017-06-22 =
+
+* Fix - Prevent fatals involving Commerce Classes and Tribe__Tickets__Tickets
+
+= [4.5] 2017-06-22 =
+
+* Feature - Show remaining ticket count, buy now now buttons in list views of The Events Calendar [71092 & 71094]
+* Feature - An API to get ticket, attendee, event, and order infomation from a post id for RSVP, EDD, and WooCommerce Tickets [74363]
+* Tweak - Removed support for Shopp and WP E-Commerce plugins [71909]
+* Tweak - Added filters: `tribe_events_tickets_woo_quantity_column_class`
+* Tweak - Removed filters: `shopptickets_assign_to_category`, `shopptickets_ticket_category`, `shopptickets_generate_tickets_hook`, `shopptickets_historical_purchase_names`, `shopptickets_ticket_category_description`, `shopptickets_ticket_category_parent`, `tribe_tickets_plus_shopp_get_ticket`, `shopptickets_ticket_price_html`, `shopptickets_quantity_selector_options`, `shopptickets_ticket_email_content`, `shopptickets_ticket_email_headers`, `shopptickets_ticket_email_attachments`, `shopptickets_ticket_email_recipient`, `shopptickets_ticket_email_subject`, `wpectickets_order_is_complete`, `wpecticket_fulfilment_error_message`, `tribe_tickets_plus_wpec_get_ticket`, `wpectickets_ticket_price_html`
+* Tweak - Removed actions: `event_tickets_shopp_attendee_created`, `event_tickets_shopp_ticket_created`, `shopptickets_checkin`, `shopptickets_uncheckin`, `event_tickets_wpec_attendee_created`, `event_tickets_wpec_ticket_created`, `wpectickets-send-tickets-email`, `eddtickets_ticket_deleted`, `wpectickets_checkin`, `wpectickets_uncheckin`
+* Tweak - Changed views: `eddtickets/tickets`, `shopptickets/tickets`, `tickets-plus/attendee-list-checkbox-rsvp`, `tickets-plus/attendee-list-checkbox-tickets`, `wootickets/tickets`, `wpectickets/tickets`
+* Language - 0 new strings added, 34 updated, 0 fuzzied, and 21 obsoleted [event-tickets-plus]
 
 = [4.4.9] 2017-06-01 =
 

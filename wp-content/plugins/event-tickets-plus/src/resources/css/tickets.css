@@ -157,6 +157,11 @@ a.tribe-attendees-list-showall {
 	margin-left: 5px;
 }
 
+.tribe-tickets-attendees-list-optout input[type="radio"] + label,
+	.tribe-tickets-attendees-list-optout input[type="checkbox"] + label {
+	display: inline-block;
+}
+
 .tribe-orders-list {
 	list-style: none;
 	padding: 0;

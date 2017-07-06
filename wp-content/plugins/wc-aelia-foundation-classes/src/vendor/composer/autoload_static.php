@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit44655c3afc65006ea5de44a7928034b6
+class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
 {
     public static $prefixLengthsPsr4 = array (
         'P' => 
@@ -103,6 +103,7 @@ class ComposerStaticInit44655c3afc65006ea5de44a7928034b6
         'GeoIp2\\Exception\\OutOfQueriesException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/OutOfQueriesException.php',
         'GeoIp2\\Model\\AbstractModel' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/AbstractModel.php',
         'GeoIp2\\Model\\AnonymousIp' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/AnonymousIp.php',
+        'GeoIp2\\Model\\Asn' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Asn.php',
         'GeoIp2\\Model\\City' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/City.php',
         'GeoIp2\\Model\\ConnectionType' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/ConnectionType.php',
         'GeoIp2\\Model\\Country' => __DIR__ . '/..' . '/geoip2/geoip2/src/Model/Country.php',
@@ -258,10 +259,10 @@ class ComposerStaticInit44655c3afc65006ea5de44a7928034b6
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit44655c3afc65006ea5de44a7928034b6::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit44655c3afc65006ea5de44a7928034b6::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit44655c3afc65006ea5de44a7928034b6::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit44655c3afc65006ea5de44a7928034b6::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$classMap;
 
         }, null, ClassLoader::class);
     }

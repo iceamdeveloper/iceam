@@ -4,11 +4,11 @@
 			<tr>
 				<td>
 					<label for="tribe-tickets-hide-attendees-list">
-						<?php esc_html_e( 'Hide attendees list on event page', 'event-tickets-plus' ); ?>
+						<?php esc_html_e( 'Display attendees list', 'event-tickets-plus' ); ?>
 					</label>
 				</td>
 				<td>
-					<input type="checkbox" name="tribe-tickets-hide-attendees-list" id="tribe-tickets-hide-attendees-list" value="1" <?php checked( $is_attendees_list_hidden ); ?> />
+					<input type="checkbox" name="tribe-tickets-hide-attendees-list" id="tribe-tickets-hide-attendees-list" value="1" <?php checked( ! $is_attendees_list_hidden ); // inverted purposefully for backwards-compat @since M17.12 ?> />
 				</td>
 			</tr>
 		</table>

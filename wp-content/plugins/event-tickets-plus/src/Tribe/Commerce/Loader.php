@@ -18,8 +18,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 
 			$this->woocommerce();
 			$this->easy_digital_downloads();
-			$this->wpecommerce();
-			$this->shopp();
 		}
 
 		/**
@@ -130,109 +128,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__Loader' ) ) {
 			}
 
 			$this->commerce_providers['easy_digital_downloads'] = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance();
-		}
-
-		/**
-		 * Check if WPEC is installed and active.
-		 * If it is and the version is compatible, load our WPEC connector.
-		 */
-		public function wpecommerce() {
-			// Check if the legacy plugin exists
-			if ( class_exists( 'Tribe__Events__Tickets__Wpec__Main' ) ) {
-				$args           = array(
-					'action'        => 'deactivate',
-					'plugin'        => $this->get_plugin_file( 'The Events Calendar: WPEC Tickets' ),
-					'plugin_status' => 'all',
-					'paged'         => 1,
-					's'             => '',
-				);
-				$deactivate_url = wp_nonce_url( add_query_arg( $args, 'plugins.php' ), 'deactivate-plugin_' . $args['plugin'] );
-
-				$this->nag_data['wpecommerce'] = array(
-					__( 'WP eCommerce', 'event-tickets-plus' ),
-					$deactivate_url,
-					'legacy-plugin',
-				);
-
-				return;
-			}
-
-			if ( ! class_exists( 'WP_eCommerce' ) ) {
-				return;
-			}
-
-			// Here we will check for Comptibility problems
-			if ( ! version_compare( WPSC_VERSION, Tribe__Tickets_Plus__Commerce__WPEC__Main::REQUIRED_WPEC_VERSION, '>=' ) ) {
-				$this->nag_data['wpecommerce'] = array(
-					__( 'WP eCommerce', 'event-tickets-plus' ),
-					add_query_arg( array(
-						'tab'       => 'plugin-information',
-						'plugin'    => 'wp-e-commerce',
-						'TB_iframe' => 'true',
-					), admin_url( 'plugin-install.php' ) ),
-					'incompatible',
-				);
-
-				return;
-			}
-
-			$this->commerce_providers['wpecommerce'] = Tribe__Tickets_Plus__Commerce__WPEC__Main::get_instance();
-		}
-
-		/**
-		 * Check if Shopp is installed and active.
-		 * If it is and the version is compatible, load our Shopp connector.
-		 */
-		public function shopp() {
-			// Check if the legacy plugin exists
-			if ( class_exists( 'Tribe__Events__Tickets__Shopp__Main' ) ) {
-				$args           = array(
-					'action'        => 'deactivate',
-					'plugin'        => $this->get_plugin_file( 'The Events Calendar: Shopp Tickets' ),
-					'plugin_status' => 'all',
-					'paged'         => 1,
-					's'             => '',
-				);
-				$deactivate_url = wp_nonce_url( add_query_arg( $args, 'plugins.php' ), 'deactivate-plugin_' . $args['plugin'] );
-
-				$this->nag_data['shopp'] = array(
-					__( 'Shopp', 'event-tickets-plus' ),
-					$deactivate_url,
-					'legacy-plugin',
-				);
-
-				return;
-			}
-
-			$shoppVersion = false;
-
-			if ( class_exists( 'ShoppVersion' ) ) {
-				$shoppVersion = ShoppVersion::release();
-			} // 1.3+
-			elseif ( defined( 'SHOPP_VERSION' ) ) {
-				$shoppVersion = SHOPP_VERSION;
-			} // Pre-1.3
-
-			if ( empty( $shoppVersion ) ) {
-				return;
-			}
-
-			// Here we will check for Comptibility problems
-			if ( ! version_compare( $shoppVersion, Tribe__Tickets_Plus__Commerce__Shopp__Main::REQUIRED_SHOPP_VERSION, '>=' ) ) {
-				$this->nag_data['shopp'] = array(
-					__( 'Shopp', 'event-tickets-plus' ),
-					add_query_arg( array(
-						'tab'       => 'plugin-information',
-						'plugin'    => 'shopp',
-						'TB_iframe' => 'true',
-					), admin_url( 'plugin-install.php' ) ),
-					'incompatible',
-				);
-
-				return;
-			}
-
-			$this->commerce_providers['shopp'] = Tribe__Tickets_Plus__Commerce__Shopp__Main::get_instance();
 		}
 
 		/**

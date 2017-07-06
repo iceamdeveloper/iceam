@@ -67,8 +67,11 @@ For more information about installation and management of plugins, please refer 
 
 == Changelog ==
 
+= 1.8.9.170629 =
+* Fix - Logger doesn't track debug messages anymore when debug mode is deactivated.
+
 = 1.8.8.170506 =
-* Improved logic to detect frontend Ajax calls.
+* Tweak - Updated logic to detect frontend Ajax calls
 
 = 1.8.7.170426 =
 * Lowered permission required to manage plugin's settings to "manage_woocommerce".

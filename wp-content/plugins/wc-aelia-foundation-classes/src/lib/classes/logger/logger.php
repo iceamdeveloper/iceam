@@ -262,15 +262,17 @@ class Logger {
 	/**
 	 * Initialises the logger.
 	 *
+	 * @param bool debug_mode Indicates if debug mode is active. If it's not,
+	 * debug messages won't be logged.
 	 * @since 1.8.0.160728
 	 */
-	protected function init_logger() {
+	protected function init_logger($debug_mode = false) {
 		// TODO Check that the target log file is writable. If not, raise a PHP warning
 
 		$this->log_handlers = apply_filters('wc_aelia_log_handlers', array(
 			new StreamHandler(self::get_log_file_name($this->log_id), \Monolog\Logger::NOTICE),
 		), $this->log_id, $this);
-		$this->set_log_level($this->_debug_mode);
+		$this->set_debug_mode($debug_mode);
 
 		$this->logger = new \MonoLog\Logger($this->log_id, $this->log_handlers);
 		$this->logger->pushProcessor(new ProcessIdProcessor());
@@ -285,9 +287,8 @@ class Logger {
 	 */
 	public function __construct($log_id, $debug_mode = false) {
 		$this->log_id = $log_id;
-		$this->_debug_mode = $debug_mode;
 
-		$this->init_logger();
+		$this->init_logger($debug_mode);
 	}
 
 	/**

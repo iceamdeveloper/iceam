@@ -38,7 +38,7 @@
 
 .single-tribe_events #tribe-events-content form.cart,
 .single-tribe_events #tribe-events-content div.cart {
-	margin: 30px 0;
+	margin: 0 0 30px;
 }
 
 .tribe-events-tickets {
@@ -73,16 +73,8 @@
 	vertical-align: middle;
 }
 
-.tribe-events-tickets td.wpec {
-	line-height: 0;
-}
-
 .tribe-events-tickets td.woocommerce {
 	border-bottom: 0;
-}
-
-.tribe-events-tickets td.wpec img {
-	display: none;
 }
 
 .tribe-events-tickets .tickets_nostock {
@@ -90,7 +82,7 @@
 	text-align: center;
 }
 
-h2.tribe-events-tickets-title {
+.tribe-events-tickets-title {
 	font-size: 1.4em;
 	font-weight: bold;
 	margin: 20px 0 15px;
@@ -222,127 +214,8 @@ h2.tribe-events-tickets-title {
 	font-style: italic;
 }
 
-/* = Pro Tickets Front End Styles
-=============================================*/
-
-.tribe-events-style-full .tribe-events-tickets-title {
-	font-family: sans-serif;
-}
-
-.tribe-events-style-full .tribe-events-tickets {
-	background: #f8f8f8;
-	border-radius: 3px;
-}
-
-.tribe-events-style-full .tribe-events-tickets .woocommerce {
-	border-bottom: 1px solid #dfdfdf;
-}
-
-.tribe-events-style-full .tribe-events-tickets .woocommerce.add-to-cart {
-	border-bottom: 0;
-	padding: 0 10px 16px;
-}
-
-.tribe-events-style-full table,
-	.tribe-events-style-full th,
-	.tribe-events-style-full td {
-	border: 0;
-}
-
-.tribe-events-style-full .woocommerce .quantity input {
-	background-color: #fff;
-	border-radius: 3px;
-	margin-bottom: 5px;
-	padding: 5px 10px;
-	text-align: left;
-	width: 4.375em;
-}
-
-.tribe-events-style-full .tribe-tickets-remaining {
-	color: #777;
-	display: block;
-	font-size: 11px;
-}
-
-.tribe-events-style-full .tribe-tickets-attendees-list-optout label {
-	color: #777;
-	font-size: 13px;
-}
-
-.tribe-events-style-full .tickets_name,
-	.tribe-events-style-full .tickets_name p,
-	.tribe-events-style-full .tickets_description,
-	.tribe-events-style-full .tickets_price {
-	border-bottom: 1px solid #dfdfdf;
-	color: #464646;
-	font-size: 15px;
-	padding: 16px 10px 8px 10px;
-}
-
-.tribe-events-style-full.tribe-events-style-theme h2.tribe-events-tickets-title {
-	font-size: 17px;
-}
-
-#tribe-events .button {
-	border: 0;
-	border-radius: 3px;
-	background: -webkit-linear-gradient( top, #009FF1, #0080DB);
-	background: linear-gradient( to bottom, #009FF1, #0080DB);
-	cursor: pointer;
-	color: #fff;
-	display: inline-block;
-	font-size: 14px;
-	font-weight: 400;
-	font-family: sans-serif;
-	letter-spacing: 1px;
-	line-height: 1;
-	height: auto;
-	margin-top: 16px;
-	margin-top: 1rem;
-	padding: 10px;
-	text-align: center;
-	-webkit-transition: all .15s ease-in-out;
-	transition: all .15s ease-in-out;
-	-webkit-font-smoothing: subpixel-antialiased;
-}
-
-.clear {
-	*zoom: 1;
-}
-
-.clear:before,
-	.clear:after {
-	content: '';
-	display: table;
-}
-
-.clear:after {
-	clear: both;
-}
-
-.tribe-event-tickets input[type="date"],
-	.tribe-event-tickets input[type="time"],
-	.tribe-event-tickets input[type="datetime-local"],
-	.tribe-event-tickets input[type="week"],
-	.tribe-event-tickets input[type="month"],
-	.tribe-event-tickets input[type="text"],
-	.tribe-event-tickets input[type="email"],
-	.tribe-event-tickets input[type="url"],
-	.tribe-event-tickets input[type="password"],
-	.tribe-event-tickets input[type="search"],
-	.tribe-event-tickets input[type="tel"],
-	.tribe-event-tickets input[type="number"],
-	.tribe-event-tickets textarea,
-	.tribe-event-tickets select {
-	background: #fff;
-}
-
 @media (max-width: 600px) {/* = WooTickets
 	=============================================*/
-
-	td.wpec {
-		width: 84px;
-	}
 
 	td.tickets_name {
 		font-size: 18px;
@@ -364,9 +237,5 @@ h2.tribe-events-tickets-title {
 	.tribe-events-style-full .tribe-events-tickets td {
 		border: 0;
 		display: inline-block;
-	}
-
-	.tribe-events-tickets td.woocommerce {
-		border-bottom: 0;
 	}
 }

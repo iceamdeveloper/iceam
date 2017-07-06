@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.4.9';
+		const VERSION = '4.5.1';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.4.7';
+		const REQUIRED_TICKETS_VERSION = '4.5.0.1';
 
 		/**
 		 * Directory of the plugin
@@ -103,8 +103,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			add_action( 'event_tickets_rsvp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 			add_action( 'event_ticket_woo_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 			add_action( 'event_ticket_edd_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
-			add_action( 'event_tickets_shopp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
-			add_action( 'event_tickets_wpec_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 		}
 
 		public function init() {
@@ -291,7 +289,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 * @return array
 		 */
 		public function add_template_updates_check( $plugins ) {
-			// ET+ views can be in one of a range of different subdirectories (eddtickets, shopptickets
+			// ET+ views can be in one of a range of different subdirectories (eddtickets, wootickets
 			// etc) so we will tell the template checker to simply look in views/tribe-events and work
 			// things out from there
 			$plugins[ __( 'Event Tickets Plus', 'event-tickets-plus' ) ] = array(

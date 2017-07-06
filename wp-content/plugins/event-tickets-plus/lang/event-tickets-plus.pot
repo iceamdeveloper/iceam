@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Event Tickets Plus 4.4.9\n"
+"Project-Id-Version: Event Tickets Plus 4.5.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/event-tickets-"
 "plus\n"
-"POT-Creation-Date: 2017-05-31 18:13:18+00:00\n"
+"POT-Creation-Date: 2017-06-27 15:40:11+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-05-31 18:13\n"
+"PO-Revision-Date: 2017-06-27 15:40\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
@@ -71,7 +71,7 @@ msgstr ""
 msgid "Stock"
 msgstr ""
 
-#: src/Tribe/Attendees_List.php:267
+#: src/Tribe/Attendees_List.php:247
 msgid "Load all attendees"
 msgstr ""
 
@@ -114,8 +114,7 @@ msgstr ""
 #: src/Tribe/CSV_Importer/Column_Names.php:68
 #: src/Tribe/CSV_Importer/Rows.php:52 src/Tribe/CSV_Importer/Rows.php:71
 #: src/Tribe/Commerce/WooCommerce/Email.php:15
-#: src/views/eddtickets/tickets.php:22 src/views/shopptickets/tickets.php:87
-#: src/views/wootickets/tickets.php:33 src/views/wpectickets/tickets.php:100
+#: src/views/eddtickets/tickets.php:29 src/views/wootickets/tickets.php:40
 msgid "Tickets"
 msgstr ""
 
@@ -170,142 +169,62 @@ msgid ""
 "Sorry, there is insufficient stock to fulfill your order with respect to %s"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:155
+#: src/Tribe/Commerce/EDD/Main.php:167
 msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:472
-#: src/Tribe/Commerce/WooCommerce/Main.php:789
+#: src/Tribe/Commerce/EDD/Main.php:488
+#: src/Tribe/Commerce/WooCommerce/Main.php:805
 msgid "You'll receive your tickets in another email."
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:925 src/Tribe/Commerce/WPEC/Main.php:767
-#: src/Tribe/Commerce/WooCommerce/Main.php:1556
+#: src/Tribe/Commerce/EDD/Main.php:1042
+#: src/Tribe/Commerce/WooCommerce/Main.php:1675
 msgid "(deleted)"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1100
-#: src/Tribe/Commerce/WooCommerce/Main.php:1805
+#: src/Tribe/Commerce/EDD/Main.php:1241
+#: src/Tribe/Commerce/WooCommerce/Main.php:1948
 msgid "Event sales report"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1158 src/Tribe/Commerce/Shopp/Main.php:1133
-#: src/Tribe/Commerce/WPEC/Main.php:1038
-#: src/Tribe/Commerce/WooCommerce/Main.php:1853
+#: src/Tribe/Commerce/EDD/Main.php:1299
+#: src/Tribe/Commerce/WooCommerce/Main.php:1996
 msgid "This is a ticket for the event:"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1241
+#: src/Tribe/Commerce/EDD/Main.php:1382
 msgid "%s ticket is sold out"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1244
+#: src/Tribe/Commerce/EDD/Main.php:1385
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1285
+#: src/Tribe/Commerce/EDD/Main.php:1426
 msgid "Print Ticket"
 msgstr ""
 
-#: src/Tribe/Commerce/Loader.php:57 src/Tribe/Commerce/Loader.php:73
+#: src/Tribe/Commerce/Loader.php:55 src/Tribe/Commerce/Loader.php:71
 msgid "WooCommerce"
 msgstr ""
 
-#: src/Tribe/Commerce/Loader.php:105 src/Tribe/Commerce/Loader.php:120
+#: src/Tribe/Commerce/Loader.php:103 src/Tribe/Commerce/Loader.php:118
 msgid "Easy Digital Downloads"
 msgstr ""
 
-#: src/Tribe/Commerce/Loader.php:152 src/Tribe/Commerce/Loader.php:167
-msgid "WP eCommerce"
-msgstr ""
-
-#: src/Tribe/Commerce/Loader.php:199 src/Tribe/Commerce/Loader.php:223
-msgid "Shopp"
-msgstr ""
-
-#: src/Tribe/Commerce/Loader.php:286
+#: src/Tribe/Commerce/Loader.php:181
 msgid ""
 "To begin using Tickets Plus with %3$s, you need to <a href=\"%1$s\" title="
 "\"Deactivate the legacy addon for %2$s\">deactivate the old legacy plugin</"
 "a>."
 msgstr ""
 
-#: src/Tribe/Commerce/Loader.php:297
+#: src/Tribe/Commerce/Loader.php:192
 msgid ""
 "To begin using Tickets Plus, please install and activate the latest version "
 "of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:2
-msgid ""
-"Event Tickets Plus will discontinue support for Shopp in an upcoming release."
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:177
-msgctxt "ticket provider"
-msgid "Shopp"
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:1008
-msgid "Unknown item"
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:1123
-msgid "Event"
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:1206 src/Tribe/Commerce/WPEC/Main.php:1099
-msgid "Resend Tickets"
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:1244
-msgid "Email containing tickets (sent by ShoppTickets)"
-msgstr ""
-
-#: src/Tribe/Commerce/Shopp/Main.php:1286
-msgid "Your tickets from %s"
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Email.php:29
-msgid "Your tickets"
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:2
-msgid ""
-"Event Tickets Plus will discontinue support for WP E-Commerce in an upcoming "
-"release."
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:129
-msgctxt "ticket provider"
-msgid "WPEC"
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:628
-msgid ""
-"We're sorry but there was insufficient inventory to completely fulfill your "
-"order! We have added as many tickets as we could, but we recommend reviewing "
-"your order (below) in case you need to make some further adjustments."
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:831
-#: src/Tribe/Commerce/WooCommerce/Main.php:1626
-msgid "In trash (was %s)"
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:837
-#: src/Tribe/Commerce/WooCommerce/Main.php:1632
-msgid "Deleted"
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:884
-#: src/Tribe/Commerce/WooCommerce/Main.php:1681
-msgid "Unknown"
-msgstr ""
-
-#: src/Tribe/Commerce/WPEC/Main.php:1104
-msgid "&nbsp; [Sent]"
 msgstr ""
 
 #: src/Tribe/Commerce/WooCommerce/Email.php:16
@@ -318,20 +237,32 @@ msgstr ""
 msgid "Your tickets from {site_title}"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:104
+#: src/Tribe/Commerce/WooCommerce/Email.php:84
 msgid "Subject"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:106
+#: src/Tribe/Commerce/WooCommerce/Email.php:86
 msgid "Defaults to <code>%s</code>"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:220
+#: src/Tribe/Commerce/WooCommerce/Main.php:225
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1830
+#: src/Tribe/Commerce/WooCommerce/Main.php:1769
+msgid "In trash (was %s)"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:1775
+msgid "Deleted"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:1824
+msgid "Unknown"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:1973
 msgid "Report"
 msgstr ""
 
@@ -424,13 +355,13 @@ msgstr ""
 msgid "As soon as an order is created"
 msgstr ""
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.4.9)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:297
+#: src/Tribe/Main.php:295
 msgid "Event Tickets Plus"
 msgstr ""
 
-#: src/Tribe/Main.php:337
+#: src/Tribe/Main.php:335
 msgid "Require users to log in before they purchase tickets"
 msgstr ""
 
@@ -532,28 +463,28 @@ msgstr ""
 msgid "This ticket has custom Attendee Information fields"
 msgstr ""
 
-#: src/Tribe/QR.php:97
+#: src/Tribe/QR.php:102
 msgid "The ticket with ID %s has already been checked in."
 msgstr ""
 
-#: src/Tribe/QR.php:101
+#: src/Tribe/QR.php:106
 msgid "The ticket with ID %s was checked in."
 msgstr ""
 
-#: src/Tribe/QR.php:119
+#: src/Tribe/QR.php:124
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
 
-#: src/Tribe/QR.php:140
+#: src/Tribe/QR.php:145
 msgid "Check in for this event"
 msgstr ""
 
-#: src/Tribe/QR.php:143
+#: src/Tribe/QR.php:148
 msgid "Scan this QR code at the event to check in."
 msgstr ""
 
 #: src/admin-views/attendees-list.php:7
-msgid "Hide attendees list on event page"
+msgid "Display attendees list"
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:13
@@ -572,30 +503,24 @@ msgid "(This is the maximum allowed number of sales for this ticket.)"
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:30
-#: src/admin-views/shopp-metabox-advanced.php:3
 #: src/admin-views/woocommerce-metabox-advanced.php:30
-#: src/admin-views/wpec-metabox-advanced.php:3
 msgid "Stock:"
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:34
 #: src/admin-views/woocommerce-metabox-advanced.php:34
-#: src/admin-views/wpec-metabox-advanced.php:7
 msgid ""
 "(Total available # of this ticket type. Once they're gone, ticket type is "
 "sold out.)"
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:39
-#: src/admin-views/shopp-metabox-advanced.php:12
 #: src/admin-views/woocommerce-metabox-advanced.php:53
-#: src/admin-views/wpec-metabox-advanced.php:12
 msgid "SKU:"
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:43
 #: src/admin-views/woocommerce-metabox-advanced.php:56
-#: src/admin-views/wpec-metabox-advanced.php:16
 msgid "(A unique identifying code for each ticket type you're selling)"
 msgstr ""
 
@@ -607,9 +532,7 @@ msgid ""
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:52
-#: src/admin-views/shopp-metabox-advanced.php:25
 #: src/admin-views/woocommerce-metabox-advanced.php:65
-#: src/admin-views/wpec-metabox-advanced.php:26
 msgid ""
 "Selling tickets for a recurring event series is not recommended. The tickets "
 "you configure will show on all instances of an event series which can be "
@@ -617,9 +540,7 @@ msgid ""
 msgstr ""
 
 #: src/admin-views/edd-metabox-advanced.php:59
-#: src/admin-views/shopp-metabox-advanced.php:31
 #: src/admin-views/woocommerce-metabox-advanced.php:71
-#: src/admin-views/wpec-metabox-advanced.php:32
 msgid "Selling tickets for recurring events"
 msgstr ""
 
@@ -708,23 +629,6 @@ msgstr ""
 msgid "(Current sale price - this can be managed via the product editor)"
 msgstr ""
 
-#: src/admin-views/shopp-metabox-advanced.php:7
-msgid ""
-"Total available # of this ticket type: leave blank if you do not require "
-"stock control"
-msgstr ""
-
-#: src/admin-views/shopp-metabox-advanced.php:16
-msgid "A unique identifying code for each ticket type you're selling"
-msgstr ""
-
-#: src/admin-views/shopp-metabox-advanced.php:23
-msgid ""
-"Currently, ShoppTickets will only show up on the frontend once per full "
-"event. For PRO users this means the same ticket will appear across all "
-"events in the series. Please configure your events accordingly."
-msgstr ""
-
 #: src/admin-views/woocommerce-metabox-advanced.php:41
 msgid "Purchase limit:"
 msgstr ""
@@ -800,13 +704,6 @@ msgstr ""
 msgid "Total Site Fees:"
 msgstr ""
 
-#: src/admin-views/wpec-metabox-advanced.php:24
-msgid ""
-"Currently, WPECTickets will only show up on the frontend once per full "
-"event. For PRO users this means the same ticket will appear across all "
-"events in the series. Please configure your events accordingly."
-msgstr ""
-
 #: src/views/attendees-list.php:14
 msgid "Who's Attending"
 msgstr ""
@@ -817,28 +714,26 @@ msgid_plural "%d people are attending %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/eddtickets/tickets.php:69 src/views/wootickets/tickets.php:104
+#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:134
 msgid "%1$s available"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:78 src/views/shopptickets/tickets.php:57
-#: src/views/wootickets/tickets.php:114
+#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:144
 msgid "Out of stock!"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:97 src/views/shopptickets/tickets.php:75
+#: src/views/eddtickets/tickets.php:105
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/wootickets/tickets.php:129 src/views/wpectickets/tickets.php:80
+#: src/views/wootickets/tickets.php:167
 msgid "Don't list me on the public attendee list"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:117 src/views/shopptickets/tickets.php:95
-#: src/views/wootickets/tickets.php:145 src/views/wpectickets/tickets.php:113
+#: src/views/eddtickets/tickets.php:125 src/views/wootickets/tickets.php:190
 msgid "Add to cart"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:126 src/views/wootickets/tickets.php:155
+#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:199
 msgid ""
 "You must have JavaScript activated to purchase tickets. Please enable "
 "JavaScript in your browser."
@@ -854,10 +749,6 @@ msgstr ""
 
 #: src/views/meta.php:26
 msgid "Attendee"
-msgstr ""
-
-#: src/views/shopptickets/tickets.php:51 src/views/wpectickets/tickets.php:56
-msgid "%1$s out of %2$s available"
 msgstr ""
 
 #: src/views/tickets-plus/orders-edit-meta.php:16
@@ -878,14 +769,6 @@ msgstr ""
 
 #: src/views/tickets-plus/orders-tickets.php:70
 msgid "Attendee %d"
-msgstr ""
-
-#: src/views/wpectickets/tickets.php:40
-msgid "Quantity"
-msgstr ""
-
-#: src/views/wpectickets/tickets.php:62
-msgid "Sold Out"
 msgstr ""
 
 #. Description of the plugin/theme

@@ -237,7 +237,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		$output = sprintf(
 			esc_html__(
-				'%1$s', 'the-events-calendar'
+				'%1$s', 'event-tickets-plus'
 			), $order_number_link
 		);
 
