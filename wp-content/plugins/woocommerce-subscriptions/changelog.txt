@@ -1,5 +1,23 @@
 *** WooCommerce Subscriptions Changelog ***
 
+2017.06.22 - version 2.2.8
+* Fix: WooCommerce 3.0: Update use of deprecated 'woocommerce_stock_html' filter by using new wc_get_stock_html() method. PR#2175 & PR#2193
+* Fix: Make sure subscriptions suspended at PayPal.com are also correctly suspended in WooCommerce. PR#2199
+* Fix: Do not display manual gateways when paying for failed renewal with an automatic retry. PR#2177
+* Fix: Compare the site URL stored by Subscriptions against the WP_SITEURL constant when that constant is set, instead of always comparing against the 'siteurl' option value. PR#2167
+* Fix: Apply discounts from renewal orders rather than subscriptions for renewal carts so that any code or manual application of a discount to the renewal order is applied correctly. PR#2156
+* Fix: Do not cancel auto-draft subscriptions before post deletion as they do not need to be cancelled and cancellation emails can cause confusion. PR#2173
+* Fix: Add 3rd param to 'woocommerce_order_item_name' filter calls to make sure they match parameters on WooCommerce filters. PR#2159
+* Fix: Only return parent product IDs if a parent product exists. Fixes broken switch URLs for grouped products. PR#2160
+* Fix: Update subscription payment method when renewal has been paid and has pending status and retry. PR#2141
+* Fix: Make sure trial calculations for synced variation products are correct with  PayPal Standard. PR#2168
+* Fix: Set correct PHPDoc for returned type in WC_Subscription::get_parent(). Props @davefx. PR#2169
+* Fix: Set correct PHPDoc return type in wcs-renewal-functions.php. PR#2198
+* Fix: Copy custom, non-prefixed, subscription meta data to renewal orders. PR#2157
+* Fix: Take sale price into account when displaying "From" price for variable products. PR#2176
+* Fix: Take sale price into account when switching. PR#2171
+* Fix: Fix undefined var $switched_subscriptions. PR#2192
+
 2017.05.26 - version 2.2.7
 * Tweak: Integrate with My Account > Payment Methods actions to make sure when a customer deletes a payment method, subscriptions using that payment method are automatically updated to use a different token. Or if there are no other payment methods on the customer's account, a customer can't delete the payment method used for automatic payments. PR#1866
 * Tweak: Do not display 'Free' on free shipping methods to improve compatibility with the approached used in WooCommerce 2.6 and newer. PR#1766

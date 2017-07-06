@@ -5,9 +5,9 @@
  * Description: Sell products and services with recurring payments in your WooCommerce Store.
  * Author: Prospress Inc.
  * Author URI: http://prospress.com/
- * Version: 2.2.7
+ * Version: 2.2.8
  *
- * Copyright 2016 Prospress, Inc.  (email : freedoms@prospress.com)
+ * Copyright 2017 Prospress, Inc.  (email : freedoms@prospress.com)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -126,7 +126,7 @@ class WC_Subscriptions {
 
 	public static $plugin_file = __FILE__;
 
-	public static $version = '2.2.7';
+	public static $version = '2.2.8';
 
 	private static $total_subscription_count = null;
 
@@ -973,7 +973,13 @@ class WC_Subscriptions {
 	 */
 	public static function is_duplicate_site() {
 
-		$is_duplicate = ( get_site_url() !== self::get_site_url() ) ? true : false;
+		if ( defined( 'WP_SITEURL' ) ) {
+			$site_url = WP_SITEURL;
+		} else {
+			$site_url = get_site_url();
+		}
+
+		$is_duplicate = self::get_site_url() !== $site_url;
 
 		return apply_filters( 'woocommerce_subscriptions_is_duplicate_site', $is_duplicate );
 	}
