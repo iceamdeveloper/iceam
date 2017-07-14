@@ -47,7 +47,7 @@ include dirname( __FILE__ ) . '/price-fields.php';
 <?php
 if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 	if ( is_admin() ) {
-		$bumpdown = __( 'Currently, eddTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly.', 'event-tickets-plus' );
+		$bumpdown = __( 'Currently, tickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly.', 'event-tickets-plus' );
 	} else {
 		$bumpdown = __( 'Selling tickets for a recurring event series is not recommended. The tickets you configure will show on all instances of an event series which can be confusing to attendees. Please configure your events carefully.', 'event-tickets-plus' );
 	}

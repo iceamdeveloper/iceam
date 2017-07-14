@@ -754,7 +754,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @param string $heading
 	 * @param object $email
 	 */
-	public function maybe_add_tickets_msg_to_email( $heading, $email ) {
+	public function maybe_add_tickets_msg_to_email( $heading, $email = null ) {
+		// If the email object wasn't passed, go no further
+		if ( null === $email ) {
+			return;
+		}
+
 		// Do nothing unless this is a "customer_*" type email
 		if ( ! isset( $email->id ) || 0 !== strpos( $email->id, 'customer_' ) ) {
 			return;

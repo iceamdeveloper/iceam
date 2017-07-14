@@ -5,7 +5,7 @@ Tags: events, calendar, event, venue, organizer, dates, date, google maps, confe
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
 Tested up to: 4.8
-Stable tag: 4.4.13
+Stable tag: 4.4.14
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -202,6 +202,13 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.14] 2017-07-13 =
+
+* Fix - Do not generate exclusions for recurring events simply because the child instances have falled outside of the configured cleanup range [80582]
+* Fix - Consolidate generation of /all/ and single recurring event permalink logic within Events Calendar PRO [74153]
+* Fix - Improve compatibility with WP SEO Premium and stop redirect rules from being generated inappropriately when recurring events are updated [74938]
+* Fix - Default to showing upcoming event instances in the /all/ view (but fallback on showing expired events if no upcoming events remain in the series) [74852]
 
 = [4.4.13] 2017-06-28 =
 

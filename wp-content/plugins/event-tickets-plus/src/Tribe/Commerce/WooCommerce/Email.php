@@ -35,7 +35,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 
 		if ( $order_id ) {
 			$this->object    = new WC_Order( $order_id );
-			$this->recipient = $this->object->billing_email;
+			$this->recipient = method_exists( $this->object, 'get_billing_email' )
+				? $this->object->get_billing_email() // WC 3.x
+				: $this->object->billing_email; // WC 2.x
 		}
 
 		if ( ! $this->is_enabled() || ! $this->get_recipient() ) {
@@ -66,7 +68,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 
 		$wootickets = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
 
-		$attendees = $wootickets->get_attendees_by_id( $this->object->id );
+		$attendees = method_exists( $this->object, 'get_id' )
+			? $wootickets->get_attendees_by_id( $this->object->get_id() ) // WC 3.x
+			: $wootickets->get_attendees_by_id( $this->object->id ); // WC 2.x
 
 		return $wootickets->generate_tickets_email_content( $attendees );
 	}

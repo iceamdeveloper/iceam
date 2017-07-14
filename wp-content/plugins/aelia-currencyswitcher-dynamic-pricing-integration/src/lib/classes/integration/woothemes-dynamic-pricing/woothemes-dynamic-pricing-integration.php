@@ -99,6 +99,12 @@ class Dynamic_Pricing_Integration {
 	protected function set_hooks() {
 		add_filter('woocommerce_dynamic_pricing_get_rule_amount', array($this, 'woocommerce_dynamic_pricing_get_rule_amount'), 20, 4);
 		add_filter('wc_dynamic_pricing_load_modules', array($this, 'wc_dynamic_pricing_load_modules'), 20);
+
+		// Prevent double discount of variation prices
+		// @since 1.0.1.170710
+		if(class_exists('\WC_Dynamic_Pricing')) {
+			remove_filter('woocommerce_variation_prices_price', array(\WC_Dynamic_Pricing::instance(), 'on_get_variation_prices_price' ), 10, 3);
+		}
 	}
 
 	/**

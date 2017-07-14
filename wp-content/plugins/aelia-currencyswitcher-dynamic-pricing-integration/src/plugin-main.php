@@ -12,7 +12,7 @@ use Aelia\WC\Messages;
  * Aelia Currency Switcher Dynamic Pricing Integration plugin.
  **/
 class WC_Aelia_CS_Dynamic_Pricing_Plugin extends Aelia_Plugin {
-	public static $version = '1.0.0.170123';
+	public static $version = '1.0.1.170710';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;

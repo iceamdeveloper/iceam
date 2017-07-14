@@ -14,7 +14,7 @@ msgstr ""
 msgid "Display attendees list"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:199
+#: src/views/eddtickets/tickets.php:144 src/views/wootickets/tickets.php:210
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr ""
 
@@ -242,10 +242,10 @@ msgstr "Deelnemer %d"
 msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!"
 msgstr "Event Ticket Plus laat jou kaartjies vir geleenthede verkoop, unieke persoonlike inligting van jou deelnemers versamel en meer!"
 
-#: src/views/eddtickets/tickets.php:105
+#: src/views/eddtickets/tickets.php:115
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/wootickets/tickets.php:167
+#: src/views/wootickets/tickets.php:177
 msgid "Don't list me on the public attendee list"
 msgstr "Moenie my op die publieke deelnemerslys lys nie."
 
@@ -620,22 +620,22 @@ msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Main.php:488
-#: src/Tribe/Commerce/WooCommerce/Main.php:805
+#: src/Tribe/Commerce/WooCommerce/Main.php:810
 msgid "You'll receive your tickets in another email."
 msgstr "Jy sal jou kaartjies in 'n ander e-pos ontvang"
 
 #: src/Tribe/Commerce/EDD/Main.php:1042
-#: src/Tribe/Commerce/WooCommerce/Main.php:1675
+#: src/Tribe/Commerce/WooCommerce/Main.php:1680
 msgid "(deleted)"
 msgstr "(geskrap)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1241
-#: src/Tribe/Commerce/WooCommerce/Main.php:1948
+#: src/Tribe/Commerce/WooCommerce/Main.php:1953
 msgid "Event sales report"
 msgstr "Geleentheid verkope verslag"
 
 #: src/Tribe/Commerce/EDD/Main.php:1299
-#: src/Tribe/Commerce/WooCommerce/Main.php:1996
+#: src/Tribe/Commerce/WooCommerce/Main.php:2001
 msgid "This is a ticket for the event:"
 msgstr "Dit is 'n kaartjie vir die geleentheid:"
 
@@ -659,15 +659,15 @@ msgstr "WooCommerce"
 msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 msgstr "Om Tickets Plus te begin gebruik, installeer en aktiveer asseblief eers die nuutste weergawe van <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1769
+#: src/Tribe/Commerce/WooCommerce/Main.php:1774
 msgid "In trash (was %s)"
 msgstr "In asblik (was %s)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1775
+#: src/Tribe/Commerce/WooCommerce/Main.php:1780
 msgid "Deleted"
 msgstr "Geskrap"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1824
+#: src/Tribe/Commerce/WooCommerce/Main.php:1829
 msgid "Unknown"
 msgstr "Onbekend"
 
@@ -682,15 +682,15 @@ msgstr "Kaartjies"
 msgid "Email the user will receive after a completed order with the tickets they purchased."
 msgstr "Epos wat die gebruiker sal kry wanneer 'n bestelling voltooi is met hulle kaartjies op."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:84
+#: src/Tribe/Commerce/WooCommerce/Email.php:88
 msgid "Subject"
 msgstr "Onderwep"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:86
+#: src/Tribe/Commerce/WooCommerce/Email.php:90
 msgid "Defaults to <code>%s</code>"
 msgstr "Verstek na <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1973
+#: src/Tribe/Commerce/WooCommerce/Main.php:1978
 msgid "Report"
 msgstr "Verslag"
 
@@ -719,22 +719,19 @@ msgid "(A unique identifying code for each ticket type you're selling)"
 msgstr "('n Unieke identifieserende kode vir elke kaartjie tipe wat jy verkoop)"
 
 #: src/admin-views/edd-metabox-advanced.php:50
-msgid "Currently, eddTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
-msgstr "Huidiglik sal eddTickets slegs op die voorkant wys een keer per volle geleentheid. Vir PRO gebruikers betekend dit dat dieselfde kaartjie oor al die geleenthede in die reeks sal verkyn. Stel asseblief jou geleentheid daarvolgens op."
-
 #: src/admin-views/woocommerce-metabox-advanced.php:63
-msgid "Currently, WooTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
-msgstr "Huidiglik sal WooTickets slegs op die voorkant wys een keer per volle geleentheid. Vir PRO gebruikers betekend dit dat dieselfde kaartjie oor al die geleenthede in die reeks sal verkyn. Stel asseblief jou geleentheid daarvolgens op."
+msgid "Currently, tickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
+msgstr ""
 
 #: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:144
 msgid "Out of stock!"
 msgstr "Uit voorraad uit!"
 
-#: src/views/eddtickets/tickets.php:125 src/views/wootickets/tickets.php:190
+#: src/views/eddtickets/tickets.php:135 src/views/wootickets/tickets.php:201
 msgid "Add to cart"
 msgstr "Voeg by mandjie"
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.1)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.2)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: src/Tribe/Main.php:295
 msgid "Event Tickets Plus"

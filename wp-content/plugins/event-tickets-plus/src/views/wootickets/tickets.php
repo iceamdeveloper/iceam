@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.5
+ * @version 4.5.2
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -155,8 +155,18 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 				echo '</tr>';
 
 				if ( $product->is_in_stock() ) {
-					if ( class_exists( 'Tribe__Tickets_Plus__Attendees_List' ) && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() ) ) {
-						?>
+					/**
+					 * Use this filter to hide the Attendees List Optout
+					 *
+					 * @since 4.5.2
+					 *
+					 * @param bool
+					 */
+					$hide_attendee_list_optout = apply_filters( 'tribe_tickets_plus_hide_attendees_list_optout', false );
+					if ( ! $hide_attendee_list_optout
+						 && class_exists( 'Tribe__Tickets_Plus__Attendees_List' )
+						 && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() )
+					) { ?>
 						<tr class="tribe-tickets-attendees-list-optout">
 							<td colspan="4">
 								<input
@@ -169,6 +179,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 						</tr>
 						<?php
 					}
+
 					include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 				}
 			}

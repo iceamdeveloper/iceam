@@ -14,7 +14,7 @@ msgstr ""
 msgid "Display attendees list"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:199
+#: src/views/eddtickets/tickets.php:144 src/views/wootickets/tickets.php:210
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr ""
 
@@ -242,10 +242,10 @@ msgstr "Participant %d"
 msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:105
+#: src/views/eddtickets/tickets.php:115
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/wootickets/tickets.php:167
+#: src/views/wootickets/tickets.php:177
 msgid "Don't list me on the public attendee list"
 msgstr "Ne pas m'afficher dans la liste des participants publique"
 
@@ -620,22 +620,22 @@ msgid "Easy Digital Downloads"
 msgstr "Téléchargements Digitaux Faciles"
 
 #: src/Tribe/Commerce/EDD/Main.php:488
-#: src/Tribe/Commerce/WooCommerce/Main.php:805
+#: src/Tribe/Commerce/WooCommerce/Main.php:810
 msgid "You'll receive your tickets in another email."
 msgstr "Vous recevrez vos billets dans un autre e-mail."
 
 #: src/Tribe/Commerce/EDD/Main.php:1042
-#: src/Tribe/Commerce/WooCommerce/Main.php:1675
+#: src/Tribe/Commerce/WooCommerce/Main.php:1680
 msgid "(deleted)"
 msgstr "(supprimé)"
 
 #: src/Tribe/Commerce/EDD/Main.php:1241
-#: src/Tribe/Commerce/WooCommerce/Main.php:1948
+#: src/Tribe/Commerce/WooCommerce/Main.php:1953
 msgid "Event sales report"
 msgstr "Rapport de ventes des événements"
 
 #: src/Tribe/Commerce/EDD/Main.php:1299
-#: src/Tribe/Commerce/WooCommerce/Main.php:1996
+#: src/Tribe/Commerce/WooCommerce/Main.php:2001
 msgid "This is a ticket for the event:"
 msgstr "Ceci est un billet pour l'événement:"
 
@@ -659,15 +659,15 @@ msgstr "WooCommerce"
 msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1769
+#: src/Tribe/Commerce/WooCommerce/Main.php:1774
 msgid "In trash (was %s)"
 msgstr "Dans la corbeille (il y avait %s)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1775
+#: src/Tribe/Commerce/WooCommerce/Main.php:1780
 msgid "Deleted"
 msgstr "Supprimé"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1824
+#: src/Tribe/Commerce/WooCommerce/Main.php:1829
 msgid "Unknown"
 msgstr "Inconnus"
 
@@ -682,15 +682,15 @@ msgstr "Billets"
 msgid "Email the user will receive after a completed order with the tickets they purchased."
 msgstr "L'utilisateur recevra cet email après avoir passé la commande de ses billets."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:84
+#: src/Tribe/Commerce/WooCommerce/Email.php:88
 msgid "Subject"
 msgstr "Sujet"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:86
+#: src/Tribe/Commerce/WooCommerce/Email.php:90
 msgid "Defaults to <code>%s</code>"
 msgstr "Par défaut <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1973
+#: src/Tribe/Commerce/WooCommerce/Main.php:1978
 msgid "Report"
 msgstr "Rapport"
 
@@ -719,22 +719,19 @@ msgid "(A unique identifying code for each ticket type you're selling)"
 msgstr "(Code unique pour chaque type de billet que vous vendez)"
 
 #: src/admin-views/edd-metabox-advanced.php:50
-msgid "Currently, eddTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
-msgstr "Actuellement, eddTickets n'apparaitra qu'une fois sur le front-end par événement complet. Pour les utilisateurs PRO les billets apparaitront sur tous les événements de la série. Veuillez configurer vos événements."
-
 #: src/admin-views/woocommerce-metabox-advanced.php:63
-msgid "Currently, WooTickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
-msgstr "Actuellement, WooTickets n'apparaitra qu'une fois sur le front-end par événement complet. Pour les utilisateurs PRO les billets apparaitront sur tous les événements de la série. Veuillez configurer vos événements."
+msgid "Currently, tickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
+msgstr ""
 
 #: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:144
 msgid "Out of stock!"
 msgstr "Plus en stock!"
 
-#: src/views/eddtickets/tickets.php:125 src/views/wootickets/tickets.php:190
+#: src/views/eddtickets/tickets.php:135 src/views/wootickets/tickets.php:201
 msgid "Add to cart"
 msgstr "Ajouter au panier"
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.1)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.2)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: src/Tribe/Main.php:295
 msgid "Event Tickets Plus"
