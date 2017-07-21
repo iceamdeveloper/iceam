@@ -5,13 +5,6 @@
 *
 *	Known Issues:
 *
-*	SENSEI:
-*	Latest Sensei update broke video display. There is a newer update that may fix this issue,
-*	but it has not been tested yet. I believe this is in files:
-*
-*		/woothemes-sensei/includes/class-sensei-course.php line 2950
-*		/woothemes-sensei/includes/class-sensei-frontend.php line 898
-*
 *
  */
 
@@ -31,11 +24,59 @@ function admin_style() {
 	wp_enqueue_style('admin-styles', get_stylesheet_directory_uri().'/css/admin.css');
 }
 add_action('admin_enqueue_scripts', 'admin_style');
+
+
+/***********************************************************************
+ *
+ *	LOAD WIDGETS
+ *
+ **********************************************************************/
+
+locate_template( 'widget-course-events.php', TRUE, TRUE );
+locate_template( 'widget-course-signup.php', TRUE, TRUE );
+
+
+/***********************************************************************
+ *
+ *	REMOVE WORDPRESS EMOJI
+ *
+ **********************************************************************/
+
+remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+remove_action( 'wp_print_styles', 'print_emoji_styles' );
+remove_action( 'admin_print_styles', 'print_emoji_styles' );
+
+
+/***********************************************************************
+ *
+ *	ENQUEUE STYLESHEET(S)
+ *
+ **********************************************************************/
+
+add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
+function theme_enqueue_styles() {
+    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css?v=1' );
+}
+
+
+/***********************************************************************
+ *
+ *	CHANGE EXCERPT LENGTH
+ *
+ **********************************************************************/
+
+function custom_excerpt_length( $length ) {
+	return 200;
+}
+add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
  
 
 /***********************************************************************
  *
  *	COLLAPSE COURSE DESCRIPTION DISPLAY FOR USERS WITH AN ACTIVE SUBSCRIPTION
+ *
+ *	Why disabled?
  *
  **********************************************************************/
  
@@ -92,6 +133,26 @@ function apply_signup_coupons() {
 	// if there is no subscription product in the cart, stop
 	$has_subscription = WC_Subscriptions_Cart::cart_contains_subscription();
 	if(!$has_subscription) return;
+	
+	// if there is a subscription, find out if it has student discount or diplomate discount category
+	$apply_coupon = false;
+    $items = $woocommerce->cart->get_cart();
+	
+	foreach($items as $item => $values) {
+		if($values['data']->is_type( 'subscription' )){
+			$_product = $values['data']->post;
+			$_ID = $_product->ID;
+			$terms = get_the_terms($_ID, "product_cat");
+			foreach ( $terms as $term ) {
+				if($term->name == "Diplomate Discount" || $term->name == "Student Discount"){
+					$apply_coupon = true;
+				}
+			}
+		}
+	}
+	
+	// if none of the subscription items have the categories, don't apply the coupon
+	if(!$apply_coupon) return;
 
 	// get the current user's info
 	$user_ID = get_current_user_id();
@@ -145,52 +206,6 @@ function woo_tickets_filter_completed_order( $text ) {
 
 /***********************************************************************
  *
- *	LOAD WIDGETS
- *
- **********************************************************************/
-
-locate_template( 'widget-course-events.php', TRUE, TRUE );
-locate_template( 'widget-course-signup.php', TRUE, TRUE );
-
-
-/***********************************************************************
- *
- *	REMOVE WORDPRESS EMOJI
- *
- **********************************************************************/
-
-remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
-remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
-remove_action( 'wp_print_styles', 'print_emoji_styles' );
-remove_action( 'admin_print_styles', 'print_emoji_styles' );
-
-
-/***********************************************************************
- *
- *	ENQUEUE STYLESHEET(S)
- *
- **********************************************************************/
-
-add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
-function theme_enqueue_styles() {
-    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css?v=1' );
-}
-
-
-/***********************************************************************
- *
- *	CHANGE EXCERPT LENGTH
- *
- **********************************************************************/
-
-function custom_excerpt_length( $length ) {
-	return 200;
-}
-add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
-
-
-/***********************************************************************
- *
  *	HIDE EVENT COST (WHICH PAGE IS THIS UTILIZED ON?)
  *
  **********************************************************************/
@@ -222,6 +237,9 @@ function fix_course_purchase_label( $subscription_string, $product ) {
 /***********************************************************************
  *
  *	FIX "Quiz Quiz" IN QUIZ TITLES
+ *
+ *	example: /quiz/the-diseases-of-the-jingui-yaolue-final-quiz/
+ *	(visible when disabled)
  *
  **********************************************************************/
 
@@ -325,7 +343,7 @@ function woo_custom_deregister_bbpress_template_stack ( $stack ) {
 
 /***********************************************************************
  *
- *	
+ *	NOT CURRENTLY IN USE ??
  *
  **********************************************************************/
 
@@ -353,7 +371,9 @@ function custom_sensei_login_form() {
 /***********************************************************************
  *
  *	HIDE DIPLOMATES TAB IF USER IS NOT A DIPLOMATE OR ADMIN
- *	TODO: ADD PAGE REFERENCE TO THIS COMMENT
+ *	
+ *	example: /member-directory/jvpstudent/profile/edit/group/1/
+ *	Profile > Edit
  *
  **********************************************************************/
 
@@ -847,5 +867,3 @@ add_filter('sensei_wc_single_add_to_cart_button_text','change_btn_text',9999,1);
  *	THE END
  *
  **********************************************************************/
-
-?>
