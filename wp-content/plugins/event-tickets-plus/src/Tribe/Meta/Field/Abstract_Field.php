@@ -42,10 +42,10 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 			return;
 		}
 
-		$this->id = isset( $data['id'] ) ? $data['id'] : null;
-		$this->label = isset( $data['label'] ) ? $data['label'] : null;
+		$this->id       = isset( $data['id'] ) ? $data['id'] : null;
+		$this->label    = isset( $data['label'] ) ? $data['label'] : null;
 		$this->required = isset( $data['required'] ) ? $data['required'] : null;
-		$this->extra = isset( $data['extra'] ) ? $data['extra'] : null;
+		$this->extra    = isset( $data['extra'] ) ? $data['extra'] : null;
 
 		if ( $this->label ) {
 			$this->slug = sanitize_title( $this->label );
@@ -171,7 +171,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 			return null;
 		}
 
-		$value = null;
+		$value  = null;
 		$values = get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
 
 		if ( 'checkbox' === $this->type ) {
@@ -219,7 +219,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 			return;
 		}
 
-		include Tribe__Tickets_Plus__Main::instance()->plugin_path . "src/views/meta/{$template}";
+		include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( "meta/{$template}" );
 
 		return ob_get_clean();
 	}
@@ -241,9 +241,9 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 			return '';
 		}
 
-		$data = (array) $this;
+		$data                     = (array) $this;
 		$ticket_specific_settings = $this->get_field_settings();
-		$data = array_merge( $data, (array) $ticket_specific_settings );
+		$data                     = array_merge( $data, (array) $ticket_specific_settings );
 
 		$field_id = rand();
 		$type     = $this->type;

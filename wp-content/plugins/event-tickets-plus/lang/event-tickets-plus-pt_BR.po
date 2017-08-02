@@ -14,7 +14,7 @@ msgstr ""
 msgid "Display attendees list"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:144 src/views/wootickets/tickets.php:210
+#: src/views/eddtickets/tickets.php:145 src/views/wootickets/tickets.php:210
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr ""
 
@@ -242,7 +242,7 @@ msgstr ""
 msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:115
+#: src/views/eddtickets/tickets.php:116
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
 #: src/views/wootickets/tickets.php:177
@@ -727,11 +727,11 @@ msgstr ""
 msgid "Out of stock!"
 msgstr "Vagas esgotadas"
 
-#: src/views/eddtickets/tickets.php:135 src/views/wootickets/tickets.php:201
+#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:201
 msgid "Add to cart"
 msgstr "Adicionar ao Carrinho"
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.2)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.3)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: src/Tribe/Main.php:295
 msgid "Event Tickets Plus"

@@ -5,7 +5,7 @@ Tags: events, calendar, event, venue, organizer, dates, date, google maps, confe
 Donate link: http://m.tri.be/29
 Requires at least: 3.9
 Tested up to: 4.8
-Stable tag: 4.4.14
+Stable tag: 4.4.15
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -202,6 +202,11 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.4.15] 2017-07-26 =
+
+* Fix - Box-sizing issue with mini calendar widget on some themes. Thanks to @schreml for reporting this. [68087]
+* Add - Action hooks before and after recurring meta fields. [73826]
 
 = [4.4.14] 2017-07-13 =
 

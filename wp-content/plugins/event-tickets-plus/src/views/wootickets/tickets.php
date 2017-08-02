@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.5.2
+ * @version 4.5.3
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login

@@ -49,7 +49,7 @@ class Tribe__Tickets_Plus__Meta__RSVP {
 	 * Outputs the meta fields for the ticket
 	 */
 	public function front_end_meta_fields( $post, $ticket ) {
-		include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/views/meta.php';
+		include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 	}
 
 	/**

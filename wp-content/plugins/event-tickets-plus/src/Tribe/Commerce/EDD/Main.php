@@ -790,7 +790,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$pending = $this->stock_control->count_incomplete_order_items( $ticket_id );
 
 		// Ticket stock is a simple reflection of remaining inventory for this item...
-		$stock = $stock - $purchased - $pending;
+		$stock = absint( $stock ) - $purchased - $pending;
 
 		// ...With some exceptions for global stock tickets
 		$stock = $this->set_stock_level_for_global_stock_tickets( $stock, $event_id, $ticket_id );
