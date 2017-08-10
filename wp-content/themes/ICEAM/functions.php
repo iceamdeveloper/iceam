@@ -8,10 +8,9 @@
 *
  */
 
- 
- 
- 
- 
+
+
+
  
 /***********************************************************************
  *
@@ -70,7 +69,60 @@ function custom_excerpt_length( $length ) {
 	return 200;
 }
 add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
+
+
+
+
  
+/***********************************************************************
+ *
+ *	SHOW ONLY DIPLOMATES TO NON-LOGGED IN (PUBLIC) USERS
+ *
+ **********************************************************************/
+
+ 
+add_action('bp_ajax_querystring','member_dir_exclude_users',20,2);
+function member_dir_exclude_users($qs=false,$object=false){
+    //list of users to exclude
+     
+    if($object!='members')//hide for members only
+        return $qs;
+        
+    $excluded_user=join(',',filter_buddypress_user_ids());//comma separated ids of users whom you want to exclude
+    
+    $args=wp_parse_args($qs);
+    
+    //check if we are searching for friends list etc?, do not exclude in this case
+    if(!empty($args['user_id']))
+        return $qs;
+    
+    if(!empty($args['exclude']))
+        $args['exclude']=$args['exclude'].','.$excluded_user;
+    else 
+        $args['exclude']=$excluded_user;
+      
+    $qs=build_query($args);
+      
+	return $qs;
+    
+}
+
+function filter_buddypress_user_ids(){
+	$non_diplomates = array();
+	if(!get_current_user_id()){
+		$non_diplomates = get_users( array( 'role__in' => ['customer', 'practitioner'], 'fields' => 'ID' ) );
+	}
+	
+	// primarily for hiding admin / dev / qa user accounts
+	$hidden = get_users(array('meta_key'=>'wpcf-hide-in-members', 'meta_value'=>'1', 'fields' => 'ID' ) );
+	
+	$excluded = array_merge($non_diplomates, $hidden);
+
+	return $excluded;
+}
+
+
+
 
 /***********************************************************************
  *
