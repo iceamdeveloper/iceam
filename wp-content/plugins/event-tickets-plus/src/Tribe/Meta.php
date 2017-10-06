@@ -315,8 +315,8 @@ class Tribe__Tickets_Plus__Meta {
 		// Save templates too
 		if ( isset( $data['tribe-tickets-save-fieldset'] ) && ! empty( $data['tribe-tickets-saved-fieldset-name'] ) ) {
 			$fieldset = wp_insert_post( array(
-				'post_type' => Tribe__Tickets_Plus__Meta__Fieldset::POSTTYPE,
-				'post_title' => $data['tribe-tickets-saved-fieldset-name'],
+				'post_type'   => Tribe__Tickets_Plus__Meta__Fieldset::POSTTYPE,
+				'post_title'  => $data['tribe-tickets-saved-fieldset-name'],
 				'post_status' => 'publish',
 			) );
 

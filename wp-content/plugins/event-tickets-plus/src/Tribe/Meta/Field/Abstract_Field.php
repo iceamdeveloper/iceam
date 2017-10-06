@@ -18,7 +18,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 	 */
 	public function __construct( $ticket_id, $data = array() ) {
 		$this->ticket_id = $ticket_id;
-		$this->post = tribe_events_get_ticket_event( $this->ticket_id );
+		$this->post      = tribe_events_get_ticket_event( $this->ticket_id );
 
 		$this->field_type_name = array(
 			'checkbox' => __( 'Checkbox', 'event-tickets-plus' ),
@@ -81,6 +81,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 	 */
 	public function render( $attendee_id = null ) {
 		$field = $this->get_field_settings();
+		$field = $this->sanitize_field_options_for_render( $field );
 		$value = $this->get_field_value( $attendee_id );
 
 		return $this->render_field( $field, $value, $attendee_id );
@@ -125,10 +126,8 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 	 * @return array
 	 */
 	public function get_field_settings() {
-		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
-
-		$meta_settings = (array) $meta_object->get_meta_fields_by_ticket( $this->ticket_id );
-
+		$meta_object    = Tribe__Tickets_Plus__Main::instance()->meta();
+		$meta_settings  = (array) $meta_object->get_meta_fields_by_ticket( $this->ticket_id );
 		$field_settings = array();
 
 		// loop over the meta field settings attached to the ticket until we find the settings that
@@ -198,6 +197,27 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 	}
 
 	/**
+	 * Returns a version of checkbox, radio, and dropdown fields with any blank/empty options
+	 * removed. All other fields are ignored/unaltered by this.
+	 *
+	 * @since 4.5.5
+	 *
+	 * @param object $field The meta field being rendered.
+	 *
+	 * @return object The same meta field with its "options" cleaned of any empty values.
+	 */
+	public function sanitize_field_options_for_render( $field ) {
+		if ( ! isset( $field->extra['options'] ) || ! is_array( $field->extra['options'] ) ) {
+			return $field;
+		}
+
+		$field->extra['options'] = array_filter( $field->extra['options'] );
+		$field->extra['options'] = array_values( $field->extra['options'] );
+
+		return $field;
+	}
+
+	/**
 	 * Renders the field as it would be displayed on the front end
 	 *
 	 * @since 4.1
@@ -243,6 +263,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 
 		$data                     = (array) $this;
 		$ticket_specific_settings = $this->get_field_settings();
+		$ticket_specific_settings = $this->sanitize_field_options_for_render( $ticket_specific_settings  );
 		$data                     = array_merge( $data, (array) $ticket_specific_settings );
 
 		$field_id = rand();

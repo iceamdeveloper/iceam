@@ -67,11 +67,11 @@ class Tribe__Tickets_Plus__Meta__Render {
 		wp_enqueue_style( 'event-tickets-meta' );
 		wp_enqueue_script( 'event-tickets-meta-report' );
 
-		$meta_fields = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $item['product_id'] );
-		$meta_data = get_post_meta( $item['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$meta_fields   = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $item['product_id'] );
+		$meta_data     = get_post_meta( $item['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
 		$orphaned_data = (array) $meta_data;
 
-		$valid_meta_html = '';
+		$valid_meta_html    = '';
 		$orphaned_meta_html = '';
 
 		foreach ( $meta_fields as $field ) {
@@ -149,6 +149,17 @@ class Tribe__Tickets_Plus__Meta__Render {
 		}
 
 		$meta_fields = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $item['product_id'] );
+
+		/**
+ 		 * Filters the ticket meta fields to be included in the tickets email
+ 		 *
+  		 * @since 4.5.4
+  		 *
+  		 * @param array $meta_fields
+  		 * @param array $item
+  		 */
+		$meta_fields = apply_filters( 'tribe_event_tickets_plus_email_meta_fields', $meta_fields, $item );
+
 		$meta_data = get_post_meta( $item['qr_ticket_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
 
 		if ( ! $meta_fields || ! $meta_data ) {

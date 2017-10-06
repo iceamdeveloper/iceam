@@ -1151,7 +1151,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		$must_login           = ! is_user_logged_in() && $this->login_required();
 		$global_stock_enabled = $this->uses_global_stock( $post->ID );
+
 		Tribe__Tickets__Tickets::add_frontend_stock_data( $tickets );
+
+		/**
+		 * Allow for the addition of content (namely the "Who's Attening?" list) above the ticket form.
+		 *
+		 * @since 4.5.4
+		 */
+		do_action( 'tribe_tickets_before_front_end_ticket_form' );
 
 		include $this->getTemplateHierarchy( 'wootickets/tickets' );
 	}

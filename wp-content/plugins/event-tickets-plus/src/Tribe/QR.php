@@ -83,32 +83,45 @@ class Tribe__Tickets_Plus__QR {
 	}
 
 	/**
-	 * Show a notice so the user knows the ticket was checked in
+	 * Show a notice so the user knows the ticket was checked in.
 	 */
 	public function admin_notice() {
+
 		if ( empty( $_GET['qr_checked_in'] ) ) {
 			return;
 		}
 
-		//Use Human Readable ID Where Available for QR Check in Message
-		$ticket_id = absint( $_GET['qr_checked_in'] );
-		$checked_status = get_post_meta( $ticket_id, '_tribe_qr_status', true );
+		// Use Human-readable ID Where Available for QR Check in Message.
+		$ticket_id        = absint( $_GET['qr_checked_in'] );
+		$ticket_status    = get_post_status( $ticket_id );
+		$checked_status   = get_post_meta( $ticket_id, '_tribe_qr_status', true );
 		$ticket_unique_id = get_post_meta( $ticket_id, '_unique_id', true );
-		$ticket_id = $ticket_unique_id === '' ? $ticket_id : $ticket_unique_id;
+		$ticket_id        = $ticket_unique_id === '' ? $ticket_id : $ticket_unique_id;
 
-		//if status is qr then display already checked in warning
-		if ( $checked_status ) {
+		// If the attendee was deleted.
+		if ( false === $ticket_status || 'trash' === $ticket_status ) {
+
 			echo '<div class="error"><p>';
-			printf( esc_html__( 'The ticket with ID %s has already been checked in.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
+				printf( esc_html__( 'The ticket with ID %s was deleted and cannot be checked-in.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
 			echo '</p></div>';
+
+		// If status is QR then display already checked-in warning.
+		} elseif ( $checked_status ) {
+
+			echo '<div class="error"><p>';
+				printf( esc_html__( 'The ticket with ID %s has already been checked in.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
+			echo '</p></div>';
+
+		// Otherwise, just check-in like normal.
 		} else {
+
 			echo '<div class="updated"><p>';
-			printf( esc_html__( 'The ticket with ID %s was checked in.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
+				printf( esc_html__( 'The ticket with ID %s was checked in.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
 			echo '</p></div>';
-			//update the checked in status when using the qr code here
+
+			// Update the checked-in status when using the QR code here.
 			update_post_meta( absint( $_GET['qr_checked_in'] ), '_tribe_qr_status', 1 );
 		}
-
 	}
 
 	/**

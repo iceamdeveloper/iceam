@@ -119,7 +119,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * @return string
 	 */
 	public function column_date( $item ) {
-		return Tribe__Date_Utils::reformat( $item['completed_at'], Tribe__Date_Utils::DATEONLYFORMAT );
+		$date = ( $item['status'] == 'completed' ) ? $item['completed_at'] : $item['created_at'];
+
+		return Tribe__Date_Utils::reformat( $date, Tribe__Date_Utils::DATEONLYFORMAT );
 	}//end column_date
 
 	/**

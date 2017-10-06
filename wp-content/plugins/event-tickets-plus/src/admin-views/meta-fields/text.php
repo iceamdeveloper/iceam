@@ -2,7 +2,7 @@
 $multiline = isset( $extra['multiline'] ) ? $extra['multiline'] : '';
 ?>
 <div class="tribe-tickets-input tribe-tickets-input-checkbox tribe-tickets-required">
-	<label for="tickets_attendee_info_field" class="prompt">
+	<label class="prompt">
 		<input
 			type="checkbox"
 			name="tribe-tickets-input[<?php echo esc_attr( $field_id ); ?>][extra][multiline]"

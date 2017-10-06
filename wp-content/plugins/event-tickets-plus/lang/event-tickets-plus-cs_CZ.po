@@ -7,8 +7,13 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
-"X-Generator: GlotPress/1.0-alpha-1100\n"
+"X-Generator: GlotPress/2.3.1\n"
+"Language: cs_CZ\n"
 "Project-Id-Version: Event Tickets Plus\n"
+
+#: src/Tribe/QR.php:105
+msgid "The ticket with ID %s was deleted and cannot be checked-in."
+msgstr ""
 
 #: src/admin-views/attendees-list.php:7
 msgid "Display attendees list"
@@ -23,19 +28,9 @@ msgctxt "Browser title"
 msgid "%s - Order list"
 msgstr ""
 
-#: src/admin-views/meta-fields/_field.php:9
+#: src/admin-views/meta-fields/text.php:13
 msgctxt "Attendee information fields"
-msgid "Label:"
-msgstr ""
-
-#: src/admin-views/meta-fields/_field.php:17
-msgctxt "Attendee information fields"
-msgid "Required?"
-msgstr ""
-
-#: src/admin-views/meta-fields/_field.php:21
-msgctxt "Attendee information fields"
-msgid "Delete this field"
+msgid "Multi-line text field?"
 msgstr ""
 
 #: src/admin-views/meta-fields/checkbox.php:11
@@ -45,202 +40,212 @@ msgctxt "Attendee information fields"
 msgid "Options (one per line)"
 msgstr ""
 
-#: src/admin-views/meta-fields/text.php:13
+#: src/admin-views/meta-fields/_field.php:21
 msgctxt "Attendee information fields"
-msgid "Multi-line text field?"
+msgid "Delete this field"
 msgstr ""
 
-#: src/Tribe/QR.php:124
+#: src/admin-views/meta-fields/_field.php:17
+msgctxt "Attendee information fields"
+msgid "Required?"
+msgstr ""
+
+#: src/admin-views/meta-fields/_field.php:9
+msgctxt "Attendee information fields"
+msgid "Label:"
+msgstr ""
+
+#: src/Tribe/QR.php:137
 msgid "Could not render QR code because gzuncompress() is not available"
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:84
-msgid "Purchased"
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Settings.php:18
-msgid "Event Tickets uses WooCommerce order statuses to control when attendee records should be generated and when tickets are sent to customers. The first enabled status reached by an order will trigger the action."
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Settings.php:19
-msgid "When should tickets be emailed to customers?"
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Settings.php:20
-msgid "If no status is selected, no ticket emails will be sent."
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Settings.php:21
-msgid "When should attendee records be generated?"
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Settings.php:22
-msgid "Please select at least one status."
 msgstr ""
 
 #: src/Tribe/Commerce/WooCommerce/Settings.php:63
 msgid "As soon as an order is created"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:83
-msgid "Email"
-msgstr "Email"
+#: src/Tribe/Commerce/WooCommerce/Settings.php:22
+msgid "Please select at least one status."
+msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:85
-msgid "Address"
-msgstr "Adresa"
+#: src/Tribe/Commerce/WooCommerce/Settings.php:21
+msgid "When should attendee records be generated?"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Settings.php:20
+msgid "If no status is selected, no ticket emails will be sent."
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Settings.php:19
+msgid "When should tickets be emailed to customers?"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Settings.php:18
+msgid "Event Tickets uses WooCommerce order statuses to control when attendee records should be generated and when tickets are sent to customers. The first enabled status reached by an order will trigger the action."
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:84
+msgid "Purchased"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:241
+msgid "%1$s"
+msgstr "%1$s"
 
 #: src/Tribe/Commerce/WooCommerce/Orders/Table.php:87
 msgid "Status"
 msgstr "Stav"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:239
-msgid "%1$s"
-msgstr "%1$s"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:85
+msgid "Address"
+msgstr "Adresa"
 
-#: src/admin-views/woocommerce-orders.php:125
-msgid "Pending Payment:"
-msgstr "Nevyřízené platby:"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:83
+msgid "Email"
+msgstr "Email"
 
 #: src/admin-views/woocommerce-orders.php:130
 msgid "Canceled:"
 msgstr "Zrušeno:"
 
-#: src/Tribe/Meta/Render.php:21
-msgctxt "attendee table meta"
-msgid "Details"
-msgstr "Podrobnosti"
+#: src/admin-views/woocommerce-orders.php:125
+msgid "Pending Payment:"
+msgstr "Nevyřízené platby:"
 
-#: src/Tribe/Meta/Render.php:51
-msgid "View details %s"
-msgstr "Zobrazit podrobnosti %s"
-
-#: src/Tribe/Meta/Render.php:52
-msgid "Hide details %s"
-msgstr "Skrýt podrobnosti %s"
-
-#: src/admin-views/edd-metabox-advanced.php:52
-#: src/admin-views/woocommerce-metabox-advanced.php:65
-msgid "Selling tickets for a recurring event series is not recommended. The tickets you configure will show on all instances of an event series which can be confusing to attendees. Please configure your events carefully."
-msgstr "Prodej vstupenek na opakující se akce nedoporučujeme. Vstupenky, které nastavíte, se objeví u všech opakování dané události, což může být ro některé účastníky matoucí. Nastavujte své akce opatrně."
-
-#: src/admin-views/woocommerce-orders.php:9
-msgid "Event Details"
-msgstr "Údaje o akci"
-
-#: src/admin-views/woocommerce-orders.php:40
-msgid "Sales by Ticket"
-msgstr "Prodeje podle vstupenky"
+#: src/admin-views/woocommerce-orders.php:110
+msgid "Total Sales: %s %s"
+msgstr "Celkem prodejů: %s %s"
 
 #: src/admin-views/woocommerce-orders.php:52
 #: src/admin-views/woocommerce-orders.php:120
 msgid "Processing:"
 msgstr "Zpracovává se:"
 
-#: src/admin-views/woocommerce-orders.php:110
-msgid "Total Sales: %s %s"
-msgstr "Celkem prodejů: %s %s"
+#: src/admin-views/woocommerce-orders.php:40
+msgid "Sales by Ticket"
+msgstr "Prodeje podle vstupenky"
 
-#: src/Tribe/Commerce/Attendance_Totals.php:62
-msgctxt "attendee summary"
-msgid "Total Tickets Sold:"
-msgstr "Celkem prodáno vstupenek:"
+#: src/admin-views/woocommerce-orders.php:9
+msgid "Event Details"
+msgstr "Údaje o akci"
 
-#: src/Tribe/Commerce/Attendance_Totals.php:63
-msgctxt "attendee summary"
-msgid "Complete:"
-msgstr ""
+#: src/admin-views/edd-metabox-advanced.php:52
+#: src/admin-views/woocommerce-metabox-advanced.php:65
+msgid "Selling tickets for a recurring event series is not recommended. The tickets you configure will show on all instances of an event series which can be confusing to attendees. Please configure your events carefully."
+msgstr "Prodej vstupenek na opakující se akce nedoporučujeme. Vstupenky, které nastavíte, se objeví u všech opakování dané události, což může být ro některé účastníky matoucí. Nastavujte své akce opatrně."
 
-#: src/Tribe/Commerce/EDD/Main.php:167
-msgctxt "ticket provider"
-msgid "Easy Digital Downloads"
-msgstr "Easy Digital Downloads"
+#: src/Tribe/Meta/Render.php:52
+msgid "Hide details %s"
+msgstr "Skrýt podrobnosti %s"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:225
-msgctxt "ticket provider"
-msgid "WooCommerce"
-msgstr "WooCommerce"
+#: src/Tribe/Meta/Render.php:51
+msgid "View details %s"
+msgstr "Zobrazit podrobnosti %s"
+
+#: src/Tribe/Meta/Render.php:21
+msgctxt "attendee table meta"
+msgid "Details"
+msgstr "Podrobnosti"
+
+#: src/views/tickets-plus/orders-edit-meta.php:16
+msgid "Ticket deleted: attendee info cannot be updated."
+msgstr "Vstupenka byla smazána: údaje o účastníkovi nelze aktualizovat."
 
 #: src/Tribe/Meta/Render.php:125
 msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr "Další data účastníka:"
 
-#: src/views/tickets-plus/orders-edit-meta.php:16
-msgid "Ticket deleted: attendee info cannot be updated."
-msgstr "Vstupenka byla smazána: údaje o účastníkovi nelze aktualizovat."
+#: src/Tribe/Commerce/WooCommerce/Main.php:225
+msgctxt "ticket provider"
+msgid "WooCommerce"
+msgstr "WooCommerce"
 
-#: event-tickets-plus.php:143
-msgid "To begin using Event Tickets Plus, please install and activate the latest version of %1$s%2$s%3$s and ensure its own requirements have been met."
-msgstr "Než začnete používat plugin Event Tickets Plus, nainstalujte si a aktivujte aktuální verzi pluginu %1$s%2$s%3$s a zajistěte, aby byly splněny jeho vlastní požadavky."
+#: src/Tribe/Commerce/EDD/Main.php:167
+msgctxt "ticket provider"
+msgid "Easy Digital Downloads"
+msgstr "Easy Digital Downloads"
 
-#: src/Tribe/CSV_Importer/Column_Names.php:46
-msgid "Event Name or ID or Slug"
-msgstr "Název, ID nebo Název v URL akce"
+#: src/Tribe/Commerce/Attendance_Totals.php:63
+msgctxt "attendee summary"
+msgid "Complete:"
+msgstr ""
 
-#: src/Tribe/CSV_Importer/Column_Names.php:47
-msgid "Ticket Name"
-msgstr "Název vstupenky"
+#: src/Tribe/Commerce/Attendance_Totals.php:62
+msgctxt "attendee summary"
+msgid "Total Tickets Sold:"
+msgstr "Celkem prodáno vstupenek:"
 
-#: src/Tribe/CSV_Importer/Column_Names.php:48
-msgid "Ticket Description"
-msgstr "Popis vstupenky"
-
-#: src/Tribe/CSV_Importer/Column_Names.php:49
-msgid "Ticket Start Sale Date"
-msgstr "Datum začátku prodeje vstupenky"
-
-#: src/Tribe/CSV_Importer/Column_Names.php:50
-msgid "Ticket Start Sale Time"
-msgstr "Čas začátku prodeje vstupenky"
-
-#: src/Tribe/CSV_Importer/Column_Names.php:51
-msgid "Ticket End Sale Date"
-msgstr "Datum ukončení prodeje vstupenky"
-
-#: src/Tribe/CSV_Importer/Column_Names.php:52
-msgid "Ticket End Sale Time"
-msgstr "Čas ukončení prodeje vstupenky"
-
-#: src/Tribe/CSV_Importer/Column_Names.php:53
-msgid "Ticket Price"
-msgstr "Cena vstupenky"
-
-#: src/Tribe/CSV_Importer/Column_Names.php:55
-msgid "Ticket SKU"
-msgstr "Katalogové číslo vstupenky"
-
-#: src/Tribe/CSV_Importer/Tickets_Importer.php:233
-msgid "Recurring event tickets are not supported, event %d."
-msgstr "Vstupenky na opakující se akce nejsou podporovány. (akce: %d)"
-
-#: src/Tribe/Main.php:335
-msgid "Require users to log in before they purchase tickets"
-msgstr "Vyžadovat přihlášení uživatelů před zakoupením vstupenek"
-
-#: src/views/login-to-purchase.php:16
-msgid "Login to purchase"
-msgstr "Před zakoupením se musíte přihlásit"
-
-#: src/views/tickets-plus/orders-edit-meta.php:26
-msgid "Toggle attendee info"
-msgstr "Přepnout údaje o účastnících"
-
-#: src/views/tickets-plus/orders-tickets.php:29
-msgid "My Tickets for This %s"
-msgstr "Moje vstupenky na tuto akci"
-
-#: src/views/tickets-plus/orders-tickets.php:45
-msgid "Order #%1$s: %2$s reserved by %3$s (%4$s) on %5$s"
-msgstr "Objednávka č. %1$s: %2$s rezervoval %3$s (%4$s), dne %5$s"
+#. Description of the plugin/theme
+msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!"
+msgstr "Event Tickets Plus vám umožní prodávat vstupenky na akce, shromažďovat údaje o účastnících a další věci."
 
 #: src/views/tickets-plus/orders-tickets.php:70
 msgid "Attendee %d"
 msgstr "Účastník %d"
 
-#. Description of the plugin/theme
-msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!"
-msgstr "Event Tickets Plus vám umožní prodávat vstupenky na akce, shromažďovat údaje o účastnících a další věci."
+#: src/views/tickets-plus/orders-tickets.php:45
+msgid "Order #%1$s: %2$s reserved by %3$s (%4$s) on %5$s"
+msgstr "Objednávka č. %1$s: %2$s rezervoval %3$s (%4$s), dne %5$s"
+
+#: src/views/tickets-plus/orders-tickets.php:29
+msgid "My Tickets for This %s"
+msgstr "Moje vstupenky na tuto akci"
+
+#: src/views/tickets-plus/orders-edit-meta.php:26
+msgid "Toggle attendee info"
+msgstr "Přepnout údaje o účastnících"
+
+#: src/views/login-to-purchase.php:16
+msgid "Login to purchase"
+msgstr "Před zakoupením se musíte přihlásit"
+
+#: src/Tribe/Main.php:335
+msgid "Require users to log in before they purchase tickets"
+msgstr "Vyžadovat přihlášení uživatelů před zakoupením vstupenek"
+
+#: src/Tribe/CSV_Importer/Tickets_Importer.php:233
+msgid "Recurring event tickets are not supported, event %d."
+msgstr "Vstupenky na opakující se akce nejsou podporovány. (akce: %d)"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:55
+msgid "Ticket SKU"
+msgstr "Katalogové číslo vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:53
+msgid "Ticket Price"
+msgstr "Cena vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:52
+msgid "Ticket End Sale Time"
+msgstr "Čas ukončení prodeje vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:51
+msgid "Ticket End Sale Date"
+msgstr "Datum ukončení prodeje vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:50
+msgid "Ticket Start Sale Time"
+msgstr "Čas začátku prodeje vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:49
+msgid "Ticket Start Sale Date"
+msgstr "Datum začátku prodeje vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:48
+msgid "Ticket Description"
+msgstr "Popis vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:47
+msgid "Ticket Name"
+msgstr "Název vstupenky"
+
+#: src/Tribe/CSV_Importer/Column_Names.php:46
+msgid "Event Name or ID or Slug"
+msgstr "Název, ID nebo Název v URL akce"
+
+#: event-tickets-plus.php:143
+msgid "To begin using Event Tickets Plus, please install and activate the latest version of %1$s%2$s%3$s and ensure its own requirements have been met."
+msgstr "Než začnete používat plugin Event Tickets Plus, nainstalujte si a aktivujte aktuální verzi pluginu %1$s%2$s%3$s a zajistěte, aby byly splněny jeho vlastní požadavky."
 
 #: src/views/eddtickets/tickets.php:116
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
@@ -249,132 +254,17 @@ msgstr "Event Tickets Plus vám umožní prodávat vstupenky na akce, shromažď
 msgid "Don't list me on the public attendee list"
 msgstr "Neuvádějte mě na veřejném seznamu účastníků"
 
-#: src/Tribe/Meta/Fieldset.php:15
-msgid "Ticket Fieldsets"
-msgstr "Sady polí vstupenky"
+#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:134
+msgid "%1$s available"
+msgstr "%1$s k dispozici"
 
-#: src/Tribe/Meta/Fieldset.php:67
-msgid "Ticket Fieldset"
-msgstr "Sada polí vstupenky"
+#: src/views/meta.php:26
+msgid "Attendee"
+msgstr "Účastník"
 
-#: src/Tribe/Meta/Fieldset.php:68
-msgid "Add New Ticket Fieldset"
-msgstr "Vytvořit novou sadu polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:69
-msgid "Edit Ticket Fieldset"
-msgstr "Upravit sadu polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:70
-msgid "New Ticket Fieldset"
-msgstr "Vytvořit sadu polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:71
-msgid "View Ticket Fieldset"
-msgstr "Zobrazit sadu polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:72
-msgid "Search Ticket Fieldsets"
-msgstr "Hledat sady polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:73
-msgid "No ticket fieldsets found"
-msgstr "Nebyly nalezeny žádné sady polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:74
-msgid "No ticket fieldsets found in Trash"
-msgstr "V koši nebyly nalezeny žádné sady polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:75
-msgid "All Ticket Fieldsets"
-msgstr "Všechny sady polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:76
-msgid "Ticket Fieldset Archives"
-msgstr "Archiv sad polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:77
-msgid "Insert into ticket fieldset"
-msgstr "Vložit do sady polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:78
-msgid "Uploaded to this ticket fieldset"
-msgstr "Přiřazeno k sadě polí vstupenky"
-
-#: src/Tribe/Meta/Fieldset.php:97
-msgid "Custom Ticket Fields"
-msgstr "Vlastní pole vstupenky"
-
-#: src/Tribe/Meta/Render.php:162 src/admin-views/meta.php:30
-msgid "Attendee Information"
-msgstr "Údaje o účastnících"
-
-#: src/Tribe/QR.php:102
-msgid "The ticket with ID %s has already been checked in."
-msgstr "Vstupenka s číslem %s již byla zaregistrována."
-
-#: src/Tribe/QR.php:148
-msgid "Scan this QR code at the event to check in."
-msgstr "Při vstupu na akci naskenujte tento QR kód pro registraci."
-
-#: src/admin-views/meta.php:6
-msgid "Attendee Information:"
-msgstr "Údaje o účastnících:"
-
-#: src/admin-views/meta.php:12
-msgid "Request information for each attendee during registration"
-msgstr "Vyžadovat údaje o každém účastníkovi během registrace"
-
-#: src/admin-views/meta.php:15
-msgid "The name and contact info of the person acquiring tickets is collected by default"
-msgstr "Standardně se shromažďuje jméno a kontakt na osobu, která obdrží vstupenky"
-
-#: src/admin-views/meta.php:39
-msgid "Add New Field:"
-msgstr "Přidat nové pole:"
-
-#: src/admin-views/meta.php:57
-msgid "Active Fields:"
-msgstr "Aktivní pole:"
-
-#: src/admin-views/meta.php:60
-msgid "No active fields."
-msgstr "Žádná aktivní pole."
-
-#: src/admin-views/meta.php:60
-msgid "Add new fields or"
-msgstr "Přidat nová pole nebo"
-
-#: src/admin-views/meta.php:64
-msgid "Start with a saved fieldset..."
-msgstr "Použít uloženou sadu polí..."
-
-#: src/admin-views/meta.php:89
-msgid "Save this fieldset for use on other tickets?"
-msgstr "Chcete uložit tuto sadu polí pro použití u dalších vstupenek?"
-
-#: src/admin-views/meta.php:93
-msgid "Name this fieldset:"
-msgstr "Zadejte název sady polí:"
-
-#: src/admin-views/edd-metabox-advanced.php:13
-#: src/admin-views/woocommerce-metabox-advanced.php:13
-msgid "Global stock mode:"
-msgstr "Režim celkových zásob:"
-
-#: src/admin-views/edd-metabox-advanced.php:20
-#: src/admin-views/woocommerce-metabox-advanced.php:20
-msgid "Cap sales:"
-msgstr "Omezit prodej:"
-
-#: src/admin-views/edd-metabox-advanced.php:24
-#: src/admin-views/woocommerce-metabox-advanced.php:24
-msgid "(This is the maximum allowed number of sales for this ticket.)"
-msgstr "(Maximální povolený počet kusů této vstupenky k prodeji.)"
-
-#: src/views/attendees-list.php:14
-msgid "Who's Attending"
-msgstr "Kdo se účastní"
+#: src/views/meta.php:21
+msgid "Please fill in all required fields"
+msgstr "Doplňte prosím všechny požadované informace"
 
 #: src/views/attendees-list.php:15
 msgid "One person is attending %2$s"
@@ -383,73 +273,161 @@ msgstr[0] "Jedna osoba se účastní %2$s"
 msgstr[1] "%d osoby se účastní %s"
 msgstr[2] "%d osob se účastní %s"
 
-#: src/views/meta.php:21
-msgid "Please fill in all required fields"
-msgstr "Doplňte prosím všechny požadované informace"
+#: src/views/attendees-list.php:14
+msgid "Who's Attending"
+msgstr "Kdo se účastní"
 
-#: src/views/meta.php:26
-msgid "Attendee"
-msgstr "Účastník"
+#: src/admin-views/edd-metabox-advanced.php:24
+#: src/admin-views/woocommerce-metabox-advanced.php:24
+msgid "(This is the maximum allowed number of sales for this ticket.)"
+msgstr "(Maximální povolený počet kusů této vstupenky k prodeji.)"
 
-#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:134
-msgid "%1$s available"
-msgstr "%1$s k dispozici"
+#: src/admin-views/edd-metabox-advanced.php:20
+#: src/admin-views/woocommerce-metabox-advanced.php:20
+msgid "Cap sales:"
+msgstr "Omezit prodej:"
 
-#: event-tickets-plus.php:138
-msgid "Event Tickets"
-msgstr "Event Tickets"
+#: src/admin-views/edd-metabox-advanced.php:13
+#: src/admin-views/woocommerce-metabox-advanced.php:13
+msgid "Global stock mode:"
+msgstr "Režim celkových zásob:"
 
-#: src/Tribe/APM.php:74 src/Tribe/CSV_Importer/Column_Names.php:54
-msgid "Ticket Stock"
-msgstr "Zásoby vstupenek"
+#: src/admin-views/meta.php:93
+msgid "Name this fieldset:"
+msgstr "Zadejte název sady polí:"
 
-#: src/Tribe/APM.php:90
-msgid "Sales"
-msgstr "Prodeje"
+#: src/admin-views/meta.php:89
+msgid "Save this fieldset for use on other tickets?"
+msgstr "Chcete uložit tuto sadu polí pro použití u dalších vstupenek?"
 
-#: src/Tribe/APM.php:91
-msgid "Stock"
-msgstr "Zásoby"
+#: src/admin-views/meta.php:64
+msgid "Start with a saved fieldset..."
+msgstr "Použít uloženou sadu polí..."
 
-#: src/Tribe/APM/Sales_Filter.php:26
-msgid "Are"
-msgstr "Jsou"
+#: src/admin-views/meta.php:60
+msgid "Add new fields or"
+msgstr "Přidat nová pole nebo"
 
-#: src/Tribe/APM/Sales_Filter.php:27
-msgid "Are Not"
-msgstr "Nejsou"
+#: src/admin-views/meta.php:60
+msgid "No active fields."
+msgstr "Žádná aktivní pole."
 
-#: src/Tribe/APM/Sales_Filter.php:28
-msgid "Are at least"
-msgstr "Jsou alespoň"
+#: src/admin-views/meta.php:57
+msgid "Active Fields:"
+msgstr "Aktivní pole:"
 
-#: src/Tribe/APM/Sales_Filter.php:29
-msgid "Are at most"
-msgstr "Jsou nanejvýš"
+#: src/admin-views/meta.php:39
+msgid "Add New Field:"
+msgstr "Přidat nové pole:"
 
-#: src/Tribe/APM/Stock_Filter.php:21
-msgid "Is"
-msgstr "Je"
+#: src/admin-views/meta.php:15
+msgid "The name and contact info of the person acquiring tickets is collected by default"
+msgstr "Standardně se shromažďuje jméno a kontakt na osobu, která obdrží vstupenky"
 
-#: src/Tribe/APM/Stock_Filter.php:22
-msgid "Is Not"
-msgstr "Není"
+#: src/admin-views/meta.php:12
+msgid "Request information for each attendee during registration"
+msgstr "Vyžadovat údaje o každém účastníkovi během registrace"
 
-#: src/Tribe/APM/Stock_Filter.php:23
-msgid "Is at least"
-msgstr "Je alespoň"
+#: src/admin-views/meta.php:6
+msgid "Attendee Information:"
+msgstr "Údaje o účastnících:"
 
-#: src/Tribe/APM/Stock_Filter.php:24
-msgid "Is at most"
-msgstr "Je nanejvýš"
+#: src/Tribe/QR.php:161
+msgid "Scan this QR code at the event to check in."
+msgstr "Při vstupu na akci naskenujte tento QR kód pro registraci."
 
-#: src/Tribe/Attendees_List.php:247
-msgid "Load all attendees"
-msgstr "Načíst všechny účastníky"
+#: src/Tribe/QR.php:112
+msgid "The ticket with ID %s has already been checked in."
+msgstr "Vstupenka s číslem %s již byla zaregistrována."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:18
-msgid "Your tickets from {site_title}"
-msgstr "Vaše vstupenky z webu {site_title}"
+#: src/Tribe/Meta/Render.php:173 src/admin-views/meta.php:30
+msgid "Attendee Information"
+msgstr "Údaje o účastnících"
+
+#: src/Tribe/Meta/Fieldset.php:97
+msgid "Custom Ticket Fields"
+msgstr "Vlastní pole vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:78
+msgid "Uploaded to this ticket fieldset"
+msgstr "Přiřazeno k sadě polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:77
+msgid "Insert into ticket fieldset"
+msgstr "Vložit do sady polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:76
+msgid "Ticket Fieldset Archives"
+msgstr "Archiv sad polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:75
+msgid "All Ticket Fieldsets"
+msgstr "Všechny sady polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:74
+msgid "No ticket fieldsets found in Trash"
+msgstr "V koši nebyly nalezeny žádné sady polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:73
+msgid "No ticket fieldsets found"
+msgstr "Nebyly nalezeny žádné sady polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:72
+msgid "Search Ticket Fieldsets"
+msgstr "Hledat sady polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:71
+msgid "View Ticket Fieldset"
+msgstr "Zobrazit sadu polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:70
+msgid "New Ticket Fieldset"
+msgstr "Vytvořit sadu polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:69
+msgid "Edit Ticket Fieldset"
+msgstr "Upravit sadu polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:68
+msgid "Add New Ticket Fieldset"
+msgstr "Vytvořit novou sadu polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:67
+msgid "Ticket Fieldset"
+msgstr "Sada polí vstupenky"
+
+#: src/Tribe/Meta/Fieldset.php:15
+msgid "Ticket Fieldsets"
+msgstr "Sady polí vstupenky"
+
+#: src/Tribe/Meta/Field/Abstract_Field.php:27 src/admin-views/meta.php:42
+msgid "Text"
+msgstr "Text"
+
+#: src/Tribe/Meta/Field/Abstract_Field.php:26 src/admin-views/meta.php:51
+msgid "Dropdown"
+msgstr "Rozbalovací menu"
+
+#: src/Tribe/Meta/Field/Abstract_Field.php:25 src/admin-views/meta.php:45
+msgid "Radio"
+msgstr "Přepínač"
+
+#: src/Tribe/Meta/Field/Abstract_Field.php:24 src/admin-views/meta.php:48
+msgid "Checkbox"
+msgstr "Zaškrtávací políčko"
+
+#: src/Tribe/Meta.php:511
+msgid "This ticket has custom Attendee Information fields"
+msgstr "Tato vstupenka obsahuje vlastní pole pro údaje o účastníkovi"
+
+#: src/Tribe/Commerce/WooCommerce/Settings.php:30
+msgid "WooCommerce Support"
+msgstr "Podpora WooCommerce"
+
+#: src/Tribe/Commerce/EDD/Global_Stock.php:195
+#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:199
+msgid "Sorry, there is insufficient stock to fulfill your order with respect to %s"
+msgstr "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na %s"
 
 #: src/Tribe/Commerce/EDD/Global_Stock.php:163
 #: src/Tribe/Commerce/WooCommerce/Global_Stock.php:167
@@ -459,63 +437,81 @@ msgstr[0] "Bohužel nemáme dostatečné množství zásob ke splnění vaší o
 msgstr[1] "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na vámi zvolené vstupenky a ve vztahu k těmto akcím: %s"
 msgstr[2] "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na vámi zvolené vstupenky a ve vztahu k těmto akcím: %s"
 
-#: src/Tribe/Commerce/EDD/Global_Stock.php:195
-#: src/Tribe/Commerce/WooCommerce/Global_Stock.php:199
-msgid "Sorry, there is insufficient stock to fulfill your order with respect to %s"
-msgstr "Bohužel nemáme dostatečné množství zásob ke splnění vaší objednávky s ohledem na %s"
+#: src/Tribe/Commerce/WooCommerce/Email.php:18
+msgid "Your tickets from {site_title}"
+msgstr "Vaše vstupenky z webu {site_title}"
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:30
-msgid "WooCommerce Support"
-msgstr "Podpora WooCommerce"
+#: src/Tribe/Attendees_List.php:290
+msgid "Load all attendees"
+msgstr "Načíst všechny účastníky"
 
-#: src/Tribe/Meta.php:511
-msgid "This ticket has custom Attendee Information fields"
-msgstr "Tato vstupenka obsahuje vlastní pole pro údaje o účastníkovi"
+#: src/Tribe/APM/Stock_Filter.php:24
+msgid "Is at most"
+msgstr "Je nanejvýš"
 
-#: src/Tribe/Meta/Field/Abstract_Field.php:24 src/admin-views/meta.php:48
-msgid "Checkbox"
-msgstr "Zaškrtávací políčko"
+#: src/Tribe/APM/Stock_Filter.php:23
+msgid "Is at least"
+msgstr "Je alespoň"
 
-#: src/Tribe/Meta/Field/Abstract_Field.php:25 src/admin-views/meta.php:45
-msgid "Radio"
-msgstr "Přepínač"
+#: src/Tribe/APM/Stock_Filter.php:22
+msgid "Is Not"
+msgstr "Není"
 
-#: src/Tribe/Meta/Field/Abstract_Field.php:26 src/admin-views/meta.php:51
-msgid "Dropdown"
-msgstr "Rozbalovací menu"
+#: src/Tribe/APM/Stock_Filter.php:21
+msgid "Is"
+msgstr "Je"
 
-#: src/Tribe/Meta/Field/Abstract_Field.php:27 src/admin-views/meta.php:42
-msgid "Text"
-msgstr "Text"
+#: src/Tribe/APM/Sales_Filter.php:29
+msgid "Are at most"
+msgstr "Jsou nanejvýš"
 
-#: src/admin-views/price-fields.php:12
-msgid "Sale Price:"
-msgstr "Prodejní cena:"
+#: src/Tribe/APM/Sales_Filter.php:28
+msgid "Are at least"
+msgstr "Jsou alespoň"
 
-#: src/admin-views/price-fields.php:16
-msgid "(Current sale price - this can be managed via the product editor)"
-msgstr "(aktuální prodejní cena - může být dále upravena v editoru produktů)"
+#: src/Tribe/APM/Sales_Filter.php:27
+msgid "Are Not"
+msgstr "Nejsou"
 
-#: src/admin-views/woocommerce-metabox-advanced.php:41
-msgid "Purchase limit:"
-msgstr "Limitovaný prodej:"
+#: src/Tribe/APM/Sales_Filter.php:26
+msgid "Are"
+msgstr "Jsou"
 
-#: src/admin-views/woocommerce-metabox-advanced.php:44
-msgid "The maximum number of tickets per order. (0 means there's no limit)"
-msgstr "Maximální počet vstupenek na objednávku. (0 znamená bez limitu)"
+#: src/Tribe/APM.php:91
+msgid "Stock"
+msgstr "Zásoby"
 
-#: src/Tribe/APM.php:68
-msgid "Ticket Sales"
-msgstr "Prodeje vstupenek"
+#: src/Tribe/APM.php:90
+msgid "Sales"
+msgstr "Prodeje"
 
-#: src/admin-views/woocommerce-orders.php:43
-msgid "Tickets sold:"
-msgstr "Prodáno vstupenek:"
+#: src/Tribe/APM.php:74 src/Tribe/CSV_Importer/Column_Names.php:54
+msgid "Ticket Stock"
+msgstr "Zásoby vstupenek"
 
-#: src/admin-views/woocommerce-orders.php:48
-#: src/admin-views/woocommerce-orders.php:115
-msgid "Completed:"
-msgstr "Dokončeno:"
+#: event-tickets-plus.php:138
+msgid "Event Tickets"
+msgstr "Event Tickets"
+
+#: src/admin-views/woocommerce-orders.php:144
+msgid "Total Site Fees:"
+msgstr "Celkové manipulační poplatky:"
+
+#: src/admin-views/woocommerce-orders.php:140
+msgid "Total Ticket Sales:"
+msgstr "Celkové prodeje vstupenek:"
+
+#: src/admin-views/woocommerce-orders.php:91
+msgid "SKU: (%s)"
+msgstr "Katalogové číslo: (%s)"
+
+#: src/admin-views/woocommerce-orders.php:77
+msgid "Sold %d of %d %s"
+msgstr "Prodáno %d z celkem %d %s"
+
+#: src/admin-views/woocommerce-orders.php:75
+msgid "Sold %d %s"
+msgstr "Prodáno %d %s"
 
 #: src/admin-views/woocommerce-orders.php:71
 msgid "(%d awaiting review)"
@@ -524,155 +520,155 @@ msgstr[0] "(%d čeká na vyřízení)"
 msgstr[1] "(%d čekají na vyřízení)"
 msgstr[2] "(%d čeká na vyřízení)"
 
-#: src/admin-views/woocommerce-orders.php:75
-msgid "Sold %d %s"
-msgstr "Prodáno %d %s"
+#: src/admin-views/woocommerce-orders.php:48
+#: src/admin-views/woocommerce-orders.php:115
+msgid "Completed:"
+msgstr "Dokončeno:"
 
-#: src/admin-views/woocommerce-orders.php:77
-msgid "Sold %d of %d %s"
-msgstr "Prodáno %d z celkem %d %s"
+#: src/admin-views/woocommerce-orders.php:43
+msgid "Tickets sold:"
+msgstr "Prodáno vstupenek:"
 
-#: src/admin-views/woocommerce-orders.php:91
-msgid "SKU: (%s)"
-msgstr "Katalogové číslo: (%s)"
+#: src/Tribe/APM.php:68
+msgid "Ticket Sales"
+msgstr "Prodeje vstupenek"
 
-#: src/admin-views/woocommerce-orders.php:140
-msgid "Total Ticket Sales:"
-msgstr "Celkové prodeje vstupenek:"
+#: src/admin-views/woocommerce-metabox-advanced.php:44
+msgid "The maximum number of tickets per order. (0 means there's no limit)"
+msgstr "Maximální počet vstupenek na objednávku. (0 znamená bez limitu)"
 
-#: src/admin-views/woocommerce-orders.php:144
-msgid "Total Site Fees:"
-msgstr "Celkové manipulační poplatky:"
+#: src/admin-views/woocommerce-metabox-advanced.php:41
+msgid "Purchase limit:"
+msgstr "Limitovaný prodej:"
 
-#: src/Tribe/Commerce/Loader.php:181
-msgid "To begin using Tickets Plus with %3$s, you need to <a href=\"%1$s\" title=\"Deactivate the legacy addon for %2$s\">deactivate the old legacy plugin</a>."
-msgstr "Než začnete používat plugin Tickets Plus a plugin %3$s, musíte <a href=\"%1$s\" title=\"Deaktivovat zastaralý doplněk pro %2$s\">deaktivovat zastaralý plugin</a>."
+#: src/admin-views/price-fields.php:16
+msgid "(Current sale price - this can be managed via the product editor)"
+msgstr "(aktuální prodejní cena - může být dále upravena v editoru produktů)"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:90
-msgid "See purchases for this event"
-msgstr "Zobrazit prodeje na tuto akci"
+#: src/admin-views/price-fields.php:12
+msgid "Sale Price:"
+msgstr "Prodejní cena:"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:92
-#: src/Tribe/Commerce/WooCommerce/Tabbed_View/Orders_Report_Tab.php:16
-msgid "Orders"
-msgstr "Objednávky"
+#: src/admin-views/price-fields.php:7
+msgid "(0 or empty for free tickets)"
+msgstr "(pro vstupné zdarma ponechte prázdné nebo zadejte 0)"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
-msgid "Order"
-msgstr "Objednávka"
-
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:82
-msgid "Purchaser"
-msgstr ""
-
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:86
-msgid "Date"
-msgstr "Datum"
-
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:91
-msgid "Subtotal"
-msgstr "Mezisoučet"
-
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:92
-msgid "Site Fee"
-msgstr "Manipulační poplatek"
-
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:95
-msgid "Total"
-msgstr "Cena celkem"
-
-#: src/Tribe/QR.php:145
-msgid "Check in for this event"
-msgstr "Registrace na akci"
+#: src/admin-views/price-fields.php:3
+msgid "Price:"
+msgstr "Cena:"
 
 #: src/admin-views/edd-metabox-advanced.php:59
 #: src/admin-views/woocommerce-metabox-advanced.php:71
 msgid "Selling tickets for recurring events"
 msgstr "Prodej vstupenek na opakující se akce"
 
-#: src/admin-views/price-fields.php:3
-msgid "Price:"
-msgstr "Cena:"
+#: src/Tribe/QR.php:158
+msgid "Check in for this event"
+msgstr "Registrace na akci"
 
-#: src/admin-views/price-fields.php:7
-msgid "(0 or empty for free tickets)"
-msgstr "(pro vstupné zdarma ponechte prázdné nebo zadejte 0)"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:95
+msgid "Total"
+msgstr "Cena celkem"
 
-#: src/Tribe/Commerce/EDD/Email.php:13
-msgid "Your tickets from {sitename}"
-msgstr "Vaše vstupenky z webu {sitename}"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:92
+msgid "Site Fee"
+msgstr "Manipulační poplatek"
 
-#: src/Tribe/Commerce/EDD/Email.php:33
-msgid "Tribe Ticket Emails"
-msgstr "Emaily pro Tribe vstupenky"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:91
+msgid "Subtotal"
+msgstr "Mezisoučet"
 
-#: src/Tribe/Commerce/EDD/Email.php:34
-msgid "Configure the ticket receipt emails"
-msgstr "Nastavení emailů pro doručení vstupenek"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:86
+msgid "Date"
+msgstr "Datum"
 
-#: src/Tribe/Commerce/EDD/Email.php:39
-msgid "Tickets Email Subject"
-msgstr "Předmět emailu se vstupenkami"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:82
+msgid "Purchaser"
+msgstr ""
 
-#: src/Tribe/Commerce/EDD/Email.php:40
-msgid "Enter the subject line for the tickets receipt email"
-msgstr "Zadejte předmět emailu pro doručení vstupenek"
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
+msgid "Order"
+msgstr "Objednávka"
 
-#: src/Tribe/Commerce/Loader.php:103 src/Tribe/Commerce/Loader.php:118
-msgid "Easy Digital Downloads"
-msgstr "Easy Digital Downloads"
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:92
+#: src/Tribe/Commerce/WooCommerce/Tabbed_View/Orders_Report_Tab.php:16
+msgid "Orders"
+msgstr "Objednávky"
 
-#: src/Tribe/Commerce/EDD/Main.php:488
-#: src/Tribe/Commerce/WooCommerce/Main.php:810
-msgid "You'll receive your tickets in another email."
-msgstr "Vstupenky obdržíte v dalším emailu."
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:90
+msgid "See purchases for this event"
+msgstr "Zobrazit prodeje na tuto akci"
 
-#: src/Tribe/Commerce/EDD/Main.php:1042
-#: src/Tribe/Commerce/WooCommerce/Main.php:1680
-msgid "(deleted)"
-msgstr "(smazáno)"
+#: src/Tribe/Commerce/Loader.php:181
+msgid "To begin using Tickets Plus with %3$s, you need to <a href=\"%1$s\" title=\"Deactivate the legacy addon for %2$s\">deactivate the old legacy plugin</a>."
+msgstr "Než začnete používat plugin Tickets Plus a plugin %3$s, musíte <a href=\"%1$s\" title=\"Deaktivovat zastaralý doplněk pro %2$s\">deaktivovat zastaralý plugin</a>."
 
-#: src/Tribe/Commerce/EDD/Main.php:1241
-#: src/Tribe/Commerce/WooCommerce/Main.php:1953
-msgid "Event sales report"
-msgstr "Přehled prodejů vstupenek"
+#. Author URI of the plugin/theme
+msgid "http://m.tri.be/28"
+msgstr "http://m.tri.be/28"
 
-#: src/Tribe/Commerce/EDD/Main.php:1299
-#: src/Tribe/Commerce/WooCommerce/Main.php:2001
-msgid "This is a ticket for the event:"
-msgstr "Toto je vstupenka na akci:"
+#. Author of the plugin/theme
+msgid "Modern Tribe, Inc."
+msgstr "Modern Tribe, Inc."
 
-#: src/Tribe/Commerce/EDD/Main.php:1382
-msgid "%s ticket is sold out"
-msgstr "Vstupenky %s jsou vyprodány"
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.5)  #-#-#-#-#
+#. Plugin Name of the plugin/theme
+#: src/Tribe/Main.php:295
+msgid "Event Tickets Plus"
+msgstr "Event Tickets Plus"
 
-#: src/Tribe/Commerce/EDD/Main.php:1385
-msgid "Sorry! Only %d tickets remaining for %s"
-msgstr "Je nám líto, ale vstupenek %2$s zbývá pouze: %1$d"
+#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:201
+msgid "Add to cart"
+msgstr "Přidat do košíku"
 
-#: src/Tribe/Commerce/EDD/Main.php:1426
-msgid "Print Ticket"
-msgstr "Tisk vstupenky"
+#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:144
+msgid "Out of stock!"
+msgstr "Není k dispozici!"
 
-#: src/Tribe/Commerce/Loader.php:55 src/Tribe/Commerce/Loader.php:71
-msgid "WooCommerce"
-msgstr "WooCommerce"
+#: src/admin-views/edd-metabox-advanced.php:50
+#: src/admin-views/woocommerce-metabox-advanced.php:63
+msgid "Currently, tickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
+msgstr ""
 
-#: src/Tribe/Commerce/Loader.php:192
-msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
-msgstr "Než začnete používat plugin Tickets Plus, nainstalujte si a aktivujte aktuální verzi pluginu <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
+#: src/admin-views/edd-metabox-advanced.php:43
+#: src/admin-views/woocommerce-metabox-advanced.php:56
+msgid "(A unique identifying code for each ticket type you're selling)"
+msgstr "(Jedinečný identifikační kód pro každý typ prodávané vstupenky)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1774
-msgid "In trash (was %s)"
-msgstr "V koši (bylo %s)"
+#: src/admin-views/edd-metabox-advanced.php:39
+#: src/admin-views/woocommerce-metabox-advanced.php:53
+msgid "SKU:"
+msgstr "Katalogové číslo:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1780
-msgid "Deleted"
-msgstr "Smazáno"
+#: src/admin-views/edd-metabox-advanced.php:34
+#: src/admin-views/woocommerce-metabox-advanced.php:34
+msgid "(Total available # of this ticket type. Once they're gone, ticket type is sold out.)"
+msgstr "(Celkový počet vstupenek tohoto typu k dispozici. Jakmile dojdou zásoby, tento typ bude vyprodán.)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1829
-msgid "Unknown"
-msgstr "Neznámý"
+#: src/admin-views/edd-metabox-advanced.php:30
+#: src/admin-views/woocommerce-metabox-advanced.php:30
+msgid "Stock:"
+msgstr "Zásoby:"
+
+#: src/Tribe/QR.php:119
+msgid "The ticket with ID %s was checked in."
+msgstr "Vstupenka s číslem %s byla zaregistrována."
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:1986
+msgid "Report"
+msgstr "Přehled"
+
+#: src/Tribe/Commerce/WooCommerce/Email.php:90
+msgid "Defaults to <code>%s</code>"
+msgstr "Výchozí je <code>%s</code>"
+
+#: src/Tribe/Commerce/WooCommerce/Email.php:88
+msgid "Subject"
+msgstr "Předmět"
+
+#: src/Tribe/Commerce/WooCommerce/Email.php:16
+msgid "Email the user will receive after a completed order with the tickets they purchased."
+msgstr "Emailová zpráva, kterou uživatel obdrží po dokončení objednávky společně se zakoupenými vstupenkami."
 
 #: src/Tribe/CSV_Importer/Column_Names.php:68
 #: src/Tribe/CSV_Importer/Rows.php:52 src/Tribe/CSV_Importer/Rows.php:71
@@ -681,69 +677,78 @@ msgstr "Neznámý"
 msgid "Tickets"
 msgstr "Vstupenky"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:16
-msgid "Email the user will receive after a completed order with the tickets they purchased."
-msgstr "Emailová zpráva, kterou uživatel obdrží po dokončení objednávky společně se zakoupenými vstupenkami."
+#: src/Tribe/Commerce/WooCommerce/Main.php:1837
+msgid "Unknown"
+msgstr "Neznámý"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:88
-msgid "Subject"
-msgstr "Předmět"
+#: src/Tribe/Commerce/WooCommerce/Main.php:1788
+msgid "Deleted"
+msgstr "Smazáno"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:90
-msgid "Defaults to <code>%s</code>"
-msgstr "Výchozí je <code>%s</code>"
+#: src/Tribe/Commerce/WooCommerce/Main.php:1782
+msgid "In trash (was %s)"
+msgstr "V koši (bylo %s)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1978
-msgid "Report"
-msgstr "Přehled"
+#: src/Tribe/Commerce/Loader.php:192
+msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
+msgstr "Než začnete používat plugin Tickets Plus, nainstalujte si a aktivujte aktuální verzi pluginu <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 
-#: src/Tribe/QR.php:106
-msgid "The ticket with ID %s was checked in."
-msgstr "Vstupenka s číslem %s byla zaregistrována."
+#: src/Tribe/Commerce/Loader.php:55 src/Tribe/Commerce/Loader.php:71
+msgid "WooCommerce"
+msgstr "WooCommerce"
 
-#: src/admin-views/edd-metabox-advanced.php:30
-#: src/admin-views/woocommerce-metabox-advanced.php:30
-msgid "Stock:"
-msgstr "Zásoby:"
+#: src/Tribe/Commerce/EDD/Main.php:1435
+msgid "Print Ticket"
+msgstr "Tisk vstupenky"
 
-#: src/admin-views/edd-metabox-advanced.php:34
-#: src/admin-views/woocommerce-metabox-advanced.php:34
-msgid "(Total available # of this ticket type. Once they're gone, ticket type is sold out.)"
-msgstr "(Celkový počet vstupenek tohoto typu k dispozici. Jakmile dojdou zásoby, tento typ bude vyprodán.)"
+#: src/Tribe/Commerce/EDD/Main.php:1394
+msgid "Sorry! Only %d tickets remaining for %s"
+msgstr "Je nám líto, ale vstupenek %2$s zbývá pouze: %1$d"
 
-#: src/admin-views/edd-metabox-advanced.php:39
-#: src/admin-views/woocommerce-metabox-advanced.php:53
-msgid "SKU:"
-msgstr "Katalogové číslo:"
+#: src/Tribe/Commerce/EDD/Main.php:1391
+msgid "%s ticket is sold out"
+msgstr "Vstupenky %s jsou vyprodány"
 
-#: src/admin-views/edd-metabox-advanced.php:43
-#: src/admin-views/woocommerce-metabox-advanced.php:56
-msgid "(A unique identifying code for each ticket type you're selling)"
-msgstr "(Jedinečný identifikační kód pro každý typ prodávané vstupenky)"
+#: src/Tribe/Commerce/EDD/Main.php:1308
+#: src/Tribe/Commerce/WooCommerce/Main.php:2009
+msgid "This is a ticket for the event:"
+msgstr "Toto je vstupenka na akci:"
 
-#: src/admin-views/edd-metabox-advanced.php:50
-#: src/admin-views/woocommerce-metabox-advanced.php:63
-msgid "Currently, tickets will only show up on the frontend once per full event. For PRO users this means the same ticket will appear across all events in the series. Please configure your events accordingly."
-msgstr ""
+#: src/Tribe/Commerce/EDD/Main.php:1250
+#: src/Tribe/Commerce/WooCommerce/Main.php:1961
+msgid "Event sales report"
+msgstr "Přehled prodejů vstupenek"
 
-#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:144
-msgid "Out of stock!"
-msgstr "Není k dispozici!"
+#: src/Tribe/Commerce/EDD/Main.php:1051
+#: src/Tribe/Commerce/WooCommerce/Main.php:1688
+msgid "(deleted)"
+msgstr "(smazáno)"
 
-#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:201
-msgid "Add to cart"
-msgstr "Přidat do košíku"
+#: src/Tribe/Commerce/EDD/Main.php:488
+#: src/Tribe/Commerce/WooCommerce/Main.php:810
+msgid "You'll receive your tickets in another email."
+msgstr "Vstupenky obdržíte v dalším emailu."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.5.3)  #-#-#-#-#
-#. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:295
-msgid "Event Tickets Plus"
-msgstr "Event Tickets Plus"
+#: src/Tribe/Commerce/Loader.php:103 src/Tribe/Commerce/Loader.php:118
+msgid "Easy Digital Downloads"
+msgstr "Easy Digital Downloads"
 
-#. Author of the plugin/theme
-msgid "Modern Tribe, Inc."
-msgstr "Modern Tribe, Inc."
+#: src/Tribe/Commerce/EDD/Email.php:40
+msgid "Enter the subject line for the tickets receipt email"
+msgstr "Zadejte předmět emailu pro doručení vstupenek"
 
-#. Author URI of the plugin/theme
-msgid "http://m.tri.be/28"
-msgstr "http://m.tri.be/28"
+#: src/Tribe/Commerce/EDD/Email.php:39
+msgid "Tickets Email Subject"
+msgstr "Předmět emailu se vstupenkami"
+
+#: src/Tribe/Commerce/EDD/Email.php:34
+msgid "Configure the ticket receipt emails"
+msgstr "Nastavení emailů pro doručení vstupenek"
+
+#: src/Tribe/Commerce/EDD/Email.php:33
+msgid "Tribe Ticket Emails"
+msgstr "Emaily pro Tribe vstupenky"
+
+#: src/Tribe/Commerce/EDD/Email.php:13
+msgid "Your tickets from {sitename}"
+msgstr "Vaše vstupenky z webu {sitename}"

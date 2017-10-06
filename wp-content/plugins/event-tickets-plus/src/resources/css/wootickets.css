@@ -74,7 +74,7 @@
 }
 
 .tribe-events-tickets td.woocommerce {
-	border-bottom: 0;
+	border-bottom: 1px solid #dfdfdf;
 }
 
 .tribe-events-tickets .tickets_nostock {

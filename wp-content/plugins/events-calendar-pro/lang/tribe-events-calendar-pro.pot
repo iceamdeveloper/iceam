@@ -2,13 +2,13 @@
 # This file is distributed under the same license as the The Events Calendar PRO package.
 msgid ""
 msgstr ""
-"Project-Id-Version: The Events Calendar PRO 4.4.15\n"
+"Project-Id-Version: The Events Calendar PRO 4.4.18\n"
 "Report-Msgid-Bugs-To: http://m.tri.be/191x\n"
-"POT-Creation-Date: 2017-07-25 17:35:56+00:00\n"
+"POT-Creation-Date: 2017-10-04 18:29:39+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2017-07-25 17:35\n"
+"PO-Revision-Date: 2017-10-04 18:29\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
@@ -189,104 +189,108 @@ msgstr ""
 msgid "map"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:111
+#: src/Tribe/Geo_Loc.php:114
 msgid "Distance"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:142
+#: src/Tribe/Geo_Loc.php:152
 msgid "Map view search distance limit"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:144
+#: src/Tribe/Geo_Loc.php:154
 msgid ""
 "Set the distance that the location search covers (find events within X "
 "distance units of location search input)."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:151
+#: src/Tribe/Geo_Loc.php:161
 msgid "Distance unit"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:157 src/Tribe/Geo_Loc_Filter.php:23
+#: src/Tribe/Geo_Loc.php:167 src/Tribe/Geo_Loc_Filter.php:23
 msgid "Miles"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:158 src/Tribe/Geo_Loc_Filter.php:26
+#: src/Tribe/Geo_Loc.php:168 src/Tribe/Geo_Loc_Filter.php:26
 msgid "Kilometers"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:164
+#: src/Tribe/Geo_Loc.php:174
 msgid "Fix geolocation data"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:164
+#: src/Tribe/Geo_Loc.php:174
 msgid ""
 "You have %d venues for which we don't have geolocation data. We need to use "
 "the Google Maps API to get that information. Doing this may take a while "
 "(approximately 1 minute for every 200 venues)."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:173
+#: src/Tribe/Geo_Loc.php:183
 msgid "Hide location search"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:174
+#: src/Tribe/Geo_Loc.php:184
 msgid ""
 "Removes location search field from the events bar on all views except for "
 "map view."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:229
+#: src/Tribe/Geo_Loc.php:239
 msgid "Map"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:263
+#: src/Tribe/Geo_Loc.php:273
+msgid "Venue Overwrite Coordinates"
+msgstr ""
+
+#: src/Tribe/Geo_Loc.php:305
 msgid "Near"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:264
+#: src/Tribe/Geo_Loc.php:306
 msgid "Location"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:289
+#: src/Tribe/Geo_Loc.php:331
 msgid "Use latitude + longitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:293
+#: src/Tribe/Geo_Loc.php:335
 msgid "Latitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:294
+#: src/Tribe/Geo_Loc.php:336
 msgid "Longitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:454
+#: src/Tribe/Geo_Loc.php:530
 msgctxt "debug geodata"
 msgid "Geocode request failed ($1%s - $2%s)"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:455
+#: src/Tribe/Geo_Loc.php:531
 msgctxt "debug geodata"
 msgid "empty response"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:506
+#: src/Tribe/Geo_Loc.php:582
 msgid ""
 "The latitude and longitude for your venue could not be fetched. The Google "
 "Maps API daily query limit has been reached!"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:822
+#: src/Tribe/Geo_Loc.php:980
 msgid "Fix venues data"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:866
+#: src/Tribe/Geo_Loc.php:1024
 msgid ""
 "You have venues for which we don't have Geolocation information. <a "
 "href='%s'>Click here to generate it</a>."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:892
+#: src/Tribe/Geo_Loc.php:1050
 msgid "Fixed geolocation data for %d venues"
 msgstr ""
 
@@ -311,7 +315,7 @@ msgid "all"
 msgstr ""
 
 #: src/Tribe/Main.php:73 src/admin-views/event-recurrence.php:104
-#: src/admin-views/event-recurrence.php:340
+#: src/admin-views/event-recurrence.php:356
 msgid "week"
 msgstr ""
 
@@ -562,8 +566,8 @@ msgstr ""
 msgid "The events calendar mini calendar widget"
 msgstr ""
 
-#: src/Tribe/Mini_Calendar_Widget.php:11 src/Tribe/Mini_Calendar_Widget.php:24
-#: src/Tribe/Mini_Calendar_Widget.php:73
+#: src/Tribe/Mini_Calendar_Widget.php:11 src/Tribe/Mini_Calendar_Widget.php:28
+#: src/Tribe/Mini_Calendar_Widget.php:77
 msgid "Events Calendar"
 msgstr ""
 
@@ -1660,17 +1664,17 @@ msgstr ""
 msgid "$template_object is expected to be an actual object"
 msgstr ""
 
-#: src/Tribe/Templates/Map.php:104
+#: src/Tribe/Templates/Map.php:105
 msgid "No results were found for events in or near <strong>\"%s\"</strong>."
 msgstr ""
 
-#: src/Tribe/Templates/Map.php:106 src/Tribe/Templates/Week.php:207
+#: src/Tribe/Templates/Map.php:107 src/Tribe/Templates/Week.php:207
 msgid ""
 "No matching events listed under %s. Please try viewing the full calendar for "
 "a complete list of events."
 msgstr ""
 
-#: src/Tribe/Templates/Map.php:108
+#: src/Tribe/Templates/Map.php:109
 msgid "There were no results found."
 msgstr ""
 
@@ -1827,6 +1831,10 @@ msgid ""
 "Once you click OK this cannot be undone."
 msgstr ""
 
+#: src/admin-views/event-meta.php:17
+msgid "Additional %1$s Fields"
+msgstr ""
+
 #: src/admin-views/event-meta.php:32 src/admin-views/event-meta.php:48
 msgid "None"
 msgstr ""
@@ -1848,80 +1856,80 @@ msgid "Delete This"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:55
-#: src/admin-views/event-recurrence.php:293
+#: src/admin-views/event-recurrence.php:309
 msgid "event"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:56
-#: src/admin-views/event-recurrence.php:294
+#: src/admin-views/event-recurrence.php:310
 msgid "events"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:59
 #: src/admin-views/event-recurrence.php:96
-#: src/admin-views/event-recurrence.php:297
-#: src/admin-views/event-recurrence.php:332
+#: src/admin-views/event-recurrence.php:313
+#: src/admin-views/event-recurrence.php:348
 #: src/admin-views/recurrence/months.php:90
 #: src/admin-views/recurrence/years.php:136
 msgid "day"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:59
-#: src/admin-views/event-recurrence.php:297
+#: src/admin-views/event-recurrence.php:313
 msgid "Daily"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:60
-#: src/admin-views/event-recurrence.php:298
+#: src/admin-views/event-recurrence.php:314
 msgid "Weekly"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:61
-#: src/admin-views/event-recurrence.php:299
+#: src/admin-views/event-recurrence.php:315
 msgid "Monthly"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:62
-#: src/admin-views/event-recurrence.php:300
+#: src/admin-views/event-recurrence.php:316
 msgid "Yearly"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:63
-#: src/admin-views/event-recurrence.php:301
+#: src/admin-views/event-recurrence.php:317
 msgid "Once"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:68
-#: src/admin-views/event-recurrence.php:306
+#: src/admin-views/event-recurrence.php:322
 #: src/admin-views/recurrence/months.php:2
 #: src/admin-views/recurrence/years.php:53
 msgid "On"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:81
-#: src/admin-views/event-recurrence.php:318
+#: src/admin-views/event-recurrence.php:334
 #: src/admin-views/recurrence/years.php:12
 msgid "Every"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:99
-#: src/admin-views/event-recurrence.php:335
+#: src/admin-views/event-recurrence.php:351
 #: src/views/pro/widgets/countdown-widget.php:20
 msgid "days"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:107
-#: src/admin-views/event-recurrence.php:343
+#: src/admin-views/event-recurrence.php:359
 msgid "weeks"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:112
-#: src/admin-views/event-recurrence.php:348
+#: src/admin-views/event-recurrence.php:364
 msgid "month"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:115
-#: src/admin-views/event-recurrence.php:351
+#: src/admin-views/event-recurrence.php:367
 msgid "months"
 msgstr ""
 
@@ -1939,22 +1947,22 @@ msgid "a different time:"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:195
-#: src/admin-views/event-recurrence.php:397
+#: src/admin-views/event-recurrence.php:413
 msgid "Series ends"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:204
-#: src/admin-views/event-recurrence.php:407
+#: src/admin-views/event-recurrence.php:423
 msgid "on"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:205
-#: src/admin-views/event-recurrence.php:408
+#: src/admin-views/event-recurrence.php:424
 msgid "after"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:206
-#: src/admin-views/event-recurrence.php:409
+#: src/admin-views/event-recurrence.php:425
 msgid "never"
 msgstr ""
 
@@ -1963,55 +1971,59 @@ msgid "Series ends on this date"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:239
-#: src/admin-views/event-recurrence.php:441
+#: src/admin-views/event-recurrence.php:457
 msgctxt "occurence count text"
 msgid "events"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:242
-#: src/admin-views/event-recurrence.php:444
+#: src/admin-views/event-recurrence.php:460
 msgid "You must select a recurrence end date"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:251
-#: src/admin-views/event-recurrence.php:465
+#: src/admin-views/event-recurrence.php:481
 msgid "Show Details"
 msgstr ""
 
 #: src/admin-views/event-recurrence.php:252
-#: src/admin-views/event-recurrence.php:466
+#: src/admin-views/event-recurrence.php:482
 msgid "Hide Details"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:260
+#: src/admin-views/event-recurrence.php:261
 msgid "Schedule multiple events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:263
+#: src/admin-views/event-recurrence.php:264
 msgid "Add more events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:276
+#: src/admin-views/event-recurrence.php:273
+msgid "Recurring Events Active"
+msgstr ""
+
+#: src/admin-views/event-recurrence.php:292
 msgid "Event will not occur:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:452
+#: src/admin-views/event-recurrence.php:468
 msgid "Frequency of recurring event must be a number"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:472
+#: src/admin-views/event-recurrence.php:488
 msgid "Add Exclusion"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:477
+#: src/admin-views/event-recurrence.php:493
 msgid "Recurrence Description:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:479
+#: src/admin-views/event-recurrence.php:495
 msgid "Recurrence Description"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:482
+#: src/admin-views/event-recurrence.php:498
 msgid ""
 "Use this field if you want to override the auto-generated descriptions of "
 "event recurrence"
@@ -2581,7 +2593,7 @@ msgstr ""
 msgid "There are no upcoming %s at this time."
 msgstr ""
 
-#: src/views/pro/widgets/modules/single-event.php:177
+#: src/views/pro/widgets/modules/single-event.php:194
 msgctxt "list separator for final two elements"
 msgid "and"
 msgstr ""

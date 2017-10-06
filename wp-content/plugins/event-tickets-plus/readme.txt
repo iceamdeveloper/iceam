@@ -2,9 +2,9 @@
 
 Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tribe, faction23, geoffgraham, ggwicz, jazbek, jbrinley, joshlimecuda, leahkoerper, lucatume, mastromktg, neillmcshea, nicosantos, peterchester, reid.peifer, roblagatta, shane.pearlman, thatdudebutch,  zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
-Requires at least: 3.9
-Tested up to: 4.8
-Stable tag: 4.5.3
+Requires at least: 4.5
+Tested up to: 4.8.2
+Stable tag: 4.5.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -141,6 +141,25 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.5.5] 2017-09-20 =
+
+* Fix - Fix issue where "Who's Attending?" list would often incorrectly report the number of people attending an event [87429]
+* Fix - Prevent blank option values for fields like radio, checkbox, and dropdown [72409]
+* Tweak - Make the bottom-border on some WooCommerce ticket elements more consistent in color and width (props to @webidextrous for reporting this!) [81562]
+
+= [4.5.4] 2017-09-06 =
+
+* Fix - Fixed issue where "Who's Attending?" list would often fail to show up on custom post types. [73052]
+* Fix - Fixed dates in Orders report for items with status other than complete [77694]
+* Fix - Ensure that if an Attendee is deleted, it cannot be "checked in" (props to ahelman for reporting this!) [75744]
+* Tweak - Added new filter `tribe_event_tickets_plus_email_meta_fields` (thanks @carlosmachado for the suggestion) [63516]
+* Tweak - Adjusted multiline option markup for meta fields type text [67508] 
+* Tweak - Fixed incorrect plugin version in code documentation [87065]
+* Tweak - Purge unused meta fields template file [72411]
+* Tweak - Changed views: `eddtickets/tickets.php` and `wootickets/tickets.php`
+* Tweak - New template tags: `unhook_event_tickets_order_link_logic()`
+* Language - 1 new strings added, 19 updated, 0 fuzzied, and 0 obsoleted
 
 = [4.5.3] 2017-07-26 =
 

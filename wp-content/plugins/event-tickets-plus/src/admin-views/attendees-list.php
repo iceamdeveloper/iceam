@@ -8,7 +8,7 @@
 					</label>
 				</td>
 				<td>
-					<input type="checkbox" name="tribe-tickets-hide-attendees-list" id="tribe-tickets-hide-attendees-list" value="1" <?php checked( ! $is_attendees_list_hidden ); // inverted purposefully for backwards-compat @since M17.12 ?> />
+					<input type="checkbox" name="tribe-tickets-hide-attendees-list" id="tribe-tickets-hide-attendees-list" value="1" <?php checked( ! $is_attendees_list_hidden ); // inverted purposefully for backwards-compat @since 4.5.1 ?> />
 				</td>
 			</tr>
 		</table>

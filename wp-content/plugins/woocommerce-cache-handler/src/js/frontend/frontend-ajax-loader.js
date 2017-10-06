@@ -1,5 +1,22 @@
 /* JavaScript for Frontend pages */
 jQuery(document).ready(function($) {
+	/**
+	 * Returns the value of a cookie.
+	 *
+	 * @param string name The cookie name.
+	 * @return mixed
+	 */
+	function get_cookie(name) {
+		// If js-cookie is installed, use it
+		if(typeof Cookies != 'undefined') {
+			return Cookies.get(name);
+		}
+		if(typeof $.cookie != 'undefined') {
+			return $.cookie(name);
+		}
+		return null;
+	}
+
 	var params = woocommerce_cache_handler_params;
 	var ajax_url = params.ajax_url;
 	var active_currency = '';
@@ -173,8 +190,8 @@ jQuery(document).ready(function($) {
 	 * that they show the country passed as a parameter as "selected".
 	 */
 	var update_country_selectors = function() {
-		var country_code = $.cookie('aelia_customer_country') || '';
-		var state_code = $.cookie('aelia_customer_state') || '';
+		var country_code = get_cookie('aelia_customer_country') || '';
+		var state_code = get_cookie('aelia_customer_state') || '';
 		if(country_code == '') {
 			return;
 		}

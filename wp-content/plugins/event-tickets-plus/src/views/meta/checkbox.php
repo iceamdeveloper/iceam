@@ -6,10 +6,11 @@
  *
  *     [your-theme]/tribe-events/meta/checkbox.php
  *
- * @version 4.3.5
+ * @version 4.5.5
  *
  */
 $options = null;
+
 if ( isset( $field['extra'] ) && ! empty( $field['extra']['options'] ) ) {
 	$options = $field['extra']['options'];
 }
@@ -30,8 +31,8 @@ if ( ! $options ) {
 	<?php
 	foreach ( $options as $option ) {
 		$option_slug = sanitize_title( $option );
-		$option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}";
-		$slug = $this->slug . '_' . $option_slug;
+		$option_id   = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}";
+		$slug        = $this->slug . '_' . $option_slug;
 
 		?>
 		<label for="<?php echo esc_attr( $option_id ); ?>" class="tribe-tickets-meta-field-header">

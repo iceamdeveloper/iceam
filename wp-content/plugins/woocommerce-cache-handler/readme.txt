@@ -1,8 +1,12 @@
 === WooCommerce Cache Handler ===
-Requires at least: 4.0
-Tested up to: 4.7
 Tags: woocommerce, multi-currency, multiple currency, caching
-License: GPL-3.0
+Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
+Requires at least: 4.0
+Tested up to: 4.8
+License: GPLv3
+License URI: http://www.gnu.org/licenses/gpl-3.0.html
+WC requires at least: 2.4
+WC tested up to: 3.1.2
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
@@ -16,7 +20,7 @@ Implements a workaround to allow plugins to work with caching systems that don't
 
 * WordPress 4.0 or newer.
 * PHP 5.3 or newer.
-* WooCommerce 2.4.x to 3.0.x.
+* WooCommerce 2.4.x to 3.1.x.
 * [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or later.
 
 == Frequently Asked Questions ==
@@ -36,6 +40,9 @@ For more information about installation and management of plugins, please refer 
 1. **Settings > Options**. Miscellaneous options.
 
 == Changelog ==
+
+= 1.0.7.170926 =
+* Bug fix - Fixed handling of cookies with WooCommerce 3.0 and later.
 
 = 1.0.6.170520 =
 * Code cleanup.

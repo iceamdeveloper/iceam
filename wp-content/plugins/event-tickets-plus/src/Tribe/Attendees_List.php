@@ -33,7 +33,11 @@ class Tribe__Tickets_Plus__Attendees_List {
 		$myself = self::instance();
 
 		// This will include before the RSVP
-		add_action( 'tribe_events_single_event_after_the_meta', array( $myself, 'render' ), 4 );
+		add_action( 'tribe_tickets_before_front_end_ticket_form', array( $myself, 'render' ), 4 );
+
+		// Unhook Event Ticket's "View your RSVPs" rendering logic so that we can re-render with ET+'s "Who's attending?" list.
+		add_action( 'init', array( $myself, 'unhook_event_tickets_order_link_logic' ) );
+		add_action( 'tribe_tickets_before_front_end_ticket_form', array( Tribe__Tickets__Tickets_View::instance(), 'inject_link_template' ), 4 );
 
 		// Add the Admin Option for removing the Attendees List
 		add_action( 'tribe_events_tickets_metabox_pre', array( $myself, 'render_admin_options' ) );
@@ -93,13 +97,13 @@ class Tribe__Tickets_Plus__Attendees_List {
 		if ( '' === $is_hidden ) {
 			/**
 			 * default to hide - which is unchecked but stored as true (1) in the Db for backwards compat.
-			 * @since M17.12
+			 * @since 4.5.1
 			 */
 			$is_hidden = true;
 		} else {
 			/**
 			 * invert logic for backwards compat.
-			 * @since M17.12
+			 * @since 4.5.1
 			 */
 			$is_hidden = ! $is_hidden;
 		}
@@ -169,6 +173,19 @@ class Tribe__Tickets_Plus__Attendees_List {
 	}
 
 	/**
+	 * Unhook Event Ticket's "View your RSVPs" rendering logic. Better enables re-rendering of that link
+	 * with ET+'s "Who's attending?" list across all tickets-enabled post types.
+	 *
+	 * @since 4.5.4
+	 */
+	public function unhook_event_tickets_order_link_logic() {
+		$tickets_view = Tribe__Tickets__Tickets_View::instance();
+
+		remove_action( 'tribe_events_single_event_after_the_meta', array( $tickets_view, 'inject_link_template' ), 4 );
+		remove_filter( 'the_content', array( $tickets_view, 'inject_link_template_the_content' ), 9 );
+	}
+
+	/**
 	 * Includes the Attendees List HTML
 	 *
 	 * @param  int|WP_Post $event
@@ -181,19 +198,32 @@ class Tribe__Tickets_Plus__Attendees_List {
 		}
 
 		if (
-			'tribe_events_single_event_after_the_meta' === current_filter() &&
+			'tribe_tickets_before_front_end_ticket_form' === current_filter() &&
 			self::is_hidden_on( $event )
 		) {
 			return;
 		}
 
 		// using the Attendees as a variable here allows more template configuration if needed
-		$attendees = Tribe__Tickets__Tickets::get_event_attendees( $event->ID );
-		$attendees_total = count( $attendees );
+		$attendees       = Tribe__Tickets__Tickets::get_event_attendees( $event->ID );
+		$attendees_going = $attendees;
+
+		if ( empty( $attendees ) || ! is_array( $attendees ) ) {
+			return;
+		}
+
+		foreach ( $attendees as $key => $attendee ) {
+			if ( 'no' === $attendee['order_status'] ) {
+				unset( $attendees_going[ $key ] );
+			}
+		}
+
+		$attendees_total = count( $attendees_going );
 
 		if ( 0 === $attendees_total ) {
 			return;
 		}
+
 		$attendees_list = $this->get_attendees( $event->ID, $limit );
 
 		include_once Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'attendees-list' );
@@ -207,6 +237,14 @@ class Tribe__Tickets_Plus__Attendees_List {
 	 * @return array
 	 */
 	public function get_attendees( $event, $limit = 20 ) {
+
+		/**
+		 * Allow for adjusting the limit of attendees retrieved for the front-end "Who's Attending?" list.
+		 *
+		 * @since 4.5.5
+		 *
+		 * @param int $limit Number of attendees to retrieve.
+		 */
 		$limit      = apply_filters( 'tribe_tickets_plus_attendees_list_limit', $limit );
 		$attendees  = Tribe__Tickets__Tickets::get_event_attendees( $event );
 		$total      = count( $attendees );
@@ -221,8 +259,13 @@ class Tribe__Tickets_Plus__Attendees_List {
 				continue;
 			}
 
-			// Skip when we already have another email like this one
+			// Skip when we already have another email like this one.
 			if ( in_array( $attendee['purchaser_email'], $emails ) ) {
+				continue;
+			}
+
+			// Skip folks who've RSVPed as "Not Going".
+			if ( 'no' === $attendee['order_status'] ) {
 				continue;
 			}
 
