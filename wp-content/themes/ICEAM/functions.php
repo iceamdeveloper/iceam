@@ -10,6 +10,52 @@
 
 
 
+ 
+/***********************************************************************
+ *
+ *	ENSURE THAT ADAPTIVE PAYMENT RECIPIENTS ARE INCLUDED ON
+ *	NEW ORDER EMAILS WITH ORDER DETAILS
+ *
+ **********************************************************************/
+
+function add_adaptive_recipients($id, $recipient, $order){
+	// for some reason this filter is run on the WooCommerce > Emails settings page.
+	// However, in this context, the order object for the email is not set
+	// so detect if this is an admin page and, if so, kill the operation
+	$page = $_GET['page'] = isset( $_GET['page'] ) ? $_GET['page'] : '';
+	if ( 'wc-settings' === $page ) {
+		return $recipient; 
+	}
+	
+	if ( sizeof( $order->get_items() ) > 0 ) {
+		foreach ( $order->get_items() as $item ) {
+			if ( $item['qty'] ) {
+				$product_id        = $item['product_id'];
+				$product_receivers = get_post_meta( $product_id, '_paypal_adaptive_receivers', true );
+				$product_receivers = array_filter( explode( PHP_EOL, $product_receivers ) );
+
+				if ( ! is_array( $product_receivers ) || empty( $product_receivers ) ) {
+					continue;
+				}
+				
+
+				foreach ( $product_receivers as $receiver ) {
+					$receiver = array_map( 'sanitize_text_field', array_filter( explode( '|', $receiver ) ) );
+					if ( ! is_array( $receiver ) || empty( $receiver ) ) {
+						continue;
+					}
+					
+					$recipient .= ', ' . $receiver[0];
+				}
+			}
+		}
+	}
+	
+	return $recipient;
+}
+add_filter("woocommerce_email_recipient_new_order","add_adaptive_recipients",20,3);
+
+
 
  
 /***********************************************************************
