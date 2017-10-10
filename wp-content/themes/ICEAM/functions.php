@@ -18,7 +18,7 @@
  *
  **********************************************************************/
 
-function add_adaptive_recipients($id, $recipient, $order){
+function add_adaptive_recipients($recipient, $order){
 	// for some reason this filter is run on the WooCommerce > Emails settings page.
 	// However, in this context, the order object for the email is not set
 	// so detect if this is an admin page and, if so, kill the operation
@@ -53,7 +53,7 @@ function add_adaptive_recipients($id, $recipient, $order){
 	
 	return $recipient;
 }
-add_filter("woocommerce_email_recipient_new_order","add_adaptive_recipients",20,3);
+add_filter("woocommerce_email_recipient_new_order","add_adaptive_recipients",20,2);
 
 
 
