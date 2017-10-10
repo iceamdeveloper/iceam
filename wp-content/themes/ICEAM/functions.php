@@ -11,13 +11,21 @@
 
 
 
+/**
+* Disables the public attendee lists on all events
+*
+* Removes the tribe_events_single_event_after_the_meta action that injects the attendee
+* list that was introduced with the initial 4.1 release of Event Tickets Plus
+*/
+
+add_filter( 'tribe_tickets_plus_hide_attendees_list', '__return_true' );
+
  
 /***********************************************************************
  *
  *	ADD COLOR TO THE ADMIN LEFT NAV FOR SCANNABILITY
  *
  **********************************************************************/
- 
  
 function admin_style() {
 	wp_enqueue_style('admin-styles', get_stylesheet_directory_uri().'/css/admin.css');

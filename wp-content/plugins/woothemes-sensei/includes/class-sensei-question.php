@@ -488,7 +488,7 @@ class Sensei_Question {
     public static function the_question_description( $question_id  ){
 
         echo self::get_the_question_description( $question_id );
-
+		echo "<!-- **here** -->";
     }
 
     /**

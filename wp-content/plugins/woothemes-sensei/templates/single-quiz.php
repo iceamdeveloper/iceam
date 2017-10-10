@@ -59,7 +59,7 @@
 	                <?php while ( sensei_quiz_has_questions() ): sensei_setup_the_question(); ?>
 
 	                    <li class="<?php sensei_the_question_class();?>">
-
+<!-- here -->
 	                        <?php
 
 	                            /**
@@ -76,7 +76,7 @@
 	                            do_action( 'sensei_quiz_question_inside_before', sensei_get_the_question_id() );
 
 	                        ?>
-
+<!-- here -->
 	                        <?php sensei_the_question_content(); ?>
 
 	                        <?php

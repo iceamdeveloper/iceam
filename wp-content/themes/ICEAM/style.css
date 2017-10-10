@@ -643,6 +643,10 @@ table.profile-fields td.label{
     width: 100%;
 }
 
+.sensei.single-quiz .restricted{
+    display: none;
+}
+
 .sensei.single-course .course-lessons .lesson .lesson-meta > span{
     font-size: inherit;
 }
