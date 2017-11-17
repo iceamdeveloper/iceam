@@ -229,9 +229,14 @@ add_filter( 'woocommerce_subscriptions_update_users_role', '__return_false', 100
  *
  *	AUTOMATICALLY APPLY COUPON TO SUBSCRIPTION SIGNUP PRODUCT
  *
+ *	Dynamic Pricing discounts apply to the recurring fee on a subscription product,
+ *	but not the signup fee. This function looks for subscription products in the cart
+ *	and, if it finds them, applies a coupon that reduces the signup fee cost.
+ *
  **********************************************************************/
  
 add_action( 'woocommerce_before_cart', 'apply_signup_coupons' );
+add_action( 'woocommerce_before_checkout_form', 'apply_signup_coupons' );
 
 function apply_signup_coupons() {
     global $woocommerce;
