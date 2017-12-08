@@ -22,6 +22,14 @@ font-family: 'Raleway', sans-serif;
 
 */
 
+
+/*temporarily hide purchase buttons from two courses*/
+.single-course.postid-47 #iceam_course_signup_widget-2, 
+.single-course.postid-23 #iceam_course_signup_widget-2 {
+    display: none;
+}
+
+
 html {
     box-sizing: border-box;
 }
