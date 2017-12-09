@@ -1260,6 +1260,92 @@ body.page-id-67 .callout.staff {
 	background: #fff;
 }
 
+/*Profile*/
+#buddypress table.forum tr.alt td, #buddypress table.messages-notices tr.alt td, #buddypress table.notifications tr.alt td, #buddypress table.notifications-settings tr.alt td, #buddypress table.profile-fields tr.alt td, #buddypress table.profile-settings tr.alt td, #buddypress table.wp-profile-fields tr.alt td {
+	background:white;
+	color:black;
+}
+#buddypress table.forum tr td, #buddypress table.forum tr th, #buddypress table.messages-notices tr td, #buddypress table.messages-notices tr th, #buddypress table.notifications tr td, #buddypress table.notifications tr th, #buddypress table.notifications-settings tr td, #buddypress table.notifications-settings tr th, #buddypress table.profile-fields tr td, #buddypress table.profile-fields tr th, #buddypress table.profile-settings tr td, #buddypress table.wp-profile-fields tr td, #buddypress table.wp-profile-fields tr th {
+	padding-left: 0;
+	padding-top: 0;
+}
+#buddypress div.profile h2 {
+    margin-top: 15px;
+    margin-bottom: 25px;
+    border-bottom: 2px solid #212832;
+    padding-bottom: 7px;
+}
+li.bbp-topic-voice-count {
+	width: 12%;
+}
+li.bbp-topic-title {
+	width: 54%;
+}
+#buddypress .standard-form button {
+	background: #212832;
+    border: none;
+    color: #fff!important;
+    font-size: 16px;
+    cursor: inherit;
+    outline: inherit;
+    padding: 10px 20px;
+    text-align: inherit;
+    text-decoration: inherit;
+}
+#buddypress .standard-form button:hover {
+	background: #ffa739;
+    color: #FFF !important;
+    border: 0px;
+}
+#buddypress .dropdown {
+    display: inline-block;
+}
+#buddypress .dropdown-menu {
+    min-width: 100%;
+}
+#buddypress .dropdown-menu li a {
+    font-size: 1.15em;
+}
+#buddypress .dropdown-menu li.current a {
+	background: #eee;
+	color:#212832; 
+}
+#buddypress .dropdown-menu li.current a:hover {
+	text-decoration: none;
+}
+#buddypress #settings-form {
+    border: none;
+    padding: 0;
+}
+#buddypress .md-pad {
+    padding: 10px 25px;
+}
+#buddypress table.profile-fields tr td p {
+    margin-bottom: 8px;
+}
+#buddypress #item-header-cover-image #item-header-avatar {
+    position: relative;
+}
+.membership-level {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    left: 100%;
+    bottom: 21px;
+}
+.membership-level img {
+    height: 100%;
+    width: auto;
+}
+body.buddypress.profile div.profile li.bbp-topic-voice-count,
+body.buddypress.profile div.profile li.bbp-topic-reply-count { display: none; }
+body.buddypress.profile div.profile li.bbp-topic-freshness {
+    width: 46%;
+    text-align: left;
+    padding-left: 3%;
+}
+
+
 
 
 @media only screen and (max-width: 767px){

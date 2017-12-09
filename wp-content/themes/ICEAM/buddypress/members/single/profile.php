@@ -16,16 +16,16 @@
  * @since 1.1.0
  */
 do_action( 'bp_before_profile_content' ); ?>
+<div class='col-xs-12 profile no-pad'>
 
-<div class="profile col-sm-6">
-
-	<h2 class='section-title'>Profile</h2>
+<div class="col-sm-<?php if( !is_user_logged_in() || bp_current_action() !== 'public' ){echo '8'; } else { echo '6'; } ?>">
 
 	<?php
 		switch ( bp_current_action() ) :
 		
 			// Edit
 			case 'edit'   :
+				echo "<h2 class='section-title'>Edit Profile</h2>";
 				bp_get_template_part( 'members/single/profile/edit' );
 				break;
 		
@@ -41,6 +41,8 @@ do_action( 'bp_before_profile_content' ); ?>
 		
 			// Compose
 			case 'public' :
+
+				echo "<h2 class='section-title'>Profile</h2>";
 		
 				// Display XProfile
 				if ( bp_is_active( 'xprofile' ) )
@@ -59,17 +61,26 @@ do_action( 'bp_before_profile_content' ); ?>
 		endswitch;
 	?>
 
+	<?php if( bp_is_my_profile() || current_user_can('administrator') ): ?>
+	
 	<div class='dropdown'>
-		<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Dropdown Example
+		<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown" style='margin-top:.5em;'>Manage my Profile
   			<span class="caret"></span></button>
 		<ul class='dropdown-menu'>
 			<?php bp_get_options_nav(); ?>
+			<?php $displayed_user = get_user_by('ID',bp_displayed_user_id()); ?>
+			<li><a href="<?php echo get_home_url().'/member-directory/'.$displayed_user->user_nicename.'/settings'?>">Account Settings</a></li>
 		</ul>
 	</div>
+	
+	<?php endif; ?>
 
 </div><!-- .profile -->
 
-<div class='col-md-6'>
+<?php if( is_user_logged_in() && bp_current_action() == 'public' ): ?>
+
+<div class='col-sm-6'>
+
 	<h2 class='section-title'>Forum Activity</h2>
 	
 	<h3>Recent Topics</h3>
@@ -100,6 +111,10 @@ do_action( 'bp_before_profile_content' ); ?>
 	
 	<p><a href="forums" class="btn btn-default">See All Forum Activity</a></p>
 	
+</div>
+
+<?php endif; ?>
+
 </div>
 
 

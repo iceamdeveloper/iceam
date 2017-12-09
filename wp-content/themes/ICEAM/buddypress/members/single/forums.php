@@ -7,6 +7,7 @@
  */
 
 ?>
+<div class-'col-xs-12 profile'>
 
 <div class="item-list-tabs no-ajax" id="subnav" aria-label="<?php esc_attr_e( 'Member secondary navigation', 'buddypress' ); ?>" role="navigation">
 	<ul>
@@ -63,4 +64,6 @@ else :
 	 */
 	do_action( 'bp_after_member_forums_content' ); ?>
 
-<?php endif;
+<?php endif; ?>
+
+</div>

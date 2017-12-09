@@ -20,6 +20,8 @@ do_action( 'bp_before_member_header' ); ?>
 <div id="cover-image-container">
 	<a id="header-cover-image" href="<?php bp_displayed_user_link(); ?>"></a>
 
+
+
 	<div id="item-header-cover-image">
 		<div id="item-header-avatar">
 			<a href="<?php bp_displayed_user_link(); ?>">
@@ -27,6 +29,14 @@ do_action( 'bp_before_member_header' ); ?>
 				<?php bp_displayed_user_avatar( 'type=full' ); ?>
 
 			</a>
+			
+			<?php if( wc_memberships_is_user_active_member( bp_displayed_user_id() ,"5288") || wc_memberships_is_user_active_member( bp_displayed_user_id() ,"5315") ): ?>
+			<div class='membership-level'>
+				<?php if( wc_memberships_is_user_active_member( bp_displayed_user_id() ,"5315") ){ $img_src = 'gold-medal.png'; } else { $img_src = 'silver-medal.png'; } ?>
+				<img src='<?php echo get_stylesheet_directory_uri(); ?>/images/<?php echo $img_src; ?>' />
+			</div>
+			<?php endif; ?>
+
 		</div><!-- #item-header-avatar -->
 
 		<div id="item-header-content">

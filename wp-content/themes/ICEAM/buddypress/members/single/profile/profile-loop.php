@@ -39,10 +39,14 @@ do_action( 'bp_before_profile_loop_content' ); ?>
 
 				/** This action is documented in bp-templates/bp-legacy/buddypress/members/single/profile/profile-wp.php */
 				do_action( 'bp_before_profile_field_content' ); ?>
+				
+				<?php if( bp_get_the_profile_group_id() == 7 ){ 
+					echo '<h2 class="section-title">Practice Information</h2>';
+				} ?>
 
 				<div class="bp-widget <?php bp_the_profile_group_slug(); ?>">
 
-					<h3><?php bp_the_profile_group_name(); ?></h3>
+<!--					<h3><?php// bp_the_profile_group_name(); ?></h3>-->
 
 					<table class="profile-fields <?php echo $user_ID; ?>">
 
@@ -52,9 +56,9 @@ do_action( 'bp_before_profile_loop_content' ); ?>
 
 								<tr<?php bp_field_css_class(); ?>>
 
-									<td class="label"><?php bp_the_profile_field_name(); ?></td>
-
-									<td class="data"><?php bp_the_profile_field_value(); ?></td>
+									<!-- <td class="data"><strong><?php bp_the_profile_field_name(); ?></strong> -->
+									
+									<br><?php bp_the_profile_field_value(); ?></td>
 
 								</tr>
 

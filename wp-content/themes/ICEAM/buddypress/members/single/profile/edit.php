@@ -8,28 +8,91 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
     if (function_exists("wc_memberships_is_user_active_member")){
         echo "<!-- group: " . bp_get_current_profile_group_id() . " -->";
     }
+
+    //only display profile fields groups that the user is subscribed to
+    function filter_profile_tabs( $tabs, $groups, $group_name ){
+            
+        // get the current user's info
+        $user_ID = get_current_user_id();
+        $member_info = get_userdata($user_ID);
+
+        unset($tabs);
+        $tabs[] = '';
+
+        if( wc_memberships_is_user_active_member( null ,"5288") ){
+            $active_diplomate = true;
+        } else { $active_diplomate = false; }
+        if( wc_memberships_is_user_active_member( null ,"5315") ){
+            $gold_diplomate = true;
+        } else { $gold_diplomate = false; }
+        if( in_array('administrator',$member_info->roles) ){
+            $is_admin = true;
+        } else { $is_admin = false; }
+
+        for ( $i = 0, $count = count( $groups ); $i < $count; ++$i ) {
+
+            $current_id = $groups[$i]->id;
+
+            // Setup the selected class.
+            $selected = '';
+            if ( $group_name === $groups[ $i ]->name ) {
+              $selected = ' class="current"';
+            }
+
+            // Skip if group has no fields.
+            if ( empty( $groups[ $i ]->fields ) 
+                || !$gold_diplomate && !$active_diplomate && $current_id == 3 && !$is_admin 
+                || !$gold_diplomate && $current_id == 6 && !$is_admin 
+                || !$gold_diplomate && $current_id == 7 && !$is_admin ) {
+              continue;
+            }
+
+            // Build the profile field group link.
+            $link   = trailingslashit( bp_displayed_user_domain() . bp_get_profile_slug() . '/edit/group/' . $groups[ $i ]->id );
+
+            // Add tab to end of tabs array.
+            $tabs[] = sprintf(
+              '<li %1$s><a href="%2$s">%3$s</a></li>',
+              $selected,
+              esc_url( $link ),
+              esc_html( apply_filters( 'bp_get_the_profile_group_name', $groups[ $i ]->name ) )
+            );
+          }
+
+        return $tabs;
+    }
+
 ?>
 
 <form action="<?php bp_the_profile_group_edit_form_action(); ?>" method="post" id="profile-edit-form" class="standard-form <?php bp_the_profile_group_slug(); ?>">
 
 	<?php do_action( 'bp_before_profile_field_content' ); ?>
 
+        <?php add_filter('xprofile_filter_profile_group_tabs','filter_profile_tabs', 10, 3 ); ?>
+
 		<h4><?php printf( __( "Editing '%s' Profile Group", "buddypress" ), bp_get_the_profile_group_name() ); ?></h4>
-
-		<ul class="button-nav">
-
-			<?php bp_profile_group_tabs(); ?>
-
-		</ul>
-
-		<div class="clear"></div>
         
-        <?php
-            
+        <?php 
             // get the current user's info
             $user_ID = get_current_user_id();
             $member_info = get_userdata($user_ID);
-            
+        ?>		
+
+        <?php if( in_array('administrator',$member_info->roles) || wc_memberships_is_user_active_member(null,"5288") || wc_memberships_is_user_active_member(null,"5315") ): ?>
+        <div class='dropdown'>
+			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Member Profile Fields <span class="caret"></span></button>	
+			<ul class="dropdown-menu">
+				<?php bp_profile_group_tabs(); ?>
+			</ul>
+		</div>
+        <?php endif; ?>
+
+		<div class="clear"></div>
+
+        
+
+            <?php 
+
             /*
             * if user is an admin,
             * or the field group is "Member Fields" (group ID 1)
@@ -106,6 +169,18 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
         
                                 <?php bp_the_profile_field_options(); ?>
                             </div>
+        
+                        <?php endif; ?>
+        
+                        <?php if ( 'image' == bp_get_the_profile_field_type() ) : ?>
+        
+							<?php
+							if (class_exists('Bxcft_Field_Type_Image')){
+								$profile_image = new Bxcft_Field_Type_Image();
+								$profile_image->edit_field_html();
+								echo "<hr>";
+							}
+							?>
         
                         <?php endif; ?>
         
