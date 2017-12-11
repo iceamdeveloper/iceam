@@ -9,6 +9,8 @@
 /** This action is documented in bp-templates/bp-legacy/buddypress/members/single/profile/profile-wp.php */
 do_action( 'bp_before_profile_loop_content' ); ?>
 
+<p><?php $member_bio = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'42' ) ); echo $member_bio; ?></p>
+
 <?php if ( bp_has_profile() ) : ?>
 
 	<?php while ( bp_profile_groups() ) : bp_the_profile_group(); ?>
@@ -56,7 +58,7 @@ do_action( 'bp_before_profile_loop_content' ); ?>
 
 								<tr<?php bp_field_css_class(); ?>>
 
-									<!-- <td class="data"><strong><?php bp_the_profile_field_name(); ?></strong> -->
+									<td class="data"><strong><?php bp_the_profile_field_name(); ?></strong>
 									
 									<br><?php bp_the_profile_field_value(); ?></td>
 
