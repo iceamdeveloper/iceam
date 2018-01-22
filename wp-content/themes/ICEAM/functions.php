@@ -549,7 +549,9 @@ function display_subscription_title($subscription){
         $_product  = apply_filters( 'woocommerce_subscriptions_order_item_product', $subscription->get_product_from_item( $item ), $item );
 		
         if ( apply_filters( 'woocommerce_order_item_visible', true, $item ) ) {
-            echo wp_kses_post( apply_filters( 'woocommerce_order_item_name', $item['name'], $item ) );
+            echo "<p>";
+			echo wp_kses_post( apply_filters( 'woocommerce_order_item_name', $item['name'], $item ) );
+			echo "</p>";
         }
     }
 }
