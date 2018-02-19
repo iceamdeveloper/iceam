@@ -1344,8 +1344,17 @@ body.buddypress.profile div.profile li.bbp-topic-freshness {
     text-align: left;
     padding-left: 3%;
 }
-
-
+h3.profile-subheader {
+    font-size: 1.25em;
+    text-transform: none;
+    margin: 0.5em 0;
+}
+#content #buddypress input[type=submit] {
+    background-color: #f36557;
+}
+#content #buddypress input[type=submit]:hover {
+    background-color: #ffa739;
+}
 
 
 @media only screen and (max-width: 767px){
