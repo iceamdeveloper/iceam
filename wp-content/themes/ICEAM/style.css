@@ -658,6 +658,10 @@ table.profile-fields td.label{
 	margin-top: 30px;
 }
 
+#tribe-events-content{
+    overflow: visible;
+}
+
 #tribe-bar-form,
 .tribe-events-calendar,
 .single-tribe_events #tribe-events-footer,
