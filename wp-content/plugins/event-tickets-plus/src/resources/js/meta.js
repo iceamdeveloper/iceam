@@ -15,7 +15,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 				.siblings( '.attendee-meta-row' )
 				.slideToggle();
 		});
-		
+
 		this.$ticket_form = $( '.tribe-events-tickets' ).closest( '.cart' );
 
 		this.$ticket_form

@@ -58,7 +58,7 @@ class Tribe__Tickets_Plus__QR {
 			$url = add_query_arg(
 				array(
 					'post_type'     => $post->post_type,
-					'page'          => Tribe__Tickets__Tickets_Handler::$attendees_slug,
+					'page'          => tribe( 'tickets.attendees' )->slug(),
 					'event_id'      => $event_id,
 					'qr_checked_in' => $ticket_id,
 				), admin_url( 'edit.php' )

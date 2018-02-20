@@ -117,15 +117,10 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 		}
 
 		?>
-		<table id="tribetickets" class="event-tickets-plus-fieldset-table">
-			<?php
-			include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/meta.php';
-			?>
-		</table>
+		<div id="tribetickets" class="event-tickets-plus-fieldset-table tribe-tickets-plus-fieldset-page">
+			<?php include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/meta.php'; ?>
+		</div>
 		<?php
-
-		wp_enqueue_style( 'event-tickets-meta' );
-		wp_enqueue_script( 'event-tickets-meta-admin' );
 	}
 
 	/**
@@ -135,7 +130,7 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 	 */
 	public function get_fieldsets() {
 		$templates = get_posts( array(
-			'post_type' => Tribe__Tickets_Plus__Meta__Fieldset::POSTTYPE,
+			'post_type' => self::POSTTYPE,
 			'orderby' => 'title',
 			'order' => 'ASC',
 			'posts_per_page' => -1,

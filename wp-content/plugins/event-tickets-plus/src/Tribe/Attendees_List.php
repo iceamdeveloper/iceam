@@ -42,10 +42,6 @@ class Tribe__Tickets_Plus__Attendees_List {
 		// Add the Admin Option for removing the Attendees List
 		add_action( 'tribe_events_tickets_metabox_pre', array( $myself, 'render_admin_options' ) );
 
-		foreach ( Tribe__Tickets__Main::instance()->post_types() as $post_type ) {
-			add_action( 'save_post_' . $post_type, array( $myself, 'save_attendees_list_option' ) );
-		}
-
 		// Create the ShortCode
 		add_shortcode( 'tribe_attendees_list', array( $myself, 'shortcode' ) );
 
@@ -54,26 +50,6 @@ class Tribe__Tickets_Plus__Attendees_List {
 		add_action( 'event_tickets_rsvp_ticket_created', array( $myself, 'purge_transient' ), 10, 3 );
 		add_action( 'wootickets_generate_ticket_attendee', array( $myself, 'purge_transient' ), 10, 3 );
 		add_action( 'event_tickets_edd_ticket_created', array( $myself, 'edd_purge_transient' ), 10, 2 );
-	}
-
-	/**
-	 * Save the current meta option on if the Current Post Should have the attendees list hidden
-	 *
-	 * @param int $post_id
-	 */
-	public function save_attendees_list_option( $post_id ) {
-		if ( ! ( isset( $_POST[ 'tribe-tickets-post-settings' ] ) && wp_verify_nonce( $_POST[ 'tribe-tickets-post-settings' ], 'tribe-tickets-meta-box' ) ) ) {
-			return;
-		}
-
-		// Bail on autosaves/bulk updates
-		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
-			return;
-		}
-
-		$is_shown = ! empty( $_POST['tribe-tickets-hide-attendees-list'] );
-
-		update_post_meta( $post_id, self::HIDE_META_KEY, $is_shown );
 	}
 
 	/**

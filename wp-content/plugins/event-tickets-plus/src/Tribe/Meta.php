@@ -58,17 +58,16 @@ class Tribe__Tickets_Plus__Meta {
 			$this->path = trailingslashit( $path );
 		}
 
-		add_action( 'tribe_events_tickets_metabox_advanced', array( $this, 'metabox' ), 99, 2 );
-		add_action( 'wp_ajax_tribe-tickets-info-render-field', array( $this, 'ajax_render_fields' ) );
-		add_action( 'wp_ajax_tribe-tickets-load-saved-fields', array( $this, 'ajax_render_saved_fields' ) );
 		add_action( 'event_tickets_after_save_ticket', array( $this, 'save_meta' ), 10, 3 );
 		add_action( 'event_tickets_ticket_list_after_ticket_name', array( $this, 'maybe_render_custom_meta_icon' ) );
-		add_action( 'wp_enqueue_scripts', array( $this, 'wp_enqueue_scripts' ) );
+		add_action( 'tribe_events_tickets_metabox_edit_accordion_content', array( $this, 'accordion_content' ), 10, 2 );
 
-		add_filter( 'event_tickets_ajax_ticket_add_data', array( $this, 'inject_fieldsets_in_json' ), 10, 2 );
+		/* Ajax filters and actions */
+		add_filter( 'tribe_events_tickets_metabox_edit_attendee', array( $this, 'ajax_attendee_meta' ), 10, 2 );
+		add_action( 'wp_ajax_tribe-tickets-info-render-field', array( $this, 'ajax_render_fields' ) );
+		add_action( 'wp_ajax_tribe-tickets-load-saved-fields', array( $this, 'ajax_render_saved_fields' ) );
 
 		$this->meta_fieldset();
-		$this->register_resources();
 		$this->render();
 		$this->rsvp_meta();
 		$this->export();
@@ -115,63 +114,17 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	public function register_resources() {
-		wp_register_script(
-			'jquery-cookie',
-			plugins_url( 'vendor/jquery.cookie/jquery.cookie.js', dirname( dirname( __FILE__ ) ) ),
-			array( 'jquery' ),
-			Tribe__Tickets__Main::instance()->js_version(),
-			true
-		);
-
-		wp_register_script(
-			'jquery-deparam',
-			plugins_url( 'vendor/jquery.deparam/jquery.deparam.js', dirname( dirname( __FILE__ ) ) ),
-			array(),
-			Tribe__Tickets__Main::instance()->js_version()
-		);
-
-		wp_register_script(
-			'event-tickets-meta',
-			plugins_url( 'resources/js/meta.js', dirname( __FILE__ ) ),
-			array( 'jquery-cookie', 'jquery-deparam' ),
-			Tribe__Tickets__Main::instance()->js_version(),
-			true
-		);
-
-		wp_register_style(
-			'event-tickets-meta',
-			plugins_url( 'resources/css/meta.css', dirname( __FILE__ ) ),
-			array(),
-			Tribe__Tickets__Main::instance()->css_version()
-		);
-
-		wp_register_script(
-			'event-tickets-meta-admin',
-			plugins_url( 'resources/js/meta-admin.js', dirname( __FILE__ ) ),
-			array(
-				'jquery-ui-draggable',
-				'jquery-ui-droppable',
-			),
-			Tribe__Tickets__Main::instance()->js_version()
-		);
-
-		wp_register_script(
-			'event-tickets-meta-report',
-			plugins_url( 'resources/js/meta-report.js', dirname( __FILE__ ) ),
-			array(),
-			Tribe__Tickets__Main::instance()->js_version()
-		);
+		_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__Assets::admin_enqueue_scripts' );
 	}
 
 	public function wp_enqueue_scripts() {
-		wp_enqueue_script( 'event-tickets-meta' );
+		_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__Assets::admin_enqueue_scripts' );
 	}
 
 	/**
 	 * Retrieves custom meta fields for a given ticket
 	 *
-	 * @param int $ticket_id Ticket ID
-	 *
+	 * @param int $ticket_id ID of ticket post
 	 * @return array
 	 */
 	public function get_meta_fields_by_ticket( $ticket_id ) {
@@ -182,7 +135,7 @@ class Tribe__Tickets_Plus__Meta {
 		}
 
 		$field_meta = get_post_meta( $ticket_id, self::META_KEY, true );
-		$fields = array();
+		$fields     = array();
 
 		if ( $field_meta ) {
 			foreach ( (array) $field_meta as $field ) {
@@ -203,8 +156,9 @@ class Tribe__Tickets_Plus__Meta {
 		/**
 		 * Filters the fields for a ticket
 		 *
-		 * @var array $fields
-		 * @var int $ticket_id
+		 * @var array $fields array of fields to filter
+		 * @param int $ticket_id ID of ticket post
+		 * @return array $fields the filtered array
 		 */
 		$fields = apply_filters( 'event_tickets_plus_meta_fields_by_ticket', $fields, $ticket_id );
 
@@ -214,14 +168,13 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Retrieves the meta fields for all tickets associated with the specified event.
 	 *
-	 * @param $event_id
-	 *
+	 * @param int $post_id ID of parent "event" post
 	 * @return array
 	 */
-	public function get_meta_fields_by_event( $event_id ) {
+	public function get_meta_fields_by_event( $post_id ) {
 		$fields = array();
 
-		foreach ( Tribe__Tickets__Tickets::get_event_tickets( $event_id ) as $ticket ) {
+		foreach ( Tribe__Tickets__Tickets::get_event_tickets( $post_id ) as $ticket ) {
 			$meta_fields = $this->get_meta_fields_by_ticket( $ticket->ID );
 
 			if ( is_array( $meta_fields ) && ! empty( $meta_fields ) ) {
@@ -234,9 +187,9 @@ class Tribe__Tickets_Plus__Meta {
 		 * a specific event.
 		 *
 		 * @var array $fields
-		 * @var int   $event_id
+		 * @param int $post_id ID of parent "event" post
 		 */
-		return apply_filters( 'tribe_tickets_plus_get_meta_fields_by_event', $fields, $event_id );
+		return apply_filters( 'tribe_tickets_plus_get_meta_fields_by_event', $fields, $post_id );
 	}
 
 	/**
@@ -244,30 +197,61 @@ class Tribe__Tickets_Plus__Meta {
 	 *
 	 * @since 4.1
 	 *
-	 * @param int $post_id Post ID the ticket is attached to
-	 * @param int $ticket_id Ticket ID
+	 * @deprecated 4.6
 	 */
-	public function metabox( $post_id, $ticket_id ) {
-		if ( ! is_admin() ) {
+	public function metabox( $unused_post_id, $unused_ticket_id ) {
+		_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__Meta::accordion_content' );
+
+		$this->accordion_content( $unused_post_id, $ticket_id );
+	}
+
+	/**
+	 * Function to output accordion button & content to edit ticket panel
+	 *
+	 * @since 4.6
+	 *
+	 * @param int $unused_post_id ID of parent "event" post
+	 * @param int $ticket_id ID of ticket post
+	 */
+	public function accordion_content( $unused_post_id, $ticket_id = null ) {
+		$is_admin = tribe_is_truthy( tribe_get_request_var( 'is_admin', is_admin() ) );
+
+		if ( ! $is_admin ) {
 			return;
 		}
 
 		$enable_meta = $this->meta_enabled( $ticket_id );
 		$active_meta = $this->get_meta_fields_by_ticket( $ticket_id );
+		$templates   = $this->meta_fieldset()->get_fieldsets();
 
-		$templates = $this->meta_fieldset()->get_fieldsets();
+		tribe( 'tickets-plus.admin.views' )->template( 'attendee-meta', get_defined_vars() );
+	}
 
-		include $this->path . 'src/admin-views/meta.php';
+	/**
+	 * Gets just the meta fields for insertion via ajax
+	 *
+	 * @param int $unused_post_id ID of parent "event" post
+	 * @param int $ticket_id ID of ticket post
+	 * @return string The cutom field(s) html
+	 */
+	public function ajax_attendee_meta( $unused_post_id, $ticket_id ) {
+		$output      = '';
+		$active_meta = $this->get_meta_fields_by_ticket( $ticket_id );
+		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
 
-		wp_enqueue_style( 'event-tickets-meta' );
-		wp_enqueue_script( 'event-tickets-meta-admin' );
+		foreach ( $active_meta as $meta ) {
+			$field = $meta_object->generate_field( $ticket_id, $meta->type, (array) $meta );
+			// outputs HTML input field - no escaping
+			$output .= $field->render_admin_field();
+		}
+
+		return $output;
 	}
 
 	/**
 	 * Returns whether or not custom meta is enabled for the given ticket
 	 *
-	 * @param int $ticket_id Ticket post ID
-	 *
+	 * @param int $ticket_id ID of ticket post
 	 * @return bool
 	 */
 	public function meta_enabled( $ticket_id ) {
@@ -286,19 +270,11 @@ class Tribe__Tickets_Plus__Meta {
 	 *
 	 * @since 4.1
 	 *
-	 * @param int $post_id Event ID
+	 * @param int $post_id ID of parent "event" post
 	 * @param Tribe__Tickets__Ticket_Object $ticket Ticket object
 	 * @param array $data Post data that was submitted
 	 */
-	public function save_meta( $post_id, $ticket, $data ) {
-		// save the enabled/disabled state of the custom meta
-		update_post_meta( $ticket->ID, self::ENABLE_META_KEY, empty( $data['show_attendee_info'] ) ? 0 : 1 );
-
-		// if we're not enabling custom meta, don't bother saving the configured fields
-		if ( empty( $data['show_attendee_info'] ) ) {
-			return;
-		}
-
+	public function save_meta( $unused_post_id, $ticket, $data ) {
 		if ( empty( $data['tribe-tickets-input'] ) ) {
 			$meta = array();
 		} else {
@@ -320,12 +296,19 @@ class Tribe__Tickets_Plus__Meta {
 				'post_status' => 'publish',
 			) );
 
-			// this is for the meta fields template
+			// This is for the meta fields template
 			update_post_meta( $fieldset, Tribe__Tickets_Plus__Meta__Fieldset::META_KEY, $meta );
 		}
 
 	}
 
+	/**
+	 * Builds an array of fields
+	 *
+	 * @param int $ticket_id ID of ticket post
+	 * @param array $data field data
+	 * @return array array of fields
+	 */
 	public function build_field_array( $ticket_id, $data ) {
 		if ( empty( $data['tribe-tickets-input'] ) ) {
 			return array();
@@ -415,10 +398,9 @@ class Tribe__Tickets_Plus__Meta {
 	 *
 	 * @since 4.1
 	 *
-	 * @param null|int $ticket_id Ticket ID the field is attached to
+	 * @param int $ticket_id ID of ticket post the field is attached to
 	 * @param string $type Type of field being generated
 	 * @param array $data Field settings for the field
-	 *
 	 * @return Tribe__Tickets_Plus__Meta__Field__Abstract_Field child class
 	 */
 	public function generate_field( $ticket_id, $type, $data = array() ) {
@@ -437,11 +419,10 @@ class Tribe__Tickets_Plus__Meta {
 	 * @since 4.1
 	 *
 	 * @param int $product_id Commerce provider product ID
-	 *
 	 * @return array
 	 */
 	public function get_meta_cookie_data( $product_id ) {
-		return $this->storage->get_meta_data_for($product_id);
+		return $this->storage->get_meta_data_for( $product_id );
 	}
 
 	/**
@@ -450,7 +431,6 @@ class Tribe__Tickets_Plus__Meta {
 	 * @since 4.1
 	 *
 	 * @param array $product_ids Collection of Product IDs in an order
-	 *
 	 * @return array
 	 */
 	public function build_order_meta( $product_ids ) {
@@ -492,11 +472,13 @@ class Tribe__Tickets_Plus__Meta {
 	 * @param int $product_id Commerce product ID
 	 */
 	public function clear_meta_cookie_data( $product_id ) {
-		$this->storage->clear_meta_data_for($product_id);
+		$this->storage->clear_meta_data_for( $product_id );
 	}
 
 	/**
 	 * If the given ticket has attendee meta, render an icon to indicate that
+	 *
+	 * @param Tribe__Tickets__Ticket_Object $ticket
 	 */
 	public function maybe_render_custom_meta_icon( $ticket ) {
 		if ( ! is_admin() ) {
@@ -516,10 +498,126 @@ class Tribe__Tickets_Plus__Meta {
 	 * Injects fieldsets into JSON data during ticket add ajax output
 	 *
 	 * @param array $return Data array to be output in the ajax response for ticket adds
-	 * @param int $post_id Post ID number of post that tickets are tied to
+	 * @param int $post_id ID of parent "event" post
+	 * @return array $return output Data array with added fieldsets
 	 */
-	public function inject_fieldsets_in_json( $return, $post_id ) {
+	public function inject_fieldsets_in_json( $return, $unused_post_id ) {
 		$return['fieldsets'] = $this->meta_fieldset()->get_fieldsets();
 		return $return;
 	}
+
+	/************************
+	 *                      *
+	 *  Deprecated Methods  *
+	 *                      *
+	 ************************/
+	// @codingStandardsIgnoreStart
+
+	/**
+	 * Injects additional elements into the main ticket admin panel "header"
+	 *
+	 * @deprecated 4.6.2
+	 * @since 4.6
+	 *
+	 * @param int $post_id ID of parent "event" post
+	 */
+	public function tickets_post_capacity( $post_id ) {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/button-view-orders' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/button-view-orders' );
+	}
+
+	/**
+	 * Injects "New Ticket" button into initial view
+	 *
+	 * @deprecated 4.6.2
+	 * @since 4.6
+	 */
+	public function tickets_new_ticket_button() {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'button-new-ticket' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/button-new-ticket' );
+	}
+
+	/**
+	 * Injects additional columns into tickets table body
+	 *
+	 * @deprecated 4.6.2
+	 * @since 4.6
+	 *
+	 * @param $ticket_ID (obj) the ticket object
+	 * @param $provider_obj (obj) the ticket provider object
+	 */
+	public function ticket_table_add_tbody_column( $ticket, $provider_obj ) {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.editor' )->add_column_content_price( \$ticket, \$provider_obj )" );
+		tribe( 'tickets-plus.editor' )->add_column_content_price( $ticket, $provider_obj );
+	}
+
+	/**
+	 * Injects additional columns into tickets table header
+	 *
+	 * @deprecated 4.6.2
+	 * @since 4.6
+	 */
+	public function ticket_table_add_header_column() {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/column-head-price' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/column-head-price' );
+	}
+
+	/**
+	 * Creates and outputs the capacity table for the ticket settings panel
+	 *
+	 * @since 4.6
+	 * @deprecated 4.6.2
+	 *
+	 * @param int $post_id ID of parent "event" post
+	 *
+	 * @return void
+	 */
+	public function tickets_settings_capacity_table( $post_id ) {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/capacity-table' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/capacity-table' );
+	}
+
+	/**
+	 * Get the total capacity for the event, format it and display.
+	 *
+	 * @deprecated 4.6.2
+	 * @since 4.6
+	 *
+	 * @param int $post_id ID of parent "event" post
+	 *
+	 * @return void
+	 */
+	public function display_tickets_capacity( $post_id ) {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/total-capacity' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/total-capacity' );
+	}
+
+	/**
+	 * Injects additional fields into the event settings form below the capacity table
+	 *
+	 * @deprecated 4.6.2
+	 * @since 4.6
+	 *
+	 * @param int $post_id - the post id of the parent "event" post
+	 *
+	 * @return void
+	 */
+	public function tickets_settings_content( $post_id ) {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/price-field' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/settings-content' );
+	}
+
+	/**
+	 * Allows for the insertion of additional content into the ticket edit form - main section
+	 *
+	 * @since 4.6
+	 * @deprecated 4.6.2
+	 *
+	 */
+	public function tickets_edit_main() {
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/price-field' )" );
+		tribe( 'tickets-plus.admin.views' )->template( 'editor/price-field' );
+	}
+
+	// @codingStandardsIgnoreEnd
 }

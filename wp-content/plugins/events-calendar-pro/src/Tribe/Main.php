@@ -59,7 +59,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		public $shortcodes;
 
 		const REQUIRED_TEC_VERSION = '4.5.6';
-		const VERSION = '4.4.18';
+		const VERSION = '4.4.23';
 
 		private function __construct() {
 			$this->pluginDir = trailingslashit( basename( EVENTS_CALENDAR_PRO_DIR ) );
@@ -68,10 +68,6 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			$this->pluginSlug = 'events-calendar-pro';
 
 			$this->loadTextDomain();
-
-			$this->all_slug = sanitize_title( __( 'all', 'tribe-events-calendar-pro' ) );
-			$this->weekSlug = sanitize_title( __( 'week', 'tribe-events-calendar-pro' ) );
-			$this->photoSlug = sanitize_title( __( 'photo', 'tribe-events-calendar-pro' ) );
 
 			require_once( $this->pluginPath . 'src/functions/template-tags/general.php' );
 			require_once( $this->pluginPath . 'src/functions/template-tags/week.php' );
@@ -220,10 +216,14 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 
 		/**
 		 * AJAX handler for the Widget Term Select2
+		 *
+		 * @todo   We need to mode this to use Tribe__Ajax__Dropdown class
+		 *
 		 * @return void
 		 */
 		public function ajax_widget_get_terms() {
 			$disabled = $_POST['disabled'];
+			$search = tribe_get_request_var( 'search', false );
 
 			$taxonomies = get_object_taxonomies( Tribe__Events__Main::POSTTYPE, 'objects' );
 			$taxonomies = array_reverse( $taxonomies );
@@ -242,6 +242,11 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				}
 
 				foreach ( $terms as $term ) {
+					// This is a workout to make #93598 work
+					if ( $search && false === strpos( $term->name, $search ) ) {
+						continue;
+					}
+
 					$group['children'][] = array(
 						'id' => esc_attr( $term->term_id ),
 						'text' => esc_html( $term->name ),
@@ -719,12 +724,12 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 					$fields = Tribe__Main::array_insert_after_key(
 						'monthAndYearFormat', $fields, array(
 							'weekDayFormat' => array(
-								'type' => 'text',
-								'label' => __( 'Week Day Format', 'tribe-events-calendar-pro' ),
-								'tooltip' => __( 'Enter the format to use for week days. Used when showing days of the week in Week view.', 'tribe-events-calendar-pro' ),
-								'default' => 'D jS',
-								'size' => 'medium',
-								'validation_type' => 'html',
+								'type'            => 'text',
+								'label'           => __( 'Week Day Format', 'tribe-events-calendar-pro' ),
+								'tooltip'         => __( 'Enter the format to use for week days. Used when showing days of the week in Week view.', 'tribe-events-calendar-pro' ),
+								'default'         => 'D jS',
+								'size'            => 'medium',
+								'validation_type' => 'not_empty',
 							),
 						)
 					);
@@ -1281,7 +1286,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		}
 
 		public function load_widget_assets( $hook = null ) {
-			if ( 'widgets.php' !== $hook ) {
+			if ( 'widgets.php' !== $hook && 'customize.php' !== $hook ) {
 				return;
 			}
 
@@ -1340,7 +1345,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				$geoloc = Tribe__Events__Pro__Geo_Loc::instance();
 
 				$data = array(
-					'geocenter' => $geoloc->estimate_center_point(),
+					'geocenter' => $geoloc->get_min_max_coords(),
 					'map_tooltip_event' => esc_html( sprintf( _x( '%s: ', 'Event title map marker prefix', 'tribe-events-calendar-pro' ), tribe_get_event_label_singular() ) ),
 					'map_tooltip_address' => esc_html__( 'Address: ', 'tribe-events-calendar-pro' ),
 				);
@@ -1997,6 +2002,10 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * built calling the `tribe` function.
 		 */
 		public function on_plugins_loaded() {
+			$this->all_slug = sanitize_title( __( 'all', 'tribe-events-calendar-pro' ) );
+			$this->weekSlug = sanitize_title( __( 'week', 'tribe-events-calendar-pro' ) );
+			$this->photoSlug = sanitize_title( __( 'photo', 'tribe-events-calendar-pro' ) );
+
 			tribe_singleton( 'events-pro.admin.settings', 'Tribe__Events__Pro__Admin__Settings', array( 'hook' ) );
 			tribe_singleton( 'events-pro.customizer.photo-view', 'Tribe__Events__Pro__Customizer__Photo_View' );
 

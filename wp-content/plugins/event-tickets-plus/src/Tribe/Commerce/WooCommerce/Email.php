@@ -50,11 +50,33 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	/**
 	 * get_subject function.
 	 *
-	 * @access public
 	 * @return string
 	 */
 	public function get_subject() {
 		return apply_filters( 'wootickets_ticket_email_subject', $this->format_string( $this->subject ), $this->object );
+	}
+
+	/**
+	 * get_attachments function.
+	 *
+	 * Gets an array of attachments (each item to be a full path file name) to
+	 * attach to the email.
+	 *
+	 * @return array
+	 */
+	public function get_attachments() {
+		/**
+		 * Filters the array of files to be attached to the WooCommmerce Ticket
+		 * email.
+		 *
+		 * Example use case is the PDF Tickets extension.
+		 *
+		 * @param array  $attachments  An array of full path file names.
+		 * @param int    $this->id     The email method ID.
+		 * @param object $this->object Object this email is for, for example a
+		 *                             customer, product, or email.
+		 */
+		return apply_filters( 'tribe_tickets_plus_woo_email_attachments', array(), $this->id, $this->object );
 	}
 
 
@@ -78,9 +100,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 
 	/**
 	 * Initialise Settings Form Fields
-	 *
-	 * @access public
-	 * @return void
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(

@@ -28,8 +28,7 @@ class Tribe__Tickets_Plus__APM {
 	 */
 	public function __construct() {
 		add_action( 'tribe_events_pro_init_apm_filters', array( $this, 'init_apm_filters' ), 9 );
-		add_filter( 'tribe_events_pro_apm_filters_fallback_columns',
-			array( $this, 'fallback_columns' ) );
+		add_filter( 'tribe_events_pro_apm_filters_fallback_columns', array( $this, 'fallback_columns' ) );
 		add_filter( 'tribe_events_pro_apm_filters_args', array( $this, 'filter_args' ) );
 		add_filter( 'tribe_apm_column_headers', array( $this, 'column_headers' ) );
 	}
@@ -94,41 +93,13 @@ class Tribe__Tickets_Plus__APM {
 	}
 
 	/**
-	 * Sales counter singleton accessor method.
-	 *
-	 * @return Tribe__Tickets_Plus__Commerce__Sales_Counter|Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
-	 */
-	public function sales_counter() {
-		if ( empty( $this->sales_counter ) ) {
-			$commerce_loader     = Tribe__Tickets_Plus__Main::instance()->commerce_loader();
-			$this->sales_counter = new Tribe__Tickets_Plus__Commerce__Sales_Counter( $commerce_loader );
-		}
-
-		return $this->sales_counter;
-	}
-
-	/**
-	 * Stock counter class singleton accessor method.
-	 *
-	 * @return Tribe__Tickets_Plus__Commerce__Stock_Counter|Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
-	 */
-	public function stock_counter() {
-		if ( empty( $this->stock_counter ) ) {
-			$commerce_loader     = Tribe__Tickets_Plus__Main::instance()->commerce_loader();
-			$this->stock_counter = new Tribe__Tickets_Plus__Commerce__Stock_Counter( $commerce_loader );
-		}
-
-		return $this->stock_counter;
-	}
-
-	/**
 	 * Sales filter singleton accessor method.
 	 *
 	 * @return Tribe__Tickets_Plus__APM__Sales_Filter
 	 */
 	public function sales_filter() {
 		if ( empty( $this->sales_filter ) ) {
-			$this->sales_filter = new Tribe__Tickets_Plus__APM__Sales_Filter( $this->sales_counter() );
+			$this->sales_filter = new Tribe__Tickets_Plus__APM__Sales_Filter();
 		}
 
 		return $this->sales_filter;
@@ -141,9 +112,37 @@ class Tribe__Tickets_Plus__APM {
 	 */
 	public function stock_filter() {
 		if ( empty( $this->stock_filter ) ) {
-			$this->stock_filter = new Tribe__Tickets_Plus__APM__Stock_Filter( $this->stock_counter() );
+			$this->stock_filter = new Tribe__Tickets_Plus__APM__Stock_Filter();
 		}
 
 		return $this->stock_filter;
+	}
+
+	/**
+	 * Deprecated Methods
+	 */
+
+	/**
+	 * Sales counter singleton accessor method.
+	 *
+	 * @deprecated 4.6
+	 *
+	 * @return Tribe__Tickets_Plus__Commerce__Sales_Counter|Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
+	 */
+	public function sales_counter() {
+		_deprecated_method( __METHOD__, '4.6', 'Tribe__Tickets_Plus__APM__Sales_Filter::get_total_value()' );
+		return new Tribe__Tickets_Plus__Commerce__Sales_Counter( Tribe__Tickets_Plus__Main::instance()->commerce_loader() );
+	}
+
+	/**
+	 * Stock counter singleton accessor method.
+	 *
+	 * @deprecated 4.6
+	 *
+	 * @return Tribe__Tickets_Plus__Commerce__Stock_Counter|Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
+	 */
+	public function stock_counter() {
+		_deprecated_method( __METHOD__, '4.6', 'Tribe__Tickets_Plus__APM__Stock_Filter::get_total_value()' );
+		return new Tribe__Tickets_Plus__Commerce__Stock_Counter( Tribe__Tickets_Plus__Main::instance()->commerce_loader() );
 	}
 }

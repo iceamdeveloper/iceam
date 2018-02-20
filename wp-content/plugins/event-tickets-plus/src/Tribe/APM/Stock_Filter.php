@@ -35,4 +35,33 @@ class Tribe__Tickets_Plus__APM__Stock_Filter extends Tribe__Tickets_Plus__APM__A
 	protected function key() {
 		return self::$key;
 	}
+
+	/**
+	 * Returns the total numeric value of an event meta.
+	 *
+	 * E.g. the total tickets sales, stock.
+	 *
+	 * @param WP_Post $event
+	 *
+	 * @return int|WP_Error
+	 */
+	public function get_total_value( $event ) {
+		$event                = get_post( $event );
+		$supported_post_types = Tribe__Tickets__Main::instance()->post_types();
+		if ( empty( $event ) || ! in_array( $event->post_type, $supported_post_types ) ) {
+			return new WP_Error( 'not-an-event', sprintf( 'The post with ID "%s" is not an event.', $event->ID ) );
+		}
+
+		$sum = 0;
+
+		$all_tickets = Tribe__Tickets__Tickets::get_all_event_tickets( $event->ID );
+		/** @var Tribe__Tickets__Ticket_Object $ticket */
+		foreach ( $all_tickets as $ticket ) {
+			$sum += $ticket->stock();
+		}
+
+		// return the sum
+		return $sum;
+	}
+
 }

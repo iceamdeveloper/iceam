@@ -10,52 +10,38 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 	 * Initializes the meta functionality
 	 */
 	my.init = function() {
-		this.$tribe_tickets = $( document.getElementById( 'tribetickets' ) );
-		this.$event_tickets = $( document.getElementById( 'event_tickets' ) );
+		my.$tribe_tickets = $( document.getElementById( 'tribetickets' ) );
+		my.$event_tickets = $( document.getElementById( 'event_tickets' ) );
 
-		this.$event_tickets
-			.on( 'change', 'input.show_attendee_info', this.event.toggle_linked_form )
-			.on( 'change', '.save_attendee_fieldset', this.event.toggle_linked_form );
+		my.$event_tickets
+			.on( 'change', 'input.show_attendee_info', my.event.toggle_linked_form )
+			.on( 'change', '.save_attendee_fieldset', my.event.toggle_linked_form );
 
-		this.$tribe_tickets
-			.on( 'change', '.ticket-attendee-info-dropdown', this.event.select_saved_fieldset )
-			.on( 'click', '.meta-postbox .hndle, .meta-postbox .handlediv', this.event.click_postbox )
-			.on( 'click', 'a.add-attendee-field', this.event.add_field )
-			.on( 'click', 'a.delete-attendee-field', this.event.remove_field )
-			.on( 'edit-ticket.tribe', this.event.edit_ticket )
-			.on( 'clear.tribe', this.event.reset_ticket_form )
-			.on( 'ticket-provider-changed.tribe', this.event.provider_changed )
-			.on( 'saved-ticket.tribe', this.event.saved_ticket );
+		my.$tribe_tickets
+			.on( 'change', '.ticket-attendee-info-dropdown', my.event.select_saved_fieldset )
+			.on( 'click', '.meta-postbox .hndle, .meta-postbox .handlediv', my.event.click_postbox )
+			.on( 'click', 'a.add-attendee-field', my.event.add_field )
+			.on( 'click', 'a.delete-attendee-field', my.event.remove_field )
+			.on( 'edit-ticket.tribe', my.event.edit_ticket )
+			.on( 'saved-ticket.tribe', my.event.saved_ticket );
 
-		this.init_ticket_fields();
+		my.init_ticket_fields();
 
-		this.$event_tickets.trigger( 'event-tickets-plus-meta-initialized.tribe' );
-	};
-
-	my.reset_ticket_form = function() {
-		var hide_form = true;
-		var $checkbox = $( 'input.show_attendee_info' );
-		var $meta_form = $checkbox.parents( 'tr' ).next( 'tr.tribe-tickets-attendee-info-form' );
-
-		$checkbox.filter( ':checked' ).each( function () {
-			hide_form = false;
-			$meta_form.show();
-		} );
-
-		if ( hide_form ) {
-			$meta_form.hide();
-		}
+		my.$event_tickets.trigger( 'event-tickets-plus-meta-initialized.tribe' );
 	};
 
 	/**
 	 * Sets up the custom meta field area for the ticket form
 	 */
 	my.init_ticket_fields = function() {
-		this.reset_ticket_form();
-		this.init_custom_field_sorting();
-		this.maybe_hide_saved_fields_select();
-		this.$event_tickets.trigger( 'event-tickets-plus-ticket-meta-initialized.tribe', {
-			ticket_id: this.$event_tickets.find( '#ticket_id' ).val()
+		if ( ! my.$event_tickets ) {
+			my.$event_tickets = $( document.getElementById( 'event_tickets' ) );
+		}
+
+		my.init_custom_field_sorting();
+		my.maybe_hide_saved_fields_select();
+		my.$event_tickets.trigger( 'event-tickets-plus-ticket-meta-initialized.tribe', {
+			ticket_id: my.$event_tickets.find( '#ticket_id' ).val()
 		} );
 	};
 
@@ -136,7 +122,7 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 	 * @param int saved_fieldset_id Fieldset ID to inject
 	 */
 	my.inject_saved_fields = function( saved_fieldset_id ) {
-		var field_jqxhr = this.fetch_saved_fields( saved_fieldset_id );
+		var field_jqxhr = my.fetch_saved_fields( saved_fieldset_id );
 
 		field_jqxhr.done( function( response ) {
 			if ( ! response.success ) {
@@ -204,8 +190,8 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 
 		$field.remove();
 
-		this.maybe_hide_saved_fields_select();
-		this.$event_tickets.trigger( 'event-tickets-plus-field-removed.tribe', { field: field_html } );
+		my.maybe_hide_saved_fields_select();
+		my.$event_tickets.trigger( 'event-tickets-plus-field-removed.tribe', { field: field_html } );
 	};
 
 	/**
@@ -262,23 +248,11 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 	};
 
 	/**
-	 * event to handle initializing the ticket area when editing an event ticket
-	 */
-	my.event.reset_ticket_form = function() {
-		my.reset_ticket_form();
-	};
-
-	/**
 	 * Toggles an element with the WordPress postbox behaviors tied to it via the .postbox and
 	 * associated classes
 	 */
 	my.event.click_postbox = function() {
 		my.toggle_postbox( $( this ).closest( '.meta-postbox' ) );
-	};
-
-	my.event.provider_changed = function() {
-		$( 'tr.tribe-tickets-show-attendee-info' ).show();
-		my.reset_ticket_form();
 	};
 
 	my.event.saved_ticket = function( e, response ) {

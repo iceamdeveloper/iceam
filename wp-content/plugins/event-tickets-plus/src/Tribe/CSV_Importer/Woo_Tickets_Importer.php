@@ -30,8 +30,16 @@ class Tribe__Tickets_Plus__CSV_Importer__Woo_Tickets_Importer extends Tribe__Tic
 	 * @return array
 	 */
 	protected function modify_data( array $record, array $data ) {
-		$data['ticket_woo_stock'] = $this->get_value_by_key( $record, 'ticket_stock' );
-		$data['ticket_woo_sku'] = $this->get_value_by_key( $record, 'ticket_sku' );
+		$stock = $this->get_value_by_key( $record, 'ticket_stock' );
+		$capacity = $this->get_value_by_key( $record, 'ticket_capacity' );
+
+		if ( empty( $capacity ) ) {
+			$capacity = $stock;
+		}
+
+		$data['tribe-ticket']['capacity'] = $capacity;
+		$data['tribe-ticket']['stock'] = $stock;
+		$data['ticket_sku'] = $this->get_value_by_key( $record, 'ticket_sku' );
 
 		return $data;
 	}

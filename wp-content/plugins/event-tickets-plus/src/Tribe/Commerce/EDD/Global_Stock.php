@@ -220,6 +220,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Global_Stock {
 		foreach ( $quantities as $ticket_id => $amount_purchased ) {
 			$ticket_id    = absint( $ticket_id );
 			$event        = tribe_events_get_ticket_event( $ticket_id );
+
+			if ( ! $event ) {
+				continue;
+			}
+
 			$global_stock = new Tribe__Tickets__Global_Stock( $event->ID );
 
 			// We're only interested if the ticket utilizes global stock
@@ -239,7 +244,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Global_Stock {
 				// Reduce the cap in line with the number of capped tickets that were purchased, if any
 				case Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE:
 					$original_level = $tickets[ $ticket_id ]->global_stock_cap();
-					update_post_meta( $ticket_id, '_global_stock_cap', $original_level - $amount_purchased );
+					update_post_meta( $ticket_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, $original_level - $amount_purchased );
 				// Fall-through is deliberate - capped sales still draw from the global inventory pool
 				case Tribe__Tickets__Global_Stock::GLOBAL_STOCK_MODE:
 					$original_level = $global_stock->get_stock_level();

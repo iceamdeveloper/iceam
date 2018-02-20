@@ -41,6 +41,17 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	protected $ticket_meta_expire_time = 86400;
 
 	/**
+	 * A flag to prevent maybe_update_ticket_meta_cookie from running more than necessary.
+	 *
+	 * This is required because we only want to update the ticket meta cookie once per request,
+	 * however multiple objects of this type may be created (once by the RSVP provider, for
+	 * example, and once by the WooCommerce provider).
+	 *
+	 * @var boolean
+	 */
+	private static $has_updated_meta_cookie = false;
+
+	/**
 	 * @return bool
 	 */
 	public function maybe_set_attendee_meta_cookie() {
@@ -91,20 +102,35 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 *                     was not needed or failed.
 	 */
 	private function maybe_update_ticket_meta_cookie() {
-		$id          = $_COOKIE[ self::HASH_COOKIE_KEY ];
+		$id = $_COOKIE[ self::HASH_COOKIE_KEY ];
+
+		/**
+		 * Allows for the "has updated meta cookie" flag to be manually overriden.
+		 *
+		 * @since 4.5.6
+		 *
+		 * @param boolean $has_updated_meta_cookie
+		 */
+		if ( apply_filters( 'tribe_tickets_plus_meta_cookie_flag', self::$has_updated_meta_cookie ) ) {
+		    return $id;
+		} else {
+		    self::$has_updated_meta_cookie = true;
+		}
+
 		$transient   = self::TRANSIENT_PREFIX . $id;
 		$ticket_meta = $_POST[ self::META_DATA_KEY ];
 
 		$stored_ticket_meta = get_transient( $transient );
 
-		// Prevents Catchable Fatal when it doesn't exist or is a scallar
+		// Prevents Catchable Fatal when it doesn't exist or is a scalar
 		if ( empty( $stored_ticket_meta ) || is_scalar( $stored_ticket_meta ) ) {
 			$stored_ticket_meta = array();
 		}
 
 		delete_transient( $transient );
-		$ticket_meta = tribe_array_merge_recursive( $stored_ticket_meta, $ticket_meta );
-		$set         = set_transient( $transient, $ticket_meta, $this->ticket_meta_expire_time );
+		$merged = $this->combine_new_and_saved_attendee_meta( $ticket_meta, $stored_ticket_meta );
+
+		$set = set_transient( $transient, $merged, $this->ticket_meta_expire_time );
 
 		if ( ! $set ) {
 			return false;
@@ -121,6 +147,38 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	protected function set_hash_cookie( $transient_id ) {
 		setcookie( self::HASH_COOKIE_KEY, $transient_id, 0, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl() );
 		$_COOKIE[ self::HASH_COOKIE_KEY ] = $transient_id;
+	}
+
+	/**
+	 * Adds attendee meta from currently-being-bought tickets to tickets that are already in the cart.
+	 *
+	 * @since 4.5.6
+	 *
+	 * @param array $new The attendee meta data that's not yet been saved.
+	 * @param array $saved The existing attendee data storied in cookies/transients.
+	 *
+	 * @return array
+	 */
+	protected function combine_new_and_saved_attendee_meta( $new, $saved ) {
+
+		if ( empty( $saved ) ) {
+			return $new;
+		}
+
+		foreach ( $new as $ticket_id => $data ) {
+
+			$data = array_values( $data );
+
+			if ( isset( $saved[ $ticket_id ] ) && $saved[ $ticket_id ] !== $new[ $ticket_id ] ) {
+				// If there's already stored attendee meta for this ticket, add some more meta to that existing entry.
+				$saved[ $ticket_id ][] = $data[0];
+			} else {
+				// Otherwise we've got a ticket for which there's no stored data yet, so just add a new entry in the data array.
+				$saved[ $ticket_id ] = $data;
+			}
+		}
+
+		return $saved;
 	}
 
 	/**

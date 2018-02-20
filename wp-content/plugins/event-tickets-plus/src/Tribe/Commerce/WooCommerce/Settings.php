@@ -1,10 +1,13 @@
 <?php
 /**
- * Adds WooCommerce-specific settings to the tickets settings screen.
+ * Add WooCommerce settings to the tickets settings, and automatically pull some settings from Woo.
  */
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 	public function __construct() {
 		add_filter( 'tribe_tickets_settings_tab_fields', array( $this, 'add_settings' ) );
+
+		// Use Woo's decimal separator in the Add Ticket Cost field.
+		add_filter( 'tribe_event_ticket_decimal_point', 'wc_get_price_decimal_separator' );
 	}
 
 	public function add_settings( array $settings_fields ) {

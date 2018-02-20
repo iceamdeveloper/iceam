@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.5.3
+ * @version 4.6.2
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -16,6 +16,10 @@ global $woocommerce;
 $is_there_any_product         = false;
 $is_there_any_product_to_sell = false;
 $unavailability_messaging     = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
+
+if ( ! empty( $tickets ) ) {
+	$tickets = tribe( 'tickets.handler' )->sort_tickets_by_menu_order( $tickets );
+}
 
 ob_start();
 
@@ -30,7 +34,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 ?>
 <form
 	id="buy-tickets"
-	action="<?php echo esc_url( $woocommerce->cart->get_cart_url() ) ?>"
+	action="<?php echo esc_url( wc_get_cart_url() ) ?>"
 	class="<?php echo esc_attr( implode( ' ', $cart_classes ) ); ?>"
 	method="post"
 	enctype='multipart/form-data'
@@ -42,6 +46,11 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 
 	<table class="tribe-events-tickets">
 		<?php
+		/**
+		 * Reorder the tickets per the admin interface order
+		 *
+		 * @since 4.6
+		 */
 		foreach ( $tickets as $ticket ) :
 			/**
 			 * Changing any HTML to the `$ticket` Arguments you will need apply filters
@@ -61,8 +70,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 			}
 
 			$is_there_any_product = true;
-			$ticket_stock = $ticket->stock();
-			$data_product_id = '';
+			$data_product_id      = '';
 
 			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
 
@@ -76,22 +84,26 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 				 * @since  4.3.2
 				 *
 				 * @param array $column_classes
+				 * @param int $ticket->ID
 				 */
-				$column_classes = (array) apply_filters( 'tribe_events_tickets_woo_quantity_column_class', array( 'woocommerce' ) );
+				$column_classes = (array) apply_filters( 'tribe_events_tickets_woo_quantity_column_class', array( 'woocommerce' ), $ticket->ID );
 
 				// Max quantity will be left open if backorders allowed, restricted to 1 if the product is
 				// constrained to be sold individually or else set to the available stock quantity
 				$max_quantity = $product->backorders_allowed() ? '' : $product->get_stock_quantity();
 				$max_quantity = $product->is_sold_individually() ? 1 : $max_quantity;
-				$original_stock = $ticket->original_stock();
+				$available    = $ticket->available();
 
-				// For global stock enabled tickets with a cap, use the cap as the max quantity
-				if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode() ) {
-					$max_quantity = $ticket->global_stock_cap();
-					$original_stock = $ticket->global_stock_cap();
-				}
-
-				echo '<tr>';
+				/**
+				 * Filter classes on the row
+				 *
+				 * @since  4.5.5
+				 *
+				 * @param array $row_classes
+				 * @param int $ticket->ID
+				 */
+				$row_classes = (array) apply_filters( 'tribe_events_tickets_row_class', array( 'woocommerce', 'tribe-tickets-form-row' ), $ticket->ID );
+				echo '<tr class="' . esc_attr( implode( ' ', $row_classes ) ) . '" data-product-id="' . esc_attr( $ticket->ID ) . '">';
 
 				/**
 				 * Filter classes on the Price column
@@ -103,18 +115,13 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 				$column_classes = (array) apply_filters( 'tribe_events_tickets_woo_quantity_column_class', array( 'woocommerce' ) );
 				echo '<td class="' . esc_attr( implode( ' ', $column_classes ) ) . '" data-product-id="' . esc_attr( $ticket->ID ) . '">';
 
-				if ( $product->is_in_stock() ) {
+				if ( 0 !== $available ) {
 					// Max quantity will be left open if backorders allowed, restricted to 1 if the product is
 					// constrained to be sold individually or else set to the available stock quantity
-					$max_quantity = $product->backorders_allowed() ? '' : $product->get_stock_quantity();
+					$stock        = $ticket->stock();
+					$max_quantity = $product->backorders_allowed() ? '' : $stock;
 					$max_quantity = $product->is_sold_individually() ? 1 : $max_quantity;
-					$original_stock = $ticket->original_stock();
-
-					// For global stock enabled tickets with a cap, use the cap as the max quantity
-					if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode() ) {
-						$max_quantity = $ticket->global_stock_cap();
-						$original_stock = $ticket->global_stock_cap();
-					}
+					$available    = $ticket->available();
 
 					woocommerce_quantity_input( array(
 						'input_name'  => 'quantity_' . $ticket->ID,
@@ -125,14 +132,13 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 
 					$is_there_any_product_to_sell = true;
 
-					$remaining = $ticket->remaining();
-
-					if ( $remaining ) {
+					if ( $available ) {
 						?>
 						<span class="tribe-tickets-remaining">
 						<?php
+						$readable_amount = tribe_tickets_get_readable_amount( $available, null, false );
 						echo sprintf( esc_html__( '%1$s available', 'event-tickets-plus' ),
-							'<span class="available-stock" data-product-id="' . esc_attr( $ticket->ID ) . '">' . esc_html( $remaining ) . '</span>'
+							'<span class="available-stock" data-product-id="' . esc_attr( $ticket->ID ) . '">' . esc_html( $readable_amount ) . '</span>'
 						);
 						?>
 						</span>
@@ -148,9 +154,17 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 
 				echo '<td class="tickets_name">' . $ticket->name . '</td>';
 
-				echo '<td class="tickets_price">' . $this->get_price_html( $product ) . '</td>';
+				echo '<td class="tickets_price">';
 
-				echo '<td class="tickets_description">' . $ticket->description . '</td>';
+				if ( method_exists( $product, 'get_price' ) && $product->get_price() ) {
+					echo $this->get_price_html( $product );
+				} else {
+					esc_html_e( 'Free', 'event-tickets-plus' );
+				}
+
+				echo '</td>';
+
+				echo '<td class="tickets_description">' . ( $ticket->show_description() ? $ticket->description : '' ) . '</td>';
 
 				echo '</tr>';
 
@@ -207,7 +221,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 		<noscript>
 			<tr>
 				<td class="tribe-link-tickets-message">
-					<div class="no-javascript-msg"><?php esc_html_e( 'You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser.', 'event-tickets' ); ?></div>
+					<div class="no-javascript-msg"><?php esc_html_e( 'You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser.', 'event-tickets-plus' ); ?></div>
 				</td>
 			</tr>
 		</noscript>

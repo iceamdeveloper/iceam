@@ -1,10 +1,10 @@
 === Event Tickets Plus ===
 
-Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tribe, faction23, geoffgraham, ggwicz, jazbek, jbrinley, joshlimecuda, leahkoerper, lucatume, mastromktg, neillmcshea, nicosantos, peterchester, reid.peifer, roblagatta, shane.pearlman, thatdudebutch,  zbtirrell
-Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, Shopp, EDD, WPEC, WP-eCommerce, WPEC Tickets, Shopp Tickets, Easy Digital Downloads, EDDTickets
+Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
+Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.5
-Tested up to: 4.8.2
-Stable tag: 4.5.5
+Tested up to: 4.9.1
+Stable tag: 4.6.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -33,12 +33,12 @@ Event Tickets Plus adds features and functionality onto the core Event Tickets p
 
 = Requirements =
 
-* PHP 5.2.4 or greater (recommended: PHP 5.4 or greater)
-* WordPress 3.9 or above
+* PHP 5.2.4 or greater (recommended: PHP 7.0 or greater)
+* WordPress 4.5 or above
 * jQuery 1.11.x
-* Event Tickets 4.0 or above
-* Event Tickets Plus 4.0 or above
-* The Events Calendar 4.0 or above (optional)
+* Event Tickets 4.6 or above
+* Event Tickets Plus 4.6 or above
+* The Events Calendar 4.6 or above (optional)
 
 == Documentation ==
 
@@ -68,49 +68,49 @@ The plugin is produced by <a href="http://m.tri.be/3i">Modern Tribe Inc</a>.
 
 = Current Contributors =
 
-* <a href="http://profiles.wordpress.org/users/barryhughes">Barry Hughes</a>
-* <a href="http://profiles.wordpress.org/users/brianjessee">Brian Jessee</a>
-* <a href="http://profiles.wordpress.org/users/brook-tribe">Brook Harding</a>
-* <a href="http://profiles.wordpress.org/users/geoffgraham">Geoff Graham</a>
-* <a href="http://profiles.wordpress.org/users/ggwicz">George Gecewicz</a>
-* <a href="http://profiles.wordpress.org/users/bordoni">Gustavo Bordoni</a>
-* <a href="http://profiles.wordpress.org/users/jazbek">Jessica Yazbek</a>
-* <a href="http://profiles.wordpress.org/users/jbrinley">Jonathan Brinley</a>
-* <a href="http://profiles.wordpress.org/users/joshlimecuda">Josh Mallard</a>
-* <a href="http://profiles.wordpress.org/users/leahkoerper">Leah Koerper</a>
-* <a href="http://profiles.wordpress.org/users/lucatume">Luca Tumedei</a>
-* <a href="http://profiles.wordpress.org/users/mat-lipe">Mat Lipe</a>
-* <a href="http://profiles.wordpress.org/users/borkweb">Matthew Batchelder</a>
-* <a href="http://profiles.wordpress.org/users/mdbitz">Matthew Denton</a>
-* <a href="http://profiles.wordpress.org/users/neillmcshea">Neill McShea</a>
-* <a href="http://profiles.wordpress.org/users/mastromktg">Nick Mastromattei</a>
-* <a href="http://profiles.wordpress.org/users/nicosantos">Nico Santo</a>
-* <a href="http://profiles.wordpress.org/users/peterchester">Peter Chester</a>
-* <a href="http://profiles.wordpress.org/users/roblagatta">Rob La Gatta</a>
-* <a href="http://profiles.wordpress.org/users/reid.peifer">Reid Peifer</a>
-* <a href="http://profiles.wordpress.org/users/ryancurban">Ryan Urban</a>
-* <a href="http://profiles.wordpress.org/users/faction23">Samuel Estok</a>
-* <a href="http://profiles.wordpress.org/users/shane.pearlman">Shane Pearlman</a>
-* <a href="http://profiles.wordpress.org/users/thatdudebutch">Wayne Stratton</a>
-* <a href="http://profiles.wordpress.org/users/zbtirrell">Zachary Tirrell</a>
+* <a href="https://profiles.wordpress.org/users/barryhughes">Barry Hughes</a>
+* <a href="https://profiles.wordpress.org/users/brianjessee">Brian Jessee</a>
+* <a href="https://profiles.wordpress.org/users/geoffgraham">Geoff Graham</a>
+* <a href="https://profiles.wordpress.org/users/ggwicz">George Gecewicz</a>
+* <a href="https://profiles.wordpress.org/users/bordoni">Gustavo Bordoni</a>
+* <a href="https://profiles.wordpress.org/users/jbrinley">Jonathan Brinley</a>
+* <a href="https://profiles.wordpress.org/users/leahkoerper">Leah Koerper</a>
+* <a href="https://profiles.wordpress.org/users/lucatume">Luca Tumedei</a>
+* <a href="https://profiles.wordpress.org/users/borkweb">Matthew Batchelder</a>
+* <a href="https://profiles.wordpress.org/users/neillmcshea">Neill McShea</a>
+* <a href="https://profiles.wordpress.org/users/mastromktg">Nick Mastromattei</a>
+* <a href="https://profiles.wordpress.org/users/nicosantos">Nico Santo</a>
+* <a href="https://profiles.wordpress.org/users/peterchester">Peter Chester</a>
+* <a href="https://profiles.wordpress.org/users/roblagatta">Rob La Gatta</a>
+* <a href="https://profiles.wordpress.org/users/reid.peifer">Reid Peifer</a>
+* <a href="https://profiles.wordpress.org/users/ryancurban">Ryan Urban</a>
+* <a href="https://profiles.wordpress.org/users/faction23">Samuel Estok</a>
+* <a href="https://profiles.wordpress.org/users/shane.pearlman">Shane Pearlman</a>
+* <a href="https://profiles.wordpress.org/users/zbtirrell">Zachary Tirrell</a>
 
 = Past Contributors =
 
-* <a href="http://profiles.wordpress.org/users/caseypatrickdriscoll">Casey Driscoll</a>
-* <a href="http://profiles.wordpress.org/users/ckpicker">Casey Picker</a>
-* <a href="http://profiles.wordpress.org/users/dancameron">Dan Cameron</a>
-* <a href="http://profiles.wordpress.org/users/MZAWeb">Daniel Dvorkin</a>
-* <a href="http://profiles.wordpress.org/users/jkudish">Joachim Kudish</a>
-* <a href="http://profiles.wordpress.org/users/jgadbois">John Gadbois</a>
-* <a href="http://profiles.wordpress.org/users/jonahcoyote">Jonah West</a>
+* <a href="https://profiles.wordpress.org/users/brook-tribe">Brook Harding</a>
+* <a href="https://profiles.wordpress.org/users/caseypatrickdriscoll">Casey Driscoll</a>
+* <a href="https://profiles.wordpress.org/users/ckpicker">Casey Picker</a>
+* <a href="https://profiles.wordpress.org/users/dancameron">Dan Cameron</a>
+* <a href="https://profiles.wordpress.org/users/MZAWeb">Daniel Dvorkin</a>
+* <a href="https://profiles.wordpress.org/users/jazbek">Jessica Yazbek</a>
+* <a href="https://profiles.wordpress.org/users/jkudish">Joachim Kudish</a>
+* <a href="https://profiles.wordpress.org/users/jgadbois">John Gadbois</a>
+* <a href="https://profiles.wordpress.org/users/jonahcoyote">Jonah West</a>
+* <a href="https://profiles.wordpress.org/users/joshlimecuda">Josh Mallard</a>
 * <a href="https://profiles.wordpress.org/justinendler/">Justin Endler</a>
-* <a href="http://profiles.wordpress.org/users/kellykathryn">Kelly Groves</a>
-* <a href="http://profiles.wordpress.org/users/kelseydamas">Kelsey Damas</a>
-* <a href="http://profiles.wordpress.org/users/kyleunzicker">Kyle Unzicker</a>
-* <a href="http://profiles.wordpress.org/users/mattwiebe">Matt Wiebe</a>
-* <a href="http://profiles.wordpress.org/users/nickciske">Nick Ciske</a>
-* <a href="http://profiles.wordpress.org/users/paulhughes01">Paul Hughes</a>
-* <a href="http://profiles.wordpress.org/users/codearachnid">Timothy Wood</a>
+* <a href="https://profiles.wordpress.org/users/kellykathryn">Kelly Groves</a>
+* <a href="https://profiles.wordpress.org/users/kelseydamas">Kelsey Damas</a>
+* <a href="https://profiles.wordpress.org/users/kyleunzicker">Kyle Unzicker</a>
+* <a href="https://profiles.wordpress.org/users/mat-lipe">Mat Lipe</a>
+* <a href="https://profiles.wordpress.org/users/mdbitz">Matthew Denton</a>
+* <a href="https://profiles.wordpress.org/users/mattwiebe">Matt Wiebe</a>
+* <a href="https://profiles.wordpress.org/users/nickciske">Nick Ciske</a>
+* <a href="https://profiles.wordpress.org/users/paulhughes01">Paul Hughes</a>
+* <a href="https://profiles.wordpress.org/users/codearachnid">Timothy Wood</a>
+* <a href="https://profiles.wordpress.org/users/thatdudebutch">Wayne Stratton</a>
 
 = Translations =
 
@@ -125,9 +125,6 @@ Our Free Plugins:
 * <a href="https://wordpress.org/plugins/the-events-calendar/" target="_blank">The Events Calendar</a>
 * <a href="http://m.tri.be/18vx" target="_blank">Event Tickets</a>
 * <a href="http://wordpress.org/plugins/advanced-post-manager/?ref=tec-readme" target="_blank">Advanced Post Manager</a>
-* <a href="http://wordpress.org/plugins/blog-copier/?ref=tec-readme" target="_blank">Blog Copier</a>
-* <a href="http://wordpress.org/plugins/image-rotation-repair/?ref=tec-readme" target="_blank">Image Rotation Widget</a>
-* <a href="http://wordpress.org/plugins/widget-builder/?ref=tec-readme" target="_blank">Widget Builder</a>
 
 Our Premium Plugins:
 
@@ -136,11 +133,79 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/2e" target="_blank">The Events Calendar: Eventbrite Tickets</a>
 * <a href="http://m.tri.be/2g" target="_blank">The Events Calendar: Community Events</a>
 * <a href="http://m.tri.be/18vw" target="_blank">The Events Calendar: Community Tickets</a>
-* <a href="http://m.tri.be/2h" target="_blank">The Events Calendar: Facebook Events</a>
-* <a href="http://m.tri.be/18h9" target="_blank">The Events Calendar: iCal Importer</a>
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.6.2] 2017-12-07 =
+
+* Fix - Make sure Stock is updated accordingly based on total sales when updating capacity [93601]
+* Fix - Resolved bug where "Purchase limit" field was not saving correctly [92914]
+* Fix - Fixed an issue where the wrong number of tickets available would be shown in WooCommerce and Eeasy Digital Downloads purchase forms [71118]
+* Tweak - Added filter to change the default value for the option to show attendees on the event, 'tribe_tickets_plus_default_show_attendees_value' [80620]
+* Tweak - Prevent EDD from being a provider for front-end Community Tickets, as only WooCommerce is allowed for that [91758]
+* Tweak - Updated tooltip text for Capacity settings when using EDD [94042]
+* Tweak - Event capacity field will be enabled if never set via Ticket creation form [90823]
+* Tweak - Modified warning toggle with tribe prefix [91215]
+* Tweak - Avoid printing the SKU ticket fields on frontend forms (e.g. Community Event Tickets) [91208]
+* Tweak - Added helper text to selection of ecommerce plugin to clarify what that changes [93919]
+* Tweak - Decreased the width of the ticket capacity fields so they're sized more proportionally to the values they hold [93042]
+* Tweak - Fixed some typos in names of deprecated properties on the Tribe__Tickets_Plus__Commerce__WooCommerce__Main class [90848]
+* Tweak - Resolved problems with importing sale time for tickets [92936]
+* Language - 2 new strings added, 24 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.6.1.1] 2017-11-24 =
+
+* Fix - Ensure attendee meta information is available within the admin environment [94142]
+* Language - 1 new strings added, 52 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.6.1] 2017-11-21 =
+
+* Fix - Added checkin status class to EDD to fix checkin buttons showing as disabled [92247]
+* Fix - Formats properly when displaying Unlimited capacity Tickets [92243]
+* Fix - Prevents deleted shared event capacity to still factor in when no tickets are sharing capacity [91125]
+* Fix - Updating capacity for the event all tickets gets Stock validation preventing Out of Stock message [93103]
+* Tweak - EDD quantity styling to match WooCommerce and RSVP forms [92551]
+* Tweak - Only display admin links in Community Tickets if user is able to access the admin [79565]
+* Tweak - Added filters: `tribe_events_tickets_edd_display_ecommerce_links`, `tribe_filter_attendee_order_link`
+* Tweak - Removed filters: `tribe_events_tickets_woo_display_ecommerce_links`
+
+= [4.6] 2017-11-09 =
+
+* New - Fully redesigned ticket editor interface
+* New - Ticket description is now optional for frontend display
+* New - Introduced "shared capacity" to replace "global stock"
+* New - Introduced "Sell up to" capacity field to replace "global stock with cap"
+* New - Improved helper text and error messages
+* New - Reorder tickets via drag and drop
+* New - Updated time pickers for start and end sale
+* New - Improved clarity around ticket availability
+* New - Total Event Capacity display
+* New - Introduced filter to change the default value for the option to show attendees on the event, 'tribe_tickets_plus_default_show_attendees_value' [80620]
+* Fix - `Woocommerce->get_attendees()` and `EDD->get_attendees()` signatures now require the `$attendees_query` is a `WP_Query` to match the abstract method
+* Tweak - Added filters: `tribe_events_tickets_module_name`, `tribe_tickets_get_default_module`, `tribe_events_tickets_woo_display_ecommerce_links`
+* Tweak - Removed filters: `tribe_events_tickets_woo_display_sku`
+* Tweak - Added actions: `tribe_events_tickets_metabox_edit_ajax_advanced`
+* Tweak - Removed actions: `wootickets_after_`, `wootickets_after_save_ticket`
+* Tweak - Changed views: `eddtickets/tickets`, `meta`, `wootickets/tickets`
+* Tweak - Made unlimited capacity an explicit option
+* Tweak - Changed ecommerce usage setting to per-event instead of per-ticket
+* Tweak - Changed minimum supported version of WooCommerce to 3.0
+* Tweak - Changed minimum supported version of WordPress to 4.5
+* Language - 41 new strings added, 67 updated, 2 fuzzied, and 13 obsoleted
+
+= [4.5.6] 2017-10-18 =
+
+* New - Added new filter, `tribe_tickets_plus_meta_cookie_flag`, that lets users manually control the updating of attendee meta storage cookies. [68609]
+* Fix - Updated some template files to use the `wc_get_cart_url()` function (instead of calling the `get_cart_url()` WC method directly) to prevent PHP notices [90706]
+* Fix - Improved some aspects of temporary storage of attendee meta during the checkout process; the data persists more reliably (props to @slny311 and others) [68609]
+* Fix - Re-added legacy WooCommerce version 2.x _visibility "hidden" meta to ticket Products (missing as of version 4.4.7 until now).
+* Fix - Added support for the resend tickets email action when running alongside WooCommerce 3.2.x (with thanks to Benjamin Schreier for highlighting this) [90884]
+* Fix - Fixed an issue with EDD tickets not being correctly assigned to users in some cases (thank you @atmedia for reporting this!) [88894]
+* Tweak - Added new `wootickets_ticket_email_attachments` filter [90576]
+* Tweak - Added CSS class and filter to table rows in WooCommerce ticket purchase form (thank you @helgatheviking for coding this) [89807]
+* Tweak - Started using Woo's Decimal Separator setting on the Add Ticket screens [41459]
+* Compatibility - Minimum supported version of WooCommerce is now 2.5 [90706]
 
 = [4.5.5] 2017-09-20 =
 
@@ -154,7 +219,7 @@ Our Premium Plugins:
 * Fix - Fixed dates in Orders report for items with status other than complete [77694]
 * Fix - Ensure that if an Attendee is deleted, it cannot be "checked in" (props to ahelman for reporting this!) [75744]
 * Tweak - Added new filter `tribe_event_tickets_plus_email_meta_fields` (thanks @carlosmachado for the suggestion) [63516]
-* Tweak - Adjusted multiline option markup for meta fields type text [67508] 
+* Tweak - Adjusted multiline option markup for meta fields type text [67508]
 * Tweak - Fixed incorrect plugin version in code documentation [87065]
 * Tweak - Purge unused meta fields template file [72411]
 * Tweak - Changed views: `eddtickets/tickets.php` and `wootickets/tickets.php`

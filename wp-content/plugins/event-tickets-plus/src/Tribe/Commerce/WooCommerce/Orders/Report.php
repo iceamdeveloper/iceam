@@ -40,8 +40,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		);
 
 		add_filter( 'tribe_filter_attendee_page_slug', array( $this, 'add_attendee_resources_page_slug' ) );
-		add_action( 'admin_enqueue_scripts', array( tribe( 'tickets.handler' ), 'attendees_page_load_css_js' ) );
-		add_action( 'admin_enqueue_scripts', array( tribe( 'tickets.handler' ), 'attendees_page_load_pointers' ) );
+		add_action( 'admin_enqueue_scripts', tribe_callback( 'tickets.attendees', 'enqueue_assets' ) );
+		add_action( 'admin_enqueue_scripts', tribe_callback( 'tickets.attendees', 'load_pointers' ) );
 		add_action( "load-$this->orders_page", array( $this, 'orders_page_screen_setup' ) );
 
 	}
@@ -210,7 +210,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 			$tickets_sold[ $ticket->name ]['sold'] += $net_sold;
 			$tickets_sold[ $ticket->name ]['pending'] += absint( $ticket->qty_pending() );
-			$tickets_sold[ $ticket->name ]['completed'] += absint( $tickets_sold[ $ticket->name ]['sold'] ) - absint( $tickets_sold[ $ticket->name ]['pending'] );
+			$tickets_sold[ $ticket->name ]['completed'] += absint( $tickets_sold[ $ticket->name ]['sold'] );
 
 			$total_sold += $net_sold;
 			$total_pending += absint( $ticket->qty_pending() );
@@ -224,10 +224,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 					$tickets_breakdown[ $status ]['_line_total'] += $product[0]->_line_total;
 				}
 			}
-
 		}
 
-		$total_completed += absint( $total_sold ) - absint( $total_pending );
+		$total_completed += absint( $total_sold );
 
 		$tabbed_view = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View( $event_id );
 		$tabbed_view->render( self::$tab_slug );
