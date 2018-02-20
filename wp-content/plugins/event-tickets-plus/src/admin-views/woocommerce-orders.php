@@ -74,7 +74,7 @@
 						if ( ! $ticket_sold['has_stock'] ) {
 							$sold_message = sprintf( __( 'Sold %d %s', 'event-tickets-plus' ), esc_html( $ticket_sold['sold'] ), $pending );
 						} else {
-							$sold_message = sprintf( __( 'Sold %d of %d %s', 'event-tickets-plus' ), esc_html( $ticket_sold['sold'] ), esc_html( $ticket_sold['sold'] + absint( $ticket_sold['ticket']->stock() ) ), $pending );
+							$sold_message = sprintf( __( 'Sold %d of %d %s', 'event-tickets-plus' ), esc_html( $ticket_sold['sold'] ), esc_html( $ticket_sold['ticket']->capacity() ), $pending );
 						}
 
 						if ( $ticket_sold['ticket']->price ) {

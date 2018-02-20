@@ -6,7 +6,7 @@
  * Plugin URI: https://wordpress.sucuri.net/
  * Author URI: https://sucuri.net/
  * Author: Sucuri Inc.
- * Version: 1.8.11
+ * Version: 1.8.12
  *
  * PHP version 5
  *
@@ -83,7 +83,7 @@ define('SUCURISCAN', 'sucuriscan');
 /**
  * Current version of the plugin's code.
  */
-define('SUCURISCAN_VERSION', '1.8.11');
+define('SUCURISCAN_VERSION', '1.8.12');
 
 /**
  * The name of the folder where the plugin's files will be located.
@@ -231,6 +231,11 @@ require_once 'src/settings-webinfo.php';
 
 /* Load global variables and triggers */
 require_once 'src/globals.php';
+
+/* Load WP-CLI command */
+if (defined('WP_CLI') && WP_CLI) {
+    include_once 'src/cli.lib.php';
+}
 
 /**
  * Uninstalls the plugin, its settings and reverts the hardening.

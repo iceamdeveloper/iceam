@@ -1,6 +1,4 @@
 <?php
-
-
 abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 
 	/**
@@ -12,29 +10,24 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 	 * @var array
 	 */
 	protected $query_search_options = array();
-	/**
-	 * @var Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
-	 */
-	protected $total_provider;
 
 	/**
 	 * Tribe__Tickets_Plus__APM__Abstract_Filter constructor.
-	 *
-	 * @param Tribe__Tickets_Plus__Commerce__Total_Provider_Interface $total_provider
 	 */
-	public function __construct( Tribe__Tickets_Plus__Commerce__Total_Provider_Interface $total_provider ) {
+	public function __construct() {
 		$this->set_up_query_search_options();
 
 		$type = $this->type;
 		add_filter( 'tribe_custom_row' . $type, array( $this, 'form_row' ), 10, 4 );
 		add_filter( 'tribe_maybe_active' . $type, array( $this, 'maybe_set_active' ), 10, 3 );
 		add_action( 'tribe_after_parse_query', array( $this, 'parse_query' ), 10, 2 );
-		add_action( 'manage_' . Tribe__Events__Main::POSTTYPE . '_posts_custom_column', array(
-			$this,
-			'post_custom_column',
-		), 10, 2 );
 
-		$this->total_provider = $total_provider;
+		add_action(
+			'manage_' . Tribe__Events__Main::POSTTYPE . '_posts_custom_column',
+			array( $this, 'post_custom_column' ),
+			10,
+			2
+		);
 	}
 
 	/**
@@ -184,21 +177,6 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 		}
 
 		return array_values( $posts );
-	}
-
-	/**
-	 * Returns the total numeric value of an event meta.
-	 *
-	 * E.g. the total tickets sales, stock.
-	 *
-	 * @param WP_Post $event
-	 *
-	 * @return int|WP_Error
-	 */
-	public function get_total_value( $event ) {
-		$total = $this->total_provider->get_total_for( $event );
-
-		return $total;
 	}
 
 	/**

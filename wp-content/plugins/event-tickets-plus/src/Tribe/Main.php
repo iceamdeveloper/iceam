@@ -12,26 +12,35 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.5.5';
+		const VERSION = '4.6.2';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.5.0.1';
+		const REQUIRED_TICKETS_VERSION = '4.6.2';
 
 		/**
 		 * Directory of the plugin
 		 *
-		 * @var
+		 * @var string
 		 */
 		public $plugin_dir;
 
 		/**
 		 * Path of the plugin
 		 *
-		 * @var
+		 * @var string
 		 */
 		public $plugin_path;
+
+		/**
+		 * URL of the plugin
+		 *
+		 * @since 4.6
+		 *
+		 * @var string
+		 */
+		public $plugin_url;
 
 		/**
 		 * Holds an instance of Tribe__Tickets_Plus__PUE
@@ -84,9 +93,11 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		public function __construct() {
 			$this->plugin_path = trailingslashit( EVENT_TICKETS_PLUS_DIR );
 			$this->plugin_dir  = trailingslashit( basename( $this->plugin_path ) );
+			$this->plugin_url  = plugins_url() . '/' . $this->plugin_dir;
 			$this->pue         = new Tribe__Tickets_Plus__PUE;
 
 			add_action( 'init', array( $this, 'init' ), 9 );
+			add_action( 'plugins_loaded', array( $this, 'commerce_loader' ), 100 );
 
 			// Register the plugin as active after the tribe autoloader runs
 			$this->register_active_plugin();
@@ -94,7 +105,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->apm_filters();
 
 			add_action( 'init', array( $this, 'csv_import_support' ) );
-			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_scripts' ) );
 			add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
 			add_filter( 'tribe_tickets_settings_systems_supporting_login_requirements', array( $this, 'register_login_setting' ) );
 			add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ), 5 );
@@ -105,12 +115,20 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			add_action( 'event_ticket_edd_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 		}
 
+		/**
+		 * Loading the Service Provider
+		 *
+		 * @since 4.6
+		 */
+		public function on_load() {
+			tribe_register_provider( 'Tribe__Tickets_Plus__Service_Provider' );
+		}
+
 		public function init() {
 			if ( class_exists( 'Tribe__Main' ) && ! is_admin() && ! class_exists( 'Tribe__Tickets_Plus__PUE__Helper' ) ) {
 				tribe_main_pue_helper();
 			}
 
-			$this->register_resources();
 			$this->commerce_loader();
 			$this->meta();
 			$this->tickets_view();
@@ -132,17 +150,18 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		}
 
 
+		/**
+		* @deprecated 4.6
+		*/
 		public function register_resources() {
-			wp_register_style( 'event-tickets-plus-tickets', plugins_url( 'resources/css/tickets.css', dirname( __FILE__ ) ), array( 'dashicons' ),
-				Tribe__Tickets__Main::instance()->css_version() );
-			wp_register_script( 'event-tickets-plus-attendees-list', plugins_url( 'resources/js/attendees-list.js', dirname( __FILE__ ) ), array( 'jquery' ),
-				Tribe__Tickets__Main::instance()->js_version(), true );
+			_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__Assets:enqueue_scripts ' );
 		}
 
+		/**
+		* @deprecated 4.6
+		*/
 		public function enqueue_scripts() {
-			wp_enqueue_style( 'event-tickets-plus-tickets' );
-			wp_enqueue_script( 'event-tickets-plus-attendees-list' );
-			$post_types = Tribe__Tickets__Main::instance()->post_types();
+			_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__Assets:enqueue_scripts' );
 		}
 
 		/**

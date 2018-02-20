@@ -124,6 +124,12 @@
 			// once all online courses are subscriptions this should be unnecessary
 			// based on simple.php in WC templates/single-product/add-to-cart/
 			} else if ( $product->is_purchasable() ) {
+
+				if( types_render_field( 'unavailable-online', array() ) ){
+					echo '<h4>This course is not currently available&nbsp;online.</h4>';
+				} else {
+
+				
 				
 			?>
 			
@@ -146,10 +152,11 @@
 			
 				echo "<h4 style='margin: 30px 0px 0px;'>Register for " . wc_price( $total_price ) . "</h4>";			
 				echo "<p style='margin-top:15px'><strong>Optional course renewal for " . wc_price($the_price) . " <nobr>after $the_period</nobr></strong></p>";
-			
-			} // End If Statement ?>
-			
-			<h5 style='margin-top:15px'>* Read about <a href='/pricing'>online course pricing</a>.</h5>
+				
+				echo "<h5 style='margin-top:15px'>* Read about <a href='/pricing'>online course pricing</a>.</h5>";
+				
+				} //End toolset if statement
+			} // End is purchaseable if Statement ?>
 			
 		<?php
 		

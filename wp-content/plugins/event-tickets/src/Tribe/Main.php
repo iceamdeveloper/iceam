@@ -1,43 +1,42 @@
 <?php
-
 class Tribe__Tickets__Main {
 
 	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '4.5.6';
+	const VERSION = '4.6.3';
 
 	/**
 	 * Min required The Events Calendar version
 	 */
-	const MIN_TEC_VERSION = '4.5.6';
+	const MIN_TEC_VERSION = '4.6.7';
 
 	/**
 	 * Min required version of Tribe Common
 	 */
-	const MIN_COMMON_VERSION = '4.5.6';
+	const MIN_COMMON_VERSION = '4.7.3';
 
 	/**
 	 * Name of the provider
-	 * @var
+	 * @var string
 	 */
 	public $plugin_name;
 
 	/**
 	 * Directory of the plugin
-	 * @var
+	 * @var string
 	 */
 	public $plugin_dir;
 
 	/**
 	 * Path of the plugin
-	 * @var
+	 * @var string
 	 */
 	public $plugin_path;
 
 	/**
 	 * URL of the plugin
-	 * @var
+	 * @var string
 	 */
 	public $plugin_url;
 
@@ -168,6 +167,9 @@ class Tribe__Tickets__Main {
 
 			return;
 		}
+
+		// Intialize the Service Provider for Tickets
+		tribe_register_provider( 'Tribe__Tickets__Service_Provider' );
 
 		$this->hooks();
 
@@ -320,8 +322,6 @@ class Tribe__Tickets__Main {
 	 */
 	public function hooks() {
 		add_action( 'init', array( $this, 'init' ) );
-		add_action( 'add_meta_boxes', array( 'Tribe__Tickets__Metabox', 'maybe_add_meta_box' ) );
-		add_action( 'admin_enqueue_scripts', array( 'Tribe__Tickets__Metabox', 'add_admin_scripts' ) );
 		add_filter( 'tribe_post_types', array( $this, 'inject_post_types' ) );
 
 		// Setup Help Tab texting
@@ -329,7 +329,7 @@ class Tribe__Tickets__Main {
 		add_action( 'tribe_help_pre_get_sections', array( $this, 'add_help_section_featured_content' ) );
 		add_action( 'tribe_help_pre_get_sections', array( $this, 'add_help_section_extra_content' ) );
 		add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
-		add_action( 'plugins_loaded', array( 'Tribe__Support', 'getInstance' ) );
+		add_action( 'tribe_tickets_plugin_loaded', array( 'Tribe__Support', 'getInstance' ) );
 
 		// Setup Front End Display
 		add_action( 'tribe_events_inside_cost', 'tribe_tickets_buy_button', 10, 0 );
@@ -363,48 +363,9 @@ class Tribe__Tickets__Main {
 			add_filter( 'tribe_event_import_rsvp_column_names', array( Tribe__Tickets__CSV_Importer__Column_Names::instance(), 'filter_rsvp_column_names' ) );
 		}
 
-		// Register singletons we might need
-		tribe_singleton( 'tickets.handler', 'Tribe__Tickets__Tickets_Handler' );
-
-		// Caching
-		tribe_singleton( 'tickets.cache-central', 'Tribe__Tickets__Cache__Central', array( 'hook' ) );
-		tribe_singleton( 'tickets.cache', tribe( 'tickets.cache-central' )->get_cache() );
-
-		// Query Vars
-		tribe_singleton( 'tickets.query', 'Tribe__Tickets__Query', array( 'hook' ) );
-		tribe( 'tickets.query' );
-
-		// Tribe Data API Init
-		tribe_singleton( 'tickets.data_api', 'Tribe__Tickets__Data_API' );
-
-		// View links, columns and screen options
-		if ( is_admin() ) {
-			tribe_singleton( 'tickets.admin.views', 'Tribe__Tickets__Admin__Views', array( 'hook' ) );
-			tribe_singleton( 'tickets.admin.columns', 'Tribe__Tickets__Admin__Columns', array( 'hook' ) );
-			tribe_singleton( 'tickets.admin.screen-options', 'Tribe__Tickets__Admin__Screen_Options', array( 'hook' ) );
-			tribe( 'tickets.admin.views' );
-			tribe( 'tickets.admin.columns' );
-			tribe( 'tickets.admin.screen-options' );
-		}
-	}
-
-	/**
-	 * Used to add our beloved tickets to the JSON-LD markup
-	 *
-	 * @deprecated
-	 *
-	 * @param  array   $data The actual json-ld variable
-	 * @param  array   $args Arguments used to create the Markup
-	 * @param  WP_Post $post What post does this referer too
-	 * @return false
-	 */
-	public function inject_tickets_json_ld( $data, $args, $post ) {
-		/**
-		 * @todo remove this after 4.4
-		 */
-		_deprecated_function( __METHOD__, '4.2', 'Tribe__Tickets__JSON_LD__Order' );
-
-		return false;
+		// Load our assets
+		add_action( 'tribe_tickets_plugin_loaded', tribe_callback( 'tickets.assets', 'enqueue_scripts' ) );
+		add_action( 'tribe_tickets_plugin_loaded', tribe_callback( 'tickets.assets', 'admin_enqueue_scripts' ) );
 	}
 
 	/**
@@ -765,5 +726,4 @@ class Tribe__Tickets__Main {
 		<link rel="stylesheet" id="tribe-tickets-embed-css" href="<?php echo esc_url( $css_path ); ?>" type="text/css" media="all">
 		<?php
 	}
-
 }

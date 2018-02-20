@@ -4,7 +4,7 @@ Requires at least: 3.6
 Tested up to: 4.7
 License: GPLv3
 WC requires at least: 2.4
-WC tested up to: 2.7
+WC tested up to: 3.2
 
 Implements the integration between [Aelia Currency Switcher](https://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Dynamic Pricing plugin](https://www.woothemes.com/products/woocommerce-dynamic-pricing/).
 

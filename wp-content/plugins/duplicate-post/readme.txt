@@ -3,8 +3,8 @@ Contributors: 		lopo
 Donate link: 		https://duplicate-post.lopo.it/
 Tags: 				duplicate post, copy, clone
 Requires at least: 	3.6
-Tested up to: 		4.7
-Stable tag: 		3.1.2
+Tested up to: 		4.9
+Stable tag: 		3.2.1
 License: 			GPLv2 or later
 License URI: 		http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,19 +19,19 @@ How it works:
 
 1. In 'Edit Posts'/'Edit Pages', you can click on 'Clone' link below the post/page title: this will immediately create a copy and return to the list.
 
-2. NEW! In 'Edit Posts'/'Edit Pages', you can select one or more items, then choose 'Clone' in the 'Bulk Actions' dropdown to copy them all at once.
+2. In 'Edit Posts'/'Edit Pages', you can select one or more items, then choose 'Clone' in the 'Bulk Actions' dropdown to copy them all at once.
 
 3. In 'Edit Posts'/'Edit Pages', you can click on 'New Draft' link below the post/page title.
 
 4. On the post edit screen, you can click on 'Copy to a new draft' above "Cancel"/"Move to trash". 
 
-5. While viewing a post as a logged in user, you can click on 'Copy to a new draft' as a dropdown link under "Edit Post" in the admin bar.
+5. While viewing a post as a logged in user, you can click on 'Copy to a new draft' in the admin bar.
 
 3, 4 and 5 will lead to the edit page for the new draft: change what you want, click on 'Publish' and you're done.
 
 There is also a **template tag**, so you can put it in your templates and clone your posts/pages from the front-end. Clicking on the link will lead you to the edit page for the new draft, just like the admin bar link.
 
-Duplicate Post has many useful settings to customize its behaviour and restrict its use to certain roles or post types. Check out the extensive documentation on [the plugin's site](https://duplicate-post.lopo.it).
+Duplicate Post has many useful settings to customize its behavior and restrict its use to certain roles or post types. Check out the extensive documentation on [the plugin's site](https://duplicate-post.lopo.it).
 
 **If you're a plugin developer**, I suggest you to read the [Developer's Guide](https://duplicate-post.lopo.it/docs/developers-guide/) to ensure compatibility between your plugin(s) and mine. Feel free to [contact me](https://duplicate-post.lopo.it/contact) so we can keep in touch and collaborate.
 
@@ -75,6 +75,9 @@ If Duplicate Post is still in English, or if there are some untraslated strings,
 6. Bulk clone action.
 
 == Upgrade Notice ==
+
+= 3.2.1 =
+Fixes some problems with Multisite, WPML, revisions
 
 = 3.2 =
 new website + WPML compatibility + various fixes
@@ -138,9 +141,15 @@ New features and customization, WP 3.0 compatibility: you should upgrade if you 
 
 == Changelog ==
 
+= 3.2.1 (2017-11-25) =
+* Fixing some issues of the 3.* trunk before major redesign
+* Fixes issue when upgrading on multisite
+* Improved compatibility with WPML + page builders, thanks to WPML team
+* Prevents creating a revision immediately after the cloning
+
 = 3.2 (2017-04-04) =
 * new website with extensive documentation
-* WMPL compatibility, thanks to WMPL team
+* WPML compatibility, thanks to WPML team
 * improved Jetpack compatibility (Subscriptions, Markdown)
 * small changes to hooks
 * improved security with nonces
@@ -291,4 +300,3 @@ If you find this useful and if you want to contribute, there are three ways:
    1. You can [write me](https://duplicate-post.lopo.it/contact) and submit your bug reports, suggestions and requests for features;
    2. If you want to translate it to your language (there are just a few lines of text), you can use the [translation project](https://translate.wordpress.org/projects/wp-plugins/duplicate-post);
    3. Using the plugin is free, but if you want you can support my efforts by donating with PayPal [here](https://duplicate-post.lopo.it/donate)
-

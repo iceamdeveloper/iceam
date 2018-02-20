@@ -59,6 +59,11 @@
 	content: '*';
 }
 
+#ticket_global_stock .ticket_field {
+	display: block;
+	margin-left: 132px;
+}
+
 /**
  * Theme Specific rules
  */
@@ -67,9 +72,7 @@
 	width: 100%;
 }
 
-/**
- * List of Attendees
- */
+/* * List of Attendees */
 
 .tribe-attendees-list {
 	display: table;
@@ -257,4 +260,25 @@ a.tribe-attendees-list-showall {
 .tribe-event-tickets-plus-meta select {
 	background: white;
 	border: 1px solid #ddd;
+}
+
+input[type=checkbox].tribe_show_attendees {
+	margin-left: .4em;
+}
+
+/* = EDD CSS
+=============================================*/
+
+.edd.quantity {
+	border-bottom: 1px solid #dfdfdf;
+	color: #464646;
+	font-size: 15px;
+	padding: 16px 10px;
+	width: 192px;
+}
+
+.edd.quantity input {
+	margin-bottom: 5px;
+	padding: 5px 10px;
+	width: 4.375em;
 }

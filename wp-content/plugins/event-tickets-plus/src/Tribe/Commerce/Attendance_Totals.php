@@ -13,7 +13,7 @@
  */
 class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__Abstract_Attendance_Totals {
 	protected $total_sold = 0;
-	protected $total_complete = 0;
+	protected $total_paid = 0;
 	protected $total_pending = 0;
 
 	/**
@@ -25,11 +25,11 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 				continue;
 			}
 
-			$this->total_sold += $ticket->qty_sold();
+			$this->total_paid += $ticket->qty_sold();
 			$this->total_pending += $ticket->qty_pending();
 		}
 
-		$this->total_complete = $this->total_sold - $this->total_pending;
+		$this->total_sold = $this->total_paid + $this->total_pending;
 	}
 
 	/**
@@ -63,7 +63,7 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 		$total_paid_label = esc_html_x( 'Complete:', 'attendee summary', 'event-tickets-plus' );
 
 		$total_sold = $this->get_total_sold();
-		$total_paid = $this->get_total_complete();
+		$total_paid = $this->get_total_paid();
 
 		echo "
 			<ul>
@@ -108,16 +108,29 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	/**
 	 * The total number of tickets sold and paid for, for this event.
 	 *
+	 * @deprecated 4.6
+	 *
 	 * @return int
 	 */
 	public function get_total_complete() {
+		return $this->get_total_paid();
+	}
+
+	/**
+	 * The total number of tickets sold and paid for, for this event.
+	 *
+	 * @since  4.6
+	 *
+	 * @return int
+	 */
+	public function get_total_paid() {
 		/**
 		 * Returns the total tickets sold and paid for, for an event.
 		 *
-		 * @param int $total_complete
+		 * @param int $total_paid
 		 * @param int $original_total_complete
 		 * @param int $event_id
 		 */
-		return (int) apply_filters( 'tribe_tickets_plus_get_total_paid', $this->total_complete, $this->total_complete, $this->event_id );
+		return (int) apply_filters( 'tribe_tickets_plus_get_total_paid', $this->total_paid, $this->total_paid, $this->event_id );
 	}
 }

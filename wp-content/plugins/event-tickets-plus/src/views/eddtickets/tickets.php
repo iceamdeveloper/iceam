@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.5.3
+ * @version 4.6.2
  *
  * @var bool $must_login
  */
@@ -15,7 +15,11 @@ global $edd_options;
 $is_there_any_product         = false;
 $is_there_any_product_to_sell = false;
 $unavailability_messaging     = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
-$stock                        = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->stock();
+$stock_mananger               = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->stock();
+
+if ( ! empty( $tickets ) ) {
+	$tickets = tribe( 'tickets.handler' )->sort_tickets_by_menu_order( $tickets );
+}
 
 ob_start();
 ?>
@@ -36,7 +40,8 @@ ob_start();
 			 * on the `eddtickets_get_ticket` hook.
 			 */
 
-			$product = edd_get_download( $ticket->ID );
+			$product   = edd_get_download( $ticket->ID );
+			$available = $ticket->available();
 
 			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
 
@@ -48,31 +53,25 @@ ob_start();
 				echo '<td width="75" class="edd quantity" data-product-id="' . esc_attr( $ticket->ID ) . '">';
 
 
-				if ( $stock->available_units( $product->ID ) ) {
-
-					// For global stock enabled tickets with a cap, use the cap as the max quantity
-					if ( $global_stock_enabled && Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode() ) {
-						$remaining = $ticket->global_stock_cap();
-					}
-					else {
-						$remaining = $ticket->remaining();
-					}
+				if ( 0 !== $available ) {
+					$stock = $ticket->stock();
 
 					$max = '';
 					if ( $ticket->managing_stock() ) {
-						$max = 'max="' . absint( $remaining ) . '"';
+						$max = 'max="' . absint( $stock ) . '"';
 					}
 
 					echo '<input type="number" class="edd-input" min="0" ' . $max . ' name="quantity_' . esc_attr( $ticket->ID ) . '" value="0" ' . disabled( $must_login, true, false ) . '/>';
 
 					$is_there_any_product_to_sell = true;
 
-					if ( $remaining ) {
+					if ( $available ) {
 						?>
 						<span class="tribe-tickets-remaining">
 							<?php
+							$readable_amount = tribe_tickets_get_readable_amount( $available, null, false );
 							echo sprintf( esc_html__( '%1$s available', 'event-tickets-plus' ),
-								'<span class="available-stock" data-product-id="' . esc_attr( $ticket->ID ) . '">' . esc_html( $remaining ) . '</span>'
+								'<span class="available-stock" data-product-id="' . esc_attr( $ticket->ID ) . '">' . esc_html( $readable_amount ) . '</span>'
 							);
 							?>
 						</span>
@@ -89,7 +88,7 @@ ob_start();
 
 				echo '<td class="tickets_price">' . $this->get_price_html( $product ) . '</td>';
 
-				echo '<td class="tickets_description">' . $ticket->description . '</td>';
+				echo '<td class="tickets_description">' . ( $ticket->show_description() ? $ticket->description : '' ) . '</td>';
 
 				echo '</tr>';
 
@@ -130,7 +129,7 @@ ob_start();
 			?>
 			<tr>
 				<td colspan="4" class="eddtickets-add">
-					<?php if ( $must_login ): ?>
+					<?php if ( $must_login ) : ?>
 						<?php include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'login-to-purchase' ); ?>
 					<?php else: ?>
 						<button type="submit" class="edd-submit tribe-button <?php echo esc_attr( $color ); ?>"><?php esc_html_e( 'Add to cart', 'event-tickets-plus' );?></button>
@@ -142,7 +141,7 @@ ob_start();
 		<noscript>
 			<tr>
 				<td class="tribe-link-tickets-message">
-					<div class="no-javascript-msg"><?php esc_html_e( 'You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser.', 'event-tickets' ); ?></div>
+					<div class="no-javascript-msg"><?php esc_html_e( 'You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser.', 'event-tickets-plus' ); ?></div>
 				</td>
 			</tr>
 		</noscript>

@@ -53,6 +53,7 @@ class Tribe__Tickets_Plus__CSV_Importer__Column_Names {
 			'ticket_price'           => esc_html__( 'Ticket Price', 'event-tickets-plus' ),
 			'ticket_stock'           => esc_html__( 'Ticket Stock', 'event-tickets-plus' ),
 			'ticket_sku'             => esc_html__( 'Ticket SKU', 'event-tickets-plus' ),
+			'ticket_capacity'        => esc_html__( 'Ticket Capacity', 'event-tickets-plus' ),
 		) );
 
 		return $column_names;

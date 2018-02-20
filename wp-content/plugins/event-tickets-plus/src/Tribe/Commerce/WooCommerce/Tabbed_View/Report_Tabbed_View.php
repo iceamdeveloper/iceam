@@ -57,9 +57,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_Vie
 		}
 
 		$attendees_report = new Tribe__Tickets__Tabbed_View__Attendee_Report_Tab( $view );
-		$tickets_handler  = tribe( 'tickets.handler' );
 		$post             = get_post( $this->post_id );
-		$attendees_report->set_url( $tickets_handler->get_attendee_report_link( $post ) );
+		$attendees_report->set_url( tribe( 'tickets.attendees' )->get_report_link( $post ) );
 		$view->register( $attendees_report );
 
 		$orders_report     = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Orders_Report_Tab( $view );

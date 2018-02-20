@@ -48,7 +48,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 	 * @return bool true|false according to whether the update was successful or not
 	 */
 	public function increment_units( $product_id, $increment_by = 1 ) {
-		$ticket = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->get_ticket( null, $product_id );
+		$ticket = tribe( 'tickets-plus.commerce.edd' )->get_ticket( null, $product_id );
 
 		if ( ! $ticket || ! $ticket->managing_stock() ) {
 			return false;
@@ -75,7 +75,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 		// Look through the list of purchased downloads: for any that relate to tickets,
 		// determine how much inventory was purchased
 		foreach ( $payment_data['downloads'] as $purchase ) {
-			if ( ! get_post_meta( $purchase['id'], Tribe__Tickets_Plus__Commerce__EDD__Main::$event_key ) ) {
+			if ( ! get_post_meta( $purchase['id'], tribe( 'tickets-plus.commerce.edd' )->event_key ) ) {
 				continue;
 			}
 
@@ -130,8 +130,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 
 		$this->update_ticket_inventory_counts( $ticket_id );
 
-		if ( null === $order_statuses )
+		if ( null === $order_statuses ) {
 			$order_statuses = $this->get_valid_payment_statuses();
+		}
 
 		$order_statuses = $this->escape_fields( $order_statuses );
 

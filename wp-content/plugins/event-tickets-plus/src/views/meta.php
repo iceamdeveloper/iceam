@@ -6,13 +6,10 @@
  *
  *     [your-theme]/tribe-events/meta.php
  *
- * @version 4.3.5
+ * @version 4.6
  *
  */
 $meta = Tribe__Tickets_Plus__Main::instance()->meta();
-if ( ! $meta->meta_enabled( $ticket->ID ) ) {
-	return;
-}
 $meta_fields = $meta->get_meta_fields_by_ticket( $ticket->ID );
 ?>
 <tr class="tribe-event-tickets-plus-meta" id="tribe-event-tickets-plus-meta-<?php echo esc_attr( $ticket->ID ); ?>" data-ticket-id="<?php echo esc_attr( $ticket->ID ); ?>">

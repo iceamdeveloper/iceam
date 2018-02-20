@@ -10,6 +10,35 @@
 
 .tribe-attendee-fields-box {
 	vertical-align: top;
+
+	.default_explanation {
+		color: #b4b9be;
+		font-style: italic;
+	}
+
+	.tribe-attendee-fields-new {
+		width: 20%;
+
+		@media screen and ( max-width: 782px ) {
+			width: 100%;
+			display: block;
+
+			.tribe-tickets-attendee-info-options {
+				padding-right: 0;
+			}
+		}
+	}
+
+	.tribe-attendee-fields-existing {
+		@media screen and ( max-width: 782px ) {
+			width: 100%;
+			display: block;
+		}
+	}
+}
+
+.tribe-intro {
+	font-size: 12px;
 }
 
 #saved_ticket_attendee_info_chosen {
@@ -69,8 +98,6 @@
 }
 
 .tribe-tickets-attendee-info-form {
-	display: none;
-
 	td {
 		padding-bottom: 10px;
 	}
@@ -85,6 +112,12 @@
 
 	.eventtable {
 		width: 100%;
+	}
+}
+
+.tribe-tickets-plus-fieldset-page {
+	.tribe-tickets-attendee-info-form {
+		display: block;
 	}
 }
 
@@ -108,7 +141,7 @@
 
 	p {
 		color: #999;
-		font-size: 18px;
+		font-size: 14px;
 		font-style: normal;
 		margin: 0 0 10px;
 	}
@@ -158,10 +191,6 @@
 	a {
 		color: red;
 	}
-}
-
-.tribe-tickets-attendee-save-fieldset {
-	margin-top: 30px;
 }
 
 .tribe-tickets-attendee-saved-fieldset-name {
@@ -257,10 +286,13 @@ tr.event-tickets-meta-toggle-open {
 
 .eventForm .ticket_name .dashicons {
 	color: #ccc;
-	float: left;
 	margin-right: 5px;
 }
 
-.ticket_form .detailed.description {
+.ticket_form .detailed.ticket_form_right {
 	display: block;
+}
+
+#tribe_show_attendees {
+	margin-left: .4em;
 }

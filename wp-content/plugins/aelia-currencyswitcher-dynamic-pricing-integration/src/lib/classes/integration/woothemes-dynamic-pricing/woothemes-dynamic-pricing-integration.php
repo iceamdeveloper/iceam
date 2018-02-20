@@ -63,6 +63,10 @@ class Dynamic_Pricing_Integration {
 	 * @return float The amount converted in the destination currency.
 	 */
 	protected function convert($amount, $from_currency = null, $to_currency = null) {
+		// Get the raw amount, with a point as the decimal separator
+		// @since 1.0.2.171106
+		$amount = $this->get_raw_amount($amount);
+
 		if(empty($from_currency)) {
 			$from_currency = $this->settings()->base_currency();
 		}
@@ -71,11 +75,17 @@ class Dynamic_Pricing_Integration {
 			$to_currency = $this->currency_switcher()->get_selected_currency();
 		}
 
-		return $this->currency_switcher()->convert($amount,
-																							 $from_currency,
-																							 $to_currency);
+		return wc_format_localized_price($this->currency_switcher()->convert($amount,
+																																				 $from_currency,
+																																				 $to_currency));
 	}
 
+	/**
+	 * Returns the base currency for a product.
+	 *
+	 * @param int product_id
+	 * @return string
+	 */
 	protected function get_product_base_currency($product_id) {
 		return $this->currency_prices_manager()->get_product_base_currency($product_id);
 	}
@@ -105,6 +115,29 @@ class Dynamic_Pricing_Integration {
 		if(class_exists('\WC_Dynamic_Pricing')) {
 			remove_filter('woocommerce_variation_prices_price', array(\WC_Dynamic_Pricing::instance(), 'on_get_variation_prices_price' ), 10, 3);
 		}
+	}
+
+	/**
+	 * Given a localised amount, it returns a raw amount, without thousand
+	 * separators, and with the point as the decimal separator.
+	 *
+	 * @param float amount
+	 * @return float
+	 * @since 1.0.2.171106
+	 */
+	protected function get_raw_amount($amount) {
+		// Remove the filter used to override the decimal separator. This will allow
+		// WooCommerce to re-format the amount correctly, returning a value with
+		// the point as the decimal separator
+		remove_filter('pre_option_woocommerce_price_decimal_sep', array($this->currency_switcher(), 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
+
+		// Return the amount, now as raw float
+		$amount = floatval(wc_format_decimal($amount));
+
+		// Restore the filter used to override the decimal separator
+		add_filter('pre_option_woocommerce_price_decimal_sep', array($this->currency_switcher(), 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
+
+		return $amount;
 	}
 
 	/**

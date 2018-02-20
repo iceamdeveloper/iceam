@@ -1,10 +1,10 @@
  === Event Tickets ===
 
-Contributors: ModernTribe, aguseo, borkweb, barry.hughes, bordoni, brianjessee, brook-tribe, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, mat-lipe, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, shelbelliott, tribecari, vicskf, zbtirrell
+Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: RSVP, events, tickets, event management, calendar, ticket sales, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, ticket integration, event ticketing
 Requires at least: 4.5
-Tested up to: 4.8.2
-Stable tag: 4.5.6
+Tested up to: 4.9.1
+Stable tag: 4.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -44,7 +44,7 @@ Just getting started? Definitely watch and read through the [New User Primer](ht
 * Visitors can RSVP to events
 * Add RSVP to posts, pages, or any custom post type
 * Works out of the box with The Events Calendar
-* Upgrade to [Event Tickets Plus](http://m.tri.be/18th) to sell tickets using WooCommerce, Shopp, Easy Digital Downloads or WP-eCommerce
+* Upgrade to [Event Tickets Plus](http://m.tri.be/18th) to sell tickets using WooCommerce and Easy Digital Downloads
 * Completely responsive from mobile to tablet to desktop
 * Tested on the major theme frameworks such as Avada, Genesis, Woo Themes, Thesis and many more.
 * Internationalized & Translated
@@ -55,7 +55,7 @@ Looking for something else? We've got add-ons available to take your calendar to
 
 = Event Tickets Plus =
 
-Get premium support and add paid ticketing features with [Event Tickets Plus](http://m.tri.be/18wg). This includes the ability to sell tickets, collect sales, and manage attendees all from within your WordPress dashboard!  Works with your favorite eCommerce plugin (WooCommerce, Shopp, Easy Digital Downloads, or WP E-Commerce).
+Get premium support and add paid ticketing features with [Event Tickets Plus](http://m.tri.be/18wg). This includes the ability to sell tickets, collect sales, and manage attendees all from within your WordPress dashboard! We currently support WooCommerce or Easy Digital Downloads.
 
 = The Events Calendar =
 
@@ -95,16 +95,16 @@ If you've identified a bug and want to submit a patch, we'd welcome it at our [G
 
 = Requirements =
 
-* PHP 5.2.4 or greater (recommended: PHP 5.4 or greater)
-* WordPress 3.9 or above
+* PHP 5.2.4 or greater (recommended: PHP 7.0 or greater)
+* WordPress 4.5 or above
 * jQuery 1.11.x
-* Event Tickets 4.0 or above
-* The Events Calendar 4.0 or above (optional)
+* Event Tickets 4.6 or above
+* The Events Calendar 4.6 or above (optional)
 
 == Screenshots ==
 
-1. RSVP setup
-2. RSVPs on an event
+1. RSVP metabox
+2. Add New RSVP
 3. RSVP on a post
 4. Attendee report
 5. Emailed ticket
@@ -125,7 +125,7 @@ Note that we aren't going to say "tough luck" if you identify a plugin/theme con
 
 = Event Tickets Plus is just what I need! I'm sold! How can I get my hands on it? =
 
-Events Tickets Plus can be purchased directly on [our website](http://m.tri.be/18th). There are five (5) license types available, and all licenses include 1 year of access to support + updates.
+Events Tickets Plus can be purchased directly on [our website](http://m.tri.be/18th). There are five (5) license types available, and all licenses include access to premium support, new feature releases, and regular maintenance updates.
 
 = I'm interested in Event Tickets Plus or another add-on, but I have a few questions before making the purchase. Can you help me get those addressed? =
 
@@ -185,7 +185,6 @@ The plugin is produced by [Modern Tribe Inc](http://m.tri.be/18uc).
 * [Andras Guseo](https://profiles.wordpress.org/aguseo)
 * [Barry Hughes](https://profiles.wordpress.org/barryhughes)
 * [Brian Jessee](https://profiles.wordpress.org/brianjessee)
-* [Brook Harding](https://profiles.wordpress.org/brook-tribe)
 * [Caroline Tucker](https://profiles.wordpress.org/tribecari)
 * [Clifford Paulick](https://profiles.wordpress.org/cliffpaulick)
 * [Daniel Dvorkin](https://profiles.wordpress.org/MZAWeb)
@@ -201,11 +200,11 @@ The plugin is produced by [Modern Tribe Inc](http://m.tri.be/18uc).
 * [Peter Chester](https://profiles.wordpress.org/peterchester)
 * [Reid Peifer](https://profiles.wordpress.org/reid.peifer)
 * [Shane Pearlman](https://profiles.wordpress.org/shane.pearlman)
-* [Shelby Elliott](https://profiles.wordpress.org/shelbelliott)
 * [Zachary Tirrell](https://profiles.wordpress.org/zbtirrell)
 
 = Past Contributors =
 
+* [Brook Harding](https://profiles.wordpress.org/brook-tribe)
 * [Casey Driscoll](https://profiles.wordpress.org/caseypatrickdriscoll)
 * [Casey Picker](https://profiles.wordpress.org/ckpicker)
 * [Dan Cameron](https://profiles.wordpress.org/dancameron)
@@ -228,10 +227,74 @@ The plugin is produced by [Modern Tribe Inc](http://m.tri.be/18uc).
 * [Rob La Gatta](https://profiles.wordpress.org/roblagatta)
 * [Ryan Urban](https://profiles.wordpress.org/ryancurban)
 * [Samuel Estok](https://profiles.wordpress.org/faction23)
+* [Shelby Elliott](https://profiles.wordpress.org/shelbelliott)
 * [Timothy Wood](https://profiles.wordpress.org/codearachnid)
 * [Trisha Salas](https://profiles.wordpress.org/trishasalas)
 
 == Changelog ==
+
+= [4.6.3] 2018-01-10 =
+
+* Fix - Ensured that only users of the editor or administrator roles can delete, check-in, and undo check-ins on tickets (props to @skamath for reporting this!) [68831]
+* Tweak - Addressed some issues where the ticket form would sometimes show up even when all tickets' end-sale dates had passed (props to @reckling and others for reporting this!) [94724]
+* Tweak - Introduced the `tribe_tickets_caps_can_manage_attendees` filter for customizing what user capabilities are required for managing attendees [68831]
+
+= [4.6.2] 2017-12-07 =
+
+* Fix - Fixed broken RSVP ticket sales when using Aggregator CSV [92936]
+* Fix - Prevent non-escaped underscores from getting into the final SQL for LIKE queries (Props to @misenhower) [GH#567]
+* Fix - Fixed sorting for Tickets so that moving them to the first and last position of the order is allowed [92558]
+* Fix - Improved handling of Stock to ensure it's updated accordingly based on total sales when updating capacity [93601]
+* Fix - Improved CSS for Capacity Table on mobile [90907]
+* Fix - Fixed some bugs with attendees management that prevented check-in features from working in Community Tickets front-end views (props @musician4you and several other folks for highlighting this issue) [81629]
+* Tweak - Introduced the `tribe_tickets_event_action_links_edit_url` filter for more granular control over "edit event" links in various views [93339]
+* Tweak - Prevent EDD from being a provider for front-end Community Tickets, as only WooCommerce is allowed for that [91758]
+* Tweak - Added actions: `event_tickets_ticket_list_before_ticket_name`, `event_tickets_ticket_list_after_ticket_name`
+* Language - 0 new strings added, 54 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.6.1.1] 2017-11-24 =
+
+* Fix - Fixed some issues to ensure Start and End Time for Ticket sales work correctly (props to Scott) [93439]
+* Fix - Ensure attendee fields remain visible within the admin environment (compatibility fix for Event Tickets Plus) [94142]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.6.1] 2017-11-21 =
+
+* Fix - RSVP and Tickets migration from pre-4.6 updates capacity corretly for all cases now (props to Uwe Matern) [93231]
+* Fix - Ensure Attendees column for events displays the correct percentages [92287]
+* Fix - Tickets Editor now has more support for Accessibility [80651]
+* Tweak - Prevent unnecessary AJAX requests when using tickets editor [88642]
+* Tweak - Removes weird clearing of fields when canceling or saving Tickets [88642]
+* Tweak - Allow saving of Ticket Editor contents when Updating the Event [91760]
+* Tweak - Included more hooks via the new Template class for the Ticket Editor: `tribe_template_file`, `tribe_template_before_include`, `tribe_template_after_include` and `tribe_template_html` [91760]
+* Tweak - Only display admin links in Community Tickets if user is able to access the admin [79565]
+* Tweak - spacing of message to logged in users to view attendees [92550]
+* Tweak - Added filters: `tribe_ticket_filter_attendee_report_link`, `tribe_tickets_attendees_show_title`
+* Tweak - Removed filters: `tribe_tickets_default_end_date`, `tribe_tickets_ajax_refresh_settings`, `tribe_tickets_can_update_ticket_price`, `tribe_tickets_disallow_update_ticket_price_message`, `tribe_events_tickets_metabox_edit_attendee`
+* Tweak - Added actions: `tribe_tickets_save_post`
+* Tweak - Removed actions: `tribe_events_tickets_pre_ticket_list`, `tribe_events_tickets_post_ticket_list`
+* Tweak - Changed views: `tickets/email`, `tickets/orders-link`
+* Language - 10 new strings added, 132 updated, 0 fuzzied, and 9 obsoleted
+
+= [4.6] 2017-11-09 =
+
+* New - Fully redesigned ticket editor interface
+* New - Ticket description is now optional for frontend display
+* New - Updated time pickers for start and end sale
+* New - Improved clarity around ticket availability
+* Tweak - Renamed "stock" to "capacity"
+* Tweak - Added filters: `tribe_event_ticket_decimal_point`, `tribe_tickets_default_ticket_capacity_type`, `tribe_tickets_rsvp_send_mail`, `tribe_tickets_show_description`, `tribe_tickets_ajax_refresh_tables`, `tribe_tickets_ajax_refresh_settings`, `tribe_events_tickets_metabox_edit_attendee`, `tribe_tickets_get_default_module`, `tribe_tickets_total_event_capacity`
+* Tweak - Removed filters: `tribe_events_tickets_attendees_url`
+* Tweak - Added actions: `tribe_events_tickets_metabox_edit_advanced`, `tribe_events_tickets_ticket_table_add_tbody_column`, `tribe_events_save_tickets_settings`, `tribe_events_tickets_capacity`, `tribe_events_tickets_post_capacity`, `tribe_events_tickets_pre_ticket_list`, `tribe_events_tickets_post_ticket_list`, `tribe_events_tickets_new_ticket_buttons`, `tribe_events_tickets_new_ticket_warnings`, `tribe_events_tickets_after_new_ticket_panel`, `tribe_events_tickets_pre_edit`, `tribe_events_tickets_metabox_edit_main`, `tribe_events_tickets_metabox_edit_accordion_content`, `tribe_events_tickets_post_accordion`, `tribe_events_tickets_bottom`, `tribe_events_tickets_bottom_right`, `tribe_events_tickets_ticket_table_add_header_column`, `tribe_ticket_order_field`, `tribe_events_tickets_settings_content`, `tribe_events_tickets_metabox_edit_advanced`
+* Tweak - Removed actions: `tribe_events_tickets_metabox_advanced`, `event_tickets_ticket_list_after_ticket_name`, `tribe_events_tickets_metabox_pre`
+* Tweak - Changed views: `tickets/email`, `tickets/rsvp`
+* Tweak - Changed minimum supported version of WordPress to 4.5
+* Language - 57 new strings added, 152 updated, 4 fuzzied, and 26 obsoleted
+
+= [4.5.7] 2017-10-18 =
+
+* Tweak - Improved compatibility of the "Attendees Export" CSV with Excel and other programs by removing line breaks from multi-line fields in the CSV (props: @twodoplhins) [80563]
+* Tweak - Improve contrast on labels for ticket settings [93919]
 
 = [4.5.6] 2017-09-20 =
 
@@ -273,6 +336,7 @@ The plugin is produced by [Modern Tribe Inc](http://m.tri.be/18uc).
 * Fix - Improved get_ticket_counts() to account for tickets with global stock enabled  [82684]
 * Fix - Improved tribe_events_count_available_tickets() to account for tickets with global stock enabled (thanks to Florian for reporting this) [81967]
 * Fix — Fixed some PHP notices that would show up when buying EDD tickets. [83277]
+
 
 = [4.5.2] 2017-07-13 =
 
