@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit883ade2616862e1621e5147eaa9a9e44
+class ComposerStaticInit84f7bdef6a4cdf2ef294625208eddbb0
 {
     public static $classMap = array (
         'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bundles_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes-bundles-plugin/wc-aelia-cs-bundles-integration.php',
@@ -16,7 +16,7 @@ class ComposerStaticInit883ade2616862e1621e5147eaa9a9e44
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit883ade2616862e1621e5147eaa9a9e44::$classMap;
+            $loader->classMap = ComposerStaticInit84f7bdef6a4cdf2ef294625208eddbb0::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -14,7 +14,7 @@ class Tribe__Tickets__Admin__Move_Ticket_Types extends Tribe__Tickets__Admin__Mo
 		add_action( 'wp_ajax_move_ticket_types_post_list', array( $this, 'update_post_choices' ) );
 		add_action( 'wp_ajax_move_ticket_type', array( $this, 'move_ticket_type_requests' ) );
 		add_action( 'tribe_tickets_ticket_type_moved', array( $this, 'notify_event_attendees' ), 100, 3 );
-		add_action( 'tribe_events_tickets_metabox_advanced', array( $this, 'expose_ticket_history' ), 100 );
+		add_action( 'tribe_events_tickets_metabox_edit_ajax_advanced', array( $this, 'expose_ticket_history' ), 100 );
 		add_filter( 'tribe_tickets_move_tickets_template_vars', array( $this, 'move_tickets_dialog_vars' ) );
 		add_filter( 'tribe_tickets_move_tickets_script_data', array( $this, 'move_tickets_dialog_data' ) );
 	}
@@ -111,7 +111,7 @@ class Tribe__Tickets__Admin__Move_Ticket_Types extends Tribe__Tickets__Admin__Mo
 
 		wp_send_json_success( array(
 			'message' => sprintf(
-				'<p>' . __( 'Ticket type %1$s for %2$s was successfully moved to %3$s. All previously sold tickets of this type have been transferred to %3$s. Please adjust stock manually as needed. %1$s ticket holders have received an email notifying them of the change. You may now close this window!', 'event-tickets' ) . '</p>',
+				'<p>' . __( 'Ticket type %1$s for %2$s was successfully moved to %3$s. All previously sold tickets of this type have been transferred to %3$s. Please adjust capacity and stock manually as needed. %1$s ticket holders have received an email notifying them of the change. You may now close this window!', 'event-tickets' ) . '</p>',
 				'<a href="' . esc_url( get_admin_url( null, '/post.php?post=' . $ticket_type_id . '&action=edit' ) ) . '" target="_blank">' . get_the_title( $ticket_type_id ) . '</a>',
 				'<a href="' . esc_url( get_admin_url( null, '/post.php?post=' . $src_post_id . '&action=edit' ) ) . '" target="_blank">' . get_the_title( $src_post_id ) . '</a>',
 				'<a href="' . esc_url( get_admin_url( null, '/post.php?post=' . $destination_id . '&action=edit' ) ) . '" target="_blank">' . get_the_title( $destination_id ) . '</a>'
@@ -166,6 +166,37 @@ class Tribe__Tickets__Admin__Move_Ticket_Types extends Tribe__Tickets__Admin__Mo
 			return false;
 		}
 
+		$src_event_cap = new Tribe__Tickets__Global_Stock( $src_post_id );
+		$tgt_event_cap = new Tribe__Tickets__Global_Stock( $destination_post_id );
+
+		$src_mode = get_post_meta( $ticket_type_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, true );
+
+		// When the Mode is not `own` we have to check and modify some stuff
+		if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE !== $src_mode ) {
+			// If we have Source cap and not on Target, we set it up
+			if ( ! $tgt_event_cap->is_enabled() ) {
+				$src_event_capacity = tribe_tickets_get_capacity( $src_post_id );
+
+				// Activate Shared Capacity on the Ticket
+				$tgt_event_cap->enable();
+
+				// Setup the Stock level to match Source capacity
+				$tgt_event_cap->set_stock_level( $src_event_capacity );
+
+				// Update the Target event with the Capacity from the Source
+				update_post_meta( $destination_post_id, tribe( 'tickets.handler' )->key_capacity, $src_event_capacity );
+			} elseif ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $src_mode ) {
+				// Check if we have capped to avoid ticket cap over event cap
+				$src_ticket_capacity = tribe_tickets_get_capacity( $ticket_type_id );
+				$tgt_event_capacity = tribe_tickets_get_capacity( $destination_post_id );
+
+				// Don't allow ticket capacity to be bigger than Target Event Cap
+				if ( $src_ticket_capacity > $tgt_event_capacity ) {
+					update_post_meta( $ticket_type_id, tribe( 'tickets.handler' )->key_capacity, $tgt_event_capacity );
+				}
+			}
+		}
+
 		$provider->clear_attendees_cache( $src_post_id );
 		$provider->clear_attendees_cache( $destination_post_id );
 
@@ -179,7 +210,7 @@ class Tribe__Tickets__Admin__Move_Ticket_Types extends Tribe__Tickets__Admin__Mo
 
 		$history_data = array(
 			'src_event_id' => $src_post_id,
-			'tgt_event_it' => $destination_post_id,
+			'tgt_event_id' => $destination_post_id,
 		);
 
 		Tribe__Post_History::load( $ticket_type_id )->add_entry( $history_message, $history_data );

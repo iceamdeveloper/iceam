@@ -20,7 +20,7 @@ Implements a workaround to allow plugins to work with caching systems that don't
 
 * WordPress 4.0 or newer.
 * PHP 5.3 or newer.
-* WooCommerce 2.4.x to 3.1.x.
+* WooCommerce 2.4.x to 3.3.x.
 * [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or later.
 
 == Frequently Asked Questions ==
@@ -40,6 +40,14 @@ For more information about installation and management of plugins, please refer 
 1. **Settings > Options**. Miscellaneous options.
 
 == Changelog ==
+
+= 1.0.9.180212 =
+* Tweak - Handled condition in which a country selector widget doesn't contain the country code that the Cache Handler is trying to set.
+
+= 1.0.8.180207 =
+* Improvement - Improved error handling for Ajax calls in in Ajax Loader.
+* Fix - Fixed compatibility with country selector widget implemented by the Tax Display by Country plugin.
+* Updated supported WooCommerce versions.
 
 = 1.0.7.170926 =
 * Bug fix - Fixed handling of cookies with WooCommerce 3.0 and later.

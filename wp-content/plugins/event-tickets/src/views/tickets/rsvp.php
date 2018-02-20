@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/tickets/rsvp.php
  *
- * @version 4.5.5
+ * @version 4.6
  *
  * @var bool $must_login
  */
@@ -65,6 +65,7 @@ $now = current_time( 'timestamp' );
 
 			$is_there_any_product = true;
 			$is_there_any_product_to_sell = $ticket->is_in_stock();
+			$remaining = $ticket->remaining();
 
 			if ( $is_there_any_product_to_sell ) {
 				$are_products_available = true;
@@ -79,14 +80,16 @@ $now = current_time( 'timestamp' );
 							type="number"
 							class="tribe-ticket-quantity"
 							min="0"
-							max="<?php echo esc_attr( $ticket->remaining() ); ?>"
+							<?php if ( -1 !== $remaining ) : ?>
+								max="<?php echo esc_attr( $remaining ); ?>"
+							<?php endif; ?>
 							name="quantity_<?php echo absint( $ticket->ID ); ?>"
 							value="0"
 							<?php disabled( $must_login ); ?>
 						>
 						<?php if ( $ticket->managing_stock() ) : ?>
 							<span class="tribe-tickets-remaining">
-					<?php echo sprintf( esc_html__( '%1$s out of %2$s available', 'event-tickets' ), $ticket->remaining(), $ticket->original_stock() ); ?>
+					<?php echo sprintf( esc_html__( '%1$s out of %2$s available', 'event-tickets' ), $ticket->remaining(), $ticket->capacity() ); ?>
 				</span>
 						<?php endif; ?>
 					<?php else: ?>
@@ -97,7 +100,7 @@ $now = current_time( 'timestamp' );
 					<?php echo esc_html( $ticket->name ); ?>
 				</td>
 				<td class="tickets_description" colspan="2">
-					<?php echo esc_html( $ticket->description ); ?>
+					<?php echo esc_html( ( $ticket->show_description() ? $ticket->description : '' ) ); ?>
 				</td>
 			</tr>
 			<?php

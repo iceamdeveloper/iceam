@@ -51,6 +51,16 @@ jQuery(document).ready(function($) {
 				'exec': 'get_active_currency'
 			});
 			$.post(ajax_url, ajax_args, function(response) {
+				// Check that the response contains the active currency. Without it, we
+				// can't do anything
+				// @since 1.0.8.180207
+				if(!response || !response['active_currency']) {
+					console.log('Unable to determine the active currency');
+					console.log('Response for Ajax call "' + ajax_args.exec + '":');
+					console.log(response);
+					return;
+				}
+
 				active_currency = response['active_currency'];
 				$(document).trigger('active_currency_retrieved', active_currency);
 			});
@@ -186,6 +196,18 @@ jQuery(document).ready(function($) {
 	}
 
 	/**
+	 * Indicates if a country exists amongst the options in a given country
+	 * selector widget.
+	 *
+	 * @param object $widget
+	 * @param string country_code
+	 * @since 1.0.9.180212
+	 */
+	var country_exists_in_selector = function($widget, country_code) {
+		return $widget.find('select.countries option[value="' + country_code + '"]').length > 0;
+	}
+
+	/**
 	 * Updates the country selector rendered by the Aelia plugins, so
 	 * that they show the country passed as a parameter as "selected".
 	 */
@@ -199,10 +221,33 @@ jQuery(document).ready(function($) {
 		// Update country and state selectors
 		$('.widget_wc_aelia_country_selector_widget, .widget_wc_aelia_customer_country_selector_widget').each(function() {
 			var $widget = $(this);
-			$widget.find('select.countries').val(country_code).change();
+			var location_changed = false;
 
-			if(state_code != '') {
-				$widget.find('select.states').val(state_code).change();
+			// If the country we fetched doesn't exist in the country selector, it
+			// can't be selected. Trying to select it anyway would cause an infinite
+			// loop, as the country selector would have a different value at the next
+			// page load, and triggered the (pointless) selection again
+			// @since
+			if(!country_exists_in_selector($widget, country_code)) {
+				return;
+			}
+
+			// Only change the country if the selected one is different
+			// @since 1.0.8.180207
+			if($widget.find('select.countries').val() != country_code) {
+				$widget.find('select.countries').val(country_code);
+				location_changed = true;
+			}
+
+			// Only change the state/province if the selected one is different
+			// @since 1.0.8.180207
+			if((state_code != '') && ($widget.find('select.states').val() != 'state_code')) {
+				$widget.find('select.states').val(state_code);
+				location_changed = true;
+			}
+
+			if(location_changed) {
+				$widget.find('select.countries').change();
 			}
 		});
 	}

@@ -5,9 +5,11 @@ Plugin URI: https://aelia.co/
 Description: Dynamic Pricing integration for Aelia Currency Switcher for WooCommerce
 Author: Aelia <support@aelia.co>
 Author URI: https://aelia.co
-Version: 1.0.1.170710
+Version: 1.0.2.171106
 Text Domain: wc-aelia-cs-dynamic-pricing-integration
 Domain Path: /languages
+WC requires at least: 2.4.0
+WC tested up to: 3.2.3
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-cs-dynamic-pricing-requirementscheck.php');

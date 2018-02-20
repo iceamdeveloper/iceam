@@ -1,13 +1,143 @@
+// For compatibility purposes we add this
+if ( 'undefined' === typeof tribe.tickets ) {
+	tribe.tickets = {};
+}
+
+tribe.tickets.editor = {};
+
 var ticketHeaderImage = window.ticketHeaderImage || {};
 
-(function( window, $, undefined ) {
+(function( window, $, _, obj ) {
 	'use strict';
 
-	ticketHeaderImage = {
+	// base elements
+	var $body          = $( 'html, body' );
+	var $document      = $( document );
+	var $tribe_tickets = $( document.getElementById( 'tribetickets' ) );
 
+	// Bail if we don't have what we need
+	if ( 0 === $tribe_tickets.length ) {
+		return;
+	}
+
+	var $tickets_container = $( document.getElementById( 'event_tickets' ) );
+	var $post_id           = $( document.getElementById( 'post_ID' ) );
+	var $publish           = $( document.getElementById( 'publish' ) );
+	var $metaboxBlocker    = $tribe_tickets.find( '.tribe-tickets-editor-blocker' );
+	var $spinner           = $tribe_tickets.find( '.spinner' );
+
+	// panels
+	var $base_panel        = $( document.getElementById( 'tribe_panel_base' ) );
+	var $edit_panel        = $( document.getElementById( 'tribe_panel_edit' ) );
+	var $settings_panel    = $( document.getElementById( 'tribe_panel_settings' ) );
+
+	// Datepicker and Timepicker variables
+	var datepickerFormats = [
+		'yy-mm-dd',
+		'm/d/yy',
+		'mm/dd/yy',
+		'd/m/yy',
+		'dd/mm/yy',
+		'm-d-yy',
+		'mm-dd-yy',
+		'd-m-yy',
+		'dd-mm-yy',
+		'yy.mm.dd',
+		'mm.dd.yy',
+		'dd.mm.yy'
+	];
+	var dateFormat = datepickerFormats[0];
+
+	var changeEventCapacity = function( event, eventCapacity ) {
+		if ( 'undefined' === typeof eventCapacity ) {
+			var $element = $( this );
+			eventCapacity = $element.val();
+		}
+
+		if ( undefined === eventCapacity ) {
+			return;
+		}
+
+		// Make sure we don't have NaN
+		if ( ! eventCapacity ) {
+			eventCapacity = 0;
+		}
+
+		eventCapacity = parseInt( eventCapacity, 10 );
+		var $maxCapacity = $( '.tribe-ticket-capacity-max' );
+		var $capacityValue = $maxCapacity.find( '.tribe-ticket-capacity-value' );
+		var $capacity = $( '.tribe-ticket-field-capacity[name="tribe-ticket[capacity]"]' );
+
+		// may as well set this here just in case
+		$capacity.attr( 'placeholder', eventCapacity );
+
+		if ( ! eventCapacity ) {
+			eventCapacity = 0;
+		} else {
+			$capacity.attr( 'max', eventCapacity );
+		}
+
+		$capacityValue.text( eventCapacity );
+	};
+
+	/**
+	 * Sets the ticket edit form provider to the currently selected default ticketing provider.
+	 * Defaults to RSVP if something fails
+	 *
+	 * @since 4.6
+	 *
+	 * @param boolean force selection to RSVP
+	 * @return void
+	 */
+	function set_default_provider_radio( force_rsvp ) {
+		if ( 'undefined' === typeof force_rsvp ) {
+			force_rsvp = true;
+		}
+		var $checkedProvider = $tribe_tickets.find( '.tribe-ticket-editor-field-default_provider' );
+
+		if ( $checkedProvider.is( ':radio' ) ) {
+			$checkedProvider = $checkedProvider.filter( ':checked' );
+		}
+
+		var provider_id;
+
+		if ( force_rsvp ) {
+			provider_id = 'Tribe__Tickets__RSVP_radio';
+		} else {
+			// Allows default to WooCommerce
+			provider_id = 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main_radio';
+		}
+
+		if ( ! force_rsvp && $checkedProvider.length > 0 ) {
+			provider_id = $checkedProvider.val() + '_radio';
+		}
+
+		$( document.getElementById( provider_id ) ).prop( 'checked', true ).trigger( 'change' );
+	}
+
+	/**
+	 * If the user attempts to nav away without saving global stock setting
+	 * changes then try to bring this to their attention!
+	 */
+	obj.beforeUnload = function( event ) {
+		var returnValue = false;
+
+		// If we are not on the base panel we alert the user about leaving
+		// NOTE: This custom message will only work for Chrome < 51, Opera < 38, Firefox < 44, and Safari < 9.1
+		if ( 'true' === $base_panel.attr( 'aria-hidden' ) ) {
+			returnValue = tribe_global_stock_admin_ui.nav_away_msg;
+		}
+
+		event.returnValue = returnValue;
+
+		// We can't trigger a confirm() dialog from within this action but returning
+		// a string should achieve effectively the same result
+		return returnValue;
+	};
+
+	ticketHeaderImage = {
 		// Call this from the upload button to initiate the upload frame.
 		uploader: function() {
-
 			var frame = wp.media( {
 				title   : HeaderImageData.title,
 				multiple: false,
@@ -28,9 +158,10 @@ var ticketHeaderImage = window.ticketHeaderImage || {};
 		},
 		// Output Image preview and populate widget form.
 		render  : function( attachment ) {
-			$( '#tribe_ticket_header_preview' ).html( ticketHeaderImage.imgHTML( attachment ) );
-			$( '#tribe_ticket_header_image_id' ).val( attachment.id );
-			$( '#tribe_ticket_header_remove' ).show();
+			$( document.getElementById( 'tribe_ticket_header_preview' ) ).html( ticketHeaderImage.imgHTML( attachment ) );
+			$( document.getElementById( 'tribe_ticket_header_image_id' ) ).val( attachment.id );
+			$( document.getElementById( 'tribe_ticket_header_remove' ) ).show();
+			$( document.getElementById( 'tribe_tickets_image_preview_filename' ) ).show().find( '.filename' ).text( attachment.filename );
 		},
 		// Render html for the image.
 		imgHTML : function( attachment ) {
@@ -42,195 +173,139 @@ var ticketHeaderImage = window.ticketHeaderImage || {};
 		}
 	};
 
+	obj.panels = {
+		list: '#tribe_panel_base',
+		ticket: '#tribe_panel_edit',
+		settings: '#tribe_panel_settings',
+	};
 
-	$( document ).ready( function() {
-		var $event_pickers = $( '#tribe-event-datepickers' ),
-			$tribe_tickets = $( '#tribetickets' ),
-			$tickets_container = $( '#event_tickets' ),
-			$enable_global_stock = $( "#tribe-tickets-enable-global-stock" ),
-			$global_stock_level = $( "#tribe-tickets-global-stock-level" ),
-			global_stock_setting_changed = false,
-			$body = $( 'html, body' ),
-			startofweek = 0;
+	/**
+	 * Switch from one panel to another
+	 * @param  event  e      triggering event
+	 * @param  object ($base_panel) $panel jQuery object containing the panel we want to switch to
+	 * @return void
+	 */
+	obj.swapPanel = function( panel ) {
+		var $panel;
 
-		$tribe_tickets.on( {
-			/**
-			 * Makes a Visual Spining thingy appear on the Tickets metabox.
-			 * Also prevents user Action on the metabox elements.
-			 *
-			 * @param  {jQuery.event} event  The jQuery event
-			 * @param  {string} action You can use `start` or `stop`
-			 * @return {void}
-			 */
-			'spin.tribe': function( event, action ) {
-				if ( typeof action === 'undefined' || $.inArray( action, [ 'start', 'stop' ] ) ){
-					action = 'stop';
-				}
+		if ( panel instanceof jQuery ) {
+			$panel = panel;
+		} else if ( 'undefined' !== typeof obj.panels[ panel ] ) {
+			$panel = $( obj.panels[ panel ] );
+		} else {
+			$panel = $base_panel;
+		}
 
-				if ( 'stop' === action ) {
-					$tickets_container.css( 'opacity', '1' )
-						.find( '#tribe-loading' ).hide();
-				} else {
-					$tickets_container.css( 'opacity', '0.5' )
-						.find( '#tribe-loading' ).show();
-
-				}
-			},
-
-			/**
-			 * Clears the Form fields the correct way
-			 *
-			 * @return {void}
-			 */
-			'clear.tribe': function() {
-				var $this = $( this ),
-					$ticket_form = $this.find( '#ticket_form'),
-					$ticket_settings = $ticket_form.find( "tr:not(.event-wide-settings)" );
-
-				$this.find( 'a#ticket_form_toggle' ).show();
-
-				$ticket_settings.find( 'input:not(:button):not(:radio):not(:checkbox):not([type="hidden"]), textarea' ).val( '' );
-				$ticket_settings.find( 'input:checkbox' ).attr( 'checked', false );
-				$ticket_settings.find( '#ticket_id' ).val( '' );
-
-				$this.find( '#ticket_form input[name="show_attendee_info"]' ).prop( 'checked', false ).change();
-
-				// some fields may have a default value we don't want to lose after clearing the form
-				$this.find( 'input[data-default-value]' ).each( function() {
-					var $current_field = $( this );
-					$current_field.val( $current_field.data( 'default-value' ) );
-				} );
-
-				// Reset the min/max datepicker settings so that they aren't inherited by the next ticket that is edited
-				$this.find( '#ticket_start_date' ).datepicker( 'option', 'maxDate', null );
-				$this.find( '#ticket_end_date' ).datepicker( 'option', 'minDate', null );
-
-				$this.find( '.ticket_start_time, .ticket_end_time, .ticket.sale_price' ).hide();
-
-				$this.find( '#ticket_price' ).removeProp( 'disabled' )
-					.siblings( '.no-update-message' ).html( '' ).hide()
-					.end().siblings( '.description' ).show();
-
-				$('#tribe-tickets-attendee-sortables').empty();
-				$('.tribe-tickets-attendee-saved-fields').show();
-
-				$ticket_form.hide();
-			},
-
-			/**
-			 * Scrolls to the Tickets container once the ticket form receives the focus.
-			 *
-			 * @return {void}
-			 */
-			'focus.tribe': function() {
-				$body.animate( {
-					scrollTop: $tickets_container.offset().top - 50
-				}, 500 );
-			},
-
-			/**
-			 * When the edit ticket form fields have completed loading we can setup
-			 * other UI features as needed.
-			 */
-			'edit-tickets-complete.tribe': function() {
-				show_hide_ticket_type_history();
-			},
-
-			/**
-			 * Sets/Swaps out the name & id attributes on Advanced ticket meta fields so we don't have (or submit)
-			 * duplicate fields
-			 *
-			 * @return {void}
-			 */
-			'set-advanced-fields.tribe': function() {
-				var $this = $( this );
-				var $ticket_form = $this.find( '#ticket_form' );
-				var $ticket_advanced = $ticket_form.find( 'tr.ticket_advanced:not(.ticket_advanced_meta)' ).find( 'input, select, textarea' );
-				var provider = $ticket_form.find( '#ticket_provider:checked' ).val();
-
-				// for each advanded ticket input, select, and textarea, relocate the name and id fields a bit
-				$ticket_advanced.each( function() {
-					var $el = $( this );
-
-					// if there's a value in the name attribute, move it to the data attribute then clear out the id as well
-					if ( $el.attr( 'name' ) ) {
-						$el.data( 'name', $el.attr( 'name' ) ).attr( {
-							'name': '',
-							'id': ''
-						} );
-					}
-
-					// if the field is for the currently selected provider, make sure the name and id fields are populated
-					if (
-						$el.closest( 'tr' ).hasClass( 'ticket_advanced_' + provider )
-						&& $el.data( 'name' )
-						&& 0 === $el.attr( 'name' ).length
-					) {
-						$el.attr( {
-							'name': $el.data( 'name' ),
-							'id': $el.data( 'name' )
-						} );
-					}
-				} );
-
-				// (Re-)set the global stock fields
-				$tribe_tickets.trigger( 'set-global-stock-fields.tribe' );
-
-				// Also reset each time the global stock mode selector is changed
-				$( '#ticket_global_stock' ).change( function() {
-					$tribe_tickets.trigger( 'set-global-stock-fields.tribe' );
-				});
-			},
-
-			'set-global-stock-fields.tribe': function() {
-				var provider_class   = currently_selected_provider();
-				var $provider_fields = $( this ).find( '#ticket_form').find( '.ticket_advanced_' + provider_class );
-
-				if ( $provider_fields.length < 1 ) {
-					return;
-				}
-
-				var $normal_stock_field  = $provider_fields.filter( '.stock' );
-				var $global_stock_fields = $provider_fields.filter( '.global-stock-mode' );
-				var $sales_cap_field     = $global_stock_fields.filter( '.sales-cap-field' );
-
-				var mode     = $( '#ticket_global_stock' ).val();
-				var enabled  = global_stock_enabled();
-
-				// Show or hide global (and normal, "per-ticket") stock settings as appropriate
-				$global_stock_level.toggle( enabled );
-				$global_stock_fields.toggle( global_stock_enabled() );
-				$normal_stock_field.toggle( ! enabled );
-
-				// If global stock is not enabled we need go no further
-				if ( ! enabled ) {
-					return;
-				}
-
-				// Otherwise, toggle on and off the relevant stock quantity fields
-				switch ( mode ) {
-					case "global":
-						$sales_cap_field.hide();
-						$normal_stock_field.hide();
-						break;
-					case "capped":
-						$sales_cap_field.show();
-						$normal_stock_field.hide();
-						break;
-					case "own":
-						$sales_cap_field.hide();
-						$normal_stock_field.show();
-						break;
-				}
-			}
+		// First, hide them all!
+		$tribe_tickets.find( '.ticket_panel' ).each( function() {
+			$( this ).attr( 'aria-hidden', true );
 		} );
+
+		// then show the one we want
+		$panel.attr( 'aria-hidden', false );
+
+		if ( ! $panel.is( $base_panel ) ) {
+			$( window ).on( 'beforeunload.tribe', obj.beforeUnload );
+		} else {
+			$( window ).off( 'beforeunload.tribe' );
+		}
+	}
+
+	obj.fetchPanels = function( data, swapTo ) {
+		if ( 'undefined' === typeof data ) {
+			data = [];
+		}
+
+		var params = {
+			action  : 'tribe-ticket-panels',
+			notice  : false,
+			post_id : $post_id.val(),
+			nonce   : TribeTickets.add_ticket_nonce,
+			data    : data,
+			is_admin: $( 'body' ).hasClass( 'wp-admin' )
+		};
+
+		$.post(
+			ajaxurl,
+			params,
+			function( response ) {
+				if ( ! response.success ) {
+					return;
+				}
+
+				obj.refreshPanels( response.data, swapTo );
+			},
+			'json'
+		);
+	};
+
+	obj.startWatchingMoveLinkIn = function() {
+		$tickets_container.find( '.tribe-ticket-move-link' ).one( 'click', function() {
+			// give ThickBox some time to load, in ms
+			window.setTimeout( obj.listentToThickboxEvents, 250 );
+		} )
+	};
+
+	obj.listentToThickboxEvents = function() {
+		/**
+		 * ThickBox id from its source code.
+		 *
+		 * @see /wp-includes/js/thickbox/thickbox.js
+		 */
+		var $tbWindow = $( '#TB_window' );
+
+		if ( $tbWindow.length === 0 ) {
+			return;
+		}
+
+		// refetch the panels when the ThickBox closes and swap to the ticket list
+		$tbWindow.one( 'tb_unload', function() {
+			obj.fetchPanels( null, 'list' );
+		} );
+	};
+
+	obj.refreshPanels = function ( panels, swapTo ) {
+		// After this point is safe to assume we have a valid set of panels
+		$base_panel = $( panels.list );
+		$edit_panel = $( panels.ticket );
+		$settings_panel = $( panels.settings );
+
+		// Rplace the old ones
+		$tribe_tickets.find( obj.panels.list ).replaceWith( $base_panel );
+		$tribe_tickets.find( obj.panels.ticket ).replaceWith( $edit_panel );
+		$tribe_tickets.find( obj.panels.settings ).replaceWith( $settings_panel );
+
+		// Makes sure the Panels are Ready for interaction
+		obj.setupPanels();
+
+		// At the end always swap panels (deafults to base/list)
+		obj.swapPanel( swapTo );
+	};
+
+	obj.setupPanels = function() {
+		window.MTAccordion( {
+			target: '.accordion', // ID (or class) of accordion container
+		} );
+
+		// date elements
+		var $event_pickers     = $( document.getElementById( 'tribe-event-datepickers' ) );
+		var $ticket_start_date = $( document.getElementById( 'ticket_start_date' ) );
+		var $ticket_end_date   = $( document.getElementById( 'ticket_end_date' ) );
+		var $ticket_start_time = $( document.getElementById( 'ticket_start_time' ) );
+		var $ticket_end_time   = $( document.getElementById( 'ticket_end_time' ) );
+		var startofweek        = 0;
 
 		if ( $event_pickers.length ) {
 			startofweek = $event_pickers.data( 'startofweek' );
 		}
 
+		if ( 'undefined' !== typeof tribe_dynamic_help_text ) {
+			var indexDatepickerFormat =  $.isNumeric( tribe_dynamic_help_text.datepicker_format_index ) ? tribe_dynamic_help_text.datepicker_format_index : 0;
+			dateFormat = datepickerFormats[ indexDatepickerFormat ];
+		}
+
 		var datepickerOpts = {
-			dateFormat     : 'yy-mm-dd',
+			dateFormat     : dateFormat,
 			showAnim       : 'fadeIn',
 			changeMonth    : true,
 			changeYear     : true,
@@ -239,472 +314,426 @@ var ticketHeaderImage = window.ticketHeaderImage || {};
 			showButtonPanel: false,
 			onChange       : function() {
 			},
+			beforeShow     : function( element, object ) {
+				object.input.data( 'prevDate', object.input.datepicker( 'getDate' ) );
+
+				// Capture the datepicker div here; it's dynamically generated so best to grab here instead of elsewhere.
+				var $dpDiv = $( object.dpDiv );
+
+				// "Namespace" our CSS a bit so that our custom jquery-ui-datepicker styles don't interfere with other plugins'/themes'.
+				$dpDiv.addClass( 'tribe-ui-datepicker' );
+
+				// @todo Look into making this also compatible with ACF
+				// $event_details.trigger( 'tribe.ui-datepicker-div-beforeshow', [ object ] );
+
+				$dpDiv.attrchange({
+					trackValues : true,
+					callback    : function( attr ) {
+						// This is a non-ideal, but very reliable way to look for the closing of the ui-datepicker box,
+						// since onClose method is often included by other plugins, including Events Calender PRO.
+						if (
+							attr.newValue.indexOf( 'display: none' ) >= 0 ||
+							attr.newValue.indexOf( 'display:none' ) >= 0
+						) {
+							$dpDiv.removeClass( 'tribe-ui-datepicker' );
+
+							// @todo Look into making this also compatible with ACF
+							// $event_details.trigger( 'tribe.ui-datepicker-div-closed', [ object ] );
+						}
+					}
+				});
+			},
 			onSelect       : function( dateText, inst ) {
-				var the_date = $.datepicker.parseDate( 'yy-mm-dd', dateText );
+				var the_date = $.datepicker.parseDate( dateFormat, dateText );
+
 				if ( inst.id === 'ticket_start_date' ) {
-					$( '#ticket_end_date' ).datepicker( 'option', 'minDate', the_date );
-					if ( the_date ) {
-						$( '.ticket_start_time' ).show();
-					}
-					else {
-						$( '.ticket_start_time' ).hide();
-					}
-				}
-				else {
-					$( '#ticket_start_date' ).datepicker( 'option', 'maxDate', the_date );
-					if ( the_date ) {
-						$( '.ticket_end_time' ).show();
-					}
-					else {
-						$( '.ticket_end_time' ).hide();
-					}
+					$ticket_end_date.datepicker( 'option', 'minDate', the_date );
+				} else {
+					$ticket_start_date.datepicker( 'option', 'maxDate', the_date );
 				}
 			}
 		};
 
 		$.extend( datepickerOpts, tribe_l10n_datatables.datepicker );
 
-		$( '#ticket_start_date' ).datepicker( datepickerOpts ).keyup( function( e ) {
+		var $timepickers = $tribe_tickets.find( '.tribe-timepicker:not(.ui-timepicker-input)' );
+		tribe_timepickers.setup_timepickers( $timepickers );
+
+		$ticket_start_date.datepicker( datepickerOpts ).datepicker( 'option', 'defaultDate', $( document.getElementById( 'EventStartDate' ) ).val() ).keyup( function( e ) {
 			if ( e.keyCode === 8 || e.keyCode === 46 ) {
 				$.datepicker._clearDate( this );
 			}
 		} );
-		$( '#ticket_end_date' ).datepicker( datepickerOpts ).keyup( function( e ) {
+
+		$ticket_end_date.datepicker( datepickerOpts ).datepicker( 'option', 'defaultDate', $( document.getElementById( 'EventEndDate' ) ).val() ).keyup( function( e ) {
 			if ( e.keyCode === 8 || e.keyCode === 46 ) {
 				$.datepicker._clearDate( this );
 			}
 		} );
 
-		/**
-		 * Indicates if the "enable global stock" field has been checked.
-		 *
-		 * @returns boolean
-		 */
-		function global_stock_enabled() {
-			return $enable_global_stock.prop( "checked" );
-		}
+		if ( $( document.getElementById( 'tribe_ticket_header_preview' ) ).find( 'img' ).length ) {
+			$( document.getElementById( 'tribe_ticket_header_remove' ) ).show();
 
-		/**
-		 * Show or hide global stock fields and settings as appropriate.
-		 */
-		function show_hide_global_stock() {
-			global_stock_setting_changed = true;
-			$tribe_tickets.trigger( 'set-global-stock-fields.tribe' );
-		}
-
-		/**
-		 * Show or hide the appropriate set of provider-specific fields.
-		 */
-		function show_hide_advanced_fields() {
-			$( 'tr.ticket_advanced' ).hide();
-			$( 'tr.ticket_advanced_' + currently_selected_provider() + ':not(.sale_price)' ).show();
-			$tribe_tickets.trigger( 'set-advanced-fields.tribe' );
-			$( document.getElementById( 'tribetickets' ) ).trigger( 'ticket-provider-changed.tribe' );
-		}
-
-		/**
-		 * Returns the currently selected ticketing provider.
-		 *
-		 * @return string
-		 */
-		function currently_selected_provider() {
-			var $checked_provider = $( 'input[name="ticket_provider"]:checked' );
-			return ( $checked_provider.length > 0 )
-				? $checked_provider[0].value
-				: "";
-		}
-
-		/**
-		 * When a ticket type is edited we should (re-)establish the UI for showing
-		 * and hiding its history, if it has one.
-		 */
-		function show_hide_ticket_type_history() {
-			var $history = $tribe_tickets.find( 'tr.ticket_advanced.history' );
-
-			if ( ! $history.length ) {
-				return;
-			}
-
-			var $toggle_link = $history.find( 'a.toggle-history' );
-			var $toggle_link_text = $toggle_link.find( 'span' );
-			var $history_list = $history.find( 'ul' );
-
-			$history.find( 'a.toggle-history' ).click( function( event ) {
-				$toggle_link_text.toggle();
-				$history_list.toggle();
-				event.stopPropagation();
-				return false;
-			} );
-		}
-
-		// Show or hide the global stock level as appropriate, both initially and thereafter
-		$enable_global_stock.change( show_hide_global_stock );
-		$enable_global_stock.trigger( 'change' );
-
-		// Triggering a change event will falsely set the global_stock_setting_changed flag to
-		// true - undo this as it is a one-time false positive
-		global_stock_setting_changed = false;
-
-		/* Show the advanced metabox for the selected provider and hide the others on selection change */
-		$( 'input[name=ticket_provider]:radio' ).change( function() {
-			show_hide_advanced_fields();
-		} );
-
-		/* Show the advanced metabox for the selected provider and hide the others at ready */
-		$( 'input[name=ticket_provider]:checked' ).each( function() {
-			show_hide_advanced_fields();
-		} );
-
-		/* "Add a ticket" link action */
-		$( 'a#ticket_form_toggle' ).click( function( e ) {
-			$( 'h4.ticket_form_title_edit' ).hide();
-			$( 'h4.ticket_form_title_add' ).show();
-			$( this ).hide();
-			$tribe_tickets
-				.trigger( 'clear.tribe' )
-				.trigger( 'set-advanced-fields.tribe' )
-				.trigger( 'focus.tribe' );
-			$( '#ticket_form' ).show();
-			$( document.getElementById( 'tribetickets' ) ).trigger( 'ticket-provider-changed.tribe' );
-			e.preventDefault();
-		} );
-
-		/* "Cancel" button action */
-		$( '#ticket_form_cancel' ).click( function() {
-			$tribe_tickets
-				.trigger( 'clear.tribe' )
-				.trigger( 'set-advanced-fields.tribe' )
-				.trigger( 'focus.tribe' );
-		} );
-
-		/* "Save Ticket" button action */
-		$( '#ticket_form_save' ).click( function( e ) {
-			var $form = $( '#ticket_form_table' ),
-				type = $form.find( '#ticket_provider:checked' ).val(),
-				$rows = $form.find( '.ticket, .ticket_advanced_meta, .ticket_advanced_' + type );
-
-			$tribe_tickets.trigger( 'save-ticket.tribe', e ).trigger( 'spin.tribe', 'start' );
-
-			var params = {
-				action  : 'tribe-ticket-add-' + $( 'input[name=ticket_provider]:checked' ).val(),
-				formdata: $rows.find( '.ticket_field' ).serialize(),
-				post_ID : $( '#post_ID' ).val(),
-				nonce   : TribeTickets.add_ticket_nonce
-			};
-
-			$.post(
-				ajaxurl,
-				params,
-				function( response ) {
-					$tribe_tickets.trigger( 'saved-ticket.tribe', response );
-
-					if ( response.success ) {
-						$tribe_tickets.trigger( 'clear.tribe' );
-						$( 'td.ticket_list_container' ).empty().html( response.data.html );
-						$( '.ticket_time' ).hide();
-					}
-				},
-				'json'
-			).complete( function() {
-				$tribe_tickets.trigger( 'spin.tribe', 'stop' ).trigger( 'focus.tribe' );
-			} );
-
-		} );
-
-		/* "Delete Ticket" link action */
-
-		$tribe_tickets.on( 'click', '.ticket_delete', function( e ) {
-			if ( ! confirm( tribe_ticket_notices.confirm_alert ) ) {
-				return false;
-			}
-
-			e.preventDefault();
-
-			$tribe_tickets.trigger( 'delete-ticket.tribe', e ).trigger( 'spin.tribe', 'start' );
-
-			var params = {
-				action   : 'tribe-ticket-delete-' + $( this ).attr( 'attr-provider' ),
-				post_ID  : $( '#post_ID' ).val(),
-				ticket_id: $( this ).attr( 'attr-ticket-id' ),
-				nonce    : TribeTickets.remove_ticket_nonce
-			};
-
-			$.post(
-				ajaxurl,
-				params,
-				function( response ) {
-					$tribe_tickets.trigger( 'deleted-ticket.tribe', response );
-
-					if ( response.success ) {
-						$tribe_tickets.trigger( 'clear.tribe' );
-						$( 'td.ticket_list_container' ).empty().html( response.data );
-					}
-				},
-				'json'
-			).complete( function() {
-				$tribe_tickets.trigger( 'spin.tribe', 'stop' );
-			} );
-		} );
-
-		/* "Edit Ticket" link action */
-
-		$tribe_tickets
-			.on( 'click', '.ticket_edit', function( e ) {
-
-				e.preventDefault();
-
-				$( 'h4.ticket_form_title_edit' ).show();
-				$( 'h4.ticket_form_title_add' ).hide();
-
-				$tribe_tickets.trigger( 'spin.tribe', 'start' );
-
-				var params = {
-					action   : 'tribe-ticket-edit-' + $( this ).attr( 'attr-provider' ),
-					post_ID  : $( '#post_ID' ).val(),
-					ticket_id: $( this ).attr( 'attr-ticket-id' ),
-					nonce    : TribeTickets.edit_ticket_nonce
-				};
-
-				$.post(
-					ajaxurl,
-					params,
-					function( response ) {
-						$tribe_tickets
-							.trigger( 'clear.tribe' )
-							.trigger( 'set-advanced-fields.tribe' )
-							.trigger( 'edit-ticket.tribe', response );
-
-						var regularPrice = response.data.price;
-						var salePrice    = regularPrice;
-						var onSale       = false;
-
-						if ( 'undefined' !== typeof response.data.on_sale && response.data.on_sale ) {
-							onSale       = true;
-							regularPrice = response.data.regular_price;
-						}
-
-						$( '#ticket_id' ).val( response.data.ID );
-						$( '#ticket_name' ).val( response.data.name );
-						$( '#ticket_description' ).val( response.data.description );
-
-						if ( onSale ) {
-							$( '.ticket_advanced_' + response.data.provider_class + '.sale_price' ).show();
-						}
-
-						var start_date = response.data.start_date.substring( 0, 10 );
-						var end_date = response.data.end_date.substring( 0, 10 );
-
-						$( '#ticket_start_date' ).val( start_date );
-						$( '#ticket_end_date' ).val( end_date );
-
-						var $start_meridian = $( document.getElementById( 'ticket_start_meridian' ) ),
-						      $end_meridian = $( document.getElementById( 'ticket_end_meridian' ) );
-
-						if ( response.data.start_date ) {
-							var start_hour = parseInt( response.data.start_date.substring( 11, 13 ) );
-							var start_meridian = 'am';
-
-							if ( start_hour > 12 ) {
-								start_meridian = 'pm';
-								start_hour = parseInt( start_hour ) - 12;
-								start_hour = ( '0' + start_hour ).slice( - 2 );
-							}
-							if ( 12 === start_hour ) {
-								start_meridian = 'pm';
-							}
-							if ( 0 === start_hour && 'am' === start_meridian ) {
-								start_hour = 12;
-							}
-
-							// Return the start hour to a 0-padded string
-							start_hour = start_hour.toString();
-							if ( 1 === start_hour.length ) {
-								start_hour = '0' + start_hour;
-							}
-
-							$( '#ticket_start_hour' ).val( start_hour ).trigger( "change" );
-							$( '#ticket_start_minute' ).val( response.data.start_date.substring( 14, 16 ) ).trigger( "change" );
-							$( '#ticket_start_meridian' ).val( start_meridian ).trigger( "change" );
-
-							$( '.ticket_start_time' ).show();
-						}
-
-						if ( response.data.end_date ) {
-
-							var end_hour = parseInt( response.data.end_date.substring( 11, 13 ) );
-							var end_meridian = 'am';
-
-							if ( end_hour > 12 && $end_meridian.length ) {
-								end_meridian = 'pm';
-								end_hour = parseInt( end_hour ) - 12;
-								end_hour = ( '0' + end_hour ).slice( - 2 );
-							}
-							if ( end_hour === 12 ) {
-								end_meridian = 'pm';
-							}
-							if ( 0 === end_hour && 'am' === end_meridian ) {
-								end_hour = 12;
-							}
-
-							// Return the end hour to a 0-padded string
-							end_hour = end_hour.toString();
-							if ( 1 === end_hour.length ) {
-								end_hour = '0' + end_hour;
-							}
-
-							$( '#ticket_end_hour' ).val( end_hour ).trigger( "change" );
-							$( '#ticket_end_minute' ).val( response.data.end_date.substring( 14, 16 ) ).trigger( "change" );
-							$( '#ticket_end_meridian' ).val( end_meridian ).trigger( "change" );
-
-							$( '.ticket_end_time' ).show();
-						}
-
-						var $ticket_advanced = $( 'tr.ticket_advanced input' );
-						$ticket_advanced.data( 'name', $ticket_advanced.attr( 'name' ) ).attr( {
-							'name': '',
-							'id': ''
-						} );
-						$( 'tr.ticket_advanced' ).remove();
-						$( 'tr.ticket.bottom' ).before( response.data.advanced_fields );
-
-						// trigger a change event on the provider radio input so the advanced fields can be re-initialized
-						$( 'input:radio[name=ticket_provider]' ).filter( '[value=' + response.data.provider_class + ']' ).click();
-						$( 'input[name=ticket_provider]:radio' ).change();
-
-						// set the prices after the advanced fields have been added to the form
-						var $ticket_price = $tribe_tickets.find( '#ticket_price' );
-						$ticket_price.val( regularPrice );
-
-						if ( 'undefined' !== typeof response.data.disallow_update_price_message ) {
-							$ticket_price.siblings( '.no-update-message' ).html( response.data.disallow_update_price_message );
-						} else {
-							$ticket_price.siblings( '.no-update-message' ).html( '' );
-						}
-
-						if ( 'undefined' !== typeof response.data.can_update_price && ! response.data.can_update_price ) {
-							$ticket_price.prop( 'disabled', 'disabled' );
-							$ticket_price.siblings( '.description' ).hide();
-							$ticket_price.siblings( '.no-update-message' ).show();
-						} else {
-							$ticket_price.removeProp( 'disabled' );
-							$ticket_price.siblings( '.description' ).show();
-							$ticket_price.siblings( '.no-update-message' ).hide();
-						}
-
-						var $sale_field = $tribe_tickets.find( '#ticket_sale_price' );
-
-						if ( onSale ) {
-							$sale_field
-								.val( salePrice )
-								.closest( 'tr' )
-								.show();
-						} else {
-							$sale_field.closest( 'tr' ).hide();
-						}
-
-						if ( 'undefined' !== typeof response.data.purchase_limit && response.data.purchase_limit ) {
-							$( '#ticket_purchase_limit' ).val( response.data.purchase_limit );
-						}
-
-						$tribe_tickets.find( '.tribe-bumpdown-trigger' ).bumpdown();
-
-						$( 'a#ticket_form_toggle' ).hide();
-						$( '#ticket_form' ).show();
-
-						$tribe_tickets
-							.trigger( 'set-advanced-fields.tribe' )
-							.trigger( 'edit-ticket.tribe', response );
-
-					},
-					'json'
-				).complete( function() {
-					$tribe_tickets
-						.trigger( 'spin.tribe', 'stop' )
-						.trigger( 'focus.tribe' )
-						.trigger( 'edit-tickets-complete.tribe' );
-				} );
-
-			} )
-			.on( 'click', '#tribe_ticket_header_image', function( e ) {
-				e.preventDefault();
-				ticketHeaderImage.uploader( '', '' );
-			} )
-			.on( 'keyup', '#ticket_price', function ( e ) {
-				e.preventDefault();
-
-				var regex;
-				var decimal_point = price_format.decimal;
-
-				regex = new RegExp( '[^\-0-9\%\\' + decimal_point + ']+', 'gi' );
-
-				var value = $( this ).val();
-				var newvalue = value.replace( regex, '' );
-
-				// @todo add info message or tooltip to let people know we are removing the comma or period
-				if ( value !== newvalue ) {
-					$( this ).val( newvalue );
-				}
-			} );
-
-
-		var $remove = $( '#tribe_ticket_header_remove' );
-		var $preview = $( '#tribe_ticket_header_preview' );
-
-		if ( $preview.find( 'img' ).length ) {
-			$remove.show();
-		}
-
-		/**
-		 * Track changes to the global stock level. Changes to the global stock
-		 * checkbox itself is handled elsewhere.
-		 */
-		$global_stock_level.change( function() {
-			global_stock_setting_changed = true;
-		} );
-
-		/**
-		 * Unset the global stock settings changed flag if the post is being
-		 * saved/updated (no need to trigger a confirmation dialog in these
-		 * cases).
-		 */
-		$( 'input[type="submit"]' ).click( function() {
-			global_stock_setting_changed = false;
-		} );
-
-		/**
-		 * If the user attempts to nav away without saving global stock setting
-		 * changes then try to bring this to their attention!
-		 */
-		$( window ).on( 'beforeunload', function() {
-			// If the global stock settings have not changed, do not interfere
-			if ( ! global_stock_setting_changed ) {
-				return;
-			}
-
-			// We can't trigger a confirm() dialog from within this action but returning
-			// a string should achieve effectively the same result
-			return tribe_global_stock_admin_ui.nav_away_msg;
-
-		} );
-
-		$('body').on( 'click', '#tribe_ticket_header_remove', function( e ) {
-
-			e.preventDefault();
-			$preview.html( '' );
-			$remove.hide();
-			$( '#tribe_ticket_header_image_id' ).val( '' );
-
-		} );
-
-		if ( $( '#tribe_ticket_header_preview img' ).length ) {
-
-			var $tiximg = $( '#tribe_ticket_header_preview img' );
+			var $tiximg = $( document.getElementById( 'tribe_ticket_header_preview' ) ).find( 'img' );
 			$tiximg.removeAttr( 'width' ).removeAttr( 'height' );
 
 			if ( $tribe_tickets.width() < $tiximg.width() ) {
 				$tiximg.css( 'width', '95%' );
 			}
 		}
+
+		// When we have Meta fields for Attendees
+		if (
+			'undefined' !== typeof tribe_event_tickets_plus
+			&& $.isPlainObject( tribe_event_tickets_plus )
+			&& $.isPlainObject( tribe_event_tickets_plus.meta )
+			&& $.isPlainObject( tribe_event_tickets_plus.meta.admin )
+			&& $.isFunction( tribe_event_tickets_plus.meta.admin.init_ticket_fields )
+		) {
+			tribe_event_tickets_plus.meta.admin.init_ticket_fields();
+		}
+
+		// Setup Drag and Drop
+		if (
+			tribe.tickets.table
+			&& 0 !== $base_panel.find( '.tribe-tickets-editor-table-tickets-body tr' ).length
+		) {
+			tribe.tickets.table.toggle_sortable();
+		}
+
+		$tribe_tickets.find( tribe.validation.selectors.item ).validation();
+
+		// Make sure we display the correct Fields and things
+		$tribe_tickets.find( '.tribe-dependent' ).dependency();
+		$tribe_tickets.find( '.tribe-dependency' ).trigger( 'verify.dependency' );
+	};
+
+	$document.ajaxSend( function( event, jqxhr, settings ) {
+		if ( 'string' !== $.type( settings.data ) ) {
+			return;
+		}
+
+		if ( -1 === settings.data.indexOf( 'action=tribe-ticket' ) ) {
+			return;
+		}
+
+		$tribe_tickets.trigger( 'spin.tribe', 'start' );
 	} );
 
-})( window, jQuery );
+	$document.ajaxComplete( function( event, jqxhr, settings ) {
+		if ( 'string' !== $.type( settings.data ) ) {
+			return;
+		}
+
+		if ( -1 === settings.data.indexOf( 'action=tribe-ticket' ) ) {
+			return;
+		}
+
+		$tribe_tickets.trigger( 'spin.tribe', 'stop' );
+	} );
+
+	/* Add some trigger actions */
+	$document.on( {
+		/**
+		 * Makes a Visual Spinning thingy appear on the Tickets metabox.
+		 * Also prevents user Action on the metabox elements.
+		 *
+		 * @param  {jQuery.event} event  The jQuery event
+		 * @param  {string} action You can use `start` or `stop`
+		 * @return {void}
+		 */
+		'spin.tribe': function( event, action ) {
+			if ( 'undefined' === typeof action || $.inArray( action, [ 'start', 'stop' ] ) ){
+				action = 'stop';
+			}
+
+			if ( 'stop' === action ) {
+				$metaboxBlocker.hide();
+				$spinner.removeClass( 'is-active' );
+			} else {
+				$metaboxBlocker.show();
+				$spinner.addClass( 'is-active' );
+			}
+		},
+	} );
+
+	/**
+	 * When Hitting the Publish button we remove our beforeunload
+	 */
+	$publish.on( 'click', function ( event ) {
+		$( window ).off( 'beforeunload.tribe' );
+	} );
+
+	/* "Settings" button action */
+	$document.on( 'click', '#settings_form_toggle', function( event ) {
+		// Prevent Form Submit on button click
+		event.preventDefault();
+
+		// Fetches as fresh set of panels
+		obj.fetchPanels( null, 'settings' );
+
+		// Make it safe that it wont submit
+		return false;
+	} );
+
+	/**
+	 * Cancel buttons, which refresh and swap to list
+	 */
+	$document.on( 'click', '#tribe_settings_form_cancel, #ticket_form_cancel', function( event ) {
+		// Prevent Form Submit on button click
+		event.preventDefault();
+
+		// Fetches as fresh set of panels
+		obj.fetchPanels( null, 'list' );
+
+		// Make it safe that it wont submit
+		return false;
+	} );
+
+	/* "Save Settings" button action */
+	$document.on( 'click', '#tribe_settings_form_save', function( event ) {
+		// Prevent Form Submit on button click
+		event.preventDefault();
+
+		// Fetches form data from this panel
+		var formData = $settings_panel.find( 'input,textarea' ).serialize();
+
+		// Save and Refresh the Panels
+		obj.fetchPanels( formData, 'list' );
+
+		// Make it safe that it wont submit
+		return false;
+	} );
+
+	/* "Add ticket" button action */
+	$document.on( 'click', '.ticket_form_toggle', function( event ) {
+		// Prevent Form Submit on button click
+		event.preventDefault();
+
+		// Where we clicked
+		var $button = $( this );
+
+		set_default_provider_radio( 'rsvp_form_toggle' === $button.attr( 'id' ) );
+
+		// Triggers Dependency
+		$edit_panel.find( '.tribe-dependency' ).trigger( 'verify.dependency' );
+
+		obj.swapPanel( 'ticket' );
+
+		// Make it safe that it wont submit
+		return false;
+	} );
+
+	/* "Edit Ticket" link action */
+	$document.on( 'click', '.ticket_edit_button', function( event ) {
+		// Prevent Form Submit on button click
+		event.preventDefault();
+
+		// Where we clicked
+		var $button = $( this );
+
+		// Prep the Params for the Request
+		var params = {
+			action   : 'tribe-ticket-edit',
+			post_id  : $post_id.val(),
+			ticket_id: $button.data( 'ticketId' ),
+			nonce    : TribeTickets.edit_ticket_nonce,
+			is_admin : $( 'body' ).hasClass( 'wp-admin' )
+		};
+
+		$.post(
+			ajaxurl,
+			params,
+			function( response ) {
+				if ( ! response.success ) {
+					return;
+				}
+
+				obj.refreshPanels( response.data, 'ticket' );
+				obj.startWatchingMoveLinkIn( '#event_tickets' )
+			},
+			'json'
+		);
+
+		// Make it safe that it wont submit
+		return false;
+	} );
+
+	/* "Save Ticket" button action */
+	$document.on( 'click.tribe', '[name="ticket_form_save"]', function( e ) {
+		var $form = $( document.getElementById( 'ticket_form_table' ) );
+
+		// Makes sure we have validation
+		$form.trigger( 'validation.tribe' );
+
+		// Prevent anything from happening when there are errors
+		if ( tribe.validation.hasErrors( $form ) ) {
+			return;
+		}
+
+		$tribe_tickets.trigger( 'pre-save-ticket.tribe', e );
+
+		var $orders = $base_panel.find( '.tribe-ticket-field-order' );
+		var params = {
+			action    : 'tribe-ticket-add',
+			data      : $edit_panel.find( 'input,textarea' ).serialize(),
+			post_id   : $post_id.val(),
+			nonce     : TribeTickets.add_ticket_nonce,
+			menu_order: $orders.length,
+			is_admin  : $( 'body' ).hasClass( 'wp-admin' )
+		};
+
+		$.post(
+			ajaxurl,
+			params,
+			function( response ) {
+				if ( ! response.success ) {
+					return;
+				}
+
+				obj.refreshPanels( response.data );
+			},
+			'json'
+		);
+	} );
+
+	/* "Delete Ticket" link action */
+	$document.on( 'click', '.ticket_delete', function( event ) {
+		if ( ! confirm( tribe_ticket_notices.confirm_alert ) ) {
+			return false;
+		}
+
+		event.preventDefault();
+
+		$tribe_tickets.trigger( 'delete-ticket.tribe', event );
+
+		var deleted_ticket_id = $( this ).attr( 'attr-ticket-id' );
+
+		var params = {
+			action   : 'tribe-ticket-delete',
+			post_id  : $post_id.val(),
+			ticket_id: deleted_ticket_id,
+			nonce    : TribeTickets.remove_ticket_nonce,
+			is_admin : $( 'body' ).hasClass( 'wp-admin' )
+		};
+
+		$.post(
+			ajaxurl,
+			params,
+			function( response ) {
+				if ( ! response.success ) {
+					return;
+				}
+
+				obj.refreshPanels( response.data );
+			},
+			'json'
+		);
+	} );
+
+	/* Change global stock type if we've put a value in global_stock_cap */
+	$document.on( 'change', '.tribe-ticket-field-capacity', function( e ) {
+		var $this = $( this );
+		var $globalField = $this.parents( '.input_block' ).eq( 0 ).find( '.tribe-ticket-field-mode' );
+
+		// Bail if we have any value on Stock Cap
+		if ( ! $this.val() ) {
+			return;
+		}
+
+		$globalField.val( 'capped' );
+	} );
+
+	$document.on( 'keyup', '#ticket_price', function ( e ) {
+		e.preventDefault();
+
+		var decimal_point = price_format.decimal;
+		var regex         = new RegExp( '[^\-0-9\%\\' + decimal_point + ']+', 'gi' );
+		var value         = $( this ).val();
+		var newvalue      = value.replace( regex, '' );
+
+		// @todo add info message or tooltip to let people know we are removing the comma or period
+		if ( value !== newvalue ) {
+			$( this ).val( newvalue );
+		}
+	} );
+
+	$document.on( 'click', '#tribe_ticket_header_image, #tribe_ticket_header_preview', function( e ) {
+		e.preventDefault();
+		ticketHeaderImage.uploader( '', '' );
+	} );
+
+	$document.on( 'focus', '#settings_global_capacity_edit', function() {
+		var $capacity = $( this );
+		var nonSharedCapacity = 0;
+		var $capacities = $( '.tribe-tickets-editor-capacity-table' ).find( '[data-capacity]' );
+
+		$capacities.each( function() {
+			var $item = $( this );
+			nonSharedCapacity = nonSharedCapacity + parseInt( $item.data( 'capacity' ), 10 );
+		} );
+
+		$capacity.data( 'nonSharedCapacity', nonSharedCapacity );
+	} );
+
+	/* Handle saving changes to capacity from Settings form */
+	$document.on( 'blur change', '#settings_global_capacity_edit', function() {
+		var $totalRow = $( '.tribe-tickets-editor-table-row-capacity-total' );
+		var totalCapacity = parseInt( $totalRow.data( 'totalCapacity' ), 10 );
+
+		// We just bail if we are dealing with any unlimited
+		if ( -1 === totalCapacity ) {
+			return;
+		}
+
+		var $capacity = $( this );
+		var $total = $totalRow.find( '.tribe-tickets-editor-total-capacity' );
+		var capacity = parseInt( $capacity.val(), 10 );
+		var nonSharedCapacity = $capacity.data( 'nonSharedCapacity' );
+
+		// Prevent Fails with empty stuff
+		if ( '' === capacity || 0 > capacity || _.isNaN( capacity ) ) {
+			capacity = 0;
+		}
+
+		var total = nonSharedCapacity + capacity;
+
+		$total.text( total );
+	} );
+
+	/* Handle editing global capacity from the settings panel */
+	$document.on( 'click', '#global_capacity_edit_button', function( e ) {
+		e.preventDefault();
+		$( document.getElementById( 'settings_global_capacity_edit' ) ).prop( 'disabled', false ).focus();
+	} );
+
+	/* Track changes to the global stock level on the ticket edit form. */
+	$document.on( 'blur', '[name="tribe-ticket[event_capacity]"]', changeEventCapacity );
+
+	/**
+	 * Track changes to Capacity to avoid going over the max
+	 */
+	$document.on( 'change', '[name="tribe-ticket[capacity]"]', function( event ) {
+		var $field = $( this );
+		var max = parseInt( $field.attr( 'max' ), 10 );
+		var value = parseInt( $field.val(), 10 );
+
+		if ( max && max < value ) {
+			$field.val( max );
+		}
+	} );
+
+	/* Remove header image action */
+	$document.on( 'click', '#tribe_ticket_header_remove', function( e ) {
+		e.preventDefault();
+		$( document.getElementById( 'tribe_ticket_header_preview' ) ).html( '' );
+		$( document.getElementById( 'tribe_ticket_header_remove' ) ).hide();
+		$( document.getElementById( 'tribe_tickets_image_preview_filename' ) ).hide().find( '.filename' ).text( '' );
+		$( document.getElementById( 'tribe_ticket_header_image_id' ) ).val( '' );
+	} );
+
+	$document.ready( function() {
+		obj.setupPanels();
+	} );
+
+} )( window, jQuery, _, tribe.tickets.editor );

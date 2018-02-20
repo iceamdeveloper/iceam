@@ -1,20 +1,20 @@
-/* = WooTickets Admin Styles
-=============================================*/
+.tribe-tickets-column-attendees-link {
+	display: inline-block;
+}
 
 #ticket_form {
-	display: none;
-
 	input[type=radio] {
 		margin-right: 5px;
 	}
 
 	span {
-		margin-right: 10px;
+		&.datetime_seperator {
+			margin-left: 10px;
+		}
 	}
 }
 
 .ticket_list {
-
 	h4 {
 		border-bottom: 1px solid #e5e5e5;
 		padding-bottom: 6px;
@@ -33,8 +33,8 @@
 		}
 
 		td {
-			padding: 4px 7px 2px;
-			vertical-align: top;
+			padding: 10px;
+			vertical-align: middle;
 
 			div.ticket_controls {
 				visibility: hidden;
@@ -43,23 +43,8 @@
 	}
 }
 
-p.ticket_name {
-	font-size: 13px;
+.ticket_name p:first-child {
 	font-weight: bold;
-}
-
-.ticket_form {
-	p.description {
-		display: inline;
-
-		&.detailed-description {
-			display: block;
-		}
-	}
-
-	h4.ticket_form_title_edit {
-		display: none;
-	}
 }
 
 #tribe_ticket_header_preview img {
@@ -88,6 +73,10 @@ p.ticket_name {
 #event_tickets,
 .eventtable.ticket_list.eventForm {
 	table-layout: fixed;
+}
+
+.tribe-strong-label {
+	font-weight: bold;
 }
 
 /* Specific goal of this rule is to prevent the number input busting the ticket form layout under Twenty Fifteen */

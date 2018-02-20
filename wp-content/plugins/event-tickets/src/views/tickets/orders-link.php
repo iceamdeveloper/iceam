@@ -6,9 +6,7 @@
  *
  * Override this template in your own theme by creating a file at [your-theme]/tribe-events/tickets/orders-link.php
  *
- * @package TribeEventsCalendar
- * @version 4.5.5
- *
+ * @version 4.6.1
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -56,6 +54,6 @@ $message  = sprintf( esc_html__( 'You have %s for this %s.', 'event-tickets' ), 
 $message .= ' <a href="' . esc_url( $link ) . '">' . sprintf( esc_html__( 'View your %s', 'event-tickets' ), $this->get_description_rsvp_ticket( $event_id, $user_id, true ) ) . '</a>';
 ?>
 
-<div class="tribe-link-tickets-message">
+<div class="tribe-link-view-attendee">
 	<?php echo $message; ?>
 </div>

@@ -5,9 +5,11 @@ Plugin URI: https://aelia.co/
 Description: Bundles integration for Aelia Currency Switcher for WooCommerce
 Author: Aelia <support@aelia.co>
 Author URI: https://aelia.co
-Version: 1.2.1.170415
+Version: 1.2.3.171201
 Text Domain: wc-aelia-cs-bundles-integration
 Domain Path: /languages
+WC requires at least: 2.4
+WC tested up to: 3.2.5
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-cs-bundles-requirementscheck.php');

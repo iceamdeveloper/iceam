@@ -9,6 +9,8 @@ use \WC_Product;
 use \WC_Product_Subscription;
 use \WC_Product_Subscription_Variation;
 use \WC_Subscriptions_Cart;
+use \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher_Widget;
+use \Aelia\WC\CurrencySwitcher\WC_Aelia_Currencies_Manager;
 
 /**
  * Implements support for WooThemes Subscriptions plugin.
@@ -328,18 +330,29 @@ class Subscriptions_Integration {
 	/**
 	 * Indicates if we are editing an order.
 	 *
+	 * @param string post_type
 	 * @return bool
 	 * @since 1.3.1.170405
 	 */
-	protected static function editing_order() {
+	protected static function editing_order($post_type = 'shop_order') {
 		if(!empty($_GET['action']) && ($_GET['action'] == 'edit') && !empty($_GET['post'])) {
 			$post = get_post($_GET['post']);
 
-			if(!empty($post) && ($post->post_type == 'shop_order')) {
+			if(!empty($post) && ($post->post_type == $post_type)) {
 				return $post->ID;
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Indicates if we are editing a subscription.
+	 *
+	 * @return bool
+	 * @since 1.3.8.171004
+	 */
+	protected static function editing_subscription() {
+		return self::editing_order('shop_subscription');
 	}
 
 	/**
@@ -365,7 +378,7 @@ class Subscriptions_Integration {
 	 * Set the hooks required by the class.
 	 */
 	protected function set_hooks() {
-		if(WC_Aelia_CS_Subscriptions::is_frontend() || self::editing_order()) {
+		if(WC_Aelia_CS_Subscriptions::is_frontend() || self::editing_order() || self::editing_subscription()) {
 			// Price conversion
 			add_filter('wc_aelia_currencyswitcher_product_convert_callback', array($this, 'wc_aelia_currencyswitcher_product_convert_callback'), 10, 2);
 			add_filter('woocommerce_subscriptions_product_price', array($this, 'woocommerce_subscriptions_product_price'), 10, 2);
@@ -398,6 +411,14 @@ class Subscriptions_Integration {
 		// NOTE: as of 15/12/2015 this patch should no longer be needed.
 		//add_filter('woocommerce_order_again_cart_item_data', array($this, 'woocommerce_order_again_cart_item_data'), 10, 3);
 		//add_filter('woocommerce_checkout_init', array($this, 'maybe_override_currency'), 10);
+
+		// Handle manual creation of subscription
+		// @since 1.3.8.171004
+		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 5, 2);
+		// Currency selector on the Edit Subscription page
+		// @since 1.3.8.171004
+		add_action('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
+		add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
 	}
 
 	/**
@@ -868,5 +889,160 @@ class Subscriptions_Integration {
 		$prices_type_field_map[self::FIELD_SIGNUP_FEE_CURRENCY_PRICES] = '_subscription_sign_up_fee';
 
 		return $prices_type_field_map;
+	}
+
+	/**
+	 * Fired after an order is saved. It addsa a filter to ensure that the currency
+	 * for new subscriptions is set to the active currency.
+	 *
+	 * @param int post_id The post (subscription) ID.
+	 * @param post The post corresponding to the order that is being been saved.
+	 * @since 1.3.8.171004
+	 */
+	public function woocommerce_process_shop_order_meta($post_id, $post) {
+		// Set the currency on manually created orders when their first draft is saved.
+		// This is done to prevent WooCommerce from returning shop's base currency
+		// when WC_Order::get_currency() is called. See old code below, for reference
+		// @since 4.5.1.171012
+		$order = wc_get_order($post_id);
+		if(in_array($order->get_status(), array('draft', 'auto-draft'))) {
+			add_filter('woocommerce_currency', array($this->currency_switcher(), 'woocommerce_currency'), 5);
+		}
+
+		// Only set the currency if the order doesn't have one set against it.
+		// Using direct access to meta is less than ideal, but it's the only way to
+		// determine if the meta is missing, as the new WC_Data layer always returns
+		// a currency value, even when the order has none.
+		// This bug has been reported in https://github.com/woocommerce/woocommerce/issues/14966
+		//$order_currency = get_post_meta($post_id, '_order_currency', true);
+		//if(empty($order_currency)) {
+		//	add_filter('woocommerce_currency', array($this->currencyswitcher(), 'woocommerce_currency'), 5);
+		//}
+	}
+
+	/**
+	 * Adds meta boxes to the admin interface.
+	 *
+	 * @see add_meta_boxes().
+	 * @since 1.3.8.171004
+	 */
+	public function add_meta_boxes() {
+		add_meta_box('aelia_cs_order_currency_box',
+								 __('Subscription currency', Definitions::TEXT_DOMAIN),
+								 array($this, 'render_currency_selector_widget'),
+								 'shop_subscription',
+								 'side',
+								 'default');
+	}
+
+	/**
+	 * Renders the currency selector widget in "new subscription" page.
+	 *
+	 * @since 1.3.8.171004
+	 */
+	public function render_currency_selector_widget() {
+		$order_currency = $this->displayed_order_currency();
+
+		global $post;
+		if(empty($order_currency)) {
+			echo '<p>';
+			echo __('Set currency for this new subscription. It is recommended to choose ' .
+							'the order currency <b>before</b> adding the products, as changing ' .
+							'it later will not update the product prices.',
+							Definitions::TEXT_DOMAIN);
+			echo '</p>';
+			echo '<p>';
+			echo __('<b>NOTE</b>: you can only select the currency <b>once</b>. If ' .
+							'you choose the wrong currency, please discard the subscription and ' .
+							'create a new one.',
+							Definitions::TEXT_DOMAIN);
+			echo '</p>';
+			$currency_selector_options = array(
+				'title' => '',
+				'widget_type' => 'dropdown',
+			);
+
+			echo WC_Aelia_CurrencySwitcher_Widget::render_currency_selector($currency_selector_options);
+		}
+		else {
+			// Prepare the text to use to display the order currency
+			$order_currency_text = $order_currency;
+
+			$currency_name = WC_Aelia_Currencies_Manager::get_currency_name($order_currency);
+			// If a currency name is returned, append it to the code for displau.
+			// If a currency name cannot be found, the method will return the currency
+			// code itself. In such case, there would be no point in displaying the
+			// code twice.
+			if($currency_name != $order_currency) {
+				$order_currency_text .= ' - ' . $currency_name;
+			}
+
+			echo '<h4 class="order-currency">';
+			echo $order_currency_text;
+			echo '</h4>';
+		}
+	}
+
+	/**
+	 * Indicates if we are on the Edit Subscription page.
+	 *
+	 * @param string action The action to check for ("edit" to check if we are
+	 * modifying an existing order, or "add" to check if we are creating a new order).
+	 * @return bool
+	 * @since 1.3.8.171004
+	 * @since WC 2.7
+	 */
+	protected function is_edit_subscription_page($action = 'edit') {
+		if(!function_exists('get_current_screen')) {
+			return false;
+		}
+
+		$screen = get_current_screen();
+
+		return is_object($screen) && ($screen->post_type == 'shop_subscription') && ($screen->action === $action);
+	}
+
+	/**
+	 * Returns the currency to be assigned to a subscription being created manually.
+	 *
+	 * @param string currency
+	 * @return string
+	 * @since 1.3.8.171004
+	 */
+	public function get_currency_for_manual_subscription($currency) {
+		if(is_admin() && !defined('DOING_AJAX') && function_exists('get_current_screen')) {
+			if($this->is_edit_subscription_page('add')) {
+				$currency = null;
+			}
+			elseif($this->is_edit_subscription_page('edit')) {
+				global $post;
+
+				if($post->post_type == 'shop_subscription') {
+					// Disable this filter temporarily, to prevent infinite recursion. This
+					// is required due to changes in the admin pages in WooCommerce 2.7
+					// @since WC 2.7
+					remove_filter('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
+					$order_currency = $this->currency_switcher()->get_order_currency($post->ID);
+
+					if(!empty($order_currency)) {
+						$currency = $order_currency;
+					}
+					// Restore the filter
+					add_filter('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
+				}
+			}
+		}
+		return $currency;
+	}
+
+	/**
+	 * Returns the currency of the subscription currently being displayed.
+	 *
+	 * @return string
+	 * @since 1.3.8.171004
+	 */
+	protected function displayed_order_currency() {
+		global $post;
+		return $this->currency_switcher()->get_order_currency($post->ID);
 	}
 }

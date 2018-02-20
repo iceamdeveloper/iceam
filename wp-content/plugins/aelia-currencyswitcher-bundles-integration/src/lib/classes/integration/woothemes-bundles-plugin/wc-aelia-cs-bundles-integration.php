@@ -148,6 +148,11 @@ class Bundles_Integration {
 	public function woocommerce_init() {
 		if(WC_Aelia_CS_Bundles_Plugin::is_frontend()) {
 			add_action('woocommerce_bundles_synced_bundle', array($this, 'woocommerce_bundles_synced_bundle'), 10, 1);
+
+			// Prevent overwriting product meta with the result of the conversions
+			// @since 1.2.3.171201
+			// @since Bundles 5.6.1
+			add_filter('woocommerce_bundles_update_price_meta', '__return_false');
 		}
 	}
 
@@ -316,11 +321,11 @@ class Bundles_Integration {
 		$bundle_base_sale_prices_in_currency[$shop_base_currency] = get_post_meta($product_id, '_wc_pb_base_sale_price', true);
 
 		// Take regular price in the specific product base currency
-		$product_base_regular_price = get_value($product_base_currency, $bundle_base_regular_prices_in_currency);
+		$product_base_regular_price = isset($bundle_base_regular_prices_in_currency[$product_base_currency]) ? $bundle_base_regular_prices_in_currency[$product_base_currency] : '';
 		// If a regular price was not entered for the selected product base currency,
 		// take the one in shop base currency
 		if(!is_numeric($product_base_regular_price)) {
-			$product_base_regular_price = get_value($shop_base_currency, $bundle_base_regular_prices_in_currency);
+			$product_base_regular_price = isset($bundle_base_regular_prices_in_currency[$shop_base_currency]) ? $bundle_base_regular_prices_in_currency[$shop_base_currency] : '';
 
 			// If a product doesn't have a price in the product-specific base currency,
 			// then that base currency is not valid. In such case, shop's base currency
@@ -329,19 +334,21 @@ class Bundles_Integration {
 		}
 
 		// Take sale price in the specific product base currency
-		$product_base_sale_price = get_value($product_base_currency, $bundle_base_sale_prices_in_currency);
+		$product_base_sale_price = isset($bundle_base_sale_prices_in_currency[$product_base_currency]) ? $bundle_base_sale_prices_in_currency[$product_base_currency] : '';
 		// If a sale price was not entered for the selected product base currency,
 		// take the one in shop base currency
 		if(!is_numeric($product_base_sale_price)) {
-			$product_base_sale_price = get_value($shop_base_currency, $bundle_base_sale_prices_in_currency);
+			$product_base_sale_price = isset($bundle_base_sale_prices_in_currency[$shop_base_currency]) ? $bundle_base_sale_prices_in_currency[$shop_base_currency] : '';
 		}
 
-		$product->base_regular_price = get_value($currency, $bundle_base_regular_prices_in_currency);
+		// Take the regular price in the active currency
+		$product->base_regular_price = isset($bundle_base_regular_prices_in_currency[$currency]) ? $bundle_base_regular_prices_in_currency[$currency] : '';
 		if(($currency != $product_base_currency) && !is_numeric($product->base_regular_price)) {
 			$product->base_regular_price = $prices_manager->convert_product_price_from_base($product_base_regular_price, $currency, $product_base_currency, $product, 'regular_price');
 		}
 
-		$product->base_sale_price = get_value($currency, $bundle_base_sale_prices_in_currency);
+		// Take the sale price in the active currency
+		$product->base_sale_price = isset($bundle_base_sale_prices_in_currency[$currency]) ? $bundle_base_sale_prices_in_currency[$currency] : '';
 		if(($currency != $product_base_currency) && !is_numeric($product->base_sale_price)) {
 			$product->base_sale_price = $prices_manager->convert_product_price_from_base($product_base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
 		}
@@ -502,10 +509,5 @@ class Bundles_Integration {
 	 */
 	public function woocommerce_bundles_synced_bundle($product) {
 		$this->convert_bundle_product_prices($product, get_woocommerce_currency());
-
-		// Prevent overwriting product meta with the result of the conversions
-		// @since 1.2.0.161222
-		// @since Bundles 5.1
-		add_filter('woocommerce_bundles_update_price_meta', '__return_false');
 	}
 }

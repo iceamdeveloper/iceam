@@ -26,6 +26,7 @@ class Tribe__Tickets__Data_API {
 	protected function setup_data() {
 
 		foreach ( Tribe__Tickets__Tickets::modules() as $module_class => $module_instance ) {
+			$provider = call_user_func( array( $module_class, 'get_instance' ) );
 
 			/**
 			 * The usage of plain `$module_class::ATTENDEE_EVENT_KEY` will throw a `T_PAAMAYIM_NEKUDOTAYIM`
@@ -34,27 +35,22 @@ class Tribe__Tickets__Data_API {
 			 * So we have to construct the constant name using a string and use the `constant` function.
 			 */
 			$types['order']   = constant( "$module_class::ORDER_OBJECT" );
-			$types['product'] = $module_class::get_instance()->ticket_object;
+			$types['product'] = $provider->ticket_object;
 			$types['ticket']  = constant( "$module_class::ATTENDEE_OBJECT" );
 			if ( 'Tribe__Tickets__RSVP' === $module_class ) {
-				$types['ticket'] = $module_class::get_instance()->ticket_object;
+				$types['ticket'] = $provider->ticket_object;
 			}
 			$types['attendee'] = constant( "$module_class::ATTENDEE_OBJECT" );
 
 			$this->ticket_class[ $module_class ] = array();
 
-			foreach ( $types as $key => $value ) {
 
+			foreach ( $types as $key => $value ) {
 				$this->ticket_types[ $key ][]                = $value;
 				$this->ticket_class[ $module_class ][ $key ] = $value;
-
-			}
-			if ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $module_class ) {
-				$this->ticket_class[ $module_class ]['tribe_for_event'] = $module_class::$event_key;
-			} else {
-				$this->ticket_class[ $module_class ]['tribe_for_event'] = $module_class::get_instance()->event_key;
 			}
 
+			$this->ticket_class[ $module_class ]['tribe_for_event'] = $provider->event_key;
 			$this->ticket_class[ $module_class ]['event_id_key'] = constant( "$module_class::ATTENDEE_EVENT_KEY" );
 			$this->ticket_class[ $module_class ]['order_id_key'] = constant( "$module_class::ATTENDEE_ORDER_KEY" );
 		}
@@ -202,7 +198,7 @@ class Tribe__Tickets__Data_API {
 			return false;
 		}
 
-		return $services['class']::get_instance();
+		return call_user_func( array( $services['class'], 'get_instance' ) );
 	}
 
 	/**
@@ -365,8 +361,9 @@ class Tribe__Tickets__Data_API {
 			return array();
 		}
 
-		return $services['class']::get_instance()->get_attendees_by_id( $post_id, $services['post_type'] );
+		$provider = call_user_func( array( $services['class'], 'get_instance' ) );
 
+		return $provider->get_attendees_by_id( $post_id, $services['post_type'] );
 	}
 
 	/**
@@ -387,7 +384,6 @@ class Tribe__Tickets__Data_API {
 
 		return $has_meta;
 	}
-
 
 	/**
 	 * Check if a order key passed exists and return attendee object name

@@ -59,7 +59,9 @@ class Tribe__Tickets__CSV_Importer__RSVP_Importer extends Tribe__Events__Importe
 	 * @param Tribe__Tickets__RSVP|null                             $rsvp_tickets
 	 */
 	public function __construct(
-		Tribe__Events__Importer__File_Reader $file_reader, Tribe__Events__Importer__Featured_Image_Uploader $featured_image_uploader = null, Tribe__Tickets__RSVP $rsvp_tickets = null
+		Tribe__Events__Importer__File_Reader $file_reader,
+		Tribe__Events__Importer__Featured_Image_Uploader $featured_image_uploader = null,
+		Tribe__Tickets__RSVP $rsvp_tickets = null
 	) {
 		parent::__construct( $file_reader, $featured_image_uploader );
 		$this->rsvp_tickets = ! empty( $rsvp_tickets ) ? $rsvp_tickets : Tribe__Tickets__RSVP::get_instance();
@@ -186,8 +188,7 @@ class Tribe__Tickets__CSV_Importer__RSVP_Importer extends Tribe__Events__Importe
 			$start_date = new DateTime( $data['ticket_start_date'] . ' ' . $ticket_start_sale_time );
 
 			$data['ticket_start_meridian'] = $start_date->format( 'A' );
-			$data['ticket_start_hour']     = $start_date->format( 'h' );
-			$data['ticket_start_minute']   = $start_date->format( 'i' );
+			$data['ticket_start_time']     = $start_date->format( 'H:i:00' );
 		}
 
 		$ticket_end_sale_time = $this->get_value_by_key( $record, 'ticket_end_sale_time' );
@@ -196,11 +197,18 @@ class Tribe__Tickets__CSV_Importer__RSVP_Importer extends Tribe__Events__Importe
 			$end_date = new DateTime( $data['ticket_end_date'] . ' ' . $ticket_end_sale_time );
 
 			$data['ticket_end_meridian'] = $end_date->format( 'A' );
-			$data['ticket_end_hour']     = $end_date->format( 'h' );
-			$data['ticket_end_minute']   = $end_date->format( 'i' );
+			$data['ticket_end_time']     = $end_date->format( 'H:i:00' );
 		}
 
-		$data['ticket_rsvp_stock'] = $this->get_value_by_key( $record, 'ticket_stock' );
+		$stock = $this->get_value_by_key( $record, 'ticket_stock' );
+		$capacity = $this->get_value_by_key( $record, 'ticket_capacity' );
+
+		if ( empty( $capacity ) ) {
+			$capacity = $stock;
+		}
+
+		$data['tribe-ticket']['capacity'] = $capacity;
+		$data['tribe-ticket']['stock'] = $stock;
 
 		return $data;
 	}

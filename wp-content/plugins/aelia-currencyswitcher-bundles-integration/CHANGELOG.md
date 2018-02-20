@@ -1,6 +1,10 @@
 # WooCommerce Currency Switcher - Bundles Integration
 
 ## Version 1.x
+####1.2.3.171201
+* Improved compatibility with Bundles 5.6.1.
+	* Improved logic used to prevent the Bundles plugin from storing the converted prices agains bundles' meta.
+
 ####1.2.2.170415
 * Improved compatibility with Bundles 5.2.
 	* Altered logic to determine a bundle's regular price to work correctly in Bundles 5.1 and 5.2.

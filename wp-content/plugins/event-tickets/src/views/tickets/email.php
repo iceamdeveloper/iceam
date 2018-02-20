@@ -15,8 +15,7 @@
  *                              'ticket_id'
  *                              'security_code')
  *
- * @package TribeEventsCalendar
- * @version 4.5.5
+ * @version 4.6.1
  *
  */
 ?>
@@ -237,7 +236,7 @@
 				}
 
 				$event      = get_post( $ticket['event_id'] );
-				$header_id  = Tribe__Tickets__Tickets_Handler::instance()->get_header_image_id( $ticket['event_id'] );
+				$header_id  = get_post_meta( $ticket['event_id'], tribe( 'tickets.handler' )->key_image_header, true );
 				$header_img = false;
 				if ( ! empty( $header_id ) ) {
 					$header_img = wp_get_attachment_image_src( $header_id, 'full' );

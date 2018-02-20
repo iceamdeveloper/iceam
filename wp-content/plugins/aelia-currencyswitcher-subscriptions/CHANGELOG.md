@@ -1,6 +1,12 @@
 # WooCommerce Currency Switcher - Subscriptions Integration
 
 ## Version 1.x
+####1.3.9.171109
+* Fix - Fixed typo and invalid reference to the Currency Switcher instance on Edit/Create Order pages.
+
+####1.3.8.171004
+* Tweak - Improved support for the selection of the currency during the manual creation of subscriptions.
+
 ####1.3.7.170607
 * Improved compatibility with Subscriptions 2.2.7.
 	* Fixed display of "From" price for variable subscriptions.
