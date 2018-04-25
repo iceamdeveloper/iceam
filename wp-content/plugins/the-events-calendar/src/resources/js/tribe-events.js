@@ -341,7 +341,7 @@ Date.prototype.format = function( mask, utc ) {
 	 */
 	function tribe_tmpl( id, data ) {
 		var me = arguments.callee;
-		if ( false ) {
+		if ( !me.cache[id] ) {
 			me.cache[id] = (function() {
 				var name = id, string = /^[\w\-]+$/.test( id ) ? me.get( id ) : (name = 'template(string)', id); // no warnings
 				var line = 1, body = (
@@ -776,10 +776,7 @@ Date.prototype.format = function( mask, utc ) {
 				! tribe_ev.state.view ||
 
 				// We are on the default mobile view
-				tribe_ev.data.default_mobile_view == tribe_ev.state.view ||
-
-				// We are with an defined view
-				tribe_ev.data.cur_url == tribe_ev.data.base_url
+				tribe_ev.data.default_mobile_view == tribe_ev.state.view
 			) {
 				return false;
 			}
@@ -1151,7 +1148,7 @@ Date.prototype.format = function( mask, utc ) {
 		 * )
 		 */
 		map_view      : function() {
-			return ( typeof GeoLoc !== 'undefined' && GeoLoc.map_view ) ? true : false;
+			return typeof GeoLoc !== 'undefined' && GeoLoc.map_view;
 		},
 		/**
 		 * @function tribe_ev.tests.no_bar
@@ -1343,7 +1340,7 @@ Date.prototype.format = function( mask, utc ) {
 			ts.view = $tribe_events_header.data( 'view' );
 		}
 
-		if ( $tribe_events.tribe_has_attr( 'data-datepicker_format' ) && $tribe_events.attr( 'data-datepicker_format' ).length === 1 ) {
+		if ( $tribe_events.tribe_has_attr( 'data-datepicker_format' ) && $tribe_events.attr( 'data-datepicker_format' ).length >= 1 ) {
 			ts.datepicker_format = $tribe_events.attr( 'data-datepicker_format' );
 		}
 

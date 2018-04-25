@@ -58,8 +58,8 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public $shortcodes;
 
-		const REQUIRED_TEC_VERSION = '4.5.6';
-		const VERSION = '4.4.23';
+		const REQUIRED_TEC_VERSION = '4.6.12';
+		const VERSION = '4.4.25';
 
 		private function __construct() {
 			$this->pluginDir = trailingslashit( basename( EVENTS_CALENDAR_PRO_DIR ) );
@@ -423,7 +423,12 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @return string The modified html.
 		 */
 		public function events_before_html( $html ) {
-			global $wp_query;
+			$wp_query = tribe_get_global_query_object();
+
+			if ( is_null( $wp_query ) ) {
+				return $html;
+			}
+
 			if ( $wp_query->tribe_is_event_venue || $wp_query->tribe_is_event_organizer ) {
 				add_filter( 'tribe-events-bar-should-show', '__return_false' );
 			}
@@ -439,7 +444,12 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @return string The modified title.
 		 */
 		public function reset_page_title( $title, $depth = true ) {
-			global $wp_query;
+			$wp_query = tribe_get_global_query_object();
+
+			if ( is_null( $wp_query ) ) {
+				return $title;
+			}
+
 			$tec = Tribe__Events__Main::instance();
 			$date_format = apply_filters( 'tribe_events_pro_page_title_date_format', tribe_get_date_format( true ) );
 
@@ -506,9 +516,11 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @return mixed
 		 */
 		public function detect_recurrence_redirect() {
-			global $wp_query, $wp;
+			global $wp;
 
-			if ( ! isset( $wp_query->query_vars['eventDisplay'] ) ) {
+			$wp_query = tribe_get_global_query_object();
+
+			if ( is_null( $wp_query ) || ! isset( $wp_query->query_vars['eventDisplay'] ) ) {
 				return false;
 			}
 
@@ -561,7 +573,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				$confirm_redirect = apply_filters( 'tribe_events_pro_detect_recurrence_redirect', true, $wp_query->query_vars['eventDisplay'] );
 				do_action( 'tribe_events_pro_detect_recurrence_redirect', $wp_query->query_vars['eventDisplay'] );
 				if ( $confirm_redirect ) {
-					Tribe__Main::instance()->log()->log_warning( sprintf(
+					tribe( 'logger' )->log_warning( sprintf(
 							_x( 'Invalid instance of a recurring event was requested ($1%s) redirecting to $2%s', 'debug recurrence', 'tribe-events-calendar-pro' ),
 							$problem,
 							$current_url
@@ -602,9 +614,13 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @return int
 		 */
 		public function get_last_recurrence_id( $event_list ) {
-			global $wp_query;
 
-			$event_list = empty( $event_list ) ? $wp_query->posts : $event_list;
+			$wp_query = tribe_get_global_query_object();
+
+			if ( ! is_null( $wp_query ) && empty( $event_list ) ) {
+				$event_list = $wp_query->posts;
+			}
+
 			$right_now = current_time( 'timestamp' );
 			$next_recurrence = 0;
 
@@ -888,7 +904,11 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @TODO move this to template class
 		 */
 		public function body_class( $classes ) {
-			global $wp_query;
+			$wp_query = tribe_get_global_query_object();
+
+			if ( is_null( $wp_query ) ) {
+				return $classes;
+			}
 
 			// @TODO do we really need all these array_diff()s?
 
@@ -1079,7 +1099,8 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				$parent_start_date = date( 'Y-m-d', strtotime( $parent_start ) );
 			}
 
-			if ( $parent_start_date == $date ) {
+			$sequence_number = $query->get( 'eventSequence' );
+			if ( $parent_start_date === $date && empty( $sequence_number )  ) {
 				$post_id = $parent_id;
 			} else {
 				/* Look for child posts taking place on the requested date (but not
@@ -1945,7 +1966,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @return string
 		 */
 		public function oembed_discovery_links_for_recurring_events( $output ) {
-			global $wp_query;
+			$wp_query = tribe_get_global_query_object();
 
 			if ( $output ) {
 				return $output;
@@ -1955,7 +1976,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				return $output;
 			}
 
-			if ( empty( $wp_query->posts[0] ) ) {
+			if ( is_null( $wp_query ) || empty( $wp_query->posts[0] ) ) {
 				return $output;
 			}
 

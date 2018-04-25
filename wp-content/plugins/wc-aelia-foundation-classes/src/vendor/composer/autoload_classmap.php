@@ -34,7 +34,6 @@ return array(
     'Aelia_WC_AFC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-afc-requirementscheck.php',
     'Aelia_WC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-requirementscheck.php',
     'Composer\\CaBundle\\CaBundle' => $vendorDir . '/composer/ca-bundle/src/CaBundle.php',
-    'GeoIp2\\Compat\\JsonSerializable' => $vendorDir . '/geoip2/geoip2/src/Compat/JsonSerializable.php',
     'GeoIp2\\Database\\Reader' => $vendorDir . '/geoip2/geoip2/src/Database/Reader.php',
     'GeoIp2\\Exception\\AddressNotFoundException' => $vendorDir . '/geoip2/geoip2/src/Exception/AddressNotFoundException.php',
     'GeoIp2\\Exception\\AuthenticationException' => $vendorDir . '/geoip2/geoip2/src/Exception/AuthenticationException.php',

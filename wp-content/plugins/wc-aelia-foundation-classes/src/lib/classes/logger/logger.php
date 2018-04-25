@@ -46,7 +46,7 @@ class Logger {
 	 *
 	 * @return bool
 	 */
-	protected function set_debug_mode($debug_mode) {
+	public function set_debug_mode($debug_mode) {
 		$this->_debug_mode = $debug_mode;
 
 		if($debug_mode) {

@@ -11,7 +11,11 @@ msgstr ""
 "Language: cs_CZ\n"
 "Project-Id-Version: Events Calendar Pro\n"
 
-#: src/Tribe/Geo_Loc.php:608
+#: src/Tribe/Recurrence/Meta.php:1704
+msgid "Allow users to decide whether to show all instances of a recurring event on list-style views."
+msgstr ""
+
+#: src/Tribe/Geo_Loc.php:1014
 msgid "Enter your API Key"
 msgstr ""
 
@@ -19,7 +23,7 @@ msgstr ""
 msgid "Expected an array but received a variable of type '%s'"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:275
+#: src/Tribe/Geo_Loc.php:652
 msgid "Venue Overwrite Coordinates"
 msgstr ""
 
@@ -36,7 +40,7 @@ msgstr ""
 msgid "Hide this widget if there are no upcoming events"
 msgstr ""
 
-#: src/Tribe/Main.php:1349
+#: src/Tribe/Main.php:1364
 msgctxt "Event title map marker prefix"
 msgid "%s: "
 msgstr ""
@@ -765,11 +769,11 @@ msgctxt "placeholder used where the true day of the day is determined dynamicall
 msgid "day"
 msgstr ""
 
-#: src/views/pro/list/venue-nav.php:42
+#: src/views/pro/list/venue-nav.php:40
 msgid "Next %s"
 msgstr "Další %s"
 
-#: src/views/pro/list/venue-nav.php:34
+#: src/views/pro/list/venue-nav.php:32
 msgid "Previous %s"
 msgstr "Předchozí %s"
 
@@ -807,36 +811,36 @@ msgstr "Celkem %s"
 msgid "$template_object is expected to be an actual object"
 msgstr "$template_object by měl být skutečný objekt"
 
-#: src/Tribe/Main.php:2005
+#: src/Tribe/Main.php:2022
 msgid "all"
 msgstr "vse"
 
-#: src/Tribe/Main.php:565
+#: src/Tribe/Main.php:575
 msgctxt "debug recurrence"
 msgid "Invalid instance of a recurring event was requested ($1%s) redirecting to $2%s"
 msgstr "Požadovaná instance opakující se akce je neplatná ($1%s). Probíhá přesměrování na $2%s"
 
-#: src/Tribe/Main.php:543
+#: src/Tribe/Main.php:553
 msgctxt "debug recurrence"
 msgid "incorrect slug"
 msgstr "neplatný název  v URL"
 
-#: src/Tribe/Main.php:530
+#: src/Tribe/Main.php:540
 msgctxt "debug recurrence"
 msgid "invalid date"
 msgstr "neplatné datum"
 
-#: src/Tribe/Main.php:516
+#: src/Tribe/Main.php:526
 msgctxt "debug recurrence"
 msgid "Unknown"
 msgstr "Neznámá"
 
-#: src/Tribe/Geo_Loc.php:551
+#: src/Tribe/Geo_Loc.php:934
 msgctxt "debug geodata"
 msgid "empty response"
 msgstr "prázdná odpověď"
 
-#: src/Tribe/Geo_Loc.php:550
+#: src/Tribe/Geo_Loc.php:933
 msgctxt "debug geodata"
 msgid "Geocode request failed ($1%s - $2%s)"
 msgstr "Požadavek na geokódování se nezdařil ($1%s - $2%s)"
@@ -861,19 +865,19 @@ msgstr "Toto není akce."
 msgid "Times:"
 msgstr "Počet opakování:"
 
-#: src/Tribe/Main.php:1901
+#: src/Tribe/Main.php:1916
 msgid "Events Calendar PRO"
 msgstr "Events Calendar PRO"
 
-#: src/Tribe/Geo_Loc.php:604
+#: src/Tribe/Geo_Loc.php:1010
 msgid "The latitude and longitude for your venue could not be fetched. The Google Maps API daily query limit has been reached!. %1$s "
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:163
+#: src/Tribe/Geo_Loc.php:213
 msgid "Distance unit"
 msgstr "Jednotka vzdálenosti"
 
-#: src/Tribe/Geo_Loc.php:86
+#: src/Tribe/Geo_Loc.php:134
 msgid "map"
 msgstr "mapa"
 
@@ -1118,11 +1122,11 @@ msgstr "Pro Vlastní opakování musíte vybrat typ."
 msgid "Could not process queue for event %1$d: %2$s"
 msgstr "Nepodařilo se zpracovat frontu pro akci %1$d: %2$s"
 
-#: src/Tribe/Main.php:453
+#: src/Tribe/Main.php:459
 msgid "%1$s for week of %2$s"
 msgstr "%1$s na týden od %2$s"
 
-#: src/Tribe/Main.php:447
+#: src/Tribe/Main.php:453
 msgid "All %1$s for %2$s"
 msgstr "Všechny %1$s pro %2$s"
 
@@ -1130,7 +1134,7 @@ msgstr "Všechny %1$s pro %2$s"
 msgid "tutorial that will walk you through the process"
 msgstr "návod, který vás provede celým procesem"
 
-#: src/Tribe/Main.php:759
+#: src/Tribe/Main.php:771
 msgid "Thanks for buying Events Calendar PRO! From all of us at Modern Tribe, we sincerely appreciate it. If you're looking for help with Events Calendar PRO, you've come to the right place. We are committed to helping make your calendar be spectacular... and hope the resources provided below will help get you there."
 msgstr "Děkujeme za nákup Events Calendar PRO! Všichni tady v Modern Tribe jsme to víc než ocenili. Pokud potřebujete pomoci s Events Calendar PRO, jste na správném místě. Zavázali jsme se k tomu, aby i váš kalendář byl dech beroucí... a doufáme, že zdroje uvedené níže vám v tom pomohou."
 
@@ -1176,7 +1180,7 @@ msgstr "Hodiny"
 msgid "All Day"
 msgstr "celý den"
 
-#: src/views/pro/single-organizer.php:32 src/views/pro/single-venue.php:36
+#: src/views/pro/single-organizer.php:32 src/views/pro/single-venue.php:39
 msgid "&larr; Back to %s"
 msgstr "&larr; Zpět na %s"
 
@@ -1197,81 +1201,81 @@ msgstr "Další %s <span>&raquo;</span>"
 msgid "<span>&laquo;</span> Previous %s"
 msgstr "<span>&laquo;</span> Předchozí %s"
 
-#: src/views/pro/list/venue-nav.php:28 src/views/pro/map/nav.php:20
+#: src/views/pro/list/venue-nav.php:26 src/views/pro/map/nav.php:20
 #: src/views/pro/photo/nav.php:20
 msgid "%s List Navigation"
 msgstr "Navigace pro seznam (%s)"
 
-#: src/functions/template-tags/week.php:228
+#: src/functions/template-tags/week.php:233
 msgid "Next Week <span>&raquo;</span>"
 msgstr "Další týden <span>&raquo;</span>"
 
-#: src/functions/template-tags/week.php:196
+#: src/functions/template-tags/week.php:198
 msgid "<span>&laquo;</span> Previous Week"
 msgstr "<span>&laquo;</span> Předchozí týden"
 
-#: src/functions/template-tags/general.php:753
+#: src/functions/template-tags/general.php:761
 msgid "(See all)"
 msgstr "(zobrazit vše)"
 
-#: src/functions/template-tags/general.php:750
+#: src/functions/template-tags/general.php:758
 msgid "Recurring %s"
 msgstr "Opakující se %s"
 
-#: src/functions/template-tags/general.php:606
-#: src/functions/template-tags/general.php:629
+#: src/functions/template-tags/general.php:614
+#: src/functions/template-tags/general.php:637
 msgid "Date out of range."
 msgstr "Datum je mimo platný rozsah."
 
-#: src/functions/template-tags/general.php:443
+#: src/functions/template-tags/general.php:447
 msgid "The current default phone is: %s"
 msgstr "Současný výchozí telefon je: %s"
 
-#: src/functions/template-tags/general.php:428
+#: src/functions/template-tags/general.php:432
 msgid "The current default country is: %s"
 msgstr "Současná výchozí země je: %s"
 
-#: src/functions/template-tags/general.php:413
+#: src/functions/template-tags/general.php:417
 msgid "The current default postal code/zip code is: %s"
 msgstr "Současné výchozí PSČ je: %s"
 
-#: src/functions/template-tags/general.php:398
+#: src/functions/template-tags/general.php:402
 msgid "The current default province is: %s"
 msgstr "Současný výchozí kraj je: %s"
 
-#: src/functions/template-tags/general.php:383
+#: src/functions/template-tags/general.php:387
 msgid "The current default state is: %s"
 msgstr "Současný výchozí stát je: %s"
 
-#: src/functions/template-tags/general.php:368
+#: src/functions/template-tags/general.php:372
 msgid "The current default city is: %s"
 msgstr "Současné výchozí město je: %s"
 
-#: src/functions/template-tags/general.php:353
+#: src/functions/template-tags/general.php:357
 msgid "The current default address is: %s"
 msgstr "Současná výchozí adresa je: %s"
 
-#: src/functions/template-tags/general.php:338
+#: src/functions/template-tags/general.php:342
 msgid "The current default venue is: %s"
 msgstr "Současné výchozí místo je: %s"
 
-#: src/functions/template-tags/general.php:323
+#: src/functions/template-tags/general.php:327
 msgid "The current default organizer is: %s"
 msgstr "Současný výchozí pořadatel je: %s"
 
-#: src/functions/template-tags/general.php:321
-#: src/functions/template-tags/general.php:336
-#: src/functions/template-tags/general.php:351
-#: src/functions/template-tags/general.php:366
-#: src/functions/template-tags/general.php:381
-#: src/functions/template-tags/general.php:396
-#: src/functions/template-tags/general.php:411
-#: src/functions/template-tags/general.php:426
-#: src/functions/template-tags/general.php:441
+#: src/functions/template-tags/general.php:325
+#: src/functions/template-tags/general.php:340
+#: src/functions/template-tags/general.php:355
+#: src/functions/template-tags/general.php:370
+#: src/functions/template-tags/general.php:385
+#: src/functions/template-tags/general.php:400
+#: src/functions/template-tags/general.php:415
+#: src/functions/template-tags/general.php:430
+#: src/functions/template-tags/general.php:445
 msgid "No default set"
 msgstr "Výchozí není nastaveno"
 
-#: src/functions/template-tags/general.php:141
+#: src/functions/template-tags/general.php:145
 msgid "Show only the first upcoming instance of recurring %s"
 msgstr "Zobrazit pouze první nadcházející instanci opakující se %s"
 
@@ -1748,10 +1752,6 @@ msgstr "Automaticky odstranit instance opakujících se akcí, které jsou star�
 msgid "Clean up recurring events after"
 msgstr "Vyčistit opakující se akce po uplynutí"
 
-#: src/Tribe/Recurrence/Meta.php:1704
-msgid "Allow users to decide whether to show all instances of a recurring event."
-msgstr "Povolit uživatelům možnost, zda si chtějí zobrazit všechny instance opakující se akce."
-
 #: src/Tribe/Recurrence/Meta.php:1703
 msgid "Front-end recurring event instances toggle"
 msgstr "Možnost rozbalení instancí opakující se akce na webu"
@@ -1998,145 +1998,145 @@ msgstr "Kalendář akcí"
 msgid "The events calendar mini calendar widget"
 msgstr "Widget ve formě mini kalendáře akcí"
 
-#: src/Tribe/Main.php:1836
+#: src/Tribe/Main.php:1851
 msgid "Week Of"
 msgstr "V týdnu"
 
-#: src/Tribe/Main.php:1819
+#: src/Tribe/Main.php:1834
 msgid "Photo"
 msgstr "Foto"
 
-#: src/Tribe/Main.php:1801
+#: src/Tribe/Main.php:1816
 msgid "Week"
 msgstr "Týden"
 
-#: src/Tribe/Main.php:1572
+#: src/Tribe/Main.php:1587
 msgid "View All Add-Ons"
 msgstr "Prohlédnout všechny doplňky"
 
-#: src/Tribe/Main.php:1570
+#: src/Tribe/Main.php:1585
 msgid "Support"
 msgstr "Podpora"
 
-#: src/Tribe/Main.php:1510
+#: src/Tribe/Main.php:1525
 msgid "Organizer draft updated. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr "Koncept Pořadatele byl uložen. <a target=\"_blank\" href=\"%s\">Zobrazit náhled pořadatele</a>"
 
-#: src/Tribe/Main.php:1506
+#: src/Tribe/Main.php:1521
 msgid "Organizer scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview organizer</a>"
 msgstr "Pořadatel bude automaticky publikován: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Zobrazit náhled pořadatele</a>"
 
-#: src/Tribe/Main.php:1504
+#: src/Tribe/Main.php:1519
 msgid "Organizer submitted. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr "Pořadatel byl odeslán ke schválení. <a target=\"_blank\" href=\"%s\">Zobrazit náhled pořadatele</a>"
 
-#: src/Tribe/Main.php:1503
+#: src/Tribe/Main.php:1518
 msgid "Organizer published. <a href=\"%s\">View organizer</a>"
 msgstr "Pořadatel byl publikován. <a href=\"%s\">Zobrazit pořadatele</a>"
 
-#: src/Tribe/Main.php:1502
+#: src/Tribe/Main.php:1517
 msgid "Organizer updated. <a href=\"%s\">View organizer</a>"
 msgstr "Pořadatel byl aktualizován. <a href=\"%s\">Zobrazit pořadatele</a>"
 
-#: src/Tribe/Main.php:1500
+#: src/Tribe/Main.php:1515
 msgid "Venue draft updated. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr "Koncept Místa konání byl uložen. <a target=\"_blank\" href=\"%s\">Zobrazit náhled místa konání</a>"
 
 #. translators: Publish box date format, see http://php.net/date
-#: src/Tribe/Main.php:1498 src/Tribe/Main.php:1508
+#: src/Tribe/Main.php:1513 src/Tribe/Main.php:1523
 msgid "M j, Y @ G:i"
 msgstr "j.n.Y, G:i"
 
-#: src/Tribe/Main.php:1496
+#: src/Tribe/Main.php:1511
 msgid "Venue scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview venue</a>"
 msgstr "Místo konání bude automaticky publikováno: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Zobrazit náhled místa konání</a>"
 
-#: src/Tribe/Main.php:1494
+#: src/Tribe/Main.php:1509
 msgid "Venue submitted. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr "Místo konání bylo odesláno ke schválení. <a target=\"_blank\" href=\"%s\">Zobrazit náhled místa konání</a>"
 
 #. translators: %s: date and time of the revision
-#: src/Tribe/Main.php:1493
+#: src/Tribe/Main.php:1508
 msgid "Venue published. <a href=\"%s\">View venue</a>"
 msgstr "Místo konání bylo publikováno. <a href=\"%s\">Zobrazit místo konání</a>"
 
-#: src/Tribe/Main.php:1491
+#: src/Tribe/Main.php:1506
 msgid "Venue updated. <a href=\"%s\">View venue</a>"
 msgstr "Místo konání bylo aktualizováno. <a href=\"%s\">Zobrazit místo konání</a>"
 
-#: src/Tribe/Main.php:1463
+#: src/Tribe/Main.php:1478
 msgid "Settings"
 msgstr "Nastavení"
 
-#: src/Tribe/Main.php:1350
+#: src/Tribe/Main.php:1365
 msgid "Address: "
 msgstr "Adresa:"
 
-#: src/Tribe/Main.php:796
+#: src/Tribe/Main.php:808
 msgid "Before posting a new thread, please do a search to make sure your issue hasn't already been addressed. When posting please make sure to provide as much detail about the problem as you can (with screenshots or screencasts if feasible), and make sure that you've identified whether a plugin / theme conflict could be at play in your initial message."
 msgstr "Než založíte nové téma v diskuzi, prohledejte prosím ostatní a zkontrolujte, zda se už vašemu problému nějaká diskuze nevěnuje. Při psaní příspěvku poskytněte co možná nejvíce podrobností o vašem problému (pokud možno včetně screenshotů nebo screencastů) a ve vaší počáteční zprávě nezapomeňte uvést, zda nemůže být ve hře i konflikt s jiným pluginem či šablonou."
 
-#: src/Tribe/Main.php:795
+#: src/Tribe/Main.php:807
 msgid "Our number one goal is helping you succeed, and to whatever extent possible, we'll help troubleshoot and guide your customizations or tweaks. While we won't build your site for you, and we can't guarantee we'll be able to get you 100% integrated with every theme or plugin out there, we'll do all we can to point you in the right direction and to make you -- and your client, as is often more importantly the case -- satisfied."
 msgstr "Naším hlavním cílem je vám pomoci v co možná největší míře při řešení problémů a poskytnutí rad v otázkách přizpůsobení či vylepšení. Přestože nebudeme budovat vaše stránky za vás a nemůžeme vždy zaručit plnou integraci s úplně každou šablonou a pluginem, budeme se snažit udělat vše, abychom vás nasměrovali tím správným směrem a abyste byli spokojeni nejen vy, ale -- a to je často mnohem důležitější -- i vaši klienti."
 
-#: src/Tribe/Main.php:794
+#: src/Tribe/Main.php:806
 msgid "Users who have purchased an Events Calendar PRO license are granted total access to our %spremium support forums%s. Unlike at the %sWordPress.org support forum%s, where our involvement is limited to identifying and patching bugs, we have a dedicated support team for PRO users. We're on the PRO forums daily throughout the business week, and no thread should go more than 24-hours without a response."
 msgstr "Uživatelé, kteří si zakoupili licenci k pluginu Events Calendar PRO, mají garantován plný přístup na naše %sprémiové fórum podpory%s. Narozdíl od %sfóra podpory na WordPress.org%s, kde je naše účast omezena pouze na identifikaci a záplatování chyb, máme pro naše PRO uživatele speciální tým podpory. Na PRO fórech jsme k dispozici denně po celý pracovní týden a žádný z vašich dotazů by neměl zůstat bez odpovědi déle než 24 hodin."
 
-#: src/Tribe/Main.php:793
+#: src/Tribe/Main.php:805
 msgid "Written documentation can only take things so far...sometimes, you need help from a real person. This is where our %ssupport forums%s come into play."
 msgstr "Písemná dokumentace má přeci jenom své limity a někdy zkrátka potřebujete pomoc od skutečné osoby. A právě zde vstupují do hry naše %sfóra podpory%s."
 
-#: src/Tribe/Main.php:780
+#: src/Tribe/Main.php:792
 msgid "Otherwise, if you're feeling adventurous, you can get started by heading to the Events menu and adding your first event."
 msgstr "Pokud jste ale dobrodružné povahy, můžete rovnou přejít do nabídky Akce a vytvořit vaši první akci."
 
-#: src/Tribe/Main.php:778
+#: src/Tribe/Main.php:790
 msgid "Take care of your license key. Though not required to create your first event, you'll want to get it in place as soon as possible to guarantee your access to support and upgrades. %sHere's how to find your license key%s, if you don't have it handy."
 msgstr "Nezapomeňte na svůj licenční klíč. Ačkoli pro vytvoření vaší první akce není potřeba, co nejdříve se ujistěte, že je na svém místě a tím budete mít zaručen váš přístup k podpoře a aktualizacím. %sZde je návod, jak najít svůj licenční klíč%s, pokud ho nemáte po ruce."
 
-#: src/Tribe/Main.php:776
+#: src/Tribe/Main.php:788
 msgid "%sInstallation/Setup FAQs%s from our support page can help give an overview of what the plugin can and cannot do. This section of the FAQs may be helpful as it aims to address any basic install questions not addressed by the new user primer."
 msgstr "%sFAQ k instalaci a nastavení%s na naší stránce podpory vám poskytne přehled o tom, co plugin může a nemůže dělat. Tato sekce často kladených otázek ohledně základní instalace je užitečná zejména v případech, které nejsou řešeny v příručce nového uživatele."
 
-#: src/Tribe/Main.php:774
+#: src/Tribe/Main.php:786
 msgid "%sOur New User Primer%s was designed for folks in your exact position. Featuring both step-by-step videos and written walkthroughs that feature accompanying screenshots, the primer aims to take you from zero to hero in no time."
 msgstr "%sNaše příručka nového uživatele%s byla vytvořena přávě pro vás. Pomocí video průvodců a popisných návodů se screenshoty přestanete být pouhým začátečníkem ve velmi krátkém čase."
 
-#: src/Tribe/Main.php:771
+#: src/Tribe/Main.php:783
 msgid "If this is your first time using The Events Calendar Pro, you're in for a treat and are already well on your way to creating a first event. Here are some basics we've found helpful for users jumping into it for the first time:"
 msgstr "Pokud teprve začínáte s pluginem The Events Calendar Pro, čeká vás příjemné překvapení a jste již na cestě k vytvoření vaší první akce. Zde je několik základních informací, které mohou být užitečné pro začátečníky:"
 
-#: src/Tribe/Main.php:741
+#: src/Tribe/Main.php:753
 msgid "Check this to only show weekdays on Week View"
 msgstr "Zaškrtnutím této volby se v týdenním přehledu zobrazí pouze pracovní dny"
 
-#: src/Tribe/Main.php:740
+#: src/Tribe/Main.php:752
 msgid "Hide weekends on Week View"
 msgstr "Skrýt víkendy u týdenního přehledu"
 
-#: src/Tribe/Main.php:729
+#: src/Tribe/Main.php:741
 msgid "Enter the format to use for week days. Used when showing days of the week in Week view."
 msgstr "Zadejte formát pro dny v týdnu. Používá se při zobrazení jednotlivých dnů v týdnu u týdenního přehledu."
 
-#: src/Tribe/Main.php:728
+#: src/Tribe/Main.php:740
 msgid "Week Day Format"
 msgstr "Formát pro dny v týdnu"
 
-#: src/Tribe/Main.php:718
+#: src/Tribe/Main.php:730
 msgid "Remove related events from the single event view"
 msgstr "Odstranit výpis souvisejících akcí při zobrazení jednotlivé akce"
 
-#: src/Tribe/Main.php:717
+#: src/Tribe/Main.php:729
 msgid "Hide related events"
 msgstr "Skrýt související akce"
 
-#: src/Tribe/Main.php:702 src/admin-views/event-meta-options.php:3
+#: src/Tribe/Main.php:714 src/admin-views/event-meta-options.php:3
 msgid "Additional Fields"
 msgstr "Dodatečná pole"
 
-#: src/Tribe/Main.php:700 src/admin-views/tribe-options-defaults.php:35
+#: src/Tribe/Main.php:712 src/admin-views/tribe-options-defaults.php:35
 msgid "Default Content"
 msgstr "Výchozí obsah"
 
@@ -2144,11 +2144,11 @@ msgstr "Výchozí obsah"
 msgid "%s for week of %s"
 msgstr "%s na týden od %s"
 
-#: src/Tribe/Main.php:2007
+#: src/Tribe/Main.php:2024
 msgid "photo"
 msgstr "foto"
 
-#: src/Tribe/Main.php:2006 src/admin-views/event-recurrence.php:104
+#: src/Tribe/Main.php:2023 src/admin-views/event-recurrence.php:104
 #: src/admin-views/event-recurrence.php:360
 msgid "week"
 msgstr "týden"
@@ -2169,75 +2169,75 @@ msgstr "Typ: %s %s"
 msgid "%d %s"
 msgstr "%d %s"
 
-#: src/Tribe/Geo_Loc.php:1126
+#: src/Tribe/Geo_Loc.php:1583
 msgid "Fixed geolocation data for %d venues"
 msgstr "Geolokační data byla opravena pro %d míst"
 
-#: src/Tribe/Geo_Loc.php:1100
+#: src/Tribe/Geo_Loc.php:1557
 msgid "You have venues for which we don't have Geolocation information. <a href='%s'>Click here to generate it</a>."
 msgstr "U některých míst konání nejsou k dispozici geolokační informace. <a href='%s'>Klikněte zde pro jejich vytvoření</a>."
 
-#: src/Tribe/Geo_Loc.php:1056
+#: src/Tribe/Geo_Loc.php:1512
 msgid "Fix venues data"
 msgstr "Opravit data u míst konání"
 
-#: src/Tribe/Geo_Loc.php:338
+#: src/Tribe/Geo_Loc.php:715
 msgid "Longitude"
 msgstr "Zeměpisná délka"
 
-#: src/Tribe/Geo_Loc.php:337
+#: src/Tribe/Geo_Loc.php:714
 msgid "Latitude"
 msgstr "Zeměpisná šířka"
 
-#: src/Tribe/Geo_Loc.php:333
+#: src/Tribe/Geo_Loc.php:710
 msgid "Use latitude + longitude"
 msgstr "Použijte zeměpisnou šířku + délku"
 
-#: src/Tribe/Geo_Loc.php:308
+#: src/Tribe/Geo_Loc.php:685
 msgid "Location"
 msgstr "Místo"
 
-#: src/Tribe/Geo_Loc.php:307
+#: src/Tribe/Geo_Loc.php:684
 msgid "Near"
 msgstr "Blízko"
 
-#: src/Tribe/Geo_Loc.php:241
+#: src/Tribe/Geo_Loc.php:617
 msgid "Map"
 msgstr "Mapa"
 
-#: src/Tribe/Geo_Loc.php:186
+#: src/Tribe/Geo_Loc.php:236
 msgid "Removes location search field from the events bar on all views except for map view."
 msgstr "Odstraní pole pro hledání místa z lišty akcí u všech zobrazení kromě mapového."
 
-#: src/Tribe/Geo_Loc.php:185
+#: src/Tribe/Geo_Loc.php:235
 msgid "Hide location search"
 msgstr "Skrýt hledání místa"
 
-#: src/Tribe/Geo_Loc.php:176
+#: src/Tribe/Geo_Loc.php:226
 msgid "You have %d venues for which we don't have geolocation data. We need to use the Google Maps API to get that information. Doing this may take a while (approximately 1 minute for every 200 venues)."
 msgstr "U %d míst konání nejsou k dispozici geolokační informace. Pro jejich získání musíme použít Google Maps API. To může chvíli trvat (asi 1 minutu na každých 200 míst)."
 
-#: src/Tribe/Geo_Loc.php:176
+#: src/Tribe/Geo_Loc.php:226
 msgid "Fix geolocation data"
 msgstr "Opravit geolokační data"
 
-#: src/Tribe/Geo_Loc.php:170 src/Tribe/Geo_Loc_Filter.php:26
+#: src/Tribe/Geo_Loc.php:220 src/Tribe/Geo_Loc_Filter.php:26
 msgid "Kilometers"
 msgstr "Kilometry"
 
-#: src/Tribe/Geo_Loc.php:169 src/Tribe/Geo_Loc_Filter.php:23
+#: src/Tribe/Geo_Loc.php:219 src/Tribe/Geo_Loc_Filter.php:23
 msgid "Miles"
 msgstr "Míle"
 
-#: src/Tribe/Geo_Loc.php:156
+#: src/Tribe/Geo_Loc.php:206
 msgid "Set the distance that the location search covers (find events within X distance units of location search input)."
 msgstr "Nastavte vzdálenost pro hledání místa (nalezne akce v dosahu X jednotek vzdálenosti od hledaného místa)."
 
-#: src/Tribe/Geo_Loc.php:154
+#: src/Tribe/Geo_Loc.php:204
 msgid "Map view search distance limit"
 msgstr "Limit vzdálenosti pro hledání v mapovém zobrazení"
 
-#: src/Tribe/Geo_Loc.php:116
+#: src/Tribe/Geo_Loc.php:164
 msgid "Distance"
 msgstr "Vzdálenost"
 

@@ -2,7 +2,33 @@
 
 == Changelog ==
 
-= [4.7.7.1] TBD =
+= [4.7.11] 2018-04-18 =
+
+* Fix - Restore "type" attribute to some inline `<script>` tags to ensure proper character encoding in Customizer-generated CSS [103167]
+* Tweak - Allow to register the same ID of a post if has multiple types for JSON-LD `<script>` tag [94989]
+* Tweak - Added the `a5hleyrich/wp-background-processing` package and the asynchronous process handling base [102323]
+* Tweak - Added the `Tribe__Process__Post_Thumbnail_Setter` class to handle post thumbnail download and creation in an asynchronous manner [102323]
+* Tweak - Deprecated the `Tribe__Main::doing_ajax()` method and moved it to the `Tribe__Context::doing_ajax()` method [102323]
+* Tweak - Modified the `select2` implementation to work with the `maximumSelectionSize` argument via data attribute. [103577]
+* Tweak - Add new filters: `tribe_countries` and `tribe_us_states` to allow easier extensibility on the names used for each country [79880]
+* Fix - Updated Timezones::abbr() with additional support for timezone strings not covered by PHP date format "T" [102705]
+
+= [4.7.10] 2018-03-28 =
+
+* Tweak - Adjusted app shop text in relation to Modern Tribe's ticketing solutions [101655]
+* Tweak - Added wrapper function around use of `tribe_events_get_the_excerpt` for safety [95034]
+
+= [4.7.9] 2018-03-12 =
+
+* Tweak - Added the a `tribe_currency_cost` filtering for Currency control for Prices and Costs
+
+= [4.7.8] 2018-03-06 =
+
+* Feature - Added new `tribe_get_global_query_object()` template tag for accessing the $wp_query global without triggering errors if other software has directly manipulated the global [100199]
+* Fix - Remove unnecessary timezone-abbreviation caching approach to improve accuracy of timezone abbreviations and better reflect DST changes [97344]
+* Fix - Make sure JSON strings are always a single line of text [99089]
+
+= [4.7.7.1] 2018-02-16 =
 
 * Fix - Rollback changes introduced in version 4.7.7 to allow month view to render correctly.
 

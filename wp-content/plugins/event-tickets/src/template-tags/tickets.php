@@ -238,8 +238,24 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 					$button_anchor = '#buy-tickets';
 				}
 
-				$button = '<form method="get" action="' . esc_url( get_the_permalink( $event_id ) . $button_anchor ) . '">'
-					. '<button type="submit" name="tickets_process" class="tribe-button">' . $button_label . '</button>'
+				$permalink = get_the_permalink( $event_id );
+				$query_string = parse_url( $permalink, PHP_URL_QUERY );
+				$query_params = empty( $query_string ) ? array() : (array) explode( '&', $query_string );
+
+				$button = '<form method="get" action="' . esc_url( $permalink . $button_anchor ) . '">';
+
+				// Add any query attribute as a hidden input as the action of the form is GET
+				foreach ( $query_params as $param ) {
+					$parts = explode( '=', $param );
+
+					// a query string must be 2 parts only a name and a value
+					if ( is_array( $parts ) && 2 === count( $parts ) ) {
+						list( $name, $value ) = $parts;
+						$button .= '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
+					}
+				}
+
+				$button	.= '<button type="submit" name="tickets_process" class="tribe-button">' . $button_label . '</button>'
 					. '</form>';
 
 				$parts[ $type . '-button' ] = $html['button'] = $button;
@@ -337,17 +353,7 @@ if ( ! function_exists( 'tribe_events_ticket_is_on_sale' ) ) {
 			return true;
 		}
 
-		// Timestamps for comparison purposes
-		$now    = current_time( 'timestamp' );
-		$start  = strtotime( $ticket->start_date );
-		$finish = strtotime( $ticket->end_date );
-
-		// Are we within the applicable date range?
-		$has_started = ( empty( $ticket->start_date ) || ( $start && $now > $start ) );
-		$not_ended   = ( empty( $ticket->end_date ) || ( $finish && $now < $finish ) );
-
-		// Result
-		return ( $has_started && $not_ended );
+		return $ticket->date_in_range( 'now' );
 	}
 }//end if
 
@@ -385,6 +391,19 @@ if ( ! function_exists( 'tribe_tickets_get_ticket_stock_message' ) ) {
 		$stock        = $ticket->stock();
 		$available    = $ticket->available();
 		$sold         = (int) $ticket->qty_sold();
+
+		/**
+		 * Allows filtering the available number that will be displayed.
+		 *
+		 * @since 4.7
+		 *
+		 * @param int                           $available
+		 * @param Tribe__Tickets__Ticket_Object $ticket
+		 * @param int                           $sold
+		 * @param int                           $stock
+		 */
+		$available = apply_filters( 'tribe_tickets_stock_message_available_quantity', $available, $ticket, $sold, $stock );
+
 		$cancelled    = (int) $ticket->qty_cancelled();
 		$pending      = (int) $ticket->qty_pending();
 		$status       = '';
@@ -750,7 +769,7 @@ function tribe_tickets_delete_capacity( $object ) {
  *
  * @since  4.6.2
  *
- * @param  int  $object   Post We are trying to save capacity
+ * @param  int|WP_Post|Tribe__Tickets__Ticket_Object  $object   Post We are trying to save capacity
  * @param  int  $capacty  How much we are trying to update the capacity to
  *
  * @return int|false

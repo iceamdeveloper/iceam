@@ -4,7 +4,7 @@ Plugin Name: Aelia Foundation Classes for WooCommerce
 Description: This plugin implements common classes for other WooCommerce plugins developed by Aelia.
 Author: Aelia
 Author URI: https://aelia.co
-Version: 1.8.9.170629
+Version: 1.8.10.180315
 Plugin URI: https://aelia.co/shop/product-category/woocommerce/
 Text Domain: wc-aelia-foundation-classes
 Domain Path: /languages

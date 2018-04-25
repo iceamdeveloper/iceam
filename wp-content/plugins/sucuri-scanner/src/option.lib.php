@@ -178,7 +178,7 @@ class SucuriScanOption extends SucuriScanRequest
      */
     public static function getAllOptions()
     {
-        $options = wp_cache_get('alloptions', SUCURISCAN, WP_DEBUG);
+        $options = wp_cache_get('alloptions', SUCURISCAN);
 
         if ($options && is_array($options)) {
             return $options;

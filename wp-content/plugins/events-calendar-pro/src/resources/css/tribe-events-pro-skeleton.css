@@ -378,14 +378,14 @@
 	font-weight: bold;
 	line-height: 1.25;
 	position: absolute;
-	z-index: 500;
+	z-index: 3;
 	width: 100%;
 	padding: 4px;
 }
 
 
 .tribe-grid-body div[id*="tribe-events-event-"]:hover {
-	z-index: 800;
+	z-index: 4;
 }
 
 

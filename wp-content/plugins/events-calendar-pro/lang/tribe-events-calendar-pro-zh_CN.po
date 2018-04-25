@@ -11,7 +11,11 @@ msgstr ""
 "Language: zh_CN\n"
 "Project-Id-Version: Events Calendar Pro\n"
 
-#: src/Tribe/Geo_Loc.php:608
+#: src/Tribe/Recurrence/Meta.php:1704
+msgid "Allow users to decide whether to show all instances of a recurring event on list-style views."
+msgstr ""
+
+#: src/Tribe/Geo_Loc.php:1014
 msgid "Enter your API Key"
 msgstr ""
 
@@ -19,7 +23,7 @@ msgstr ""
 msgid "Expected an array but received a variable of type '%s'"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:275
+#: src/Tribe/Geo_Loc.php:652
 msgid "Venue Overwrite Coordinates"
 msgstr ""
 
@@ -36,7 +40,7 @@ msgstr ""
 msgid "Hide this widget if there are no upcoming events"
 msgstr ""
 
-#: src/Tribe/Main.php:1349
+#: src/Tribe/Main.php:1364
 msgctxt "Event title map marker prefix"
 msgid "%s: "
 msgstr ""
@@ -765,11 +769,11 @@ msgctxt "placeholder used where the true day of the day is determined dynamicall
 msgid "day"
 msgstr ""
 
-#: src/views/pro/list/venue-nav.php:42
+#: src/views/pro/list/venue-nav.php:40
 msgid "Next %s"
 msgstr ""
 
-#: src/views/pro/list/venue-nav.php:34
+#: src/views/pro/list/venue-nav.php:32
 msgid "Previous %s"
 msgstr ""
 
@@ -807,36 +811,36 @@ msgstr "所有 %s"
 msgid "$template_object is expected to be an actual object"
 msgstr ""
 
-#: src/Tribe/Main.php:2005
+#: src/Tribe/Main.php:2022
 msgid "all"
 msgstr ""
 
-#: src/Tribe/Main.php:565
+#: src/Tribe/Main.php:575
 msgctxt "debug recurrence"
 msgid "Invalid instance of a recurring event was requested ($1%s) redirecting to $2%s"
 msgstr ""
 
-#: src/Tribe/Main.php:543
+#: src/Tribe/Main.php:553
 msgctxt "debug recurrence"
 msgid "incorrect slug"
 msgstr ""
 
-#: src/Tribe/Main.php:530
+#: src/Tribe/Main.php:540
 msgctxt "debug recurrence"
 msgid "invalid date"
 msgstr ""
 
-#: src/Tribe/Main.php:516
+#: src/Tribe/Main.php:526
 msgctxt "debug recurrence"
 msgid "Unknown"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:551
+#: src/Tribe/Geo_Loc.php:934
 msgctxt "debug geodata"
 msgid "empty response"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:550
+#: src/Tribe/Geo_Loc.php:933
 msgctxt "debug geodata"
 msgid "Geocode request failed ($1%s - $2%s)"
 msgstr ""
@@ -861,19 +865,19 @@ msgstr ""
 msgid "Times:"
 msgstr ""
 
-#: src/Tribe/Main.php:1901
+#: src/Tribe/Main.php:1916
 msgid "Events Calendar PRO"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:604
+#: src/Tribe/Geo_Loc.php:1010
 msgid "The latitude and longitude for your venue could not be fetched. The Google Maps API daily query limit has been reached!. %1$s "
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:163
+#: src/Tribe/Geo_Loc.php:213
 msgid "Distance unit"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:86
+#: src/Tribe/Geo_Loc.php:134
 msgid "map"
 msgstr ""
 
@@ -1116,11 +1120,11 @@ msgstr ""
 msgid "Could not process queue for event %1$d: %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:453
+#: src/Tribe/Main.php:459
 msgid "%1$s for week of %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:447
+#: src/Tribe/Main.php:453
 msgid "All %1$s for %2$s"
 msgstr ""
 
@@ -1128,7 +1132,7 @@ msgstr ""
 msgid "tutorial that will walk you through the process"
 msgstr ""
 
-#: src/Tribe/Main.php:759
+#: src/Tribe/Main.php:771
 msgid "Thanks for buying Events Calendar PRO! From all of us at Modern Tribe, we sincerely appreciate it. If you're looking for help with Events Calendar PRO, you've come to the right place. We are committed to helping make your calendar be spectacular... and hope the resources provided below will help get you there."
 msgstr ""
 
@@ -1174,7 +1178,7 @@ msgstr "小时"
 msgid "All Day"
 msgstr "全天"
 
-#: src/views/pro/single-organizer.php:32 src/views/pro/single-venue.php:36
+#: src/views/pro/single-organizer.php:32 src/views/pro/single-venue.php:39
 msgid "&larr; Back to %s"
 msgstr ""
 
@@ -1195,81 +1199,81 @@ msgstr ""
 msgid "<span>&laquo;</span> Previous %s"
 msgstr ""
 
-#: src/views/pro/list/venue-nav.php:28 src/views/pro/map/nav.php:20
+#: src/views/pro/list/venue-nav.php:26 src/views/pro/map/nav.php:20
 #: src/views/pro/photo/nav.php:20
 msgid "%s List Navigation"
 msgstr ""
 
-#: src/functions/template-tags/week.php:228
+#: src/functions/template-tags/week.php:233
 msgid "Next Week <span>&raquo;</span>"
 msgstr "下一週 <span>&raquo;</span>"
 
-#: src/functions/template-tags/week.php:196
+#: src/functions/template-tags/week.php:198
 msgid "<span>&laquo;</span> Previous Week"
 msgstr "<span>&laquo;</span> 前一週"
 
-#: src/functions/template-tags/general.php:753
+#: src/functions/template-tags/general.php:761
 msgid "(See all)"
 msgstr "(检视所有)"
 
-#: src/functions/template-tags/general.php:750
+#: src/functions/template-tags/general.php:758
 msgid "Recurring %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:606
-#: src/functions/template-tags/general.php:629
+#: src/functions/template-tags/general.php:614
+#: src/functions/template-tags/general.php:637
 msgid "Date out of range."
 msgstr "日期超过范围"
 
-#: src/functions/template-tags/general.php:443
+#: src/functions/template-tags/general.php:447
 msgid "The current default phone is: %s"
 msgstr "目前预设电话号码是：%s"
 
-#: src/functions/template-tags/general.php:428
+#: src/functions/template-tags/general.php:432
 msgid "The current default country is: %s"
 msgstr "目前预设国家为：%s"
 
-#: src/functions/template-tags/general.php:413
+#: src/functions/template-tags/general.php:417
 msgid "The current default postal code/zip code is: %s"
 msgstr "目前预设邮递区号是：%s"
 
-#: src/functions/template-tags/general.php:398
+#: src/functions/template-tags/general.php:402
 msgid "The current default province is: %s"
 msgstr "目前预设省为：%s"
 
-#: src/functions/template-tags/general.php:383
+#: src/functions/template-tags/general.php:387
 msgid "The current default state is: %s"
 msgstr "目前预设州是：%s"
 
-#: src/functions/template-tags/general.php:368
+#: src/functions/template-tags/general.php:372
 msgid "The current default city is: %s"
 msgstr "目前预设城市为：%s"
 
-#: src/functions/template-tags/general.php:353
+#: src/functions/template-tags/general.php:357
 msgid "The current default address is: %s"
 msgstr "目前预设地址是：%s"
 
-#: src/functions/template-tags/general.php:338
+#: src/functions/template-tags/general.php:342
 msgid "The current default venue is: %s"
 msgstr "目前预设地点为：%s"
 
-#: src/functions/template-tags/general.php:323
+#: src/functions/template-tags/general.php:327
 msgid "The current default organizer is: %s"
 msgstr "目前预设主办人为：%s"
 
-#: src/functions/template-tags/general.php:321
-#: src/functions/template-tags/general.php:336
-#: src/functions/template-tags/general.php:351
-#: src/functions/template-tags/general.php:366
-#: src/functions/template-tags/general.php:381
-#: src/functions/template-tags/general.php:396
-#: src/functions/template-tags/general.php:411
-#: src/functions/template-tags/general.php:426
-#: src/functions/template-tags/general.php:441
+#: src/functions/template-tags/general.php:325
+#: src/functions/template-tags/general.php:340
+#: src/functions/template-tags/general.php:355
+#: src/functions/template-tags/general.php:370
+#: src/functions/template-tags/general.php:385
+#: src/functions/template-tags/general.php:400
+#: src/functions/template-tags/general.php:415
+#: src/functions/template-tags/general.php:430
+#: src/functions/template-tags/general.php:445
 msgid "No default set"
 msgstr "没有预设"
 
-#: src/functions/template-tags/general.php:141
+#: src/functions/template-tags/general.php:145
 msgid "Show only the first upcoming instance of recurring %s"
 msgstr ""
 
@@ -1746,10 +1750,6 @@ msgstr "自动移除比此还旧的循环活动 instances"
 msgid "Clean up recurring events after"
 msgstr "清除之后循环活动"
 
-#: src/Tribe/Recurrence/Meta.php:1704
-msgid "Allow users to decide whether to show all instances of a recurring event."
-msgstr "允许使用者决定是否显示循环活动中的所有 instances。"
-
 #: src/Tribe/Recurrence/Meta.php:1703
 msgid "Front-end recurring event instances toggle"
 msgstr "前台循环活动 instances 切换"
@@ -1996,145 +1996,145 @@ msgstr "Events Calendar"
 msgid "The events calendar mini calendar widget"
 msgstr "The events calendar 迷你行事曆小工具"
 
-#: src/Tribe/Main.php:1836
+#: src/Tribe/Main.php:1851
 msgid "Week Of"
 msgstr "週活动日"
 
-#: src/Tribe/Main.php:1819
+#: src/Tribe/Main.php:1834
 msgid "Photo"
 msgstr "图片"
 
-#: src/Tribe/Main.php:1801
+#: src/Tribe/Main.php:1816
 msgid "Week"
 msgstr "週"
 
-#: src/Tribe/Main.php:1572
+#: src/Tribe/Main.php:1587
 msgid "View All Add-Ons"
 msgstr "检视所有附加元件"
 
-#: src/Tribe/Main.php:1570
+#: src/Tribe/Main.php:1585
 msgid "Support"
 msgstr "支援"
 
-#: src/Tribe/Main.php:1510
+#: src/Tribe/Main.php:1525
 msgid "Organizer draft updated. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr "主办人草稿已更新。<a target=\"_blank\" href=\"%s\">预览主办人</a>"
 
-#: src/Tribe/Main.php:1506
+#: src/Tribe/Main.php:1521
 msgid "Organizer scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview organizer</a>"
 msgstr "主办人订于：<strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">预览主办人</a>"
 
-#: src/Tribe/Main.php:1504
+#: src/Tribe/Main.php:1519
 msgid "Organizer submitted. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr "主办人已提交。<a target=\"_blank\" href=\"%s\">预览主办人</a>"
 
-#: src/Tribe/Main.php:1503
+#: src/Tribe/Main.php:1518
 msgid "Organizer published. <a href=\"%s\">View organizer</a>"
 msgstr "主办人已发佈。<a href=\"%s\">检视主办人</a>"
 
-#: src/Tribe/Main.php:1502
+#: src/Tribe/Main.php:1517
 msgid "Organizer updated. <a href=\"%s\">View organizer</a>"
 msgstr "主办人已更新。<a href=\"%s\">检视主办人</a>"
 
-#: src/Tribe/Main.php:1500
+#: src/Tribe/Main.php:1515
 msgid "Venue draft updated. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr "地点草稿已更新。<a target=\"_blank\" href=\"%s\">预览地点</a>"
 
 #. translators: Publish box date format, see http://php.net/date
-#: src/Tribe/Main.php:1498 src/Tribe/Main.php:1508
+#: src/Tribe/Main.php:1513 src/Tribe/Main.php:1523
 msgid "M j, Y @ G:i"
 msgstr "M j, Y @ G:i"
 
-#: src/Tribe/Main.php:1496
+#: src/Tribe/Main.php:1511
 msgid "Venue scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview venue</a>"
 msgstr "地点订于：<strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">预览地点</a>"
 
-#: src/Tribe/Main.php:1494
+#: src/Tribe/Main.php:1509
 msgid "Venue submitted. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr "地点已提交。<a target=\"_blank\" href=\"%s\">预览地点</a>"
 
 #. translators: %s: date and time of the revision
-#: src/Tribe/Main.php:1493
+#: src/Tribe/Main.php:1508
 msgid "Venue published. <a href=\"%s\">View venue</a>"
 msgstr "地点已发佈。<a href=\"%s\">检视地点</a>"
 
-#: src/Tribe/Main.php:1491
+#: src/Tribe/Main.php:1506
 msgid "Venue updated. <a href=\"%s\">View venue</a>"
 msgstr "地点已更新。<a href=\"%s\">检视地点</a>"
 
-#: src/Tribe/Main.php:1463
+#: src/Tribe/Main.php:1478
 msgid "Settings"
 msgstr "设定"
 
-#: src/Tribe/Main.php:1350
+#: src/Tribe/Main.php:1365
 msgid "Address: "
 msgstr "地址："
 
-#: src/Tribe/Main.php:796
+#: src/Tribe/Main.php:808
 msgid "Before posting a new thread, please do a search to make sure your issue hasn't already been addressed. When posting please make sure to provide as much detail about the problem as you can (with screenshots or screencasts if feasible), and make sure that you've identified whether a plugin / theme conflict could be at play in your initial message."
 msgstr "上传问题前，请搜寻论坛文章以确认你的问题没有被提出，当上传支援需求时请尽可能提供问题细节的描述 (如果可能的话请附上萤幕截图或撷取影片)，还有测试问题可能是与哪一个外挂 / 佈景主题冲突所造成的。"
 
-#: src/Tribe/Main.php:795
+#: src/Tribe/Main.php:807
 msgid "Our number one goal is helping you succeed, and to whatever extent possible, we'll help troubleshoot and guide your customizations or tweaks. While we won't build your site for you, and we can't guarantee we'll be able to get you 100% integrated with every theme or plugin out there, we'll do all we can to point you in the right direction and to make you -- and your client, as is often more importantly the case -- satisfied."
 msgstr "我们首要的目标是帮助你成功，还有有扩展无限的可能，我们将协助你解决问题并导引你完成客製或微调修復工作。 然而由于我们并没有为你创建你的网站，因此我们无法保证能 100% 整合每一主题佈景主题或外挂，我们将指引对的方向让你 -- 和你的客户，因为通常更重要的是让案件 -- 满意。"
 
-#: src/Tribe/Main.php:794
+#: src/Tribe/Main.php:806
 msgid "Users who have purchased an Events Calendar PRO license are granted total access to our %spremium support forums%s. Unlike at the %sWordPress.org support forum%s, where our involvement is limited to identifying and patching bugs, we have a dedicated support team for PRO users. We're on the PRO forums daily throughout the business week, and no thread should go more than 24-hours without a response."
 msgstr "购买 Events Calendar PRO 密钥的使用者将完全授权进入我们的 %s进阶支援论坛%s。不像于 %sWordPress.org 支援论坛%s，只限于确认及修復错误的支援，我们有专门的支援团队提供 PRO 使用者最佳服务，我们于 PRO 论坛营业日的每一天，而所有的问题都能在 24 小时内获得回复。"
 
-#: src/Tribe/Main.php:793
+#: src/Tribe/Main.php:805
 msgid "Written documentation can only take things so far...sometimes, you need help from a real person. This is where our %ssupport forums%s come into play."
 msgstr "编写使用说明文件仅能解决一定程度的问题...有时候，你需要我们团队的协助，这时我们的 %s支援论坛%s 便会启动其机制。"
 
-#: src/Tribe/Main.php:780
+#: src/Tribe/Main.php:792
 msgid "Otherwise, if you're feeling adventurous, you can get started by heading to the Events menu and adding your first event."
 msgstr "否则，如果你觉得如此做有风险的话，你也可以从前往活动选单新增你的第一个活动开始。"
 
-#: src/Tribe/Main.php:778
+#: src/Tribe/Main.php:790
 msgid "Take care of your license key. Though not required to create your first event, you'll want to get it in place as soon as possible to guarantee your access to support and upgrades. %sHere's how to find your license key%s, if you don't have it handy."
 msgstr "请妥为保管你的授权密钥，虽然你在建立第一个活动时并不需要它，但当你需要要支援或更新时就必须立即取得它以获得连结，%s这裡将告诉你如何取得你的授权密钥%s，当密钥不在你手边时。"
 
-#: src/Tribe/Main.php:776
+#: src/Tribe/Main.php:788
 msgid "%sInstallation/Setup FAQs%s from our support page can help give an overview of what the plugin can and cannot do. This section of the FAQs may be helpful as it aims to address any basic install questions not addressed by the new user primer."
 msgstr "%s安装／设定 FAQs%s 从我们支援页面的常见问题集中能够帮助你了解此外挂产品的能与不能，FAQs 版区之所以会对使用者有所帮助，是因为其致力于必需的安装问题而不是只专注在新手上路。"
 
-#: src/Tribe/Main.php:774
+#: src/Tribe/Main.php:786
 msgid "%sOur New User Primer%s was designed for folks in your exact position. Featuring both step-by-step videos and written walkthroughs that feature accompanying screenshots, the primer aims to take you from zero to hero in no time."
 msgstr "%s新手入门指南%s 为导引你正确使用本外挂产品而製作，以循序渐进的教学影片及附有丰富截图的产品攻略双管齐下解说产品的使用方法，此入门指南将带领你零时差地从零到专家。"
 
-#: src/Tribe/Main.php:771
+#: src/Tribe/Main.php:783
 msgid "If this is your first time using The Events Calendar Pro, you're in for a treat and are already well on your way to creating a first event. Here are some basics we've found helpful for users jumping into it for the first time:"
 msgstr "如果这是你第一次使用 The Events Calendar Pro，你将会喜欢它并准备好要开始建立你的第一个活动，这是一些有助于使用者第一次进入其中的必要讯息。"
 
-#: src/Tribe/Main.php:741
+#: src/Tribe/Main.php:753
 msgid "Check this to only show weekdays on Week View"
 msgstr ""
 
-#: src/Tribe/Main.php:740
+#: src/Tribe/Main.php:752
 msgid "Hide weekends on Week View"
 msgstr ""
 
-#: src/Tribe/Main.php:729
+#: src/Tribe/Main.php:741
 msgid "Enter the format to use for week days. Used when showing days of the week in Week view."
 msgstr ""
 
-#: src/Tribe/Main.php:728
+#: src/Tribe/Main.php:740
 msgid "Week Day Format"
 msgstr "週间格式"
 
-#: src/Tribe/Main.php:718
+#: src/Tribe/Main.php:730
 msgid "Remove related events from the single event view"
 msgstr "从单一活动检视表中移除相关活动"
 
-#: src/Tribe/Main.php:717
+#: src/Tribe/Main.php:729
 msgid "Hide related events"
 msgstr "隐藏相关活动"
 
-#: src/Tribe/Main.php:702 src/admin-views/event-meta-options.php:3
+#: src/Tribe/Main.php:714 src/admin-views/event-meta-options.php:3
 msgid "Additional Fields"
 msgstr "额外栏位"
 
-#: src/Tribe/Main.php:700 src/admin-views/tribe-options-defaults.php:35
+#: src/Tribe/Main.php:712 src/admin-views/tribe-options-defaults.php:35
 msgid "Default Content"
 msgstr "预设内容"
 
@@ -2142,11 +2142,11 @@ msgstr "预设内容"
 msgid "%s for week of %s"
 msgstr ""
 
-#: src/Tribe/Main.php:2007
+#: src/Tribe/Main.php:2024
 msgid "photo"
 msgstr "图片"
 
-#: src/Tribe/Main.php:2006 src/admin-views/event-recurrence.php:104
+#: src/Tribe/Main.php:2023 src/admin-views/event-recurrence.php:104
 #: src/admin-views/event-recurrence.php:360
 msgid "week"
 msgstr "週"
@@ -2167,75 +2167,75 @@ msgstr "类型：%s %s"
 msgid "%d %s"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1126
+#: src/Tribe/Geo_Loc.php:1583
 msgid "Fixed geolocation data for %d venues"
 msgstr "修復 geolocation 地理位置资料地点数 %d 个。"
 
-#: src/Tribe/Geo_Loc.php:1100
+#: src/Tribe/Geo_Loc.php:1557
 msgid "You have venues for which we don't have Geolocation information. <a href='%s'>Click here to generate it</a>."
 msgstr "你有地点未包含于我们的 geolocation 地理位置资料中，<a href='%s'>点击此以产生</a>。"
 
-#: src/Tribe/Geo_Loc.php:1056
+#: src/Tribe/Geo_Loc.php:1512
 msgid "Fix venues data"
 msgstr "修復地点资料"
 
-#: src/Tribe/Geo_Loc.php:338
+#: src/Tribe/Geo_Loc.php:715
 msgid "Longitude"
 msgstr "经度"
 
-#: src/Tribe/Geo_Loc.php:337
+#: src/Tribe/Geo_Loc.php:714
 msgid "Latitude"
 msgstr "纬度"
 
-#: src/Tribe/Geo_Loc.php:333
+#: src/Tribe/Geo_Loc.php:710
 msgid "Use latitude + longitude"
 msgstr "使用纬度+经度"
 
-#: src/Tribe/Geo_Loc.php:308
+#: src/Tribe/Geo_Loc.php:685
 msgid "Location"
 msgstr "位置"
 
-#: src/Tribe/Geo_Loc.php:307
+#: src/Tribe/Geo_Loc.php:684
 msgid "Near"
 msgstr "靠近"
 
-#: src/Tribe/Geo_Loc.php:241
+#: src/Tribe/Geo_Loc.php:617
 msgid "Map"
 msgstr "地图"
 
-#: src/Tribe/Geo_Loc.php:186
+#: src/Tribe/Geo_Loc.php:236
 msgid "Removes location search field from the events bar on all views except for map view."
 msgstr "从活动工具列所有检视中移除位置搜寻栏位，除地图检视外。"
 
-#: src/Tribe/Geo_Loc.php:185
+#: src/Tribe/Geo_Loc.php:235
 msgid "Hide location search"
 msgstr "隐藏位置搜寻"
 
-#: src/Tribe/Geo_Loc.php:176
+#: src/Tribe/Geo_Loc.php:226
 msgid "You have %d venues for which we don't have geolocation data. We need to use the Google Maps API to get that information. Doing this may take a while (approximately 1 minute for every 200 venues)."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:176
+#: src/Tribe/Geo_Loc.php:226
 msgid "Fix geolocation data"
 msgstr "修復 geolocation 地理位置资料"
 
-#: src/Tribe/Geo_Loc.php:170 src/Tribe/Geo_Loc_Filter.php:26
+#: src/Tribe/Geo_Loc.php:220 src/Tribe/Geo_Loc_Filter.php:26
 msgid "Kilometers"
 msgstr "公里"
 
-#: src/Tribe/Geo_Loc.php:169 src/Tribe/Geo_Loc_Filter.php:23
+#: src/Tribe/Geo_Loc.php:219 src/Tribe/Geo_Loc_Filter.php:23
 msgid "Miles"
 msgstr "英里"
 
-#: src/Tribe/Geo_Loc.php:156
+#: src/Tribe/Geo_Loc.php:206
 msgid "Set the distance that the location search covers (find events within X distance units of location search input)."
 msgstr "设定位置搜寻可以复盖的距离 (发现活动于位置搜寻输入的 X 距离单位内)。"
 
-#: src/Tribe/Geo_Loc.php:154
+#: src/Tribe/Geo_Loc.php:204
 msgid "Map view search distance limit"
 msgstr "地图检视搜寻距离限制"
 
-#: src/Tribe/Geo_Loc.php:116
+#: src/Tribe/Geo_Loc.php:164
 msgid "Distance"
 msgstr "距离"
 

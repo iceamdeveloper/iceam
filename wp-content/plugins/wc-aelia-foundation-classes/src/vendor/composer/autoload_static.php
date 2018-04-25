@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
+class ComposerStaticInit7e230b51e4c727349a93fa92d73234f8
 {
     public static $prefixLengthsPsr4 = array (
         'P' => 
@@ -14,8 +14,9 @@ class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
         'M' => 
         array (
             'Monolog\\' => 8,
+            'MaxMind\\WebService\\' => 19,
+            'MaxMind\\Exception\\' => 18,
             'MaxMind\\Db\\' => 11,
-            'MaxMind\\' => 8,
         ),
         'G' => 
         array (
@@ -36,13 +37,17 @@ class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
+        'MaxMind\\WebService\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService',
+        ),
+        'MaxMind\\Exception\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception',
+        ),
         'MaxMind\\Db\\' => 
         array (
             0 => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db',
-        ),
-        'MaxMind\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src',
         ),
         'GeoIp2\\' => 
         array (
@@ -93,7 +98,6 @@ class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
         'Aelia_WC_AFC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-requirementscheck.php',
         'Aelia_WC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-requirementscheck.php',
         'Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
-        'GeoIp2\\Compat\\JsonSerializable' => __DIR__ . '/..' . '/geoip2/geoip2/src/Compat/JsonSerializable.php',
         'GeoIp2\\Database\\Reader' => __DIR__ . '/..' . '/geoip2/geoip2/src/Database/Reader.php',
         'GeoIp2\\Exception\\AddressNotFoundException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AddressNotFoundException.php',
         'GeoIp2\\Exception\\AuthenticationException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AuthenticationException.php',
@@ -259,10 +263,10 @@ class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -278,8 +278,6 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 	 * Take care of common setup needs including enqueing various assets required by the default views.
 	 */
 	public function prepare_default() {
-		global $wp_query;
-
 		/**
 		 * We overwrite the global $wp_query object to facilitate embedding the requested view (the
 		 * original will be restored during tribe_events_pro_tribe_events_shortcode_post_render):
@@ -289,6 +287,8 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 		 * @see $this->reset_query()
 		 * @todo revise in a future release
 		 */
+		global $wp_query;
+
 		$wp_query = new WP_Query( $this->query_args );
 
 		// Assets required by all our supported views

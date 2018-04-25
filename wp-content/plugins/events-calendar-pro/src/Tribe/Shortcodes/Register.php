@@ -5,13 +5,12 @@
  * Registers shortcodes handlers for each of the widget wrappers.
  */
 class Tribe__Events__Pro__Shortcodes__Register {
-
 	/**
 	 * Variable that holds the attributes of the shortcode being rendered by the iCal feed.
 	 *
 	 * @since 4.4.23
 	 *
- 	 * @var array
+	 * @var array
 	 */
 	private $ical_shortcode_attributes = array(
 		'view' => 'default',
@@ -115,7 +114,14 @@ class Tribe__Events__Pro__Shortcodes__Register {
 	 * @since 4.4.23
 	 */
 	public function search_shortcodes() {
-		if ( is_single() && ! is_singular( Tribe__Events__Main::POSTTYPE ) ) {
+
+		$valid_types = array(
+			Tribe__Events__Main::POSTTYPE,
+			Tribe__Events__Organizer::POSTTYPE,
+			Tribe__Events__Venue::POSTTYPE,
+		);
+
+		if ( is_single() && ! is_singular( $valid_types ) ) {
 			$this->find_events_in_shortcode();
 		} elseif ( is_page() ) {
 			$this->find_events_in_shortcode();
@@ -133,24 +139,53 @@ class Tribe__Events__Pro__Shortcodes__Register {
 	private function find_events_in_shortcode() {
 		$this->ical_shortcode_attributes = $this->get_shortcode_attributes( get_the_ID() );
 		$this->ical_shortcode_attributes['view'] = tribe_get_request_var( 'tribe_event_display', $this->ical_shortcode_attributes['view'] );
+
 		if ( 'month' === strtolower( $this->ical_shortcode_attributes['view'] ) ) {
+			add_filter( 'tribe_ical_feed_month_view_query_args', array( $this, 'ical_events_list_args' ) );
 			add_filter( 'tribe_is_month', '__return_true' );
 		} else {
-			add_filter( 'tribe_events_ical_events_list_args', array( $this, 'ical_events_list_args' ) );
 			add_filter( 'tribe_events_ical_events_list_query', '__return_null' );
+			add_filter( 'tribe_events_ical_events_list_args', array( $this, 'ical_events_list_args' ) );
 		}
 	}
 
 	/**
 	 * Callback attached to the filter `tribe_events_ical_events_list_args` to change the set of arguments used to
-	 * query the Objects used on the iCal feed.
+	 * query the Objects used on the iCal feed if the view is not month otherwise is attached to the filter
+	 * `tribe_ical_feed_month_view_query_args`.
 	 *
+	 * @since 4.4.24
+	 *
+	 * @param $args array
 	 * @return array
 	 */
-	public function ical_events_list_args() {
-		return array(
-			'eventDisplay' => $this->ical_shortcode_attributes['view'],
-		);
+	public function ical_events_list_args( $args = array() ) {
+		$date = empty( $this->ical_shortcode_attributes['date'] ) ? '' : $this->ical_shortcode_attributes['date'];
+		$view = $this->ical_shortcode_attributes['view'];
+		if ( 'month' === $this->ical_shortcode_attributes['view'] ) {
+			$view = 'custom';
+			if ( ! empty( $this->ical_shortcode_attributes['date'] ) ) {
+				$args['start_date'] = Tribe__Events__Template__Month::calculate_first_cell_date( $date );
+				$args['end_date'] = Tribe__Events__Template__Month::calculate_final_cell_date( $date );
+			}
+		} else {
+			// if we are not in a month view $args should be created from scratch instead.
+			$args = array();
+			if ( ! empty( $date ) ) {
+				$args['start_date'] = $date;
+			}
+		}
+		$args['eventDisplay'] = $view;
+
+		if ( ! empty( $this->ical_shortcode_attributes['category'] ) ) {
+			$args[ Tribe__Events__Main::TAXONOMY ] = $this->ical_shortcode_attributes['category'];
+		}
+
+		if ( ! empty( $this->ical_shortcode_attributes['featured'] ) ) {
+			$args['meta_key'] = Tribe__Events__Featured_Events::FEATURED_EVENT_KEY;
+		}
+
+		return $args;
 	}
 
 	/**

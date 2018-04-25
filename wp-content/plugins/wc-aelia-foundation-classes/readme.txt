@@ -67,6 +67,9 @@ For more information about installation and management of plugins, please refer 
 
 == Changelog ==
 
+= 1.8.10.180315 =
+* Fix - Fixed error related to `Logger::set_debug_mode()` method being inaccessible.
+
 = 1.8.9.170629 =
 * Fix - Logger doesn't track debug messages anymore when debug mode is deactivated.
 
