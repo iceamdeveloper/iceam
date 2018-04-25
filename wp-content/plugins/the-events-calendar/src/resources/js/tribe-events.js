@@ -341,7 +341,7 @@ Date.prototype.format = function( mask, utc ) {
 	 */
 	function tribe_tmpl( id, data ) {
 		var me = arguments.callee;
-		if ( !me.cache[id] ) {
+		if ( false ) {
 			me.cache[id] = (function() {
 				var name = id, string = /^[\w\-]+$/.test( id ) ? me.get( id ) : (name = 'template(string)', id); // no warnings
 				var line = 1, body = (
