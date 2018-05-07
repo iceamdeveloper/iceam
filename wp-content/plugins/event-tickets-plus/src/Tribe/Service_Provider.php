@@ -30,6 +30,12 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 		$this->container->singleton( 'tickets-plus.commerce.edd.checkin-stati', 'Tribe__Tickets_Plus__Commerce__EDD__CheckIn_Stati' );
 		$this->container->singleton( 'tickets-plus.commerce.woo.checkin-stati', 'Tribe__Tickets_Plus__Commerce__WooCommerce__CheckIn_Stati' );
 
+		// additional service providers
+		$this->container->register( 'Tribe__Tickets_Plus__Commerce__PayPal__Service_Provider' );
+
+		// EDD specific
+		$this->container->singleton( 'tickets-plus.commerce.edd.orders', 'Tribe__Tickets_Plus__Commerce__EDD__Orders_Report' );
+
 		$this->hook();
 	}
 
@@ -41,14 +47,16 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 	 * @since 4.6
 	 */
 	protected function hook() {
-		tribe( 'tickets-plus.editor' );
-
 		if ( is_admin() ) {
 			tribe( 'tickets-plus.admin.views' );
 		}
 
 		tribe( 'tickets-plus.assets' )->enqueue_scripts();
 		tribe( 'tickets-plus.assets' )->admin_enqueue_scripts();
+		tribe( 'tickets-plus.editor' );
+
+		add_filter( 'event_tickets_attendees_edd_checkin_stati', tribe_callback( 'tickets-plus.commerce.edd.checkin-stati', 'filter_attendee_ticket_checkin_stati' ), 10 );
+		add_filter( 'tribe_filter_attendee_order_link', tribe_callback( 'tickets-plus.commerce.edd.orders', 'filter_attendee_order_link' ), 10, 2 );
 	}
 
 	/**

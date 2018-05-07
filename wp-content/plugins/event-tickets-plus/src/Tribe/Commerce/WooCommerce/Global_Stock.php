@@ -196,6 +196,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 		$message = apply_filters( 'tribe_tickets_plus_woo_global_stock_cart_error', sprintf( $message, $ticket_list ), $insufficient_stock_items );
 
 		$error->add( 'out-of-global-stock', $message );
+
 		wc_add_notice( $error->get_error_message(), 'error' );
 	}
 
@@ -205,7 +206,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	 * @param int $product_id
 	 */
 	protected function cart_flag_capped_stock_error( $product_id ) {
-		$error = new WP_Error;
+		$error       = new WP_Error;
 		$ticket_name = wc_get_product( $product_id )->get_title();
 
 		$message = sprintf(
@@ -223,6 +224,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 		$message = apply_filters( 'tribe_tickets_plus_woo_global_stock_cart_error', $message, $product_id );
 
 		$error->add( 'out-of-capped-stock-' . $product_id, $message );
+
 		wc_add_notice( $error->get_error_message(), 'error' );
 	}
 
@@ -242,10 +244,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 			$product       = $woo_tickets->get_product_from_item( $order, $item );
 			$product_id    = $woo_tickets->get_product_id( $product );
 			$event         = $woo_tickets->get_event_for_ticket( $product_id );
-			$global_stock  = new Tribe__Tickets__Global_Stock( $event->ID );
 
-			// Skip non-tickets or tickets that do not utilize global stock
-			if ( ! $event || ! $global_stock->is_enabled() || ! $product->managing_stock() ) {
+			// Skip non-tickets
+			if ( ! $event || ! isset( $event->ID ) ) {
+				continue;
+			}
+
+			$global_stock = new Tribe__Tickets__Global_Stock( $event->ID );
+
+			// Skip tickets that do not utilize global stock
+			if ( ! $global_stock->is_enabled() || ! $product->managing_stock() ) {
 				continue;
 			}
 
@@ -270,8 +278,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 		// For each ticket product that utilizes global stock, adjust the product inventory
 		foreach ( $ordered as $event_id => $quantity ) {
 			$global_stock = new Tribe__Tickets__Global_Stock( $event_id );
-			$level = $global_stock->get_stock_level();
-			$new_level = (int) $level - (int) $quantity;
+			$level        = $global_stock->get_stock_level();
+			$new_level    = (int) $level - (int) $quantity;
 
 			$global_stock->set_stock_level( $new_level );
 		}
@@ -309,15 +317,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	public function increase_global_stock_on_refund( $product_id, $old_stock, $new_stock ) {
 
 		$post_id = get_post_meta( $product_id, Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->event_key, true );
-		$ticket = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->get_ticket( $post_id, $product_id );
+		$ticket  = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->get_ticket( $post_id, $product_id );
 
 		if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE !== $ticket->global_stock_mode() ) {
 			$global_stock_obj = new Tribe__Tickets__Global_Stock( $post_id );
 			$global_stock_obj->set_stock_level( $new_stock );
 
 			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket->global_stock_mode() ) {
-				$capped_stock = get_post_meta( $product_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, true );
+				$capped_stock     = get_post_meta( $product_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, true );
 				$new_capped_stock = $capped_stock + ( $new_stock - $old_stock );
+
 				update_post_meta( $product_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, $new_capped_stock, $capped_stock );
 			}
 		}

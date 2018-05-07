@@ -8,9 +8,10 @@ class Tribe__Tickets_Plus__Assets {
 	public function enqueue_scripts() {
 		// Set up our base list of enqueues
 		$enqueue_array = array(
-			array( 'event-tickets-plus-tickets-css', 'tickets.css' ),
+			array( 'event-tickets-plus-tickets-css', 'tickets.css', array( 'dashicons' ) ),
 			array( 'jquery-deparam', 'vendor/jquery.deparam/jquery.deparam.js', array( 'jquery' ) ),
 			array( 'jquery-cookie', 'vendor/jquery.cookie/jquery.cookie.js', array( 'jquery' ) ),
+			array( 'event-tickets-plus-attendees-list-js', 'attendees-list.js', array( 'event-tickets-attendees-list-js' ) ),
 			array( 'event-tickets-plus-meta-js', 'meta.js', array( 'jquery-cookie', 'jquery-deparam' ) ),
 		);
 
@@ -35,6 +36,7 @@ class Tribe__Tickets_Plus__Assets {
 			array( 'event-tickets-plus-attendees-list-js', 'attendees-list.js', array( 'event-tickets-attendees-list-js' ) ),
 			array( 'event-tickets-plus-meta-admin-js', 'meta-admin.js', array( 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable' ) ),
 			array( 'event-tickets-plus-admin-css', 'admin.css', array( 'event-tickets-admin-css' ) ),
+			array( 'event-tickets-plus-admin-tables-js', 'tickets-tables.js', array( 'underscore', 'jquery', 'tribe-common' ) ),
 		);
 
 		/**

@@ -59,18 +59,44 @@ class Tribe__Tickets_Plus__Meta__Unique_ID {
 
 		$event_root         = $this->get_event_root( $event_id );
 		$next_ticket_number = $this->get_next_ticket_number( $event_id );
-		$progressive_number = $event_root . $next_ticket_number;
+		$progressive_number = $event_root . $next_ticket_number . '-' . $this->generate_alphanumeric_id();
 
 		update_post_meta( $attendee_id, $this->unique_id_meta_key, $progressive_number );
 
 		return $progressive_number;
 	}
 
+	/**
+	 * Generates an ID with alphanumeric characters on it.
+	 *
+	 * @param int $length
+	 *
+	 * @return string
+	 */
+	protected function generate_alphanumeric_id( $length = 6 ) {
+
+		$batch = array_merge( range( '0', '9' ), range( 'A', 'Z' ) );
+
+		shuffle( $batch );
+		$id = '';
+		$keys = array_rand( $batch, $length );
+		foreach ( $keys as $index ) {
+			$id .= $batch[ $index ];
+		}
+		return $id;
+	}
+
 	protected function maybe_prime_pool() {
 		if ( ! $this->pool->is_primed() ) {
 			/** @var \wpdb $wpdb */
 			global $wpdb;
-			$query     = $wpdb->prepare( "SELECT pm.meta_value as 'root', p.ID as 'ID' FROM $wpdb->posts p JOIN $wpdb->postmeta pm ON p.ID = pm.post_id WHERE pm.meta_key = %s", $this->root_meta_key );
+			$query = $wpdb->prepare( "SELECT pm.meta_value as 'root', p.ID as 'ID'
+				FROM $wpdb->posts p 
+				JOIN $wpdb->postmeta pm 
+				ON p.ID = pm.post_id 
+				WHERE pm.meta_key = %s",
+				$this->root_meta_key
+			);
 
 			// Fetch from DB and array_filter to remove any empty results
 			$all_roots = array_filter( $wpdb->get_results( $query ) );

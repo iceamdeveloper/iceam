@@ -11,15 +11,15 @@ msgstr ""
 "Language: da_DK\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
-#: src/admin-views/editor/panel/settings.php:63
-msgid "Note: adjusting this setting will only impact new tickets. Existing tickets will not change. We highly recommend that all tickets for one event use the same ecommerce plugin."
+#. Description of the plugin/theme
+msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more! Includes advanced options like shared capacity between tickets, ticket QR codes, and integrations with your favorite ecommerce provider."
 msgstr ""
 
-#: src/admin-views/editor/panel/settings.php:63
-msgid "It looks like you have multiple ecommerce plugins active. We recommend running only one at a time. However, if you need to run multiple, please select which one to use to sell tickets for this event."
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:50
+msgid "Number of orders per page:"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:21
+#: src/admin-views/editor/fieldset/settings-capacity.php:21
 msgid "Global Shared Capacity field"
 msgstr ""
 
@@ -28,12 +28,9 @@ msgid "Edit ticket in WooCommerce"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:103
+#: src/admin-views/tpp-metabox-capacity.php:105
 #: src/admin-views/woocommerce-metabox-capacity.php:103
 msgid "Ticket capacity will only be used by attendees buying this ticket type"
-msgstr ""
-
-#: src/admin-views/editor/field-price.php:38
-msgid "Leave blank for free tickets"
 msgstr ""
 
 #: src/admin-views/edd-metabox-ecommerce.php:29
@@ -51,26 +48,31 @@ msgid "Ecommerce:"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:138
+#: src/admin-views/tpp-metabox-capacity.php:140
 #: src/admin-views/woocommerce-metabox-capacity.php:138
 msgid "Unlimited capacity"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:121
+#: src/admin-views/tpp-metabox-capacity.php:123
 #: src/admin-views/woocommerce-metabox-capacity.php:121
 msgid "Please set the Capacity for this ticket."
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:102
+#: src/admin-views/tpp-metabox-capacity.php:104
 #: src/admin-views/woocommerce-metabox-capacity.php:102
 msgid "Set capacity for this ticket only"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:84
+#: src/admin-views/tpp-metabox-capacity.php:86
 #: src/admin-views/woocommerce-metabox-capacity.php:84
 msgid "(max %s)"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:82
+#: src/admin-views/tpp-metabox-capacity.php:84
 #: src/admin-views/woocommerce-metabox-capacity.php:82
 msgid "Optional: limit sales to portion of the shared capacity"
 msgstr ""
@@ -80,33 +82,41 @@ msgid "Ticket shared capacity cannot be bigger then Event Capacity."
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:68
+#: src/admin-views/tpp-metabox-capacity.php:70
 #: src/admin-views/woocommerce-metabox-capacity.php:68
 msgid "Sell up to:"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:53
+#: src/admin-views/tpp-metabox-capacity.php:55
 #: src/admin-views/woocommerce-metabox-capacity.php:53
 msgid "Please set the Shared Capacity."
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:44
+#: src/admin-views/tpp-metabox-capacity.php:46
 #: src/admin-views/woocommerce-metabox-capacity.php:44
 msgid "Set shared capacity:"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:34
+#: src/admin-views/tpp-metabox-capacity.php:36
+#: src/admin-views/tpp-metabox-capacity.php:79
 #: src/admin-views/woocommerce-metabox-capacity.php:34
 #: src/admin-views/woocommerce-metabox-capacity.php:77
 msgid "Shared capacity ticket types share a common pool of tickets for all attendees"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:33
+#: src/admin-views/tpp-metabox-capacity.php:35
 #: src/admin-views/woocommerce-metabox-capacity.php:33
 msgid "Share capacity with other tickets"
 msgstr ""
 
 #: src/admin-views/edd-metabox-capacity.php:20
 #: src/admin-views/edd-metabox-capacity.php:112
+#: src/admin-views/tpp-metabox-capacity.php:22
+#: src/admin-views/tpp-metabox-capacity.php:114
 #: src/admin-views/woocommerce-metabox-capacity.php:20
 #: src/admin-views/woocommerce-metabox-capacity.php:112
 msgid "Capacity:"
@@ -116,62 +126,37 @@ msgstr ""
 msgid "Need to collect information from your ticket buyers? Configure your own registration form with the options below."
 msgstr ""
 
-#: src/admin-views/editor/column-head-price.php:1
-msgid "Price"
-msgstr ""
-
-#: src/admin-views/editor/column-body-price.php:18
 #: src/views/wootickets/tickets.php:162
 msgid "Free"
 msgstr ""
 
-#: src/admin-views/editor/column-body-price.php:16
-msgid "RSVP"
-msgstr ""
-
-#: src/admin-views/editor/panel/settings.php:62
-msgid "Sell tickets using:"
-msgstr ""
-
-#: src/admin-views/editor/capacity-table.php:104
+#: src/admin-views/editor/fieldset/settings-capacity.php:104
 msgid "Create a ticket to add event capacity"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:100
+#: src/admin-views/editor/fieldset/settings-capacity.php:100
 msgid "Total Capacity:"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:86
+#: src/admin-views/editor/fieldset/settings-capacity.php:86
 msgid "RSVPs:"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:65
+#: src/admin-views/editor/fieldset/settings-capacity.php:65
 msgid "Unlimited Capacity:"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:40
-#: src/admin-views/editor/capacity-table.php:50
+#: src/admin-views/editor/fieldset/settings-capacity.php:40
+#: src/admin-views/editor/fieldset/settings-capacity.php:50
 msgid "Independent Capacity:"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:27
+#: src/admin-views/editor/fieldset/settings-capacity.php:27
 msgid "Edit Shared Capacity"
 msgstr ""
 
-#: src/admin-views/editor/capacity-table.php:13
+#: src/admin-views/editor/fieldset/settings-capacity.php:13
 msgid "Shared Capacity:"
-msgstr ""
-
-#: src/admin-views/editor/button-new-ticket.php:15
-msgid "New ticket"
-msgstr ""
-
-#: src/admin-views/editor/button-new-ticket.php:13
-msgid "Add a new ticket"
-msgstr ""
-
-#: src/admin-views/editor/button-view-orders.php:32
-msgid "View Orders"
 msgstr ""
 
 #: src/admin-views/editor/total-capacity.php:19
@@ -186,7 +171,7 @@ msgstr ""
 msgid "Total Event Capacity:"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2407
+#: src/Tribe/Commerce/WooCommerce/Main.php:2429
 msgid "Resend tickets email"
 msgstr ""
 
@@ -218,7 +203,7 @@ msgstr ""
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:120
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:138
 msgctxt "Browser title"
 msgid "%s - Order list"
 msgstr ""
@@ -254,47 +239,47 @@ msgstr "Tekst:"
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:66
+#: src/Tribe/Commerce/WooCommerce/Settings.php:74
 msgid "As soon as an order is created"
 msgstr "Så snart en ordre er oprettet"
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:25
+#: src/Tribe/Commerce/WooCommerce/Settings.php:33
 msgid "Please select at least one status."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:24
+#: src/Tribe/Commerce/WooCommerce/Settings.php:32
 msgid "When should attendee records be generated?"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:23
+#: src/Tribe/Commerce/WooCommerce/Settings.php:31
 msgid "If no status is selected, no ticket emails will be sent."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:22
+#: src/Tribe/Commerce/WooCommerce/Settings.php:30
 msgid "When should tickets be emailed to customers?"
 msgstr "Hvornår skal billetter blive sendt med mail til kunderne?"
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:21
+#: src/Tribe/Commerce/WooCommerce/Settings.php:29
 msgid "Event Tickets uses WooCommerce order statuses to control when attendee records should be generated and when tickets are sent to customers. The first enabled status reached by an order will trigger the action."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:84
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:89
 msgid "Purchased"
 msgstr "Købt"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:241
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:246
 msgid "%1$s"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:87
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:92
 msgid "Status"
 msgstr "Status"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:85
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:90
 msgid "Address"
 msgstr "Adresse"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:83
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:88
 msgid "Email"
 msgstr "Email"
 
@@ -345,12 +330,12 @@ msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:217
+#: src/Tribe/Commerce/WooCommerce/Main.php:233
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:166
+#: src/Tribe/Commerce/EDD/Main.php:186
 msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr ""
@@ -363,10 +348,6 @@ msgstr ""
 #: src/Tribe/Commerce/Attendance_Totals.php:62
 msgctxt "attendee summary"
 msgid "Total Tickets Sold:"
-msgstr ""
-
-#. Description of the plugin/theme
-msgid "Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more!"
 msgstr ""
 
 #: src/views/tickets-plus/orders-tickets.php:70
@@ -386,11 +367,7 @@ msgid "Toggle attendee info"
 msgstr ""
 
 #: src/views/login-to-purchase.php:16
-msgid "Login to purchase"
-msgstr ""
-
-#: src/Tribe/Main.php:354
-msgid "Require users to log in before they purchase tickets"
+msgid "Log in to purchase"
 msgstr ""
 
 #: src/Tribe/CSV_Importer/Tickets_Importer.php:233
@@ -440,6 +417,7 @@ msgstr ""
 #: src/views/eddtickets/tickets.php:115
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
+#: src/views/tpp/attendees-list-optout.php:35
 #: src/views/wootickets/tickets.php:191
 msgid "Don't list me on the public attendee list"
 msgstr ""
@@ -502,7 +480,7 @@ msgstr ""
 msgid "Attendee Information:"
 msgstr ""
 
-#: src/admin-views/editor/panel/settings.php:35
+#: src/admin-views/editor/settings-attendees.php:22
 msgid "Show attendees list on event page"
 msgstr ""
 
@@ -590,11 +568,11 @@ msgstr "Radio"
 msgid "Checkbox"
 msgstr "Checkbox"
 
-#: src/Tribe/Meta.php:493
+#: src/Tribe/Meta.php:500
 msgid "This ticket has custom Attendee Information fields"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Settings.php:33
+#: src/Tribe/Commerce/WooCommerce/Settings.php:41
 msgid "WooCommerce Support"
 msgstr ""
 
@@ -710,53 +688,40 @@ msgstr "Billetsalg"
 msgid "Purchase limit:"
 msgstr ""
 
-#: src/admin-views/editor/field-price.php:53
-msgid "Current sale price - this can be managed via the product editor"
-msgstr ""
-
-#: src/admin-views/editor/field-price.php:43
-msgid "Sale Price:"
-msgstr "Udsalgspris"
-
-#: src/admin-views/editor/column-body-price.php:9
-#: src/admin-views/editor/field-price.php:29
-msgid "Price:"
-msgstr "Pris:"
-
 #: src/Tribe/QR.php:158
 msgid "Check in for this event"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:95
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:100
 msgid "Total"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:92
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:97
 msgid "Site Fee"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:91
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:96
 msgid "Subtotal"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:86
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:91
 msgid "Date"
 msgstr "Dato"
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:82
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:87
 msgid "Purchaser"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:81
+#: src/Tribe/Commerce/WooCommerce/Orders/Table.php:86
 msgid "Order"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:92
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:110
 #: src/Tribe/Commerce/WooCommerce/Tabbed_View/Orders_Report_Tab.php:16
 msgid "Orders"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:90
+#: src/Tribe/Commerce/WooCommerce/Orders/Report.php:108
 msgid "See purchases for this event"
 msgstr ""
 
@@ -772,9 +737,9 @@ msgstr ""
 msgid "Modern Tribe, Inc."
 msgstr ""
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.6.2)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.7)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:314
+#: src/Tribe/Main.php:313
 msgid "Event Tickets Plus"
 msgstr ""
 
@@ -819,19 +784,19 @@ msgstr ""
 msgid "Tickets"
 msgstr "Billetter"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2000
+#: src/Tribe/Commerce/WooCommerce/Main.php:2044
 msgid "Unknown"
 msgstr "Ukendt"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1951
+#: src/Tribe/Commerce/WooCommerce/Main.php:1995
 msgid "Deleted"
 msgstr "Slettet"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:1945
+#: src/Tribe/Commerce/WooCommerce/Main.php:1989
 msgid "In trash (was %s)"
 msgstr "I papirkurven (var %s)"
 
-#: src/Tribe/Commerce/EDD/Main.php:1665
+#: src/Tribe/Commerce/EDD/Main.php:1643
 msgid "Event"
 msgstr "Begivenhed"
 
@@ -843,35 +808,35 @@ msgstr ""
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:1808
+#: src/Tribe/Commerce/EDD/Main.php:1786
 msgid "Print Ticket"
 msgstr "Print billet"
 
-#: src/Tribe/Commerce/EDD/Main.php:1767
+#: src/Tribe/Commerce/EDD/Main.php:1745
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr "Beklager! Kun %d billetter tilbage til %s"
 
-#: src/Tribe/Commerce/EDD/Main.php:1764
+#: src/Tribe/Commerce/EDD/Main.php:1742
 msgid "%s ticket is sold out"
 msgstr "%s billet er udsolgt"
 
-#: src/Tribe/Commerce/EDD/Main.php:1683
-#: src/Tribe/Commerce/WooCommerce/Main.php:2287
+#: src/Tribe/Commerce/EDD/Main.php:1661
+#: src/Tribe/Commerce/WooCommerce/Main.php:2309
 msgid "This is a ticket for the event:"
 msgstr "Dette er en billet til begivenheden:"
 
-#: src/Tribe/Commerce/EDD/Main.php:1614
-#: src/Tribe/Commerce/WooCommerce/Main.php:2236
+#: src/Tribe/Commerce/EDD/Main.php:1592
+#: src/Tribe/Commerce/WooCommerce/Main.php:2258
 msgid "Event sales report"
 msgstr "Begivenheds salgsrapport"
 
-#: src/Tribe/Commerce/EDD/Main.php:1290
-#: src/Tribe/Commerce/WooCommerce/Main.php:1853
+#: src/Tribe/Commerce/EDD/Main.php:1261
+#: src/Tribe/Commerce/WooCommerce/Main.php:1897
 msgid "(deleted)"
 msgstr "(slettet)"
 
-#: src/Tribe/Commerce/EDD/Main.php:501
-#: src/Tribe/Commerce/WooCommerce/Main.php:804
+#: src/Tribe/Commerce/EDD/Main.php:458
+#: src/Tribe/Commerce/WooCommerce/Main.php:823
 msgid "You'll receive your tickets in another email."
 msgstr "Du vil modtage dine billetter i en anden e-mail"
 

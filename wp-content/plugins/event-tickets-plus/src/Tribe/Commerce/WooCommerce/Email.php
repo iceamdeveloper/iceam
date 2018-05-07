@@ -14,23 +14,40 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 		$this->id          = 'wootickets';
 		$this->title       = __( 'Tickets', 'event-tickets-plus' );
 		$this->description = __( 'Email the user will receive after a completed order with the tickets they purchased.', 'event-tickets-plus' );
-
-		$this->subject = __( 'Your tickets from {site_title}', 'event-tickets-plus' );
-
+		$this->subject     = __( 'Your tickets from {site_title}', 'event-tickets-plus' );
 
 		// Triggers for this email
 		add_action( 'wootickets-send-tickets-email', array( $this, 'trigger' ) );
 
-
 		// Call parent constuctor
 		parent::__construct();
 
+		/**
+		 * Allows for filtering whether the Woo tickets email is enabled.
+		 *
+		 * @deprecated TBD
+		 *
+		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
+		 */
 		$this->enabled = apply_filters( 'wootickets-tickets-email-enabled', 'yes' );
-		$this->email_type = 'html';
 
+		/**
+		 * Allows for filtering whether the Woo tickets email is enabled.
+		 *
+		 * @since TBD
+		 *
+		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
+		 */
+		$this->enabled = apply_filters( 'tribe_tickets_plus_email_enabled', 'yes' );
+
+		$this->email_type = 'html';
 	}
 
-
+	/**
+	 * The callback fired on the wootickets-send-tickets-email action.
+	 *
+	 * @param int $order_id The ID of the WooCommerce order whose tickets are being emailed.
+	 */
 	public function trigger( $order_id ) {
 
 		if ( $order_id ) {
@@ -44,23 +61,44 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 			return;
 		}
 
-		$this->send( $this->get_recipient(), $this->get_subject(), $this->get_content(), $this->get_headers(), $this->get_attachments() );
+		$sent = $this->send(
+			$this->get_recipient(),
+			$this->get_subject(),
+			$this->get_content(),
+			$this->get_headers(),
+			$this->get_attachments()
+		);
+
+		if ( $sent ) {
+			$this->maybe_add_order_note_for_manual_email( $order_id );
+		}
 	}
 
 	/**
-	 * get_subject function.
+	 * Gets the subject for the email, defaulting to "Your tickets from {site_title}".
 	 *
 	 * @return string
 	 */
 	public function get_subject() {
-		return apply_filters( 'wootickets_ticket_email_subject', $this->format_string( $this->subject ), $this->object );
+
+		$subject      = $this->subject;
+		$woo_settings = get_option( 'woocommerce_wootickets_settings' );
+
+		if ( ! empty( $woo_settings['subject'] ) ) {
+			$subject = $woo_settings['subject'];
+		}
+
+		/**
+		 * Allows for filtering the WooCommerce Tickets email subject.
+		 *
+		 * @param string $subject The email subject.
+		 * @param WC_Order $ticket The WC_Order for this ticket purchase.
+		 */
+		return apply_filters( 'wootickets_ticket_email_subject', $this->format_string( $subject ), $this->object );
 	}
 
 	/**
-	 * get_attachments function.
-	 *
-	 * Gets an array of attachments (each item to be a full path file name) to
-	 * attach to the email.
+	 * Gets an array of attachments (each item to be a full path file name) to attach to the email.
 	 *
 	 * @return array
 	 */
@@ -79,10 +117,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 		return apply_filters( 'tribe_tickets_plus_woo_email_attachments', array(), $this->id, $this->object );
 	}
 
-
 	/**
 	 * Retrieve the full HTML for the tickets email
-	 *
 	 *
 	 * @return string
 	 */
@@ -97,19 +133,43 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 		return $wootickets->generate_tickets_email_content( $attendees );
 	}
 
-
 	/**
 	 * Initialise Settings Form Fields
 	 */
 	public function init_form_fields() {
 		$this->form_fields = array(
 			'subject' => array(
-				'title'            => __( 'Subject', 'woocommerce' ),
-				'type'             => 'text',
-				'description'      => sprintf( __( 'Defaults to <code>%s</code>', 'woocommerce' ), $this->subject ),
-				'placeholder'      => '',
-				'default'          => '',
+				'title'       => __( 'Subject', 'woocommerce' ),
+				'type'        => 'text',
+				'description' => sprintf( __( 'Defaults to <code>%s</code>', 'woocommerce' ), $this->subject ),
+				'placeholder' => '',
+				'default'     => '',
 			),
+		);
+	}
+
+	/**
+	 * Adds an Order Note to the WooCommerce order if we're manually re-sending a tickets email.
+	 *
+	 * @since TBD
+	 *
+	 * @param int $order_id The WooCommerce order ID.
+	 */
+	public function maybe_add_order_note_for_manual_email( $order_id ) {
+
+		if ( ! function_exists( 'wc_create_order_note' ) ) {
+			return false;
+		}
+
+		if ( 'resend_tickets_email' !== tribe_get_request_var( 'wc_order_action' ) ) {
+			return false;
+		}
+
+		return wc_create_order_note(
+			$order_id,
+			esc_html__( 'Tickets email notification manually sent to user.', 'event-tickets-plus' ),
+			false,
+			false
 		);
 	}
 }

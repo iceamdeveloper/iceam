@@ -11,18 +11,6 @@ abstract class Tribe__Tickets_Plus__Tickets extends Tribe__Tickets__Tickets {
 	}
 
 	/**
-	 * Indicates if we currently require users to be logged in before they can obtain
-	 * tickets.
-	 *
-	 * @return bool
-	 */
-	protected function login_required() {
-		$requirements = (array) tribe_get_option( 'ticket-authentication-requirements', array() );
-
-		return in_array( 'event-tickets-plus_all', $requirements );
-	}
-
-	/**
 	 * Processes the front-end tickets form data to handle requests common to all type of tickets.
 	 *
 	 * Children classes should call this method when overriding.
@@ -32,61 +20,6 @@ abstract class Tribe__Tickets_Plus__Tickets extends Tribe__Tickets__Tickets {
 		$meta_store->maybe_set_attendee_meta_cookie();
 	}
 
-	/**
-	 * Returns the class name of the default module/provider.
-	 *
-	 * @since 4.6
-	 *
-	 * @return string
-	 */
-	public static function get_default_module() {
-		$modules = array_keys( self::modules() );
-
-		if ( 1 === count( $modules ) ) {
-			// There's only one, just return it.
-			self::$default_module = array_shift( $modules );
-		} else {
-			// Remove RSVP for this part
-			unset( $modules[ array_search( 'Tribe__Tickets__RSVP', $modules ) ] );
-
-			// We just return the first, so we don't show favoritism
-			self::$default_module = array_shift( $modules );
-		}
-
-		/**
-		 * Filters the default commerce module (provider)
-		 *
-		 * @since 4.6
-		 *
-		 * @param string default ticket module class name
-		 * @param array array of ticket module class names
-		 */
-		return apply_filters( 'tribe_tickets_get_default_module', self::$default_module, $modules );
-	}
-
-	/**
-	 * Get the saved or default ticket provider
-	 *
-	 * @since 4.6
-	 *
-	 * @param int $event_id - the post id of the event the ticket is attached to.
-	 *
-	 * @return string ticket module class name
-	 */
-	public static function get_event_ticket_provider( $event_id = null ) {
-
-		// if  post ID is set, and a value has been saved, return the saved value
-		if ( ! empty( $event_id ) ) {
-			$saved = get_post_meta( $event_id, tribe( 'tickets.handler' )->key_provider_field, true );
-
-			if ( ! empty( $saved ) ) {
-				return $saved;
-			}
-		}
-
-		// otherwise just return the default
-		return self::get_default_module();
-	}
 
 	/**
 	 * Returns the amount of global stock set for the event.

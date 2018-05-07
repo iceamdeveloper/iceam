@@ -103,11 +103,20 @@
 					<?php
 
 					if ( $total_sold ) {
-						$total_sold = '(' . absint( $total_sold ) . ')';
+						$total_sold = absint( $total_sold );
 					}; ?>
 
 					<div class="totals-header">
-						<h3><?php echo sprintf( __( 'Total Sales: %s %s', 'event-tickets-plus' ), esc_html( tribe_format_currency( number_format( $event_revenue, 2 ), $event_id ) ), $total_sold ); ?></h3>
+						<h3>
+							<?php
+							$totals_header = sprintf(
+								__( 'Total Sales: %1$s (%2$s)', 'event-tickets-plus' ),
+								tribe_format_currency( number_format( $event_revenue, 2 ), $event_id ),
+								$total_sold
+							);
+							echo esc_html( $totals_header );
+							?>
+						</h3>
 					</div>
 
 					<div id="sales_breakdown_wrapper" class="tribe-event-meta-note">
@@ -130,6 +139,13 @@
 							<strong><?php esc_html_e( 'Canceled:', 'event-tickets-plus' ); ?></strong>
 							<?php echo esc_html( tribe_format_currency( number_format( $tickets_breakdown['wc-cancelled']['_line_total'], 2 ), $event_id ) ); ?>
 							<span id="total_issued">(<?php echo esc_html( $tickets_breakdown['wc-cancelled']['_qty'] ); ?>)</span>
+						</div>
+						<div>
+							<strong><?php esc_html_e( 'Discounts:', 'event-tickets-plus' ); ?></strong>
+							<?php
+							$sign = $discounts > 0 ? '-' : '';
+							echo esc_html( $sign . tribe_format_currency( number_format( $discounts, 2 ), $event_id ) );
+							?>
 						</div>
 					</div>
 

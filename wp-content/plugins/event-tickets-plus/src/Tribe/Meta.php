@@ -66,6 +66,7 @@ class Tribe__Tickets_Plus__Meta {
 		add_filter( 'tribe_events_tickets_metabox_edit_attendee', array( $this, 'ajax_attendee_meta' ), 10, 2 );
 		add_action( 'wp_ajax_tribe-tickets-info-render-field', array( $this, 'ajax_render_fields' ) );
 		add_action( 'wp_ajax_tribe-tickets-load-saved-fields', array( $this, 'ajax_render_saved_fields' ) );
+		add_action( 'woocommerce_remove_cart_item', array( $this, 'clear_storage_on_remove_cart_item' ), 10, 2 );
 
 		$this->meta_fieldset();
 		$this->render();
@@ -89,6 +90,7 @@ class Tribe__Tickets_Plus__Meta {
 	public function rsvp_meta() {
 		if ( ! $this->rsvp_meta ) {
 			$this->rsvp_meta = new Tribe__Tickets_Plus__Meta__RSVP;
+			$this->rsvp_meta->hook();
 		}
 
 		return $this->rsvp_meta;
@@ -285,8 +287,14 @@ class Tribe__Tickets_Plus__Meta {
 		update_post_meta( $ticket->ID, self::META_KEY, $meta );
 
 		if ( ! $meta ) {
+			// no meta? Do not enable meta on the ticket.
+			delete_post_meta( $ticket->ID, self::ENABLE_META_KEY );
+
 			return;
 		}
+
+		// if there is some meta enable meta for the ticket
+		update_post_meta( $ticket->ID, self::ENABLE_META_KEY, 'yes' );
 
 		// Save templates too
 		if ( isset( $data['tribe-tickets-save-fieldset'] ) && ! empty( $data['tribe-tickets-saved-fieldset-name'] ) ) {
@@ -522,8 +530,8 @@ class Tribe__Tickets_Plus__Meta {
 	 * @param int $post_id ID of parent "event" post
 	 */
 	public function tickets_post_capacity( $post_id ) {
-		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/button-view-orders' )" );
-		tribe( 'tickets-plus.admin.views' )->template( 'editor/button-view-orders' );
+		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets.admin.views' )->template( 'editor/button-view-orders' )" );
+		tribe( 'tickets.admin.views' )->template( 'editor/button-view-orders' );
 	}
 
 	/**
@@ -620,4 +628,25 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	// @codingStandardsIgnoreEnd
+
+	/**
+	 * Clear the storage allocated by a product if the product is removed from the cart.
+	 *
+	 * @since 4.7.1
+	 *
+	 * @param $cart_item_key
+	 * @param $cart
+	 */
+	public function clear_storage_on_remove_cart_item( $cart_item_key = '', $cart = null ) {
+		$product_id = null;
+
+		if ( $cart instanceof WC_Cart ) {
+			$product    = $cart->cart_contents[ $cart_item_key ];
+			$product_id = empty( $product['product_id'] ) ? null : $product['product_id'];
+		}
+
+		if ( ! is_null( $product_id ) ) {
+			$this->storage->clear_meta_data_for( $product_id );
+		}
+	}
 }

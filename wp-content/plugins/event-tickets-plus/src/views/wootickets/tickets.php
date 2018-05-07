@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.6.2
+ * @version 4.7.1
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -123,14 +123,18 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 					$max_quantity = $product->is_sold_individually() ? 1 : $max_quantity;
 					$available    = $ticket->available();
 
-					woocommerce_quantity_input( array(
+					$input = woocommerce_quantity_input( array(
 						'input_name'  => 'quantity_' . $ticket->ID,
 						'input_value' => 0,
 						'min_value'   => 0,
-						'max_value'   => $must_login ? 0 : $max_quantity, // Currently WC does not support a 'disable' attribute
-					) );
+						'max_value'   => $max_quantity,
+					), null, false );
 
 					$is_there_any_product_to_sell = true;
+					$disabled_attr = disabled( $must_login, true, false );
+					$input = str_replace( '<input type="number"', '<input type="number"' . $disabled_attr, $input );
+
+					echo $input;
 
 					if ( $available ) {
 						?>

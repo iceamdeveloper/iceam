@@ -16,11 +16,29 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	public static $tab_slug = 'tribe-tickets-plus-woocommerce-orders-report';
 
 	/**
+	 * @var string The orders page menu hook suffix.
+	 *
+	 * @see add_submenu_page()
+	 */
+	public $orders_page;
+
+	/**
+	 * The table that will display the ticket orders.
+	 *
+	 * @var Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table
+	 */
+	protected $orders_table;
+
+	/**
 	 * Constructor!
 	 */
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'orders_page_register' ) );
 		add_filter( 'post_row_actions', array( $this, 'orders_row_action' ) );
+
+		// register the WooCommerce orders report tab
+		$wc_tabbed_view = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View();
+		$wc_tabbed_view->register( );
 	}
 
 	/**
@@ -164,6 +182,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		$event_revenue = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_revenue( $event_id );
 		$event_sales = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_sales( $event_id );
 		$event_fees = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_fees( $event_id );
+		$discounts = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_discounts( $event_id );
 
 		$tickets_sold = $tickets_breakdown = array();
 		$total_sold = 0;
@@ -228,8 +247,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 		$total_completed += absint( $total_sold );
 
-		$tabbed_view = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View( $event_id );
-		$tabbed_view->render( self::$tab_slug );
+		// Build and render the tabbed view from Event Tickets and set this as the active tab
+		$tabbed_view = new Tribe__Tickets__Commerce__Orders_Tabbed_View();
+		$tabbed_view->set_active( self::$tab_slug );
+		$tabbed_view->render();
 
 		include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/woocommerce-orders.php';
 	}

@@ -10,6 +10,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 		add_filter( 'tribe_event_ticket_decimal_point', 'wc_get_price_decimal_separator' );
 	}
 
+	/**
+	 * Append WooCommerce-specific settings section to tickets settings tab
+	 * @param array $settings_fields
+	 *
+	 * @since 4.7
+	 *
+	 * @return array
+	 */
 	public function add_settings( array $settings_fields ) {
 		$extra_settings = $this->additional_settings();
 		return Tribe__Main::array_insert_before_key( 'tribe-form-content-end', $settings_fields, $extra_settings );

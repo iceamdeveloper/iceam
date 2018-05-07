@@ -48,12 +48,12 @@ class Tribe__Tickets_Plus__Attendees_List {
 		// Purging the attendees cache on all the modules
 		// @todo: make this a little bit more clean
 		add_action( 'event_tickets_rsvp_ticket_created', array( $myself, 'purge_transient' ), 10, 3 );
-		add_action( 'wootickets_generate_ticket_attendee', array( $myself, 'purge_transient' ), 10, 3 );
+		add_action( 'event_ticket_woo_attendee_created', array( $myself, 'purge_transient' ), 10, 3 );
 		add_action( 'event_tickets_edd_ticket_created', array( $myself, 'edd_purge_transient' ), 10, 2 );
 	}
 
 	/**
-	 * Verify if users has the option to hide the Attendees list, applys a good filter
+	 * Verify if users has the option to hide the Attendees list, applies a good filter
 	 *
 	 * @param  int|WP_Post  $post
 	 * @return boolean

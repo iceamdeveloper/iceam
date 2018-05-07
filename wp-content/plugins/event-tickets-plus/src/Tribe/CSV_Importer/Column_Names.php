@@ -43,17 +43,18 @@ class Tribe__Tickets_Plus__CSV_Importer__Column_Names {
 	 */
 	public function filter_tickets_woo_column_names( array $column_names ) {
 		$column_names = array_merge( $column_names, array(
-			'event_name'             => esc_html__( 'Event Name or ID or Slug', 'event-tickets-plus' ),
-			'ticket_name'            => esc_html__( 'Ticket Name', 'event-tickets-plus' ),
-			'ticket_description'     => esc_html__( 'Ticket Description', 'event-tickets-plus' ),
-			'ticket_start_sale_date' => esc_html__( 'Ticket Start Sale Date', 'event-tickets-plus' ),
-			'ticket_start_sale_time' => esc_html__( 'Ticket Start Sale Time', 'event-tickets-plus' ),
-			'ticket_end_sale_date'   => esc_html__( 'Ticket End Sale Date', 'event-tickets-plus' ),
-			'ticket_end_sale_time'   => esc_html__( 'Ticket End Sale Time', 'event-tickets-plus' ),
-			'ticket_price'           => esc_html__( 'Ticket Price', 'event-tickets-plus' ),
-			'ticket_stock'           => esc_html__( 'Ticket Stock', 'event-tickets-plus' ),
-			'ticket_sku'             => esc_html__( 'Ticket SKU', 'event-tickets-plus' ),
-			'ticket_capacity'        => esc_html__( 'Ticket Capacity', 'event-tickets-plus' ),
+			'event_name'              => esc_html__( 'Event Name or ID or Slug', 'event-tickets-plus' ),
+			'ticket_name'             => esc_html__( 'Ticket Name', 'event-tickets-plus' ),
+			'ticket_description'      => esc_html__( 'Ticket Description', 'event-tickets-plus' ),
+			'ticket_show_description' => esc_html__( 'Ticket Show Description', 'event-tickets-plus' ),
+			'ticket_start_sale_date'  => esc_html__( 'Ticket Start Sale Date', 'event-tickets-plus' ),
+			'ticket_start_sale_time'  => esc_html__( 'Ticket Start Sale Time', 'event-tickets-plus' ),
+			'ticket_end_sale_date'    => esc_html__( 'Ticket End Sale Date', 'event-tickets-plus' ),
+			'ticket_end_sale_time'    => esc_html__( 'Ticket End Sale Time', 'event-tickets-plus' ),
+			'ticket_price'            => esc_html__( 'Ticket Price', 'event-tickets-plus' ),
+			'ticket_stock'            => esc_html__( 'Ticket Stock', 'event-tickets-plus' ),
+			'ticket_sku'              => esc_html__( 'Ticket SKU', 'event-tickets-plus' ),
+			'ticket_capacity'         => esc_html__( 'Ticket Capacity', 'event-tickets-plus' ),
 		) );
 
 		return $column_names;

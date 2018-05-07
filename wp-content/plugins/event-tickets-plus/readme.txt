@@ -3,21 +3,21 @@
 Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.5
-Tested up to: 4.9.1
-Stable tag: 4.6.2
+Tested up to: 4.9.5
+Stable tag: 4.7.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-Event Tickets Plus allows you to sell tickets to your events using WooCommerce or Easy Digital Downloads. Use it on your posts and pages, or add <a href="http://m.tri.be/18vc">The Events Calendar</a> and sell tickets from your events listings.
+Event Tickets Plus allows you to sell tickets to your events using WooCommerce, Easy Digital Downloads, or our built in Tribe Commerce tool. Use it on your posts and pages, or add <a href="http://m.tri.be/18vc">The Events Calendar</a> and sell tickets from your events listings.
 
 == Description ==
 
-Event Tickets Plus adds features and functionality onto the core Event Tickets plugin, so you can sell tickets with WooCommerce or Easy Digital Downloads.  You can sell tickets on any existing post type or use <a href="http://m.tri.be/18vc">The Events Calendar</a> for a full events and ticketing solution.  Event Tickets Plus gives you the power to keep ticket sales contained entirely within your site. This means no more sending buyers to a third-party portal or requiring an outside solution like Eventbrite. Tickets have unique QR codes that make checking in your guests a breeze. Plus, the plugin allows you to take advantage of many of the powerful features already built into your commerce provider (reports, SKU tracking, etc) and apply those specifically to tickets. Whether soliciting free RSVPs to a community gathering or hosting a huge party with multiple price tiers, Event Tickets has got you covered.
+Event Tickets Plus adds features and functionality onto the core Event Tickets plugin, so you can sell tickets with WooCommerce or Easy Digital Downloads. You can sell tickets on any existing post type or use <a href="http://m.tri.be/18vc">The Events Calendar</a> for a full events and ticketing solution. Event Tickets Plus gives you the power to keep ticket sales contained entirely within your site. This means no more sending buyers to a third-party portal or requiring an outside solution. Tickets have unique QR codes that make checking in your guests a breeze. Plus, the plugin allows you to take advantage of many of the powerful features already built into your commerce provider (reports, SKU tracking, etc) and apply those specifically to tickets. Whether soliciting free RSVPs to a community gathering or hosting a huge party with multiple price tiers, Event Tickets has got you covered.
 
 = Event Tickets =
 
 * Sell tickets to events directly within the event listings. You can control the branding, look and feel to be consistent with your site's appearance.
-* Set different price tiers, limit the number of tickets available and select timeframes for when tickets are available/unavailable.
+* Set different price tiers, limit the number of tickets available, and select timeframes for when tickets are available/unavailable.
 * Generate reports (courtesy of your chosen commerce provider) on an event-wide or ticket-specific basis.
 * Send printable PDF tickets to purchasers via email.
 * Confirm and check in attendees at the door with QR coded tickets.
@@ -136,6 +136,43 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.7.2] 2018-04-18 =
+
+* Feature - Add new action, `tribe_tickets_before_front_end_ticket_form`, if tickets has been expired and the tickets form is not rendered any more [98203]
+* Fix - Fixed an issue where shared capacity would reduce available stock on load of the event editor; thanks to Sherman, Michael, and Greg for bringing it up! [94702]
+* Fix - Fixed emails with Easy Digital Downloads tickets not being sent [102216]
+* Fix - Added new column in the CSV import of tickets for the "Show ticket description" value, accompanied by new filter `tribe_tickets_plus_import_ticket_data` to change the data before ticket creation via CSV (thanks to April in our Help Desk for flagging this problem!) [96162]
+
+= [4.7.1] 2018-03-28 =
+
+* Feature - Added updater class to enable changes on future updates [84675]
+* Fix - Resolved undefined variable error that could occur when purchasing tickets via WooCommerce in some circumstances (thanks to @justlevine for flagging this problem) [73562]
+* Fix - Added safety checks to stop customers from buying tickets left in the cart *after* the ticket sale dates have passed (our thanks to Lawrence in the forums for flag this problem) [90765]
+* Fix - Added checks to help prevent tickets from inadvertently being added to the cart more than once when site visitors use the browser refresh button (thanks to Preethi in our forums for reporting this problem) [89843]
+* Fix - Fixed some broken functionality and design elements on the front-end "Who's Attending?" list on ticketed events (thanks to @learningarchitects and others for reporting this bug!) [95236]
+* Fix - Restored the order notes that get added to orders when a tickets email is manually re-sent to a customer (props to Nick H. in our forums for spotting this bug) [91730]
+* Fix - Restored functionality of the custom WooCommerce tickets email subject line (props to @ilardo for surfacing this bug in the forums) [99755]
+* Fix - Corrected a number of wrongly declared textdomains (thanks to @websource for drawing our attention to this)
+* Fix - Make sure the sales page does not trigger any error when `get_current_screen` does not return an object (thanks to @artistinformatici for report this problem in our forums) [101881]
+* Fix - Prevented a fatal error that would sometimes arise when viewing events with EDD tickets [95402]
+* Tweak - Modified WooCommerce ticket inputs so that they are disabled when viewed by unauthenticated users, when a requirement for users to login before purchasing is in effect [96464]
+* Tweak - Added caching to `get_orders_by_status` call to avoid unnecessarily repeated queries [99161]
+* Tweak - Fixed harmless (but annoying) PHP notice that would sometimes arise when tickets were in the same WooCommerce cart as non-ticket products (thanks @liblogger for reporting this one!) [94170]
+* Tweak - Fixed a PHP notice that would sometimes arise when deleting tickets with attendees (thanks to @svkg for reporting this in our forums) [97787]
+* Tweak - Added logic to clear cookies and storage used from a product when it is removed from the cart [90902]
+* Tweak - Added new filter `tribe_tickets_plus_email_enabled` to allow for enabling or disabling the tickets emails - this replaces the now-deprecated `wootickets-tickets-email-enabled` filter [99755]
+* Tweak - Added new filter `tribe_tickets_plus_woocommerce_order_link_url` to allow for remove of the order links on front end order report [93923]
+
+= [4.7] 2018-03-13 =
+
+* Feature - Extended capacity and stock control for Tribe Commerce Paypal Tickets
+* Fix - Remove the Purchase Limit field from WooCommerce and Easy Digital Downloads tickets back-end edit form [95479]
+* Tweak - Addressed some issues where the ticket form would sometimes show up even when all tickets' end-sale dates had passed (props to @reckling and others for reporting this!) [94724]
+* Tweak - Added filters: `tribe_tickets_plus_woo_get_attendees`, `tribe_tickets_plus_hide_attendees_list_optout`
+* Tweak - Removed actions: `wootickets_generate_ticket_attendee`
+* Tweak - Changed views: `login-to-purchase`, `tpp/attendees-list-optout`
+* Language - 2 new strings added, 60 updated, 1 fuzzied, and 14 obsoleted
 
 = [4.6.2] 2017-12-07 =
 
