@@ -125,7 +125,16 @@ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 
 
 
+/***********************************************************************
+ *
+ *	DON'T ALLOW USERS TO SIGN UP FOR COURSES THAT DO NOT
+ *	HAVE A WOOCOMMERCE PRODUCT ASSOCIATED WITH THEM
+ *
+ **********************************************************************/
 
+add_filter( 'sensei_display_start_course_form', __return_false);
+
+ 
  
 /***********************************************************************
  *
