@@ -3,7 +3,10 @@ namespace Aelia\WC;
 if(!defined('ABSPATH')) exit; // Exit if accessed directly
 
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\LogglyHandler;
+use Monolog\Handler\ChromePHPHandler;
 use Monolog\Processor\ProcessIdProcessor;
+use \Exception;
 
 /**
  * Writes to the log used by the plugin.
@@ -46,11 +49,16 @@ class Logger {
 	 *
 	 * @return bool
 	 */
-	protected function set_debug_mode($debug_mode) {
+	public function set_debug_mode($debug_mode) {
 		$this->_debug_mode = $debug_mode;
 
 		if($debug_mode) {
 			$log_level = \Monolog\Logger::DEBUG;
+
+			$this->init_debug_log_handlers();
+			$this->logger->info('Debug mode enabled', array(
+				'Logger ID' => $this->log_id,
+			));
 		}
 		else {
 			$log_level = \Monolog\Logger::NOTICE;
@@ -59,11 +67,23 @@ class Logger {
 	}
 
 	/**
+	 * Initialises additional loggers that should be used in debug mode.
+	 *
+	 * @since 1.8.4.170118
+	 */
+	protected function init_debug_log_handlers() {
+		// The ChromePHPHandler seems to cause 404 errors, for some reason, and has
+		// been disabled. Errors verified with WC 3.3.1 and WordPress 4.9.4.
+		// @since 1.9.16.180213
+		//$this->logger->pushHandler(new ChromePHPHandler(\Monolog\Logger::DEBUG));
+	}
+
+	/**
 	 * Retrieves the "debug mode" setting.
 	 *
 	 * @return bool
 	 */
-	protected function get_debug_mode() {
+	public function get_debug_mode() {
 		return $this->_debug_mode;
 	}
 
@@ -89,6 +109,23 @@ class Logger {
 	}
 
 	/**
+	 * Handles an exception occurred while trying to log a message.
+	 *
+	 * @param \Exception e The exception occurred while logging the message.
+	 * @param string message The original message being logged.
+	 * @since 1.9.9.171120
+	 */
+	protected function log_exception(\Exception $e, $message) {
+		$msg = sprintf('[%1$s] - Unexpected exception occurred while logging a message. Original message: "%2$s". Exception: "%3$s".',
+									 get_class($this),
+									 $message,
+									 $e->getMessage());
+		$msg .= ' ';
+		$msg .= 'This error could be due to a misconfiguration, or a conflict. Please report it to the Aelia Support Team.';
+		trigger_error($msg, E_USER_WARNING);
+	}
+
+	/**
 	 * Adds a message to the log.
 	 *
 	 * @param string message The message to log.
@@ -96,11 +133,16 @@ class Logger {
 	 * while debug mode is true.
 	 */
 	public function log($message, $is_debug_msg = true) {
-		if($is_debug_msg) {
-			return $this->logger->debug($message);
+		try {
+			if($is_debug_msg) {
+				return $this->logger->debug($message);
+			}
+			else {
+				return $this->logger->notice($message);
+			}
 		}
-		else {
-			return $this->logger->notice($message);
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
 		}
 	}
 
@@ -116,7 +158,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function debug($message, array $context = array()) {
-		return $this->logger->debug($message, $context);
+		try {
+			$this->logger->debug($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -131,7 +178,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function info($message, array $context = array())	{
-		return $this->logger->info($message, $context);
+		try {
+			$this->logger->info($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -146,7 +198,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function notice($message, array $context = array()) {
-		return $this->logger->notice($message, $context);
+		try {
+			$this->logger->notice($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -161,7 +218,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function warning($message, array $context = array()) {
-		return $this->logger->warning($message, $context);
+		try {
+			$this->logger->warning($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -176,7 +238,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function error($message, array $context = array()) {
-		return $this->logger->error($message, $context);
+		try {
+			$this->logger->error($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -191,7 +258,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function critical($message, array $context = array()) {
-		return $this->logger->critical($message, $context);
+		try {
+			$this->logger->critical($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -206,7 +278,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function alert($message, array $context = array()) {
-		return $this->logger->alert($message, $context);
+		try {
+			$this->logger->alert($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -221,7 +298,12 @@ class Logger {
 	 * @since 1.8.0.160728
 	 */
 	public function emergency($message, array $context = array()) {
-		return $this->logger->emergency($message, $context);
+		try {
+			$this->logger->emergency($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -238,7 +320,12 @@ class Logger {
 		// Add a special "audit" argument, to separate this message from the normal
 		// INFO messages
 		$context['_audit'] = true;
-		return $this->info($message, $context);
+		try {
+			$this->info($message, $context);
+		}
+		catch(\Exception $e) {
+			$this->log_exception($e, $message);
+		}
 	}
 
 	/**
@@ -256,7 +343,7 @@ class Logger {
 			$upload_dir = wp_upload_dir();
 			$log_dir = $upload_dir['basedir'] . '/wc-logs/';
 		}
-		return trailingslashit($log_dir) . sanitize_file_name($log_id) . '.log';
+		return str_replace('\\', '/', trailingslashit($log_dir) . sanitize_file_name($log_id) . '.log');
 	}
 
 	/**
@@ -271,11 +358,19 @@ class Logger {
 
 		$this->log_handlers = apply_filters('wc_aelia_log_handlers', array(
 			new StreamHandler(self::get_log_file_name($this->log_id), \Monolog\Logger::NOTICE),
+			// TODO Implement Loggly only if plugin is configured for that purpose
+			//new LogglyHandler('15fc33d6-ac21-44c2-a88e-a2d5bf4db398'),
 		), $this->log_id, $this);
-		$this->set_debug_mode($debug_mode);
 
 		$this->logger = new \MonoLog\Logger($this->log_id, $this->log_handlers);
-		$this->logger->pushProcessor(new ProcessIdProcessor());
+
+		// Only add the Process ID logger if the getmypid() function exists. Some
+		// hosting providers remove it for some reason.
+		// @since 1.9.8.171002
+		if(function_exists('getmypid')) {
+			$this->logger->pushProcessor(new ProcessIdProcessor());
+		}
+		$this->set_debug_mode($debug_mode);
 	}
 
 	/**

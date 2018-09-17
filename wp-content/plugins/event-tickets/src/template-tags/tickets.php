@@ -238,9 +238,24 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 					$button_anchor = '#buy-tickets';
 				}
 
-				$button = '<form method="get" action="' . esc_url( get_the_permalink( $event_id ) . $button_anchor ) . '">'
-					. '<button type="submit" name="tickets_process" class="tribe-button">' . $button_label . '</button>'
-					. '</form>';
+				$permalink = get_the_permalink( $event_id );
+				$query_string = parse_url( $permalink, PHP_URL_QUERY );
+				$query_params = empty( $query_string ) ? array() : (array) explode( '&', $query_string );
+
+				$button = '<form method="get" action="' . esc_url( $permalink . $button_anchor ) . '">';
+
+				// Add any query attribute as a hidden input as the action of the form is GET
+				foreach ( $query_params as $param ) {
+					$parts = explode( '=', $param );
+
+					// a query string must be 2 parts only a name and a value
+					if ( is_array( $parts ) && 2 === count( $parts ) ) {
+						list( $name, $value ) = $parts;
+						$button .= '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
+					}
+				}
+
+				$button	.= '<button type="submit" name="tickets_process" class="tribe-button">' . $button_label . '</button></form>';
 
 				$parts[ $type . '-button' ] = $html['button'] = $button;
 			}
@@ -337,17 +352,7 @@ if ( ! function_exists( 'tribe_events_ticket_is_on_sale' ) ) {
 			return true;
 		}
 
-		// Timestamps for comparison purposes
-		$now    = current_time( 'timestamp' );
-		$start  = strtotime( $ticket->start_date );
-		$finish = strtotime( $ticket->end_date );
-
-		// Are we within the applicable date range?
-		$has_started = ( empty( $ticket->start_date ) || ( $start && $now > $start ) );
-		$not_ended   = ( empty( $ticket->end_date ) || ( $finish && $now < $finish ) );
-
-		// Result
-		return ( $has_started && $not_ended );
+		return $ticket->date_in_range( 'now' );
 	}
 }//end if
 
@@ -385,9 +390,23 @@ if ( ! function_exists( 'tribe_tickets_get_ticket_stock_message' ) ) {
 		$stock        = $ticket->stock();
 		$available    = $ticket->available();
 		$sold         = (int) $ticket->qty_sold();
-		$cancelled    = (int) $ticket->qty_cancelled();
-		$pending      = (int) $ticket->qty_pending();
-		$status       = '';
+
+		/**
+		 * Allows filtering the available number that will be displayed.
+		 *
+		 * @since 4.7
+		 *
+		 * @param int                           $available
+		 * @param Tribe__Tickets__Ticket_Object $ticket
+		 * @param int                           $sold
+		 * @param int                           $stock
+		 */
+		$available = apply_filters( 'tribe_tickets_stock_message_available_quantity', $available, $ticket, $sold, $stock );
+
+		$cancelled     = (int) $ticket->qty_cancelled();
+		$pending       = (int) $ticket->qty_pending();
+		$refunded      = (int) $ticket->qty_refunded();
+		$status        = '';
 		$status_counts = array();
 
 		$is_global = Tribe__Tickets__Global_Stock::GLOBAL_STOCK_MODE === $ticket->global_stock_mode() && $global_stock->is_enabled();
@@ -397,7 +416,7 @@ if ( ! function_exists( 'tribe_tickets_get_ticket_stock_message' ) ) {
 		$event_cap  = tribe_tickets_get_capacity( $event->ID );
 		$ticket_cap = tribe_tickets_get_capacity( $ticket->ID );
 
-		$sold_label = __( 'Sold', 'event-tickets' );
+		$sold_label = __( 'issued', 'event-tickets' );
 		if ( 'Tribe__Tickets__RSVP' === $ticket->provider_class ) {
 			$sold_label = _x( 'RSVP\'d Going', 'separate going and remain RSVPs', 'event-tickets' );
 		}
@@ -407,18 +426,11 @@ if ( ! function_exists( 'tribe_tickets_get_ticket_stock_message' ) ) {
 			if ( -1 === $available ) {
 				$status_counts[] = sprintf( esc_html__( '%s %d', 'event-tickets' ), esc_html( $sold_label ), esc_html( $sold ) );
 			} elseif ( $is_global ) {
-				$status_counts[] = sprintf( _x( '%1$d Remaining of shared capacity', 'ticket shared capacity message (remaining stock)', 'event-tickets' ), tribe_tickets_get_readable_amount( $available ) );
+				$status_counts[] = sprintf( _x( '%1$d available of shared capacity', 'ticket shared capacity message (remaining stock)', 'event-tickets' ), tribe_tickets_get_readable_amount( $available ) );
 			} else {
-				$status_counts[] = sprintf( _x( '%1$d Remaining', 'ticket stock message (remaining stock)', 'event-tickets' ), tribe_tickets_get_readable_amount( $available ) );
+				// It's "own stock". We use the $stock value
+				$status_counts[] = sprintf( _x( '%1$d available', 'ticket stock message (remaining stock)', 'event-tickets' ), tribe_tickets_get_readable_amount( $available ) );
 			}
-		}
-
-		if ( $pending > 0 ) {
-			$status_counts[] = sprintf( _x( '%1$d Awaiting Review', 'ticket stock message (pending stock)', 'event-tickets' ), $pending );
-		}
-
-		if ( ! empty( $cancelled ) ) {
-			$status_counts[] = sprintf( _x( '%1$d Cancelled', 'ticket stock message (cancelled stock)', 'event-tickets' ), $cancelled );
 		}
 
 		if ( ! empty( $status_counts ) ) {
@@ -750,7 +762,7 @@ function tribe_tickets_delete_capacity( $object ) {
  *
  * @since  4.6.2
  *
- * @param  int  $object   Post We are trying to save capacity
+ * @param  int|WP_Post|Tribe__Tickets__Ticket_Object  $object   Post We are trying to save capacity
  * @param  int  $capacty  How much we are trying to update the capacity to
  *
  * @return int|false
@@ -873,4 +885,89 @@ function tribe_tickets_get_readable_amount( $number, $mode = 'own', $display = f
 	}
 
 	return $html;
+}
+
+/**
+ * Checks if the specified user (defaults to currently-logged-in user) belongs to any active
+ * WooCommerce Membership plans, *and* if the specified ticket (by ticket ID) has any active
+ * member discounts applied to it. It may not be the user's membership plan specifically, so this
+ * template tag *may* produce some false positives.
+ *
+ * @since 4.7.3
+ *
+ * @param int $ticket_id
+ * @param int $user_id
+ * @return boolean
+ */
+function tribe_tickets_ticket_in_wc_membership_for_user( $ticket_id, $user_id = 0 ) {
+
+	if (
+		! function_exists( 'wc_memberships_get_user_active_memberships' ) ||
+		! function_exists( 'wc_memberships_product_has_member_discount' )
+	) {
+		return false;
+	}
+
+	$user_id = 0 ? get_current_user_id() : $user_id;
+
+	$user_is_member             = wc_memberships_get_user_active_memberships( $user_id );
+	$ticket_has_member_discount = wc_memberships_product_has_member_discount( $ticket_id );
+
+	return $user_is_member && $ticket_has_member_discount;
+}
+
+/**
+ * Builds and returns the correct ticket repository.
+ *
+ * @since 4.8
+ *
+ * @param string $repository The slug of the repository to build/return.
+ *
+ * @return Tribe__Repository__Interface
+ */
+function tribe_tickets( $repository = 'default' ) {
+	$map = array(
+		'default' => 'tickets.ticket-repository',
+		'restv1'  => 'tickets.rest-v1.ticket-repository',
+	);
+
+	/**
+	 * Filters the map relating ticket repository slugs to service container bindings.
+	 *
+	 * @since 4.8
+	 *
+	 * @param array  $map        A map in the shape [ <repository_slug> => <service_name> ]
+	 * @param string $repository The currently requested implementation.
+	 */
+	$map = apply_filters( 'tribe_tickets_ticket_repository_map', $map, $repository );
+
+	return tribe( Tribe__Utils__Array::get( $map, $repository, $map['default'] ) );
+}
+
+/**
+ * Builds and returns the correct attendee repository.
+ *
+ * @since 4.8
+ *
+ * @param string $repository The slug of the repository to build/return.
+ *
+ * @return Tribe__Repository__Interface
+ */
+function tribe_attendees( $repository = 'default' ) {
+	$map = array(
+		'default' => 'tickets.attendee-repository',
+		'restv1'  => 'tickets.rest-v1.attendee-repository',
+	);
+
+	/**
+	 * Filters the map relating attendee repository slugs to service container bindings.
+	 *
+	 * @since 4.8
+	 *
+	 * @param array  $map        A map in the shape [ <repository_slug> => <service_name> ]
+	 * @param string $repository The currently requested implementation.
+	 */
+	$map = apply_filters( 'tribe_tickets_attendee_repository_map', $map, $repository );
+
+	return tribe( Tribe__Utils__Array::get( $map, $repository, $map['default'] ) );
 }

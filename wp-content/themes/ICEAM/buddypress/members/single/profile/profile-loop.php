@@ -52,9 +52,9 @@ $mem_prac_url = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_i
 	<!-- Automatic Fields -->
 	<h3 class='profile-subheader'><?php echo $mem_name; ?></h3>
 	<?php if($mem_school_name!==''){ ?><p style='margin:0;'><strong>School Name: </strong><?php echo $mem_school_name; ?></p><?php } ?>
-	<?php if( $mem_lisence_state!=='' && !wc_memberships_is_user_active_member($profile_ID,"5288") && !wc_memberships_is_user_active_member( $profile_ID , "5315" ) ) { 
+<!-- 	<?php if( $mem_lisence_state!=='' && !wc_memberships_is_user_active_member($profile_ID,"5288") && !wc_memberships_is_user_active_member( $profile_ID , "5315" ) ) { 
 		?><p><strong>Lisence State: </strong><?php echo $mem_lisence_state; ?></p><?php 
-	} ?>
+	} ?> -->
 	<!-- Silver Fields -->
 	<?php if(wc_memberships_is_user_active_member($profile_ID,"5288")||wc_memberships_is_user_active_member( $profile_ID , "5315" )){
 	$member_location_info = '';

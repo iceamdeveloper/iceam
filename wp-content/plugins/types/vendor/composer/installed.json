@@ -120,12 +120,12 @@
     },
     {
         "name": "otgs/installer",
-        "version": "1.8.2",
-        "version_normalized": "1.8.2.0",
+        "version": "1.8.8",
+        "version_normalized": "1.8.8.0",
         "source": {
             "type": "git",
             "url": "ssh://git@git.onthegosystems.com:10022/installer/installer.git",
-            "reference": "36101873478f3590c410701f7869570310271477"
+            "reference": "4f33032eed7d02bf2cd1871706d249370ecf7032"
         },
         "require": {
             "composer/installers": "~1.0",
@@ -134,7 +134,7 @@
         "require-dev": {
             "phpunit/phpunit": "~4.5"
         },
-        "time": "2017-08-04T15:33:42+00:00",
+        "time": "2018-03-01T13:01:25+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -149,7 +149,7 @@
             ]
         },
         "license": [
-            "GPL-2.0"
+            "GPL-2.0-or-later"
         ],
         "authors": [
             {
@@ -217,12 +217,12 @@
     },
     {
         "name": "toolset/toolset-common",
-        "version": "2.5.8",
-        "version_normalized": "2.5.8.0",
+        "version": "2.6.2",
+        "version_normalized": "2.6.2.0",
         "source": {
             "type": "git",
             "url": "ssh://git@git.onthegosystems.com:10022/toolset/toolset-common.git",
-            "reference": "afd2128b775ac8942402ea6c3ab0bbeb85e0dc0b"
+            "reference": "f8084f2b13708b5589842bb8b1ab6a4c77a8e9ac"
         },
         "require": {
             "php": ">=5.2.0"
@@ -233,7 +233,7 @@
             "otgs/unit-tests-framework": "~1.2.0",
             "phpunit/php-token-stream": "<2.0"
         },
-        "time": "2017-12-07T11:25:32+00:00",
+        "time": "2018-03-01T14:00:14+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -248,9 +248,15 @@
                 "expression-parser/",
                 "inc/",
                 "toolset-forms/",
+                "toolset-blocks/",
                 "user-editors/",
                 "utility/",
                 "bootstrap.php"
+            ]
+        },
+        "autoload-dev": {
+            "classmap": [
+                "tests/res/stubs"
             ]
         },
         "scripts": {
