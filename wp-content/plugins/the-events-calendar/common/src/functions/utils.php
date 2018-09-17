@@ -158,31 +158,6 @@ if ( ! function_exists( 'tribe_get_request_var' ) ) {
 	}
 }
 
-if ( ! function_exists( 'tribe_get_global_query_object' ) ) {
-	/**
-	 * Grabs the $wp_query global in a safe way with some fallbacks that help prevent fatal errors
-	 * on sites where themes or other plugins directly manipulate the $wp_query global.
-	 *
-	 * @since 4.7.8
-	 *
-	 * @return object The $wp_query, the $wp_the_query if $wp_query empty, null otherwise.
-	 */
-	function tribe_get_global_query_object() {
-		global $wp_query;
-		global $wp_the_query;
-
-		if ( ! empty( $wp_query ) ) {
-			return $wp_query;
-		}
-
-		if ( ! empty( $wp_the_query ) ) {
-			return $wp_the_query;
-		}
-
-		return null;
-	}
-}
-
 if ( ! function_exists( 'tribe_is_truthy' ) ) {
 	/**
 	 * Determines if the provided value should be regarded as 'true'.
@@ -229,32 +204,6 @@ if ( ! function_exists( 'tribe_is_truthy' ) ) {
 		// For other types (ints, floats etc) cast to bool
 		return (bool) $var;
 	}
-}
-
-/**
- * Sorting function based on Priority
- *
- * @since  4.7.20
- *
- * @param  object|array  $a  First Subject to compare
- * @param  object|array  $b  Second subject to compare
- *
- * @return int
- */
-function tribe_sort_by_priority( $a, $b ) {
-	if ( is_array( $a ) ) {
-		$a_priority = $a['priority'];
-	} else {
-		$a_priority = $a->priority;
-	}
-
-	if ( is_array( $b ) ) {
-		$b_priority = $b['priority'];
-	} else {
-		$b_priority = $b->priority;
-	}
-
-	return (int) $a_priority === (int) $b_priority ? 0 : (int) $a_priority > (int) $b_priority;
 }
 
 if ( ! function_exists( 'tribe_normalize_terms_list' ) ) {
@@ -450,39 +399,5 @@ if ( ! function_exists( 'tribe_post_exists' ) ) {
 		$found    = $wpdb->get_var( $prepared );
 
 		return ! empty( $found ) ? (int) $found : false;
-	}
-}
-
-if ( ! function_exists( 'tribe_post_excerpt' ) ) {
-	/**
-	 * Wrapper function for `tribe_events_get_the_excerpt` to prevent access the function when is not present on the
-	 * current site installation.
-	 *
-	 * @param $post
-	 *
-	 * @return null|string
-	 */
-	function tribe_post_excerpt( $post ) {
-		if ( function_exists( 'tribe_events_get_the_excerpt' ) ) {
-			return tribe_events_get_the_excerpt( $post );
-		}
-
-		if ( ! is_numeric( $post ) && ! $post instanceof WP_Post ) {
-			$post = get_the_ID();
-		}
-
-		if ( is_numeric( $post ) ) {
-			$post = WP_Post::get_instance( $post );
-		}
-
-		if ( ! $post instanceof WP_Post ) {
-			return null;
-		}
-
-		$excerpt = has_excerpt( $post->ID )
-			? $post->post_excerpt
-			: wp_trim_words( $post->post_content );
-
-		return wpautop( $excerpt );
 	}
 }

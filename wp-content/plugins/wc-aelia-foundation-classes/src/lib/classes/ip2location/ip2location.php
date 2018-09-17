@@ -352,29 +352,16 @@ class IP2Location extends Base_Class {
 	 * @return string
 	 */
 	public function get_visitor_ip_address() {
-		// Parse the proxy headers that might contain the real IP address
-		// @since 
-		foreach(array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR') as $header_key) {
-			if(!empty($_SERVER[$header_key])) {
-				// Store the original value, so that we can pass it to a filter
-				$forwarded_for = $_SERVER[$header_key];
+		$forwarded_for = isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : $_SERVER['REMOTE_ADDR'];
 
-				// Reverse proxy headers may contain multiple addresses, separated by a
-				// comma. The first valid one is the real client, followed by intermediate
-				// proxy servers
-				foreach(explode(',', $forwarded_for) as $ip_address) {
-					$ip_address = trim($ip_address);
-					// Take the first valid IP address and return it
-					if(filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
-						return apply_filters('wc_aelia_visitor_ip', $ip_address, $forwarded_for);
-					}
-				}
-			}
-		}
+		// Field HTTP_X_FORWARDED_FOR may contain multiple addresses, separated by a
+		// comma. The first one is the real client, followed by intermediate proxy
+		// servers
+		$ip_addresses = explode(',', $forwarded_for);
+		$visitor_ip = trim(array_shift($ip_addresses));
 
-		// As a fallback, return an empty string, to indicate that it was not possible
-		// to fetch the IP address
-		return '';
+		$visitor_ip = apply_filters('wc_aelia_visitor_ip', $visitor_ip, $forwarded_for);
+		return $visitor_ip;
 	}
 
 	/**

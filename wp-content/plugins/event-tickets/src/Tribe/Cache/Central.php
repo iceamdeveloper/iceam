@@ -73,9 +73,6 @@ class Tribe__Tickets__Cache__Central {
 		 * Reset the caches when a post is deleted.
 		 */
 		add_action( 'delete_post', array( $this->cache, 'reset_all' ) );
-
-		add_action( 'trash_post', array( $this->cache, 'reset_all' ) );
-		add_action( 'untrashed_post', array( $this->cache, 'reset_all' ) );
 	}
 
 	/**

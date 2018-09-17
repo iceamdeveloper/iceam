@@ -30,33 +30,6 @@
                 <?php settings_fields('mailgun'); ?>
                 <h3><?php _e('Configuration', 'mailgun'); ?></h3>
                 <table class="form-table">
-					<tr valign="top">
-						<th scope="row">
-			                <?php
-				                $config_region = (defined('MAILGUN_REGION') && MAILGUN_REGION);
-				                if ($config_region):
-					                _e('Your Region is', 'mailgun');
-				                else:
-					                _e('Select Your Region', 'mailgun');
-				                endif;
-			                ?>
-						</th>
-						<td>
-			                <?php
-				                if ($config_region):
-					                $region = (MAILGUN_REGION === 'us') ? __('U.S./North America', 'mailgun') : __('Europe', 'mailgun');
-					                ?>
-									<input readonly="readonly" id="mailgun-region" type="text" name="mailgun[region]" value="<?php echo $region ?>">
-									<p class="description"><?php _e('You have set the region in your wp-config.php file. Email will be sent from this region, and your customer data will be stored in this region.', 'mailgun') ?></p>
-				                <?php else: ?>
-									<select id="mailgun-region" name="mailgun[region]">
-										<option value="us"<?php selected('us', $this->get_option('region')); ?>><?php _e('U.S./North America', 'mailgun') ?></option>
-										<option value="eu"<?php selected('eu', $this->get_option('region')); ?>><?php _e('Europe', 'mailgun') ?></option>
-									</select>
-									<p class="description"><?php _e('Choose a region - U.S./North America or Europe - from which to send email, and to store your customer data. Please note that your sending domain must be set up in whichever region you choose.', 'mailgun') ?></p>
-				                <?php endif; ?>
-						</td>
-					</tr>
                     <tr valign="top">
                         <th scope="row">
                             <?php _e('Use HTTP API', 'mailgun'); ?>
@@ -84,7 +57,7 @@
                         </th>
                         <td>
                             <input type="text" class="regular-text" name="mailgun[apiKey]" value="<?php esc_attr_e($this->get_option('apiKey')); ?>" placeholder="key-3ax6xnjp29jd6fds4gc373sgvjxteol0" />
-                            <p class="description"><?php _e('Your Mailgun API key. Only valid for use with the API.', 'mailgun'); ?></p>
+                            <p class="description"><?php _e('Your Mailgun API key, that starts with and includes "key-". Only valid for use with the API.', 'mailgun'); ?></p>
                         </td>
                     </tr>
                     <tr valign="top" class="mailgun-smtp">
@@ -115,18 +88,6 @@
                                 <option value="0"<?php selected('0', $this->get_option('secure')); ?>><?php _e('No', 'mailgun'); ?></option>
                             </select>
                             <p class="description"><?php _e('Set this to "No" if your server cannot establish SSL SMTP connections or if emails are not being delivered. If you set this to "No" your password will be sent in plain text. Only valid for use with SMTP. Default "Yes".', 'mailgun'); ?></p>
-                        </td>
-                    </tr>
-                    <tr valign="top" class="mailgun-smtp">
-                        <th scope="row">
-                            <?php _e('Security Type', 'mailgun'); ?>
-                        </th>
-                        <td>
-                            <select name="mailgun[sectype]">
-                                <option value="ssl"<?php selected('ssl', $this->get_option('sectype')); ?>>SSL</option>
-                                <option value="tls"<?php selected('tls', $this->get_option('sectype')); ?>>TLS</option>
-                            </select>
-                            <p class="description"><php _e('Leave this at "TLS" unless mail sending fails. This option only matters for Secure SMTP. Default "TLS".', 'mailgun'); ?></p>
                         </td>
                     </tr>
                     <tr valign="top">

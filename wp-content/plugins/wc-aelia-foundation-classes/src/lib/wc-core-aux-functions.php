@@ -298,26 +298,3 @@ if(!function_exists('aelia_wp_version_is')) {
 		return version_compare($wp_version, $version, $comparison_operator);
 	}
 }
-
-if(!function_exists('aelia_date_to_string')) {
-	/**
-	 * Converts a timestamp, or a date object, to the specified format.
-	 *
-	 * @param int|WC_Datetime date The date to convert.
-	 * @param string format The target format.
-	 * @return string The date as a string in YMD format.
-	 * @since 1.9.19.180713
-	 */
-	function aelia_date_to_string($date, $format = 'Ymd') {
-		if(empty($date)) {
-			return '';
-		}
-
-		if(is_object($date) && ($date instanceof \WC_DateTime)) {
-			return $date->format($format);
-		}
-		return date($format, $date);
-	}
-}
-
-

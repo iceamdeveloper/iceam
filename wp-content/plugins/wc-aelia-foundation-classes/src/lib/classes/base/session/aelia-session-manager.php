@@ -53,17 +53,6 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		public static function set_value($key, $value) {
 			$woocommerce = self::wc();
 
-			// Allow to change both the key and the value before setting the data
-			// against the session
-			// @since 1.9.12.180104
-			$key = apply_filters('wc_aelia_afc_session_set_value_key', $key, $value);
-			$value = apply_filters('wc_aelia_afc_session_set_value', $value, $key);
-
-			// Don't set values if the key is empty
-			if(empty($key)) {
-				return;
-			}
-
 			// WooCommerce 2.1
 			if(version_compare($woocommerce->version, '2.1', '>=')) {
 				if(isset($woocommerce->session)) {
@@ -115,11 +104,7 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 				self::delete_value($key);
 			}
 
-			$result = empty($result) ? $default : $result;
-
-			// Allow to change both the value before returning it
-			// @since 1.9.12.180104
-			return apply_filters('wc_aelia_afc_session_get_value', $result, $key, $default, $remove_after_get);
+			return empty($result) ? $default : $result;
 		}
 
 		/**
@@ -130,10 +115,6 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		 */
 		public static function delete_value($key) {
 			$woocommerce = self::wc();
-
-			// Allow to change the key before deleting the value
-			// @since 1.9.12.180104
-			$key = apply_filters('wc_aelia_afc_session_delete_value_key', $key);
 
 			// WooCommerce 2.1
 			if(version_compare($woocommerce->version, '2.1', '>=')) {
@@ -163,30 +144,10 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		 * @since 1.5.11.150507
 		 */
 		public static function set_cookie($name, $value, $expire = 0, $secure = false) {
-			// Allow to change the cookie before setting it
-			// @since 1.9.12.180104
-			$cookie_data = apply_filters('wc_aelia_afc_session_set_cookie', array(
-				'name' => $name,
-				'value' => $value,
-				'expire' => $expire,
-				'secure' => $secure,
-				'cookie_path' => COOKIEPATH,
-				'cookie_domain' => COOKIE_DOMAIN,
-			));
-
 			if(!headers_sent()) {
-				// Check that the cookie data is valid, before setting the cookie
-				//// @since 1.9.18.180319
-				if(!empty($cookie_data) && is_array($cookie_data)) {
-					setcookie($cookie_data['name'],
-										$cookie_data['value'],
-										$cookie_data['expire'],
-										$cookie_data['cookie_path'],
-										$cookie_data['cookie_domain'],
-										$cookie_data['secure']);
-					// Overwrite the cookie in the global variable, so that it can be accessed immediately
-					$_COOKIE[$cookie_data['name']] = $cookie_data['value'];
-				}
+				setcookie($name, $value, $expire, COOKIEPATH, COOKIE_DOMAIN, $secure);
+				// Overwrite the cookie in the global variable, so that it can be accessed immediately
+				$_COOKIE[$name] = $value;
 			}
 			elseif(defined('WP_DEBUG') && WP_DEBUG) {
 				headers_sent($file, $line);
@@ -203,11 +164,7 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		 * @since 1.5.11.150507
 		 */
 		public static function get_cookie($name, $default = null) {
-			// Allow to change the cookie name before fetching it
-			// @since 1.9.12.180104
-			$value = isset($_COOKIE[$name]) ? $_COOKIE[$name] : $default;
-
-			return apply_filters('wc_aelia_afc_session_get_cookie', $value, $name, $default);
+			return get_value($name, $_COOKIE, $default);
 		}
 	}
 }

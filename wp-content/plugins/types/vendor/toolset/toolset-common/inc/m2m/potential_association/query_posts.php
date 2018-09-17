@@ -34,9 +34,6 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	private $query_factory;
 
 
-	private $element_factory;
-
-
 	/**
 	 * Toolset_Potential_Association_Query constructor.
 	 *
@@ -50,15 +47,13 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	 *     - page: int
 	 *     - wp_query_override: array
 	 * @param Toolset_Relationship_Query_Factory|null $query_factory_di
-	 * @param Toolset_Element_Factory|null $element_factory_di
 	 */
 	public function __construct(
 		IToolset_Relationship_Definition $relationship,
 		IToolset_Relationship_Role_Parent_Child $target_role,
 		IToolset_Element $for_element,
 		$args,
-		Toolset_Relationship_Query_Factory $query_factory_di = null,
-		Toolset_Element_Factory $element_factory_di = null
+		Toolset_Relationship_Query_Factory $query_factory_di = null
 	) {
 		$this->relationship = $relationship;
 		$this->for_element = $for_element;
@@ -70,13 +65,11 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 		}
 
 		$this->query_factory = ( null === $query_factory_di ? new Toolset_Relationship_Query_Factory() : $query_factory_di );
-		$this->element_factory = ( null === $element_factory_di ? new Toolset_Element_Factory() : $element_factory_di );
 	}
 
 
 	/**
 	 * @return IToolset_Post[]
-	 * @throws Toolset_Element_Exception_Element_Doesnt_Exist
 	 */
 	public function get_results() {
 
@@ -117,7 +110,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 		$augment_query_for_distinct_relationships = $this->query_factory->distinct_relationship_posts(
 			$this->relationship,
 			$this->target_role,
-			$this->for_element
+			$this->for_element->get_id()
 		);
 
 		$augment_query_for_distinct_relationships->before_query();
@@ -171,12 +164,14 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	 * @param WP_Post[] $wp_posts
 	 *
 	 * @return IToolset_Post[]
-	 * @throws Toolset_Element_Exception_Element_Doesnt_Exist
 	 */
 	private function transform_results( $wp_posts ) {
 		$results = array();
 		foreach( $wp_posts as $wp_post ) {
-			$results[] = $this->element_factory->get_post( $wp_post );
+			$results[] = Toolset_Element::get_instance(
+				Toolset_Field_Utils::DOMAIN_POSTS,
+				$wp_post
+			);
 		}
 
 		return $results;
@@ -200,22 +195,16 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	 * The relationship, target role and the other element are those provided in the constructor.
 	 *
 	 * @param IToolset_Element $association_candidate Element that wants to be associated.
-	 * @param bool $check_is_already_associated Perform the check that the element is already associated for distinct
-	 *     relationships. Default is true. Set to false only if the check was performed manually before.
-	 *
 	 * @return Toolset_Result Result with an user-friendly message in case the association is denied.
 	 * @since 2.5.6
 	 */
-	public function check_single_element( IToolset_Element $association_candidate, $check_is_already_associated = true ) {
+	public function check_single_element( IToolset_Element $association_candidate ) {
 
 		if( ! $this->relationship->get_element_type( $this->target_role )->is_match( $association_candidate ) ) {
 			return new Toolset_Result( false, __( 'The element has a wrong type or a domain for this relationship.', 'wpcf' ) );
 		}
 
-		if( $check_is_already_associated
-			&& $this->relationship->is_distinct()
-			&& $this->is_element_already_associated( $association_candidate )
-		) {
+		if( $this->relationship->is_distinct() && $this->is_element_already_associated( $association_candidate ) ) {
 			return new Toolset_Result( false,
 				__( 'These two elements are already associated and the relationship doesn\'t allow non-distinct associations.', 'wpcf' )
 			);
@@ -270,32 +259,21 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	}
 
 
-	/**
-	 * @inheritdoc
-	 *
-	 * @param IToolset_Element $element
-	 *
-	 * @return bool
-	 */
-	public function is_element_already_associated( IToolset_Element $element ) {
+	private function is_element_already_associated( IToolset_Element $element ) {
 
 		/** @var IToolset_Element[] $parent_and_child */
 		$parent_and_child = Toolset_Relationship_Role::sort_elements( $element, $this->for_element, $this->target_role );
 
-		$query = $this->query_factory->associations_v2();
+		$query = $this->query_factory->associations( array(
+			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $this->relationship->get_slug(),
+			Toolset_Association_Query::QUERY_PARENT_ID => $parent_and_child[0]->get_id(),
+			Toolset_Association_Query::QUERY_CHILD_ID => $parent_and_child[1]->get_id(),
+			Toolset_Association_Query::QUERY_LIMIT => 1,
+		) );
 
-		$query->add( $query->relationship( $this->relationship ) )
-			->add( $query->parent( $parent_and_child[0] ) )
-			->add( $query->child( $parent_and_child[1] ) )
-			->do_not_add_default_conditions() // include all existing associations
-			->limit( 1 ) // because we're not interested in the actual resuls
-			->need_found_rows()
-			->return_association_uids() // ditto
-			->get_results();
+		$results = $query->get_results();
 
-		$result_count = $query->get_found_rows();
-
-		return ( $result_count > 0 );
+		return ( count( $results ) > 0 );
 	}
 
 
@@ -329,19 +307,20 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	private function get_number_of_already_associated_elements(
 		IToolset_Relationship_Role_Parent_Child $role, IToolset_Element $element
 	) {
-		$query = $this->query_factory->associations_v2();
-		$query
-			->add( $query->relationship_slug( $this->relationship->get_slug() ) )
-			->add( $query->element( $element, $role ) )
-			->do_not_add_default_conditions() // include all existing associations
-			->need_found_rows()
-			->limit( 1 ) // because we're not interested in the actual resuls
-			->return_association_uids() // ditto
-			->get_results();
+		$for_element_role_query = (
+			$role instanceof Toolset_Relationship_Role_Parent
+				? Toolset_Association_Query::QUERY_PARENT_ID
+				: Toolset_Association_Query::QUERY_CHILD_ID
+		);
 
-		$row_count = $query->get_found_rows();
+		$query = $this->query_factory->associations( array(
+			Toolset_Association_Query::QUERY_RELATIONSHIP_SLUG => $this->relationship->get_slug(),
+			$for_element_role_query => $element->get_id()
+		) );
 
-		return $row_count;
+		$results = $query->get_results();
+
+		return count( $results );
 	}
 
 	/**

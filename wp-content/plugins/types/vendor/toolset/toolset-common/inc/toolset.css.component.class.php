@@ -305,8 +305,7 @@ if ( ! class_exists( 'Toolset_CssComponent' ) ) {
                 'dd_layouts_edit',
                 'views-editor',
                 'ct-editor',
-                'view-archives-editor',
-				'cred_association_form'
+                'view-archives-editor'
             );
 
 

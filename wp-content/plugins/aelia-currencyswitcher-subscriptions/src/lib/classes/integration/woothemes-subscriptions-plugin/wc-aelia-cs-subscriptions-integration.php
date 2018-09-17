@@ -410,20 +410,15 @@ class Subscriptions_Integration {
 		// Fix checkout currency during renewals
 		// NOTE: as of 15/12/2015 this patch should no longer be needed.
 		//add_filter('woocommerce_order_again_cart_item_data', array($this, 'woocommerce_order_again_cart_item_data'), 10, 3);
-		//add_filter('woocommerce_checkout_init', array($this, 'maybe_override_currency'), 50);
+		//add_filter('woocommerce_checkout_init', array($this, 'maybe_override_currency'), 10);
 
 		// Handle manual creation of subscription
 		// @since 1.3.8.171004
 		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 5, 2);
 		// Currency selector on the Edit Subscription page
 		// @since 1.3.8.171004
-		add_filter('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
+		add_action('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
 		add_action('add_meta_boxes', array($this, 'add_meta_boxes'));
-
-		// Load the Edit Order scripts on the Edit Subscription page, to ensure that
-		// product prices are loaded in the correct order currency
-		// @since 1.3.11.180222
-		add_filter('wc_aelia_cs_load_order_edit_scripts', array($this, 'wc_aelia_cs_load_order_edit_scripts'), 10, 2);
 	}
 
 	/**
@@ -661,14 +656,7 @@ class Subscriptions_Integration {
 			if($this->product_requires_conversion($product, $selected_currency)) {
 				$product = $this->convert_product_prices($product, $selected_currency);
 			}
-
-			// Check that the sign up fee is numeric, before returning it. This is to
-			// prevent warnings being raised by the Subscriptions plugin, which takes
-			// fees "blindly"
-			// @since 1.3.10.180218
-			if(is_numeric($product->subscription_sign_up_fee)) {
-				$subscription_sign_up_fee =  (float)$product->subscription_sign_up_fee;
-			}
+			$subscription_sign_up_fee = $product->subscription_sign_up_fee;
 		}
 
 		return $subscription_sign_up_fee;
@@ -912,18 +900,13 @@ class Subscriptions_Integration {
 	 * @since 1.3.8.171004
 	 */
 	public function woocommerce_process_shop_order_meta($post_id, $post) {
-		if($post->post_type != 'shop_subscription') {
-			return;
-		}
-
 		// Set the currency on manually created orders when their first draft is saved.
 		// This is done to prevent WooCommerce from returning shop's base currency
 		// when WC_Order::get_currency() is called. See old code below, for reference
 		// @since 4.5.1.171012
 		$order = wc_get_order($post_id);
-
-		if($order->has_status(array('draft', 'auto-draft', 'pending')) && !empty($_POST['aelia_cs_currency'])) {
-			add_filter('woocommerce_currency', array($this->currency_switcher(), 'woocommerce_currency'), 50);
+		if(in_array($order->get_status(), array('draft', 'auto-draft'))) {
+			add_filter('woocommerce_currency', array($this->currency_switcher(), 'woocommerce_currency'), 5);
 		}
 
 		// Only set the currency if the order doesn't have one set against it.
@@ -1061,23 +1044,5 @@ class Subscriptions_Integration {
 	protected function displayed_order_currency() {
 		global $post;
 		return $this->currency_switcher()->get_order_currency($post->ID);
-	}
-
-	/**
-	 * Ensure that the JavaScript for the Edit Order page are also loaded on the
-	 * Add/Edit Subscription page.
-	 *
-	 * @param bool should_load_scripts
-	 * @param object post
-	 * @return bool
-	 * @since 1.3.11.180222
-	 */
-	public function wc_aelia_cs_load_order_edit_scripts($should_load_scripts, $post) {
-		if(!$should_load_scripts) {
-			$post_type = is_object($post) ? $post->post_type : null;
-			$should_load_scripts = ($post_type === 'shop_subscription');
-		}
-
-		return $should_load_scripts;
 	}
 }

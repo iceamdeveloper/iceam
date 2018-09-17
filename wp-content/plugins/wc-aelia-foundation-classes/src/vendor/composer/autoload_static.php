@@ -4,12 +4,8 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
+class ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f
 {
-    public static $files = array (
-        '89ff252b349d4d088742a09c25f5dd74' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php',
-    );
-
     public static $prefixLengthsPsr4 = array (
         'P' => 
         array (
@@ -18,9 +14,8 @@ class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
         'M' => 
         array (
             'Monolog\\' => 8,
-            'MaxMind\\WebService\\' => 19,
-            'MaxMind\\Exception\\' => 18,
             'MaxMind\\Db\\' => 11,
+            'MaxMind\\' => 8,
         ),
         'G' => 
         array (
@@ -41,17 +36,13 @@ class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
         array (
             0 => __DIR__ . '/..' . '/monolog/monolog/src/Monolog',
         ),
-        'MaxMind\\WebService\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src/WebService',
-        ),
-        'MaxMind\\Exception\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src/Exception',
-        ),
         'MaxMind\\Db\\' => 
         array (
             0 => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db',
+        ),
+        'MaxMind\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind/web-service-common/src',
         ),
         'GeoIp2\\' => 
         array (
@@ -74,8 +65,6 @@ class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
     );
 
     public static $classMap = array (
-        'Aelia\\WC\\AFC\\Messages' => __DIR__ . '/../..' . '/lib/classes/messages/messages.php',
-        'Aelia\\WC\\AFC\\Settings' => __DIR__ . '/../..' . '/lib/classes/settings/settings.php',
         'Aelia\\WC\\Admin_Message' => __DIR__ . '/../..' . '/lib/classes/base/messages/admin_message.php',
         'Aelia\\WC\\AeliaSimpleXMLElement' => __DIR__ . '/../..' . '/lib/classes/base/xml/aelia-simplexmlelement.php',
         'Aelia\\WC\\Aelia_Install' => __DIR__ . '/../..' . '/lib/classes/base/install/install.php',
@@ -85,7 +74,6 @@ class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
         'Aelia\\WC\\Base_Class' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/aelia-base-class.php',
         'Aelia\\WC\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
         'Aelia\\WC\\ExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
-        'Aelia\\WC\\Free_Plugin_Dev_Version_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/free-plugin-dev-version-updater.php',
         'Aelia\\WC\\Free_Plugin_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/free-plugin-updater.php',
         'Aelia\\WC\\IAelia_Plugin' => __DIR__ . '/../..' . '/lib/classes/base/plugin/aelia-plugin.php',
         'Aelia\\WC\\IExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
@@ -105,6 +93,7 @@ class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
         'Aelia_WC_AFC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-requirementscheck.php',
         'Aelia_WC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-requirementscheck.php',
         'Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
+        'GeoIp2\\Compat\\JsonSerializable' => __DIR__ . '/..' . '/geoip2/geoip2/src/Compat/JsonSerializable.php',
         'GeoIp2\\Database\\Reader' => __DIR__ . '/..' . '/geoip2/geoip2/src/Database/Reader.php',
         'GeoIp2\\Exception\\AddressNotFoundException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AddressNotFoundException.php',
         'GeoIp2\\Exception\\AuthenticationException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AuthenticationException.php',
@@ -270,10 +259,10 @@ class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit4c0fa9434d3d4ce5a3553c4592c44f1f::$classMap;
 
         }, null, ClassLoader::class);
     }

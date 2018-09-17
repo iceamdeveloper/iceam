@@ -1,5 +1,4 @@
 <?php
-
 if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 	/**
 	 *    Generic object to hold information about a single ticket
@@ -167,16 +166,6 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 		protected $qty_cancelled = 0;
 
 		/**
-		 * Number of tickets for which an order has been refunded.
-		 * Use $this->$qty_refunded( value ) to set manage and get the value
-		 *
-		 * @since 4.7.3
-		 *
-		 * @var int
-		 */
-		protected $qty_refunded = 0;
-
-		/**
 		 * Holds whether or not stock is being managed
 		 *
 		 * @var boolean
@@ -218,38 +207,17 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 		 * Purchase limite for the ticket
 		 *
 		 * @var
-		 * @deprecated 4.7.5
 		 */
 		public $purchase_limit;
-
-		/**
-		 * Variable used to save the DateTimeZone object of the parent event
-		 *
-		 * @since 4.7.1
-		 *
-		 * @var null|DateTimeZone
-		 */
-		private $event_timezone = null;
-
-		/**
-		 * ID of the parent event of the current Ticket
-		 *
-		 * @since 4.7.1
-		 *
-		 * @var null|int
-		 */
-		private $event_id = null;
 
 		/**
 		 * Get the ticket's start date
 		 *
 		 * @since 4.2
 		 *
-		 * @param bool $as_timestamp Flag to disable the default behavior and use DateTime object instead.
-		 *
 		 * @return string
 		 */
-		public function start_date( $as_timestamp = true ) {
+		public function start_date() {
 			$start_date = null;
 			if ( ! empty( $this->start_date ) ) {
 				$start_date = $this->start_date;
@@ -258,8 +226,9 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 					$start_date .= ' ' . $this->start_time;
 				}
 
-				$start_date = $this->get_date( $start_date, $as_timestamp );
+				$start_date = strtotime( $start_date );
 			}
+
 			return $start_date;
 		}
 
@@ -268,11 +237,9 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 		 *
 		 * @since 4.2
 		 *
-		 * @param bool $as_timestamp Flag to disable the default behavior and use DateTime object instead.
-		 *
 		 * @return string
 		 */
-		public function end_date( $as_timestamp = true ) {
+		public function end_date() {
 			$end_date = null;
 
 			if ( ! empty( $this->end_date ) ) {
@@ -282,7 +249,7 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 					$end_date .= ' ' . $this->end_time;
 				}
 
-				$end_date = $this->get_date( $end_date, $as_timestamp );
+				$end_date = strtotime( $end_date );
 			}
 
 			return $end_date;
@@ -295,103 +262,17 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 		 *
 		 * @return boolean Whether or not the provided date/time falls within the start/end date range
 		 */
-		public function date_in_range( $datetime = 'now' ) {
-			$timestamp = is_numeric( $datetime ) ? $datetime : strtotime( $datetime );
-			// Attempt to convert the timestamp to a Date object.
-			try {
-				$timezone = $this->get_event_timezone();
-				if ( 'now' === $datetime ) {
-					$now = new DateTime( 'now', $timezone  );
-				} else {
-					$now = new DateTime( '@' . $timestamp );
-					if ( $timezone instanceof DateTimeZone ) {
-						$now->setTimezone( $timezone );
-					}
-				}
-			} catch ( Exception $exception ) {
-				return false;
+		public function date_in_range( $datetime ) {
+			if ( is_numeric( $datetime ) ) {
+				$timestamp = $datetime;
+			} else {
+				$timestamp = strtotime( $datetime );
 			}
 
-			$start = $this->start_date( false );
-			$end   = $this->end_date( false );
+			$start_date = $this->start_date();
+			$end_date   = $this->end_date();
 
-			if ( ! $start instanceof DateTime || ! $end instanceof DateTime || ! $now instanceof DateTime ) {
-				$now   = $timestamp;
-				$start = $this->start_date();
-				$end   = $this->end_date();
-			}
-
-			// Bail if we don't have an end date and the event has passed
-			// Check if the event has passed in case we're using TEC
-			$is_past_event = function_exists( 'tribe_is_past_event' )
-				? tribe_is_past_event( tribe_events_get_event( $this->event_id ) )
-				: false;
-
-			if ( empty( $end ) && $is_past_event ) {
-				return false;
-			}
-
-			return ( empty( $start ) || $now >= $start ) && ( empty( $end ) || $now <= $end );
-		}
-
-
-		/**
-		 * Get a DateTime object or a Timestamp date representation of the object, if the DateTime object is used
-		 * the timezone from the event associated with the ticket is going to be used to have a more accurate
-		 * timestamp
-		 *
-		 * @since 4.7.1
-		 *
-		 * @param string $date
-		 * @param bool $as_timestamp
-		 *
-		 * @return DateTime|false|int
-		 */
-		public function get_date( $date = '', $as_timestamp = true ) {
-
-			if ( $as_timestamp ) {
-				return strtotime( $date );
-			}
-
-			try {
-				$timezone = $this->get_event_timezone();
-				return new DateTime( $date, $timezone );
-			} catch ( Exception $exception ) {
-				return strtotime( $date );
-			}
-		}
-
-
-		/**
-		 * Return a DateTimeZone associated with the parent Event of the current ticket
-		 *
-		 * @since 4.7.1
-		 *
-		 * @return DateTimeZone|null
-		 */
-		public function get_event_timezone() {
-
-			if (
-				class_exists( 'Tribe__Events__Timezones' )
-				&& ! is_null( $this->get_event_id() )
-				&& is_null( $this->event_timezone )
-			) {
-				try {
-					$this->event_timezone = new DateTimeZone( Tribe__Events__Timezones::get_event_timezone_string( $this->get_event_id() ) );
-				} catch ( Exception $exception ) {
-					$this->event_timezone = null;
-				}
-			}
-
-			if ( null === $this->event_timezone ) {
-				$wp_timezone = Tribe__Timezones::wp_timezone_string();
-				if ( Tribe__Timezones::is_utc_offset( $wp_timezone ) ) {
-					$wp_timezone = Tribe__Timezones::generate_timezone_string_from_utc_offset( $wp_timezone );
-				}
-				$this->event_timezone = new DateTimeZone( $wp_timezone );
-			}
-
-			return $this->event_timezone;
+			return ( empty( $start_date ) || $timestamp > $start_date ) && ( empty( $end_date ) || $timestamp < $end_date );
 		}
 
 		/**
@@ -491,11 +372,9 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 				return true;
 			}
 
-			$remaining = $this->inventory();
+			$remaining = $this->remaining();
 
-			$is_unlimited = $remaining === - 1;
-
-			return false === $remaining || $remaining > 0 || $is_unlimited;
+			return false === $remaining || $remaining > 0;
 		}
 
 		/**
@@ -552,11 +431,6 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 			foreach ( $attendees as $attendee ) {
 				// Prevent RSVP with Not Going Status to decrease Inventory
 				if ( 'rsvp' === $attendee['provider_slug'] && 'no' === $attendee['order_status'] ) {
-					continue;
-				}
-
-				// allow providers to decide if an attendee will count toward inventory decrease or not
-				if ( ! $this->provider->attendee_decreases_inventory( $attendee ) ) {
 					continue;
 				}
 
@@ -626,6 +500,8 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 				return -1;
 			}
 
+			$stock_mode = $this->global_stock_mode();
+
 			$values[] = $this->inventory();
 			$values[] = $this->capacity();
 			$values[] = $this->stock();
@@ -645,10 +521,6 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 		 * @return  int
 		 */
 		public function capacity() {
-			if ( ! $this->managing_stock() ) {
-				return '';
-			}
-
 			if ( is_null( $this->capacity ) ) {
 				$this->capacity = tribe_tickets_get_capacity( $this->ID );
 			}
@@ -834,9 +706,6 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 				case 'qty_sold':
 					return $this->qty_sold();
 					break;
-				case 'qty_refunded':
-					return $this->qty_refunded();
-					break;
 				case 'qty_cancelled':
 					return $this->qty_cancelled();
 					break;
@@ -861,9 +730,6 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 					break;
 				case 'qty_sold':
 					return $this->qty_sold( $value );
-					break;
-				case 'qty_refunded':
-					return $this->qty_refunded( $value );
 					break;
 				case 'qty_cancelled':
 					return $this->qty_cancelled( $value );
@@ -891,28 +757,6 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 
 			// return the new Qty Cancelled
 			return $this->qty_cancelled;
-		}
-
-		/**
-		 * Method to manage the protected `qty_refunded` property of the Object
-		 * Prevents setting `qty_refunded` lower then zero
-		 *
-		 * @since 4.7.3
-		 *
-		 * @param int|null $value This will overwrite the old value
-		 * @return int
-		 */
-		public function qty_refunded(  $value = null ) {
-			// If the Value was passed as numeric value overwrite
-			if ( is_numeric( $value ) ) {
-				$this->qty_refunded = $value;
-			}
-
-			// Prevents qty_refunded from going negative
-			$this->qty_refunded = max( (int) $this->qty_refunded, 0 );
-
-			// return the new Qty Refunded
-			return $this->qty_refunded;
 		}
 
 		/**
@@ -980,23 +824,5 @@ if ( ! class_exists( 'Tribe__Tickets__Ticket_Object' ) ) {
 			// Make sure we have the correct value
 			return tribe_is_truthy( $show );
 		}
-
-		/**
-		 * Access the ID of the Event parent of the current Ticket.
-		 *
-		 * @since 4.7.1
-		 *
-		 * @return int|null
-		 */
-		public function get_event_id() {
-			if ( is_null( $this->event_id ) ) {
-				$event = $this->get_event();
-				if ( $event instanceof WP_Post ) {
-					$this->event_id = $event->ID;
-				}
-			}
-			return $this->event_id;
-		}
 	}
-
 }

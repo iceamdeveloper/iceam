@@ -2,6 +2,8 @@
 namespace Aelia\WC;
 if(!defined('ABSPATH')) exit; // Exit if accessed directly
 
+use \Aelia\WC\Messages;
+
 /**
  * Aelia Foundation Classes for WooCommerce.
  **/
@@ -46,7 +48,7 @@ class WC_AeliaFoundationClasses_Install extends Aelia_Install {
 					`message_id` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
 					`date_updated` datetime DEFAULT NULL,
 					PRIMARY KEY (`user_id`, `message_id`)
-				) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+				) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
 			";
 			$result = $this->exec($SQL);
 

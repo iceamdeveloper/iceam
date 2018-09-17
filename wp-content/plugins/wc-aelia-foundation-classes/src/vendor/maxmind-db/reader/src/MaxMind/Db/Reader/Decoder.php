@@ -2,15 +2,19 @@
 
 namespace MaxMind\Db\Reader;
 
+use MaxMind\Db\Reader\InvalidDatabaseException;
+use MaxMind\Db\Reader\Util;
+
 class Decoder
 {
+
     private $fileStream;
     private $pointerBase;
     // This is only used for unit testing
     private $pointerTestHack;
     private $switchByteOrder;
 
-    private $types = [
+    private $types = array(
         0 => 'extended',
         1 => 'pointer',
         2 => 'utf8_string',
@@ -27,7 +31,7 @@ class Decoder
         13 => 'end_marker',
         14 => 'boolean',
         15 => 'float',
-    ];
+    );
 
     public function __construct(
         $fileStream,
@@ -40,6 +44,7 @@ class Decoder
 
         $this->switchByteOrder = $this->isPlatformLittleEndian();
     }
+
 
     public function decode($offset)
     {
@@ -54,20 +59,20 @@ class Decoder
         // Pointers are a special case, we don't read the next $size bytes, we
         // use the size to determine the length of the pointer and then follow
         // it.
-        if ($type === 'pointer') {
+        if ($type == 'pointer') {
             list($pointer, $offset) = $this->decodePointer($ctrlByte, $offset);
 
             // for unit testing
             if ($this->pointerTestHack) {
-                return [$pointer];
+                return array($pointer);
             }
 
             list($result) = $this->decode($pointer);
 
-            return [$result, $offset];
+            return array($result, $offset);
         }
 
-        if ($type === 'extended') {
+        if ($type == 'extended') {
             list(, $nextByte) = unpack(
                 'C',
                 Util::read($this->fileStream, $offset, 1)
@@ -77,10 +82,10 @@ class Decoder
 
             if ($typeNum < 8) {
                 throw new InvalidDatabaseException(
-                    'Something went horribly wrong in the decoder. An extended type '
-                    . 'resolved to a type number < 8 ('
+                    "Something went horribly wrong in the decoder. An extended type "
+                    . "resolved to a type number < 8 ("
                     . $this->types[$typeNum]
-                    . ')'
+                    . ")"
                 );
             }
 
@@ -101,42 +106,40 @@ class Decoder
             case 'array':
                 return $this->decodeArray($size, $offset);
             case 'boolean':
-                return [$this->decodeBoolean($size), $offset];
+                return array($this->decodeBoolean($size), $offset);
         }
 
         $newOffset = $offset + $size;
         $bytes = Util::read($this->fileStream, $offset, $size);
         switch ($type) {
             case 'utf8_string':
-                return [$this->decodeString($bytes), $newOffset];
+                return array($this->decodeString($bytes), $newOffset);
             case 'double':
                 $this->verifySize(8, $size);
-
-                return [$this->decodeDouble($bytes), $newOffset];
+                return array($this->decodeDouble($bytes), $newOffset);
             case 'float':
                 $this->verifySize(4, $size);
-
-                return [$this->decodeFloat($bytes), $newOffset];
+                return array($this->decodeFloat($bytes), $newOffset);
             case 'bytes':
-                return [$bytes, $newOffset];
+                return array($bytes, $newOffset);
             case 'uint16':
             case 'uint32':
-                return [$this->decodeUint($bytes), $newOffset];
+                return array($this->decodeUint($bytes), $newOffset);
             case 'int32':
-                return [$this->decodeInt32($bytes), $newOffset];
+                return array($this->decodeInt32($bytes), $newOffset);
             case 'uint64':
             case 'uint128':
-                return [$this->decodeBigUint($bytes, $size), $newOffset];
+                return array($this->decodeBigUint($bytes, $size), $newOffset);
             default:
                 throw new InvalidDatabaseException(
-                    'Unknown or unexpected type: ' . $type
+                    "Unknown or unexpected type: " . $type
                 );
         }
     }
 
     private function verifySize($expected, $actual)
     {
-        if ($expected !== $actual) {
+        if ($expected != $actual) {
             throw new InvalidDatabaseException(
                 "The MaxMind DB file's data section contains bad data (unknown data type or corrupt data)"
             );
@@ -145,26 +148,25 @@ class Decoder
 
     private function decodeArray($size, $offset)
     {
-        $array = [];
+        $array = array();
 
         for ($i = 0; $i < $size; $i++) {
             list($value, $offset) = $this->decode($offset);
             array_push($array, $value);
         }
 
-        return [$array, $offset];
+        return array($array, $offset);
     }
 
     private function decodeBoolean($size)
     {
-        return $size === 0 ? false : true;
+        return $size == 0 ? false : true;
     }
 
     private function decodeDouble($bits)
     {
         // XXX - Assumes IEEE 754 double on platform
         list(, $double) = unpack('d', $this->maybeSwitchByteOrder($bits));
-
         return $double;
     }
 
@@ -172,7 +174,6 @@ class Decoder
     {
         // XXX - Assumes IEEE 754 floats on platform
         list(, $float) = unpack('f', $this->maybeSwitchByteOrder($bits));
-
         return $float;
     }
 
@@ -180,13 +181,13 @@ class Decoder
     {
         $bytes = $this->zeroPadLeft($bytes, 4);
         list(, $int) = unpack('l', $this->maybeSwitchByteOrder($bytes));
-
         return $int;
     }
 
     private function decodeMap($size, $offset)
     {
-        $map = [];
+
+        $map = array();
 
         for ($i = 0; $i < $size; $i++) {
             list($key, $offset) = $this->decode($offset);
@@ -194,15 +195,15 @@ class Decoder
             $map[$key] = $value;
         }
 
-        return [$map, $offset];
+        return array($map, $offset);
     }
 
-    private $pointerValueOffset = [
+    private $pointerValueOffset = array(
         1 => 0,
         2 => 2048,
         3 => 526336,
         4 => 0,
-    ];
+    );
 
     private function decodePointer($ctrlByte, $offset)
     {
@@ -211,7 +212,7 @@ class Decoder
         $buffer = Util::read($this->fileStream, $offset, $pointerSize);
         $offset = $offset + $pointerSize;
 
-        $packed = $pointerSize === 4
+        $packed = $pointerSize == 4
             ? $buffer
             : (pack('C', $ctrlByte & 0x7)) . $buffer;
 
@@ -219,13 +220,12 @@ class Decoder
         $pointer = $unpacked + $this->pointerBase
             + $this->pointerValueOffset[$pointerSize];
 
-        return [$pointer, $offset];
+        return array($pointer, $offset);
     }
 
     private function decodeUint($bytes)
     {
         list(, $int) = unpack('N', $this->zeroPadLeft($bytes, 4));
-
         return $int;
     }
 
@@ -233,7 +233,7 @@ class Decoder
     {
         $maxUintBytes = log(PHP_INT_MAX, 2) / 8;
 
-        if ($byteLength === 0) {
+        if ($byteLength == 0) {
             return 0;
         }
 
@@ -261,7 +261,6 @@ class Decoder
                 );
             }
         }
-
         return $integer;
     }
 
@@ -279,16 +278,16 @@ class Decoder
         $bytes = Util::read($this->fileStream, $offset, $bytesToRead);
         $decoded = $this->decodeUint($bytes);
 
-        if ($size === 29) {
+        if ($size == 29) {
             $size = 29 + $decoded;
-        } elseif ($size === 30) {
+        } elseif ($size == 30) {
             $size = 285 + $decoded;
         } elseif ($size > 30) {
             $size = ($decoded & (0x0FFFFFFF >> (32 - (8 * $bytesToRead))))
                 + 65821;
         }
 
-        return [$size, $offset + $bytesToRead];
+        return array($size, $offset + $bytesToRead);
     }
 
     private function zeroPadLeft($content, $desiredLength)
@@ -305,7 +304,6 @@ class Decoder
     {
         $testint = 0x00FF;
         $packed = pack('S', $testint);
-
         return $testint === current(unpack('v', $packed));
     }
 }

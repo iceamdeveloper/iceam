@@ -4,7 +4,7 @@
  * Plugin Name:  Mailgun
  * Plugin URI:   http://wordpress.org/extend/plugins/mailgun/
  * Description:  Mailgun integration for WordPress
- * Version:      1.5.13.1
+ * Version:      1.5.8.5
  * Author:       Mailgun
  * Author URI:   http://www.mailgun.com/
  * License:      GPLv2 or later
@@ -43,13 +43,16 @@ class Mailgun
     /**
      * Setup shared functionality for Admin and Front End.
      *
-     * @since	0.1
+     * @return none
+     *
+     * @since 0.1
      */
     public function __construct()
     {
         $this->options = get_option('mailgun');
         $this->plugin_file = __FILE__;
         $this->plugin_basename = plugin_basename($this->plugin_file);
+        $this->api_endpoint = 'https://api.mailgun.net/v3/';
 
         // Either override the wp_mail function or configure PHPMailer to use the
         // Mailgun SMTP servers
@@ -77,13 +80,11 @@ class Mailgun
     /**
      * Get specific option from the options table.
      *
-     * @param	string	$option		Name of option to be used as array key for retrieving the specific value
-     * @param	array	$options	Array to iterate over for specific values
-     * @param	bool	$default	False if no options are set
+     * @param string $option Name of option to be used as array key for retrieving the specific value
      *
-     * @return	mixed
+     * @return mixed
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function get_option($option, $options = null, $default = false)
     {
@@ -101,11 +102,11 @@ class Mailgun
      * Hook into phpmailer to override SMTP based configurations
      * to use the Mailgun SMTP server.
      *
-     * @param	object	$phpmailer	The PHPMailer object to modify by reference
+     * @param object $phpmailer The PHPMailer object to modify by reference
      *
-     * @return	void
+     * @return none
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function phpmailer_init(&$phpmailer)
     {
@@ -113,7 +114,6 @@ class Mailgun
         $domain = (defined('MAILGUN_DOMAIN') && MAILGUN_DOMAIN) ? MAILGUN_DOMAIN : $this->get_option('domain');
         $username = preg_replace('/@.+$/', '', $username)."@{$domain}";
         $secure = (defined('MAILGUN_SECURE') && MAILGUN_SECURE) ? MAILGUN_SECURE : $this->get_option('secure');
-        $sectype = (defined('MAILGUN_SECTYPE') && MAILGUN_SECTYPE) ? MAILGUN_SECTYPE : $this->get_option('sectype');
         $password = (defined('MAILGUN_PASSWORD') && MAILGUN_PASSWORD) ? MAILGUN_PASSWORD : $this->get_option('password');
 
         $phpmailer->Mailer = 'smtp';
@@ -123,7 +123,7 @@ class Mailgun
         $phpmailer->Username = $username;
         $phpmailer->Password = $password;
 
-        $phpmailer->SMTPSecure = (bool) $secure ? $sectype : 'none';
+        $phpmailer->SMTPSecure = (bool) $secure ? 'tls' : 'none';
         // Without this line... wp_mail for SMTP-only will always return false. But why? :(
         $phpmailer->Debugoutput = 'mg_smtp_debug_output';
         $phpmailer->SMTPDebug = 2;
@@ -131,13 +131,12 @@ class Mailgun
 
     /**
      * Deactivate this plugin and die.
-     * Deactivate the plugin when files critical to it's operation cannot be loaded
      *
-     * @param	$file	Files critical to plugin functionality
+     * Used to deactivate the plugin when files critical to it's operation can not be loaded
      *
-     * @return	void
+     * @since 0.1
      *
-     * @since	0.1
+     * @return none
      */
     public function deactivate_and_die($file)
     {
@@ -153,23 +152,17 @@ class Mailgun
     /**
      * Make a Mailgun api call.
      *
-     * @param	string	$uri	The endpoint for the Mailgun API
-     * @param	array	$params	Array of parameters passed to the API
-     * @param	string	$method	The form request type
+     * @param string $endpoint The Mailgun endpoint uri
      *
-     * @return	array
+     * @return array
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function api_call($uri, $params = array(), $method = 'POST')
     {
         $options = get_option('mailgun');
-        $getRegion = (defined('MAILGUN_REGION') && MAILGUN_REGION) ? MAILGUN_REGION : $options['region'];
         $apiKey = (defined('MAILGUN_APIKEY') && MAILGUN_APIKEY) ? MAILGUN_APIKEY : $options['apiKey'];
         $domain = (defined('MAILGUN_DOMAIN') && MAILGUN_DOMAIN) ? MAILGUN_DOMAIN : $options['domain'];
-
-        $region = mg_detect_region($getRegion);
-        $this->api_endpoint = ($region) ? $region : 'https://api.mailgun.net/v3/';
 
         $time = time();
         $url = $this->api_endpoint.$uri;
@@ -213,9 +206,9 @@ class Mailgun
     /**
      * Get account associated lists.
      *
-     * @return	array
+     * @return array
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function get_lists()
     {
@@ -233,9 +226,9 @@ class Mailgun
     /**
      * Handle add list ajax post.
      *
-     * @return	string	json
+     * @return string json
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function add_list()
     {
@@ -268,11 +261,11 @@ class Mailgun
     /**
      * Frontend List Form.
      *
-     * @param	string	$list_address	Mailgun address list id
-     * @param	array	$args			widget arguments
-     * @param	array	$instance		widget instance params
+     * @param string $list_address Mailgun address list id
+     * @param array  $args         widget arguments
+     * @param string $instance     widget instance params
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function list_form($list_address, $args = array(), $instance = array())
     {
@@ -397,11 +390,9 @@ class Mailgun
     /**
      * Initialize List Form.
      *
-     * @param	array	$atts	Form attributes
+     * @param array $atts Form attributes
      *
-     * @return	string
-     *
-     * @since	0.1
+     * @since 0.1
      */
     public function build_list_form($atts)
     {
@@ -439,7 +430,7 @@ class Mailgun
     /**
      * Initialize List Widget.
      *
-     * @since	0.1
+     * @since 0.1
      */
     public function load_list_widget()
     {

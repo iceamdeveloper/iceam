@@ -273,4 +273,4 @@
 			}
 		});
 	};
-}( jQuery, window.underscore || window._ ) );
+}( jQuery, _ ) );

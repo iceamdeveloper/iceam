@@ -298,7 +298,7 @@ class Toolset_Naming_Helper {
 			get_post_types( array(), 'names' )
 		);
 
-		if( in_array( $value, $post_types, true ) ) {
+		if( in_array( $value, $post_types ) ) {
 			$conflict = array(
 				'conflicting_id' => $value,
 				'message' => sprintf(

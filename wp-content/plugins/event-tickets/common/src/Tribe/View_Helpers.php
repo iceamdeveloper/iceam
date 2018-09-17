@@ -20,12 +20,11 @@ if ( ! class_exists( 'Tribe__View_Helpers' ) ) {
 		 * @return array The countries array.
 		 */
 		public static function constructCountries( $postId = '', $useDefault = true ) {
-			$eventCountries = tribe_get_option( 'tribeEventsCountries' );
 
-			if ( $eventCountries != '' ) {
+			if ( tribe_get_option( 'tribeEventsCountries' ) != '' ) {
 				$countries = array();
 
-				$country_rows = explode( "\n", $eventCountries );
+				$country_rows = explode( "\n", tribe_get_option( 'tribeEventsCountries' ) );
 				foreach ( $country_rows as $crow ) {
 					$country = explode( ',', $crow );
 					if ( isset( $country[0] ) && isset( $country[1] ) ) {
@@ -39,7 +38,7 @@ if ( ! class_exists( 'Tribe__View_Helpers' ) ) {
 				}
 			}
 
-			if ( ! isset( $countries ) || ! is_array( $countries ) || count( $countries ) < 1 ) {
+			if ( ! isset( $countries ) || ! is_array( $countries ) || count( $countries ) == 1 ) {
 				$countries = tribe( 'languages.locations' )->get_countries();
 			}
 

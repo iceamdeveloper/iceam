@@ -1,5 +1,5 @@
 === Toolset Types - Custom Post Types, Custom Fields and Taxonomies ===
-Contributors: AmirHelzer, brucepearson, christianglingener, jadpm, zaantar, jmilczarek, kouratoras, displaynone
+Contributors: AmirHelzer, brucepearson, christianglingener, jadpm, zaantar
 Donate link: http://wp-types.com
 Tags: CMS, custom field, custom fields, custom post type, custom post types, field, fields post, post type, post types, taxonomies, taxonomy, toolset
 Text Domain: wpcf
@@ -7,7 +7,7 @@ Domain Path: /embedded/locale
 License: GPLv2
 Requires at least: 3.7
 Tested up to: 4.9
-Stable tag: 2.2.22
+Stable tag: 2.2.21
 
 The complete and reliable plugin for managing custom post types, custom taxonomies and custom fields.
 
@@ -157,12 +157,6 @@ Additionally, Types is the only plugin that lets you define parent/child relatio
 10. Bulk editing child content using Field Tables
 
 == Changelog ==
-
-= 2.2.22 =
-* First version of the public relationship API that will be sustainable also for many-to-many relationships.
-* Added a warning about dropping the PHP 5.2 support (which is no longer officially supported anyway) in the near future.
-* Fixed: Using the_title filter without the mandatory $id argument.
-* Fixed: Deprecated function notice in PHP 7.2.
 
 = 2.2.21 =
 * Fixed a compatibility issue with Beaver Builder

@@ -46,18 +46,15 @@ Toolset.Gui.ListingViewModel = function(itemModels, defaults, itemSearchFunction
      * @returns {string} One or more CSS classes.
      * @since 2.0
      */
-    self.sortIconClass = function (propertyName, sortType) {
-        if ( 'undefined' === typeof sortType || ['alpha', 'numeric'].indexOf( sortType ) === -1 ) {
-            sortType = 'alpha';
-        }
+    self.sortIconClass = function (propertyName) {
         if (sortHelper.currentSortBy() === propertyName) {
             if (1 === sortHelper.currentSortDirection()) {
-                return 'fa fa-sort-' + sortType + '-asc';
+                return 'fa fa-sort-alpha-asc';
             } else {
-                return 'fa fa-sort-' + sortType + '-desc';
+                return 'fa fa-sort-alpha-desc';
             }
         } else {
-            return 'fa sort-icon-inactive fa-sort-' + sortType + '-asc';
+            return 'fa sort-icon-inactive fa-sort-alpha-asc';
         }
     };
 

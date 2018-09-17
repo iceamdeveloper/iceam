@@ -6,8 +6,6 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Aelia\\WC\\AFC\\Messages' => $baseDir . '/lib/classes/messages/messages.php',
-    'Aelia\\WC\\AFC\\Settings' => $baseDir . '/lib/classes/settings/settings.php',
     'Aelia\\WC\\Admin_Message' => $baseDir . '/lib/classes/base/messages/admin_message.php',
     'Aelia\\WC\\AeliaSimpleXMLElement' => $baseDir . '/lib/classes/base/xml/aelia-simplexmlelement.php',
     'Aelia\\WC\\Aelia_Install' => $baseDir . '/lib/classes/base/install/install.php',
@@ -17,7 +15,6 @@ return array(
     'Aelia\\WC\\Base_Class' => $baseDir . '/lib/classes/base/base-classes/aelia-base-class.php',
     'Aelia\\WC\\Definitions' => $baseDir . '/lib/classes/definitions/definitions.php',
     'Aelia\\WC\\ExchangeRatesModel' => $baseDir . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
-    'Aelia\\WC\\Free_Plugin_Dev_Version_Updater' => $baseDir . '/lib/classes/updater/free-plugin-dev-version-updater.php',
     'Aelia\\WC\\Free_Plugin_Updater' => $baseDir . '/lib/classes/updater/free-plugin-updater.php',
     'Aelia\\WC\\IAelia_Plugin' => $baseDir . '/lib/classes/base/plugin/aelia-plugin.php',
     'Aelia\\WC\\IExchangeRatesModel' => $baseDir . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
@@ -37,6 +34,7 @@ return array(
     'Aelia_WC_AFC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-afc-requirementscheck.php',
     'Aelia_WC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-requirementscheck.php',
     'Composer\\CaBundle\\CaBundle' => $vendorDir . '/composer/ca-bundle/src/CaBundle.php',
+    'GeoIp2\\Compat\\JsonSerializable' => $vendorDir . '/geoip2/geoip2/src/Compat/JsonSerializable.php',
     'GeoIp2\\Database\\Reader' => $vendorDir . '/geoip2/geoip2/src/Database/Reader.php',
     'GeoIp2\\Exception\\AddressNotFoundException' => $vendorDir . '/geoip2/geoip2/src/Exception/AddressNotFoundException.php',
     'GeoIp2\\Exception\\AuthenticationException' => $vendorDir . '/geoip2/geoip2/src/Exception/AuthenticationException.php',

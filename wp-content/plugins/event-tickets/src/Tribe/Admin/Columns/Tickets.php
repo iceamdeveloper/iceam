@@ -89,16 +89,15 @@ class Tribe__Tickets__Admin__Columns__Tickets {
 	 * @return string The column HTML.
 	 */
 	protected function render_tickets_entry( $post_id ) {
-		$post      = get_post( $post_id );
-		$attendees = Tribe__Tickets__Tickets::get_event_attendees( $post_id );
-		$totals    = count( $attendees );
+		$post = get_post( $post_id );
+		$totals = tribe( 'tickets.handler' )->get_post_totals( $post );
 
 		// Bail with —
-		if ( 0 === $totals ) {
+		if ( 0 === $totals['tickets'] ) {
 			return '&mdash;';
 		}
 
-		$content = sprintf( '<div>%s</div>%s', $totals, $this->get_percentage_string( $post_id ) );
+		$content = sprintf( '<div>%s</div>%s', $totals['sold'], $this->get_percentage_string( $post->ID ) );
 		$attendees_link = tribe( 'tickets.attendees' )->get_report_link( $post );
 
 		return sprintf( '<a href="%s" target="_blank" class="tribe-tickets-column-attendees-link">%s</a>', $attendees_link, $content );
@@ -116,23 +115,21 @@ class Tribe__Tickets__Admin__Columns__Tickets {
 	 *                post tickets has unlimited stock.
 	 */
 	protected function get_percentage_string( $post_id, $deprecated = null ) {
-		$ticket    = tribe( 'tickets.handler' )->get_post_totals( $post_id );
-		$attendees = Tribe__Tickets__Tickets::get_event_attendees( $post_id );
-		$totals    = count( $attendees );
+		$totals = tribe( 'tickets.handler' )->get_post_totals( $post_id );
 
 		// Bail early for unlimited
-		if ( $ticket['has_unlimited'] ) {
+		if ( $totals['has_unlimited'] ) {
 			return tribe_tickets_get_readable_amount( -1 );
 		}
 
-		$shared_capacity_obj  = new Tribe__Tickets__Global_Stock( $post_id );
+		$shared_capacity_obj = new Tribe__Tickets__Global_Stock( $post_id );
 		$global_stock_enabled = $shared_capacity_obj->is_enabled();
-		$global_stock         = $shared_capacity_obj->get_stock_level();
+		$global_stock = $shared_capacity_obj->get_stock_level();
 
-		$stock = $global_stock_enabled ? $global_stock : $ticket['stock'];
+		$stock = $global_stock_enabled ? $global_stock : $totals['stock'];
 
 		// If there have been zero sales we need not do any further arithmetic
-		if ( 0 === $totals || 0 === $ticket['capacity'] ) {
+		if ( 0 === $totals['sold'] || 0 === $totals['capacity'] ) {
 			$percentage = 0;
 		}
 		// If $stock is zero (and items *have* been sold per the above conditional) we can assume 100%
@@ -141,7 +138,7 @@ class Tribe__Tickets__Admin__Columns__Tickets {
 		}
 		// In all other cases, calculate the actual percentage
 		else {
-			$percentage = round( ( 100 / $ticket['capacity'] ) * $totals, 0 );
+			$percentage = round( ( 100 / $totals['capacity'] ) * $totals['sold'], 0 );
 		}
 
 		return ' <div><small>(' . $percentage . '%)</small></div>';

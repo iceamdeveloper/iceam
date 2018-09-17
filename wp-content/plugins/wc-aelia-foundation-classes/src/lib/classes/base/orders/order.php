@@ -2,8 +2,6 @@
 namespace Aelia\WC;
 if(!defined('ABSPATH')) exit; // Exit if accessed directly
 
-use \WC_Cache_Helper;
-
 /**
  * Aelia Order. Extends standard WC_Order, providing convenience methods to
  * handle multi-currency environments.
@@ -280,30 +278,5 @@ class Order extends \WC_Order {
 	 */
 	public function get_shipping_country($context = 'view') {
 		return $this->get_property('shipping_country', $context);
-	}
-
-	/**
-	 * Gets refunded total in base currency.
-	 *
-	 * @return float
-	 * @since 2.0.1.180821
-	 */
-	public function get_total_refunded_in_base_currency() {
-		$cache_key = WC_Cache_Helper::get_cache_prefix('orders') . 'total_refunded_base_currency' . $this->get_id();
-		$cached_data = wp_cache_get($cache_key, $this->cache_group);
-
-		if($cached_data !== false) {
-			return $cached_data;
-		}
-
-		$total_refunded_base_currency = 0;
-		foreach($this->get_refunds() as $refund) {
-			$refund_total = $refund->get_meta('_refund_amount_base_currency');
-			$total_refunded_base_currency += $refund_total;
-		}
-
-		wp_cache_set($cache_key, $total_refunded_base_currency, $this->cache_group);
-
-		return $total_refunded_base_currency;
 	}
 }

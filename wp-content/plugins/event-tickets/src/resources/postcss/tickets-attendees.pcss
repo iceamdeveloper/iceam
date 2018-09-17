@@ -12,14 +12,17 @@
 	}
 
 	.welcome-panel-column-container {
-		display: flex;
-		flex-flow: row;
-		justify-content: space-between;
 		position: initial;
 		*zoom: 1;
 
-		@media screen and (max-width: 768px) {
-			flex-wrap: wrap;
+		&::before,
+		&::after {
+			content: '';
+			display: table;
+		}
+
+		&::after {
+			clear: both;
 		}
 	}
 
@@ -82,10 +85,19 @@
 
 	.welcome-panel-last {
 		border-left: 1px solid #eee;
-		display: flex;
-		flex-flow: row wrap;
+		float: right;
 		padding: 10px 20px 5px;
 		*zoom: 1;
+
+		&::before,
+		&::after {
+			content: '';
+			display: table;
+		}
+
+		&::after {
+			clear: both;
+		}
 
 		@media screen and (max-width: 768px) {
 			width: 100%;
@@ -96,10 +108,8 @@
 		}
 
 		.totals-header {
-			    flex: 0 0 100%;
-
 			h3 {
-    			display: inline-block;
+				display: inline-block;
 				width: auto;
 			}
 		}
@@ -115,6 +125,7 @@
 
 		ul {
 			@media screen and (max-width: 870px) {
+				float: left;
 				width: 50%;
 			}
 
@@ -277,8 +288,18 @@
 
 .welcome-panel {
 	.welcome-panel-content {
-		margin: 0;
+		margin-left: 0;
 		*zoom: 1;
+
+		&::before,
+		&::after {
+			content: '';
+			display: table;
+		}
+
+		&::after {
+			clear: both;
+		}
 
 		@media screen and (max-width: 768px) {
 			margin-left: 0;
@@ -288,7 +309,7 @@
 }
 
 /*
- * Preserves utility of modal windows, especially the "Email Attendees" modal, in views above the
+ * Preserves utility of modal windows, especially the "Email Attendees" modal, in views above the 
  * mobile view but under the upper limits of "tablet" views. The weird class names and !important declarations
  * are unfortunately needed to override Thickbox's inline styles.
  */
@@ -321,13 +342,5 @@
 
 	#TB_iframeContent {
 		width: 100% !important;
-	}
-}
-
-table.orders {
-	tr {
-		&.refunded, &.denied, &.pending {
-			font-style: italic;
-		}
 	}
 }

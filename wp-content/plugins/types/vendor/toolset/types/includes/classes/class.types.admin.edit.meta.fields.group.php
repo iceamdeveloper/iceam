@@ -515,7 +515,7 @@ var wpcfDefaultCss = ' .  json_encode( base64_encode($admin_styles_value) ) . ';
                     wpcf_admin_message(
                         sprintf(
                             __("A group by name <em>%s</em> already exists. Please use a different name and save again.", 'wpcf'),
-                            apply_filters( 'the_title', $exists->post_title, $exists->ID )
+                            apply_filters('the_title', $exists->post_title)
                         ),
                         'error'
                     );
@@ -538,7 +538,7 @@ var wpcfDefaultCss = ' .  json_encode( base64_encode($admin_styles_value) ) . ';
                 wpcf_admin_message(
                     sprintf(
                         __("A group by name <em>%s</em> already exists. Please use a different name and save again.", 'wpcf'),
-                        apply_filters( 'the_title', $exists->post_title, $exists->ID )
+                        apply_filters('the_title', $exists->post_title)
                     ),
                     'error'
                 );
@@ -651,3 +651,4 @@ var wpcfDefaultCss = ' .  json_encode( base64_encode($admin_styles_value) ) . ';
         update_post_meta($group_id, '_wp_types_group_showfor', $post_types);
     }
 }
+

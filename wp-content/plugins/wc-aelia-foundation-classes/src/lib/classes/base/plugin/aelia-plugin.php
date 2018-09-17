@@ -14,8 +14,6 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		public static function settings();
 		public function setup();
 		public static function cleanup();
-		public function get_plugin_file($relative_path_only = false);
-		public function get_slug($for_updates = false);
 	}
 
 	// Load general functions file
@@ -34,14 +32,6 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		public static $text_domain = 'wc-aelia-plugin';
 		// @var string The plugin name
 		public static $plugin_name = 'wc-aelia-plugin';
-
-		/**
-		 * The action used to route ajax calls to this plugin.
-		 *
-		 * @var string
-		 * @since 1.9.4.170410
-		 */
-		protected static $ajax_action = 'wc-aelia-plugin';
 
 		// @var string The folder and file name of the main plugin file. This may
 		// not be the same file where the main plugin class is located, as many
@@ -115,7 +105,6 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		public function get_logger() {
 			if(empty($this->logger)) {
 				$this->logger = new Logger(static::$plugin_slug);
-				$this->logger->set_debug_mode($this->debug_mode());
 			}
 			return $this->logger;
 		}
@@ -141,14 +130,8 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 			// Debug
 			//var_dump($this->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');die();
 
-			//var_dump(
-			//		$this->get_update_url($plugin_slug),
-			//		$plugin_file,
-			//		$plugin_slug
-			//);die();
-
 			require_once(WC_AeliaFoundationClasses::instance()->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');
-			$update_checker = \Puc_v4_Factory::buildUpdateChecker(
+			$MyUpdateChecker = \PucFactory::buildUpdateChecker(
 					$this->get_update_url($plugin_slug),
 					$plugin_file,
 					$plugin_slug
@@ -257,6 +240,28 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		}
 
 		/**
+		 * Ensures that the WooCommerce session is initialised. The method implements
+		 * checks to prevent redundant initialisations, in order to improve
+		 * performances.
+		 */
+		public static function init_woocommerce_session() {
+			/* WooCommerce 2.1+ - Initialise session, if needed. WooCommerce 2.0
+			 * and earlier initialise the session automatically as startup.
+			 */
+			if(version_compare(wc()->version, '2.1', '>=')) {
+				// If WooCommerce session was not initialised, start it
+				if(!Aelia_SessionManager::has_session()) {
+					// Only start the session if the visitor is not a bot
+					if(!self::visitor_is_bot()) {
+						// Initialise the session only if the visitor is not a bot. Bots don't use
+						// sessions and don't benefit from them, anyway
+						do_action('woocommerce_set_cart_cookies', true);
+					}
+				}
+			}
+		}
+
+		/**
 		 * Triggers an error displaying the message associated to an error code.
 		 *
 		 * @param mixed error_code The Error Code.
@@ -309,7 +314,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 			}
 
 			// Automatic updates
-			add_filter('wc_aelia_afc_register_plugins_to_update', array($this, 'wc_aelia_afc_register_plugins_to_update'), 10, 1);
+			add_filter('aelia_register_plugins_to_update', array($this, 'aelia_register_plugins_to_update'), 10, 1);
 		}
 
 		/**
@@ -393,13 +398,13 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * the messages produced by the plugin.
 		 */
 		public function __construct($settings_controller = null, $messages_controller = null) {
-			$this->_settings_controller = $settings_controller;
-			$this->_messages_controller = empty($messages_controller) ? new Messages : $messages_controller;
-
 			// Set plugin's paths
 			$this->set_paths();
 			// Set plugin's URLs
 			$this->set_urls();
+
+			$this->_settings_controller = $settings_controller;
+			$this->_messages_controller = empty($messages_controller) ? new Messages : $messages_controller;
 
 			// Set all required hooks
 			$this->set_hooks();
@@ -683,7 +688,6 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 					'woocommerce_remove_variations',
 					'woocommerce_link_all_variations',
 					'woocommerce_bulk_edit_variations',
-					'woocommerce_json_search_products_and_variations',
 				)));
 		}
 
@@ -753,7 +757,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * @since 1.7.3.160531
 		 */
 		protected function ajax_nonce_id() {
-			return static::$plugin_slug . '-nonce';
+			return self::$plugin_slug . '-nonce';
 		}
 
 		/**
@@ -763,7 +767,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * @since 1.7.3.160531
 		 */
 		protected function ajax_action() {
-			return static::$ajax_action;
+			return '';
 		}
 
 		/**
@@ -826,7 +830,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 			$result = Definitions::RES_OK;
 			// Verify nonce
 			if(apply_filters('wc_aelia_afc_should_validate_ajax_nonce', true)) {
-				if(!check_ajax_referer($this->ajax_nonce_id(), '_ajax_nonce', false)) {
+				if(check_ajax_referer($this->ajax_nonce_id(), '_ajax_nonce', false)) {
 					$result = Definitions::ERR_AJAX_INVALID_REFERER;
 				}
 			}
@@ -895,7 +899,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * plugin added to it.
 		 * @since 1.7.0.150818
 		 */
-		public function wc_aelia_afc_register_plugins_to_update(array $plugins_to_update) {
+		public function aelia_register_plugins_to_update(array $plugins_to_update) {
 			return $plugins_to_update;
 		}
 
@@ -903,15 +907,11 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * Sets the the folder and file name of the main plugin file.
 		 *
 		 * WHY
-		 * The "main plugin file" information cannot always be retrieved with __FILE__.
-		 * The main plugin file could actually be just a loader, which takes care of
-		 * loading the actual plugin class. A call to __FILE__ from this plugin class
-		 * could, therefore, return the wrong information. By allowing the loader to
-		 * set the plugin file, we can always get the correct information.
-		 *
-		 * NOTE
-		 * If the main_plugin_file property is left empty, the value of __FILE__ is
-		 * returned by default.
+		 * The "main plugin file" information cannot be retrieved with __FILE__. The
+		 * main plugin file is actually just a loader, which takes care of loading
+		 * the actual plugin class. A call to __FILE__ from this plugin class would,
+		 * therefore, return the wrong information. By allowing the loader to set
+		 * the plugin file, we can always get the correct information.
 		 *
 		 * @param string plugin_file A string indicating the main plugin file.
 		 * @since 1.7.1.150824
@@ -919,79 +919,6 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		public function set_main_plugin_file($plugin_file) {
 			//$this->main_plugin_file = untrailingslashit(plugin_basename($plugin_file));
 			$this->main_plugin_file = $plugin_file;
-		}
-
-		/**
-		 * gets the the folder and file name of the main plugin file.
-		 *
-		 * @param bool relative_path_only Indicates if the method should return only
-		 * the relative path of plugin's file (i.e. my-plugin-folder/my-plugin-file.php).
-		 * If set to false, the method will return the full path to the file.
-		 *
-		 * @since 1.8.4.170118
-		 */
-		public function get_plugin_file($relative_path_only = false) {
-			$main_plugin_file = $this->main_plugin_file;
-
-			if(empty($main_plugin_file)) {
-				$main_plugin_file = __FILE__;
-
-				$this->get_logger()->info(__('Main plugin file not specified. Taking current file ' .
-																		 'as a default.', Definitions::TEXT_DOMAIN),
-																	array(
-																		'Plugin Slug' => static::$plugin_slug,
-																		'Plugin File' => $main_plugin_file,
-																	));
-			}
-
-			if($relative_path_only) {
-				// Return the last folder and the file name
-				return basename(dirname($main_plugin_file)) . '/' . basename($main_plugin_file) ;
-			}
-			return $main_plugin_file;
-		}
-
-		/**
-		 * Returns the plugin's slug.
-		 *
-		 * @param bool for_updates If set to true, it will return the plugin's slug
-		 * that should be used to check for updates. This allows plugins to have a
-		 * different slug when checking for updates.
-		 *
-		 * @since 1.8.4.170118
-		 */
-		public function get_slug($for_updates = false) {
-			$plugin_class = get_class($this);
-
-			if($for_updates) {
-				// In case the plugin uses a different slug from the one registered in the
-				// update server, it can set the "slug_for_update_check" property to indicate
-				// it
-				return isset($plugin_class::$slug_for_update_check) ? $plugin_class::$slug_for_update_check : $plugin_class::$plugin_slug;
-			}
-			return $plugin_class::$plugin_slug;
-		}
-
-		/**
-		 * Indicates if the plugin has been configured. This method must be
-		 * overridden by descendant classes.
-		 *
-		 * @return bool
-		 * @since 1.8.2.161216
-		 */
-		public function is_plugin_configured() {
-			return true;
-		}
-
-		/**
-		 * Indicates if the plugin's debug mode is active. This method must be
-		 * overridden by descendant classes.
-		 *
-		 * @return bool
-		 * @since 1.8.2.161216
-		 */
-		public function debug_mode() {
-			return false;
 		}
 	}
 }

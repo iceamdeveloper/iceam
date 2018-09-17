@@ -5,15 +5,15 @@
  * @package   user-switching
  * @link      https://github.com/johnbillion/user-switching
  * @author    John Blackbourn <john@johnblackbourn.com>
- * @copyright 2009-2018 John Blackbourn
+ * @copyright 2009-2017 John Blackbourn
  * @license   GPL v2 or later
  *
  * Plugin Name: User Switching
  * Description: Instant switching between user accounts in WordPress
- * Version:     1.3.1
+ * Version:     1.3.0
  * Plugin URI:  https://johnblackbourn.com/wordpress-plugin-user-switching/
- * Author:      John Blackbourn & contributors
- * Author URI:  https://github.com/johnbillion/user-switching/graphs/contributors
+ * Author:      John Blackbourn
+ * Author URI:  https://johnblackbourn.com/
  * Text Domain: user-switching
  * Domain Path: /languages/
  * Network:     true
@@ -33,13 +33,6 @@
  * Main container class for the User Switching plugin.
  */
 class user_switching {
-
-	/**
-	 * The name used to identify the application for debugging purposes.
-	 *
-	 * @var string
-	 */
-	public static $application = 'WordPress/User Switching';
 
 	/**
 	 * Class constructor. Sets up some filters and actions.
@@ -182,13 +175,12 @@ class user_switching {
 					$args = array(
 						'user_switched' => 'true',
 					);
-
 					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, $redirect_to ) );
 					} elseif ( ! current_user_can( 'read' ) ) {
-						wp_safe_redirect( add_query_arg( $args, home_url() ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, home_url() ) );
 					} else {
-						wp_safe_redirect( add_query_arg( $args, admin_url() ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, admin_url() ) );
 					}
 					exit;
 
@@ -227,11 +219,10 @@ class user_switching {
 						'user_switched' => 'true',
 						'switched_back' => 'true',
 					);
-
 					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, $redirect_to ) );
 					} else {
-						wp_safe_redirect( add_query_arg( $args, admin_url( 'users.php' ) ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, admin_url( 'users.php' ) ) );
 					}
 					exit;
 				} else {
@@ -256,11 +247,10 @@ class user_switching {
 					$args = array(
 						'switched_off' => 'true',
 					);
-
 					if ( $redirect_to ) {
-						wp_safe_redirect( add_query_arg( $args, $redirect_to ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, $redirect_to ) );
 					} else {
-						wp_safe_redirect( add_query_arg( $args, home_url() ), 302, self::$application );
+						wp_safe_redirect( add_query_arg( $args, home_url() ) );
 					}
 					exit;
 				} else {
@@ -332,7 +322,7 @@ class user_switching {
 		if ( $old_user ) {
 
 			?>
-			<div id="user_switching" class="updated notice is-dismissible">
+			<div id="user_switching" class="updated">
 				<p><span class="dashicons dashicons-admin-users" style="color:#56c234"></span>
 				<?php
 					$message = '';
@@ -380,7 +370,7 @@ class user_switching {
 		} elseif ( isset( $_GET['user_switched'] ) ) {
 
 			?>
-			<div id="user_switching" class="updated notice is-dismissible">
+			<div id="user_switching" class="updated">
 				<p>
 				<?php
 					if ( isset( $_GET['switched_back'] ) ) {

@@ -3,11 +3,11 @@ Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
 Requires at least: 3.6
-Tested up to: 4.9
+Tested up to: 4.7
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 2.4
-WC tested up to: 3.3
+WC tested up to: 3.0
 
 Adds a set of convenience classes that can simplify the development of other plugins for WooCommerce.
 
@@ -33,7 +33,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 
 ##Requirements
 * WordPress 3.6 or later.
-* PHP 5.4 or later.
+* PHP 5.3 or later.
 * WooCommerce 2.4 or later
 
 ## Notes
@@ -67,59 +67,6 @@ For more information about installation and management of plugins, please refer 
 
 == Changelog ==
 
-= 2.0.1.180821 =
-* Feature - Added new method `Order::get_total_refunded_in_base_currency`;
-
-= 2.0.0.180808 =
-* Feature - Added new auto-update and licence management features for premium plugins.
-
-= 1.9.19.180713 =
-* Tweak - Added new function `aelia_date_to_string`.
-
-= 1.9.18.180319 =
-* Feature - Premium Licenses. Added possibility to easily replace a license key, without having to deactivate it first.
-
-= 1.9.17.180307 =
-* Tweak - Improved validation of remote API responses in Premium Updater.
-
-= 1.9.16.180213 =
-* Tweak - Improved handling of remote API errors in Premium Updater.
-
-= 1.9.15.180210 =
-* Dev - Added new updater to handle updates for development versions of free plugins.
-* Fixed call to `empty()` in Premium Plugin Updater.
-
-= 1.9.14.180126 =
-* Fix - Fixed bug that caused the licence data from a plugin to overwrite the data from another plugin during update checks.
-* Tweak - Improved IP2Location class to parse additional reverse proxy headers.
-
-= 1.9.13.180123 =
-* Improvement - Improved validation of Ajax responses.
-
-= 1.9.12.180104 =
-* Added new filters to allow filtering keys and values for cookies and session storage.
-
-= 1.9.11.171214 =
-* Updated Yahnis Plugin Updater library to version 4.x.
-
-= 1.9.10.171201 =
-* UI - Added message to inform shop administrators about the new licensing system.
-
-= 1.9.9.171120 =
-* Improvement - Added handling of exceptions in the Logger, to prevent crashes due to incorrect folder permissions.
-
-= 1.9.8.171002 =
-* UI - Consolidated the Admin UI for the support/debug settings and the license management under a single Aelia tab.
-
-= 1.9.7.170912 =
-* Fix - Improved logic used to ensure that minicart is updated when the currency changes, to handle the new "hashed" cart fragment IDs.
-
-= 1.9.6.170823 =
-* Improved license management interface for Aelia Premium Plugin Updater.
-
-= 1.9.4.170410 =
-* Improved logging. Added logic to initialise extra handlers (e.g. ChromePHP) in debug mode.
-
 = 1.8.9.170629 =
 * Fix - Logger doesn't track debug messages anymore when debug mode is deactivated.
 
@@ -149,10 +96,6 @@ For more information about installation and management of plugins, please refer 
 * Improved compatibility with WooCommerce 2.7:
 	* Added method `Order::get_currency()`.
 * Removed legacy code.
-
-= 1.8.3.170110 =
-* Added logic to check for updates for premium plugins.
-* Added new class `Aelia\WC\AFC\Messages`, to handle plugin's messages.
 
 = 1.8.2.161216 =
 * Improved compatibility with WooCommerce 2.7:
@@ -454,8 +397,7 @@ For more information about installation and management of plugins, please refer 
 = 1.0.2.140509 =
 * Updated Composer dependencies.
 * Removed unneeded code.
+* Corrected reference to global WooCommerce instance in Aelia\WC\Aelia_SessionManager class.
 
-== Upgrade Notice ==
-
-= 2.0 =
-Version 2.0 is a major update of the Aelia Foundation Classes. Although the upgrade is designed to be 100% backward compatible, we recommend take a full backup of your site before upgrading the plugin and test your ecommerce flow after the update.
+= 1.0.1.140509 =
+* First public release

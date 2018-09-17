@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/tickets/rsvp.php
  *
- * @version 4.8.1
+ * @version 4.6
  *
  * @var bool $must_login
  */
@@ -18,6 +18,7 @@ $are_products_available       = false;
 ob_start();
 $messages = Tribe__Tickets__RSVP::get_instance()->get_messages();
 $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
+$now = current_time( 'timestamp' );
 ?>
 
 <form
@@ -30,7 +31,6 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 	<h2 class="tribe-events-tickets-title tribe--rsvp">
 		<?php echo esc_html_x( 'RSVP', 'form heading', 'event-tickets' ) ?>
 	</h2>
-
 
 	<div class="tribe-rsvp-messages">
 		<?php
@@ -59,7 +59,7 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 				continue;
 			}
 
-			if ( ! $ticket->date_in_range() ) {
+			if ( ! $ticket->date_in_range( $now ) ) {
 				continue;
 			}
 
@@ -79,7 +79,6 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 						<input
 							type="number"
 							class="tribe-ticket-quantity"
-						        step="1"
 							min="0"
 							<?php if ( -1 !== $remaining ) : ?>
 								max="<?php echo esc_attr( $remaining ); ?>"
@@ -90,7 +89,7 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 						>
 						<?php if ( $ticket->managing_stock() ) : ?>
 							<span class="tribe-tickets-remaining">
-					<?php echo sprintf( esc_html__( '%1$s out of %2$s available', 'event-tickets' ), $ticket->available(), $ticket->capacity() ); ?>
+					<?php echo sprintf( esc_html__( '%1$s out of %2$s available', 'event-tickets' ), $ticket->remaining(), $ticket->capacity() ); ?>
 				</span>
 						<?php endif; ?>
 					<?php else: ?>
@@ -100,7 +99,6 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 				<td class="tickets_name">
 					<?php echo esc_html( $ticket->name ); ?>
 				</td>
-
 				<td class="tickets_description" colspan="2">
 					<?php echo esc_html( ( $ticket->show_description() ? $ticket->description : '' ) ); ?>
 				</td>
@@ -128,25 +126,7 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 					 *
 					 * @var array of Tribe__Tickets__Ticket_Object
 					 */
-					do_action( 'tribe_tickets_rsvp_before_confirmation_fields', $tickets );
-
-					/**
-					 * Set the default Full Name for the RSVP form
-					 *
-					 * @since 4.7.1
-					 *
-					 * @param string
-					 */
-					$name = apply_filters( 'tribe_tickets_rsvp_form_full_name', '' );
-
-					/**
-					 * Set the default value for the email on the RSVP form.
-					 *
-					 * @since 4.7.1
-					 *
-					 * * @param string
-					 */
-					$email = apply_filters( 'tribe_tickets_rsvp_form_email', '' );
+					do_action( 'event_tickets_rsvp_before_confirmation_fields', $tickets );
 					?>
 					<table class="tribe-tickets-table">
 						<tr class="tribe-tickets-full-name-row">
@@ -154,7 +134,7 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 								<label for="tribe-tickets-full-name"><?php esc_html_e( 'Full Name', 'event-tickets' ); ?>:</label>
 							</td>
 							<td colspan="3">
-								<input type="text" name="attendee[full_name]" id="tribe-tickets-full-name" value="<?php echo esc_html( $name ); ?>">
+								<input type="text" name="attendee[full_name]" id="tribe-tickets-full-name">
 							</td>
 						</tr>
 						<tr class="tribe-tickets-email-row">
@@ -162,7 +142,7 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 								<label for="tribe-tickets-email"><?php esc_html_e( 'Email', 'event-tickets' ); ?>:</label>
 							</td>
 							<td colspan="3">
-								<input type="email" name="attendee[email]" id="tribe-tickets-email" value="<?php echo esc_html( $email ); ?>">
+								<input type="email" name="attendee[email]" id="tribe-tickets-email">
 							</td>
 						</tr>
 
@@ -235,14 +215,14 @@ $messages_class = $messages ? 'tribe-rsvp-message-display' : '';
 
 <?php
 $content = ob_get_clean();
-echo $content;
-
 if ( $is_there_any_product ) {
-	// If we have available tickets there is generally no need to display a 'tickets unavailable' message
+	echo $content;
+
+	// If we have rendered tickets there is generally no need to display a 'tickets unavailable' message
 	// for this post
 	$this->do_not_show_tickets_unavailable_message();
 } else {
-	// Indicate that there are not any tickets, so a 'tickets unavailable' message may be
+	// Indicate that we did not render any tickets, so a 'tickets unavailable' message may be
 	// appropriate (depending on whether other ticket providers are active and have a similar
 	// result)
 	$this->maybe_show_tickets_unavailable_message( $tickets );

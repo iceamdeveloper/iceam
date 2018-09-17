@@ -54,8 +54,6 @@ class Tribe__Tickets__Query {
 		$cache      = tribe( 'tickets.cache' );
 		$post_types = (array) $query->get( 'post_type', array( 'post' ) );
 
-		$cache->include_past( true );
-
 		$ids = $has_tickets ? $cache->posts_with_ticket_types( $post_types ) : $cache->posts_without_ticket_types( $post_types );
 
 		$post__in = $query->get( 'post__in' );
@@ -69,7 +67,5 @@ class Tribe__Tickets__Query {
 
 		$query->set( 'post__in', $in );
 		$query->query_vars['post__in'] = $in;
-
-		$cache->include_past( false );
 	}
 }

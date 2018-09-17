@@ -104,4 +104,4 @@ tribe.utils = tribe.utils || {};
 				return p1.toUpperCase();
 			} );
 	};
-}( tribe.utils, window.underscore || _ ) );
+}( tribe.utils, _ ) );

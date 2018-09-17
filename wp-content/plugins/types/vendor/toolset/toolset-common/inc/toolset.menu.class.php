@@ -22,9 +22,6 @@ if ( ! class_exists( 'Toolset_Menu', false ) ) {
      */
     class Toolset_Menu {
 
-
-    	const TROUBLESHOOTING_PAGE_SLUG = 'toolset-debug-information';
-
         public $toolset_pages;
 
         public function __construct() {
@@ -35,6 +32,7 @@ if ( ! class_exists( 'Toolset_Menu', false ) ) {
             add_action( 'admin_init',											array( &$this, 'admin_init' ), 1 );
             add_action( 'admin_menu',											array( &$this, 'admin_menu' ) );
             add_action( 'admin_enqueue_scripts', 								array( &$this, 'admin_enqueue_scripts' ) );
+
             add_filter( 'toolset_filter_register_menu_pages', 					array( &$this, 'register_debug_page_in_menu' ), 100 );
         }
 
@@ -98,6 +96,7 @@ if ( ! class_exists( 'Toolset_Menu', false ) ) {
                         $this->add_submenu_page( $page, $top_level_page );
                     }
                 }
+
             }
         }
 
@@ -239,10 +238,10 @@ if ( ! class_exists( 'Toolset_Menu', false ) ) {
         public function register_debug_page_in_menu( $pages ) {
             if (
                 isset( $_GET['page'] )
-                && $_GET['page'] === self::TROUBLESHOOTING_PAGE_SLUG
+                && $_GET['page'] == 'toolset-debug-information'
             ) {
                 $pages[] = array(
-                    'slug'			=> self::TROUBLESHOOTING_PAGE_SLUG,
+                    'slug'			=> 'toolset-debug-information',
                     'menu_title'	=> __( 'Toolset Debug', 'wpv-views' ),
                     'page_title'	=> __( 'Toolset Debug', 'wpv-views' ),
                     'callback'		=> array( $this, 'debug_page' )
@@ -257,9 +256,10 @@ if ( ! class_exists( 'Toolset_Menu', false ) ) {
             return $pages;
         }
 
-
         public function debug_page() {
+
 	        $page = Toolset_Page_Troubleshooting::get_instance();
+
 	        $page->render();
         }
 

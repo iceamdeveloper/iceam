@@ -134,7 +134,7 @@ class Toolset_Script {
 class Toolset_Assets_Manager {
 
 
-	private static $instance;
+	protected static $instance;
 
 
 	protected $styles = array();
@@ -172,8 +172,6 @@ class Toolset_Assets_Manager {
 
 	const SCRIPT_ICL_EDITOR = 'icl_editor-script';
 	const SCRIPT_ICL_MEDIA_MANAGER = 'icl_media-manager-js';
-	
-	const SCRIPT_TOOLSET_MEDIA_MANAGER = 'toolset-media-manager-js';
 
 	const SCRIPT_KNOCKOUT = 'knockout';
 	const SCRIPT_KNOCKOUT_MAPPING = 'knockout-mapping';
@@ -195,10 +193,6 @@ class Toolset_Assets_Manager {
 	const SCRIPT_CHOSEN = 'toolset-chosen';
 	const SCRIPT_CHOSEN_WRAPPER = 'toolset-chosen-wrapper';
 
-	// parsley lib for field validation
-	const SCRIPT_PARSLEY = 'toolset-parsley';
-
-
 	/**
 	 * For compatibility with ACF Plugin that's not using the right handle for this module (wp-event-manager)
 	 * we are using ACF handle to prevent unwanted overrides of window.wp.hooks namespace (******!)
@@ -210,8 +204,6 @@ class Toolset_Assets_Manager {
 	// Styles
 	//
 	//
-
-	const STYLE_PARSLEY = 'toolset-parsley-style';
 
 	const STYLE_CODEMIRROR = 'toolset-meta-html-codemirror-css';
 	const STYLE_CODEMIRROR_CSS_HINT = 'toolset-meta-html-codemirror-css-hint-css';
@@ -313,17 +305,8 @@ class Toolset_Assets_Manager {
 	}
 
 
-	/**
-	 * Note: This *can not* be directly used in subclasses.
-	 *
-	 * @return Toolset_Assets_Manager
-	 */
 	public static function get_instance() {
-		if( null === self::$instance ) {
-			self::$instance = new self();
-		}
-
-		return self::$instance;
+		return self::getInstance();
 	}
 
 
@@ -405,13 +388,6 @@ class Toolset_Assets_Manager {
 			$this->assets_url . '/visual-editor/res/js/codemirror/addon/hint/show-hint.css',
 			array(),
 			"5.5.0"
-		);
-
-		$this->register_style(
-			self::STYLE_PARSLEY,
-			$this->assets_url . '/res/lib/parsley/parsley.css',
-			array(),
-			'2.8.0'
 		);
 
 		$this->register_style(
@@ -574,14 +550,6 @@ class Toolset_Assets_Manager {
 		);
 
 		$this->register_script(
-			self::SCRIPT_PARSLEY,
-			$this->assets_url . '/res/lib/parsley/parsley.js',
-			array('jquery'),
-			'2.8.0',
-			true
-		);
-
-		$this->register_script(
 			self::SCRIPT_CHOSEN,
 			$this->assets_url . "/res/lib/chosen/chosen.jquery.js",
 			array( 'jquery' ),
@@ -736,13 +704,6 @@ class Toolset_Assets_Manager {
 			self::SCRIPT_ICL_MEDIA_MANAGER,
 			$this->assets_url . '/visual-editor/res/js/icl_media_manager.js',
 			array( self::SCRIPT_ICL_EDITOR ),
-			TOOLSET_COMMON_VERSION
-		);
-		
-		$this->register_script(
-			self::SCRIPT_TOOLSET_MEDIA_MANAGER,
-			$this->assets_url . "/res/js/toolset-media-manager.js",
-			array( self::SCRIPT_ICL_EDITOR, self::SCRIPT_TOOLSET_EVENT_MANAGER ),
 			TOOLSET_COMMON_VERSION
 		);
 
@@ -945,15 +906,6 @@ class Toolset_Assets_Manager {
 				unset( $this->styles[ $handles ] );
 			}
 		}
-	}
-
-
-	public function add_script( Toolset_Script $script ) {
-		if( isset( $this->scripts[ $script->handle ] ) ) {
-			return;
-		}
-
-		$this->scripts[ $script->handle ] = $script;
 	}
 
 

@@ -439,8 +439,10 @@ class Tribe__Meta__Chunker {
 		if ( ! empty( $this->max_chunk_size ) ) {
 			return $this->max_chunk_size;
 		}
-
-		$max_size = tribe( 'db' )->get_max_allowed_packet_size();
+		/** @var wpdb $wpdb */
+		global $wpdb;
+		$max_size = $wpdb->get_results( "SHOW VARIABLES LIKE 'max_allowed_packet';", ARRAY_A );
+		$max_size = ! empty( $max_size[0]['Value'] ) ? $max_size[0]['Value'] : 1048576;
 
 		/**
 		 * Filters the max size of the of the chunks in bytes.

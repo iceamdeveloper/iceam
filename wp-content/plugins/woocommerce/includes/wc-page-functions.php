@@ -4,11 +4,15 @@
  *
  * Functions related to pages and menus.
  *
+ * @author   Automattic
+ * @category Core
  * @package  WooCommerce\Functions
  * @version  2.6.0
  */
 
-defined( 'ABSPATH' ) || exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly.
+}
 
 /**
  * Replace a page title with the endpoint title.
@@ -58,18 +62,12 @@ function wc_get_page_id( $page ) {
 /**
  * Retrieve page permalink.
  *
- * @param string      $page page slug.
- * @param string|bool $fallback Fallback URL if page is not set. Defaults to home URL. @since 3.4.0.
+ * @param string $page page slug.
  * @return string
  */
-function wc_get_page_permalink( $page, $fallback = null ) {
+function wc_get_page_permalink( $page ) {
 	$page_id   = wc_get_page_id( $page );
-	$permalink = 0 < $page_id ? get_permalink( $page_id ) : '';
-
-	if ( ! $permalink ) {
-		$permalink = is_null( $fallback ) ? get_home_url() : $fallback;
-	}
-
+	$permalink = 0 < $page_id ? get_permalink( $page_id ) : get_home_url();
 	return apply_filters( 'woocommerce_get_' . $page . '_page_permalink', $permalink );
 }
 
@@ -101,13 +99,7 @@ function wc_get_endpoint_url( $endpoint, $value = '', $permalink = '' ) {
 		} else {
 			$query_string = '';
 		}
-		$url = trailingslashit( $permalink ) . trailingslashit( $endpoint );
-
-		if ( $value ) {
-			$url .= trailingslashit( $value );
-		}
-
-		$url .= $query_string;
+		$url = trailingslashit( $permalink ) . $endpoint . '/' . $value . $query_string;
 	} else {
 		$url = add_query_arg( $endpoint, $value, $permalink );
 	}
@@ -156,7 +148,7 @@ function wc_nav_menu_item_classes( $menu_items ) {
 		return $menu_items;
 	}
 
-	$shop_page      = wc_get_page_id( 'shop' );
+	$shop_page      = (int) wc_get_page_id( 'shop' );
 	$page_for_posts = (int) get_option( 'page_for_posts' );
 
 	if ( ! empty( $menu_items ) && is_array( $menu_items ) ) {
@@ -178,8 +170,8 @@ function wc_nav_menu_item_classes( $menu_items ) {
 			} elseif ( is_shop() && $shop_page === $menu_id && 'page' === $menu_item->object ) {
 				// Set active state if this is the shop page link.
 				$menu_items[ $key ]->current = true;
-				$classes[]                   = 'current-menu-item';
-				$classes[]                   = 'current_page_item';
+				$classes[] = 'current-menu-item';
+				$classes[] = 'current_page_item';
 
 			} elseif ( is_singular( 'product' ) && $shop_page === $menu_id ) {
 				// Set parent state if this is a product page.
