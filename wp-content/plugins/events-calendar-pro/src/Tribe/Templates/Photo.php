@@ -17,16 +17,18 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Photo' ) ) {
 		protected $body_class = 'events-photo';
 		const AJAX_HOOK = 'tribe_photo';
 		public $view_path = 'pro/photo/content';
+		public $photoSlug = 'photo';
 
 		/**
 		 * Array of asset packages needed for this template
 		 *
 		 * @var array
 		 **/
-		protected $asset_packages = array( 'ajax-photoview' );
+		protected $asset_packages = array();
 
 		protected function hooks() {
 			parent::hooks();
+			tribe_asset_enqueue( 'tribe-events-pro-photo' );
 			add_filter( 'tribe_events_header_attributes', array( $this, 'header_attributes' ) );
 		}
 
@@ -37,8 +39,25 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Photo' ) ) {
 		 **/
 		public function header_attributes( $attrs ) {
 			$attrs['data-startofweek'] = get_option( 'start_of_week' );
-			$attrs['data-view'] = 'photo';
-			$attrs['data-baseurl'] = tribe_get_photo_permalink( false );
+			$attrs['data-view']        = 'photo';
+			$attrs['data-baseurl']     = tribe_get_photo_permalink( false );
+
+			$term         = false;
+			$term_name    = get_query_var( Tribe__Events__Main::TAXONOMY );
+
+			if ( ! empty( $term_name ) ) {
+				$term_obj = get_term_by( 'slug', $term_name, Tribe__Events__Main::TAXONOMY );
+
+				if ( ! empty( $term_obj ) ) {
+					$term = 0 < $term_obj->term_id ? $term_obj->term_id : false;
+					if ( $term ) {
+						$term_link = get_term_link( (int) $term, Tribe__Events__Main::TAXONOMY );
+						if ( ! is_wp_error( $term_link ) ) {
+							$attrs['data-baseurl'] = trailingslashit( $term_link . $this->photoSlug );
+						}
+					}
+				}
+			}
 
 			return apply_filters( 'tribe_events_pro_header_attributes', $attrs );
 		}
@@ -96,9 +115,8 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Photo' ) ) {
 				$args['order'] = 'DESC';
 			}
 
-
 			$query = Tribe__Events__Query::getEvents( $args, true );
-			$hash  = $query->query_vars;
+			$hash  = $args;
 
 			$hash['paged']      = null;
 			$hash['start_date'] = null;
@@ -119,7 +137,9 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Photo' ) ) {
 				'view'        => $view_state,
 			);
 
-			global $wp_query, $post;
+			global $post;
+			global $wp_query;
+
 			$wp_query = $query;
 			if ( ! empty( $query->posts ) ) {
 				$post = $query->posts[0];

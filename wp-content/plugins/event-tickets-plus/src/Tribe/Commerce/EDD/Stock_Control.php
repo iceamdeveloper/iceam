@@ -128,8 +128,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 	public function get_purchased_inventory( $ticket_id, array $order_statuses = null ) {
 		global $wpdb;
 
-		$this->update_ticket_inventory_counts( $ticket_id );
-
 		if ( null === $order_statuses ) {
 			$order_statuses = $this->get_valid_payment_statuses();
 		}
@@ -150,60 +148,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
         ";
 
 		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $ticket_id ) );
-	}
-
-	/**
-	 * Tries to ensure purchased inventory calculations for a given ticket are correct.
-	 *
-	 * Releases 3.9.1 and earlier did not record the amount of purchased inventory reliably,
-	 * this method looks for a marker that indicates it has already been recomputed or else
-	 * recomputes purchased inventory levels and *then* sets the marker so the process does
-	 * not have to repeat.
-	 *
-	 * @todo  remove 6 months or more from release 118
-	 * @param int $ticket_id
-	 */
-	protected function update_ticket_inventory_counts( $ticket_id ) {
-		// If this process was already completed let's do nothing more
-		if ( get_post_meta( $ticket_id, self::COMPUTED_INVENTORY, true ) ) {
-			return;
-		}
-
-		// For each EDD payment that looks like it might contain a purchase of $ticket_id,
-		// re-establish the total amount of $ticket_id stock purchased
-		foreach ( $this->possible_purchases_of( $ticket_id ) as $payment_id ) {
-			$payment_data = edd_get_payment_meta( $payment_id );
-			$this->record_purchased_inventory( $payment_id, $payment_data );
-		}
-
-		// Typically we will not want to re-determine this: set a flag accordingly
-		update_post_meta( $ticket_id, self::COMPUTED_INVENTORY, true );
-	}
-
-	/**
-	 * Returns a (possibly empty) list of edd_payments that might have included purchases
-	 * of the specified ticket ID.
-	 *
-	 * @todo   remove when $this->compute_ticket_purchases() is also removed
-	 * @param  int $ticket_id
-	 * @return array
-	 */
-	protected function possible_purchases_of( $ticket_id ) {
-		global $wpdb;
-
-		$sql = "
-			SELECT
-			    $wpdb->postmeta.post_id
-			FROM
-			    $wpdb->posts
-			        JOIN
-			    $wpdb->postmeta ON $wpdb->postmeta.post_id = $wpdb->posts.ID
-			WHERE
-			    meta_key = '_edd_payment_meta'
-			        AND LOCATE( '%d', meta_value) > 0;
-        ";
-
-		return $wpdb->get_col( $wpdb->prepare( $sql, $ticket_id ) );
 	}
 
 	/**

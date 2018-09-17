@@ -29,6 +29,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	protected static $orders = array();
 
 	/**
+	 * @var string The user option that will be used to store the number of orders per page to show.
+	 */
+	public $per_page_option;
+
+	/**
 	 * Class constructor
 	 */
 	public function __construct() {
@@ -37,6 +42,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 			'plural'   => 'orders',
 			'ajax'     => true,
 		);
+
+		$this->per_page_option = Tribe__Tickets_Plus__Commerce__WooCommerce__Screen_Options::$per_page_user_option;
+
+		$screen = get_current_screen();
+
+		if ( $screen instanceof WP_Screen ) {
+			$screen->add_option( 'per_page', array(
+				'label'  => __( 'Number of orders per page:', 'event-tickets-plus' ),
+				'option' => $this->per_page_option,
+			) );
+		}
 
 		parent::__construct( $args );
 	}//end __construct
@@ -52,14 +68,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	public function search_box( $text, $input_id ) {
 		return;
 	}//end search_box
-
-	/**
-	 * Display the pagination.
-	 * We are not paginating the order list, so it returns empty.
-	 */
-	public function pagination( $which ) {
-		return '';
-	}//end pagination
 
 	/**
 	 * Checks the current user's permissions
@@ -237,6 +245,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		$order_number_link = '<a href="' . esc_url( $order_url ) . '">#' . absint( $order_number ) . '</a>';
 
+		/**
+		 * Allows for control of the order number link in the attendee report
+		 *
+		 * @since 4.7.3
+		 *
+		 * @param string $order_number_link The default "order" link.
+		 * @param int    $order_number      The Post ID of the order.
+		 */
+		$order_number_link = apply_filters( 'tribe_tickets_plus_woocommerce_order_link_url', $order_number_link, $order_number );
+
 		$output = sprintf(
 			esc_html__(
 				'%1$s', 'event-tickets-plus'
@@ -245,7 +263,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		if ( 'completed' !== $item['status'] ) {
 			$output .= '<div class="order-status order-status-' . esc_attr( $item['status'] ) . '">' . esc_html(
-					ucwords( $item['status'] )
+					wc_get_order_status_name( $item['status'] )
 				) . '</div>';
 		}
 
@@ -282,16 +300,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 */
 	public function column_total( $item ) {
 		$total = 0;
-
 		foreach ( $this->valid_order_items[ $item['id'] ] as $line_item ) {
-			$total += $line_item['subtotal'];
+			$total += (float) $line_item['subtotal'];
+			if ( self::item_has_discount( $line_item ) ) {
+				$total -= self::item_get_discount( $line_item );
+			}
 		}
 
 		if ( self::$pass_fees_to_user ) {
 			$total += $this->calc_site_fee( $total );
 		}
 
-		return tribe_format_currency( number_format( $total, 2 ) );
+		$post_id = Tribe__Utils__Array::get_in_any( array( $_GET, $_REQUEST ), 'event_id', null );
+
+		return tribe_format_currency( number_format( $total, 2 ), $post_id );
 	}//end column_total
 
 	/**
@@ -333,10 +355,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		WC()->api->includes();
 		WC()->api->register_resources( new WC_API_Server( '/' ) );
-
-		$main = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
-
-		$tickets = $main->get_tickets( $event_id );
 
 		$args = array(
 			'post_type'      => 'tribe_wooticket',
@@ -411,20 +429,23 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	public function prepare_items() {
 		$this->event_id = isset( $_GET['event_id'] ) ? $_GET['event_id'] : 0;
 
-		$this->items = self::get_orders( $this->event_id );
-		$total_items = count( $this->items );
-		$per_page    = $total_items;
+		$items       = self::get_orders( $this->event_id );
+		$total_items = count( $items );
+		$per_page    = $this->get_items_per_page( $this->per_page_option );
 
-		$this->valid_order_items = self::get_valid_order_items_for_event( $this->event_id, $this->items );
+		$this->valid_order_items = self::get_valid_order_items_for_event( $this->event_id, $items );
+
+		$current_page = $this->get_pagenum();
+
+		$this->items = array_slice( $items, ( $current_page - 1 ) * $per_page, $per_page );
 
 		$this->set_pagination_args(
 			array(
 				'total_items' => $total_items,
 				'per_page'    => $per_page,
-				'total_pages' => 1,
 			)
 		);
-	}//end prepare_items
+	}
 
 	/**
 	 * Return sales (sans fees) for the given event
@@ -461,6 +482,71 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		}
 
 		return $total;
+	}
+
+	/**
+	 * Get the total of discounts for the given event
+	 *
+	 * @param int $event_id  Event post ID
+	 *
+	 * @return float|int
+	 */
+	public static function event_discounts( $event_id ) {
+		$orders            = self::get_orders( $event_id );
+		$valid_order_items = self::get_valid_order_items_for_event( $event_id, $orders );
+
+		$discounts = 0;
+
+		foreach ( $valid_order_items as $order_id => $order ) {
+			$item = $orders[ $order_id ];
+
+			if ( 'cancelled' === $item['status']
+			     || 'refunded' === $item['status']
+			     || 'failed' === $item['status']
+			) {
+				continue;
+			}
+
+			foreach ( $order as $line_item ) {
+				if ( self::item_has_discount( $line_item ) ) {
+					$discounts += self::item_get_discount( $line_item );
+				}
+			}
+		}
+
+		return $discounts;
+	}
+
+	/**
+	 * Logic to detect if an item has a discount based on a discrepancy between total and subtotal.
+	 *
+	 * @see https://github.com/woocommerce/woocommerce/blob/869fb52927b675bd4c200cf3480a8813c9465a28/includes/admin/meta-boxes/views/html-order-item.php#L54
+	 *
+	 * @since 4.7.3
+	 *
+	 * @param $item The line item to review if has a discount
+	 *
+	 * @return bool
+	 */
+	public static function item_has_discount( $item ) {
+		return (
+			isset( $item['subtotal'] )
+			&& isset( $item['total'] )
+			&& $item['subtotal'] !== $item['total']
+		);
+	}
+
+	/**
+	 * Get the amount of the discount to be applied
+	 *
+	 * @since 4.7.3
+	 *
+	 * @param $item The line item with the data to process the order
+	 *
+	 * @return float
+	 */
+	public static function item_get_discount( $item ) {
+		return (float) $item['subtotal'] - (float) $item['total'];
 	}
 
 	/**

@@ -165,7 +165,14 @@ class Tribe__Events__Pro__Recurrence__Meta {
 				// set the end too to stick with new format
 				$exclusion['end'] = $formatted;
 			} else {
-				$exclusion['end'] = date( $datepicker_format, strtotime( $exclusion['end'] ) );
+				if ( isset( $exlcusion['end'] ) ) {
+					$exclusion['end'] = date( $datepicker_format, strtotime( $exclusion['end'] ) );
+				}
+			}
+
+			// If there's no value, clean the output of the custom date
+			if ( isset( $exclusion['custom']['date']['date'] ) && ! $exclusion['custom']['date']['date'] ) {
+				$exclusion = Tribe__Utils__Array::set( $exclusion, array( 'custom', 'date', 'date' ), '' );
 			}
 		}
 
@@ -195,7 +202,8 @@ class Tribe__Events__Pro__Recurrence__Meta {
 		if ( ! $menu_parent ) {
 			return;
 		}
-		if ( current_user_can( 'edit_post', $post->ID ) ) {
+		// We need to make sure we're editing the correct post (in cases where we show events on venue pages, etc), and the user can do so.
+		if ( get_edit_post_link( $post->ID ) === $menu_parent->href && current_user_can( 'edit_post', $post->ID ) ) {
 			$wp_admin_bar->add_node( array(
 				'id'     => 'edit-series',
 				'title'  => __( 'Edit Series', 'tribe-events-calendar-pro' ),
@@ -950,7 +958,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 		if ( empty( $post_id ) ) {
 			return array();
 		}
-		$cache = new Tribe__Cache();
+		$cache = tribe( 'cache' );
 		$dates = $cache->get( 'event_dates_' . $post_id, 'save_post' );
 		if ( is_array( $dates ) ) {
 			return $dates;
@@ -976,7 +984,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 
 		$sql       = $wpdb->prepare( $sql, $post_id, $post_id, Tribe__Events__Main::POSTTYPE );
 		$result    = $wpdb->get_col( $sql );
-		$cache->set( 'recurrence_start_dates_' . $post_id, $result, Tribe__Cache::NO_EXPIRATION, 'save_post' );
+		$cache->set( 'event_dates_' . $post_id, $result, Tribe__Cache::NO_EXPIRATION, 'save_post' );
 
 		return $result;
 	}
@@ -1104,7 +1112,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 				// recurrence meta entry might be malformed
 				if ( is_wp_error( $rule ) ) {
 					// let's not process it and let's not try to fix it as it might be a third-party modification
-					tribe( 'logger' )->log_debug( "Broken recurrence data detected for event #$event_id", __CLASS__ );
+					tribe( 'logger' )->log_debug( "Broken recurrence data detected for event #{$event_id}", __CLASS__ );
 					continue;
 				}
 
@@ -1302,6 +1310,16 @@ class Tribe__Events__Pro__Recurrence__Meta {
 				__( 'October' ),
 				__( 'November' ),
 				__( 'December' ),
+			),
+			'time_spans' => array(
+				'day'               => _x( 'day', 'Used when displaying the word "day" in "the last day" or "the first day"', 'tribe-events-calendar-pro' ),
+				'days'              => _x( 'days', 'Used when displaying the word "days" in e.g. "every 3 days"', 'tribe-events-calendar-pro' ),
+				'week'              => _x( 'week', 'Used when displaying the word "week" in "the last week" or "the first week"', 'tribe-events-calendar-pro' ),
+				'weeks'             => _x( 'weeks', 'Used when displaying the word "weeks" in e.g. "every 3 weeks"', 'tribe-events-calendar-pro' ),
+				'month'             => _x( 'month', 'Used when displaying the word "month" in e.g. "every month"', 'tribe-events-calendar-pro' ),
+				'months'            => _x( 'months', 'Used when displaying the word "months" in e.g. "every 3 months"', 'tribe-events-calendar-pro' ),
+				'year'              => _x( 'year', 'Used when displaying the word "year" in e.g. "every year"', 'tribe-events-calendar-pro' ),
+				'years'             => _x( 'years', 'Used when displaying the word "years" in e.g. "every 2 years"', 'tribe-events-calendar-pro' ),
 			),
 			'collection_joiner' => _x( 'and', 'Joins the last item in a list of items (i.e. the "and" in Monday, Tuesday, and Wednesday)', 'tribe-events-calendar-pro' ),
 			'day_placeholder'   => _x( '[day]', 'Placeholder text for a day of the week (or days of the week) before the user has selected any', 'tribe-events-calendar-pro' ),
@@ -1541,14 +1559,14 @@ class Tribe__Events__Pro__Recurrence__Meta {
 
 			// If the events are single events, use the dates of those single instances.
 			if ( 'date' === $type && isset( $rule['custom']['date']['date'] ) ) {
-				$series_end = date( tribe_get_date_format( true ), strtotime( $rule['custom']['date']['date'] ) );
+				$series_end = date_i18n( tribe_get_date_format( true ), strtotime( $rule['custom']['date']['date'] ) );
 
 			// Otherwise there's no end date specified.
 			} else {
 				$series_end = _x( 'an unspecified date', 'An unspecified end date', 'tribe-events-calendar-pro' );
 			}
 		} else {
-			$series_end = date( tribe_get_date_format( true ), strtotime( $rule['end'] ) );
+			$series_end = date_i18n( tribe_get_date_format( true ), strtotime( $rule['end'] ) );
 		}
 
 		$text = str_replace( array(
@@ -1701,7 +1719,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 				'userToggleSubsequentRecurrences'  => array(
 					'type'            => 'checkbox_bool',
 					'label'           => __( 'Front-end recurring event instances toggle', 'tribe-events-calendar-pro' ),
-					'tooltip'         => __( 'Allow users to decide whether to show all instances of a recurring event.', 'tribe-events-calendar-pro' ),
+					'tooltip'         => __( 'Allow users to decide whether to show all instances of a recurring event on list-style views.', 'tribe-events-calendar-pro' ),
 					'default'         => false,
 					'validation_type' => 'boolean',
 				),

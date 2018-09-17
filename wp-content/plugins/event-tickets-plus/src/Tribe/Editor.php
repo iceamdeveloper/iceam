@@ -1,5 +1,12 @@
 <?php
-class Tribe__Tickets_Plus__Editor {
+
+/**
+ * Class Tribe__Tickets_Plus__Editor
+ *
+ * @since 4.7
+ */
+class Tribe__Tickets_Plus__Editor extends Tribe__Tickets__Editor {
+
 	/**
 	 * Configure all action and filters user by this Class
 	 *
@@ -8,51 +15,34 @@ class Tribe__Tickets_Plus__Editor {
 	 * @return void
 	 */
 	public function hook() {
-		add_action( 'tribe_events_tickets_post_capacity', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/button-view-orders' ) );
+		add_action( 'tribe_events_tickets_settings_content_before', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/fieldset/settings-capacity' ) );
+		add_action( 'tribe_events_tickets_settings_content', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/settings-attendees' ) );
 		add_action( 'tribe_events_tickets_capacity', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/total-capacity' ) );
-		add_action( 'tribe_events_tickets_settings_content', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/panel/settings' ) );
-		add_action( 'tribe_events_tickets_metabox_edit_main', array( $this, 'filter_get_price_fields' ), 10, 2 );
-		add_action( 'tribe_events_tickets_new_ticket_buttons', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/button-new-ticket' ) );
-		add_action( 'tribe_events_tickets_ticket_table_add_header_column', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/column-head-price' ) );
-
-		add_action( 'tribe_events_tickets_ticket_table_add_tbody_column', array( $this, 'add_column_content_price' ), 10, 2 );
+		add_filter( 'tribe_filter_attendee_order_link', array( $this, 'filter_attendee_order_link' ), 10, 2 );
 	}
 
 	/**
-	 * Prints and returns the Price fields
+	 * Filters the link to the Orders page to show the correct one.
 	 *
-	 * @since  4.6.2
+	 * By default the link would point to PayPal ticket orders.
 	 *
-	 * @param  int  $post_id    Post ID
-	 * @param  int  $ticket_id  Ticket ID
+	 * @since 4.7
 	 *
-	 * @return string
+	 * @param string $url
+	 * @param int    $post_id
+	 *
+	 * @return string The updated Orders page URL
 	 */
-	public function filter_get_price_fields( $post_id, $ticket_id ) {
-		$context = array(
-			'post_id' => $post_id,
-			'ticket_id' => $ticket_id,
-		);
+	public function filter_attendee_order_link( $url, $post_id ) {
+		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
 
-		return tribe( 'tickets-plus.admin.views' )->template( 'editor/field-price', $context );
-	}
+		if ( 'Tribe__Tickets__Commerce__PayPal__Main' === $provider ) {
+			return $url;
+		}
 
-	/**
-	 * Prints and returns the Body for the Price Column
-	 *
-	 * @since  4.6.2
-	 *
-	 * @param  Tribe__Tickets__Ticket_Object $ticket        Ticket object
-	 * @param  mixed                         $provider_obj  The ticket provider object
-	 *
-	 * @return string
-	 */
-	public function add_column_content_price( $ticket, $provider_obj ) {
-		$context = array(
-			'ticket' => $ticket,
-			'provider_obj' => $provider_obj,
-		);
+		$url = remove_query_arg( 'page', $url );
+		$url = add_query_arg( array( 'page' => 'tickets-orders' ), $url );
 
-		return tribe( 'tickets-plus.admin.views' )->template( 'editor/column-body-price', $context );
+		return $url;
 	}
 }

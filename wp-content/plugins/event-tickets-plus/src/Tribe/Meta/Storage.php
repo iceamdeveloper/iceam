@@ -52,7 +52,10 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	private static $has_updated_meta_cookie = false;
 
 	/**
-	 * @return bool
+	 * Sets or updates the attendee meta cookies and returns the name
+	 * of the transient storing them.
+	 *
+	 * @return string
 	 */
 	public function maybe_set_attendee_meta_cookie() {
 		$empty_or_wrong_format = empty( $_POST[ self::META_DATA_KEY ] ) || ! is_array( $_POST[ self::META_DATA_KEY ] );
@@ -211,7 +214,13 @@ class Tribe__Tickets_Plus__Meta__Storage {
 		}
 
 		if ( ! $transient_id && 'product' === get_post_type( $id ) && ! is_admin() ) {
-			$transient_id = WC()->session->get( self::HASH_COOKIE_KEY );
+			$wc_session   = WC()->session;
+
+			if ( empty( $wc_session ) ) {
+				return array();
+			}
+
+			$transient_id = $wc_session->get( self::HASH_COOKIE_KEY );
 		}
 
 		if ( ! $transient_id ) {
@@ -273,7 +282,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	/**
 	 * Deletes the cookie storing the transient hash
 	 */
-	protected function delete_cookie() {
+	public function delete_cookie() {
 		setcookie( self::HASH_COOKIE_KEY, '', time() - 3600, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl() );
 		unset( $_COOKIE[ self::HASH_COOKIE_KEY ] );
 	}
@@ -284,8 +293,10 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 * @param int $id A ticket ID
 	 */
 	protected function delete_woocommerce_session( $id ) {
-		if ( 'product' === get_post_type( $id ) ) {
-			WC()->session->__unset( self::HASH_COOKIE_KEY );
+		$session = function_exists( 'WC' ) ? WC()->session : null;
+		$valid_instance = $session && $session instanceof WC_Session;
+		if ( 'product' === get_post_type( $id ) && $valid_instance ) {
+			$session->__unset( self::HASH_COOKIE_KEY );
 		}
 	}
 }

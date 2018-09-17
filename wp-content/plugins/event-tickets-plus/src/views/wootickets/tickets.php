@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.6.2
+ * @version 4.8.1
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -38,6 +38,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 	class="<?php echo esc_attr( implode( ' ', $cart_classes ) ); ?>"
 	method="post"
 	enctype='multipart/form-data'
+	novalidate
 >
 
 	<h2 class="tribe-events-tickets-title tribe--tickets">
@@ -72,7 +73,7 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 			$is_there_any_product = true;
 			$data_product_id      = '';
 
-			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
+			if ( $ticket->date_in_range() ) {
 
 				$is_there_any_product = true;
 
@@ -123,14 +124,18 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 					$max_quantity = $product->is_sold_individually() ? 1 : $max_quantity;
 					$available    = $ticket->available();
 
-					woocommerce_quantity_input( array(
+					$input = woocommerce_quantity_input( array(
 						'input_name'  => 'quantity_' . $ticket->ID,
 						'input_value' => 0,
 						'min_value'   => 0,
-						'max_value'   => $must_login ? 0 : $max_quantity, // Currently WC does not support a 'disable' attribute
-					) );
+						'max_value'   => $max_quantity,
+					), null, false );
 
 					$is_there_any_product_to_sell = true;
+					$disabled_attr = disabled( $must_login, true, false );
+					$input = str_replace( '<input type="number"', '<input type="number"' . $disabled_attr, $input );
+
+					echo $input;
 
 					if ( $available ) {
 						?>
@@ -229,23 +234,15 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 </form>
 <?php
 $content = ob_get_clean();
+echo $content;
+
 if ( $is_there_any_product ) {
-	echo $content;
-
-	// @todo remove safeguard in 4.3 or later
-	if ( $unavailability_messaging ) {
-		// If we have rendered tickets there is generally no need to display a 'tickets unavailable' message
-		// for this post
-		$this->do_not_show_tickets_unavailable_message();
-	}
+	// If we have available tickets there is generally no need to display a 'tickets unavailable' message
+	// for this post
+	$this->do_not_show_tickets_unavailable_message();
 } else {
-	// @todo remove safeguard in 4.3 or later
-	if ( $unavailability_messaging ) {
-		$unavailability_message = $this->get_tickets_unavailable_message( $tickets );
-
-		// if there isn't an unavailability message, bail
-		if ( ! $unavailability_message ) {
-			return;
-		}
-	}
+	// Indicate that there are not any tickets, so a 'tickets unavailable' message may be
+	// appropriate (depending on whether other ticket providers are active and have a similar
+	// result)
+	$this->maybe_show_tickets_unavailable_message( $tickets );
 }

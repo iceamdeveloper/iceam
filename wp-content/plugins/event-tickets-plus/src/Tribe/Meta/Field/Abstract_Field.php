@@ -235,10 +235,6 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 
 		$field = (array) $field;
 
-		if ( empty( $field['slug'] ) ) {
-			return;
-		}
-
 		include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( "meta/{$template}" );
 
 		return ob_get_clean();

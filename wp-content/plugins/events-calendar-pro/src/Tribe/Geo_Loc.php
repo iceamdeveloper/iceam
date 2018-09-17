@@ -16,37 +16,63 @@ class Tribe__Events__Pro__Geo_Loc {
 	 * Meta key for the venue Latitude
 	 */
 	const LAT = '_VenueLat';
+
 	/**
 	 * Meta key for the venue Longitude
 	 */
 	const LNG = '_VenueLng';
+
 	/**
-	 * Meta key for if the venue ha overwriten Coordinates
+	 * Meta key for if the venue has overwritten coordinates.
 	 */
 	const OVERWRITE = '_VenueOverwriteCoords';
+
 	/**
-	 * Meta key for the full address we used to get the geo points from Google Maps
-	 * It's used as a cache, so we only ping Google when the user changed something in the address.
+	 * The meta key for the full address, either from user input that then gets
+     * sent to the geocoder or, if geocoding is successful, this field gets
+     * overwritten with that full address result. Therefore, it's used as a
+     * cache to avoid sending geocoder requests unless this field changes (i.e.
+     * does not match the value saved from the last geocoding result).
 	 */
 	const ADDRESS = '_VenueGeoAddress';
+
 	/**
 	 * Option key for the Geoloc settings
 	 */
 	const OPTIONNAME = 'tribe_geoloc_options';
+
 	/**
 	 * Cache key for the geo point at the center of all site's venues
 	 */
 	const ESTIMATION_CACHE_KEY = 'geoloc_center_point_estimation';
+
 	/**
 	 * Earth radio in Kms. Used for the distance math.
 	 */
 	const EARTH_RADIO = 6371;
 
 	/**
+	 * Deprecated once we reverted the geolocalization changes to this class
+	 *
+	 * @since      4.4.24
+	 * @deprecated 4.4.24.2
+	 */
+	const GEODATE = '_VenueGeoDateUTC';
+
+	/**
+	 * Deprecated once we reverted the geolocalization changes to this class
+	 *
+	 * @since      4.4.24
+	 * @deprecated 4.4.24.2
+	 */
+	const SITE_GEO_FIXED_OPTIONNAME = '_tribe_geoloc_fixed';
+
+	/**
 	 * Settings.
 	 * @var
 	 */
 	protected static $options;
+
 	/**
 	 * Slug of the map view
 	 * @var mixed|void
@@ -106,6 +132,7 @@ class Tribe__Events__Pro__Geo_Loc {
 		add_filter( 'tribe_events_importer_venue_column_names', array( $this, 'filter_aggregator_add_overwrite_geolocation_column' ) );
 
 		add_action( 'admin_notices', array( $this, 'maybe_notify_about_google_over_limit' ) );
+		add_filter( 'tribe_events_google_map_link', array( $this, 'google_map_link' ), 10, 2 );
 	}
 
 	/**
@@ -129,7 +156,7 @@ class Tribe__Events__Pro__Geo_Loc {
 				|| tribe_is_map()
 			)
 		) {
-			Tribe__Events__Pro__Template_Factory::asset_package( 'ajax-maps' );
+			tribe_asset_enqueue( 'tribe-events-pro-map' );
 		}
 	}
 
@@ -258,7 +285,11 @@ class Tribe__Events__Pro__Geo_Loc {
 	 * @return array
 	 */
 	public function filter_aggregator_add_overwrite_geolocation_value( $venue, $record, $venue_id, $importer ) {
-		$venue['OverwriteCoords'] = $importer->get_value_by_key( $record, 'venue_overwrite_coords' );
+		$record_value = $importer->get_value_by_key( $record, 'venue_overwrite_coords' );
+		$from_venue   = Tribe__Utils__Array::get( $venue, 'OverwriteCoords', '' );
+
+		$venue['OverwriteCoords'] = '' === $record_value && '' !== $from_venue ? $from_venue : $record_value;
+
 		return $venue;
 	}
 
@@ -272,7 +303,7 @@ class Tribe__Events__Pro__Geo_Loc {
 	 * @return array
 	 */
 	public function filter_aggregator_add_overwrite_geolocation_column( $columns ) {
-		$columns['venue_overwrite_coords'] = esc_html__( 'Venue Overwrite Coordinates', 'the-events-calendar' );
+		$columns['venue_overwrite_coords'] = esc_html__( 'Venue Overwrite Coordinates', 'tribe-events-calendar-pro' );
 
 		return $columns;
 	}
@@ -454,7 +485,7 @@ class Tribe__Events__Pro__Geo_Loc {
 		 * @param array $rewrite_slugs An array of rewrite slugs to use; defaults to [ 'map' ], the
 		 *                             default geocode-based rewrite slug.
 		 */
-		$rewrite_slugs = apply_filters('tribe_events_pro_geocode_rewrite_slugs', array( $this->rewrite_slug ) );
+		$rewrite_slugs = apply_filters( 'tribe_events_pro_geocode_rewrite_slugs', array( $this->rewrite_slug ) );
 
 		foreach ( $rewrite_slugs as $rewrite_slug ) {
 			$newRules[ $base . $rewrite_slug ] = 'index.php?post_type=' . Tribe__Events__Main::POSTTYPE . '&eventDisplay=map';
@@ -505,7 +536,7 @@ class Tribe__Events__Pro__Geo_Loc {
 		$reset = false;
 
 		// Check the Overwrite data, otherwise just reset it
-		if ( $overwrite && false !== $_lat && false !== $_lng ){
+		if ( $overwrite && false !== $_lat && false !== $_lng ) {
 			update_post_meta( $venueId, self::OVERWRITE, 1 );
 			update_post_meta( $venueId, self::LAT, (string) $_lat );
 			update_post_meta( $venueId, self::LNG, (string) $_lng );
@@ -513,13 +544,17 @@ class Tribe__Events__Pro__Geo_Loc {
 			$this->clear_min_max_coords_cache();
 			return true;
 		} else {
-			if ( 1 === (int) get_post_meta( $venueId, self::OVERWRITE, true ) ){
+			if ( 1 === (int) get_post_meta( $venueId, self::OVERWRITE, true ) ) {
 				$reset = true;
 			}
 			update_post_meta( $venueId, self::OVERWRITE, 0 );
 		}
 
-		$address = trim( $_address . ' ' . $_city . ' ' . $_province . ' ' . $_state . ' ' . $_zip . ' ' . $_country );
+		// Remove remaining spaces from any of the pieces of the address.
+		$pieces = array_map( 'trim', compact( '_address', '_province', '_city', '_state', '_zip', '_country' ) );
+		$address = implode( ' ', array_filter( $pieces ) );
+		// Remove any parenthesis from the address and his content as well
+		$address = preg_replace( '/\(.*\)/', '', $address );
 
 		if ( empty( $address ) ) {
 			return false;
@@ -546,10 +581,10 @@ class Tribe__Events__Pro__Geo_Loc {
 		$data = wp_remote_get( apply_filters( 'tribe_events_pro_geocode_request_url', $api_url ) );
 
 		if ( is_wp_error( $data ) || ! isset( $data['body'] ) ) {
-			Tribe__Main::instance()->log()->log_warning( sprintf(
+			tribe( 'logger' )->log_warning( sprintf(
 					_x( 'Geocode request failed ($1%s - $2%s)', 'debug geodata', 'tribe-events-calendar-pro' ),
 					is_wp_error( $data ) ? $data->get_error_code() : _x( 'empty response', 'debug geodata' ),
-					$url
+                    $api_url
 				),
 				__METHOD__
 			);
@@ -570,12 +605,27 @@ class Tribe__Events__Pro__Geo_Loc {
 			return false;
 		}
 
-		if ( ! empty( $data_arr->results[0]->geometry->location->lat ) ) {
-			update_post_meta( $venueId, self::LAT, (string) $data_arr->results[0]->geometry->location->lat );
-		}
+		if ( ! empty( $data_arr->results[0] ) ) {
+			$geo_result = $data_arr->results[0];
 
-		if ( ! empty( $data_arr->results[0]->geometry->location->lng ) ) {
-			update_post_meta( $venueId, self::LNG, (string) $data_arr->results[0]->geometry->location->lng );
+			if ( ! empty( $geo_result->geometry->location->lat ) ) {
+				update_post_meta( $venueId, self::LAT, (string) $geo_result->geometry->location->lat );
+			}
+
+			if ( ! empty( $geo_result->geometry->location->lng ) ) {
+				update_post_meta( $venueId, self::LNG, (string) $geo_result->geometry->location->lng );
+			}
+
+			/**
+			 * Allows further processing of geodata for Venue.
+			 *
+			 * @since 4.4.31
+			 *
+			 * @param int    $venueId    Venue ID.
+			 * @param object $geo_result Geo result object.
+			 * @param array  $pieces     User provided address pieces.
+			 */
+			do_action( 'tribe_geoloc_save_venue_geodata', $venueId, $geo_result, $pieces );
 		}
 
 		// Saving the aggregated address so we don't need to ping google on every save
@@ -897,19 +947,16 @@ class Tribe__Events__Pro__Geo_Loc {
 		$coords = apply_filters( 'tribe_geoloc_pre_get_min_max_coords', null );
 
 		if ( null === $coords ) {
-			// Since we are just getting the IDs this is rather performant.
-			$published_events_query = tribe_get_events(
-				array(
-					'post_type'      => Tribe__Events__Main::POSTTYPE,
-					'posts_per_page' => - 1,
-					'fields'         => 'ids',
-					'orderby'        => 'none',
-				)
-			);
+			$venues_list = $this->get_active_venues();
+			$published_venues = array();
+
+			if ( ! empty( $venues_list ) ) {
+				$published_venues = $this->filter_published_venues( $venues_list );
+			}
 
 			// Only run query if there are events
-			if ( ! empty( $published_events_query ) ) {
-				$event_ids_prepared = implode( ', ', $published_events_query );
+			if ( ! empty( $published_venues ) ) {
+				$venues_ids_prepared = implode( ', ', $published_venues );
 				$latitude_key       = self::LAT;
 				$longitude_key      = self::LNG;
 
@@ -935,13 +982,7 @@ class Tribe__Events__Pro__Geo_Loc {
 								`meta_key` = '{$latitude_key}'
 								OR `meta_key` = '{$longitude_key}'
 							)
-							AND `post_id` IN (
-								SELECT `meta_value`
-								FROM `{$wpdb->postmeta}`
-								WHERE
-									`meta_key` = '_EventVenueID'
-									AND `post_id` IN ( {$event_ids_prepared} )
-							)
+							AND `post_id` IN ( {$venues_ids_prepared} )
 					) AS `coords`
 				";
 
@@ -968,6 +1009,56 @@ class Tribe__Events__Pro__Geo_Loc {
 		}
 
 		return $coords;
+	}
+
+	/**
+	 * Get a list of IDs of all the active venues being used on events, this will allow to filter with only the active
+	 * venues used at the moment.
+	 *
+	 * @since 4.4.24
+	 *
+	 * @return array
+	 */
+	private function get_active_venues() {
+		$results = array();
+		global $wpdb;
+		$sql = "SELECT DISTINCT meta_value
+		FROM `{$wpdb->postmeta}`
+		WHERE meta_key = '_EventVenueID'";
+
+		$query = $wpdb->get_results( $sql );
+		if ( empty( $query ) || ! is_array( $query ) ) {
+			return $results;
+		}
+
+		foreach ( $query as $row ) {
+			$results[] = absint( $row->meta_value );
+		}
+
+		return $results;
+	}
+
+	/**
+	 * Makes sure the list of venues are published.
+	 *
+	 * @since 4.4.24
+	 *
+	 * @param array $list List of Venues IDs
+	 *
+	 * @return array
+	 */
+	private function filter_published_venues( $list = array() ) {
+		$query = new WP_Query(
+			array(
+				'post_type' => Tribe__Events__Venue::POSTTYPE,
+				'posts_per_page' => -1,
+				'post_status' => 'publish',
+				'fields' => 'ids',
+				'post__in' => $list,
+				'no_found_rows' => true,
+			)
+		);
+		return $query->posts;
 	}
 
 	/**
@@ -1136,7 +1227,7 @@ class Tribe__Events__Pro__Geo_Loc {
 	 */
 	public function generate_geopoints_for_all_venues() {
 
-		set_time_limit( 5 * 60 );
+		tribe_set_time_limit( 5 * 60 );
 
 		$venues = $this->get_venues_without_geoloc_info( true );
 
@@ -1172,5 +1263,49 @@ class Tribe__Events__Pro__Geo_Loc {
 		}
 
 		return self::$instance;
+	}
+
+	/**
+	 * Update the Google Map Link to add the coordinates if present to increase accuracy on it.
+	 *
+	 * @since 4.4.26
+	 *
+	 * @param $link
+	 * @param $post_id
+	 *
+	 * @return string
+	 */
+	public function google_map_link( $link, $post_id ) {
+		$venue_id = function_exists( 'tribe_get_venue_id' ) ? tribe_get_venue_id( $post_id ) : $post_id;
+		$is_venue = function_exists( 'tribe_is_venue' ) ? tribe_is_venue( $venue_id ) : false;
+
+		/**
+		 * Disable the behavior to add the coordinates if present on the Google Map Link
+		 *
+		 * @since 4.4.26
+		 *
+		 * @param $disable true to disable the behavior / false to keep doing it
+		 * @param $post_id The ID of the post being modified
+		 *
+		 * @return boolean
+		 */
+		$disable_behavior = apply_filters( 'tribe_events_pro_google_map_link_disable_coordinates', false, $post_id );
+
+		if ( ! $is_venue || $disable_behavior ) {
+			return $link;
+		}
+
+		$coordinates = tribe_get_coordinates( $post_id );
+		if ( empty( $coordinates['lat'] ) || empty( $coordinates['lng'] ) || ! function_exists( 'tribe_is_venue' ) ) {
+			return $link;
+		}
+
+		return add_query_arg(
+			array(
+				'api'   => 1,
+				'query' => urlencode( $coordinates['lat'] . ',' . $coordinates['lng'] ),
+			),
+			'https://www.google.com/maps/search/'
+		);
 	}
 }

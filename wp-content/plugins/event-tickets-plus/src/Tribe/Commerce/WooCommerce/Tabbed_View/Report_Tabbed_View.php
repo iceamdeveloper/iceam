@@ -12,35 +12,57 @@
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View {
 
 	/**
-	 * @var int The current post ID.
-	 */
-	protected $post_id;
-
-	/**
-	 * @var array A map that binds requested pages to tabs.
-	 */
-	protected $tab_map = array(
-		'tickets-attendees' => 'tribe-tickets-attendance-report',
-		'tickets-orders'    => 'tribe-tickets-plus-woocommerce-orders-report',
-	);
-
-	/**
-	 * Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View constructor.
+	 * Registers the tabbed view actions.
 	 *
-	 * @param int $post_id The current post ID.
+	 * The tabs are not AJAX powered by UI around existing links.
+	 *
+	 * @since 4.7
 	 */
-	public function __construct( $post_id ) {
-		$this->post_id = $post_id;
+	public function register() {
+		add_filter( 'tribe_tickets_orders_tabbed_view_tab_map', array( $this, 'filter_tribe_tickets_orders_tabbed_view_tab_map' ) );
+		add_action( 'tribe_tickets_orders_tabbed_view_register_tab_right', array( $this, 'register_orders_tab' ), 10, 2 );
+	}
+
+	/**
+	 * Adds the WooCommerce orders tab slug to the tab slug map.
+	 *
+	 * @since 4.7
+	 *
+	 * @param array $tab_map
+	 *
+	 * @return array
+	 */
+	public function filter_tribe_tickets_orders_tabbed_view_tab_map( array $tab_map = array() ) {
+		$tab_map['tickets-orders'] = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report::$tab_slug;
+
+		return $tab_map;
+	}
+
+	/**
+	 * Registers the WooCommerce orders tab among those the tabbed view should render.
+	 *
+	 * @since 4.7
+	 *
+	 * @param Tribe__Tabbed_View $tabbed_view
+	 * @param WP_Post            $post
+	 */
+	public function register_orders_tab( Tribe__Tabbed_View $tabbed_view, WP_Post $post ) {
+		$orders_report     = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Orders_Report_Tab( $tabbed_view );
+		$orders_report_url = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report::get_tickets_report_link( $post );
+		$orders_report->set_url( $orders_report_url );
+		$tabbed_view->register( $orders_report );
 	}
 
 	/**
 	 * Renders the tabbed view for the current post.
 	 *
-	 * The tabs are not AJAX powered by UI around existing links.
+	 * @since 4.7
+	 *
+	 * @param bool $active_tab_slug Whether this tab should be set to active or not.
 	 */
 	public function render( $active = null ) {
 		$view = new Tribe__Tabbed_View();
-		$view->set_label( apply_filters( 'the_title', get_post( $this->post_id )->post_title ) );
+		$view->set_label( apply_filters( 'the_title', get_post( $this->post_id )->post_title, $this->post_id ) );
 		$query_string = empty( $_SERVER['QUERY_STRING'] ) ? '' : '?' . $_SERVER['QUERY_STRING'];
 		$request_uri  = 'edit.php' . $query_string;
 		$view->set_url( remove_query_arg( 'tab', $request_uri ) );

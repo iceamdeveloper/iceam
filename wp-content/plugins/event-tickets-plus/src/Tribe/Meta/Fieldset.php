@@ -17,6 +17,8 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 		add_action( 'admin_menu', array( $this, 'add_menu_item' ), 11 );
 		add_action( 'save_post', array( $this, 'save_meta' ), 10, 3 );
 		$this->register_posttype();
+
+		add_filter( 'wp_insert_post_data', array( $this, 'maybe_add_default_title' ), 10, 2 );
 	}
 
 	public function add_menu_item() {
@@ -138,4 +140,28 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 
 		return $templates;
 	}
+
+	/**
+	 * Add a default title to the Ticket Fieldset if none set
+	 *
+	 * @since 4.7.3
+	 *
+	 * @param $data array an array of post data
+	 * @param $postarr array An array of elements that make up a post to update or insert
+	 *
+	 * @return array
+	 */
+	public function maybe_add_default_title( $data, $postarr ) {
+
+		if (
+			self::POSTTYPE === $data['post_type'] &&
+			empty( $data['post_title'] )
+		) {
+			$id                 = empty( $postarr['ID'] ) ? $data['post_date'] : $postarr['ID'];
+			$data['post_title'] = __( 'Ticket Fieldset', 'event-tickets-plus' ) . ' - ' . $id;
+		}
+
+		return $data;
+	}
+
 }

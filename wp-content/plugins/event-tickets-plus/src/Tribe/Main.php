@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.6.2';
+		const VERSION = '4.8.1';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.6.2';
+		const REQUIRED_TICKETS_VERSION = '4.8.1';
 
 		/**
 		 * Directory of the plugin
@@ -98,6 +98,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			add_action( 'init', array( $this, 'init' ), 9 );
 			add_action( 'plugins_loaded', array( $this, 'commerce_loader' ), 100 );
+			add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 100 );
 
 			// Register the plugin as active after the tribe autoloader runs
 			$this->register_active_plugin();
@@ -106,13 +107,14 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			add_action( 'init', array( $this, 'csv_import_support' ) );
 			add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
-			add_filter( 'tribe_tickets_settings_systems_supporting_login_requirements', array( $this, 'register_login_setting' ) );
 			add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ), 5 );
 
 			// Unique ticket identifiers
 			add_action( 'event_tickets_rsvp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 			add_action( 'event_ticket_woo_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 			add_action( 'event_ticket_edd_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
+
+			add_action( 'admin_init', array( $this, 'run_updates' ), 10, 0 );
 		}
 
 		/**
@@ -129,11 +131,37 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 				tribe_main_pue_helper();
 			}
 
+			// REST API v1
+			tribe_register_provider( 'Tribe__Tickets_Plus__REST__V1__Service_Provider' );
+
 			$this->commerce_loader();
 			$this->meta();
 			$this->tickets_view();
 			$this->qr();
 			$this->attendees_list();
+		}
+
+		/**
+		 * Finalize the initialization of this plugin
+		 *
+		 * @since 4.7.6
+		 */
+		public function plugins_loaded() {
+
+			$this->bind_implementations();
+
+			tribe( 'tickets-plus.privacy' );
+		}
+
+		/**
+		 * Registers the implementations in the container
+		 *
+		 * @since 4.7.6
+		 */
+		public function bind_implementations() {
+
+			// Privacy
+			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', array( 'hook' ) );
 		}
 
 		/**
@@ -353,6 +381,23 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		public function register_login_setting( array $options ) {
 			$options[ 'event-tickets-plus_all' ] = __( 'Require users to log in before they purchase tickets', 'event-tickets-plus' );
 			return $options;
+		}
+
+		/**
+		 * Make necessary database updates on admin_init
+		 *
+		 * @since 4.7.1
+		 *
+		 */
+		public function run_updates() {
+			if ( ! class_exists( 'Tribe__Events__Updater' ) ) {
+				return; // core needs to be updated for compatibility
+			}
+
+			$updater = new Tribe__Tickets_Plus__Updater( self::VERSION );
+			if ( $updater->update_required() ) {
+				$updater->do_updates();
+			}
 		}
 	}
 }

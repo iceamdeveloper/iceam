@@ -10,6 +10,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 		add_filter( 'tribe_event_ticket_decimal_point', 'wc_get_price_decimal_separator' );
 	}
 
+	/**
+	 * Append WooCommerce-specific settings section to tickets settings tab
+	 * @param array $settings_fields
+	 *
+	 * @since 4.7
+	 *
+	 * @return array
+	 */
 	public function add_settings( array $settings_fields ) {
 		$extra_settings = $this->additional_settings();
 		return Tribe__Main::array_insert_before_key( 'tribe-form-content-end', $settings_fields, $extra_settings );
@@ -18,10 +26,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 	protected function additional_settings() {
 		$dispatch_options = $generation_options = $this->get_trigger_statuses();
 
-		$section_label = esc_html__( 'Event Tickets uses WooCommerce order statuses to control when attendee records should be generated and when tickets are sent to customers. The first enabled status reached by an order will trigger the action.', 'event-tickets-plus' );
-		$dispatch_label = esc_html__( 'When should tickets be emailed to customers?', 'event-tickets-plus' );
-		$dispatch_tooltip = esc_html__( 'If no status is selected, no ticket emails will be sent.', 'event-tickets-plus' );
-		$generation_label = esc_html__( 'When should attendee records be generated?', 'event-tickets-plus' );
+		$section_label      = esc_html__( 'Event Tickets uses WooCommerce order statuses to control when attendee records should be generated and when tickets are sent to customers. The first enabled status reached by an order will trigger the action.', 'event-tickets-plus' );
+		$dispatch_label     = esc_html__( 'When should tickets be emailed to customers?', 'event-tickets-plus' );
+		$dispatch_tooltip   = esc_html__( 'If no status is selected, no ticket emails will be sent.', 'event-tickets-plus' );
+		$generation_label   = esc_html__( 'When should attendee records be generated?', 'event-tickets-plus' );
 		$generation_tooltip = esc_html__( 'Please select at least one status.', 'event-tickets-plus' );
 
 		$dispatch_defaults = $this->get_default_ticket_dispatch_statuses();

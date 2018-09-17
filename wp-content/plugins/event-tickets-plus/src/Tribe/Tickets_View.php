@@ -92,7 +92,14 @@ class Tribe__Tickets_Plus__Tickets_View {
 						continue;
 					}
 
-					update_post_meta( $attendee['attendee_id'], constant( "{$attendee['provider']}::ATTENDEE_OPTOUT_KEY" ), $optout );
+					$provider_class = $attendee['provider'];
+					if ( ! defined( "{$provider_class}::ATTENDEE_OPTOUT_KEY" ) ) {
+						$attendee_optout_key = call_user_func( array( $provider_class, 'get_key' ), 'ATTENDEE_OPTOUT_KEY' );
+					} else {
+						$attendee_optout_key = constant( "{$provider_class}::ATTENDEE_OPTOUT_KEY" );
+					}
+
+					update_post_meta( $attendee['attendee_id'], $attendee_optout_key, $optout );
 				}
 			}
 		}

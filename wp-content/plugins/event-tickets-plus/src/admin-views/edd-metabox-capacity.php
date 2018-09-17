@@ -145,30 +145,5 @@ if ( $this->supports_global_stock() ) {
 		</div>
 	</fieldset>
 	<?php
-}
 
-if ( isset( $purchase_limit ) ) {
-	?>
-	<div
-		id="<?php echo $provider; ?>_ticket_purchase_limit_fieldset"
-		class="input_block tribe-dependent"
-		data-depends="#Tribe__Tickets__RSVP_radio"
-		data-condition-is-not-checked
-	>
-		<label
-			for="<?php echo $provider; ?>_ticket_purchase_limit"
-			class="ticket_field ticket_form_left"
-		>
-			<?php esc_html_e( 'Purchase limit:', 'event-tickets-plus' ); ?>
-		</label>
-		<input
-			type="text"
-			id="<?php echo $provider; ?>_ticket_purchase_limit"
-			name="ticket_purchase_limit"
-			class="ticket_field ticket_form_right"
-			size="7"
-			value="<?php echo esc_attr( $purchase_limit ); ?>"
-		/>
-	</div>
-	<?php
 }
