@@ -38,7 +38,7 @@ abstract class Toolset_Field_Group {
 	/**
 	 * @var WP_Post Post object that represents the field group.
 	 */
-	private $post;
+	protected $post;
 
 
 	/** @var Toolset_Post_Type_Repository|null */
@@ -513,7 +513,7 @@ abstract class Toolset_Field_Group {
 		if ( $type_input instanceof IToolset_Post_Type ) {
 			$post_type_slug = $type_input->get_slug();
 			$post_type = $type_input;
-		} elseif( is_string( $type_input ) ) {
+		} elseif( is_string( $type_input ) || is_int( $type_input )) {
 			$post_type_slug = $type_input;
 			$post_type = null;
 		} else {
@@ -745,4 +745,17 @@ abstract class Toolset_Field_Group {
 		return $this->_post_type_repository;
 	}
 
+
+	/**
+	 * @return bool
+	 * @since 2.8
+	 */
+	public function contains_repeating_field_group() {
+		// Note: Must not be overridden until types-1593 is implemented. @refactoring
+		$has_rfg = array_reduce( $this->get_field_slugs(), function( $has_rfg, $field_slug ) {
+			return $has_rfg || (bool) preg_match( '/(' . Types_Field_Group_Repeatable::PREFIX . '[a-z0-9_]+)/', $field_slug );
+		}, false );
+
+		return $has_rfg;
+	}
 }

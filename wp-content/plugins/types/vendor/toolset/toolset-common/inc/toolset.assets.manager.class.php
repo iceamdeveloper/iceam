@@ -134,7 +134,7 @@ class Toolset_Script {
 class Toolset_Assets_Manager {
 
 
-	protected static $instance;
+	private static $instance;
 
 
 	protected $styles = array();
@@ -172,6 +172,8 @@ class Toolset_Assets_Manager {
 
 	const SCRIPT_ICL_EDITOR = 'icl_editor-script';
 	const SCRIPT_ICL_MEDIA_MANAGER = 'icl_media-manager-js';
+	
+	const SCRIPT_TOOLSET_MEDIA_MANAGER = 'toolset-media-manager-js';
 
 	const SCRIPT_KNOCKOUT = 'knockout';
 	const SCRIPT_KNOCKOUT_MAPPING = 'knockout-mapping';
@@ -193,6 +195,10 @@ class Toolset_Assets_Manager {
 	const SCRIPT_CHOSEN = 'toolset-chosen';
 	const SCRIPT_CHOSEN_WRAPPER = 'toolset-chosen-wrapper';
 
+	// parsley lib for field validation
+	const SCRIPT_PARSLEY = 'toolset-parsley';
+
+
 	/**
 	 * For compatibility with ACF Plugin that's not using the right handle for this module (wp-event-manager)
 	 * we are using ACF handle to prevent unwanted overrides of window.wp.hooks namespace (******!)
@@ -204,6 +210,8 @@ class Toolset_Assets_Manager {
 	// Styles
 	//
 	//
+
+	const STYLE_PARSLEY = 'toolset-parsley-style';
 
 	const STYLE_CODEMIRROR = 'toolset-meta-html-codemirror-css';
 	const STYLE_CODEMIRROR_CSS_HINT = 'toolset-meta-html-codemirror-css-hint-css';
@@ -255,6 +263,9 @@ class Toolset_Assets_Manager {
 	 */
 	protected $assets_url = '';
 
+	private $did_initialize_scripts = false;
+	private $did_initialize_styles = false;
+
 
 	protected function __construct() {
 
@@ -281,22 +292,22 @@ class Toolset_Assets_Manager {
 		add_action( 'toolset_localize_script', array( $this, 'localize_script' ), 10, 3 );
 	}
 
+	private static $instances = array();
 
 	/**
 	 * @return Toolset_Assets_Manager
 	 * @deprecated Use get_instance instead().
 	 */
 	final public static function getInstance() {
-		static $instances = array();
 		$called_class = get_called_class();
 
-		if ( isset( $instances[ $called_class ] ) ) {
-			return $instances[ $called_class ];
+		if ( isset( self::$instances[ $called_class ] ) ) {
+			return self::$instances[ $called_class ];
 		} else {
 			if ( class_exists( $called_class ) ) {
-				$instances[ $called_class ] = new $called_class();
+				self::$instances[ $called_class ] = new $called_class();
 
-				return $instances[ $called_class ];
+				return self::$instances[ $called_class ];
 			} else {
 				// This can unfortunately happen when the get_called_class() workaround for PHP 5.2 misbehaves.
 				return false;
@@ -305,15 +316,51 @@ class Toolset_Assets_Manager {
 	}
 
 
+	/**
+	 * Note: This *can not* be directly used in subclasses.
+	 *
+	 * @return Toolset_Assets_Manager
+	 */
 	public static function get_instance() {
-		return self::getInstance();
+		if( null === self::$instance ) {
+			$called_class = get_called_class();
+			if( $called_class === 'Toolset_Assets_Manager' && isset( self::$instances[ $called_class ] ) ) {
+				// Make sure that we don't re-instantiate the Toolset_Assets_Manager class even if it was instantiated
+				// before through the legacy getInstance() method.
+				//
+				// @refactoring Stop subclassing Toolset_Assets_Manager
+				self::$instance = self::$instances[ $called_class ];
+			} else {
+				self::$instance = new self();
+			}
+		}
+
+		return self::$instance;
+	}
+
+	/**
+	 * Backward compatibility
+	 * For PHP 7 we renamed the method __initialize_styles() and __initialize_scripts() to initialize_styles() and initialize_scripts().
+	 * As both are public methods we apply this fallback for the case someone calls the old methods.
+	 *
+	 * @param $method
+	 * @param $arguments
+	 */
+	public function __call( $method, $arguments ) {
+		switch( $method ) {
+			case '__initialize_styles':
+				$this->initialize_styles();
+				break;
+			case '__initialize_scripts':
+				$this->initialize_scripts();
+				break;
+		}
 	}
 
 
-
 	public function init() {
-		$this->__initialize_styles();
-		$this->__initialize_scripts();
+		$this->initialize_styles();
+		$this->initialize_scripts();
 	}
 
 
@@ -352,7 +399,27 @@ class Toolset_Assets_Manager {
 	}
 
 
-	protected function __initialize_styles() {
+	protected function initialize_styles() {
+
+		// Prevent an infinite recursion in case we have a subclass of this that has:
+		//
+		// function __initialize_styles() {
+		//     // ...
+		//     return parent::__initialize_styles();
+		// }
+		if( $this->did_initialize_styles ) {
+			return null;
+		}
+		$this->did_initialize_styles = true;
+
+		if( method_exists( $this, '__initialize_styles' ) ) {
+			// Support for subclasses overwriting the previous __initialize_styles function.
+			//
+			// This will cause the common assets never to be registered in these subclasses,
+			// but we don't mind - these assets are already registered by Toolset_Assets_Manager
+			// on every request.
+			return $this->__initialize_styles();
+		}
 
 		// Libraries
 		//
@@ -388,6 +455,13 @@ class Toolset_Assets_Manager {
 			$this->assets_url . '/visual-editor/res/js/codemirror/addon/hint/show-hint.css',
 			array(),
 			"5.5.0"
+		);
+
+		$this->register_style(
+			self::STYLE_PARSLEY,
+			$this->assets_url . '/res/lib/parsley/parsley.css',
+			array(),
+			'2.8.0'
 		);
 
 		$this->register_style(
@@ -503,7 +577,27 @@ class Toolset_Assets_Manager {
 	}
 
 
-	protected function __initialize_scripts() {
+	protected function initialize_scripts() {
+
+		// Prevent an infinite recursion in case we have a subclass of this that has:
+		//
+		// function __initialize_scripts() {
+		//     // ...
+		//     return parent::__initialize_scripts();
+		// }
+		if( $this->did_initialize_scripts ) {
+			return null;
+		}
+		$this->did_initialize_scripts = true;
+
+		if( method_exists( $this, '__initialize_scripts' ) ) {
+			// Support for subclasses overwriting the previous __initialize_scripts function.
+			//
+			// This will cause the common assets never to be registered in these subclasses,
+			// but we don't mind - these assets are already registered by Toolset_Assets_Manager
+			// on every request.
+			return $this->__initialize_scripts();
+		}
 
 		// Libraries
 		//
@@ -546,6 +640,14 @@ class Toolset_Assets_Manager {
 			$this->assets_url . "/res/js/toolset-chosen-wrapper.js",
 			array( 'jquery', self::SCRIPT_CHOSEN ),
 			TOOLSET_COMMON_VERSION,
+			true
+		);
+
+		$this->register_script(
+			self::SCRIPT_PARSLEY,
+			$this->assets_url . '/res/lib/parsley/parsley.js',
+			array('jquery'),
+			'2.8.0',
 			true
 		);
 
@@ -706,6 +808,13 @@ class Toolset_Assets_Manager {
 			array( self::SCRIPT_ICL_EDITOR ),
 			TOOLSET_COMMON_VERSION
 		);
+		
+		$this->register_script(
+			self::SCRIPT_TOOLSET_MEDIA_MANAGER,
+			$this->assets_url . "/res/js/toolset-media-manager.js",
+			array( self::SCRIPT_ICL_EDITOR, self::SCRIPT_TOOLSET_EVENT_MANAGER ),
+			TOOLSET_COMMON_VERSION
+		);
 
 		$this->register_script(
 			self::SCRIPT_JSCROLLPANE,
@@ -801,8 +910,9 @@ class Toolset_Assets_Manager {
 			self::SCRIPT_TOOLSET_SHORTCODE,
 			$this->assets_url . "/res/js/toolset-shortcode.js",
 			array( 
-				'jquery', 'jquery-ui-dialog', 'jquery-ui-tabs', 'suggest', 'shortcode', 'underscore', 'wp-util', 
-				self::SCRIPT_SELECT2, self::SCRIPT_ICL_EDITOR, self::SCRIPT_UTILS, self::SCRIPT_TOOLSET_EVENT_MANAGER ),
+				'jquery', 'jquery-ui-dialog', 'jquery-ui-tabs', 'suggest', 'shortcode', 'underscore', 'wp-util', 'wp-pointer', 
+				self::SCRIPT_SELECT2, self::SCRIPT_ICL_EDITOR, self::SCRIPT_UTILS, self::SCRIPT_TOOLSET_EVENT_MANAGER 
+			),
 			TOOLSET_COMMON_VERSION,
 			true
 		);
@@ -906,6 +1016,15 @@ class Toolset_Assets_Manager {
 				unset( $this->styles[ $handles ] );
 			}
 		}
+	}
+
+
+	public function add_script( Toolset_Script $script ) {
+		if( isset( $this->scripts[ $script->handle ] ) ) {
+			return;
+		}
+
+		$this->scripts[ $script->handle ] = $script;
 	}
 
 

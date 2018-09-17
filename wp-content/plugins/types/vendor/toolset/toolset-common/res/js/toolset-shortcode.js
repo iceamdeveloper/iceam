@@ -151,7 +151,14 @@ Toolset.shortcodeManager = function( $ ) {
 		 *
 		 * @since 2.5.4
 		 */
-		Toolset.hooks.addFilter( 'toolset-filter-get-crafted-shortcode', self.getCraftedShortcode );
+		Toolset.hooks.addFilter( 'toolset-filter-get-crafted-shortcode', self.getCraftedShortcode, 10, 2 );
+
+		/**
+		 * Filter the generated Types shortcode to support shortcodes with different format.
+		 *
+		 * @since 2.5.4
+		 */
+		Toolset.hooks.addFilter( 'toolset-filter-get-crafted-shortcode', self.secureShortcodeFromSanitizationIfNeeded, 11 );
 		
 		/**
 		 * Return the current crafted shortcode with the current dialog GUI attrbutes.
@@ -212,6 +219,20 @@ Toolset.shortcodeManager = function( $ ) {
 		 */
 		Toolset.hooks.addAction( 'toolset-action-shortcode-dialog-loaded', self.initSelect2 );
 		
+		/**
+		 * Init the post selectors and reference field selectors once the shortcode dialog is completely opened.
+		 *
+		 * @since 2.5.4
+		 */
+		Toolset.hooks.addAction( 'toolset-action-shortcode-dialog-loaded', self.initPostSelector );
+		
+		/**
+		 * Init a wizard dialog, set the options width, and set the right value as selected.
+		 *
+		 * @since 2.5.4
+		 */
+		Toolset.hooks.addAction( 'toolset-action-set-shortcode-wizard-gui', self.setShortcodeWizardGui );
+		
 		return self;
 		
 	};
@@ -230,6 +251,7 @@ Toolset.shortcodeManager = function( $ ) {
 		self.templates.attributeGroupWrapper = wp.template( 'toolset-shortcode-attribute-group-wrapper' );
 		self.templates.attributes = {
 			content: wp.template( 'toolset-shortcode-content' ),
+			information: wp.template( 'toolset-shortcode-attribute-information' ),
 			text: wp.template( 'toolset-shortcode-attribute-text' ),
 			radio: wp.template( 'toolset-shortcode-attribute-radio' ),
 			select: wp.template( 'toolset-shortcode-attribute-select' ),
@@ -368,12 +390,12 @@ Toolset.shortcodeManager = function( $ ) {
 	});
 	
 	/**
-	 * Init select2 and ajaxSelect2 attribute controls.
+	 * Init select2 attributes controls.
 	 *
 	 * @since 2.5.4
 	 */
-	self.initSelect2 = function() {
-		$( '.js-toolset-shortcode-gui-dialog-container .js-toolset-shortcode-gui-field-select2' ).each( function() {
+	self.initSelect2Attributes = function() {
+		$( '.js-toolset-shortcode-gui-dialog-container .js-toolset-shortcode-gui-field-select2:not(.js-toolset-shortcode-gui-field-select2-inited)' ).each( function() {
 			var selector = $( this ),
 				selectorParent = selector.closest( '.js-toolset-shortcode-gui-dialog-container' );
 			
@@ -392,12 +414,16 @@ Toolset.shortcodeManager = function( $ ) {
 					.$dropdown
 						.addClass( 'toolset_select2-dropdown-in-dialog' );
 		});
-		
-		$( '.js-toolset-shortcode-gui-dialog-container .js-toolset-shortcode-gui-field-ajax-select2' ).each( function() {
-			var selector = $( this ),
-				selectorParent = selector.closest( '.js-toolset-shortcode-gui-dialog-container' );
-			
-			selector
+	};
+	
+	/**
+	 * Init the ajaxSelect2 attributes action.
+	 *
+	 * @since 2.5.4
+	 */
+	self.initSelect2AjaxAction = function( selector ) {
+		var selectorParent = selector.closest( '.js-toolset-shortcode-gui-dialog-container' );
+		selector
 				.addClass( 'js-toolset-shortcode-gui-field-select2-inited' )
 				.css( { width: '100%' } )
 				.toolset_select2(
@@ -406,18 +432,22 @@ Toolset.shortcodeManager = function( $ ) {
 						dropdownAutoWidth:	true, 
 						dropdownParent:		selectorParent,
 						placeholder:		selector.data( 'placeholder' ),
+						minimumInputLength:	2,
 						ajax: {
-							url: toolset_shortcode_i18n.ajaxurl + '?action=' + selector.data( 'action' ) + '&nonce=' + selector.data( 'nonce' ),
+							url: toolset_shortcode_i18n.ajaxurl,
 							dataType: 'json',
 							delay: 250,
 							type: 'post',
 							data: function( params ) {
 								return {
-									s:          params.term,
-									page:       params.page,
+									action:  selector.data( 'action' ),
+									s:       params.term,
+									page:    params.page,
+									wpnonce: selector.data( 'nonce' )
 								};
 							},
-							processResults: function( response, params ) {
+							processResults: function( originalResponse, params ) {
+								var response = WPV_Toolset.Utils.Ajax.parseResponse( originalResponse );
 								params.page = params.page || 1;
 								if ( response.success ) {
 									return {
@@ -435,8 +465,112 @@ Toolset.shortcodeManager = function( $ ) {
 				.data( 'toolset_select2' )
 					.$dropdown
 						.addClass( 'toolset_select2-dropdown-in-dialog' );
+	};
+	
+	/**
+	 * Init ajaxSelect2 attributes controls.
+	 * Get the prefill label for any existing value.
+	 *
+	 * @since 2.5.4
+	 */
+	self.initSelect2AjaxAttributes = function() {
+		$( '.js-toolset-shortcode-gui-dialog-container .js-toolset-shortcode-gui-field-ajax-select2:not(.js-toolset-shortcode-gui-field-select2-inited)' ).each( function() {
+			var selector = $( this );
+			
+			if ( 
+				selector.val() 
+				&& selector.data( 'prefill' )
+			) {
+				var prefillData = {
+					action:  selector.data( 'prefill' ),
+					wpnonce: selector.data( 'prefill-nonce' ),
+					s:       selector.val()
+				};
+				$.ajax({
+					url:     toolset_shortcode_i18n.ajaxurl,
+					data:    prefillData,
+					type:    "post",
+					success: function( originalResponse ) {
+						var response = WPV_Toolset.Utils.Ajax.parseResponse( originalResponse );
+						if ( response.success ) {
+							selector
+								.find( 'option:selected' )
+									.html( response.data.label );
+						} else {
+							selector
+								.find( 'option:selected' )
+									.remove();
+						}
+						self.initSelect2AjaxAction( selector );
+					},
+					error: function ( ajaxContext ) {
+						selector
+							.find( 'option:selected' )
+								.remove();
+						self.initSelect2AjaxAction( selector );
+					}
+				});
+			} else {
+				self.initSelect2AjaxAction( selector );
+			}
+			
 		});
 	};
+	
+	/**
+	 * Init select2 and ajaxSelect2 attributes controls.
+	 *
+	 * @since 2.5.4
+	 */
+	self.initSelect2 = function() {
+		self.initSelect2Attributes();
+		self.initSelect2AjaxAttributes();
+	};
+	
+	/**
+	 * Set the first post selector and post reference selector as checked, if any.
+	 *
+	 * @since m2m
+	 */
+	self.initPostSelector = function() {
+		$( 'input[name="related_object"]:not(:disabled)', '.js-toolset-shortcode-gui-dialog-container' )
+			.first()
+				.prop( 'checked', true );
+		
+		$( 'input[name="referenced_object"]:not(:disabled)', '.js-toolset-shortcode-gui-dialog-container' )
+			.first()
+				.prop( 'checked', true );
+	};
+	
+	/**
+	 * Initialize the wizard GUI for a shortcode.
+	 *
+	 * @param string The value to set as selected
+	 *
+	 * @since m2m
+	 */
+	self.setShortcodeWizardGui = function( value ) {
+		var $optionsContainer = $( '.js-toolset-shortcode-gui-wizard-options-container', '.js-toolset-shortcode-gui-wizard-container' ),
+			$options = $( '.js-toolset-shortcode-gui-wizard-option', $optionsContainer ),
+			optionsLength = $options.length;
+		
+		$( '.toolset-shortcode-gui-wizard-option-selected', $optionsContainer ).removeClass( 'toolset-shortcode-gui-wizard-option-selected' );
+		$optionsContainer.find( 'input[value=' + value + ']' )
+			.prop( 'checked', true )
+			.trigger( 'change' )
+				.closest( '.js-toolset-shortcode-gui-wizard-option' )
+					.addClass( 'toolset-shortcode-gui-wizard-option-selected' );
+	};
+	
+	$( document ).on( 'change', '.js-toolset-shortcode-gui-wizard-option input[type=radio]', function() {
+		var $optionsContainer = $( '.js-toolset-shortcode-gui-wizard-options-container', '.js-toolset-shortcode-gui-wizard-container' );
+		
+		$( '.toolset-shortcode-gui-wizard-option-selected', $optionsContainer ).removeClass( 'toolset-shortcode-gui-wizard-option-selected' );
+		
+		$( 'input[type=radio].toolset-shortcode-gui-wizard-option-hidden:checked', $optionsContainer )
+			.closest( '.js-toolset-shortcode-gui-wizard-option' )
+				.addClass( 'toolset-shortcode-gui-wizard-option-selected' );
+	});
 	
 	/**
 	 * Clean validation errors on input change.
@@ -445,6 +579,13 @@ Toolset.shortcodeManager = function( $ ) {
 	 */
 	$( document ).on( 'change keyup input cut paste', '.js-toolset-shortcode-gui-dialog-container input, .js-toolset-shortcode-gui-dialog-container select', function() {
 		$( this ).removeClass( 'toolset-shortcode-gui-invalid-attr js-toolset-shortcode-gui-invalid-attr' );
+		if ( $( this ).hasClass( 'toolset_select2-hidden-accessible' ) ) {
+			$( this )
+				.toolset_select2()
+					.data( 'toolset_select2' )
+						.$selection
+							.removeClass( 'toolset-shortcode-gui-invalid-attr js-toolset-shortcode-gui-invalid-attr' );
+		}
 	});
 	
 	/**
@@ -751,13 +892,21 @@ Toolset.shortcodeManager = function( $ ) {
 		});
 		*/
 		// Special case: item selector tab
-		if (
-			$( '.js-toolset-shortcode-gui-item-selector:checked', evaluatedContainer ).length > 0
-			&& 'object_id' == $( '.js-toolset-shortcode-gui-item-selector:checked', evaluatedContainer ).val()
-		) {
-			var itemSelection = $( '.js-toolset-shortcode-gui-item-selector_object_id', evaluatedContainer ),
-				itemSelectionId = itemSelection.val(),
-				itemSelectionValid = true;
+        var $itemSelector = $( '.js-toolset-shortcode-gui-item-selector:checked', evaluatedContainer );
+        if (
+            $itemSelector.length > 0
+            && (
+                'object_id' == $itemSelector.val() ||
+                'object_id_raw' == $itemSelector.val()
+            )
+        ) {
+
+            var itemSelection = ( 'object_id' == $itemSelector.val() )
+                ? $( '[name="specific_object_id"]', evaluatedContainer )
+                : $( '[name="specific_object_id_raw"]', evaluatedContainer );
+
+            var	itemSelectionId = itemSelection.val(),
+                itemSelectionValid = true;
 				//$itemSelectionMessage = '';
 			if ( '' == itemSelectionId ) {
 				itemSelectionValid = false;
@@ -793,37 +942,44 @@ Toolset.shortcodeManager = function( $ ) {
 	 * Get the shortcode crafted with the current dialog shortcode attributes.
 	 *
 	 * @param defaultValue string Initial dummy parameter si this can be used as a filter callback.
+	 * @param $dialog      object The jQuery object that holds the dialog to craft the shortcode for.
 	 *
 	 * @return string
 	 *
 	 * @since m2m
 	 */ 
-	self.getCraftedShortcode = function( defaultValue ) {
-		return self.craftShortcode();
+	self.getCraftedShortcode = function( defaultValue, $dialog ) {
+		if ( $dialog == null ) {
+			// Backwards compatibility: before m2m we did not force a dialog to craft the shortcode from
+			$dialog = $( '.js-toolset-shortcode-gui-dialog-container' );
+		}
+		return self.craftShortcode( $dialog );
 	}
 	
 	/**
 	 * Craft a shortcode given the attributes in the currently open dialog.
+	 *
+	 * @param $dialog object The jQuery object that holds the dialog to craft the shortcode for.
 	 *
 	 * @return string
 	 *
 	 * @since 2.5.4
 	 * @since m2m Add support for postSelector, userSelector, typesViewsTermSelector, typesUserSelector and typesViewsUserSelector attribute types.
 	 */
-	self.craftShortcode = function() {
-		var shortcodeName = $( '.js-toolset-shortcode-gui-shortcode-handle' ).val(),
+	self.craftShortcode = function( $dialog ) {
+		var shortcodeName = $( '.js-toolset-shortcode-gui-shortcode-handle', $dialog ).val(),
 			shortcodeAttributeString = '',
 			shortcodeAttributeValues = {},
 			shortcodeRawAttributeValues = {},
 			shortcodeContent = '',
 			shortcodeToInsert = '',
-			shortcodeIsValid = self.validateShortcodeAttributes( $( '.js-toolset-shortcode-gui-dialog-container' ) );
+			shortcodeIsValid = self.validateShortcodeAttributes( $dialog );
 		
 		if ( ! shortcodeIsValid ) {
 			return;
 		}
 		
-		$( '.js-toolset-shortcode-gui-attribute-wrapper', '.js-toolset-shortcode-gui-dialog-container' ).each( function() {
+		$( '.js-toolset-shortcode-gui-attribute-wrapper', $dialog ).each( function() {
 			var attributeWrapper = $( this ),
 				shortcodeAttributeKey = attributeWrapper.data( 'attribute' ),
 				shortcodeAttributeValue = '',
@@ -844,8 +1000,15 @@ Toolset.shortcodeManager = function( $ ) {
 						case 'related':
 							shortcodeAttributeValue = $( '[name="related_object"]:checked', attributeWrapper ).val();
 							break;
-						case 'object_id':
+						case 'referenced':
+							shortcodeAttributeValue = $( '[name="referenced_object"]:checked', attributeWrapper ).val();
+							break;
+                        case 'object_id_raw':
+                            shortcodeAttributeValue = $( '.js-toolset-shortcode-gui-item-selector_object_id_raw', attributeWrapper ).val();
+                            break;
+                        case 'object_id':
 							shortcodeAttributeValue = $( '.js-toolset-shortcode-gui-item-selector_object_id', attributeWrapper ).val();
+							break;
 						case 'parent': // The value is correct out of the box
 						default:
 							break;
@@ -854,7 +1017,7 @@ Toolset.shortcodeManager = function( $ ) {
 				case 'select':
 				case 'select2':
 				case 'ajaxSelect2':
-					shortcodeAttributeValue = $('option:checked', attributeWrapper ).val();
+					shortcodeAttributeValue = $('select', attributeWrapper ).val();
 					break;
 				case 'radio':
 				case 'radiohtml':
@@ -862,6 +1025,9 @@ Toolset.shortcodeManager = function( $ ) {
 					break;
 				case 'checkbox':
 					shortcodeAttributeValue = $('input:checked', attributeWrapper ).val();
+					break;
+				case 'information':
+					shortcodeAttributeValue = false;
 					break;
 				default:
 					shortcodeAttributeValue = $('input', attributeWrapper ).val();
@@ -921,7 +1087,7 @@ Toolset.shortcodeManager = function( $ ) {
 		// Compose the shortcodeAttributeString string
 		_.each( shortcodeAttributeValues, function( value, key ) {
 			if ( value ) {
-				shortcodeAttributeString += " " + key + '="' + value + '"';
+				shortcodeAttributeString += " " + key + "='" + value + "'";
 			}
 		});
 		
@@ -929,8 +1095,8 @@ Toolset.shortcodeManager = function( $ ) {
 		shortcodeToInsert = '[' + shortcodeName + shortcodeAttributeString + ']';
 		
 		// Shortcodes with content: add it plus the closing shortode tag
-		if ( $( '.js-toolset-shortcode-gui-content' ).length > 0 ) {
-			shortcodeContent = $( '.js-toolset-shortcode-gui-content' ).val();
+		if ( $( '.js-toolset-shortcode-gui-content', $dialog ).length > 0 ) {
+			shortcodeContent = $( '.js-toolset-shortcode-gui-content', $dialog ).val();
 			shortcodeToInsert += shortcodeContent;
 			shortcodeToInsert += '[/' + shortcodeName + ']';
 		}
@@ -1105,6 +1271,42 @@ Toolset.shortcodeManager = function( $ ) {
 		$( '.js-wpv-loop-wizard-save-shortcode-ui-active' )
 			.removeClass( 'js-wpv-loop-wizard-save-shortcode-ui-active' );
 	};
+	
+	/**
+	 * Shortcodes GUI pointer management.
+	 *
+	 * @since m2m
+	 */
+	$( document ).on( 'click', '.js-wp-toolset-shortcode-pointer-trigger', function() {
+		var $tooltipTriggerer = $( this ),
+			tooltipContent = $tooltipTriggerer.closest( 'li' ).find( '.js-wp-toolset-shortcode-pointer-content' ).html();
+			edge = ( $( 'html[dir="rtl"]' ).length > 0 ) ? 'top' : 'top';
+
+		// hide this pointer if other pointer is opened.
+		$( '.wp-toolset-pointer' ).fadeOut( 100 );
+
+		$tooltipTriggerer.pointer({
+			pointerClass: 'wp-toolset-pointer wp-toolset-shortcode-pointer js-wp-toolset-shortcode-pointer',
+			pointerWidth: 400,
+			content: tooltipContent,
+			position: {
+				edge: edge,
+				align: 'center',
+				offset: '15 0'
+			},
+			buttons: function( event, t ) {
+				var button_close = $( '<button class="button button-primary-toolset alignright">' + 'Close' + '</button>' );
+				button_close.bind( 'click.pointer', function( e ) {
+					e.preventDefault();
+					t.element.pointer( 'close' );
+				});
+				return button_close;
+			}
+		}).pointer( 'open' );
+		$( '.js-wp-toolset-shortcode-pointer:not(.js-wp-toolset-shortcode-pointer-indexed)' )
+			.addClass( '.js-wp-toolset-shortcode-pointer-zindexed' )
+			.css( 'z-index', '10000000' );
+	});
 
     self.secureShortcodeFromSanitizationIfNeeded = function( shortcode_data ) {
         var shortcode_string;

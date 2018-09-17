@@ -46,8 +46,10 @@ class Toolset_Common_Bootstrap {
 
 	// Names of various sections/modules of the common library that can be loaded.
 	const TOOLSET_AUTOLOADER = 'toolset_autoloader';
+	const TOOLSET_API = 'toolset_api';
 	const TOOLSET_DEBUG = 'toolset_debug';
 	const TOOLSET_FORMS = 'toolset_forms';
+	const TOOLSET_BLOCKS = 'toolset_blocks';
 	const TOOLSET_VISUAL_EDITOR = 'toolset_visual_editor';
 	const TOOLSET_PARSER = 'toolset_parser';
     const TOOLSET_USER_EDITOR = 'toolset_user_editor';
@@ -187,6 +189,11 @@ class Toolset_Common_Bootstrap {
 			$this->register_toolset_forms();
 		}
 
+		// Maybe register Toolset blocks
+		if ( $this->should_load_section( $load, self::TOOLSET_BLOCKS ) ) {
+			$this->register_toolset_blocks();
+		}
+
 		// Maybe register the editor addon
 		if ( $this->should_load_section( $load, self::TOOLSET_VISUAL_EDITOR ) ) {
 			$this->register_visual_editor();
@@ -321,7 +328,7 @@ class Toolset_Common_Bootstrap {
 
 			if ( ! class_exists( 'Toolset_Bootstrap_Loader', false ) ) {
                 require_once( TOOLSET_COMMON_PATH . '/inc/toolset.bootstrap.loader.class.php' );
-                $toolset_load_bootstrap = Toolset_Bootstrap_Loader::getInstance();
+                Toolset_Bootstrap_Loader::getInstance();
             }
 
 			// Load Admin Notices Manager
@@ -332,9 +339,17 @@ class Toolset_Common_Bootstrap {
 
 			// Load Admin Notices Controller (user of our Toolset_Admin_Notices_Manager)
             if( ! class_exists( 'Toolset_Controller_Admin_Notices', false ) ) {
-				require_once( TOOLSET_COMMON_PATH . '/inc/controller/admin/notices.php' );
 				new Toolset_Controller_Admin_Notices();
             }
+
+			// Load Toolset Singleton Factory based on PHP_Version
+			if( ! class_exists( 'Toolset_Singleton_Factory', false ) ) {
+				if( version_compare( PHP_VERSION, '5.6.0', '>=' ) ) {
+					require_once( TOOLSET_COMMON_PATH . '/utility/singleton_factory.php' );
+				} else {
+					require_once( TOOLSET_COMMON_PATH . '/utility/singleton_factory_pre_php_5_6.php' );
+				}
+			}
 
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.compatibility.php' );
 			require_once( TOOLSET_COMMON_PATH . '/inc/toolset.function.helpers.php' );
@@ -357,6 +372,32 @@ class Toolset_Common_Bootstrap {
 
 			$this->register_relationships();
 
+			// Initialize the admin controller for various tasks if we're in the backend.
+			if( self::MODE_ADMIN === $this->get_request_mode() ) {
+				$admin_controller = new Toolset_Admin_Controller();
+				$admin_controller->initialize();
+			}
+
+			require_once TOOLSET_COMMON_PATH . '/inc/public_api/loader.php';
+			$public_api_loader = new Toolset_Public_API_Loader();
+			$public_api_loader->initialize();
+
+			$wp_query_adjustments = new Toolset_Wp_Query_Adjustments_Loader();
+			$wp_query_adjustments->initialize();
+
+			$interop_mediator = new \OTGS\Toolset\Common\Interop\Mediator();
+			$interop_mediator->initialize();
+			
+			/** 
+			 * Avoid the initialization of this class.
+			 *
+			 * @since m2m
+			 */
+			if ( ! apply_filters( 'toolset_disable_legacy_relationships_meta_access', false ) ) {
+				$postmeta_access = new Toolset_Postmeta_Access_Loader();
+				$postmeta_access->initialize();
+			}
+
 			$this->apply_filters_on_sections_loaded( 'toolset_register_include_section' );
 		}
 	}
@@ -373,6 +414,11 @@ class Toolset_Common_Bootstrap {
 		if ( ! $this->is_section_loaded( self::TOOLSET_UTILS ) ) {
 			$this->add_section_loaded( self::TOOLSET_UTILS );
 			require_once TOOLSET_COMMON_PATH . '/utility/utils.php';
+		}
+
+		if ( ! $this->is_section_loaded( self::TOOLSET_API ) ) {
+			$this->add_section_loaded( self::TOOLSET_API );
+			require_once TOOLSET_COMMON_PATH . '/api.php';
 		}
 
 		// Although this is full of DDL prefixes, we need to actually port before using it.
@@ -418,6 +464,15 @@ class Toolset_Common_Bootstrap {
 			do_action( 'toolset_register_classmap', $classmap );
 
 			$this->apply_filters_on_sections_loaded( 'toolset_register_forms_section' );
+		}
+	}
+
+	public function register_toolset_blocks() {
+		if ( ! $this->is_section_loaded( self::TOOLSET_BLOCKS ) ) {
+			$this->add_section_loaded( self::TOOLSET_BLOCKS );
+			$toolset_blocks = new Toolset_Blocks();
+			$toolset_blocks->load_blocks();
+			$this->apply_filters_on_sections_loaded( 'toolset_register_toolset_blocks_section' );
 		}
 	}
 

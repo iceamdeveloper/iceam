@@ -46,15 +46,18 @@ Toolset.Gui.ListingViewModel = function(itemModels, defaults, itemSearchFunction
      * @returns {string} One or more CSS classes.
      * @since 2.0
      */
-    self.sortIconClass = function (propertyName) {
+    self.sortIconClass = function (propertyName, sortType) {
+        if ( 'undefined' === typeof sortType || ['alpha', 'numeric'].indexOf( sortType ) === -1 ) {
+            sortType = 'alpha';
+        }
         if (sortHelper.currentSortBy() === propertyName) {
             if (1 === sortHelper.currentSortDirection()) {
-                return 'fa fa-sort-alpha-asc';
+                return 'fa fa-sort-' + sortType + '-asc';
             } else {
-                return 'fa fa-sort-alpha-desc';
+                return 'fa fa-sort-' + sortType + '-desc';
             }
         } else {
-            return 'fa sort-icon-inactive fa-sort-alpha-asc';
+            return 'fa sort-icon-inactive fa-sort-' + sortType + '-asc';
         }
     };
 
@@ -328,6 +331,9 @@ Toolset.Gui.ListingViewModel = function(itemModels, defaults, itemSearchFunction
         self.hideDisplayedMessage();
         self.displayedMessage({text: text, type: type});
         self.messageVisibilityMode('show');
+        if ( type !== 'error' ) {
+            self.autoHideDislayedMessage( text );
+        }
     };
 
 
@@ -351,6 +357,18 @@ Toolset.Gui.ListingViewModel = function(itemModels, defaults, itemSearchFunction
     self.removeDisplayedMessage = function () {
         self.messageVisibilityMode('remove');
     };
+
+
+    /**
+     * Auto hide dislayed message after a time depending on text long
+     *
+     * @param {string} text Text needed for timing calculation
+     * @since m2m
+     */
+    self.autoHideDislayedMessage = function( text ) {
+        var miliseconds = Math.max( Math.min( text.length * 50, 2000 ), 7000 );
+        setTimeout( self.removeDisplayedMessage, miliseconds );
+    }
 
 
     /**
