@@ -300,20 +300,12 @@ if ( ! class_exists( 'Tribe__Validate' ) ) {
 		}
 
 		/**
-		 * Validates fields that have multiple options (checkbox list, etc.)
-		 * by making sure the value is part of the options array.
+		 * validates fields that have multiple options (checkbox list, etc.)
+		 * by making sure the value is part of the options array
+		 *
+		 * @return stdClass validation result object
 		 */
 		public function options_multi() {
-			// if we are here it cannot be empty
-			if ( empty( $this->value ) ) {
-				$this->result->valid = false;
-				$this->result->error = sprintf( esc_html__( "%s must have a value that's part of its options.", 'tribe-common' ), $this->label );
-
-				return;
-			}
-
-			$this->value = is_array( $this->value ) ? $this->value : array( $this->value );
-
 			foreach ( $this->value as $val ) {
 				if ( array_key_exists( $val, $this->field['options'] ) ) {
 					$this->value         = ( $this->value === 0 ) ? false : $this->value;

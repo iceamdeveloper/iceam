@@ -91,9 +91,7 @@ class Tribe__Events__Revisions__Preview {
 	 * @return bool
 	 */
 	protected function is_previewing() {
-		if ( ! $wp_query = tribe_get_global_query_object() ) {
-			return;
-		}
+		global $wp_query;
 
 		return $wp_query->is_preview() && tribe_is_event( $wp_query->post ) || ! empty( $_GET['preview_id'] ) && is_numeric( $_GET['preview_id'] ) && ! empty( $_GET['preview'] ) && tribe_is_event( $_GET['preview_id'] );
 	}
@@ -103,10 +101,7 @@ class Tribe__Events__Revisions__Preview {
 	 */
 	protected function get_event_id() {
 		if ( $this->is_previewing() ) {
-
-			if ( ! $wp_query = tribe_get_global_query_object() ) {
-				return;
-			}
+			global $wp_query;
 
 			return $wp_query->is_preview() && tribe_is_event( $wp_query->post ) ? $wp_query->post->ID : $_GET['preview_id'];
 		} else if ( $this->is_saving_preview() ) {

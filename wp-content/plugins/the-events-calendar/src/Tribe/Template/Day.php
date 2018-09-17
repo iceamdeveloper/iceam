@@ -15,7 +15,7 @@ if ( ! class_exists( 'Tribe__Events__Template__Day' ) ) {
 	class Tribe__Events__Template__Day extends Tribe__Events__Template_Factory {
 
 		protected $body_class = 'tribe-events-day';
-		protected $asset_packages = array();
+		protected $asset_packages = array( 'ajax-dayview' );
 
 		const AJAX_HOOK = 'tribe_event_day';
 
@@ -38,8 +38,6 @@ if ( ! class_exists( 'Tribe__Events__Template__Day' ) ) {
 
 			parent::hooks();
 
-			tribe_asset_enqueue( 'tribe-events-ajax-day' );
-
 			add_filter( 'tribe_get_ical_link', array( $this, 'ical_link' ), 20, 1 );
 			add_filter( 'tribe_events_header_attributes', array( $this, 'header_attributes' ) );
 		}
@@ -51,10 +49,7 @@ if ( ! class_exists( 'Tribe__Events__Template__Day' ) ) {
 		 **/
 		public function header_attributes( $attrs ) {
 
-			if ( ! $wp_query = tribe_get_global_query_object() ) {
-				return;
-			}
-
+			global $wp_query;
 			$current_day = $wp_query->get( 'start_date' );
 
 			$attrs['data-view']    = 'day';
@@ -90,10 +85,7 @@ if ( ! class_exists( 'Tribe__Events__Template__Day' ) ) {
 		 * @return string
 		 */
 		public function ical_link( $link ) {
-			if ( ! $wp_query = tribe_get_global_query_object() ) {
-				return;
-			}
-
+			global $wp_query;
 			$day = $wp_query->get( 'start_date' );
 
 			return trailingslashit( esc_url( trailingslashit( tribe_get_day_link( $day ) ) . '?ical=1' ) );
@@ -104,7 +96,8 @@ if ( ! class_exists( 'Tribe__Events__Template__Day' ) ) {
 		 *
 		 **/
 		public function setup_view() {
-			$wp_query = tribe_get_global_query_object();
+
+			global $wp_query;
 
 			$time_format = apply_filters( 'tribe_events_day_timeslot_format', get_option( 'time_format', Tribe__Date_Utils::TIMEFORMAT ) );
 
@@ -187,9 +180,7 @@ if ( ! class_exists( 'Tribe__Events__Template__Day' ) ) {
 
 				$query = tribe_get_events( $args, true );
 
-				global $post;
-				global $wp_query;
-
+				global $wp_query, $post;
 				$wp_query = $query;
 
 				add_filter( 'tribe_is_day', '__return_true' ); // simplest way to declare that this is a day view

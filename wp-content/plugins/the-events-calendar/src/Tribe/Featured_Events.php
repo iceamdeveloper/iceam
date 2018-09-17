@@ -64,7 +64,8 @@ class Tribe__Events__Featured_Events {
 		if ( null === $query ) {
 			$query = $GLOBALS['wp_query'];
 		}
-		return tribe_is_truthy( $query->get( 'featured' ) );
+
+		return (bool) $query->get( 'featured' );
 	}
 
 	/**

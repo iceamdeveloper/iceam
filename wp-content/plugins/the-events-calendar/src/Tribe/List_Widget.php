@@ -63,12 +63,7 @@ class Tribe__Events__List_Widget extends WP_Widget {
 	 * @param string $pluginPath    The pluginpath so we can locate the template stuff.
 	 */
 	public function widget_output( $args, $instance, $template_name = 'widgets/list-widget' ) {
-		global $tribe_ecp;
-		global $post;
-
-		if ( ! $wp_query = tribe_get_global_query_object() ) {
-			return;
-		}
+		global $wp_query, $tribe_ecp, $post;
 
 		$instance = wp_parse_args(
 			$instance, array(
