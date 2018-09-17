@@ -87,11 +87,13 @@ class Tribe__Tickets__Tickets_Handler {
 			add_action( 'save_post_' . $post_type, array( $this, 'save_post' ) );
 		}
 
-		add_filter( 'get_post_metadata', array( $this, 'filter_capacity_support' ), 15, 3 );
+		add_filter( 'get_post_metadata', array( $this, 'filter_capacity_support' ), 15, 4 );
 		add_filter( 'updated_postmeta', array( $this, 'update_shared_tickets_capacity' ), 15, 4 );
 
 		add_filter( 'updated_postmeta', array( $this, 'update_meta_date' ), 15, 4 );
 		add_action( 'wp_insert_post', array( $this, 'update_start_date' ), 15, 3 );
+
+		$this->path = trailingslashit(  dirname( dirname( dirname( __FILE__ ) ) ) );
 	}
 
 	/**
@@ -244,12 +246,18 @@ class Tribe__Tickets__Tickets_Handler {
 			return false;
 		}
 
-		$update_meta = $this->key_start_date;
+		$meta_key = $this->key_start_date;
 		$tickets = $this->get_tickets_ids( $post_id );
 
-		foreach ( $tickets as $ticket ) {
+		foreach ( $tickets as $ticket_id ) {
 			// Skip tickets with manual updates to that meta
-			if ( $this->has_manual_update( $ticket, $update_meta ) ) {
+			if ( $this->has_manual_update( $ticket_id, $meta_key ) ) {
+				continue;
+			}
+
+			$current_date = get_post_meta( $ticket_id, $meta_key, true );
+			// Skip if the ticket has already a date
+			if ( ! empty( $current_date ) ) {
 				continue;
 			}
 
@@ -260,12 +268,11 @@ class Tribe__Tickets__Tickets_Handler {
 			}
 			// Convert to seconds
 			$round *= MINUTE_IN_SECONDS;
-
 			$date = strtotime( $post->post_date );
 			$date = round( $date / $round ) * $round;
 			$date = date( Tribe__Date_Utils::DBDATETIMEFORMAT, $date );
 
-			update_post_meta( $ticket, $update_meta, $date );
+			update_post_meta( $ticket_id, $meta_key, $date );
 		}
 
 		return true;
@@ -324,8 +331,9 @@ class Tribe__Tickets__Tickets_Handler {
 
 		$provider_index = array(
 			'rsvp' => 'Tribe__Tickets__RSVP',
-			'woo' => 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main',
-			'edd' => 'Tribe__Tickets_Plus__Commerce__EDD__Main',
+			'tpp'  => 'Tribe__Tickets__Commerce__PayPal__Main',
+			'woo'  => 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main',
+			'edd'  => 'Tribe__Tickets_Plus__Commerce__EDD__Main',
 		);
 
 		$relationships = array(
@@ -333,6 +341,10 @@ class Tribe__Tickets__Tickets_Handler {
 				// RSVP
 				'_tribe_rsvp_event' => 'rsvp',
 				'_tribe_rsvp_for_event' => 'rsvp',
+
+				// PayPal tickets
+				'_tribe_tpp_event' => 'tpp',
+				'_tribe_tpp_for_event' => 'tpp',
 
 				// EDD
 				'_tribe_eddticket_event' => 'edd',
@@ -346,6 +358,9 @@ class Tribe__Tickets__Tickets_Handler {
 				// RSVP
 				'_tribe_rsvp_product' => 'rsvp',
 
+				// PayPal tickets
+				'_tribe_tpp_product' => 'tpp',
+
 				// EDD
 				'_tribe_eddticket_product' => 'edd',
 
@@ -356,6 +371,9 @@ class Tribe__Tickets__Tickets_Handler {
 				// RSVP
 				'_tribe_rsvp_order' => 'rsvp',
 
+				// PayPal tickets
+				'_tribe_tpp_order' => 'tpp',
+
 				// EDD
 				'_tribe_eddticket_order' => 'edd',
 
@@ -364,6 +382,9 @@ class Tribe__Tickets__Tickets_Handler {
 
 			),
 			'order_item' => array(
+				// PayPal tickets
+				'_tribe_tpp_order' => 'tpp',
+
 				// Woo
 				'_tribe_wooticket_order_item' => 'woo',
 			),
@@ -543,7 +564,7 @@ class Tribe__Tickets__Tickets_Handler {
 	 *
 	 * @return int
 	 */
-	public function filter_capacity_support( $value, $object_id, $meta_key ) {
+	public function filter_capacity_support( $value, $object_id, $meta_key, $single = true ) {
 		// Something has been already set
 		if ( ! is_null( $value ) ) {
 			return $value;
@@ -559,7 +580,7 @@ class Tribe__Tickets__Tickets_Handler {
 
 		// Bail when we already have the MetaKey saved
 		if ( metadata_exists( 'post', $object_id, $meta_key ) ) {
-			return get_post_meta( $object_id, $meta_key, true );
+			return get_post_meta( $object_id, $meta_key, $single );
 		}
 
 		// Do the migration
@@ -567,6 +588,11 @@ class Tribe__Tickets__Tickets_Handler {
 
 		// Hook it back up
 		add_filter( 'get_post_metadata', array( $this, 'filter_capacity_support' ), 15, 4 );
+
+		// This prevents get_post_meta without single param to break
+		if ( ! $single ) {
+			$capacity = (array) $capacity;
+		}
 
 		return $capacity;
 	}
@@ -615,6 +641,7 @@ class Tribe__Tickets__Tickets_Handler {
 				$capacity += $totals['sold'] + $totals['pending'];
 			}
 		} else {
+
 			// In here we deal with Tickets migration from legacy
 			$mode = get_post_meta( $object->ID, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, true );
 			$totals = $this->get_ticket_totals( $object->ID );
@@ -847,13 +874,15 @@ class Tribe__Tickets__Tickets_Handler {
 		$provider_class = get_class( $provider );
 
 		if ( tribe_tickets_post_type_enabled( $post->post_type ) ) {
-			$default_provider = Tribe__Tickets_Plus__Tickets::get_event_ticket_provider( $post->ID );
+			$default_provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post->ID );
 		} else {
 			$default_provider = tribe_tickets_get_ticket_provider( $post->ID );
 		}
 
 		if ( ! $default_provider ) {
-			$default_provider = class_exists( 'Tribe__Tickets_Plus__Main' ) ? 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' : 'Tribe__Tickets__RSVP';
+			$default_provider = class_exists( 'Tribe__Tickets_Plus__Main' )
+				? 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main'
+				: 'Tribe__Tickets__RSVP';
 		}
 
 		if ( ! is_string( $default_provider ) ) {
@@ -943,10 +972,12 @@ class Tribe__Tickets__Tickets_Handler {
 
 			$capacity = $ticket->capacity();
 
-			if ( -1 === $capacity ) {
+			if ( -1 === $capacity || '' === $capacity ) {
 				$total = -1;
 				break;
 			}
+
+			$capacity = is_numeric( $capacity ) ? (int) $capacity : 0;
 
 			$total += $capacity;
 		}
@@ -1047,6 +1078,36 @@ class Tribe__Tickets__Tickets_Handler {
 	}
 
 	/**
+	 * Gets the Maximum Purchase number for a given ticket
+	 *
+	 * @since  4.8.1
+	 *
+	 * @param  int|string  $ticket_id  Ticket to fetch purchase max from
+	 *
+	 * @return int
+	 */
+	public function get_ticket_max_purchase( $ticket_id ) {
+		$event_id = tribe_events_get_ticket_event( $ticket_id );
+		$provider = tribe_tickets_get_ticket_provider( $ticket_id );
+		$ticket = $provider->get_ticket( $event_id, $ticket_id );
+
+		$available = $ticket->available();
+
+		/**
+		 * Allows filtering of the max input for purchase of this one ticket
+		 *
+		 * @since 4.8.1
+		 *
+		 * @param int                           $available Max Purchase number
+		 * @param Tribe__Tickets__Ticket_Object $ticket    Ticket Object
+		 * @param int                           $event_id  Event ID
+		 * @param int                           $ticket_id Ticket Raw ID
+		 *
+		 */
+		return apply_filters( 'tribe_tickets_get_ticket_max_purchase', $available, $ticket, $event_id, $ticket_id );
+	}
+
+	/**
 	 * Get an array list of shared capacity tickets for an event.
 	 *
 	 * @since 4.6
@@ -1129,16 +1190,6 @@ class Tribe__Tickets__Tickets_Handler {
 		// Bail on Invalid post
 		if ( ! $post instanceof WP_Post ) {
 			return false;
-		}
-
-		$provider = tribe_get_request_var( 'ticket_provider', false );
-
-		if ( $provider && tribe( 'tickets.metabox' )->module_is_valid( $provider ) ) {
-			// Get the Provider
-			$provider = call_user_func( array( $provider, 'get_instance' ) );
-
-			// Sve the actual ticket
-			$ticket_id = $provider->ticket_add( $post->ID, $_POST );
 		}
 
 		$this->save_form_settings( $post );

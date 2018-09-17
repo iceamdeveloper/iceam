@@ -8,24 +8,33 @@ if(!defined('ABSPATH')) exit; // Exit if accessed directly
 require_once('lib/classes/base/plugin/aelia-plugin.php');
 require_once('lib/classes/definitions/definitions.php');
 
+use Aelia\WC\AFC\Settings;
+//use Aelia\WC\AFC\Settings_Renderer;
+use Aelia\WC\AFC\Messages;
+
 /**
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '1.8.9.170629';
+	public static $version = '2.0.1.180821';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
 	public static $plugin_name = 'Aelia Foundation Classes for WooCommerce';
 
+	/**
+	 * The action used to route ajax calls to this plugin.
+	 *
+	 * @var string
+	 */
+	protected static $ajax_action = 'wc_aelia_afc_ajax';
+
 	public static function factory() {
 		// Load Composer autoloader
 		require_once(__DIR__ . '/vendor/autoload.php');
 
-		$settings_key = self::$plugin_slug;
-
-		$settings_controller = null;
-		$messages_controller = null;
+		$settings_controller = new Settings(self::$text_domain);
+		$messages_controller = new Messages(self::$text_domain);
 
 		$plugin_instance = new self($settings_controller, $messages_controller);
 		return $plugin_instance;
@@ -36,7 +45,7 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 *
 	 * @param Aelia\WC\Settings settings_controller The controller that will handle
 	 * the plugin settings.
-	 * @param Aelia\WC\Messages messages_controller The controller that will handle
+	 * @param Aelia\WC\AFC\Messages messages_controller The controller that will handle
 	 * the messages produced by the plugin.
 	 */
 	public function __construct($settings_controller,
@@ -57,6 +66,11 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		parent::set_hooks();
 		add_filter('cron_schedules', array($this, 'cron_schedules'));
 		add_action('aelia_afc_geoip_updater', array('\Aelia\WC\IP2Location', 'update_database'));
+
+		// Admin init
+		add_action('admin_init', array($this, 'admin_init'), 5);
+
+		add_action('wp_login', array($this, 'wp_login'), 10, 2);
 	}
 
 	/**
@@ -108,6 +122,44 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 											'all');
 		// Styles - Enqueue styles required for plugin Admin page
 		wp_enqueue_style(static::$plugin_slug . '-admin');
+
+		do_action('wc_aelia_afc_load_admin_scripts');
+
+		$this->localize_admin_scripts();
+	}
+
+	/**
+	 * Loads the settings that will be used by the admin scripts.
+	 *
+	 * @since 1.9.4.170410
+	 */
+	protected function localize_admin_scripts() {
+		// Prepare parameters for common admin scripts
+		$admin_scripts_params = array(
+			'ajax_action' => $this->ajax_action(),
+			'ajax_url' => admin_url('admin-ajax.php', 'relative'),
+			'home_url' => home_url(),
+			'wp_nonce' => wp_create_nonce($this->ajax_nonce_id()),
+		);
+
+		$admin_scripts_params = apply_filters('wc_aelia_afc_admin_script_params', $admin_scripts_params);
+
+		wp_localize_script(static::$plugin_slug . '-admin-common',
+											 'aelia_afc_admin_params',
+											 $admin_scripts_params);
+	}
+
+	/**
+	 * Loads Styles and JavaScript for the frontend. Extend as needed in
+	 * descendant classes.
+	 */
+	public function load_frontend_scripts() {
+		// Enqueue the required Frontend stylesheets
+		//wp_enqueue_style(static::$plugin_slug . '-frontend');
+
+		// JavaScript
+		wp_enqueue_script(static::$plugin_slug . '-frontend');
+		//$this->localize_frontend_scripts();
 	}
 
 	/**
@@ -120,6 +172,120 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		if(!wp_get_schedule('aelia_afc_geoip_updater')) {
 			wp_schedule_event(time(), 'weekly', 'aelia_afc_geoip_updater');
 		}
+	}
+
+	/**
+	 * Triggers actions when the admin section is initialised.
+	 *
+	 * @since 1.9.10.171201
+	 */
+	public function admin_init() {
+		$this->show_admin_messages();
+
+		// Initialize the updaters when in the Admin section
+		// @since 1.8.3.170110
+		$this->initialize_updaters();
+	}
+
+	/**
+	 * Shows messages to the site administrators.
+	 *
+	 * @since 1.9.10.171201
+	 */
+	public function show_admin_messages() {
+		// Inform admins about the new licensing system
+		// @since 1.9.10.171201
+		Messages::admin_message(
+			$this->_messages_controller->get_message(Definitions::NOTICE_NEW_LICENSING_SYSTEM),
+			array(
+				'level' => E_USER_NOTICE,
+				'code' => Definitions::NOTICE_NEW_LICENSING_SYSTEM,
+				'dismissable' => true,
+				'permissions' => 'manage_woocommerce',
+				'message_header' => __('New licensing system for your Aelia plugins', self::$text_domain),
+		));
+	}
+
+	/**
+	 * Indicates if the plugin updaters should be initialised.
+	 *
+	 * @return bool
+	 * @since 1.9.12.180104
+	 */
+	protected function should_initialize_updaters() {
+		// If current user cannot manage the plugins, don't load the updaters
+		if(!current_user_can('update_plugins')) {
+			return false;
+		}
+
+		// If we are handling an Ajax call, and it's not a plugin update or an AFC
+		// call, don't load the updaters
+		if(self::doing_ajax() && (empty($_REQUEST['action']) || !in_array($_REQUEST['action'], array('update-plugin', 'wc_aelia_afc_ajax')))) {
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Initialises the updater classes, which will check for product updates.
+	 *
+	 * @since 1.7.0.150818
+	 */
+	public function initialize_updaters() {
+		if(!$this->should_initialize_updaters()) {
+			//return;
+		}
+		$plugins_to_update = apply_filters('wc_aelia_afc_register_plugins_to_update', array(
+			// Free plugins
+			'free' => array(),
+			// Free plugins (development versions)
+			'free-dev' => array(),
+			// Premium plugins
+			'premium' => array(),
+		));
+
+		// Initialise the updater for both free and premium plugins
+		foreach($plugins_to_update as $plugin_type => $plugin_list) {
+			$updater = Updater::init_updater($plugin_type, $plugin_list);
+
+			if($updater instanceof Updater) {
+				$updater->check_for_updates();
+			}
+		}
+	}
+
+	/**
+	 * Allows the plugin to register itself for automatic updates.
+	 *
+	 * @param array The array of the plugins to update, structured as follows:
+	 * array(
+	 *   'free' => <Array of free plugins>,
+	 *   'free-dev' => <Array of free plugins (development versions)>,
+	 *   'premium' => <Array of premium plugins, which require licence activation>,
+	 * )
+	 * @return array The array of plugins to update, with the details of this
+	 * plugin added to it.
+	 * @since 1.7.0.150818
+	 */
+	public function wc_aelia_afc_register_plugins_to_update(array $plugins_to_update) {
+		// Set the following to "false" to stop using the development version of the
+		// AFC
+		$use_dev_updates = false;
+
+		// If the "DEV" flag is enabled, use the updater for the development version
+		// of the plugin
+		if($use_dev_updates) {
+			// Add this plugins to the list of the free plugins (development versions)
+			// to update automatically
+			$plugins_to_update['free-dev'][self::$plugin_slug] = $this;
+		}
+		else {
+			// Add this plugins to the list of the free plugins to update automatically
+			$plugins_to_update['free'][self::$plugin_slug] = $this;
+		}
+
+		return $plugins_to_update;
 	}
 
 	/**
@@ -189,6 +355,43 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Performs actions when the user logs in.
+	 *
+	 * @param string user_login The user's login.
+	 * @param object user A user object.
+	 * @since 1.8.2.161216
+	 */
+	public function wp_login($user_login, $user) {
+		// Sets the cookie that indicates that cart fragments should be refreshed.
+		// We store the cookie path in the cookie, to make it easier to retrieve that
+		// information via JavaScript
+		Aelia_SessionManager::set_cookie(Definitions::SESSION_USER_LOGGED_IN, COOKIEPATH);
+	}
+
+	/**
+	 * Indicates if debug mode is active.
+	 *
+	 * @return bool
+	 * @since 1.9.4.170410
+	 */
+	public function debug_mode() {
+		return $this->_settings_controller->debug_mode();
+	}
+
+	/**
+	 * Returns a list of valid Ajax commands and the callback associated to each.
+	 *
+	 * @return array A list of command => callback pairs.
+	 * @since 1.9.4.170410
+	 */
+	protected function get_valid_ajax_commands() {
+		return apply_filters('wc_aelia_afc_ajax_callbacks', array(
+			// Add the Ajax commands provided by the plugin, in
+			// command => callable format
+		));
 	}
 }
 class_alias('\Aelia\WC\WC_AeliaFoundationClasses', 'WC_AeliaFoundationClasses');
