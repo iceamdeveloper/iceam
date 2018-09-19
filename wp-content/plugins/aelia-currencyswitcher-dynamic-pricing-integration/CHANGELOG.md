@@ -1,6 +1,9 @@
 # WooCommerce Currency Switcher - Dynamic Pricing Integration
 
 ## Version 1.x
+####1.0.3.180713
+* Fix - Fixed display of individual variation prices in WC 3.4 and later.
+
 ####1.0.2.171106
 * Tweak - Added logic to handle discounts that use commas as the decimal separator.
 

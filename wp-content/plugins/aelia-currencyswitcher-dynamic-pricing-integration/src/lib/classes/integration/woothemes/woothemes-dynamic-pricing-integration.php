@@ -110,6 +110,10 @@ class Dynamic_Pricing_Integration {
 		add_filter('woocommerce_dynamic_pricing_get_rule_amount', array($this, 'woocommerce_dynamic_pricing_get_rule_amount'), 20, 4);
 		add_filter('wc_dynamic_pricing_load_modules', array($this, 'wc_dynamic_pricing_load_modules'), 20);
 
+		// Fix the display of the variation prices
+		// @since 1.0.3.180713
+		add_filter('woocommerce_variation_prices', array($this, 'woocommerce_variation_prices'), 999, 3);
+
 		// Prevent double discount of variation prices
 		// @since 1.0.1.170710
 		if(class_exists('\WC_Dynamic_Pricing')) {
@@ -380,5 +384,39 @@ class Dynamic_Pricing_Integration {
 			}
 		}
 		return $module;
+	}
+
+	/**
+	 * Alters the variation prices used for the display of variable products. This
+	 * is required because the Dynamic Pricing plugin reduces the product price,
+	 * but it doesn't update the sale price (looks like a bug). That causes the
+	 * variation prices not to be displayed on the product page, as WooCommerce hides
+	 * them if all regular and sale prices are the same.
+	 *
+	 * WHY THIS HAPPENS
+	 * WC 3.4 checks the product's regular and sale prices. If the sale prices are
+	 * different from the final price (which is the case with the Dynamic Pricing
+	 * plugin), WC overwrites the sale prices with the regular prices. This causes
+	 * all sale prices to be the same, and the variation prices to be hidden.
+	 *
+	 * @param array prices
+	 * @param WC_Product
+	 * @param bool for_display
+	 * @return array
+	 * @since 1.0.3.180713
+	 * @see WC_Product_Variable_Data_Store_CPT::read_price_data()
+	 */
+	public function woocommerce_variation_prices($prices, $product, $for_display) {
+		foreach($prices['sale_price'] as $variation_id => $sale_price) {
+			$variation_price = $prices['price'][$variation_id];
+
+			if(is_numeric($sale_price) &&
+				 is_numeric($variation_price) &&
+				 ($sale_price > $variation_price)) {
+				$prices['sale_price'][$variation_id] = $variation_price;
+			}
+		}
+
+		return $prices;
 	}
 }

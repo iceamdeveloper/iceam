@@ -126,6 +126,17 @@ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 
 
 
+/***********************************************************************
+ *
+ *	DON'T ALLOW USERS TO SIGN UP FOR COURSES THAT DO NOT
+ *	HAVE A WOOCOMMERCE PRODUCT ASSOCIATED WITH THEM
+ *
+ **********************************************************************/
+
+add_filter( 'sensei_display_start_course_form', __return_false);
+
+
+
 
  
 /***********************************************************************
@@ -163,8 +174,9 @@ function member_dir_exclude_users($qs=false,$object=false){
 
 function filter_buddypress_user_ids(){
 	$non_diplomates = array();
-	
-	$non_diplomates = get_users( array( 'role__in' => ['customer', 'practitioner'], 'fields' => 'ID' ) );
+	if(!get_current_user_id()){
+		$non_diplomates = get_users( array( 'role__in' => ['customer', 'practitioner'], 'fields' => 'ID' ) );
+	}
 	
 	// primarily for hiding admin / dev / qa user accounts
 	$hidden = get_users(array('meta_key'=>'wpcf-hide-in-members', 'meta_value'=>'1', 'fields' => 'ID' ) );
@@ -247,7 +259,10 @@ function apply_signup_coupons() {
 	// if there is a subscription, find out if it has student discount or diplomate discount category
 	$apply_coupon = false;
     $items = $woocommerce->cart->get_cart();
-	
+    $total = floatval( preg_replace( '#[^\d.]#', '', $woocommerce->cart->get_cart_total() ) );
+    echo "<p>total: $total</p>";
+    
+    
 	foreach($items as $item => $values) {
 		if($values['data']->is_type( 'subscription' )){
 			$_product = $values['data']->post;
@@ -268,15 +283,25 @@ function apply_signup_coupons() {
 	$user_ID = get_current_user_id();
 	$member_info = get_userdata($user_ID);
 	
-	// apply the correct coupon, based on role
+	// apply the correct coupon, based on role or cart total
 	// remember that in the system a 'student' (role) is a 'customer'
 	$coupon_code = "";
 	if ($user_ID != 0 && in_array('customer',$member_info->roles)){
 		$coupon_code = 'studentonlinesignup';
+        
 	} else if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) ){
 		$coupon_code = 'diplomateonlinesignup';
-	}
-		
+        
+	} else if ($total > 1000 && $total < 2000){
+		$coupon_code = 'bulksignupdiscount5';
+        
+	} else if ($total > 2000 && $total < 3000){
+        $coupon_code = 'bulksignupdiscount10';
+        
+    } else if ($total > 3000){
+        $coupon_code = 'bulksignupdiscount15';
+    }
+    
 	// if no coupon, or this coupon is already applied, stop
     if ( $coupon_code == "" || $woocommerce->cart->has_discount( $coupon_code ) ) return;
 
