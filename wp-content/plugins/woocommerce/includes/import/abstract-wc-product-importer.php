@@ -319,9 +319,8 @@ abstract class WC_Product_Importer implements WC_Importer_Interface {
 	 */
 	protected function set_product_data( &$product, $data ) {
 		if ( isset( $data['raw_attributes'] ) ) {
-			$attributes          = array();
-			$default_attributes  = array();
-			$existing_attributes = $product->get_attributes();
+			$attributes         = array();
+			$default_attributes = array();
 
 			foreach ( $data['raw_attributes'] as $position => $attribute ) {
 				$attribute_id = 0;
@@ -338,22 +337,12 @@ abstract class WC_Product_Importer implements WC_Importer_Interface {
 					$is_visible = 1;
 				}
 
-				// Get name.
-				$attribute_name = $attribute_id ? wc_attribute_taxonomy_name_by_id( $attribute_id ) : $attribute['name'];
-
-				// Set if is a variation attribute based on existing attributes if possible so updates via CSV do not change this.
+				// Set if is a variation attribute.
 				$is_variation = 0;
 
-				if ( $existing_attributes ) {
-					foreach ( $existing_attributes as $existing_attribute ) {
-						if ( $existing_attribute->get_name() === $attribute_name ) {
-							$is_variation = $existing_attribute->get_variation();
-							break;
-						}
-					}
-				}
-
 				if ( $attribute_id ) {
+					$attribute_name = wc_attribute_taxonomy_name_by_id( $attribute_id );
+
 					if ( isset( $attribute['value'] ) ) {
 						$options = array_map( 'wc_sanitize_term_text_based', $attribute['value'] );
 						$options = array_filter( $options, 'strlen' );

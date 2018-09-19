@@ -203,7 +203,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 		foreach ( $tickets as $ticket ) {
 
-			//Only Display if a WooCommerce Ticket otherwise kick out
+			// Only Display if a WooCommerce Ticket otherwise kick out
 			if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' != $ticket->provider_class ) {
 				continue;
 			}
@@ -218,11 +218,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 					'completed' => 0,
 				);
 			}
-			$stock = $ticket->stock();
-			$sold = $ticket->qty_sold();
+			$stock     = $ticket->stock();
+			$sold      = $ticket->qty_sold();
 			$cancelled = $ticket->qty_cancelled();
+			$refunded  = $ticket->qty_refunded();
 
-			$net_sold = $sold - $cancelled;
+			$net_sold = $sold - ( $cancelled + $refunded );
 			if ( $net_sold < 0 ) {
 				$net_sold = 0;
 			}

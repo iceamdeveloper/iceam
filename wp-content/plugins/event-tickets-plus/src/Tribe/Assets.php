@@ -37,6 +37,7 @@ class Tribe__Tickets_Plus__Assets {
 			array( 'event-tickets-plus-meta-admin-js', 'meta-admin.js', array( 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable' ) ),
 			array( 'event-tickets-plus-admin-css', 'admin.css', array( 'event-tickets-admin-css' ) ),
 			array( 'event-tickets-plus-admin-tables-js', 'tickets-tables.js', array( 'underscore', 'jquery', 'tribe-common' ) ),
+			array( 'event-tickets-plus-admin-qr', 'qr.js', array( 'jquery' ) ),
 		);
 
 		/**
@@ -57,7 +58,16 @@ class Tribe__Tickets_Plus__Assets {
 		tribe_assets(
 			tribe( 'tickets-plus.main' ),
 			$enqueue_array,
-			'admin_enqueue_scripts'
+			'admin_enqueue_scripts',
+			array(
+				'priority' => 0,
+				'localize' => (object) array(
+					'name' => 'tribe_qr',
+					'data' => array(
+						'generate_qr_nonce'   => wp_create_nonce( 'generate_qr_nonce' ),
+					),
+				),
+			)
 		);
 	}
 }

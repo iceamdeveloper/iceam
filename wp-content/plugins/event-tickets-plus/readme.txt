@@ -3,8 +3,9 @@
 Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.5
-Tested up to: 4.9.5
-Stable tag: 4.7.2
+Tested up to: 4.9.8
+Stable tag: 4.8.1
+Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -136,6 +137,61 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.8.1] 2018-09-12 =
+
+* Feature - Add a filter to enable security code check during QR checkin, tribe_tickets_plus_qr_check_security_code  [87756]
+* Fix - Show the ticket table when tickets are all sold out, show message in list view [111893]
+* Tweak - Set `tribe_tickets_plus_trash_ticket` filter to true by default [112409]
+* Tweak - Added internal methods to WooCommerce and EDD handle more atomic Views for Gutenberg extension [112478]
+
+= [4.8] 2018-08-22 =
+
+* Feature - Include a Tickets REST API endpoint for read operations [108021]
+* Feature - Include WooTickets and EDD tickets fields in the WP personal data erase [108491]
+* Fix - Properly update attendees transient when checkin/unchekin an attendee for WooCommerce and EDD Tickets, in order to see changes immediately. Thanks to Adam for the report! [104355]
+* Tweak - WooCommerce Orders Sales by Ticket section to remove duplicate data [110034]
+* Tweak - Attendees section to clarify infomation [110038]
+
+= [4.7.6] 2018-08-01 =
+
+* Add - New template file for inserting the QR codes in tickets emails. Props to @madebyelmcity for bringing this up [62181]
+* Fix - Fix EDD tickets stock being borked after updating capacity. Thanks to @lvdesigner and @artstream8401 for flagging this! [106741]
+* Fix - Prevent ticket unavailability message from displaying twice with multiple ticket providers [110014]
+* Tweak - Adjusted order status output in the tickets order report tab to use translated version. Props to @websource for the report [109640]
+* Feature - Include RSVP, Tribe Commerce, WooTickets and EDD tickets fields data in WP personal data export [108488]
+
+= [4.7.5] 2018-07-09 =
+
+* Feature - Add QR API settings field and button to generate key [102116]
+* Feature - Add base REST API system and endpoint for QR check in [102107]
+* Feature - Add security code and REST path to QR code url and require use of security code for REST check in [102112]
+* Fix - When adding a WooCommerce ticket to the cart, redirect only if the "WooCommerce" setting is set. Thanks to Thomas and Ilkka for flagging this! [46648]
+* Fix - Display unavailability message when tickets are not yet or no longer available [81334]
+* Tweak - Add `tribe_tickets_plus_trash_ticket` filter to give the opportunity to trash tickets when deleted instead of actually deleting them [46393]
+
+= [4.7.4] 2018-06-20 =
+
+* Fix - Fixed an issue with new "Enable QR codes for tickets?" option being only visible if WooCommerce was active [107236]
+* Language - 2 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.7.3] 2018-05-29 =
+
+* Tweak - Make QR codes optional via new "Enable QR codes for tickets?" option in Tickets settings [41649]
+* Fix - Remove attendees from the public list if their order have failed (Thanks @beerddwr for flagging this!) [103912]
+* Fix - Fixed an issue where EDD was throwing insufficient stock error for shared capacity tickets (props to @artstream8401 for reporting this!) [101079]
+* Fix - Clean the attendees cache every time an order is updated, so the changes are reflected immediately (Thanks @bartenderatlas, @artistinformatici, @danceworks and others for reporting) [103831]
+* Fix - Synchronize the event cost when a WooCommerce sale start or end (Thanks @floydcountrystore for notifying us!) [104019]
+* Fix - Ensured that the tickets start and end sale date respect the event timezone (props @Ryan, @Georges and others for flagging this!) [76683]
+* Fix - Add class to handle WooCommerce order refunds on a ticket basis [102081]
+* Fix - Prevent the event tickets page to break when EDD is deactivated and there were EDD orders [64253]
+* Fix - Add default title to the ticket field set if none provided [70739]
+* Fix - Sanitize HTML classes for ticket attendee details in the admin area (Thanks @Gergana, @ucheng and @mr-d for flagging this!) [65385]
+* Fix - Ignore whitespaces in ticket required fields (props @jonahgirl and @seanaguilar for notifying us!) [95950]
+* Fix - Render ticket fields without label (Thanks @creeert-net and @daviddweb for spotting this) [63286]
+* Tweak - Made the QR code base URL default to having a trailing slash to prevent issues with some server configurations [74797]
+* Tweak - Added new `tribe_tickets_qr_code_base_url` to allow easy filtering of the QR code base URL [74797]
+* Language - 5 new strings added, 74 updated, 0 fuzzied, and 1 obsoleted
 
 = [4.7.2] 2018-04-18 =
 

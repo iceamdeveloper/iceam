@@ -171,7 +171,6 @@ input[data-field="custom-interval"] {
 
 .tribe-has-recurrence-rule .tribe-recurrence-exclusion-row {
 	display: table-row;
-	-webkit-transition: opacity 0.35s ease-in;
 	transition: opacity 0.35s ease-in;
 }
 

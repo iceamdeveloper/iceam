@@ -248,7 +248,6 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 				'taxonomy' => 'product_visibility',
 				'field'    => 'name',
 				'terms'    => 'featured',
-				'operator' => true === $request['featured'] ? 'IN' : 'NOT IN',
 			);
 		}
 
@@ -1741,7 +1740,7 @@ class WC_REST_Products_Controller extends WC_REST_Legacy_Products_Controller {
 				),
 				'shipping_class_id'     => array(
 					'description' => __( 'Shipping class ID.', 'woocommerce' ),
-					'type'        => 'integer',
+					'type'        => 'string',
 					'context'     => array( 'view', 'edit' ),
 					'readonly'    => true,
 				),

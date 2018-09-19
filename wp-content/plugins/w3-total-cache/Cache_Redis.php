@@ -161,7 +161,7 @@ class Cache_Redis extends Cache_Base {
 	 * @param unknown $key
 	 * @return bool
 	 */
-	function hard_delete( $key, $group = '' ) {
+	function hard_delete( $key ) {
 		$storage_key = $this->get_item_key( $key );
 		$accessor = $this->_get_accessor( $storage_key );
 		if ( is_null( $accessor ) )

@@ -239,11 +239,11 @@ class Cdn_MaxCdn_Popup {
 			echo 'currently set to <strong>';
 			echo htmlspecialchars( $details[$field]['current'] );
 			echo '</strong><br />';
-			echo '<label class="w3tc_change_label"><input type="checkbox" name="' . $field . '_change" value="y"' .
+			echo '<input type="checkbox" name="' . $field . '_change" value="y"' .
 				' checked="checked" /> ';
 			echo 'change to <strong>';
 			echo htmlspecialchars( $details[$field]['new'] );
-			echo '</strong></label><br />';
+			echo '</strong><br />';
 		}
 	}
 

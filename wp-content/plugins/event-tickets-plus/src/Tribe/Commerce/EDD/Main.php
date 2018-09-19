@@ -17,7 +17,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	/**
 	 * Min required The Events Calendar version
 	 */
-	const REQUIRED_TEC_VERSION = '4.6';
+	const REQUIRED_TEC_VERSION = '4.6.20';
 	/**
 	 * Min required Easy Digital Downloads version
 	 */
@@ -86,14 +86,13 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	/**
 	 * Meta key that relates Attendees and Products.
 	 *
-	 * @deprecated 4.7 Use $attendee_product_key variable instead
 	 */
 	public $attendee_event_key = '_tribe_eddticket_event';
 
 	/**
 	 * Meta key that relates Attendees and Products.
 	 *
-	 * @deprecated TBD Use $attendee_product_key variable instead
+	 * @deprecated 4.7.3 Use $attendee_product_key variable instead
 	 */
 	const ATTENDEE_PRODUCT_KEY = '_tribe_eddticket_product';
 	public $attendee_product_key = '_tribe_eddticket_product';
@@ -222,6 +221,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		add_filter( 'tribe_tickets_settings_post_types', array( $this, 'exclude_product_post_type' ) );
 		add_action( 'tribe_events_tickets_metabox_edit_advanced', array( $this, 'do_metabox_advanced_options' ), 10, 2 );
 		add_filter( 'tribe_tickets_get_default_module', array( $this, 'override_default_module' ), 10, 2 );
+
+		add_action( 'eddtickets_checkin', array( $this, 'purge_attendees_transient' ) );
+		add_action( 'eddtickets_uncheckin', array( $this, 'purge_attendees_transient' ) );
 	}
 
 	/**
@@ -416,6 +418,17 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	}
 
 	/**
+	 * Where the cart form should lead the users into
+	 *
+	 * @since  4.8.1
+	 *
+	 * @return string
+	 */
+	public function get_cart_url() {
+		return add_query_arg( 'eddtickets_process', 1, edd_get_checkout_uri() );
+	}
+
+	/**
 	 * Adds a message to EDD's order email confirmation.
 	 * @param string $email_body
 	 * @param int $payment_id
@@ -592,11 +605,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		if ( '' !== $data['mode'] ) {
-			if ( 'update' === $save_type ) {
-				$totals = tribe( 'tickets.handler' )->get_ticket_totals( $ticket->ID );
-				$data['stock'] -= $totals['pending'] + $totals['sold'];
-			}
-
 			// In here is safe to check because we don't have unlimted = -1
 			$status = ( 0 < $data['stock'] ) ? 'instock' : 'outofstock';
 
@@ -656,20 +664,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			}
 		} else {
 			delete_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_start_date );
-		}
-
-
-		// Default Purchase Limit
-		if ( ! isset( $ticket->purchase_limit ) ) {
-			$ticket->purchase_limit = '';
-		}
-
-		$ticket->purchase_limit = trim( Tribe__Utils__Array::get( $raw_data, 'ticket_purchase_limit', $ticket->purchase_limit ) );
-
-		if ( '' !== $ticket->purchase_limit ) {
-			update_post_meta( $ticket->ID, '_ticket_purchase_limit', absint( $ticket->purchase_limit ) );
-		} else {
-			delete_post_meta( $ticket->ID, '_ticket_purchase_limit' );
 		}
 
 		if ( ! empty( $raw_data['ticket_end_date'] ) ) {
@@ -734,8 +728,21 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		if ( empty( $post_id ) ) $post_id = get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
 		$product_id = get_post_meta( $ticket_id, self::ATTENDEE_PRODUCT_KEY, true );
 
-		// Try to kill the actual ticket/attendee post
-		$delete = wp_delete_post( $ticket_id, true );
+		/**
+		 * Use this Filter to choose if you want to trash tickets instead
+		 * of deleting them directly
+		 *
+		 * @param bool   false
+		 * @param int    $ticket_id
+		 */
+		if ( apply_filters( 'tribe_tickets_plus_trash_ticket', true, $ticket_id ) ) {
+			// Move it to the trash
+			$delete = wp_trash_post( $ticket_id );
+		} else {
+			// Try to kill the actual ticket/attendee post
+			$delete = wp_delete_post( $ticket_id, true );
+		}
+
 		if ( is_wp_error( $delete ) ) {
 			return false;
 		}
@@ -824,7 +831,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$expired_tickets = 0;
 
 		foreach ( $tickets as $ticket ) {
-			if ( ! $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
+			if ( ! $ticket->date_in_range() ) {
 				$expired_tickets++;
 			}
 		}
@@ -846,13 +853,12 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			 *
 			 * add_action( 'tribe_tickets_expired_front_end_ticket_form', array( Tribe__Tickets_Plus__Attendees_List::instance(), 'render' ) );
 			 *
-			 * @since TBD
+			 * @since 4.7.3
 			 *
 			 * @param boolean $must_login
 			 * @param array $tickets
 			 */
 			do_action( 'tribe_tickets_expired_front_end_ticket_form', $must_login, $tickets );
-			return;
 		}
 
 		$global_stock         = new Tribe__Tickets__Global_Stock( $post->ID );
@@ -1064,7 +1070,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * tests to see if it functions as a ticket: if so, the corresponding event
 	 * object is returned. If not, boolean false is returned.
 	 *
-	 * @param object $ticket_product
+	 * @param object|int $ticket_product
 	 *
 	 * @return bool|WP_Post
 	 */
@@ -1113,7 +1119,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 			case self::ATTENDEE_OBJECT :
 
-				return $this->get_attendees_by_attendee_id( $post_id );
+				return $this->get_all_attendees_by_attendee_id( $post_id );
 
 				break;
 
@@ -1196,7 +1202,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 *
 	 * @return array
 	 */
-	protected function get_attendees_by_attendee_id( $attendee_id ) {
+	public function get_all_attendees_by_attendee_id( $attendee_id ) {
 
 		$attendees_query = new WP_Query( array(
 			'p'         => $attendee_id,
@@ -1348,6 +1354,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return array
 	 */
 	public function get_order_data( $order_id ) {
+
+		if ( ! tribe_tickets_is_edd_active() ) {
+			return;
+		}
+
 		$user_info     = edd_get_payment_meta_user_info( $order_id );
 		$name          = $user_info['first_name'] . ' ' . $user_info['last_name'];
 		$email         = $user_info['email'];
@@ -1437,6 +1448,31 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	}
 
 	/**
+	 * Remove the Post Transients when a EDD Ticket is Checked In
+	 *
+	 * @since 4.8.0
+	 *
+	 * @param  int $attendee_id
+	 * @return void
+	 */
+	public function purge_attendees_transient( $attendee_id ) {
+
+		$event_id = get_post_meta( $attendee_id, $this->attendee_event_key, true );
+		if ( ! $event_id ) {
+			return;
+		}
+
+		$current_transient = Tribe__Post_Transient::instance()->get( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
+		if ( ! $current_transient ) {
+			return;
+		}
+
+		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE, $current_transient );
+
+	}
+
+
+	/**
 	 * Add the extra options in the admin's new/edit ticket metabox portion that is loaded via ajax
 	 * Currently, that includes the sku
 	 *
@@ -1485,15 +1521,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$capacity            = null;
 		$event_capacity      = null;
 
-		/**
-		 * Filter the default purchase limit for the ticket
-		 *
-		 * @since  4.6
-		 *
-		 * @param int anything greater than 0 will show limits section, 0 will hide
-		 */
-		$purchase_limit = apply_filters( 'tribe_tickets_default_purchase_limit', 0 );
-
 		$stock_object = new Tribe__Tickets__Global_Stock( $post_id );
 
 		if ( $stock_object->is_enabled() ) {
@@ -1510,10 +1537,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				$capacity            = tribe_tickets_get_capacity( $ticket->ID );
 				$global_stock_mode   = $ticket->global_stock_mode();
 				$global_stock_cap    = $ticket->global_stock_cap();
-
-				if ( metadata_exists( 'post', $ticket->ID, '_ticket_purchase_limit' ) ) {
-					$purchase_limit = get_post_meta( $ticket->ID, '_ticket_purchase_limit', true );
-				}
 			}
 		}
 
@@ -1688,6 +1711,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return string
 	 */
 	public function get_price_html( $product, $attendee = false ) {
+
+		if ( ! tribe_tickets_is_edd_active() ) {
+			return;
+		}
+
 		$product_id = $product;
 
 		// Avoid Catchable Fatal on EDD for using product_id as a possible string
@@ -1991,6 +2019,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			return false;
 		}
 
+		/** @var Tribe__Tickets__Commerce__Currency $currency */
+		$currency        = tribe( 'tickets.commerce.currency' );
+		$currency_symbol = $currency->get_currency_symbol( $product_id, true );
+
 		// Iterate over all the amount of tickets purchased (for this product)
 		$quantity = (int) $item['quantity'];
 		for ( $i = 0; $i < $quantity; $i ++ ) {
@@ -2010,6 +2042,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			update_post_meta( $attendee_id, self::ATTENDEE_EVENT_KEY, $post_id );
 			update_post_meta( $attendee_id, $this->security_code, $this->generate_security_code( $order_id, $attendee_id ) );
 			update_post_meta( $attendee_id, $this->attendee_optout_key, $optout );
+			update_post_meta( $attendee_id, '_paid_price', $this->get_price_value( $product_id ) );
+			update_post_meta( $attendee_id, '_price_currency_symbol', $currency_symbol );
 
 			// The ID of the customer who paid for the tickets.
 			$user_id = get_post_meta( $order_id, '_edd_payment_user_id', true );
@@ -2050,7 +2084,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * Depending on the available version of EDD the product might be a post object or a Download
 	 * object and it might not implement the `get__stock` method.
 	 *
-	 * @since TBD
+	 * @since 4.7.3
 	 *
 	 * @param WP_Post|EDD_Download $product
 	 *
@@ -2071,7 +2105,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	/**
 	 * Get the value of the currency selected for EDD
 	 *
-	 * @since TBD
+	 * @since 4.7.3
 	 *
 	 * @return string
 	 */

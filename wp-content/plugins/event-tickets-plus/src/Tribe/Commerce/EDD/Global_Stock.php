@@ -111,7 +111,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Global_Stock {
 
 			// This is also a great opportunity to test and see if ticket caps have been exceeded
 			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $tickets[ $product->ID ]->global_stock_mode() ) {
-				if ( $cart_item['quantity'] > $tickets[ $product->ID ]->global_stock_cap() ) {
+
+				$ticket_capacity = tribe_tickets_get_capacity( $product->ID ) - $tickets[ $product->ID ]->qty_sold();
+
+				if ( $cart_item['quantity'] > $ticket_capacity ) {
+
 					$this->cart_flag_capped_stock_error( $product->ID );
 				}
 			}

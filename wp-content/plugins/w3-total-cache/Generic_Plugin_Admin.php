@@ -372,10 +372,7 @@ class Generic_Plugin_Admin {
 			}
 
 			global $pagenow;
-			if ( $pagenow == 'plugins.php' || $this->is_w3tc_page ||
-				isset( $_REQUEST['w3tc_note'] ) ||
-				isset( $_REQUEST['w3tc_error'] ) ||
-				isset( $_REQUEST['w3tc_message'] ) ) {
+			if ( $pagenow == 'plugins.php' || $this->is_w3tc_page ) {
 				/**
 				 * Only admin can see W3TC notices and errors
 				 */
@@ -476,8 +473,8 @@ class Generic_Plugin_Admin {
 		$n = 0;
 
 		foreach ( $sections as $section => $data ) {
-			$content = '<div class="w3tchelp_content" data-section="' .
-				$section . '"></div>';
+			$content = '<div class="w3tchelp_content w3tchelp_section_' .
+				md5( $section ) . '"></div>';
 
 			$screen->add_help_tab( array(
 					'id' => 'w3tc_faq_' . $n,
@@ -489,17 +486,24 @@ class Generic_Plugin_Admin {
 	}
 
 	public function w3tc_ajax_faq() {
-		$section = $_REQUEST['section'];
+		$sections = Generic_Faq::sections();
+		$faq = Generic_Faq::parse();
 
-		$entries = Generic_Faq::parse( $section );
 		$response = array();
 
-		ob_start();
-		include W3TC_DIR . '/Generic_Plugin_Admin_View_Faq.php';
-		$content = ob_get_contents();
-		ob_end_clean();
+		foreach ( $sections as $section => $data ) {
+			$entries = $faq[$section];
+			$columns = array_chunk( $entries, ceil( count( $entries ) / 3 ) );
 
-		echo json_encode( array( 'content' => $content ) );
+			ob_start();
+			include W3TC_INC_OPTIONS_DIR . '/common/help.php';
+			$content = ob_get_contents();
+			ob_end_clean();
+
+			$response[md5( $section )] = $content;
+		}
+
+		echo json_encode( $response );
 	}
 
 
@@ -776,22 +780,24 @@ class Generic_Plugin_Admin {
 			}
 		}
 
-		$errors = apply_filters( 'w3tc_errors', $errors );
-		$notes = apply_filters( 'w3tc_notes', $notes );
+		if ( Util_Admin::is_w3tc_admin_page() ) {
+			$errors = apply_filters( 'w3tc_errors', $errors );
+			$notes = apply_filters( 'w3tc_notes', $notes );
 
-		/**
-		 * Show messages
-		 */
-		foreach ( $notes as $key => $note ) {
-			echo sprintf(
-				'<div class="updated w3tc_note" id="%s"><p>%s</p></div>',
-				$key,
-				$note );
-		}
+			/**
+			 * Show messages
+			 */
+			foreach ( $notes as $key => $note ) {
+				echo sprintf(
+					'<div class="updated w3tc_note" id="%s"><p>%s</p></div>',
+					$key,
+					$note );
+			}
 
-		foreach ( $errors as $key => $error ) {
-			echo sprintf( '<div class="error w3tc_error" id="%s"><p>%s</p></div>',
-				$key, $error );
+			foreach ( $errors as $key => $error ) {
+				echo sprintf( '<div class="error w3tc_error" id="%s"><p>%s</p></div>',
+					$key, $error );
+			}
 		}
 	}
 }

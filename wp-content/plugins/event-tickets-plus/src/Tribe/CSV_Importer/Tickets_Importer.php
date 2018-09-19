@@ -120,7 +120,7 @@ abstract class Tribe__Tickets_Plus__CSV_Importer__Tickets_Importer extends Tribe
 		/**
 		 * Add an opportunity for the user to change the values for the created ticket via the CSV import.
 		 *
-		 * @since TBD
+		 * @since 4.7.3
 		 *
 		 * @param array $data The data for the new created ticket.
 		 */

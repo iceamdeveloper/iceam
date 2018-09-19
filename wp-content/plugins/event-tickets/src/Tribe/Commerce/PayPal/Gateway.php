@@ -52,6 +52,11 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 	protected $handler;
 
 	/**
+	 * @var int The invoice number expiration time in seconds.
+	 */
+	protected $invoice_expiration_time = 900;
+
+	/**
 	 * Tribe__Tickets__Commerce__PayPal__Gateway constructor.
 	 *
 	 * @since 4.7
@@ -89,8 +94,7 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 			return;
 		}
 
-		$url           = $this->get_cart_url( '_cart' );
-		$now           = time();
+		$cart_url           = $this->get_cart_url( '_cart' );
 		$post_url      = get_permalink( $post );
 		$currency_code = trim( tribe_get_option( 'ticket-commerce-currency-code' ) );
 		$product_ids   = $_POST['product_id'];
@@ -105,7 +109,7 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 		 *
 		 * @since 4.7
 		 *
-		 * @see  \Tribe__Tickets__Commerce__PayPal__Handler__IPN::check_response()
+		 * @see  Tribe__Tickets__Commerce__PayPal__Handler__IPN::check_response()
 		 * @link https://developer.paypal.com/docs/classic/paypal-payments-standard/integration-guide/Appx_websitestandard_htmlvariables/
 		 *
 		 * @param string $notify_url
@@ -115,6 +119,10 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 		$notify_url = apply_filters( 'tribe_tickets_commerce_paypal_notify_url', $notify_url, $post, $product_ids );
 
 		$custom_args = array( 'user_id' => get_current_user_id(), 'tribe_handler' => 'tpp', 'pid' => $post->ID );
+
+		$invoice_number = $this->set_invoice_number();
+
+		$custom_args['invoice'] = $invoice_number;
 
 		/**
 		 * Filters the custom arguments that will be sent ot PayPal.
@@ -139,9 +147,15 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 			'return'        => $this->get_success_page_url(),
 			'currency_code' => $currency_code ? $currency_code : 'USD',
 			'custom'        => $custom,
+			/*
+			 * We're not sending an invoice anymore.
+			 * It would mess up the cart cookies and we ended up not using it.
+			 */
 		);
 
-		$this->set_invoice_number();
+		/** @var Tribe__Tickets__Commerce__PayPal__Cart__Interface $cart */
+		$cart = tribe( 'tickets.commerce.paypal.cart' );
+		$cart->set_id( $invoice_number );
 
 		foreach ( $product_ids as $ticket_id ) {
 			$ticket   = tribe( 'tickets.commerce.paypal' )->get_ticket( $post->ID, $ticket_id );
@@ -150,7 +164,7 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 			// skip if the ticket in no longer in stock or is not sellable
 			if (
 				! $ticket->is_in_stock()
-				|| ! $ticket->date_in_range( $now )
+				|| ! $ticket->date_in_range()
 			) {
 				continue;
 			}
@@ -163,11 +177,6 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 				$quantity = $inventory;
 			}
 
-			// enforce purchase limit
-			if ( $ticket->purchase_limit && $quantity > $ticket->purchase_limit ) {
-				$quantity = $ticket->purchase_limit;
-			}
-
 			// if the ticket doesn't have a quantity, skip it
 			if ( empty( $quantity ) ) {
 				continue;
@@ -177,6 +186,8 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 			$args['amount']      = $ticket->price;
 			$args['item_number'] = "{$post->ID}:{$ticket->ID}";
 			$args['item_name']   = urlencode( wp_kses_decode_entities( $this->get_product_name( $ticket, $post ) ) );
+
+			$cart->add_item( $ticket->ID, $quantity );
 
 			// we can only submit one product at a time. Bail if we get to here because we have a product
 			// with a requested quantity
@@ -192,6 +203,8 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 			die;
 		}
 
+		$cart->save();
+
 		/**
 		 * Filters the arguments passed to PayPal while adding items to the cart
 		 *
@@ -203,7 +216,20 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 		 */
 		$args = apply_filters( 'tribe_tickets_commerce_paypal_add_to_cart_args', $args, $_POST, $post );
 
-		$url = add_query_arg( $args, $url );
+		$cart_url = add_query_arg( $args, $cart_url );
+
+		/**
+		 * To allow the Invoice cookie to apply we have to redirect to a page on the same domain
+		 * first.
+		 * The redirection is handled in the `Tribe__Tickets__Redirections::maybe_redirect` class
+		 * on the `wp_loaded` action.
+		 *
+		 * @see Tribe__Tickets__Redirections::maybe_redirect
+		 */
+		$url = add_query_arg(
+			array( 'tribe_tickets_redirect_to' => rawurlencode( $cart_url ) ),
+			home_url()
+		);
 
 		wp_redirect( $url );
 		die;
@@ -358,7 +384,9 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 		$invoice = $this->get_invoice_number();
 
 		// set the cookie (if it was already set, it'll extend the lifetime)
-		setcookie( self::$invoice_cookie_name, $invoice, 900);
+		$secure = 'https' === parse_url( home_url(), PHP_URL_SCHEME );
+		setcookie( self::$invoice_cookie_name, $invoice, time() + $this->invoice_expiration_time, COOKIEPATH, COOKIE_DOMAIN, $secure );
+		set_transient( $this->invoice_transient_name( $invoice ), '1', $this->invoice_expiration_time );
 
 		return $invoice;
 	}
@@ -373,8 +401,14 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 			return;
 		}
 
+		$invoice_number = $_COOKIE[ self::$invoice_cookie_name ];
 		unset( $_COOKIE[ self::$invoice_cookie_name ] );
-		setcookie( self::$invoice_cookie_name, null, -1 );
+		$deleted = delete_transient( $this->invoice_transient_name( $invoice_number ) );
+
+		if ( ! headers_sent() ) {
+			$secure = 'https' === parse_url( home_url(), PHP_URL_SCHEME );
+			setcookie( self::$invoice_cookie_name, '', time() - 3600, COOKIEPATH, COOKIE_DOMAIN, $secure );
+		}
 	}
 
 	/**
@@ -462,14 +496,21 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 	 * @return string
 	 */
 	protected function get_invoice_number() {
-		$invoice_length = 127;
+		$invoice_length = 12;
 
 		if (
 			! empty( $_COOKIE[ self::$invoice_cookie_name ] )
 			&& strlen( $_COOKIE[ self::$invoice_cookie_name ] ) === $invoice_length
 		) {
 			$invoice = $_COOKIE[ self::$invoice_cookie_name ];
-		} else {
+			$invoice_transient = get_transient( $this->invoice_transient_name( $invoice ) );
+
+			if ( empty( $invoice_transient ) ) {
+				$invoice = null;
+			}
+		}
+
+		if ( empty( $invoice ) ) {
 			$invoice = wp_generate_password( $invoice_length, false );
 		}
 
@@ -554,5 +595,18 @@ class Tribe__Tickets__Commerce__PayPal__Gateway {
 	 */
 	public function get_raw_transaction_data() {
 		return $this->raw_transaction_data;
+	}
+
+	/**
+	 * Returns the name of the transient corresponding to an invoice number.
+	 *
+	 * @since 4.7.4
+	 *
+	 * @param string $invoice_number
+	 *
+	 * @return string
+	 */
+	protected function invoice_transient_name( $invoice_number ) {
+		return 'tpp_invoice_' . md5( $invoice_number );
 	}
 }

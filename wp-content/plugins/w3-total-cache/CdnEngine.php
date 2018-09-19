@@ -59,10 +59,6 @@ class CdnEngine {
 				$instances[$instance_key] = new CdnEngine_Mirror_Highwinds( $config );
 				break;
 
-			case 'limelight':
-				$instances[$instance_key] = new CdnEngine_Mirror_LimeLight( $config );
-				break;
-
 			case 'maxcdn':
 				$instances[$instance_key] = new CdnEngine_Mirror_MaxCdn( $config );
 				break;
@@ -86,10 +82,6 @@ class CdnEngine {
 
 			case 's3_compatible':
 				$instances[$instance_key] = new CdnEngine_S3_Compatible( $config );
-				break;
-
-			case 'stackpath':
-				$instances[$instance_key] = new CdnEngine_Mirror_StackPath( $config );
 				break;
 
 			default :

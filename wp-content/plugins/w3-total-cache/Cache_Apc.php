@@ -135,7 +135,7 @@ class Cache_Apc extends Cache_Base {
 	 * @param unknown $key
 	 * @return bool
 	 */
-	function hard_delete( $key, $group = '' ) {
+	function hard_delete( $key ) {
 		$storage_key = $this->get_item_key( $key );
 		return apc_delete( $storage_key );
 	}

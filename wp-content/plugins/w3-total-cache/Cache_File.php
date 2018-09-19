@@ -151,7 +151,7 @@ class Cache_File extends Cache_Base {
 
 		$path = $this->_cache_dir . DIRECTORY_SEPARATOR .
 			( $group ? $group . DIRECTORY_SEPARATOR : '' ) .
-			$this->_get_path( $storage_key, $group );
+			$this->_get_path( $storage_key );
 		if ( !is_readable( $path ) )
 			return array( null, $has_old_data );
 
@@ -227,7 +227,7 @@ class Cache_File extends Cache_Base {
 
 		$path = $this->_cache_dir . DIRECTORY_SEPARATOR .
 			( $group ? $group . DIRECTORY_SEPARATOR : '' ) .
-			$this->_get_path( $storage_key, $group );
+			$this->_get_path( $storage_key );
 
 		if ( !file_exists( $path ) )
 			return true;
@@ -259,9 +259,9 @@ class Cache_File extends Cache_Base {
 	 *
 	 * @return bool
 	 */
-	function hard_delete( $key, $group = '' ) {
+	function hard_delete( $key ) {
 		$key = $this->get_item_key( $key );
-		$path = $this->_cache_dir . DIRECTORY_SEPARATOR . $this->_get_path( $key, $group );
+		$path = $this->_cache_dir . DIRECTORY_SEPARATOR . $this->_get_path( $key );
 		return @unlink( $path );
 	}
 
@@ -292,7 +292,7 @@ class Cache_File extends Cache_Base {
 		$path =
 			$this->_cache_dir . DIRECTORY_SEPARATOR .
 			( $group ? $group . DIRECTORY_SEPARATOR : '' ) .
-			$this->_get_path( $key, $group );
+			$this->_get_path( $key );
 
 		if ( file_exists( $path ) ) {
 			return @filemtime( $path );
@@ -307,7 +307,7 @@ class Cache_File extends Cache_Base {
 	 * @param string  $key
 	 * @return string
 	 */
-	function _get_path( $key, $group = '' ) {
+	function _get_path( $key ) {
 		if ( $this->_use_wp_hash && function_exists( 'wp_hash' ) )
 			$hash = wp_hash( $key );
 		else
@@ -438,7 +438,7 @@ class Cache_File extends Cache_Base {
 	private function fopen_write( $key, $group, $mode ) {
 		$storage_key = $this->get_item_key( $key );
 
-		$sub_path = $this->_get_path( $storage_key, $group );
+		$sub_path = $this->_get_path( $storage_key );
 		$path = $this->_cache_dir . DIRECTORY_SEPARATOR .
 			( $group ? $group . DIRECTORY_SEPARATOR : '' ) . $sub_path;
 

@@ -96,7 +96,7 @@ class Cdn_AdminActions {
 				), true );
 		} else {
 			Util_Admin::redirect_with_custom_messages2( array(
-					'errors' => array( 'Failed to purge CDN: ' .
+					'errors' => array( 'Failed to flush CDN: ' .
 						implode( ', ', $errors ) )
 				), true );
 		}
@@ -340,7 +340,7 @@ class Cdn_AdminActions {
 		}
 
 		if ( count( $purge ) ) {
-			$common->purge( $purge, $results );
+			$common->purge( $purge, false, $results );
 		} else {
 			$errors[] = __( 'Empty files list.', 'w3-total-cache' );
 		}
@@ -406,8 +406,6 @@ class Cdn_AdminActions {
 
 		if ( $result ) {
 			if ( $engine == 'google_drive' || $engine == 'highwinds' ||
-				$engine == 'limelight' ||
-				$engine == 'maxcdn' || $engine == 'stackpath' ||
 				$engine == 'rackspace_cdn' ||
 				$engine == 'rscf' || $engine == 's3_compatible' ) {
 				// those use already stored w3tc config

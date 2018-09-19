@@ -94,7 +94,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 			if ( $el.is( '.tribe-tickets-meta-radio' ) || $el.is( '.tribe-tickets-meta-checkbox' ) ) {
 				val = $el.find( 'input:checked' ).length ? 'checked' : '';
 			} else {
-				val = $el.find( 'input, select, textarea' ).val();
+				val = $el.find( 'input, select, textarea' ).val().trim();
 			}
 
 			if ( 0 === val.length ) {

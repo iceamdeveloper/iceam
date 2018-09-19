@@ -59,7 +59,7 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	 * Prints an HTML (unordered) list of attendance totals.
 	 */
 	public function print_totals() {
-		$total_sold_label = esc_html_x( 'Total Tickets Sold:', 'attendee summary', 'event-tickets-plus' );
+		$total_sold_label = esc_html_x( 'Total Tickets Issued:', 'attendee summary', 'event-tickets-plus' );
 		$total_paid_label = esc_html_x( 'Complete:', 'attendee summary', 'event-tickets-plus' );
 
 		$total_sold = $this->get_total_sold();

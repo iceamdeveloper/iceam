@@ -134,7 +134,6 @@ jQuery( function ( $ ) {
 		})
 
 		.on( 'init_tooltips', function() {
-
 			$( '.tips, .help_tip, .woocommerce-help-tip' ).tipTip( {
 				'attribute': 'data-tip',
 				'fadeIn': 50,

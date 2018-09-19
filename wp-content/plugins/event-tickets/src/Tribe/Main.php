@@ -4,17 +4,17 @@ class Tribe__Tickets__Main {
 	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '4.7.2';
+	const VERSION = '4.8.1';
 
 	/**
 	 * Min required The Events Calendar version
 	 */
-	const MIN_TEC_VERSION = '4.6.7';
+	const MIN_TEC_VERSION = '4.6.22';
 
 	/**
 	 * Min required version of Tribe Common
 	 */
-	const MIN_COMMON_VERSION = '4.7.3';
+	const MIN_COMMON_VERSION = '4.7.20';
 
 	/**
 	 * Name of the provider
@@ -186,6 +186,8 @@ class Tribe__Tickets__Main {
 		Tribe__Tickets__JSON_LD__Order::hook();
 		Tribe__Tickets__JSON_LD__Type::hook();
 
+		tribe( 'tickets.privacy' );
+
 		/**
 		 * Fires once Event Tickets has completed basic setup.
 		 */
@@ -202,6 +204,13 @@ class Tribe__Tickets__Main {
 		tribe_singleton( 'tickets.rsvp', new Tribe__Tickets__RSVP );
 		tribe_singleton( 'tickets.commerce.currency', 'Tribe__Tickets__Commerce__Currency', array( 'hook' ) );
 		tribe_singleton( 'tickets.commerce.paypal', new Tribe__Tickets__Commerce__PayPal__Main );
+		tribe_singleton( 'tickets.redirections', 'Tribe__Tickets__Redirections' );
+
+		// REST API v1
+		tribe_register_provider( 'Tribe__Tickets__REST__V1__Service_Provider' );
+
+		// Privacy
+		tribe_singleton( 'tickets.privacy', 'Tribe__Tickets__Privacy', array( 'hook' ) );
 	}
 
 	/**
@@ -369,6 +378,9 @@ class Tribe__Tickets__Main {
 		add_action( 'tribe_tickets_plugin_loaded', tribe_callback( 'tickets.assets', 'enqueue_scripts' ) );
 		add_action( 'tribe_tickets_plugin_loaded', tribe_callback( 'tickets.assets', 'admin_enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', tribe_callback( 'tickets.assets', 'enqueue_editor_scripts' ) );
+
+		// Redirections
+		add_action( 'wp_loaded', tribe_callback( 'tickets.redirections', 'maybe_redirect' ) );
 	}
 
 	/**

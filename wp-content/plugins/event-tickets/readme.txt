@@ -3,8 +3,8 @@
 Contributors: ModernTribe, borkweb, bordoni, barry.hughes, aguseo, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, vicskf, zbtirrell
 Tags: RSVP, events, tickets, event management, calendar, ticket sales, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, ticket integration, event ticketing
 Requires at least: 4.5
-Tested up to: 4.9.5
-Stable tag: 4.7.2
+Tested up to: 4.9.8
+Stable tag: 4.8.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -114,12 +114,88 @@ Currently, the following add-ons are available for Event Tickets:
 * [Event Tickets Plus](http://m.tri.be/18wk), for selling tickets to your events using your favorite e-commerce platform.
 * [The Events Calendar](https://wordpress.org/plugins/the-events-calendar/), for managing a full calendar of events with ease.
 * [Events Calendar PRO](http://m.tri.be/18wi), for adding premium calendar features like recurring events, advanced views, cool widgets, shortcodes, additional fields, and more!
-* [Event Aggregator](http://m.tri.be/197u), a service that effortlessly fills your calendar with events from Facebook, Meetup, Google Calendar, iCalendar, CSV, and ICS.
+* [Event Aggregator](http://m.tri.be/197u), a service that effortlessly fills your calendar with events from Meetup, Google Calendar, iCalendar, Eventbrite, CSV, and ICS.
 * [Community Events](http://m.tri.be/2g), for allowing frontend event submission from your readers.
 * [Community Tickets](http://m.tri.be/18wl), which allows event organizers to sell tickets to the events they submit via Community Events.
 * [Filter Bar](http://m.tri.be/fa), for adding advanced frontend filtering capabilities to your events calendar.
+* [Eventbrite Tickets](http://m.tri.be/2e), for selling tickets to your event directly through Eventbrite.
 
 == Changelog ==
+
+= [4.8.1] 2018-09-12 =
+
+* Fix - Show the ticket table when tickets are all sold out, show message in list view [111893]
+* Fix - Fixed ticket description issue when creating events with no description. Thanks Aaron Brazell for the fix! [113038]
+* Fix - Correct un-responsive ticket table, thanks @understandphoto for bringing this to our attention! [109730]
+* Tweak - Added filter: `tribe_tickets_get_ticket_max_purchase` [112478]
+
+= [4.8] 2018-08-22 =
+
+* Feature - Include a Tickets REST API endpoint for read operations [108021]
+* Fix - Fixed datepicker formats YYYY.MM.DD, MM.DD.YYYY and DD.MM.YYYY validation error on ticket start sale date. Thanks @dmitry-zhuk, Albert and others for reporting this issue! [102815]
+* Fix - Active tab logic for Attendees in Tribe Commerce, thanks Luc [107897]
+* Fix - Fixed default currency symbol inconsistency. Thanks Uwe and Zé for pointing this out! [104093]
+* Tweak - Tribe Commerce Orders Sales by Ticket section to remove duplicate data [110034]
+* Tweak - Attendees section to clarify infomation [110038]
+
+= [4.7.6] 2018-08-01 =
+
+* Fix - Fixed the "Show description" setting for Tribe Commerce tickets in the backend and frontend [100524]
+* Fix - Added required post ID parameter to `the_title` filter in Tribe Commerce [109592]
+* Fix - Stop showing tickets for past events with no end sale date. Thanks to @thesinglegourmet for flagging this! [107121]
+* Fix - Stop showing posts with "pending review" status in the blog page. Thanks Jansen, Antonio and others for reporting this issue! [102184]
+* Tweak - Added start sale date to ticket unavailability message with filters to disable or include the time [82684]
+* Tweak - Added parent post and order IDs as parameters to the Tribe Commerce email filters [104209]
+* Tweak - Made the attendees list html title translatable. Thanks @websource for pointing this out [109595]
+* Tweak - Added a new filter `tribe_tickets_email_ticket_image` for easier ticket image customization in the tickets email [79876]
+* Tweak - Corrected the reference to the [tribe-tpp-success] shortcode within the Tribe Commerce settings area [111011]
+* Feature - Include RSVP and Tribe Commerce tickets fields data in WP personal data eraser [108490]
+* Feature - Include TribeCommerce orders data in WP personal data exporter [108487]
+
+= [4.7.5.1] 2018-07-10 =
+
+* Fix - Fatal error on some product pages when The Events Calendar is not active [110248]
+
+= [4.7.5] 2018-07-09 =
+
+* Fix - Display unavailability message when tickets are not yet or no longer available [81334]
+* Fix - Issues with calculating and displaying ticketed events on the admin list [71122]
+* Fix - Add Privacy Policy guide for Event Tickets [108456]
+* Feature - Include RSVP and Tribe Commerce tickets fields data in WP personal data export [107156]
+
+= [4.7.4.1] 2018-06-22 =
+
+* Fix - Sending the ticket email when WooCommerce is active and purchasing another ticket type [109102]
+
+= [4.7.4] 2018-06-20 =
+
+* Fix - Properly calculate existing stock for RSVPs. Thanks to @afplct, @jacob, @dimaginet and others for flagging this! [102634]
+* Fix - Properly update attendees transient when checkin/unchekin an attendee, in order to see changes immediately. Thanks to @newcollegeofflorida and @gschnoor for flagging this! [73272]
+* Fix - Make sure the ticket creation is compatible with object cache. Thanks @zanart, @bethanymrac, @vividimage and others for flagging this! [105802]
+* Fix - Display a notice if the user accesses the tickets page and doesn't have tickets [89201]
+* Fix - If the ticket is a WooCommerce product and has a featured image, display it in the email [79877]
+* Fix - Make sure the Paypal orders are being recorded. Thanks @burlingtonbytes for flagging this! [108436]
+* Tweak - Added new action, `tribe_tickets_ticket_email_ticket_top`, to the tickets email template [79878]
+* Tweak - Changed `tribe_tickets_email_include_event_date` filter default value to true. Now event date shows by default in RSVP ticket emails. Thanks @melvidge for the feedback [102309]
+* Tweak - Replaced start date in the RSVP non-attendace email template with full event schedule details [87686]
+* Tweak - Changed shortlinks to use https in Event Tickets welcome screen [75647]
+* Language - 2 new strings added, 66 updated, 0 fuzzied, and 1 obsoleted
+
+= [4.7.3.1] 2018-05-31 =
+
+* Fix - Include new DataTables files in event tickets via tribe-common
+
+= [4.7.3] 2018-05-29 =
+
+* Fix - Display the correct number of attendees on the events list in the admin section (props to @vbt, @xen and others for flagging this!) [102128]
+* Fix - Display the correct number of available tickets on list and day view (Thanks to @designfestbrum, @kaisv and others for reporting this problem!) [100340]
+* Fix - Ensured that the ticket start and end sale date respect the event timezone (props to @Ryan, @Georges, @bcbookprizes for flagging this!) [76683]
+* Fix - Add methods to handle refunds for tickets and fix the attendees report accordingly [102081]
+* Fix - Modify the front end ticket list display so it always displays even when Hide From Event Listings is checked for an event, thanks to @atmedia for reporting [74523]
+* Tweak - Better handle the admin display of ticket prices that are affected WooCommerce Membership discounts (thanks to @cardinalacres, @steamfablab, and others for reporting these issues!) [97583]
+* Tweak - Added a "Return to Cart" link to PayPal tickets form [100253]
+* Tweak - Changed validation on the option 'Post types that can have tickets' to allow empty value [105930]
+* Language - 10 new strings added, 170 updated, 1 fuzzied, and 3 obsoleted
 
 = [4.7.2] 2018-04-18 =
 

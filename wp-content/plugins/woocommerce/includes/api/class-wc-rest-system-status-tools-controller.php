@@ -4,11 +4,15 @@
  *
  * Handles requests to the /system_status/tools/* endpoints.
  *
+ * @author   WooThemes
+ * @category API
  * @package  WooCommerce/API
  * @since    3.0.0
  */
 
-defined( 'ABSPATH' ) || exit;
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
+}
 
 /**
  * @package WooCommerce/API
@@ -175,17 +179,7 @@ class WC_REST_System_Status_Tools_Controller extends WC_REST_Controller {
 				'button'  => __( 'Reset', 'woocommerce' ),
 				'desc'    => __( 'This will reset your usage tracking settings, causing it to show the opt-in banner again and not sending any data.', 'woocommerce' ),
 			),
-			'regenerate_thumbnails'      => array(
-				'name'   => __( 'Regenerate shop thumbnails', 'woocommerce' ),
-				'button' => __( 'Regenerate', 'woocommerce' ),
-				'desc'   => __( 'This will regenerate all shop thumbnails to match your theme and/or image settings.', 'woocommerce' ),
-			)
 		);
-
-		// Jetpack does the image resizing heavy lifting so you don't have to.
-		if ( ( class_exists( 'Jetpack' ) && Jetpack::is_module_active( 'photon' ) ) || ! apply_filters( 'woocommerce_background_image_regeneration', true ) ) {
-			unset( $tools['regenerate_thumbnails'] );
-		}
 
 		return apply_filters( 'woocommerce_debug_tools', $tools );
 	}
@@ -448,14 +442,8 @@ class WC_REST_System_Status_Tools_Controller extends WC_REST_Controller {
 				delete_option( 'woocommerce_allow_tracking' );
 				WC_Admin_Notices::add_notice( 'tracking' );
 				$message = __( 'Usage tracking settings successfully reset.', 'woocommerce' );
-				break;
-
-			case 'regenerate_thumbnails':
-				WC_Regenerate_Images::queue_image_regeneration();
-				$message = __( 'Thumbnail regeneration has been scheduled to run in the background.', 'woocommerce' );
-				break;
-
-			default:
+			break;
+			default :
 				$tools = $this->get_tools();
 				if ( isset( $tools[ $tool ]['callback'] ) ) {
 					$callback = $tools[ $tool ]['callback'];

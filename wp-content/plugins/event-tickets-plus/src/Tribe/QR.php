@@ -36,37 +36,13 @@ class Tribe__Tickets_Plus__QR {
 			return;
 		}
 
+
+		$event_id      = (int) $_GET['event_id'];
+		$ticket_id     = (int) $_GET['ticket_id'];
+		$security_code = (string) isset( $_GET['security_code'] ) ? esc_attr( $_GET['security_code'] ) : '';
+
 		// See if the user had access or not to the checkin process
-		$user_had_access = false;
-
-		$event_id = (int) $_GET['event_id'];
-		$ticket_id = (int) $_GET['ticket_id'];
-
-		// If the user is the site owner (or similar), Check in the user to the event
-		if ( is_user_logged_in() && current_user_can( 'edit_posts' ) ) {
-
-			$this->_check_in( $ticket_id );
-
-			$post = get_post( $event_id );
-
-			if ( empty( $post ) ) {
-				return;
-			}
-
-			$user_had_access = true;
-
-			$url = add_query_arg(
-				array(
-					'post_type'     => $post->post_type,
-					'page'          => tribe( 'tickets.attendees' )->slug(),
-					'event_id'      => $event_id,
-					'qr_checked_in' => $ticket_id,
-				), admin_url( 'edit.php' )
-			);
-
-		} else { // Probably just the ticket holder, redirect to the event front end single
-			$url = get_permalink( $event_id );
-		}
+		$checkin_arr = $this->authorized_checkin( $event_id, $ticket_id, $security_code );
 
 		/**
 		 * Filters the redirect URL if the user can access the QR checkin
@@ -76,11 +52,96 @@ class Tribe__Tickets_Plus__QR {
 		 * @param int    $ticket_id       Ticket Post ID
 		 * @param bool   $user_had_access Whether or not the logged-in user has permission to perform check ins
 		 */
-		$url = apply_filters( 'tribe_tickets_plus_qr_handle_redirects', $url, $event_id, $ticket_id, $user_had_access );
+		$url = apply_filters( 'tribe_tickets_plus_qr_handle_redirects', $checkin_arr['url'], $event_id, $ticket_id, $checkin_arr['user_had_access'] );
 
 		wp_redirect( esc_url_raw( $url ) );
 		exit;
 	}
+
+	/**
+	 * Check if user is authorized to Checkin Ticket
+	 *
+	 * @since 4.8.1
+	 *
+	 * @param $event_id      int event post ID
+	 * @param $ticket_id     int ticket tost ID
+	 * @param $security_code string ticket security code
+	 *
+	 * @return array
+	 */
+	public function authorized_checkin( $event_id, $ticket_id, $security_code ) {
+
+		if ( ! is_user_logged_in() || ! current_user_can( 'edit_posts' ) ) {
+			$checkin_arr = array(
+				'url'             => get_permalink( $event_id ),
+				'user_had_access' => false,
+			);
+
+			return $checkin_arr;
+		}
+
+		$post = get_post( $event_id );
+
+		if ( empty( $post ) ) {
+			return array( 'url' => '', 'user_had_access' => true );
+		}
+
+		/**
+		 * Filters the check for security code when checking in a ticket
+		 *
+		 * @param false bool the default is not to check security code
+		 */
+		$check_security_code = apply_filters( 'tribe_tickets_plus_qr_check_security_code', false );
+
+		$service_provider = tribe( 'tickets.data_api' )->get_ticket_provider( $ticket_id );
+
+		//if check_security_code and security key does not match do not checkin and redirect with message
+		if ( $check_security_code &&
+			(
+				empty( $service_provider->security_code ) ||
+				$security_code !== get_post_meta( $ticket_id, $service_provider->security_code, true )
+			)
+		) {
+
+			$url = add_query_arg(
+				array(
+					'post_type'              => $post->post_type,
+					'page'                   => tribe( 'tickets.attendees' )->slug(),
+					'event_id'               => $event_id,
+					'qr_checked_in'          => $ticket_id,
+					'no_security_code_match' => true,
+				), admin_url( 'edit.php' )
+			);
+
+			$checkin_arr = array(
+				'url'             => $url,
+				'user_had_access' => true,
+			);
+
+			return $checkin_arr;
+
+		}
+
+		// If the user is the site owner (or similar), Check in the user to the event
+		$this->_check_in( $ticket_id );
+
+		$url = add_query_arg(
+			array(
+				'post_type'     => $post->post_type,
+				'page'          => tribe( 'tickets.attendees' )->slug(),
+				'event_id'      => $event_id,
+				'qr_checked_in' => $ticket_id,
+			), admin_url( 'edit.php' )
+		);
+
+		$checkin_arr = array(
+			'url'             => $url,
+			'user_had_access' => true,
+		);
+
+		return $checkin_arr;
+	}
+
 
 	/**
 	 * Show a notice so the user knows the ticket was checked in.
@@ -93,6 +154,7 @@ class Tribe__Tickets_Plus__QR {
 
 		// Use Human-readable ID Where Available for QR Check in Message.
 		$ticket_id        = absint( $_GET['qr_checked_in'] );
+		$no_match         = isset( $_GET['no_security_code_match'] ) ? absint( $_GET['no_security_code_match'] ) : false;
 		$ticket_status    = get_post_status( $ticket_id );
 		$checked_status   = get_post_meta( $ticket_id, '_tribe_qr_status', true );
 		$ticket_unique_id = get_post_meta( $ticket_id, '_unique_id', true );
@@ -103,6 +165,12 @@ class Tribe__Tickets_Plus__QR {
 
 			echo '<div class="error"><p>';
 				printf( esc_html__( 'The ticket with ID %s was deleted and cannot be checked-in.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
+			echo '</p></div>';
+
+		// If Security Code does not match
+		} elseif ( $no_match ) {
+			echo '<div class="error"><p>';
+				printf( esc_html__( 'The security code for ticket with ID %s does not match.', 'event-tickets-plus' ), esc_html( $ticket_id ) );
 			echo '</p></div>';
 
 		// If status is QR then display already checked-in warning.
@@ -138,35 +206,21 @@ class Tribe__Tickets_Plus__QR {
 			return;
 		}
 
-		$link = $this->_get_link( $ticket['qr_ticket_id'], $ticket['event_id'] );
+		$enabled = tribe_get_option( 'tickets-enable-qr-codes', true );
+
+		if ( empty( $enabled ) ) {
+			return;
+		}
+
+		$link = $this->_get_link( $ticket['qr_ticket_id'], $ticket['event_id'], $ticket['security_code'] );
 		$qr   = $this->_get_image( $link );
 
 		if ( ! $qr ) {
 			return;
 		}
-		?>
-		<table class="content" align="center" width="620" cellspacing="0" cellpadding="0" border="0" bgcolor="#ffffff" style="margin:15px auto 0; padding:0;">
-			<tr>
-				<td align="center" valign="top" class="wrapper" width="620">
-					<table class="inner-wrapper" border="0" cellpadding="0" cellspacing="0" width="620" bgcolor="#f7f7f7" style="margin:0 auto !important; width:620px; padding:0;">
-						<tr>
-							<td valign="top" class="ticket-content" align="left" width="140" border="0" cellpadding="20" cellspacing="0" style="padding:20px; background:#f7f7f7;">
-								<img src="<?php echo esc_url( $qr ); ?>" width="140" height="140" alt="QR Code Image" style="border:0; outline:none; height:auto; max-width:100%; display:block;"/>
-							</td>
-							<td valign="top" class="ticket-content" align="left" border="0" cellpadding="20" cellspacing="0" style="padding:20px; background:#f7f7f7;">
-								<h3 style="color:#0a0a0e; margin:0 0 10px 0 !important; font-family: 'Helvetica Neue', Helvetica, sans-serif; font-style:normal; font-weight:700; font-size:28px; letter-spacing:normal; text-align:left;line-height: 100%;">
-									<span style="color:#0a0a0e !important"><?php esc_html_e( 'Check in for this event', 'event-tickets-plus' ); ?></span>
-								</h3>
-								<p>
-									<?php esc_html_e( 'Scan this QR code at the event to check in.', 'event-tickets-plus' ); ?>
-								</p>
-							</td>
-						</tr>
-					</table>
-				</td>
-			</tr>
-		</table>
-		<?php
+
+		// echo QR template for email
+		tribe_tickets_get_template_part( 'tickets-plus/email-qr', null, array( 'qr' => $qr ), true );
 	}
 
 
@@ -178,11 +232,29 @@ class Tribe__Tickets_Plus__QR {
 	 *
 	 * @return string
 	 */
-	private function _get_link( $ticket_id, $event_id ) {
+	private function _get_link( $ticket_id, $event_id, $security_code ) {
 
-		$url = add_query_arg( 'event_qr_code', 1, home_url() );
+		/**
+		 * Allows filtering the base URL which QR code query args are appended to. Defaults to
+		 * the site's home_url() with a trailing slash.
+		 *
+		 * @since 4.7.3
+		 *
+		 * @param string $url
+		 * @param int $ticket_id
+		 * @param int $event_id
+		 */
+		$base_url = apply_filters( 'tribe_tickets_qr_code_base_url', home_url( '/' ), $ticket_id, $event_id );
+
+		$url = add_query_arg( 'event_qr_code', 1, $base_url );
 		$url = add_query_arg( 'ticket_id', $ticket_id, $url );
 		$url = add_query_arg( 'event_id', $event_id, $url );
+		$url = add_query_arg( 'security_code', $security_code, $url );
+
+		// add REST API QR Endpoint Path
+		if ( function_exists( 'tribe_tickets_rest_url_prefix' ) ) {
+			$url = add_query_arg( 'path', urlencode( tribe_tickets_rest_url_prefix() . '/qr' ), $url );
+		}
 
 		return $url;
 	}

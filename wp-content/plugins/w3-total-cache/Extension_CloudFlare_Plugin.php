@@ -103,7 +103,7 @@ class Extension_CloudFlare_Plugin {
 				$api->purge();
 			} catch ( \Exception $ex ) {
 				$action_made['error'] =
-					'CloudFlare cache: ' . $ex->getMessage();
+					'Failed to purge CloudFlare cache: ' . $ex->getMessage();
 			}
 
 			$this->flush_operation_requested = false;
