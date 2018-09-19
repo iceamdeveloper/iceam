@@ -9,6 +9,7 @@
  */
 
 
+
  
 /***********************************************************************
  *
@@ -134,7 +135,9 @@ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
 
 add_filter( 'sensei_display_start_course_form', __return_false);
 
- 
+
+
+
  
 /***********************************************************************
  *
@@ -157,12 +160,12 @@ function member_dir_exclude_users($qs=false,$object=false){
     //check if we are searching for friends list etc?, do not exclude in this case
     if(!empty($args['user_id']))
         return $qs;
-    
+        
     if(!empty($args['exclude']))
         $args['exclude']=$args['exclude'].','.$excluded_user;
     else 
         $args['exclude']=$excluded_user;
-      
+        
     $qs=build_query($args);
       
 	return $qs;
@@ -549,7 +552,7 @@ add_action( 'init', 'woo_custom_move_navigation', 10 );
  **********************************************************************/
 
 function rewrite_thankyou() {
-	$thanks_str = "Thank you. Your order has been received. </p><p>If you have not already, please complete your student profile!</p><p><a href='" . bp_loggedin_user_domain() . "/profile/edit/group/1/' class='btn btn-primary'>Update My Profile Now</a>";
+	$thanks_str = "Thank you. Your order has been received. </p><p>If you have not already, please complete your profile!</p><p><a href='" . bp_loggedin_user_domain() . "/profile/edit/group/1/' class='btn btn-primary'>Update My Profile Now</a>";
 	
 	return $thanks_str;
 }

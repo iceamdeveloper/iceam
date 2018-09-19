@@ -1,6 +1,15 @@
 # WooCommerce Currency Switcher - Subscriptions Integration
 
 ## Version 1.x
+####1.3.12.180713
+* Fix - Removed notices that appeared when the integration logic tried to check if a product is on sale.
+
+####1.3.11.180222
+* Fix - Added logic to ensure that the product prices are loaded in the correct currency on the Edit Subscription page.
+
+####1.3.10.180218
+* Fix - Added check to ensure that the sign up fees returned to the Subscriptions plugin are numeric.
+
 ####1.3.9.171109
 * Fix - Fixed typo and invalid reference to the Currency Switcher instance on Edit/Create Order pages.
 
