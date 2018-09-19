@@ -8,6 +8,12 @@
 
 ?>
 
+<?php 
+$membership_ID_1 = "8222"; 
+$membership_ID_2 = "8218";
+?>
+
+
 <?php
 
 /**
@@ -30,9 +36,9 @@ do_action( 'bp_before_member_header' ); ?>
 
 			</a>
 			
-			<?php if( wc_memberships_is_user_active_member( bp_displayed_user_id() ,"5288") || wc_memberships_is_user_active_member( bp_displayed_user_id() ,"5315") ): ?>
+			<?php if( wc_memberships_is_user_active_member( bp_displayed_user_id() ,$membership_ID_1) || wc_memberships_is_user_active_member( bp_displayed_user_id() ,$membership_ID_2) ): ?>
 			<div class='membership-level'>
-				<?php if( wc_memberships_is_user_active_member( bp_displayed_user_id() ,"5315") ){ $img_src = 'gold-medal.png'; } else { $img_src = 'silver-medal.png'; } ?>
+				<?php if( wc_memberships_is_user_active_member( bp_displayed_user_id() ,$membership_ID_2) ){ $img_src = 'gold-medal.png'; } else { $img_src = 'silver-medal.png'; } ?>
 				<img src='<?php echo get_stylesheet_directory_uri(); ?>/images/<?php echo $img_src; ?>' />
 			</div>
 			<?php endif; ?>

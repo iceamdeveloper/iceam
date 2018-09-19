@@ -9,6 +9,11 @@
 /** This action is documented in bp-templates/bp-legacy/buddypress/members/single/profile/profile-wp.php */
 do_action( 'bp_before_profile_loop_content' ); ?>
 
+<?php 
+$membership_ID_1 = "8222"; 
+$membership_ID_2 = "8218";
+?>
+
 <?php
 
 // get the current user's info
@@ -18,7 +23,7 @@ $is_admin = $user_ID !=0 && in_array('administrator',$member_info->roles);
 
 $profile_ID = bp_displayed_user_id();
 $user_memberships = wc_memberships_get_user_memberships($profile_ID);
-wc_memberships_is_user_active_member( $profile_ID , "5288" ); 
+wc_memberships_is_user_active_member( $profile_ID , $membership_ID_1 ); 
 
 //no membership
 $mem_name = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'1' ) ); 
@@ -52,11 +57,11 @@ $mem_prac_url = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_i
 	<!-- Automatic Fields -->
 	<h3 class='profile-subheader'><?php echo $mem_name; ?></h3>
 	<?php if($mem_school_name!==''){ ?><p style='margin:0;'><strong>School Name: </strong><?php echo $mem_school_name; ?></p><?php } ?>
-<!-- 	<?php if( $mem_lisence_state!=='' && !wc_memberships_is_user_active_member($profile_ID,"5288") && !wc_memberships_is_user_active_member( $profile_ID , "5315" ) ) { 
+<!-- 	<?php if( $mem_lisence_state!=='' && !wc_memberships_is_user_active_member($profile_ID,$membership_ID_1) && !wc_memberships_is_user_active_member( $profile_ID , $membership_ID_2 ) ) { 
 		?><p><strong>Lisence State: </strong><?php echo $mem_lisence_state; ?></p><?php 
 	} ?> -->
 	<!-- Silver Fields -->
-	<?php if(wc_memberships_is_user_active_member($profile_ID,"5288")||wc_memberships_is_user_active_member( $profile_ID , "5315" )){
+	<?php if(wc_memberships_is_user_active_member($profile_ID,$membership_ID_1)||wc_memberships_is_user_active_member( $profile_ID , $membership_ID_2 )){
 	$member_location_info = '';
 		if($mem_city!==''){ 
 			$member_location_info .= '<p>'.$mem_city.', ';
@@ -70,7 +75,7 @@ $mem_prac_url = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_i
 		echo $member_location_info;
 	} ?>
 	<!-- Gold Fields -->
-	<?php if(wc_memberships_is_user_active_member( $profile_ID , "5315" )){ ?>
+	<?php if(wc_memberships_is_user_active_member( $profile_ID , $membership_ID_2 )){ ?>
 		<?php if($mem_bio!==''){ ?><p><strong>Bio:</strong><br><?php echo $mem_bio; ?></p><?php } ?>
 		<?php if($mem_edu!==''){ ?><p><strong>Education:</strong><br><?php echo $mem_edu; ?></p><?php } ?>
 		<?php if($mem_lisences!==''){ ?><p><strong>Professional Lisences:</strong><br><?php echo $mem_lisences; ?></p><?php } ?>

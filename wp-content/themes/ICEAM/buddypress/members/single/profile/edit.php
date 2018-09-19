@@ -1,6 +1,9 @@
 <?php do_action( 'bp_before_profile_edit_content' );
 
 
+$membership_ID_1 = "8222"; 
+$membership_ID_2 = "8218";
+
 
 if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) ) :
 	while ( bp_profile_groups() ) : bp_the_profile_group();
@@ -19,10 +22,10 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
         unset($tabs);
         $tabs[] = '';
 
-        if( wc_memberships_is_user_active_member( null ,"5288") ){
+        if( wc_memberships_is_user_active_member( null ,$membership_ID_1) ){
             $active_diplomate = true;
         } else { $active_diplomate = false; }
-        if( wc_memberships_is_user_active_member( null ,"5315") ){
+        if( wc_memberships_is_user_active_member( null ,$membership_ID_2) ){
             $gold_diplomate = true;
         } else { $gold_diplomate = false; }
         if( in_array('administrator',$member_info->roles) ){
@@ -78,7 +81,7 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
             $member_info = get_userdata($user_ID);
         ?>		
 
-        <?php if( in_array('administrator',$member_info->roles) || wc_memberships_is_user_active_member(null,"5288") || wc_memberships_is_user_active_member(null,"5315") ): ?>
+        <?php if( in_array('administrator',$member_info->roles) || wc_memberships_is_user_active_member(null,$membership_ID_1) || wc_memberships_is_user_active_member(null,$membership_ID_2) ): ?>
         <div class='dropdown'>
 			<button class="btn btn-primary dropdown-toggle" type="button" data-toggle="dropdown">Member Profile Fields <span class="caret"></span></button>	
 			<ul class="dropdown-menu">
@@ -100,7 +103,7 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
             * or field group is the "gold diplomate membership" (group ID 6)
             */
             
-            if (in_array('administrator',$member_info->roles) || bp_get_current_profile_group_id() == 1 || bp_get_current_profile_group_id() == 3 && wc_memberships_is_user_active_member(null,"5288") || wc_memberships_is_user_active_member(null,"5315") ): ?>
+            if (in_array('administrator',$member_info->roles) || bp_get_current_profile_group_id() == 1 || bp_get_current_profile_group_id() == 3 && wc_memberships_is_user_active_member(null,$membership_ID_1) || wc_memberships_is_user_active_member(null,$membership_ID_2) ): ?>
     
                 <?php while ( bp_profile_fields() ) : bp_the_profile_field(); ?>
         
