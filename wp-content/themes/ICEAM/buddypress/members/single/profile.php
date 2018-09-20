@@ -102,7 +102,7 @@ do_action( 'bp_before_profile_content' ); ?>
 	<div id="bbpress-forums">
 		<?php
 			if ( bbp_get_user_replies_created() ) {
-				bbp_get_template_part( 'loop', 'replies' );	
+				bbp_get_template_part( 'loop', 'replies' );
 			} else {
 		?>
 			<p><?php bbp_is_user_home() ? _e( 'You have not replied to any topics.', 'bbpress' ) : _e( 'This user has not replied to any topics.', 'bbpress' ); ?></p>

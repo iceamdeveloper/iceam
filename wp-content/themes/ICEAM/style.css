@@ -1465,8 +1465,12 @@ form.standard-form.bps_form .editfield, form.standard-form.bps_form .editfield.f
 .editfield {
     position: relative;
 }
-#buddypress .standard-form .field_type_textbox label, #buddypress .standard-form .field_type_textbox legend, #buddypress .standard-form .field_type_textbox span.label,
-#buddypress .standard-form .editfield label, #buddypress .standard-form .editfield legend, #buddypress .standard-form .editfield span.label     {
+#buddypress .standard-form .field_type_textbox label,
+#buddypress .standard-form .field_type_textbox legend,
+#buddypress .standard-form .field_type_textbox span.label,
+#buddypress .standard-form .editfield label,
+#buddypress .standard-form .editfield legend,
+#buddypress .standard-form .editfield span.label {
     margin: 0;
     width: auto;
     font-weight: normal;
@@ -1477,11 +1481,18 @@ form.standard-form.bps_form .editfield, form.standard-form.bps_form .editfield.f
     transition: all 300ms ease-in-out;
     pointer-events: none;
 }
-#buddypress .standard-form .editfield.field_type_selectbox label, #buddypress .standard-form .editfield.field_type_selectbox legend, #buddypress .standard-form .editfield.field_type_selectbox span.label {
+
+#buddypress .standard-form .editfield.field_photo label,
+#buddypress .standard-form .editfield.field_type_selectbox label,
+#buddypress .standard-form .editfield.field_type_selectbox legend,
+#buddypress .standard-form .editfield.field_type_selectbox span.label {
     position: relative;
     padding-left: 0;
 }
-#buddypress .standard-form .active label, #buddypress .standard-form .active legend, #buddypress .standard-form .active span.label {
+
+#buddypress .standard-form .active label,
+#buddypress .standard-form .active legend,
+#buddypress .standard-form .active span.label {
     padding: 2px 12px 22px;
     font-size: 11px;
     color: #428bca;

@@ -8,6 +8,7 @@
 *
  */
 
+
  
 
 /***********************************************************************
@@ -88,6 +89,35 @@ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
  **********************************************************************/
 
 add_filter( 'sensei_display_start_course_form', __return_false);
+
+
+
+ 
+
+/***********************************************************************
+ *
+ *	FILTER HOW MANY FORUM TOPICS AND REPLIES DISPLAY ON USER PROFILE PAGES
+ *
+ **********************************************************************/
+
+function filter_bbp_get_topics_per_page( $retval, $default ) {
+    if (bbp_is_single_user()){
+        return 5;
+    }
+    
+    return $retval;
+}; 
+add_filter( 'bbp_get_topics_per_page', 'filter_bbp_get_topics_per_page', 100, 2 );
+
+function filter_bbp_get_replies_per_page( $retval, $default ) {
+    if (bbp_is_single_user()){
+        return 5;
+    }
+    
+    return $retval;
+}; 
+add_filter( 'bbp_get_replies_per_page', 'filter_bbp_get_replies_per_page', 100, 2 );
+
 
 
 
