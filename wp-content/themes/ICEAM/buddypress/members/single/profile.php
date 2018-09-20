@@ -69,7 +69,7 @@ do_action( 'bp_before_profile_content' ); ?>
 		<ul class='dropdown-menu'>
 			<?php bp_get_options_nav(); ?>
 			<?php $displayed_user = get_user_by('ID',bp_displayed_user_id()); ?>
-			<li><a href="<?php echo get_home_url().'/member-directory/'.$displayed_user->user_nicename.'/settings'?>">Account Settings</a></li>
+			<li><a href="<?php echo get_home_url().'/practitioner-directory/'.$displayed_user->user_nicename.'/settings'?>">Account Settings</a></li>
 		</ul>
 	</div>
 	

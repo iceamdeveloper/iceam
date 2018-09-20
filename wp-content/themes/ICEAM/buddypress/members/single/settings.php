@@ -56,6 +56,6 @@ endswitch; ?>
 
 <?php $displayed_user = get_user_by('ID',bp_displayed_user_id()); ?>
 <div class='clearfix'></div>
-<a href="<?php echo get_home_url().'/member-directory/'.$displayed_user->user_nicename ?>" class="btn btn-default" style='margin-top:.5em;'>&larr; View Profile</a>
+<a href="<?php echo get_home_url().'/practitioner-directory/'.$displayed_user->user_nicename ?>" class="btn btn-default" style='margin-top:.5em;'>&larr; View Profile</a>
 
 </div><?php
