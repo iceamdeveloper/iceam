@@ -45,8 +45,8 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
             // Skip if group has no fields.
             if ( empty( $groups[ $i ]->fields ) 
                 || !$gold_diplomate && !$active_diplomate && $current_id == 3 && !$is_admin 
-                || !$gold_diplomate && $current_id == 6 && !$is_admin 
-                || !$gold_diplomate && $current_id == 7 && !$is_admin ) {
+                || !$gold_diplomate && $current_id == 4 && !$is_admin 
+                || !$gold_diplomate && $current_id == 5 && !$is_admin ) {
               continue;
             }
 
@@ -100,7 +100,7 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
             * if user is an admin,
             * or the field group is "Member Fields" (group ID 1)
             * or field group is the "active diplomate membership" (group ID 3)
-            * or field group is the "gold diplomate membership" (group ID 6)
+            * or field group is the "gold diplomate membership" (group ID 4)
             */
             
             if (in_array('administrator',$member_info->roles) || bp_get_current_profile_group_id() == 1 || bp_get_current_profile_group_id() == 3 && wc_memberships_is_user_active_member(null,$membership_ID_1) || wc_memberships_is_user_active_member(null,$membership_ID_2) ): ?>

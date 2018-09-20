@@ -181,15 +181,15 @@ jQuery(document).ready(function(){
 	}
 
 	if($(".editfield").length){
-		$(".editfield input[type=text]").on("focus",function(){
+		$(".editfield input[type=text], .editfield textarea").on("focus",function(){
 			$(this).parents(".editfield").addClass("active");
 		});
-		$(".editfield input[type=text]").on("blur",function(){
+		$(".editfield input[type=text], .editfield textarea").on("blur",function(){
 			if($(this).val()===""){
 				$(this).parents(".editfield").removeClass("active");
 			}
 		});
-		$(".editfield input[type=text]").each(function(){
+		$(".editfield input[type=text], .editfield textarea").each(function(){
 			if($(this).val()!==""){
 				$(this).parents(".editfield").addClass("active");
 			}

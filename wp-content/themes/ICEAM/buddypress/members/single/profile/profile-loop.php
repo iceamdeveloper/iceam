@@ -30,25 +30,25 @@ $mem_name = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),
 $mem_lisence_state = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'6' ) ); 
 $mem_school_name = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'15' ) ); 
 //silver
-$mem_city = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'40' ) ); 
-$mem_state = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'41' ) ); 
-$mem_country = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'42' ) ); 
+$mem_city = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'25' ) ); 
+$mem_state = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'26' ) ); 
+$mem_country = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'27' ) ); 
 //gold
 $mem_bio = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'28' ) ); 
-$mem_edu = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'36' ) ); 
-$mem_lisences = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'37' ) ); 
-$mem_dipdate = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'38' ) ); 
-$mem_email = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'54' ) ); 
+$mem_edu = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'29' ) ); 
+$mem_lisences = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'30' ) ); 
+$mem_dipdate = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'31' ) ); 
+$mem_email = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'32' ) ); 
 //practice
-$mem_prac_photo = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'35' ) ); 
-$mem_prac_name = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'53' ) ); 
-$mem_prac_ad1 = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'30' ) ); 
-$mem_prac_ad2 = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'34' ) ); 
-$mem_prac_city = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'31' ) ); 
-$mem_prac_state = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'32' ) ); 
-$mem_prac_zip = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'33' ) ); 
-$mem_prac_country = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'39' ) ); 
-$mem_prac_url = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'29' ) ); 
+$mem_prac_photo = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'33' ) ); 
+$mem_prac_name = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'34' ) ); 
+$mem_prac_ad1 = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'35' ) ); 
+$mem_prac_ad2 = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'36' ) ); 
+$mem_prac_city = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'37' ) ); 
+$mem_prac_state = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'38' ) ); 
+$mem_prac_zip = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'39' ) ); 
+$mem_prac_country = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'41' ) ); 
+$mem_prac_url = bp_get_profile_field_data( array('user_id'=>bp_get_member_user_id(),'field'=>'40' ) ); 
 
 ?>
 

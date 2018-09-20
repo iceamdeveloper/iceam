@@ -8,9 +8,90 @@
 *
  */
 
+ 
+
+/***********************************************************************
+ *
+ *	ENQUEUE STYLESHEET(S)
+ *
+ **********************************************************************/
+
+add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
+function theme_enqueue_styles() {
+    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css?v=1' );
+    
+    // load the theme stylesheet here instead of in parent theme
+    wp_deregister_style('theme-stylesheet');
+	wp_dequeue_style( 'theme-stylesheet' );
+
+	$rand = rand( 0, 999999999999 );
+    wp_register_style( 'theme-stylesheet', get_stylesheet_uri(), array(), $rand, 'all' );
+	wp_enqueue_style( 'theme-stylesheet');
+}
+
 
 
  
+/***********************************************************************
+ *
+ *	ADD COLOR TO THE ADMIN LEFT NAV FOR SCANNABILITY
+ *
+ **********************************************************************/
+ 
+function admin_style() {
+	wp_enqueue_style('admin-styles', get_stylesheet_directory_uri().'/css/admin.css');
+}
+add_action('admin_enqueue_scripts', 'admin_style');
+
+
+/***********************************************************************
+ *
+ *	LOAD WIDGETS
+ *
+ **********************************************************************/
+
+locate_template( 'widget-course-events.php', TRUE, TRUE );
+locate_template( 'widget-course-signup.php', TRUE, TRUE );
+
+
+/***********************************************************************
+ *
+ *	REMOVE WORDPRESS EMOJI
+ *
+ **********************************************************************/
+
+remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
+remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
+remove_action( 'wp_print_styles', 'print_emoji_styles' );
+remove_action( 'admin_print_styles', 'print_emoji_styles' );
+
+
+
+/***********************************************************************
+ *
+ *	CHANGE EXCERPT LENGTH
+ *
+ **********************************************************************/
+
+function custom_excerpt_length( $length ) {
+	return 200;
+}
+add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
+
+
+
+/***********************************************************************
+ *
+ *	DON'T ALLOW USERS TO SIGN UP FOR COURSES THAT DO NOT
+ *	HAVE A WOOCOMMERCE PRODUCT ASSOCIATED WITH THEM
+ *
+ **********************************************************************/
+
+add_filter( 'sensei_display_start_course_form', __return_false);
+
+
+
+
 /***********************************************************************
  *
  *	ENSURE THAT ADAPTIVE PAYMENT RECIPIENTS ARE INCLUDED ON
@@ -65,76 +146,6 @@ add_filter("woocommerce_email_recipient_new_order","add_adaptive_recipients",20,
 */
 
 add_filter( 'tribe_tickets_plus_hide_attendees_list', '__return_true' );
-
- 
-/***********************************************************************
- *
- *	ADD COLOR TO THE ADMIN LEFT NAV FOR SCANNABILITY
- *
- **********************************************************************/
- 
-function admin_style() {
-	wp_enqueue_style('admin-styles', get_stylesheet_directory_uri().'/css/admin.css');
-}
-add_action('admin_enqueue_scripts', 'admin_style');
-
-
-/***********************************************************************
- *
- *	LOAD WIDGETS
- *
- **********************************************************************/
-
-locate_template( 'widget-course-events.php', TRUE, TRUE );
-locate_template( 'widget-course-signup.php', TRUE, TRUE );
-
-
-/***********************************************************************
- *
- *	REMOVE WORDPRESS EMOJI
- *
- **********************************************************************/
-
-remove_action( 'wp_head', 'print_emoji_detection_script', 7 );
-remove_action( 'admin_print_scripts', 'print_emoji_detection_script' );
-remove_action( 'wp_print_styles', 'print_emoji_styles' );
-remove_action( 'admin_print_styles', 'print_emoji_styles' );
-
-
-/***********************************************************************
- *
- *	ENQUEUE STYLESHEET(S)
- *
- **********************************************************************/
-
-add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
-function theme_enqueue_styles() {
-    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css?v=1' );
-}
-
-
-/***********************************************************************
- *
- *	CHANGE EXCERPT LENGTH
- *
- **********************************************************************/
-
-function custom_excerpt_length( $length ) {
-	return 200;
-}
-add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
-
-
-
-/***********************************************************************
- *
- *	DON'T ALLOW USERS TO SIGN UP FOR COURSES THAT DO NOT
- *	HAVE A WOOCOMMERCE PRODUCT ASSOCIATED WITH THEM
- *
- **********************************************************************/
-
-add_filter( 'sensei_display_start_course_form', __return_false);
-
 
 
 
@@ -507,7 +518,7 @@ function custom_sensei_login_form() {
  *
  *	HIDE DIPLOMATES TAB IF USER IS NOT A DIPLOMATE OR ADMIN
  *	
- *	example: /member-directory/jvpstudent/profile/edit/group/1/
+ *	example: /practitioner-directory/jvpstudent/profile/edit/group/1/
  *	Profile > Edit
  *
  **********************************************************************/

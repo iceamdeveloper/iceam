@@ -1451,11 +1451,14 @@ input#field_any_contains {
 #buddypress .standard-form p.description {
     padding-left:  12px;
 }
-#buddypress .standard-form input[type=text] {
+#buddypress .standard-form input[type=text], #buddypress .standard-form textarea {
     width:  100%;
     padding: 19px 0 0 12px;
 }
-
+#buddypress .standard-form .editfield .datebox label {
+    position: relative;
+    padding-left: 0;
+}
 form.standard-form.bps_form .editfield, form.standard-form.bps_form .editfield.field_any-field, form.standard-form.bps_form .editfield.field_name {
     width: 99%;
 }
