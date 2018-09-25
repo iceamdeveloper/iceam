@@ -182,7 +182,7 @@ add_filter( 'tribe_tickets_plus_hide_attendees_list', '__return_true' );
  
 /***********************************************************************
  *
- *	SHOW ONLY DIPLOMATES TO NON-LOGGED IN (PUBLIC) USERS
+ *	SHOW ONLY DIPLOMATES IN PRACTITIONERS DIRECTORY
  *
  **********************************************************************/
 
@@ -215,9 +215,9 @@ function member_dir_exclude_users($qs=false,$object=false){
 
 function filter_buddypress_user_ids(){
 	$non_diplomates = array();
-	if(!get_current_user_id()){
+	//if(!get_current_user_id()){
 		$non_diplomates = get_users( array( 'role__in' => ['customer', 'practitioner'], 'fields' => 'ID' ) );
-	}
+	//}
 	
 	// primarily for hiding admin / dev / qa user accounts
 	$hidden = get_users(array('meta_key'=>'wpcf-hide-in-members', 'meta_value'=>'1', 'fields' => 'ID' ) );

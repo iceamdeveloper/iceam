@@ -57,7 +57,7 @@
 	
 			<div class="item">
 				<div class="item-title">
-					<a href="<?php bp_member_permalink(); ?>"><?php echo bp_core_get_user_displayname(bp_get_member_user_id()); ?></a>
+					<p><a href="<?php bp_member_permalink(); ?>"><?php echo bp_members_get_user_nicename(bp_get_member_user_id()); ?></a></p>
 					
 					<?php
 						$location = "";
