@@ -198,6 +198,7 @@ header nav#navigation {
     float: left;
     clear: none;
     margin: 0;
+    left: auto;
     background: transparent;
     margin-top: 60px;
     font-family: 'Lato', sans-serif;
