@@ -26,14 +26,7 @@
 	woo_post_inside_before();
 ?>
 	<header>
-		<?php
-			// if the user is not logged in...
-			if ($user_ID == ''){
-				echo("<h1>Diplomate Directory</h1>");
-			} else {
-				echo("<h1>Member Directory</h1>");
-			}
-		?>
+        <h1>Practitioner Directory</h1>
 	</header>
 
 	<section class="entry">

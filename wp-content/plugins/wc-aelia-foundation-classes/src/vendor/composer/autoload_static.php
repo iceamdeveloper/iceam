@@ -4,8 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7e230b51e4c727349a93fa92d73234f8
+class ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1
 {
+    public static $files = array (
+        '89ff252b349d4d088742a09c25f5dd74' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php',
+    );
+
     public static $prefixLengthsPsr4 = array (
         'P' => 
         array (
@@ -70,6 +74,8 @@ class ComposerStaticInit7e230b51e4c727349a93fa92d73234f8
     );
 
     public static $classMap = array (
+        'Aelia\\WC\\AFC\\Messages' => __DIR__ . '/../..' . '/lib/classes/messages/messages.php',
+        'Aelia\\WC\\AFC\\Settings' => __DIR__ . '/../..' . '/lib/classes/settings/settings.php',
         'Aelia\\WC\\Admin_Message' => __DIR__ . '/../..' . '/lib/classes/base/messages/admin_message.php',
         'Aelia\\WC\\AeliaSimpleXMLElement' => __DIR__ . '/../..' . '/lib/classes/base/xml/aelia-simplexmlelement.php',
         'Aelia\\WC\\Aelia_Install' => __DIR__ . '/../..' . '/lib/classes/base/install/install.php',
@@ -79,6 +85,7 @@ class ComposerStaticInit7e230b51e4c727349a93fa92d73234f8
         'Aelia\\WC\\Base_Class' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/aelia-base-class.php',
         'Aelia\\WC\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
         'Aelia\\WC\\ExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
+        'Aelia\\WC\\Free_Plugin_Dev_Version_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/free-plugin-dev-version-updater.php',
         'Aelia\\WC\\Free_Plugin_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/free-plugin-updater.php',
         'Aelia\\WC\\IAelia_Plugin' => __DIR__ . '/../..' . '/lib/classes/base/plugin/aelia-plugin.php',
         'Aelia\\WC\\IExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
@@ -263,10 +270,10 @@ class ComposerStaticInit7e230b51e4c727349a93fa92d73234f8
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit7e230b51e4c727349a93fa92d73234f8::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit3ae438bc8fa21d83721db9ed45b5dff1::$classMap;
 
         }, null, ClassLoader::class);
     }

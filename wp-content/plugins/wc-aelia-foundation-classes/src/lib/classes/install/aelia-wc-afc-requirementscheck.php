@@ -17,11 +17,6 @@ class Aelia_WC_AFC_RequirementsChecks extends Aelia_WC_RequirementsChecks {
 		'WooCommerce' => '2.4',
 	);
 
-	public function __construct() {
-		$this->required_php_version = '5.4';
-		parent::__construct();
-	}
-
 	/**
 	 * Factory method. It MUST be copied to every descendant class, as it has to
 	 * be compatible with PHP 5.2 and earlier, so that the class can be instantiated

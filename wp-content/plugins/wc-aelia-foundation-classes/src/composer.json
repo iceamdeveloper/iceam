@@ -1,9 +1,9 @@
 {
 	"require": {
 		"geoip2/geoip2": "~2.0",
-		"yahnis-elsts/plugin-update-checker": "3.2",
+		"yahnis-elsts/plugin-update-checker": "4.4",
 		"nategood/httpful": "*",
-		"monolog/monolog": "^1.20"
+		"monolog/monolog": "^1.23"
   },
 	"require-dev": {
 		"mockery/mockery": "*"

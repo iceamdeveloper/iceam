@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.6.2
+ * @version 4.8.1
  *
  * @var bool $must_login
  */
@@ -29,6 +29,7 @@ ob_start();
 	class="cart"
 	method="post"
 	enctype='multipart/form-data'
+	novalidate
 >
 	<h2 class="tribe-events-tickets-title"><?php esc_html_e( 'Tickets', 'event-tickets-plus' );?></h2>
 
@@ -43,7 +44,7 @@ ob_start();
 			$product   = edd_get_download( $ticket->ID );
 			$available = $ticket->available();
 
-			if ( $ticket->date_in_range( current_time( 'timestamp' ) ) ) {
+			if ( $ticket->date_in_range() ) {
 
 				$is_there_any_product = true;
 
@@ -150,23 +151,15 @@ ob_start();
 
 <?php
 $contents = ob_get_clean();
+echo $contents;
+
 if ( $is_there_any_product ) {
-	echo $contents;
-
-	// @todo remove safeguard in 4.3 or later
-	if ( $unavailability_messaging ) {
-		// If we have rendered tickets there is generally no need to display a 'tickets unavailable' message
-		// for this post
-		$this->do_not_show_tickets_unavailable_message();
-	}
+	// If we have available tickets there is generally no need to display a 'tickets unavailable' message
+	// for this post
+	$this->do_not_show_tickets_unavailable_message();
 } else {
-	// @todo remove safeguard in 4.3 or later
-	if ( $unavailability_messaging ) {
-		$unavailability_message = $this->get_tickets_unavailable_message( $tickets );
-
-		// if there isn't an unavailability message, bail
-		if ( ! $unavailability_message ) {
-			return;
-		}
-	}
+	// Indicate that there are not any tickets, so a 'tickets unavailable' message may be
+	// appropriate (depending on whether other ticket providers are active and have a similar
+	// result)
+	$this->maybe_show_tickets_unavailable_message( $tickets );
 }

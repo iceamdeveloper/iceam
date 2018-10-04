@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.7.2';
+		const VERSION = '4.8.1';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.7';
+		const REQUIRED_TICKETS_VERSION = '4.8.1';
 
 		/**
 		 * Directory of the plugin
@@ -98,6 +98,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			add_action( 'init', array( $this, 'init' ), 9 );
 			add_action( 'plugins_loaded', array( $this, 'commerce_loader' ), 100 );
+			add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 100 );
 
 			// Register the plugin as active after the tribe autoloader runs
 			$this->register_active_plugin();
@@ -130,11 +131,37 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 				tribe_main_pue_helper();
 			}
 
+			// REST API v1
+			tribe_register_provider( 'Tribe__Tickets_Plus__REST__V1__Service_Provider' );
+
 			$this->commerce_loader();
 			$this->meta();
 			$this->tickets_view();
 			$this->qr();
 			$this->attendees_list();
+		}
+
+		/**
+		 * Finalize the initialization of this plugin
+		 *
+		 * @since 4.7.6
+		 */
+		public function plugins_loaded() {
+
+			$this->bind_implementations();
+
+			tribe( 'tickets-plus.privacy' );
+		}
+
+		/**
+		 * Registers the implementations in the container
+		 *
+		 * @since 4.7.6
+		 */
+		public function bind_implementations() {
+
+			// Privacy
+			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', array( 'hook' ) );
 		}
 
 		/**

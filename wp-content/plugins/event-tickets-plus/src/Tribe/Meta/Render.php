@@ -101,8 +101,8 @@ class Tribe__Tickets_Plus__Meta__Render {
 			$value = $value ? wp_kses_post( $value ) : '&nbsp;';
 
 			$valid_meta_html .= '
-				<dt class="event-tickets-meta-label_' . esc_attr( $field->slug ) . '">' . wp_kses_post( $field->label ) . '</dt>
-				<dd class="event-tickets-meta-data_' . esc_attr( $field->slug ) . '">' . $value . '</dd>
+				<dt class="event-tickets-meta-label_' . sanitize_html_class( $field->slug ) . '">' . wp_kses_post( $field->label ) . '</dt>
+				<dd class="event-tickets-meta-data_' . sanitize_html_class( $field->slug ) . '">' . $value . '</dd>
 			';
 		}
 

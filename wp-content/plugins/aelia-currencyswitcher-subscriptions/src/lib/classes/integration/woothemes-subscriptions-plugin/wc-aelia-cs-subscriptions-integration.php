@@ -239,7 +239,8 @@ class Subscriptions_Integration {
 		//	$product->subscription_sign_up_fee
 		//);
 
-		if(is_numeric($product->sale_price) && $product->is_on_sale()) {
+		if(is_numeric($product->sale_price) &&
+			 $this->product_is_on_sale($product, $product->sale_price, $product->regular_price)) {
 			$product->price = $product->sale_price;
 		}
 		else {
@@ -1079,5 +1080,55 @@ class Subscriptions_Integration {
 		}
 
 		return $should_load_scripts;
+	}
+
+	/**
+	 * Indicates if the product is on sale. A product is considered on sale if:
+	 * - Its "sale end date" is empty, or later than today.
+	 * - Its sale price in the active currency is lower than its regular price.
+	 *
+	 * @param WC_Product product The product to check.
+	 * @param mixed sale_price The product's sale price. If null, the sale price
+	 * is fetched by calling WC_Product::get_sale_price().
+	 * @param mixed regular_price The product's regular price. If null, the regular price
+	 * is fetched by calling WC_Product::get_regular_price().
+	 * @return bool
+	 * @since 1.3.12.180713
+	 */
+	protected function product_is_on_sale(WC_Product $product, $sale_price = null, $regular_price = null) {
+		$sale_price_dates_from = $this->date_to_string($product->get_date_on_sale_from());
+		$sale_price_dates_to = $this->date_to_string($product->get_date_on_sale_to());
+
+		$is_on_sale = false;
+		$today = date('Ymd');
+		if((empty($sale_price_dates_from) ||
+				$today >= $sale_price_dates_from) &&
+			 (empty($sale_price_dates_to) ||
+				$sale_price_dates_to > $today)) {
+			$sale_price = $sale_price !== null ? $sale_price : $product->get_sale_price();
+			$regular_price = $regular_price !== null ? $regular_price : $product->get_regular_price();
+
+			$is_on_sale = is_numeric($sale_price) && ($sale_price < $regular_price);
+		}
+		return $is_on_sale;
+	}
+
+	/**
+	 * Converts a timestamp, or a date object, to the specified format.
+	 *
+	 * @param int|WC_Datetime date The date to convert.
+	 * @param string format The target format.
+	 * @return string The date as a string in YMD format.
+	 * @since 1.3.12.180713
+	 */
+	protected function date_to_string($date, $format = 'Ymd') {
+		if(empty($date)) {
+			return '';
+		}
+
+		if(is_object($date) && ($date instanceof \WC_DateTime)) {
+			return $date->format($format);
+		}
+		return date($format, $date);
 	}
 }

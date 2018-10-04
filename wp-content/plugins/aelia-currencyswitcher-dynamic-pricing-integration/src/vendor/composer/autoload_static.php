@@ -4,11 +4,11 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb17c4b6c87b77f338c29f057288a9ca3
+class ComposerStaticInitd8839944ee2ab5a9ec1937ab8646d537
 {
     public static $classMap = array (
         'Aelia\\WC\\CurrencySwitcher\\DynamicPricing\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
-        'Aelia\\WC\\CurrencySwitcher\\DynamicPricing\\Dynamic_Pricing_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes-dynamic-pricing/woothemes-dynamic-pricing-integration.php',
+        'Aelia\\WC\\CurrencySwitcher\\DynamicPricing\\Dynamic_Pricing_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes/woothemes-dynamic-pricing-integration.php',
         'Aelia_WC_CS_Dynamic_Pricing_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-cs-dynamic-pricing-requirementscheck.php',
         'Aelia_WC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-requirementscheck.php',
     );
@@ -16,7 +16,7 @@ class ComposerStaticInitb17c4b6c87b77f338c29f057288a9ca3
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInitb17c4b6c87b77f338c29f057288a9ca3::$classMap;
+            $loader->classMap = ComposerStaticInitd8839944ee2ab5a9ec1937ab8646d537::$classMap;
 
         }, null, ClassLoader::class);
     }

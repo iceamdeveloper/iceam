@@ -4,6 +4,7 @@ class Tribe__Tickets_Plus__Attendees_List {
 
 	/**
 	 * Meta key to hold the if the Post has Attendees List hidden
+	 *
 	 * @var string
 	 */
 	const HIDE_META_KEY = '_tribe_hide_attendees_list';
@@ -27,6 +28,7 @@ class Tribe__Tickets_Plus__Attendees_List {
 
 	/**
 	 * Hook the necessary filters and Actions!
+	 *
 	 * @return void
 	 */
 	public static function hook() {
@@ -72,13 +74,15 @@ class Tribe__Tickets_Plus__Attendees_List {
 		// By default non-existent meta will be an empty string
 		if ( '' === $is_hidden ) {
 			/**
-			 * default to hide - which is unchecked but stored as true (1) in the Db for backwards compat.
+			 * Default to hide - which is unchecked but stored as true (1) in the Db for backwards compat.
+			 *
 			 * @since 4.5.1
 			 */
 			$is_hidden = true;
 		} else {
 			/**
-			 * invert logic for backwards compat.
+			 * Invert logic for backwards compat.
+			 *
 			 * @since 4.5.1
 			 */
 			$is_hidden = ! $is_hidden;
@@ -189,7 +193,11 @@ class Tribe__Tickets_Plus__Attendees_List {
 		}
 
 		foreach ( $attendees as $key => $attendee ) {
-			if ( 'no' === $attendee['order_status'] ) {
+			// If the order failed or they choose not to be displayed, take them off the list.
+			if (
+				'no' === $attendee['order_status']
+				|| 'failed' === $attendee['order_status']
+			) {
 				unset( $attendees_going[ $key ] );
 			}
 		}
@@ -231,7 +239,7 @@ class Tribe__Tickets_Plus__Attendees_List {
 		foreach ( $attendees as $key => $attendee ) {
 			$html = '';
 			// Only Check for optout when It's there
-			if ( isset( $attendee['optout'] ) && $attendee['optout'] !== false ) {
+			if ( isset( $attendee['optout'] ) && false !== $attendee['optout'] ) {
 				continue;
 			}
 
@@ -242,6 +250,11 @@ class Tribe__Tickets_Plus__Attendees_List {
 
 			// Skip folks who've RSVPed as "Not Going".
 			if ( 'no' === $attendee['order_status'] ) {
+				continue;
+			}
+
+			// Skip "Failed" orders
+			if ( 'failed' === $attendee['order_status'] ) {
 				continue;
 			}
 

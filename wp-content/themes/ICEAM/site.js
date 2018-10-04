@@ -180,5 +180,32 @@ jQuery(document).ready(function(){
 		$("#my-courses .col-2").remove();
 	}
 
+	if($(".editfield").length){
+		$(".editfield input[type=text], .editfield textarea").on("focus",function(){
+			$(this).parents(".editfield").addClass("active");
+		});
+		$(".editfield input[type=text], .editfield textarea").on("blur",function(){
+			if($(this).val()===""){
+				$(this).parents(".editfield").removeClass("active");
+			}
+		});
+		$(".editfield input[type=text], .editfield textarea").each(function(){
+			if($(this).val()!==""){
+				$(this).parents(".editfield").addClass("active");
+			}
+		});
+	}
+
 	
 });
+
+
+
+
+
+
+
+
+
+
+

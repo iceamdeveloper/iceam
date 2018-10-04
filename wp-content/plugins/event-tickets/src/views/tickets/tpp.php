@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/tickets/tpp.php
  *
- * @version 4.7
+ * @version 4.7.6
  *
  * @var bool $must_login
  * @var bool $can_login
@@ -105,7 +105,7 @@ $cart_url       = '';
 					<?php echo $this->main->get_price_html( $ticket->ID ); ?>
 				</td>
 				<td class="tickets_description" colspan="2">
-					<?php echo esc_html( $ticket->description ); ?>
+					<?php echo esc_html( ( $ticket->show_description() ? $ticket->description : '' ) ); ?>
 				</td>
 				<td class="tickets_submit">
 					<?php if ( ! $must_login ) : ?>
@@ -136,6 +136,14 @@ $cart_url       = '';
 					<?php if ( ! $must_login && $can_login ) : ?>
 						<?php include tribe( 'tickets.commerce.paypal' )->getTemplateHierarchy( 'login-before-purchase' ); ?>
 					<?php endif; ?>
+				</td>
+			</tr>
+		<?php endif ?>
+
+		<?php if ( tribe( 'tickets.commerce.paypal.cart' )->has_items() ) : ?>
+			<tr>
+				<td colspan="5" class="tpp-add">
+					<?php include tribe( 'tickets.commerce.paypal' )->getTemplateHierarchy( 'tickets/tpp-return-to-cart' ); ?>
 				</td>
 			</tr>
 		<?php endif ?>

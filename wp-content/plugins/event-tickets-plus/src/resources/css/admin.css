@@ -20,7 +20,6 @@
 	box-shadow: none;
 	float: right;
 	margin: 0 10px 0 0;
-	-webkit-transition: all .5s ease;
 	transition: all .5s ease;
 }
 .tribe-warning-toggle label {
@@ -39,7 +38,6 @@
 .recurring-warning {
 	color: red;
 	padding: 10px;
-	-webkit-transition: all .5s ease;
 	transition: all .5s ease;
 }
 .recurring-warning .dashicons {

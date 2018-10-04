@@ -248,7 +248,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		/**
 		 * Allows for control of the order number link in the attendee report
 		 *
-		 * @since TBD
+		 * @since 4.7.3
 		 *
 		 * @param string $order_number_link The default "order" link.
 		 * @param int    $order_number      The Post ID of the order.
@@ -263,7 +263,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		if ( 'completed' !== $item['status'] ) {
 			$output .= '<div class="order-status order-status-' . esc_attr( $item['status'] ) . '">' . esc_html(
-					ucwords( $item['status'] )
+					wc_get_order_status_name( $item['status'] )
 				) . '</div>';
 		}
 
@@ -522,7 +522,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 *
 	 * @see https://github.com/woocommerce/woocommerce/blob/869fb52927b675bd4c200cf3480a8813c9465a28/includes/admin/meta-boxes/views/html-order-item.php#L54
 	 *
-	 * @since TBD
+	 * @since 4.7.3
 	 *
 	 * @param $item The line item to review if has a discount
 	 *
@@ -539,7 +539,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	/**
 	 * Get the amount of the discount to be applied
 	 *
-	 * @since TBD
+	 * @since 4.7.3
 	 *
 	 * @param $item The line item with the data to process the order
 	 *

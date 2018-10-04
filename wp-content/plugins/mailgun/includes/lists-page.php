@@ -44,7 +44,7 @@ $lists_arr = $mailgun->get_lists();
 
     <span class="alignright">
         <a target="_blank" href="http://www.mailgun.com/">
-            <img src="https://www.mailgun.com/static/img/mailgun.svg" alt="Mailgun" style="width: 10em;"/>
+            <img src="https://assets.mailgun.com/img/mailgun.svg" alt="Mailgun" style="width: 10em;"/>
         </a>
     </span>
 
@@ -52,7 +52,7 @@ $lists_arr = $mailgun->get_lists();
 
     <?php settings_fields('mailgun'); ?>
 
-    <h3><?php _e('Available Mailing Lists', 'mailgun'); ?> | <a href="/wp-admin/options-general.php?page=mailgun">Back to settings</a></h3>
+    <h3><?php _e('Available Mailing Lists', 'mailgun'); ?> | <a href="<?php echo admin_url('options-general.php?page=mailgun'); ?>">Back to settings</a></h3>
 
     <p><?php _e("{$missing_error}You must use a valid Mailgun domain name and API key to access lists", 'mailgun'); ?></p>
 

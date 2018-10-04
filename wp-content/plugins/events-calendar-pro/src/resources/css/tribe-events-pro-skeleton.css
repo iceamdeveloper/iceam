@@ -23,24 +23,19 @@
  *
  */
 
+.tribe-events-page-title {
+	padding-left: 0;
+}
 
 /* Events Loop */
-
 
 .tribe-events-loop .tribe-events-loop .type-tribe_events {
 	margin: 0;
 }
 
-
-.tribe-events-loop h2.tribe-events-page-title {
-	padding-left: 0;
-}
-
-
 .tribe-events-loop .published {
 	margin-top: 0;
 }
-
 
 .tribe-events-loop .entry-title {
 	color: #333;
@@ -52,14 +47,11 @@
 	font-weight: bold;
 }
 
-
 /* = Week Grid Template Styles
    @ Template: Week.php
 =============================================*/
 
-
 /* grid structure */
-
 
 .tribe-events-grid {
 	width: 100%;
@@ -68,14 +60,11 @@
 	box-sizing: border-box;
 }
 
-
 .tribe-events-grid * {
 	box-sizing: border-box;
 }
 
-
 /* grid header */
-
 
 .tribe-grid-header .column {
 	text-align: center;
@@ -84,15 +73,12 @@
 	letter-spacing: 1px;
 }
 
-
 .tribe-grid-header .column a {
 	color: #333;
 	font-weight: bold;
 }
 
-
 /* columns & structure */
-
 
 .tribe-week-grid-wrapper {
 	height: 500px;
@@ -100,18 +86,15 @@
 	position: relative;
 }
 
-
 .tribe-grid-body {
 	overflow: visible;
 	position: relative;
 }
 
-
 .tribe-week-grid-hours {
 	position: relative;
 	z-index: 20;
 }
-
 
 .tribe-events-grid .column.first,
 .tribe-week-grid-hours {
@@ -120,7 +103,6 @@
 	margin-right: -40px;
 	border-left: 0;
 }
-
 
 .tribe-grid-allday .column.first,
 .tribe-week-grid-hours div {
@@ -132,14 +114,12 @@
 	text-align: center;
 }
 
-
 .tribe-events-grid .tribe-scroller {
 	position: relative;
 	width: 100%;
 	height: 500px;
 	overflow: hidden;
 }
-
 
 .tribe-events-grid .tribe-scroller > .scroller-content {
 	position: absolute;
@@ -151,16 +131,13 @@
 	left: 0;
 }
 
-
 .tribe-events-grid .tribe-scroller > .scroller-content:focus {
 	outline: thin dotted;
 }
 
-
 .tribe-events-grid .tribe-scroller > .scroller-content::-webkit-scrollbar {
 	display: none;
 }
-
 
 .tribe-events-grid .tribe-scroller > .scroller-pane {
 	background: rgba(0, 0, 0, .25);
@@ -172,12 +149,10 @@
 	visibility: hidden\9;
 	/* Target only IE7 and IE8 with this hack */
 	opacity: .01;
-	-webkit-transition: .2s;
 	transition: .2s;
 	border-radius: 5px;
 	z-index: 1000;
 }
-
 
 .tribe-events-grid .tribe-scroller > .scroller-pane  > .scroller-slider {
 	background: #444;
@@ -187,13 +162,11 @@
 	border-radius: 3px;
 }
 
-
 .tribe-events-grid .tribe-scroller:hover > .scroller-pane {
 	visibility: visible\9;
 	/* Target only IE7 and IE8 with this hack */
 	opacity: 0.99;
 }
-
 
 .tribe-events-grid .scroller-pane.active {
 	visibility: visible\9;
@@ -201,24 +174,20 @@
 	opacity: 0.99;
 }
 
-
 .tribe-events-grid .has-scrollbar > .scroller-content::-webkit-scrollbar {
 	display: block;
 }
-
 
 .scroller-pane.flashed {
 	visibility: visible\9; /* Target only IE7 and IE8 with this hack */
 	opacity: 0.99;
 }
 
-
 .tribe-grid-content-wrap {
 	width: 100%;
 	float: left;
 	padding-left: 40px;
 }
-
 
 .tribe-events-grid .tribe-grid-content-wrap .column {
 	display: inline-block;
@@ -230,19 +199,15 @@
 	border-left: 1px solid #bbb;
 }
 
-
 .tribe-grid-body .tribe-grid-content-wrap .column {
 	position: relative;
 }
 
-
 /* Global Week Event Styles */
-
 
 .tribe-events-grid div[id*='tribe-events-event-'] {
 	visibility: hidden;
 }
-
 
 .tribe-events-grid .type-tribe_events h3.entry-title {
 	padding: 4px 6px;
@@ -254,7 +219,6 @@
 	height: 100%;
 }
 
-
 .tribe-events-grid .type-tribe_events a {
 	display: block;
 	font-size: 12px;
@@ -264,7 +228,6 @@
 	width: 100%;
 }
 
-
 .tribe-grid-allday .type-tribe_events > div,
 .tribe-grid-body .type-tribe_events .tribe-events-week-hourly-single {
 	width: 100%;
@@ -272,24 +235,19 @@
 	cursor: pointer;
 }
 
-
 /* All day */
-
 
 .tribe-grid-allday {
 	position: relative;
 }
 
-
 .tribe-grid-allday .column {
 	min-height: 60px;
 }
 
-
 .tribe-grid-allday .column.first {
 	top: 0;
 }
-
 
 .tribe-grid-allday .column.first span {
 	position: absolute;
@@ -300,27 +258,22 @@
 	margin-left: -15px;
 }
 
-
 .tribe-grid-allday .type-tribe_events {
 	margin: 0;
 	position: relative;
 	padding: 4px;
 }
 
-
 .tribe-grid-allday .type-tribe_events ~ .type-tribe_events,
 	.tribe-grid-allday .tribe-event-placeholder ~ .type-tribe_events {
 	padding: 0 4px 4px;
 }
 
-
 .tribe-grid-allday .type-tribe_events h3.entry-title {
 	padding: 0;
 }
 
-
 /* Truncated all day titles */
-
 
 .tribe-grid-allday .type-tribe_events h3.entry-title a.url {
 	padding: 8px 6px;
@@ -333,46 +286,37 @@
 	z-index: 1;
 }
 
-
 .tribe-grid-allday .type-tribe_events.tribe-dayspan2 > div {
 	width: 200%;
 }
-
 
 .tribe-grid-allday .type-tribe_events.tribe-dayspan3 > div {
 	width: 300%;
 }
 
-
 .tribe-grid-allday .type-tribe_events.tribe-dayspan4 > div {
 	width: 400%;
 }
-
 
 .tribe-grid-allday .type-tribe_events.tribe-dayspan5 > div {
 	width: 500%;
 }
 
-
 .tribe-grid-allday .type-tribe_events.tribe-dayspan6 > div {
 	width: 600%;
 }
-
 
 .tribe-grid-allday .type-tribe_events.tribe-dayspan7 > div {
 	width: 700%;
 }
 
-
 /* Actual Event Styles */
-
 
 .tribe-grid-body .type-tribe_events {
 	width: 100%;
 	height: 100%;
 	padding: 4px;
 }
-
 
 .tribe-grid-body div[id*="tribe-events-event-"] {
 	font-weight: bold;
@@ -383,16 +327,13 @@
 	padding: 4px;
 }
 
-
 .tribe-grid-body div[id*="tribe-events-event-"]:hover {
 	z-index: 4;
 }
 
-
 .tribe-grid-body .tribe-events-tooltip .tribe-events-event-body {
 	position: relative;
 }
-
 
 .tribe-grid-body .tribe-events-tooltip .tribe-events-arrow {
 	width: 11px;
@@ -403,46 +344,37 @@
 	top: 6px;
 }
 
-
 .tribe-grid-body .tribe-events-right .tribe-events-tooltip .tribe-events-arrow {
 	left: auto;
 	right: -11px;
 	background-position: -20px 0;
 }
 
-
 /* Tooltip */
-
 
 .tribe-events-grid div[id*="tribe-events-tooltip-"] {
 	text-align: left;
 }
 
-
 /* Specific Classes */
 
-
 /* Week view grid background */
-
 
 .tribe-week-grid-outer-wrap {
 	position: relative;
 	z-index: 10;
 }
 
-
 .tribe-week-grid-inner-wrap {
 	position: absolute;
 	width: 100%;
 }
-
 
 .tribe-week-grid-block {
 	height: 60px;
 	padding: 0;
 	margin: 0;
 }
-
 
 .tribe-week-grid-block div {
 	height: 30px;
@@ -451,26 +383,20 @@
 	border-top: 1px solid #ddd;
 }
 
-
 /* = Photo View Template Styles
    @ Template: Photo.php
 =============================================*/
 
-
 /* CSS3 Transitions */
-
 
 #tribe-events-content.tribe-events-list {
 	padding: 1px 0 !important;
 }
 
-
 .isotope,
 .isotope .isotope-item {
-	-webkit-transition-duration: 0.2s;
-          	transition-duration: 0.2s;
+ transition-duration: 0.2s;
 }
-
 
 .photo-loader {
 	position: absolute;
@@ -478,15 +404,12 @@
 	left: 50%;
 }
 
-
 /* Tile Styling */
-
 
 .tribe-events-photo-event {
 	padding: 0;
 	position: relative;
 }
-
 
 .tribe-events-photo-event .tribe-events-event-image {
 	float: none;
@@ -494,43 +417,31 @@
 	width: 100%;
 }
 
-
 .tribe-events-photo-event .tribe-events-event-cost {
 	display: none;
 }
-
 
 .tribe-events-photo-event .date-divider {
 	padding: 0 5px;
 }
 
-
 #tribe-events-photo-events {
 	opacity: 1;
 	margin: 18px -4.5% 18px 0;
-	-webkit-transition-property: height, width;
-          	transition-property: height, width;
+ transition-property: height, width;
 }
-
 
 #tribe-events-photo-events .isotope-item {
-	-webkit-transition-property: -webkit-transform, opacity;
-	-webkit-transition-property: opacity, -webkit-transform;
-	transition-property: opacity, -webkit-transform;
-	transition-property: transform, opacity;
-	transition-property:         transform, opacity, -webkit-transform;
+	transition-property:         transform, opacity;
 }
-
 
 #tribe-events-photo-events .tribe-events-photo-grid-sizer {
 	width: 32%;
 }
 
-
 #tribe-events-photo-events .tribe-events-photo-gutter-sizer {
 	width: 2%;
 }
-
 
 #tribe-events-photo-events .type-tribe_events.tribe-events-photo-event {
 	float: left;
@@ -540,16 +451,13 @@
 	border: 0;
 }
 
-
 #tribe-events-photo-events.photo-two-col .type-tribe_events.tribe-events-photo-event {
 	width: 46%;
 }
 
-
 #tribe-events-photo-events.photo-hidden {
 	opacity: 0 !important;
 }
-
 
 #tribe-events-photo-events .tribe-events-photo-event {
 	border-bottom: 0;
@@ -559,18 +467,15 @@
 	width: 32%;
 }
 
-
 #tribe-events-photo-events .tribe-events-photo-event:before,
 		#tribe-events-photo-events .tribe-events-photo-event:after {
 	content: '';
 	display: table;
 }
 
-
 #tribe-events-photo-events .tribe-events-photo-event:after {
 	clear: both;
 }
-
 
 .tribe-events-list .tribe-events-photo-event .tribe-events-event-details {
 	float: none;
@@ -579,54 +484,43 @@
 	word-wrap: break-word;
 }
 
-
 .tribe-events-list .tribe-events-photo-event .tribe-events-event-image + .tribe-events-event-details {
 	padding: 8% 0 0;
 }
-
 
 .tribe-events-loop .tribe-events-photo-event .entry-content {
 	float: none;
 	margin-top: 10px;
 }
 
-
 .tribe-events-photo .tribe-events-loop .type-tribe_events .tribe-events-event-meta {
 	margin: 0;
 	padding-right: 0;
 }
 
-
-.tribe-events-list #tribe-events-photo-events .tribe-events-event-details h2 {
+.tribe-events-list #tribe-events-photo-events .tribe-events-event-details .tribe-events-list-event-title {
 	padding-right: 0;
 }
-
 
 .tribe-events-list .tribe-events-loop .tribe-events-event-meta .event-is-recurring img {
 	display: inline;
 }
 
-
 .tribe-events-photo-event .entry-title a {
-	-webkit-transition: .2s ease-in;
-  			transition: .2s ease-in;
+transition: .2s ease-in;
 }
-
 
 /* = Map View Template Styles
    @ Template: Map.php
 =============================================*/
 
-
 /* tribe geolocation map area */
-
 
 #tribe-geo-map-wrapper {
 	position: relative;
 	z-index: 2;
 	margin-bottom: 20px;
 }
-
 
 #tribe-geo-map {
 	width: 100%;
@@ -635,23 +529,18 @@
 	z-index: 3;
 }
 
-
 #tribe-geo-map label {
 	width: auto;
 	display: inline;
 }
 
-
 #tribe-geo-map img {
 	max-width: none;
 }
 
-
 /* tribe geo location option links (displayed when multiple locations found) */
 
-
-#tribe-geo-results h2,
-#tribe-geo-options h2 {
+#tribe-geo-results .tribe-events-map-event-title, #tribe-geo-options .tribe-events-map-event-title {
 	color: #222;
 	font-size: 18px;
 	font-weight: bold;
@@ -660,12 +549,9 @@
 	padding: 0;
 }
 
-
-#tribe-geo-results h2 a,
-#tribe-geo-options h2 a {
+#tribe-geo-results .tribe-events-map-event-title a, #tribe-geo-options .tribe-events-map-event-title a {
 	color: #222;
 }
-
 
 #tribe-geo-links {
 	margin-top: 20px;
@@ -674,12 +560,10 @@
 	border-left: 1px solid #eee;
 }
 
-
 #tribe-geo-options {
 	display: none;
 	margin-bottom: 20px;
 }
-
 
 .tribe-geo-option-link {
 	display: block;
@@ -687,21 +571,17 @@
 	color: #444;
 	border-bottom: 1px solid #eee;
 	padding: 3px 6px;
-	-webkit-transition: 0.1s ease-in-out;
-			transition: 0.1s ease-in-out;
+transition: 0.1s ease-in-out;
 }
-
 
 .tribe-geo-option-link:hover {
 	background: #f5f5f5;
 }
 
-
 .tribe-geo-option-link:hover,
 	.tribe-geo-option-link:focus {
 	text-decoration: none;
 }
-
 
 .tribe-option-loaded,
 .tribe-geo-option-link.tribe-option-loaded:hover {
@@ -709,15 +589,12 @@
 	color: #fff;
 }
 
-
 /* tribe geo location results list formatting */
-
 
 #tribe-geo-results .tribe-events-notices {
 	text-align: center;
 	margin: 2.25em 0 0 0;
 }
-
 
 .tribe-geo-result-entry {
 	position: relative;
@@ -726,12 +603,10 @@
 	padding: 2.25em 0;
 }
 
-
 .tribe-geo-result-last {
 	border-bottom: none;
 	padding-bottom: none;
 }
-
 
 .tribe-geo-result-thumb {
 	float: left;
@@ -739,15 +614,12 @@
 	margin-right: 2%;
 }
 
-
 .tribe-geo-result-thumb a {
 	display: block;
 	border: 1px solid #ddd;
 	padding: 2px;
-	-webkit-transition: 0.1s ease-in-out;
-			transition: 0.1s ease-in-out;
+transition: 0.1s ease-in-out;
 }
-
 
 .tribe-geo-result-thumb a img {
 	max-width: 100%;
@@ -755,12 +627,10 @@
 	display: block;
 }
 
-
 .tribe-geo-result-data {
 	float: right;
 	width: 68%;
 }
-
 
 .tribe-geo-result-date {
 	display: block;
@@ -770,35 +640,29 @@
 	text-transform: none;
 }
 
-
 .tribe-geo-result-venue {
 	display: block;
 	margin: 10px 0 0 0;
 	font-size: 16px;
 }
 
-
 .tribe-geo-result-excerpt {
 	margin: 10px 0 0 0;
 }
 
+.tribe-geo-result-entry .tribe-events-map-event-title {
+	float: left;
+	width: 80%;
+}
 
 .tribe-geo-result-entry .tribe-geo-result-excerpt p {
 	font-size: 14px;
 }
 
-
-.tribe-geo-result-entry h2 {
-	float: left;
-	width: 80%;
-}
-
-
 .tribe-geo-result-cost {
 	width: 18%;
 	float: right;
 }
-
 
 .tribe-geo-result-cost span {
 	display: block;
@@ -810,7 +674,6 @@
 	text-align: center;
 }
 
-
 .timer {
 	text-align: center;
 	width: 100%;
@@ -818,11 +681,9 @@
 	margin: 20px 0;
 }
 
-
 /* = View Loading / Pagination Styles
    @ Template: Map.php & Photo.php
 =============================================*/
-
 
 #tribe-geo-loading/*,
 #tribe-photo-loading*/ {
@@ -836,10 +697,8 @@
 	background: rgba(255, 255, 255, .2);
 	z-index: 4;
 	webkit-transition: all 1s linear;
-	-webkit-transition: all 1s linear;
 	transition: all 1s linear;
 }
-
 
 #tribe-geo-loading img {
 	position: absolute;
@@ -848,33 +707,27 @@
 	margin: -16px 0 0 -16px;
 }
 
-
 /* = Single Organizer Template Styles (Pro Version)
    @ Template: Single_Organizer.php
 =============================================*/
 
-
 #tribe-events-content.tribe-events-organizer {
 	padding: 0;
 }
-
 
 .single-tribe_organizer  .tribe_organizer h2.entry-title {
 	margin: 0 0 .5em 0;
 	padding: 0;
 }
 
-
 /* = Related Events
    @ Template: Single_Event.php
 =============================================*/
-
 
 ul.related-events {
 	display: block;
 	margin: 0;
 }
-
 
 ul.related-events li {
 	display: block;
@@ -885,23 +738,19 @@ ul.related-events li {
 	list-style-type: none;
 }
 
-
 .related-event-date {
 	font-size: .75em;
 	text-transform: uppercase;
 }
 
-
-h3.tribe-events-related-events-title {
+.tribe-events-related-events-title {
 	margin-bottom: 4%;
 }
-
 
 .tribe-events-single ul.tribe-related-events {
 	margin: 0 -4% 8% 0;
 	border: none;
 }
-
 
 .tribe-events-single ul.tribe-related-events li {
 	float: left;
@@ -912,16 +761,13 @@ h3.tribe-events-related-events-title {
 	list-style: none;
 }
 
-
 .tribe-events-single ul.tribe-related-events li .date-divider {
 	padding: 0 5px;
 }
 
-
 .tribe-events-single ul.tribe-related-events .tribe-related-events-thumbnail {
 	margin-bottom: 4%;
 }
-
 
 .tribe-events-single ul.tribe-related-events .tribe-related-events-thumbnail img {
 	width: 100%;
@@ -929,21 +775,17 @@ h3.tribe-events-related-events-title {
 	height: auto;
 }
 
-
 .tribe-events-single ul.tribe-related-events .tribe-related-events-title {
 	margin-bottom: 4%;
 }
-
 
 /* = Events Calendar Widget Styles (Sidebar)
    @ Template: widgets/calendar-widget.php
 =============================================*/
 
-
 .tribe-events-calendar-widget #tribe-events-calendar-wrap {
 	width: 100%;
 }
-
 
 .tribe-events-calendar-widget .tribe-events-calendar .tribe-events-tooltip {
 	width: 100px;
@@ -953,7 +795,6 @@ h3.tribe-events-related-events-title {
 	margin-bottom: 1.625em;
 }
 
-
 .tribe-events-calendar-widget table.tribe-events-calendar {
 	width: 100%;
 	table-layout: fixed;
@@ -961,12 +802,10 @@ h3.tribe-events-related-events-title {
 	border-collapse: collapse;
 }
 
-
 .tribe-events-calendar-widget table.tribe-events-calendar,
 	.tribe-events-calendar-widget .tribe-events-calendar td {
 	border: 1px solid #bbb;
 }
-
 
 .tribe-events-calendar-widget th {
 	font-size: 10px;
@@ -975,47 +814,39 @@ h3.tribe-events-related-events-title {
 	width: 14.28%;
 }
 
-
 .tribe-events-calendar-widget td {
 	height: auto;
 	text-align: center;
 }
-
 
 .tribe-events-calendar-widget td div[id*="tribe-events-daynum-"] {
 	padding: 6px 0;
 	background-color: #f9f9f9;
 }
 
-
 .tribe-events-calendar-widget td a.tribe-events-day-has-event {
 	color: #06c;
 	cursor: default;
 }
-
 
 .tribe-events-calendar-widget div[id*="tribe-events-daynum-"],
 	.tribe-events-calendar-widget td a {
 	font-size: 10px;
 }
 
-
 .tribe-events-calendar-widget .tribe-events-tooltip .tribe-events-arrow {
 	left: 2px;
 }
-
 
 .tribe-events-calendar-widget .tribe-events-right .tribe-events-tooltip {
 	right: 0;
 	left: auto;
 }
 
-
 .tribe-events-calendar-widget .tribe-events-right .tribe-events-tooltip .tribe-events-arrow {
 	left: auto;
 	right: 2px;
 }
-
 
 .tribe-events-calendar-widget h5.entry-title {
 	font-size: 11px;
@@ -1023,26 +854,21 @@ h3.tribe-events-related-events-title {
 	padding: 0;
 }
 
-
 .tribe-view-all-events {
 	float: right;
 }
-
 
 .tribe-events-widget-link {
 	margin-top: 8px;
 }
 
-
 #ajax-loading-mini {
 	display: none;
 }
 
-
 /* = Events Countdown Widget
    @ Template: widgets/countdown-widget.php
 =============================================*/
-
 
 .tribe-countdown-timer span.tribe-countdown-seconds,
 	.tribe-countdown-timer span.format,
@@ -1050,20 +876,17 @@ h3.tribe-events-related-events-title {
 	display: none;
 }
 
-
 div.tribe-countdown-timer {
 	text-align: center;
 	padding-top: 10px;
 	line-height: 1;
 }
 
-
 div.tribe-countdown-number {
 	float: left;
 	color: #000;
 	font-size: 32px;
 }
-
 
 span.tribe-countdown-under {
 	font-size: 10px;
@@ -1074,7 +897,6 @@ span.tribe-countdown-under {
 	top: -10px;
 }
 
-
 div.tribe-countdown-colon {
 	float: left;
 	color: #666;
@@ -1082,27 +904,22 @@ div.tribe-countdown-colon {
 	padding: 0 4px;
 }
 
-
 div.tribe-countdown-right {
 	float: left;
 }
-
 
 div.tribe-countdown-text {
 	clear: both;
 }
 
-
 /* = "Month View" Generated from [tribe_events] Shortcode
 =========================================================*/
-
 
 .tribe-events-shortcode .tribe-events-month table .type-tribe_events {
 	margin: 0 5%;
 	padding: 6px 8px;
 	border-bottom: 1px solid #e7e7e7;
 }
-
 
 .tribe-events-shortcode .tribe-events-month table .tribe-events-last {
 	border-bottom: 0;

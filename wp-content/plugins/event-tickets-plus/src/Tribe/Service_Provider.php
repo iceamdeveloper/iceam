@@ -30,11 +30,18 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 		$this->container->singleton( 'tickets-plus.commerce.edd.checkin-stati', 'Tribe__Tickets_Plus__Commerce__EDD__CheckIn_Stati' );
 		$this->container->singleton( 'tickets-plus.commerce.woo.checkin-stati', 'Tribe__Tickets_Plus__Commerce__WooCommerce__CheckIn_Stati' );
 
+		// QR code support
+		$this->container->singleton( 'tickets-plus.qr.site-settings', 'Tribe__Tickets_Plus__QR__Settings', array( 'hook' ) );
+
 		// additional service providers
 		$this->container->register( 'Tribe__Tickets_Plus__Commerce__PayPal__Service_Provider' );
 
 		// EDD specific
 		$this->container->singleton( 'tickets-plus.commerce.edd.orders', 'Tribe__Tickets_Plus__Commerce__EDD__Orders_Report' );
+
+		// Repositories, we replace the original bindings to expand the repository with ET+ functions
+		$this->container->bind( 'tickets.ticket-repository', 'Tribe__Tickets_Plus__Ticket_Repository' );
+		$this->container->bind( 'tickets.attendee-repository', 'Tribe__Tickets_Plus__Attendee_Repository' );
 
 		$this->hook();
 	}
@@ -47,6 +54,9 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 	 * @since 4.6
 	 */
 	protected function hook() {
+		tribe( 'tickets-plus.editor' );
+		tribe( 'tickets-plus.qr.site-settings' );
+
 		if ( is_admin() ) {
 			tribe( 'tickets-plus.admin.views' );
 		}
@@ -57,14 +67,5 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 
 		add_filter( 'event_tickets_attendees_edd_checkin_stati', tribe_callback( 'tickets-plus.commerce.edd.checkin-stati', 'filter_attendee_ticket_checkin_stati' ), 10 );
 		add_filter( 'tribe_filter_attendee_order_link', tribe_callback( 'tickets-plus.commerce.edd.orders', 'filter_attendee_order_link' ), 10, 2 );
-	}
-
-	/**
-	 * Binds and sets up implementations at boot time.
-	 *
-	 * @since 4.6
-	 */
-	public function boot() {
-		// no ops
 	}
 }

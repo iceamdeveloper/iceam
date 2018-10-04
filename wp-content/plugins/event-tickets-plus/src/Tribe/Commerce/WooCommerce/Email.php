@@ -11,10 +11,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 
 	public function __construct() {
 
-		$this->id          = 'wootickets';
-		$this->title       = __( 'Tickets', 'event-tickets-plus' );
-		$this->description = __( 'Email the user will receive after a completed order with the tickets they purchased.', 'event-tickets-plus' );
-		$this->subject     = __( 'Your tickets from {site_title}', 'event-tickets-plus' );
+		$this->id             = 'wootickets';
+		$this->title          = __( 'Tickets', 'event-tickets-plus' );
+		$this->description    = __( 'Email the user will receive after a completed order with the tickets they purchased.', 'event-tickets-plus' );
+		$this->subject        = __( 'Your tickets from {site_title}', 'event-tickets-plus' );
+		$this->customer_email = true;
 
 		// Triggers for this email
 		add_action( 'wootickets-send-tickets-email', array( $this, 'trigger' ) );
@@ -25,7 +26,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 		/**
 		 * Allows for filtering whether the Woo tickets email is enabled.
 		 *
-		 * @deprecated TBD
+		 * @deprecated 4.7.3
 		 *
 		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
 		 */
@@ -34,7 +35,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 		/**
 		 * Allows for filtering whether the Woo tickets email is enabled.
 		 *
-		 * @since TBD
+		 * @since 4.7.3
 		 *
 		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
 		 */
@@ -151,7 +152,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	/**
 	 * Adds an Order Note to the WooCommerce order if we're manually re-sending a tickets email.
 	 *
-	 * @since TBD
+	 * @since 4.7.3
 	 *
 	 * @param int $order_id The WooCommerce order ID.
 	 */

@@ -13,15 +13,42 @@
 
 ?>
 
+
+
 <?php do_action( 'bp_before_members_loop' ); ?>
 
-<?php if ( bp_has_members( bp_ajax_querystring( 'members' ) ) ) : ?>
+<?php
+    // force alphabetical sort by default
+    if(bp_ajax_querystring( 'members' ) != "" && strrpos( bp_ajax_querystring( 'members' ), "type") === false){
+        $queryString = bp_ajax_querystring( 'members' ) . "&type=alphabetical";
+    } else {
+        $queryString = bp_ajax_querystring( 'members' );
+    }
+?>
+
+<?php if ( bp_has_members( $queryString ) ) : ?>
 
 	<?php do_action( 'bp_before_directory_members_list' ); ?>
 
 	<div id="members-list" class="row" role="main">
 
 	<?php while ( bp_members() ) : bp_the_member(); ?>
+
+		<?php 
+			// $diplomate = false;
+			// $user_ID = bp_get_member_user_id();
+			// $user_data = get_userdata( $user_ID );
+
+			// if(!empty( $user_data->roles )){
+			// 	foreach ($user_data->roles as $role) {
+			// 		if($role == 'diplomate'){ $diplomate = true; }
+			// 	}
+				
+			// }
+
+			// if($diplomate):
+
+		?>
 	
 		<div class="col-xs-6 col-sm-3">
 			<div class="item-avatar">
@@ -30,7 +57,7 @@
 	
 			<div class="item">
 				<div class="item-title">
-					<a href="<?php bp_member_permalink(); ?>"><?php echo bp_core_get_user_displayname(bp_get_member_user_id()); ?></a>
+					<p><a href="<?php bp_member_permalink(); ?>"><?php echo bp_members_get_user_nicename(bp_get_member_user_id()); ?></a></p>
 					
 					<?php
 						$location = "";
@@ -84,6 +111,8 @@
 			<div class="clear"></div>
 		</div>
 
+	<?php //endif; ?>
+
 	<?php endwhile; ?>
 
 	</div> <!-- #members-list -->
@@ -111,7 +140,12 @@
 <?php else: ?>
 
 	<div id="message" class="info">
-		<p><?php _e( "Sorry, no members were found.", 'buddypress' ); ?></p>
+		<p><?php _e( "Sorry, no members were found. Please be patient as we learn about our site members!", 'buddypress' ); ?>
+        <?php
+            $current_user = wp_get_current_user();
+            $name = $current_user->user_login;
+        ?>
+        <br/><br/>Haven't completed <em>your</em> profile yet? We'd love for you to <a href="<?php echo "/practitioner-directory/$name/profile/edit/" ?>">fill it out now</a>!
 	</div>
 
 <?php endif; ?>

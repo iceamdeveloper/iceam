@@ -49,6 +49,7 @@ class Tribe__Tickets__Tickets_View {
 		}
 
 		// Intercept Template file for Tickets
+		add_action( 'tribe_events_pre_get_posts', array( $myself, 'modify_ticket_display_query' ) );
 		add_filter( 'tribe_events_template', array( $myself, 'intercept_template' ), 20, 2 );
 
 		// We will inject on the Priority 4, to be happen before RSVP
@@ -372,6 +373,30 @@ class Tribe__Tickets__Tickets_View {
 		return $content;
 	}
 
+
+	/**
+	 * Modify the front end ticket list display for it to always display
+	 * even when Hide From Event Listings is checked for an event
+	 *
+	 * @since 4.7.3
+	 *
+	 * @param $query WP_Query Query object
+	 *
+	 */
+	public function modify_ticket_display_query( $query ) {
+
+		if ( ! $query->tribe_is_event_query ) {
+			return;
+		}
+
+		$display = get_query_var( 'eventDisplay', false );
+		if ( 'tickets' !== $display ) {
+			return;
+		}
+
+		$query->set( 'post__not_in', '' );
+	}
+
 	/**
 	 * We need to intercept the template loading and load the correct file
 	 *
@@ -627,8 +652,9 @@ class Tribe__Tickets__Tickets_View {
 		array_walk( $options, array( $this, 'normalize_rsvp_option' ) );
 
 		// If an option was passed return it's label, but if doesn't exist return false
-		if ( ! is_null( $selected ) ) {
-			return isset( $options[ $selected  ] ) ? $options[ $selected  ]['label'] : false;
+		if ( null !== $selected ) {
+			return isset( $options[ $selected  ] ) ?
+                $options[ $selected  ]['label'] : false;
 		}
 
 		return $just_labels ?

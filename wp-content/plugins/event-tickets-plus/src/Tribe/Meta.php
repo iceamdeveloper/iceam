@@ -297,10 +297,10 @@ class Tribe__Tickets_Plus__Meta {
 		update_post_meta( $ticket->ID, self::ENABLE_META_KEY, 'yes' );
 
 		// Save templates too
-		if ( isset( $data['tribe-tickets-save-fieldset'] ) && ! empty( $data['tribe-tickets-saved-fieldset-name'] ) ) {
+		if ( isset( $data['tribe-tickets-save-fieldset'] ) ) {
 			$fieldset = wp_insert_post( array(
 				'post_type'   => Tribe__Tickets_Plus__Meta__Fieldset::POSTTYPE,
-				'post_title'  => $data['tribe-tickets-saved-fieldset-name'],
+				'post_title'  => empty( $data['tribe-tickets-saved-fieldset-name'] ) ? null : $data['tribe-tickets-saved-fieldset-name'],
 				'post_status' => 'publish',
 			) );
 
