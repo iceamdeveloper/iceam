@@ -288,7 +288,7 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 		// Prepare multi-select to allow choosing the Exchange Rates Provider
 		add_settings_field(
 			$exchange_rates_provider_field_id,
-	    __('Select the Provider from which the Exchange Rates will be fetched.',
+	    __('Select the Provider from which the exchange rates will be fetched.',
 				 $this->_textdomain),
 	    array($this, 'render_dropdown'),
 	    $this->_settings_key,
@@ -311,8 +311,15 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 			self::SECTION_OPENEXCHANGERATES_SETTINGS,
 			Settings::FIELD_OPENEXCHANGE_API_KEY,
 	    __('Open Exchange Rates API Key', $this->_textdomain),
-			__('If you do not have an API Key, please visit https://openexchangerates.org/ ' .
-				 'to register and get one.', $this->_textdomain),
+			'<strong>' .
+			__('An API key is required to use the Open Exchange Rates service.', $this->_textdomain) .
+			'</strong></br>' .
+			sprintf(__('If you do not have an API Key, please visit <a href="%1$s">%1$s</a> ' .
+								 'to register and get a free one.', $this->_textdomain),
+							'https://openexchangerates.org/signup') .
+			'<br/>' .
+			__('Alternatively, please select a different exchange rates provider, ' .
+				 'such as Yahoo! Finance, which does not require an API key.', $this->_textdomain),
 			''
 		);
 
@@ -397,16 +404,18 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 				 'customers to choose the country before reaching the checkout page, ' .
 				 'showing them the prices in the appropriate currency while they browse the site ',
 				 $this->_textdomain) .
-			'<br />' .
+			'<br /><br />' .
 			__('<strong>Important</strong>: if you enable this option, <strong>do not use the currency ' .
-				 'selector widget</strong>, as any currency selected by the customer will be ignored and ' .
-				 'overridden by this feature.',
+				 'selector widget, or the currency selection via URL.</strong>',
+				 $this->_textdomain) .
+			' ' .
+			__('Any currency selection made via the selector widget, or via URL arguments will be ' .
+				 "ignored, and the currency will always be set based on customer's country.",
 				 $this->_textdomain)
 		);
 
 		/*** Support and troubleshooting settings ***/
-		$log_id = Logger::instance()->log_id;
-		$log_file_path = Logger::get_log_file_name(Logger::instance()->log_id);
+		$log_file_path = \Aelia\WC\Logger::get_log_file_name(Definitions::PLUGIN_SLUG);
 
 		$this->render_checkbox_field(
 			self::SECTION_SUPPORT,
@@ -548,21 +557,52 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 	}
 
 	public function exchange_rates_update_section_callback() {
-		echo
-		'<p>' .
-		__('In this section you can configure the frequency of automatic updates for Exchange Rates.',
-			 $this->_textdomain) .
-		'</p>';
+		?>
+		<div><?php
+			echo __('In this section you can configure the frequency of automatic updates for the exchange rates.',
+			 $this->_textdomain);
+		?></div>
+		<div class="notice-warning">
+			<p>
+				<strong><?php echo __('Important', $this->_textdomain); ?>: </strong>
+				<span><?php
+					echo __('The first time you save the settings, the rates will fetched from the selected provider.',
+									$this->_textdomain) .
+							 ' ' .
+							 __('You will then be able to alter them manually, or schedule them to be updated automatically.',
+									$this->_textdomain);
+				?></span>
+			</p>
+		</div>
+		<?php
 	}
 
 	public function openexchangerates_settings_section_callback() {
 		$model_key = $this->_settings_controller->get_exchange_rates_model_key('Aelia\WC\CurrencySwitcher\Exchange_Rates_OpenExchangeRates_Model');
-		echo
-			'<p class="exchange_rate_model_settings ' . $model_key . '">' .
-			__('In this section you can configure the parameters to connect to Open Exchange ' .
-				 'Rates website.',
-				 $this->_textdomain) .
-			'</p>';
+		?>
+		<div class="exchange_rate_model_settings <?php echo $model_key; ?>">
+			<script type="text/javascript">
+				jQuery(document).ready(function($) {
+					/**
+					 * Ensure that the settings can't be saved if Open Exchange Rates is
+					 * the selected provider, but no API key was entered.
+					 *
+					 * @since 4.5.2.171019
+					 */
+					$('#wc_aelia_currency_switcher_form > .buttons .button[type="submit"]').on('click', function() {
+						var $api_key_field = $('#wc_aelia_currency_switcher\\[openexchange_api_key\\]');
+						$api_key_field.prop('required', $api_key_field.is(':visible'));
+					});
+					return true;
+				});
+			</script>
+			<p><?php
+				__('In this section you can configure the parameters to connect to Open Exchange ' .
+					 'Rates website.',
+					 $this->_textdomain);
+			?></p>
+		</div>
+		<?php
 	}
 
 	public function ipgeolocation_settings_section_callback() {
@@ -842,6 +882,7 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 
 		// Retrieve the exchange rates
 		$exchange_rates = get_value(Settings::FIELD_EXCHANGE_RATES, $args, array());
+
 		if(!is_array($exchange_rates)) {
 			//var_dump($exchange_rates);return;
 			throw new InvalidArgumentException(__('Argument "exchange_rates" must be an array.', $this->_textdomain));
@@ -889,11 +930,14 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 		$html .= '<th class="rate_markup">';
 		$html .= __('Rate Markup', $this->_textdomain);
 		$html .= '<span class="help-icon" title="' .
-						 __('If specified, this markup will be added to the standard ' .
-								'exchange rate. Markup must be an absolute value. Example: ' .
-								'if you have an exchange rate of 1.34 enter a markup of 0.05. ' .
-								'The final exchange rate will then be (1.34 + 0.05) = 1.39',
-								$this->_textdomain) .
+						 __('If specified, this markup will be added to the standard exchange rate.', $this->_textdomain) . ' ' .
+						 __("The markup can be be an absolute value, which is added 'as is' to the rate, or a percentage.", $this->_textdomain) . '<br><br> ' .
+						 '<strong>' .
+						 __('Examples', $this->_textdomain) . 
+						 '</strong><br>' .
+						 __('Original  exchange rate: 1.23', $this->_textdomain) . '<br>' .
+						 __('Markup: 0.05 (absolute value). Result: 1.23 + 0.05 = 1.28', $this->_textdomain) . '<br>' .
+						 __('Markup: 10% (percentage). Result: 1.23 + 10% = 1.353', $this->_textdomain) .
 						 '"></span>';
 		$html .= '</th>';
 
@@ -955,7 +999,7 @@ class Settings_Renderer extends \Aelia\WC\Settings_Renderer {
 
 			// Discard currencies that are no longer enabled
 			if(!in_array($currency, $enabled_currencies)) {
-				return;
+				continue;
 			}
 
 			$currency_field_id = $this->group_field($currency, $base_field_id);

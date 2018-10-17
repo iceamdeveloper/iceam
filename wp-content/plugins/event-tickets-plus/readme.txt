@@ -4,7 +4,7 @@ Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, 
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.5
 Tested up to: 4.9.8
-Stable tag: 4.8.1
+Stable tag: 4.8.2
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -138,9 +138,13 @@ Our Premium Plugins:
 
 == Changelog ==
 
+= [4.8.2] 2018-10-03 =
+
+* Tweak - Add `tribe_tickets_plus_qr_enabled` filter [113627]
+
 = [4.8.1] 2018-09-12 =
 
-* Feature - Add a filter to enable security code check during QR checkin, tribe_tickets_plus_qr_check_security_code  [87756]
+* Feature - Add a filter to enable security code check during QR checkin, `tribe_tickets_plus_qr_check_security_code`  [87756]
 * Fix - Show the ticket table when tickets are all sold out, show message in list view [111893]
 * Tweak - Set `tribe_tickets_plus_trash_ticket` filter to true by default [112409]
 * Tweak - Added internal methods to WooCommerce and EDD handle more atomic Views for Gutenberg extension [112478]

@@ -110,29 +110,41 @@ class WC_Aelia_CS_BE_Table_Rates_Integration {
 		// If shipping prices are not already set in the active currency, convert
 		// them using exchange rates
 		if(empty($shipping_method->shipping_prices_in_currency)) {
-			// "Global" threshold for free shipping
-			$shipping_method->ship_free = $this->convert($shipping_method->ship_free);
+			// Filter the "subtotal" condition, to ensure it's converted to the active
+			// currency
+			// @since 4.5.8.171127
+			add_filter('betrs_condition_tertiary_subtotal', array($this, 'betrs_condition_tertiary_subtotal'), 10, 2);
 
-			if(!empty($shipping_method->table_rates) && is_array($shipping_method->table_rates)) {
-				foreach($shipping_method->table_rates as $shipping_id => $values) {
-					$this->logger()->debug('Processing BE Table Rate Shipping cost', array(
-						'Shipping ID' => $shipping_id,
-						'Values' => $values,
-					));
-
-					// Table rate shipping thresholds
-					if($values['cond'] === 'price') {
-						$values['min'] = $this->convert($values['min']);
-						$values['max'] = $this->convert($values['max']);
-
-						$this->logger()->debug('Condition "price" found. Shipping conditions (min/max) converted.', array(
-							'Values' => $values,
-						));
-
-					}
-					$shipping_method->table_rates[$shipping_id] = $values;
-				}
-			}
+			// The logic below is deprecated since BE Table Rates 4.0 and should no
+			// longer be used. Unfortunately, the BE Table Rates plugin doesn't expose
+			// the version number, so we can only "dismiss" older versions by disabling
+			// the code (fetching the version number using get_plugin_data() would be
+			// to "heavy" and not worth it).
+			// @deprecated since 4.5.8.171127
+			// @deprecated since BE Table Rates 4.0
+			//// "Global" threshold for free shipping
+			//$shipping_method->ship_free = $this->convert($shipping_method->ship_free);
+			//if(!empty($shipping_method->table_rates) && is_array($shipping_method->table_rates)) {
+			//
+			//	foreach($shipping_method->table_rates as $shipping_id => $values) {
+			//		$this->logger()->debug('Processing BE Table Rate Shipping cost', array(
+			//			'Shipping ID' => $shipping_id,
+			//			'Values' => $values,
+			//		));
+			//
+			//		// Table rate shipping thresholds
+			//		if($values['cond'] === 'price') {
+			//			$values['min'] = $this->convert($values['min']);
+			//			$values['max'] = $this->convert($values['max']);
+			//
+			//			$this->logger()->debug('Condition "price" found. Shipping conditions (min/max) converted.', array(
+			//				'Values' => $values,
+			//			));
+			//
+			//		}
+			//		$shipping_method->table_rates[$shipping_id] = $values;
+			//	}
+			//}
 		}
 		return $shipping_method;
 	}
@@ -144,7 +156,7 @@ class WC_Aelia_CS_BE_Table_Rates_Integration {
 	 * @since 4.4.5.170118
 	 */
 	protected function be_table_rates_version_supported() {
-		return class_exists('\BE_Table_Rate_Shipping');
+		return class_exists('\BE_Table_Rate_Method');
 	}
 
 	/**
@@ -204,10 +216,26 @@ class WC_Aelia_CS_BE_Table_Rates_Integration {
 		}
 
 		foreach($shipping_methods as $key => $method) {
-			if($method instanceof \BE_Table_Rate_Shipping) {
+			if($method instanceof \BE_Table_Rate_Method) {
 				$shipping_methods[$key] = $this->set_shipping_method_params_in_currency($method);
 			}
 		}
 		return $shipping_methods;
+	}
+
+	/**
+	 * Converts the value of the "subtotal" condition to the active currency.
+	 *
+	 * @param float value The value to convert to the active currency.
+	 * @param array condition The parameter describing the condition.
+	 * @return float The converted condition amount.
+	 * @since 4.5.8.171127
+	 */
+	public function betrs_condition_tertiary_subtotal($value, $condition) {
+		if(is_numeric($value)) {
+			$value = $this->convert($value);
+		}
+
+		return $value;
 	}
 }

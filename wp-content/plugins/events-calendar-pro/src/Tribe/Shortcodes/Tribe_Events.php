@@ -315,8 +315,6 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 			remove_action( 'tribe_events_bar_before_template', tribe_callback( 'tec.bar', 'disabled_bar_before' ) );
 			remove_action( 'tribe_events_bar_after_template', tribe_callback( 'tec.bar', 'disabled_bar_after' ) );
 
-			tribe_asset_enqueue( 'tribe-events-pro-geoloc' );
-
 			add_action( 'tribe_events_bar_before_template', tribe_callback( 'tec.bar', 'disabled_bar_before' ) );
 			add_action( 'tribe_events_bar_after_template', tribe_callback( 'tec.bar', 'disabled_bar_after' ) );
 
@@ -354,6 +352,7 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 	 */
 	public function enable_tribe_bar() {
 		remove_filter( 'tribe-events-bar-should-show', array( $this, 'enable_tribe_bar' ) );
+		remove_filter( 'tribe_get_template_part_path_modules/bar.php', '__return_false' );
 		return true;
 	}
 

@@ -19,7 +19,7 @@ if(!empty($widget_title)) {
 
 echo '<!-- Currency Switcher v.' . WC_Aelia_CurrencySwitcher::$version . ' - Country Selector Widget -->';
 echo '<form method="post" class="country_selector_form">';
-echo '<select class="countries" name="' . Definitions::ARG_BILLING_COUNTRY . '">';
+echo '<select class="countries" name="' . Definitions::ARG_CUSTOMER_COUNTRY . '">';
 foreach($widget_args['countries'] as $country_code => $country_name) {
 	$selected_attr = '';
 	if($country_code === $widget_args['selected_country']) {

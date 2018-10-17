@@ -111,10 +111,39 @@ class WC_Aelia_CS_Admin_Interface_Manager {
 						$order->get_total_in_base_currency(),
 						$base_currency
 					);
-					echo '<div class="order_total_base_currency" title="' .
-							 __('Order total in base currency (estimated)', Definitions::TEXT_DOMAIN) .
-							 '">';
-					echo '(' . esc_html(strip_tags($order_total_base_currency)) . ')';
+
+					// Fetch the refunded total in base currency, to calculate the net total in base
+					// currency
+					// @since 4.6.3.180821
+					$order_total_refunded_base_currency = $order->get_total_refunded_in_base_currency();
+					if(!empty($order_total_refunded_base_currency)) {
+						$net_total = $order->get_total_in_base_currency() - $order_total_refunded_base_currency;
+
+						$formatted_total = '<del>' . strip_tags($order_total_base_currency) . '</del> ';
+						$formatted_total .= '<ins>' . strip_tags($currency_switcher->format_price(
+							$net_total,
+							$base_currency	
+						)) . '</ins>';						
+					}
+					else {
+						// When no refunds are present, just show the order total in base currency
+						$formatted_total = $order_total_base_currency;
+					}
+
+					// Add a tooltip to explain what the extra totals are for. The tooltip also explains why
+					// a fully refunded order might show a net higher or lower than zero, due to the difference
+					// in the exchange rates used for the original order and the refund(s)
+					// @since 4.6.3.180821
+					$total_base_currency_title = implode(" ", array(
+						__('Order total in base currency (estimated).', Definitions::TEXT_DOMAIN) . '<br/><br/>',
+						'<strong>' . __('Note', Definitions::TEXT_DOMAIN) . '</strong>:',
+						__('Refunded orders might show a net total in base currency higher or lower than zero.', Definitions::TEXT_DOMAIN),
+						__('This is normal, and can happen when the exchange rate applied  to a refund is different ' .
+							 'from the rate applied to the original order.', Definitions::TEXT_DOMAIN),
+					));
+
+					echo '<div class="order_total_base_currency">';
+					echo '<span class="tips" data-tip="' . $total_base_currency_title . '">(' . $formatted_total . ')</span>';
 					echo '</div>';
 				}
 
@@ -254,7 +283,7 @@ class WC_Aelia_CS_Admin_Interface_Manager {
 	 */
 	public function woocommerce_coupon_data_tabs($tabs) {
 		$tabs['multi_currency'] = array(
-			'label' => __('Multi-currency', 'woocommerce'),
+			'label' => __('Multi-currency', Definitions::TEXT_DOMAIN),
 			'target' => 'multi_currency_coupon_data',
 			'class' => 'multi_currency_coupon_data',
 		);

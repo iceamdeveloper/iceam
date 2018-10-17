@@ -12,6 +12,22 @@ class WC_Aelia_Currencies_Manager {
 	// the world_currencies() method
 	protected static $_world_currencies;
 
+	// @var The instance of the logger used by the class
+	protected $_logger;
+
+	/**
+	 * Returns a logger instance.
+	 *
+	 * @return Aelia\WC\Logger
+	 * @since 4.4.2.170117
+	 */
+	protected function logger() {
+		if(empty($this->_logger)) {
+			$this->_logger = WC_Aelia_CurrencySwitcher::instance()->get_logger();
+		}
+		return $this->_logger;
+	}
+
 	// @var array A list of the currencies used by all countries
 	protected $_country_currencies = array(
 		'AD' => 'EUR', // Andorra - Euro
@@ -150,7 +166,7 @@ class WC_Aelia_Currencies_Manager {
 		//'LT' => 'LTL', // Lithuania - Lithuanian Litas
 		'LT' => 'EUR', // Lithuania - Euro, since January 2015
 		'LU' => 'EUR', // Luxembourg - Euro
-		'LV' => 'LVL', // Latvia - Latvian Lats
+		'LV' => 'EUR', // Latvia - Latvian Lats
 		'LY' => 'LYD', // Libya - Libyan Dinar
 		'MA' => 'MAD', // Morocco - Moroccan Dirham
 		'MC' => 'EUR', // Monaco - Euro
@@ -476,19 +492,19 @@ class WC_Aelia_Currencies_Manager {
 		$ip2location = IP2Location::factory();
 		$country_code = $ip2location->get_country_code($host);
 
-		Logger::instance()->notice(__('Attempting to select currency by geolocation.', Definitions::TEXT_DOMAIN),
-															 array(
-																"Host" => $host,
-																"Detected country code" => $country_code,
-															 ));
+		$this->logger()->debug(__('Attempting to select currency by geolocation.', Definitions::TEXT_DOMAIN),
+													 array(
+														"Host" => $host,
+														"Detected country code" => $country_code,
+													));
 
 		if($country_code === false) {
-			Logger::instance()->error(__('Geolocation failed, selecting default currency.', Definitions::TEXT_DOMAIN),
-																array(
-																	'Host' => $host,
-																	'Geolocation errors' => $ip2location->get_errors(),
-																	'Default currency' => $default_currency,
-																));
+			$this->logger()->info(__('Geolocation failed, selecting default currency.', Definitions::TEXT_DOMAIN),
+														array(
+															'Host' => $host,
+															'Geolocation errors' => $ip2location->get_errors(),
+															'Default currency' => $default_currency,
+														));
 			return $default_currency;
 		}
 

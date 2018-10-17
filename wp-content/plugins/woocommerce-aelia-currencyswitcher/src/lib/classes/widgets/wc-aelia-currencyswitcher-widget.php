@@ -12,6 +12,9 @@ class WC_Aelia_CurrencySwitcher_Widget extends \WP_Widget {
 	const TYPE_DROPDOWN = 'dropdown';
 	const TYPE_BUTTONS = 'buttons';
 
+	// @var bool Indicates if one or more currencies were configured incorrectly.
+	public $misconfigured_currencies = false;
+
 	/**
 	 * Returns a list of the available widget types and their attributes.
 	 *
@@ -258,6 +261,11 @@ class WC_Aelia_CurrencySwitcher_Widget extends \WP_Widget {
 	protected function set_hooks() {
 		add_filter('wc_aelia_currencyswitcher_widget_currency_options',
 							 array($this, 'widget_currency_options'), 5, 2);
+
+		// Display errors on the widget, if needed
+		// @since 4.5.7.171124
+		add_action('wc_aelia_cs_widget_before_currency_selector_form',
+							 array($this, 'wc_aelia_cs_widget_before_currency_selector_form'), 10, 1);
 	}
 
 	/**
@@ -281,5 +289,46 @@ class WC_Aelia_CurrencySwitcher_Widget extends \WP_Widget {
 		}
 
 		return $currency_options;
+	}
+
+	/**
+	 * Displays the errors related to the widget, if any.
+	 *
+	 * @param WC_Aelia_CurrencySwitcher_Widget widget
+	 * @since 4.5.7.171124
+	 */
+	public function wc_aelia_cs_widget_before_currency_selector_form($widget) {
+		// Only show errors to shop administrators
+		if(!current_user_can('manage_wooocommerce')) {
+			//return;
+		}
+
+		$currency_switcher = WC_Aelia_CurrencySwitcher::instance();
+		$error_messages = array();
+		// If one or more Currencies are misconfigured, inform the Administrators of
+		// such issue
+		if(!empty($widget->misconfigured_currencies)) {
+			$error_messages[] = $currency_switcher->get_error_message(Definitions::ERR_MISCONFIGURED_CURRENCIES);
+		}
+
+		// Check if the "force currency by country" option is enabled. If it is,
+		// inform the admin that the manual currency selection will have no effect
+		$force_currency_by_country = WC_Aelia_CurrencySwitcher::settings()->get(Settings::FIELD_FORCE_CURRENCY_BY_COUNTRY, Settings::OPTION_DISABLED);
+		if($force_currency_by_country != Settings::OPTION_DISABLED) {
+			$error_messages[] = $currency_switcher->get_error_message(Definitions::ERR_MANUAL_CURRENCY_SELECTION_DISABLED);
+		}
+
+		if(!empty($error_messages)) {
+			echo '<div class="error">';
+			echo '<h5 class="title">' . __('Warning', $this->text_domain) . '</h5>';
+			echo '<ul class="widget_errors">';
+			foreach($error_messages as $message) {
+				echo '<li class="error_message">';
+				echo $message;
+				echo '</li>';
+			}
+			echo '</ul>';
+			echo '</div>';
+		}
 	}
 }

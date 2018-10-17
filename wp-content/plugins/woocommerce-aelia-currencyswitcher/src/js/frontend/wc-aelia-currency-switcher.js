@@ -34,6 +34,22 @@ jQuery(document).ready(function($) {
 		$price_slider_amount.find('#min_price').attr('data-min', min_price);
 		$price_slider_amount.find('#max_price').attr('data-max', max_price);
 
+		// Convert actual ranges
+		var current_min_price = parseFloat($price_slider_amount.find('#min_price').val());
+		var current_max_price = parseFloat($price_slider_amount.find('#max_price').val());
+
+		if(!isNaN(current_min_price)) {
+			// Convert current minimum value to selected currency
+			current_min_price = Math.floor(current_min_price * exchange_rate_from_base);
+			$price_slider_amount.find('#min_price').val(current_min_price);
+		}
+		if(!isNaN(current_max_price)) {
+			// Convert current maximum value to selected currency
+			current_max_price = Math.ceil(current_max_price * exchange_rate_from_base);
+			$price_slider_amount.find('#max_price').val(current_max_price);
+		}
+
+
 		if(typeof woocommerce_price_slider_params != 'undefined') {
 			// Slider Min and Max values are also in Base Currency
 			if(woocommerce_price_slider_params.min_price) {
@@ -63,10 +79,28 @@ jQuery(document).ready(function($) {
 	// Check if the currency was set via the URL
 	var currency_set_by_url = get_url_param('aelia_cs_currency');
 
-	// Invalidate cache of WooCommerce minicart when the currency is selected via
-	// the URL. This will ensure that the minicart is updated correctly
-	var supports_html5_storage = ('sessionStorage' in window && window['sessionStorage'] !== null);
-	if(supports_html5_storage && currency_set_by_url) {
-		sessionStorage.removeItem('wc_fragments', '');
+	try {
+		// Invalidate cache of WooCommerce minicart when the currency is selected via
+		// the URL. This will ensure that the minicart is updated correctly
+		var supports_html5_storage = ('sessionStorage' in window && window['sessionStorage'] !== null);
+		if(supports_html5_storage && currency_set_by_url) {
+			// The fragment name might be generated dynamically by WooCommerce, so
+			// we have to retrieve it from the WC parameters
+			// @since WC 3.1
+			var fragment_name = 'wc_fragments';
+			if(wc_cart_fragments_params && wc_cart_fragments_params.fragment_name) {
+				fragment_name = wc_cart_fragments_params.fragment_name;
+			}
+
+			sessionStorage.removeItem(fragment_name, '');
+		}
+	}
+	catch(exception) {
+		var error_msg = 'Aelia - Exception occurred while accessing window.sessionStorage. ' +
+										'This could be caused by the browser disabling cookies. ' +
+										'COOKIES MUST BE ENABLED for the site to work correctly. ' +
+										'Exception details below.';
+		console.log(error_msg);
+		console.log(exception);
 	}
 });

@@ -616,6 +616,14 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 
 		// Coupon hooks
 		$this->set_coupon_hooks();
+
+		// Shipping hooks
+		// @since 4.4.21.170830
+		$this->set_shipping_methods_hooks();
+
+		// Order hooks
+		// @since 4.4.21.170830
+		$this->set_order_hooks();
 	}
 
 	/**
@@ -625,6 +633,26 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 */
 	protected function set_coupon_hooks() {
 		add_action('woocommerce_coupon_loaded', array($this, 'woocommerce_coupon_loaded'));
+	}
+
+	/**
+	 * Sets hooks related to shipping methods.
+	 *
+	 * @since 4.4.21.170830
+	 */
+	protected function set_shipping_methods_hooks() {
+		add_filter('woocommerce_package_rates', array($this, 'woocommerce_package_rates'));
+	}
+
+	/**
+	 * Sets hooks related to orders.
+	 */
+	protected function set_order_hooks() {
+		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 5, 2);
+
+		// Add hooks to handle Order totals in base currency
+		add_filter('update_post_metadata', array($this, 'update_post_metadata'), 1, 4);
+		add_action('woocommerce_resume_order', array($this, 'woocommerce_resume_order'), 10, 1);
 	}
 
 	/**
@@ -638,6 +666,70 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	public function woocommerce_coupon_loaded($coupon) {
 		$this->set_coupon_amounts($coupon);
 		return $coupon;
+	}
+
+	/**
+	 * Processes shipping methods before they are used by WooCommerce. Used to
+	 * convert shipping costs into the selected Currency.
+	 *
+	 * @param array An array of WC_Shipping_Method classes.
+	 * @return array An array of WC_Shipping_Method classes, with their costs
+	 * converted into Currency.
+	 * @since 4.4.21.170830
+	 */
+	public function woocommerce_package_rates($available_shipping_methods) {
+		$selected_currency = $this->get_selected_currency();
+		$base_currency = $this->base_currency();
+
+		foreach($available_shipping_methods as $shipping_method) {
+			if(!empty($shipping_method->shipping_prices_in_currency)) {
+				continue;
+			}
+
+			// Convert shipping cost
+			if(!is_array($shipping_method->cost)) {
+				// Convert a simple total cost into currency
+				$shipping_method->cost = $this->currencyswitcher()->convert($shipping_method->cost,
+																																		$base_currency,
+																																		$selected_currency);
+			}
+			else {
+				// Based on documentation, class can contain an array of costs in case
+				// of shipping costs applied per item. In such case, each one has to
+				// be converted
+				foreach($shipping_method->cost as $cost_key => $cost_value) {
+					$shipping_method->cost[$cost_key] = $this->currencyswitcher()->convert($cost_value,
+																																								 $base_currency,
+																																								 $selected_currency);
+				}
+			}
+
+			// Convert shipping taxes
+			if(!is_array($shipping_method->taxes)) {
+				// Convert a simple total taxes into currency
+				$shipping_method->taxes = $this->currencyswitcher()->convert($shipping_method->taxes,
+																																		 $base_currency,
+																																		 $selected_currency);
+			}
+			else {
+				// Based on documentation, class can contain an array of taxes in case
+				// of shipping taxes applied per item. In such case, each one has to
+				// be converted
+				foreach($shipping_method->taxes as $taxes_key => $taxes_value) {
+					$shipping_method->taxes[$taxes_key] = $this->currencyswitcher()->convert($taxes_value,
+																																									 $base_currency,
+																																									 $selected_currency);
+				}
+			}
+
+			// Flag the shipping method to keep track of the fact that its costs have
+			// been converted into selected Currency. This is necessary because this
+			// is often called multiple times within the same page load, passing the
+			// same data that was already processed
+			$shipping_method->shipping_prices_in_currency = true;
+		}
+
+		return $available_shipping_methods;
 	}
 
 	/**
@@ -673,6 +765,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 					 'not aware. Product prices will not be converted. Please report the issue to ' .
 					 'support as a compatibility request'),
 				array(
+					'Product Class' => $product_class,
 					'Product Type' => $product->product_type,
 				));
 		}
@@ -1411,9 +1504,9 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 *
 	 * @return WC_Aelia_CurrencyPrices_Manager
 	 */
-	public static function Instance() {
+	public static function instance() {
 		if(empty(self::$instance)) {
-			self::$instance = new WC_Aelia_CurrencyPrices_Manager();
+			self::$instance = new static();
 		}
 		return self::$instance;
 	}
@@ -1700,5 +1793,122 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	public function woocommerce_get_sale_price($price, $product) {
 		$product = $this->convert_product_prices($product, $this->get_selected_currency());
 		return $product->sale_price;
+	}
+
+	/**
+	 * Filters Post metadata being saved before it's returned to caller.
+	 *
+	 * @param mixed metadata The original metadata.
+	 * @param int object_id The post ID.
+	 * @param meta_key The metadata to be saved.
+	 * @param meta_value The value to be saved.
+	 * @return mixed The metadata value.
+	 * @since x.x
+	 */
+	public function update_post_metadata($metadata, $object_id, $meta_key, $meta_value) {
+		// Convert  totals into base Currency (they are saved in the currency used
+		// to complete the transaction)
+		if(in_array($meta_key,
+								array('_order_total',
+											'_order_discount',
+											'_cart_discount',
+											'_order_shipping',
+											'_order_tax',
+											'_order_shipping_tax',
+											'_refund_amount',
+											)
+								)
+			) {
+
+			$order = $this->currencyswitcher()->get_order($object_id);
+
+			// Add the metadata required to handle refunds correctly
+			if(get_post_type($object_id) == 'shop_order_refund') {
+				$this->set_refund_metadata($order);
+			}
+
+			// If Order Currency is empty, it means that we are in checkout phase.
+			// WooCommerce saves the Order Currency AFTER the Order Total (a bit
+			// nonsensical, but that's the way it is). In such case, we can take the
+			// currency currently selected to place the Order and set it as the default
+			$order_currency = $order->get_currency();
+			if(empty($order_currency)) {
+				$order_currency = get_woocommerce_currency();
+			}
+
+			// Save the amount in base currency. This will be used to correct the reports
+			$amount_in_base_currency = $this->currencyswitcher()->convert($meta_value,
+																																		$order_currency,
+																																		$this->base_currency(),
+																																		null,
+																																		false);
+			$order->set_meta($meta_key . '_base_currency', $amount_in_base_currency);
+		}
+
+		return $metadata;
+	}
+
+	/**
+	 * Sets additional metadata against a refund.
+	 *
+	 * @param WC_Order refund The target refund.
+	 * @since x.x
+	 */
+	protected function set_refund_metadata($refund) {
+		$refund_currency = $refund->get_currency();
+		// Set refund currency, if it's missing
+		if(empty($refund_currency)) {
+			$refund_id = aelia_get_order_id($refund);
+			$parent_order_id = wp_get_post_parent_id($refund_id);
+			// Set the currency against the refund. Such information it vital to be able
+			// to calculate the refund amounts in base currency
+			if(is_numeric($parent_order_id)) {
+				$order_currency = $this->currencyswitcher()->get_order_currency($parent_order_id);
+			}
+			else {
+				$order_currency = get_woocommerce_currency();
+			}
+			// Debug
+			//var_dump($parent_order_id, $order_currency);
+			update_post_meta($refund_id, '_order_currency', $order_currency);
+		}
+	}
+
+	/**
+	 * Updates the order currency when a suspended order is resumed.
+	 *
+	 * See support request #1214
+	 * This action covers  the edge case in which an order was saved in one currency,
+	 * then resumed after switching currency. Since WooCommerce saves the currency
+	 * AFTER the order amounts, the conversion hooks pick up the previous order currency
+	 * from the order and perform an incorrect conversion. By updating the currency
+	 * as soon as an order is resumed, the conversion will work again.
+	 *
+	 * @param int order_id The ID of the order being resumed.
+	 * @link https://aelia.freshdesk.com/helpdesk/tickets/1214
+	 * @since x.x
+	 */
+	public function woocommerce_resume_order($order_id) {
+		update_post_meta($order_id, '_order_currency', get_woocommerce_currency());
+	}
+
+	/**
+	 * Fired after an order is saved. It checks that the order currency has been
+	 * stored against the post, adding it if it's missing. This method is needed
+	 * because, for some reason, WooCommerce does not store the order currency when
+	 * an order is created from the backend.
+	 *
+	 * @param int post_id The post (order) ID.
+	 * @param WC_Order The order that has just been saved.
+	 * @since 4.5.17.180417
+	 */
+	public function woocommerce_process_shop_order_meta($post_id, $post) {
+		$order = $this->get_order($post_id);
+		// Check if order currency is saved. If not, set it to currently selected currency
+		$order_currency = $order->get_currency();
+
+		if(empty($order_currency)) {
+			$order->set_order_currency($this->get_selected_currency());
+		}
 	}
 }

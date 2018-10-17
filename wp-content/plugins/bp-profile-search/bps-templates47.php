@@ -6,10 +6,14 @@ function bps_escaped_form_data47 ()
 
 	$meta = bps_meta ($form);
 	$fields = bps_parse_request (bps_get_request ('form', $form));
+	wp_register_script ('bps-template', plugins_url ('bp-profile-search/bps-template.js'), array (), BPS_VERSION);
 
 	$F = new stdClass;
 	$F->id = $form;
+	$F->title = bps_wpml ($form, '-', 'title', get_the_title ($form));
 	$F->location = $location;
+	$F->unique_id = bps_unique_id ('form_'. $form);
+	$F->page = parse_url ($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 	$template_options = $meta['template_options'][$meta['template']];
 	if (isset ($template_options['header']))
@@ -30,54 +34,81 @@ function bps_escaped_form_data47 ()
 	$F->method = $meta['method'];
 	$F->fields = array ();
 
-	foreach ($meta['field_code'] as $k => $id)
+	foreach ($meta['field_code'] as $k => $code)
 	{
-		if (empty ($fields[$id]))  continue;
+		if (empty ($fields[$code]))  continue;
 
-		$f = $fields[$id];
+		$f = $fields[$code];
 		$mode = $meta['field_mode'][$k];
 		if (!bps_Fields::set_display ($f, $mode))  continue;
 
 		$f->label = $f->name;
-		$custom_label = bps_wpml ($form, $id, 'label', $meta['field_label'][$k]);
+		$custom_label = bps_wpml ($form, $f->code, 'label', $meta['field_label'][$k]);
 		if (!empty ($custom_label))
 		{
 			$f->label = $custom_label;
 			$F->fields[] = bps_set_hidden_field ($f->code. '_label', $f->label);
 		}
 
-		$custom_desc = bps_wpml ($form, $id, 'comment', $meta['field_desc'][$k]);
+		$custom_desc = bps_wpml ($form, $f->code, 'comment', $meta['field_desc'][$k]);
 		if ($custom_desc == '-')
 			$f->description = '';
 		else if (!empty ($custom_desc))
 			$f->description = $custom_desc;
 
-		if (!isset ($f->filter))
+		switch ($f->display)
 		{
-			$f->min = $f->max = $f->value = '';
-			$f->values = array ();
-			if ($f->display == 'distance')
+		case 'range':
+		case 'range-select':
+			if (!isset ($f->value['min']))  $f->value['min'] = '';
+			if (!isset ($f->value['max']))  $f->value['max'] = '';
+			$f->min = $f->value['min'];
+			$f->max = $f->value['max'];
+			break;
+
+		case 'textbox':
+		case 'number':
+			if (!isset ($f->value))  $f->value = '';
+			break;
+
+		case 'distance':
+			if (!isset ($f->value['location']))
 				$f->value['distance'] = $f->value['units'] = $f->value['location'] = $f->value['lat'] = $f->value['lng'] = '';
+			wp_enqueue_script ($f->script_handle);
+			wp_enqueue_script ('bps-template');
+			break;
+
+		case 'selectbox':
+			if (!isset ($f->value))  $f->value = '';
+			$f->options = array ('' => '') + $f->options;
+			break;
+
+		case 'radio':
+			if (!isset ($f->value))  $f->value = '';
+			wp_enqueue_script ('bps-template');
+			break;
+
+		case 'multiselectbox':
+		case 'checkbox':
+			if (!isset ($f->value))  $f->value = '';
+			break;
 		}
-		else
-		{
-			$f->min = isset ($f->value['min'])? $f->value['min']: '';
-			$f->max = isset ($f->value['max'])? $f->value['max']: '';
-			$f->values = (array)$f->value;
-		}
+
+		$f->values = (array)$f->value;
+
+		$f->html_name = ($mode == '')? $f->code: $f->code. '_'. $mode;
+		$f->unique_id = bps_unique_id ($f->html_name);
+		$f->mode = $mode;
+		$f->full_label = bps_full_label ($f);
 
 		do_action ('bps_field_before_search_form', $f);
-
-		if ($mode != '')  $f->code .= '_'. $mode;
-		$f->unique_id = bps_unique_id ($f->code);
-
 		$F->fields[] = $f;
 	}
 
 	$F->fields[] = bps_set_hidden_field (BPS_FORM, $form);
-
 	do_action ('bps_before_search_form', $F);
 
+	$f->code = ($mode == '')? $f->code: $f->code. '_'. $mode;		// to be removed
 	foreach ($F->fields as $f)
 	{
 		if (!is_array ($f->value))  $f->value = esc_attr (stripslashes ($f->value));
@@ -135,6 +166,28 @@ function bps_escaped_filters_data47 ()
 	return $F;
 }
 
+function bps_full_label ($f)
+{
+	$labels = array
+	(
+		'contains'		=> __('<strong>%1$s</strong><span> contains:</span>', 'bp-profile-search'),
+		''				=> __('<strong>%1$s</strong><span> is:<span>', 'bp-profile-search'),
+		'like'			=> __('<strong>%1$s</strong><span> is like:<span>', 'bp-profile-search'),
+		'range'			=> __('<strong>%1$s</strong><span> range:<span>', 'bp-profile-search'),
+		'age_range'		=> __('<strong>%1$s</strong><span> range:<span>', 'bp-profile-search'),
+		'distance'		=> __('<strong>%1$s</strong><span> is within:<span>', 'bp-profile-search'),
+		'one_of'		=> __('<strong>%1$s</strong><span> is one of:<span>', 'bp-profile-search'),
+		'match_any'		=> __('<strong>%1$s</strong><span> match any:<span>', 'bp-profile-search'),
+		'match_all'		=> __('<strong>%1$s</strong><span> match all:<span>', 'bp-profile-search'),
+		'unknown'		=> __('<strong>%1$s</strong>:', 'bp-profile-search'),
+	);
+
+	$mode = isset ($labels[$f->mode])? $f->mode: 'unknown';
+	$label = sprintf ($labels[$mode], $f->label);
+
+	return apply_filters ('bps_full_label', $label, $f);
+}
+
 function bps_print_filter ($f)
 {
 	if (!empty ($f->options))
@@ -182,8 +235,8 @@ function bps_print_filter ($f)
 
 	case 'distance':
 		if ($f->value['units'] == 'km')
-			return sprintf (esc_html__('is within %1$s km of: %2$s', 'bp-profile-search'), $f->value['distance'], $f->value['location']);
-		return sprintf (esc_html__('is within %1$s miles of: %2$s', 'bp-profile-search'), $f->value['distance'], $f->value['location']);
+			return sprintf (esc_html__('is within: %1$s km of %2$s', 'bp-profile-search'), $f->value['distance'], $f->value['location']);
+		return sprintf (esc_html__('is within: %1$s miles of %2$s', 'bp-profile-search'), $f->value['distance'], $f->value['location']);
 
 	default:
 		return "BP Profile Search: undefined filter <em>$f->filter</em>";

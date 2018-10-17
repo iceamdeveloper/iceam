@@ -120,10 +120,13 @@ class Tribe__Events__Pro__Geo_Loc {
 		add_action( 'wp_enqueue_scripts', array( $this, 'scripts' ) );
 		add_action( 'admin_init', array( $this, 'maybe_generate_geopoints_for_all_venues' ) );
 		add_action( 'admin_init', array( $this, 'maybe_offer_generate_geopoints' ) );
-
 		add_filter( 'tribe-events-bar-views', array( $this, 'setup_view_for_bar' ), 25, 1 );
 		add_filter( 'tribe_settings_tab_fields', array( $this, 'inject_settings' ), 10, 2 );
-		add_filter( 'tribe-events-bar-filters', array( $this, 'setup_geoloc_filter_in_bar' ), 1, 1 );
+
+		if ( ! tribe_is_using_basic_gmaps_api() ) {
+			add_filter( 'tribe-events-bar-filters', array( $this, 'setup_geoloc_filter_in_bar' ), 1, 1 );
+		}
+
 		add_filter( 'tribe_events_rewrite_rules_custom', array( $this, 'add_routes' ), 10, 3 );
 		add_action( 'tribe_events_pre_get_posts', array( $this, 'setup_geoloc_in_query' ) );
 		add_filter( 'tribe_events_list_inside_before_loop', array( $this, 'add_event_distance' ) );
@@ -384,6 +387,13 @@ class Tribe__Events__Pro__Geo_Loc {
 	 * @return void
 	 */
 	public function setup_geoloc_in_query( $query ) {
+
+		// The basic gMaps API doesn't let us get lat/long from Google, so we can't be sure there's any valid
+		// GeoLoc data for venues. So don't limit the query by that possibly-nonexistent data.
+		if ( tribe_is_using_basic_gmaps_api() ) {
+			return;
+		}
+
 		if (
 			empty( $query->query_vars['tribe_geoloc'] )
 			&& (

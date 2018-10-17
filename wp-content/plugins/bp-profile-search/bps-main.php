@@ -3,13 +3,13 @@
 Plugin Name: BP Profile Search
 Plugin URI: http://www.dontdream.it/bp-profile-search/
 Description: Search your BuddyPress Members Directory.
-Version: 4.8.6
+Version: 4.9.1
 Author: Andrea Tarantini
 Author URI: http://www.dontdream.it/
 Text Domain: bp-profile-search
 */
 
-define ('BPS_VERSION', '4.8.6');
+define ('BPS_VERSION', '4.9.1');
 define ('BPS_FORM', 'bp_profile_search');
 
 include 'bps-admin.php';
@@ -19,6 +19,7 @@ include 'bps-fields.php';
 include 'bps-form.php';
 include 'bps-help.php';
 include 'bps-search.php';
+include 'bps-template.php';
 include 'bps-templates47.php';
 include 'bps-templates48.php';
 include 'bps-widget.php';
@@ -29,36 +30,6 @@ add_action ('plugins_loaded', 'bps_translate');
 function bps_translate ()
 {
 	load_plugin_textdomain ('bp-profile-search');
-}
-
-add_filter ('bp_get_template_stack', 'bps_template_stack', 20);
-function bps_template_stack ($stack)
-{
-	$stack[] = dirname (__FILE__). '/templates';
-	return $stack;
-}
-
-function bps_templates ()
-{
-	$templates = array ('members/bps-form-nouveau', 'members/bps-form-legacy', 'members/bps-form-sample-1', 'members/bps-form-sample-2');
-	return apply_filters ('bps_templates', $templates);
-}
-
-function bps_default_template ()
-{
-	$templates = bps_templates ();
-	return $templates[0];
-}
-
-function bps_is_template ($template)
-{
-	$templates = bps_templates ();
-	return in_array ($template, $templates);
-}
-
-function bps_valid_template ($template)
-{
-	return bps_is_template ($template)? $template: bps_default_template ();
 }
 
 add_action ('init', 'bps_upgrade');
@@ -213,7 +184,7 @@ function bps_columns ($column, $post_id)
 
 	$options = bps_meta ($post_id);
 	if ($column == 'fields')  echo count ($options['field_code']);
-	else if ($column == 'template')  echo _bps_get_template ($options['template']);
+	else if ($column == 'template')  echo bps_locate_template ($options['template']);
 	else if ($column == 'action')
 	{
 		$dirs = bps_directories ();
@@ -235,27 +206,6 @@ function _bps_get_widget ($form)
 		if (isset ($widget['form']) && $widget['form'] == $form)  $titles[] = !empty ($widget['title'])? $widget['title']: __('(no title)');
 		
 	return count ($titles)? implode ('<br/>', $titles): __('unused', 'bp-profile-search');
-}
-
-function _bps_get_template ($template)
-{
-//	$retired = array ('members/bps-form-nouveau', 'members/bps-form-legacy');
-	$retired = array ();
-
-	$path = bp_locate_template ($template. '.php');
-	if ($path === false)
-		return '<strong style="color:red;">'. $template. '</strong><br>'. __('template not found, please update this form', 'bp-profile-search');
-
-	$path = str_replace (WP_CONTENT_DIR, '', $path);
-	$path = str_replace ($template. '.php', '', $path);
-	if ($path == '/plugins/bp-profile-search/templates/')
-	{
-		if (in_array ($template, $retired))
-			return '<strong style="color:red;">'. $template. '</strong><br>'. __('this template is about to be retired, please consider switching to bps-form-default', 'bp-profile-search');
-		return '<strong style="color:green;">'. $template. '</strong><br>'. __('built-in template', 'bp-profile-search');
-	}
-
-	return '<strong style="color:blue;">'. $template. '</strong><br>'. sprintf (__('located in: %1$s', 'bp-profile-search'), $path);
 }
 
 add_filter ('bulk_actions-edit-bps_form', 'bps_bulk_actions');

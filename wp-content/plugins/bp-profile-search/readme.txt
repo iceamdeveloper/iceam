@@ -4,7 +4,7 @@ Tags: buddypress, directory, members, users, profile, search, filter
 Requires at least: 4.5
 Tested up to: 4.9
 Requires PHP: 5.3
-Stable tag: 4.8.6
+Stable tag: 4.9.1
 
 Custom members search forms and results pages, and custom members directories for your BuddyPress site.
 
@@ -26,7 +26,7 @@ To build a Members directory, use the shortcode <code>[bps_directory]</code>, se
 
 A detailed documentation is available on the [BP Profile Search](http://www.dontdream.it/bp-profile-search/) page.
 
-Requires at least BuddyPress 2.2 -- Tested up to BuddyPress 3.1.0
+Requires at least BuddyPress 2.2 -- Tested up to BuddyPress 3.2.0
 
 == Installation ==
 
@@ -42,6 +42,12 @@ See the standard installation procedure, in [Managing Plugins](https://codex.wor
 
 == Changelog ==
 
+= 4.9.1 =
+* Fixed PHP Warnings in form templates
+* Fixed bug in WPML support
+= 4.9 =
+* Introduced a new default form template, to gradually replace older templates
+* See [Form Templates](http://dontdream.it/bp-profile-search/form-templates/) for details
 = 4.8.6 =
 * Added search by user taxonomies (including BP member types)
 * Added column in the *Search Forms* page showing the current template and its location

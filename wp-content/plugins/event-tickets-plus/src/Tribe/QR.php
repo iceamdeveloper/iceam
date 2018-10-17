@@ -208,6 +208,16 @@ class Tribe__Tickets_Plus__QR {
 
 		$enabled = tribe_get_option( 'tickets-enable-qr-codes', true );
 
+		/**
+		 * Filters the QR enabled value
+		 *
+		 * @since 4.8.2
+		 *
+		 * @param bool   $enabled       The bool that comes from the options
+		 * @param array  $ticket        The ticket
+		 */
+		$enabled = apply_filters( 'tribe_tickets_plus_qr_enabled', $enabled, $ticket );
+
 		if ( empty( $enabled ) ) {
 			return;
 		}

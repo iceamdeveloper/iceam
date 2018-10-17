@@ -25,6 +25,11 @@ class Definitions {
 	const ARG_CHECKOUT_SHIPPING_COUNTRY = 's_country';
 	const ARG_CUSTOMER_COUNTRY = 'aelia_customer_country';
 	const ARG_REPORT_CURRENCY = 'report_currency';
+
+	// The currency used during an admin operation
+	// @since 4.5.5.171114
+	const ARG_ADMIN_CURRENCY = 'admin_currency';
+
 	/**
 	 * Obsolete key. Used to store customer's country.
 	 * @var string
@@ -56,9 +61,11 @@ class Definitions {
 	const ERR_INVALID_DESTINATION_CURRENCY = 1104;
 	const ERR_INVALID_TEMPLATE = 1105;
 	const ERR_INVALID_WIDGET_CLASS = 1106;
+	const ERR_MANUAL_CURRENCY_SELECTION_DISABLED = 1107;
 
 	const WARN_DYNAMIC_PRICING_INTEGRATION = 2001;
 	const NOTICE_INTEGRATION_ADDONS = 2002;
+	const WARN_YAHOO_FINANCE_DISCONTINUED = 2003;
 
 	// Session/User Keys
 	const USER_CURRENCY = 'aelia_cs_selected_currency';

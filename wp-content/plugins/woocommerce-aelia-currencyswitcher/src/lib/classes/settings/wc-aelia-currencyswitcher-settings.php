@@ -54,7 +54,7 @@ class Settings extends \Aelia\WC\Settings {
 	const OPTION_SHIPPING_COUNTRY = 'shipping_country';
 
 	// @var string The default Exchange Rates Model class to use when the configured one is not valid.
-	const DEFAULT_EXCHANGE_RATES_PROVIDER = '\Aelia\WC\CurrencySwitcher\WC_Aelia_YahooFinanceModel';
+	const DEFAULT_EXCHANGE_RATES_PROVIDER = '\Aelia\WC\CurrencySwitcher\Exchange_Rates_OpenExchangeRates_Model';
 
 	// @var array A list of the currencies supported by WooCommerce
 	private $_woocommerce_currencies;
@@ -86,7 +86,7 @@ class Settings extends \Aelia\WC\Settings {
 																	$class_name));
 		}
 
-		$model_id = md5($class_name);
+		$model_id = isset($class_name::$id) ? $class_name::$id : md5($class_name);
 		$model_info = new stdClass();
 		$model_info->class_name = $class_name;
 		$model_info->label = $label;
@@ -98,10 +98,37 @@ class Settings extends \Aelia\WC\Settings {
 	 */
 	protected function register_exchange_rates_models() {
 		$namespace = 'Aelia\\WC\\CurrencySwitcher\\';
-		$this->register_exchange_rates_model($namespace . 'WC_Aelia_YahooFinanceModel', __('Yahoo! Finance', $this->textdomain));
+		$this->register_exchange_rates_model($namespace . 'WC_Aelia_YahooFinanceModel', __('Yahoo! Finance', $this->textdomain) .
+																																											 ' (' .
+																																											 __('Service no longer active.', $this->textdomain) .
+																																											 ' ' .
+																																											 __('Please choose another option.', $this->textdomain) .
+																																											 ')');
 		$this->register_exchange_rates_model($namespace . 'Exchange_Rates_OpenExchangeRates_Model', __('Open Exchange Rates', $this->textdomain));
 		$this->register_exchange_rates_model($namespace . 'WC_Aelia_TCBModel', __('Turkey Central Bank', $this->textdomain));
 		$this->register_exchange_rates_model($namespace . 'Exchange_Rates_WebServiceX_Model', __('WebServiceX', $this->textdomain));
+
+		// Add OFX model
+		// @since 4.5.13.180118
+		$this->register_exchange_rates_model($namespace . 'WC_Aelia_OFXModel', __('OFX', $this->textdomain) . ' (' . __('Beta', $this->textdomain) . ')');
+
+		// Allow 3rd parties to add their models
+		// @since 4.5.13.180118
+		$this->exchange_rates_models = apply_filters('wc_aelia_cs_exchange_rates_models', $this->exchange_rates_models);
+	}
+
+	/**
+	 * Returns a list of the registered exchange rates models.
+	 *
+	 * @return array
+	 * @since 4.6.2.180725
+	 */
+	protected function get_exchange_rates_models() {
+		if(empty($this->exchange_rates_models)) {
+			$this->register_exchange_rates_models();
+		}
+
+		return $this->exchange_rates_models;
 	}
 
 	/**
@@ -109,7 +136,7 @@ class Settings extends \Aelia\WC\Settings {
 	 */
 	public function exchange_rates_providers_options() {
 		$result = array();
-		foreach($this->exchange_rates_models as $key => $properties) {
+		foreach($this->get_exchange_rates_models() as $key => $properties) {
 			$result[$key] = get_value('label', $properties);
 		}
 
@@ -125,7 +152,7 @@ class Settings extends \Aelia\WC\Settings {
 	 * @return string|null The key used to register the Model, or null ifnot found.
 	 */
 	public function get_exchange_rates_model_key($class_name) {
-		foreach($this->exchange_rates_models as $key => $properties) {
+		foreach($this->get_exchange_rates_models() as $key => $properties) {
 			if(get_value('class_name', $properties) == $class_name) {
 				return $key;
 			}
@@ -145,8 +172,9 @@ class Settings extends \Aelia\WC\Settings {
 	protected function get_exchange_rates_model_instance($key,
 																											 array $settings = null,
 																											 $default_class = self::DEFAULT_EXCHANGE_RATES_PROVIDER) {
-		$model_info = get_value($key, $this->exchange_rates_models);
-		$model_class = get_value('class_name', $model_info, $default_class);
+		$exchange_rates_models_models = $this->get_exchange_rates_models();
+		$model_info = $exchange_rates_models_models[$key];
+		$model_class = isset($model_info->class_name) ? $model_info->class_name : $default_class;
 
 		return new $model_class($settings);
 	}
@@ -332,8 +360,20 @@ class Settings extends \Aelia\WC\Settings {
 			}
 
 			// Add the markup to the exchange rate, if one was specified
-			if($include_markup && is_numeric(get_value('rate_markup', $settings))) {
-				$exchange_rate += (float)$settings['rate_markup'];
+			if($include_markup) {
+				// We can add a numeric markup as it is
+				if(is_numeric(get_value('rate_markup', $settings))) {
+					$exchange_rate += (float)$settings['rate_markup'];
+				}
+				else {
+					// Interpret a percentage markup, such as "10%"
+					// @since 4.6.5.180828
+					$markup_multiply_factor = aelia_get_percentage_multiply_factor($settings['rate_markup']);
+
+					if(is_numeric($markup_multiply_factor)) {
+						$exchange_rate = $exchange_rate * $markup_multiply_factor;
+					}
+				}
 			}
 
 			$result[$currency] = $exchange_rate;
@@ -670,17 +710,18 @@ class Settings extends \Aelia\WC\Settings {
 		// WordPress seems to trigger the validation multiple times under some
 		// circumstances. This trick will avoid re-validating the data that was
 		// already processed earlier
-		if(get_value('validation_complete', $settings, false)) {
+		if(!empty($settings['validation_complete'])) {
 			return $settings;
 		}
 
 		//var_dump($settings);die();
 		$processed_settings = $this->current_settings();
 		$woocommerce_currency = $this->base_currency();
-		$enabled_currencies = get_value(self::FIELD_ENABLED_CURRENCIES, $settings, array());
+		$enabled_currencies = isset($settings[self::FIELD_ENABLED_CURRENCIES]) ? $settings[self::FIELD_ENABLED_CURRENCIES] : array();
+		$new_enabled_currencies = isset($processed_settings[self::FIELD_ENABLED_CURRENCIES]) ? $processed_settings[self::FIELD_ENABLED_CURRENCIES] : array();
 
 		// Retrieve the new currencies eventually added to the "enabled" list
-		$currencies_diff = array_diff($enabled_currencies, get_value(self::FIELD_ENABLED_CURRENCIES, $processed_settings, array()));
+		$currencies_diff = array_diff($enabled_currencies, $new_enabled_currencies);
 
 		// Validate Exchange Rates Provider settings
 		$exchange_rates_provider_ok = $this->_validate_exchange_rates_provider_settings($settings);
@@ -690,13 +731,16 @@ class Settings extends \Aelia\WC\Settings {
 			$processed_settings[self::FIELD_OPENEXCHANGE_API_KEY] = trim(get_value(self::FIELD_OPENEXCHANGE_API_KEY, $settings));
 		}
 
+		$this->set_exchange_rates_update_schedule($processed_settings, $settings);
+
 		// Validate enabled currencies
 		if($this->_validate_enabled_currencies($enabled_currencies) === true) {
 			//var_dump($enabled_currencies);die();
 			$processed_settings[self::FIELD_ENABLED_CURRENCIES] = $enabled_currencies;
 
 			// Validate Exchange Rates
-			$exchange_rates = get_value(self::FIELD_EXCHANGE_RATES, $settings, array());
+			$exchange_rates = isset($settings[self::FIELD_EXCHANGE_RATES]) ? $settings[self::FIELD_EXCHANGE_RATES] : array();
+
 			if($this->_validate_exchange_rates($exchange_rates) === true) {
 				$processed_settings[self::FIELD_EXCHANGE_RATES] = $exchange_rates;
 			}
@@ -710,8 +754,7 @@ class Settings extends \Aelia\WC\Settings {
 				// - If button "Save and update Exchange Rates" has been clicked
 				if(empty($processed_settings[self::FIELD_EXCHANGE_RATES]) ||
 					 !empty($currencies_diff) ||
-					 (isset($_POST['wc_aelia_currency_switcher']) && get_value('update_exchange_rates_button', $_POST['wc_aelia_currency_switcher']))
-					 ) {
+					 (!empty($_POST['wc_aelia_currency_switcher']['update_exchange_rates_button']))) {
 					if($this->update_exchange_rates($processed_settings, $errors) === true) {
 						// This is not an "error", but a confirmation message. Unfortunately,
 						// WordPress only has "add_settings_error" to add messages of any type
@@ -729,13 +772,12 @@ class Settings extends \Aelia\WC\Settings {
 		}
 
 		// Validate enabled payment gateways for each currency
-		$enabled_payment_gateways = get_value(self::FIELD_PAYMENT_GATEWAYS, $settings, array());
+		$enabled_payment_gateways = isset($settings[self::FIELD_PAYMENT_GATEWAYS]) ? $settings[self::FIELD_PAYMENT_GATEWAYS] : array();
+
 		//var_dump($enabled_payment_gateways);die();
 		if($this->_validate_payment_gateways($enabled_currencies, $enabled_payment_gateways) === true) {
 			$processed_settings[self::FIELD_PAYMENT_GATEWAYS] = $enabled_payment_gateways;
 		}
-
-		$this->set_exchange_rates_update_schedule($processed_settings, $settings);
 
 		// Save Exchange Rates Auto-update settings
 		$processed_settings[self::FIELD_EXCHANGE_RATES_UPDATE_ENABLE] = get_value(self::FIELD_EXCHANGE_RATES_UPDATE_ENABLE, $settings);
@@ -788,9 +830,6 @@ class Settings extends \Aelia\WC\Settings {
 	 */
 	public function __construct($settings_key, $textdomain = '', Settings_Renderer $renderer) {
 		parent::__construct($settings_key, $textdomain, $renderer);
-
-		// Register available Exchange Rates models
-		$this->register_exchange_rates_models();
 
 		$this->store_default_currency_settings();
 

@@ -86,73 +86,6 @@ function bps_show_form0 ($attr, $content)
 	return ob_get_clean ();
 }
 
-function bps_template_args ()
-{
-	return end ($GLOBALS['bps_template_args']);
-}
-
-function bps_call_template ($template, $args = array ())
-{
-	$located = bp_locate_template ($template. '.php');
-
-	if ($located === false)
-	{
-		bps_error ('template_not_found', $template);
-		return false;
-	}
-
-	echo "\n<!-- BP Profile Search ". BPS_VERSION. " $template -->\n";
-	if (bps_debug ())
-	{
-		$path = str_replace (WP_CONTENT_DIR, '', $located);
-		echo "<!--\n";
-		echo "path $path\n";
-		echo "args "; print_r ($args);
-		echo "-->\n";
-	}
-
-	$GLOBALS['bps_template_args'][] = $args;
-	include $located;
-	array_pop ($GLOBALS['bps_template_args']);
-
-	echo "\n<!-- BP Profile Search end $template -->\n";
-	return true;
-}
-
-function bps_call_form_template ($template, $args)
-{
-	$template = bps_valid_template ($template);
-	$located = bp_locate_template ($template. '.php');
-
-	if ($located === false)
-	{
-		bps_error ('template_not_found', $template);
-		return false;
-	}
-
-	$form = $args[0];
-	$meta = bps_meta ($form);
-	$options = isset ($meta['template_options'][$template])? $meta['template_options'][$template]: array ();
-
-	echo "\n<!-- BP Profile Search ". BPS_VERSION. " $template -->\n";
-	if (bps_debug ())
-	{
-		$path = str_replace (WP_CONTENT_DIR, '', $located);
-		echo "<!--\n";
-		echo "path $path\n";
-		echo "args "; print_r ($args);
-		echo "options "; print_r ($options);
-		echo "-->\n";
-	}
-
-	$GLOBALS['bps_template_args'][] = $args;
-	include $located;
-	array_pop ($GLOBALS['bps_template_args']);
-
-	echo "\n<!-- BP Profile Search end $template -->\n";
-	return true;
-}
-
 function bps_error ($code, $data = array ())
 {
 	$errors = array
@@ -201,6 +134,8 @@ function bps_wpml ($form, $code, $key, $value)
 			return apply_filters ('wpml_translate_single_string', $value, 'Profile Search', "form {$form} - header");
 		case 'toggle form':
 			return apply_filters ('wpml_translate_single_string', $value, 'Profile Search', "form {$form} - toggle form");
+		case 'title':
+			return apply_filters ('wpml_translate_single_string', $value, 'Profile Search', "form {$form} - title");
 		}
 	}
 	else if (class_exists ('WPGlobus_Core'))

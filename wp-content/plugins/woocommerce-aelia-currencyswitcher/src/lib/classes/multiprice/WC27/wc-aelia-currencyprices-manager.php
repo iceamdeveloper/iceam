@@ -166,8 +166,6 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @return float|null
 	 */
 	public function get_min_value(array $values) {
-		$values = array_filter($values, array($this, 'keep_numeric'));
-
 		if(empty($values)) {
 			return null;
 		}
@@ -184,8 +182,6 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @return float|null
 	 */
 	public function get_max_value(array $values) {
-		$values = array_filter($values, array($this, 'keep_numeric'));
-
 		if(empty($values)) {
 			return null;
 		}
@@ -458,7 +454,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 			self::FIELD_SALE_CURRENCY_PRICES => '_sale_price',
 			self::FIELD_VARIABLE_SALE_CURRENCY_PRICES => '_sale_price',
 		);
-		$prices_type_field_map = apply_filters('wc_aelia_currencyswitcher_prices_type_field_map', $prices_type_field_map);
+		$prices_type_field_map = apply_filters('wc_aelia_currencyswitcher_prices_type_field_map', $prices_type_field_map, $post_id);
 
 		// If a price in base currency was not loaded from the metadata added by the
 		// Currency Switcher, take the one from the product metadata
@@ -544,7 +540,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 *
 	 * @param string view_file_name The name of the view file to include.
 	 */
-	private function load_view($view_file_name) {
+	protected function load_view($view_file_name) {
 		$file_to_load = $this->admin_views_path . '/' . $view_file_name;
 		$file_to_load = apply_filters('wc_aelia_currencyswitcher_product_pricing_view_load', $file_to_load);
 
@@ -556,7 +552,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	/**
 	 * Sets the hooks required by the class.
 	 */
-	private function set_hooks() {
+	protected function set_hooks() {
 		// Hooks for simple, external and grouped products
 		add_action('woocommerce_product_options_pricing', array($this, 'woocommerce_product_options_pricing'));
 		add_action('woocommerce_process_product_meta_simple', array($this, 'process_product_meta'));
@@ -568,12 +564,13 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 
 		// Hooks for grouped products
 		add_action('woocommerce_process_product_meta_grouped', array($this, 'process_product_meta'));
-		add_action('woocommerce_grouped_price_html', array($this, 'woocommerce_grouped_price_html'), 10, 2);
+		//add_action('woocommerce_grouped_price_html', array($this, 'woocommerce_grouped_price_html'), 10, 2);
 
 		// WooCommerce 2.1
-		add_filter('woocommerce_get_variation_regular_price', array($this, 'woocommerce_get_variation_regular_price'), 20, 4);
-		add_filter('woocommerce_get_variation_sale_price', array($this, 'woocommerce_get_variation_sale_price'), 20, 4);
-		add_filter('woocommerce_get_variation_price', array($this, 'woocommerce_get_variation_price'), 20, 4);
+		// @deprecated since 4.4.18.170517
+		//add_filter('woocommerce_get_variation_regular_price', array($this, 'woocommerce_get_variation_regular_price'), 20, 4);
+		//add_filter('woocommerce_get_variation_sale_price', array($this, 'woocommerce_get_variation_sale_price'), 20, 4);
+		//add_filter('woocommerce_get_variation_price', array($this, 'woocommerce_get_variation_price'), 20, 4);
 
 		// WooCommerce 2.3+
 		add_filter('woocommerce_product_is_on_sale', array($this, 'woocommerce_product_is_on_sale'), 7, 2);
@@ -627,6 +624,10 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		// Order hooks
 		// @since 4.4.15.170420
 		$this->set_order_hooks();
+
+		// Shipping hooks
+		// @since 4.4.21.170830
+		$this->set_shipping_methods_hooks();
 	}
 
 	/**
@@ -637,9 +638,10 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	protected function set_coupon_hooks() {
 		add_action('woocommerce_coupon_options_save', array($this, 'woocommerce_coupon_options_save'), 10, 1);
 
-		add_action('woocommerce_get_coupon_amount', array($this, 'woocommerce_get_coupon_amount'), 5, 2);
-		add_action('woocommerce_get_coupon_minimum_amount', array($this, 'woocommerce_get_coupon_minimum_amount'), 5, 2);
-		add_action('woocommerce_get_coupon_maximum_amount', array($this, 'woocommerce_get_coupon_maximum_amount'), 5, 2);
+		// Use the new coupon hook introduced in WooCommerce 3.0.x
+		add_action('woocommerce_coupon_get_amount', array($this, 'woocommerce_coupon_get_amount'), 5, 2);
+		add_action('woocommerce_coupon_get_minimum_amount', array($this, 'woocommerce_coupon_get_minimum_amount'), 5, 2);
+		add_action('woocommerce_coupon_get_maximum_amount', array($this, 'woocommerce_coupon_get_maximum_amount'), 5, 2);
 	}
 
 	/**
@@ -648,7 +650,26 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @since 4.4.15.170420
 	 */
 	protected function set_order_hooks() {
-		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 10, 2);
+		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 5, 2);
+
+		// Use the new CRUD events to update order meta
+		// @since 4.5.1.171012
+		add_action('woocommerce_order_object_updated_props', array($this, 'woocommerce_order_object_updated_props'), 50, 2);
+		add_action('woocommerce_order_refund_object_updated_props', array($this, 'woocommerce_order_refund_object_updated_props'), 50, 2);
+	}
+
+	/**
+	 * Sets hooks related to shipping methods.
+	 *
+	 * @since 4.4.21.170830
+	 */
+	protected function set_shipping_methods_hooks() {
+		add_filter('woocommerce_package_rates', array($this, 'woocommerce_package_rates'));
+
+		// Process the arguments used to calculate the shipping cost
+		// @since 4.6.0.180628
+		// @link https://github.com/woocommerce/woocommerce/issues/20632
+		add_filter('woocommerce_shipping_method_add_rate_args', array($this, 'woocommerce_shipping_method_add_rate_args'), 10, 2);
 	}
 
 	/**
@@ -684,6 +705,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 					 'not aware. Product prices will not be converted. Please report the issue to ' .
 					 'support as a compatibility request'),
 				array(
+					'Product Class' => $product_class,
 					'Product Type' => $product->get_type(),
 				));
 		}
@@ -714,9 +736,13 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * - Its sale price in the active currency is lower than its regular price.
 	 *
 	 * @param WC_Product product The product to check.
+	 * @param mixed sale_price The product's sale price. If null, the sale price
+	 * is fetched by calling WC_Product::get_sale_price().
+	 * @param mixed regular_price The product's regular price. If null, the regular price
+	 * is fetched by calling WC_Product::get_regular_price().
 	 * @return bool
 	 */
-	protected function product_is_on_sale(WC_Product $product) {
+	protected function product_is_on_sale(WC_Product $product, $sale_price = null, $regular_price = null) {
 		$sale_price_dates_from = $this->date_to_string($product->get_date_on_sale_from());
 		$sale_price_dates_to = $this->date_to_string($product->get_date_on_sale_to());
 
@@ -726,8 +752,10 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 				$today >= $sale_price_dates_from) &&
 			 (empty($sale_price_dates_to) ||
 				$sale_price_dates_to > $today)) {
-			$sale_price = $product->get_sale_price();
-			$is_on_sale = is_numeric($sale_price) && ($sale_price < $product->get_regular_price());
+			$sale_price = $sale_price !== null ? $sale_price : $product->get_sale_price();
+			$regular_price = $regular_price !== null ? $regular_price : $product->get_regular_price();
+
+			$is_on_sale = is_numeric($sale_price) && ($sale_price < $regular_price);
 		}
 		return $is_on_sale;
 	}
@@ -795,8 +823,8 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		//	$product->sale_price
 		//);
 
-		if($this->product_is_on_sale($product) &&
-			 is_numeric($product->sale_price)) {
+		if(is_numeric($product->sale_price) &&
+			 $this->product_is_on_sale($product, $product->sale_price, $product->regular_price)) {
 			$product->price = $product->sale_price;
 		}
 		else {
@@ -846,9 +874,6 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 
 		// Get the method to use to process the product
 		$convert_callback = $this->get_convert_callback($product);
-		
-		
-		
 		if(!empty($convert_callback) && is_callable($convert_callback)) {
 			// Invoke the callback directly, rather than using call_user_func(), for
 			// better performance
@@ -856,10 +881,6 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 			if(is_array($convert_callback)) {
 				$object = array_shift($convert_callback);
 				$method = array_shift($convert_callback);
-				
-				// $object = Aelia\WC\CurrencySwitcher\Subscriptions\Subscriptions_Integration Object
-				// $method = "convert_subscription_product_prices"
-				
 				$product = $object->$method($product, $currency);
 			}
 			else {
@@ -871,7 +892,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 			// If no conversion function is found, use the generic one
 			$product = $this->convert_generic_product_prices($product, $currency);
 		}
-		
+
 		// Assign the original product to the processed one
 		//$product->currencyswitcher_original_product = $original_product;
 		//// Remove "conversion is in progress" flag from the original product, in case
@@ -897,46 +918,32 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @return WC_Product_Variable The product with converted prices.
 	 */
 	public function convert_variable_product_prices(WC_Product $product, $currency) {
-		$product_children = $product->get_children();
-		if(empty($product_children)) {
-			return $product;
-		}
+		$variation_prices = $product->get_variation_prices();
 
-		$variation_regular_prices = array();
-		$variation_sale_prices = array();
-		$variation_prices = array();
+		$variation_prices['regular_price'] = is_array($variation_prices['regular_price']) ? array_filter($variation_prices['regular_price'], array($this, 'keep_numeric')) : array();
+		$variation_prices['sale_price'] = is_array($variation_prices['sale_price']) ? array_filter($variation_prices['sale_price'], array($this, 'keep_numeric')) : array();
+		$variation_prices['price'] = is_array($variation_prices['price']) ? array_filter($variation_prices['price'], array($this, 'keep_numeric')) : array() ;
 
-		foreach($product_children as $variation_id) {
-			$variation = $this->get_product($variation_id);
-			if(empty($variation)) {
-				continue;
-			}
+		$product->min_variation_regular_price = $this->get_min_value($variation_prices['regular_price']);
+		$product->max_variation_regular_price = $this->get_max_value($variation_prices['regular_price']);
 
-			$variation_regular_prices[$variation_id] = $variation->get_regular_price();
-			$variation_sale_prices[$variation_id] = $variation->get_sale_price();
-			$variation_prices[$variation_id] = $variation->get_price();
-		}
+		$product->min_variation_sale_price = $this->get_min_value($variation_prices['sale_price']);
+		$product->max_variation_sale_price = $this->get_max_value($variation_prices['sale_price']);
 
-		$product->min_variation_regular_price = $this->get_min_value($variation_regular_prices);
-		$product->max_variation_regular_price = $this->get_max_value($variation_regular_prices);
-
-		$product->min_variation_sale_price = $this->get_min_value($variation_sale_prices);
-		$product->max_variation_sale_price = $this->get_max_value($variation_sale_prices);
-
-
-		$product->min_variation_price = $this->get_min_value($variation_prices);
-		$product->max_variation_price = $this->get_max_value($variation_prices);
+		$product->min_variation_price = $this->get_min_value($variation_prices['price']);
+		$product->max_variation_price = $this->get_max_value($variation_prices['price']);
 
 		// Keep track of the variation IDs from which the minimum and maximum prices
 		// were taken
-		$product->min_regular_price_variation_id = array_search($product->min_variation_regular_price, $variation_regular_prices);
-		$product->max_regular_price_variation_id = array_search($product->max_variation_regular_price, $variation_regular_prices);
-
-		$product->min_sale_price_variation_id = array_search($product->min_variation_sale_price, $variation_sale_prices);
-		$product->max_sale_price_variation_id = array_search($product->max_variation_sale_price, $variation_sale_prices);
-
-		$product->min_price_variation_id = array_search($product->min_variation_price, $variation_prices);
-		$product->max_price_variation_id = array_search($product->max_variation_price, $variation_prices);
+		// @deprecated since 4.5.10.171206
+		//$product->min_regular_price_variation_id = array_search($product->min_variation_regular_price, $variation_regular_prices);
+		//$product->max_regular_price_variation_id = array_search($product->max_variation_regular_price, $variation_regular_prices);
+		//
+		//$product->min_sale_price_variation_id = array_search($product->min_variation_sale_price, $variation_sale_prices);
+		//$product->max_sale_price_variation_id = array_search($product->max_variation_sale_price, $variation_sale_prices);
+		//
+		//$product->min_price_variation_id = array_search($product->min_variation_price, $variation_prices);
+		//$product->max_price_variation_id = array_search($product->max_variation_price, $variation_prices);
 
 		$product->regular_price = $product->min_variation_regular_price;
 		$product->sale_price = $product->min_variation_price;
@@ -1019,8 +1026,9 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	public function convert_grouped_product_prices(WC_Product_Grouped $product, $currency) {
 		// Grouped products don't have a price. Prices can be found in child products
 		// which belong to the grouped product. Such child products are processed
-		// independently, therefore no further action is needed
-		return $product;
+		// independently, therefore we can treat the grouped product as if it were a
+		// simple one
+		return $this->convert_simple_product_prices($product, $currency);
 	}
 
 	/**
@@ -1091,10 +1099,16 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 
 			$tax_display_mode = get_option('woocommerce_tax_display_shop');
 			if($tax_display_mode == 'incl') {
-				$price = $variation->get_price_including_tax(1, $price);
+				$price = wc_get_price_including_tax($variation, array(
+					'qty' => 1,
+					'price' => $price,
+				));
 			}
 			else {
-				$price = $variation->get_price_excluding_tax(1, $price);
+				$price = wc_get_price_excluding_tax($variation, array(
+					'qty' => 1,
+					'price' => $price,
+				));
 			}
 		}
 		return $price;
@@ -1108,28 +1122,29 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @param string min_or_max The type of price to retrieve. It can be 'min' or 'max'.
 	 * @param boolean display Whether the value is going to be displayed
 	 * @return float
+	 * @deprecated since 4.4.18.170517
 	 */
-	public function woocommerce_get_variation_regular_price($price, $product, $min_or_max, $display) {
-		// If we are in the backend, no conversion takes place, therefore we can return
-		// the original value, in base currency
-		if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax()) {
-			return $price;
-		}
-
-		if(!$this->is_min_max_price_type_valid($min_or_max)) {
-			trigger_error(sprintf(__('Invalid variation regular price type specified: "%s".'),
-														$min_or_max),
-										E_USER_WARNING);
-			return $price;
-		}
-
-		// Retrieve the price in the selected currency
-		$price_property = $min_or_max . '_variation_regular_price';
-		// Process the price, recalculating it depending if it already includes tax or not
-		$price = $this->process_variation_price_tax($product->$price_property, $product, $min_or_max, $display);
-
-		return $price;
-	}
+	//public function woocommerce_get_variation_regular_price($price, $product, $min_or_max, $display) {
+	//	// If we are in the backend, no conversion takes place, therefore we can return
+	//	// the original value, in base currency
+	//	if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax()) {
+	//		return $price;
+	//	}
+	//
+	//	if(!$this->is_min_max_price_type_valid($min_or_max)) {
+	//		trigger_error(sprintf(__('Invalid variation regular price type specified: "%s".'),
+	//													$min_or_max),
+	//									E_USER_WARNING);
+	//		return $price;
+	//	}
+	//
+	//	// Retrieve the price in the selected currency
+	//	$price_property = $min_or_max . '_variation_regular_price';
+	//	// Process the price, recalculating it depending if it already includes tax or not
+	//	$price = $this->process_variation_price_tax($product->$price_property, $product, $min_or_max, $display);
+	//
+	//	return $price;
+	//}
 
 	/**
 	 * Get the minimum or maximum variation sale price.
@@ -1139,28 +1154,29 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @param string min_or_max The type of price to retrieve. It can be 'min' or 'max'.
 	 * @param boolean display Whether the value is going to be displayed
 	 * @return float
+	 * @deprecated since 4.4.18.170517
 	 */
-	public function woocommerce_get_variation_sale_price($price, $product, $min_or_max, $display) {
-		// If we are in the backend, no conversion takes place, therefore we can return
-		// the original value, in base currency
-		if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax()) {
-			return $price;
-		}
-
-		if(!$this->is_min_max_price_type_valid($min_or_max)) {
-			trigger_error(sprintf(__('Invalid variation sale price type specified: "%s".'),
-														$min_or_max),
-										E_USER_WARNING);
-			return $price;
-		}
-
-		// Retrieve the price in the selected currency
-		$sale_price_property = $min_or_max . '_variation_sale_price';
-		// Process the price, recalculating it depending if it already includes tax or not
-		$sale_price = $this->process_variation_price_tax($product->$sale_price_property, $product, $min_or_max, $display);
-
-		return $sale_price;
-	}
+	//public function woocommerce_get_variation_sale_price($price, $product, $min_or_max, $display) {
+	//	// If we are in the backend, no conversion takes place, therefore we can return
+	//	// the original value, in base currency
+	//	if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax()) {
+	//		return $price;
+	//	}
+	//
+	//	if(!$this->is_min_max_price_type_valid($min_or_max)) {
+	//		trigger_error(sprintf(__('Invalid variation sale price type specified: "%s".'),
+	//													$min_or_max),
+	//									E_USER_WARNING);
+	//		return $price;
+	//	}
+	//
+	//	// Retrieve the price in the selected currency
+	//	$sale_price_property = $min_or_max . '_variation_sale_price';
+	//	// Process the price, recalculating it depending if it already includes tax or not
+	//	$sale_price = $this->process_variation_price_tax($product->$sale_price_property, $product, $min_or_max, $display);
+	//
+	//	return $sale_price;
+	//}
 
 	/**
 	 * Get the minimum or maximum variation price.
@@ -1170,30 +1186,31 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @param string min_or_max The type of price to retrieve. It can be 'min' or 'max'.
 	 * @param boolean display Whether the value is going to be displayed
 	 * @return float
+	 * @deprecated since 4.4.18.170517
 	 */
-	public function woocommerce_get_variation_price($price, $product, $min_or_max, $display) {
-		// If we are in the backend, no conversion takes place, therefore we can return
-		// the original value, in base currency
-		if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax() || !is_object($product)) {
-			return $price;
-		}
-
-		if(!$this->is_min_max_price_type_valid($min_or_max)) {
-			trigger_error(sprintf(__('Invalid variation sale price type specified: "%s".'),
-														$min_or_max),
-										E_USER_WARNING);
-			return $price;
-		}
-
-		// Retrieve the price in the selected currency
-		$price_property = $min_or_max . '_variation_price';
-
-		//var_dump($price, $product->min_price_variation_id);die();
-		// Process the price, recalculating it depending if it already includes tax or not
-		$price = $this->process_variation_price_tax($product->$price_property, $product, $min_or_max, $display);
-
-		return $price;
-	}
+	//public function woocommerce_get_variation_price($price, $product, $min_or_max, $display) {
+	//	// If we are in the backend, no conversion takes place, therefore we can return
+	//	// the original value, in base currency
+	//	if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax() || !is_object($product)) {
+	//		return $price;
+	//	}
+	//
+	//	if(!$this->is_min_max_price_type_valid($min_or_max)) {
+	//		trigger_error(sprintf(__('Invalid variation sale price type specified: "%s".'),
+	//													$min_or_max),
+	//									E_USER_WARNING);
+	//		return $price;
+	//	}
+	//
+	//	// Retrieve the price in the selected currency
+	//	$price_property = $min_or_max . '_variation_price';
+	//
+	//	//var_dump($price, $product->min_price_variation_id);die();
+	//	// Process the price, recalculating it depending if it already includes tax or not
+	//	$price = $this->process_variation_price_tax($product->$price_property, $product, $min_or_max, $display);
+	//
+	//	return $price;
+	//}
 
 	/**
 	 * Indicates if a product is on sale. The method takes into account the product
@@ -1434,9 +1451,9 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 *
 	 * @return WC_Aelia_CurrencyPrices_Manager
 	 */
-	public static function Instance() {
+	public static function instance() {
 		if(empty(self::$instance)) {
-			self::$instance = new WC_Aelia_CurrencyPrices_Manager();
+			self::$instance = new static();
 		}
 		return self::$instance;
 	}
@@ -1609,8 +1626,51 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @since 4.4.8.170210
 	 */
 	protected function product_requires_conversion($product, $currency) {
-		// If the product is already in the target currency, it doesn't require conversion
+		// If the product is already in the target currency, it doesn't require
+		// conversion
 		return empty($product->currency) || ($product->currency != $currency);
+	}
+
+	/**
+	 * Indicates if a product should have the specified property after a conversion.
+	 *
+	 * USE
+	 * The Currency Switcher sets properties such as "price", "regular_price" and
+	 * "sale_price", which apply to most products. After a successful conversion,
+	 * such properties are expected to be set. However, some product types (e.g.
+	 * bookings) don't use those properties, which are not set even after a successful
+	 * conversion. This function allows 3rd parties to specify that such properties
+	 * should not be expected, and it will avoid notices and warnings, raised by
+	 * WooCommerce, in relation to the direct access of an object's properties.
+	 *
+	 * @param WC_Product product
+	 * @param string property_name
+	 * @return bool
+	 * @since 4.6.2.180725
+	 */
+	protected function product_should_have_property($product, $property_name) {
+		return apply_filters('wc_aelia_cs_product_should_have_property', true, $product, $property_name);
+	}
+
+	/**
+	 * Logs the fact that an expected property is missing from a product instance.
+	 *
+	 * @param WC_Product product
+	 * @param string property_name
+	 * @return bool
+	 * @since 4.6.2.180725
+	 */
+	protected function log_missing_product_property($product, $property_name) {
+		$this->logger()->notice(__('Expected price property was not set after conversion.', self::$text_domain) .
+														' ' .
+														__('This might not be an error. Some product types do not use regular or sale prices, and ' .
+															 'such properties are not set for them. In such case, you can ignore this message.', self::$text_domain),
+														array(
+															'Missing Price' => $property_name,
+															'Product ID' => $product->get_id(),
+															'Product Type' => $product->get_type(),
+															'Product Class' => get_class($product),
+														));
 	}
 
 	/**
@@ -1622,12 +1682,33 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 */
 	public function woocommerce_product_get_price($price, $product = null) {
 		$selected_currency = $this->get_selected_currency();
-		
 		if($this->product_requires_conversion($product, $selected_currency)) {
-			$product = $this->convert_product_prices($product, $selected_currency); // line ~850
-			$price = $product->price;
+			$product = $this->convert_product_prices($product, $selected_currency);
+
+			// Only use the price property if set
+			// @since 4.6.2.180725
+			if(property_exists($product, 'price')) {
+				$price = $product->price;
+			}
+			else {
+				// If the product was supposed to have a price property that is missing,
+				// log the event
+				// @since 4.6.2.180725
+				if($this->product_should_have_property($product, 'price')) {
+					$this->log_missing_product_property($product, 'price');
+				}
+			}
 		}
-		
+
+		// Ensure that the price is returned as a number, to prevent WooCommerce
+		// checks on prices from failing when one price is a number and one is a
+		// string
+		// @since 4.5.17.180404
+		// @link https://aelia.freshdesk.com/helpdesk/tickets/6802
+		if(is_numeric($price)) {
+			$price = (float)$price;
+		}
+
 		return $price;
 	}
 
@@ -1643,8 +1724,31 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		$selected_currency = $this->get_selected_currency();
 		if($this->product_requires_conversion($product, $selected_currency)) {
 			$product = $this->convert_product_prices($product, $selected_currency);
-			$price = $product->regular_price;
+
+			// Only use the price property if set
+			// @since 4.6.2.180725
+			if(property_exists($product, 'regular_price')) {
+				$price = $product->regular_price;
+			}
+			else {
+				// If the product was supposed to have a price property that is missing,
+				// log the event
+				// @since 4.6.2.180725
+				if($this->product_should_have_property($product, 'regular_price')) {
+					$this->log_missing_product_property($product, 'regular_price');
+				}
+			}
 		}
+
+		// Ensure that the price is returned as a number, to prevent WooCommerce
+		// checks on prices from failing when one price is a number and one is a
+		// string
+		// @since 4.5.17.180404
+		// @link https://aelia.freshdesk.com/helpdesk/tickets/6802
+		if(is_numeric($price)) {
+			$price = (float)$price;
+		}
+
 		return $price;
 	}
 
@@ -1660,8 +1764,31 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 		$selected_currency = $this->get_selected_currency();
 		if($this->product_requires_conversion($product, $selected_currency)) {
 			$product = $this->convert_product_prices($product, $selected_currency);
-			$price = $product->sale_price;
+
+			// Only use the price property if set
+			// @since 4.6.2.180725
+			if(property_exists($product, 'sale_price')) {
+				$price = $product->sale_price;
+			}
+			else {
+				// If the product was supposed to have a price property that is missing,
+				// log the event
+				// @since 4.6.2.180725
+				if($this->product_should_have_property($product, 'sale_price')) {
+					$this->log_missing_product_property($product, 'sale_price');
+				}
+			}
 		}
+
+		// Ensure that the price is returned as a number, to prevent WooCommerce
+		// checks on prices from failing when one price is a number and one is a
+		// string
+		// @since 4.5.17.180404
+		// @link https://aelia.freshdesk.com/helpdesk/tickets/6802
+		if(is_numeric($price)) {
+			$price = (float)$price;
+		}
+
 		return $price;
 	}
 
@@ -1703,6 +1830,16 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @since 4.4.1.170108
 	 */
 	protected function should_convert_coupon($coupon) {
+		// The coupon amount should not be converted when viewing the coupon list in
+		// the Admin area
+		// @since 4.4.20.170807
+		if(is_admin() && !WC_Aelia_CurrencySwitcher::doing_ajax() && function_exists('get_current_screen')) {
+			$screen = get_current_screen();
+			if(is_object($screen) && ($screen->id === 'edit-shop_coupon')) {
+				return false;
+			}
+		}
+
 		$active_currency = $this->get_selected_currency();
 		// If we are working with base currency, do not perform any conversion (it
 		// would not make any difference, anyway)
@@ -1726,7 +1863,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 			$currency = $this->get_selected_currency();
 		}
 
-		$coupon_currency_data = get_post_meta($coupon->get_id(), self::FIELD_COUPON_CURRENCY_DATA, true);
+		$coupon_currency_data = $coupon->get_meta(self::FIELD_COUPON_CURRENCY_DATA);
 		// Narrow down the data to the one for the selected currency
 		$coupon_currency_data = isset($coupon_currency_data[$currency]) ? $coupon_currency_data[$currency] : array();
 
@@ -1745,7 +1882,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @return double The converted amount.
 	 * @since 4.4.1.170108
 	 */
-	public function woocommerce_get_coupon_amount($amount, $coupon) {
+	public function woocommerce_coupon_get_amount($amount, $coupon) {
 		if($this->should_convert_coupon($coupon)) {
 			$coupon_types_to_convert = apply_filters('wc_aelia_cs_coupon_types_to_convert', array(
 				'fixed_cart', 'fixed_product'
@@ -1789,7 +1926,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @return double The converted amount.
 	 * @since 4.4.1.170108
 	 */
-	public function woocommerce_get_coupon_minimum_amount($amount, $coupon) {
+	public function woocommerce_coupon_get_minimum_amount($amount, $coupon) {
 		if($this->should_convert_coupon($coupon)) {
 			// Convert minimum amount to the selected currency
 			$min_amount = $this->get_coupon_data_for_currency($coupon, 'minimum_amount');
@@ -1817,7 +1954,7 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @return double The converted amount.
 	 * @since 4.4.1.170108
 	 */
-	public function woocommerce_get_coupon_maximum_amount($amount, $coupon) {
+	public function woocommerce_coupon_get_maximum_amount($amount, $coupon) {
 		if($this->should_convert_coupon($coupon)) {
 			// Convert maximum amount to the selected currency
 			$max_amount = $this->get_coupon_data_for_currency($coupon, 'maximum_amount');
@@ -1846,6 +1983,198 @@ class WC_Aelia_CurrencyPrices_Manager implements IWC_Aelia_CurrencyPrices_Manage
 	 * @since 4.4.15.170420
 	 */
 	public function woocommerce_process_shop_order_meta($post_id, $post) {
-		add_filter('woocommerce_currency', array($this->currencyswitcher(), 'woocommerce_currency'), 5);
+		// Set the currency on manually created orders when their first draft is saved.
+		// This is done to prevent WooCommerce from returning shop's base currency
+		// when WC_Order::get_currency() is called. See old code below, for reference
+		// @since 4.5.1.171012
+		$order = wc_get_order($post_id);
+		if(in_array($order->get_status(), array('draft', 'auto-draft')) || isset($_POST[Definitions::ARG_CURRENCY])) {
+			add_filter('woocommerce_currency', array($this->currencyswitcher(), 'woocommerce_currency'), 5);
+		}
+	}
+
+	/**
+	 * Processes shipping methods before they are used by WooCommerce. Used to
+	 * convert shipping costs into the selected Currency.
+	 *
+	 * @param array An array of WC_Shipping_Method classes.
+	 * @return array An array of WC_Shipping_Method classes, with their costs
+	 * converted into Currency.
+	 * @since 4.4.21.170830
+	 */
+	/**
+	 * Processes shipping methods before they are used by WooCommerce. Used to
+	 * convert shipping costs into the selected Currency.
+	 *
+	 * @param array An array of WC_Shipping_Method classes.
+	 * @return array An array of WC_Shipping_Method classes, with their costs
+	 * converted into Currency.
+	 * @since 4.4.21.170830
+	 */
+	public function woocommerce_package_rates($available_shipping_methods) {
+		$selected_currency = $this->get_selected_currency();
+		$base_currency = $this->base_currency();
+
+		foreach($available_shipping_methods as $shipping_method) {
+			if(!empty($shipping_method->shipping_prices_in_currency)) {
+				continue;
+			}
+
+			// Convert shipping cost
+			if(!is_array($shipping_method->cost)) {
+				// Convert a simple total cost into currency
+				$shipping_method->cost = $this->currencyswitcher()->convert($shipping_method->cost,
+																																		$base_currency,
+																																		$selected_currency);
+			}
+			else {
+				// Based on documentation, class can contain an array of costs in case
+				// of shipping costs applied per item. In such case, each one has to
+				// be converted
+				foreach($shipping_method->cost as $cost_key => $cost_value) {
+					$shipping_method->cost[$cost_key] = $this->currencyswitcher()->convert($cost_value,
+																																								 $base_currency,
+																																								 $selected_currency);
+				}
+			}
+
+			// Convert shipping taxes
+			if(!is_array($shipping_method->taxes)) {
+				// Convert a simple total taxes into currency
+				$shipping_method->taxes = $this->currencyswitcher()->convert($shipping_method->taxes,
+																																		 $base_currency,
+																																		 $selected_currency);
+			}
+			else {
+				// Based on documentation, class can contain an array of taxes in case
+				// of shipping taxes applied per item. In such case, each one has to
+				// be converted
+				foreach($shipping_method->taxes as $taxes_key => $taxes_value) {
+					$shipping_method->taxes[$taxes_key] = $this->currencyswitcher()->convert($taxes_value,
+																																									 $base_currency,
+																																									 $selected_currency);
+				}
+			}
+
+			// Flag the shipping method to keep track of the fact that its costs have
+			// been converted into selected Currency. This is necessary because this
+			// is often called multiple times within the same page load, passing the
+			// same data that was already processed
+			$shipping_method->shipping_prices_in_currency = true;
+		}
+
+		return $available_shipping_methods;
+	}
+
+	/**
+	 * Updates the order meta in shop's base currency (order total, discount
+	 * total, shipping total, etc)
+	 *
+	 * @param WC_Order order
+	 * @param array updated_props
+	 * @since 4.5.1.171012
+	 */
+	protected function update_order_props_in_currency($order, $updated_props) {
+		// The following list maps a meta key with the corresponding property, added
+		// in WC 3.0. The mapping has to be meta key -> object property
+		$order_props_meta = array(
+			// Orders
+			'_order_total' => 'total',
+			'_cart_discount' => 'discount_total',
+			'_order_shipping' => 'shipping_total',
+			'_order_tax' => 'cart_tax',
+			'_order_shipping_tax' => 'shipping_tax',
+			'_cart_discount_tax' => 'discount_tax',
+			// Refunds
+			'_refund_amount' => 'amount',
+		);
+
+		// Prepare the list of meta attributes that should be processed
+		$meta_to_process = array_intersect($order_props_meta, $updated_props);
+
+		if(empty($meta_to_process)) {
+			return;
+		}
+
+		$order_currency = $order->get_currency();
+		$base_currency = $this->base_currency();
+
+		// Calculate the amount in base currency for each property, and save it
+		// against the order meta
+		foreach($meta_to_process as $meta_key => $prop_name) {
+			// Get the value of the property that was just saved
+      $original_amount = $order->{"get_$prop_name"}();
+
+			$amount_in_base_currency = null;
+			if(is_numeric($original_amount)) {
+				// Save the amount in base currency. This will be used to correct the reports
+				$amount_in_base_currency = $this->currencyswitcher()->convert($original_amount,
+																																			$order_currency,
+																																			$base_currency,
+																																			null,
+																																			false);
+			}
+			$order->update_meta_data($meta_key . '_base_currency', $amount_in_base_currency);
+
+			// Debug
+			//var_dump($order->get_id(), $prop_name, $original_amount, $amount_in_base_currency);
+		}
+
+		$order->save();
+	}
+
+	/**
+	 * Performs actions when the properties of an order have been modified.
+	 *
+	 * @param WC_Order order
+	 * @param array updated_props
+	 * @since 4.5.1.171012
+	 */
+	public function woocommerce_order_object_updated_props($order, $updated_props) {
+		$this->update_order_props_in_currency($order, $updated_props);
+	}
+
+	/**
+	 * Performs actions when the properties of a refund have been modified.
+	 *
+	 * @param WC_Refund refund
+	 * @param array updated_props
+	 * @since 4.5.1.171012
+	 */
+	public function woocommerce_order_refund_object_updated_props($refund, $updated_props) {
+		// Unhook this action, to prevent infinite loops due to the properties of the
+		// order and the refund being updated
+		// @since 4.5.12.171215
+		remove_action('woocommerce_order_refund_object_updated_props', array($this, 'woocommerce_order_refund_object_updated_props'), 50, 2);
+
+		$this->update_order_props_in_currency($refund, $updated_props);
+
+		// Restore the action, so that the next refund can be intercepted. This should
+		// not be required, as each refund is a separate Ajax call, but we do it
+		// to be safe
+		// @since 4.5.12.171215
+		add_action('woocommerce_order_refund_object_updated_props', array($this, 'woocommerce_order_refund_object_updated_props'), 50, 2);
+	}
+
+	/**
+	 * Alters the arguments used to calculate a shipping rate.
+	 *
+	 * @param array args
+	 * @param WC_Shipping_Method shipping_method
+	 * @since 4.6.0.180628
+	 * @link https://github.com/woocommerce/woocommerce/issues/20632
+	 */
+	public function woocommerce_shipping_method_add_rate_args($args, $shipping_method) {
+		// If the shipping_prices_in_currency property is set, it means that the
+		// shipping costs have already been converted to the active currency, either
+		// by the Aelia Shipping Pricing plugin, or by some custom code. In this case,
+		// we don't have to alter the arguments
+		if(empty($shipping_method->shipping_prices_in_currency)) {
+			// Ensure that the shipping method's cost is calculated using the correct
+			// amount of decimals, before it's converted by the Currency Switcher
+			$args['price_decimals'] = WC_Aelia_CurrencySwitcher::settings()->price_decimals(get_woocommerce_currency());
+		}
+
+		return $args;
 	}
 }

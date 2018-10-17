@@ -58,8 +58,8 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public $shortcodes;
 
-		const REQUIRED_TEC_VERSION = '4.6.22';
-		const VERSION = '4.4.32';
+		const REQUIRED_TEC_VERSION = '4.6.24';
+		const VERSION = '4.4.33';
 
 		private function __construct() {
 			$this->pluginDir = trailingslashit( basename( EVENTS_CALENDAR_PRO_DIR ) );
@@ -70,6 +70,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			$this->loadTextDomain();
 
 			require_once( $this->pluginPath . 'src/functions/template-tags/general.php' );
+			require_once( $this->pluginPath . 'src/functions/template-tags/map.php' );
 			require_once( $this->pluginPath . 'src/functions/template-tags/week.php' );
 			require_once( $this->pluginPath . 'src/functions/template-tags/venue.php' );
 			require_once( $this->pluginPath . 'src/functions/template-tags/widgets.php' );
@@ -958,6 +959,10 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				}
 			}
 
+			if ( tribe_is_map() && tribe_is_using_basic_gmaps_api() ) {
+				$classes[] = 'tribe-events-map-view-basic';
+			}
+
 			return $classes;
 		}
 
@@ -1190,7 +1195,11 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 
 			// map view
 			if ( tribe_is_map() ) {
-				$template = Tribe__Events__Templates::getTemplateHierarchy( 'pro/map' );
+				if ( tribe_is_using_basic_gmaps_api() ) {
+					$template = Tribe__Events__Templates::getTemplateHierarchy( 'pro/map-basic' );
+				} else {
+					$template = Tribe__Events__Templates::getTemplateHierarchy( 'pro/map' );
+				}
 			}
 
 			// recurring "all" view
@@ -1357,13 +1366,10 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @return void
 		 */
 		public function enqueue_styles() {
+			global $post;
+
 			if ( tribe_is_event_query()
-				 || is_active_widget( false, false, 'tribe-events-adv-list-widget' )
-				 || is_active_widget( false, false, 'tribe-mini-calendar' )
-				 || is_active_widget( false, false, 'tribe-events-countdown-widget' )
-				 || is_active_widget( false, false, 'next_event' )
-				 || is_active_widget( false, false, 'tribe-events-venue-widget' )
-				 || is_active_widget( false, false, 'tribe-this-week-events-widget' )
+				|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_events' ) )
 			) {
 				tribe_asset_enqueue_group( 'events-pro-styles' );
 			}
@@ -1383,17 +1389,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			if (
 				$force
 				|| tribe_is_event_query()
-				|| is_active_widget( false, false, 'tribe-events-adv-list-widget' )
-				|| is_active_widget( false, false, 'tribe-mini-calendar' )
-				|| is_active_widget( false, false, 'tribe-events-countdown-widget' )
-				|| is_active_widget( false, false, 'next_event' )
-				|| is_active_widget( false, false, 'tribe-events-venue-widget' )
-				|| is_active_widget( false, false, 'tribe-this-week-events-widget' )
 				|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_events' ) )
-				|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_mini_calendar' ) )
-				|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_this_week' ) )
-				|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_event_countdown' ) )
-				|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_featured_venue' ) )
 			) {
 
 				// Be sure we enqueue TEC scripts
@@ -1405,11 +1401,6 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				tribe_asset_enqueue( 'tribe-events-pro' );
 				$data_pro = tribe( 'events-pro.assets' )->get_data_tribe_events_pro();
 				wp_localize_script( 'tribe-events-pro', 'TribeEventsPro', $data_pro );
-
-				// Be sure we enqueue PRO geoloc when needed with the proper localization
-				tribe_asset_enqueue( 'tribe-events-pro-geoloc' );
-				$data_geo = tribe( 'events-pro.assets' )->get_data_tribe_geoloc();
-				wp_localize_script( 'tribe-events-pro-geoloc', 'GeoLoc', $data_geo );
 
 			}
 		}

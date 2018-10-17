@@ -74,3 +74,23 @@ if(!function_exists('in_array_ci')) {
       return false;
    }
 }
+
+if(!function_exists('aelia_get_percentage_multiply_factor')) {
+   /**
+		* Given a string with a percentage (e.g. "1.23%"), returns the multiplication
+		* factor to be used to modify a value by such percentage. If an invalid percentage
+		* is passed, the function returns 1.
+		*
+		* @param string percentage
+		* @return float
+		* @since 4.6.5.180828
+    */
+   function aelia_get_percentage_multiply_factor($percentage) {
+			$result = 1;
+			if(preg_match("/\-*?[0-9]+%/", $percentage, $matches)) {
+				$percentage = str_replace('%', '', $matches[0]);
+				$result = 1 + $percentage / 100;
+			}
+      return $result;
+   }
+}

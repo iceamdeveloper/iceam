@@ -19,6 +19,14 @@ class WC_Aelia_CurrencySwitcher_Install extends \Aelia\WC\Aelia_Install {
 	// @since 3.9.6.160408
 	protected $invalid_fx_rates = array();
 
+	// @var bool Indicates if we are running all updates in one go.
+	// @since 4.5.3.171108
+	protected $running_all_updates = false;
+
+	// @var string The version associated to the last update method executed.
+	// @since 4.5.3.171108
+	protected $last_update_method_version = null;
+
 	/**
 	 * Returns current instance of the Currency Switcher.
 	 *
@@ -66,7 +74,16 @@ class WC_Aelia_CurrencySwitcher_Install extends \Aelia\WC\Aelia_Install {
 			return true;
 		}
 
-		return parent::update($plugin_id, $new_version);
+		$result = parent::update($plugin_id, $new_version);
+
+		// If we didn't run all updates, reset the "last update" version to the
+		// last executed operation. This will ensure that the update process will
+		// resume from the next step
+		// @since 4.5.3.171108
+		if(!$this->running_all_updates && !empty($this->last_update_method_version)) {
+			update_option($plugin_id, $this->last_update_method_version);
+		}
+		return $result;
 	}
 
 	/**
@@ -153,13 +170,10 @@ class WC_Aelia_CurrencySwitcher_Install extends \Aelia\WC\Aelia_Install {
 	}
 
 	/**
-	 * Calculate order totals and taxes in base currency for Orders that have been
-	 * generated before version 3.2.10.1402126. This method corrects the calculation
-	 * of order totals in base currency, which were incorrectly made taking into
-	 * account the exchange markup eventually specified in configuration.
-	 * Note: recalculation is made from the 1st of the year onwards, as exchange
-	 * rates have changed significantly in the past months and it's not currently
-	 * possible to retrieve them at a specific point in time.
+	 * Sets custom meta with totals in base currency (i.e. <amount>_base_currency
+	 * against orders that were placed in base currency before the Currency Switcher
+	 * was installed.
+	 *
 	 * @return bool
 	 */
 	protected function update_to_3_2_10_1402126() {
@@ -200,106 +214,144 @@ class WC_Aelia_CurrencySwitcher_Install extends \Aelia\WC\Aelia_Install {
 
 		// Debug
 		//var_dump($SQL);die();
+		return true;
+	}
 
+	/**
+	 * Calculate order totals and taxes in base currency for Orders that have been
+	 * generated before version 3.2.11.1402126. This method corrects the calculation
+	 * of order totals in base currency, which were incorrectly made taking into
+	 * account the exchange markup eventually specified in configuration.
+	 * Note: recalculation is made from the 1st of the year onwards, as exchange
+	 * rates have changed significantly in the past months and it's not currently
+	 * possible to retrieve them at a specific point in time.
+	 * @return bool
+	 */
+	protected function update_to_3_2_11_1402126() {
 		$last_year = date('Y') - 1;
-		$last_order_id = 0;
-		$process_loop = true;
 		$cs = $this->currency_switcher();
+		$base_currency = $this->settings->base_currency();
 
-		while($process_loop) {
-			// Retrieve the exchange rates for the orders whose data already got
-			// partially converted
-			$SQL = "
-				SELECT
-					posts.ID AS order_id
-					,posts.post_date AS post_date
-					,meta_order.meta_key
-					,meta_order.meta_value
-					-- ,meta_order_base_currency.meta_key AS meta_key_base_currency
-					,meta_order_base_currency.meta_value AS meta_value_base_currency
-					,meta_order_currency.meta_value AS currency
-				FROM
-					{$this->wpdb->posts} AS posts
-				JOIN
-					{$this->wpdb->postmeta} AS meta_order ON
-						(meta_order.post_id = posts.ID) AND
-						(meta_order.meta_key IN ('_order_total', '_order_discount', '_cart_discount', '_order_shipping', '_order_tax', '_order_shipping_tax'))
-				LEFT JOIN
-					{$this->wpdb->postmeta} AS meta_order_base_currency ON
-						(meta_order_base_currency.post_id = posts.ID) AND
-						(meta_order_base_currency.meta_key = CONCAT(meta_order.meta_key, '_base_currency')) AND
-						(meta_order_base_currency.meta_value > 0)
-				LEFT JOIN
-					{$this->wpdb->postmeta} AS meta_order_currency ON
-						(meta_order_currency.post_id = posts.ID) AND
-						(meta_order_currency.meta_key = '_order_currency')
-				WHERE
-					(posts.post_type = 'shop_order') AND
-					(meta_order.meta_value IS NOT NULL) AND
-					(meta_order_base_currency.meta_value IS NULL) AND
-					(post_date >= '{$last_year}-01-01 00:00:00') AND
-					(posts.ID > {$last_order_id})
-				ORDER BY
-					posts.ID ASC
-				LIMIT 1000
-			";
+		$this->add_message(E_USER_NOTICE, __('Calculating order totals in base currency for past orders...'));
+		// Retrieve the exchange rates for the orders whose data already got
+		// partially converted
+		$SQL = "
+			SELECT
+				posts.ID AS order_id
+				,posts.post_date AS post_date
+				,meta_order.meta_key
+				,meta_order.meta_value
+				,CONCAT(meta_order.meta_key, '_base_currency') AS meta_key_base_currency
+				,meta_order_base_currency.meta_value AS meta_value_base_currency
+				,meta_order_currency.meta_value AS currency
+			FROM
+				{$this->wpdb->posts} AS posts
+			JOIN
+				{$this->wpdb->postmeta} AS meta_order ON
+					(meta_order.post_id = posts.ID) AND
+					(meta_order.meta_key IN ('_order_total', '_order_discount', '_cart_discount', '_order_shipping', '_order_tax', '_order_shipping_tax'))
+			LEFT JOIN
+				{$this->wpdb->postmeta} AS meta_order_base_currency ON
+					(meta_order_base_currency.post_id = posts.ID) AND
+					(meta_order_base_currency.meta_key = CONCAT(meta_order.meta_key, '_base_currency'))
+			LEFT JOIN
+				{$this->wpdb->postmeta} AS meta_order_currency ON
+					(meta_order_currency.post_id = posts.ID) AND
+					(meta_order_currency.meta_key = '_order_currency')
+			WHERE
+				(posts.post_type = 'shop_order') AND
+				(meta_order.meta_value IS NOT NULL) AND
+				(meta_order_base_currency.meta_value IS NULL) AND
+				(post_date >= '{$last_year}-01-01 00:00:00')
+			ORDER BY
+				posts.ID ASC
+		";
 
-			$orders_to_update = $this->select($SQL);
-			// Stop when there are no more rows to update
-			if(empty($orders_to_update)) {
-				$process_loop = false;
-			}
+		$orders_to_update = $this->select($SQL);
+		$total_orders_to_update = count($orders_to_update);
 
-			// Debug
-			//var_dump($orders_to_update); die();
+		// Limit the rows to update to a thousand at a time, to avoid timeouts
+		$max_orders_to_update = !empty($_GET['aelia_cs_install_row_limit']) ? $_GET['aelia_cs_install_row_limit'] : 1000;
+		$updated_orders = 0;
 
-			// Keep track of the orders without currency, so that we can report them
-			// only once
-			$orders_without_currency = array();
-			foreach($orders_to_update as $order) {
-				// If order currency is empty, for whatever reason, no conversion can be
-				// performed (it's not possible to assume that a specific currency was
-				// used)
-				if(empty($order->currency) && !in_array($order->order_id, $orders_without_currency)) {
+		// Debug
+		//var_dump($orders_to_update); die();
+
+		// Keep track of the orders without currency, so that we can report them
+		// only once
+		$orders_without_currency = array();
+		foreach($orders_to_update as $order) {
+			// If order currency is empty, for whatever reason, no conversion can be
+			// performed (it's not possible to assume that a specific currency was
+			// used)
+			if(empty($order->currency)) {
+				if(!in_array($order->order_id, $orders_without_currency)) {
 					$orders_without_currency[] = $order->order_id;
-					$this->logger->info(__('Order does not have a currency' .
+					$this->logger->info(__('Order does not have a currency.' . ' ' .
 																 'This may lead to imprecise results in the reports.', Definitions::TEXT_DOMAIN),
 															array(
 																'Order ID' => $order->order_id,
 																'Base Currency' => $base_currency,
 															));
-
-					continue;
 				}
 
-				// Try to retrieve the exchange rate used when the order was placed
-				$value_in_base_currency = $this->convert($order->meta_value,
-																								 $order->currency,
-																								 $base_currency,
-																								 $order);
-				$value_in_base_currency = $cs->float_to_string($value_in_base_currency);
-
-				try {
-					update_post_meta($order->order_id,
-													 $order->meta_key . '_base_currency',
-													 $value_in_base_currency);
-				}
-				catch(Exception $e) {
-					$this->add_message(E_USER_ERROR,
-														 sprintf(__('Exception occurred updating base currency values for order %s. ' .
-																				'Error: %s.'),
-																		 $order->order_id,
-																		 $e->getMessage()));
-					return false;
-				}
-				// Keep track of the last order ID processed, so that the query can
-				// resume from the next one
-				$last_order_id = $order->order_id;
+				continue;
 			}
-			// Flushing the cache will prevent memory issues. This is important, because
-			// update_post_meta() tends to cache post meta after processing it
-			wp_cache_flush();
+
+			// If the meta value is not numeric, assume that it's zero
+			if(!is_numeric($order->meta_value)) {
+				$order->meta_value = 0;
+				$this->logger->info(__('Invalid value found for order meta. Value assumed to be zero', Definitions::TEXT_DOMAIN),
+														array(
+															'Order ID' => $order->order_id,
+															'Meta Value' => $order->meta_value,
+														));
+			}
+
+			// Try to retrieve the exchange rate used when the order was placed
+			$value_in_base_currency = $this->convert($order->meta_value,
+																							 $order->currency,
+																							 $base_currency,
+																							 $order);
+			$value_in_base_currency = $cs->float_to_string($value_in_base_currency);
+
+			try {
+				update_post_meta($order->order_id,
+												 $order->meta_key . '_base_currency',
+												 $value_in_base_currency);
+			}
+			catch(Exception $e) {
+				$this->add_message(E_USER_ERROR,
+													 sprintf(__('Exception occurred updating base currency values for order %s. ' .
+																			'Error: %s.'),
+																	 $order->order_id,
+																	 $e->getMessage()));
+				return false;
+			}
+
+			// Stop after having reached the maximum amount of orders for one run
+			$updated_orders++;
+			if($updated_orders >= $max_orders_to_update) {
+				break;
+			}
+
+			// If we haven't updated all orders, reset the progress version to the
+			// previous one, so that this update can run again
+			if($updated_orders < $total_orders_to_update) {
+				$this->last_update_method_version = '3.2.10.1402126';
+			}
 		}
+
+		// Inform the user of the progress
+		$message = sprintf(__('Done. %s rows affected.'), $updated_orders);
+		if($total_orders_to_update > $updated_orders) {
+			$message .= ' ' . sprintf(__('%d rows remaining. The process will continue at the next page load.'), $total_orders_to_update - $updated_orders);
+		}
+		$this->add_message(E_USER_NOTICE, $message);
+
+		// Flushing the cache will prevent memory issues. This is important, because
+		// update_post_meta() tends to cache post meta after processing it
+		wp_cache_flush();
 
 		return true;
 	}
@@ -655,5 +707,45 @@ class WC_Aelia_CurrencySwitcher_Install extends \Aelia\WC\Aelia_Install {
 												 sprintf(__('Done. %s rows affected.'), count($dataset)));
 		}
 		return true;
+	}
+
+	/**
+	 * Returns a list of the methods that will perform the updates. This method
+	 * alters the list normally returned by the installation logic, so that methods
+	 * are executed step by step (one per page load), rather than all together.
+	 * This helps avoiding timeouts on servers with a strict execution limit.
+	 *
+	 * @param string current_version Current version of the plugin. This will
+	 * determine which update methods still have to be executed.
+	 * @return array
+	 * @since 4.5.3.171108
+	 */
+	protected function get_update_methods($current_version) {
+		$update_methods = parent::get_update_methods($current_version);
+		$update_steps_count = count($update_methods);
+
+		// If we are going step by step, only return the first element of the steps
+		// to perform. At the next iteration, that element will be skipped, and the
+		// next one will be returned
+		if(empty($_GET['run_all_updates'])) {
+			$update_methods = array_slice($update_methods, 0, 1, true);
+		}
+
+		$this->running_all_updates = ($update_steps_count === count($update_methods));
+		$last_update_method = end($update_methods);
+		$this->last_update_method_version = $this->extract_version_from_method($last_update_method);
+
+		if(!empty($update_methods) && !$this->running_all_updates) {
+			$this->add_message(E_USER_NOTICE,
+												 '<strong>' .
+												 __('The Currency Switcher is preparing the data for sales reports.', Definitions::TEXT_DOMAIN) .
+												 '</strong>  ' .
+												 __('You might see several update messages appearing ' .
+														'after opening or refreshing admin pages.', Definitions::TEXT_DOMAIN) .
+												 ' ' .
+												 __('This is normal. The messages will stop appearing when the ' .
+														'update process is completed.', Definitions::TEXT_DOMAIN));
+		}
+		return $update_methods;
 	}
 }

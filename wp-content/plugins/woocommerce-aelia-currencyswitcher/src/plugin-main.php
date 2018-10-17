@@ -29,7 +29,7 @@ interface IWC_Aelia_CurrencySwitcher {
  */
 class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_CurrencySwitcher {
 	// @var string The plugin version
-	public static $version = '4.4.15.170421';
+	public static $version = '4.6.6.181004';
 
 	// @var string The plugin slug
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
@@ -65,6 +65,21 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 * @since 4.4.7.170202
 	 */
 	protected $loaded_orders = array();
+
+	/**
+	 * Returns the instance of the logger used by the plugin.
+	 *
+	 * @return \Aelia\WC\Logger.
+	 * @since 4.5.16.180307
+	 */
+	// TODO This method will be redundant with the AFC 1.9.x. Remove it when no longer needed.
+	public function get_logger() {
+		if(empty($this->logger)) {
+			$this->logger = parent::get_logger();
+			$this->logger->set_debug_mode($this->debug_mode());
+		}
+		return $this->logger;
+	}
 
 	/**
 	 * Factory method.
@@ -104,8 +119,6 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		require_once('lib/backward-compatibility.php');
 
 		parent::__construct($settings_controller, $messages_controller);
-
-		$this->logger = new Logger(self::$plugin_slug, $this->debug_mode());
 	}
 
 	/**
@@ -241,6 +254,9 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			'2.6' => 'WC26',
 			// 2.7
 			'2.7' => 'WC27',
+			// 3.2
+			// @since 4.5.0.170901
+			'3.2' => 'WC32',
 		);
 
 		krsort($namespaces);
@@ -488,7 +504,7 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 
 		$selected_currency = $this->get_selected_currency();
 		// Debug
-		//var_dump($selected_currency);
+		//var_dump("SELECTED", $selected_currency);
 
 		return $selected_currency;
 	}
@@ -611,13 +627,14 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 * @param WC_Order The order that has just been saved.
 	 */
 	public function woocommerce_process_shop_order_meta($post_id, $post) {
-		$order = $this->get_order($post_id);
-		// Check if order currency is saved. If not, set it to currently selected currency
-		$order_currency = $order->get_currency();
-
-		if(empty($order_currency)) {
-			$order->set_order_currency($this->get_selected_currency());
-		}
+		// Set the active currency to the one from the order. This will ensure that
+		// elements like the decimal separator will be taken into account, and prevent
+		// WooCommerce from setting item prices to zero.
+		// @link https://aelia.freshdesk.com/helpdesk/tickets/6815
+		// @see WC_Order_Item_Product::set_total()
+		// @since 4.5.17.180404
+		$this->set_active_currency_to_order_currency($post_id);
+		add_filter('woocommerce_currency', array($this, 'woocommerce_currency'), 5);
 	}
 
 	/**
@@ -639,6 +656,7 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 
 		$woocommerce_writepanel_params = array(
 			'currency_format_symbol' => get_woocommerce_currency_symbol($order_currency),
+			'order_currency' => $order_currency,
 			// TODO Load the decimal places from the Currency Switcher settings
 			// TODO Load the thousand separator from the Currency Switcher settings
 		);
@@ -646,6 +664,19 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		$woocommerce_admin_params = array_merge($woocommerce_admin_params, $woocommerce_writepanel_params);
 
 		return $woocommerce_admin_params;
+	}
+
+	/**
+	 * Indicates if the scripts to extend the Order Edit page should be loaded.
+	 *
+	 * @param object post
+	 * @return bool
+	 * @since 4.5.15.180222
+	 */
+	protected function should_load_order_edit_scripts($post) {
+		$post_type = is_object($post) ? $post->post_type : null;
+
+		return apply_filters('wc_aelia_cs_load_order_edit_scripts', $post_type === 'shop_order', $post);
 	}
 
 	/**
@@ -659,11 +690,12 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			'enabled_currencies' => $this->enabled_currencies(),
 		);
 
-		$post_type = get_value('post_type', $post);
+		$post_type = is_object($post) ? $post->post_type : null;
 		// When viewing an Order, load the settings for the currency used when it
 		// was placed
-		if($post_type === 'shop_order') {
+		if($this->should_load_order_edit_scripts($post)) {
 			$woocommerce_admin_params = $this->load_order_currency_settings($post->ID, $woocommerce_admin_params);
+			wp_enqueue_script('wc-aelia-currency-switcher-order-edit');
 		}
 
 		// When viewing a product, load the script to handle the currency-specific
@@ -691,7 +723,6 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 * Sets hooks related to shipping methods.
 	 */
 	protected function set_shipping_methods_hooks() {
-		add_filter('woocommerce_package_rates', array($this, 'woocommerce_package_rates'));
 		add_filter('woocommerce_evaluate_shipping_cost_args', array($this, 'woocommerce_evaluate_shipping_cost_args'), 10, 3);
 
 		// WC 2.5 and earlier
@@ -742,7 +773,7 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		else{
 			add_filter('woocommerce_order_tax_totals', array($this, 'woocommerce_order_tax_totals'), 10, 2);
 		}
-		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 10, 2);
+		add_action('woocommerce_process_shop_order_meta', array($this, 'woocommerce_process_shop_order_meta'), 7, 2);
 
 		// Hook each notification email, so that the order currency can be used when
 		// they are sent
@@ -807,101 +838,6 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			remove_filter('pre_option_woocommerce_price_thousand_sep', array($this, 'pre_option_woocommerce_price_thousand_sep'), 10, 1);
 			remove_filter('pre_option_woocommerce_price_decimal_sep', array($this, 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
 		}
-	}
-
-	/**
-	 * Filters Post metadata being saved before it's returned to caller.
-	 *
-	 * @param mixed metadata The original metadata.
-	 * @param int object_id The post ID.
-	 * @param meta_key The metadata to be saved.
-	 * @param meta_value The value to be saved.
-	 * @return mixed The metadata value.
-	 */
-	public function update_post_metadata($metadata, $object_id, $meta_key, $meta_value) {
-		// Convert  totals into base Currency (they are saved in the currency used
-		// to complete the transaction)
-		if(in_array($meta_key,
-								array('_order_total',
-											'_order_discount',
-											'_cart_discount',
-											'_order_shipping',
-											'_order_tax',
-											'_order_shipping_tax',
-											'_refund_amount',
-											)
-								)
-			) {
-
-			$order = $this->get_order($object_id);
-
-			// Add the metadata required to handle refunds correctly
-			if(get_post_type($object_id) == 'shop_order_refund') {
-				$this->set_refund_metadata($order);
-			}
-
-			// If Order Currency is empty, it means that we are in checkout phase.
-			// WooCommerce saves the Order Currency AFTER the Order Total (a bit
-			// nonsensical, but that's the way it is). In such case, we can take the
-			// currency currently selected to place the Order and set it as the default
-			$order_currency = $order->get_currency();
-			if(empty($order_currency)) {
-				$order_currency = get_woocommerce_currency();
-			}
-
-			// Save the amount in base currency. This will be used to correct the reports
-			$amount_in_base_currency = $this->convert($meta_value,
-																								$order_currency,
-																								$this->settings_controller()->base_currency(),
-																								null,
-																								false);
-			$order->set_meta($meta_key . '_base_currency', $amount_in_base_currency);
-		}
-
-		return $metadata;
-	}
-
-	/**
-	 * Sets additional metadata against a refund.
-	 *
-	 * @param WC_Order refund The target refund.
-	 * @since 4.0.6.150604
-	 */
-	protected function set_refund_metadata($refund) {
-		$refund_currency = $refund->get_currency();
-		// Set refund currency, if it's missing
-		if(empty($refund_currency)) {
-			$refund_id = aelia_get_order_id($refund);
-			$parent_order_id = wp_get_post_parent_id($refund_id);
-			// Set the currency against the refund. Such information it vital to be able
-			// to calculate the refund amounts in base currency
-			if(is_numeric($parent_order_id)) {
-				$order_currency = $this->get_order_currency($parent_order_id);
-			}
-			else {
-				$order_currency = get_woocommerce_currency();
-			}
-			// Debug
-			//var_dump($parent_order_id, $order_currency);
-			update_post_meta($refund_id, '_order_currency', $order_currency);
-		}
-	}
-
-	/**
-	 * Updates the order currency when a suspended order is resumed.
-	 *
-	 * See support request #1214
-	 * This action covers  the edge case in which an order was saved in one currency,
-	 * then resumed after switching currency. Since WooCommerce saves the currency
-	 * AFTER the order amounts, the conversion hooks pick up the previous order currency
-	 * from the order and perform an incorrect conversion. By updating the currency
-	 * as soon as an order is resumed, the conversion will work again.
-	 *
-	 * @param int order_id The ID of the order being resumed.
-	 * @link https://aelia.freshdesk.com/helpdesk/tickets/1214
-	 */
-	public function woocommerce_resume_order($order_id) {
-		update_post_meta($order_id, '_order_currency', get_woocommerce_currency());
 	}
 
 	/**
@@ -999,12 +935,12 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			if(empty($order_id)) {
 				// An empty order id indicates that something is not right. Without it,
 				// we cannot calculate the amounts in base currency
-				$this->logger->info(__('Order not found. Calculation of metadata in base ' .
-															 'currency skipped.', self::$text_domain),
-														array(
-															'Order Item ID' => $order_item_id,
-															'Meta Key' => $meta_key,
-														));
+				$this->get_logger()->info(__('Order not found. Calculation of metadata in base ' .
+																		 'currency skipped.', self::$text_domain),
+																	array(
+																		'Order Item ID' => $order_item_id,
+																		'Meta Key' => $meta_key,
+																	));
 			}
 			else {
 				// Retrieve the order currency
@@ -1205,10 +1141,6 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		// Add hooks for shortcodes
 		$this->set_shortcodes_hooks();
 
-		// Add hooks to handle Order totals in base currency
-		add_filter('update_post_metadata', array($this, 'update_post_metadata'), 1, 4);
-		add_action('woocommerce_resume_order', array($this, 'woocommerce_resume_order'), 10, 1);
-
 		// Handle totals in base currency for order items
 		add_filter('update_order_item_metadata', array($this, 'update_order_item_metadata'), 10, 4);
 		add_filter('add_order_item_metadata', array($this, 'update_order_item_metadata'), 10, 4);
@@ -1224,6 +1156,10 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		add_filter('wc_aelia_cs_enabled_currencies', array($this, 'enabled_currencies'));
 		// Filter to allow 3rd parties to convert a value from one currency to another
 		add_filter('wc_aelia_cs_convert', array($this, 'convert'), 10, 5);
+
+		// Filter to allow 3rd parties to retrieve a product's base currency
+		// @since 4.4.19.170602
+		add_filter('wc_aelia_cs_get_product_base_currency', array($this, 'wc_aelia_cs_get_product_base_currency'), 10, 2);
 
 		// Admin backend
 		add_action('admin_init', array($this, 'admin_init'));
@@ -1467,69 +1403,6 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	//	$this->recalculate_cart_totals(true);
 	//}
 
-	/**
-	 * Processes shipping methods before they are used by WooCommerce. Used to
-	 * convert shipping costs into the selected Currency.
-	 *
-	 * @param array An array of WC_Shipping_Method classes.
-	 * @return array An array of WC_Shipping_Method classes, with their costs
-	 * converted into Currency.
-	 */
-	public function woocommerce_package_rates($available_shipping_methods) {
-		$selected_currency = $this->get_selected_currency();
-		$base_currency = $this->base_currency();
-
-		// TODO Improve calculation of shipping taxes so that decimals are preserved
-		foreach($available_shipping_methods as $shipping_method) {
-			if(!empty($shipping_method->shipping_prices_in_currency)) {
-				continue;
-			}
-
-			// Convert shipping cost
-			if(!is_array($shipping_method->cost)) {
-				// Convert a simple total cost into currency
-				$shipping_method->cost = $this->convert($shipping_method->cost,
-																								$base_currency,
-																								$selected_currency);
-			}
-			else {
-				// Based on documentation, class can contain an array of costs in case
-				// of shipping costs applied per item. In such case, each one has to
-				// be converted
-				foreach($shipping_method->cost as $cost_key => $cost_value) {
-					$shipping_method->cost[$cost_key] = $this->convert($cost_value,
-																														 $base_currency,
-																														 $selected_currency);
-				}
-			}
-
-			// Convert shipping taxes
-			if(!is_array($shipping_method->taxes)) {
-				// Convert a simple total taxes into currency
-				$shipping_method->taxes = $this->convert($shipping_method->taxes,
-																								$base_currency,
-																								$selected_currency);
-			}
-			else {
-				// Based on documentation, class can contain an array of taxes in case
-				// of shipping taxes applied per item. In such case, each one has to
-				// be converted
-				foreach($shipping_method->taxes as $taxes_key => $taxes_value) {
-					$shipping_method->taxes[$taxes_key] = $this->convert($taxes_value,
-																															 $base_currency,
-																															 $selected_currency);
-				}
-			}
-
-			// Flag the shipping method to keep track of the fact that its costs have
-			// been converted into selected Currency. This is necessary because this
-			// is often called multiple times within the same page load, passing the
-			// same data that was already processed
-			$shipping_method->shipping_prices_in_currency = true;
-		}
-
-		return $available_shipping_methods;
-	}
 
 	/**
 	 * Processes the arguments that will be used in the formulas entered for the
@@ -1696,19 +1569,23 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		// Admin Interface Manager will handle the components and widgets for the WP admin pages
 		$this->load_admin_interface_manager();
 
+		// If we are on the frontend, and the "force currency by customer country"
+		// option is enabled, take the currency based on customer's country
+		// @since 4.5.7.171124
+		if(self::is_frontend() && !self::editing_order() && !$this->admin_currency_override() &&
+			 ($this->force_currency_by_country() != Settings::OPTION_DISABLED)) {
+			$selected_currency = $this->get_currency_by_customer_country();
+		}
+
 		// Check if user explicitly selected a currency
-		$selected_currency = get_value(Definitions::ARG_CURRENCY, $_POST);
+		if(empty($selected_currency)) {
+			$selected_currency = isset($_POST[Definitions::ARG_CURRENCY]) ? $_POST[Definitions::ARG_CURRENCY] : null;
+		}
+
 		// Check if currency was passed via the URL
 		if(empty($selected_currency) &&
 			 self::settings()->get(Settings::FIELD_CURRENCY_VIA_URL_ENABLED)) {
-			$selected_currency = get_value(Definitions::ARG_CURRENCY, $_GET);
-		}
-
-		// If no currency was explicitly selected and currency by customer country
-		// is enabled, determine the one to use from the billing country
-		if(empty($selected_currency) && !self::editing_order() &&
-			 ($this->force_currency_by_country() != Settings::OPTION_DISABLED)) {
-			$selected_currency = $this->get_currency_by_customer_country();
+			$selected_currency = isset($_GET[Definitions::ARG_CURRENCY]) ? $_GET[Definitions::ARG_CURRENCY] : null;
 		}
 
 		// Update selected Currency
@@ -1798,8 +1675,19 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 											 array(),
 											 self::$version,
 											 true);
+
+		// Script for Edit Product page
+		// @since 4.2.5.150907
 		wp_register_script('wc-aelia-currency-switcher-product-edit',
 											 $this->url('plugin') . '/js/admin/' . $js_path . '/wc-aelia-currency-switcher-product-edit.js',
+											 array('jquery', 'wc-aelia-currency-switcher-admin-overrides'),
+											 self::$version,
+											 true);
+
+		// Script for Edit Order page
+		// @since 4.5.5.171114
+		wp_register_script('wc-aelia-currency-switcher-order-edit',
+											 $this->url('plugin') . '/js/admin/' . $js_path . '/wc-aelia-currency-switcher-order-edit.js',
 											 array('jquery', 'wc-aelia-currency-switcher-admin-overrides'),
 											 self::$version,
 											 true);
@@ -2028,9 +1916,6 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 */
 	protected function store_customer_country($customer_country) {
 		Aelia_SessionManager::set_cookie(Definitions::SESSION_CUSTOMER_COUNTRY, $customer_country);
-		// Legacy code. The "billing country" value was deprecated in 1.3.0.150105,
-		// but it may be used by other plugins
-		Aelia_SessionManager::set_cookie(Definitions::SESSION_BILLING_COUNTRY, $customer_country);
 	}
 
 	/**
@@ -2053,31 +1938,27 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			 // and added a "wc-ajax" in the GET. Yet one more nonsensical change from
 			 // the WooCommerce "ninjas"
 			 (isset($_REQUEST['wc-ajax']) && ($_REQUEST['wc-ajax'] === 'update_order_review'))) {
-			// If user is on checkout page and changes the country, get the country
-			// code and store it in the session
-			check_ajax_referer('update-order-review', 'security');
-
-			// Determine if the prices should be based on billing or shipping country,
-			// and check if such country has changed
-			if($this->force_currency_by_country() == Settings::OPTION_SHIPPING_COUNTRY) {
-				$argument_to_check = Definitions::ARG_CHECKOUT_SHIPPING_COUNTRY;
-			}
-			else {
-				$argument_to_check = Definitions::ARG_CHECKOUT_BILLING_COUNTRY;
-			}
-			if(isset($_POST[$argument_to_check])) {
-				$result = $_POST[$argument_to_check];
-				$this->store_customer_country($result);
+			// If user is on checkout page and changes the billing country, get the
+			// country code and store it in the session
+			if(check_ajax_referer('update-order-review', 'security', false)) {
+				// Determine if the prices should be based on billing or shipping country,
+				// and check if such country has changed
+				if($this->force_currency_by_country() == Settings::OPTION_SHIPPING_COUNTRY) {
+					$argument_to_check = Definitions::ARG_CHECKOUT_SHIPPING_COUNTRY;
+				}
+				else {
+					$argument_to_check = Definitions::ARG_CHECKOUT_BILLING_COUNTRY;
+				}
+				if(isset($_POST[$argument_to_check])) {
+					$result = $_POST[$argument_to_check];
+				}
 			}
 		}
 
-		/* If prices should be based on shipping country, and customer changed the
-		 * country on the cart, take the newly selected country.
-		 */
+		// If changed the country on the cart, take the newly selected country
 		if(empty($result) && ($this->force_currency_by_country() === Settings::OPTION_SHIPPING_COUNTRY)) {
 			if(!empty($_POST['calc_shipping']) && wp_verify_nonce($_POST['_wpnonce'], 'woocommerce-cart')) {
 				$result = wc_clean($_POST['calc_shipping_country']);
-				$this->store_customer_country($result);
 			}
 		}
 
@@ -2085,27 +1966,18 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		if(empty($result)) {
 			if(isset($_POST[Definitions::ARG_CUSTOMER_COUNTRY])) {
 				$result = $_POST[Definitions::ARG_CUSTOMER_COUNTRY];
-				$this->store_customer_country($result);
 			}
 		}
 
-		// Check if "billing country" argument was posted. This is a legacy check,
-		// the "billing country" argument was deprecated in 4.0.0.150311
-		if(empty($result)) {
-			if(isset($_POST[Definitions::ARG_BILLING_COUNTRY])) {
-				$result = $_POST[Definitions::ARG_BILLING_COUNTRY];
-				$this->store_customer_country($result);
-			}
-		}
-
-		// If no customer country was posted, check if one was stored in the session
+		// If no billing country was posted, check if one was stored in the session
 		if(empty($result)) {
 			$result = Aelia_SessionManager::get_cookie(Definitions::SESSION_CUSTOMER_COUNTRY);
 		}
 
-		// If no country was passed, take customer's country from his profile
+		// If no country was passed, and the customer is logged in, take the country
+		// from his profile
 		if(empty($result)) {
-			if(isset($woocommerce->customer)) {
+			if(is_user_logged_in() && isset($woocommerce->customer)) {
 				if($this->force_currency_by_country() === Settings::OPTION_SHIPPING_COUNTRY) {
 					$result = $woocommerce->customer->get_shipping_country();
 				}
@@ -2133,8 +2005,10 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			$result = $woocommerce->countries->get_base_country();
 		}
 
+		$this->store_customer_country($result);
+
 		$this->customer_country = $result;
-		return $result;
+		return apply_filters('wc_aelia_cs_customer_country', $result, $this);
 	}
 
 	/**
@@ -2168,8 +2042,10 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 * - shipping_country: currency should be determined by shipping country.
 	 */
 	protected function force_currency_by_country() {
-		return self::settings()->current_settings(Settings::FIELD_FORCE_CURRENCY_BY_COUNTRY,
-																							Settings::OPTION_DISABLED);
+		// Allow 3rd parties to change the setting on the fly.
+		// @since 4.5.16.180307
+		return apply_filters('wc_aelia_cs_force_currency_by_country', self::settings()->current_settings(Settings::FIELD_FORCE_CURRENCY_BY_COUNTRY,
+																																																		 Settings::OPTION_DISABLED));
 	}
 
 	/**
@@ -2269,7 +2145,8 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	}
 
 	/**
-	 * Renders the shortcode to display a product price.
+	 * Renders the shortcode to display an arbitrary amount, converted to the
+	 * active currency.
 	 *
 	 * @param array shortcode_args The arguments passed to the shortcode.
 	 * @since 4.3.0.160302
@@ -2304,17 +2181,19 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 		// The argument keys are forced to lower case, therefore we must use the
 		// lower case currency code to find explicit prices
 		if(isset($args[strtolower($target_currency)])) {
-			$converted_amount = $args[strtolower($target_currency)];
+			$raw_converted_amount = $args[strtolower($target_currency)];
 		}
 		else {
 			$include_markup = (bool)($args['include_markup'] == '1');
-			$converted_amount = $this->convert($args['amount'],
+			$raw_converted_amount = $this->convert($args['amount'],
 																				 $args['from_currency'],
 																				 $args['to_currency'],
 																				 $decimals,
 																				 $include_markup);
 		}
 
+		// Keep a copy of the raw amount, so that we can pass it to the filter
+		$converted_amount = $raw_converted_amount;
 		// Format price, if requested
 		if($args['formatted'] == 1) {
 			$converted_amount = wc_price($converted_amount, array(
@@ -2323,7 +2202,7 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 			));
 		}
 
-		return apply_filters('wc_aelia_cs_shortcode_currency_amount', $converted_amount, $shortcode_args);
+		return apply_filters('wc_aelia_cs_shortcode_currency_amount', $converted_amount, $shortcode_args, $raw_converted_amount);
 	}
 
 	/**
@@ -2339,7 +2218,7 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 * @since 4.4.0.161221
 	 */
 	public function wc_aelia_afc_register_plugins_to_update(array $plugins_to_update) {
-		//// Add this plugins to the list of the plugins to update automatically
+		// Add this plugins to the list of the plugins to update automatically
 		$plugins_to_update['premium'][self::$plugin_slug] = $this;
 		return $plugins_to_update;
 	}
@@ -2375,6 +2254,19 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 				'permissions' => 'manage_woocommerce',
 				'message_header' => __('Important change', self::$text_domain),
 		));
+
+		// Inform admins that the Dynamic Pricing integration has been moved to an
+		// external plugin
+		// @since 4.5.14.180122
+		Messages::admin_message(
+			$this->_messages_controller->get_message(Definitions::WARN_YAHOO_FINANCE_DISCONTINUED),
+			array(
+				'level' => E_USER_WARNING,
+				'code' => Definitions::WARN_YAHOO_FINANCE_DISCONTINUED,
+				'dismissable' => true,
+				'permissions' => 'manage_woocommerce',
+				'message_header' => __('Important change', self::$text_domain),
+		));
 	}
 
 	/**
@@ -2384,6 +2276,52 @@ class WC_Aelia_CurrencySwitcher extends Aelia_Plugin implements IWC_Aelia_Curren
 	 */
 	public function admin_init() {
 		$this->show_admin_messages();
+
+		// Add filter to ovveride selected currency in the admin area, regardless
+		// of any other settings
+		// @since 4.5.5.171114
+		if($this->admin_currency_override()) {
+			add_filter('woocommerce_currency', array($this, 'admin_woocommerce_currency'), 6);
+		}
+	}
+
+	/**
+	 * Returns a product's base currency.
+	 *
+	 * @param string base_currency The original base currency passed to the filter.
+	 * @param int product_id
+	 * @return string
+	 * @since 4.4.19.170602
+	 */
+	public function wc_aelia_cs_get_product_base_currency($base_currency, $product_id) {
+		return $this->currencyprices_manager()->get_product_base_currency($product_id);
+	}
+
+	/**
+	 * Indicates if the currency was overridden by an Admin operation.
+	 *
+	 * @return bool
+	 * @since 4.5.5.171114
+	 */
+	protected function admin_currency_override() {
+		return is_admin() && !empty($_GET[Definitions::ARG_ADMIN_CURRENCY]) && current_user_can('manage_woocommerce');
+	}
+
+	/**
+	 * Replaces the selected currency with the currency selected explicly during
+	 * an Admin operation.
+	 *
+	 * @param string currency
+	 * @return string
+	 * @since 4.5.5.171114
+	 */
+	public function admin_woocommerce_currency($currency) {
+		// If a currency was explicitly selected, replace any other currency with it
+		if(!empty($_GET[Definitions::ARG_ADMIN_CURRENCY])) {
+			$this->selected_currency = $_GET[Definitions::ARG_ADMIN_CURRENCY];
+		}
+
+		return apply_filters('wc_aelia_cs_admin_selected_currency', $this->get_selected_currency());
 	}
 }
 

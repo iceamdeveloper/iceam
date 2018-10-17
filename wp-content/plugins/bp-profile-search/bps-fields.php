@@ -133,6 +133,22 @@ function bps_parse_request ($request)
 				$f->value = $value;
 			}
 			break;
+		case 'range':
+			if (is_numeric ($value['min']))
+				$f->value['min'] = $value['min'];
+			if (is_numeric ($value['max']))
+				$f->value['max'] = $value['max'];
+			if (isset ($f->value))
+				$f->filter = $filter;
+			break;
+		case 'age_range':
+			if (is_numeric ($value['min']))
+				$f->value['min'] = (int)$value['min'];
+			if (is_numeric ($value['max']))
+				$f->value['max'] = (int)$value['max'];
+			if (isset ($f->value))
+				$f->filter = $filter;
+			break;
 		case 'range_min':
 		case 'age_range_min':
 			if (!is_numeric ($value))  break;

@@ -154,8 +154,9 @@ function bps_ajax_template_options ()
 
 function bps_template_options ($form, $template)
 {
-	$located = bp_locate_template ($template. '.php');
+	echo bps_locate_template ($template);
 
+	$located = bp_locate_template ($template. '.php');
 	if ($located === false)  return false;
 
 	$meta = bps_meta ($form);
@@ -192,40 +193,6 @@ function bps_template_options ($form, $template)
 	}
 
 	return true;
-}
-
-function bps_jquery_ui_themes ()
-{
-	$themes = array (
-		'' => __('no theme', 'bp-profile-search'),
-		'base' => 'Base',
-		'black-tie' => 'Black Tie',
-		'blitzer' => 'Blitzer',
-		'cupertino' => 'Cupertino',
-		'dark-hive' => 'Dark Hive',
-		'dot-luv' => 'Dot Luv',
-		'eggplant' => 'Eggplant',
-		'excite-bike' => 'Excite Bike',
-		'flick' => 'Flick',
-		'hot-sneaks' => 'Hot Sneaks',
-		'humanity' => 'Humanity',
-		'le-frog' => 'Le Frog',
-		'mint-choc' => 'Mint Choc',
-		'overcast' => 'Overcast',
-		'pepper-grinder' => 'Pepper Grinder',
-		'redmond' => 'Redmond',
-		'smoothness' => 'Smoothness',
-		'south-street' => 'South Street',
-		'start' => 'Start',
-		'sunny' => 'Sunny',
-		'swanky-purse' => 'Swanky Purse',
-		'trontastic' => 'Trontastic',
-		'ui-darkness' => 'UI darkness',
-		'ui-lightness' => 'UI lightness',
-		'vader' => 'Vader',
-	);	
-
-	return apply_filters ('bps_jquery_ui_themes', $themes);
 }
 
 function bps_persistent ($post)
@@ -291,7 +258,9 @@ function bps_update_meta ($form, $post)
 		if (isset ($template_options['button']))  bps_set_wpml ($form, '-', 'toggle form', $template_options['button']);
 	}
 
+	bps_set_wpml ($form, '-', 'title', $post->post_title);
 	update_post_meta ($form, 'bps_options', $meta);
+
 	return true;
 }
 

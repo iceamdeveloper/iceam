@@ -219,12 +219,7 @@ function bps_usermeta_search ($f)
 
 function bps_get_roles ()
 {
-	global $wp_roles;
-
-	if (empty ($wp_roles))
-		$wp_roles = new WP_Roles ();
-
-	return $wp_roles->get_names ();
+	return wp_roles()->get_names ();
 }
 
 add_filter ('bps_add_fields', 'bps_taxonomies_setup', 99);

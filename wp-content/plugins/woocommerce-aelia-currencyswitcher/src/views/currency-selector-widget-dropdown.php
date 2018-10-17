@@ -17,15 +17,10 @@ if(!empty($currency_switcher_widget_title)) {
 	echo get_value('after_title', $widget_args);
 }
 
-// If one or more Currencies are misconfigured, inform the Administrators of
-// such issue
-if((get_value('misconfigured_currencies', $this, false) === true) && current_user_can('manage_options')) {
-	$error_message = WC_Aelia_CurrencySwitcher::instance()->get_error_message(Definitions::ERR_MISCONFIGURED_CURRENCIES);
-	echo '<div class="error">';
-	echo '<h5 class="title">' . __('Error', $this->text_domain) . '</h5>';
-	echo $error_message;
-	echo '</div>';
-}
+// Trigger an action to allow rendering elements before the selector form
+// (e.g. to show error messages)
+// @since 4.5.7.171124
+do_action('wc_aelia_cs_widget_before_currency_selector_form', $this);
 
 echo '<!-- Currency Switcher v.' . WC_Aelia_CurrencySwitcher::$version . ' - Currency Selector Widget -->';
 echo '<form method="post" class="currency_switch_form">';

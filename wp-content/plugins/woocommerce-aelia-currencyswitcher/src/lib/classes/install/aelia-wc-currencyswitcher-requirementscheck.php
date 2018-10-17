@@ -19,9 +19,9 @@ class Aelia_WC_CurrencySwitcher_RequirementsChecks extends Aelia_WC_Requirements
 
 	// @var array An array of WordPress plugins (name => version) required by the plugin.
 	protected $required_plugins = array(
-		'WooCommerce' => '2.4',
+		'WooCommerce' => '2.6',
 		'Aelia Foundation Classes for WooCommerce' => array(
-			'version' => '1.8.3.170202',
+			'version' => '2.0.1.180821',
 			'extra_info' => 'You can get the plugin <a href="http://bit.ly/WC_AFC_S3">from our site</a>, free of charge.',
 			'autoload' => true,
 			'url' => 'http://bit.ly/WC_AFC_S3',

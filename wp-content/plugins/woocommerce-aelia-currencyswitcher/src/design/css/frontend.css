@@ -22,3 +22,8 @@
 .widget_wc_aelia_country_selector_widget .button.change_country {
 	display: none;
 }
+
+.widget_wc_aelia_currencyswitcher_widget .widget_errors {
+	list-style-type: disc;
+	list-style-position: inside;
+}

@@ -1,17 +1,6 @@
-/**
- * The Events Calendar Pro Widget This Week Full Stylesheet
- *
- * To add your own custom styles, create a stylesheet with the name
- * widget-this-week.css in the tribe-events/pro/ directory of your theme.
- * Your new stylesheet will be loaded after our own stylesheet.
- *
- * To replace our stylesheet altogether, you can use the 'tribe_events_pro_widget_calendar_stylesheet_url' filter.
- *
- * @package TribeEventsCalendarPro
- *
- */
-/*
-* This Week Widget CSS */
+/* = This Week Widget
+   @ Template: pro/widgets/this-week-widget.php
+=============================================*/
 
 .tribe-this-week-widget-wrapper {
 	position: relative;
@@ -31,6 +20,10 @@
 .tribe-this-week-widget-wrapper .tribe-events-page-title {
 	font-size: 26px;
 	text-align: center;
+}
+
+.tribe-this-week-widget-wrapper a {
+	color: #757575;
 }
 
 .tribe-events-visuallyhidden {
@@ -54,17 +47,16 @@
 .tribe-events-sub-nav .tribe-this-week-nav-link.nav-next,
 .tribe-events-sub-nav .tribe-this-week-nav-link.nav-previous {
 	border: none;
-	display: inline-block;
 	float: left;
 	list-style-type: none;
-	margin: 0 .5% 0 0;
+	margin: 0 5px 0 0;
 	padding: .5rem 0;
 	text-align: left;
 }
 
 .tribe-events-sub-nav .tribe-this-week-nav-link.nav-next {
 	float: right;
-	margin: 0 0 0 .5%;
+	margin: 0 0 0 5px;
 	text-align: right;
 }
 
@@ -72,13 +64,26 @@
 * This Week Widget Common CSS */
 
 .tribe-this-week-widget-header-date {
-	background-color: #f5f5f5;
+	background-color: #666;
 	border: none;
-	color: #333;
+	color: #fff;
 	font-weight: 700;
 	margin-bottom: 8px;
 	padding: 5px 0;
 	text-align: center;
+}
+
+.this-week-today .tribe-this-week-widget-header-date {
+	background-color: #21759b;
+}
+
+.this-week-past .tribe-this-week-widget-header-date {
+	background-color: #b2b2b2;
+}
+
+.this-week-past .type-tribe_events {
+	filter: Alpha(opacity=50);
+	opacity: .5;
 }
 
 .tribe-this-week-widget-day-wrap {
@@ -86,7 +91,7 @@
 }
 
 .tribe-this-week-event {
-	border-left: 4px #f5f5f5 solid;
+	border-left: 4px #21759b solid;
 	margin-bottom: 8px;
 	padding: 0 0 0 6px;
 }
@@ -110,6 +115,7 @@
 }
 
 .tribe-this-week-widget-day {
+	color: #333;
 	font-size: 16px;
 	margin: 0;
 }
@@ -121,6 +127,7 @@
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	color: #114b7d;
 	font-size: 16px;
 	vertical-align: top;
 }
@@ -137,6 +144,7 @@
 	box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	-webkit-box-sizing: border-box;
+	color: #114b7d;
 	float: left;
 	font-size: 14px;
 	vertical-align: top;
@@ -149,6 +157,7 @@
 
 .tribe-this-week-widget-horizontal .entry-title,
 .tribe-this-week-widget-horizontal .entry-title a {
+	color: #333;
 	font-size: 14px;
 }
 
@@ -162,7 +171,6 @@
 		width: 100%;
 	}
 }
-
 
 /*
 * AJAX */
@@ -191,60 +199,4 @@
 .tribe-events-ajax-loading.tribe-events-active-spinner img,
 .tribe-events-loading .tribe-events-ajax-loading {
 	display: block;
-}
-
-/*
-* Twenty Fourteen CSS */
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .this-week-past .type-tribe_events,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .this-week-past .type-tribe_events {
-	filter: Alpha(opactiy=7);
-	opacity: .7;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .entry-title,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .entry-title {
-	line-height: 1.1;
-	margin-bottom: .25em;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .entry-title a,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .entry-title a {
-	color: #fff;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .entry-title a:hover,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .entry-title a:hover {
-	color: #ccc;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .tribe-events-viewmore,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .tribe-events-viewmore {
-	border-color: #555;
-	font-size: .8rem;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .tribe-events-viewmore a,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .tribe-events-viewmore a,
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .tribe-venue a,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .tribe-venue a {
-	color: #ccc;
-	line-height: 1.25;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .tribe-events-viewmore a:hover,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .tribe-events-viewmore a:hover,
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .tribe-venue a:hover,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .tribe-venue a:hover {
-	color: #aaa;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .duration,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .duration {
-	color: #90BBD0;
-	margin-bottom: .25em;
-}
-
-.tribe-theme-twentyfourteen .primary-sidebar .tribe-this-week-widget-wrapper .tribe-this-week-widget-day,
-.tribe-theme-twentyfourteen .footer-sidebar .tribe-this-week-widget-wrapper .tribe-this-week-widget-day {
-	color: #90BBD0;
 }

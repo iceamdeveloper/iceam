@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit580c48c5da2ce4569fa38a51cce869ad
+class ComposerStaticInitf55ad192ac64315529a013bb3ac22997
 {
     public static $classMap = array (
         'Aelia\\WC\\CurrencySwitcher\\Aelia_Order' => __DIR__ . '/../..' . '/lib/classes/order/wc-aelia-order.php',
@@ -12,7 +12,6 @@ class ComposerStaticInit580c48c5da2ce4569fa38a51cce869ad
         'Aelia\\WC\\CurrencySwitcher\\Exchange_Rates_OpenExchangeRates_Model' => __DIR__ . '/../..' . '/lib/classes/integration/exchange-rates-providers/wc-aelia-openexchangeratesmodel.php',
         'Aelia\\WC\\CurrencySwitcher\\Exchange_Rates_WebServiceX_Model' => __DIR__ . '/../..' . '/lib/classes/integration/exchange-rates-providers/wc-aelia-webservicexmodel.php',
         'Aelia\\WC\\CurrencySwitcher\\IWC_Aelia_Reporting_Manager' => __DIR__ . '/../..' . '/lib/classes/reporting/wc-aelia-reporting-manager.php',
-        'Aelia\\WC\\CurrencySwitcher\\Logger' => __DIR__ . '/../..' . '/lib/classes/logger/logger.php',
         'Aelia\\WC\\CurrencySwitcher\\Messages' => __DIR__ . '/../..' . '/lib/classes/messages/messages.php',
         'Aelia\\WC\\CurrencySwitcher\\Reports' => __DIR__ . '/../..' . '/lib/classes/reporting/wc-aelia-cs-reports.php',
         'Aelia\\WC\\CurrencySwitcher\\Settings' => __DIR__ . '/../..' . '/lib/classes/settings/wc-aelia-currencyswitcher-settings.php',
@@ -23,6 +22,8 @@ class ComposerStaticInit580c48c5da2ce4569fa38a51cce869ad
         'Aelia\\WC\\CurrencySwitcher\\WC26\\WC_Aelia_CurrencyPrices_Manager' => __DIR__ . '/../..' . '/lib/classes/multiprice/WC26/wc-aelia-currencyprices-manager.php',
         'Aelia\\WC\\CurrencySwitcher\\WC27\\IWC_Aelia_CurrencyPrices_Manager' => __DIR__ . '/../..' . '/lib/classes/multiprice/WC27/wc-aelia-currencyprices-manager.php',
         'Aelia\\WC\\CurrencySwitcher\\WC27\\WC_Aelia_CurrencyPrices_Manager' => __DIR__ . '/../..' . '/lib/classes/multiprice/WC27/wc-aelia-currencyprices-manager.php',
+        'Aelia\\WC\\CurrencySwitcher\\WC32\\IWC_Aelia_CurrencyPrices_Manager' => __DIR__ . '/../..' . '/lib/classes/multiprice/WC32/wc-aelia-currencyprices-manager.php',
+        'Aelia\\WC\\CurrencySwitcher\\WC32\\WC_Aelia_CurrencyPrices_Manager' => __DIR__ . '/../..' . '/lib/classes/multiprice/WC32/wc-aelia-currencyprices-manager.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CS_Admin_Interface_Manager' => __DIR__ . '/../..' . '/lib/classes/integration/admin/wc-aelia-cs-admin-interface-manager.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CS_BE_Table_Rates_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/be-table-rates/wc-aelia-cs-be-table-rates-integration.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CS_Cart_Notices_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/cart-notices-plugin/wc-aelia-cs-cart-notices-integration.php',
@@ -31,6 +32,7 @@ class ComposerStaticInit580c48c5da2ce4569fa38a51cce869ad
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_CurrencySwitcher_Widget' => __DIR__ . '/../..' . '/lib/classes/widgets/wc-aelia-currencyswitcher-widget.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_Customer_Country_Selector_Widget' => __DIR__ . '/../..' . '/lib/classes/widgets/wc-aelia-customer-country-selector-widget.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_KISSMetrics_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/KISSmetrics/wc-aelia-kissmetrics-integration.php',
+        'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_OFXModel' => __DIR__ . '/../..' . '/lib/classes/integration/exchange-rates-providers/wc-aelia-ofxmodel.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_Reporting_Manager' => __DIR__ . '/../..' . '/lib/classes/reporting/wc-aelia-reporting-manager.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_TCBModel' => __DIR__ . '/../..' . '/lib/classes/integration/exchange-rates-providers/wc-aelia-turkeycentralbankmodel.php',
         'Aelia\\WC\\CurrencySwitcher\\WC_Aelia_YahooFinanceModel' => __DIR__ . '/../..' . '/lib/classes/integration/exchange-rates-providers/wc-aelia-yahoofinancemodel.php',
@@ -41,7 +43,7 @@ class ComposerStaticInit580c48c5da2ce4569fa38a51cce869ad
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit580c48c5da2ce4569fa38a51cce869ad::$classMap;
+            $loader->classMap = ComposerStaticInitf55ad192ac64315529a013bb3ac22997::$classMap;
 
         }, null, ClassLoader::class);
     }

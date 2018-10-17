@@ -12,15 +12,23 @@ class Messages extends \Aelia\WC\Messages {
 	public function load_error_messages() {
 		parent::load_error_messages();
 
+		$settings_page_url = admin_url('admin.php?page=' . Definitions::MENU_SLUG);
+		$support_url = 'https://aelia.co/contact';
+
 		$this->add_error_message(Definitions::ERR_FILE_NOT_FOUND, __('File not found: "%s".', Definitions::TEXT_DOMAIN));
 		$this->add_error_message(Definitions::ERR_INVALID_CURRENCY, __('Currency not valid: "%s".', Definitions::TEXT_DOMAIN));
 		$this->add_error_message(Definitions::ERR_MISCONFIGURED_CURRENCIES,
 														 __('One or more Currencies are not configured correctly (e.g. ' .
-																'Exchange Rates may be missing, or set to zero). Please ' .
-																'check Currency Switcher Options and ensure that all enabled ' .
-																'Currencies have been configured correctly. If the problem ' .
-																'persists, please contact Support.',
-																Definitions::TEXT_DOMAIN));
+																'exchange rates may be missing, incorrect, or set to zero).', Definitions::TEXT_DOMAIN) .
+																' ' .
+																sprintf(__('Please <a href="%1$s">check the Currency Switcher settings</a> '.
+																					 'and make sure that all enabled currencies have been configured ' .
+																					 'correctly.', Definitions::TEXT_DOMAIN),
+																				$settings_page_url) .
+																' ' .
+																sprintf(__('If the issue persists, please <a href="%1$s">contact the Aelia ' .
+																					 'Support Team</a>.', Definitions::TEXT_DOMAIN),
+																				$support_url));
 		$this->add_error_message(Definitions::ERR_INVALID_SOURCE_CURRENCY,
 														 __('Currency Conversion - Source Currency not valid or exchange rate ' .
 																'not found for: "%s". Please make sure that the Currency '.
@@ -37,8 +45,19 @@ class Messages extends \Aelia\WC\Messages {
 														 __('Rendering - Requested template could not be found in either plugin\'s ' .
 																'folders, nor in your theme. Plugin slug: "%s". Template name: "%s".'.
 																Definitions::TEXT_DOMAIN));
+		$this->add_error_message(Definitions::ERR_MANUAL_CURRENCY_SELECTION_DISABLED,
+														 sprintf(__('The option "force currency by country" is enabled in the ' .
+																				'<a href="%1$s">Currency Switcher settings</a>.', Definitions::TEXT_DOMAIN),
+																		 $settings_page_url) .
+														 ' ' .
+														 __('Due to that, the currency selection performed using this widget ' .
+																'will have no effect.', Definitions::TEXT_DOMAIN) .
+														 ' ' .
+														 __('If you wish to enable the manual selection of the currency ' .
+																'using this widget, please disable the "force currency by country" ' .
+																'option.', Definitions::TEXT_DOMAIN));
 
-		// Add message to inform customers about the new Dynamic Pricing addon
+		// Add message to inform merchants about the new Dynamic Pricing addon
 		$this->add_message(
 			Definitions::WARN_DYNAMIC_PRICING_INTEGRATION,
 			'<strong>' .
@@ -53,6 +72,33 @@ class Messages extends \Aelia\WC\Messages {
 							'https://aelia.co/shop/woocommerce-dynamic-pricing-integration-currency-switcher/') .
 			'<br><br>' .
 			__('If you are not using the Dynamic Pricing plugin, please disregard this message. Thanks.',
+				 Definitions::TEXT_DOMAIN)
+		);
+
+		// Add message to inform merchants that Yahoo! Finance has been discontinued
+		// @since 4.5.14.180122
+		$this->add_message(
+			Definitions::WARN_YAHOO_FINANCE_DISCONTINUED,
+			'<strong>' .
+			__('The Yahoo! Finance service has been discontinued', Definitions::TEXT_DOMAIN) .
+			'</strong><br>' .
+			' ' .
+			__('The Yahoo! Finance is no longer available, and can no longer be used to fetch ' .
+				 'exchange rates.', Definitions::TEXT_DOMAIN) .
+			' ' .
+			sprintf(__('If you are using Yahoo! Finance to update the exchange rates, please ' .
+								 '<a href="%1$s">review your Currency Switcher settings</a> and ' .
+								 'select another provider.',
+								 Definitions::TEXT_DOMAIN),
+							$settings_page_url) .
+			' ' .
+			sprintf(__('Open Exchange Rates is an excellent alternative. You can get a ' .
+								 'free API key for their service here: ' .
+								 '<a href="%1$s" target="_blank">%1$s</a>.',
+								 Definitions::TEXT_DOMAIN),
+							'https://openexchangerates.org/signup/free') .
+			'<br><br>' .
+			__('If you are not using Yahoo! Finance as the exchange rates provider, please disregard this message. Thanks.',
 				 Definitions::TEXT_DOMAIN)
 		);
 
