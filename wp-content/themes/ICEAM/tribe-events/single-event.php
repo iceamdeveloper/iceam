@@ -106,6 +106,8 @@ $event_id = get_the_ID();
 						$term_names[] = $term->name;
 					}
 				}
+				$eventId = get_the_ID();
+				$singleSignupRestricted = array(8390,8356);
 				
 				// get the current user's info
 				$user_ID = get_current_user_id();
@@ -121,7 +123,18 @@ $event_id = get_the_ID();
 					
 				<?php	
 				// if this is an Advanced course
-				} else if(in_array('Advanced',$term_names)){
+				} else if( $user_ID != 0 && !in_array('diplomate',$member_info->roles ) && in_array($eventId,$singleSignupRestricted)){ ?>
+						<div class="tribe-events-non-diplomate">
+							<h3>We're Sorry</h3>
+							<p>You must be a Diplomate to register for this course outside of a training module.</p>
+							
+							<p>Please
+							<?php if ($user_ID == 0){ ?>
+								<a href="/my-courses/">login</a> or
+							<?php } ?>
+							view our <a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a></p>
+						</div>
+				<?php } else if(in_array('Advanced',$term_names)){
 					// if the user is logged in as a diplomate or administrator or teacher
 					// show the purchase tickets module
 					if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) || $user_ID != 0 && in_array('teacher',$member_info->roles)) {
