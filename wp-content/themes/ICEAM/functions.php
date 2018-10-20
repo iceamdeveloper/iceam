@@ -5,11 +5,14 @@
 *
 *	Known Issues:
 *
+*	/wp-content/plugins/the-events-calendar/src/resources/js/embedded-map.min.js is being loaded manually in child_theme_js()
+*	because it is not working properly in the events calendar (or pro?).
+*	This should be checked to see if it is corrected in updated versions of the plugin.
+*
 *
  */
 
 
- 
 
 /***********************************************************************
  *
@@ -43,6 +46,25 @@ function admin_style() {
 	wp_enqueue_style('admin-styles', get_stylesheet_directory_uri().'/css/admin.css');
 }
 add_action('admin_enqueue_scripts', 'admin_style');
+
+
+
+
+// enqueue javascript
+function child_theme_js(){
+	// use wp_deregister_script() and wp_dequeue_script() to remove scripts loaded in parent
+	// use wp_register_script() and wp_enqueue_script() to add scripts
+    
+    $this_post_type = get_post_type();
+
+	if($this_post_type == "tribe_venue" || $this_post_type == "tribe_events"){
+		wp_register_script( 'tribe-gmaps', '/wp-content/plugins/the-events-calendar/src/resources/js/embedded-map.min.js');
+		wp_enqueue_script( 'tribe-gmaps' );
+	}
+}
+add_action( 'wp_enqueue_scripts', 'child_theme_js' );
+
+
 
 
 /***********************************************************************
