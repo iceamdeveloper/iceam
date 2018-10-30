@@ -195,6 +195,36 @@ jQuery(document).ready(function(){
 			}
 		});
 	}
+    
+    
+    // show / hide appropriate practitioner / student fields on the register page
+    
+    if($("body.registration.register.buddypress")){
+        $(".field-visibility-settings, .field-visibility-settings-toggle").remove();
+        
+        var $status_selector = $(".field_current-status select");
+        
+        var thingsy = function(){
+            var val = $status_selector.val();
+            if(val == "Practitioner"){
+                console.log(val);
+                $(".field_practitioner-license-number").show();
+                $(".field_licensing-state").show();
+                
+                $(".field_student-id-number").hide();
+                $(".field_school-name").hide();
+            } else if(val == "Student"){
+                $(".field_practitioner-license-number").hide();
+                $(".field_licensing-state").hide();
+                
+                $(".field_student-id-number").show();
+                $(".field_school-name").show();
+            }
+        };
+        
+        thingsy();
+        $status_selector.on("change", thingsy);
+    }
 
 	
 });
