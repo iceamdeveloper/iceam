@@ -107,11 +107,18 @@ $event_id = get_the_ID();
 					}
 				}
 				$eventId = get_the_ID();
-				$singleSignupRestricted = array(8390,8356);
+				$singleSignupRestricted = array(8390,8356,8480,7055,8483,7064);
+				if($eventId == (8480||7055||8483||7064)){
+					$ven = 'london';
+				} else {
+					$ven = 'potland';
+				}
 				
 				// get the current user's info
 				$user_ID = get_current_user_id();
 				$member_info = get_userdata($user_ID);
+
+				echo 'user'.$user_ID;
 				
 				if ($register_offsite == 1){
 					$venue_ID = get_post_meta(get_the_ID(), "_EventVenueID", true );
@@ -123,7 +130,7 @@ $event_id = get_the_ID();
 					
 				<?php	
 				// if this is an Advanced course
-				} else if( $user_ID != 0 && !in_array('diplomate',$member_info->roles ) && in_array($eventId,$singleSignupRestricted)){ ?>
+				} else if( !in_array('diplomate',$member_info->roles ) && in_array($eventId,$singleSignupRestricted)){ ?>
 						<div class="tribe-events-non-diplomate">
 							<h3>We're Sorry</h3>
 							<p>You must be a Diplomate to register for this course outside of a training module.</p>
@@ -132,7 +139,7 @@ $event_id = get_the_ID();
 							<?php if ($user_ID == 0){ ?>
 								<a href="/my-courses/">login</a> or
 							<?php } ?>
-							view our <a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a></p>
+							view our <?php if($ven=='portland'){ ?><a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a><?php } else { ?><a href="/venue/iceam-london/">London ICEAM Course Modules.</a><?php } ?></p>
 						</div>
 				<?php } else if(in_array('Advanced',$term_names)){
 					// if the user is logged in as a diplomate or administrator or teacher

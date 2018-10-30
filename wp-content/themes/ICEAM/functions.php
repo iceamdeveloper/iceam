@@ -545,7 +545,7 @@ function woo_custom_deregister_bbpress_template_stack ( $stack ) {
  *
  **********************************************************************/
 
-global $woothemes_sensei;
+//global $woothemes_sensei;
 //remove_action( 'sensei_login_form', array( $woothemes_sensei->frontend, 'sensei_login_form' ), 10 );
 
 //add_action( 'sensei_login_form', 'custom_sensei_login_form' , 10 );
