@@ -323,7 +323,7 @@ function apply_signup_coupons() {
 	$apply_coupon = false;
     $items = $woocommerce->cart->get_cart();
     $total = floatval( preg_replace( '#[^\d.]#', '', $woocommerce->cart->get_cart_total() ) );
-    echo "<p>total: $total</p>";
+    //echo "<p>the total: $total</p>";
     
     
 	foreach($items as $item => $values) {
@@ -794,12 +794,15 @@ function custom_checkout_update_order_meta(){
 	
 	$userdata = get_userdata($user_id);
 	$roles = ($userdata->roles ? $userdata->roles : []);
-	
+    
 	if($_POST['user_type_select'] == "Practitioner" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
 		wp_update_user( array( 'ID' => $user_id, 'role' => strtolower($_POST['user_type_select']) ) );
 	} else if($_POST['user_type_select'] == "Student" && !in_array('administrator',$roles) && !in_array('diplomate',$roles)){
 		wp_update_user( array( 'ID' => $user_id, 'role' => 'customer' ) );
 	}
+    
+    // also ensure all users have forum participant role when a product is purchased
+    bbp_set_user_role( $user_id, "bbp_participant" );
 }
 
 
@@ -822,6 +825,40 @@ function custom_checkout_field_display_admin_order_meta($order){
 		echo '<p><strong>'.__('School Name').':</strong> ' . get_post_meta( $order->id, 'School Name', true ) . '</p>';
 	}
 }
+
+
+
+
+/***********************************************************************
+ *
+ *	MAKE SURE THAT STUDENTS ARE SET IN THE SYSTEM AS STUDENT ROLE
+ *	("CUSTOMERS") AS REGISTRATION IS FINALIZED
+ *
+ **********************************************************************/
+
+add_action('bp_core_activated_user', 'bp_custom_registration_role',10 , 3);
+function bp_custom_registration_role($user_id) {
+    $current_status = xprofile_get_field_data('Current Status', $user_id);
+    if(strtolower($current_status) == "student"){
+        wp_update_user( array( 'ID' => $user_id, 'role' => 'customer' ) );
+    }
+}
+
+
+
+/***********************************************************************
+ *
+ *	SHOW REGISTER NOW MESSAGE IN CART
+ *
+ **********************************************************************/
+ 
+add_action('woocommerce_before_cart','show_cart_registration_prompt',10, 1);
+function show_cart_registration_prompt($woocommerce_before_cart){
+    if(!get_current_user_id()){
+        echo('<div class="woocommerce-message"><a href="/register" class="btn btn-primary" style="margin-left: 10px; float: right; display: inline-block;">Sign Up Now!</a> Some automatic discounts are not displayed until logged in. Not <a href="/register">registered</a> yet? </div>');
+    }
+}
+
 
 
 
@@ -1060,6 +1097,7 @@ function change_btn_text($text){
 	return $text;
 }
 add_filter('sensei_wc_single_add_to_cart_button_text','change_btn_text',9999,1);
+
 
 
 /***********************************************************************
