@@ -65,6 +65,9 @@
 		
 		// if the product isn't identified at this point there is a problem
 		if ( ! isset ( $product ) || ! is_object( $product ) ) return;
+        
+        // if the product is not available, do not show
+        if ( $product->stock_status == "outofstock" ) return;
 		
 		// check to see if the user is currently a student in this course
 		// if the user has not completed the course, don't show purchase btn
