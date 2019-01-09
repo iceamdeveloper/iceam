@@ -671,6 +671,16 @@ table.profile-fields td.label{
 }
 
 
+/* FORUMS */
+
+body.activation.activate p.submit{
+    background: none;
+}
+
+
+
+/*       */
+
 .single-lesson .video{
 	position: relative;
 }
