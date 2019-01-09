@@ -5,12 +5,7 @@ function bps_xprofile_setup ($fields)
 {
 	global $group, $field;
 
-	if (!function_exists ('bp_has_profile'))
-	{
-//		printf ('<p class="bps_error">'. __('%s: The BuddyPress Extended Profiles component is not active.', 'bp-profile-search'). '</p>',
-//			'<strong>BP Profile Search '. BPS_VERSION. '</strong>');
-		return $fields;
-	}
+	if (!bp_is_active ('xprofile'))  return $fields;
 
 	$args = array ('hide_empty_fields' => false, 'member_type' => bp_get_member_types ());
 	if (bp_has_profile ($args))
@@ -105,8 +100,7 @@ function bps_xprofile_search ($f)
 	case 'text_contains':
 	case 'location_contains':
 		$value = str_replace ('&', '&amp;', $value);
-		$escaped = '%'. bps_esc_like ($value). '%';
-		$sql['where'][$filter] = $wpdb->prepare ("value LIKE %s", $escaped);
+		$sql['where'][$filter] = bps_sql_expression ("value LIKE %s", $value, true);
 		break;
 
 	case 'text_like':
@@ -114,25 +108,25 @@ function bps_xprofile_search ($f)
 		$value = str_replace ('&', '&amp;', $value);
 		$value = str_replace ('\\\\%', '\\%', $value);
 		$value = str_replace ('\\\\_', '\\_', $value);
-		$sql['where'][$filter] = $wpdb->prepare ("value LIKE %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("value LIKE %s", $value);
 		break;
 
 	case 'text_is':
 	case 'location_is':
 		$value = str_replace ('&', '&amp;', $value);
-		$sql['where'][$filter] = $wpdb->prepare ("value = %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("value = %s", $value);
 		break;
 
 	case 'integer_is':
-		$sql['where'][$filter] = $wpdb->prepare ("value = %d", $value);
+		$sql['where'][$filter] = bps_sql_expression ("value = %d", $value);
 		break;
 
 	case 'decimal_is':
-		$sql['where'][$filter] = $wpdb->prepare ("value = %f", $value);
+		$sql['where'][$filter] = bps_sql_expression ("value = %f", $value);
 		break;
 
 	case 'date_is':
-		$sql['where'][$filter] = $wpdb->prepare ("DATE(value) = %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("DATE(value) = %s", $value);
 		break;
 
 	case 'text_one_of':
@@ -166,9 +160,29 @@ function bps_xprofile_search ($f)
 
 	$sql = apply_filters ('bps_field_sql', $sql, $f);
 	$query = $sql['select']. ' WHERE '. implode (' AND ', $sql['where']);
-
+	
 	$results = $wpdb->get_col ($query);
 	return $results;
+}
+
+function bps_sql_expression ($format, $value, $escape=false)
+{
+	global $wpdb;
+
+	foreach (array (' AND ', ' OR ') as $split)
+	{
+		$values = explode ($split, $value);
+		if (count ($values) > 1)  break;
+	}
+
+	$parts = array ();
+	foreach ($values as $value)
+	{
+		if ($escape)  $value = '%'. bps_esc_like ($value). '%';
+		$parts[] = $wpdb->prepare ($format, $value);
+	}
+
+	return '('. implode ($split, $parts). ')';
 }
 
 function bps_xprofile_sort_directory ($sql, $object, $f, $order)
@@ -244,7 +258,7 @@ function bps_xprofile_options ($field_id)
 add_filter ('bps_add_fields', 'bps_anyfield_setup');
 function bps_anyfield_setup ($fields)
 {
-	if (!function_exists ('bp_has_profile'))  return $fields;
+	if (!bp_is_active ('xprofile'))  return $fields;
 
 	$f = new stdClass;
 	$f->group = __('Any field', 'bp-profile-search');
@@ -273,18 +287,17 @@ function bps_anyfield_search ($f)
 	switch ($filter)
 	{
 	case 'contains':
-		$escaped = '%'. bps_esc_like ($value). '%';
-		$sql['where'][$filter] = $wpdb->prepare ("value LIKE %s", $escaped);
+		$sql['where'][$filter] = bps_sql_expression ("value LIKE %s", $value, true);
 		break;
 
 	case '':
-		$sql['where'][$filter] = $wpdb->prepare ("value = %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("value = %s", $value);
 		break;
 
 	case 'like':
 		$value = str_replace ('\\\\%', '\\%', $value);
 		$value = str_replace ('\\\\_', '\\_', $value);
-		$sql['where'][$filter] = $wpdb->prepare ("value LIKE %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("value LIKE %s", $value);
 		break;
 	}
 

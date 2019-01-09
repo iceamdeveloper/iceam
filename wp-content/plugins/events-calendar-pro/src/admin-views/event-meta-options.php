@@ -38,7 +38,20 @@
 					</div>
 
 					<div class="tribe-field-content">
-
+						<?php
+						/**
+						 * Allow for additional rendering of elements inside at the end of the custom
+						 * fields markup, before any other custom field markup
+						 *
+						 * @param array $field Field rendered on this action
+						 * @param int $index Index of the field usually used to identify the field name
+						 * @param int $count Total count of the current field useful to identify copies amount of same field
+						 * @param array $custom_fields An array with all the custom fields
+						 *
+						 * @since 4.4.34
+						 */
+						do_action( 'tribe_events_pro_before_custom_field_content', $field, $index, $count, $custom_fields );
+						?>
 						<div class="tribe-field-row tribe-field-type">
 							<label><?php esc_html_e( 'Field Type', 'tribe-events-calendar-pro' ); ?></label>
 							<select
@@ -78,6 +91,20 @@
 								data-count="<?php echo esc_attr( $count ); ?>" rows="3"><?php echo stripslashes( esc_textarea( isset( $field['values'] ) ? $field['values'] : '' ) ) ?></textarea>
 						</div>
 						<span class="add-remove-actions"></span>
+						<?php
+						/**
+						 * Allow for additional rendering of elements inside at the end of the custom
+						 * fields markup.
+						 *
+						 * @param array $field Field rendered on this action
+						 * @param int $index Index of the field usually used to identify the field name
+						 * @param int $count Total count of the current field useful to identify copies amount of same field
+						 * @param array $custom_fields An array with all the custom fields
+						 *
+						 * @since 4.4.34
+						 */
+						do_action( 'tribe_events_pro_after_custom_field_content', $field, $index, $count, $custom_fields );
+						?>
 					</div>
 				</td>
 			</tr>

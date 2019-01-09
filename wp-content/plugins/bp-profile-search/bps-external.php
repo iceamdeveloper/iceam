@@ -49,22 +49,21 @@ function bps_users_search ($f)
 	switch ($filter)
 	{
 	case 'text_contains':
-		$escaped = '%'. bps_esc_like ($value). '%';
-		$sql['where'][$filter] = $wpdb->prepare ("{$f->code} LIKE %s", $escaped);
+		$sql['where'][$filter] = bps_sql_expression ("{$f->code} LIKE %s", $value, true);
 		break;
 
 	case 'text_is':
-		$sql['where'][$filter] = $wpdb->prepare ("{$f->code} = %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("{$f->code} = %s", $value);
 		break;
 
 	case 'text_like':
 		$value = str_replace ('\\\\%', '\\%', $value);
 		$value = str_replace ('\\\\_', '\\_', $value);
-		$sql['where'][$filter] = $wpdb->prepare ("{$f->code} LIKE %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("{$f->code} LIKE %s", $value);
 		break;
 
 	case 'integer_is':
-		$sql['where'][$filter] = $wpdb->prepare ("{$f->code} = %d", $value);
+		$sql['where'][$filter] = bps_sql_expression ("{$f->code} = %d", $value);
 		break;
 
 	case 'integer_range':
@@ -153,22 +152,21 @@ function bps_usermeta_search ($f)
 	switch ($filter)
 	{
 	case 'text_contains':
-		$escaped = '%'. bps_esc_like ($value). '%';
-		$sql['where'][$filter] = $wpdb->prepare ("meta_value LIKE %s", $escaped);
+		$sql['where'][$filter] = bps_sql_expression ("meta_value LIKE %s", $value, true);
 		break;
 
 	case 'text_is':
-		$sql['where'][$filter] = $wpdb->prepare ("meta_value = %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("meta_value = %s", $value);
 		break;
 
 	case 'text_like':
 		$value = str_replace ('\\\\%', '\\%', $value);
 		$value = str_replace ('\\\\_', '\\_', $value);
-		$sql['where'][$filter] = $wpdb->prepare ("meta_value LIKE %s", $value);
+		$sql['where'][$filter] = bps_sql_expression ("meta_value LIKE %s", $value);
 		break;
 
 	case 'integer_is':
-		$sql['where'][$filter] = $wpdb->prepare ("meta_value = %d", $value);
+		$sql['where'][$filter] = bps_sql_expression ("meta_value = %d", $value);
 		break;
 
 	case 'integer_range':
@@ -258,6 +256,8 @@ function bps_taxonomies_setup ($fields)
 					unset ($f->options[$k]);
 			}
 		}
+
+		if (empty ($f->options))  continue;
 
 		$f->search = 'bps_taxonomies_search';
 		$fields[] = $f;

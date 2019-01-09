@@ -11,27 +11,159 @@ msgstr ""
 "Language: cs_CZ\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
-#: src/Tribe/Settings.php:39
-msgid "Enable QR codes for tickets?"
-msgstr "Povolit QR kódy pro vstupenky?"
+#: tests/_data/classes/Dummy_Endpoint.php:90
+msgid "No description provided"
+msgstr ""
 
-#: src/Tribe/Settings.php:35
+#: tests/_data/classes/Dummy_Endpoint.php:54
+msgid "The requested ticket is not accessible"
+msgstr ""
+
+#: src/admin-views/woocommerce-orders.php:55
+msgid "Sold %d of %d"
+msgstr ""
+
+#: src/admin-views/woocommerce-orders.php:53
+msgid "Sold %d"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:155
+msgid "The security code of the ticket to verify for check in."
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:149
+msgid "The ID of the ticket to check in."
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:143
+msgid "The API key to authorize check in."
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:121
+msgid "The ticket id."
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:102
+msgid "The ticket is already checked in"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:99
+msgid "A required parameter is missing or an input parameter is in the wrong format"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:93
+msgid "Returns successful check in"
+msgstr ""
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:38
+msgid "The event WordPress post ID"
+msgstr ""
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:34
+msgid "The security code of the ticket to verify for check in"
+msgstr ""
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:30
+msgid "The API key to authorize check in"
+msgstr ""
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:26
+msgid "The ticket WordPress post ID"
+msgstr ""
+
+#: src/Tribe/QR.php:173
+msgid "The security code for ticket with ID %s does not match."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:114
+msgid "QR API Key Generated"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:108
+msgid "The QR API key was not generated, please try again."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:101
+msgid "Permission Error"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:81
+msgid "If you change the API key then agents will no longer be able to check-in tickets until they add the new key in their app settings."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:80
+msgid "Generate API Key"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:76
+msgid "Generate Key"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:67
+msgid "Enter this API key in the settings of your Event Tickets Plus app to activate check in."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:66
+msgid "Tickets check-in app API key"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:60
+msgid "Show QR codes on tickets"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:55
+msgid "Emailed tickets can include QR codes to provide secure check in for your attendees. %1$sDownload our Event Ticket Plus app%2$s for an easy mobile check-in process that syncs with your attendee records."
+msgstr ""
+
+#: src/Tribe/Privacy.php:372
+msgid "EDD Attendee Data"
+msgstr ""
+
+#: src/Tribe/Privacy.php:281
+msgid "WooTicket Attendee Data"
+msgstr ""
+
+#: src/Tribe/Privacy.php:209
+msgid "EDD Ticket fields information was not removed. A database error may have occurred during deletion."
+msgstr ""
+
+#: src/Tribe/Privacy.php:136
+msgid "WooTicket fields information was not removed. A database error may have occurred during deletion."
+msgstr ""
+
+#: src/Tribe/Privacy.php:64
+msgid "Event EDD Attendee"
+msgstr ""
+
+#: src/Tribe/Privacy.php:59
+msgid "WooTickets Attendee"
+msgstr ""
+
+#: src/Tribe/Privacy.php:41
+msgid "EDD Ticket Eraser"
+msgstr ""
+
+#: src/Tribe/Privacy.php:36
+msgid "WooTicket Eraser"
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:50
 msgid "QR Codes"
 msgstr "QR kódy"
 
-#: src/admin-views/woocommerce-orders.php:144
+#: src/admin-views/woocommerce-orders.php:120
 msgid "Discounts:"
 msgstr "Slevy:"
 
-#: src/admin-views/woocommerce-orders.php:113
+#: src/admin-views/woocommerce-orders.php:89
 msgid "Total Sales: %1$s (%2$s)"
 msgstr "Celkem: %1$s (%2$s)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2706
+#: src/Tribe/Commerce/WooCommerce/Main.php:2811
 msgid "The ticket: %1$s, in your cart is no longer available or valid. You need to remove it from your cart in order to continue."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:170
+#: src/Tribe/Commerce/WooCommerce/Email.php:171
 msgid "Tickets email notification manually sent to user."
 msgstr ""
 
@@ -154,7 +286,7 @@ msgstr ""
 msgid "Need to collect information from your ticket buyers? Configure your own registration form with the options below."
 msgstr ""
 
-#: src/views/wootickets/tickets.php:167
+#: src/views/wootickets/tickets.php:166
 msgid "Free"
 msgstr ""
 
@@ -199,7 +331,7 @@ msgstr ""
 msgid "Total Event Capacity:"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2465
+#: src/Tribe/Commerce/WooCommerce/Main.php:2527
 msgid "Resend tickets email"
 msgstr ""
 
@@ -219,7 +351,7 @@ msgstr ""
 msgid "Ticket Capacity"
 msgstr ""
 
-#: src/Tribe/QR.php:105
+#: src/Tribe/QR.php:167
 msgid "The ticket with ID %s was deleted and cannot be checked-in."
 msgstr ""
 
@@ -227,7 +359,7 @@ msgstr ""
 msgid "Display attendees list"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:145 src/views/wootickets/tickets.php:229
+#: src/views/eddtickets/tickets.php:143 src/views/wootickets/tickets.php:226
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr ""
 
@@ -263,7 +395,7 @@ msgctxt "Attendee information fields"
 msgid "Label:"
 msgstr ""
 
-#: src/Tribe/QR.php:137
+#: src/Tribe/QR.php:205
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
 
@@ -311,16 +443,15 @@ msgstr "Adresa"
 msgid "Email"
 msgstr "Email"
 
-#: src/admin-views/woocommerce-orders.php:139
+#: src/admin-views/woocommerce-orders.php:115
 msgid "Canceled:"
 msgstr "Zrušeno:"
 
-#: src/admin-views/woocommerce-orders.php:134
+#: src/admin-views/woocommerce-orders.php:110
 msgid "Pending Payment:"
 msgstr "Nevyřízené platby:"
 
-#: src/admin-views/woocommerce-orders.php:52
-#: src/admin-views/woocommerce-orders.php:129
+#: src/admin-views/woocommerce-orders.php:105
 msgid "Processing:"
 msgstr "Zpracovává se:"
 
@@ -354,12 +485,12 @@ msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr "Další data účastníka:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:244
+#: src/Tribe/Commerce/WooCommerce/Main.php:243
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:182
+#: src/Tribe/Commerce/EDD/Main.php:181
 msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
@@ -371,8 +502,8 @@ msgstr ""
 
 #: src/Tribe/Commerce/Attendance_Totals.php:62
 msgctxt "attendee summary"
-msgid "Total Tickets Sold:"
-msgstr "Celkem prodáno vstupenek:"
+msgid "Total Tickets Issued:"
+msgstr ""
 
 #: src/views/tickets-plus/orders-tickets.php:70
 msgid "Attendee %d"
@@ -394,7 +525,7 @@ msgstr "Přepnout údaje o účastnících"
 msgid "Log in to purchase"
 msgstr ""
 
-#: src/Tribe/Main.php:355
+#: src/Tribe/Main.php:385
 msgid "Require users to log in before they purchase tickets"
 msgstr "Vyžadovat přihlášení uživatelů před zakoupením vstupenek"
 
@@ -446,11 +577,11 @@ msgstr "Než začnete používat plugin Event Tickets Plus, nainstalujte si a ak
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
 #: src/views/tpp/attendees-list-optout.php:35
-#: src/views/wootickets/tickets.php:196
+#: src/views/wootickets/tickets.php:195
 msgid "Don't list me on the public attendee list"
 msgstr "Neuvádějte mě na veřejném seznamu účastníků"
 
-#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:145
+#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:144
 msgid "%1$s available"
 msgstr "%1$s k dispozici"
 
@@ -513,11 +644,11 @@ msgstr "Údaje o účastnících:"
 msgid "Show attendees list on event page"
 msgstr ""
 
-#: src/Tribe/QR.php:167
+#: src/views/tickets-plus/email-qr.php:28
 msgid "Scan this QR code at the event to check in."
 msgstr "Při vstupu na akci naskenujte tento QR kód pro registraci."
 
-#: src/Tribe/QR.php:112
+#: src/Tribe/QR.php:180
 msgid "The ticket with ID %s has already been checked in."
 msgstr "Vstupenka s číslem %s již byla zaregistrována."
 
@@ -597,7 +728,7 @@ msgstr "Přepínač"
 msgid "Checkbox"
 msgstr "Zaškrtávací políčko"
 
-#: src/Tribe/Meta.php:501
+#: src/Tribe/Meta.php:504
 msgid "This ticket has custom Attendee Information fields"
 msgstr "Tato vstupenka obsahuje vlastní pole pro údaje o účastníkovi"
 
@@ -674,52 +805,27 @@ msgstr "Zásoby vstupenek"
 msgid "Event Tickets"
 msgstr "Event Tickets"
 
-#: src/admin-views/woocommerce-orders.php:160
+#: src/admin-views/woocommerce-orders.php:136
 msgid "Total Site Fees:"
 msgstr "Celkové manipulační poplatky:"
 
-#: src/admin-views/woocommerce-orders.php:156
+#: src/admin-views/woocommerce-orders.php:132
 msgid "Total Ticket Sales:"
 msgstr "Celkové prodeje vstupenek:"
 
-#: src/admin-views/woocommerce-orders.php:91
+#: src/admin-views/woocommerce-orders.php:64
 msgid "SKU: (%s)"
 msgstr "Katalogové číslo: (%s)"
 
-#: src/admin-views/woocommerce-orders.php:77
-msgid "Sold %d of %d %s"
-msgstr "Prodáno %d z celkem %d %s"
-
-#: src/admin-views/woocommerce-orders.php:75
-msgid "Sold %d %s"
-msgstr "Prodáno %d %s"
-
-#: src/admin-views/woocommerce-orders.php:71
-msgid "(%d awaiting review)"
-msgid_plural "(%d awaiting review)"
-msgstr[0] "(%d čeká na vyřízení)"
-msgstr[1] "(%d čekají na vyřízení)"
-msgstr[2] "(%d čeká na vyřízení)"
-
-#: src/admin-views/woocommerce-orders.php:48
-#: src/admin-views/woocommerce-orders.php:124
+#: src/admin-views/woocommerce-orders.php:100
 msgid "Completed:"
 msgstr "Dokončeno:"
-
-#: src/admin-views/woocommerce-orders.php:43
-msgid "Tickets sold:"
-msgstr "Prodáno vstupenek:"
 
 #: src/Tribe/APM.php:67
 msgid "Ticket Sales"
 msgstr "Prodeje vstupenek"
 
-#: src/admin-views/edd-metabox-capacity.php:162
-#: src/admin-views/woocommerce-metabox-capacity.php:162
-msgid "Purchase limit:"
-msgstr "Limitovaný prodej:"
-
-#: src/Tribe/QR.php:164
+#: src/views/tickets-plus/email-qr.php:25
 msgid "Check in for this event"
 msgstr "Registrace na akci"
 
@@ -768,17 +874,17 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.7.3)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.9.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:315
+#: src/Tribe/Main.php:345
 msgid "Event Tickets Plus"
 msgstr "Event Tickets Plus"
 
-#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:220
+#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:217
 msgid "Add to cart"
 msgstr "Přidat do košíku"
 
-#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:155
+#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:154
 msgid "Out of stock!"
 msgstr "Není k dispozici!"
 
@@ -792,15 +898,15 @@ msgstr "Jedinečný identifikační kód pro každý typ prodávané vstupenky"
 msgid "SKU:"
 msgstr "Katalogové číslo:"
 
-#: src/Tribe/QR.php:119
+#: src/Tribe/QR.php:187
 msgid "The ticket with ID %s was checked in."
 msgstr "Vstupenka s číslem %s byla zaregistrována."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:144
+#: src/Tribe/Commerce/WooCommerce/Email.php:145
 msgid "Defaults to <code>%s</code>"
 msgstr "Výchozí je <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:142
+#: src/Tribe/Commerce/WooCommerce/Email.php:143
 msgid "Subject"
 msgstr "Předmět"
 
@@ -815,19 +921,19 @@ msgstr "Emailová zpráva, kterou uživatel obdrží po dokončení objednávky 
 msgid "Tickets"
 msgstr "Vstupenky"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2080
+#: src/Tribe/Commerce/WooCommerce/Main.php:2130
 msgid "Unknown"
 msgstr "Neznámý"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2031
+#: src/Tribe/Commerce/WooCommerce/Main.php:2081
 msgid "Deleted"
 msgstr "Smazáno"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2025
+#: src/Tribe/Commerce/WooCommerce/Main.php:2075
 msgid "In trash (was %s)"
 msgstr "V koši (bylo %s)"
 
-#: src/Tribe/Commerce/EDD/Main.php:1665
+#: src/Tribe/Commerce/EDD/Main.php:1735
 msgid "Event"
 msgstr "Akce"
 
@@ -839,35 +945,35 @@ msgstr "Než začnete používat plugin Tickets Plus, nainstalujte si a aktivujt
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:1821
+#: src/Tribe/Commerce/EDD/Main.php:1892
 msgid "Print Ticket"
 msgstr "Tisk vstupenky"
 
-#: src/Tribe/Commerce/EDD/Main.php:1780
+#: src/Tribe/Commerce/EDD/Main.php:1849
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr "Je nám líto, ale vstupenek %2$s zbývá pouze: %1$d"
 
-#: src/Tribe/Commerce/EDD/Main.php:1777
+#: src/Tribe/Commerce/EDD/Main.php:1847
 msgid "%s ticket is sold out"
 msgstr "Vstupenky %s jsou vyprodány"
 
-#: src/Tribe/Commerce/EDD/Main.php:1683
-#: src/Tribe/Commerce/WooCommerce/Main.php:2345
+#: src/Tribe/Commerce/EDD/Main.php:1753
+#: src/Tribe/Commerce/WooCommerce/Main.php:2407
 msgid "This is a ticket for the event:"
 msgstr "Toto je vstupenka na akci:"
 
-#: src/Tribe/Commerce/EDD/Main.php:1614
-#: src/Tribe/Commerce/WooCommerce/Main.php:2294
+#: src/Tribe/Commerce/EDD/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:2356
 msgid "Event sales report"
 msgstr "Přehled prodejů vstupenek"
 
-#: src/Tribe/Commerce/EDD/Main.php:1278
-#: src/Tribe/Commerce/WooCommerce/Main.php:1933
+#: src/Tribe/Commerce/EDD/Main.php:1319
+#: src/Tribe/Commerce/WooCommerce/Main.php:1969
 msgid "(deleted)"
 msgstr "(smazáno)"
 
-#: src/Tribe/Commerce/EDD/Main.php:454
-#: src/Tribe/Commerce/WooCommerce/Main.php:833
+#: src/Tribe/Commerce/EDD/Main.php:490
+#: src/Tribe/Commerce/WooCommerce/Main.php:862
 msgid "You'll receive your tickets in another email."
 msgstr "Vstupenky obdržíte v dalším emailu."
 

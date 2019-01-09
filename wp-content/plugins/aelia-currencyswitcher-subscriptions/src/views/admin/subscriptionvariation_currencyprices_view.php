@@ -27,7 +27,7 @@ $loop = $currencyprices_manager->loop_idx;
 
 echo '<tr>';
 echo '<td colspan="2">';
-echo '<div id="wc_aelia_cs_subscription_prices" class="variation clearfix show_if_variable-subscription">';
+echo '<div class="wc_aelia_cs_subscription_prices variation clearfix show_if_variable-subscription">';
 // Display header of currency pricing section
 include('currencyprices_header.php');
 

@@ -61,11 +61,11 @@ function enableSortableFieldOptions () {
 	});
 }
 
-jQuery (document).ready (function () {
+jQuery(function () {
 	enableSortableFieldOptions ();
 });
 
-jQuery(document).ready(function ($) {
+jQuery(function ($) {
 	$('#template').change(function () {
 		var template_spinner = $('#bps_template .spinner');
 		var save_button = $('input[type=submit]');

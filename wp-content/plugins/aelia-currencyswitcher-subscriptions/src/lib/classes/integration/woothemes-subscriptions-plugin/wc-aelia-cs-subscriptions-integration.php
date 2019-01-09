@@ -196,6 +196,9 @@ class Subscriptions_Integration {
 
 		// Take subscription price in the specific product base currency
 		$base_subscription_price = isset($product_regular_prices_in_currency[$product_base_currency]) ? $product_regular_prices_in_currency[$product_base_currency] : null;
+
+		//var_dump($product_id, $product_regular_prices_in_currency, $product_base_currency,"BASE SUB PRICE", $base_subscription_price);
+
 		// If a subscription price was not entered for the selected product base currency,
 		// take the one in shop base currency
 		if(!is_numeric($base_subscription_price)) {
@@ -223,9 +226,26 @@ class Subscriptions_Integration {
 			$base_subscription_sign_up_fee = isset($product_signup_prices_in_currency[$shop_base_currency]) ? $product_signup_prices_in_currency[$shop_base_currency] : null;
 		}
 
-		$product->regular_price = isset($product_regular_prices_in_currency[$currency]) ? $product_regular_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'regular_price');
-		$product->sale_price = isset($product_sale_prices_in_currency[$currency]) ? $product_sale_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
-		$product->subscription_sign_up_fee = isset($product_signup_prices_in_currency[$currency]) ? $product_signup_prices_in_currency[$currency] : $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_sign_up_fee, $currency, $product_base_currency, $product, 'signup_fee');
+		// If the regular price is not valid, take it from the base currency
+		// @since 1.4.0.181107
+		$product->regular_price = isset($product_regular_prices_in_currency[$currency]) ? $product_regular_prices_in_currency[$currency] : null;
+		if(($currency != $product_base_currency) && !is_numeric($product->regular_price)) {
+			$product->regular_price = $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'regular_price');
+		}
+
+		// If the sale price is not valid, take it from the base currency
+		// @since 1.4.0.181107
+		$product->sale_price = isset($product_sale_prices_in_currency[$currency]) ? $product_sale_prices_in_currency[$currency] : null;
+		if(($currency != $product_base_currency) && !is_numeric($product->sale_price)) {
+			$product->sale_price = $this->currencyprices_manager()->convert_product_price_from_base($base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
+		}
+
+		// If the sign up fee is not valid, take it from the base currency
+		// @since 1.4.0.181107
+		$product->subscription_sign_up_fee = isset($product_signup_prices_in_currency[$currency]) ? $product_signup_prices_in_currency[$currency] : null;
+		if(($currency != $product_base_currency) && !is_numeric($product->subscription_sign_up_fee)) {
+			$product->subscription_sign_up_fee = $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_sign_up_fee, $currency, $product_base_currency, $product, 'signup_fee');
+		}
 
 		// Debug
 		//var_dump(
@@ -1096,15 +1116,20 @@ class Subscriptions_Integration {
 	 * @since 1.3.12.180713
 	 */
 	protected function product_is_on_sale(WC_Product $product, $sale_price = null, $regular_price = null) {
-		$sale_price_dates_from = $this->date_to_string($product->get_date_on_sale_from());
-		$sale_price_dates_to = $this->date_to_string($product->get_date_on_sale_to());
+		$sale_price_dates_from = $product->get_date_on_sale_from();
+		$sale_price_dates_to = $product->get_date_on_sale_to();
 
 		$is_on_sale = false;
-		$today = date('Ymd');
-		if((empty($sale_price_dates_from) ||
-				$today >= $sale_price_dates_from) &&
-			 (empty($sale_price_dates_to) ||
-				$sale_price_dates_to > $today)) {
+		$today = current_time('timestamp', true);
+
+		// An empty "from" date means that the sale is active right now,
+		// until the "to" date.
+		$from_valid = empty($sale_price_dates_from) || ($today >= $sale_price_dates_from->getTimestamp());
+		// An empty "to" date means that the sale is active indefinitely,
+		// starting from the "from"
+		$to_valid = empty($sale_price_dates_to) || ($today < $sale_price_dates_to->getTimestamp());
+
+		if($from_valid && $to_valid) {
 			$sale_price = $sale_price !== null ? $sale_price : $product->get_sale_price();
 			$regular_price = $regular_price !== null ? $regular_price : $product->get_regular_price();
 

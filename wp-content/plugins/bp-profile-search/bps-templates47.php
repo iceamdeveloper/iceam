@@ -13,7 +13,6 @@ function bps_escaped_form_data47 ()
 	$F->title = bps_wpml ($form, '-', 'title', get_the_title ($form));
 	$F->location = $location;
 	$F->unique_id = bps_unique_id ('form_'. $form);
-	$F->page = parse_url ($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 
 	$template_options = $meta['template_options'][$meta['template']];
 	if (isset ($template_options['header']))
@@ -56,9 +55,13 @@ function bps_escaped_form_data47 ()
 		else if (!empty ($custom_desc))
 			$f->description = $custom_desc;
 
+		if ($f->display == 'integer')  $f->display = 'number';
+		if ($f->display == 'integer-range')  $f->display = 'range';
+
 		switch ($f->display)
 		{
 		case 'range':
+		case 'date-range':
 		case 'range-select':
 			if (!isset ($f->value['min']))  $f->value['min'] = '';
 			if (!isset ($f->value['max']))  $f->value['max'] = '';
@@ -68,6 +71,7 @@ function bps_escaped_form_data47 ()
 
 		case 'textbox':
 		case 'number':
+		case 'date':
 			if (!isset ($f->value))  $f->value = '';
 			break;
 
@@ -80,7 +84,6 @@ function bps_escaped_form_data47 ()
 
 		case 'selectbox':
 			if (!isset ($f->value))  $f->value = '';
-			$f->options = array ('' => '') + $f->options;
 			break;
 
 		case 'radio':
@@ -98,17 +101,15 @@ function bps_escaped_form_data47 ()
 
 		$f->html_name = ($mode == '')? $f->code: $f->code. '_'. $mode;
 		$f->unique_id = bps_unique_id ($f->html_name);
-		$f->mode = $mode;
-		$f->full_label = bps_full_label ($f);
 
 		do_action ('bps_field_before_search_form', $f);
+		$f->code = ($mode == '')? $f->code: $f->code. '_'. $mode;		// to be removed
 		$F->fields[] = $f;
 	}
 
 	$F->fields[] = bps_set_hidden_field (BPS_FORM, $form);
 	do_action ('bps_before_search_form', $F);
 
-	$f->code = ($mode == '')? $f->code: $f->code. '_'. $mode;		// to be removed
 	foreach ($F->fields as $f)
 	{
 		if (!is_array ($f->value))  $f->value = esc_attr (stripslashes ($f->value));
@@ -164,28 +165,6 @@ function bps_escaped_filters_data47 ()
 	}
 
 	return $F;
-}
-
-function bps_full_label ($f)
-{
-	$labels = array
-	(
-		'contains'		=> __('<strong>%1$s</strong><span> contains:</span>', 'bp-profile-search'),
-		''				=> __('<strong>%1$s</strong><span> is:<span>', 'bp-profile-search'),
-		'like'			=> __('<strong>%1$s</strong><span> is like:<span>', 'bp-profile-search'),
-		'range'			=> __('<strong>%1$s</strong><span> range:<span>', 'bp-profile-search'),
-		'age_range'		=> __('<strong>%1$s</strong><span> range:<span>', 'bp-profile-search'),
-		'distance'		=> __('<strong>%1$s</strong><span> is within:<span>', 'bp-profile-search'),
-		'one_of'		=> __('<strong>%1$s</strong><span> is one of:<span>', 'bp-profile-search'),
-		'match_any'		=> __('<strong>%1$s</strong><span> match any:<span>', 'bp-profile-search'),
-		'match_all'		=> __('<strong>%1$s</strong><span> match all:<span>', 'bp-profile-search'),
-		'unknown'		=> __('<strong>%1$s</strong>:', 'bp-profile-search'),
-	);
-
-	$mode = isset ($labels[$f->mode])? $f->mode: 'unknown';
-	$label = sprintf ($labels[$mode], $f->label);
-
-	return apply_filters ('bps_full_label', $label, $f);
 }
 
 function bps_print_filter ($f)

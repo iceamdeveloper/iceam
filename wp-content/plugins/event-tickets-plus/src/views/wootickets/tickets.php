@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/wootickets/tickets.php
  *
- * @version 4.8.1
+ * @version 4.9
  *
  * @var bool $global_stock_enabled
  * @var bool $must_login
@@ -70,7 +70,6 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 				$product = new WC_Product( $ticket->ID );
 			}
 
-			$is_there_any_product = true;
 			$data_product_id      = '';
 
 			if ( $ticket->date_in_range() ) {
@@ -198,8 +197,6 @@ $cart_classes = (array) apply_filters( 'tribe_events_tickets_woo_cart_class', ar
 						</tr>
 						<?php
 					}
-
-					include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 				}
 			}
 

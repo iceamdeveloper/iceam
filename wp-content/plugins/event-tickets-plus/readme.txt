@@ -2,9 +2,9 @@
 
 Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
-Requires at least: 4.5
-Tested up to: 4.9.8
-Stable tag: 4.8.2
+Requires at least: 4.7
+Tested up to: 5.0.2
+Stable tag: 4.9.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -137,6 +137,24 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.9.1] 2018-12-19 =
+
+* Fix - Avoid fatal error when completing an order via WooCommerce [119705]
+* Fix - Prevent `WC_Product_Simple` from fataling when filtering max purchase limit on Tickets Block view [119861]
+* Language - 0 new strings added, 2 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.9] 2018-11-29 =
+
+* Feature - added new registration page for collecting attendee registration information as part of the check out process.
+* Tweak - Changed views: `eddtickets/tickets.php` and `wootickets/tickets.php`
+* Language - 0 new strings added, 19 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.8.3] 2018-10-22 =
+
+* Fix - Display availability message when there are no tickets for WooTickets [115200]
+* Fix - Include orphaned Attendee Meta in the export. Thanks Kelly for flagging this! [74425]
+* Language - 34 new strings added, 41 updated, 1 fuzzied, and 6 obsoleted
 
 = [4.8.2] 2018-10-03 =
 

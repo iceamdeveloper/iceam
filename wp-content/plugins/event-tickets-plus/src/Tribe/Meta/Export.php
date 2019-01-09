@@ -28,6 +28,9 @@ class Tribe__Tickets_Plus__Meta__Export {
 	public function setup_columns( $event_id ) {
 		$this->meta_columns = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_event( $event_id );
 
+		// Add Orphaned Columns
+		$this->add_orphaned_columns( $event_id );
+
 		if ( empty( $this->meta_columns ) ) {
 			return;
 		}
@@ -43,6 +46,91 @@ class Tribe__Tickets_Plus__Meta__Export {
 
 		add_filter( $filter_name, array( $this, 'add_columns' ), 20 );
 		add_filter( 'tribe_events_tickets_attendees_table_column', array( $this, 'populate_columns' ), 10, 3 );
+	}
+
+	/**
+	 * Add orphaned columns to the export based on what we have for
+	 * the event attendees.
+	 *
+	 * @since 4.8.3
+	 *
+	 * @param int $event_id the event to fech the attendee data from
+	 *
+	 * @return void
+	 */
+	public function add_orphaned_columns( $event_id ) {
+
+		// Go thorugh the event attendees and get the fields
+		foreach ( Tribe__Tickets__Tickets::get_event_attendees( $event_id ) as $attendee ) {
+
+			// Get the metafields of that attendee
+			$meta_fields = get_post_meta( $attendee['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
+
+			// If we have some meta fields
+			if ( ! is_array( $meta_fields ) ) {
+				return;
+			}
+
+			// Go through the metafields
+			foreach ( $meta_fields as $key => $value ) {
+				$this->add_orphaned_column( $key );
+			}
+		}
+	}
+
+	/**
+	 * Add orphaned column to the export based on what we have for
+	 * the event attendees.
+	 *
+	 * @since 4.8.3
+	 *
+	 * @param string $key the column key
+	 * @param string $value the column label
+	 *
+	 * @return array $field
+	 */
+	public function add_orphaned_column( $key ) {
+
+		// Bail if the field is already part of the columns
+		if ( $this->column_exists( $key ) ) {
+			return false;
+		}
+
+		// Add the column with a format that
+		// can be processed by the exporter
+		$field          = array();
+		$field['type']  = 'orphaned';
+		$field['slug']  = $key;
+		$field['label'] = ucwords( str_replace( '-', ' ', str_replace( '_', ': ', $key ) ) );
+
+		// Add the field to the columns
+		$this->meta_columns[] = (object) $field;
+
+		return $field;
+
+	}
+
+	/**
+	 * Check if a column exists, by checking agains the object slug
+	 *
+	 * @since 4.8.3
+	 *
+	 * @param string $key The slug we want to compare
+	 *
+	 * @return bool
+	 */
+	public function column_exists( $key ) {
+
+		foreach ( $this->meta_columns as $column ) {
+			// Bail if the column key exists or if it's a checkbox
+			if (
+				$column->slug === $key
+				|| 'checkbox' === $column->type
+			) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**

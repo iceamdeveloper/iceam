@@ -34,11 +34,15 @@ function bps_locate_template ($template)
 {
 	$retired = array ('members/bps-form-nouveau', 'members/bps-form-legacy', 'members/bps-form-sample-1', 'members/bps-form-sample-2');
 
-	$path = bp_locate_template ($template. '.php');
-	if ($path === false)
-		return '<strong style="color:red;">'. $template. '</strong><br>'. __('template not found!', 'bp-profile-search');
+	$located = bp_locate_template ($template. '.php');
+	if ($located === false)
+	{
+		if (in_array ($template, $retired))
+			return '<strong style="color:red;">'. $template. '</strong><br>'. __('this template has been retired, please switch to bps-form-default', 'bp-profile-search');
+		return '<strong style="color:red;">'. $template. '</strong><br>'. __('template not found', 'bp-profile-search');
+	}
 
-	$path = str_replace (WP_CONTENT_DIR. '/', '', $path);
+	$path = str_replace (WP_CONTENT_DIR. '/', '', $located);
 	$path = str_replace ($template. '.php', '', $path);
 	if ($path == 'plugins/bp-profile-search/templates/')
 	{
@@ -55,10 +59,7 @@ function bps_call_template ($template, $args = array ())
 	$located = bp_locate_template ($template. '.php');
 
 	if ($located === false)
-	{
-		bps_error ('template_not_found', $template);
-		return false;
-	}
+		return bps_error ('template_not_found', $template);
 
 	echo "\n<!-- BP Profile Search ". BPS_VERSION. " $template -->\n";
 	if (bps_debug ())
@@ -84,10 +85,7 @@ function bps_call_form_template ($template, $args)
 	$located = bp_locate_template ($template. '.php');
 
 	if ($located === false)
-	{
-		bps_error ('template_not_found', $template);
-		return false;
-	}
+		return bps_error ('template_not_found', $template);
 
 	$form = $args[0];
 	$meta = bps_meta ($form);

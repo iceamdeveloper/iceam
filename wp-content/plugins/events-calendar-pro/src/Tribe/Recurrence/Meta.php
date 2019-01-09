@@ -581,7 +581,16 @@ class Tribe__Events__Pro__Recurrence__Meta {
 	 */
 	public static function loadRecurrenceData( $post_id ) {
 		$post = get_post( $post_id );
-		if ( ! empty( $post->post_parent ) ) {
+		/**
+		 * Control if the recurrence meta is displayed
+		 *
+		 * @since 4.4.35
+		 *
+		 * @param bool $display By default is true
+		 * @param int $post_id The ID of the post where the meta box is being included
+		 */
+		$show_recurrence_meta = apply_filters( 'tribe_events_pro_show_recurrence_meta_box', true, $post_id );
+		if ( ! empty( $post->post_parent ) || ! $show_recurrence_meta ) {
 			return; // don't show recurrence fields for instances of a recurring event
 		}
 

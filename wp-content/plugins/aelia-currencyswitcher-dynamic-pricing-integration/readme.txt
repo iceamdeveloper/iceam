@@ -15,9 +15,9 @@ This plugin is a temporary workaround for the lack of multi-currency support in 
 
 * PHP 5.3 or newer.
 * WordPress 4.7 or newer.
-* WooCommerce 2.4.x to 2.7.x.
+* WooCommerce 2.6.x to 3.5.x
 * Aelia Currency Switcher 4.4.6.170120 or newer.
-* WooCommerce Dynamic Pricing (by Brent Shepherd) 2.12 or newer.
+* WooCommerce Dynamic Pricing (by Brent Shepherd) 3.17 or newer.
 * Free [Aelia Foundation Classes plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.3.170202 or newer.
 
 == Installation ==
@@ -26,4 +26,19 @@ This plugin is a temporary workaround for the lack of multi-currency support in 
 3. That's it! Now the price of the Dynamic Pricing you enter will be converted automatically in the appropriate currency.
 
 == Changelog ==
-Please refer to file **CHANGELOG.md** included with this plugin.
+
+= 1.0.4.181213 =
+* Updated supported WooCommerce version.
+* Updated supported Dynamic Pricing plugin version.
+
+= 1.0.3.180713 =
+* Fix - Fixed display of individual variation prices in WC 3.4 and later.
+
+= 1.0.2.171106 =
+* Tweak - Added logic to handle discounts that use commas as the decimal separator.
+
+= 1.0.1.170710 =
+* Fix - Fixed display of variable product price range in Dynamic Pricing 3.0.7 and later.
+
+= 1.0.0.170123 =
+* First release.

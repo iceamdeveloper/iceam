@@ -58,8 +58,6 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 		 * @since 4.5.4
 		 */
 		do_action( 'tribe_tickets_before_front_end_ticket_form' );
-
-		include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 	}
 
 	/**
@@ -72,9 +70,14 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 	 * @return array
 	 */
 	public function filter_custom_args( array $custom_args ) {
-		if ( empty( $this->transient_name ) ) {
+		$storage = new Tribe__Tickets_Plus__Meta__Storage;
+		$data = $storage->get_meta_data();
+		if ( empty( $data ) ) {
 			return $custom_args;
 		}
+
+		$this->meta_id = $storage->get_hash_cookie();
+		$this->transient_name = $this->get_transient_name( $this->meta_id );
 
 		// keep it short as PayPal has a number limit on custom arguments
 		$custom_args[ $this->attendee_meta_custom_key ] = $this->meta_id;
@@ -91,12 +94,28 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 	 * @since 4.7
 	 */
 	public function process_front_end_tickets_form() {
+		if ( empty( $_POST[ Tribe__Tickets_Plus__Meta__Storage::META_DATA_KEY ] ) ) {
+			return;
+		}
+
 		$id = $this->storage->maybe_set_attendee_meta_cookie();
 
 		if ( ! empty( $id ) ) {
 			$this->meta_id        = $id;
 			$this->transient_name = $this->get_transient_name( $id );
 		}
+
+		// Store the current PayPal redirect so we can return to it after dealing with ticket meta.
+		$redirect_key = tribe_get_request_var( 'event_tickets_redirect_to', '' );
+		$url          = $this->storage->retrieve_temporary_data( $redirect_key );
+
+		if ( empty( $url ) ) {
+			return;
+		}
+
+		$url = base64_decode( $url );
+		wp_redirect( $url );
+		tribe_exit();
 	}
 
 	/**
@@ -123,7 +142,6 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 	 */
 	public function listen_for_ticket_creation( $post_id, $ticket_type, $transaction_data ) {
 		$custom = Tribe__Utils__Array::get( $transaction_data, 'custom', false );
-
 		if ( empty( $custom ) ) {
 			return;
 		}
@@ -135,7 +153,6 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 		}
 
 		$meta_id = Tribe__Utils__Array::get( $decoded_custom, $this->attendee_meta_custom_key, false );
-
 		if ( empty( $meta_id ) ) {
 			return;
 		}
@@ -169,6 +186,63 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 		}
 
 		update_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, $attendee_meta );
+	}
+
+	/**
+	 * Hooked to a PayPal action right before add-to-cart to potentially manipulate data for attendee-registration
+	 *
+	 * @since 4.9
+	 *
+	 * @param string $url
+	 * @param string $cart_url
+	 * @param array $post_data
+	 *
+	 * @return string
+	 */
+	public function maybe_alter_post_data( $post_data ) {
+		global $post;
+
+		if ( empty( $post_data['tribe_tickets_saving_attendees'] ) ) {
+			return;
+		}
+
+		$storage = new Tribe__Tickets_Plus__Meta__Storage;
+		$data = $storage->get_meta_data();
+
+		if ( ! $data ) {
+			return;
+		}
+
+		$keys                              = array_keys( $data );
+		$product_id                        = current( $keys );
+		$_POST['product_id']               = $keys;
+		$_POST['quantity_' . $product_id ] = count( $data[ $product_id ] );
+		$event_ids                         = tribe_tickets_get_event_ids( $product_id );
+		$post                              = get_post( current( $event_ids ) );
+		if ( $provider = tribe_tickets_get_ticket_provider( $product_id ) ) {
+			$_POST['provider'] = get_class( $provider );
+		}
+	}
+
+	/**
+	 * Filters the add-to-cart url used for redirection
+	 *
+	 * If we are saving data on the attendee registration page, we need to redirect to paypal
+	 *
+	 * @since 4.9
+	 *
+	 * @param string $url
+	 * @param string $cart_url
+	 * @param array $post_data
+	 *
+	 * @return string
+	 */
+	public function maybe_filter_redirect( $url, $cart_url, $post_data ) {
+		if ( empty( $post_data['tribe_tickets_saving_attendees'] ) ) {
+			return $url;
+		}
+
+		return $cart_url;
 	}
 
 	/**

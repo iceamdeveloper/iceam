@@ -11,7 +11,7 @@ $text_domain = WC_Aelia_CS_Subscriptions::$text_domain;
 
 $post_id = $currencyprices_manager->current_post->ID;
 
-echo '<div id="wc_aelia_cs_subscription_prices" class="clearfix show_if_subscription">';
+echo '<div class="wc_aelia_cs_subscription_prices clearfix show_if_subscription">';
 // Debug
 // echo 'DEBUG - SUBSCRIPTION';
 // Display header of currency pricing section
@@ -21,7 +21,7 @@ $product_regular_prices = $currencyprices_manager->get_product_regular_prices($p
 $product_sale_prices = $currencyprices_manager->get_product_sale_prices($post_id);
 $signup_prices = Subscriptions_Integration::get_subscription_signup_prices($post_id);
 
-echo '<table>';
+echo '<table class="prices_wrapper">';
 echo '<tr>';
 echo '<th>';
 echo '</th>';

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-06-19 02:46:36+0000\n"
+"PO-Revision-Date: 2018-11-12 16:23:40+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -11,27 +11,159 @@ msgstr ""
 "Language: es\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
-#: src/Tribe/Settings.php:39
-msgid "Enable QR codes for tickets?"
-msgstr "¿Habilitar códigos QR para los tickets?"
+#: tests/_data/classes/Dummy_Endpoint.php:90
+msgid "No description provided"
+msgstr "No se proporcionó ninguna descripción"
 
-#: src/Tribe/Settings.php:35
+#: tests/_data/classes/Dummy_Endpoint.php:54
+msgid "The requested ticket is not accessible"
+msgstr "La entrada solicitada no está disponible"
+
+#: src/admin-views/woocommerce-orders.php:55
+msgid "Sold %d of %d"
+msgstr "Vendidas %d de %d"
+
+#: src/admin-views/woocommerce-orders.php:53
+msgid "Sold %d"
+msgstr "Vendido: %d"
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:155
+msgid "The security code of the ticket to verify for check in."
+msgstr "El código de seguridad para verificar la entrada al momento del registro."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:149
+msgid "The ID of the ticket to check in."
+msgstr "La ID de la entrada para el registro."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:143
+msgid "The API key to authorize check in."
+msgstr "La clave API para autorizar el registro."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:121
+msgid "The ticket id."
+msgstr "La ID de la entrada."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:102
+msgid "The ticket is already checked in"
+msgstr "La entrada ya está registrada"
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:99
+msgid "A required parameter is missing or an input parameter is in the wrong format"
+msgstr "Falta un parámetro requerido, o hay un parámetro de entrada con un formato incorrecto"
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:93
+msgid "Returns successful check in"
+msgstr "Registro realizado correctamente"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:38
+msgid "The event WordPress post ID"
+msgstr "ID de la entrada de WordPress para el evento"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:34
+msgid "The security code of the ticket to verify for check in"
+msgstr "Código de seguridad para verificación de la entrada al momento del registro"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:30
+msgid "The API key to authorize check in"
+msgstr "La clave API para autorizar el registro"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:26
+msgid "The ticket WordPress post ID"
+msgstr "La ID de entrada de WordPress"
+
+#: src/Tribe/QR.php:173
+msgid "The security code for ticket with ID %s does not match."
+msgstr "El código de seguridad para la entrada con ID %s no coincide."
+
+#: src/Tribe/QR/Settings.php:114
+msgid "QR API Key Generated"
+msgstr "Clave API para QR generada"
+
+#: src/Tribe/QR/Settings.php:108
+msgid "The QR API key was not generated, please try again."
+msgstr "La clave API para QR no fue generada, inténtelo de nuevo."
+
+#: src/Tribe/QR/Settings.php:101
+msgid "Permission Error"
+msgstr "Error de permiso"
+
+#: src/Tribe/QR/Settings.php:81
+msgid "If you change the API key then agents will no longer be able to check-in tickets until they add the new key in their app settings."
+msgstr "Si cambia la clave API, los agentes ya no podrán registrar las entradas hasta que agreguen la nueva clave en los ajustes de su aplicación."
+
+#: src/Tribe/QR/Settings.php:80
+msgid "Generate API Key"
+msgstr "Generar clave API"
+
+#: src/Tribe/QR/Settings.php:76
+msgid "Generate Key"
+msgstr "Generar clave"
+
+#: src/Tribe/QR/Settings.php:67
+msgid "Enter this API key in the settings of your Event Tickets Plus app to activate check in."
+msgstr "Introduzca esta clave API en los ajustes de la aplicación Event Tickets Plus para activar el registro."
+
+#: src/Tribe/QR/Settings.php:66
+msgid "Tickets check-in app API key"
+msgstr "Clave API para la aplicación para el registro de entradas"
+
+#: src/Tribe/QR/Settings.php:60
+msgid "Show QR codes on tickets"
+msgstr "Mostrar códigos QR en las entradas"
+
+#: src/Tribe/QR/Settings.php:55
+msgid "Emailed tickets can include QR codes to provide secure check in for your attendees. %1$sDownload our Event Ticket Plus app%2$s for an easy mobile check-in process that syncs with your attendee records."
+msgstr "Las entradas enviadas por correo electrónico pueden incluir un código QR para garantizar un registro seguro a los asistentes. %1$sDescargue nuestra aplicación Event Ticket Plus%2$s que facilita el proceso de registro con un dispositivo móvil, y se sincroniza con los datos del asistente."
+
+#: src/Tribe/Privacy.php:372
+msgid "EDD Attendee Data"
+msgstr "Datos del asistente de EDD"
+
+#: src/Tribe/Privacy.php:281
+msgid "WooTicket Attendee Data"
+msgstr "Datos del asistente de WooTicket"
+
+#: src/Tribe/Privacy.php:209
+msgid "EDD Ticket fields information was not removed. A database error may have occurred during deletion."
+msgstr "No se ha eliminado la información de los campos de entrada de EDD. Podría haber ocurrido un error de base de datos durante la eliminación."
+
+#: src/Tribe/Privacy.php:136
+msgid "WooTicket fields information was not removed. A database error may have occurred during deletion."
+msgstr "No se ha eliminado la información de los campos de entrada de WooTicket. Podría haber ocurrido un error de base de datos durante la eliminación."
+
+#: src/Tribe/Privacy.php:64
+msgid "Event EDD Attendee"
+msgstr "Asistente del evento EDD"
+
+#: src/Tribe/Privacy.php:59
+msgid "WooTickets Attendee"
+msgstr "Asistente de WooTickets"
+
+#: src/Tribe/Privacy.php:41
+msgid "EDD Ticket Eraser"
+msgstr "Borrador de entradas de EDD"
+
+#: src/Tribe/Privacy.php:36
+msgid "WooTicket Eraser"
+msgstr "Borrador de WooTicket"
+
+#: src/Tribe/QR/Settings.php:50
 msgid "QR Codes"
 msgstr "Códigos QR"
 
-#: src/admin-views/woocommerce-orders.php:144
+#: src/admin-views/woocommerce-orders.php:120
 msgid "Discounts:"
 msgstr "Descuentos:"
 
-#: src/admin-views/woocommerce-orders.php:113
+#: src/admin-views/woocommerce-orders.php:89
 msgid "Total Sales: %1$s (%2$s)"
 msgstr "Ventas Totales: %1$s (%2$s)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2706
+#: src/Tribe/Commerce/WooCommerce/Main.php:2811
 msgid "The ticket: %1$s, in your cart is no longer available or valid. You need to remove it from your cart in order to continue."
 msgstr "El ticket: %1$s, que está en tu carrito ya no es válido. Es necesario removerlo del carrito para continuar."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:170
+#: src/Tribe/Commerce/WooCommerce/Email.php:171
 msgid "Tickets email notification manually sent to user."
 msgstr "Los tickets han sido enviados manualmente por correo electrónico."
 
@@ -154,7 +286,7 @@ msgstr "Capacidad:"
 msgid "Need to collect information from your ticket buyers? Configure your own registration form with the options below."
 msgstr "¿Necesitas solicitar información de los compradores de tus tickets? Configura to propio formulario de registro con las opciones a continuación."
 
-#: src/views/wootickets/tickets.php:167
+#: src/views/wootickets/tickets.php:166
 msgid "Free"
 msgstr "Gratis"
 
@@ -199,7 +331,7 @@ msgstr "El número total de posibles asistentes para este evento"
 msgid "Total Event Capacity:"
 msgstr "Capacidad Total del Evento:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2465
+#: src/Tribe/Commerce/WooCommerce/Main.php:2527
 msgid "Resend tickets email"
 msgstr "Reenviar correo electrónico con los tickets"
 
@@ -219,7 +351,7 @@ msgstr "Advertencia"
 msgid "Ticket Capacity"
 msgstr "Capacidad de ticket"
 
-#: src/Tribe/QR.php:105
+#: src/Tribe/QR.php:167
 msgid "The ticket with ID %s was deleted and cannot be checked-in."
 msgstr "El ticket con ID %s ha sido borrado y no puede hacerse check-in."
 
@@ -227,7 +359,7 @@ msgstr "El ticket con ID %s ha sido borrado y no puede hacerse check-in."
 msgid "Display attendees list"
 msgstr "Mostrar la lista de asistentes"
 
-#: src/views/eddtickets/tickets.php:145 src/views/wootickets/tickets.php:229
+#: src/views/eddtickets/tickets.php:143 src/views/wootickets/tickets.php:226
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr "Debe tener JavaScript activado para comprar las entradas. Por favor, active JavaScript en su navegador."
 
@@ -263,7 +395,7 @@ msgctxt "Attendee information fields"
 msgid "Label:"
 msgstr "Etiqueta:"
 
-#: src/Tribe/QR.php:137
+#: src/Tribe/QR.php:205
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr "No se pudo mostrar el código QR, porque gzuncompress() no está disponible"
 
@@ -311,16 +443,15 @@ msgstr "Dirección"
 msgid "Email"
 msgstr "Correo electrónico"
 
-#: src/admin-views/woocommerce-orders.php:139
+#: src/admin-views/woocommerce-orders.php:115
 msgid "Canceled:"
 msgstr "Cancelado:"
 
-#: src/admin-views/woocommerce-orders.php:134
+#: src/admin-views/woocommerce-orders.php:110
 msgid "Pending Payment:"
 msgstr "Pago Pendiente:"
 
-#: src/admin-views/woocommerce-orders.php:52
-#: src/admin-views/woocommerce-orders.php:129
+#: src/admin-views/woocommerce-orders.php:105
 msgid "Processing:"
 msgstr "Procesando:"
 
@@ -354,12 +485,12 @@ msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr "Otros datos del asistente:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:244
+#: src/Tribe/Commerce/WooCommerce/Main.php:243
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:182
+#: src/Tribe/Commerce/EDD/Main.php:181
 msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
@@ -371,8 +502,8 @@ msgstr "Completo:"
 
 #: src/Tribe/Commerce/Attendance_Totals.php:62
 msgctxt "attendee summary"
-msgid "Total Tickets Sold:"
-msgstr "Total de entradas vendidas:"
+msgid "Total Tickets Issued:"
+msgstr "Total de entradas emitidas:"
 
 #: src/views/tickets-plus/orders-tickets.php:70
 msgid "Attendee %d"
@@ -394,7 +525,7 @@ msgstr "Cambiar la información de los asistentes"
 msgid "Log in to purchase"
 msgstr "Iniciar sesión para comprar"
 
-#: src/Tribe/Main.php:355
+#: src/Tribe/Main.php:385
 msgid "Require users to log in before they purchase tickets"
 msgstr "Requiere que los usuarios inicien sesión antes de comprar las entradas"
 
@@ -404,7 +535,7 @@ msgstr "Los tickets para eventos recurrentes no son soportados, evento %d."
 
 #: src/Tribe/CSV_Importer/Column_Names.php:56
 msgid "Ticket SKU"
-msgstr "SKU del Ticket"
+msgstr "SKU de entrada"
 
 #: src/Tribe/CSV_Importer/Column_Names.php:54
 msgid "Ticket Price"
@@ -446,11 +577,11 @@ msgstr "Para empezar a usar Event Tickets Plus, por favor instala y activa la ú
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
 #: src/views/tpp/attendees-list-optout.php:35
-#: src/views/wootickets/tickets.php:196
+#: src/views/wootickets/tickets.php:195
 msgid "Don't list me on the public attendee list"
 msgstr "No listarme en la lista pública de asistentes"
 
-#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:145
+#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:144
 msgid "%1$s available"
 msgstr "%1$s disponible"
 
@@ -474,7 +605,7 @@ msgstr "Quién asiste"
 
 #: src/admin-views/meta.php:58
 msgid "Name this fieldset:"
-msgstr "Nombra este conjunto de campos"
+msgstr "Nombra este conjunto de campos:"
 
 #: src/admin-views/meta.php:54
 msgid "Save this fieldset for use on other tickets?"
@@ -512,11 +643,11 @@ msgstr "Información del Asistente:"
 msgid "Show attendees list on event page"
 msgstr "Mostrar lista de asistentes en la página del evento"
 
-#: src/Tribe/QR.php:167
+#: src/views/tickets-plus/email-qr.php:28
 msgid "Scan this QR code at the event to check in."
 msgstr "Escanea este código QR en el evento para el check in."
 
-#: src/Tribe/QR.php:112
+#: src/Tribe/QR.php:180
 msgid "The ticket with ID %s has already been checked in."
 msgstr "La entrada con ID %s ya ha sido registrada."
 
@@ -596,7 +727,7 @@ msgstr "Radio"
 msgid "Checkbox"
 msgstr "Casilla"
 
-#: src/Tribe/Meta.php:501
+#: src/Tribe/Meta.php:504
 msgid "This ticket has custom Attendee Information fields"
 msgstr "Este ticket tiene campos de información personalizados para el asistente"
 
@@ -672,51 +803,27 @@ msgstr "Stock"
 msgid "Event Tickets"
 msgstr "Tickets del Evento"
 
-#: src/admin-views/woocommerce-orders.php:160
+#: src/admin-views/woocommerce-orders.php:136
 msgid "Total Site Fees:"
 msgstr "Comisiones Totales:"
 
-#: src/admin-views/woocommerce-orders.php:156
+#: src/admin-views/woocommerce-orders.php:132
 msgid "Total Ticket Sales:"
 msgstr "Venta Total:"
 
-#: src/admin-views/woocommerce-orders.php:91
+#: src/admin-views/woocommerce-orders.php:64
 msgid "SKU: (%s)"
 msgstr "SKU: (%s)"
 
-#: src/admin-views/woocommerce-orders.php:77
-msgid "Sold %d of %d %s"
-msgstr "Vendido %d de %d %s"
-
-#: src/admin-views/woocommerce-orders.php:75
-msgid "Sold %d %s"
-msgstr "Vendido %d %s"
-
-#: src/admin-views/woocommerce-orders.php:71
-msgid "(%d awaiting review)"
-msgid_plural "(%d awaiting review)"
-msgstr[0] "(%d en espera de revisión)"
-msgstr[1] "(%d en espera de revisión)"
-
-#: src/admin-views/woocommerce-orders.php:48
-#: src/admin-views/woocommerce-orders.php:124
+#: src/admin-views/woocommerce-orders.php:100
 msgid "Completed:"
 msgstr "Completado:"
 
-#: src/admin-views/woocommerce-orders.php:43
-msgid "Tickets sold:"
-msgstr "Entradas vendidas:"
-
 #: src/Tribe/APM.php:67
 msgid "Ticket Sales"
-msgstr "Venta de Entradas"
+msgstr "Venta de entradas"
 
-#: src/admin-views/edd-metabox-capacity.php:162
-#: src/admin-views/woocommerce-metabox-capacity.php:162
-msgid "Purchase limit:"
-msgstr "Límite de compra:"
-
-#: src/Tribe/QR.php:164
+#: src/views/tickets-plus/email-qr.php:25
 msgid "Check in for this event"
 msgstr "Haz check in para este evento"
 
@@ -755,7 +862,7 @@ msgstr "Ver compras para este evento"
 
 #: src/Tribe/Commerce/Loader.php:176
 msgid "To begin using Tickets Plus with %3$s, you need to <a href=\"%1$s\" title=\"Deactivate the legacy addon for %2$s\">deactivate the old legacy plugin</a>."
-msgstr "Para utilizar \"Tickets Plus\" con %3$s, es necesario <a href=\"%1$s\" title=\"Desactivar el complemento %2$s\">desactive el antiguo plugin</a>."
+msgstr "Para utilizar Tickets Plus con %3$s, es necesario <a href=\"%1$s\" title=\"Desactivar el complemento para %2$s\">desactivar el antiguo plugin</a>."
 
 #. Author URI of the plugin/theme
 msgid "http://m.tri.be/28"
@@ -765,108 +872,108 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.7.3)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.9.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:315
+#: src/Tribe/Main.php:345
 msgid "Event Tickets Plus"
 msgstr "Event Tickets Plus"
 
-#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:220
+#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:217
 msgid "Add to cart"
 msgstr "Agrega al carrito"
 
-#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:155
+#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:154
 msgid "Out of stock!"
 msgstr "¡Agotado!"
 
 #: src/admin-views/edd-metabox-sku.php:25
 #: src/admin-views/woocommerce-metabox-sku.php:24
 msgid "A unique identifying code for each ticket type you're selling"
-msgstr "Un código único de identificación para cada categoría de boleto que vendes"
+msgstr "Un código único de identificación para cada categoría de entrada a la venta"
 
 #: src/admin-views/edd-metabox-sku.php:15
 #: src/admin-views/woocommerce-metabox-sku.php:14
 msgid "SKU:"
 msgstr "Número de referencia:"
 
-#: src/Tribe/QR.php:119
+#: src/Tribe/QR.php:187
 msgid "The ticket with ID %s was checked in."
-msgstr "La entrada con ID %s ha sido confirmada"
+msgstr "La entrada con ID %s ha sido confirmada."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:144
+#: src/Tribe/Commerce/WooCommerce/Email.php:145
 msgid "Defaults to <code>%s</code>"
 msgstr "El valor predeterminado es <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:142
+#: src/Tribe/Commerce/WooCommerce/Email.php:143
 msgid "Subject"
 msgstr "Asunto"
 
 #: src/Tribe/Commerce/WooCommerce/Email.php:16
 msgid "Email the user will receive after a completed order with the tickets they purchased."
-msgstr "Correo electrónico que el usuario recibirá después de completar un pedido con los tickets que ha comprado."
+msgstr "Correo electrónico que el usuario recibirá una vez finalizada la compra de las entradas."
 
 #: src/Tribe/CSV_Importer/Column_Names.php:70
 #: src/Tribe/CSV_Importer/Rows.php:52 src/Tribe/CSV_Importer/Rows.php:71
 #: src/Tribe/Commerce/WooCommerce/Email.php:15
 #: src/views/eddtickets/tickets.php:34 src/views/wootickets/tickets.php:45
 msgid "Tickets"
-msgstr "Tickets"
+msgstr "Entradas"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2080
+#: src/Tribe/Commerce/WooCommerce/Main.php:2130
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2031
+#: src/Tribe/Commerce/WooCommerce/Main.php:2081
 msgid "Deleted"
 msgstr "Eliminado"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2025
+#: src/Tribe/Commerce/WooCommerce/Main.php:2075
 msgid "In trash (was %s)"
 msgstr "En la papelera (era %s)"
 
-#: src/Tribe/Commerce/EDD/Main.php:1665
+#: src/Tribe/Commerce/EDD/Main.php:1735
 msgid "Event"
 msgstr "Evento"
 
 #: src/Tribe/Commerce/Loader.php:187
 msgid "To begin using Tickets Plus, please install and activate the latest version of <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
-msgstr "Para empezar a usar Tickets Plus, por favor instala y activa la última versión de <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
+msgstr "Para empezar a usar Tickets Plus, por favor instale y active la última versión de <a href=\"%s\" class=\"thickbox\" title=\"%s\">%s</a>."
 
 #: src/Tribe/Commerce/Loader.php:50 src/Tribe/Commerce/Loader.php:66
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:1821
+#: src/Tribe/Commerce/EDD/Main.php:1892
 msgid "Print Ticket"
-msgstr "Imprime tu ticket"
+msgstr "Imprimir entrada"
 
-#: src/Tribe/Commerce/EDD/Main.php:1780
+#: src/Tribe/Commerce/EDD/Main.php:1849
 msgid "Sorry! Only %d tickets remaining for %s"
-msgstr "¡Lo sentimos! Solamente quedan %d tickets para %s"
+msgstr "¡Lo sentimos! Solo quedan %d entradas para %s"
 
-#: src/Tribe/Commerce/EDD/Main.php:1777
+#: src/Tribe/Commerce/EDD/Main.php:1847
 msgid "%s ticket is sold out"
-msgstr "%s tíquet está agotado"
+msgstr "Las entradas para %s están agotadas"
 
-#: src/Tribe/Commerce/EDD/Main.php:1683
-#: src/Tribe/Commerce/WooCommerce/Main.php:2345
+#: src/Tribe/Commerce/EDD/Main.php:1753
+#: src/Tribe/Commerce/WooCommerce/Main.php:2407
 msgid "This is a ticket for the event:"
-msgstr "Este es un tíquet para el evento:"
+msgstr "Esta es la entrada para el evento:"
 
-#: src/Tribe/Commerce/EDD/Main.php:1614
-#: src/Tribe/Commerce/WooCommerce/Main.php:2294
+#: src/Tribe/Commerce/EDD/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:2356
 msgid "Event sales report"
 msgstr "Reporte de ventas por evento"
 
-#: src/Tribe/Commerce/EDD/Main.php:1278
-#: src/Tribe/Commerce/WooCommerce/Main.php:1933
+#: src/Tribe/Commerce/EDD/Main.php:1319
+#: src/Tribe/Commerce/WooCommerce/Main.php:1969
 msgid "(deleted)"
 msgstr "(eliminado)"
 
-#: src/Tribe/Commerce/EDD/Main.php:454
-#: src/Tribe/Commerce/WooCommerce/Main.php:833
+#: src/Tribe/Commerce/EDD/Main.php:490
+#: src/Tribe/Commerce/WooCommerce/Main.php:862
 msgid "You'll receive your tickets in another email."
-msgstr "Recibirás tus tickets en otro correo electrónico."
+msgstr "Recibirá las entradas en otro correo electrónico."
 
 #: src/Tribe/Commerce/Loader.php:98 src/Tribe/Commerce/Loader.php:113
 msgid "Easy Digital Downloads"
@@ -874,20 +981,20 @@ msgstr "Easy Digital Downloads"
 
 #: src/Tribe/Commerce/EDD/Email.php:40
 msgid "Enter the subject line for the tickets receipt email"
-msgstr "Ingresa el asunto para el correo del recibo"
+msgstr "Ingrese el asunto para el mensaje del recibo de las entradas"
 
 #: src/Tribe/Commerce/EDD/Email.php:39
 msgid "Tickets Email Subject"
-msgstr "Asunto del Correo de los tickets"
+msgstr "Asunto del mensaje con las entradas"
 
 #: src/Tribe/Commerce/EDD/Email.php:34
 msgid "Configure the ticket receipt emails"
-msgstr "Configura los correos de recibo"
+msgstr "Configure los mensajes de recibo"
 
 #: src/Tribe/Commerce/EDD/Email.php:33
 msgid "Tribe Ticket Emails"
-msgstr "Correos de Tribe Tickets"
+msgstr "Mensajes de Tribe Tickets"
 
 #: src/Tribe/Commerce/EDD/Email.php:13
 msgid "Your tickets from {sitename}"
-msgstr "Tus entradas de {sitename}"
+msgstr "Sus entradas de {sitename}"

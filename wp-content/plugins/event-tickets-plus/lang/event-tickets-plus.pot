@@ -2,14 +2,14 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Event Tickets Plus 4.8\n"
+"Project-Id-Version: Event Tickets Plus 4.9\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/event-tickets-"
 "plus\n"
-"POT-Creation-Date: 2018-08-20 15:18:27+00:00\n"
+"POT-Creation-Date: 2018-11-28 01:25:38+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2018-08-20 15:18\n"
+"PO-Revision-Date: 2018-11-28 01:25\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
@@ -182,39 +182,39 @@ msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:456
-#: src/Tribe/Commerce/WooCommerce/Main.php:841
+#: src/Tribe/Commerce/EDD/Main.php:490
+#: src/Tribe/Commerce/WooCommerce/Main.php:862
 msgid "You'll receive your tickets in another email."
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1273
-#: src/Tribe/Commerce/WooCommerce/Main.php:1929
+#: src/Tribe/Commerce/EDD/Main.php:1319
+#: src/Tribe/Commerce/WooCommerce/Main.php:1969
 msgid "(deleted)"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1621
-#: src/Tribe/Commerce/WooCommerce/Main.php:2301
+#: src/Tribe/Commerce/EDD/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:2356
 msgid "Event sales report"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1672
+#: src/Tribe/Commerce/EDD/Main.php:1735
 msgid "Event"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1690
-#: src/Tribe/Commerce/WooCommerce/Main.php:2352
+#: src/Tribe/Commerce/EDD/Main.php:1753
+#: src/Tribe/Commerce/WooCommerce/Main.php:2407
 msgid "This is a ticket for the event:"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1784
+#: src/Tribe/Commerce/EDD/Main.php:1847
 msgid "%s ticket is sold out"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1787
+#: src/Tribe/Commerce/EDD/Main.php:1849
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1828
+#: src/Tribe/Commerce/EDD/Main.php:1892
 msgid "Print Ticket"
 msgstr ""
 
@@ -277,28 +277,28 @@ msgstr ""
 msgid "Tickets email notification manually sent to user."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:244
+#: src/Tribe/Commerce/WooCommerce/Main.php:243
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2021
+#: src/Tribe/Commerce/WooCommerce/Main.php:2075
 msgid "In trash (was %s)"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2027
+#: src/Tribe/Commerce/WooCommerce/Main.php:2081
 msgid "Deleted"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2076
+#: src/Tribe/Commerce/WooCommerce/Main.php:2130
 msgid "Unknown"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2472
+#: src/Tribe/Commerce/WooCommerce/Main.php:2527
 msgid "Resend tickets email"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2713
+#: src/Tribe/Commerce/WooCommerce/Main.php:2795
 msgid ""
 "The ticket: %1$s, in your cart is no longer available or valid. You need to "
 "remove it from your cart in order to continue."
@@ -397,13 +397,13 @@ msgstr ""
 msgid "As soon as an order is created"
 msgstr ""
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.8)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.9)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:342
+#: src/Tribe/Main.php:345
 msgid "Event Tickets Plus"
 msgstr ""
 
-#: src/Tribe/Main.php:382
+#: src/Tribe/Main.php:385
 msgid "Require users to log in before they purchase tickets"
 msgstr ""
 
@@ -501,7 +501,7 @@ msgstr ""
 msgid "Attendee Information"
 msgstr ""
 
-#: src/Tribe/Meta.php:501
+#: src/Tribe/Meta.php:504
 msgid "This ticket has custom Attendee Information fields"
 msgstr ""
 
@@ -592,19 +592,23 @@ msgstr ""
 msgid "QR API Key Generated"
 msgstr ""
 
-#: src/Tribe/QR.php:105
+#: src/Tribe/QR.php:167
 msgid "The ticket with ID %s was deleted and cannot be checked-in."
 msgstr ""
 
-#: src/Tribe/QR.php:112
+#: src/Tribe/QR.php:173
+msgid "The security code for ticket with ID %s does not match."
+msgstr ""
+
+#: src/Tribe/QR.php:180
 msgid "The ticket with ID %s has already been checked in."
 msgstr ""
 
-#: src/Tribe/QR.php:119
+#: src/Tribe/QR.php:187
 msgid "The ticket with ID %s was checked in."
 msgstr ""
 
-#: src/Tribe/QR.php:137
+#: src/Tribe/QR.php:205
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr ""
 
@@ -949,11 +953,11 @@ msgid_plural "%d people are attending %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:145
+#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:144
 msgid "%1$s available"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:155
+#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:154
 msgid "Out of stock!"
 msgstr ""
 
@@ -961,15 +965,15 @@ msgstr ""
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
 #: src/views/tpp/attendees-list-optout.php:35
-#: src/views/wootickets/tickets.php:196
+#: src/views/wootickets/tickets.php:195
 msgid "Don't list me on the public attendee list"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:220
+#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:217
 msgid "Add to cart"
 msgstr ""
 
-#: src/views/eddtickets/tickets.php:145 src/views/wootickets/tickets.php:229
+#: src/views/eddtickets/tickets.php:143 src/views/wootickets/tickets.php:226
 msgid ""
 "You must have JavaScript activated to purchase tickets. Please enable "
 "JavaScript in your browser."
@@ -1015,7 +1019,7 @@ msgstr ""
 msgid "Attendee %d"
 msgstr ""
 
-#: src/views/wootickets/tickets.php:167
+#: src/views/wootickets/tickets.php:166
 msgid "Free"
 msgstr ""
 

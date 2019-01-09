@@ -50,18 +50,10 @@ function bps_display_form ($form, $location='')
 {
 	$meta = bps_meta ($form);
 
-	if (!function_exists ('bp_locate_template'))
-	{
-		bps_error ('buddypress_not_active');
-	}
-	else if (empty ($meta['field_code']))
-	{
-		bps_error ('form_empty_or_nonexistent', $form);
-	}
-	else
-	{
-		bps_call_form_template ($meta['template'], array ($form, $location));
-	}
+	if (empty ($meta['field_code']))
+		return bps_error ('form_empty_or_nonexistent', $form);
+
+	bps_call_form_template ($meta['template'], array ($form, $location));
 }
 
 add_shortcode ('bps_form', 'bps_show_form');
@@ -88,10 +80,9 @@ function bps_show_form0 ($attr, $content)
 
 function bps_error ($code, $data = array ())
 {
-	$errors = array
+	$formats = array
 	(
 		'template_not_found'			=> __('%1$s error: Template "%2$s" not found.', 'bp-profile-search'),
-		'buddypress_not_active'			=> __('%1$s error: BuddyPress is not active.', 'bp-profile-search'),
 		'form_empty_or_nonexistent'		=> __('%1$s error: Form ID "%2$d" is empty or nonexistent.', 'bp-profile-search'),
 	);
 
@@ -99,8 +90,9 @@ function bps_error ($code, $data = array ())
 	$plugin = '<strong>BP Profile Search '. BPS_VERSION. '</strong>';
 	array_unshift ($data, $plugin);
 ?>
-	<p class="bps-error"><?php vprintf ($errors[$code], $data); ?></p>
+	<p class="bps-error"><?php vprintf ($formats[$code], $data); ?></p>
 <?php
+	return false;
 }
 
 function bps_set_wpml ($form, $code, $key, $value)

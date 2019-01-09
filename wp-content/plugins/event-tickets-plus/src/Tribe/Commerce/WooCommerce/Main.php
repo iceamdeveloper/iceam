@@ -84,7 +84,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Meta key that relates Attendees and Events.
 	 *
-
 	 * @deprecated 4.7 Use $attendee_event_key variable instead
 	 */
 	const ATTENDEE_EVENT_KEY = '_tribe_wooticket_event';
@@ -244,16 +243,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$this->plugin_name = $this->pluginName = _x( 'WooCommerce', 'ticket provider', 'event-tickets-plus' );
 		$this->plugin_slug = $this->pluginSlug = 'wootickets';
 		$this->plugin_path = $this->pluginPath = trailingslashit( EVENT_TICKETS_PLUS_DIR );
-		$this->plugin_dir  = $this->pluginDir  = trailingslashit( basename( $this->plugin_path ) );
-		$this->plugin_url  = $this->pluginUrl  = trailingslashit( plugins_url( $this->plugin_dir ) );
+		$this->plugin_dir  = $this->pluginDir = trailingslashit( basename( $this->plugin_path ) );
+		$this->plugin_url  = $this->pluginUrl = trailingslashit( plugins_url( $this->plugin_dir ) );
 
 		parent::__construct();
 
+		$this->bind_implementations();
 		$this->hooks();
 		$this->orders_report();
 		$this->global_stock();
 		$this->meta();
 		$this->settings();
+	}
+
+	/**
+	 * Binds implementations that are specific to WooCommerce
+	 */
+	public function bind_implementations() {
+		tribe_singleton( 'tickets-plus.commerce.woo.cart', 'Tribe__Tickets_Plus__Commerce__WooCommerce__Cart', array( 'hook' ) );
+		tribe( 'tickets-plus.commerce.woo.cart' );
 	}
 
 	/**
@@ -361,7 +369,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @param array         $values
 	 */
 	public function set_attendee_optout_value( $item, $cart_item_key, $values ) {
-		if ( isset( $values[ 'attendee_optout' ] ) ) {
+		if ( isset( $values['attendee_optout'] ) ) {
 			$item->add_meta_data( $this->attendee_optout_key, $values['attendee_optout'] );
 		}
 	}
@@ -647,8 +655,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$has_tickets = false;
 
 		// Get the items purchased in this order
-		$order             = new WC_Order( $order_id );
-		$order_items       = $order->get_items();
+		$order       = new WC_Order( $order_id );
+		$order_items = $order->get_items();
 
 		// Bail if the order is empty
 		if ( empty( $order_items ) ) {
@@ -692,7 +700,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				$currency        = tribe( 'tickets.commerce.currency' );
 				$currency_symbol = $currency->get_currency_symbol( $product_id, true );
 
-				for ( $i = 0; $i < $quantity; $i ++ ) {
+				for ( $i = 0; $i < $quantity; $i++ ) {
 
 					$attendee = array(
 						'post_status' => 'publish',
@@ -739,7 +747,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 							: $order->customer_user; // WC 2.2.x
 
 						$this->record_attendee_user_id( $attendee_id, $customer_id );
-						$order_attendee_id ++;
+						$order_attendee_id++;
 					}
 				}
 			}
@@ -787,7 +795,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 *
 	 * @return string
 	 */
-	public function generate_security_code( $order_id, $attendee_id = ''  ) {
+	public function generate_security_code( $order_id, $attendee_id = '' ) {
 		return substr( md5( $order_id . '_' . $attendee_id ), 0, 10 );
 	}
 
@@ -881,7 +889,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			);
 
 			$ticket->ID = wp_insert_post( $args );
-			$product = wc_get_product( $ticket->ID );
+			$product    = wc_get_product( $ticket->ID );
 
 			if ( ! $product ) {
 				return false;
@@ -1009,7 +1017,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		// Default Capacity will be 0
-		$default_capacity = 0;
+		$default_capacity   = 0;
 		$is_capacity_passed = true;
 
 		// If we have Event Global stock we fetch that Stock
@@ -1046,7 +1054,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		if ( '' !== $data['mode'] ) {
 			if ( 'update' === $save_type ) {
-				$totals = tribe( 'tickets.handler' )->get_ticket_totals( $ticket->ID );
+				$totals        = tribe( 'tickets.handler' )->get_ticket_totals( $ticket->ID );
 				$data['stock'] -= $totals['pending'] + $totals['sold'];
 			}
 
@@ -1096,7 +1104,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				$start_date .= ' ' . $raw_data['ticket_start_time'];
 			}
 
-			$ticket->start_date = date( Tribe__Date_Utils::DBDATETIMEFORMAT, strtotime( $start_date ) );
+			$ticket->start_date  = date( Tribe__Date_Utils::DBDATETIMEFORMAT, strtotime( $start_date ) );
 			$previous_start_date = get_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_start_date, true );
 
 			// Only update when we are modifying
@@ -1114,7 +1122,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				$end_date .= ' ' . $raw_data['ticket_end_time'];
 			}
 
-			$ticket->end_date = date( Tribe__Date_Utils::DBDATETIMEFORMAT, strtotime( $end_date ) );
+			$ticket->end_date  = date( Tribe__Date_Utils::DBDATETIMEFORMAT, strtotime( $end_date ) );
 			$previous_end_date = get_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_end_date, true );
 
 			// Only update when we are modifying
@@ -1170,7 +1178,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 * of deleting them directly
 		 *
 		 * @param bool   false
-		 * @param int    $ticket_id
+		 * @param int $ticket_id
 		 */
 		if ( apply_filters( 'tribe_tickets_plus_trash_ticket', true, $ticket_id ) ) {
 			// Move it to the trash
@@ -1228,8 +1236,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		// WooCommerce 3.x
 		if ( function_exists( 'wc_update_product_stock' ) ) {
 			$success = wc_update_product_stock( $product, (int) $product->get_stock_quantity() + $increment_by );
-		}
-		// WooCommerce 2.x
+		} // WooCommerce 2.x
 		else {
 			$success = $product->set_stock( (int) $product->stock + $increment_by );
 		}
@@ -1333,7 +1340,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			 * @since 4.7.3
 			 *
 			 * @param boolean $must_login
-			 * @param array $tickets
+			 * @param array   $tickets
 			 */
 			do_action( 'tribe_tickets_expired_front_end_ticket_form', $must_login, $tickets );
 		}
@@ -1361,7 +1368,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		global $woocommerce;
 
-		if ( empty( $_REQUEST['wootickets_process'] ) || intval( $_REQUEST['wootickets_process'] ) !== 1 || empty( $_POST['product_id'] ) ) {
+		// We just want to process wootickets submissions here.
+		if (
+			empty( $_REQUEST['wootickets_process'] )
+			|| intval( $_REQUEST['wootickets_process'] ) !== 1
+			|| empty( $_POST['product_id'] )
+		) {
 			return;
 		}
 
@@ -1378,9 +1390,24 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			}
 		}
 
-		set_transient( $this->get_cart_transient_key(), wc_get_cart_url() );
+		if ( empty( $_POST[ Tribe__Tickets_Plus__Meta__Storage::META_DATA_KEY ] ) ) {
+			return;
+		}
+
+		set_transient( $this->get_cart_transient_key(), wc_get_checkout_url() );
+
+		wp_safe_redirect( wc_get_checkout_url() );
+		tribe_exit();
 	}
 
+	/**
+	 * Return whether we're currently on the checkout page.
+	 *
+	 * @return bool
+	 */
+	public function is_checkout_page() {
+		return is_checkout();
+	}
 
 	/**
 	 * Gets an individual ticket
@@ -1405,13 +1432,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$product_post = get_post( $this->get_product_id( $product ) );
 		$qty_sold     = get_post_meta( $ticket_id, 'total_sales', true );
 
-		$return->description      = $product_post->post_excerpt;
-		$return->frontend_link    = get_permalink( $ticket_id );
-		$return->ID               = $ticket_id;
-		$return->name             = $product->get_title();
-		$return->price            = $this->get_price_value_for( $product, $return );
-		$return->regular_price    = $product->get_regular_price();
-		$return->on_sale          = (bool) $product->is_on_sale();
+		$return->description   = $product_post->post_excerpt;
+		$return->frontend_link = get_permalink( $ticket_id );
+		$return->ID            = $ticket_id;
+		$return->name          = $product->get_title();
+		$return->price         = $this->get_price_value_for( $product, $return );
+		$return->regular_price = $product->get_regular_price();
+		$return->on_sale       = (bool) $product->is_on_sale();
 		if ( $return->on_sale ) {
 			$return->price = $product->get_sale_price();
 		}
@@ -1422,8 +1449,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->sku              = $product->get_sku();
 		$return->show_description = $return->show_description();
 
-		$start_date               = get_post_meta( $ticket_id, '_ticket_start_date', true );
-		$end_date                 = get_post_meta( $ticket_id, '_ticket_end_date', true );
+		$start_date = get_post_meta( $ticket_id, '_ticket_start_date', true );
+		$end_date   = get_post_meta( $ticket_id, '_ticket_end_date', true );
 
 		if ( ! empty( $start_date ) ) {
 			$start_date_unix    = strtotime( $start_date );
@@ -1453,7 +1480,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->global_stock_mode( get_post_meta( $ticket_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, true ) );
 		$capped = get_post_meta( $ticket_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, true );
 
-		if ( '' !== $capped  ) {
+		if ( '' !== $capped ) {
 			$return->global_stock_cap( $capped );
 		}
 
@@ -1499,7 +1526,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 */
 	public function get_qty_pending( $ticket_id, $refresh = false ) {
 		if ( $refresh || empty( $this->pending_orders_by_ticket[ $ticket_id ] ) ) {
-			$pending_totals = $this->count_order_items_by_status( $ticket_id, 'incomplete' );
+			$pending_totals                               = $this->count_order_items_by_status( $ticket_id, 'incomplete' );
 			$this->pending_orders_by_ticket[ $ticket_id ] = $pending_totals['total'] ? $pending_totals['total'] : 0;
 		}
 
@@ -1791,8 +1818,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 *
 		 * @since 4.7
 		 *
-		 * @param array $attendees
-		 * @param int $post_id The post ID attendees were requested for.
+		 * @param array  $attendees
+		 * @param int    $post_id The post ID attendees were requested for.
 		 * @param string $post_type
 		 */
 		return apply_filters( 'tribe_tickets_plus_woo_get_attendees', $attendees, $post_id, $post_type );
@@ -1808,7 +1835,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 */
 	protected function get_attendees_by_post_id( $post_id ) {
 		$attendees_query = new WP_Query( array(
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_type'      => self::ATTENDEE_OBJECT,
 			'meta_key'       => self::ATTENDEE_EVENT_KEY,
 			'meta_value'     => $post_id,
@@ -1835,7 +1862,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 */
 	protected function get_attendees_by_product_id( $post_id ) {
 		$attendees_query = new WP_Query( array(
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_type'      => self::ATTENDEE_OBJECT,
 			'meta_key'       => self::ATTENDEE_PRODUCT_KEY,
 			'meta_value'     => $post_id,
@@ -1883,7 +1910,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	protected function get_attendees_by_order_id( $order_id ) {
 
 		$attendees_query = new WP_Query( array(
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_type'      => $this->attendee_object,
 			'meta_key'       => $this->attendee_order_key,
 			'meta_value'     => $order_id,
@@ -1967,7 +1994,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				// Fields for Email Tickets
 				'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
 				'ticket_name'   => ! empty( $product ) ? $product->post_title : false,
-				'holder_name'   => get_post_meta( $order_id, '_billing_first_name', true ) . ' ' . get_post_meta( $order_id, '_billing_last_name', true ),
+				'holder_name'   => $this->get_holder_name( $attendee, $order_id ),
 				'ticket_id'     => $ticket_unique_id,
 				'qr_ticket_id'  => $attendee->ID,
 				'security_code' => $security,
@@ -1991,6 +2018,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		return $attendees;
+	}
+
+	/**
+	 * Get holder name, from existing meta if possible.
+	 *
+	 * @param $attendee
+	 * @param $order_id
+	 *
+	 * @since 4.9
+	 *
+	 * @return string
+	 */
+	protected function get_holder_name( $attendee, $order_id ) {
+		return get_post_meta( $order_id, '_billing_first_name', true ) . ' ' . get_post_meta( $order_id, '_billing_last_name', true );
 	}
 
 	/**
@@ -2126,6 +2167,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @since 4.8.0
 	 *
 	 * @param  int $attendee_id
+	 *
 	 * @return void
 	 */
 	public function purge_attendees_transient( $attendee_id ) {
@@ -2169,14 +2211,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		if ( ! empty( $ticket_id ) ) {
-			$ticket = $this->get_ticket( $post_id, $ticket_id );
+			$ticket              = $this->get_ticket( $post_id, $ticket_id );
 			$is_correct_provider = tribe( 'tickets.handler' )->is_correct_provider( $ticket_id, $this );
 
 			if ( ! empty( $ticket ) ) {
-				$stock               = $ticket->managing_stock() ? $ticket->stock() : '';
-				$capacity            = tribe_tickets_get_capacity( $ticket->ID );
-				$global_stock_mode   = ( method_exists( $ticket, 'global_stock_mode' ) ) ? $ticket->global_stock_mode() : '';
-				$global_stock_cap    = ( method_exists( $ticket, 'global_stock_cap' ) ) ? $ticket->global_stock_cap() : 0;
+				$stock             = $ticket->managing_stock() ? $ticket->stock() : '';
+				$capacity          = tribe_tickets_get_capacity( $ticket->ID );
+				$global_stock_mode = ( method_exists( $ticket, 'global_stock_mode' ) ) ? $ticket->global_stock_mode() : '';
+				$global_stock_cap  = ( method_exists( $ticket, 'global_stock_cap' ) ) ? $ticket->global_stock_cap() : 0;
 			}
 		}
 
@@ -2218,24 +2260,24 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		do_action( 'tribe_events_tickets_metabox_edit_ajax_advanced', $post_id, $provider );
 
 		echo '</div>';
-	 }
+	}
 
 	/**
 	 * Add the sku field in the admin's new/edit ticket metabox
 	 *
 	 * @since 4.6
 	 *
-	 * @param $post_id int id of the event post
+	 * @param     $post_id int id of the event post
 	 * @param int $ticket_id (null) id of the ticket
 	 *
 	 * @return void
 	 */
 	public function do_metabox_sku_options( $post_id, $ticket_id = null ) {
-		$sku = '';
+		$sku                 = '';
 		$is_correct_provider = tribe( 'tickets.handler' )->is_correct_provider( $post_id, $this );
 
 		if ( ! empty( $ticket_id ) ) {
-			$ticket = $this->get_ticket( $post_id, $ticket_id );
+			$ticket              = $this->get_ticket( $post_id, $ticket_id );
 			$is_correct_provider = tribe( 'tickets.handler' )->is_correct_provider( $ticket_id, $this );
 
 			if ( ! empty( $ticket ) ) {
@@ -2256,7 +2298,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 *
 	 * @since 4.6
 	 *
-	 * @param $post_id int id of the event post
+	 * @param     $post_id int id of the event post
 	 * @param int $ticket_id (null) id of the ticket
 	 *
 	 * @return void
@@ -2268,7 +2310,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$ticket_id = tribe_get_request_var( 'ticket_id' );
 		}
 
-		$ticket = $this->get_ticket( $post_id, $ticket_id );
+		$ticket              = $this->get_ticket( $post_id, $ticket_id );
 		$is_correct_provider = tribe( 'tickets.handler' )->is_correct_provider( $ticket_id, $this );
 
 		// Bail when we are not dealing with this provider
@@ -2319,7 +2361,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * As of 4.6 we reversed the params and deprecated $event_id as it was never used
 	 *
 	 * @param deprecated $event_id_deprecated ID of the event post
-	 * @param int $ticket_id (null) id of the ticket
+	 * @param int        $ticket_id (null) id of the ticket
 	 *
 	 * @return string
 	 */
@@ -2405,7 +2447,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Get's the WC product price html
 	 *
 	 * @param int|object $product
-	 * @param array $attendee
+	 * @param array      $attendee
 	 *
 	 * @return string
 	 */
@@ -2548,6 +2590,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	protected function complete_order( $order_id ) {
 		$this->send_tickets_email( $order_id );
 
+		// Clear WooCommerce Cart once the order is Done
+		if ( null !== WC()->cart ) {
+			WC()->cart->empty_cart();
+		}
+
 		/**
 		 * Fires when a ticket order is complete.
 		 *
@@ -2564,11 +2611,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @since  4.8.1
 	 *
 	 * @param int                           $available Max Purchase number
-	 * @param Tribe__Tickets__Ticket_Object $ticket    Ticket Object
+	 * @param Tribe__Tickets__Ticket_Object $ticket Ticket Object
 	 *
 	 * @return int
 	 */
 	public function filter_ticket_max_purchase( $available, $ticket ) {
+		// Prevent fails without ticket ID
+		if ( ! isset( $ticket->ID ) ) {
+			return $available;
+		}
+
+		// Bails on invalid Ticket ID
+		if ( ! $ticket->ID || ! is_numeric( $ticket->ID ) ) {
+			return $available;
+		}
+
+		if ( 'product' !== $ticket->post_type ) {
+			return $available;
+		}
+
 		if ( class_exists( 'WC_Product_Simple' ) ) {
 			$product = new WC_Product_Simple( $ticket->ID );
 		} else {
@@ -2616,12 +2677,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
 
 		return doing_action( 'wp_ajax_tribe-ticket-edit-' . __CLASS__ )
-		       || doing_action( 'wp_ajax_tribe-ticket-add-' . __CLASS__ )
-		       || doing_action( 'wp_ajax_tribe-ticket-delete-' . __CLASS__ )
-		       || ( is_admin()
-		          && ! empty( $screen )
-		          && $screen->base === 'post'
-		          && $screen->parent_base === 'edit' );
+			|| doing_action( 'wp_ajax_tribe-ticket-add-' . __CLASS__ )
+			|| doing_action( 'wp_ajax_tribe-ticket-delete-' . __CLASS__ )
+			|| ( is_admin()
+				&& ! empty( $screen )
+				&& $screen->base === 'post'
+				&& $screen->parent_base === 'edit' );
 	}
 
 	/**
@@ -2671,7 +2732,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 *
 	 * @param Tribe__Tickets__Tickets_Handler $handler
 	 */
-	public function render_tabbed_view( Tribe__Tickets__Attendees $handler  ) {
+	public function render_tabbed_view( Tribe__Tickets__Attendees $handler ) {
 		$post = $handler->get_post();
 
 		$has_tickets = count( (array) self::get_tickets( $post->ID ) );
@@ -2732,7 +2793,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	public function validate_tickets() {
 
 		foreach ( WC()->cart->get_cart() as $cart_item_key => $values ) {
-			$product_id  = empty( $values['product_id'] ) ? null : $values['product_id'];
+			$product_id = empty( $values['product_id'] ) ? null : $values['product_id'];
 
 			if ( is_null( $product_id ) ) {
 				continue;

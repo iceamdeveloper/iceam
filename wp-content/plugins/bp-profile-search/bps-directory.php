@@ -6,28 +6,21 @@ function bps_directories ()
 
 	if (count ($dirs))  return $dirs;
 
-	if (function_exists ('bp_core_get_directory_page_ids'))
+	$bp_pages = bp_core_get_directory_page_ids ();
+	if (isset ($bp_pages['members']))
 	{
-		$bp_pages = bp_core_get_directory_page_ids ();
-		if (isset ($bp_pages['members']))
-		{
-			$members = $bp_pages['members'];
-// echo "-- debug: bp_core_get_directory_page_ids returns $members --\n";
-			$members = bps_wpml_id ($members);
-			$dirs[$members] = new stdClass;
-			$dirs[$members]->label = get_the_title ($members);
-			$dirs[$members]->link = parse_url (get_page_link ($members), PHP_URL_PATH);
+		$members = $bp_pages['members'];
+		$members = bps_wpml_id ($members);
+		$dirs[$members] = new stdClass;
+		$dirs[$members]->label = get_the_title ($members);
+		$dirs[$members]->link = parse_url (get_page_link ($members), PHP_URL_PATH);
 
-			if (function_exists ('bp_get_member_types'))
-			{
-				$member_types = bp_get_member_types (array (), 'objects');
-				foreach ($member_types as $type)  if ($type->has_directory == 1)
-				{
-					$dirs[$type->name] = new stdClass;
-					$dirs[$type->name]->label = $dirs[$members]->label. ' - '. $type->labels['name'];
-					$dirs[$type->name]->link = parse_url (bp_get_member_type_directory_permalink ($type->name), PHP_URL_PATH);
-				}
-			}
+		$member_types = bp_get_member_types (array (), 'objects');
+		foreach ($member_types as $type)  if ($type->has_directory == 1)
+		{
+			$dirs[$type->name] = new stdClass;
+			$dirs[$type->name]->label = $dirs[$members]->label. ' - '. $type->labels['name'];
+			$dirs[$type->name]->link = parse_url (bp_get_member_type_directory_permalink ($type->name), PHP_URL_PATH);
 		}
 	}
 
@@ -69,32 +62,24 @@ function bps_show_directory ($attr, $content)
 {
 	ob_start ();
 
-	if (!function_exists ('bp_get_template_part'))
+	if (bps_debug ())
 	{
-		printf ('<p class="bps_error">'. __('%s: BuddyPress is not active.', 'bp-profile-search'). '</p>',
-			'<strong>BP Profile Search '. BPS_VERSION. '</strong>');
+		echo "<!--\n";
+		print_r ($attr);
+		print_r (bps_hidden_filters ());
+		echo "-->\n";
 	}
-	else
+
+	if (isset ($attr['order_by']))
+		bps_set_sort_options ($attr['order_by']);
+
+	$template = isset ($attr['template'])? $attr['template']: 'members/index';
+	bps_call_template ($template);
+
+	if (bp_get_theme_package_id () == 'nouveau')
 	{
-		if (bps_debug ())
-		{
-			echo "<!--\n";
-			print_r ($attr);
-			print_r (bps_hidden_filters ());
-			echo "-->\n";
-		}
-
-		if (isset ($attr['order_by']))
-			bps_set_sort_options ($attr['order_by']);
-
-		$template = isset ($attr['template'])? $attr['template']: 'members/index';
-		bps_call_template ($template);
-
-		if (bp_get_theme_package_id () == 'nouveau')
-		{
-			printf ('<p class="bps_error">'. __('%s: The shortcode [bps_directory] is not working with the BuddyPress Nouveau template pack.', 'bp-profile-search'). '</p>',
-				'<strong>BP Profile Search '. BPS_VERSION. '</strong>');
-		}
+		printf ('<p class="bps-error">'. __('%s: The shortcode [bps_directory] is not working with the BuddyPress Nouveau template pack.', 'bp-profile-search'). '</p>',
+			'<strong>BP Profile Search '. BPS_VERSION. '</strong>');
 	}
 
 	return ob_get_clean ();

@@ -153,6 +153,19 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	}
 
 	/**
+	 * Gets the transient hash id from a cookie.
+	 *
+	 * @since 4.9
+	 *
+	 * @param $transient_id
+	 *
+	 * @return string
+	 */
+	public function get_hash_cookie() {
+		return $_COOKIE[ self::HASH_COOKIE_KEY ];
+	}
+
+	/**
 	 * Adds attendee meta from currently-being-bought tickets to tickets that are already in the cart.
 	 *
 	 * @since 4.5.6
@@ -174,7 +187,9 @@ class Tribe__Tickets_Plus__Meta__Storage {
 
 			if ( isset( $saved[ $ticket_id ] ) && $saved[ $ticket_id ] !== $new[ $ticket_id ] ) {
 				// If there's already stored attendee meta for this ticket, add some more meta to that existing entry.
-				$saved[ $ticket_id ][] = $data[0];
+				foreach ( $data as $meta_id => $meta_data ) {
+					$saved[ $ticket_id ][ $meta_id ] = $meta_data;
+				}
 			} else {
 				// Otherwise we've got a ticket for which there's no stored data yet, so just add a new entry in the data array.
 				$saved[ $ticket_id ] = $data;
@@ -194,18 +209,34 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	}
 
 	/**
-	 * Gets the ticket data associated to a specified ticket.
+	 * Store temporary data as a transient.
 	 *
-	 * @param int $id
+	 * @param $value
 	 *
-	 * @return array|mixed Either the data stored for the specified id
-	 *                     or an empty array.
+	 * @return string
 	 */
-	public function get_meta_data_for( $id ) {
-		if ( isset( $this->data_cache[ $id ] ) ) {
-			return $this->data_cache[ $id ];
-		}
+	public function store_temporary_data( $value ) {
+		$id            = uniqid();
+		$transient_key = self::TRANSIENT_PREFIX . '_' . $id;
+		set_transient( $transient_key, $value, $this->ticket_meta_expire_time );
 
+		return $id;
+	}
+
+	/**
+	 * Retrieve temporary data from a transient.
+	 *
+	 * @param $transient_key
+	 *
+	 * @return array|mixed
+	 */
+	public function retrieve_temporary_data( $transient_key ) {
+		$value = get_transient( self::TRANSIENT_PREFIX . '_' . $transient_key );
+
+		return empty( $value ) ? array() : $value;
+	}
+
+	public function get_meta_data( $id = null ) {
 		// determine transient id from cookie or WooCommerce session
 		$transient_id = '';
 
@@ -229,7 +260,23 @@ class Tribe__Tickets_Plus__Meta__Storage {
 
 		$transient = self::TRANSIENT_PREFIX . $transient_id;
 
-		$data = get_transient( $transient );
+		return get_transient( $transient );
+	}
+
+	/**
+	 * Gets the ticket data associated to a specified ticket.
+	 *
+	 * @param int $id
+	 *
+	 * @return array|mixed Either the data stored for the specified id
+	 *                     or an empty array.
+	 */
+	public function get_meta_data_for( $id ) {
+		if ( isset( $this->data_cache[ $id ] ) ) {
+			return $this->data_cache[ $id ];
+		}
+
+		$data = $this->get_meta_data( $id );
 
 		if ( ! isset( $data[ intval( $id ) ] ) ) {
 			return array();

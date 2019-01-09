@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-06-25 12:33:06+0000\n"
+"PO-Revision-Date: 2018-11-15 22:24:51+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -11,27 +11,159 @@ msgstr ""
 "Language: de\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
-#: src/Tribe/Settings.php:39
-msgid "Enable QR codes for tickets?"
-msgstr "QR-Codes freischalten für Karten?"
+#: tests/_data/classes/Dummy_Endpoint.php:90
+msgid "No description provided"
+msgstr "Keine Beschreibung vorhanden"
 
-#: src/Tribe/Settings.php:35
+#: tests/_data/classes/Dummy_Endpoint.php:54
+msgid "The requested ticket is not accessible"
+msgstr "Das angeforderte Ticket ist nicht zugänglich."
+
+#: src/admin-views/woocommerce-orders.php:55
+msgid "Sold %d of %d"
+msgstr "%d von %d verkauft"
+
+#: src/admin-views/woocommerce-orders.php:53
+msgid "Sold %d"
+msgstr "%d verkauft"
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:155
+msgid "The security code of the ticket to verify for check in."
+msgstr "Der Sicherheitscode des Tickets, das zur Überprüfung beim Einchecken verwendet wird."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:149
+msgid "The ID of the ticket to check in."
+msgstr "Die ID des einzucheckenden Tickets."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:143
+msgid "The API key to authorize check in."
+msgstr "Der API-Schlüssel zur Autorisierung des Check-in."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:121
+msgid "The ticket id."
+msgstr "Die Ticket-ID."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:102
+msgid "The ticket is already checked in"
+msgstr "Das Ticket ist bereits eingecheckt."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:99
+msgid "A required parameter is missing or an input parameter is in the wrong format"
+msgstr "Ein erforderlicher Parameter fehlt oder ein Eingabeparameter ist im falschen Format."
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:93
+msgid "Returns successful check in"
+msgstr "Gibt das erfolgreiche Einchecken zurück"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:38
+msgid "The event WordPress post ID"
+msgstr "The Veranstaltung WordPress post ID"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:34
+msgid "The security code of the ticket to verify for check in"
+msgstr "Der Sicherheitscode des Tickets, der beim Einchecken überprüft wird"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:30
+msgid "The API key to authorize check in"
+msgstr "Der API Schlüssel um den Check-In zu authorizieren"
+
+#: src/Tribe/REST/V1/Documentation/QR_Definition_Provider.php:26
+msgid "The ticket WordPress post ID"
+msgstr ""
+
+#: src/Tribe/QR.php:173
+msgid "The security code for ticket with ID %s does not match."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:114
+msgid "QR API Key Generated"
+msgstr "QR API Schlüssel generiert"
+
+#: src/Tribe/QR/Settings.php:108
+msgid "The QR API key was not generated, please try again."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:101
+msgid "Permission Error"
+msgstr "Berechtigungsfehler"
+
+#: src/Tribe/QR/Settings.php:81
+msgid "If you change the API key then agents will no longer be able to check-in tickets until they add the new key in their app settings."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:80
+msgid "Generate API Key"
+msgstr "API Schlüssel generieren"
+
+#: src/Tribe/QR/Settings.php:76
+msgid "Generate Key"
+msgstr "Schlüssel generieren"
+
+#: src/Tribe/QR/Settings.php:67
+msgid "Enter this API key in the settings of your Event Tickets Plus app to activate check in."
+msgstr ""
+
+#: src/Tribe/QR/Settings.php:66
+msgid "Tickets check-in app API key"
+msgstr "Tickets einchecken App API-Schlüssel"
+
+#: src/Tribe/QR/Settings.php:60
+msgid "Show QR codes on tickets"
+msgstr "QR-Codes auf Tickets anzeigen"
+
+#: src/Tribe/QR/Settings.php:55
+msgid "Emailed tickets can include QR codes to provide secure check in for your attendees. %1$sDownload our Event Ticket Plus app%2$s for an easy mobile check-in process that syncs with your attendee records."
+msgstr ""
+
+#: src/Tribe/Privacy.php:372
+msgid "EDD Attendee Data"
+msgstr "EDD Teilnehmerdaten"
+
+#: src/Tribe/Privacy.php:281
+msgid "WooTicket Attendee Data"
+msgstr "WooTicket Teilnehmerdaten"
+
+#: src/Tribe/Privacy.php:209
+msgid "EDD Ticket fields information was not removed. A database error may have occurred during deletion."
+msgstr ""
+
+#: src/Tribe/Privacy.php:136
+msgid "WooTicket fields information was not removed. A database error may have occurred during deletion."
+msgstr ""
+
+#: src/Tribe/Privacy.php:64
+msgid "Event EDD Attendee"
+msgstr "Veranstaltung EDD Teilnehmer"
+
+#: src/Tribe/Privacy.php:59
+msgid "WooTickets Attendee"
+msgstr "WooTickets Teilnehmer"
+
+#: src/Tribe/Privacy.php:41
+msgid "EDD Ticket Eraser"
+msgstr "EDD Karten Bereiniger"
+
+#: src/Tribe/Privacy.php:36
+msgid "WooTicket Eraser"
+msgstr "WooTicket Bereiniger"
+
+#: src/Tribe/QR/Settings.php:50
 msgid "QR Codes"
 msgstr "QR Codes"
 
-#: src/admin-views/woocommerce-orders.php:144
+#: src/admin-views/woocommerce-orders.php:120
 msgid "Discounts:"
 msgstr "Vergünstigungen:"
 
-#: src/admin-views/woocommerce-orders.php:113
+#: src/admin-views/woocommerce-orders.php:89
 msgid "Total Sales: %1$s (%2$s)"
 msgstr "Gesamt Verkäufe: %1$s (%2$s)"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2706
+#: src/Tribe/Commerce/WooCommerce/Main.php:2811
 msgid "The ticket: %1$s, in your cart is no longer available or valid. You need to remove it from your cart in order to continue."
 msgstr "Die Karte: %1$s, in ihrem Warenkorb ist nicht mehr länger verfügbar oder gültig. Bitte entferne es aus ihrem Warenkorb, um weiterzufahren."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:170
+#: src/Tribe/Commerce/WooCommerce/Email.php:171
 msgid "Tickets email notification manually sent to user."
 msgstr "E-Mail Benachrichtigungen für Karten manuell an den Benutzer senden."
 
@@ -154,7 +286,7 @@ msgstr "Kapazität:"
 msgid "Need to collect information from your ticket buyers? Configure your own registration form with the options below."
 msgstr "Sie möchten Informationen über Ihre die Käufer der Karten sammeln? Konfigurieren Sie Ihr eigenes Anmeldeformular mit den unten stehenden Optionen."
 
-#: src/views/wootickets/tickets.php:167
+#: src/views/wootickets/tickets.php:166
 msgid "Free"
 msgstr "Kostenlos"
 
@@ -199,7 +331,7 @@ msgstr "Die Gesamtzahl der möglichen Teilnehmer zu dieser Veranstaltung"
 msgid "Total Event Capacity:"
 msgstr "Gesamte Veranstaltungskapazität:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2465
+#: src/Tribe/Commerce/WooCommerce/Main.php:2527
 msgid "Resend tickets email"
 msgstr "Mail für die Karte erneut versenden"
 
@@ -219,7 +351,7 @@ msgstr "Warnung"
 msgid "Ticket Capacity"
 msgstr "Kartenkapazität"
 
-#: src/Tribe/QR.php:105
+#: src/Tribe/QR.php:167
 msgid "The ticket with ID %s was deleted and cannot be checked-in."
 msgstr "Die Karten mit der ID %s wurde gelöscht und kann nicht eingecheckt werden."
 
@@ -227,7 +359,7 @@ msgstr "Die Karten mit der ID %s wurde gelöscht und kann nicht eingecheckt werd
 msgid "Display attendees list"
 msgstr "Teilnehmerliste anzeigen"
 
-#: src/views/eddtickets/tickets.php:145 src/views/wootickets/tickets.php:229
+#: src/views/eddtickets/tickets.php:143 src/views/wootickets/tickets.php:226
 msgid "You must have JavaScript activated to purchase tickets. Please enable JavaScript in your browser."
 msgstr "Sie müssen Java Script aktiviert haben, um Kartenkaufen zu können. Bitte aktivieren sie Java Script in ihrem Browser."
 
@@ -263,7 +395,7 @@ msgctxt "Attendee information fields"
 msgid "Label:"
 msgstr "Beschriftung:"
 
-#: src/Tribe/QR.php:137
+#: src/Tribe/QR.php:205
 msgid "Could not render QR code because gzuncompress() is not available"
 msgstr "QR-Code kann nicht gerendert werden da gzuncompress() nicht verfügbar ist."
 
@@ -311,16 +443,15 @@ msgstr "Adresse"
 msgid "Email"
 msgstr "E-Mail"
 
-#: src/admin-views/woocommerce-orders.php:139
+#: src/admin-views/woocommerce-orders.php:115
 msgid "Canceled:"
 msgstr "Storniert:"
 
-#: src/admin-views/woocommerce-orders.php:134
+#: src/admin-views/woocommerce-orders.php:110
 msgid "Pending Payment:"
 msgstr "Laufende Zahlung:"
 
-#: src/admin-views/woocommerce-orders.php:52
-#: src/admin-views/woocommerce-orders.php:129
+#: src/admin-views/woocommerce-orders.php:105
 msgid "Processing:"
 msgstr "In Verarbeitung:"
 
@@ -354,12 +485,12 @@ msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr "Andere Teilnehmerdaten:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:244
+#: src/Tribe/Commerce/WooCommerce/Main.php:243
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:182
+#: src/Tribe/Commerce/EDD/Main.php:181
 msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
@@ -371,7 +502,7 @@ msgstr "Abgeschlossen:"
 
 #: src/Tribe/Commerce/Attendance_Totals.php:62
 msgctxt "attendee summary"
-msgid "Total Tickets Sold:"
+msgid "Total Tickets Issued:"
 msgstr "Total Karten verkauft:"
 
 #: src/views/tickets-plus/orders-tickets.php:70
@@ -394,7 +525,7 @@ msgstr "Teilnehmerinfos anzeigen"
 msgid "Log in to purchase"
 msgstr "Anmelden um zu kaufen"
 
-#: src/Tribe/Main.php:355
+#: src/Tribe/Main.php:385
 msgid "Require users to log in before they purchase tickets"
 msgstr "Zwinge Benutzer sich vor dem Kauf einzuloggen"
 
@@ -446,11 +577,11 @@ msgstr "Um Event Tickets plus zu verwenden, installieren und aktivieren Sie bitt
 #: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
 #: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
 #: src/views/tpp/attendees-list-optout.php:35
-#: src/views/wootickets/tickets.php:196
+#: src/views/wootickets/tickets.php:195
 msgid "Don't list me on the public attendee list"
 msgstr "Zeige mich nicht auf der öffentlichen Teilnehmerliste"
 
-#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:145
+#: src/views/eddtickets/tickets.php:74 src/views/wootickets/tickets.php:144
 msgid "%1$s available"
 msgstr "%1$s verfügbar"
 
@@ -512,11 +643,11 @@ msgstr "Teilnehmerinformation:"
 msgid "Show attendees list on event page"
 msgstr "Teilnehmerliste auf der Veranstaltungsseite anzeigen"
 
-#: src/Tribe/QR.php:167
+#: src/views/tickets-plus/email-qr.php:28
 msgid "Scan this QR code at the event to check in."
 msgstr "Scannen Sie diesen QR Code an der Veranstaltung um einzuchecken."
 
-#: src/Tribe/QR.php:112
+#: src/Tribe/QR.php:180
 msgid "The ticket with ID %s has already been checked in."
 msgstr "Das Ticket mit der ID %s wurde bereits eingecheckt."
 
@@ -596,7 +727,7 @@ msgstr "Radio-Button"
 msgid "Checkbox"
 msgstr "Checkbox"
 
-#: src/Tribe/Meta.php:501
+#: src/Tribe/Meta.php:504
 msgid "This ticket has custom Attendee Information fields"
 msgstr "Diese Karte enthält benutzerdefinierte Teilnehmer Infofelder"
 
@@ -672,51 +803,27 @@ msgstr "Ticketbestand"
 msgid "Event Tickets"
 msgstr "Veranstaltungstickets"
 
-#: src/admin-views/woocommerce-orders.php:160
+#: src/admin-views/woocommerce-orders.php:136
 msgid "Total Site Fees:"
 msgstr "Gesamtgebüren Seite:"
 
-#: src/admin-views/woocommerce-orders.php:156
+#: src/admin-views/woocommerce-orders.php:132
 msgid "Total Ticket Sales:"
 msgstr "Gesamtumsatz Kartenverkäufe:"
 
-#: src/admin-views/woocommerce-orders.php:91
+#: src/admin-views/woocommerce-orders.php:64
 msgid "SKU: (%s)"
 msgstr "SKU (%s)"
 
-#: src/admin-views/woocommerce-orders.php:77
-msgid "Sold %d of %d %s"
-msgstr "%d von %d %s verkauft"
-
-#: src/admin-views/woocommerce-orders.php:75
-msgid "Sold %d %s"
-msgstr "Verkauf %d %s"
-
-#: src/admin-views/woocommerce-orders.php:71
-msgid "(%d awaiting review)"
-msgid_plural "(%d awaiting review)"
-msgstr[0] "(%d Freigabe ausstehend)"
-msgstr[1] "(%d Freigaben ausstehend)"
-
-#: src/admin-views/woocommerce-orders.php:48
-#: src/admin-views/woocommerce-orders.php:124
+#: src/admin-views/woocommerce-orders.php:100
 msgid "Completed:"
 msgstr "Abgeschlossen:"
-
-#: src/admin-views/woocommerce-orders.php:43
-msgid "Tickets sold:"
-msgstr "Karten verkauft:"
 
 #: src/Tribe/APM.php:67
 msgid "Ticket Sales"
 msgstr "Kartenverkäufe"
 
-#: src/admin-views/edd-metabox-capacity.php:162
-#: src/admin-views/woocommerce-metabox-capacity.php:162
-msgid "Purchase limit:"
-msgstr "Kauf-Limit:"
-
-#: src/Tribe/QR.php:164
+#: src/views/tickets-plus/email-qr.php:25
 msgid "Check in for this event"
 msgstr "Für diese Veranstaltung einchecken"
 
@@ -765,17 +872,17 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.7.3)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.9.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: src/Tribe/Main.php:315
+#: src/Tribe/Main.php:345
 msgid "Event Tickets Plus"
 msgstr "Event Tickets Plus"
 
-#: src/views/eddtickets/tickets.php:136 src/views/wootickets/tickets.php:220
+#: src/views/eddtickets/tickets.php:134 src/views/wootickets/tickets.php:217
 msgid "Add to cart"
 msgstr "In den Warenkorb"
 
-#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:155
+#: src/views/eddtickets/tickets.php:83 src/views/wootickets/tickets.php:154
 msgid "Out of stock!"
 msgstr "Ausverkauft!"
 
@@ -789,15 +896,15 @@ msgstr "Ein eindeutig identifizierbarer Code für jeden Ticket-Typ den Sie verka
 msgid "SKU:"
 msgstr "SKU:"
 
-#: src/Tribe/QR.php:119
+#: src/Tribe/QR.php:187
 msgid "The ticket with ID %s was checked in."
 msgstr "Das Ticket mit der ID %s wurde eingecheckt."
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:144
+#: src/Tribe/Commerce/WooCommerce/Email.php:145
 msgid "Defaults to <code>%s</code>"
 msgstr "Standards zu <code>%s</code>"
 
-#: src/Tribe/Commerce/WooCommerce/Email.php:142
+#: src/Tribe/Commerce/WooCommerce/Email.php:143
 msgid "Subject"
 msgstr "Betreff"
 
@@ -812,19 +919,19 @@ msgstr "E-Mail, welches der Benutzer nach seiner erfolgreichen Bestellung mit se
 msgid "Tickets"
 msgstr "Tickets"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2080
+#: src/Tribe/Commerce/WooCommerce/Main.php:2130
 msgid "Unknown"
 msgstr "Unbekannt"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2031
+#: src/Tribe/Commerce/WooCommerce/Main.php:2081
 msgid "Deleted"
 msgstr "Gelöscht"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2025
+#: src/Tribe/Commerce/WooCommerce/Main.php:2075
 msgid "In trash (was %s)"
 msgstr "im Papioerkorb (war %s)"
 
-#: src/Tribe/Commerce/EDD/Main.php:1665
+#: src/Tribe/Commerce/EDD/Main.php:1735
 msgid "Event"
 msgstr "Veranstaltung"
 
@@ -836,35 +943,35 @@ msgstr "Um den Tickets Plus nutzen zu können, installieren Sie vorher die aktue
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:1821
+#: src/Tribe/Commerce/EDD/Main.php:1892
 msgid "Print Ticket"
 msgstr "Tickets drucken"
 
-#: src/Tribe/Commerce/EDD/Main.php:1780
+#: src/Tribe/Commerce/EDD/Main.php:1849
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr "Entschuldige! Es sind nur noch %d Tickets verf&uuml;gbar f&uuml;r %s"
 
-#: src/Tribe/Commerce/EDD/Main.php:1777
+#: src/Tribe/Commerce/EDD/Main.php:1847
 msgid "%s ticket is sold out"
 msgstr "%s Tickets sind ausverkauft"
 
-#: src/Tribe/Commerce/EDD/Main.php:1683
-#: src/Tribe/Commerce/WooCommerce/Main.php:2345
+#: src/Tribe/Commerce/EDD/Main.php:1753
+#: src/Tribe/Commerce/WooCommerce/Main.php:2407
 msgid "This is a ticket for the event:"
 msgstr "Dies ist ein Ticket für das Event:"
 
-#: src/Tribe/Commerce/EDD/Main.php:1614
-#: src/Tribe/Commerce/WooCommerce/Main.php:2294
+#: src/Tribe/Commerce/EDD/Main.php:1684
+#: src/Tribe/Commerce/WooCommerce/Main.php:2356
 msgid "Event sales report"
 msgstr "Event-Umsatzbericht"
 
-#: src/Tribe/Commerce/EDD/Main.php:1278
-#: src/Tribe/Commerce/WooCommerce/Main.php:1933
+#: src/Tribe/Commerce/EDD/Main.php:1319
+#: src/Tribe/Commerce/WooCommerce/Main.php:1969
 msgid "(deleted)"
 msgstr "(gelöscht)"
 
-#: src/Tribe/Commerce/EDD/Main.php:454
-#: src/Tribe/Commerce/WooCommerce/Main.php:833
+#: src/Tribe/Commerce/EDD/Main.php:490
+#: src/Tribe/Commerce/WooCommerce/Main.php:862
 msgid "You'll receive your tickets in another email."
 msgstr "Sie erhalten Ihre Tickets in einer gesonderten E-Mail."
 

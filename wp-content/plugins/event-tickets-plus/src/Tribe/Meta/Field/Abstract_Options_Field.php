@@ -9,8 +9,10 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Options_Field extends 
 				$meta['extra'] = array();
 			}
 
-			$options = explode( "\n", $options );
-			$options = array_map( 'trim', $options );
+			if ( is_string( $options ) ) {
+				$options = explode( "\n", $options );
+				$options = array_map( 'trim', $options );
+			}
 
 			$meta['extra']['options'] = $options;
 		}

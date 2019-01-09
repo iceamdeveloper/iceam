@@ -12,12 +12,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.8.2';
+		const VERSION = '4.9.1';
 
 		/**
 		 * Min required Tickets Core version
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.8.1';
+		const REQUIRED_TICKETS_VERSION = '4.9.2-dev';
 
 		/**
 		 * Directory of the plugin
@@ -162,6 +162,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			// Privacy
 			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', array( 'hook' ) );
+
+			// Blocks editor
+			tribe_register_provider( 'Tribe__Tickets_Plus__Editor__Provider' );
 		}
 
 		/**

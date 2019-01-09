@@ -6,7 +6,7 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.8.1
+ * @version 4.9
  *
  * @var bool $must_login
  */
@@ -118,8 +118,6 @@ ob_start();
 					</tr>
 				<?php
 				endif;
-
-				include Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'meta.php' );
 			}
 		}
 		?>

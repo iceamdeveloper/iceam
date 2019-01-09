@@ -58,8 +58,17 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public $shortcodes;
 
-		const REQUIRED_TEC_VERSION = '4.6.24';
-		const VERSION = '4.4.33';
+		/**
+		 * Where in the themes we will look for templates
+		 *
+		 * @since 4.5
+		 *
+		 * @var string
+		 */
+		public $template_namespace = 'events-pro';
+
+		const REQUIRED_TEC_VERSION = '4.7.3-dev';
+		const VERSION = '4.5.2';
 
 		private function __construct() {
 			$this->pluginDir = trailingslashit( basename( EVENTS_CALENDAR_PRO_DIR ) );
@@ -192,6 +201,9 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			Tribe__Events__Pro__Integrations__Manager::instance()->load_integrations();
 
 			add_action( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
+
+			add_action( 'tribe_events_before_event_template_data_date_display', array( $this, 'disable_recurring_info_tooltip' ) );
+			add_action( 'tribe_events_after_event_template_data_date_display', array( $this, 'enable_recurring_info_tooltip' ) );
 		}
 
 		public function filter_month_week_customizer_label( $args, $section_id, $customizer ) {
@@ -945,7 +957,11 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 					// remove the default gridview class from core
 					$classes = array_diff( $classes, array( 'events-gridview' ) );
 				}
-				if ( tribe_is_map() || ! tribe_get_option( 'hideLocationSearch', false ) ) {
+
+				if (
+					! tribe_is_using_basic_gmaps_api()
+					&& ( tribe_is_map() || ! tribe_get_option( 'hideLocationSearch', false ) )
+				) {
 					$classes[] = 'tribe-events-uses-geolocation';
 				}
 
@@ -957,10 +973,6 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				) {
 					$classes[] = 'tribe-events-recurrence-archive';
 				}
-			}
-
-			if ( tribe_is_map() && tribe_is_using_basic_gmaps_api() ) {
-				$classes[] = 'tribe-events-map-view-basic';
 			}
 
 			return $classes;
@@ -1402,6 +1414,12 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				$data_pro = tribe( 'events-pro.assets' )->get_data_tribe_events_pro();
 				wp_localize_script( 'tribe-events-pro', 'TribeEventsPro', $data_pro );
 
+				if ( ! tribe_is_using_basic_gmaps_api() ) {
+					// Be sure we enqueue PRO geoloc when needed with the proper localization
+					tribe_asset_enqueue( 'tribe-events-pro-geoloc' );
+					$data_geo = tribe( 'events-pro.assets' )->get_data_tribe_geoloc();
+					wp_localize_script( 'tribe-events-pro-geoloc', 'GeoLoc', $data_geo );
+				}
 			}
 		}
 
@@ -2064,6 +2082,8 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			tribe_singleton( 'events-pro.admin.settings', 'Tribe__Events__Pro__Admin__Settings', array( 'hook' ) );
 			tribe_singleton( 'events-pro.customizer.photo-view', 'Tribe__Events__Pro__Customizer__Photo_View' );
 			tribe_singleton( 'events-pro.recurrence.nav', 'Tribe__Events__Pro__Recurrence__Navigation', array( 'hook' ) );
+
+			tribe_register_provider( 'Tribe__Events__Pro__Editor__Provider' );
 
 			tribe( 'events-pro.admin.settings' );
 			tribe( 'events-pro.customizer.photo-view' );

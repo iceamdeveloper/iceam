@@ -9,6 +9,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 * Initializes the meta functionality
 	 */
 	my.init = function() {
+
 		$( '.tribe-list' ).on( 'click', '.attendee-meta.toggle', function() {
 			$( this )
 				.toggleClass( 'on' )
@@ -66,12 +67,6 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		var ticket_id = parseInt( $field.closest( 'td' ).data( 'product-id' ), 10 );
 		var template_html = $( document.getElementById( 'tribe-event-tickets-plus-meta-fields-tpl-' + ticket_id ) ).html();
 
-		if ( quantity && my.has_meta_fields( ticket_id ) ) {
-			$field.closest( 'table' ).find( '.tribe-event-tickets-plus-meta[data-ticket-id="' + ticket_id +'"]' ).show();
-		} else {
-			$field.closest( 'table' ).find( '.tribe-event-tickets-plus-meta[data-ticket-id="' + ticket_id +'"]' ).hide();
-		}
-
 		my.render_fields( ticket_id, quantity );
 	};
 
@@ -84,25 +79,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 * Validates the required fields for custom meta
 	 */
 	my.validate_submission = function() {
-		var is_valid = true;
-		var $fields = $( '.tribe-tickets-meta-required' );
-
-		$fields.each( function() {
-			var $el = $( this );
-			var val = '';
-
-			if ( $el.is( '.tribe-tickets-meta-radio' ) || $el.is( '.tribe-tickets-meta-checkbox' ) ) {
-				val = $el.find( 'input:checked' ).length ? 'checked' : '';
-			} else {
-				val = $el.find( 'input, select, textarea' ).val().trim();
-			}
-
-			if ( 0 === val.length ) {
-				is_valid = false;
-			}
-		} );
-
-		return is_valid;
+		return true;
 	};
 
 	my.event.quantity_changed = function() {

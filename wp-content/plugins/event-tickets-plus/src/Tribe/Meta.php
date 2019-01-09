@@ -68,6 +68,9 @@ class Tribe__Tickets_Plus__Meta {
 		add_action( 'wp_ajax_tribe-tickets-load-saved-fields', array( $this, 'ajax_render_saved_fields' ) );
 		add_action( 'woocommerce_remove_cart_item', array( $this, 'clear_storage_on_remove_cart_item' ), 10, 2 );
 
+		// Check if the attendee registration cart has required meta
+		add_filter( 'tribe_tickets_attendee_registration_has_required_meta', array( $this, 'cart_has_required_meta' ), 20, 1 );
+
 		$this->meta_fieldset();
 		$this->render();
 		$this->rsvp_meta();
@@ -512,6 +515,103 @@ class Tribe__Tickets_Plus__Meta {
 	public function inject_fieldsets_in_json( $return, $unused_post_id ) {
 		$return['fieldsets'] = $this->meta_fieldset()->get_fieldsets();
 		return $return;
+	}
+
+	/**
+	 * Checks if any of the cart tickets has required
+	 *
+	 * @since 4.9
+	 *
+	 * @param array    $cart_tickets
+	 * @param string $slug
+	 */
+	public function cart_has_required_meta( $cart_tickets = array() ) {
+
+		// Bail if we don't receive an array
+		if ( ! is_array( $cart_tickets ) ) {
+			return false;
+		}
+
+ 		// Bail if we receive an empty array
+ 		if ( empty( $cart_tickets ) ) {
+	 		return false;
+ 		}
+
+ 		foreach ( $cart_tickets as $ticket_id => $quantity ) {
+	 		if ( $this->ticket_has_required_meta( $ticket_id ) ) {
+				return true;
+			}
+	 	}
+
+	 	return false;
+
+	}
+
+	/**
+	 * See if a ticket has required meta
+	 *
+	 * @since 4.9
+	 *
+	 * @param int $ticket_id
+	 * @return bool
+	 */
+	public function ticket_has_required_meta( $ticket_id ) {
+
+		// Only include those who have meta
+		$has_meta = get_post_meta( $ticket_id, '_tribe_tickets_meta_enabled', true );
+
+		if ( empty( $has_meta ) || ! tribe_is_truthy( $has_meta ) ) {
+			return false;
+		}
+
+		return $this->meta_has_required_fields( $ticket_id );
+
+	}
+
+	/**
+	 * Checks if a ticket has required meta
+	 *
+	 * @since 4.9
+	 *
+	 * @param int    $ticket_id
+	 * @param string $slug
+	 */
+	public function meta_has_required_fields( $ticket_id ) {
+ 		// Get the meta fields for this ticket
+		$ticket_meta = $this->get_meta_fields_by_ticket( $ticket_id );
+ 		foreach ( $ticket_meta as $meta ) {
+			if ( 'on' === $meta->required ) {
+				return true;
+			}
+		}
+ 		return false;
+	}
+
+	/**
+	 * Checks if the meta field is required, by slug, for a ticket
+	 *
+	 * @since 4.9
+	 *
+	 * @param int    $ticket_id
+	 * @param string $slug
+	 */
+	public function meta_is_required( $ticket_id, $slug ) {
+
+		// Get the meta fields for this ticket
+		$ticket_meta = $this->get_meta_fields_by_ticket( $ticket_id );
+
+		foreach ( $ticket_meta as $meta ) {
+
+			// Bail if the slug is different from the one we want to check
+			if ( $slug !== $meta->slug ) {
+				continue;
+			}
+
+			// Get the value and get out of the loop
+			return ( 'on' === $meta->required );
+		}
+
+		return false;
 	}
 
 	/************************

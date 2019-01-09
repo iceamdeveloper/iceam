@@ -120,7 +120,7 @@ function bps_attributes ($post)
 		<option value='No' <?php selected ($options['directory'], 'No'); ?>><?php _e('No', 'bp-profile-search'); ?></option>
 	</select>
 
-	<p><?php _e('Need help? Use the Help tab in the upper right of your screen.'); ?></p>
+	<p><?php _e('Need help? Use the Help tab above the screen title.'); ?></p>
 <?php
 }
 
@@ -149,7 +149,7 @@ add_action ('wp_ajax_template_options', 'bps_ajax_template_options');
 function bps_ajax_template_options ()
 {
 	bps_template_options ($_POST['form'], $_POST['template']);
-	wp_die ();
+	exit;
 }
 
 function bps_template_options ($form, $template)
@@ -166,7 +166,7 @@ function bps_template_options ($form, $template)
 	$response = include $located;
 	$output = ob_get_clean ();
 
-	if ($response == 'end_of_options')
+	if (strpos ($response, 'end_of_options') === 0)
 	{
 		echo $output;
 		$located = str_replace (WP_CONTENT_DIR, '', $located);
