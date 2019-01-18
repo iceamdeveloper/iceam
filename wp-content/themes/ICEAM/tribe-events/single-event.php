@@ -117,8 +117,6 @@ $event_id = get_the_ID();
 				// get the current user's info
 				$user_ID = get_current_user_id();
 				$member_info = get_userdata($user_ID);
-
-				echo 'user'.$user_ID;
 				
 				if ($register_offsite == 1){
 					$venue_ID = get_post_meta(get_the_ID(), "_EventVenueID", true );
