@@ -348,21 +348,22 @@ function apply_signup_coupons() {
 	
 	// apply the correct coupon, based on role or cart total
 	// remember that in the system a 'student' (role) is a 'customer'
-	$coupon_code = "";
-	if ($user_ID != 0 && in_array('customer',$member_info->roles)){
-		$coupon_code = 'studentonlinesignup';
-        
-	} else if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) ){
+	$coupon_code = "";        
+	if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) ){
 		$coupon_code = 'diplomateonlinesignup';
         
+	} else if ($total > 3000){
+        $coupon_code = 'bulksignupdiscount15';
+        
+    } else if ($user_ID != 0 && in_array('customer',$member_info->roles)){
+		$coupon_code = 'studentonlinesignup';
+
 	} else if ($total > 1000 && $total < 2000){
 		$coupon_code = 'bulksignupdiscount5';
         
 	} else if ($total > 2000 && $total < 3000){
         $coupon_code = 'bulksignupdiscount10';
         
-    } else if ($total > 3000){
-        $coupon_code = 'bulksignupdiscount15';
     }
     
 	// if no coupon, or this coupon is already applied, stop

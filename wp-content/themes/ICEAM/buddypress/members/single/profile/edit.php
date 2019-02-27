@@ -1,6 +1,5 @@
 <?php do_action( 'bp_before_profile_edit_content' );
 
-
 $membership_ID_1 = "8222"; 
 $membership_ID_2 = "8218";
 
@@ -178,8 +177,8 @@ if ( bp_has_profile( 'profile_group_id=' . bp_get_current_profile_group_id() ) )
                         <?php if ( 'image' == bp_get_the_profile_field_type() ) : ?>
         
 							<?php
-							if (class_exists('Bxcft_Field_Type_Image')){
-								$profile_image = new Bxcft_Field_Type_Image();
+							if (class_exists('BPXProfileCFTR\Field_Types\Field_Type_Image')){
+								$profile_image = new BPXProfileCFTR\Field_Types\Field_Type_Image();
 								$profile_image->edit_field_html();
 								echo "<hr>";
 							}
