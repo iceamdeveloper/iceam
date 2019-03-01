@@ -1418,6 +1418,14 @@ h3.profile-subheader {
     background-color: #ffa739;
 }
 
+legend#field_33-1 {
+    position: relative!important;
+    padding-left: 0!important;
+    padding-bottom: 0!important;
+}
+
+
+
 
 @media only screen and (max-width: 767px){
     .csstransforms3d.csstransitions #navigation {
