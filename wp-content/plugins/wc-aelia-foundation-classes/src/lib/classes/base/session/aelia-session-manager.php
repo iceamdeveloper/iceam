@@ -159,10 +159,12 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		 * @param string $name The name of the cookie being set.
 		 * @param string $value The value of the cookie.
 		 * @param integer $expire The expiration of the cookie.
-		 * @param string $secure Whether the cookie should be served only over https.
+		 * @param bool  $secure Whether the cookie should be served only over https.
+		 * @param bool $httponly Whether the cookie should be served only over http
+		 * calls (no script access).
 		 * @since 1.5.11.150507
 		 */
-		public static function set_cookie($name, $value, $expire = 0, $secure = false) {
+		public static function set_cookie($name, $value, $expire = 0, $secure = false, $httponly = false) {
 			// Allow to change the cookie before setting it
 			// @since 1.9.12.180104
 			$cookie_data = apply_filters('wc_aelia_afc_session_set_cookie', array(
@@ -172,6 +174,9 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 				'secure' => $secure,
 				'cookie_path' => COOKIEPATH,
 				'cookie_domain' => COOKIE_DOMAIN,
+				// Set httponly option
+				// @since 2.0.2.181203
+				'httponly' => $httponly,
 			));
 
 			if(!headers_sent()) {
@@ -183,7 +188,8 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 										$cookie_data['expire'],
 										$cookie_data['cookie_path'],
 										$cookie_data['cookie_domain'],
-										$cookie_data['secure']);
+										$cookie_data['secure'],
+										$cookie_data['httponly']);
 					// Overwrite the cookie in the global variable, so that it can be accessed immediately
 					$_COOKIE[$cookie_data['name']] = $cookie_data['value'];
 				}

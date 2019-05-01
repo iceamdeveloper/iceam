@@ -104,7 +104,7 @@ foreach ($F->fields as $f)
 ?>
 		<div id="<?php echo $id; ?>_wrap" class="bps-<?php echo $display; ?>">
 			<label for="<?php echo $id; ?>" class="bps-label">
-				<strong><?php echo $f->label; ?></strong> <span><?php echo $f->mode; ?>:</span>
+				<strong><?php echo $f->label; ?></strong> <span><?php echo $f->mode; ?></span>
 			</label><br>
 <?php
 	if (!empty ($f->error_message))
@@ -234,9 +234,17 @@ foreach ($F->fields as $f)
 <?php
 	break;
 	default:
+
+		$field_template = 'members/bps-'. $display. '-form-field.php';
+		$located = bp_locate_template ($field_template);
+		if ($located)
+			include $located;
+		else
+		{
 ?>
 			<p class="bps-error"><?php echo "BP Profile Search: unknown display <em>$display</em> for field <em>$f->name</em>."; ?></p>
 <?php
+		}
 	break;
 	}
 ?>

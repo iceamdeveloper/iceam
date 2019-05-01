@@ -4,8 +4,8 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, modern tribe, tribe, widget, pro
 Donate link: http://m.tri.be/29
 Requires at least: 4.7
-Tested up to: 5.0.2
-Stable tag: 4.5.2
+Tested up to: 5.1
+Stable tag: 4.7.0.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -204,6 +204,61 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.7.0.1] 2019-04-25 =
+
+* Security - Ensure filter values are properly escaped before use in queries [126314]
+* Fix - Modifications to `tribe_get_events()` to resolve problems introduced by latest release `4.7.0`
+* Fix - Photo view uses the start date as Now instead of the start of the day, which was leading into inconsistent navigation [126427]
+* Fix - Ensure proper order for Mini Calendar Widget. Thanks for reporting Hillary [126131]
+* Fix - Prevents past events from showing up on Related Events section. [126124]
+* Fix - Events displayed correctly on all views, using End date instead of Start Date. Making sure events that are not over still show on upcoming [126259]
+
+= [4.7.0] 2019-04-17 =
+
+* Feature - Refactor the Database Connection to start using an Object Relational Mapping tool for a better tested codebase
+* Feature - Add the `tribe_events()` function as entry-point to the Events ORM and the supporting filter code [116356, 115579]
+* Feature - Add the `tribe_venues()` function as entry-point to the Venues ORM and the supporting filter code [116356, 115579]
+* Feature - Add the `tribe_organizers()` function as entry-point to the Organizers ORM and the supporting filter code [116356, 115579]
+* Tweak - Make sure all venue geolocalization methods use the new Object Relational Mapping
+* Fix - Use WordPress date format for the recurring event tooltip. Thanks Markus for flagging this! [123051]
+* Language - 1 new strings added, 168 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.6.2.1] 2019-03-28 =
+
+* Fix - Prevent fatal when not using Blocks Editor with Event Tickets and Events Calendar Pro active [124654]
+
+= [4.6.2] 2019-03-04 =
+
+* Fix - Prevent fatal happening on Widget Calendar Mini with Site Origin Page builder [122546]
+* Tweak - Update version of Handlebars.js dependency to version 3.0.6
+
+= [4.6.1] 2019-02-14 =
+
+* Feature - Added the "Related Events" block [118995]
+* Fix - Improve the Additional Fields presentation both in the back-end and front-end [120281]
+* Tweak - Changed views: `blocks/additional-fields/checkbox`, `blocks/additional-fields/dropdown`, `blocks/additional-fields/radio`, `blocks/additional-fields/text`, `blocks/additional-fields/textarea`, `blocks/additional-fields/url`, `blocks/related-events`, `blocks/related-events/event-info`, `blocks/related-events/event-thumbnail`, `blocks/related-events/event`, `blocks/related-events/title`
+* Language - 1 new strings added, 50 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.6] 2019-02-05 =
+
+* Feature - Add system to check plugin versions to inform you to update and prevent site breaking errors [116841]
+* Tweak - Added filters: `tribe_not_php_version_names`
+* Deprecated - Constants REQUIRED_TEC_VERSION in Tribe__Events__Pro__Main, use Plugin Dependency Checking system to check for requirements
+* Deprecated - The functions `tribe_init_ecp_addon()` and `Tribe_ECP_Load()` and `register_active_plugin()` method has been deprecated in `Tribe__Events__Pro__Main` in favor of Plugin Dependency Checking system
+* Language - 7 new strings added, 51 updated, 0 fuzzied, and 1 obsoleted
+
+= [4.5.3] 2019-01-21 =
+
+* Fix - Recurrence meta box will show again on Classic Editor [120137]
+* Fix - Update textdomain for strings coming from the Gutenberg extension merge [118656]
+* Fix - Fixed a number of small layout bugs with the new Twenty Nineteen core theme [119689]
+* Tweak - Ensure that block editor admin notices report the accurate number of recurring events created [118608]
+* Language - 2 new strings added, 58 updated, 0 fuzzied, and 1 obsoleted
+
+= [4.5.2.1] 2019-01-14 =
+
+* Fix - Display recurrence section in classic editor for all users that don't have blocks [119912]
 
 = [4.5.2] 2018-12-19 =
 

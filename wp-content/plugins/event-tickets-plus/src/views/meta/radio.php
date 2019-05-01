@@ -6,7 +6,9 @@
  *
  *     [your-theme]/tribe-events/meta/radio.php
  *
- * @version 4.3.5
+ * @since 4.3.5
+ * @since 4.10.2 Use md5() for field name slugs
+ * @version 4.10.2
  *
  */
 $options = null;
@@ -25,7 +27,7 @@ if ( ! $options ) {
 	</header>
 	<?php
 	foreach ( $options as $option ) {
-		$option_slug = sanitize_title( $option );
+		$option_slug = md5( sanitize_title( $option ) );
 		$option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}" ;
 		?>
 		<label for="<?php echo esc_attr( $option_id ); ?>" class="tribe-tickets-meta-field-header">

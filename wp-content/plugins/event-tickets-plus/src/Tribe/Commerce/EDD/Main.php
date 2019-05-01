@@ -190,6 +190,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		$this->bind_implementations();
 		$this->hooks();
+		$this->orders_report();
 		$this->meta();
 		$this->global_stock();
 	}
@@ -221,10 +222,14 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		add_action( 'edd_checkout_error_checks', array( $this, 'checkout_errors' ) );
 		add_action( 'template_redirect', array( $this, 'render_ticket_print_view' ), 10, 2 );
 
+		add_action( 'tribe_tickets_attendees_page_inside', array( $this, 'render_tabbed_view' ) );
+
 		add_filter( 'edd_url_token_allowed_params', array( $this, 'add_allowed_param' ) );
 		add_filter( 'edd_purchase_receipt', array( $this, 'add_tickets_msg_to_email' ), 10, 3 );
 		add_filter( 'post_type_link', array( $this, 'hijack_ticket_link' ), 10, 4 );
 		add_filter( 'edd_item_quantities_enabled', '__return_true' );
+		add_filter( 'edd_download_quantity_disabled', [ $this, 'maybe_disable_download_quantity' ], 10, 2 );
+		add_action( 'edd_checkout_cart_item_title_after', [ $this, 'cart_item_title_after' ], 10, 2 );
 		add_filter( 'edd_download_files', array( $this, 'ticket_downloads' ), 10, 2 );
 		add_filter( 'edd_download_file_url_args', array( $this, 'print_ticket_url' ), 10 );
 
@@ -235,6 +240,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		add_action( 'eddtickets_checkin', array( $this, 'purge_attendees_transient' ) );
 		add_action( 'eddtickets_uncheckin', array( $this, 'purge_attendees_transient' ) );
+
+		add_filter( 'tribe_attendee_registration_form_classes', [ $this, 'tribe_attendee_registration_form_class' ] );
 	}
 
 	/**
@@ -377,6 +384,16 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @param int $order_id
 	 */
 	public function generate_tickets( $order_id ) {
+
+		/**
+		 * Hook before WooCommerce Tickets are generated in Event Tickets Plus.
+		 *
+		 * @since TBD
+		 *
+		 * @param int $order_id The order ID.
+		 */
+		do_action( 'tribe_tickets_plus_woo_before_generate_tickets', $order_id );
+
 		// Bail if we already generated the info for this order
 		$done = get_post_meta( $order_id, $this->order_has_tickets, true );
 
@@ -425,6 +442,24 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$query->set( 'post__not_in', $this->get_all_tickets_ids() );
 		}
 	}
+
+	/**
+	 * Orders report object accessor method
+	 *
+	 * @since 4.10
+	 *
+	 * @return Tribe__Tickets_Plus__Commerce__EDD__Orders__Report
+	 */
+	public function orders_report() {
+		static $report;
+
+		if ( ! $report instanceof self ) {
+			$report = new Tribe__Tickets_Plus__Commerce__EDD__Orders__Report;
+		}
+
+		return $report;
+	}
+
 
 	/**
 	 * Generates the validation code that will be printed in the ticket.
@@ -528,6 +563,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				'ID'           => $ticket->ID,
 				'post_content' => $ticket->description,
 				'post_title'   => $ticket->name,
+				'menu_order'   => $ticket->menu_order,
 			);
 
 			$ticket->ID = wp_update_post( $args );
@@ -747,8 +783,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return bool
 	 */
 	public function delete_ticket( $post_id, $ticket_id ) {
+
 		// Ensure we know the event and product IDs (the event ID may not have been passed in)
-		if ( empty( $post_id ) ) $post_id = get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
+		if ( empty( $post_id ) ) {
+			$post_id = get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
+		}
 		$product_id = get_post_meta( $ticket_id, self::ATTENDEE_PRODUCT_KEY, true );
 
 		/**
@@ -766,9 +805,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$delete = wp_delete_post( $ticket_id, true );
 		}
 
-		if ( is_wp_error( $delete ) ) {
+		if ( is_wp_error( $delete ) || ! isset( $delete->ID ) ) {
 			return false;
 		}
+
+		Tribe__Tickets__Attendance::instance( $post_id )->increment_deleted_attendees_count();
 
 		$this->clear_attendees_cache( $post_id );
 
@@ -779,6 +820,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		do_action( 'eddtickets_ticket_deleted', $ticket_id, $post_id, $product_id );
+
 		return true;
 	}
 
@@ -921,10 +963,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		$tickets_in_cart = tribe( 'tickets-plus.commerce.edd.cart' )->get_tickets_in_cart();
-		$is_up_to_date   = tribe( 'tickets-plus.meta.contents' )->is_stored_meta_up_to_date( $tickets_in_cart );
+		$cart_has_meta   = Tribe__Tickets_Plus__Main::instance()->meta()->cart_has_meta( $tickets_in_cart );
 
-		if ( $tickets_in_cart && ! $is_up_to_date ) {
-			wp_safe_redirect( tribe( 'tickets.attendee_registration' )->get_url() );
+		if ( $tickets_in_cart && $cart_has_meta ) {
+			$url = add_query_arg( 'provider', $this->attendee_object, tribe( 'tickets.attendee_registration' )->get_url() );
+			wp_safe_redirect( $url );
 			tribe_exit();
 		}
 
@@ -1002,7 +1045,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		$return = new Tribe__Tickets__Ticket_Object();
 
-		$purchased     = $this->stock_control->get_purchased_inventory( $ticket_id, array( 'publish' ) );
+		$purchased_statuses = tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'edd' );
+		$purchased     = $this->stock_control->get_purchased_inventory( $ticket_id, $purchased_statuses );
 		$pending       = $this->stock_control->count_incomplete_order_items( $ticket_id );
 		$product_stock = $this->get_stock_for_product( $product );
 		$stock         = ( '' === $product_stock ) ? Tribe__Tickets__Ticket_Object::UNLIMITED_STOCK : $product_stock;
@@ -1385,6 +1429,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return string
 	 */
 	protected function get_holder_name( $attendee, $user_info ) {
+		if ( empty( $user_info ) ) {
+			return null;
+		}
+
 		return $user_info['first_name'] . ' ' . $user_info['last_name'];
 	}
 
@@ -1406,15 +1454,26 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	public function get_order_data( $order_id ) {
 
 		if ( ! tribe_tickets_is_edd_active() ) {
-			return;
+			return array();
 		}
 
 		$user_info     = edd_get_payment_meta_user_info( $order_id );
+
+		if ( empty( $user_info ) ) {
+			return array();
+		}
+
 		$name          = $user_info['first_name'] . ' ' . $user_info['last_name'];
 		$email         = $user_info['email'];
 		$order_status  = get_post_field( 'post_status', $order_id );
 		$status_label  = edd_get_payment_status( get_post( $order_id ), true );
-		$order_warning = 'publish' !== $order_status;
+
+		// Warning flag for refunded, cancelled, failed, and revoked orders
+		$order_warning      = false;
+		$warning_statues = tribe( 'tickets.status' )->get_statuses_by_action( 'warning', 'edd' );
+		if ( in_array( $order_status, $warning_statues, true ) ) {
+			$order_warning = true;
+		}
 
 		$data = array(
 			'order_id'        => $order_id,
@@ -1838,6 +1897,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	public function checkout_errors() {
 		$this->global_stock()->check_stock();
 
+		//run setup to prevent no statuses on ajax checkout
+		tribe( 'tickets.status' )->setup();
+
 		foreach ( (array) edd_get_cart_contents() as $item ) {
 			$remaining = $this->stock_control->available_units( $item['id'] );
 
@@ -1852,20 +1914,46 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	}
 
 	/**
-	 * Returns true or false according to whether ticket stock is available.
+	 * Disable EDD download quantity changes in checkout
 	 *
-	 * Left in place for legacy reasons (custom eddtickets/tickets.php views may call this
-	 * method, even though it is now only a wrapper that uses the stock control object).
+	 * @since 4.10.2
 	 *
-	 * @todo   remove 6-9 months after release 118
-	 *
-	 * @param  int $ticket_id
-	 *
-	 * @return bool
+	 * @param boolean $ret
+	 * @param int $item_id
+	 * @return void
 	 */
-	public static function is_stock_left( $ticket_id ) {
-		$stock_control = new Tribe__Tickets_Plus__Commerce__EDD__Stock_Control;
-		return $stock_control->available_units( $ticket_id ) > 0;
+	public function maybe_disable_download_quantity( $ret, $item_id ) {
+		$is_ticket = get_post_meta( $item_id, $this->event_key, true );
+
+		// disable quantity manipulation in checkout
+		if ( edd_is_checkout() && $is_ticket ) {
+			return true;
+		}
+
+		return $ret;
+	}
+
+	/**
+	 * Add quantity to title in EDD checkout
+	 *
+	 * @since 4.10.2
+	 *
+	 * @param array $item
+	 * @param string $key
+	 * @return void
+	 */
+	public function cart_item_title_after( $item, $key ) {
+		if ( ! isset( $item['quantity'] ) || 2 > $item['quantity'] ) {
+			return;
+		}
+
+		// test if  we have a ticket
+		if ( isset(  $item['options']['_tribe_eddticket_attendee_optout'] ) ) {
+			?>
+			x<strong> <?php echo esc_html( edd_get_cart_item_quantity( $item['id'], $item['options'] ) ); ?></strong>
+			<input disabled type="hidden" name="edd-cart-download-<?php echo esc_attr( $key ); ?>-quantity" data-key="<?php echo esc_attr( $key ); ?>" class="edd-item-quantity" value="<?php echo esc_attr( edd_get_cart_item_quantity( $item['id'], $item['options'] ) ); ?>"/>
+		<?php
+		}
 	}
 
 	/**
@@ -1978,6 +2066,27 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$content .= '<script>window.onload = function(){ window.print(); }</script>';
 		echo $content;
 		exit;
+	}
+
+	/**
+	 * Renders the tabbed view header before the report.
+	 *
+	 * @since 4.10
+	 *
+	 * @param Tribe__Tickets__Tickets_Handler $handler
+	 */
+	public function render_tabbed_view( Tribe__Tickets__Attendees $handler  ) {
+		$post = $handler->get_post();
+
+		$has_tickets = count( (array) self::get_tickets( $post->ID ) );
+		if ( ! $has_tickets ) {
+			return;
+		}
+
+		add_filter( 'tribe_tickets_attendees_show_title', '__return_false' );
+
+		$tabbed_view = new Tribe__Tickets_Plus__Commerce__EDD__Tabbed_View__Report_Tabbed_View();
+		$tabbed_view->register();
 	}
 
 	/**
@@ -2168,5 +2277,18 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 */
 	public function get_currency() {
 		return function_exists( 'edd_get_currency' ) ? edd_get_currency() : parent::get_currency();
+	}
+
+	/**
+	 * Add our class suffix to the list of classes for the attendee registration form
+	 * This gets appended to `tribe-block__tickets__item__attendee__fields__form--` so keep it short and sweet
+	 *
+	 * @param array $classes existing array of classes
+	 * @return array $classes with our class added
+	 */
+	public function tribe_attendee_registration_form_class( $classes ) {
+		$classes[ $this->attendee_object ] = 'edd';
+
+		return $classes;
 	}
 }

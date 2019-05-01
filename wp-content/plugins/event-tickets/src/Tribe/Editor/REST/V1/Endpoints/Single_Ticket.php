@@ -256,6 +256,7 @@ class Tribe__Tickets__Editor__REST__V1__Endpoints__Single_ticket
 			'ticket_end_date' => $body['end_date'],
 			'ticket_end_time' => $body['end_time'],
 			'ticket_sku' => $body['sku'],
+			'ticket_menu_order' => $body['menu_order'],
 			'tribe-ticket' => $body['ticket'],
 		);
 
@@ -276,7 +277,7 @@ class Tribe__Tickets__Editor__REST__V1__Endpoints__Single_ticket
 
 		do_action( 'tribe_tickets_ticket_added', $post_id );
 
-		$response = new WP_REST_Response( $provider->get_ticket( $post_id, $ticket ) );
+		$response = new WP_REST_Response( $this->get_readable_ticket_data( $ticket ) );
 		$response->set_status( 202 );
 
 		return $response;

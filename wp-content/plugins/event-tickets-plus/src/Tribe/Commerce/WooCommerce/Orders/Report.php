@@ -35,6 +35,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	public function __construct() {
 		add_action( 'admin_menu', array( $this, 'orders_page_register' ) );
 		add_filter( 'post_row_actions', array( $this, 'orders_row_action' ) );
+		add_filter( 'tribe_filter_attendee_order_link', array( $this, 'filter_editor_orders_link' ), 10, 2 );
 
 		// register the WooCommerce orders report tab
 		$wc_tabbed_view = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_View();
@@ -62,6 +63,26 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		add_action( 'admin_enqueue_scripts', tribe_callback( 'tickets.attendees', 'load_pointers' ) );
 		add_action( "load-$this->orders_page", array( $this, 'orders_page_screen_setup' ) );
 
+	}
+
+	/**
+	 * Filter the Order Link to EDD in the Ticket Editor Settings
+	 *
+	 * @since 4.10
+	 *
+	 * @param string $url     a url for the order page for an event
+	 * @param int    $post_id the post id for the current event
+	 */
+	public function filter_editor_orders_link( $url, $post_id ) {
+
+		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
+
+		if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $provider ) {
+			$url = remove_query_arg( 'page', $url );
+			$url = add_query_arg( array( 'page' => 'tickets-orders' ), $url );
+		}
+
+		return $url;
 	}
 
 	/**
@@ -134,7 +155,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	 */
 	public function orders_admin_title( $admin_title, $title ) {
 		if ( ! empty( $_GET['event_id'] ) ) {
-			$event       = get_post( $_GET['event_id'] );
+			$event       = get_post( absint( $_GET['event_id'] ) );
 			$admin_title = sprintf( esc_html_x( '%s - Order list', 'Browser title', 'event-tickets-plus' ), $event->post_title );
 		}
 
@@ -147,7 +168,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	public function orders_page_inside() {
 		$this->orders_table->prepare_items();
 
-		$event_id = isset( $_GET['event_id'] ) ? intval( $_GET['event_id'] ) : 0;
+		$event_id = isset( $_GET['event_id'] ) ? absint( $_GET['event_id'] ) : 0;
 		$event = get_post( $event_id );
 		$tickets = Tribe__Tickets__Tickets::get_event_tickets( $event_id );
 
@@ -177,29 +198,19 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		$this->orders_table->display();
 		$table = ob_get_clean();
 
-		$organizer = get_user_by( 'id', $event->post_author );
-
-		$event_revenue = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_revenue( $event_id );
+		$organizer   = get_user_by( 'id', $event->post_author );
 		$event_sales = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_sales( $event_id );
-		$event_fees = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_fees( $event_id );
-		$discounts = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_discounts( $event_id );
+		$event_fees  = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_fees( $event_id );
+		$discounts   = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_discounts( $event_id );
 
-		$tickets_sold = $tickets_breakdown = array();
-		$total_sold = 0;
+		$tickets_sold  = array();
+		$total_sold    = 0;
 		$total_pending = 0;
-		$total_completed = 0;
 
 		//Setup the ticket breakdown
-		$order_statuses = array(
-			'wc-completed',
-			'wc-pending',
-			'wc-processing',
-			'wc-cancelled',
-		);
-		foreach ( $order_statuses as $status ) {
-			$tickets_breakdown[ $status ]['_qty']        = 0;
-			$tickets_breakdown[ $status ]['_line_total'] = 0;
-		}
+		$order_overview      = tribe( 'tickets.status' )->get_providers_status_classes( 'woo' );
+		$complete_statuses   = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'woo' );
+		$incomplete_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'count_incomplete', 'woo' );
 
 		foreach ( $tickets as $ticket ) {
 
@@ -210,43 +221,38 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 			if ( empty( $tickets_sold[ $ticket->name ] ) ) {
 				$tickets_sold[ $ticket->name ] = array(
-					'ticket' => $ticket,
-					'has_stock' => ! $ticket->stock(),
-					'sku' => get_post_meta( $ticket->ID, '_sku', true ),
-					'sold' => 0,
-					'pending' => 0,
-					'completed' => 0,
+					'ticket'     => $ticket,
+					'has_stock'  => ! $ticket->stock(),
+					'sku'        => get_post_meta( $ticket->ID, '_sku', true ),
+					'sold'       => 0,
+					'pending'    => 0,
+					'completed'  => 0,
+					'refunded'   => 0,
+					'incomplete' => 0,
 				);
 			}
-			$stock     = $ticket->stock();
-			$sold      = $ticket->qty_sold();
-			$cancelled = $ticket->qty_cancelled();
-			$refunded  = $ticket->qty_refunded();
-
-			$net_sold = $sold - ( $cancelled + $refunded );
-			if ( $net_sold < 0 ) {
-				$net_sold = 0;
-			}
-
-			$tickets_sold[ $ticket->name ]['sold'] += $net_sold;
-			$tickets_sold[ $ticket->name ]['pending'] += absint( $ticket->qty_pending() );
-			$tickets_sold[ $ticket->name ]['completed'] += absint( $tickets_sold[ $ticket->name ]['sold'] );
-
-			$total_sold += $net_sold;
-			$total_pending += absint( $ticket->qty_pending() );
-
-			$tickets_sold[ $ticket->name ]['product_sales'] = $this->get_total_sales_per_productby_status( $ticket->ID );
 
 			//update ticket item counts by order status
+			$tickets_sold[ $ticket->name ]['product_sales'] = $this->get_total_sales_per_productby_status( $ticket->ID );
 			foreach ( $tickets_sold[ $ticket->name ]['product_sales'] as $status => $product ) {
 				if ( $status && isset( $product[0] ) && is_object( $product[0] ) ) {
-					$tickets_breakdown[ $status ]['_qty'] += $product[0]->_qty;
-					$tickets_breakdown[ $status ]['_line_total'] += $product[0]->_line_total;
+
+					if ( in_array( $status, $complete_statuses, true ) ) {
+						$tickets_sold[ $ticket->name ]['completed'] += $product[0]->_qty;
+					}
+
+					if ( in_array( $status, $incomplete_statuses, true ) ) {
+						$tickets_sold[ $ticket->name ]['incomplete'] += $product[0]->_qty;
+					}
+
+					$order_overview->statuses[ $status ]->add_qty( $product[0]->_qty );
+					$order_overview->statuses[ $status ]->add_line_total( $product[0]->_line_total );
+					$order_overview->add_qty( $product[0]->_qty );
+					$order_overview->add_line_total( $product[0]->_line_total );
+
 				}
 			}
 		}
-
-		$total_completed += absint( $total_sold );
 
 		// Build and render the tabbed view from Event Tickets and set this as the active tab
 		$tabbed_view = new Tribe__Tickets__Commerce__Orders_Tabbed_View();
@@ -254,6 +260,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		$tabbed_view->render();
 
 		include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/woocommerce-orders.php';
+
 	}
 
 	/**
@@ -282,12 +289,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 		$order_items = array();
 
-		$order_statuses = array(
-			'wc-completed',
-			'wc-pending',
-			'wc-processing',
-			'wc-cancelled',
-		);
+		$order_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'all', 'woo' );
 
 		foreach ( $order_statuses as $order_status ) {
 

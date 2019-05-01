@@ -273,6 +273,34 @@ tr.event-tickets-meta-toggle-open {
 	margin-left: .4em;
 }
 
+/* Tribe Events Modal Styles */
+
+.tribe_events_modal {
+	height: calc(100% + 46px);
+}
+
+.tribe_events_modal #wpadminbar,
+	.tribe_events_modal #adminmenuback,
+	.tribe_events_modal #adminmenuwrap,
+	.tribe_events_modal #wpfooter {
+		display: none;
+	}
+
+.tribe_events_modal #wpwrap {
+		margin-top: -46px;
+	}
+
+.tribe_events_modal.auto-fold #wpcontent {
+		margin: 0;
+		padding: 0 10px;
+	}
+
+.tribe_events_modal #wpbody-content > div:not(#poststuff),
+	.tribe_events_modal #poststuff .inside > a,
+	.tribe_events_modal .accordion-label {
+		display: none;
+	}
+
 @media screen and ( max-width: 782px ) {
 
 .tribe-attendee-fields-box .tribe-attendee-fields-new {
@@ -289,3 +317,18 @@ tr.event-tickets-meta-toggle-open {
 			display: block
 	}
 		}
+
+@media (min-width: 783px) {
+
+.tribe_events_modal {
+		height: calc(100% + 32px)
+}
+
+.tribe_events_modal #wpwrap {
+			margin-top: -32px
+	}
+
+.tribe_events_modal.auto-fold #wpcontent {
+			padding: 0 20px
+	}
+	}

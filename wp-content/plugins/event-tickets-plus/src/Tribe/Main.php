@@ -12,12 +12,14 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.9.1';
+		const VERSION = '4.10.3';
 
 		/**
 		 * Min required Tickets Core version
+		 *
+		 * @deprecated 4.10
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.9.2-dev';
+		const REQUIRED_TICKETS_VERSION = '4.10.4';
 
 		/**
 		 * Directory of the plugin
@@ -96,18 +98,13 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->plugin_url  = plugins_url() . '/' . $this->plugin_dir;
 			$this->pue         = new Tribe__Tickets_Plus__PUE;
 
-			add_action( 'init', array( $this, 'init' ), 9 );
-			add_action( 'plugins_loaded', array( $this, 'commerce_loader' ), 100 );
-			add_action( 'plugins_loaded', array( $this, 'plugins_loaded' ), 100 );
+			add_action( 'init', array( $this, 'init' ), 5 );
 
-			// Register the plugin as active after the tribe autoloader runs
-			$this->register_active_plugin();
-
-			$this->apm_filters();
-
-			add_action( 'init', array( $this, 'csv_import_support' ) );
+			// CSV import needs to happen before P10@init but after P5@init
+			add_action( 'init', array( $this, 'csv_import_support' ), 6 );
 			add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
 			add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ), 5 );
+			add_filter( 'tribe_tickets_settings_tab_fields', array( $this, 'additional_ticket_settings' ) );
 
 			// Unique ticket identifiers
 			add_action( 'event_tickets_rsvp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
@@ -115,42 +112,34 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			add_action( 'event_ticket_edd_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
 
 			add_action( 'admin_init', array( $this, 'run_updates' ), 10, 0 );
+
 		}
 
 		/**
-		 * Loading the Service Provider
+		 * Bootstrap of the Plugin on Init
 		 *
-		 * @since 4.6
+		 * @since 4.10
 		 */
-		public function on_load() {
-			tribe_register_provider( 'Tribe__Tickets_Plus__Service_Provider' );
-		}
-
 		public function init() {
-			if ( class_exists( 'Tribe__Main' ) && ! is_admin() && ! class_exists( 'Tribe__Tickets_Plus__PUE__Helper' ) ) {
-				tribe_main_pue_helper();
-			}
+
+			// Setup Main Service Provider
+			tribe_register_provider( 'Tribe__Tickets_Plus__Service_Provider' );
 
 			// REST API v1
 			tribe_register_provider( 'Tribe__Tickets_Plus__REST__V1__Service_Provider' );
 
 			$this->commerce_loader();
+			$this->bind_implementations();
+
+			tribe( 'tickets-plus.privacy' );
+
 			$this->meta();
 			$this->tickets_view();
 			$this->qr();
 			$this->attendees_list();
-		}
 
-		/**
-		 * Finalize the initialization of this plugin
-		 *
-		 * @since 4.7.6
-		 */
-		public function plugins_loaded() {
+			$this->apm_filters();
 
-			$this->bind_implementations();
-
-			tribe( 'tickets-plus.privacy' );
 		}
 
 		/**
@@ -159,7 +148,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 * @since 4.7.6
 		 */
 		public function bind_implementations() {
-
 			// Privacy
 			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', array( 'hook' ) );
 
@@ -170,9 +158,13 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Registers this plugin as being active for other tribe plugins and extensions
 		 *
+		 * @deprecated 4.10
+		 *
 		 * @return bool Indicates if Tribe Common wants the plugin to run
 		 */
 		public function register_active_plugin() {
+			_deprecated_function( __METHOD__, '4.10', '4.10' );
+
 			if ( ! function_exists( 'tribe_register_plugin' ) ) {
 				return true;
 			}
@@ -212,6 +204,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 * @return Tribe__Tickets_Plus__Commerce__Loader
 		 */
 		public function commerce_loader() {
+
 			if ( ! self::$commerce_loader ) {
 				self::$commerce_loader = new Tribe__Tickets_Plus__Commerce__Loader;
 			}
@@ -374,6 +367,90 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		}
 
 		/**
+		 * Add additional ticket settings to define slug and choose the template for the attendee info page.
+		 *
+		 * @since 4.10.1
+		 *
+		 * @param array $tickets_fields List of ticket fields.
+		 *
+		 * @return array List of ticket fields with additional setting fields added.
+		 */
+		public function additional_ticket_settings( $tickets_fields ) {
+			$template_options = array(
+				'default' => esc_html__( 'Default Page Template', 'event-tickets' ),
+			);
+
+			if ( class_exists( 'Tribe__Events__Main' ) ) {
+				$template_options['same']  = esc_html__( 'Same as Event Page Template', 'event-tickets' );
+			}
+
+			$templates = get_page_templates();
+
+			ksort( $templates );
+
+			foreach ( array_keys( $templates ) as $template ) {
+				$template_options[ $templates[ $template ] ] = $template;
+			}
+
+			$options = array(
+				'ticket-attendee-info-slug' => array(
+					'type'                => 'text',
+					'label'               => esc_html__( 'Attendee Registration URL slug', 'event-tickets' ),
+					'tooltip'             => esc_html__( 'The slug used for building the URL for the Attendee Registration Info page.', 'event-tickets' ),
+					'size'                => 'medium',
+					'default'             => tribe( 'tickets.attendee_registration' )->get_slug(),
+					'validation_callback' => 'is_string',
+					'validation_type'     => 'slug',
+				),
+				'ticket-attendee-info-template' => array(
+					'type'            => 'dropdown',
+					'label'           => __( 'Attendee Registration template', 'event-tickets' ),
+					'tooltip'         => __( 'Choose a page template to control the appearance of your attendee registration page.', 'event-tickets' ),
+					'validation_type' => 'options',
+					'size'            => 'large',
+					'default'         => 'default',
+					'options'         => $template_options,
+				)
+			);
+
+			$page_options = [ '' => __( 'Choose a page or leave blank.', 'event-tickets' ) ];
+
+			$pages = get_pages();
+
+			if ( $pages ) {
+				foreach ( $pages as $page ) {
+					$page_options[ $page->ID ] = $page->post_title;
+				}
+			} else {
+				//if no pages, let the user know they need one
+				$page_options = [ '' => __( 'You must create a page before using this functionality', 'event-tickets' ) ];
+			}
+
+			$ar_page_description = __( 'Optional: select an existing page to act as your attendee registration page. <strong>Requires</strong> use of the `[tribe_attendee_registration]` shortcode and overrides the above template and URL slug.', 'event-tickets' );
+
+			$ar_page = tribe( 'tickets.attendee_registration' )->get_attendee_registration_page();
+
+			// this is hooked too early for has_shortcode() to work properly, so regex to the rescue!
+			if ( ! empty( $ar_page ) && ! preg_match( '/\[tribe_attendee_registration\/?\]/', $ar_page->post_content ) ) {
+				$ar_slug_description = __( 'Selected page <strong>must</strong> use the `[tribe_attendee_registration]` shortcode. While the shortcode is missing the default redirect will be used.', 'event-tickets' );
+			}
+
+			$options['ticket-attendee-page-id'] = [
+				'type'            => 'dropdown',
+				'label'           => __( 'Attendee Registration page', 'event-tickets' ),
+				'tooltip'         => $ar_page_description,
+				'validation_type' => 'options',
+				'size'            => 'large',
+				'default'         => 'default',
+				'options'         => $page_options,
+			];
+
+			$array_key = array_key_exists( 'ticket-commerce-form-location', $tickets_fields ) ? 'ticket-commerce-form-location' : 'ticket-enabled-post-types';
+
+			return Tribe__Main::array_insert_after_key( $array_key, $tickets_fields, $options );
+		}
+
+		/**
 		 * Filters the list of ticket login requirements, making it possible to require that users
 		 * be logged in before purchasing tickets.
 		 *
@@ -393,14 +470,43 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 *
 		 */
 		public function run_updates() {
-			if ( ! class_exists( 'Tribe__Events__Updater' ) ) {
-				return; // core needs to be updated for compatibility
+			if ( ! class_exists( 'Tribe__Updater' ) ) {
+				return;
 			}
 
 			$updater = new Tribe__Tickets_Plus__Updater( self::VERSION );
 			if ( $updater->update_required() ) {
 				$updater->do_updates();
 			}
+		}
+
+		/**
+		 * Loading the Service Provider
+		 *
+		 * @deprecated 4.10
+		 *
+		 * @since 4.6
+		 */
+		public function on_load() {
+			_deprecated_function( __METHOD__, '4.10', '' );
+
+			tribe_register_provider( 'Tribe__Tickets_Plus__Service_Provider' );
+		}
+
+
+		/**
+		 * Finalize the initialization of this plugin
+		 *
+		 * @deprecated 4.10
+		 *
+		 * @since 4.7.6
+		 */
+		public function plugins_loaded() {
+			_deprecated_function( __METHOD__, '4.10', '' );
+
+			$this->bind_implementations();
+
+			tribe( 'tickets-plus.privacy' );
 		}
 	}
 }

@@ -3,7 +3,13 @@
  * This template renders a Single Ticket content
  * composed by Title and Description currently
  *
- * @version 4.9
+ * Override this template in your own theme by creating a file at:
+ * [your-theme]/tribe/tickets/registration/attendees/fields/radio.php
+ *
+ * @since 4.9
+ * @since 4.10.1 Update template paths to add the "registration/" prefix
+ * @since 4.10.2 Use md5() for field name slugs
+ * @version 4.10.2
  *
  */
 $field    = $this->get( 'field' );
@@ -33,8 +39,8 @@ $field_name    = 'tribe-tickets-meta[' . $ticket->ID . '][' . $attendee_id . '][
 	<div class="tribe-options" aria-role="radiogroup">
 		<?php
 		foreach ( $options as $option ) :
-			$option_slug = sanitize_title( $option );
-			$option_id   = "tribe-tickets-meta_{$slug}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}";
+			$option_slug = md5( sanitize_title( $option ) );
+			$option_id   = "tribe-tickets-meta_{$slug}_{$ticket->ID}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}";
 			?>
 			<label for="<?php echo esc_attr( $option_id ); ?>" class="tribe-tickets-meta-field-header">
 				<input

@@ -4,6 +4,8 @@
  * Filter to allow users to add/alter ignored post types
  *
  * @since 4.7
+ * @since 4.10.2 Update tooltip text for Confirmation email sender address and allow it to be saved as empty
+ * @version 4.10.2
  */
 $post_types_to_ignore = apply_filters( 'tribe_tickets_settings_post_type_ignore_list', array(
 	'attachment',
@@ -32,6 +34,14 @@ foreach ( $all_post_type_objects as $post_type => $post_type_object ) {
 $all_post_types = apply_filters( 'tribe_tickets_settings_post_types', $all_post_types );
 
 $options = get_option( Tribe__Main::OPTIONNAME, array() );
+
+
+include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
+
+$tickets_plus_plugin       = 'event-tickets-plus/event-tickets-plus.php';
+$available_plugins         = get_plugins();
+$is_tickets_plus_available = array_key_exists( $tickets_plus_plugin, $available_plugins );
+
 
 /**
  * List of ticketing solutions that support login requirements (ie, disabling or
@@ -64,25 +74,9 @@ $tickets_fields = array(
 	),
 );
 
-/**
- * Add an option to define slug for attendee info page
- * @since 4.9
- */
-$tickets_fields = array_merge( $tickets_fields, array(
-		'ticket-attendee-info-slug' => array(
-			'type'                => 'text',
-			'label'               => esc_html__( 'Attendee Registration URL slug', 'event-tickets' ),
-			'tooltip'             => esc_html__( 'The slug used for building the URL for the Attendee Registration Info page.', 'event-tickets' ),
-			'size'                => 'medium',
-			'default'             => tribe( 'tickets.attendee_registration' )->get_slug(),
-			'validation_callback' => 'is_string',
-			'validation_type'     => 'slug',
-		),
-	)
-);
 
 /**
- * If  The Events Calendar is active let's add an option to control the position
+ * If The Events Calendar is active let's add an option to control the position
  * of the ticket forms in the events view.
  */
 if ( class_exists( 'Tribe__Events__Main' ) ) {
@@ -93,28 +87,38 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 		'tribe_events_single_event_before_the_content' => __( 'Above the event description', 'event-tickets' ),
 	);
 
-	$tickets_fields = array_merge( $tickets_fields, array(
-		'ticket-rsvp-form-location'     => array(
-			'type'            => 'dropdown',
-			'label'           => esc_html__( 'Location of RSVP form', 'event-tickets' ),
-			'options'         => $ticket_form_location_options,
-			'validation_type' => 'options',
-			'parent_option'   => Tribe__Events__Main::OPTIONNAME,
-			'default'         => reset( $ticket_form_location_options ),
-		),
-		'ticket-commerce-form-location' => array(
-			'type'            => 'dropdown',
-			'label'           => esc_html__( 'Location of Tickets form', 'event-tickets' ),
-			'options'         => $ticket_form_location_options,
-			'validation_type' => 'options',
-			'parent_option'   => Tribe__Events__Main::OPTIONNAME,
-			'default'         => reset( $ticket_form_location_options ),
-		),
-	) );
+	$tickets_fields['ticket-rsvp-form-location'] = array(
+		'type'            => 'dropdown',
+		'label'           => esc_html__( 'Location of RSVP form', 'event-tickets' ),
+		'tooltip'         => esc_html__( 'This setting only impacts events made with the classic editor.', 'event-tickets' ),
+		'options'         => $ticket_form_location_options,
+		'validation_type' => 'options',
+		'parent_option'   => Tribe__Events__Main::OPTIONNAME,
+		'default'         => reset( $ticket_form_location_options ),
+	);
+
+	$tickets_fields['ticket-commerce-form-location'] = array(
+		'type'            => 'dropdown',
+		'label'           => esc_html__( 'Location of Tickets form', 'event-tickets' ),
+		'tooltip'         => esc_html__( 'This setting only impacts events made with the classic editor.', 'event-tickets' ),
+		'options'         => $ticket_form_location_options,
+		'validation_type' => 'options',
+		'parent_option'   => Tribe__Events__Main::OPTIONNAME,
+		'default'         => reset( $ticket_form_location_options ),
+	);
+
+	$tickets_fields['ticket-display-tickets-left-threshold'] = array(
+		'type'            => 'text',
+		'label'           => esc_html__( 'Display # tickets left threshold', 'event-tickets' ),
+		'tooltip'         => esc_html__( 'If this number is less than the number of tickets left for sale on your event, this will prevent the "# of tickets left" text from showing on your website. You can leave this blank if you would like to always show the text.', 'event-tickets' ),
+		'validation_type' => 'int',
+		'size'            => 'small',
+		'can_be_empty'    => true,
+		'parent_option'   => Tribe__Events__Main::OPTIONNAME,
+	);
 }
 
 $tickets_fields = array_merge( $tickets_fields, array(
-
 		'ticket-authentication-requirements-heading' => array(
 			'type' => 'html',
 			'html' => '<h3>' . __( 'Login Requirements', 'event-tickets' ) . '</h3>',
@@ -140,11 +144,6 @@ $tickets_fields['ticket-paypal-heading'] = array(
 	'html' => '<h3>' . __( 'Tribe Commerce', 'event-tickets' ) . '</h3>',
 );
 
-include_once( ABSPATH . 'wp-admin/includes/plugin.php' );
-
-$tickets_plus_plugin       = 'event-tickets-plus/event-tickets-plus.php';
-$available_plugins         = get_plugins();
-$is_tickets_plus_available = array_key_exists( $tickets_plus_plugin, $available_plugins );
 
 if ( ! $is_tickets_plus_available ) {
 	$plus_link = sprintf(
@@ -200,7 +199,7 @@ $current_user = get_user_by( 'id', get_current_user_id() );
 $paypal_setup_kb_url = class_exists( 'Tribe__Tickets_Plus__Main' )
 	? 'http://m.tri.be/19yk'
 	: 'http://m.tri.be/19yj';
-$paypal_setup_kb_link = '<a href="' . esc_url( $paypal_setup_kb_url ) . '">' . esc_html__( 'these instructions', 'event-tickets' ) . '</a>';
+$paypal_setup_kb_link = '<a href="' . esc_url( $paypal_setup_kb_url ) . '" target="_blank">' . esc_html__( 'these instructions', 'event-tickets' ) . '</a>';
 $paypal_setup_note    = sprintf(
 	esc_html__( 'In order to use Tribe Commerce to sell tickets, you must configure your PayPal account to communicate with your WordPress site. If you need help getting set up, follow %s', 'event-tickets' ),
 	$paypal_setup_kb_link
@@ -268,6 +267,13 @@ $paypal_fields            = array(
 		'validation_type' => 'html',
 		'class'           => 'indent light-bordered',
 	),
+	'ticket-paypal-sandbox'           => array(
+		'type'            => 'checkbox_bool',
+		'label'           => esc_html__( 'PayPal Sandbox', 'event-tickets' ),
+		'tooltip'         => esc_html__( 'Enables PayPal Sandbox mode for testing.', 'event-tickets' ),
+		'default'         => false,
+		'validation_type' => 'boolean',
+	),
 	'ticket-commerce-currency-code'   => array(
 		'type'            => 'dropdown',
 		'label'           => esc_html__( 'Currency Code', 'event-tickets' ),
@@ -305,10 +311,11 @@ $paypal_fields            = array(
 	'ticket-paypal-confirmation-email-sender-email' => array(
 		'type'            => 'email',
 		'label'           => esc_html__( 'Confirmation email sender address', 'event-tickets' ),
-		'tooltip'         => esc_html__( 'Email address PayPal tickets customers will receive confirmation from.', 'event-tickets' ),
+		'tooltip'         => esc_html__( 'Email address PayPal tickets customers will receive confirmation from. Leave empty to use the default WordPress site email address.', 'event-tickets' ),
 		'size'            => 'medium',
 		'default'         => $current_user->user_email,
 		'validation_type' => 'email',
+		'can_be_empty'    => true,
 	),
 	'ticket-paypal-confirmation-email-sender-name' => array(
 		'type'                => 'text',
@@ -328,20 +335,12 @@ $paypal_fields            = array(
 		'validation_callback' => 'is_string',
 		'validation_type'     => 'textarea',
 	),
-	'ticket-paypal-sandbox'           => array(
-		'type'            => 'checkbox_bool',
-		'label'           => esc_html__( 'PayPal Sandbox', 'event-tickets' ),
-		'tooltip'         => esc_html__( 'Enables PayPal Sandbox mode for testing.', 'event-tickets' ),
-		'default'         => false,
-		'validation_type' => 'boolean',
-	),
 );
 
 if ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) {
-	$paypal_fields = array_merge( $paypal_fields, array(
+	$ipn_fields = [
 		'ticket-paypal-notify-history' => array(
 			'type'            => 'wrapped_html',
-			'label'           => esc_html__( 'See your IPN Notification history', 'event-tickets' ),
 			'html'            => '<p>' .
 			                     sprintf(
 				                     esc_html__( 'You can see and manage your IPN Notifications history from the IPN Notifications settings area (%s).', 'event-tickets' ),
@@ -350,6 +349,7 @@ if ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) {
 			                     '</p>',
 			'size'            => 'medium',
 			'validation_type' => 'html',
+			'class'           => 'indent light-bordered',
 		),
 		'ticket-paypal-notify-url'     => array(
 			'type'            => 'text',
@@ -361,7 +361,9 @@ if ( defined( 'WP_DEBUG' ) && true === WP_DEBUG ) {
 			'default'         => home_url(),
 			'validation_type' => 'html',
 		),
-	) );
+	];
+
+	$paypal_fields = Tribe__Main::array_insert_after_key( 'ticket-paypal-ipn-config-status', $paypal_fields, $ipn_fields );
 }
 
 foreach ( $paypal_fields as $key => &$commerce_field ) {

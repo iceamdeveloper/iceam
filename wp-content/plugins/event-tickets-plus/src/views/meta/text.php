@@ -20,7 +20,7 @@ $option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attend
 		<textarea
 			id="<?php echo esc_attr( $option_id ); ?>"
 			class="ticket-meta"
-			name="tribe-tickets-meta[<?php echo $attendee_id ?>][<?php echo esc_attr( $this->slug ); ?>]"
+			name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][<?php echo esc_attr( $this->slug ); ?>]"
 			<?php echo $required ? 'required' : ''; ?>
 			<?php disabled( $this->is_restricted( $attendee_id ) ); ?>
 		><?php echo esc_textarea( $value ); ?></textarea>
@@ -31,7 +31,7 @@ $option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attend
 			type="text"
 			id="<?php echo esc_attr( $option_id ); ?>"
 			class="ticket-meta"
-			name="tribe-tickets-meta[<?php echo $attendee_id ?>][<?php echo esc_attr( $this->slug ); ?>]"
+			name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][<?php echo esc_attr( $this->slug ); ?>]"
 			value="<?php echo esc_attr( $value ); ?>"
 			<?php echo $required ? 'required' : ''; ?>
 			<?php disabled( $this->is_restricted( $attendee_id ) ); ?>

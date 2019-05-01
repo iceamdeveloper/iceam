@@ -14,7 +14,9 @@ class Aelia_WC_AFC_RequirementsChecks extends Aelia_WC_RequirementsChecks {
 
 	// @var array An array of WordPress plugins (name => version) required by the plugin.
 	protected $required_plugins = array(
-		'WooCommerce' => '2.4',
+		
+		'WooCommerce' => '2.6',
+		
 	);
 
 	/**

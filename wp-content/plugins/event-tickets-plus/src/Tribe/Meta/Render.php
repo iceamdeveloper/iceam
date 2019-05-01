@@ -78,7 +78,13 @@ class Tribe__Tickets_Plus__Meta__Render {
 			if ( 'checkbox' === $field->type && isset( $field->extra['options'] ) ) {
 				$values = array();
 				foreach ( $field->extra['options'] as $option ) {
-					$key = $field->slug . '_' . sanitize_title( $option );
+					// Support longer options by using the hash of the string.
+					$key = $field->slug . '_' . md5( sanitize_title( $option ) );
+
+					if ( ! isset( $meta_data[ $key ] ) ) {
+						// Support existing fields that did not save with md5 hash.
+						$key = $field->slug . '_' .  sanitize_title( $option );
+					}
 
 					if ( isset( $meta_data[ $key ] ) ) {
 						$values[] = $meta_data[ $key ];
@@ -98,7 +104,7 @@ class Tribe__Tickets_Plus__Meta__Render {
 				$value = '&nbsp;';
 			}
 
-			$value = $value ? wp_kses_post( $value ) : '&nbsp;';
+			$value = isset( $value ) ? wp_kses_post( $value ) : '&nbsp;';
 
 			$valid_meta_html .= '
 				<dt class="event-tickets-meta-label_' . sanitize_html_class( $field->slug ) . '">' . wp_kses_post( $field->label ) . '</dt>
@@ -178,7 +184,13 @@ class Tribe__Tickets_Plus__Meta__Render {
 				if ( 'checkbox' === $field->type && isset( $field->extra['options'] ) ) {
 					$values = array();
 					foreach ( $field->extra['options'] as $option ) {
-						$key = $field->slug . '_' . sanitize_title( $option );
+						// Support longer options by using the hash of the string.
+						$key = $field->slug . '_' . md5( sanitize_title( $option ) );
+
+						if ( ! isset( $meta_data[ $key ] ) ) {
+							// Support existing fields that did not save with md5 hash.
+							$key = $field->slug . '_' .  sanitize_title( $option );
+						}
 
 						if ( isset( $meta_data[ $key ] ) ) {
 							$values[] = $meta_data[ $key ];

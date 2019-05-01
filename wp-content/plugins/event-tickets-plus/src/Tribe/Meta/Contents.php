@@ -33,25 +33,23 @@ class Tribe__Tickets_Plus__Meta__Contents {
 		$up_to_date  = true;
 
 		foreach ( $quantity_by_ticket_id as $ticket_id => $quantity ) {
-			$should_have_meta = tribe_is_truthy( get_post_meta( $ticket_id, Tribe__Tickets_Plus__Meta::ENABLE_META_KEY, true ) );
-			$data             = empty( $stored_data[ $ticket_id ] ) ? array() : $stored_data[ $ticket_id ];
-			$ticket_meta      = $meta->get_meta_fields_by_ticket( $ticket_id );
+			$data        = empty( $stored_data[ $ticket_id ] ) ? array() : $stored_data[ $ticket_id ];
+			$ticket_meta = $meta->get_meta_fields_by_ticket( $ticket_id );
 
 			// Continue if the ticket doesn't have any meta
-			if ( empty( $ticket_meta ) && ! $should_have_meta ) {
+			if ( ! $meta->ticket_has_meta( $ticket_id ) ) {
 				continue;
 			}
 
-			// If the data for this ticket is empty, we return false
-			// That way we ensure that the users get to see the
-			// registration page even if they have non-mandatory fields
-			if ( empty( $data[ $ticket_id ] ) ) {
-				return false;
-			}
-
-			// Bail if the number of items stored for that ticket is lower
-			// than the $quantity in the cart
-			if ( count( $data[ $ticket_id ] ) < $quantity ) {
+			/**
+			 * Return false if the ticket has required meta but the data
+			 * for the ticket is empty or if the number of items stored for
+			 * the ticket is lower than the quantity in the cart
+			 */
+			if (
+				$meta->ticket_has_required_meta( $ticket_id )
+					&& ( empty( $data[ $ticket_id ] ) || count( $data[ $ticket_id ] ) < $quantity )
+			) {
 				return false;
 			}
 

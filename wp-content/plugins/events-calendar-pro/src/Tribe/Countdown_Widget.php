@@ -8,6 +8,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
 
+use Tribe__Date_Utils as Dates;
+
 if ( ! class_exists( 'Tribe__Events__Pro__Countdown_Widget' ) ) {
 	class Tribe__Events__Pro__Countdown_Widget extends WP_Widget {
 
@@ -81,6 +83,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Countdown_Widget' ) ) {
 				'posts_per_page' => $limit,
 				'post_status'    => $statuses,
 				'paged'          => $paged,
+				'start_date'     => Dates::build_date_object( 'now' ),
 			) );
 
 			if ( is_numeric( $instance['event'] ) ) {

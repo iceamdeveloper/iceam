@@ -217,7 +217,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		foreach ( $tickets as $name => $quantity ) {
 
-			$output .= "<div class='tribe-line-item'>{$quantity} - {$name}</div>";
+			$output .= '<div class"tribe-line-item">' . esc_html( $quantity ) . ' - ' . esc_html( $name ) . '</div>';
 		}
 
 		return $output;
@@ -356,16 +356,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		WC()->api->includes();
 		WC()->api->register_resources( new WC_API_Server( '/' ) );
 
+		$statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'all', 'woo' );
+		array_push( $statuses, 'publish' );
+
 		$args = array(
 			'post_type'      => 'tribe_wooticket',
 			'posts_per_page' => - 1,
-			'post_status'    => array(
-				'wc-pending',
-				'wc-processing',
-				'wc-on-hold',
-				'wc-completed',
-				'publish',
-			),
+			'post_status'    => $statuses,
 			'meta_query'     => array(
 				array(
 					'key'   => Tribe__Tickets_Plus__Commerce__WooCommerce__Main::ATTENDEE_EVENT_KEY,
@@ -427,11 +424,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * Prepares the list of items for displaying.
 	 */
 	public function prepare_items() {
-		$this->event_id = isset( $_GET['event_id'] ) ? $_GET['event_id'] : 0;
+		$this->event_id = Tribe__Utils__Array::get( $_GET, 'event_id', Tribe__Utils__Array::get( $_GET, 'post_id', 0 ) );
 
 		$items       = self::get_orders( $this->event_id );
 		$total_items = count( $items );
 		$per_page    = $this->get_items_per_page( $this->per_page_option );
+
+		/**
+		 * Allow plugins to modify the default number of orders shown per page.
+		 *
+		 * @since 4.9.2
+		 *
+		 * @param int The number of orders shown per page.
+		 */
+		$per_page = apply_filters( 'tribe_tickets_plus_order_pagination', $per_page );
 
 		$this->valid_order_items = self::get_valid_order_items_for_event( $this->event_id, $items );
 

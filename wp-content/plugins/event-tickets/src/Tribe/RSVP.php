@@ -122,6 +122,11 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 	protected $tickets_view;
 
 	/**
+	 * Array of not going statuses
+	 */
+	protected $not_going_statuses = array();
+
+	/**
 	 * Creates a Variable to prevent Double FE forms
 	 * @var boolean
 	 */
@@ -188,6 +193,7 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		add_action( 'rsvp_checkin', array( $this, 'purge_attendees_transient' ) );
 		add_action( 'rsvp_uncheckin', array( $this, 'purge_attendees_transient' ) );
 		add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ) );
+		add_filter( 'tribe_get_cost', [ $this, 'trigger_get_cost' ], 10, 3 );
 		add_filter(
 			'event_tickets_attendees_rsvp_checkin_stati',
 			array( $this, 'filter_event_tickets_attendees_rsvp_checkin_stati' )
@@ -397,6 +403,19 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 	}
 
 	/**
+	 * Get Status by Action from Status Manager
+	 *
+	 * @since 4.10
+	 *
+	 * @param $action string|array a string or array of actions that a status includes
+	 *
+	 * @return array an array of statuses
+	 */
+	public function get_statuses_by_action( $action ) {
+		return tribe( 'tickets.status' )->get_statuses_by_action( $action, 'rsvp' );
+	}
+
+	/**
 	 * Update the RSVP values for this user.
 	 *
 	 * Note that, within this method, $order_id refers to the attendee or ticket ID
@@ -411,10 +430,10 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		$user_id = get_current_user_id();
 
 		$rsvp_orders    = $this->tickets_view->get_event_rsvp_attendees( $event_id, $user_id );
-		$rsvp_order_ids = wp_list_pluck( $rsvp_orders, 'order_id' );
+		$rsvp_order_ids = array_map( 'absint', wp_list_pluck( $rsvp_orders, 'order_id' ) );
 
 		// This makes sure we don't save attendees for orders that are not from this current user and event
-		if ( ! in_array( $order_id, $rsvp_order_ids ) ) {
+		if ( ! in_array( (int) $order_id, $rsvp_order_ids, true ) ) {
 			return;
 		}
 
@@ -451,7 +470,9 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 
 		//check if changing status will cause rsvp to go over capacity
 		$previous_order_status = get_post_meta( $order_id, self::ATTENDEE_RSVP_KEY, true );
-		if ( tribe_is_truthy( $attendee_order_status ) && 'no' === $previous_order_status ) {
+
+		// The status changed from "not going" to "going", check if we have the capacity to support it.
+		if ( tribe_is_truthy( $attendee_order_status ) && in_array( $previous_order_status, $this->get_statuses_by_action( 'count_not_going' ), true ) ) {
 			$capacity = tribe_tickets_get_capacity( $product_id );
 			$sales = (int) get_post_meta( $product_id, 'total_sales', true );
 			$unlimited = -1;
@@ -462,17 +483,17 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 
 		$this->update_sales_and_stock_by_order_status( $order_id, $attendee_order_status, $product_id );
 
-		if ( ! is_null( $attendee_order_status ) ) {
+		if ( null !== $attendee_order_status ) {
 			update_post_meta( $order_id, self::ATTENDEE_RSVP_KEY, $attendee_order_status );
 		}
 
 		update_post_meta( $order_id, self::ATTENDEE_OPTOUT_KEY, (bool) $attendee_optout );
 
-		if ( ! is_null( $attendee_full_name ) ) {
+		if ( null !== $attendee_full_name ) {
 			update_post_meta( $order_id, $this->full_name, $attendee_full_name );
 		}
 
-		if ( ! is_null( $attendee_email ) ) {
+		if ( null !== $attendee_email ) {
 			update_post_meta( $order_id, $this->email, $attendee_email );
 		}
 	}
@@ -554,11 +575,11 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		 *
 		 * @param int    $order_id              ID of the RSVP order
 		 * @param int    $post_id               ID of the post the order was placed for
-		 * @param string $attendee_order_status 'yes' if the user indicated they will attend
+		 * @param string $attendee_order_status status if the user indicated they will attend
 		 */
 		do_action( 'event_tickets_rsvp_tickets_generated', $order_id, $post_id, $attendee_order_status );
 
-		$send_mail_stati = array( 'yes' );
+		$send_mail_stati = tribe( 'tickets.status' )->get_statuses_by_action( 'attendee_dispatch', 'rsvp' );
 
 		/**
 		 * Filters whether a confirmation email should be sent or not for RSVP tickets.
@@ -578,7 +599,7 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 			 * @param array  $send_mail_stati       An array of default stati triggering an attendance email.
 			 * @param int    $order_id              ID of the RSVP order
 			 * @param int    $post_id               ID of the post the order was placed for
-			 * @param string $attendee_order_status 'yes' if the user indicated they will attend
+			 * @param string $attendee_order_status status if the user indicated they will attend
 			 */
 			$send_mail_stati = apply_filters(
 				'tribe_tickets_rsvp_send_mail_stati', $send_mail_stati, $order_id, $post_id, $attendee_order_status
@@ -625,7 +646,8 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		foreach ( $all_attendees as $single_attendee ) {
 			// Do not add those attendees/tickets marked as not attending (note that despite the name
 			// 'qr_ticket_id', this key is not QR code specific, it's simply the attendee post ID)
-			if ( 'yes' !== get_post_meta( $single_attendee['qr_ticket_id'], self::ATTENDEE_RSVP_KEY, true ) ) {
+			$going_status = get_post_meta( $single_attendee['qr_ticket_id'], self::ATTENDEE_RSVP_KEY, true );
+			if ( in_array( $going_status, $this->get_statuses_by_action( 'count_not_going' ), true ) ) {
 				continue;
 			}
 
@@ -951,25 +973,13 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 			return false;
 		}
 
-		if ( ! tribe( 'tickets.attendees' )->user_can_manage_attendees() ) {
+		if ( ! tribe( 'tickets.attendees' )->user_can_manage_attendees( 0, $event_id ) ) {
 			return false;
 		}
 
 		$product_id = get_post_meta( $ticket_id, self::ATTENDEE_PRODUCT_KEY, true );
 
-		// For attendees whose status ('going' or 'not going') for whom a stock adjustment is required?
-		$rsvp_options    = $this->tickets_view->get_rsvp_options( null, false );
-		$attendee_status = get_post_meta( $ticket_id, self::ATTENDEE_RSVP_KEY, true );
-
-		$adjustment = isset( $rsvp_options[ $attendee_status ]['decrease_stock_by']  )
-			? absint( $rsvp_options[ $attendee_status ]['decrease_stock_by'] )
-			: false;
-
-		// Adjust the sales figure if required
-		if ( $adjustment ) {
-			$sales = (int) get_post_meta( $product_id, 'total_sales', true );
-			update_post_meta( $product_id, 'total_sales', $sales - $adjustment );
-		}
+		// Stock Adjustment handled by $this->update_stock_from_attendees_page()
 
 		//Store name so we can still show it in the attendee list
 		$attendees      = $this->get_attendees_by_id( $event_id );
@@ -985,7 +995,7 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 
 		// Try to kill the actual ticket/attendee post
 		$delete = wp_delete_post( $ticket_id, true );
-		if ( is_wp_error( $delete ) ) {
+		if ( is_wp_error( $delete ) || ! isset( $delete->ID ) ) {
 			return false;
 		}
 
@@ -994,6 +1004,29 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
 
 		return true;
+	}
+
+	/**
+	 * Trigger for tribe_get_cost if there are only RSVPs
+	 *
+	 * @since 4.10.2
+	 *
+	 * @param string $cost
+	 * @param int $post_id
+	 * @param boolean $unused_with_currency_symbol
+	 *
+	 * @return string $cost
+	 */
+	public function trigger_get_cost( $cost, $post_id, $unused_with_currency_symbol ) {
+
+		if (
+			empty( $cost )
+			&& tribe_events_has_tickets( get_post( $post_id ) )
+		) {
+			$cost = __( 'Free', 'event-tickets' );
+		}
+
+		return $cost;
 	}
 
 	/**
@@ -1040,7 +1073,15 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		$tickets = $this->get_tickets( $post->ID );
 
 		if ( empty( $tickets ) ) {
-			return;
+			return $content;
+		}
+
+		// test for blocks in content, but usually called after the blocks have been converted
+		if (
+			has_blocks( $content )
+			|| false !== strpos( (string) $content, 'tribe-block ' )
+		) {
+			return $content;
 		}
 
 		// Check to see if all available tickets' end-sale dates have passed, in which case no form
@@ -1144,6 +1185,7 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 		$return->description      = $product->post_excerpt;
 		$return->ID               = $ticket_id;
 		$return->name             = $product->post_title;
+		$return->post_type        = $product->post_type;
 		$return->price            = get_post_meta( $ticket_id, '_price', true );
 		$return->provider_class   = get_class( $this );
 		$return->admin_link       = '';
@@ -1180,7 +1222,7 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 	 * tests to see if it functions as a ticket: if so, the corresponding event
 	 * object is returned. If not, boolean false is returned.
 	 *
-	 * @param $ticket_product
+	 * @param WP_Post|int $ticket_product
 	 *
 	 * @return bool|WP_Post
 	 */
@@ -1531,7 +1573,9 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 			update_post_meta( $attendee_id, '_tribe_qr_status', 1 );
 		}
 
-		if ( ! $qr && ! tribe( 'tickets.attendees' )->user_can_manage_attendees() ) {
+		$event_id = get_post_meta( $attendee_id, self::ATTENDEE_EVENT_KEY, true );
+
+		if ( ! $qr && ! tribe( 'tickets.attendees' )->user_can_manage_attendees( 0, $event_id ) ) {
 			return false;
 		}
 
@@ -1579,8 +1623,9 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 	 * @return bool
 	 */
 	public function uncheckin( $attendee_id ) {
+		$event_id = get_post_meta( $attendee_id, self::ATTENDEE_EVENT_KEY, true );
 
-		if ( ! tribe( 'tickets.attendees' )->user_can_manage_attendees() ) {
+		if ( ! tribe( 'tickets.attendees' )->user_can_manage_attendees( 0, $event_id ) ) {
 			return false;
 		}
 
@@ -1873,9 +1918,10 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 	 * @return array The original array plus the 'yes' status.
 	 */
 	public function filter_event_tickets_attendees_rsvp_checkin_stati( array $stati = array() ) {
-		$stati[] = 'yes';
 
-		return array_unique( $stati );
+		$merged_array = array_merge( $stati, ( tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'rsvp' ) ) );
+
+		return array_unique( $merged_array );
 	}
 
 	/**
@@ -2141,12 +2187,11 @@ class Tribe__Tickets__RSVP extends Tribe__Tickets__Tickets {
 	 * @return int
 	 */
 	public function get_total_not_going( $event_id ) {
-
 		$not_going = 0;
 
 		foreach ( $this->get_attendees_array( $event_id ) as $attendee ) {
-			if ( 'no' === $attendee[ 'order_status' ] ) {
-				$not_going++;
+			if ( in_array( $attendee['order_status'], $this->get_statuses_by_action( 'count_not_going' ), true ) ) {
+				$not_going ++;
 			}
 		}
 

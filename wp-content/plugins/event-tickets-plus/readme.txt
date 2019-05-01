@@ -1,10 +1,10 @@
 === Event Tickets Plus ===
 
-Contributors: ModernTribe, borkweb, aguseo, barry.hughes, bordoni, brianjessee, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
+Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, barry.hughes, bordoni, borkweb, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.7
-Tested up to: 5.0.2
-Stable tag: 4.9.1
+Tested up to: 5.1.1
+Stable tag: 4.10.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -34,9 +34,6 @@ Event Tickets Plus adds features and functionality onto the core Event Tickets p
 
 = Requirements =
 
-* PHP 5.2.4 or greater (recommended: PHP 7.0 or greater)
-* WordPress 4.5 or above
-* jQuery 1.11.x
 * Event Tickets 4.6 or above
 * Event Tickets Plus 4.6 or above
 * The Events Calendar 4.6 or above (optional)
@@ -137,6 +134,103 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.10.3] 2019-04-23 =
+
+* Tweak - Changed minimum supported version of The Events Calendar to 4.9
+* Tweak - Allow menu order to be saved when saving tickets [121703]
+* Tweak - Add hooks before WooCommerce and EDD Attendees are generated `tribe_tickets_plus_woo_before_generate_tickets` and `tribe_tickets_plus_edd_before_generate_tickets` [124675]
+* Tweak - Add CSS for `tribe_events_modal` class when query string is present in URL [123818]
+* Tweak - Modify the attendee meta to remove empty values, but keep zero and improve the escaping of data [123892]
+* Tweak - Add support for display 0 when it is a value in attendee meta [123892]
+* Tweak - Change Attendee Registration page options to use ID instead of page slug [124997]
+* Tweak - Use new `tribe_attendee_registration_form_classes` hook to add form classes for EDD/WooCommerce [124997]
+* Tweak - Added actions: `tribe_tickets_plus_woo_before_generate_tickets`, `tribe_tickets_plus_woo_before_generate_tickets`
+* Fix - Add Deleted Attendees Count to EDD and add checks for EDD/WooCommerce Tickets to only increase counter once per attendee [122083]
+* Fix - Filter the Attendee Registration display to only show tickets for the current provider. Add functions to add provider to cart and Attendee Registration URL [122317]
+* Language - 0 new strings added, 16 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.10.2] 2019-04-01 =
+
+* Tweak - Change text on Tickets WooCommerce settings to properly reflect delay changes [123623]
+* Tweak - Add option to use a different page as the default Attendee Registration page using the `[tribe_attendee_registration]` shortcode [123044]
+* Tweak - Update hooks used to notify promoter of changes [124118]
+* Tweak - Add new hook `tribe_tickets_plus_woo_reset_attendee_cache` to notify when an WooCommerce attendee is reset on cache [124118]
+* Tweak - Changed views: `meta/checkbox`, `meta/radio`, `tickets-plus/orders-edit-meta`
+* Fix - Change priority of initializing of CSV mapping [123401]
+* Fix - Use a md5 hash for checkbox and radio option names to prevent fields from not saving if they a large amount of characters and handle the processing of them [119448]
+* Fix - Swap similar methods with each other for statuses of ticket generation and emails in WooCommerce, thanks to @aaemnnosttv for the code! [123242]
+* Fix - Add filter for better overriding of archive title [123065]
+* Fix - Prevent missing stati causing query errors [123011]
+* Fix - Trigger showing the submit button in "my tickets" view [114111]
+* Fix - Handle null/empty values when iterating through attendee fields [123516]
+* Language - 5 new strings added, 27 updated, 0 fuzzied, and 1 obsoleted
+
+= [4.10.1.3] 2019-03-15 =
+
+* Fix - Correct issue with WooCommerce ticket charges not being sent to Stripe and other gateways [124123]
+
+= [4.10.1.2] 2019-03-14 =
+
+* Tweak - Add new hook `tribe_tickets_plus_woo_reset_attendee_cache` to notify when an WooCommerce attendee is reset on cache [124118]
+* Tweak - Added actions: `tribe_tickets_plus_woo_reset_attendee_cache`
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.10.1.1] 2019-03-06 =
+
+* Feature - Add hooks to notify Promoter when an event with EDD and WOO tickets have changes [123732]
+* Fix - correctly clear attendees cache when delayed tickets are generated [123559]
+* Language - 0 new strings added, 18 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.10.1] 2019-02-26 =
+
+* Tweak - Added setting in Settings->Tickets->WooCommerce to turn off attendee generation delay [121818]
+* Tweak - Add wp ajax action to save attendee meta [121592]
+* Tweak - Added filter: `tribe_tickets_woo_settings` [121818]
+* Tweak - Added filters: `tribe_tickets_woo_settings`, `tribe_tickets_tickets_in_cart`
+* Tweak - Changed views: `meta/checkbox`, `meta/text`, `tickets-plus/orders-tickets`
+* Fix - Fix bug on classic RSVP for mobile viewport [120226]
+* Fix - Only show attendee registration for RSVP if going [121026]
+* Fix - Allow users to always access attendee registration page if tickets in cart have meta [121819]
+* Fix - Allow tickets with required and non-required meta to be saved together [121821]
+* Fix - Fix mobile styles for tickets and RSVP [118299]
+* Fix - Prevent fatal errors on front end ticket page if the provider is deactivated [122322]
+* Fix - Allow empty checkboxes as valid if they are the only field [122321]
+* Fix - Don't add extra checkboxes for empty lines [122321]
+* Language - 9 new strings added, 23 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.10.0.2] 2019-02-08 =
+
+* Fix - Prevent fatals in Meta when testing for blocks [122361]
+* Fix - Ensure lang files are loadeing correctly [122544]
+* Fix - Reduce WC PayPal delay from 5 minutes to 5 seconds [121818]
+
+= [4.10.0.1] 2019-02-07 =
+
+* Fix - Ensure attendee meta does not get erased on block editor ticket update [122361]
+
+= [4.10] 2019-02-05 =
+
+* Feature - Add system to check plugin versions to inform you to update and prevent site breaking errors [116841]
+* Feature - Add order page for EDD [116745]
+* Tweak - Add a class to admin attendee meta markup
+* Tweak - Update plugin header [90398]
+* Tweak - Add tooltips and additional information to WooCommerce Orders page header [115914]
+* Tweak - Added filters: `tribe_events_tickets_edd_orders_table_column`, `tribe_tickets_plus_edd_order_link_url`, `tribe_tickets_woo_cart_url`, `tribe_not_php_version_names`
+* Tweak - Added actions: `tribe_tickets_plus_report_event_details_list_top`, `tribe_tickets_plus_report_event_details_list_bottom`, `tribe_tickets_plus_after_event_details_list`
+* Tweak - Changed views: `wootickets/tickets`
+* Fix - When adding a WooCommerce ticket to the cart, redirect only if the "WooCommerce" setting is set. Thanks to Thomas and Ilkka for flagging this! [46648]
+* Deprecated - The functions `event_tickets_plus_is_incompatible_tickets_core_installed()`, `event_tickets_plus_check_for_init_failure()` and `event_tickets_plus_setup_fail_message()` and `register_active_plugin()`, `on_load()`, `plugins_loaded()` method has been deprecated in `Tribe__Tickets_Plus__Main` in favor of Plugin Dependency Checking system
+* Deprecated - Class Tribe__Tickets_Plus__Commerce__EDD__Orders_Report use Tribe__Tickets_Plus__Commerce__EDD__Orders__Report instead
+* Deprecated - `filter_attendee_order_link()` in Tribe__Tickets_Plus__Editor, replaced with method in EDD and Woo to filter order link using `tribe_filter_attendee_order_link`
+* Language - 11 new strings added, 42 updated, 1 fuzzied, and 7 obsoleted
+
+= [4.9.2] 2019-01-15 =
+
+* Tweak - Added a filterable 5 minute delay of ticket generation to Woocommerce tickets to avoid race conditions when IPN and PDT responses arrive simultaneously [119945]
+* Tweak - Added filters: `tribe_ticket_generation_delay`, `tribe_tickets_plus_order_pagination`
+* Fix - Fix attendee registration user experience [119465]
+* Fix - Fix attendee registration for RSVP block FE [119800]
 
 = [4.9.1] 2018-12-19 =
 

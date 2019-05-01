@@ -41,6 +41,10 @@
 			padding: 0;
 		}
 
+	#tribe-attendees-summary .welcome-panel-column .tribe-event-meta-note div {
+				padding: 0 0 0 15px;
+			}
+
 	#tribe-attendees-summary .welcome-panel-last {
 		border-left: 1px solid #eee;
 		display: flex;
@@ -62,6 +66,12 @@
 				width: auto;
 			}
 
+	#tribe-attendees-summary .welcome-panel-last .totals-header .order-total {
+				font-size: 16px;
+				margin: 1.20em 0 0;
+				font-weight: 600;
+			}
+
 	#tribe-attendees-summary .welcome-panel-last h4 {
 			font-size: 1.5em;
 			text-align: center;
@@ -75,12 +85,20 @@
 		margin-top: 0;
 	}
 
-.tribe-attendees-page a.tickets_uncheckin {
-		display: none;
-	}
-
 .tribe-attendees-page h4.tickets-summary {
 		margin: 0;
+	}
+
+.tribe-attendees-page .tickets_checkin {
+		min-width: 87px;
+		text-align: center;
+	}
+
+.tribe-attendees-page .tickets_uncheckin {
+		display: none;
+		height: auto;
+		line-height: 1.5;
+		white-space: normal;
 	}
 
 .tribe-attendees-page .tickets_checked td {
@@ -91,23 +109,18 @@
 			opacity: 1;
 		}
 
-.tribe-attendees-page .tickets_checked a.tickets_checkin {
+.tribe-attendees-page .tickets_checked .tickets_checkin {
 			display: none;
 		}
 
-.tribe-attendees-page .tickets_checked a.tickets_uncheckin {
+.tribe-attendees-page .tickets_checked .tickets_uncheckin {
 			display: block;
 			opacity: 1;
 		}
 
-.tribe-attendees-page .tickets_checked .inline a.tickets_uncheckin {
+.tribe-attendees-page .tickets_checked .inline .tickets_uncheckin {
 			display: inline;
 		}
-
-.tribe-attendees-page .tickets_checkin {
-		min-width: 87px;
-		text-align: center;
-	}
 
 .tribe-attendees-page .cancelled {
 		font-style: italic;

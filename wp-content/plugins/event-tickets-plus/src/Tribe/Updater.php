@@ -7,7 +7,7 @@
  * @since 4.7.1
  *
  */
-class Tribe__Tickets_Plus__Updater extends Tribe__Events__Updater {
+class Tribe__Tickets_Plus__Updater extends Tribe__Updater {
 
 	protected $version_option = 'event-tickets-plus-schema-version';
 

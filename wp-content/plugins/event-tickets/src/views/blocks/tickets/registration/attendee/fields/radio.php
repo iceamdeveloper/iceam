@@ -8,9 +8,11 @@
  *
  * See more documentation about our Blocks Editor templating system.
  *
- * @link {INSERT_ARTCILE_LINK_HERE}
+ * @link {INSERT_ARTICLE_LINK_HERE}
  *
- * @version 4.9
+ * @since 4.9
+ * @since 4.10.2 Use md5() for field name slugs
+ * @version 4.10.2
  *
  */
 $field         = $this->get( 'field' );
@@ -42,7 +44,7 @@ $slug          = $field['slug'];
 	<div class="tribe-options">
 		<?php
 		foreach ( $options as $option ) {
-			$option_slug = sanitize_title( $option );
+			$option_slug = md5( sanitize_title( $option ) );
 			$option_id = "tribe-tickets-meta_{$slug}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}" ;
 			?>
 			<label for="<?php echo esc_attr( $option_id ); ?>" class="tribe-tickets-meta-field-header">

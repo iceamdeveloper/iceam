@@ -6,9 +6,12 @@
  *
  *     [your-theme]/tribe-events/tickets-plus/orders-edit-meta.php
  *
- * @version 4.4.3
+ * @since 4.4.3
+ * @since 4.10.2 Set global for whether a ticket has any meta fields to show
+ * @version 4.10.2
  *
  */
+global $tribe_my_tickets_have_meta;
 $ticket = get_post( $attendee['product_id'] );
 
 if ( empty( $ticket ) ) {
@@ -21,6 +24,7 @@ if ( empty( $ticket ) ) {
 
 $meta = Tribe__Tickets_Plus__Main::instance()->meta();
 if ( $meta->meta_enabled( $ticket->ID ) ) {
+	$tribe_my_tickets_have_meta = true;
 	?>
 	<div class="tribe-event-tickets-plus-meta" id="tribe-event-tickets-plus-meta-<?php echo esc_attr( $ticket->ID ); ?>" data-ticket-id="<?php echo esc_attr( $ticket->ID ); ?>">
 		<a class="attendee-meta toggle show"><?php esc_html_e( 'Toggle attendee info', 'event-tickets-plus' ); ?></a>

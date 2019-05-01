@@ -83,6 +83,7 @@ class Messages extends \Aelia\WC\Messages {
 		$this->add_message(Definitions::ERR_SITE_NOT_ACTIVE,
 											 __('Could not find an active license for the specified site', $this->text_domain));
 
+		
 		// Add message to inform customers about the new licensing system
 		// @since 1.9.10.171201
 		$this->add_message(
@@ -104,5 +105,6 @@ class Messages extends \Aelia\WC\Messages {
 								 'ready to answer any question you might have.', Definitions::TEXT_DOMAIN),
 							Definitions::URL_SUPPORT)
 		);
+		
 	}
 }

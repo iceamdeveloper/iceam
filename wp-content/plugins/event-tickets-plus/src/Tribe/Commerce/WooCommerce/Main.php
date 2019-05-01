@@ -273,8 +273,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_action( 'init', array( $this, 'register_resources' ) );
 		add_action( 'add_meta_boxes', array( $this, 'woocommerce_meta_box' ) );
 		add_action( 'before_delete_post', array( $this, 'handle_delete_post' ) );
-		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'generate_tickets' ) );
-		add_action( 'woocommerce_order_status_changed', array( $this, 'generate_tickets' ), 12 );
+		add_action( 'woocommerce_order_status_changed', array( $this, 'delayed_ticket_generation' ), 12, 3 );
+		add_action( 'tribe_wc_delayed_ticket_generation', array( $this, 'generate_tickets' ) ) ;
 		add_action( 'woocommerce_order_status_changed', array( $this, 'reset_attendees_cache' ) );
 		add_action( 'woocommerce_email_header', array( $this, 'maybe_add_tickets_msg_to_email' ), 10, 2 );
 		add_action( 'tribe_events_tickets_metabox_edit_advanced', array( $this, 'do_metabox_advanced_options' ), 10, 2 );
@@ -316,6 +316,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_filter( 'tribe_tickets_get_ticket_max_purchase', array( $this, 'filter_ticket_max_purchase' ), 10, 2 );
 
 		tribe_singleton( 'commerce.woo.order.refunded', 'Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Refunded' );
+
+		add_filter( 'tribe_attendee_registration_form_classes', [ $this, 'tribe_attendee_registration_form_class' ] );
 	}
 
 	public function register_resources() {
@@ -468,7 +470,19 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return string
 	 */
 	public function get_cart_url() {
-		return wc_get_cart_url();
+
+		$cart_url = wc_get_cart_url();
+
+ 		/**
+		 * `tribe_tickets_woo_cart_url`
+		 * Allow to filter the URL
+		 *
+		 * @since 4.10
+		 *
+		 * @param string $cart_url WooCommerce Cart URL.
+		 */
+		return apply_filters( 'tribe_tickets_woo_cart_url', $cart_url );
+
 	}
 
 	/**
@@ -560,6 +574,21 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		register_post_type( $this->attendee_object, $args );
 	}
 
+	public static function is_wc_paypal_gateway_active() {
+		// Add PayPal delay settings if PayPal is active and enabled.
+		$woo_gateways = WC()->payment_gateways->get_available_payment_gateways();
+		$pp_gateways  = array( 'paypal', 'ppec_paypal' );
+
+		foreach ( $pp_gateways as $gateway ) {
+			// check if gateway exists and is enabled
+			if ( ! empty( $woo_gateways[ $gateway ] ) && $woo_gateways[ $gateway ]->enabled ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
 	/**
 	 * Checks if a Order has Tickets
 	 *
@@ -607,6 +636,44 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
+	 * Adds a 5-second delay to ticket generation to help protect against race conditions.
+	 *
+	 * @since 4.9.2
+	 *
+	 * @param int    $order_id The id of the ticket order.
+	 * @param string $unused_from     Deprecated. The status the order is transitioning from.
+	 * @param string $unused_to       Deprecated. The status the order is transitioning to.
+	 */
+	public function delayed_ticket_generation( $order_id, $unused_from = null, $unused_to = null ) {
+		// If we're not using PayPal, we don't need to delay, just generate tickets
+		if ( 'paypal' !== strtolower( get_post_meta( $order_id, '_payment_method', true ) ) ) {
+			$this->generate_tickets( $order_id );
+			return;
+		}
+
+		/**
+		 * Allows users to customize the delay put in place
+		 *
+		 * @since 4.9.2
+		 *
+		 * @param string A date/time string. Note it must be positive!
+		 */
+		$ticket_delay = apply_filters( 'tribe_ticket_generation_delay', '+5 seconds', $order_id );
+		$timestamp = strtotime( $ticket_delay );
+
+		// In case the timestamp is borked, fall back to 5 seconds
+		if ( ! $timestamp || $timestamp < time() ) {
+			$timestamp = strtotime( '+5 seconds' );
+		}
+
+		if ( self::is_wc_paypal_gateway_active() && tribe_get_option( 'tickets-woo-paypal-delay', false ) ) {
+			wp_schedule_single_event( $timestamp, 'tribe_wc_delayed_ticket_generation', array( $order_id ) );
+		} else {
+			$this->generate_tickets( $order_id );
+		}
+	}
+
+	/**
 	 * Generates the tickets.
 	 *
 	 * This happens only once, as soon as an order reaches a suitable status (which is set in
@@ -615,16 +682,26 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @param int $order_id
 	 */
 	public function generate_tickets( $order_id ) {
+
+		/**
+		 * Hook before WooCommerce Tickets are generated in Event Tickets Plus.
+		 *
+		 * @since TBD
+		 *
+		 * @param int $order_id The order ID.
+		 */
+		do_action( 'tribe_tickets_plus_woo_before_generate_tickets', $order_id );
+
 		$order_status = get_post_status( $order_id );
 
 		$generation_statuses = (array) tribe_get_option(
 			'tickets-woo-generation-status',
-			$this->settings->get_default_ticket_dispatch_statuses()
+			$this->settings->get_default_ticket_generation_statuses()
 		);
 
 		$dispatch_statuses = (array) tribe_get_option(
 			'tickets-woo-dispatch-status',
-			$this->settings->get_default_ticket_generation_statuses()
+			$this->settings->get_default_ticket_dispatch_statuses()
 		);
 
 		/**
@@ -735,10 +812,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 						/**
 						 * Action fired when an attendee ticket is generated
 						 *
-						 * @param $attendee_id       ID of attendee ticket
-						 * @param $order_id          WooCommerce order ID
-						 * @param $product_id        Product ID attendee is "purchasing"
-						 * @param $order_attendee_id Attendee # for order
+						 * @param int $attendee_id       ID of attendee ticket
+						 * @param int $order_id          WooCommerce order ID
+						 * @param int $product_id        Product ID attendee is "purchasing"
+						 * @param int $order_attendee_id Attendee # for order
 						 */
 						do_action( 'event_tickets_woocommerce_ticket_created', $attendee_id, $order_id, $product_id, $order_attendee_id );
 
@@ -759,11 +836,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				/**
 				 * Action fired when a WooCommerce has had attendee tickets generated for it
 				 *
-				 * @param $product_id RSVP ticket post ID
-				 * @param $order_id   ID of the WooCommerce order
-				 * @param $quantity   Quantity ordered
+				 * @param int $product_id RSVP ticket post ID
+				 * @param int $order_id   ID of the WooCommerce order
+				 * @param int $quantity   Quantity ordered
+				 * @param int $post_id    ID of event
 				 */
-				do_action( 'event_tickets_woocommerce_tickets_generated_for_product', $product_id, $order_id, $quantity );
+				do_action( 'event_tickets_woocommerce_tickets_generated_for_product', $product_id, $order_id, $quantity, $post_id );
 
 				update_post_meta( $order_id, $this->order_has_tickets, '1' );
 			}
@@ -921,6 +999,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				'ID'           => $ticket->ID,
 				'post_excerpt' => $ticket->description,
 				'post_title'   => $ticket->name,
+				'menu_order'   => $ticket->menu_order,
 			);
 
 			$ticket->ID = wp_update_post( $args );
@@ -1167,6 +1246,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return bool
 	 */
 	public function delete_ticket( $post_id, $ticket_id ) {
+
 		// Ensure we know the event and product IDs (the event ID may not have been passed in)
 		if ( empty( $post_id ) ) {
 			$post_id = get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
@@ -1188,18 +1268,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$delete = wp_delete_post( $ticket_id, true );
 		}
 
-		if ( is_wp_error( $delete ) ) {
+		if ( is_wp_error( $delete ) || ! isset( $delete->ID ) ) {
 			return false;
 		}
 
-		/* Class exists check exists to avoid bumping Tribe__Tickets_Plus__Main::REQUIRED_TICKETS_VERSION
-		 * during a minor release; as soon as we are able to do that though we can remove this safeguard.
-		 *
-		 * @todo remove class_exists() check once REQUIRED_TICKETS_VERSION >= 4.2
-		 */
-		if ( class_exists( 'Tribe__Tickets__Attendance' ) ) {
-			Tribe__Tickets__Attendance::instance( $post_id )->increment_deleted_attendees_count();
-		}
+		Tribe__Tickets__Attendance::instance( $post_id )->increment_deleted_attendees_count();
 
 		// Re-stock the product inventory (on the basis that a "seat" has just been freed)
 		$this->increment_product_inventory( $product_id );
@@ -1394,9 +1467,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			return;
 		}
 
-		set_transient( $this->get_cart_transient_key(), wc_get_checkout_url() );
+		$cart_url = $this->get_cart_url();
+ 		set_transient( $this->get_cart_transient_key(), $cart_url );
 
-		wp_safe_redirect( wc_get_checkout_url() );
+ 		wp_safe_redirect( $cart_url );
 		tribe_exit();
 	}
 
@@ -2062,12 +2136,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$order_warning      = false;
 
 		// Warning flag for refunded, cancelled and failed orders
-		switch ( $order_status ) {
-			case 'refunded':
-			case 'cancelled':
-			case 'failed':
-				$order_warning = true;
-				break;
+		$warning_statues = tribe( 'tickets.status' )->get_statuses_by_action( 'warning', 'woo' );
+		if ( in_array( $status, $warning_statues, true ) ) {
+			$order_warning = true;
 		}
 
 		// Warning flag where the order post was trashed
@@ -2171,7 +2242,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return void
 	 */
 	public function purge_attendees_transient( $attendee_id ) {
-
 		$event_id = get_post_meta( $attendee_id, $this->attendee_event_key, true );
 		if ( ! $event_id ) {
 			return;
@@ -2918,6 +2988,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			// Get the event this tickets is for
 			$post_id = get_post_meta( $product_id, $this->event_key, true );
 
+			/**
+			 * Action fired when an attendee data is updated when on the cache.
+			 *
+			 * @since 4.10.1.2
+			 *
+			 * @param int $post_id ID of the event associated with the order.
+			 * @param int $order_id ID of the order attached to this event.
+			 * @param array $item Details of the order
+			 */
+			do_action( 'tribe_tickets_plus_woo_reset_attendee_cache', $post_id, $order_id, $item );
+
 			if ( ! empty( $post_id ) ) {
 				// Delete the attendees cache for that event
 				tribe( 'post-transient' )->delete( $post_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
@@ -2949,5 +3030,18 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				Tribe__Events__API::update_event_cost( $event->ID );
 			}
 		}
+	}
+
+	/**
+	 * Add our class suffix to the list of classes for the attendee registration form
+	 * This gets appended to `tribe-block__tickets__item__attendee__fields__form--` so keep it short and sweet
+	 *
+	 * @param array $classes existing array of classes
+	 * @return array $classes with our class added
+	 */
+	public function tribe_attendee_registration_form_class( $classes ) {
+		$classes[ $this->attendee_object ] = 'woo';
+
+		return $classes;
 	}
 }

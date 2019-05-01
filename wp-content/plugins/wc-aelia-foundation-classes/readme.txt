@@ -3,11 +3,11 @@ Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
 Requires at least: 3.6
-Tested up to: 4.9
+Tested up to: 5.0
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-WC requires at least: 2.4
-WC tested up to: 3.3
+WC requires at least: 2.6
+WC tested up to: 3.5.4
 
 Adds a set of convenience classes that can simplify the development of other plugins for WooCommerce.
 
@@ -66,6 +66,15 @@ Should you have any question about this product, please feel free to [contact us
 For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
 == Changelog ==
+
+= 2.0.4.190201 =
+* Fix - Removed notices caused by IP2Location logging.
+
+= 2.0.3.190129 =
+* Tweak - Added logging to simplify debugging of the geolocation feature.
+
+= 2.0.2.181203 =
+* Tweak - Added "httponly" option to `Aelia_SessionManager::set_cookie()`.
 
 = 2.0.1.180821 =
 * Feature - Added new method `Order::get_total_refunded_in_base_currency`;

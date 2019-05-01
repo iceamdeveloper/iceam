@@ -122,6 +122,8 @@ class Tribe__Tickets_Plus__Meta__Storage {
 
 		$transient   = self::TRANSIENT_PREFIX . $id;
 		$ticket_meta = $_POST[ self::META_DATA_KEY ];
+		$ticket_meta = Tribe__Utils__Array::escape_multidimensional_array( $ticket_meta );
+		$ticket_meta = $this->remove_empty_values_recursive( $ticket_meta );
 
 		$stored_ticket_meta = get_transient( $transient );
 
@@ -345,5 +347,33 @@ class Tribe__Tickets_Plus__Meta__Storage {
 		if ( 'product' === get_post_type( $id ) && $valid_instance ) {
 			$session->__unset( self::HASH_COOKIE_KEY );
 		}
+	}
+
+	/**
+	 * Recursively Process Array to Remove Empty Values, but Keep 0
+	 *
+	 * @since TBD
+	 *
+	 * @param array $input a multidimensional array of attendee meta
+	 *
+	 * @return array a multidimensional array of attendee meta with no empty values
+	 */
+	public function remove_empty_values_recursive( $input ) {
+
+		foreach ( $input as &$value ) {
+			if ( is_array( $value ) ) {
+				$value = $this->remove_empty_values_recursive( $value );
+			}
+		}
+
+		// reset array for current to work correctly
+		reset( $input );
+		if ( is_array( current( $input ) ) ) {
+			// if current item is an array return it to prevent notices of string to array
+			return array_filter( $input );
+		}
+
+		// remove empty values, but keep 0 as a value
+		return array_filter( $input, 'strlen' );
 	}
 }

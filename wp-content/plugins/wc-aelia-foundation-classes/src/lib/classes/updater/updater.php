@@ -287,11 +287,11 @@ abstract class Updater extends Base_Class {
 			));
 			$updater_class = isset($plugin_updaters_map[$product_type]) ? $plugin_updaters_map[$product_type] : '';
 			if(empty($updater_class)) {
-				$this->logger->error(__('Updater could not be loaded. Invalid product type ' .
-																'specified.', Definitions::TEXT_DOMAIN),
-														 array(
-															 'Product Type' => $product_type
-														 ));
+				// $this->logger->error(__('Updater could not be loaded. Invalid product type ' .
+				// 												'specified.', Definitions::TEXT_DOMAIN),
+				// 										 array(
+				// 											 'Product Type' => $product_type
+				// 										 ));
 
 				$error_msg = sprintf(__('Aelia Updater - Updater could not be loaded. ' .
 																'Invalid product type specified: "%s". Please ' .

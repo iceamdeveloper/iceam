@@ -16,7 +16,7 @@ use Aelia\WC\AFC\Messages;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.0.1.180821';
+	public static $version = '2.0.4.190201';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -193,6 +193,7 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 * @since 1.9.10.171201
 	 */
 	public function show_admin_messages() {
+		
 		// Inform admins about the new licensing system
 		// @since 1.9.10.171201
 		Messages::admin_message(
@@ -204,6 +205,7 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 				'permissions' => 'manage_woocommerce',
 				'message_header' => __('New licensing system for your Aelia plugins', self::$text_domain),
 		));
+		
 	}
 
 	/**
@@ -213,6 +215,12 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 * @since 1.9.12.180104
 	 */
 	protected function should_initialize_updaters() {
+		// Disable updaters if the global DISABLE_AFC_UPDATERS is set
+		// @since 2.0.2.181203
+		if(defined('DISABLE_AFC_UPDATERS') && DISABLE_AFC_UPDATERS) {
+			return false;
+		}
+
 		// If current user cannot manage the plugins, don't load the updaters
 		if(!current_user_can('update_plugins')) {
 			return false;
@@ -233,8 +241,9 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 * @since 1.7.0.150818
 	 */
 	public function initialize_updaters() {
+		
 		if(!$this->should_initialize_updaters()) {
-			//return;
+			return;
 		}
 		$plugins_to_update = apply_filters('wc_aelia_afc_register_plugins_to_update', array(
 			// Free plugins
@@ -253,6 +262,7 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 				$updater->check_for_updates();
 			}
 		}
+		
 	}
 
 	/**
@@ -392,6 +402,24 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 			// Add the Ajax commands provided by the plugin, in
 			// command => callable format
 		));
+	}
+
+	/**
+	 * Returns the directory in which the plugin is stored. Only the base name of
+	 * the directory is returned (i.e. without path).
+	 *
+	 * @return string
+	 * @since
+	 */
+	public function plugin_dir() {
+		// If a 3rd party specified a directory for the AFC
+		// plugin, use it
+		// @since 2.0.2.181203
+		if(defined('AFC_PLUGIN_DIR')) {
+			$this->plugin_directory = AFC_PLUGIN_DIR;
+		}
+
+		return parent::plugin_dir();
 	}
 }
 class_alias('\Aelia\WC\WC_AeliaFoundationClasses', 'WC_AeliaFoundationClasses');

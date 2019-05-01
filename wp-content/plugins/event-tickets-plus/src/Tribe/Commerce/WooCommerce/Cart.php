@@ -13,9 +13,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	public function hook() {
 		parent::hook();
 
-		add_filter( 'tribe_tickets_attendee_registration_checkout_url', array( $this, 'maybe_filter_attendee_registration_checkout_url' ) );
-		add_filter( 'woocommerce_get_checkout_url', array( $this, 'maybe_filter_checkout_url_to_attendee_registration' ) );
-		add_filter( 'tribe_tickets_tickets_in_cart', array( $this, 'get_tickets_in_cart' ) );
+		add_filter( 'tribe_tickets_attendee_registration_checkout_url', [ $this, 'maybe_filter_attendee_registration_checkout_url' ], 8 );
+		add_filter( 'woocommerce_get_checkout_url', [ $this, 'maybe_filter_checkout_url_to_attendee_registration' ], 12 );
+		add_filter( 'tribe_tickets_tickets_in_cart', [ $this, 'get_tickets_in_cart' ] );
+		add_filter( 'tribe_providers_in_cart', [ $this, 'providers_in_cart' ], 12 );
+		add_filter( 'tribe_tickets_woo_cart_url', [ $this, 'add_provider_to_cart_url' ] );
 	}
 
 	/**
@@ -39,6 +41,24 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	}
 
 	/**
+	 * Hooked to tribe_providers_in_cart adds WC as a provider for checks if there are EDD items in the "cart"
+	 *
+	 * @since 4.10.2
+	 *
+	 * @param array $providers
+	 * @return array List of providers with EDD optionally added
+	 */
+	public function providers_in_cart( $providers ) {
+		if ( empty( $this->get_tickets_in_cart() ) ) {
+			return $providers;
+		}
+
+		$providers[] = 'WC';
+
+		return $providers;
+	}
+
+	/**
 	 * Hooked to the woocommerce_get_checkout_url filter to hijack URL if on cart and there
 	 * are attendee registration fields that need to be filled out
 	 *
@@ -49,6 +69,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	 * @return null|string
 	 */
 	public function maybe_filter_checkout_url_to_attendee_registration( $checkout_url ) {
+
+		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $commerce_woo */
+		$commerce_woo = tribe( 'tickets-plus.commerce.woo' );
+
+		if ( $commerce_woo->attendee_object !== tribe_get_request_var( 'provider' ) ) {
+			return $checkout_url;
+		}
+
 		$on_registration_page = tribe( 'tickets.attendee_registration' )->is_on_page();
 
 		// we only want to override if we are on the cart page or the attendee registration page
@@ -56,18 +84,32 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 			return $checkout_url;
 		}
 
-		$quantity_by_ticket_id = $this->get_tickets_in_cart();
-		$is_stored_meta_up_to_date = tribe( 'tickets-plus.meta.contents' )->is_stored_meta_up_to_date( $quantity_by_ticket_id );
+		$cart_tickets  = $this->get_tickets_in_cart();
+		$cart_has_meta = Tribe__Tickets_Plus__Main::instance()->meta()->cart_has_meta( $cart_tickets );
 
-		// if the we are on the attendee registration page and there aren't any required
-		// fields that still need to be filled out, we don't want to hijack
-		if ( $on_registration_page && $is_stored_meta_up_to_date ) {
-			return $checkout_url;
-		} elseif ( $on_registration_page || $is_stored_meta_up_to_date ) {
+		// If on registration page or cart page and cart has meta, return checkout url
+		if ( $on_registration_page || ( is_cart() && ! $cart_has_meta ) ) {
 			return $checkout_url;
 		}
 
-		return tribe( 'tickets.attendee_registration' )->get_url();
+		$url = add_query_arg( 'provider', $commerce_woo->attendee_object, tribe( 'tickets.attendee_registration' )->get_url() );
+		return $url;
+	}
+
+	/**
+	 * Adds a provder parameter to the cart URL to assist with
+	 * keeping tickets from different providers separate.
+	 *
+	 * @since TBD
+	 *
+	 * @param string $url Cart URL.
+	 *
+	 * @return string modified cart url
+	 */
+	public function add_provider_to_cart_url( $url ) {
+		$url = add_query_arg( 'provider', tribe( 'tickets-plus.commerce.woo' )->attendee_object, $url );
+
+		return $url;
 	}
 
 	/**

@@ -19,6 +19,7 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 
 		my.$tribe_tickets
 			.on( 'change', '.ticket-attendee-info-dropdown', my.event.select_saved_fieldset )
+			.on( 'change', '.save_attendee_fieldset', my.event.toggle_linked_form )
 			.on( 'click', '.meta-postbox .hndle, .meta-postbox .handlediv', my.event.click_postbox )
 			.on( 'click', 'a.add-attendee-field', my.event.add_field )
 			.on( 'click', 'a.delete-attendee-field', my.event.remove_field )

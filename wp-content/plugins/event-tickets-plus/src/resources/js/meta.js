@@ -5,6 +5,18 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 (function ( window, document, $, my ) {
 	'use strict';
 
+	my.selectors = {
+		field: {
+			text: '.tribe-tickets-meta-text',
+			checkbox: '.tribe-tickets-meta-checkbox',
+			select: '.tribe-tickets-meta-select',
+			radio: '.tribe-tickets-meta-radio',
+		},
+		quantity: 'input.tribe-tickets-quantity',
+		name: 'input.tribe-tickets-full-name',
+		email: 'input.tribe-tickets-email',
+	};
+
 	/**
 	 * Initializes the meta functionality
 	 */
@@ -20,8 +32,9 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		this.$ticket_form = $( '.tribe-events-tickets' ).closest( '.cart' );
 
 		this.$ticket_form
+			.on( 'change', '.tribe-tickets-order_status-row select', this.event.status_changed )
 			.on( 'change', '.quantity input, .quantity select', this.event.quantity_changed )
-			.on( 'keyup', '.quantity input', this.event.quantity_changed )
+			.on( 'keyup input', '.quantity input', this.event.quantity_changed )
 			.on( 'submit', this.event.handle_submission );
 
 		this.$ticket_form.find( '.quantity input:not([type="hidden"]), .quantity select' ).each( function() {
@@ -29,6 +42,13 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		} );
 
 		$( '.tribe-event-tickets-plus-meta-fields' ).on( 'keydown', '.tribe-tickets-meta-number input', this.event.limit_number_field_typing );
+
+		// Block editor FE event handlers
+		this.$rsvp_block = $( '.tribe-block__rsvp' );
+
+		this.$rsvp_block
+			.on( 'change', '.tribe-block__rsvp__number-input input', this.event.block_quantity_changed )
+			.on( 'keyup', '.tribe-block__rsvp__number-input input', this.event.block_quantity_changed );
 	};
 
 	my.render_fields = function( ticket_id, num ) {
@@ -63,9 +83,22 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	};
 
 	my.set_quantity = function( $field ) {
-		var quantity = parseInt( $field.val(), 10 );
-		var ticket_id = parseInt( $field.closest( 'td' ).data( 'product-id' ), 10 );
-		var template_html = $( document.getElementById( 'tribe-event-tickets-plus-meta-fields-tpl-' + ticket_id ) ).html();
+		var going = $field.closest( 'form' ).find( '.tribe-tickets-order_status-row select' ).val() === 'yes';
+
+		if ( going ) {
+			var quantity = parseInt( $field.val(), 10 );
+			var ticket_id = parseInt( $field.closest( 'td' ).data( 'product-id' ), 10 );
+
+			my.render_fields( ticket_id, quantity );
+		}
+	};
+
+	/**
+	 * Set quantity for RSVP block
+	 */
+	my.block_set_quantity = function( $field, going ) {
+		var quantity = going ? parseInt( $field.val(), 10 ) : 0;
+		var ticket_id = parseInt( $field.closest( 'form' ).data( 'product-id' ), 10 );
 
 		my.render_fields( ticket_id, quantity );
 	};
@@ -76,14 +109,60 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	};
 
 	/**
-	 * Validates the required fields for custom meta
+	 * Validates the required fields for attendee registration in RSVP block
 	 */
-	my.validate_submission = function() {
-		return true;
+	my.validate_meta = function( $form ) {
+		var is_valid = true;
+		var $fields = $form.find( '.tribe-tickets-meta-required' );
+
+		$fields.each( function() {
+			var $field = $( this );
+			var val = '';
+
+			if (
+				$field.is( my.selectors.field.radio )
+				|| $field.is( my.selectors.field.checkbox )
+			) {
+				val = $field.find( 'input:checked' ).length ? 'checked' : '';
+			} else if ( $field.is( my.selectors.field.select ) ) {
+				val = $field.find( 'select' ).val();
+			} else {
+				val = $field.find( 'input, textarea' ).val().trim();
+			}
+
+			if ( 0 === val.length ) {
+				is_valid = false;
+			}
+		} );
+
+		return is_valid;
 	};
 
 	my.event.quantity_changed = function() {
 		my.set_quantity( $( this ) );
+	};
+
+	/**
+	 * Event handler for RSVP when status has changed
+	 */
+	my.event.status_changed = function() {
+		var $quantity = my.$ticket_form.find( '.quantity' );
+		var going = $( this ).val() === 'yes';
+		var ticket_id = parseInt( $quantity.data( 'product-id' ), 10 );
+		var quantity = going ? parseInt( $quantity.find( '.tribe-ticket-quantity' ).val() ) : 0;
+
+		my.render_fields( ticket_id, quantity );
+	};
+
+	/**
+	 * Event handler for RSVP block when quantity has changed
+	 */
+	my.event.block_quantity_changed = function() {
+		var going = my.$rsvp_block
+			.find( '.tribe-block__rsvp__status .tribe-active' )
+			.hasClass( 'tribe-block__rsvp__status-button--going' );
+
+		my.block_set_quantity( $( this ), going );
 	};
 
 	/**
@@ -119,13 +198,14 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 * Validates required meta fields and stores meta data
 	 */
 	my.event.handle_submission = function( e ) {
-		if ( ! my.validate_submission() ) {
+		var $form = $( this ).closest( 'form' );
+
+		if ( ! my.validate_meta( $form ) ) {
 			e.preventDefault();
-			var $form = $( this ).closest( 'form' );
 
 			$form.addClass( 'tribe-event-tickets-plus-meta-missing-required' );
 
-			$( 'html, body').animate({
+			$( 'html, body' ).animate( {
 				scrollTop: $form.offset().top
 			}, 300 );
 			return;

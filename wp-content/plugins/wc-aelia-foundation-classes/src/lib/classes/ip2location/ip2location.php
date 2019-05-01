@@ -243,6 +243,12 @@ class IP2Location extends Base_Class {
 	public function get_country_code($ip_address){
 		//$ip_address = @gethostbyname($host);
 
+		// Log the attempt to resolve the IP address to a country code
+		// @since 2.0.3.190129
+		$this->logger->debug(__('Attempting to detect country from IP address.', WC_AeliaFoundationClasses::$text_domain), array(
+			'IP Address' => $ip_address,
+		));
+
 		// Allow 3rd parties to set the country code, if they wish
 		$country_code = apply_filters('wc_aelia_ip2location_before_get_country_code', '', $ip_address);
 
@@ -261,6 +267,14 @@ class IP2Location extends Base_Class {
 				$country_code = $city->country->isoCode;
 			}
 		}
+
+		// Log the detected country code
+		// @since 2.0.3.190129
+		$this->logger->debug(__('Country detected.', WC_AeliaFoundationClasses::$text_domain), array(
+			'IP Address' => $ip_address,
+			'Country Code' => $country_code,
+		));
+
 		return apply_filters('wc_aelia_ip2location_country_code', $country_code, $ip_address);
 	}
 
@@ -317,6 +331,12 @@ class IP2Location extends Base_Class {
 	 * @since 1.6.0.150724
 	 */
 	public function get_state($ip_address) {
+		// Log the attempt to resolve the IP address to a state code
+		// @since 2.0.3.190129
+		$this->logger->debug(__('Attempting to detect state from IP address.', WC_AeliaFoundationClasses::$text_domain), array(
+			'IP Address' => $ip_address,
+		));
+
 		// Allow 3rd parties to set the state/county code, if they wish
 		$state_code = apply_filters('wc_aelia_ip2location_before_get_state_code', '', $ip_address);
 
@@ -329,6 +349,14 @@ class IP2Location extends Base_Class {
 				$state_code = $city->mostSpecificSubdivision->isoCode;
 			}
 		}
+
+		// Log the detected state code
+		// @since 2.0.3.190129
+		$this->logger->debug(__('State detected.', WC_AeliaFoundationClasses::$text_domain), array(
+			'IP Address' => $ip_address,
+			'State Code' => $state_code,
+		));
+
 		return apply_filters('wc_aelia_ip2location_state', $state_code, $ip_address, $city);
 	}
 
@@ -352,8 +380,17 @@ class IP2Location extends Base_Class {
 	 * @return string
 	 */
 	public function get_visitor_ip_address() {
+		// Log the attempt to resolve the IP address
+		// @since 2.0.3.190129
+		$this->logger->debug(__('Attempting to fetch IP address of visitor.', WC_AeliaFoundationClasses::$text_domain), array(
+			'$_SERVER[HTTP_CLIENT_IP]' => @$_SERVER['HTTP_CLIENT_IP'],
+			'$_SERVER[HTTP_X_FORWARDED_FOR]' => @$_SERVER['HTTP_X_FORWARDED_FOR'],
+			'$_SERVER[HTTP_X_REAL_IP]' => @$_SERVER['HTTP_X_REAL_IP'],
+			'$_SERVER[REMOTE_ADDR]' => @$_SERVER['REMOTE_ADDR'],
+		));
+
 		// Parse the proxy headers that might contain the real IP address
-		// @since 
+		// @since
 		foreach(array('HTTP_CLIENT_IP', 'HTTP_X_FORWARDED_FOR', 'HTTP_X_REAL_IP', 'REMOTE_ADDR') as $header_key) {
 			if(!empty($_SERVER[$header_key])) {
 				// Store the original value, so that we can pass it to a filter
@@ -366,6 +403,12 @@ class IP2Location extends Base_Class {
 					$ip_address = trim($ip_address);
 					// Take the first valid IP address and return it
 					if(filter_var($ip_address, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE) !== false) {
+						// Log the detected IP address
+						// @since 2.0.3.190129
+						$this->logger->debug(__('Found valid IP address.', WC_AeliaFoundationClasses::$text_domain), array(
+							'Visitor IP Address' => $ip_address,
+						));
+
 						return apply_filters('wc_aelia_visitor_ip', $ip_address, $forwarded_for);
 					}
 				}

@@ -37,7 +37,10 @@
 
 				</div>
 				<div class="welcome-panel-column welcome-panel-middle">
-					<h3><?php esc_html_e( 'Sales by Ticket', 'event-tickets-plus' ); ?></h3>
+					<h3>
+						<?php esc_html_e( 'Sales by Ticket Type', 'event-tickets-plus' ); ?>
+						<?php echo $order_overview->get_sale_by_ticket_tooltip(); ?>
+					</h3>
 					<?php
 					foreach ( $tickets_sold as $ticket_sold ) {
 
@@ -46,76 +49,77 @@
 							continue;
 						}
 
-						$price        = '';
-						$sold_message = '';
+						echo $order_overview->get_ticket_sale_infomation( $ticket_sold, $event_id );
 
-						if ( ! $ticket_sold['has_stock'] ) {
-							$sold_message = sprintf( __( 'Sold %d', 'event-tickets-plus' ), esc_html( $ticket_sold['sold'] ) );
-						} else {
-							$sold_message = sprintf( __( 'Sold %d of %d', 'event-tickets-plus' ), esc_html( $ticket_sold['sold'] ), esc_html( $ticket_sold['ticket']->capacity() ) );
-						}
-
-						if ( $ticket_sold['ticket']->price ) {
-							$price = ' (' . tribe_format_currency( number_format( $ticket_sold['ticket']->price, 2 ), $event_id ) . ')';
-						}
-
-						$sku = '';
-						if ( $ticket_sold['sku'] ) {
-							$sku = 'title="' . sprintf( esc_html__( 'SKU: (%s)', 'event-tickets-plus' ), esc_html( $ticket_sold['sku'] ) ) . '"';
-						}
-						?>
-						<div class="tribe-event-meta tribe-event-meta-tickets-sold-itemized">
-							<strong <?php echo $sku; ?>><?php echo esc_html( $ticket_sold['ticket']->name . $price ); ?>:</strong>
-							<?php
-							echo esc_html( $sold_message );
-							?>
-						</div>
-						<?php
 					}
 					?>
 				</div>
 				<div class="welcome-panel-column welcome-panel-last alternate">
 
-					<?php
-
-					if ( $total_sold ) {
-						$total_sold = absint( $total_sold );
-					}; ?>
-
 					<div class="totals-header">
 						<h3>
 							<?php
+							$completed_status = $order_overview->get_completed_status_class();
 							$totals_header = sprintf(
-								__( 'Total Sales: %1$s (%2$s)', 'event-tickets-plus' ),
-								tribe_format_currency( number_format( $event_revenue, 2 ), $event_id ),
-								$total_sold
+								'%1$s: %2$s (%3$s)',
+								__( 'Total Ticket Sales', 'event-tickets-plus' ),
+								tribe_format_currency( number_format( $completed_status->get_line_total(), 2 ), $event_id ),
+								$completed_status->get_qty()
 							);
 							echo esc_html( $totals_header );
+							echo $order_overview->get_total_sale_tooltip();
 							?>
 						</h3>
+
+						<div class="order-total">
+							<?php
+							$totals_header = sprintf(
+								'%1$s: %2$s (%3$s)',
+								__( 'Total Tickets Ordered', 'event-tickets-plus' ),
+								tribe_format_currency( number_format( $order_overview->get_line_total(), 2 ), $event_id ),
+								$order_overview->get_qty()
+							);
+							echo esc_html( $totals_header );
+							echo $order_overview->get_total_order_tooltip();
+							?>
+						</div>
 					</div>
 
 					<div id="sales_breakdown_wrapper" class="tribe-event-meta-note">
+
+						<?php
+						/**
+						 * Add Completed Status First and Skip in Loop
+						 */
+						?>
 						<div>
-							<strong><?php esc_html_e( 'Completed:', 'event-tickets-plus' ); ?></strong>
-							<?php echo esc_html( tribe_format_currency( number_format( $tickets_breakdown['wc-completed']['_line_total'], 2 ), $event_id ) ); ?>
-							<span id="total_issued">(<?php echo esc_html( $tickets_breakdown['wc-completed']['_qty'] ); ?>)</span>
+							<strong><?php esc_html_e( 'Completed', 'event-tickets-plus' ); ?>:</strong>
+							<?php echo esc_html( tribe_format_currency( number_format( $completed_status->get_line_total(), 2 ), $event_id ) ); ?>
+							<span id="total_issued">(<?php echo esc_html( $completed_status->get_qty() ); ?>)</span>
 						</div>
-						<div>
-							<strong><?php esc_html_e( 'Processing:', 'event-tickets-plus' ); ?></strong>
-							<?php echo esc_html( tribe_format_currency( number_format( $tickets_breakdown['wc-processing']['_line_total'], 2 ), $event_id ) ); ?>
-							<span id="total_pending">(<?php echo esc_html( $tickets_breakdown['wc-processing']['_qty'] ); ?>)</span>
-						</div>
-						<div>
-							<strong><?php esc_html_e( 'Pending Payment:', 'event-tickets-plus' ); ?></strong>
-							<?php echo esc_html( tribe_format_currency( number_format( $tickets_breakdown['wc-pending']['_line_total'], 2 ), $event_id ) ); ?>
-							<span id="total_pending">(<?php echo esc_html( $tickets_breakdown['wc-pending']['_qty'] ); ?>)</span>
-						</div>
-						<div>
-							<strong><?php esc_html_e( 'Canceled:', 'event-tickets-plus' ); ?></strong>
-							<?php echo esc_html( tribe_format_currency( number_format( $tickets_breakdown['wc-cancelled']['_line_total'], 2 ), $event_id ) ); ?>
-							<span id="total_issued">(<?php echo esc_html( $tickets_breakdown['wc-cancelled']['_qty'] ); ?>)</span>
-						</div>
+
+						<?php
+						foreach ( $order_overview->statuses as $provider_key => $status ) {
+
+							// skip the completed order as we always display it above
+							if ( $order_overview->completed_status_id === $provider_key ) {
+								continue;
+							}
+
+							// do not show status if no tickets
+							if ( 0 >= (int) $status->get_qty() ) {
+								continue;
+							}
+							?>
+							<div>
+								<strong><?php esc_html_e( $status->name, 'event-tickets-plus' ); ?>:</strong>
+								<?php echo esc_html( tribe_format_currency( number_format( $status->get_line_total(), 2 ), $event_id ) ); ?>
+								<span id="total_issued">(<?php echo esc_html( $status->get_qty() ); ?>)</span>
+							</div>
+							<?php
+
+						}
+						?>
 						<div>
 							<strong><?php esc_html_e( 'Discounts:', 'event-tickets-plus' ); ?></strong>
 							<?php

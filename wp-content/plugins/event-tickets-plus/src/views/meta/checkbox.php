@@ -6,7 +6,9 @@
  *
  *     [your-theme]/tribe-events/meta/checkbox.php
  *
- * @version 4.5.5
+ * @since 4.5.5
+ * @since 4.10.2 Use md5() for field name slugs
+ * @version 4.10.2
  *
  */
 $options = null;
@@ -30,7 +32,8 @@ if ( ! $options ) {
 	</header>
 	<?php
 	foreach ( $options as $option ) {
-		$option_slug = sanitize_title( $option );
+
+		$option_slug = md5( sanitize_title( $option ) );
 		$option_id   = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attendee_id : '' ) . "_{$option_slug}";
 		$slug        = $this->slug . '_' . $option_slug;
 
@@ -40,7 +43,7 @@ if ( ! $options ) {
 				type="checkbox"
 				id="<?php echo esc_attr( $option_id ); ?>"
 				class="ticket-meta"
-				name="tribe-tickets-meta[<?php echo $attendee_id ?>][<?php echo esc_attr( $slug ); ?>]"
+				name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][<?php echo esc_attr( $slug ); ?>]"
 				value="<?php echo esc_attr( $option ); ?>"
 				<?php checked( true, in_array( $slug, $value ) ); ?>
 				<?php disabled( $this->is_restricted( $attendee_id ) ); ?>
@@ -52,4 +55,10 @@ if ( ! $options ) {
 		<?php
 	}
 	?>
+	<input
+		type="hidden"
+		name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][0]"
+		value=""
+		<?php disabled( $this->is_restricted( $attendee_id ) ); ?>
+	>
 </div>

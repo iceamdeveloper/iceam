@@ -18,7 +18,6 @@ class Tribe__Tickets_Plus__Editor extends Tribe__Tickets__Editor {
 		add_action( 'tribe_events_tickets_settings_content_before', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/fieldset/settings-capacity' ) );
 		add_action( 'tribe_events_tickets_settings_content', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/settings-attendees' ) );
 		add_action( 'tribe_events_tickets_capacity', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/total-capacity' ) );
-		add_filter( 'tribe_filter_attendee_order_link', array( $this, 'filter_attendee_order_link' ), 10, 2 );
 	}
 
 	/**
@@ -27,6 +26,7 @@ class Tribe__Tickets_Plus__Editor extends Tribe__Tickets__Editor {
 	 * By default the link would point to PayPal ticket orders.
 	 *
 	 * @since 4.7
+	 * @deprecated 4.10
 	 *
 	 * @param string $url
 	 * @param int    $post_id
@@ -34,6 +34,8 @@ class Tribe__Tickets_Plus__Editor extends Tribe__Tickets__Editor {
 	 * @return string The updated Orders page URL
 	 */
 	public function filter_attendee_order_link( $url, $post_id ) {
+		_deprecated_function( __METHOD__, '4.10', 'Method moved to each Commerce to modify filter tribe_filter_attendee_order_link' );
+
 		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
 
 		if ( 'Tribe__Tickets__Commerce__PayPal__Main' === $provider ) {

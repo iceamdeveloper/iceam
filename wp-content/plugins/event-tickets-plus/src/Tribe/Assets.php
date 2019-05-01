@@ -19,8 +19,18 @@ class Tribe__Tickets_Plus__Assets {
 		tribe_assets(
 			tribe( 'tickets-plus.main' ),
 			$enqueue_array,
-			'wp_enqueue_scripts'
+			'wp_enqueue_scripts',
+			array(
+				'localize' => array(
+					'name' => 'TribeTicketsPlus',
+					'data' => array(
+						'ajaxurl'                  => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
+						'save_attendee_info_nonce' => wp_create_nonce( 'save_attendee_info' ),
+					),
+				),
+			)
 		);
+
 	}
 
 	/**
@@ -61,6 +71,7 @@ class Tribe__Tickets_Plus__Assets {
 			'admin_enqueue_scripts',
 			array(
 				'priority' => 0,
+				'groups'       => 'event-tickets-plus-admin',
 				'localize' => (object) array(
 					'name' => 'tribe_qr',
 					'data' => array(

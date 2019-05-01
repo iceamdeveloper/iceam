@@ -125,10 +125,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 	 * @param  array $order_statuses
 	 * @return int
 	 */
-	public function get_purchased_inventory( $ticket_id, array $order_statuses = null ) {
+	public function get_purchased_inventory( $ticket_id, array $order_statuses = [] ) {
 		global $wpdb;
 
-		if ( null === $order_statuses ) {
+		if ( empty( $order_statuses ) ) {
 			$order_statuses = $this->get_valid_payment_statuses();
 		}
 
@@ -142,10 +142,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 			        JOIN
 			    $wpdb->postmeta ON $wpdb->postmeta.post_id = $wpdb->posts.ID
 			WHERE
-			    post_status IN ( $order_statuses )
-			        AND post_type = 'edd_payment'
-			        AND meta_key = '_edd_tickets_qty_%d';
-        ";
+			    post_type = 'edd_payment'
+			        AND meta_key = '_edd_tickets_qty_%d'
+		";
+
+		$sql .= empty( $order_statuses ) ? ';' : "AND post_status IN ( $order_statuses );";
 
 		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $ticket_id ) );
 	}
@@ -181,7 +182,16 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 	 * @return array
 	 */
 	protected function get_valid_payment_statuses() {
-		return (array) apply_filters( 'eddtickets_valid_payment_statuses', array( 'pending', 'publish' ) );
+
+		$valid_statuses = tribe( 'tickets.status' )->get_statuses_by_action( 'count_sales', 'edd' );
+		/**
+		 *  Filter EDD Valid Payment Statuses
+		 *
+		 * @since 4.0
+		 *
+		 * @param array an array of payment statuses
+		 */
+		return (array) apply_filters( 'eddtickets_valid_payment_statuses', $valid_statuses );
 	}
 
 	/**
@@ -191,6 +201,15 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 	 * @return array
 	 */
 	protected function get_pending_payment_statuses() {
-		return (array) apply_filters( 'eddtickets_pending_payment_statuses', array( 'pending' ) );
+
+		$pending_statuses = tribe( 'tickets.status' )->get_statuses_by_action( array( 'incomplete', 'count_sales' ), 'edd' );
+		/**
+		 *  Filter EDD Pending Payment Statuses
+		 *
+		 * @since 4.0
+		 *
+		 * @param array an array of payment statuses
+		 */
+		return (array) apply_filters( 'eddtickets_pending_payment_statuses', $pending_statuses );
 	}
 }

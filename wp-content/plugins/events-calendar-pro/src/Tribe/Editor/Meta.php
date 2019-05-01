@@ -67,7 +67,7 @@ class Tribe__Events__Pro__Editor__Meta extends Tribe__Editor__Meta {
 		add_filter( 'get_post_metadata', array( $this, 'fake_blocks_response' ), 15, 4 );
 		add_filter( 'get_post_metadata', array( $this, 'fake_recurrence_description' ), 15, 4 );
 		add_action( 'deleted_post_meta', array( $this, 'remove_recurrence_meta' ), 10, 3 );
-		add_filter( 'tribe_events_pro_show_recurrence_meta_box', array( $this, 'show_recurrence_classic_meta' ) );
+		add_filter( 'tribe_events_pro_show_recurrence_meta_box', array( $this, 'show_recurrence_classic_meta' ), 10, 2 );
 		add_filter( 'tribe_events_pro_split_redirect_url', array( $this, 'split_series_link' ), 10, 2 );
 	}
 
@@ -193,19 +193,31 @@ class Tribe__Events__Pro__Editor__Meta extends Tribe__Editor__Meta {
 	}
 
 	/**
-	 * Remove the recurrence meta box if classic-editor is set
+	 * Remove the recurrence meta box based on recurrence structure for blocks
 	 *
 	 * @since 4.5
+	 * @since 4.5.3 Added $post_id param
 	 *
-	 * @param $show_meta
+	 * @param  mixed  $show_meta  Default value to display recurrence or not
+	 * @param  int    $post_id    Which post we are dealing with
 	 *
 	 * @return bool
 	 */
-	public function show_recurrence_classic_meta( $show_meta ) {
+	public function show_recurrence_classic_meta( $show_meta, $post_id ) {
 		/** @var Tribe__Editor $editor */
 		$editor = tribe( 'editor' );
 
-		return $editor->is_classic_editor() ? false : $show_meta;
+		// Return default on non classic editor
+		if ( ! $editor->is_classic_editor() ) {
+			return $show_meta;
+		}
+
+		// when it doesnt have blocks we return default
+		if ( ! has_blocks( absint( $post_id ) ) ) {
+			return $show_meta;
+		}
+
+		return false;
 	}
 
 	/**

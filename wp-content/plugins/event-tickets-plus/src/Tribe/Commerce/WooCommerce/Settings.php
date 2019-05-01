@@ -8,6 +8,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 
 		// Use Woo's decimal separator in the Add Ticket Cost field.
 		add_filter( 'tribe_event_ticket_decimal_point', 'wc_get_price_decimal_separator' );
+
+		// Conditionally add settings for paypal delay
+		add_filter( 'tribe_tickets_woo_settings', array( $this, 'maybe_add_paypal_delay_settings' ) );
 	}
 
 	/**
@@ -23,6 +26,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 		return Tribe__Main::array_insert_before_key( 'tribe-form-content-end', $settings_fields, $extra_settings );
 	}
 
+	/**
+	 * Inserts additional settings fields to the Tickets tab
+	 *
+	 * @return array $fields
+	 */
 	protected function additional_settings() {
 		$dispatch_options = $generation_options = $this->get_trigger_statuses();
 
@@ -35,7 +43,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 		$dispatch_defaults = $this->get_default_ticket_dispatch_statuses();
 		$generation_defaults = $this->get_default_ticket_generation_statuses();
 
-		return array(
+		$fields = array(
 			'tickets-woo-options-title' => array(
 				'type' => 'html',
 				'html' => '<h3>' . esc_html__( 'WooCommerce Support', 'event-tickets-plus' ) . '</h3>',
@@ -63,6 +71,49 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 				'can_be_empty'    => true,
 			),
 		);
+
+		/**
+		 * Allows other plugins to alter the settings fields added to the tickets tab
+		 *
+		 * @since 4.10.1
+		 *
+		 * @param array $fields - the additional fields
+		 */
+		$fields = apply_filters( 'tribe_tickets_woo_settings', $fields );
+
+		return $fields;
+	}
+
+	/**
+	 * Conditionally adds paypal fields if WooCommerce has a PayPal gateway active
+	 *
+	 * @since 4.10.1
+	 *
+	 * @param array $fields
+	 *
+	 * @return array $fields
+	 */
+	public function maybe_add_paypal_delay_settings( $fields ) {
+		$paypal = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::is_wc_paypal_gateway_active();
+
+		// bail if we don't have one
+		if ( empty( $paypal ) ) {
+			return $fields;
+		}
+
+		// add paypal checkbox
+		$fields['tickets-woo-paypal-delay'] = array(
+			'type'            => 'radio',
+			'default'         => 'delay',
+			'validation_type' => 'options',
+			'label'           => __( 'Handling PayPal orders:', 'event-tickets-plus' ),
+			'options'         => array(
+				'delay'     => __( 'Wait at least 5 seconds after WooCommerce order status change before generating attendees and tickets in order to prevent unwanted duplicates. <i>Recommended for anyone using PayPal with WooCommerce.</i>', 'event-tickets-plus' ),
+				'immediate' => __( 'Generate attendees and tickets immediately upon WooCommerce order status change. Depending on your PayPal settings, this can result in duplicated attendees.', 'event-tickets-plus' ),
+			),
+		);
+
+		return $fields;
 	}
 
 	/**
@@ -72,15 +123,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 	 */
 	protected function get_trigger_statuses() {
 		$statuses = array( 'immediate' => __( 'As soon as an order is created', 'event-tickets-plus' ) )
-			+ (array) wc_get_order_statuses();
-
-		// In most cases cancelled, refunded and failed statuses can be removed from the set of options
-		// ...but they can be restored via the following filter in any edge cases that require them
-		unset(
-			$statuses['wc-cancelled'],
-			$statuses['wc-refunded'],
-			$statuses['wc-failed']
-		);
+			+ (array) tribe( 'tickets.status' )->get_trigger_statuses( 'woo' );
 
 		/**
 		 * Lists the possible options for generating and dispatching tickets.
@@ -97,22 +140,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Settings {
 	 * @return array
 	 */
 	public function get_default_ticket_dispatch_statuses() {
-		return array(
-			'wc-completed',
-			'wc-on-hold',
-			'wc-processing',
-		);
+		return tribe( 'tickets.status' )->get_statuses_by_action( 'attendee_dispatch', 'woo' );
 	}
 
 	/**
 	 * @return array
 	 */
 	public function get_default_ticket_generation_statuses() {
-		return array(
-			'wc-pending',
-			'wc-completed',
-			'wc-on-hold',
-			'wc-processing',
-		);
+		return tribe( 'tickets.status' )->get_statuses_by_action( 'attendee_generation', 'woo' );
 	}
 }

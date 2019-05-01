@@ -1,7 +1,100 @@
 === Tribe Common ===
 
-
 == Changelog ==
+
+ = [4.9.6.1] 2019-04-25 =
+
+* Fix - Switch from using `any` to `[ 'publish', 'private' ]` for `post_status` on any Object Relational Mapping queries [126377]
+* Fix - Resolve ORM Decorator issues that could cause fatal errors when calling methods not defined in the extending class
+
+= [4.9.6] 2019-04-23 =
+
+* Tweak - Ability to use ->where_multi() in Tribe_Repository objects to search for text matches on multiple fields (supports post fields, terms, and meta values) [125878]
+* Tweak - Allow for external modal control for modal button component [123818]
+* Tweak - Keep track of whether the current request was authorized by the Promoter connector [117668]
+* Tweak - Added filters: `tribe_common_log_to_wpcli`, `tribe_promoter_authorized_redirect_url`
+* Tweak - Changed views: `promoter/auth`
+* Language - 0 new strings added, 17 updated, 1 fuzzied, and 1 obsoleted
+
+= [4.9.5] 2019-04-17 =
+
+* Feature - Include Freemius integration on our Common Libraries to enable information collection opt-in for some new users
+* Tweak - Improve Object Relation Mapping base repository and filter classes to support usage of events
+* Tweak - Modify `Date_Utils.php` and include another way of building DateTime object with Timezone `build_date_object`
+* Tweak - Include Modern Tribe Context panel in the Debug Bar plugin
+* Tweak - Include the `tribe_image_uploader_local_urls` filter in Image Uploader class
+* Tweak - Include `tribe_process_allow_nopriv_handling` for non-logged users to improve control when async requests fire
+* Tweak - Fork `WP_Background_Process` to `Tribe__Process__Handler` to allow for better internal maintenance by our team
+* Tweak - Include more Array handling methods: `recursive_ksort`, `add_prefixed_keys_to`, `flatten`, `filter_prefixed`, `add_unprefixed_keys_to`
+* Fix - Adjust `Tribe__Admin__Helpers::is_screen()` to avoid false positives and flag the events menu Tags page as a Tribe screen [107413]
+* Fix - Improve the handling asynchronous requests for our Process Handler
+* Fix - Correct problems with image asynchronous processing of thumbnail images
+* Fix - Confirm that multisite background processing saves options and progress to the correct table in the database
+* Language - 8 new strings added, 25 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.9.4] 2019-04-01 =
+
+* Tweak - Keep track of whether the current request was authorized by the Promoter connector [117668]
+* Tweak - Adjust `determine_current_user` priority used to identify Promoter user on calls to the REST API [124302]
+
+= [4.9.3.2] 2019-03-14 =
+
+* Fix - Resolve issues where some CSS files were not properly packaged with previous release
+
+= [4.9.3.1] 2019-03-06 =
+
+* Feature - Attach the post ID to Promoter calls and remove hook from all post saves [123732]
+* Language - 0 new strings added, 0 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.9.3] 2019-03-04 =
+
+* Fix - Make sure we pass and get the parameter when using cron jobs to import images on Event Aggregator [119269]
+* Language - 0 new strings added, 0 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.9.2] 2019-02-26 =
+
+* Feature - Add Promoter access from the WP Admin Bar
+* Fix - Update the order of loading of providers to ensure correct execution for Promoter
+* Tweak - Added Promoter to the App Shop [122550]
+* Language - 0 new strings added, 0 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.9.1] 2019-02-14 =
+
+* Feature - date and timezone building and validation methods to the `Tribe__Date_Utils` and `Tribe__Timezones` classes [116356, 115579]
+* Feature - the `tribe_is_regex` and `tribe_unfenced_regex` functions [115582]
+* Feature - Add new action `tribe_editor_register_blocks` used to register Event blocks via `common`
+* Fix - Make sure assets are injected before is too late
+* Fix - Fix an issue where feature detection of async-process support would fire too many requests [118876]
+* Fix - Interface and Abstracts for REST base structures are now PHP 5.2 compatible
+* Fix - Prevent to trigger error when using `array_combine` with empty arrays
+* Fix - Improve conditionals on `Tribe__Timezones::generate_timezone_string_from_utc_offset` to return only string timezones [120647]
+* Language - 0 new strings added, 13 updated, 1 fuzzied, and 0 obsoleted
+
+= [4.9.0.1] 2019-02-07 =
+
+* Fix - Modify extension dependency checking with new system to determine if it can load [122368]
+
+= [4.9] 2019-02-05 =
+
+* Feature - Add system to check plugin versions to inform you to update and prevent site breaking errors [116841]
+* Tweak - Added support for Promoter licenses [120320]
+* Tweak - Added filters: `tribe_register_{$main_class}_plugin_version`, `tribe_register_{$main_class}_plugin_dependencies`
+* Tweak - Added actions: `tribe_plugins_loaded `
+* Tweak - Changed views: `promoter/auth`
+* Language - 3 new strings added, 10 updated, 1 fuzzied, and 1 obsoleted
+
+= [4.8.5] 2019-01-21 =
+
+* Fix - Updated translation strings from the Gutenberg extension merge [118656]
+* Add - Added `strip_dynamic_blocks` method in `Tribe__Editor__Utils` [118679]
+* Add - Added `exclude_tribe_blocks` method in `Tribe__Editor__Utils` [118679]
+* Tweak - Allow better control of when we are in Classic editor with a new filter `tribe_editor_classic_is_active` [120137]
+* Tweak - Adjusted content in the admin welcome page that users are brought to upon newly activating Event Tickets or The Events Calendar [117795]
+* Language - 0 new strings added, 9 updated, 1 fuzzied, and 1 obsoleted
+
+= [4.8.4] 2019-01-15 =
+
+* Add - Added new filter `tribe_asset_data_add_object_{$object_name}` to allow integrations to customize the object data and add additional properties [119760]
 
 = [4.8.3] 2018-12-19 =
 

@@ -1,11 +1,13 @@
 <?php
 /*
 Plugin Name: Event Tickets Plus
+Plugin URI:  http://m.tri.be/1acc
 Description: Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more! Includes advanced options like shared capacity between tickets, ticket QR codes, and integrations with your favorite ecommerce provider.
-Version: 4.9.1
+Version: 4.10.3
 Author: Modern Tribe, Inc.
 Author URI: http://m.tri.be/28
 License: GPLv2 or later
+License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: event-tickets-plus
 Domain Path: /lang/
  */
@@ -33,28 +35,109 @@ if ( ! defined( 'ABSPATH' ) ) die( '-1' );
 define( 'EVENT_TICKETS_PLUS_DIR', dirname( __FILE__ ) );
 define( 'EVENT_TICKETS_PLUS_FILE', __FILE__ );
 
-/* Defer loading Event Tickets Plus until we know that Event Tickets itself has
- * completed setup (which may not happen in some situations, such as if an
- * incompatible version of The Events Calendar is active).
+// Load the required php min version functions
+require_once dirname( EVENT_TICKETS_PLUS_FILE ) . '/src/functions/php-min-version.php';
+
+/**
+ * Verifies if we need to warn the user about min PHP version and bail to avoid fatals
  */
-add_action( 'tribe_tickets_plugin_loaded', 'event_tickets_plus_init' );
-add_action( 'tribe_tickets_plugin_failed_to_load', 'event_tickets_plus_setup_fail_message' );
+if ( tribe_is_not_min_php_version() ) {
+	tribe_not_php_version_textdomain( 'event-tickets-plus', EVENT_TICKETS_PLUS_FILE );
 
-// If we get to this action and neither of the above two actions fired, we'll need to show an error
-add_action( 'plugins_loaded', 'event_tickets_plus_check_for_init_failure', 9 );
+	/**
+	 * Include the plugin name into the correct place
+	 *
+	 * @since  4.10
+	 *
+	 * @param  array $names current list of names
+	 *
+	 * @return array
+	 */
+	function tribe_tickets_plus_not_php_version_plugin_name( $names ) {
+		$names['event-tickets-plus'] = esc_html__( 'Event Tickets Plus', 'event-tickets-plus' );
+		return $names;
+	}
 
-function event_tickets_plus_init() {
+	add_filter( 'tribe_not_php_version_names', 'tribe_tickets_plus_not_php_version_plugin_name' );
+	if ( ! has_filter( 'admin_notices', 'tribe_not_php_version_notice' ) ) {
+		add_action( 'admin_notices', 'tribe_not_php_version_notice' );
+	}
+	return false;
+}
 
-	tribe_init_tickets_plus_autoloading();
-	event_tickets_plus_setup_textdomain();
+/**
+ * Attempt to Register Plugin
+ *
+ * @since 4.10
+ */
+function tribe_register_event_tickets_plus() {
 
-	if ( event_tickets_plus_is_incompatible_tickets_core_installed() ) {
-		do_action( 'tribe_tickets_plugin_failed_to_load' );
+	// Remove action if we run this hook through common.
+	remove_action( 'plugins_loaded', 'tribe_register_event_tickets_plus', 50 );
+
+	if ( ! class_exists( 'Tribe__Abstract_Plugin_Register' ) ) {
+		// load to display error message
+		add_action( 'admin_notices', 'event_tickets_plus_show_fail_message' );
+		add_action( 'network_admin_notices', 'event_tickets_plus_show_fail_message' );
+
+		remove_action( 'tribe_common_loaded', 'event_tickets_plus_init', 10 );
+
 		return;
 	}
 
-	tribe( 'tickets-plus.main' )->on_load();
+	tribe_init_tickets_plus_autoloading();
+
+	new Tribe__Tickets_Plus__Plugin_Register();
+
 }
+add_action( 'tribe_common_loaded', 'tribe_register_event_tickets_plus', 5 );
+// add action if Event Tickets or the Events Calendar is not active
+add_action( 'plugins_loaded', 'tribe_register_event_tickets_plus', 50 );
+// ensure we load the lang files
+add_action( 'plugins_loaded', 'event_tickets_plus_setup_textdomain' );
+
+/**
+ * Instantiate class and set up WordPress actions.
+ *
+ * @since 4.10
+ */
+function event_tickets_plus_init() {
+
+	if ( class_exists( 'Tribe__Main' ) && ! is_admin() && ! class_exists( 'Tribe__Tickets_Plus__PUE__Helper' ) ) {
+		tribe_main_pue_helper();
+	}
+
+	new Tribe__Tickets_Plus__PUE( __FILE__ );
+
+	$classes_exist  = class_exists( 'Tribe__Tickets__Main' ) && class_exists( 'Tribe__Tickets_Plus__Main' );
+	$plugin_can_run = $classes_exist && tribe_check_plugin( 'Tribe__Tickets_Plus__Main' );
+
+	/**
+	 * Filter whether the plugin can run.
+	 *
+	 * @since 4.10
+	 *
+	 * @param boolean $plugin_can_run Whether the plugin can run.
+	 */
+	$plugin_can_run = apply_filters( 'tribe_event_tickets_plus_can_run', $plugin_can_run );
+
+	if ( $plugin_can_run ) {
+		tribe( 'tickets-plus.main' )->instance();
+
+		return;
+	}
+
+	// if we have the plugin register the dependency check will handle the messages
+	if ( class_exists( 'Tribe__Abstract_Plugin_Register' ) ) {
+		new Tribe__Tickets_Plus__PUE( __FILE__ );
+
+		return;
+	}
+
+	add_action( 'admin_notices', 'event_tickets_plus_show_fail_message' );
+	add_action( 'network_admin_notices', 'event_tickets_plus_show_fail_message' );
+}
+add_action( 'tribe_common_loaded', 'event_tickets_plus_init' );
 
 /**
  * Sets up the textdomain stuff
@@ -99,33 +182,6 @@ function tribe_init_tickets_plus_autoloading() {
 }
 
 /**
- * Whether the current version is incompatible with the installed and active The Events Calendar
- * @return bool
- */
-function event_tickets_plus_is_incompatible_tickets_core_installed() {
-	if ( ! class_exists( 'Tribe__Tickets__Main' ) ) {
-		return true;
-	}
-
-	if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
-		return true;
-	}
-
-	if ( ! version_compare( Tribe__Tickets__Main::VERSION, Tribe__Tickets_Plus__Main::REQUIRED_TICKETS_VERSION, '>=' ) ) {
-		return true;
-	}
-
-	return false;
-}
-
-/**
- * Hooks up the failure message.
- */
-function event_tickets_plus_setup_fail_message() {
-	add_action( 'admin_notices', 'event_tickets_plus_show_fail_message' );
-}
-
-/**
  * Shows an admin_notices message explaining why it couldn't be activated.
  */
 function event_tickets_plus_show_fail_message() {
@@ -154,11 +210,52 @@ function event_tickets_plus_show_fail_message() {
 	echo '</p></div>';
 }
 
+
+/**
+ * Whether the current version is incompatible with the installed and active The Events Calendar
+ *
+ * @deprecated 4.10
+ *
+ * @return bool
+ */
+function event_tickets_plus_is_incompatible_tickets_core_installed() {
+	_deprecated_function( __FUNCTION__, '4.10', '' );
+
+	if ( ! class_exists( 'Tribe__Tickets__Main' ) ) {
+		return true;
+	}
+
+	if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
+		return true;
+	}
+
+	if ( ! version_compare( Tribe__Tickets__Main::VERSION, Tribe__Tickets_Plus__Main::REQUIRED_TICKETS_VERSION, '>=' ) ) {
+		return true;
+	}
+
+	return false;
+}
+
+/**
+ * Hooks up the failure message.
+ *
+ * @deprecated 4.10
+ */
+function event_tickets_plus_setup_fail_message() {
+	_deprecated_function( __FUNCTION__, '4.10', '' );
+
+	add_action( 'admin_notices', 'event_tickets_plus_show_fail_message' );
+}
+
 /**
  * Last ditch effort to display an error message in the event that Event Tickets didn't even load
  * far enough to fire tribe_tickets_plugin_loaded or tribe_tickets_plugin_failed_to_load
+ *
+ * @deprecated 4.10
  */
 function event_tickets_plus_check_for_init_failure() {
+	_deprecated_function( __FUNCTION__, '4.10', '' );
+
 	if ( defined( 'EVENT_TICKETS_PLUS_TEXTDOMAIN_LOADED' ) && EVENT_TICKETS_PLUS_TEXTDOMAIN_LOADED ) {
 		return;
 	}

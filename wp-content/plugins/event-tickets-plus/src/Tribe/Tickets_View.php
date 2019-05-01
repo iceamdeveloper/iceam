@@ -33,6 +33,8 @@ class Tribe__Tickets_Plus__Tickets_View {
 		$myself = self::instance();
 
 		add_action( 'event_tickets_after_attendees_update', array( $myself, 'save_meta' ) );
+		add_action( 'wp_ajax_tribe-tickets-save-attendee-info', array( $myself, 'save_attendee_info' ) );
+		add_action( 'wp_ajax_nopriv_tribe-tickets-save-attendee-info', array( $myself, 'save_attendee_info' ) );
 		add_action( 'event_tickets_orders_attendee_contents', array( $myself, 'output_attendee_meta' ) );
 		add_filter( 'tribe_tickets_template_paths', array( $myself, 'add_template_path' ) );
 		add_action( 'tribe_tickets_orders_rsvp_item', array( $myself, 'add_meta_to_rsvp' ), 10, 2 );
@@ -52,6 +54,47 @@ class Tribe__Tickets_Plus__Tickets_View {
 	public function add_template_path( $paths ) {
 		$paths['plus'] = Tribe__Tickets_Plus__Main::instance()->plugin_path;
 		return $paths;
+	}
+
+	/**
+	 * Updates attendee meta from ajax request
+	 *
+	 * @since 4.10.1
+	 *
+	 * @return void
+	 */
+	public function save_attendee_info() {
+		if (
+			! isset( $_POST['nonce'] )
+			|| ! wp_verify_nonce( $_POST['nonce'], 'save_attendee_info' )
+		) {
+			wp_send_json_error( null, 403 );
+		}
+
+		if ( empty( $_POST['event_id'] ) ) {
+			wp_send_json_error( null, 400 );
+		}
+
+		/*
+		 * There are hooks on wp_loaded (See various process_front_end_tickets_form methods) that handle saving of the
+		 * ticket meta from $_POST by Tribe__Tickets_Plus__Meta__Storage::maybe_set_attendee_meta_cookie.
+		 */
+
+		/**
+		 * Get all tickets currently in the cart.
+		 *
+		 * @since 4.9
+		 *
+		 * @param array $tickets Array indexed by ticket id with quantity as the value
+		 *
+		 * @return array
+		 */
+		$tickets_in_cart = apply_filters( 'tribe_tickets_tickets_in_cart', array() );
+		$meta_up_to_date = tribe( 'tickets-plus.meta.contents' )->is_stored_meta_up_to_date( $tickets_in_cart );
+
+		wp_send_json_success( array(
+			'meta_up_to_date' => $meta_up_to_date,
+		) );
 	}
 
 	/**

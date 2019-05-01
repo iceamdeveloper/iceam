@@ -250,21 +250,21 @@ a.tribe-attendees-list-showall {
 
 /* Attendee meta fields */
 
-.tribe-event-tickets-plus-meta label {
+.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta label {
 		display: block;
 	}
 
-.tribe-event-tickets-plus-meta input[type="text"],
-	.tribe-event-tickets-plus-meta input[type="email"],
-	.tribe-event-tickets-plus-meta input[type="url"],
-	.tribe-event-tickets-plus-meta input[type="password"],
-	.tribe-event-tickets-plus-meta textarea {
+.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="text"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="email"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="url"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="password"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta textarea {
 		background: white;
 		margin-top: .5em;
-		width: 50%;
+		width: 100%;
 	}
 
-.tribe-event-tickets-plus-meta select {
+.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta select {
 		background: white;
 		border: 1px solid #ddd;
 	}
@@ -277,17 +277,21 @@ input[type=checkbox].tribe_show_attendees {
 =============================================*/
 
 .edd.quantity {
-	border-bottom: 1px solid #dfdfdf;
-	border-bottom: 1px solid var(--border-color);
-	color: #464646;
-	color: var(--text-dark-color);
 	font-size: 15px;
 	padding: 16px 10px;
-	width: 192px;
 }
 
-.edd.quantity input {
-		margin-bottom: 5px;
-		padding: 5px 10px;
-		width: 4.375em;
+@media (min-width: 768px) {
+
+.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="text"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="email"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="url"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="password"],
+	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta textarea {
+			width: 50%
 	}
+
+.edd.quantity {
+		width: 132px
+}
+		}

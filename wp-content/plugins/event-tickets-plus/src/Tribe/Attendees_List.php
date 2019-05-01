@@ -51,6 +51,8 @@ class Tribe__Tickets_Plus__Attendees_List {
 		// @todo: make this a little bit more clean
 		add_action( 'event_tickets_rsvp_ticket_created', array( $myself, 'purge_transient' ), 10, 3 );
 		add_action( 'event_ticket_woo_attendee_created', array( $myself, 'purge_transient' ), 10, 3 );
+		add_action( 'event_tickets_woocommerce_tickets_generated_for_product', array( $myself, 'purge_transient_post_ticket' ), 10, 4 );
+
 		add_action( 'event_tickets_edd_ticket_created', array( $myself, 'edd_purge_transient' ), 10, 2 );
 	}
 
@@ -141,14 +143,29 @@ class Tribe__Tickets_Plus__Attendees_List {
 	}
 
 	/**
-	 * Remove the Post Transients for the Tickets Attendees
+	 * Remove the Post Transients for the Tickets Attendees during attendee generation
 	 *
-	 * @param  int $attendee_id
+	 * @param  int $unused_attendee_id
 	 * @param  int $event_id
-	 * @param  int $product_id
+	 * @param  int $unused_product_id
 	 * @return void
 	 */
-	public function purge_transient( $attendee_id, $event_id, $product_id ) {
+	public function purge_transient( $unused_attendee_id, $event_id, $unused_product_id ) {
+		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
+	}
+
+	/**
+	 * Remove the Post Transients for the Tickets Attendees during late ticket generation
+	 *
+	 * @since 4.10.1.1
+	 *
+	 * @param  int $unused_attendee_id
+	 * @param  int $unused_event_id
+	 * @param  int $unused_product_id
+	 * @param  int $event_id
+	 * @return void
+	 */
+	public function purge_transient_post_ticket( $unused_product_id, $unused_order_id, $unused_quantity, $event_id ) {
 		Tribe__Post_Transient::instance()->delete( $event_id, Tribe__Tickets__Tickets::ATTENDEES_CACHE );
 	}
 

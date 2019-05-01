@@ -296,3 +296,42 @@ tr.event-tickets-meta-toggle-open {
 #tribe_show_attendees {
 	margin-left: .4em;
 }
+
+/* Tribe Events Modal Styles */
+.tribe_events_modal {
+	height: calc(100% + 46px);
+
+	@media (min-width: 783px) {
+		height: calc(100% + 32px);
+	}
+
+	#wpadminbar,
+	#adminmenuback,
+	#adminmenuwrap,
+	#wpfooter {
+		display: none;
+	}
+
+	#wpwrap {
+		margin-top: -46px;
+
+		@media (min-width: 783px) {
+			margin-top: -32px;
+		}
+	}
+
+	&.auto-fold #wpcontent {
+		margin: 0;
+		padding: 0 10px;
+
+		@media (min-width: 783px) {
+			padding: 0 20px;
+		}
+	}
+
+	#wpbody-content > div:not(#poststuff),
+	#poststuff .inside > a,
+	.accordion-label {
+		display: none;
+	}
+}

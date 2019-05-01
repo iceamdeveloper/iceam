@@ -12,11 +12,12 @@
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
-$view      = Tribe__Tickets__Tickets_View::instance();
-$post_id   = get_the_ID();
-$post      = get_post( $post_id );
-$post_type = get_post_type_object( $post->post_type );
-$user_id   = get_current_user_id();
+$view           = Tribe__Tickets__Tickets_View::instance();
+$post_id        = get_the_ID();
+$post           = get_post( $post_id );
+$post_type      = get_post_type_object( $post->post_type );
+$user_id        = get_current_user_id();
+$active_modules = Tribe__Tickets__Tickets::modules();
 
 if ( ! $view->has_ticket_attendees( $post_id, $user_id ) ) {
 	return;
@@ -32,6 +33,11 @@ $order = array_values( $orders );
 		<?php foreach ( $orders as $order_id => $attendees ) : ?>
 			<?php
 			$first_attendee = reset( $attendees );
+
+			// If Provider is not found then Continue
+			if ( ! array_key_exists( $first_attendee['provider'], $active_modules ) ) {
+				continue;
+			}
 
 			// Fetch the actual Provider
 			$provider = call_user_func( array( $first_attendee['provider'], 'get_instance' ) );

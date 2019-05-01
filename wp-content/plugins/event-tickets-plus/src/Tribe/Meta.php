@@ -58,7 +58,9 @@ class Tribe__Tickets_Plus__Meta {
 			$this->path = trailingslashit( $path );
 		}
 
+
 		add_action( 'event_tickets_after_save_ticket', array( $this, 'save_meta' ), 10, 3 );
+
 		add_action( 'event_tickets_ticket_list_after_ticket_name', array( $this, 'maybe_render_custom_meta_icon' ) );
 		add_action( 'tribe_events_tickets_metabox_edit_accordion_content', array( $this, 'accordion_content' ), 10, 2 );
 
@@ -233,6 +235,28 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	/**
+	 * Function to output meta content to edit ticket panel
+	 *
+	 * @since 4.10
+	 *
+	 * @param int $unused_post_id ID of parent "event" post
+	 * @param int $ticket_id ID of ticket post
+	 */
+	public function meta_content( $ticket_id = null ) {
+		$is_admin = tribe_is_truthy( tribe_get_request_var( 'is_admin', is_admin() ) );
+
+		if ( ! $is_admin ) {
+			return;
+		}
+
+		$enable_meta = $this->meta_enabled( $ticket_id );
+		$active_meta = $this->get_meta_fields_by_ticket( $ticket_id );
+		$templates   = $this->meta_fieldset()->get_fieldsets();
+
+		tribe( 'tickets-plus.admin.views' )->template( 'meta-content', get_defined_vars() );
+	}
+
+	/**
 	 * Gets just the meta fields for insertion via ajax
 	 *
 	 * @param int $unused_post_id ID of parent "event" post
@@ -275,11 +299,18 @@ class Tribe__Tickets_Plus__Meta {
 	 *
 	 * @since 4.1
 	 *
-	 * @param int $post_id ID of parent "event" post
+	 * @param int $unused_post_id ID of parent "event" post
 	 * @param Tribe__Tickets__Ticket_Object $ticket Ticket object
 	 * @param array $data Post data that was submitted
 	 */
 	public function save_meta( $unused_post_id, $ticket, $data ) {
+		// Bail if we are not saving ticket input data.
+		if ( ! isset( $data['tribe-tickets-input'] ) ) {
+			return false;
+		}
+
+		$data['tribe-tickets-input'] = array_filter( $data['tribe-tickets-input'] );
+
 		if ( empty( $data['tribe-tickets-input'] ) ) {
 			$meta = array();
 		} else {
@@ -328,6 +359,10 @@ class Tribe__Tickets_Plus__Meta {
 		$meta = array();
 
 		foreach ( (array) $data['tribe-tickets-input'] as $field_id => $field ) {
+			if ( empty( $field ) || ! is_array( $field ) ) {
+				continue;
+			}
+
 			$field_object = $this->generate_field( $ticket_id, $field['type'], $field );
 
 			if ( ! $field_object ) {
@@ -464,6 +499,12 @@ class Tribe__Tickets_Plus__Meta {
 					$meta[ $id ] = array();
 				}
 
+				foreach ( $the_meta as $mid => $metadata ) {
+					$metadata = array_filter( $metadata );
+
+					$the_meta[ $mid ] = $metadata;
+				}
+
 				$meta[ $id ] = array_merge_recursive( $meta[ $id ], $the_meta );
 			}
 		}
@@ -518,14 +559,44 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	/**
-	 * Checks if any of the cart tickets has required
+	 * Checks if any of the cart tickets has meta
+	 *
+	 * @since 4.10.1
+	 *
+	 * @param array $cart_tickets
+	 *
+	 * @return bool
+	 */
+	public function cart_has_meta( $cart_tickets ) {
+		// Bail if we don't receive an array
+		if ( ! is_array( $cart_tickets ) ) {
+			return false;
+		}
+
+ 		// Bail if we receive an empty array
+ 		if ( empty( $cart_tickets ) ) {
+			return false;
+		}
+
+		foreach ( $cart_tickets as $ticket_id => $quantity ) {
+			if ( $this->ticket_has_meta( $ticket_id ) ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Checks if any of the cart tickets has required meta
 	 *
 	 * @since 4.9
 	 *
-	 * @param array    $cart_tickets
-	 * @param string $slug
+	 * @param array $cart_tickets
+	 *
+	 * @return bool
 	 */
-	public function cart_has_required_meta( $cart_tickets = array() ) {
+	public function cart_has_required_meta( $cart_tickets ) {
 
 		// Bail if we don't receive an array
 		if ( ! is_array( $cart_tickets ) ) {
@@ -548,6 +619,20 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	/**
+	 * See if a ticket has meta
+	 *
+	 * @since 4.10.1
+	 *
+	 * @param int $ticket_id
+	 *
+	 * @return bool
+	 */
+	public function ticket_has_meta( $ticket_id ) {
+		$has_meta = get_post_meta( $ticket_id, self::ENABLE_META_KEY, true );
+		return ! empty( $has_meta ) && tribe_is_truthy( $has_meta );
+	}
+
+	/**
 	 * See if a ticket has required meta
 	 *
 	 * @since 4.9
@@ -557,10 +642,8 @@ class Tribe__Tickets_Plus__Meta {
 	 */
 	public function ticket_has_required_meta( $ticket_id ) {
 
-		// Only include those who have meta
-		$has_meta = get_post_meta( $ticket_id, '_tribe_tickets_meta_enabled', true );
-
-		if ( empty( $has_meta ) || ! tribe_is_truthy( $has_meta ) ) {
+		// Return false if ticket does not have meta
+		if ( ! $this->ticket_has_meta( $ticket_id ) ) {
 			return false;
 		}
 

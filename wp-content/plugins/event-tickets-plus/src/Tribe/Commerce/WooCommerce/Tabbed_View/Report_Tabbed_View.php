@@ -47,6 +47,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Report_Tabbed_Vie
 	 * @param WP_Post            $post
 	 */
 	public function register_orders_tab( Tribe__Tabbed_View $tabbed_view, WP_Post $post ) {
+
+		// only show Order Tab if WooCommerce is the Default Provider
+		$default_ticket = get_post_meta( $post->ID, tribe( 'tickets.handler' )->key_provider_field, true );
+		if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' !== $default_ticket ) {
+			return;
+		}
+
 		$orders_report     = new Tribe__Tickets_Plus__Commerce__WooCommerce__Tabbed_View__Orders_Report_Tab( $tabbed_view );
 		$orders_report_url = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report::get_tickets_report_link( $post );
 		$orders_report->set_url( $orders_report_url );

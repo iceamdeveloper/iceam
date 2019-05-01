@@ -318,10 +318,10 @@ class Logger {
 	 */
 	public function audit($message, array $context = array()) {
 		// Add a special "audit" argument, to separate this message from the normal
-		// INFO messages
+		// NOTICE messages
 		$context['_audit'] = true;
 		try {
-			$this->info($message, $context);
+			$this->notice($message, $context);
 		}
 		catch(\Exception $e) {
 			$this->log_exception($e, $message);

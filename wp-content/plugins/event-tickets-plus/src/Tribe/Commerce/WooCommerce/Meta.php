@@ -7,9 +7,25 @@
  */
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	public function __construct() {
-		add_action( 'woocommerce_order_status_changed', array( $this, 'save_attendee_meta_to_order' ), 5 );
+		add_action( 'woocommerce_order_status_changed', array( $this, 'save_attendee_meta_to_order' ), 5, 2 );
 		add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_attendee_meta_to_order' ), 5 );
 		add_action( 'event_tickets_woocommerce_ticket_created', array( $this, 'save_attendee_meta_to_ticket' ), 10, 4 );
+	}
+
+	/**
+	 * Clears meta cookie data for products when order proceeds from pending payment.
+	 *
+	 * @since 4.9.2
+	 *
+	 * @param array $product_ids WooCommerce Product IDs
+	 */
+	public function clear_meta_cookie_data_for_products( $product_ids ) {
+		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
+
+		// Clear meta cookie data for products.
+		foreach ( $product_ids as $product_id ) {
+			$meta_object->clear_meta_cookie_data( $product_id );
+		}
 	}
 
 	/**
@@ -17,9 +33,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	 *
 	 * @since 4.1
 	 *
-	 * @param int $order_id WooCommerce Order ID
+	 * @param int    $order_id    WooCommerce Order ID
+	 * @param string $from_status WooCommerce Status (from)
 	 */
-	public function save_attendee_meta_to_order( $order_id ) {
+	public function save_attendee_meta_to_order( $order_id, $from_status = null ) {
 		$order       = new WC_Order( $order_id );
 		$order_items = $order->get_items();
 
@@ -45,9 +62,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 		// store the custom meta on the order
 		update_post_meta( $order_id, Tribe__Tickets_Plus__Meta::META_KEY, $order_meta, true );
 
-		// clear out product custom meta data cookies
-		foreach ( $product_ids as $product_id ) {
-			$meta_object->clear_meta_cookie_data( $product_id );
+		if ( 'pending' === $from_status ) {
+			$this->clear_meta_cookie_data_for_products( $product_ids );
 		}
 	}
 

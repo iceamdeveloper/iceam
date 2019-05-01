@@ -216,9 +216,15 @@ class Cache_Redis extends Cache_Base {
 			if ( is_null( $accessor ) )
 				return 0;
 
-			$v = $accessor->get( $storage_key );
-			$v = intval( $v );
-			$this->_key_version[$group] = ( $v > 0 ? $v : 1 );
+			$v_original = $accessor->get( $storage_key );
+			$v = intval( $v_original );
+			$v = ( $v > 0 ? $v : 1 );
+
+			if ( (string)$v_original !== (string)$v ) {
+				$accessor->set( $storage_key, $v );
+			}
+
+			$this->_key_version[$group] = $v;
 		}
 
 		return $this->_key_version[$group];
@@ -337,6 +343,12 @@ class Cache_Redis extends Cache_Base {
 							null, null, $this->_instance_id . '_' . $this->_dbid );
 					else
 						$accessor->connect( trim( substr( $server, 5 ) ) );
+				} elseif ( strpos( $server, ':' ) === false ) {
+					if ( $this->_persistent )
+						$accessor->pconnect( trim( $server ),
+							null, null, $this->_instance_id . '_' . $this->_dbid );
+					else
+						$accessor->connect( trim( $server ) );
 				} else {
 					list( $ip, $port ) = explode( ':', $server );
 

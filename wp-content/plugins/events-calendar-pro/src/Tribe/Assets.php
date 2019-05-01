@@ -18,18 +18,29 @@ class Tribe__Events__Pro__Assets {
 		// Vendor
 		tribe_assets(
 			$pro,
-			array(
-				array( 'tribe-events-pro-imagesloaded', 'vendor/imagesloaded/imagesloaded.pkgd.js', array( 'tribe-events-pro' ) ),
-				array( 'tribe-events-pro-isotope', 'vendor/isotope/isotope.pkgd.js', array( 'tribe-events-pro-imagesloaded' ) ),
-				array( 'tribe-events-pro-slimscroll', 'vendor/nanoscroller/jquery.nanoscroller.js', array( 'tribe-events-pro', 'jquery-ui-draggable' ) ),
-			),
+			[
+				[ 'tribe-events-pro-imagesloaded', 'vendor/imagesloaded/imagesloaded.pkgd.js', [ 'tribe-events-pro' ] ],
+				[ 'tribe-events-pro-isotope', 'vendor/isotope/isotope.pkgd.js', [ 'tribe-events-pro-imagesloaded' ] ],
+				[ 'tribe-events-pro-slimscroll', 'vendor/nanoscroller/jquery.nanoscroller.js', [ 'tribe-events-pro', 'jquery-ui-draggable' ] ],
+			],
 			null,
-			array(
-				'in_footer'    => false,
-			)
+			[
+				'in_footer' => false,
+			]
+		);
+
+		// Vendor: Admin
+		tribe_assets(
+			$pro,
+			[
+				[ 'tribe-events-pro-handlebars', 'vendor/handlebars/handlebars.min.js' ],
+				[ 'tribe-events-pro-moment', 'vendor/momentjs/moment.min.js' ],
+			],
+			'admin_enqueue_scripts'
 		);
 
 		$api_url = 'https://maps.google.com/maps/api/js';
+
 		/**
 		 * Allows users to use a diferent Google Maps JS URL
 		 *
@@ -43,27 +54,27 @@ class Tribe__Events__Pro__Assets {
 			$pro,
 			'tribe-pro',
 			'pro.js',
-			array(),
+			[],
 			null,
-			array(
+			[
 				'priority' => 5,
-			)
+			]
 		);
 
 		tribe_asset(
 			$pro,
 			'tribe-events-pro',
 			'tribe-events-pro.js',
-			array( 'jquery', 'tribe-events-calendar-script' ),
+			[ 'jquery', 'tribe-events-calendar-script' ],
 			'wp_enqueue_scripts',
-			array(
-				'conditionals' => array( $this, 'should_enqueue_frontend' ),
+			[
+				'conditionals' => [ $this, 'should_enqueue_frontend' ],
 				'in_footer'    => false,
-				'localize'     => array(
+				'localize'     => [
 					'name' => 'TribeEventsPro',
-					'data' => array( $this, 'get_data_tribe_events_pro' ),
-				),
-			)
+					'data' => [ $this, 'get_data_tribe_events_pro' ],
+				],
+			]
 		);
 
 		tribe_asset(

@@ -59,6 +59,8 @@
 						<input type="text" class="ticket_field" name="tribe-tickets-saved-fieldset-name" value="">
 					</div>
 				<?php endif; ?>
+
+				<input type="hidden" name="tribe-tickets-input[0]" value="">
 			</td>
 		</tr>
 	</table>

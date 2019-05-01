@@ -260,7 +260,7 @@ a.tribe-attendees-list-showall {
 
 /* Attendee meta fields */
 
-.tribe-event-tickets-plus-meta {
+.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta {
 	label {
 		display: block;
 	}
@@ -272,7 +272,11 @@ a.tribe-attendees-list-showall {
 	textarea {
 		background: white;
 		margin-top: .5em;
-		width: 50%;
+		width: 100%;
+
+		@media (min-width: 768px) {
+			width: 50%;
+		}
 	}
 
 	select {
@@ -288,15 +292,10 @@ input[type=checkbox].tribe_show_attendees {
 /* = EDD CSS
 =============================================*/
 .edd.quantity {
-	border-bottom: 1px solid var(--border-color);
-	color: var(--text-dark-color);
 	font-size: 15px;
 	padding: 16px 10px;
-	width: 192px;
 
-	input {
-		margin-bottom: 5px;
-		padding: 5px 10px;
-		width: 4.375em;
+	@media (min-width: 768px) {
+		width: 132px;
 	}
 }
