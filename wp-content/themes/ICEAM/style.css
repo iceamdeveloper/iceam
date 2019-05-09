@@ -1519,7 +1519,8 @@ form.standard-form.bps_form .editfield, form.standard-form.bps_form .editfield.f
 
 
 /*single event specific styling - september 2019 brisbane */
-.postid-9383 .tribe-events-event-meta .tribe-events-meta-group-venue {display: none;}
+.postid-9383 .tribe-events-event-meta .tribe-events-meta-group-venue,
+div#post-9383 .tribe-events-venue-details {display: none;}
 
 
 @media only screen and (min-width: 768px){
