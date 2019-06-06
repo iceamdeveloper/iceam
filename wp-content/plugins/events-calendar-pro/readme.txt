@@ -4,8 +4,8 @@ Contributors: ModernTribe, barry.hughes, bordoni, borkweb, brianjessee, brook-tr
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, modern tribe, tribe, widget, pro
 Donate link: http://m.tri.be/29
 Requires at least: 4.7
-Tested up to: 5.1
-Stable tag: 4.7.0.1
+Tested up to: 5.2.2
+Stable tag: 4.7.3
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -204,6 +204,21 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.7.3] 2019-06-06 =
+
+* Tweak - Reduced file size by removing .po files and directing anyone creating or editing local translations to translations.theeventscalendar.com
+
+= [4.7.2] 2019-05-16 =
+
+* Fix - Make sure Map view initial state is consistent no matter the API key used [126142]
+* Fix - Make sure latitude and longitude are correctly parsed in Map view [126623]
+
+= [4.7.1] 2019-05-02 =
+
+* Fix - Prevent Moment.js and Handlebars from loading on all admin pages [126254]
+* Fix - Prevent Handlebars conflict with Caldera Forms [126254]
+* Language - 0 new strings added, 4 updated, 0 fuzzied, and 0 obsoleted
 
 = [4.7.0.1] 2019-04-25 =
 

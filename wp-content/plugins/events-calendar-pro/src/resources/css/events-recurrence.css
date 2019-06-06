@@ -8,8 +8,6 @@
  * @see: http://moderntribe.github.io/products-engineering/css/
  */
 
-@custom-media --tablet (max-width: 782px);
-
 /******* Recurrence Rule visibility *******/
 
 .recurrence-row td {
@@ -351,7 +349,7 @@ span.first-label-in-line{
 	padding-top: 10px;
 }
 
-@media (--tablet) {
+@media (max-width: 782px) {
 
 .tribe-event-recurrence.tribe-open .tribe-recurrence-details .tribe-field-start_time,
 			.tribe-event-recurrence.tribe-open .tribe-recurrence-details .tribe-field-end_time,

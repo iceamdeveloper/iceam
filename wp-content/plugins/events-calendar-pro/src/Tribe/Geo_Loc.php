@@ -459,19 +459,25 @@ class Tribe__Events__Pro__Geo_Loc {
 		if ( ! empty( $query->query_vars['tribe_geoloc_lat'] ) ) {
 			$lat = (float) $query->query_vars['tribe_geoloc_lat'];
 		} elseif ( ! empty( $_REQUEST['tribe-bar-geoloc-lat'] ) ) {
-			$lat = filter_var( $_REQUEST['tribe-bar-geoloc-lat'], FILTER_SANITIZE_NUMBER_FLOAT );
+			$lat = filter_var( $_REQUEST['tribe-bar-geoloc-lat'], FILTER_VALIDATE_FLOAT );
 		}
 
 		if ( ! empty( $query->query_vars['tribe_geoloc_lng'] ) ) {
 			$lng = (float) $query->query_vars['tribe_geoloc_lng'];
 		} elseif ( ! empty( $_REQUEST['tribe-bar-geoloc-lng'] ) ) {
-			$lng = filter_var( $_REQUEST['tribe-bar-geoloc-lng'], FILTER_SANITIZE_NUMBER_FLOAT );
+			$lng = filter_var( $_REQUEST['tribe-bar-geoloc-lng'], FILTER_VALIDATE_FLOAT );
 		}
+
+		if ( empty( $lat ) && empty( $lng ) ) {
+			// If there's no latitude and longitude information provided then show all events.
+			return;
+		}
+
 
 		$force = false;
 
 		if ( ! empty( $lat ) && ! empty( $lng ) ) {
-			// Show only venues that have geoloc info
+			// Show only venues that have geolocation information.
 			$force = true;
 
 			// Get venues closest to the specified location
@@ -481,7 +487,7 @@ class Tribe__Events__Pro__Geo_Loc {
 			|| ( ! empty( $query->query_vars['eventDisplay'] ) && 'map' === $query->query_vars['eventDisplay'] )
 			|| ! empty( $query->query_vars['tribe_geoloc'] )
 		) {
-			// Show only venues that have geoloc info
+			// Show only venues that have geolocation information.
 			$force = true;
 
 			// Set a geofence the size of the planet

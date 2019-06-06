@@ -36,7 +36,10 @@ class Tribe__Events__Pro__Assets {
 				[ 'tribe-events-pro-handlebars', 'vendor/handlebars/handlebars.min.js' ],
 				[ 'tribe-events-pro-moment', 'vendor/momentjs/moment.min.js' ],
 			],
-			'admin_enqueue_scripts'
+			'admin_enqueue_scripts',
+			[
+				'conditionals' => [ Tribe__Main::instance(), 'should_load_common_admin_css' ],
+			]
 		);
 
 		$api_url = 'https://maps.google.com/maps/api/js';
@@ -81,17 +84,17 @@ class Tribe__Events__Pro__Assets {
 			$pro,
 			'tribe-events-pro-photo',
 			'tribe-events-photo-view.js',
-			array( 'tribe-events-pro-isotope' ),
+			[ 'tribe-events-pro-isotope' ],
 			null,
-			array(
-				'localize' => array(
+			[
+				'localize' => [
 					'name' => 'TribePhoto',
-					'data' => array(
+					'data' => [
 						'ajaxurl'     => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
 						'tribe_paged' => tribe_get_request_var( 'tribe_paged', 0 ),
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 
 		tribe_asset(

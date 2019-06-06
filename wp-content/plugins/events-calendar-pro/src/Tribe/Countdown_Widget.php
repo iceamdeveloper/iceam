@@ -160,17 +160,22 @@ if ( ! class_exists( 'Tribe__Events__Pro__Countdown_Widget' ) ) {
 		public function get_output( $instance, $deprecated = null, $deprecated_ = null, $deprecated__ = null ) {
 			$time = Tribe__Timezones::localize_date( Tribe__Date_Utils::DBDATETIMEFORMAT, current_time( 'timestamp' ) );
 
-			if ( 'next-event' === $instance['type'] || 'future-event' === $instance['type'] ) {
-				$upcoming_event = 'future-event' === $instance['type'] ? 'future' : 'list';
-				$event = tribe_get_events( array(
-					'eventDisplay'   => $upcoming_event,
-					'posts_per_page' => 1,
-					'start_date'     => $time,
-				) );
-				$event = reset( $event );
+			if ( 'next-event' === $instance['type'] ) {
+				$event = tribe_events()
+					->where( 'ends_after', 'now' )
+					->where( 'hidden', false )
+					->order( 'ASC' )
+					->first();
+			} elseif ( 'future-event' === $instance['type'] ) {
+				$event = tribe_events()
+					->where( 'starts_after', 'now' )
+					->where( 'hidden', false )
+					->order( 'ASC' )
+					->first();
 			} else {
 				$event = get_post( $instance['event'] );
 			}
+
 			$ret = $instance['complete'];
 			$show_seconds = $instance['show_seconds'];
 
