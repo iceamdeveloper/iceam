@@ -13631,6 +13631,12 @@ module.exports = wp.data;
 
 /***/ }),
 /* 21 */
+/***/ (function(module, exports) {
+
+module.exports = tribe.common.elements;
+
+/***/ }),
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -13687,12 +13693,6 @@ var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
 
 
 /***/ }),
-/* 22 */
-/***/ (function(module, exports) {
-
-module.exports = tribe.common.elements;
-
-/***/ }),
 /* 23 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
@@ -13708,6 +13708,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WOO_CLASS", function() { return WOO_CLASS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PROVIDER_CLASS_TO_PROVIDER_MAPPING", function() { return PROVIDER_CLASS_TO_PROVIDER_MAPPING; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PROVIDER_TYPES", function() { return PROVIDER_TYPES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EDD_ORDERS", function() { return EDD_ORDERS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TC_ORDERS", function() { return TC_ORDERS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WOO_ORDERS", function() { return WOO_ORDERS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TICKET_ORDERS_PAGE_SLUG", function() { return TICKET_ORDERS_PAGE_SLUG; });
@@ -13741,10 +13742,11 @@ var PROVIDER_CLASS_TO_PROVIDER_MAPPING = (_PROVIDER_CLASS_TO_PR = {}, babel_runt
 
 var PROVIDER_TYPES = [TC, EDD, WOO];
 
+var EDD_ORDERS = 'edd-orders';
 var TC_ORDERS = 'tpp-orders';
 var WOO_ORDERS = 'tickets-orders';
 
-var TICKET_ORDERS_PAGE_SLUG = (_TICKET_ORDERS_PAGE_S = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, TC_CLASS, TC_ORDERS), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, WOO_CLASS, WOO_ORDERS), _TICKET_ORDERS_PAGE_S);
+var TICKET_ORDERS_PAGE_SLUG = (_TICKET_ORDERS_PAGE_S = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, EDD_CLASS, EDD_ORDERS), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, TC_CLASS, TC_ORDERS), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, WOO_CLASS, WOO_ORDERS), _TICKET_ORDERS_PAGE_S);
 
 var UNLIMITED = 'unlimited';
 var SHARED = 'shared';
@@ -13784,11 +13786,11 @@ var prop_types = __webpack_require__(1);
 var prop_types_default = /*#__PURE__*/__webpack_require__.n(prop_types);
 
 // EXTERNAL MODULE: ./node_modules/classnames/index.js
-var classnames = __webpack_require__(21);
+var classnames = __webpack_require__(22);
 var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
 
 // EXTERNAL MODULE: external "tribe.common.elements"
-var external_tribe_common_elements_ = __webpack_require__(22);
+var external_tribe_common_elements_ = __webpack_require__(21);
 
 // EXTERNAL MODULE: ./src/modules/elements/action-button/style.pcss
 var style = __webpack_require__(479);
@@ -18595,7 +18597,7 @@ for (var i = 0; i < DOMIterables.length; i++) {
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(21);
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(22);
 /* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _style_pcss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(485);
 /* harmony import */ var _style_pcss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_style_pcss__WEBPACK_IMPORTED_MODULE_3__);
@@ -19041,7 +19043,7 @@ module.exports = isSymbol;
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(1);
 /* harmony import */ var prop_types__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(prop_types__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(21);
+/* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(22);
 /* harmony import */ var classnames__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(classnames__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var _style_pcss__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(482);
 /* harmony import */ var _style_pcss__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(_style_pcss__WEBPACK_IMPORTED_MODULE_3__);
@@ -41258,7 +41260,7 @@ var inherits = __webpack_require__(37);
 var inherits_default = /*#__PURE__*/__webpack_require__.n(inherits);
 
 // EXTERNAL MODULE: ./node_modules/classnames/index.js
-var classnames = __webpack_require__(21);
+var classnames = __webpack_require__(22);
 var classnames_default = /*#__PURE__*/__webpack_require__.n(classnames);
 
 // EXTERNAL MODULE: external {"var":"wp.components","root":["wp","components"]}
@@ -41275,7 +41277,7 @@ var AutosizeInput = __webpack_require__(86);
 var AutosizeInput_default = /*#__PURE__*/__webpack_require__.n(AutosizeInput);
 
 // EXTERNAL MODULE: external "tribe.common.elements"
-var external_tribe_common_elements_ = __webpack_require__(22);
+var external_tribe_common_elements_ = __webpack_require__(21);
 
 // EXTERNAL MODULE: ./src/modules/blocks/rsvp/counters/style.pcss
 var counters_style = __webpack_require__(492);
@@ -41381,6 +41383,13 @@ var container_header_style = __webpack_require__(493);
 
 
 
+
+var template_clipboard = wp.element.createElement(external_tribe_common_elements_["Tooltip"], {
+	labelClassName: 'tribe-editor__ticket__container-header-clipboard-tooltip',
+	label: wp.element.createElement(external_tribe_common_icons_["Clipboard"], null),
+	text: Object(external_var_wp_i18n_root_wp_i18n_["__"])('This ticket has Attendee Information Fields configured.', 'event-tickets')
+});
+
 var template_getTitle = function getTitle(hasAttendeeInfoFields, isDisabled, isSelected, onTempTitleChange, tempTitle, title) {
 	return isSelected ? wp.element.createElement(
 		'div',
@@ -41392,7 +41401,7 @@ var template_getTitle = function getTitle(hasAttendeeInfoFields, isDisabled, isS
 			onChange: onTempTitleChange,
 			disabled: isDisabled
 		}),
-		hasAttendeeInfoFields && wp.element.createElement(external_tribe_common_icons_["Clipboard"], null)
+		hasAttendeeInfoFields && template_clipboard
 	) : wp.element.createElement(
 		'h2',
 		{ className: 'tribe-editor__rsvp-container-header__title' },
@@ -42106,11 +42115,11 @@ var template_RSVPAttendeeRegistration = function RSVPAttendeeRegistration(_ref) 
 	var linkText = hasAttendeeInfoFields ? linkTextEdit : linkTextAdd;
 
 	return wp.element.createElement(modules_elements["AttendeesRegistration"], {
-		helperText: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Save your RSVP to enable attendee registration fields', 'event-tickets'),
+		helperText: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Save your RSVP to enable attendee information fields', 'event-tickets'),
 		iframeURL: attendeeRegistrationURL,
 		isDisabled: isDisabled,
 		isModalOpen: isModalOpen,
-		label: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Attendee Registration', 'event-tickets'),
+		label: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Attendee Information', 'event-tickets'),
 		linkText: linkText,
 		modalTitle: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Attendee Information', 'event-tickets'),
 		onClick: onClick,
@@ -43597,7 +43606,8 @@ var utils = __webpack_require__(8);
 	keywords: ['event', 'events-gutenberg', 'tribe'],
 
 	supports: {
-		html: false
+		html: false,
+		multiple: false
 	},
 
 	attributes: {
@@ -43988,6 +43998,7 @@ var tickets_action_dashboard_container_mapStateToProps = function mapStateToProp
 		hasRecurrenceRules: action_dashboard_container_getHasRecurrenceRules(state),
 		hasTicketsPlus: external_tribe_common_data_["plugins"].selectors.hasPlugin(state)(external_tribe_common_data_["plugins"].constants.TICKETS_PLUS),
 		onConfirmClick: function onConfirmClick() {
+			// eslint-disable-line wpcalypso/redux-no-bound-selectors
 			var clientId = ownProps.clientId;
 
 			var _select = Object(external_var_wp_data_root_wp_data_["select"])('core/editor'),
@@ -44446,7 +44457,7 @@ var template_Availability = function Availability(_ref) {
 	    total = _ref.total;
 
 	var Available = wp.element.createElement(modules_elements["NumericLabel"], {
-		className: classnames_default()('tribe-editor__tickets__availability-label', 'tribe-editor__tickets__availability-label--available'),
+		className: classnames_default()('tribe-editor__tickets__availability-label', 'tribe-editor__tickets__availability-label--available', 'tribe-tooltip'),
 		count: available,
 		singular: Object(external_var_wp_i18n_root_wp_i18n_["__"])('%d ticket available', 'event-tickets'),
 		plural: Object(external_var_wp_i18n_root_wp_i18n_["__"])('%d tickets available', 'event-tickets')
@@ -44462,7 +44473,15 @@ var template_Availability = function Availability(_ref) {
 	return wp.element.createElement(
 		'div',
 		{ className: 'tribe-editor__tickets__availability' },
-		Available,
+		wp.element.createElement(
+			'span',
+			{
+				'class': 'tribe-tooltip',
+				title: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Ticket availability is based on the lowest number of inventory, stock, and capacity.', 'event-tickets')
+			},
+			Available,
+			wp.element.createElement('span', { className: 'dashicons dashicons-info' })
+		),
 		Total
 	);
 };
@@ -44562,8 +44581,7 @@ var template_TicketsContainer = function TicketsContainer(_ref) {
 			'div',
 			{ className: innerBlocksClassName },
 			wp.element.createElement(external_var_wp_editor_root_wp_editor_["InnerBlocks"], {
-				allowedBlocks: ['tribe/tickets-item'],
-				templateLock: 'insert'
+				allowedBlocks: ['tribe/tickets-item']
 			})
 		),
 		showInactiveBlock && wp.element.createElement(modules_elements["InactiveBlock"], {
@@ -44918,7 +44936,8 @@ var tickets_container_mapDispatchToProps = function mapDispatchToProps(dispatch)
 	keywords: ['event', 'events-gutenberg', 'tribe'],
 
 	supports: {
-		html: false
+		html: false,
+		multiple: false
 	},
 
 	attributes: {
@@ -44990,7 +45009,7 @@ var template_TicketContainerHeaderTitle = function TicketContainerHeaderTitle(_r
 	var clipboard = hasAttendeeInfoFields && wp.element.createElement(external_tribe_common_elements_["Tooltip"], {
 		labelClassName: 'tribe-editor__ticket__container-header-clipboard-tooltip',
 		label: wp.element.createElement(external_tribe_common_icons_["Clipboard"], null),
-		text: Object(external_var_wp_i18n_root_wp_i18n_["__"])('This ticket has Additional Fields configured.', 'event-tickets')
+		text: Object(external_var_wp_i18n_root_wp_i18n_["__"])('This ticket has Attendee Information Fields configured.', 'event-tickets')
 	});
 
 	return wp.element.createElement(
@@ -45509,11 +45528,12 @@ var quantity_template_TicketContainerHeaderDescription = function TicketContaine
 
 	return !isSelected && wp.element.createElement(
 		'div',
-		{ className: 'tribe-editor__ticket__container-header-quantity' },
+		{ className: 'tribe-editor__ticket__container-header-quantity tribe-tooltip', title: Object(external_var_wp_i18n_root_wp_i18n_["__"])('This pertains to Orders that have been marked Completed.', 'event-tickets') },
 		wp.element.createElement(
 			'span',
 			{ className: 'tribe-editor__ticket__container-header-quantity-label' },
-			getLabel()
+			getLabel(),
+			wp.element.createElement('span', { 'class': 'dashicons dashicons-info' })
 		),
 		getQuantityBar()
 	);
@@ -46662,11 +46682,11 @@ var template_AttendeesRegistration = function AttendeesRegistration(_ref) {
 	var linkText = hasAttendeeInfoFields ? template_linkTextEdit : template_linkTextAdd;
 
 	return wp.element.createElement(modules_elements["AttendeesRegistration"], {
-		helperText: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Save your ticket to enable attendee registration fields', 'event-tickets'),
+		helperText: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Save your ticket to enable attendee information fields', 'event-tickets'),
 		iframeURL: attendeeRegistrationURL,
 		isDisabled: isDisabled,
 		isModalOpen: isModalOpen,
-		label: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Attendee Registration', 'event-tickets'),
+		label: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Attendee Information', 'event-tickets'),
 		linkText: linkText,
 		modalTitle: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Attendee Information', 'event-tickets'),
 		onClick: onClick,

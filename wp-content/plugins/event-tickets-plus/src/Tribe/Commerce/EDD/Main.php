@@ -6,6 +6,11 @@ if ( class_exists( 'Tribe__Tickets_Plus__Commerce__EDD__Main' ) || ! class_exist
 
 class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tickets {
 	/**
+	 * {@inheritdoc}
+	 */
+	public $orm_provider = 'edd';
+
+	/**
 	 * Value indicating there is no limit on the number of tickets that can be sold.
 	 */
 	const UNLIMITED = '_unlimited';
@@ -388,7 +393,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		/**
 		 * Hook before WooCommerce Tickets are generated in Event Tickets Plus.
 		 *
-		 * @since TBD
+		 * @since 4.10.4
 		 *
 		 * @param int $order_id The order ID.
 		 */
@@ -1183,239 +1188,110 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return array|mixed
 	 */
 	public function get_attendees_by_id( $post_id, $post_type = null ) {
-
 		if ( ! $post_type ) {
 			$post_type = get_post_type( $post_id );
 		}
 
 		switch ( $post_type ) {
-
-			case $this->ticket_object :
-
-				return $this->get_attendees_by_product_id( $post_id );
+			case $this->ticket_object:
+				$attendees = $this->get_attendees_by_product_id( $post_id );
 
 				break;
-
-			case self::ATTENDEE_OBJECT :
-
-				return $this->get_all_attendees_by_attendee_id( $post_id );
+			case $this->attendee_object:
+				$attendees = $this->get_all_attendees_by_attendee_id( $post_id );
 
 				break;
-
-			case $this->order_object :
-
-				return $this->get_attendees_by_order_id( $post_id );
+			case $this->order_object:
+				$attendees = $this->get_attendees_by_order_id( $post_id );
 
 				break;
-			default :
-
-				return $this->get_attendees_by_post_id( $post_id );
+			default:
+				$attendees = $this->get_attendees_by_post_id( $post_id );
 
 				break;
-		}
-
-	}
-
-	/**
-	 * Get EDD Tickets Attendees for an Post by id
-	 *
-	 * @since  4.6
-	 *
-	 * @param  int $post_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees_by_product_id( $post_id ) {
-
-		$args = array(
-			'posts_per_page' => -1,
-			'post_type'      => self::ATTENDEE_OBJECT,
-			'meta_key'       => self::ATTENDEE_PRODUCT_KEY,
-			'meta_value'     => $post_id,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		);
-
-		$attendees_query = new WP_Query( $args );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
-		}
-
-		return $this->get_attendees( $attendees_query, $post_id );
-
-	}
-
-	/**
-	 * Get EDD Tickets Attendees for an Post by id
-	 *
-	 * @param int $post_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees_by_post_id( $post_id ) {
-
-		$args = array(
-			'posts_per_page' => -1,
-			'post_type'      => self::ATTENDEE_OBJECT,
-			'meta_key'       => self::ATTENDEE_EVENT_KEY,
-			'meta_value'     => $post_id,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		);
-
-		$attendees_query = new WP_Query( $args );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
-		}
-
-		return $this->get_attendees( $attendees_query, $post_id );
-
-	}
-
-	/**
-	 * Get Attendees by ticket/attendee ID
-	 *
-	 * @param int $attendee_id
-	 *
-	 * @return array
-	 */
-	public function get_all_attendees_by_attendee_id( $attendee_id ) {
-
-		$attendees_query = new WP_Query( array(
-			'p'         => $attendee_id,
-			'post_type' => self::ATTENDEE_OBJECT,
-		) );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
-		}
-
-		return $this->get_attendees( $attendees_query, $attendee_id );
-
-	}
-
-	/**
-	 * Get attendees by order id
-	 *
-	 * @param int $order_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees_by_order_id( $order_id ) {
-
-		$attendees_query = new WP_Query( array(
-			'posts_per_page' => -1,
-			'post_type'      => $this->attendee_object,
-			'meta_key'       => $this->attendee_order_key,
-			'meta_value'     => $order_id,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		) );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
-		}
-
-		return $this->get_attendees( $attendees_query, $order_id );
-
-	}
-
-	/**
-	 * Get all the attendees for post type. It returns an array with the
-	 * following fields:
-	 *  'order_id'
-	 *  'order_status'
-	 *  'purchaser_name'
-	 *  'purchaser_email'
-	 *  'ticket'
-	 *  'attendee_id'
-	 *  'security'
-	 *  'product_id'
-	 *  'check_in'
-	 *  'provider'
-	 *
-	 * @since 4.5 Introduced $post_id and changed first param to a WP_Query instead of Integer
-	 *
-	 * @param int $attendees_query
-	 * @param int $post_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees( $attendees_query, $post_id ) {
-
-		$attendees = array();
-
-		foreach ( $attendees_query->posts as $attendee ) {
-			$product_id = get_post_meta( $attendee->ID, $this->attendee_product_key, true );
-
-			if ( empty( $product_id ) ) {
-				continue;
-			}
-
-			$order_id      = get_post_meta( $attendee->ID, $this->attendee_order_key, true );
-			$checkin       = get_post_meta( $attendee->ID, $this->checkin_key, true );
-			$security      = get_post_meta( $attendee->ID, $this->security_code, true );
-			$optout        = (bool) get_post_meta( $attendee->ID, $this->attendee_optout_key, true );
-			$user_id       = get_post_meta( $attendee->ID, $this->attendee_user_id, true );
-			$product       = get_post( $product_id );
-			$product_title = ( ! empty( $product ) ) ? $product->post_title : get_post_meta( $attendee->ID, $this->deleted_product, true ) . ' ' . __( '(deleted)', 'eddtickets' );
-
-			$user_info = edd_get_payment_meta_user_info( $order_id );
-
-			$ticket_unique_id = get_post_meta( $attendee->ID, '_unique_id', true );
-			$ticket_unique_id = $ticket_unique_id === '' ? $attendee->ID : $ticket_unique_id;
-
-			$meta = '';
-			if ( class_exists( 'Tribe__Tickets_Plus__Meta' ) ) {
-				$meta = get_post_meta( $attendee->ID, Tribe__Tickets_Plus__Meta::META_KEY, true );
-
-				// Process Meta to include value, slug, and label
-				if ( ! empty( $meta ) ) {
-					$meta = $this->process_attendee_meta( $product_id, $meta );
-				}
-			}
-
-			// Add the Attendee Data to the Order data
-			$attendee_data = array_merge( $this->get_order_data( $order_id ), array(
-				'ticket'        => $product_title,
-				'attendee_id'   => $attendee->ID,
-				'optout'        => $optout,
-				'security'      => $security,
-				'product_id'    => $product_id,
-				'check_in'      => $checkin,
-				'user_id'       => $user_id,
-
-				// Fields for Email Tickets
-				'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
-				'ticket_name'   => ! empty( $product ) ? $product->post_title : false,
-				'holder_name'   => $this->get_holder_name( $attendee, $user_info ),
-				'order_id'      => $order_id,
-				'ticket_id'     => $ticket_unique_id,
-				'qr_ticket_id'  => $attendee->ID,
-				'security_code' => $security,
-
-				// Attendee Meta
-				'attendee_meta' => $meta,
-			) );
-
-			/**
-			 * Allow users to filter the Attendee Data
-			 *
-			 * @param array   An associative array with the Information of the Attendee
-			 * @param string  What Provider is been used
-			 * @param WP_Post Attendee Object
-			 * @param int     Post ID
-			 *
-			 */
-			$attendee_data = apply_filters( 'tribe_tickets_attendee_data', $attendee_data, 'edd', $attendee, $post_id );
-
-			$attendees[] = $attendee_data;
 		}
 
 		return $attendees;
+	}
 
+	/**
+	 * {@inheritdoc}
+	 */
+	public function get_attendee( $attendee, $post_id = 0 ) {
+		if ( is_numeric( $attendee ) ) {
+			$attendee = get_post( $attendee );
+		}
+
+		if ( ! $attendee instanceof WP_Post || $this->attendee_object !== $attendee->post_type ) {
+			return false;
+		}
+
+		$product_id = get_post_meta( $attendee->ID, $this->attendee_product_key, true );
+
+		if ( empty( $product_id ) ) {
+			return false;
+		}
+
+		$order_id      = get_post_meta( $attendee->ID, $this->attendee_order_key, true );
+		$checkin       = get_post_meta( $attendee->ID, $this->checkin_key, true );
+		$security      = get_post_meta( $attendee->ID, $this->security_code, true );
+		$optout        = (bool) get_post_meta( $attendee->ID, $this->attendee_optout_key, true );
+		$user_id       = get_post_meta( $attendee->ID, $this->attendee_user_id, true );
+		$product       = get_post( $product_id );
+		$product_title = ( ! empty( $product ) ) ? $product->post_title : get_post_meta( $attendee->ID, $this->deleted_product, true ) . ' ' . __( '(deleted)', 'eddtickets' );
+
+		$user_info = edd_get_payment_meta_user_info( $order_id );
+
+		$ticket_unique_id = get_post_meta( $attendee->ID, '_unique_id', true );
+		$ticket_unique_id = $ticket_unique_id === '' ? $attendee->ID : $ticket_unique_id;
+
+		$meta = '';
+		if ( class_exists( 'Tribe__Tickets_Plus__Meta' ) ) {
+			$meta = get_post_meta( $attendee->ID, Tribe__Tickets_Plus__Meta::META_KEY, true );
+
+			// Process Meta to include value, slug, and label
+			if ( ! empty( $meta ) ) {
+				$meta = $this->process_attendee_meta( $product_id, $meta );
+			}
+		}
+
+		// Add the Attendee Data to the Order data
+		$attendee_data = array_merge( $this->get_order_data( $order_id ), array(
+			'ticket'        => $product_title,
+			'attendee_id'   => $attendee->ID,
+			'order_item_id' => '',
+			'security'      => $security,
+			'product_id'    => $product_id,
+			'check_in'      => $checkin,
+			'optout'        => $optout,
+			'user_id'       => $user_id,
+			//'ticket_sent'   => $ticket_sent,
+
+			// Fields for Email Tickets
+			'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
+			'ticket_name'   => ! empty( $product ) ? $product->post_title : false,
+			'holder_name'   => $this->get_holder_name( $attendee, $user_info ),
+			'order_id'      => $order_id,
+			'ticket_id'     => $ticket_unique_id,
+			'qr_ticket_id'  => $attendee->ID,
+			'security_code' => $security,
+
+			// Attendee Meta
+			'attendee_meta' => $meta,
+		) );
+
+		/**
+		 * Allow users to filter the Attendee Data
+		 *
+		 * @param array An associative array with the Information of the Attendee
+		 * @param string What Provider is been used
+		 * @param WP_Post Attendee Object
+		 * @param int Post ID
+		 *
+		 */
+		$attendee_data = apply_filters( 'tribe_tickets_attendee_data', $attendee_data, 'edd', $attendee, $post_id );
+
+		return $attendee_data;
 	}
 
 	/**
@@ -1457,7 +1333,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			return array();
 		}
 
-		$user_info     = edd_get_payment_meta_user_info( $order_id );
+		$user_info = edd_get_payment_meta_user_info( $order_id );
 
 		if ( empty( $user_info ) ) {
 			return array();
@@ -1475,16 +1351,17 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$order_warning = true;
 		}
 
-		$data = array(
-			'order_id'        => $order_id,
-			'order_status'    => $status_label,
-			'order_warning'   => $order_warning,
-			'purchaser_name'  => $name,
-			'purchaser_email' => $email,
-			'provider'        => __CLASS__,
-			'provider_slug'   => 'edd',
-			'purchase_time'   => get_post_time( Tribe__Date_Utils::DBDATETIMEFORMAT, false, $order_id ),
-		);
+		$data = [
+			'order_id'           => $order_id,
+			'order_status'       => $status_label,
+			'order_status_label' => $status_label,
+			'order_warning'      => $order_warning,
+			'purchaser_name'     => $name,
+			'purchaser_email'    => $email,
+			'provider'           => __CLASS__,
+			'provider_slug'      => 'edd',
+			'purchase_time'      => get_post_time( Tribe__Date_Utils::DBDATETIMEFORMAT, false, $order_id ),
+		];
 
 		/**
 		 * Allow users to filter the Order Data

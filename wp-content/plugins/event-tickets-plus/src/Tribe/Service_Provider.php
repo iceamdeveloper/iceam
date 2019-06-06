@@ -45,6 +45,12 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 		$this->container->bind( 'tickets.ticket-repository', 'Tribe__Tickets_Plus__Ticket_Repository' );
 		$this->container->bind( 'tickets.attendee-repository', 'Tribe__Tickets_Plus__Attendee_Repository' );
 
+		// Add custom contexts.
+		$this->container->bind( 'tickets-plus.ticket-repository.edd', 'Tribe__Tickets_Plus__Repositories__Ticket__EDD' );
+		$this->container->bind( 'tickets-plus.ticket-repository.woo', 'Tribe__Tickets_Plus__Repositories__Ticket__WooCommerce' );
+		$this->container->bind( 'tickets-plus.attendee-repository.edd', 'Tribe__Tickets_Plus__Repositories__Attendee__EDD' );
+		$this->container->bind( 'tickets-plus.attendee-repository.woo', 'Tribe__Tickets_Plus__Repositories__Attendee__WooCommerce' );
+
 		$this->hook();
 	}
 
@@ -68,5 +74,8 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 		tribe( 'tickets-plus.assets' )->admin_enqueue_scripts();
 
 		add_filter( 'event_tickets_attendees_edd_checkin_stati', tribe_callback( 'tickets-plus.commerce.edd.checkin-stati', 'filter_attendee_ticket_checkin_stati' ), 10 );
+
+		add_filter( 'tribe_tickets_ticket_repository_map', tribe_callback( 'tickets.ticket-repository', 'filter_ticket_repository_map' ), 10 );
+		add_filter( 'tribe_tickets_attendee_repository_map', tribe_callback( 'tickets.attendee-repository', 'filter_attendee_repository_map' ), 10 );
 	}
 }

@@ -2,9 +2,9 @@
 Contributors: dontdream
 Tags: buddypress, directory, members, users, profile, search, filter
 Requires at least: 4.6
-Tested up to: 5.1
+Tested up to: 5.2
 Requires PHP: 5.3
-Stable tag: 5.0.3
+Stable tag: 5.0.5
 
 Custom members search forms and results pages, and custom members directories for your BuddyPress site.
 
@@ -26,7 +26,7 @@ To build a Members directory, use the shortcode <code>[bps_directory]</code>, se
 
 A detailed documentation is available on the [BP Profile Search](https://www.dontdream.it/bp-profile-search/) page.
 
-Requires at least BuddyPress 2.4 -- Tested up to BuddyPress 4.2.0
+Requires at least BuddyPress 2.4 -- Tested up to BuddyPress 4.3.0
 
 == Installation ==
 
@@ -42,6 +42,14 @@ See the standard installation procedure, in [Managing Plugins](https://codex.wor
 
 == Changelog ==
 
+= 5.0.5 =
+* Fixed bug with *range* and *age_range* in old templates, introduced in 5.0.2
+= 5.0.4 =
+* Made the AND and OR keywords translatable in searches
+* Fixed bug with the *bps_match_all* hook
+* Made the multiple select size adjustable in search forms
+* Minor adjustment to the bps-form-default template
+* See [BP Profile Search 5.0.4](https://dontdream.it/bp-profile-search-5-0-4/) for details
 = 5.0.3 =
 * Fixed compatibility with *GEO my WordPress*
 * Fixed bug in the [bps_directory] shortcode with values containing ampersand (&)

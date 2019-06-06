@@ -8,13 +8,6 @@
  * @see: http://moderntribe.github.io/products-engineering/css/
  */
 
-:root {
-	--text-light-color: #777;
-	--text-dark-color: #464646;
-	--border-color: #dfdfdf;
-	--table-background-color: #f8f8f8;
-}
-
 .tribe-event-tickets-meta-required-message {
 	color: red;
 	display: none;
@@ -60,11 +53,29 @@
 	display: block;
 }
 
+.tribe-tickets-meta-required header,
+	.tribe-tickets-meta-required label {
+		position: relative;
+	}
+
+.tribe-tickets-meta-required header h3 {
+		margin: 0;
+	}
+
 .tribe-tickets-meta-required header:first-child::after,
 	.tribe-tickets-meta-required label:first-child::after {
 		color: red;
 		content: '*';
+		margin-left: .5em;
+		position: absolute;
+		top: 50%;
+		-webkit-transform: translateY(-50%);
+		        transform: translateY(-50%);
 	}
+
+.tribe-tickets-meta-required .tribe-options label:first-child::after {
+			content: '';
+		}
 
 #ticket_global_stock .ticket_field {
 		display: block;

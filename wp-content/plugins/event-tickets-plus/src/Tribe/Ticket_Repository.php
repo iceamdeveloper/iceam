@@ -9,36 +9,52 @@
  * @since 4.8
  */
 class Tribe__Tickets_Plus__Ticket_Repository extends Tribe__Tickets__Ticket_Repository {
+
 	/**
-	 * Returns an array of the ticket types handled by this repository.
+	 * Filters the map relating ticket repository slugs to service container bindings.
 	 *
-	 * @since 4.8
+	 * @since 4.10.5
 	 *
-	 * @return array
+	 * @param array $map A map in the shape [ <repository_slug> => <service_name> ]
+	 *
+	 * @return array A map in the shape [ <repository_slug> => <service_name> ]
+	 */
+	public function filter_ticket_repository_map( $map ) {
+		// Easy Digital Downloads
+		$map['edd'] = 'tickets-plus.ticket-repository.edd';
+
+		// WooCommerce
+		$map['woo'] = 'tickets-plus.ticket-repository.woo';
+
+		return $map;
+	}
+
+	/**
+	 * {@inheritdoc}
 	 */
 	public function ticket_types() {
 		$types = parent::ticket_types();
+
+		// Easy Digital Downloads
+		$types['edd'] = 'download';
+
 		// WooCommerce
 		$types['woo'] = 'product';
-		// Eeasy Digital Downloads
-		$types['edd'] = 'download';
 
 		return $types;
 	}
 
 	/**
-	 * Returns the list of meta keys relating a Ticket to a Post (Event).
-	 *
-	 * @since 4.8
-	 *
-	 * @return array
+	 * {@inheritdoc}
 	 */
 	public function ticket_to_event_keys() {
 		$keys = parent::ticket_to_event_keys();
-		// WooCommerce
-		$keys['woo'] = '_tribe_wooticket_for_event';
+
 		// Easy Digital Downloads
 		$keys['edd'] = '_tribe_eddticket_for_event';
+
+		// WooCommerce
+		$keys['woo'] = '_tribe_wooticket_for_event';
 
 		return $keys;
 	}

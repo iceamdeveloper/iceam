@@ -12,14 +12,14 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.10.3';
+		const VERSION = '4.10.5';
 
 		/**
 		 * Min required Tickets Core version
 		 *
 		 * @deprecated 4.10
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.10.4';
+		const REQUIRED_TICKETS_VERSION = '4.10.6-dev';
 
 		/**
 		 * Directory of the plugin
@@ -113,6 +113,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			add_action( 'admin_init', array( $this, 'run_updates' ), 10, 0 );
 
+			add_filter( 'tribe-events-save-options', [ $this, 'retro_attendee_page_option' ] );
 		}
 
 		/**
@@ -448,6 +449,44 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$array_key = array_key_exists( 'ticket-commerce-form-location', $tickets_fields ) ? 'ticket-commerce-form-location' : 'ticket-enabled-post-types';
 
 			return Tribe__Main::array_insert_after_key( $array_key, $tickets_fields, $options );
+		}
+
+		/**
+		 * Handle converting an old key to a new one, in this case
+		 * ticket-attendee-info-slug -> ticket-attendee-info-id
+		 *
+		 * @since 4.10.4
+		 *
+		 * @todo Move this to common at some point for better utility?
+		 *
+		 * @param array $options List of options to save.
+		 * @return array Modified list of options to save.
+		 */
+		public function retro_attendee_page_option( $options ) {
+			// Don't migrate option if old option is not set.
+			if ( empty( $options['ticket-attendee-info-slug'] ) ) {
+				return $options;
+			}
+
+			$slug = $options['ticket-attendee-info-slug'];
+			unset( $options['ticket-attendee-info-slug'] );
+
+			// ID is already set, just return $options without the slug.
+			if ( ! empty( $options['ticket-attendee-info-id'] ) ) {
+				return $options;
+			}
+
+			$page = get_page_by_path( $slug, OBJECT );
+
+			// Slug does not match any pages or it may have changed, just return $options without the slug.
+			if ( empty( $page ) ) {
+				return $options;
+			}
+
+			// Set ID to the slug page's ID  and return $options without the slug.
+			$options['ticket-attendee-info-id'] = $page->ID;
+
+			return $options;
 		}
 
 		/**

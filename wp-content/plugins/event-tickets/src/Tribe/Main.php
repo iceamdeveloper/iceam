@@ -4,21 +4,21 @@ class Tribe__Tickets__Main {
 	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '4.10.4.3';
+	const VERSION = '4.10.6';
 
 	/**
 	 * Min required The Events Calendar version
 	 *
 	 * @deprecated 4.10
 	 */
-	const MIN_TEC_VERSION = '4.9-dev';
+	const MIN_TEC_VERSION = '4.9.2-dev';
 
 	/**
 	 * Min required version of Tribe Common
 	 *
 	 * @deprecated 4.10
 	 */
-	const MIN_COMMON_VERSION = '4.9-dev';
+	const MIN_COMMON_VERSION = '4.9.9-dev';
 
 	/**
 	* Min Version of WordPress
@@ -32,14 +32,14 @@ class Tribe__Tickets__Main {
 	*
 	* @since 4.10
 	*/
-	protected $min_php = '5.2.17';
+	protected $min_php = '5.6';
 
 	/**
 	* Min Version of The Events Calendar
 	*
 	* @since 4.10
 	*/
-	protected $min_tec_version = '4.9.0.3-dev';
+	protected $min_tec_version = '4.9.2-dev';
 
 	/**
 	 * Name of the provider
@@ -194,9 +194,15 @@ class Tribe__Tickets__Main {
 			class_exists( 'Tribe__Events__Main' ) &&
 			! version_compare( Tribe__Events__Main::VERSION, $this->min_tec_version, '>=' )
 		) {
-			add_action( 'admin_notices', array( $this, 'tec_compatibility_notice' ) );
-			add_action( 'network_admin_notices', array( $this, 'tec_compatibility_notice' ) );
-			add_action( 'tribe_plugins_loaded', array( $this, 'remove_exts' ), 0 );
+			add_action( 'admin_notices', [ $this, 'tec_compatibility_notice' ] );
+			add_action( 'network_admin_notices', [ $this, 'tec_compatibility_notice' ] );
+			add_action( 'tribe_plugins_loaded', [ $this, 'remove_exts' ], 0 );
+			/*
+			* After common was loaded by another source (e.g. The Event Calendar) let's append this plugin source files
+			* to the ones the Autoloader will search. Since we're appending them the ones registered by the plugin
+			* "owning" common will be searched first.
+			*/
+			add_action( 'tribe_common_loaded', [ $this, 'register_plugin_autoload_paths' ] );
 
 			return;
 		}
@@ -427,18 +433,8 @@ class Tribe__Tickets__Main {
 	 * Sets up autoloading
 	 */
 	protected function init_autoloading() {
-		$prefixes = array(
-			'Tribe__Tickets__' => $this->plugin_path . 'src/Tribe',
-		);
-
-		if ( ! class_exists( 'Tribe__Autoloader' ) ) {
-			require_once( $GLOBALS['tribe-common-info']['dir'] . '/Autoloader.php' );
-
-			$prefixes['Tribe__'] = $GLOBALS['tribe-common-info']['dir'];
-		}
-
-		$autoloader = Tribe__Autoloader::instance();
-		$autoloader->register_prefixes( $prefixes );
+		$autoloader = $this->get_autoloader_instance();
+		$this->register_plugin_autoload_paths();
 
 		require_once $this->plugin_path . 'src/template-tags/tickets.php';
 
@@ -760,12 +756,15 @@ class Tribe__Tickets__Main {
 			tribe_update_option( 'ticket-enabled-post-types', $defaults );
 		}
 
+		// Remove WooCommerce Product and EDD post types to prevent recursion fatal error on save.
+		$filtered_post_types = array_diff( (array) $options['ticket-enabled-post-types'], [ 'product', 'download' ] );
+
 		/**
 		 * Filters the list of post types that support tickets
 		 *
 		 * @param array $post_types Array of post types
 		 */
-		return apply_filters( 'tribe_tickets_post_types', (array) $options['ticket-enabled-post-types'] );
+		return apply_filters( 'tribe_tickets_post_types', $filtered_post_types );
 	}
 
 	/**
@@ -893,4 +892,36 @@ class Tribe__Tickets__Main {
 
 			echo $output;
 		}
+
+	/**
+	 * Returns the autoloader singleton instance to use in a context-aware manner.
+	 *
+	 * @since 4.10.6
+	 *
+	 * @return \Tribe__Autoloader Teh singleton common Autoloader instance.
+	 */
+	public function get_autoloader_instance() {
+		if ( ! class_exists( 'Tribe__Autoloader' ) ) {
+			require_once $GLOBALS['tribe-common-info']['dir'] . '/Autoloader.php';
+
+			Tribe__Autoloader::instance()->register_prefixes( [
+				'Tribe__' => $GLOBALS['tribe-common-info']['dir'],
+			] );
+		}
+
+		return Tribe__Autoloader::instance();
+	}
+
+	/**
+	 * Registers the plugin autoload paths in the Common Autoloader instance.
+	 *
+	 * @since 4.10.6
+	 */
+	public function register_plugin_autoload_paths() {
+		$prefixes = array(
+			'Tribe__Tickets__' => $this->plugin_path . 'src/Tribe',
+		);
+
+		$this->get_autoloader_instance()->register_prefixes( $prefixes );
+	}
 }

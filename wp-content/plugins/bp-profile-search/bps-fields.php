@@ -209,7 +209,7 @@ function bps_parse_request ($request)
 			if (!empty ($value['location']) && !empty ($value['lat']) && !empty ($value['lng']))
 			{
 				if (empty ($value['distance']))  $value['distance'] = 1;
-					$f->filter = $filter;
+				$f->filter = $filter;
 				$f->value = $value;
 			}
 			break;

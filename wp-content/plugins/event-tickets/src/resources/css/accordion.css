@@ -8,10 +8,6 @@
  * @see: http://moderntribe.github.io/products-engineering/css/
  */
 
-:root {
-	--base-font-size: 12px;
-}
-
 /* Accordion Styles */
 
 .accordion-header {
@@ -20,7 +16,6 @@
 	color: inherit;
 	cursor: pointer;
 	font-size: 12px;
-	font-size: var(--base-font-size);
 	font-weight: bold;
 	padding: 10px 20px;
 	box-sizing: border-box;
@@ -36,19 +31,15 @@
 		color: #fff;
 		content: '\f132';
 		font-family: 'dashicons';
-		font-size: calc(12px - 2px);
-		font-size: calc(var(--base-font-size) - 2px);
-		line-height: calc(12px + 5px);
-		line-height: calc(var(--base-font-size) + 5px);
+		font-size: 10px;
+		line-height: 17px;
 		font-weight: 400;
-		height: calc(12px + 2px);
-		height: calc(var(--base-font-size) + 2px);
+		height: 14px;
 		left: 0;
 		padding: 0;
 		position: absolute;
 		top: 12px;
-		width: calc(12px + 3px);
-		width: calc(var(--base-font-size) + 3px);
+		width: 15px;
 		text-align: center;
 		padding-right: 1px;
 	}
@@ -66,8 +57,7 @@
 
 .accordion-header.is-active::before {
 			content: '\f460';
-			line-height: calc(12px + 3px);
-			line-height: calc(var(--base-font-size) + 3px);
+			line-height: 15px;
 		}
 
 .accordion-header:focus {

@@ -12,9 +12,10 @@
  * necessary to obtain a new object of this type to get accurate results.
  */
 class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__Abstract_Attendance_Totals {
-	protected $total_sold = 0;
-	protected $total_paid = 0;
-	protected $total_pending = 0;
+	protected $total_sold      = 0;
+	protected $total_paid      = 0;
+	protected $total_pending   = 0;
+	protected $total_cancelled = 0;
 
 	/**
 	 * Calculate totals for the current event.
@@ -25,8 +26,9 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 				continue;
 			}
 
-			$this->total_paid += $ticket->qty_sold();
-			$this->total_pending += $ticket->qty_pending();
+			$this->total_paid      += $ticket->qty_sold();
+			$this->total_pending   += $ticket->qty_pending();
+			$this->total_cancelled += $ticket->qty_cancelled();
 		}
 
 		$this->total_sold = $this->total_paid + $this->total_pending;
@@ -59,18 +61,20 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	 * Prints an HTML (unordered) list of attendance totals.
 	 */
 	public function print_totals() {
-		$total_sold_label = esc_html_x( 'Total Tickets Issued:', 'attendee summary', 'event-tickets-plus' );
-		$total_paid_label = esc_html_x( 'Complete:', 'attendee summary', 'event-tickets-plus' );
+		$args = [
+			'total_sold_label'        => _x( 'Total Tickets:', 'attendee summary', 'event-tickets' ),
+			'total_complete_label'    => _x( 'Complete:', 'attendee summary', 'event-tickets' ),
+			'total_cancelled_label'   => _x( 'Cancelled:', 'attendee summary', 'event-tickets' ),
+			'total_sold'              => $this->get_total_sold(),
+			'total_complete'          => $this->get_total_complete(),
+			'total_cancelled'         => $this->get_total_cancelled(),
+			'total_sold_tooltip'      => $this->get_total_sold_tooltip(),
+			'total_completed_tooltip' => $this->get_total_completed_tooltip(),
+			'total_cancelled_tooltip' => $this->get_total_cancelled_tooltip(),
+		];
 
-		$total_sold = $this->get_total_sold();
-		$total_paid = $this->get_total_paid();
 
-		echo "
-			<ul>
-				<li> <strong>$total_sold_label</strong> $total_sold </li>
-				<li> $total_paid_label $total_paid </li>
-			</ul>
-		";
+		tribe( 'tickets.admin.views' )->template( 'attendees-totals-list', $args, true );
 	}
 
 	/**
@@ -106,14 +110,14 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	}
 
 	/**
-	 * The total number of tickets sold and paid for, for this event.
+	 * The total number of tickets sold and paid for, minus cancelled, for this event.
 	 *
 	 * @deprecated 4.6
 	 *
 	 * @return int
 	 */
 	public function get_total_complete() {
-		return $this->get_total_paid();
+		return $this->get_total_paid() - $this->get_total_cancelled();
 	}
 
 	/**
@@ -132,5 +136,25 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 		 * @param int $event_id
 		 */
 		return (int) apply_filters( 'tribe_tickets_plus_get_total_paid', $this->total_paid, $this->total_paid, $this->event_id );
+	}
+
+	/**
+	 * The total number of tickets sold then cancelled, for this event.
+	 *
+	 * @since  4.10.4
+	 *
+	 * @return int
+	 */
+	public function get_total_cancelled() {
+		/**
+		 * Returns the total tickets cancelled, for an event.
+		 *
+		 * @since 4.10.4
+		 *
+		 * @param int $total_cancelled
+		 * @param int $original_total_complete
+		 * @param int $event_id
+		 */
+		return (int) apply_filters( 'tribe_tickets_plus_get_total_cancelled', $this->total_cancelled, $this->total_cancelled, $this->event_id );
 	}
 }

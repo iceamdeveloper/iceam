@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Plugins - Event Tickets - Stable (latest release) package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2019-04-25 17:26:11+0000\n"
+"PO-Revision-Date: 2019-05-17 09:57:54+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -23,12 +23,12 @@ msgstr "Mostrar subtitulo"
 #: src/modules/blocks/attendees/template.js:114
 #: src/resources/js/app/blocks.js:46889
 msgid "Display Title"
-msgstr ""
+msgstr "Mostrat título"
 
 #: src/modules/blocks/attendees/template.js:112
 #: src/resources/js/app/blocks.js:46887
 msgid "Attendees Settings"
-msgstr ""
+msgstr "Ajustes de asistentes"
 
 #: src/modules/blocks/ticket/container-header/title/template.js:48
 #: src/resources/js/app/blocks.js:44562
@@ -38,7 +38,7 @@ msgstr "Tipo de ticket *"
 #: src/modules/blocks/ticket/container-header/title/template.js:32
 #: src/resources/js/app/blocks.js:44550
 msgid "This ticket has Additional Fields configured."
-msgstr ""
+msgstr "Esta entrada tiene configurados unos campos adicionales"
 
 #: src/modules/blocks/rsvp/header-image/template.js:26
 #: src/modules/blocks/tickets/header-image/template.js:26
@@ -145,7 +145,7 @@ msgstr ""
 #: src/modules/blocks/tickets/container/template.js:45
 #: src/resources/js/app/blocks.js:44105
 msgid "Tickets are no longer available"
-msgstr ""
+msgstr "Las entradas ya no están disponibles"
 
 #: src/views/blocks/rsvp/content-inactive.php:18
 msgid "RSVPs are not yet available"
@@ -750,7 +750,7 @@ msgstr ""
 #: src/modules/blocks/ticket/container-content/attendees-registration/template.js:19
 #: src/resources/js/app/blocks.js:41778 src/resources/js/app/blocks.js:46201
 msgid "Attendee Registration"
-msgstr ""
+msgstr "Registro de asistentes"
 
 #: src/Tribe/Editor/Attendee_Registration.php:140
 msgid "Are you sure you want to leave this page?"
@@ -856,7 +856,7 @@ msgstr "Seleciona una opción"
 
 #: src/views/registration/summary/tickets-header.php:16
 msgid "Ticket summary"
-msgstr ""
+msgstr "Resumen de la entrada"
 
 #: src/views/registration/button-checkout.php:31
 msgid "Checkout"

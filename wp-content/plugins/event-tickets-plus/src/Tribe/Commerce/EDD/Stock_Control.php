@@ -87,6 +87,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 		// For each purchased ticket, record the level of inventory purchased
 		foreach ( $quantity as $purchase_id => $amount ) {
 			update_post_meta( $payment, self::PURCHASED_TICKETS . $purchase_id, absint( $quantity[ $purchase_id ] ) );
+			// and update stock to reflect
+			if ( ! empty( $amount ) && is_numeric( $amount ) ) {
+				$this->increment_units( $purchase_id, ( 0 - $amount )  );
+			}
 		}
 
 		if ( ! empty( $quantity ) ) {
@@ -136,16 +140,13 @@ class Tribe__Tickets_Plus__Commerce__EDD__Stock_Control {
 
 		$sql = "
 			SELECT
-			    SUM( $wpdb->postmeta.meta_value)
-			FROM
-			    $wpdb->posts
-			        JOIN
-			    $wpdb->postmeta ON $wpdb->postmeta.post_id = $wpdb->posts.ID
-			WHERE
-			    post_type = 'edd_payment'
-			        AND meta_key = '_edd_tickets_qty_%d'
+				COUNT( * )
+				FROM $wpdb->postmeta
+					JOIN $wpdb->posts ON $wpdb->posts.ID = $wpdb->postmeta.post_id
+				WHERE
+					$wpdb->postmeta.meta_key = '_tribe_eddticket_product'
+					AND $wpdb->postmeta.meta_value = %s
 		";
-
 		$sql .= empty( $order_statuses ) ? ';' : "AND post_status IN ( $order_statuses );";
 
 		return (int) $wpdb->get_var( $wpdb->prepare( $sql, $ticket_id ) );

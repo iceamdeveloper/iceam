@@ -50,12 +50,6 @@ function bps_escaped_form_data49 ()
 		else
 			$f->error_message = '';
 
-		if ($f->display == 'range' && count ($f->options))
-		{
-			$f->display = 'range-select';
-			$f->options = array ('' => '') + $f->options;
-		}
-
 		switch ($f->display)
 		{
 		case 'range':
@@ -90,6 +84,7 @@ function bps_escaped_form_data49 ()
 			break;
 
 		case 'multiselectbox':
+			$f->multiselect_size = 4;
 		case 'checkbox':
 			if (!isset ($f->value))  $f->value = array ();
 			break;

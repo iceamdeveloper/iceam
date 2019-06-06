@@ -11,12 +11,12 @@ function bps_set_request ()
 		setcookie ($cookie, 1, 0, COOKIEPATH);
 	}
 
-	$persistent = bps_get_option ('persistent', '1');
-	$new_search = isset ($_REQUEST[bp_core_get_component_search_query_arg ('members')]);
-
 	if (isset ($_REQUEST['bp_profile_search']) && !isset ($_REQUEST[BPS_FORM]))
 		$_REQUEST[BPS_FORM] = $_REQUEST['bp_profile_search'];
 	unset ($_REQUEST['bp_profile_search']);
+
+	$persistent = bps_get_option ('persistent', '1');
+	$new_search = isset ($_REQUEST[bp_core_get_component_search_query_arg ('members')]);
 
 	if ($new_search || !$persistent)
 		if (!isset ($_REQUEST[BPS_FORM]))  $_REQUEST[BPS_FORM] = 'clear';
@@ -56,6 +56,11 @@ function bps_allowed_keys ($form)
 	{
 		$mode = $meta['field_mode'][$k];
 		$keys[] = ($mode == '')? $code: $code. '_'. $mode;
+		if ($mode == 'range' || $mode == 'age_range')
+		{
+			$keys[] = $code. '_'. $mode. '_min';
+			$keys[] = $code. '_'. $mode. '_max';
+		}
 		$keys[] = $code. '_label';
 	}
 
@@ -168,9 +173,14 @@ function bps_search ($request, $users=null)		// published interface, 20190324
 	}
 
 	if (isset ($users))
+	{
+		if (count ($users) == 0)  return $results;
 		$results['users'] = $users;
+	}
 	else
+	{
 		$results['validated'] = false;
+	}
 
 	return $results;
 }
@@ -224,10 +234,13 @@ function bps_field_search_results ($found, $f)
 	return $found;
 }
 
+if (!defined ('BPS_AND'))  define ('BPS_AND', ' AND ');
+if (!defined ('BPS_OR'))  define ('BPS_OR', ' OR ');
+
 function bps_is_expression ($value)
 {
-	$and = explode (' AND ', $value);
-	$or = explode (' OR ', $value);
+	$and = explode (BPS_AND, $value);
+	$or = explode (BPS_OR, $value);
 
 	if (count ($and) > 1 && count ($or) > 1)  return 'mixed';
 	if (count ($and) > 1)  return 'and';
@@ -240,7 +253,7 @@ function bps_sql_expression ($format, $value, $escape=false)
 {
 	global $wpdb;
 
-	foreach (array (' AND ', ' OR ') as $split)
+	foreach (array (BPS_AND, BPS_OR) as $split)
 	{
 		$values = explode ($split, $value);
 		if (count ($values) > 1)  break;
@@ -253,7 +266,8 @@ function bps_sql_expression ($format, $value, $escape=false)
 		$parts[] = $wpdb->prepare ($format, $value);
 	}
 
-	return '('. implode ($split, $parts). ')';
+	$join = ($split == BPS_AND)? ' AND ': ' OR ';
+	return '('. implode ($join, $parts). ')';
 }
 
 function bps_esc_like ($text)

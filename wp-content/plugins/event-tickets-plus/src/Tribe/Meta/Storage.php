@@ -150,7 +150,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 * @param $transient_id
 	 */
 	protected function set_hash_cookie( $transient_id ) {
-		setcookie( self::HASH_COOKIE_KEY, $transient_id, 0, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl() );
+		setcookie( self::HASH_COOKIE_KEY, $transient_id, 0, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl(), true );
 		$_COOKIE[ self::HASH_COOKIE_KEY ] = $transient_id;
 	}
 
@@ -332,7 +332,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 * Deletes the cookie storing the transient hash
 	 */
 	public function delete_cookie() {
-		setcookie( self::HASH_COOKIE_KEY, '', time() - 3600, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl() );
+		setcookie( self::HASH_COOKIE_KEY, '', time() - 3600, COOKIEPATH ? COOKIEPATH : '/', COOKIE_DOMAIN, is_ssl(), true );
 		unset( $_COOKIE[ self::HASH_COOKIE_KEY ] );
 	}
 
@@ -352,7 +352,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	/**
 	 * Recursively Process Array to Remove Empty Values, but Keep 0
 	 *
-	 * @since TBD
+	 * @since 4.10.4
 	 *
 	 * @param array $input a multidimensional array of attendee meta
 	 *

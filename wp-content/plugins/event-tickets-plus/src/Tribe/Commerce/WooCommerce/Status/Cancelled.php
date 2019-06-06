@@ -17,6 +17,5 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Status__Cancelled extends Trib
 	public $incomplete       = true;
 	public $warning          = true;
 	public $count_canceled   = true;
-	public $count_incomplete = true;
 
 }

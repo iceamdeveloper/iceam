@@ -2,7 +2,7 @@
 
 
 /**
- * Class to connect ticketing infomation requests with ticket provider
+ * Class to connect ticketing information requests with ticket provider
  *
  * Class Tribe__Tickets__Data_API
  */
@@ -67,8 +67,8 @@ class Tribe__Tickets__Data_API {
 
 		// only the rsvp order key is non numeric
 		if ( is_object( $post ) && ! empty( $post->ID ) ) {
-			$post = (int) $post->ID;
 			$cpt  = get_post_type( $post->ID );
+			$post = (int) $post->ID;
 		} elseif ( ! is_numeric( $post ) ) {
 			$post = esc_attr( $post );
 			$cpt  = $this->check_rsvp_order_key_exists( $post );

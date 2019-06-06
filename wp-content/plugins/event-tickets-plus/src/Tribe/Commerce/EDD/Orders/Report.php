@@ -265,6 +265,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 						continue;
 					}
 
+					// only count the item if it matches the current ticket id
+					if ( $ticket->ID !== $line_item['id'] ) {
+						continue;
+					}
+
 					if ( in_array( $order->status, $complete_statuses, true ) ) {
 						$tickets_sold[ $ticket->name ]['completed'] += $line_item['quantity'];
 					}

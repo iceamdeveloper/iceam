@@ -8,6 +8,11 @@ if ( class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' ) || ! cla
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Plus__Tickets {
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public $orm_provider = 'woo';
+
+	/**
 	 * Name of the CPT that holds Attendees (tickets holders).
 	 *
 	 * @deprecated 4.7 Use $attendee_object variable instead
@@ -312,6 +317,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		add_action( 'wc_after_products_starting_sales', array( $this, 'syncronize_products' ) );
 		add_action( 'wc_after_products_ending_sales', array( $this, 'syncronize_products' ) );
+
+		add_action( 'tribe_ticket_available_warnings', [ $this, 'get_ticket_table_warnings' ], 10, 2 );
 
 		add_filter( 'tribe_tickets_get_ticket_max_purchase', array( $this, 'filter_ticket_max_purchase' ), 10, 2 );
 
@@ -682,11 +689,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @param int $order_id
 	 */
 	public function generate_tickets( $order_id ) {
-
 		/**
 		 * Hook before WooCommerce Tickets are generated in Event Tickets Plus.
 		 *
-		 * @since TBD
+		 * @since 4.10.4
 		 *
 		 * @param int $order_id The order ID.
 		 */
@@ -745,7 +751,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			// order attendee IDs in the meta are per ticket type
 			$order_attendee_id = 0;
 
-			$product    = $this->get_product_from_item( $order, $item );
+			$product = $this->get_product_from_item( $order, $item );
+
+			if ( empty( $product ) ) {
+				continue;
+			}
+
 			$product_id = $this->get_product_id( $product );
 
 			// Check if the order item contains attendee optout information
@@ -1564,13 +1575,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 
 		// From Event Tickets 4.4.9 onwards we can supply a callback to calculate the number of
-		// pending items per ticket on demand (since determing this is expensive and the data isn't
+		// pending items per ticket on demand (since determining this is expensive and the data isn't
 		// always required, it makes sense not to do it unless required)
 		if ( version_compare( Tribe__Tickets__Main::VERSION, '4.4.9', '>=' ) ) {
 			$return->qty_pending( array( $this, 'get_qty_pending' ) );
 			$qty_pending = $return->qty_pending();
 
-			// Removes pendings from total sold
+			// Removes pending sales from total sold
 			$return->qty_sold( $qty_sold - $qty_pending );
 		} else {
 			// If an earlier version of Event Tickets is activated we'll need to calculate this up front
@@ -1856,32 +1867,24 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return array|mixed
 	 */
 	public function get_attendees_by_id( $post_id, $post_type = null ) {
-
 		if ( ! $post_type ) {
 			$post_type = get_post_type( $post_id );
 		}
 
 		switch ( $post_type ) {
-
-			case $this->ticket_object :
-
+			case $this->ticket_object:
 				$attendees = $this->get_attendees_by_product_id( $post_id );
 
 				break;
-
-			case self::ATTENDEE_OBJECT :
-
+			case $this->attendee_object:
 				$attendees = $this->get_all_attendees_by_attendee_id( $post_id );
 
 				break;
-
-			case $this->order_object :
-
+			case $this->order_object:
 				$attendees = $this->get_attendees_by_order_id( $post_id );
 
 				break;
-			default :
-
+			default:
 				$attendees = $this->get_attendees_by_post_id( $post_id );
 
 				break;
@@ -1897,201 +1900,84 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 * @param string $post_type
 		 */
 		return apply_filters( 'tribe_tickets_plus_woo_get_attendees', $attendees, $post_id, $post_type );
-
 	}
 
 	/**
-	 * Get Woocommerce Tickets Attendees for an Post by id
-	 *
-	 * @param $post_id
-	 *
-	 * @return array
+	 * {@inheritdoc}
 	 */
-	protected function get_attendees_by_post_id( $post_id ) {
-		$attendees_query = new WP_Query( array(
-			'posts_per_page' => -1,
-			'post_type'      => self::ATTENDEE_OBJECT,
-			'meta_key'       => self::ATTENDEE_EVENT_KEY,
-			'meta_value'     => $post_id,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		) );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
+	public function get_attendee( $attendee, $post_id = 0 ) {
+		if ( is_numeric( $attendee ) ) {
+			$attendee = get_post( $attendee );
 		}
 
-		return $this->get_attendees( $attendees_query, $post_id );
-
-	}
-
-	/**
-	 * Get Woocommerce Tickets Attendees for a Product
-	 *
-	 * @since  4.6
-	 *
-	 * @param  $post_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees_by_product_id( $post_id ) {
-		$attendees_query = new WP_Query( array(
-			'posts_per_page' => -1,
-			'post_type'      => self::ATTENDEE_OBJECT,
-			'meta_key'       => self::ATTENDEE_PRODUCT_KEY,
-			'meta_value'     => $post_id,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		) );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
+		if ( ! $attendee instanceof WP_Post || $this->attendee_object !== $attendee->post_type ) {
+			return false;
 		}
 
-		return $this->get_attendees( $attendees_query, $post_id );
+		$order_id      = get_post_meta( $attendee->ID, $this->attendee_order_key, true );
+		$order_item_id = get_post_meta( $attendee->ID, $this->attendee_order_item_key, true );
+		$checkin       = get_post_meta( $attendee->ID, $this->checkin_key, true );
+		$optout        = (bool) get_post_meta( $attendee->ID, $this->attendee_optout_key, true );
+		$security      = get_post_meta( $attendee->ID, $this->security_code, true );
+		$product_id    = get_post_meta( $attendee->ID, $this->attendee_product_key, true );
+		$user_id       = get_post_meta( $attendee->ID, $this->attendee_user_id, true );
+		//$ticket_sent   = (bool) get_post_meta( $attendee->ID, $this->attendee_ticket_sent, true );
 
-	}
-
-	/**
-	 * Get Attendees by ticket/attendee ID
-	 *
-	 * @param $attendee_id
-	 *
-	 * @return array
-	 */
-	public function get_all_attendees_by_attendee_id( $attendee_id ) {
-
-		$attendees_query = new WP_Query( array(
-			'p'         => $attendee_id,
-			'post_type' => self::ATTENDEE_OBJECT,
-		) );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
+		if ( empty( $product_id ) ) {
+			return false;
 		}
 
-		return $this->get_attendees( $attendees_query, $attendee_id );
+		$product          = get_post( $product_id );
+		$product_title    = ( ! empty( $product ) ) ? $product->post_title : get_post_meta( $attendee->ID, $this->deleted_product, true ) . ' ' . __( '(deleted)', 'wootickets' );
+		$ticket_unique_id = get_post_meta( $attendee->ID, '_unique_id', true );
+		$ticket_unique_id = $ticket_unique_id === '' ? $attendee->ID : $ticket_unique_id;
 
-	}
+		$meta = '';
+		if ( class_exists( 'Tribe__Tickets_Plus__Meta' ) ) {
+			$meta = get_post_meta( $attendee->ID, Tribe__Tickets_Plus__Meta::META_KEY, true );
 
-	/**
-	 * Get attendees by order id
-	 *
-	 * @param $order_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees_by_order_id( $order_id ) {
-
-		$attendees_query = new WP_Query( array(
-			'posts_per_page' => -1,
-			'post_type'      => $this->attendee_object,
-			'meta_key'       => $this->attendee_order_key,
-			'meta_value'     => $order_id,
-			'orderby'        => 'ID',
-			'order'          => 'ASC',
-		) );
-
-		if ( ! $attendees_query->have_posts() ) {
-			return array();
-		}
-
-		return $this->get_attendees( $attendees_query, $order_id );
-
-	}
-
-	/**
-	 * Get all the attendees for post type. It returns an array with the
-	 * following fields:
-	 *
-	 *     order_id
-	 *     order_status
-	 *     purchaser_name
-	 *     purchaser_email
-	 *     ticket
-	 *     attendee_id
-	 *     security
-	 *     product_id
-	 *     check_in
-	 *     provider
-	 *
-	 * @since 4.5 Introduced $post_id and changed first param to a WP_Query instead of Integer
-	 *
-	 * @param $attendees_query
-	 * @param $post_id
-	 *
-	 * @return array
-	 */
-	protected function get_attendees( $attendees_query, $post_id ) {
-
-		$attendees = array();
-
-		foreach ( $attendees_query->posts as $attendee ) {
-			$order_id      = get_post_meta( $attendee->ID, $this->attendee_order_key, true );
-			$order_item_id = get_post_meta( $attendee->ID, $this->attendee_order_item_key, true );
-			$checkin       = get_post_meta( $attendee->ID, $this->checkin_key, true );
-			$optout        = (bool) get_post_meta( $attendee->ID, $this->attendee_optout_key, true );
-			$security      = get_post_meta( $attendee->ID, $this->security_code, true );
-			$product_id    = get_post_meta( $attendee->ID, $this->attendee_product_key, true );
-			$user_id       = get_post_meta( $attendee->ID, $this->attendee_user_id, true );
-
-			if ( empty( $product_id ) ) {
-				continue;
+			// Process Meta to include value, slug, and label
+			if ( ! empty( $meta ) ) {
+				$meta = $this->process_attendee_meta( $product_id, $meta );
 			}
-
-			$product          = get_post( $product_id );
-			$product_title    = ( ! empty( $product ) ) ? $product->post_title : get_post_meta( $attendee->ID, $this->deleted_product, true ) . ' ' . __( '(deleted)', 'wootickets' );
-			$ticket_unique_id = get_post_meta( $attendee->ID, '_unique_id', true );
-			$ticket_unique_id = $ticket_unique_id === '' ? $attendee->ID : $ticket_unique_id;
-
-			$meta = '';
-			if ( class_exists( 'Tribe__Tickets_Plus__Meta' ) ) {
-				$meta = get_post_meta( $attendee->ID, Tribe__Tickets_Plus__Meta::META_KEY, true );
-
-				// Process Meta to include value, slug, and label
-				if ( ! empty( $meta ) ) {
-					$meta = $this->process_attendee_meta( $product_id, $meta );
-				}
-			}
-
-			// Add the Attendee Data to the Order data
-			$attendee_data = array_merge( $this->get_order_data( $order_id ), array(
-				'ticket'        => $product_title,
-				'attendee_id'   => $attendee->ID,
-				'order_item_id' => $order_item_id,
-				'security'      => $security,
-				'product_id'    => $product_id,
-				'check_in'      => $checkin,
-				'optout'        => $optout,
-				'user_id'       => $user_id,
-
-				// Fields for Email Tickets
-				'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
-				'ticket_name'   => ! empty( $product ) ? $product->post_title : false,
-				'holder_name'   => $this->get_holder_name( $attendee, $order_id ),
-				'ticket_id'     => $ticket_unique_id,
-				'qr_ticket_id'  => $attendee->ID,
-				'security_code' => $security,
-
-				// Attendee Meta
-				'attendee_meta' => $meta,
-			) );
-
-			/**
-			 * Allow users to filter the Attendee Data
-			 *
-			 * @param array An associative array with the Information of the Attendee
-			 * @param string What Provider is been used
-			 * @param WP_Post Attendee Object
-			 * @param int Post ID
-			 *
-			 */
-			$attendee_data = apply_filters( 'tribe_tickets_attendee_data', $attendee_data, 'woo', $attendee, $post_id );
-
-			$attendees[] = $attendee_data;
 		}
 
-		return $attendees;
+		// Add the Attendee Data to the Order data
+		$attendee_data = array_merge( $this->get_order_data( $order_id ), array(
+			'ticket'        => $product_title,
+			'attendee_id'   => $attendee->ID,
+			'order_item_id' => $order_item_id,
+			'security'      => $security,
+			'product_id'    => $product_id,
+			'check_in'      => $checkin,
+			'optout'        => $optout,
+			'user_id'       => $user_id,
+			//'ticket_sent'   => $ticket_sent,
+
+			// Fields for Email Tickets
+			'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
+			'ticket_name'   => ! empty( $product ) ? $product->post_title : false,
+			'holder_name'   => $this->get_holder_name( $attendee, $order_id ),
+			'ticket_id'     => $ticket_unique_id,
+			'qr_ticket_id'  => $attendee->ID,
+			'security_code' => $security,
+
+			// Attendee Meta
+			'attendee_meta' => $meta,
+		) );
+
+		/**
+		 * Allow users to filter the Attendee Data
+		 *
+		 * @param array An associative array with the Information of the Attendee
+		 * @param string What Provider is been used
+		 * @param WP_Post Attendee Object
+		 * @param int Post ID
+		 *
+		 */
+		$attendee_data = apply_filters( 'tribe_tickets_attendee_data', $attendee_data, 'woo', $attendee, $post_id );
+
+		return $attendee_data;
 	}
 
 	/**
@@ -3030,6 +2916,71 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				Tribe__Events__API::update_event_cost( $event->ID );
 			}
 		}
+	}
+
+	/**
+	 * Get the warning tooltip HTML for the ticket table
+	 *
+	 * @param Tribe__Tickets__Ticket_Object|int $ticket ticket object (or ID)
+	 * @param int $event_id event ID for the ticket
+	 *
+	 * @return string HTML string for tooltip insertion
+	 */
+	public function get_ticket_table_warnings( $ticket, $event_id ) {
+		// no ticket, no event? bail
+		if ( empty( $ticket ) || empty( $event_id ) ) {
+			return;
+		}
+
+		// Just in case...
+		if ( is_numeric( $ticket ) ) {
+			$ticket = $this->get_ticket( $event_id, $ticket );
+		}
+
+		if ( __CLASS__ !== $ticket->provider_class ) {
+			return;
+		}
+
+		$messages  = [];
+		$inventory = (int) $ticket->inventory();
+		$stock     = (int) $ticket->stock();
+		$product = wc_get_product( $ticket->ID );
+
+		if ( -1 !== $ticket->capacity() ) {
+			$shared_stock = new Tribe__Tickets__Global_Stock( $event_id );
+
+			if (
+				$inventory !== $stock
+				&& ( ! $shared_stock->is_enabled() || $stock < (int) $shared_stock->get_stock_level() )
+			) {
+				$messages['mismatch'] = _x( 'The number of Complete ticket sales does not match the number of attendees. Please check the <a href="' . tribe( 'tickets.attendees' )->get_report_link( get_post( $event_id ) ) . '">Attendees list</a> and adjust ticket stock in WooCommerce as needed.', 'event-tickets' );
+			}
+
+		}
+
+		if ( 'own' === $ticket->global_stock_mode() && ! $product->get_manage_stock() ) {
+			$messages['stock'] = _x( '"Unlimited" will be displayed unless you enable the WooCommerce\'s "Manage stock" setting. You can do so <a href="' . esc_url( $ticket->admin_link ) . '">here</a>.', 'event-tickets' );
+		}
+
+		if ( empty( $messages ) ) {
+			return;
+		}
+
+		ob_start();
+		?>
+		<div class="tribe-tooltip" aria-expanded="false">
+			<span class="dashicons dashicons-warning required"></span>
+			<div class="down" <?php if ( 1 < count( $messages ) ) { echo 'style="width: 370px;"';} ?>>
+				<?php foreach( $messages as $type => $message ) : ?>
+					<p>
+						<span><?php echo $message; ?></span>
+					</p>
+				<?php endforeach;?>
+			</div>
+		</div>
+		<?php
+
+		echo ob_get_clean();
 	}
 
 	/**

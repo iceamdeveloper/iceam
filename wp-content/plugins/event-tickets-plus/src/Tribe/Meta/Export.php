@@ -54,24 +54,22 @@ class Tribe__Tickets_Plus__Meta__Export {
 	 *
 	 * @since 4.8.3
 	 *
-	 * @param int $event_id the event to fech the attendee data from
+	 * @param int $event_id the event to fetch the attendee data from
 	 *
 	 * @return void
 	 */
 	public function add_orphaned_columns( $event_id ) {
-
-		// Go thorugh the event attendees and get the fields
+		// Go through the event attendees and get the fields.
 		foreach ( Tribe__Tickets__Tickets::get_event_attendees( $event_id ) as $attendee ) {
-
-			// Get the metafields of that attendee
+			// Get the meta fields of that attendee.
 			$meta_fields = get_post_meta( $attendee['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
 
-			// If we have some meta fields
+			// If we have some meta fields.
 			if ( ! is_array( $meta_fields ) ) {
 				return;
 			}
 
-			// Go through the metafields
+			// Go through the meta fields.
 			foreach ( $meta_fields as $key => $value ) {
 				$this->add_orphaned_column( $key );
 			}
@@ -172,6 +170,32 @@ class Tribe__Tickets_Plus__Meta__Export {
 
 		if ( isset( $meta_data[ $column ] ) ) {
 			return $meta_data[ $column ];
+		}
+
+		/**
+		 * Allow plugins to remove support for checkbox field values being displayed or override the text shown.
+		 *
+		 * @since 4.10.4
+		 *
+		 * @param string|false $checkbox_label Label value of checkbox that is checked, return false to turn off label support.
+		 */
+		$checkbox_label = apply_filters( 'tribe_events_tickets_plus_attendees_list_checkbox_label', __( 'Checked', 'event-tickets-plus' ) );
+
+		if ( false === $checkbox_label ) {
+			return $existing;
+		}
+
+		// Checkbox support
+		$checkbox_parts = explode( '_', $column );
+
+		if ( 2 !== count( $checkbox_parts ) ) {
+			return $existing;
+		}
+
+		$key = $checkbox_parts[0] . '_' . md5( $checkbox_parts[1] );
+
+		if ( isset( $meta_data[ $key ] ) ) {
+			return $checkbox_label;
 		}
 
 		return $existing;

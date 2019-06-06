@@ -13620,6 +13620,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WOO_CLASS", function() { return WOO_CLASS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PROVIDER_CLASS_TO_PROVIDER_MAPPING", function() { return PROVIDER_CLASS_TO_PROVIDER_MAPPING; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "PROVIDER_TYPES", function() { return PROVIDER_TYPES; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "EDD_ORDERS", function() { return EDD_ORDERS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TC_ORDERS", function() { return TC_ORDERS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "WOO_ORDERS", function() { return WOO_ORDERS; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "TICKET_ORDERS_PAGE_SLUG", function() { return TICKET_ORDERS_PAGE_SLUG; });
@@ -13653,10 +13654,11 @@ var PROVIDER_CLASS_TO_PROVIDER_MAPPING = (_PROVIDER_CLASS_TO_PR = {}, babel_runt
 
 var PROVIDER_TYPES = [TC, EDD, WOO];
 
+var EDD_ORDERS = 'edd-orders';
 var TC_ORDERS = 'tpp-orders';
 var WOO_ORDERS = 'tickets-orders';
 
-var TICKET_ORDERS_PAGE_SLUG = (_TICKET_ORDERS_PAGE_S = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, TC_CLASS, TC_ORDERS), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, WOO_CLASS, WOO_ORDERS), _TICKET_ORDERS_PAGE_S);
+var TICKET_ORDERS_PAGE_SLUG = (_TICKET_ORDERS_PAGE_S = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, EDD_CLASS, EDD_ORDERS), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, TC_CLASS, TC_ORDERS), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_ORDERS_PAGE_S, WOO_CLASS, WOO_ORDERS), _TICKET_ORDERS_PAGE_S);
 
 var UNLIMITED = 'unlimited';
 var SHARED = 'shared';

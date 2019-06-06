@@ -51,10 +51,29 @@
 }
 
 .tribe-tickets-meta-required {
+	header,
+	label {
+		position: relative;
+	}
+
+	header h3 {
+		margin: 0;
+	}
+
 	header:first-child::after,
 	label:first-child::after {
 		color: red;
 		content: '*';
+		margin-left: .5em;
+		position: absolute;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+	.tribe-options {
+		label:first-child::after {
+			content: '';
+		}
 	}
 }
 

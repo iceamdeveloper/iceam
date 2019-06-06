@@ -8,13 +8,6 @@
  * @see: http://moderntribe.github.io/products-engineering/css/
  */
 
-:root {
-	--text-light-color: #777;
-	--text-dark-color: #464646;
-	--border-color: #dfdfdf;
-	--table-background-color: #f8f8f8;
-}
-
 .tribe-rsvp {
 	padding: 20px 0;
 }
@@ -204,7 +197,6 @@
 
 .tribe-events-tickets {
 	background: #f8f8f8;
-	background: var(--table-background-color);
 	border: 0;
 	border-radius: 3px;
 	max-width: 100%;
@@ -283,14 +275,12 @@
 
 .tribe-events-tickets .tribe-tickets-remaining {
 		color: #777;
-		color: var(--text-light-color);
 		display: block;
 		font-size: 11px;
 	}
 
 .tribe-events-tickets .tribe-tickets-attendees-list-optout label {
 			color: #777;
-			color: var( --text-light-color );
 			font-size: 13px;
 		}
 
@@ -304,7 +294,6 @@
 	.tribe-events-tickets .tickets_description,
 	.tribe-events-tickets .tickets_price {
 		color: #464646;
-		color: var(--text-dark-color);
 		font-size: 15px;
 		padding: 16px 10px;
 	}

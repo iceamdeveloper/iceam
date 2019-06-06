@@ -8,11 +8,6 @@
  * @see: http://moderntribe.github.io/products-engineering/css/
  */
 
-:root {
-	--border-light-color: #a3a3a3;
-	--button-text-color: #555;
-}
-
 .screen_reader_text {
 	clip: rect(0 0 0 0);
 	clip: rect(0, 0, 0, 0);
@@ -84,7 +79,6 @@
 
 .ticket_panel {
 	border: 1px solid #a3a3a3;
-	border: 1px solid var(--border-light-color);
 	border-radius: 5px;
 	box-sizing: border-box;
 	opacity: 1;
@@ -242,7 +236,6 @@
 		background-color: #efefef;
 		border-radius: 3px;
 		border: 1px solid #a3a3a3;
-		border: 1px solid var(--border-light-color);
 		display: none;
 		margin-left: .5em;
 		padding: .5em;
@@ -281,7 +274,7 @@
 
 .input_block input,
 	.input_block textarea {
-		max-width: calc( 100% - 132px );
+		max-width: calc(100% - 132px);
 	}
 
 .input_block .ticket_field.hasDatepicker {
@@ -309,7 +302,7 @@
 	}
 
 .input_block .tribe_stock_block {
-		padding-left: calc(20px + .4em);
+		padding-left: calc(20px + 0.4em);
 	}
 
 /* Capacity Radio Buttons */
@@ -422,7 +415,6 @@ p.description {
 		background-color: #efefef;
 		border-radius: 3px;
 		border: 1px solid #a3a3a3;
-		border: 1px solid var(--border-light-color);
 		display: none;
 		margin-left: .5em;
 		padding: .5em;

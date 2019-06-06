@@ -104,8 +104,7 @@ class Tribe__Tickets_Plus__Tickets_View {
 	 * @return void
 	 */
 	public function save_meta( $event_id ) {
-		$user_id   = get_current_user_id();
-		$attendees = Tribe__Tickets__Tickets::get_event_attendees( $event_id );
+		$user_id = get_current_user_id();
 
 		// this block only runs for Tickets
 		if ( isset( $_POST['attendee'] ) && ! empty( $_POST['event_id'] ) ) {
@@ -129,13 +128,12 @@ class Tribe__Tickets_Plus__Tickets_View {
 				$provider = call_user_func( array( $first_attendee['provider'], 'get_instance' ) );
 
 				foreach ( $attendees_by_order[ $order_id ] as $attendee ) {
-					$attendee_owner = $this->get_attendee_owner( $attendee['attendee_id'] );
-
-					if ( $user_id !== $attendee_owner ) {
+					if ( $user_id !== (int) $attendee['user_id'] ) {
 						continue;
 					}
 
 					$provider_class = $attendee['provider'];
+
 					if ( ! defined( "{$provider_class}::ATTENDEE_OPTOUT_KEY" ) ) {
 						$attendee_optout_key = call_user_func( array( $provider_class, 'get_key' ), 'ATTENDEE_OPTOUT_KEY' );
 					} else {
@@ -176,13 +174,20 @@ class Tribe__Tickets_Plus__Tickets_View {
 				continue;
 			}
 
-			// Fetches the Attendee data based on the ID
-			foreach ( $attendees as $attendee ) {
-				if ( isset( $attendee['attendee_id'] ) && $attendee['attendee_id'] === $attendee_id ) {
-					break;
-					// When it breaks the foreach it will keep the $attendee variable as the one where it broke off
-				}
+			$args = [
+				'by' => [
+					'id' => $attendee_id,
+				],
+			];
+
+			$attendee_data = Tribe__Tickets__Tickets::get_event_attendees_by_args( $event_id, $args );
+
+			// Attendee not found.
+			if ( ! $attendee_data['attendees'] ) {
+				continue;
 			}
+
+			$attendee = current( $attendee_data['attendees'] );
 
 			$fields = Tribe__Tickets_Plus__Meta::instance()->get_meta_fields_by_ticket( $attendee['product_id'] );
 
@@ -192,18 +197,16 @@ class Tribe__Tickets_Plus__Tickets_View {
 					continue;
 				}
 
-				$name = null;
 				if ( 'checkbox' === $field->type ) {
 					foreach ( $field->extra['options'] as $label ) {
 						$name = $field->slug . '_' . sanitize_title( $label );
+
 						if ( isset( $data[ $name ] ) ) {
 							unset( $data[ $name ] );
 						}
 					}
-				} else {
-					if ( isset( $data[ $field->slug ] ) ) {
-						unset( $data[ $field->slug ] );
-					}
+				} elseif ( isset( $data[ $field->slug ] ) ) {
+					unset( $data[ $field->slug ] );
 				}
 			}
 
@@ -261,20 +264,23 @@ class Tribe__Tickets_Plus__Tickets_View {
 	 * @return array                    List of Attendees grouped by order id
 	 */
 	public function get_event_attendees_by_order( $event_id, $user_id = null, $include_rsvp = false ) {
-		$attendees = Tribe__Tickets__Tickets::get_event_attendees( $event_id );
+		if ( ! $user_id ) {
+			$attendees = Tribe__Tickets__Tickets::get_event_attendees( $event_id );
+		} else {
+			// If we have a user_id then limit by that.
+			$args = [
+				'user' => $user_id,
+			];
+
+			$attendees = Tribe__Tickets__Tickets::get_event_attendees_by_args( $event_id, $args );
+		}
+
 		$orders = array();
 
 		foreach ( $attendees as $key => $attendee ) {
 			// Ignore RSVP if we don't tell it specifically
 			if ( 'rsvp' === $attendee['provider_slug'] && ! $include_rsvp ) {
 				continue;
-			}
-
-			// If we have a user_id then test it and ignore the ones that don't have it
-			if ( ! is_null( $user_id ) ) {
-				if ( empty( $attendee['user_id'] ) || $attendee['user_id'] != $user_id ) {
-					continue;
-				}
 			}
 
 			$orders[ (int) $attendee['order_id'] ][] = $attendee;

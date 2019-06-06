@@ -100,7 +100,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	 * Adds a provder parameter to the cart URL to assist with
 	 * keeping tickets from different providers separate.
 	 *
-	 * @since TBD
+	 * @since 4.10.4
 	 *
 	 * @param string $url Cart URL.
 	 *
@@ -122,6 +122,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	 * @return array
 	 */
 	public function get_tickets_in_cart( $tickets = array() ) {
+		// If the cart is null, we need to bail to prevent any "Call to a member function on null" errors
+		if ( is_null( WC()->cart ) ) {
+			return [];
+		}
+
 		$contents = WC()->cart->get_cart_contents();
 		if ( empty( $contents ) ) {
 			return $tickets;

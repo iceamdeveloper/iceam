@@ -11,47 +11,85 @@ msgstr ""
 "Language: nl\n"
 "Project-Id-Version: Event Tickets Plus\n"
 
-#: src/Tribe/Main.php:440
+#: src/Tribe/REST/V1/Endpoints/QR.php:244
+msgid "Checked In!"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:233
+msgid "Ticket not checked in!"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:224
+msgid "Already checked in!"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:215
+msgid "This attendee's ticket is not authorized to be Checked in"
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:206
+msgid "An attendee is not found with this ID."
+msgstr ""
+
+#: src/Tribe/REST/V1/Endpoints/QR.php:196
+msgid "Security code is not valid!"
+msgstr ""
+
+#: src/Tribe/Meta/Export.php:182
+msgid "Checked"
+msgstr ""
+
+#: src/Tribe/Commerce/Attendance_Totals.php:67
+msgctxt "attendee summary"
+msgid "Cancelled:"
+msgstr ""
+
+#: src/Tribe/Commerce/Attendance_Totals.php:65
+msgctxt "attendee summary"
+msgid "Total Tickets:"
+msgstr ""
+
+#: src/Tribe/Main.php:441
 msgid "Attendee Registration page"
 msgstr ""
 
-#: src/Tribe/Main.php:435
+#: src/Tribe/Main.php:436
 msgid "Selected page <strong>must</strong> use the `[tribe_attendee_registration]` shortcode. While the shortcode is missing the default redirect will be used."
 msgstr ""
 
-#: src/Tribe/Main.php:429
+#: src/Tribe/Main.php:430
 msgid "Optional: select an existing page to act as your attendee registration page. <strong>Requires</strong> use of the `[tribe_attendee_registration]` shortcode and overrides the above template and URL slug."
 msgstr ""
 
-#: src/Tribe/Main.php:426
+#: src/Tribe/Main.php:427
 msgid "You must create a page before using this functionality"
 msgstr ""
 
-#: src/Tribe/Main.php:416
+#: src/Tribe/Main.php:417
 msgid "Choose a page or leave blank."
 msgstr ""
 
-#: src/Tribe/Main.php:408
+#: src/Tribe/Main.php:409
 msgid "Choose a page template to control the appearance of your attendee registration page."
 msgstr ""
 
-#: src/Tribe/Main.php:407
+#: src/Tribe/Main.php:408
 msgid "Attendee Registration template"
 msgstr ""
 
-#: src/Tribe/Main.php:399
+#: src/Tribe/Main.php:400
 msgid "The slug used for building the URL for the Attendee Registration Info page."
 msgstr ""
 
-#: src/Tribe/Main.php:398
+#: src/Tribe/Main.php:399
 msgid "Attendee Registration URL slug"
 msgstr ""
 
-#: src/Tribe/Main.php:384
+#: src/Tribe/Main.php:385
 msgid "Same as Event Page Template"
 msgstr ""
 
-#: src/Tribe/Main.php:380
+#: src/Tribe/Main.php:381
 msgid "Default Page Template"
 msgstr ""
 
@@ -107,7 +145,7 @@ msgctxt "Plugin A \"and\" Plugin B"
 msgid " and "
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Orders/Report.php:291
+#: src/Tribe/Commerce/EDD/Orders/Report.php:296
 msgid "Search Orders"
 msgstr ""
 
@@ -260,7 +298,7 @@ msgstr ""
 msgid "Discounts:"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2881
+#: src/Tribe/Commerce/WooCommerce/Main.php:2767
 msgid "The ticket: %1$s, in your cart is no longer available or valid. You need to remove it from your cart in order to continue."
 msgstr ""
 
@@ -433,7 +471,7 @@ msgstr ""
 msgid "Total Event Capacity:"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2597
+#: src/Tribe/Commerce/WooCommerce/Main.php:2483
 msgid "Resend tickets email"
 msgstr ""
 
@@ -576,24 +614,19 @@ msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr "Andere deelnemergegevens:"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:243
+#: src/Tribe/Commerce/WooCommerce/Main.php:248
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:181
+#: src/Tribe/Commerce/EDD/Main.php:186
 msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr "Easy Digital Downloads"
 
-#: src/Tribe/Commerce/Attendance_Totals.php:63
+#: src/Tribe/Commerce/Attendance_Totals.php:66
 msgctxt "attendee summary"
 msgid "Complete:"
-msgstr ""
-
-#: src/Tribe/Commerce/Attendance_Totals.php:62
-msgctxt "attendee summary"
-msgid "Total Tickets Issued:"
 msgstr ""
 
 #: src/views/tickets-plus/orders-tickets.php:76
@@ -616,7 +649,7 @@ msgstr "Deelnemerinformatie in/uitschakelen"
 msgid "Log in to purchase"
 msgstr ""
 
-#: src/Tribe/Main.php:462
+#: src/Tribe/Main.php:501
 msgid "Require users to log in before they purchase tickets"
 msgstr "Vereis gebruikers om in te loggen voordat ze een ticket kunnen kopen"
 
@@ -826,12 +859,12 @@ msgstr "Dit ticket heeft aangepaste deelnemersinformatievelden"
 msgid "WooCommerce Support"
 msgstr "WooCommerce Support"
 
-#: src/Tribe/Commerce/EDD/Global_Stock.php:199
+#: src/Tribe/Commerce/EDD/Global_Stock.php:200
 #: src/Tribe/Commerce/WooCommerce/Global_Stock.php:213
 msgid "Sorry, there is insufficient stock to fulfill your order with respect to %s"
 msgstr "Sorry, er is niet voldoende voorraad om je bestelling uit te voeren, betreffende %s"
 
-#: src/Tribe/Commerce/EDD/Global_Stock.php:167
+#: src/Tribe/Commerce/EDD/Global_Stock.php:168
 #: src/Tribe/Commerce/WooCommerce/Global_Stock.php:180
 msgid "Sorry, there is insufficient stock to fulfill your order with respect to the tickets you selected in relation to this event: %s"
 msgid_plural "Sorry, there is insufficient stock to fulfill your order with respect to the tickets you selected in relation to these events: %s"
@@ -842,7 +875,7 @@ msgstr[1] "Sorry, er is onvoldoende voorraad om je bestelling uit te voeren voor
 msgid "Your tickets from {site_title}"
 msgstr "Je tickets van {site_title}"
 
-#: src/Tribe/Attendees_List.php:296
+#: src/Tribe/Attendees_List.php:307 src/Tribe/Attendees_List.php:308
 msgid "Load all attendees"
 msgstr "Laad alle deelnemers"
 
@@ -968,9 +1001,9 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.3)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: event-tickets-plus.php:57 src/Tribe/Main.php:338
+#: event-tickets-plus.php:57 src/Tribe/Main.php:339
 msgid "Event Tickets Plus"
 msgstr "Event Tickets Plus"
 
@@ -1015,19 +1048,19 @@ msgstr "E-mail met de tickets die de gebruiker ontvangt nadat de bestelling is a
 msgid "Tickets"
 msgstr "Tickets"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2201
+#: src/Tribe/Commerce/WooCommerce/Main.php:2087
 msgid "Unknown"
 msgstr "Onbekend "
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2152
+#: src/Tribe/Commerce/WooCommerce/Main.php:2038
 msgid "Deleted"
 msgstr "Verwijderd"
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2146
+#: src/Tribe/Commerce/WooCommerce/Main.php:2032
 msgid "In trash (was %s)"
 msgstr "In de prullemand (was %s)"
 
-#: src/Tribe/Commerce/EDD/Main.php:1794
+#: src/Tribe/Commerce/EDD/Main.php:1671
 msgid "Event"
 msgstr "Event"
 
@@ -1039,35 +1072,35 @@ msgstr "Om te beginnen met Tickets Plus, installeren en activeren van de nieuwst
 msgid "WooCommerce"
 msgstr "WooCommerce"
 
-#: src/Tribe/Commerce/EDD/Main.php:1980
+#: src/Tribe/Commerce/EDD/Main.php:1857
 msgid "Print Ticket"
 msgstr "Print Ticket"
 
-#: src/Tribe/Commerce/EDD/Main.php:1911
+#: src/Tribe/Commerce/EDD/Main.php:1788
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr "Sorry! Nog %d tickets over voor %s"
 
-#: src/Tribe/Commerce/EDD/Main.php:1909
+#: src/Tribe/Commerce/EDD/Main.php:1786
 msgid "%s ticket is sold out"
 msgstr "%s ticket is uitverkocht"
 
-#: src/Tribe/Commerce/EDD/Main.php:1812
-#: src/Tribe/Commerce/WooCommerce/Main.php:2477
+#: src/Tribe/Commerce/EDD/Main.php:1689
+#: src/Tribe/Commerce/WooCommerce/Main.php:2363
 msgid "This is a ticket for the event:"
 msgstr "Dit is een ticket voor het evenement:"
 
-#: src/Tribe/Commerce/EDD/Main.php:1743
-#: src/Tribe/Commerce/WooCommerce/Main.php:2426
+#: src/Tribe/Commerce/EDD/Main.php:1620
+#: src/Tribe/Commerce/WooCommerce/Main.php:2312
 msgid "Event sales report"
 msgstr "Evenement verkooprapport"
 
-#: src/Tribe/Commerce/EDD/Main.php:1363
-#: src/Tribe/Commerce/WooCommerce/Main.php:2043
+#: src/Tribe/Commerce/EDD/Main.php:1241
+#: src/Tribe/Commerce/WooCommerce/Main.php:1931
 msgid "(deleted)"
 msgstr "(verwijderd)"
 
-#: src/Tribe/Commerce/EDD/Main.php:525
-#: src/Tribe/Commerce/WooCommerce/Main.php:940
+#: src/Tribe/Commerce/EDD/Main.php:530
+#: src/Tribe/Commerce/WooCommerce/Main.php:951
 msgid "You'll receive your tickets in another email."
 msgstr "Let op: je krijgt je tickets in een andere mail, zodra de bestelling in onze systemen afgerond is."
 

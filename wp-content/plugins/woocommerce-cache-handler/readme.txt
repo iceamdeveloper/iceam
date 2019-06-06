@@ -41,6 +41,9 @@ For more information about installation and management of plugins, please refer 
 
 == Changelog ==
 
+= 1.0.10.190522 =
+* Updated supported WooCommerce versions.
+
 = 1.0.9.180212 =
 * Tweak - Handled condition in which a country selector widget doesn't contain the country code that the Cache Handler is trying to set.
 

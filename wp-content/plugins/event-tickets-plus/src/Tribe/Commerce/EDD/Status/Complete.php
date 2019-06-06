@@ -10,9 +10,10 @@
 class Tribe__Tickets_Plus__Commerce__EDD__Status__Complete extends Tribe__Tickets__Status__Abstract {
 
 	//This is a payment that has been paid and the product delivered to the customer.
-	public $name          = 'Completed';
-	public $provider_name = 'publish';
-	public $post_type     = 'download';
+	public $name             = 'Completed';
+	public $provider_name    = 'publish';
+	public $additional_names = [ 'Complete', 'complete' ];
+	public $post_type        = 'download';
 
 	public $trigger_option      = true;
 	public $attendee_generation = true;

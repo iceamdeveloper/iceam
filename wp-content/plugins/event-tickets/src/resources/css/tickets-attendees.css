@@ -9,9 +9,14 @@
  */
 
 #tribe-attendees-summary {
+	overflow: visible;
 	padding: 0;
 	position: relative;
 }
+
+	#tribe-attendees-summary.welcome-panel {
+		overflow: visible;
+	}
 
 	#tribe-attendees-summary h3,
 	#tribe-attendees-summary .about-description {

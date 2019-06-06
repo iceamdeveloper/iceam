@@ -3,8 +3,8 @@
 Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, barry.hughes, bordoni, borkweb, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.7
-Tested up to: 5.1.1
-Stable tag: 4.10.3
+Tested up to: 5.2
+Stable tag: 4.10.5
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,33 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.10.5] 2019-05-23 =
+
+* Feature - Implemented our abstract Object-relational Mapping layer for Easy Digital Downloads / WooCommerce Attendees and increased stability with more automated tests [123468]
+* Tweak - Added ability to query attendees by provider using `tribe_attendees( 'woo' )` and `tribe_attendees( 'edd' )` [123468]
+* Tweak - Added filters: `tribe_tickets_plus_attendees_list_limit_attendees`
+* Language - 0 new strings added, 18 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.10.4] 2019-05-14 =
+
+* Feature - Add tooltips to Attendee report, utilizing new tooltip object in tribe-common [120856]
+* Feature - Add support for checkbox values returning as "Checked" when populating data for attendee list exports [126735]
+* Tweak - Verify the status of attendee as complete when checking in using the REST API [122458]
+* Tweak - Utilize the order items to generate the Order Report for WooCommerce instead of attendees [93785]
+* Tweak - Remove canceled orders from counting as Pending Competition on the WooCommerce Tickets Order Page [120862]
+* Tweak - Changed some tooltip text on the attendee report page for clarity around capacity/inventory/stock [126342]
+* Tweak - Adjust styling of the Attendee Information required fields indicator [126779]
+* Tweak - Added filters: `tribe_tickets_plus_get_total_cancelled`, `tribe_events_tickets_plus_attendees_list_checkbox_label`
+* Fix - Update shared capacity on deletion of attendee for WooCommerce and EDD Attendees [106516]
+* Fix - Make Attendees Report match the order report, specifically "Total Tickets Issued" should not include cancelled tickets [69823]
+* Fix - Make sure that `WC()->cart` is set before we try to get it's contents [126779]
+* Fix - Prevent tickets from being counted twice in the order report when 2 or more tickets included in an order [106516]
+* Fix - Ensure capacity changes for source and target tickets when moving a ticket from one type to another [102636]
+* Fix - Deprecate old option key `ticket-attendee-info-slug` for attendee registration shortcode to prevent errors [126856]
+* Fix - Change cookie settings so that Attendee Information is passed through to checkout on non-secure sites properly [25964]
+* Fix - Alter query so EDD `Stock_Control->get_purchased_inventory()` takes moved tickets into account [124657]
+* Language - 9 new strings added, 26 updated, 0 fuzzied, and 1 obsoleted
 
 = [4.10.3] 2019-04-23 =
 
