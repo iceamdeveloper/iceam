@@ -32,15 +32,27 @@ class WC_Subscriptions_Checkout {
 		// Restore the settings after switching them for the checkout form
 		add_action( 'woocommerce_after_checkout_form', __CLASS__ . '::restore_checkout_registration_settings', 100 );
 
-		// Make sure guest checkout is not enabled in option param passed to WC JS
-		add_filter( 'woocommerce_params', __CLASS__ . '::filter_woocommerce_script_paramaters', 10, 1 );
-		add_filter( 'wc_checkout_params', __CLASS__ . '::filter_woocommerce_script_paramaters', 10, 1 );
+		// Some callbacks need to hooked after WC has loaded.
+		add_action( 'woocommerce_loaded', array( __CLASS__, 'attach_dependant_hooks' ) );
 
 		// Force registration during checkout process
 		add_action( 'woocommerce_before_checkout_process', __CLASS__ . '::force_registration_during_checkout', 10 );
 
 		// When a line item is added to a subscription on checkout, ensure the backorder data added by WC is removed
 		add_action( 'woocommerce_checkout_create_order_line_item', __CLASS__ . '::remove_backorder_meta_from_subscription_line_item', 10, 4 );
+	}
+
+	/**
+	 * @since 2.2.17
+	 */
+	public static function attach_dependant_hooks() {
+		// Make sure guest checkout is not enabled in option param passed to WC JS
+		if ( WC_Subscriptions::is_woocommerce_pre( '3.3' ) ) {
+			add_filter( 'woocommerce_params', array( __CLASS__, 'filter_woocommerce_script_parameters' ), 10, 1 );
+			add_filter( 'wc_checkout_params', array( __CLASS__, 'filter_woocommerce_script_parameters' ), 10, 1 );
+		} else {
+			add_filter( 'woocommerce_get_script_data', array( __CLASS__, 'filter_woocommerce_script_parameters' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -213,7 +225,7 @@ class WC_Subscriptions_Checkout {
 			$subscription->set_total( $cart->total );
 
 			// Hook to adjust subscriptions before saving with WC 3.0+ (matches WC 3.0's new 'woocommerce_checkout_create_order' hook)
-			do_action( 'woocommerce_checkout_create_subscription', $subscription, $posted_data );
+			do_action( 'woocommerce_checkout_create_subscription', $subscription, $posted_data, $order, $cart );
 
 			// Save the subscription if using WC 3.0 & CRUD
 			$subscription->save();
@@ -289,8 +301,8 @@ class WC_Subscriptions_Checkout {
 					$item->save(); // We need the item ID for old hooks, this can be removed once support for WC < 3.0 is dropped
 					wc_do_deprecated_action( 'woocommerce_subscriptions_add_recurring_shipping_order_item', array( $subscription->get_id(), $item->get_id(), $package_key ), '2.2.0', 'CRUD and woocommerce_checkout_create_subscription_shipping_item action instead' );
 
-					do_action( 'woocommerce_checkout_create_order_shipping_item', $item, $package_key, $package ); // WC 3.0+ will also trigger the deprecated 'woocommerce_add_shipping_order_item' hook
-					do_action( 'woocommerce_checkout_create_subscription_shipping_item', $item, $package_key, $package );
+					do_action( 'woocommerce_checkout_create_order_shipping_item', $item, $package_key, $package, $subscription ); // WC 3.0+ will also trigger the deprecated 'woocommerce_add_shipping_order_item' hook
+					do_action( 'woocommerce_checkout_create_subscription_shipping_item', $item, $package_key, $package, $subscription );
 				}
 			}
 		}
@@ -352,8 +364,10 @@ class WC_Subscriptions_Checkout {
 
 		// Allow plugins to add order item meta
 		if ( WC_Subscriptions::is_woocommerce_pre( '3.0' ) ) {
+			do_action( 'woocommerce_add_order_item_meta', $item_id, $cart_item, $cart_item_key );
 			do_action( 'woocommerce_add_subscription_item_meta', $item_id, $cart_item, $cart_item_key );
 		} else {
+			wc_do_deprecated_action( 'woocommerce_add_order_item_meta', array( $item_id, $cart_item, $cart_item_key ), '3.0', 'CRUD and woocommerce_checkout_create_order_line_item action instead' );
 			wc_do_deprecated_action( 'woocommerce_add_subscription_item_meta', array( $item_id, $cart_item, $cart_item_key ), '3.0', 'CRUD and woocommerce_checkout_create_order_line_item action instead' );
 		}
 
@@ -441,15 +455,39 @@ class WC_Subscriptions_Checkout {
 	 * Also make sure the guest checkout option value passed to the woocommerce.js forces registration.
 	 * Otherwise the registration form is hidden by woocommerce.js.
 	 *
-	 * @since 1.1
+	 * @param string $handle Default empty string ('').
+	 * @param array  $woocommerce_params
+	 *
+	 * @since 2.5.3
+	 * @return array
 	 */
-	public static function filter_woocommerce_script_paramaters( $woocommerce_params ) {
+	public static function filter_woocommerce_script_parameters( $woocommerce_params, $handle = '' ) {
+		// WC 3.3+ deprecates handle-specific filters in favor of 'woocommerce_get_script_data'.
+		if ( 'woocommerce_get_script_data' === current_filter() && ! in_array( $handle, array(
+				'woocommerce',
+				'wc-checkout',
+			) ) ) {
+			return $woocommerce_params;
+		}
 
 		if ( WC_Subscriptions_Cart::cart_contains_subscription() && ! is_user_logged_in() && isset( $woocommerce_params['option_guest_checkout'] ) && 'yes' == $woocommerce_params['option_guest_checkout'] ) {
 			$woocommerce_params['option_guest_checkout'] = 'no';
 		}
 
 		return $woocommerce_params;
+	}
+
+	/**
+	 * Also make sure the guest checkout option value passed to the woocommerce.js forces registration.
+	 * Otherwise the registration form is hidden by woocommerce.js.
+	 *
+	 * @since      1.1
+	 * @deprecated 2.5.3
+	 */
+	public static function filter_woocommerce_script_paramaters( $woocommerce_params, $handle = '' ) {
+		wcs_deprecated_function( __METHOD__, '2.5.3', 'WC_Subscriptions_Admin::filter_woocommerce_script_parameters( $woocommerce_params, $handle )' );
+
+		return self::filter_woocommerce_script_parameters( $woocommerce_params, $handle );
 	}
 
 	/**
@@ -487,5 +525,3 @@ class WC_Subscriptions_Checkout {
 		return $actions;
 	}
 }
-
-WC_Subscriptions_Checkout::init();

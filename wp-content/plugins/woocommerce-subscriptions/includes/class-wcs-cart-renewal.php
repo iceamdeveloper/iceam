@@ -39,7 +39,7 @@ class WCS_Cart_Renewal {
 		add_filter( 'woocommerce_default_order_status', array( &$this, 'maybe_preserve_order_status' ) );
 
 		// When a failed/pending renewal order is paid for via checkout, ensure a new order isn't created due to mismatched cart hashes
-		add_filter( 'woocommerce_create_order', array( &$this, 'set_renewal_order_cart_hash' ), 10, 1 );
+		add_filter( 'woocommerce_create_order', array( &$this, 'update_cart_hash' ), 10, 1 );
 
 		// When a user is prevented from paying for a failed/pending renewal order because they aren't logged in, redirect them back after login
 		add_filter( 'woocommerce_login_redirect', array( &$this, 'maybe_redirect_after_login' ), 10 , 1 );
@@ -48,6 +48,24 @@ class WCS_Cart_Renewal {
 		add_action( 'woocommerce_checkout_order_processed', array( &$this, 'update_session_cart_after_updating_renewal_order' ), 10 );
 
 		add_filter( 'wc_dynamic_pricing_apply_cart_item_adjustment', array( &$this, 'prevent_compounding_dynamic_discounts' ), 10, 2 );
+
+		// Remove non-recurring fees from renewal carts. Hooked in late (priority 1000), to ensure we handle all fees added by third-parties.
+		add_action( 'woocommerce_cart_calculate_fees', array( $this, 'remove_non_recurring_fees' ), 1000 );
+
+		// Remove subscription products with "one time shipping" from shipping packages.
+		add_filter( 'woocommerce_cart_shipping_packages', array( $this, 'maybe_update_shipping_packages' ), 0, 1 );
+
+		add_action( 'wcs_before_renewal_setup_cart_subscriptions', array( &$this, 'clear_coupons' ), 10 );
+
+		// Handles renew of password-protected products.
+		add_action( 'wcs_before_renewal_setup_cart_subscriptions', 'wcs_allow_protected_products_to_renew' );
+		add_action( 'wcs_after_renewal_setup_cart_subscriptions', 'wcs_disallow_protected_product_add_to_cart_validation' );
+
+		// Apply renewal discounts as pseudo coupons
+		add_action( 'woocommerce_setup_cart_for_subscription_renewal', array( $this, 'setup_discounts' ) );
+
+		// Work around WC changing the "created_via" meta to "checkout" regardless of its previous value during checkout.
+		add_action( 'woocommerce_checkout_create_order', array( $this, 'maybe_preserve_order_created_via' ), 0, 1 );
 	}
 
 	/**
@@ -97,10 +115,7 @@ class WCS_Cart_Renewal {
 		// Check if a user is requesting to create a renewal order for a subscription, needs to happen after $wp->query_vars are set
 		add_action( 'template_redirect', array( &$this, 'maybe_setup_cart' ), 100 );
 
-		// Apply renewal discounts as pseudo coupons
-		add_action( 'wcs_after_renewal_setup_cart_subscription', array( &$this, 'maybe_setup_discounts' ), 10, 2 );
 		add_filter( 'woocommerce_get_shop_coupon_data', array( &$this, 'renewal_coupon_data' ), 10, 2 );
-		add_action( 'wcs_before_renewal_setup_cart_subscriptions', array( &$this, 'clear_coupons' ), 10 );
 
 		add_action( 'woocommerce_remove_cart_item', array( &$this, 'maybe_remove_items' ), 10, 1 );
 		add_action( 'woocommerce_before_cart_item_quantity_zero', array( &$this, 'maybe_remove_items' ), 10, 1 );
@@ -118,6 +133,26 @@ class WCS_Cart_Renewal {
 
 		// If the shipping address on a renewal order differs to the order's billing address, check the "Ship to different address" automatically to make sure the renewal order's fields are used by default
 		add_filter( 'woocommerce_ship_to_different_address_checked', array( &$this, 'maybe_check_ship_to_different_address' ), 100, 1 );
+
+		add_filter( 'woocommerce_get_item_data', array( &$this, 'display_line_item_data_in_cart' ), 10, 2 );
+
+		// Attach hooks which depend on WooCommerce version constants. Differs from @see attach_dependant_hooks() in that this is hooked inside an inherited function and so extended classes will also inherit these callbacks
+		add_action( 'woocommerce_loaded', array( &$this, 'attach_dependant_callbacks' ), 10 );
+	}
+
+	/**
+	 * Attach callbacks dependant on WC versions
+	 *
+	 * @since 2.2.11
+	 */
+	public function attach_dependant_callbacks() {
+
+		if ( WC_Subscriptions::is_woocommerce_pre( '3.0' ) ) {
+			add_action( 'woocommerce_add_order_item_meta', array( &$this, 'add_order_item_meta' ), 10, 2 );
+			add_action( 'woocommerce_add_subscription_item_meta', array( &$this, 'add_order_item_meta' ), 10, 2 );
+		} else {
+			add_action( 'woocommerce_checkout_create_order_line_item',  array( &$this, 'add_order_line_item_meta' ), 10, 3 );
+		}
 	}
 
 	/**
@@ -167,11 +202,16 @@ class WCS_Cart_Renewal {
 
 					do_action( 'wcs_before_renewal_setup_cart_subscription', $subscription, $order );
 
-					// Add the existing subscription items to the cart
-					$this->setup_cart( $order, array(
-						'subscription_id'  => $subscription->get_id(),
-						'renewal_order_id' => $order_id,
-					) );
+					// Check if order/subscription can be paid for
+					if ( empty( $subscription ) || ! $subscription->has_status( array( 'on-hold', 'pending' ) ) ) {
+						wc_add_notice( __( 'This order can no longer be paid because the corresponding subscription does not require payment at this time.', 'woocommerce-subscriptions' ), 'error' );
+					} else {
+						// Add the existing subscription items to the cart
+						$this->setup_cart( $order, array(
+							'subscription_id'  => $subscription->get_id(),
+							'renewal_order_id' => $order_id,
+						) );
+					}
 
 					do_action( 'wcs_after_renewal_setup_cart_subscription', $subscription, $order );
 				}
@@ -184,7 +224,7 @@ class WCS_Cart_Renewal {
 					wc_add_notice( __( 'Complete checkout to renew your subscription.', 'woocommerce-subscriptions' ), 'success' );
 				}
 
-				wp_safe_redirect( WC()->cart->get_checkout_url() );
+				wp_safe_redirect( wc_get_checkout_url() );
 				exit;
 			}
 		}
@@ -205,6 +245,22 @@ class WCS_Cart_Renewal {
 
 			$variations = array();
 			$item_data  = array();
+			$custom_line_item_meta   = array();
+			$reserved_item_meta_keys = array(
+				'_item_meta',
+				'_item_meta_array',
+				'_qty',
+				'_tax_class',
+				'_product_id',
+				'_variation_id',
+				'_line_subtotal',
+				'_line_total',
+				'_line_tax',
+				'_line_tax_data',
+				'_line_subtotal_tax',
+				'_cart_item_key_' . $this->cart_item_key, // This value is unique per checkout attempt and so shouldn't be copied from existing line items.
+				'Backordered', // WC will reapply this meta if the line item is backordered. Therefore it shouldn't be copied through the cart.
+			);
 
 			// Load all product info including variation data
 			if ( WC_Subscriptions::is_woocommerce_pre( '3.0' ) ) {
@@ -219,6 +275,8 @@ class WCS_Cart_Renewal {
 						$variations[ $meta_name ] = $meta_value[0];
 					} elseif ( meta_is_product_attribute( $meta_name, $meta_value[0], $product_id ) ) {
 						$variations[ $meta_name ] = $meta_value[0];
+					} elseif ( ! in_array( $meta_name, $reserved_item_meta_keys ) ) {
+						$custom_line_item_meta[ $meta_name ] = $meta_value[0];
 					}
 				}
 			} else {
@@ -233,6 +291,8 @@ class WCS_Cart_Renewal {
 						$variations[ $meta->key ] = $meta->value;
 					} elseif ( meta_is_product_attribute( $meta->key, $meta->value, $product_id ) ) {
 						$variations[ $meta->key ] = $meta->value;
+					} elseif ( ! in_array( $meta->key, $reserved_item_meta_keys ) ) {
+						$custom_line_item_meta[ $meta->key ] = $meta->value;
 					}
 				}
 			}
@@ -260,7 +320,8 @@ class WCS_Cart_Renewal {
 				}
 			}
 
-			$cart_item_data['line_item_id'] = $item_id;
+			$cart_item_data['line_item_id']          = $item_id;
+			$cart_item_data['custom_line_item_meta'] = $custom_line_item_meta;
 
 			$item_data = apply_filters( 'woocommerce_order_again_cart_item_data', array( $this->cart_item_key => $cart_item_data ), $line_item, $subscription );
 
@@ -280,102 +341,6 @@ class WCS_Cart_Renewal {
 		}
 
 		do_action( 'woocommerce_setup_cart_for_' . $this->cart_item_key, $subscription, $cart_item_data );
-	}
-
-	/**
-	 * Check if a renewal order subscription has any coupons applied and if so add pseudo renewal coupon equivalents to ensure the discount is still applied
-	 *
-	 * @param object $subscription subscription
-	 * @since 2.0.10
-	 */
-	public function maybe_setup_discounts( $subscription, $order = null ) {
-		if ( null === $order ) {
-			// If no order arg is passed, to honor backward compatibility, apply discounts which apply to the subscription
-			$order = $subscription;
-		}
-
-		if ( wcs_is_subscription( $order ) || wcs_order_contains_renewal( $order ) ) {
-
-			$used_coupons   = $order->get_used_coupons();
-			$order_discount = wcs_get_objects_property( $order, 'cart_discount' );
-
-			// Add any used coupon discounts to the cart (as best we can) using our pseudo renewal coupons
-			if ( ! empty( $used_coupons ) ) {
-				$coupon_items = $order->get_items( 'coupon' );
-
-				foreach ( $coupon_items as $coupon_item ) {
-
-					$coupon      = new WC_Coupon( $coupon_item['name'] );
-					$coupon_type = wcs_get_coupon_property( $coupon, 'discount_type' );
-					$coupon_code = '';
-
-					// If the coupon still exists we can use the existing/available coupon properties
-					if ( true === wcs_get_coupon_property( $coupon, 'exists' ) ) {
-
-						// But we only want to handle recurring coupons that have been applied to the order
-						if ( in_array( $coupon_type, array( 'recurring_percent', 'recurring_fee' ) ) ) {
-
-							// Set the coupon type to be a renewal equivalent for correct validation and calculations
-							if ( 'recurring_percent' == $coupon_type ) {
-								wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_percent' );
-							} elseif ( 'recurring_fee' == $coupon_type ) {
-								wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_fee' );
-							}
-
-							// Adjust coupon code to reflect that it is being applied to a renewal
-							$coupon_code = wcs_get_coupon_property( $coupon, 'code' );
-						}
-					} else {
-						// If the coupon doesn't exist we can only really apply the discount amount we know about - so we'll apply a cart style pseudo coupon and then set the amount
-						wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_cart' );
-
-						// Adjust coupon code to reflect that it is being applied to a renewal
-						$coupon_code   = wcs_get_coupon_property( $coupon, 'code' );
-						$coupon_amount = is_callable( array( $coupon_item, 'get_discount' ) ) ? $coupon_item->get_discount() : $coupon_item['item_meta']['discount_amount']['0'];
-
-						wcs_set_coupon_property( $coupon, 'coupon_amount', $coupon_amount );
-					}
-
-					// Now that we have a coupon we know we want to apply
-					if ( ! empty( $coupon_code ) ) {
-
-						// Set renewal order products as the product ids on the coupon
-						if ( ! WC_Subscriptions::is_woocommerce_pre( '2.5' ) ) {
-							wcs_set_coupon_property( $coupon, 'product_ids', $this->get_products( $order ) );
-						}
-
-						// Store the coupon info for later
-						$this->store_coupon( wcs_get_objects_property( $order, 'id' ), $coupon );
-
-						// Add the coupon to the cart - the actually coupon values / data are grabbed when needed later
-						if ( WC()->cart && ! WC()->cart->has_discount( $coupon_code ) ) {
-							WC()->cart->add_discount( $coupon_code );
-						}
-					}
-				}
-			// If there are no coupons but there is still a discount (i.e. it might have been manually added), we need to account for that as well
-			} elseif ( ! empty( $order_discount ) ) {
-				$coupon = new WC_Coupon( 'discount_renewal' );
-
-				// Apply our cart style pseudo coupon and the set the amount
-				wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_cart' );
-
-				wcs_set_coupon_property( $coupon, 'coupon_amount', $order_discount );
-
-				// Set renewal order products as the product ids on the coupon
-				if ( ! WC_Subscriptions::is_woocommerce_pre( '2.5' ) ) {
-					wcs_set_coupon_property( $coupon, 'product_ids', $this->get_products( $order ) );
-				}
-
-				// Store the coupon info for later
-				$this->store_coupon( wcs_get_objects_property( $order, 'id' ), $coupon );
-
-				// Add the coupon to the cart
-				if ( WC()->cart && ! WC()->cart->has_discount( 'discount_renewal' ) ) {
-					WC()->cart->add_discount( 'discount_renewal' );
-				}
-			}
-		}
 	}
 
 	/**
@@ -441,16 +406,8 @@ class WCS_Cart_Renewal {
 
 				$price = $item_to_renew['line_subtotal'];
 
-				if ( wc_prices_include_tax() ) {
-
-					if ( apply_filters( 'woocommerce_adjust_non_base_location_prices', true ) ) {
-						$base_tax_rates = WC_Tax::get_base_tax_rates( wcs_get_objects_property( $_product, 'tax_class' ) );
-					} else {
-						$base_tax_rates = WC_Tax::get_rates( wcs_get_objects_property( $_product, 'tax_class' ) );
-					}
-
-					$base_taxes_on_item = WC_Tax::calc_tax( $price, $base_tax_rates, false, false );
-					$price += array_sum( $base_taxes_on_item );
+				if ( $_product->is_taxable() && $subscription->get_prices_include_tax() ) {
+					$price += $item_to_renew['subtotal_tax'];
 				}
 
 				$_product->set_price( $price / $item_to_renew['qty'] );
@@ -483,7 +440,7 @@ class WCS_Cart_Renewal {
 		if ( $this->cart_contains() && did_action( 'woocommerce_checkout_init' ) > 0 ) {
 
 			// Guard against the fake WC_Checkout singleton, see https://github.com/woocommerce/woocommerce-subscriptions/issues/427#issuecomment-260763250
-			remove_filter( 'woocommerce_checkout_get_value', array( &$this, 'checkout_get_value' ), 10, 2 );
+			remove_filter( 'woocommerce_checkout_get_value', array( &$this, 'checkout_get_value' ), 10 );
 
 			if ( is_callable( array( WC()->checkout(), 'get_checkout_fields' ) ) ) { // WC 3.0+
 				$address_fields = array_merge( WC()->checkout()->get_checkout_fields( 'billing' ), WC()->checkout()->get_checkout_fields( 'shipping' ) );
@@ -915,6 +872,16 @@ class WCS_Cart_Renewal {
 
 			$order = $this->get_order( $cart_item );
 
+			/**
+			 * Allow other plugins to remove/add fees of an existing order prior to building the cart without changing the saved order values
+			 * (e.g. payment gateway based fees can remove fees and later can add new fees depending on the actual selected payment gateway)
+			 *
+			 * @param WC_Order $order is renderd by reference - change meta data of this object
+			 * @param WC_Cart $cart
+			 * @since 2.2.9
+			 */
+			do_action( 'woocommerce_adjust_order_fees_for_setup_cart_for_' . $this->cart_item_key, $order, $cart );
+
 			if ( $order instanceof WC_Order ) {
 				foreach ( $order->get_fees() as $fee ) {
 					$cart->add_fee( $fee['name'], $fee['line_total'], abs( $fee['line_tax'] ) > 0, $fee['tax_class'] );
@@ -969,7 +936,15 @@ class WCS_Cart_Renewal {
 	 */
 	protected function set_cart_hash( $order_id ) {
 		$order = wc_get_order( $order_id );
-		wcs_set_objects_property( $order, 'cart_hash', md5( json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total ) );
+
+		// Use cart hash generator introduced in WooCommerce 3.6
+		if ( is_callable( array( WC()->cart, 'get_cart_hash' ) ) ) {
+			$cart_hash = WC()->cart->get_cart_hash();
+		} else {
+			$cart_hash = md5( json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
+		}
+
+		wcs_set_objects_property( $order, 'cart_hash', $cart_hash );
 	}
 
 	/**
@@ -978,12 +953,23 @@ class WCS_Cart_Renewal {
 	 *
 	 * @param Mixed | An order generated by third party plugins
 	 * @return Mixed | The unchanged order param
-	 * @since  2.1.0
+	 * @since  2.2.11
 	 */
-	public function set_renewal_order_cart_hash( $order ) {
+	public function update_cart_hash( $order ) {
 
-		if ( $item = wcs_cart_contains_renewal() ) {
-			$this->set_cart_hash( $item[ $this->cart_item_key ]['renewal_order_id'] );
+		if ( $item = $this->cart_contains() ) {
+
+			if ( isset( $item[ $this->cart_item_key ]['renewal_order_id'] ) ) {
+				$order_id = $item[ $this->cart_item_key ]['renewal_order_id'];
+			} elseif ( isset( $item[ $this->cart_item_key ]['order_id'] ) ) {
+				$order_id = $item[ $this->cart_item_key ]['order_id'];
+			} else {
+				$order_id = '';
+			}
+
+			if ( $order_id ) {
+				$this->set_cart_hash( $order_id );
+			}
 		}
 
 		return $order;
@@ -1146,6 +1132,267 @@ class WCS_Cart_Renewal {
 		}
 	}
 
+	/**
+	 * Add custom line item meta to the cart item data so it's displayed in the cart.
+	 *
+	 * @param array $cart_item_data
+	 * @param array $cart_item
+	 * @since 2.2.11
+	 */
+	public function display_line_item_data_in_cart( $cart_item_data, $cart_item ) {
+
+		if ( ! empty( $cart_item[ $this->cart_item_key ]['custom_line_item_meta'] ) ) {
+			foreach ( $cart_item[ $this->cart_item_key ]['custom_line_item_meta'] as $item_meta_key => $value ) {
+
+				$cart_item_data[] = array(
+					'key'    => $item_meta_key,
+					'value'  => $value,
+					'hidden' => substr( $item_meta_key, 0, 1 ) === '_', // meta keys prefixed with an `_` are hidden by default
+				);
+			}
+		}
+
+		return $cart_item_data;
+	}
+
+	/**
+	 * Add custom line item meta from the old line item into the new line item meta.
+	 *
+	 * Used when WC versions prior to 3.0 are active. When WC 3.0 or newer is active,
+	 * @see WCS_Cart_Renewal->add_order_line_item_meta() replaces this function
+	 *
+	 * @param int $item_id
+	 * @param array $cart_item_data
+	 * @since 2.2.11
+	 */
+	public function add_order_item_meta( $item_id, $cart_item_data ) {
+		if ( ! empty( $cart_item_data[ $this->cart_item_key ]['custom_line_item_meta'] ) ) {
+			foreach ( $cart_item_data[ $this->cart_item_key ]['custom_line_item_meta'] as $meta_key => $value ) {
+				woocommerce_add_order_item_meta( $item_id, $meta_key, $value );
+			}
+		}
+	}
+
+	/**
+	 * Add custom line item meta from the old line item into the new line item meta.
+	 *
+	 * Used when WC 3.0 or newer is active. When prior versions are active,
+	 * @see WCS_Cart_Renewal->add_order_item_meta() replaces this function
+	 *
+	 * @param WC_Order_Item_Product
+	 * @param string $cart_item_key
+	 * @param array $cart_item_data
+	 * @since 2.2.11
+	 */
+	public function add_order_line_item_meta( $item, $cart_item_key, $cart_item_data ) {
+		if ( ! empty( $cart_item_data[ $this->cart_item_key ]['custom_line_item_meta'] ) ) {
+			foreach ( $cart_item_data[ $this->cart_item_key ]['custom_line_item_meta'] as $meta_key => $value ) {
+				$item->add_meta_data( $meta_key, $value );
+			}
+		}
+	}
+
+	/**
+	 * Remove any fees applied to the renewal cart which aren't recurring.
+	 *
+	 * @param WC_Cart $cart A WooCommerce cart object.
+	 */
+	public function remove_non_recurring_fees( $cart ) {
+
+		if ( ! $this->cart_contains() ) {
+			return;
+		}
+
+		$cart_fees = $cart->get_fees();
+
+		// WC doesn't have a method for removing fees individually so we clear them and re-add them where applicable.
+		if ( is_callable( array( $cart, 'fees_api' ) ) ) { // WC 3.2 +
+			$cart->fees_api()->remove_all_fees();
+		} else {
+			$cart->fees = array();
+		}
+
+		foreach ( $cart_fees as $fee ) {
+			if ( true === apply_filters( 'woocommerce_subscriptions_is_recurring_fee', false, $fee, $cart ) ) {
+				if ( is_callable( array( $cart, 'fees_api' ) ) ) { // WC 3.2 +
+					$cart->fees_api()->add_fee( $fee );
+				} else {
+					$cart->add_fee( $fee->name, $fee->amount, $fee->taxable, $fee->tax_class );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Filters the shipping packages to remove subscriptions that have "one time shipping" enabled and, as such,
+	 * shouldn't have a shipping amount associated during a renewal.
+	 *
+	 * @since 2.3.3
+	 */
+	public function maybe_update_shipping_packages( $packages ) {
+		if ( ! $this->cart_contains() ) {
+			return $packages;
+		}
+
+		foreach ( $packages as $index => $package ) {
+			foreach ( $package['contents'] as $cart_item_key => $cart_item ) {
+				if ( WC_Subscriptions_Product::needs_one_time_shipping( $cart_item['data'] ) ) {
+					$packages[ $index ]['contents_cost'] -= $cart_item['line_total'];
+					unset( $packages[ $index ]['contents'][ $cart_item_key ] );
+				}
+			}
+
+			if ( empty( $packages[ $index ]['contents'] ) ) {
+				unset( $packages[ $index ] );
+			}
+		}
+
+		return $packages;
+	}
+
+	/**
+	 * Check if the order has any discounts applied and if so reapply them to the cart
+	 * or add pseudo coupon equivalents if the coupons no longer exist.
+	 *
+	 * @param WC_Order $order The order to copy coupons and discounts from.
+	 * @since 2.4.3
+	 */
+	public function setup_discounts( $order ) {
+		$order_discount = $order->get_total_discount();
+		$coupon_items   = $order->get_items( 'coupon' );
+
+		if ( empty( $order_discount ) && empty( $coupon_items ) ) {
+			return;
+		}
+
+		$total_coupon_discount = floatval( array_sum( wc_list_pluck( $coupon_items, 'get_discount' ) ) );
+		$coupons               = array();
+
+		// If the order total discount is different from the discount applied from coupons we have a manually applied discount.
+		$order_has_manual_discount = $order_discount !== $total_coupon_discount;
+
+		// Get all coupon line items as coupon objects.
+		if ( ! empty( $coupon_items ) ) {
+			$coupons = $this->get_line_item_coupons( $coupon_items );
+		}
+
+		if ( $order_has_manual_discount ) {
+			// Remove any coupon line items which don't grant free shipping.
+			foreach ( $coupons as $index => $coupon ) {
+				if ( ! $coupon->get_free_shipping() ) {
+					unset( $coupons[ $index ] );
+				}
+
+				// We're going to apply a coupon for the full order discount so make sure free shipping coupons don't apply any discount.
+				$coupon->set_amount( 0 );
+			}
+
+			$coupons[] = $this->get_pseudo_coupon( $order_discount );
+		}
+
+		foreach ( $coupons as $coupon ) {
+			$this->apply_order_coupon( $order, $coupon );
+		}
+	}
+
+	/**
+	 * Create coupon objects from coupon line items.
+	 *
+	 * @param array $coupon_line_items The coupon line items to apply to the cart.
+	 * @return array $coupons
+	 */
+	protected function get_line_item_coupons( $coupon_line_items ) {
+		$coupons = array();
+
+		foreach ( $coupon_line_items as $coupon_item ) {
+			$coupon = new WC_Coupon( $coupon_item['name'] );
+
+			// If the coupon no longer exists, get a pseudo coupon for the discounting amount.
+			if ( ! $coupon->get_id() > 0 ) {
+				// We shouldn't apply coupons which no longer exists it to initial payment carts.
+				if ( 'subscription_initial_payment' === $this->cart_item_key ) {
+					continue;
+				}
+
+				$coupon = $this->get_pseudo_coupon( $coupon_item->get_discount() );
+				$coupon->set_code( $coupon_item['code'] );
+			} elseif ( 'subscription_renewal' === $this->cart_item_key ) {
+				$coupon_type = $coupon->get_discount_type();
+
+				// Change recurring coupons into renewal coupons so we can handle validation while paying for a renewal order manually.
+				if ( in_array( $coupon_type, array( 'recurring_percent', 'recurring_fee' ) ) ) {
+					$coupon->set_discount_type( str_replace( 'recurring', 'renewal', $coupon_type ) );
+				}
+			}
+
+			$coupons[] = $coupon;
+		}
+
+		return $coupons;
+	}
+
+	/**
+	 * Apply a pseudo coupon to the cart for a specific discount amount.
+	 *
+	 * @param float $discount The discount amount.
+	 * @return WC_Coupon
+	 */
+	protected function get_pseudo_coupon( $discount ) {
+		$cart_types = array(
+			'subscription_initial_payment' => 'initial',
+			'subscription_renewal'         => 'renewal',
+		);
+
+		$cart_type = $cart_types[ $this->cart_item_key ];
+
+		// Generate a unique coupon code from the cart type.
+		$coupon = new WC_Coupon( "discount_{$cart_type}" );
+
+		// Apply our cart style pseudo coupon type and the set the amount.
+		$coupon->set_discount_type( "{$cart_type}_cart" );
+		$coupon->set_amount( $discount );
+
+		return $coupon;
+	}
+
+	/**
+	 * Apply an order coupon to the cart.
+	 *
+	 * @param WC_Order $order The order the discount should apply to.
+	 * @param WC_Coupon $coupon The coupon to add to the cart.
+	 */
+	protected function apply_order_coupon( $order, $coupon ) {
+		$coupon_code = $coupon->get_code();
+
+		// Set order products as the product ids on the coupon if the coupon does not already have usage restrictions for some products
+		if ( ! $coupon->get_product_ids() ) {
+			$coupon->set_product_ids( $this->get_products( $order ) );
+		}
+
+		// Store the coupon info for later
+		$this->store_coupon( $order->get_id(), $coupon );
+
+		// Add the coupon to the cart
+		if ( WC()->cart && ! WC()->cart->has_discount( $coupon_code ) ) {
+			WC()->cart->add_discount( $coupon_code );
+		}
+	}
+
+	/**
+	 * Makes sure a renewal order's "created via" meta is not changed to "checkout" by WC during checkout.
+	 *
+	 * @param WC_Order $order
+	 * @since 2.5.4
+	 */
+	public function maybe_preserve_order_created_via( $order ) {
+		$changes = $order->get_changes();
+		$current_data = $order->get_data();
+
+		if ( isset( $changes['created_via'], $current_data['created_via'] ) && 'subscription' === $current_data['created_via'] && 'checkout' === $changes['created_via'] && wcs_order_contains_renewal( $order ) ) {
+			$order->set_created_via( 'subscription' );
+		}
+	}
+
 	/* Deprecated */
 
 	/**
@@ -1210,5 +1457,115 @@ class WCS_Cart_Renewal {
 		_deprecated_function( __METHOD__, '2.2.1', __CLASS__ . '::add_line_item_meta( $order_item, $cart_item_key, $cart_item )' );
 		$this->add_line_item_meta( $order_item, $cart_item_key, $cart_item );
 	}
+
+	/**
+	 * Right before WC processes a renewal cart through the checkout, set the cart hash.
+	 * This ensures legitimate changes to taxes and shipping methods don't cause a new order to be created.
+	 *
+	 * @param Mixed | An order generated by third party plugins
+	 * @return Mixed | The unchanged order param
+	 * @since  2.1.0
+	 */
+	public function set_renewal_order_cart_hash( $order ) {
+		_deprecated_function( __METHOD__, '2.3', __CLASS__ . '::update_cart_hash( $order )' );
+		$this->update_cart_hash( $order );
+		return $order;
+	}
+
+	/**
+	 * Check if a renewal order subscription has any coupons applied and if so add pseudo renewal coupon equivalents to ensure the discount is still applied
+	 *
+	 * @param WC_Subscription $subscription subscription
+	 * @param WC_Order $order
+	 *
+	 * @since 2.0.10
+	 * @deprecated 2.4.3
+	 */
+	public function maybe_setup_discounts( $subscription, $order = null ) {
+		wcs_deprecated_function( __METHOD__, '2.4.3' );
+
+		if ( null === $order ) {
+			// If no order arg is passed, to honor backward compatibility, apply discounts which apply to the subscription
+			$order = $subscription;
+		}
+
+		if ( wcs_is_subscription( $order ) || wcs_order_contains_renewal( $order ) ) {
+
+			$used_coupons   = $order->get_used_coupons();
+			$order_discount = wcs_get_objects_property( $order, 'cart_discount' );
+
+			// Add any used coupon discounts to the cart (as best we can) using our pseudo renewal coupons
+			if ( ! empty( $used_coupons ) ) {
+				$coupon_items = $order->get_items( 'coupon' );
+
+				foreach ( $coupon_items as $coupon_item ) {
+
+					$coupon      = new WC_Coupon( $coupon_item['name'] );
+					$coupon_type = wcs_get_coupon_property( $coupon, 'discount_type' );
+					$coupon_code = '';
+
+					// If the coupon still exists we can use the existing/available coupon properties
+					if ( true === wcs_get_coupon_property( $coupon, 'exists' ) ) {
+
+						// But we only want to handle recurring coupons that have been applied to the order
+						if ( in_array( $coupon_type, array( 'recurring_percent', 'recurring_fee' ) ) ) {
+
+							// Set the coupon type to be a renewal equivalent for correct validation and calculations
+							if ( 'recurring_percent' == $coupon_type ) {
+								wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_percent' );
+							} elseif ( 'recurring_fee' == $coupon_type ) {
+								wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_fee' );
+							}
+
+							// Adjust coupon code to reflect that it is being applied to a renewal
+							$coupon_code = wcs_get_coupon_property( $coupon, 'code' );
+						}
+					} else {
+						// If the coupon doesn't exist we can only really apply the discount amount we know about - so we'll apply a cart style pseudo coupon and then set the amount
+						wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_cart' );
+
+						// Adjust coupon code to reflect that it is being applied to a renewal
+						$coupon_code   = wcs_get_coupon_property( $coupon, 'code' );
+						$coupon_amount = is_callable( array( $coupon_item, 'get_discount' ) ) ? $coupon_item->get_discount() : $coupon_item['item_meta']['discount_amount']['0'];
+
+						wcs_set_coupon_property( $coupon, 'coupon_amount', $coupon_amount );
+					}
+
+					// Now that we have a coupon we know we want to apply
+					if ( ! empty( $coupon_code ) ) {
+
+						// Set renewal order products as the product ids on the coupon
+						wcs_set_coupon_property( $coupon, 'product_ids', $this->get_products( $order ) );
+
+						// Store the coupon info for later
+						$this->store_coupon( wcs_get_objects_property( $order, 'id' ), $coupon );
+
+						// Add the coupon to the cart - the actually coupon values / data are grabbed when needed later
+						if ( WC()->cart && ! WC()->cart->has_discount( $coupon_code ) ) {
+							WC()->cart->add_discount( $coupon_code );
+						}
+					}
+				}
+			// If there are no coupons but there is still a discount (i.e. it might have been manually added), we need to account for that as well
+			} elseif ( ! empty( $order_discount ) ) {
+				$coupon = new WC_Coupon( 'discount_renewal' );
+
+				// Apply our cart style pseudo coupon and the set the amount
+				wcs_set_coupon_property( $coupon, 'discount_type', 'renewal_cart' );
+
+				wcs_set_coupon_property( $coupon, 'coupon_amount', $order_discount );
+
+				// Set renewal order products as the product ids on the coupon
+				wcs_set_coupon_property( $coupon, 'product_ids', $this->get_products( $order ) );
+
+				// Store the coupon info for later
+				$this->store_coupon( wcs_get_objects_property( $order, 'id' ), $coupon );
+
+				// Add the coupon to the cart
+				if ( WC()->cart && ! WC()->cart->has_discount( 'discount_renewal' ) ) {
+					WC()->cart->add_discount( 'discount_renewal' );
+				}
+			}
+		}
+	}
 }
-new WCS_Cart_Renewal();

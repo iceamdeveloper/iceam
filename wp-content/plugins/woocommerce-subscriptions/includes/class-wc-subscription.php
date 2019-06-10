@@ -67,6 +67,7 @@ class WC_Subscription extends WC_Order {
 		'schedule_cancelled'      => null,
 		'schedule_end'            => null,
 		'schedule_payment_retry'  => null,
+		'schedule_start'          => null,
 
 		'switch_data'             => array(),
 	);
@@ -94,12 +95,26 @@ class WC_Subscription extends WC_Order {
 	/**
 	 * Initialize the subscription object.
 	 *
-	 * @param int|WC_Subscription $order
+	 * @param int|WC_Subscription $subscription
 	 */
 	public function __construct( $subscription ) {
 
-		parent::__construct( $subscription );
+		// Add subscription date types as extra subscription data.
+		foreach ( wcs_get_subscription_date_types() as $date_type => $date_name ) {
+			// The last payment date is derived from other sources and shouldn't be stored on a subscription.
+			if ( 'last_payment' === $date_type ) {
+				continue;
+			}
 
+			$date_type_key = wcs_maybe_prefix_key( $date_type, 'schedule_' );
+
+			// Skip any custom dates which are already core date types.
+			if ( ! isset( $this->extra_data[ $date_type_key ] ) ) {
+				$this->extra_data[ $date_type_key ] = null;
+			}
+		}
+
+		parent::__construct( $subscription );
 		$this->order_type = 'shop_subscription';
 	}
 
@@ -257,30 +272,10 @@ class WC_Subscription extends WC_Order {
 		// And finally, check that the latest order (switch or renewal) doesn't need payment
 		} else {
 
-			$last_order_id = get_posts( array(
-				'posts_per_page' => 1,
-				'post_type'      => 'shop_order',
-				'post_status'    => 'any',
-				'fields'         => 'ids',
-				'orderby'        => 'ID',
-				'order'          => 'DESC',
-				'meta_query'     => array(
-					array(
-						'key'     => '_subscription_renewal',
-						'compare' => '=',
-						'value'   => $this->get_id(),
-						'type'    => 'numeric',
-					),
-				),
-			) );
+			$order = $this->get_last_order( 'all', array( 'renewal', 'switch' ) );
 
-			if ( ! empty( $last_order_id ) ) {
-
-				$order = wc_get_order( $last_order_id[0] );
-
-				if ( $order->needs_payment() || $order->has_status( array( 'on-hold', 'failed', 'cancelled' ) ) ) {
-					$needs_payment = true;
-				}
+			if ( $order && ( $order->needs_payment() || $order->has_status( array( 'on-hold', 'failed', 'cancelled' ) ) ) ) {
+				$needs_payment = true;
 			}
 		}
 
@@ -333,6 +328,8 @@ class WC_Subscription extends WC_Order {
 				if ( $this->payment_method_supports( 'subscription_reactivation' ) && $this->has_status( 'on-hold' ) ) {
 					$can_be_updated = true;
 				} elseif ( $this->has_status( 'pending' ) ) {
+					$can_be_updated = true;
+				} elseif ( $this->has_status( 'pending-cancel' ) && ( $this->is_manual() || ( false === $this->payment_method_supports( 'gateway_scheduled_payments' ) && $this->payment_method_supports( 'subscription_date_changes' ) && $this->payment_method_supports( 'subscription_reactivation' ) ) ) ) {
 					$can_be_updated = true;
 				} else {
 					$can_be_updated = false;
@@ -455,23 +452,33 @@ class WC_Subscription extends WC_Order {
 
 					case 'completed' : // core WC order status mapped internally to avoid exceptions
 					case 'active' :
-						// Recalculate and set next payment date
-						$stored_next_payment = $this->get_time( 'next_payment' );
 
-						// Make sure the next payment date is more than 2 hours in the future by default
-						if ( $stored_next_payment < ( gmdate( 'U' ) + apply_filters( 'woocommerce_subscription_activation_next_payment_date_threshold', 2 * HOUR_IN_SECONDS, $stored_next_payment, $old_status, $this ) ) ) { // also accounts for a $stored_next_payment of 0, meaning it's not set
-
-							$calculated_next_payment = $this->calculate_date( 'next_payment' );
-
-							if ( $calculated_next_payment > 0 ) {
-								$this->update_dates( array( 'next_payment' => $calculated_next_payment ) );
-							} elseif ( $stored_next_payment < gmdate( 'U' ) ) { // delete the stored date if it's in the past as we're not updating it (the calculated next payment date is 0 or none)
-								$this->delete_date( 'next_payment' );
-							}
+						if ( 'pending-cancel' === $old_status ) {
+							$this->update_dates( array(
+								'cancelled'    => 0,
+								'end'          => 0,
+								'next_payment' => $this->get_date( 'end' ),
+							) );
 						} else {
-							// In case plugins want to run some code when the subscription was reactivated, but the next payment date was not recalculated.
-							do_action( 'woocommerce_subscription_activation_next_payment_not_recalculated', $stored_next_payment, $old_status, $this );
+							// Recalculate and set next payment date
+							$stored_next_payment = $this->get_time( 'next_payment' );
+
+							// Make sure the next payment date is more than 2 hours in the future by default
+							if ( $stored_next_payment < ( gmdate( 'U' ) + apply_filters( 'woocommerce_subscription_activation_next_payment_date_threshold', 2 * HOUR_IN_SECONDS, $stored_next_payment, $old_status, $this ) ) ) { // also accounts for a $stored_next_payment of 0, meaning it's not set
+
+								$calculated_next_payment = $this->calculate_date( 'next_payment' );
+
+								if ( $calculated_next_payment > 0 ) {
+									$this->update_dates( array( 'next_payment' => $calculated_next_payment ) );
+								} elseif ( $stored_next_payment < gmdate( 'U' ) ) { // delete the stored date if it's in the past as we're not updating it (the calculated next payment date is 0 or none)
+									$this->delete_date( 'next_payment' );
+								}
+							} else {
+								// In case plugins want to run some code when the subscription was reactivated, but the next payment date was not recalculated.
+								do_action( 'woocommerce_subscription_activation_next_payment_not_recalculated', $stored_next_payment, $old_status, $this );
+							}
 						}
+
 						// Trial end date and end/expiration date don't change at all - they should be set when the subscription is first created
 						wcs_make_user_active( $this->get_user_id() );
 					break;
@@ -480,7 +487,6 @@ class WC_Subscription extends WC_Order {
 					case 'on-hold' :
 						// Record date of suspension - 'post_modified' column?
 						$this->set_suspension_count( $this->get_suspension_count() + 1 );
-						wcs_maybe_make_user_inactive( $this->get_user_id() );
 					break;
 					case 'cancelled' :
 					case 'switched' :
@@ -498,7 +504,6 @@ class WC_Subscription extends WC_Order {
 						}
 
 						$this->update_dates( $dates_to_update );
-						wcs_maybe_make_user_inactive( $this->get_user_id() );
 					break;
 				}
 
@@ -535,33 +540,53 @@ class WC_Subscription extends WC_Order {
 	 * Handle the status transition.
 	 */
 	protected function status_transition() {
+		// Use local copy of status transition value.
+		$status_transition = $this->status_transition;
 
-		if ( $this->status_transition ) {
-			do_action( 'woocommerce_subscription_status_' . $this->status_transition['to'], $this );
+		// If we're not currently in the midst of a status transition, bail early.
+		if ( ! $status_transition ) {
+			return;
+		}
 
-			if ( ! empty( $this->status_transition['from'] ) ) {
-				/* translators: 1: old subscription status 2: new subscription status */
-				$transition_note = sprintf( __( 'Status changed from %1$s to %2$s.', 'woocommerce-subscriptions' ), wcs_get_subscription_status_name( $this->status_transition['from'] ), wcs_get_subscription_status_name( $this->status_transition['to'] ) );
+		try {
+			do_action( "woocommerce_subscription_status_{$status_transition['to']}", $this );
 
-				do_action( 'woocommerce_subscription_status_' . $this->status_transition['from'] . '_to_' . $this->status_transition['to'], $this );
+			if ( ! empty( $status_transition['from'] ) ) {
+				$transition_note = sprintf(
+					/* translators: 1: old subscription status 2: new subscription status */
+					__( 'Status changed from %1$s to %2$s.', 'woocommerce-subscriptions' ),
+					wcs_get_subscription_status_name( $status_transition['from'] ),
+					wcs_get_subscription_status_name( $status_transition['to'] )
+				);
 
-				// Trigger a hook with params we want
-				do_action( 'woocommerce_subscription_status_updated', $this, $this->status_transition['to'], $this->status_transition['from'] );
+				do_action( "woocommerce_subscription_status_{$status_transition['from']}_to_{$status_transition['to']}", $this );
 
-				// Trigger a hook with params matching WooCommerce's 'woocommerce_order_status_changed' hook so functions attached to it can be attached easily to subscription status changes
-				do_action( 'woocommerce_subscription_status_changed', $this->get_id(), $this->status_transition['from'], $this->status_transition['to'], $this );
+				// Trigger a hook with params we want.
+				do_action( 'woocommerce_subscription_status_updated', $this, $status_transition['to'], $status_transition['from'] );
 
+				// Trigger a hook with params matching WooCommerce's 'woocommerce_order_status_changed' hook so functions attached to it can be attached easily to subscription status changes.
+				do_action( 'woocommerce_subscription_status_changed', $this->get_id(), $status_transition['from'], $status_transition['to'], $this );
 			} else {
 				/* translators: %s: new order status */
-				$transition_note = sprintf( __( 'Status set to %s.', 'woocommerce-subscriptions' ), wcs_get_subscription_status_name( $this->status_transition['to'] ) );
+				$transition_note = sprintf( __( 'Status set to %s.', 'woocommerce-subscriptions' ), wcs_get_subscription_status_name( $status_transition['to'] ) );
 			}
 
-			// Note the transition occured
-			$this->add_order_note( trim( $this->status_transition['note'] . ' ' . $transition_note ), 0, $this->status_transition['manual'] );
-
-			// This has ran, so reset status transition variable
-			$this->status_transition = false;
+			// Note the transition occurred.
+			$this->add_order_note( trim( "{$status_transition['note']} {$transition_note}" ), 0, $status_transition['manual'] );
+		} catch ( Exception $e ) {
+			$logger = wc_get_logger();
+			$logger->error(
+				sprintf( 'Status transition of subscription #%d errored!', $this->get_id() ),
+				array(
+					'order' => $this,
+					'error' => $e,
+				)
+			);
+			$this->add_order_note( __( 'Error during subscription status transition.', 'woocommerce-subscriptions' ) . ' ' . $e->getMessage() );
 		}
+
+		// This has run, so reset status transition variable
+		$this->status_transition = false;
 	}
 
 	/**
@@ -582,7 +607,7 @@ class WC_Subscription extends WC_Order {
 			$is_manual = false;
 		}
 
-		return $is_manual;
+		return apply_filters( 'woocommerce_subscription_is_manual', $is_manual, $this );
 	}
 
 	/**
@@ -630,7 +655,7 @@ class WC_Subscription extends WC_Order {
 			'wc-completed',
 		);
 
-		$custom_status = apply_filters( 'woocommerce_payment_complete_order_status', 'completed', $this->get_id() );
+		$custom_status = apply_filters( 'woocommerce_payment_complete_order_status', 'completed', $this->get_id(), $this );
 
 		if ( '' !== $custom_status && ! in_array( $custom_status, $paid_statuses ) && ! in_array( 'wc-' . $custom_status, $paid_statuses ) ) {
 			$paid_statuses[] = $custom_status;
@@ -656,49 +681,21 @@ class WC_Subscription extends WC_Order {
 
 			$completed_payment_count = ( ( $parent_order = $this->get_parent() ) && ( null !== wcs_get_objects_property( $parent_order, 'date_paid' ) || $parent_order->has_status( $this->get_paid_order_statuses() ) ) ) ? 1 : 0;
 
-			// Get all renewal orders - for large sites its more efficient to find the two different sets of renewal orders below using post__in than complicated meta queries
-			$renewal_orders = get_posts( array(
-				'posts_per_page'         => -1,
-				'post_status'            => 'any',
-				'post_type'              => 'shop_order',
-				'fields'                 => 'ids',
-				'orderby'                => 'date',
-				'order'                  => 'desc',
-				'meta_key'               => '_subscription_renewal',
-				'meta_compare'           => '=',
-				'meta_type'              => 'numeric',
-				'meta_value'             => $this->get_id(),
-				'update_post_term_cache' => false,
-			) );
+			$paid_renewal_orders = array();
+			$renewal_order_ids   = $this->get_related_order_ids( 'renewal' );
 
-			if ( ! empty( $renewal_orders ) ) {
+			if ( ! empty( $renewal_order_ids ) ) {
 
-				// Not all gateways will call $order->payment_complete() so we need to find renewal orders with a paid status rather than just a _paid_date
-				$paid_status_renewal_orders = get_posts( array(
-					'posts_per_page' => -1,
-					'post_status'    => $this->get_paid_order_statuses(),
-					'post_type'      => 'shop_order',
-					'fields'         => 'ids',
-					'orderby'        => 'date',
-					'order'          => 'desc',
-					'post__in'       => $renewal_orders,
-				) );
+				// Looping over the known orders is faster than database queries on large sites
+				foreach ( $renewal_order_ids as $renewal_order_id ) {
 
-				// Some stores may be using custom order status plugins, we also can't rely on order status to find paid orders, so also check for a _paid_date
-				$paid_date_renewal_orders = get_posts( array(
-					'posts_per_page'         => -1,
-					'post_status'            => 'any',
-					'post_type'              => 'shop_order',
-					'fields'                 => 'ids',
-					'orderby'                => 'date',
-					'order'                  => 'desc',
-					'post__in'               => $renewal_orders,
-					'meta_key'               => '_paid_date',
-					'meta_compare'           => 'EXISTS',
-					'update_post_term_cache' => false,
-				) );
+					$renewal_order = wc_get_order( $renewal_order_id );
 
-				$paid_renewal_orders = array_unique( array_merge( $paid_date_renewal_orders, $paid_status_renewal_orders ) );
+					// Not all gateways call $order->payment_complete(), so with WC < 3.0 we need to find renewal orders with a paid date or a paid status. WC 3.0+ takes care of setting the paid date when payment_complete() wasn't called, so isn't needed with WC 3.0 or newer.
+					if ( $renewal_order && ( null !== wcs_get_objects_property( $renewal_order, 'date_paid' ) || $renewal_order->has_status( $this->get_paid_order_statuses() ) ) ) {
+						$paid_renewal_orders[] = $renewal_order_id;
+					}
+				}
 
 				if ( ! empty( $paid_renewal_orders ) ) {
 					$completed_payment_count += count( $paid_renewal_orders );
@@ -723,27 +720,12 @@ class WC_Subscription extends WC_Order {
 	 */
 	public function get_failed_payment_count() {
 
-		$failed_payment_count = ( ( $parent_order = $this->get_parent() ) && $parent_order->has_status( 'wc-failed' ) ) ? 1 : 0;
+		$failed_payment_count = ( ( $parent_order = $this->get_parent() ) && $parent_order->has_status( 'failed' ) ) ? 1 : 0;
 
-		$failed_renewal_orders = get_posts( array(
-			'posts_per_page' => -1,
-			'post_status'    => 'wc-failed',
-			'post_type'      => 'shop_order',
-			'fields'         => 'ids',
-			'orderby'        => 'date',
-			'order'          => 'desc',
-			'meta_query'     => array(
-				array(
-					'key'     => '_subscription_renewal',
-					'compare' => '=',
-					'value'   => $this->get_id(),
-					'type'    => 'numeric',
-				),
-			),
-		) );
-
-		if ( ! empty( $failed_renewal_orders ) ) {
-			$failed_payment_count += count( $failed_renewal_orders );
+		foreach ( $this->get_related_orders( 'all', 'renewal' ) as $renewal_order ) {
+			if ( $renewal_order->has_status( 'failed' ) ) {
+				$failed_payment_count++;
+			}
 		}
 
 		return apply_filters( 'woocommerce_subscription_payment_failed_count', $failed_payment_count, $this );
@@ -796,7 +778,7 @@ class WC_Subscription extends WC_Order {
 	/**
 	 * Get suspension count.
 	 *
-	 * @return string
+	 * @return int
 	 * @since 2.2.0
 	 */
 	public function get_suspension_count( $context = 'view' ) {
@@ -1081,10 +1063,10 @@ class WC_Subscription extends WC_Order {
 	 *
 	 * @since 2.2.0
 	 * @param string $date_type Any valid WC 3.0 date property, including 'date_paid', 'date_completed', 'date_created', or 'date_modified'
-	 * @param string $order_type The type of orders to return, can be 'last', 'parent', 'switch', 'renewal' or 'all'. Default 'all'. Use 'last' to only check the last order.
+	 * @param string $order_type The type of orders to return, can be 'last', 'parent', 'switch', 'renewal' or 'any'. Default 'any'. Use 'last' to only check the last order.
 	 * @return WC_DateTime|NULL object if the date is set or null if there is no date.
 	 */
-	protected function get_related_orders_date( $date_type, $order_type = 'all' ) {
+	protected function get_related_orders_date( $date_type, $order_type = 'any' ) {
 
 		$date = null;
 
@@ -1093,7 +1075,7 @@ class WC_Subscription extends WC_Order {
 			$date       = ( ! $last_order ) ? null : wcs_get_objects_property( $last_order, $date_type );
 		} else {
 			// Loop over orders until we find a valid date of this type or run out of related orders
-			foreach ( $this->get_related_orders( 'ids', $order_type ) as $related_order_id ) {
+			foreach ( $this->get_related_orders( 'all', $order_type ) as $related_order_id ) {
 				$related_order = wc_get_order( $related_order_id );
 				$date          = ( ! $related_order ) ? null : wcs_get_objects_property( $related_order, $date_type );
 				if ( is_a( $date, 'WC_Datetime' ) ) {
@@ -1212,7 +1194,7 @@ class WC_Subscription extends WC_Order {
 
 			// Delete dates with a 0 date time
 			if ( 0 == $datetime ) {
-				if ( ! in_array( $date_type, array( 'date_created', 'last_order_date_created', 'last_order_date_modified' ) ) ) {
+				if ( ! in_array( $date_type, array( 'date_created', 'start', 'last_order_date_created', 'last_order_date_modified' ) ) ) {
 					$this->delete_date( $date_type );
 				}
 				continue;
@@ -1275,6 +1257,9 @@ class WC_Subscription extends WC_Order {
 		// Make sure some dates are before next payment date
 		switch ( $date_type ) {
 			case 'date_created' :
+				$message = __( 'The creation date of a subscription can not be deleted, only updated.', 'woocommerce-subscriptions' );
+			break;
+			case 'start' :
 				$message = __( 'The start date of a subscription can not be deleted, only updated.', 'woocommerce-subscriptions' );
 			break;
 			case 'last_order_date_created' :
@@ -1287,7 +1272,7 @@ class WC_Subscription extends WC_Order {
 		}
 
 		if ( ! empty( $message ) ) {
-			throw new Exception( $message );
+			throw new Exception( sprintf( __( 'Subscription #%d: ', 'woocommerce-subscriptions' ), $this->get_id() ) . $message );
 		}
 
 		$this->set_date_prop( $date_type, 0 );
@@ -1306,6 +1291,7 @@ class WC_Subscription extends WC_Order {
 	public function can_date_be_updated( $date_type ) {
 
 		switch ( $date_type ) {
+			case 'start':
 			case 'date_created' :
 				if ( $this->has_status( array( 'auto-draft', 'pending' ) ) ) {
 					$can_date_be_updated = true;
@@ -1395,7 +1381,7 @@ class WC_Subscription extends WC_Order {
 		$next_payment_date = 0;
 
 		// If the subscription is not active, there is no next payment date
-		$start_time        = $this->get_time( 'date_created' );
+		$start_time        = $this->get_time( 'start' );
 		$next_payment_time = $this->get_time( 'next_payment' );
 		$trial_end_time    = $this->get_time( 'trial_end' );
 		$last_payment_time = max( $this->get_time( 'last_order_date_created' ), $this->get_time( 'last_order_date_paid' ) );
@@ -1490,9 +1476,10 @@ class WC_Subscription extends WC_Order {
 				$line_subtotal = $this->get_line_subtotal( $item, true );
 			}
 			$subtotal = wcs_price_string( $this->get_price_string_details( $line_subtotal ) );
+			$subtotal = apply_filters( 'woocommerce_order_formatted_line_subtotal', $subtotal, $item, $this );
 		}
 
-		return apply_filters( 'woocommerce_order_formatted_line_subtotal', $subtotal, $item, $this );
+		return $subtotal;
 	}
 
 	/**
@@ -1652,7 +1639,7 @@ class WC_Subscription extends WC_Order {
 	}
 
 	/**
-	 * When payment is completed, either for the original purchase or a renewal payment, this function processes it.
+	 * Process payment on the subscription, which mainly means processing it for the last order on the subscription.
 	 *
 	 * @param $transaction_id string Optional transaction id to store in post meta
 	 */
@@ -1662,7 +1649,7 @@ class WC_Subscription extends WC_Order {
 			return;
 		}
 
-		// Clear the cached completed payment count
+		// Clear the cached completed payment count, kept here for backward compat even though it's also reset in $this->process_payment_complete()
 		$this->cached_completed_payment_count = false;
 
 		// Make sure the last order's status is updated
@@ -1672,6 +1659,19 @@ class WC_Subscription extends WC_Order {
 			$last_order->payment_complete( $transaction_id );
 		}
 
+		$this->payment_complete_for_order( $last_order );
+	}
+
+	/**
+	 * When payment is completed for a related order, reset any renewal related counters and reactive the subscription.
+	 *
+	 * @param WC_Order $order
+	 */
+	public function payment_complete_for_order( $last_order ) {
+
+		// Clear the cached completed payment count
+		$this->cached_completed_payment_count = false;
+
 		// Reset suspension count
 		$this->set_suspension_count( 0 );
 
@@ -1679,13 +1679,7 @@ class WC_Subscription extends WC_Order {
 		wcs_update_users_role( $this->get_user_id(), 'default_subscriber_role' );
 
 		// Add order note depending on initial payment
-		if ( 0 == $this->get_total_initial_payment() && 1 == $this->get_completed_payment_count() && false != $this->get_parent() ) {
-			$note = __( 'Sign-up complete.', 'woocommerce-subscriptions' );
-		} else {
-			$note = __( 'Payment received.', 'woocommerce-subscriptions' );
-		}
-
-		$this->add_order_note( $note );
+		$this->add_order_note( __( 'Payment status marked complete.', 'woocommerce-subscriptions' ) );
 
 		$this->update_status( 'active' ); // also saves the subscription
 
@@ -1790,78 +1784,96 @@ class WC_Subscription extends WC_Order {
 	/**
 	 * Get parent order object.
 	 *
-	 * @return WC_Order
+	 * @return mixed WC_Order|bool
 	 */
 	public function get_parent() {
-		return wc_get_order( $this->get_parent_id() );
+		$parent_id = $this->get_parent_id();
+		$order     = false;
+
+		if ( $parent_id > 0 ) {
+			$order = wc_get_order( $parent_id );
+		}
+
+		return $order;
 	}
 
 	/**
 	 * Extracting the query from get_related_orders and get_last_order so it can be moved in a cached
 	 * value.
 	 *
+	 * @deprecated 2.3.0 Moved to WCS_Subscription_Data_Store_CPT::get_related_order_ids() to separate cache logic from subscription instances and to avoid confusion from the misnomer on this method's name - it gets renewal orders, not related orders - and its ambiguity - it runs a query and returns order IDs, it does not return a SQL query string or order objects.
 	 * @return array
 	 */
-	public function get_related_orders_query( $id ) {
-		$related_post_ids = get_posts( array(
-			'posts_per_page' => -1,
-			'post_type'      => 'shop_order',
-			'post_status'    => 'any',
-			'fields'         => 'ids',
-			'orderby'        => 'date',
-			'order'          => 'DESC',
-			'meta_query'     => array(
-				array(
-					'key'     => '_subscription_renewal',
-					'compare' => '=',
-					'value'   => $id,
-					'type'    => 'numeric',
-				),
-			),
-		) );
-
-		return $related_post_ids;
+	public function get_related_orders_query( $subscription_id ) {
+		wcs_deprecated_function( __METHOD__, '2.3.0', 'WCS_Subscription_Data_Store_CPT::get_related_order_ids( wcs_get_subscription( $subscription_id ) ) via WCS_Subscription_Data_Store::instance()' );
+		return WCS_Related_Order_Store::instance()->get_related_order_ids( wcs_get_subscription( $subscription_id ), 'renewal' );
 	}
 
 	/**
 	 * Get the related orders for a subscription, including renewal orders and the initial order (if any)
 	 *
 	 * @param string $return_fields The columns to return, either 'all' or 'ids'
-	 * @param string $order_type The type of orders to return, either 'renewal' or 'all'. Default 'all'.
+	 * @param array|string $order_types Can include 'any', 'parent', 'renewal', 'resubscribe' and/or 'switch'. Custom types possible via the 'woocommerce_subscription_related_orders' filter. Defaults to array( 'parent', 'renewal', 'switch' ).
 	 * @since 2.0
+	 * @return array
 	 */
-	public function get_related_orders( $return_fields = 'ids', $order_type = 'all' ) {
+	public function get_related_orders( $return_fields = 'ids', $order_types = array( 'parent', 'renewal', 'switch' ) ) {
 
 		$return_fields = ( 'ids' == $return_fields ) ? $return_fields : 'all';
 
+		if ( 'all' === $order_types ) {
+			wcs_deprecated_argument( __METHOD__, '2.3.0', sprintf( __( 'The "all" value for $order_type parameter is deprecated. It was a misnomer, as it did not return resubscribe orders. It was also inconsistent with order type values accepted by wcs_get_subscription_orders(). Use array( "parent", "renewal", "switch" ) to maintain previous behaviour, or "any" to receive all order types, including switch and resubscribe.', 'woocommerce-subscriptions' ), __CLASS__ ) );
+			$order_types = array( 'parent', 'renewal', 'switch' );
+		} elseif ( ! is_array( $order_types ) ) {
+			// Accept either an array or string (to make it more convenient for singular types, like 'parent' or 'any')
+			$order_types = array( $order_types );
+		}
+
 		$related_orders = array();
-
-		$related_post_ids = WC_Subscriptions::$cache->cache_and_get( 'wcs-related-orders-to-' . $this->get_id(), array( $this, 'get_related_orders_query' ), array( $this->get_id() ) );
-
-		if ( 'all' == $return_fields ) {
-
-			foreach ( $related_post_ids as $post_id ) {
-				$related_orders[ $post_id ] = wc_get_order( $post_id );
+		foreach ( $order_types as $order_type ) {
+			$related_orders_for_order_type = array();
+			foreach ( $this->get_related_order_ids( $order_type ) as $order_id ) {
+				if ( 'all' === $return_fields && $order = wc_get_order( $order_id ) ) {
+					$related_orders_for_order_type[ $order_id ] = $order;
+				} elseif ( 'ids' === $return_fields ) {
+					$related_orders_for_order_type[ $order_id ] = $order_id;
+				}
 			}
 
-			if ( false != $this->get_parent_id() && 'renewal' !== $order_type ) {
-				$related_orders[ $this->get_parent_id() ] = $this->get_parent();
-			}
-		} else {
+			$related_orders += apply_filters( 'woocommerce_subscription_related_orders', $related_orders_for_order_type, $this, $return_fields, $order_type );
+		}
 
-			// Return IDs only
-			if ( false != $this->get_parent_id() && 'renewal' !== $order_type ) {
-				$related_orders[ $this->get_parent_id() ] = $this->get_parent_id();
-			}
+		arsort( $related_orders );
 
-			foreach ( $related_post_ids as $post_id ) {
-				$related_orders[ $post_id ] = $post_id;
+		return $related_orders;
+	}
+
+	/**
+	 * Get the related order IDs for a subscription based on an order type.
+	 *
+	 * @param string $order_type Can include 'any', 'parent', 'renewal', 'resubscribe' and/or 'switch'. Defaults to 'any'.
+	 * @return array List of related order IDs.
+	 * @since 2.3.0
+	 */
+	protected function get_related_order_ids( $order_type = 'any' ) {
+
+		$related_order_ids = array();
+
+		if ( in_array( $order_type, array( 'any', 'parent' ) ) && $this->get_parent_id() ) {
+			$related_order_ids[ $this->get_parent_id() ] = $this->get_parent_id();
+		}
+
+		if ( 'parent' !== $order_type ) {
+
+			$relation_types = ( 'any' === $order_type ) ? array( 'renewal', 'resubscribe', 'switch' ) : array( $order_type );
+
+			foreach ( $relation_types as $relation_type ) {
+				$related_order_ids = array_merge( $related_order_ids, WCS_Related_Order_Store::instance()->get_related_order_ids( $this, $relation_type ) );
 			}
 		}
 
-		return apply_filters( 'woocommerce_subscription_related_orders', $related_orders, $this, $return_fields, $order_type );
+		return $related_order_ids;
 	}
-
 
 	/**
 	 * Gets the most recent order that relates to a subscription, including renewal orders and the initial order (if any).
@@ -1883,13 +1895,8 @@ class WC_Subscription extends WC_Order {
 						$related_orders[] = $this->get_parent_id();
 					}
 					break;
-				case 'renewal':
-					$related_orders = array_merge( $related_orders, WC_Subscriptions::$cache->cache_and_get( 'wcs-related-orders-to-' . $this->get_id(), array( $this, 'get_related_orders_query' ), array( $this->get_id() ) ) );
-					break;
-				case 'switch':
-					$related_orders = array_merge( $related_orders, array_keys( wcs_get_switch_orders_for_subscription( $this->get_id() ) ) );
-					break;
 				default:
+					$related_orders = array_merge( $related_orders, $this->get_related_order_ids( $order_type ) );
 					break;
 			}
 		}
@@ -1914,9 +1921,11 @@ class WC_Subscription extends WC_Order {
 	/**
 	 * Determine how the payment method should be displayed for a subscription.
 	 *
+	 * @param string $context The context the payment method is being displayed in. Can be 'admin' or 'customer'. Default 'admin'.
+	 *
 	 * @since 2.0
 	 */
-	public function get_payment_method_to_display() {
+	public function get_payment_method_to_display( $context = 'admin' ) {
 
 		if ( $this->is_manual() ) {
 
@@ -1927,14 +1936,25 @@ class WC_Subscription extends WC_Order {
 
 			$payment_method_to_display = $payment_gateway->get_title();
 
-		// Fallback to the title of the payment method when the subscripion was created
+		// Fallback to the title of the payment method when the subscription was created
 		} else {
 
 			$payment_method_to_display = $this->get_payment_method_title();
 
 		}
 
-		return apply_filters( 'woocommerce_subscription_payment_method_to_display', $payment_method_to_display, $this );
+		$payment_method_to_display = apply_filters( 'woocommerce_subscription_payment_method_to_display', $payment_method_to_display, $this, $context );
+
+		if ( 'customer' === $context ) {
+			$payment_method_to_display = sprintf( __( 'Via %s', 'woocommerce-subscriptions' ), $payment_method_to_display );
+
+			// Only filter the result for non-manual subscriptions.
+			if ( ! $this->is_manual() ) {
+				$payment_method_to_display = apply_filters( 'woocommerce_my_subscriptions_payment_method', $payment_method_to_display, $this );
+			}
+		}
+
+		return $payment_method_to_display;
 	}
 
 	/**
@@ -2006,28 +2026,7 @@ class WC_Subscription extends WC_Order {
 		do_action( 'woocommerce_subscription_validate_payment_meta', $payment_method_id, $payment_meta, $this );
 		do_action( 'woocommerce_subscription_validate_payment_meta_' . $payment_method_id, $payment_meta, $this );
 
-		foreach ( $payment_meta as $meta_table => $meta ) {
-			foreach ( $meta as $meta_key => $meta_data ) {
-				if ( isset( $meta_data['value'] ) ) {
-					switch ( $meta_table ) {
-						case 'user_meta':
-						case 'usermeta':
-							update_user_meta( $this->get_user_id(), $meta_key, $meta_data['value'] );
-							break;
-						case 'post_meta':
-						case 'postmeta':
-							$this->update_meta_data( $meta_key, $meta_data['value'] );
-							break;
-						case 'options':
-							update_option( $meta_key, $meta_data['value'] );
-							break;
-						default:
-							do_action( 'wcs_save_other_payment_meta', $this, $meta_table, $meta_key, $meta_data['value'] );
-					}
-				}
-			}
-		}
-
+		wcs_set_payment_meta( $this, $payment_meta );
 	}
 
 	/**
@@ -2047,7 +2046,15 @@ class WC_Subscription extends WC_Order {
 	 * @return bool
 	 */
 	public function is_download_permitted() {
-		return apply_filters( 'woocommerce_order_is_download_permitted', ( $this->has_status( 'active' ) || $this->has_status( 'pending-cancel' ) ), $this );
+		$sending_email = did_action( 'woocommerce_email_header' ) > did_action( 'woocommerce_email_footer' );
+		$is_download_permitted = $this->has_status( 'active' ) || $this->has_status( 'pending-cancel' );
+
+		// WC Emails are sent before the subscription status is updated to active etc. so we need a way to ensure download links are added to the emails before being sent
+		if ( $sending_email && ! $is_download_permitted ) {
+			$is_download_permitted = true;
+		}
+
+		return apply_filters( 'woocommerce_order_is_download_permitted', $is_download_permitted, $this );
 	}
 
 	/**
@@ -2071,10 +2078,19 @@ class WC_Subscription extends WC_Order {
 	}
 
 	/**
+	 * Check if the subscription has a payment gateway.
+	 *
+	 * @since 2.5.0
+	 * @return bool
+	 */
+	public function has_payment_gateway() {
+		return (bool) wc_get_payment_gateway_by_order( $this );
+	}
+
+	/**
 	 * The total sign-up fee for the subscription if any.
 	 *
-	 * @param array|int Either an order item (in the array format returned by self::get_items()) or the ID of an order item.
-	 * @return bool
+	 * @return int
 	 * @since 2.0
 	 */
 	public function get_sign_up_fee() {
@@ -2135,18 +2151,31 @@ class WC_Subscription extends WC_Order {
 
 			} elseif ( 'true' === $line_item->get_meta( '_has_trial' ) ) {
 				// Sign up is amount paid for this item on original order, we can safely use 3.0 getters here because we know from the above condition 3.0 is active
-				$sign_up_fee = $original_order_item->get_total( 'edit' ) / $original_order_item->get_quantity( 'edit' );
+				$sign_up_fee = ( (float) $original_order_item->get_total( 'edit' ) ) / $original_order_item->get_quantity( 'edit' );
+			} elseif ( $original_order_item->meta_exists( '_synced_sign_up_fee' ) ) {
+				$sign_up_fee = ( (float) $original_order_item->get_meta( '_synced_sign_up_fee' ) ) / $original_order_item->get_quantity( 'edit' );
+
+				// The synced sign up fee meta contains the raw product sign up fee, if the subscription totals are inclusive of tax, we need to adjust the synced sign up fee to match tax inclusivity.
+				if ( $this->get_prices_include_tax() ) {
+					$line_item_total    = (float) $original_order_item->get_total( 'edit' ) + $original_order_item->get_total_tax( 'edit' );
+					$signup_fee_portion = $sign_up_fee / $line_item_total;
+					$sign_up_fee        = (float) $original_order_item->get_total( 'edit' ) * $signup_fee_portion;
+				}
 			} else {
 				// Sign-up fee is any amount on top of recurring amount
-				$order_line_total        = $original_order_item->get_total( 'edit' ) / $original_order_item->get_quantity( 'edit' );
-				$subscription_line_total = $line_item->get_total( 'edit' ) / $line_item->get_quantity( 'edit' );
+				$order_line_total        = ( (float) $original_order_item->get_total( 'edit' ) ) / $original_order_item->get_quantity( 'edit' );
+				$subscription_line_total = ( (float) $line_item->get_total( 'edit' ) ) / $line_item->get_quantity( 'edit' );
+
 				$sign_up_fee = max( $order_line_total - $subscription_line_total, 0 );
 			}
 
-			// If prices inc tax, ensure that the sign up fee amount includes the tax
-			if ( 'inclusive_of_tax' === $tax_inclusive_or_exclusive && ! empty( $original_order_item ) && $this->get_prices_include_tax() ) {
-				$proportion   = $sign_up_fee / ( $original_order_item->get_total( 'edit' ) / $original_order_item->get_quantity( 'edit' ) );
-				$sign_up_fee += round( $original_order_item->get_total_tax( 'edit' ) * $proportion, 2 );
+			// If prices don't inc tax, ensure that the sign up fee amount includes the tax.
+			if ( 'inclusive_of_tax' === $tax_inclusive_or_exclusive && ! empty( $original_order_item ) && ! empty( $sign_up_fee ) ) {
+				$sign_up_fee_proportion = $sign_up_fee / ( $original_order_item->get_total( 'edit' ) / $original_order_item->get_quantity( 'edit' ) );
+				$sign_up_fee_tax        = $original_order_item->get_total_tax( 'edit' ) * $sign_up_fee_proportion;
+
+				$sign_up_fee += $sign_up_fee_tax;
+				$sign_up_fee  = wc_format_decimal( $sign_up_fee, wc_get_price_decimals() );
 			}
 		}
 
@@ -2165,7 +2194,7 @@ class WC_Subscription extends WC_Order {
 
 		if ( 0 != ( $end_time = $this->get_time( 'end' ) ) ) {
 
-			$from_timestamp = $this->get_time( 'date_created' );
+			$from_timestamp = $this->get_time( 'start' );
 
 			if ( 0 != $this->get_time( 'trial_end' ) || WC_Subscriptions_Synchroniser::subscription_contains_synced_product( $this ) ) {
 
@@ -2206,7 +2235,7 @@ class WC_Subscription extends WC_Order {
 		$files = array();
 
 		// WC Emails are sent before the subscription status is updated to active etc. so we need a way to ensure download links are added to the emails before being sent
-		$sending_email = ( did_action( 'woocommerce_email_before_order_table' ) > did_action( 'woocommerce_email_after_order_table' ) ) ? true : false;
+		$sending_email = did_action( 'woocommerce_email_before_order_table' ) > did_action( 'woocommerce_email_after_order_table' );
 
 		if ( $this->has_status( apply_filters( 'woocommerce_subscription_item_download_statuses', array( 'active', 'pending-cancel' ) ) ) || $sending_email ) {
 			$files = parent::get_item_downloads( $item );
@@ -2248,8 +2277,8 @@ class WC_Subscription extends WC_Order {
 		// Get a full set of subscription dates made up of passed and current dates
 		foreach ( $this->get_valid_date_types() as $date_type ) {
 
-			// While 'start' & 'last_payment' are valid date types, they are deprecated and we use 'date_created' & 'last_order_date_created' to refer to them now instead
-			if ( in_array( $date_type, array( 'last_payment', 'start' ) ) ) {
+			// While 'last_payment' is a valid date type, it is deprecated and we use 'last_order_date_created' now instead
+			if ( 'last_payment' === $date_type ) {
 				continue;
 			}
 
@@ -2318,7 +2347,7 @@ class WC_Subscription extends WC_Order {
 						$messages[] = sprintf( __( 'The %s date must occur after the trial end date.', 'woocommerce-subscriptions' ), $date_type );
 					}
 				case 'trial_end' :
-					if ( $timestamp <= $timestamps['date_created'] ) {
+					if ( ! in_array( $date_type, array( 'end', 'cancelled' ) ) && $timestamp <= $timestamps['start'] ) {
 						$messages[] = sprintf( __( 'The %s date must occur after the start date.', 'woocommerce-subscriptions' ), $date_type );
 					}
 			}
@@ -2328,7 +2357,7 @@ class WC_Subscription extends WC_Order {
 
 		// Don't validate dates while the subscription is being read, only dates set outside of instantiation require the strict validation rules to apply
 		if ( $this->object_read && ! empty( $messages ) ) {
-			throw new Exception( join( ' ', $messages ) );
+			throw new Exception( sprintf( __( 'Subscription #%d: ', 'woocommerce-subscriptions' ), $this->get_id() ) . join( ' ', $messages ) );
 		}
 
 		return array_merge( $dates, $delete_date_types );
@@ -2381,6 +2410,75 @@ class WC_Subscription extends WC_Order {
 		}
 
 		return $this->valid_date_types;
+	}
+
+	/**
+	 * Generates a URL to add or change the subscription's payment method from the my account page.
+	 *
+	 * @return string
+	 * @since 2.5.0
+	 */
+	public function get_change_payment_method_url() {
+		$change_payment_method_url = wc_get_endpoint_url( 'subscription-payment-method', $this->get_id(), wc_get_page_permalink( 'myaccount' ) );
+		return apply_filters( 'wcs_get_change_payment_method_url', $change_payment_method_url, $this->get_id() );
+	}
+
+	 /* Get the subscription's payment method meta.
+	 *
+	 * @since 2.4.3
+	 * @return array The subscription's payment meta in the format returned by the woocommerce_subscription_payment_meta filter.
+	 */
+	public function get_payment_method_meta() {
+		WC()->payment_gateways();
+
+		if ( $this->is_manual() ) {
+			return array();
+		}
+
+		$payment_meta = apply_filters( 'woocommerce_subscription_payment_meta', array(), $this );
+
+		return isset( $payment_meta[ $this->get_payment_method() ] ) ? $payment_meta[ $this->get_payment_method() ]: array();
+	}
+
+	/************************
+	 * WC_Order overrides
+	 *
+	 * Make some WC_Order methods do nothing.
+	 ************************/
+
+	/**
+	 * Avoid running the expensive get_date_paid() query on related orders.
+	 *
+	 * @since 2.2.19
+	 */
+	public function maybe_set_date_paid() {
+		return null;
+	}
+
+	/**
+	 * Avoid running the expensive get_date_completed() query on related orders.
+	 *
+	 * @since 2.2.19
+	 */
+	protected function maybe_set_date_completed() {
+		return null;
+	}
+
+	/**
+	 * Get totals for display on pages and in emails.
+	 *
+	 * @param mixed $tax_display Excl or incl tax display mode.
+	 * @return array
+	 */
+	public function get_order_item_totals( $tax_display = '' ) {
+		$total_rows = parent::get_order_item_totals( $tax_display );
+
+		// Use get_payment_method_to_display() as it displays "Manual Renewal" for manual subscriptions.
+		if ( isset( $total_rows['payment_method'] ) ) {
+			$total_rows['payment_method']['value'] = $this->get_payment_method_to_display( 'customer' );
+		}
+
+		return apply_filters( 'woocommerce_get_subscription_item_totals', $total_rows, $this, $tax_display );
 	}
 
 	/************************
@@ -2473,5 +2571,4 @@ class WC_Subscription extends WC_Order {
 
 		return $datetime;
 	}
-
 }

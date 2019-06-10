@@ -27,13 +27,11 @@ function wcs_get_price_including_tax( $product, $args = array() ) {
 
 	if ( function_exists( 'wc_get_price_including_tax' ) ) { // WC 3.0+
 		$price = wc_get_price_including_tax( $product, $args );
-		$filter = 'woocommerce_product_get_price';
 	} else { // WC < 3.0
 		$price = $product->get_price_including_tax( $args['qty'], $args['price'] );
-		$filter = 'woocommerce_get_price';
 	}
 
-	return apply_filters( $filter, $price , $product );
+	return $price;
 }
 
 /**
@@ -53,13 +51,11 @@ function wcs_get_price_excluding_tax( $product, $args = array() ) {
 
 	if ( function_exists( 'wc_get_price_excluding_tax' ) ) { // WC 3.0+
 		$price = wc_get_price_excluding_tax( $product, $args );
-		$filter = 'woocommerce_product_get_price';
 	} else { // WC < 3.0
 		$price = $product->get_price_excluding_tax( $args['qty'], $args['price'] );
-		$filter = 'woocommerce_get_price';
 	}
 
-	return apply_filters( $filter, $price , $product );
+	return $price;
 }
 
 /**
@@ -98,7 +94,7 @@ function wcs_get_variation_prices( $variation, $variable_product ) {
  * Get an array of the minimum and maximum priced variations based on subscription billing terms.
  *
  * @param array $child_variation_ids the IDs of product variation children ids
- * @return array() Array containing the min and max variation prices and billing data
+ * @return array Array containing the min and max variation prices and billing data
  * @since 2.2.0
  */
 function wcs_get_min_max_variation_data( $variable_product, $child_variation_ids = array() ) {
@@ -161,20 +157,36 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 	$variable_subscription_sign_up_fee = $variable_subscription_trial_period = $variable_subscription_trial_length = $variable_subscription_length = $variable_subscription_sign_up_fee = $variable_subscription_trial_period = $variable_subscription_trial_length = $variable_subscription_length = '';
 	$min_variation_id                  = $max_variation_id = null;
 
+	$variations_data_prices_list        = array();
+	$variations_data_sign_up_fees_list  = array();
+	$variations_data_periods_list       = array();
+	$variations_data_intervals_list     = array();
+	$variations_data_trial_lengths_list = array();
+	$variations_data_trial_periods_list = array();
+	$variations_data_lengths_list       = array();
+
 	foreach ( $variations_data as $variation_id => $variation_data ) {
 
 		$is_max = $is_min = false;
 
-		if ( '' === $variation_data['price'] && '' === $variation_data['subscription']['sign_up_fee'] ) {
+		if ( '' === $variation_data['price'] && empty( $variation_data['subscription']['sign_up_fee'] ) ) {
 			continue;
 		}
 
-		$has_free_trial = ( '' !== $variation_data['subscription']['trial_length'] && $variation_data['subscription']['trial_length'] > 0 ) ? true : false;
+		$variations_data_prices_list        = array_unique( array_merge( $variations_data_prices_list, array( $variation_data['price'] ) ) );
+		$variations_data_sign_up_fees_list  = array_unique( array_merge( $variations_data_sign_up_fees_list, array( empty( $variation_data['subscription']['sign_up_fee'] ) ? 0 : $variation_data['subscription']['sign_up_fee'] ) ) );
+		$variations_data_periods_list       = array_unique( array_merge( $variations_data_periods_list, array( $variation_data['subscription']['period'] ) ) );
+		$variations_data_intervals_list     = array_unique( array_merge( $variations_data_intervals_list, array( $variation_data['subscription']['interval'] ) ) );
+		$variations_data_trial_lengths_list = array_unique( array_merge( $variations_data_trial_lengths_list, array( empty( $variation_data['subscription']['trial_length'] ) ? 0 : $variation_data['subscription']['trial_length'] ) ) );
+		$variations_data_trial_periods_list = array_unique( array_merge( $variations_data_trial_periods_list, array( $variation_data['subscription']['trial_period'] ) ) );
+		$variations_data_lengths_list       = array_unique( array_merge( $variations_data_lengths_list, array( $variation_data['subscription']['length'] ) ) );
+
+		$has_free_trial = '' !== $variation_data['subscription']['trial_length'] && $variation_data['subscription']['trial_length'] > 0;
 
 		// Determine some recurring price flags
-		$is_lowest_price     = ( $variation_data['price'] < $lowest_price || '' === $lowest_price ) ? true : false;
-		$is_longest_period   = ( WC_Subscriptions::get_longest_period( $variable_subscription_period, $variation_data['subscription']['period'] ) === $variation_data['subscription']['period'] ) ? true : false;
-		$is_longest_interval = ( $variation_data['subscription']['interval'] >= $variable_subscription_period_interval || '' === $variable_subscription_period_interval ) ? true : false;
+		$is_lowest_price     = $variation_data['price'] < $lowest_price || '' === $lowest_price;
+		$is_longest_period   = WC_Subscriptions::get_longest_period( $variable_subscription_period, $variation_data['subscription']['period'] ) === $variation_data['subscription']['period'];
+		$is_longest_interval = $variation_data['subscription']['interval'] >= $variable_subscription_period_interval || '' === $variable_subscription_period_interval;
 
 		// Find the amount the subscriber will have to pay up-front
 		if ( $has_free_trial ) {
@@ -182,7 +194,7 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 			$initial_period   = $variation_data['subscription']['trial_period'];
 			$initial_interval = $variation_data['subscription']['trial_length'];
 		} else {
-			$initial_amount   = $variation_data['price'] + $variation_data['subscription']['sign_up_fee'];
+			$initial_amount   = (float) $variation_data['price'] + (float) $variation_data['subscription']['sign_up_fee'];
 			$initial_period   = $variation_data['subscription']['period'];
 			$initial_interval = $variation_data['subscription']['interval'];
 		}
@@ -221,7 +233,7 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 			// Otherwise the cheapest variation is the one with the longer trial
 			} elseif ( $variable_subscription_trial_period === $variation_data['subscription']['trial_period'] ) {
 
-				$is_min = ( $variation_data['subscription']['trial_length'] > $variable_subscription_trial_length ) ? true : false;
+				$is_min = $variation_data['subscription']['trial_length'] > $variable_subscription_trial_length;
 
 			// Otherwise just a longer trial period (that isn't equal to the longest period)
 			} elseif ( WC_Subscriptions::get_longest_period( $longest_trial_period, $variation_data['subscription']['trial_period'] ) === $variation_data['subscription']['trial_period'] ) {
@@ -245,7 +257,7 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 				// Need to check trial length
 				} elseif ( $shortest_trial_period === $variation_data['subscription']['trial_period'] ) {
 
-					$is_max = ( $variation_data['subscription']['trial_length'] < $shortest_trial_length ) ? true : false;
+					$is_max = $variation_data['subscription']['trial_length'] < $shortest_trial_length;
 
 				// Need to find shortest period
 				} elseif ( WC_Subscriptions::get_shortest_period( $shortest_trial_period, $variation_data['subscription']['trial_period'] ) === $variation_data['subscription']['trial_period'] ) {
@@ -264,13 +276,13 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 			$longest_initial_period  = WC_Subscriptions::get_longest_period( $longest_initial_period, $initial_period );
 			$shortest_initial_period = WC_Subscriptions::get_shortest_period( $shortest_initial_period, $initial_period );
 
-			$is_lowest_initial_amount    = ( $initial_amount < $lowest_initial_amount || '' === $lowest_initial_amount ) ? true : false;
-			$is_longest_initial_period   = ( $initial_period === $longest_initial_period ) ? true : false;
-			$is_longest_initial_interval = ( $initial_interval >= $longest_initial_interval || '' === $longest_initial_interval ) ? true : false;
+			$is_lowest_initial_amount    = $initial_amount < $lowest_initial_amount || '' === $lowest_initial_amount;
+			$is_longest_initial_period   = $initial_period === $longest_initial_period;
+			$is_longest_initial_interval = $initial_interval >= $longest_initial_interval || '' === $longest_initial_interval;
 
-			$is_highest_initial   = ( $initial_amount > $highest_initial_amount || '' === $highest_initial_amount ) ? true : false;
-			$is_shortest_period   = ( $initial_period === $shortest_initial_period || '' === $shortest_initial_period ) ? true : false;
-			$is_shortest_interval = ( $initial_interval < $shortest_initial_interval || '' === $shortest_initial_interval ) ? true : false;
+			$is_highest_initial   = $initial_amount > $highest_initial_amount || '' === $highest_initial_amount;
+			$is_shortest_period   = $initial_period === $shortest_initial_period || '' === $shortest_initial_period;
+			$is_shortest_interval = $initial_interval < $shortest_initial_interval || '' === $shortest_initial_interval;
 
 			// If we're not dealing with the lowest initial access amount, then ignore this variation
 			if ( ! $is_lowest_initial_amount && $initial_amount !== $lowest_initial_amount ) {
@@ -381,6 +393,24 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 		}
 	}
 
+	if ( sizeof( array_unique( $variations_data_prices_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} elseif ( sizeof( array_unique( $variations_data_sign_up_fees_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} elseif ( sizeof( array_unique( $variations_data_periods_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} elseif ( sizeof( array_unique( $variations_data_intervals_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} elseif ( sizeof( array_unique( $variations_data_trial_lengths_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} elseif ( sizeof( array_unique( $variations_data_trial_periods_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} elseif ( sizeof( array_unique( $variations_data_lengths_list ) ) > 1 ) {
+		$subscription_details_identical = false;
+	} else {
+		$subscription_details_identical = true;
+	}
+
 	return array(
 		'min' => array(
 			'variation_id'  => $min_variation_id,
@@ -404,5 +434,6 @@ function wcs_calculate_min_max_variations( $variations_data ) {
 			'trial_length' => $variable_subscription_trial_length,
 			'length'       => $variable_subscription_length,
 		),
+		'identical' => $subscription_details_identical,
 	);
 }

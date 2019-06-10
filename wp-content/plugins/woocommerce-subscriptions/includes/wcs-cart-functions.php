@@ -34,14 +34,14 @@ function wcs_cart_totals_shipping_html() {
 
 	$initial_packages = WC()->shipping->get_packages();
 
-	$show_package_details = count( WC()->cart->recurring_carts ) > 1 ? true : false;
+	$show_package_details = count( WC()->cart->recurring_carts ) > 1;
 	$show_package_name    = true;
 
 	// Create new subscriptions for each subscription product in the cart (that is not a renewal)
 	foreach ( WC()->cart->recurring_carts as $recurring_cart_key => $recurring_cart ) {
 
 		// Create shipping packages for each subscription item
-		if ( WC_Subscriptions_Cart::cart_contains_subscriptions_needing_shipping() && 0 !== $recurring_cart->next_payment_date ) {
+		if ( WC_Subscriptions_Cart::cart_contains_subscriptions_needing_shipping( $recurring_cart ) && 0 !== $recurring_cart->next_payment_date ) {
 
 			// This will get a package with the 'recurring_cart_key' set to 'none' (because WC_Subscriptions_Cart::display_recurring_totals() set WC_Subscriptions_Cart::$calculation_type to 'recurring_total', but WC_Subscriptions_Cart::$recurring_cart_key has not been set), which ensures that it's a unique package, which we need in order to get all the available packages, not just the package for the recurring cart calculation we completed previously where WC_Subscriptions_Cart::filter_package_rates() removed all unchosen rates and which WC then cached
 			$packages = $recurring_cart->get_shipping_packages();
@@ -64,7 +64,14 @@ function wcs_cart_totals_shipping_html() {
 				}
 
 				$chosen_initial_method   = isset( WC()->session->chosen_shipping_methods[ $i ] ) ? WC()->session->chosen_shipping_methods[ $i ] : '';
-				$chosen_recurring_method = isset( WC()->session->chosen_shipping_methods[ $recurring_cart_key . '_' . $i ] ) ? WC()->session->chosen_shipping_methods[ $recurring_cart_key . '_' . $i ] : $chosen_initial_method;
+
+				if ( isset( WC()->session->chosen_shipping_methods[ $recurring_cart_key . '_' . $i ] ) ) {
+					$chosen_recurring_method = WC()->session->chosen_shipping_methods[ $recurring_cart_key . '_' . $i ];
+				} elseif ( in_array( $chosen_initial_method, $package['rates'] ) ) {
+					$chosen_recurring_method = $chosen_initial_method;
+				} else {
+					$chosen_recurring_method = empty( $package['rates'] ) ? '' : current( $package['rates'] )->id;
+				}
 
 				$shipping_selection_displayed = false;
 
@@ -168,7 +175,7 @@ function wcs_cart_totals_shipping_method_price_label( $method, $cart ) {
 
 	$price_label = '';
 
-	if ( $method->cost > 0 ) {
+	if ( $method->cost != 0 ) {
 
 		if ( WC()->cart->tax_display_cart == 'excl' ) {
 			$price_label .= wcs_cart_price_string( $method->cost, $cart );
@@ -185,7 +192,7 @@ function wcs_cart_totals_shipping_method_price_label( $method, $cart ) {
 		$price_label .= _x( 'Free', 'shipping method price', 'woocommerce-subscriptions' );
 	}
 
-	return $price_label;
+	return apply_filters( 'wcs_cart_totals_shipping_method_price_label', $price_label, $method, $cart );
 }
 
 /**
@@ -200,11 +207,26 @@ function wcs_cart_totals_taxes_total_html( $cart ) {
 }
 
 /**
- * Display a recurring coupon's value
+ * Display the remove link for a coupon.
+ *
+ *  @access public
+ *
+ * @param WC_Coupon $coupon
+ */
+function wcs_cart_coupon_remove_link_html( $coupon ) {
+	$html = '<a href="' . esc_url( add_query_arg( 'remove_coupon', urlencode( wcs_get_coupon_property( $coupon, 'code' ) ), defined( 'WOOCOMMERCE_CHECKOUT' ) ? wc_get_checkout_url() : wc_get_cart_url() ) ) . '" class="woocommerce-remove-coupon" data-coupon="' . esc_attr( wcs_get_coupon_property( $coupon, 'code' ) ) . '">' . __( '[Remove]', 'woocommerce-subscriptions' ) . '</a>';
+	echo wp_kses( $html, array_replace_recursive( wp_kses_allowed_html( 'post' ), array( 'a' => array( 'data-coupon' => true ) ) ) );
+}
+
+/**
+ * Display a recurring coupon's value.
+ *
+ * @see wc_cart_totals_coupon_html()
  *
  * @access public
- * @param string $coupon
- * @return void
+ *
+ * @param string|WC_Coupon $coupon
+ * @param WC_Cart          $cart
  */
 function wcs_cart_totals_coupon_html( $coupon, $cart ) {
 	if ( is_string( $coupon ) ) {
@@ -228,10 +250,11 @@ function wcs_cart_totals_coupon_html( $coupon, $cart ) {
 	// get rid of empty array elements
 	$value = implode( ', ', array_filter( $value ) );
 
-	// Apply WooCommerce core filter
-	$value = apply_filters( 'woocommerce_cart_totals_coupon_html', $value, $coupon );
+	// Apply filters.
+	$html = apply_filters( 'wcs_cart_totals_coupon_html', $value, $coupon, $cart );
+	$html = apply_filters( 'woocommerce_cart_totals_coupon_html', $html, $coupon, $discount_html );
 
-	echo wp_kses_post( apply_filters( 'wcs_cart_totals_coupon_html', wcs_cart_price_string( $value, $cart ), $coupon, $cart ) );
+	echo wp_kses( $html, array_replace_recursive( wp_kses_allowed_html( 'post' ), array( 'a' => array( 'data-coupon' => true ) ) ) );
 }
 
 /**
@@ -271,7 +294,7 @@ function wcs_cart_totals_order_total_html( $cart ) {
  * Return a formatted price string for a given cart object
  *
  * @access public
- * @return void
+ * @return string
  */
 function wcs_cart_price_string( $recurring_amount, $cart ) {
 
@@ -282,7 +305,7 @@ function wcs_cart_price_string( $recurring_amount, $cart ) {
 		'subscription_interval' => wcs_cart_pluck( $cart, 'subscription_period_interval' ),
 		'subscription_period'   => wcs_cart_pluck( $cart, 'subscription_period', '' ),
 		'subscription_length'   => wcs_cart_pluck( $cart, 'subscription_length' ),
-	) ) );
+	), $cart ) );
 }
 
 /**
@@ -358,4 +381,22 @@ function wcs_get_cart_item_name( $cart_item, $include = array() ) {
 	}
 
 	return $cart_item_name;
+}
+
+/**
+ * Allows protected products to be renewed.
+ *
+ * @since 2.4.0
+ */
+function wcs_allow_protected_products_to_renew() {
+	remove_filter( 'woocommerce_add_to_cart_validation', 'wc_protected_product_add_to_cart' );
+}
+
+/**
+ * Restores protected products from being added to the cart.
+ * @see   wcs_allow_protected_products_to_renew
+ * @since 2.4.0
+ */
+function wcs_disallow_protected_product_add_to_cart_validation() {
+	add_filter( 'woocommerce_add_to_cart_validation', 'wc_protected_product_add_to_cart', 10, 2 );
 }

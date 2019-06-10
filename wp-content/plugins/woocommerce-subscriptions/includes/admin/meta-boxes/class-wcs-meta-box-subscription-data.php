@@ -62,6 +62,11 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 									esc_url( add_query_arg( $args, admin_url( 'edit.php' ) ) ),
 									esc_html__( 'View other subscriptions', 'woocommerce-subscriptions' )
 								);
+								printf(
+									'<a href="%s">%s</a>',
+									esc_url( add_query_arg( 'user_id', $subscription->get_user_id(), admin_url( 'user-edit.php' ) ) ),
+									esc_html__( 'Profile', 'woocommerce-subscriptions' )
+								);
 							}
 							?></label>
 							<?php
@@ -97,12 +102,38 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 								?>
 							</select>
 						</p>
-
-						<?php do_action( 'woocommerce_admin_order_data_after_order_details', $subscription ); ?>
+						<?php
+						$parent_order = $subscription->get_parent();
+						if ( $parent_order ) { ?>
+						<p class="form-field form-field-wide">
+						<?php echo esc_html__( 'Parent order: ', 'woocommerce-subscriptions' ) ?>
+						<a href="<?php echo esc_url( get_edit_post_link( $subscription->get_parent_id() ) ); ?>">
+						<?php echo sprintf( esc_html__( '#%1$s', 'woocommerce-subscriptions' ), esc_html( $parent_order->get_order_number() ) ); ?>
+						</a>
+						</p>
+						<?php } else {
+						?>
+						<p class="form-field form-field-wide">
+							<label for="parent-order-id"><?php esc_html_e( 'Parent order:', 'woocommerce-subscriptions' ); ?> </label>
+							<?php
+							WCS_Select2::render( array(
+								'class'       => 'wc-enhanced-select',
+								'name'        => 'parent-order-id',
+								'id'          => 'parent-order-id',
+								'placeholder' => esc_attr__( 'Select an order&hellip;', 'woocommerce-subscriptions' ),
+							) );
+							?>
+						</p>
+						<?php }
+						do_action( 'woocommerce_admin_order_data_after_order_details', $subscription ); ?>
 
 					</div>
 					<div class="order_data_column">
-						<h4><?php esc_html_e( 'Billing Details', 'woocommerce-subscriptions' ); ?> <a class="edit_address" href="#"><a href="#" class="tips load_customer_billing" data-tip="Load billing address" style="display:none;">Load billing address</a></a></h4>
+						<h3>
+							<?php esc_html_e( 'Billing Details', 'woocommerce-subscriptions' ); ?>
+							<a href="#" class="edit_address"><?php esc_html_e( 'Edit', 'woocommerce-subscriptions' ); ?></a>
+							<a href="#" class="tips load_customer_billing" data-tip="<?php esc_attr_e( 'Load billing address', 'woocommerce-subscriptions' ); ?>" style="display:none;"><?php esc_html_e( 'Load billing address', 'woocommerce-subscriptions' ); ?></a>
+						</h3>
 						<?php
 						// Display values
 						echo '<div class="address">';
@@ -133,7 +164,7 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 						echo '<p' . ( ( '' != $subscription->get_payment_method() ) ? ' class="' . esc_attr( $subscription->get_payment_method() ) . '"' : '' ) . '><strong>' . esc_html__( 'Payment Method', 'woocommerce-subscriptions' ) . ':</strong>' . wp_kses_post( nl2br( $subscription->get_payment_method_to_display() ) );
 
 						// Display help tip
-						if ( '' != $subscription->get_payment_method()  && ! $subscription->is_manual() ) {
+						if ( '' != $subscription->get_payment_method() && ! $subscription->is_manual() ) {
 							echo wcs_help_tip( sprintf( _x( 'Gateway ID: [%s]', 'The gateway ID displayed on the Edit Subscriptions screen when editing payment method.', 'woocommerce-subscriptions' ), $subscription->get_payment_method() ) );
 						}
 
@@ -148,33 +179,50 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 							if ( ! isset( $field['type'] ) ) {
 								$field['type'] = 'text';
 							}
-
+							if ( ! isset( $field['id'] ) ) {
+								$field['id'] = '_billing_' . $key;
+							}
 							switch ( $field['type'] ) {
 								case 'select' :
-									// allow for setting a default value programaticaly, and draw the selectbox
-									woocommerce_wp_select( array( 'id' => '_billing_' . $key, 'label' => $field['label'], 'options' => $field['options'], 'value' => isset( $field['value'] ) ? $field['value'] : null ) );
-									break;
+									woocommerce_wp_select( $field );
+								break;
 								default :
-									// allow for setting a default value programaticaly, and draw the textbox
-									woocommerce_wp_text_input( array( 'id' => '_billing_' . $key, 'label' => $field['label'], 'value' => isset( $field['value'] ) ? $field['value'] : null ) );
-									break;
+									woocommerce_wp_text_input( $field );
+								break;
 							}
 						}
+
 						WCS_Change_Payment_Method_Admin::display_fields( $subscription );
 
 						echo '</div>';
 
 						do_action( 'woocommerce_admin_order_data_after_billing_address', $subscription );
+
+						// Display a link to the customer's add/change payment method screen.
+						if ( $subscription->can_be_updated_to( 'new-payment-method' ) ) {
+
+							if ( $subscription->has_payment_gateway() ) {
+								$link_text = __( 'Customer change payment method page &rarr;', 'woocommerce-subscriptions' );
+							} else {
+								$link_text = __( 'Customer add payment method page &rarr;', 'woocommerce-subscriptions' );
+							}
+
+							printf(
+								'<a href="%s">%s</a>',
+								esc_url( $subscription->get_change_payment_method_url() ),
+								esc_html( $link_text )
+							);
+						}
 						?>
 					</div>
 					<div class="order_data_column">
 
-						<h4><?php esc_html_e( 'Shipping Details', 'woocommerce-subscriptions' ); ?>
-							<a class="edit_address" href="#">
-								<a href="#" class="tips billing-same-as-shipping" data-tip="Copy from billing" style="display:none;">Copy from billing</a>
-								<a href="#" class="tips load_customer_shipping" data-tip="Load shipping address" style="display:none;">Load shipping address</a>
-							</a>
-						</h4>
+						<h3>
+							<?php esc_html_e( 'Shipping Details', 'woocommerce-subscriptions' ); ?>
+							<a href="#" class="edit_address"><?php esc_html_e( 'Edit', 'woocommerce-subscriptions' ); ?></a>
+							<a href="#" class="tips billing-same-as-shipping" data-tip="<?php esc_attr_e( 'Copy from billing', 'woocommerce-subscriptions' ); ?>" style="display:none;"><?php esc_html_e( 'Copy from billing', 'woocommerce-subscriptions' ); ?></a>
+							<a href="#" class="tips load_customer_shipping" data-tip="<?php esc_attr_e( 'Load shipping address', 'woocommerce-subscriptions' ); ?>" style="display:none;"><?php esc_html_e( 'Load shipping address', 'woocommerce-subscriptions' ); ?></a>
+						</h3>
 						<?php
 						// Display values
 						echo '<div class="address">';
@@ -185,7 +233,7 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 							echo '<p class="none_set"><strong>' . esc_html__( 'Address', 'woocommerce-subscriptions' ) . ':</strong> ' . esc_html__( 'No shipping address set.', 'woocommerce-subscriptions' ) . '</p>';
 						}
 
-						if ( self::$shipping_fields ) {
+						if ( ! empty( self::$shipping_fields ) ) {
 							foreach ( self::$shipping_fields as $key => $field ) {
 								if ( isset( $field['show'] ) && false === $field['show'] ) {
 									continue;
@@ -204,7 +252,7 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 						}
 
 						if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' == get_option( 'woocommerce_enable_order_comments', 'yes' ) ) && $post->post_excerpt ) {
-							echo '<p><strong>' . esc_html__( 'Customer Note:', 'woocommerce-subscriptions' ) . '</strong> ' . wp_kses_post( nl2br( $post->post_excerpt ) ) . '</p>';
+							echo '<p><strong>' . esc_html__( 'Customer Provided Note', 'woocommerce-subscriptions' ) . ':</strong> ' . wp_kses_post( nl2br( $post->post_excerpt ) ) . '</p>';
 						}
 
 						echo '</div>';
@@ -212,28 +260,32 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 						// Display form
 						echo '<div class="edit_address">';
 
-						if ( self::$shipping_fields ) {
+						if ( ! empty( self::$shipping_fields ) ) {
 							foreach ( self::$shipping_fields as $key => $field ) {
 								if ( ! isset( $field['type'] ) ) {
 									$field['type'] = 'text';
 								}
+								if ( ! isset( $field['id'] ) ) {
+									$field['id'] = '_shipping_' . $key;
+								}
 
 								switch ( $field['type'] ) {
 									case 'select' :
-										woocommerce_wp_select( array( 'id' => '_shipping_' . $key, 'label' => $field['label'], 'options' => $field['options'] ) );
-										break;
+										woocommerce_wp_select( $field );
+									break;
 									default :
-										woocommerce_wp_text_input( array( 'id' => '_shipping_' . $key, 'label' => $field['label'] ) );
-										break;
+										woocommerce_wp_text_input( $field );
+									break;
 								}
 							}
 						}
 
 						if ( apply_filters( 'woocommerce_enable_order_notes_field', 'yes' == get_option( 'woocommerce_enable_order_comments', 'yes' ) ) ) {
 							?>
-							<p class="form-field form-field-wide"><label for="excerpt"><?php esc_html_e( 'Customer Note:', 'woocommerce-subscriptions' ) ?></label>
-								<textarea rows="1" cols="40" name="excerpt" tabindex="6" id="excerpt" placeholder="<?php esc_attr_e( 'Customer\'s notes about the order', 'woocommerce-subscriptions' ); ?>"><?php echo wp_kses_post( $post->post_excerpt ); ?></textarea></p>
-								<?php
+							<p class="form-field form-field-wide"><label for="excerpt"><?php esc_html_e( 'Customer Provided Note', 'woocommerce-subscriptions' ) ?>:</label>
+								<textarea rows="1" cols="40" name="excerpt" tabindex="6" id="excerpt" placeholder="<?php esc_attr_e( 'Customer\'s notes about the order', 'woocommerce-subscriptions' ); ?>"><?php echo wp_kses_post( $post->post_excerpt ); ?></textarea>
+							</p>
+							<?php
 						}
 
 						echo '</div>';
@@ -250,45 +302,63 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 
 	/**
 	 * Save meta box data
+	 *
+	 * @param int     $post_id
+	 * @param WP_Post $post
 	 */
-	public static function save( $post_id, $post = '' ) {
-		global $wpdb;
-
+	public static function save( $post_id, $post = null ) {
 		if ( 'shop_subscription' != $post->post_type || empty( $_POST['woocommerce_meta_nonce'] ) || ! wp_verify_nonce( $_POST['woocommerce_meta_nonce'], 'woocommerce_save_data' ) ) {
 			return;
 		}
 
 		self::init_address_fields();
 
-		// Add key
-		add_post_meta( $post_id, '_order_key', uniqid( 'order_' ), true );
+		// Get subscription object.
+		$subscription = wcs_get_subscription( $post_id );
+
+		// Ensure there is an order key.
+		if ( ! $subscription->get_order_key() ) {
+			wcs_set_objects_property( $subscription, 'order_key', wcs_generate_order_key() );
+		}
 
 		// Update meta
-		update_post_meta( $post_id, '_customer_user', absint( $_POST['customer_user'] ) );
-
-		if ( self::$billing_fields ) {
-			foreach ( self::$billing_fields as $key => $field ) {
-
-				if ( ! isset( $_POST[ '_billing_' . $key ] ) ) {
-					continue;
-				}
-
-				update_post_meta( $post_id, '_billing_' . $key, wc_clean( $_POST[ '_billing_' . $key ] ) );
-			}
+		$customer_id = isset( $_POST['customer_user'] ) ? absint( $_POST['customer_user'] ) : 0;
+		if ( $customer_id !== $subscription->get_customer_id() ) {
+			wcs_set_objects_property( $subscription, '_customer_user', $customer_id );
 		}
 
-		if ( self::$shipping_fields ) {
-			foreach ( self::$shipping_fields as $key => $field ) {
-
-				if ( ! isset( $_POST[ '_shipping_' . $key ] ) ) {
-					continue;
-				}
-
-				update_post_meta( $post_id, '_shipping_' . $key, wc_clean( $_POST[ '_shipping_' . $key ] ) );
+		// Handle the billing fields.
+		foreach ( self::$billing_fields as $key => $field ) {
+			$field['id'] = isset( $field['id'] ) ? $field['id'] : "_billing_{$key}";
+			if ( ! isset( $_POST[ $field['id'] ] ) ) {
+				continue;
 			}
+
+			wcs_set_objects_property( $subscription, $field['id'], wc_clean( $_POST[ $field['id'] ] ) );
 		}
 
-		$subscription = wcs_get_subscription( $post_id );
+		// Handle the shipping fields.
+		foreach ( self::$shipping_fields as $key => $field ) {
+			$field['id'] = isset( $field['id'] ) ? $field['id'] : "_shipping_{$key}";
+			if ( ! isset( $_POST[ $field['id'] ] ) ) {
+				continue;
+			}
+
+			wcs_set_objects_property( $subscription, $field['id'], wc_clean( $_POST[ $field['id'] ] ) );
+		}
+
+		// Save the linked parent order id
+		if ( ! empty( $_POST['parent-order-id'] ) ) {
+			// if the parent order to be set is a renewal order
+			if ( wcs_order_contains_renewal( $_POST['parent-order-id'] ) ) {
+				// remove renewal meta
+				$parent = wc_get_order( $_POST['parent-order-id'] );
+				wcs_delete_objects_property( $parent, 'subscription_renewal' );
+			}
+			$subscription->set_parent_id( wc_clean( $_POST['parent-order-id'] ) );
+			$subscription->add_order_note( sprintf( _x( 'Subscription linked to parent order %s via admin.', 'subscription note after linking to a parent order', 'woocommerce-subscriptions' ), sprintf( '<a href="%1$s">#%2$s</a> ', esc_url( wcs_get_edit_post_link( $subscription->get_parent_id() ) ), $subscription->get_parent()->get_order_number() ) ), false, true );
+			$subscription->save();
+		}
 
 		try {
 			WCS_Change_Payment_Method_Admin::save_meta( $subscription );
@@ -303,7 +373,19 @@ class WCS_Meta_Box_Subscription_Data extends WC_Meta_Box_Order_Data {
 			wcs_add_admin_notice( sprintf( __( 'Error updating some information: %s', 'woocommerce-subscriptions' ), $e->getMessage() ), 'error' );
 		}
 
+		if ( isset( $_POST['original_post_status'] ) && 'auto-draft' === $_POST['original_post_status'] ) {
+			$subscription->set_created_via( 'admin' );
+			$subscription->save();
+
+			/**
+			 * Fire an action after a subscription is created via the admin screen.
+			 *
+			 * @since 2.4.1
+			 * @param WC_Subscription $subscription The subscription object.
+			 */
+			do_action( 'woocommerce_admin_created_subscription', $subscription );
+		}
+
 		do_action( 'woocommerce_process_shop_subscription_meta', $post_id, $post );
 	}
-
 }

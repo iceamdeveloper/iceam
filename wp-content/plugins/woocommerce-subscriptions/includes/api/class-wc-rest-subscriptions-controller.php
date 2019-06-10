@@ -81,15 +81,22 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 		if ( ! empty( $post->post_type ) && ! empty( $post->ID ) && 'shop_subscription' == $post->post_type ) {
 			$subscription = wcs_get_subscription( $post->ID );
 
-			$response->data['billing_period']    = $subscription->get_billing_period();
-			$response->data['billing_interval']  = $subscription->get_billing_interval();
+			$response->data['billing_period']   = $subscription->get_billing_period();
+			$response->data['billing_interval'] = $subscription->get_billing_interval();
+
+			// Send resubscribe data
+			$resubscribed_subscriptions                  = array_filter( $subscription->get_related_orders( 'ids', 'resubscribe' ), 'wcs_is_subscription' );
+			$response->data['resubscribed_from']         = strval( wcs_get_objects_property( $subscription, 'subscription_resubscribe' ) );
+			$response->data['resubscribed_subscription'] = strval( reset( $resubscribed_subscriptions ) ); // Subscriptions can only be resubscribed to once so return the first and only element.
 
 			foreach ( array( 'start', 'trial_end', 'next_payment', 'end' ) as $date_type ) {
-				$date_type_key = ( 'start' === $date_type ) ? 'date_created' : $date_type;
-				$date = $subscription->get_date( $date_type_key );
-
+				$date = $subscription->get_date( $date_type );
 				$response->data[ $date_type . '_date' ] = ( ! empty( $date ) ) ? wc_rest_prepare_date_response( $date ) : '';
 			}
+
+			// v1 API includes some date types in site time, include those dates in UTC as well.
+			$response->data['date_completed_gmt'] = wc_rest_prepare_date_response( $subscription->get_date_completed() );
+			$response->data['date_paid_gmt']      = wc_rest_prepare_date_response( $subscription->get_date_paid() );
 		}
 
 		return $response;
@@ -125,8 +132,6 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 				$subscription->set_total( wc_format_decimal( $request['order_total'], get_option( 'woocommerce_price_num_decimals' ) ) );
 			}
 
-			$subscription->save();
-
 			// Store the post meta on the subscription after it's saved, this is to avoid compat. issue with the filters in WC_Subscriptions::set_payment_method_meta() expecting the $subscription to have an ID (therefore it needs to be called after the WC_Subscription has been saved)
 			$payment_data = ( ! empty( $request['payment_details'] ) ) ? $request['payment_details'] : array();
 			if ( empty( $payment_data['payment_details']['method_id'] ) && ! empty( $request['payment_method'] ) ) {
@@ -135,11 +140,11 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 
 			$this->update_payment_method( $subscription, $payment_data );
 
+			$subscription->save();
+
 			// Handle set paid.
 			if ( true === $request['set_paid'] ) {
 				$subscription->payment_complete( $request['transaction_id'] );
-			} else {
-				$subscription->save(); // $subscription->payment_complete() calls $subscription->update_status() which saves the subscription, so we only need to save it if not calling that
 			}
 
 			return $subscription->get_id();
@@ -289,6 +294,10 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 
 			$payment_method_meta = apply_filters( 'woocommerce_subscription_payment_meta', array(), $subscription );
 
+			// Reload the subscription to update the meta values.
+			// In particular, the update_post_meta() called while _stripe_card_id is updated to _stripe_source_id
+			$subscription = wcs_get_subscription( $subscription->get_id() );
+
 			if ( isset( $payment_method_meta[ $payment_method ] ) ) {
 				$payment_method_meta = $payment_method_meta[ $payment_method ];
 
@@ -310,6 +319,9 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 			}
 
 			$subscription->set_payment_method( $payment_method, $payment_method_meta );
+
+			// Save the subscription to reflect the new values
+			$subscription->save();
 
 		} catch ( Exception $e ) {
 			$subscription->set_payment_method();
@@ -339,14 +351,14 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 
 			if ( ! is_null( $value ) ) {
 				switch ( $key ) {
-					case 'billing' :
-					case 'shipping' :
+					case 'billing':
+					case 'shipping':
 						$this->update_address( $subscription, $value, $key );
 						break;
-					case 'line_items' :
-					case 'shipping_lines' :
-					case 'fee_lines' :
-					case 'coupon_lines' :
+					case 'line_items':
+					case 'shipping_lines':
+					case 'fee_lines':
+					case 'coupon_lines':
 						if ( is_array( $value ) ) {
 							foreach ( $value as $item ) {
 								if ( is_array( $item ) ) {
@@ -359,14 +371,13 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 							}
 						}
 						break;
-					case 'start_date' :
-					case 'trial_end_date' :
-					case 'next_payment_date' :
-					case 'end_date' :
-						$date_type_key = ( 'start_date' === $key ) ? 'date_created' : $key;
-						$dates_to_update[ $date_type_key ] = $value;
+					case 'start_date':
+					case 'trial_end_date':
+					case 'next_payment_date':
+					case 'end_date':
+						$dates_to_update[ $key ] = $value;
 						break;
-					default :
+					default:
 						if ( is_callable( array( $subscription, "set_{$key}" ) ) ) {
 							$subscription->{"set_{$key}"}( $value );
 						}
@@ -374,6 +385,8 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 				}
 			}
 		}
+
+		$subscription->save();
 
 		try {
 			if ( ! empty( $dates_to_update ) ) {
@@ -446,6 +459,30 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 				'description' => __( "The subscription's end date.", 'woocommerce-subscriptions' ),
 				'type'        => 'date-time',
 				'context'     => array( 'view', 'edit' ),
+			),
+			'resubscribed_from' => array(
+				'description' => __( "The subscription's original subscription ID if this is a resubscribed subscription.", 'woocommerce-subscriptions' ),
+				'type'        => 'string',
+				'context'     => array( 'view' ),
+				'readonly'    => true,
+			),
+			'resubscribed_subscription' => array(
+				'description' => __( "The subscription's resubscribed subscription ID.", 'woocommerce-subscriptions' ),
+				'type'        => 'string',
+				'context'     => array( 'view' ),
+				'readonly'    => true,
+			),
+			'date_completed_gmt' => array(
+				'description' => __( "The date the subscription's latest order was completed, in GMT.", 'woocommerce-subscriptions' ),
+				'type'        => 'date-time',
+				'context'     => array( 'view' ),
+				'readonly'    => true,
+			),
+			'date_paid_gmt' => array(
+				'description' => __( "The date the subscription's latest order was paid, in GMT.", 'woocommerce-subscriptions' ),
+				'type'        => 'date-time',
+				'context'     => array( 'view' ),
+				'readonly'    => true,
 			),
 		);
 

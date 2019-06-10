@@ -79,7 +79,7 @@ class WCS_Webhooks {
 						'woocommerce_process_shop_subscription_meta',
 					),
 					'subscription.updated' => array(
-						'wc_api_subscription_updated',
+						'wcs_api_subscription_updated',
 						'woocommerce_subscription_status_changed',
 						'wcs_webhook_subscription_updated',
 						'woocommerce_process_shop_subscription_meta',
@@ -139,8 +139,6 @@ class WCS_Webhooks {
 					break;
 				case 'wp_api_v1':
 				case 'wp_api_v2':
-					require_once( 'api/class-wc-rest-subscriptions-controller.php' );
-
 					$request    = new WP_REST_Request( 'GET' );
 					$controller = new WC_REST_Subscriptions_Controller;
 
@@ -214,4 +212,3 @@ class WCS_Webhooks {
 	}
 
 }
-WCS_Webhooks::init();

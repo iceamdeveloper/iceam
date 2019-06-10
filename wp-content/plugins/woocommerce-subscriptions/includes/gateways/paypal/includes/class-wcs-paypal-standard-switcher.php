@@ -168,6 +168,7 @@ class WCS_PayPal_Standard_Switcher {
 					if ( ! wcs_is_paypal_profile_a( $paypal_id, 'billing_agreement' ) ) {
 						update_post_meta( $order_id, '_old_payment_method', 'paypal_standard' );
 						update_post_meta( $order_id, '_old_paypal_subscription_id', $paypal_id );
+						update_post_meta( $subscription->get_id(), '_switched_paypal_subscription_id', $paypal_id );
 					}
 				}
 			}
@@ -218,7 +219,7 @@ class WCS_PayPal_Standard_Switcher {
 	 */
 	public static function get_available_payment_gateways( $available_gateways ) {
 
-		if ( WC_Subscriptions_Switcher::cart_contains_switches() || ( isset( $_GET['order_id'] ) && wcs_order_contains_switch( $_GET['order_id'] ) ) ) {
+		if ( ! is_wc_endpoint_url( 'order-pay' ) && ( WC_Subscriptions_Switcher::cart_contains_switches() || ( isset( $_GET['order_id'] ) && wcs_order_contains_switch( $_GET['order_id'] ) ) ) ) {
 			foreach ( $available_gateways as $gateway_id => $gateway ) {
 				if ( 'paypal' == $gateway_id && false == WCS_PayPal::are_reference_transactions_enabled() ) {
 					unset( $available_gateways[ $gateway_id ] );
@@ -244,7 +245,7 @@ class WCS_PayPal_Standard_Switcher {
 		_deprecated_function( __METHOD__, '2.1', __CLASS__ . 'cancel_paypal_standard_after_switch( $order )' );
 
 		$order = wc_get_order( $order_id );
-		$order_completed = in_array( $new_status, array( apply_filters( 'woocommerce_payment_complete_order_status', 'processing', $order_id ), 'processing', 'completed' ) ) && in_array( $old_status, apply_filters( 'woocommerce_valid_order_statuses_for_payment', array( 'pending', 'on-hold', 'failed' ), $order ) );
+		$order_completed = in_array( $new_status, array( apply_filters( 'woocommerce_payment_complete_order_status', 'processing', $order_id, $order ), 'processing', 'completed' ) ) && in_array( $old_status, apply_filters( 'woocommerce_valid_order_statuses_for_payment', array( 'pending', 'on-hold', 'failed' ), $order ) );
 
 		if ( $order_completed && wcs_order_contains_switch( $order_id ) ) {
 			self::cancel_paypal_standard_after_switch( $order );

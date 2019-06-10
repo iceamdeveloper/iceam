@@ -15,8 +15,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class WCS_Email_Customer_Renewal_Invoice extends WC_Email_Customer_Invoice {
 
-	var $find;
-	var $replace;
+	/**
+	 * Strings to find in subjects/headings.
+	 * @var array
+	 */
+	public $find = array();
+
+	/**
+	 * Strings to replace in subjects/headings.
+	 * @var array
+	 */
+	public $replace = array();
 
 	// fields used in WC_Email_Customer_Invoice this class doesn't need
 	var $subject_paid = null;
@@ -45,6 +54,28 @@ class WCS_Email_Customer_Renewal_Invoice extends WC_Email_Customer_Invoice {
 
 		// We want all the parent's methods, with none of its properties, so call its parent's constructor, rather than my parent constructor
 		WC_Email::__construct();
+	}
+
+	/**
+	 * Get the default e-mail subject.
+	 *
+	 * @param bool $paid Whether the order has been paid or not.
+	 * @since 2.5.3
+	 * @return string
+	 */
+	public function get_default_subject( $paid = false ) {
+		return $this->subject;
+	}
+
+	/**
+	 * Get the default e-mail heading.
+	 *
+	 * @param bool $paid Whether the order has been paid or not.
+	 * @since 2.5.3
+	 * @return string
+	 */
+	public function get_default_heading( $paid = false ) {
+		return $this->heading;
 	}
 
 	/**

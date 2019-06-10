@@ -27,35 +27,38 @@ class WCS_Report_Cache_Manager {
 	 */
 	private $update_events_and_classes = array(
 		'woocommerce_subscriptions_reports_schedule_cache_updates' => array( // a custom hook that can be called to schedule a full cache update, used by WC_Subscriptions_Upgrader
-			0 => 'WC_Report_Subscription_Events_By_Date',
-			1 => 'WC_Report_Upcoming_Recurring_Revenue',
-			3 => 'WC_Report_Subscription_By_Product',
-			4 => 'WC_Report_Subscription_By_Customer',
+			0 => 'WCS_Report_Dashboard',
+			1 => 'WCS_Report_Subscription_Events_By_Date',
+			2 => 'WCS_Report_Upcoming_Recurring_Revenue',
+			4 => 'WCS_Report_Subscription_By_Product',
+			5 => 'WCS_Report_Subscription_By_Customer',
 		),
 		'woocommerce_subscription_payment_complete' => array( // this hook takes care of renewal, switch and initial payments
-			0 => 'WC_Report_Subscription_Events_By_Date',
-			4 => 'WC_Report_Subscription_By_Customer',
+			0 => 'WCS_Report_Dashboard',
+			1 => 'WCS_Report_Subscription_Events_By_Date',
+			5 => 'WCS_Report_Subscription_By_Customer',
 		),
 		'woocommerce_subscriptions_switch_completed' => array(
-			0 => 'WC_Report_Subscription_Events_By_Date',
+			1 => 'WCS_Report_Subscription_Events_By_Date',
 		),
 		'woocommerce_subscription_status_changed' => array(
-			0 => 'WC_Report_Subscription_Events_By_Date', // we really only need cancelled, expired and active status here, but we'll use a more generic hook for convenience
-			4 => 'WC_Report_Subscription_By_Customer',
+			0 => 'WCS_Report_Dashboard',
+			1 => 'WCS_Report_Subscription_Events_By_Date', // we really only need cancelled, expired and active status here, but we'll use a more generic hook for convenience
+			5 => 'WCS_Report_Subscription_By_Customer',
 		),
 		'woocommerce_subscription_status_active' => array(
-			1 => 'WC_Report_Upcoming_Recurring_Revenue',
+			2 => 'WCS_Report_Upcoming_Recurring_Revenue',
 		),
 		'woocommerce_new_order_item' => array(
-			3 => 'WC_Report_Subscription_By_Product',
+			4 => 'WCS_Report_Subscription_By_Product',
 		),
 		'woocommerce_update_order_item' => array(
-			3 => 'WC_Report_Subscription_By_Product',
+			4 => 'WCS_Report_Subscription_By_Product',
 		),
 	);
 
 	/**
-	 * Record of all the report calsses to need to have the cache updated during this request. Prevents duplicate updates in the same request for different events.
+	 * Record of all the report classes to need to have the cache updated during this request. Prevents duplicate updates in the same request for different events.
 	 */
 	private $reports_to_update = array();
 
@@ -73,7 +76,6 @@ class WCS_Report_Cache_Manager {
 	 * Attach callbacks to manage cache updates
 	 *
 	 * @since 2.1
-	 * @return null
 	 */
 	public function __construct() {
 
@@ -101,6 +103,9 @@ class WCS_Report_Cache_Manager {
 
 		// Notify store owners that report data can be out-of-date
 		add_action( 'admin_notices', array( $this, 'admin_notices' ), 0 );
+
+		// Add system status information.
+		add_filter( 'wcs_system_status', array( $this, 'add_system_status_info' ) );
 	}
 
 	/**
@@ -131,7 +136,6 @@ class WCS_Report_Cache_Manager {
 	 * @see $this->set_reports_to_update().
 	 *
 	 * @since 2.1
-	 * @return null
 	 */
 	public function schedule_cache_updates() {
 
@@ -140,24 +144,16 @@ class WCS_Report_Cache_Manager {
 			// On large sites, we want to run the cache update once at 4am in the site's timezone
 			if ( $this->use_large_site_cache() ) {
 
-				$four_am_site_time = new DateTime( '4 am', wcs_get_sites_timezone() );
-
-				// Convert to a UTC timestamp for scheduling
-				$cache_update_timestamp = $four_am_site_time->format( 'U' );
-
-				// PHP doesn't support a "next 4am" time format equivalent, so we need to manually handle getting 4am from earlier today (which will always happen when this is run after 4am and before midnight in the site's timezone)
-				if ( $cache_update_timestamp <= gmdate( 'U' ) ) {
-					$cache_update_timestamp += DAY_IN_SECONDS;
-				}
+				$cache_update_timestamp = $this->get_large_site_cache_update_timestamp();
 
 				// Schedule one update event for each class to avoid updating cache more than once for the same class for different events
 				foreach ( $this->reports_to_update as $index => $report_class ) {
 
 					$cron_args = array( 'report_class' => $report_class );
 
-					if ( false === wp_next_scheduled( $this->cron_hook, $cron_args ) ) {
+					if ( false === as_next_scheduled_action( $this->cron_hook, $cron_args ) ) {
 						// Use the index to space out caching of each report to make them 15 minutes apart so that on large sites, where we assume they'll get a request at least once every few minutes, we don't try to update the caches of all reports in the same request
-						wp_schedule_single_event( $cache_update_timestamp + 15 * MINUTE_IN_SECONDS * ( $index + 1 ), $this->cron_hook, $cron_args );
+						as_schedule_single_action( $cache_update_timestamp + 15 * MINUTE_IN_SECONDS * ( $index + 1 ), $this->cron_hook, $cron_args );
 					}
 				}
 			} else { // Otherwise, run it 10 minutes after the last cache invalidating event
@@ -167,12 +163,12 @@ class WCS_Report_Cache_Manager {
 
 					$cron_args = array( 'report_class' => $report_class );
 
-					if ( false !== ( $next_scheduled = wp_next_scheduled( $this->cron_hook, $cron_args ) ) ) {
-						wp_unschedule_event( $next_scheduled, $this->cron_hook, $cron_args );
+					if ( false !== as_next_scheduled_action( $this->cron_hook, $cron_args ) ) {
+						as_unschedule_action( $this->cron_hook, $cron_args );
 					}
 
 					// Use the index to space out caching of each report to make them 5 minutes apart so that on large sites, where we assume they'll get a request at least once every few minutes, we don't try to update the caches of all reports in the same request
-					wp_schedule_single_event( gmdate( 'U' ) + MINUTE_IN_SECONDS * ( $index + 1 ) * 5, $this->cron_hook, $cron_args );
+					as_schedule_single_action( gmdate( 'U' ) + MINUTE_IN_SECONDS * ( $index + 1 ) * 5, $this->cron_hook, $cron_args );
 				}
 			}
 		}
@@ -185,6 +181,15 @@ class WCS_Report_Cache_Manager {
 	 * @return null
 	 */
 	public function update_cache( $report_class ) {
+		/**
+		 * Filter whether Report Cache Updates are enabled.
+		 *
+		 * @param bool   $enabled      Whether report updates are enabled.
+		 * @param string $report_class The report class to use.
+		 */
+		if ( ! apply_filters( 'wcs_report_cache_updates_enabled', 'yes' === get_option( 'woocommerce_subscriptions_cache_updates_enabled', 'yes' ), $report_class ) ) {
+			return;
+		}
 
 		// Validate the report class
 		$valid_report_class = false;
@@ -200,14 +205,12 @@ class WCS_Report_Cache_Manager {
 			return;
 		}
 
+		// Hook our error catcher.
+		add_action( 'shutdown', array( $this, 'catch_unexpected_shutdown' ) );
+
 		// Load report class dependencies
 		require_once( ABSPATH . 'wp-admin/includes/class-wp-list-table.php' );
 		require_once( WC()->plugin_path() . '/includes/admin/reports/class-wc-admin-report.php' );
-
-		$report_name = strtolower( str_replace( '_', '-', str_replace( 'WC_Report_', '', $report_class ) ) );
-		$report_path = WCS_Admin_Reports::initialize_reports_path( '', $report_name, $report_class );
-
-		require_once( $report_path );
 
 		$reflector = new ReflectionMethod( $report_class, 'get_data' );
 
@@ -226,6 +229,9 @@ class WCS_Report_Cache_Manager {
 				$report->get_data( array( 'no_cache' => true ) );
 			}
 		}
+
+		// Remove our error catcher.
+		remove_action( 'shutdown', array( $this, 'catch_unexpected_shutdown' ) );
 	}
 
 	/**
@@ -274,5 +280,85 @@ class WCS_Report_Cache_Manager {
 			wcs_add_admin_notice( __( 'Please note: data for this report is cached. The data displayed may be out of date by up to 24 hours. The cache is updated each morning at 4am in your site\'s timezone.', 'woocommerce-subscriptions' ) );
 		}
 	}
+
+	/**
+	 * Handle error instances that lead to an unexpected shutdown.
+	 *
+	 * This attempts to detect if there was an error, and proactively prevent errors
+	 * from piling up.
+	 *
+	 * @author Jeremy Pry
+	 */
+	public function catch_unexpected_shutdown() {
+		$error = error_get_last();
+		if ( null === $error || ! isset( $error['type'] ) ) {
+			return;
+		}
+
+		// Check for the error types that matter to us.
+		if ( $error['type'] & ( E_ERROR | E_PARSE | E_COMPILE_ERROR | E_USER_ERROR | E_RECOVERABLE_ERROR ) ) {
+			$failures = get_option( 'woocommerce_subscriptions_cache_updates_failures', 0 );
+			$failures++;
+			update_option( 'woocommerce_subscriptions_cache_updates_failures', $failures, false );
+
+			/**
+			 * Filter the allowed number of detected failures before we turn off cache updates.
+			 *
+			 * @param int $threshold The failure count threshold.
+			 */
+			if ( $failures > apply_filters( 'woocommerce_subscriptions_cache_updates_failures_threshold', 2 ) ) {
+				update_option( 'woocommerce_subscriptions_cache_updates_enabled', 'no', false );
+			}
+		}
+	}
+
+	/**
+	 * Add system status information to include failure count and cache update status.
+	 *
+	 * @author Jeremy Pry
+	 *
+	 * @param array $data Existing status data.
+	 *
+	 * @return array Filtered status data.
+	 */
+	public function add_system_status_info( $data ) {
+		$cache_enabled = ( 'yes' === get_option( 'woocommerce_subscriptions_cache_updates_enabled', 'yes' ) );
+		$failures      = get_option( 'woocommerce_subscriptions_cache_updates_failures', 0 );
+		$new_data      = array(
+			'wcs_report_cache_enabled'  => array(
+				'name'    => _x( 'Report Cache Enabled', 'Whether the Report Cache has been enabled', 'woocommerce-subscriptions' ),
+				'label'   => 'Report Cache Enabled',
+				'note'    => $cache_enabled ? __( 'Yes', 'woocommerce-subscriptions' ) : __( 'No', 'woocommerce-subscriptions' ),
+				'success' => $cache_enabled,
+			),
+			'wcs_cache_update_failures' => array(
+				'name'    => __( 'Cache Update Failures', 'woocommerce-subscriptions' ),
+				'label'   => 'Cache Update Failures',
+				/* translators: %d refers to the number of times we have detected cache update failures */
+				'note'    => sprintf( _n( '%d failures', '%d failure', $failures, 'woocommerce-subscriptions' ), $failures ),
+				'success' => 0 === $failures,
+			),
+		);
+
+		$data = array_merge( $data, $new_data );
+
+		return $data;
+	}
+
+	/**
+	 * Get the scheduled update cache time for large sites.
+	 *
+	 * @return int The timestamp of the next occurring 4 am in the site's timezone converted to UTC.
+	 */
+	protected function get_large_site_cache_update_timestamp() {
+		// Get the timestamp for 4 am in the site's timezone converted to the UTC equivalent.
+		$cache_update_timestamp = wc_string_to_timestamp( '4 am', current_time( 'timestamp' ) ) - wc_timezone_offset();
+
+		// PHP doesn't support a "next 4am" time format equivalent, so we need to manually handle getting 4am from earlier today (which will always happen when this is run after 4am and before midnight in the site's timezone)
+		if ( $cache_update_timestamp <= gmdate( 'U' ) ) {
+			$cache_update_timestamp += DAY_IN_SECONDS;
+		}
+
+		return $cache_update_timestamp;
+	}
 }
-return new WCS_Report_Cache_Manager();

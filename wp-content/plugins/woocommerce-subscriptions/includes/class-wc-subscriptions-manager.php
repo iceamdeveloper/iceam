@@ -50,6 +50,12 @@ class WC_Subscriptions_Manager {
 		// Order is trashed, trash subscription
 		add_action( 'wp_trash_post', __CLASS__ . '::maybe_trash_subscription', 10 );
 
+		// Order is restored (untrashed), restore subscription
+		add_action( 'untrashed_post', __CLASS__ . '::maybe_untrash_subscription', 10 );
+
+		// When order is deleted, delete the subscription.
+		add_action( 'before_delete_post', array( __CLASS__, 'maybe_delete_subscription' ) );
+
 		// When a user is being deleted from the site, via standard WordPress functions, make sure their subscriptions are cancelled
 		add_action( 'delete_user', __CLASS__ . '::trash_users_subscriptions' );
 
@@ -71,27 +77,40 @@ class WC_Subscriptions_Manager {
 	/**
 	 * Sets up renewal for subscriptions managed by Subscriptions.
 	 *
-	 * This function is hooked early on the scheduled subscription payment hook and will:
-	 * - place the subscription on-hold
-	 * - create a renewal order, with the pending status if it requires payment, or processing/complete
-	 *   if the recurring total is $0.
+	 * This function is hooked early on the scheduled subscription payment hook.
 	 *
 	 * @param int $subscription_id The ID of a 'shop_subscription' post
 	 * @since 2.0
 	 */
 	public static function prepare_renewal( $subscription_id ) {
 
+		$order_note = _x( 'Subscription renewal payment due:', 'used in order note as reason for why subscription status changed', 'woocommerce-subscriptions' );
+
+		$renewal_order = self::process_renewal( $subscription_id, 'active', $order_note );
+
+		// Backward compatibility with Subscriptions < 2.2.12 where we returned false for an unknown reason
+		if ( false === $renewal_order ) {
+			return $renewal_order;
+		}
+	}
+
+	/**
+	 * Process renewal for a subscription.
+	 *
+	 * @param int $subscription_id The ID of a 'shop_subscription' post
+	 * @param string $required_status The subscription status required to process a renewal order
+	 * @param string $order_note Reason for subscription status change
+	 * @since 2.2.12
+	 */
+	public static function process_renewal( $subscription_id, $required_status, $order_note ) {
+
 		$subscription = wcs_get_subscription( $subscription_id );
 
-		if ( empty( $subscription ) || ! $subscription->has_status( 'active' ) ) {
-			return false;
-		}
-
 		// If the subscription is using manual payments, the gateway isn't active or it manages scheduled payments
-		if ( 0 == $subscription->get_total() || $subscription->is_manual() || '' == $subscription->get_payment_method() || ! $subscription->payment_method_supports( 'gateway_scheduled_payments' ) ) {
+		if ( ! empty( $subscription ) && $subscription->has_status( $required_status ) && ( 0 == $subscription->get_total() || $subscription->is_manual() || '' == $subscription->get_payment_method() || ! $subscription->payment_method_supports( 'gateway_scheduled_payments' ) ) ) {
 
 			// Always put the subscription on hold in case something goes wrong while trying to process renewal
-			$subscription->update_status( 'on-hold', _x( 'Subscription renewal payment due:', 'used in order note as reason for why subscription status changed', 'woocommerce-subscriptions' ) );
+			$subscription->update_status( 'on-hold', $order_note );
 
 			// Generate a renewal order for payment gateways to use to record the payment (and determine how much is due)
 			$renewal_order = wcs_create_renewal_order( $subscription );
@@ -101,7 +120,7 @@ class WC_Subscriptions_Manager {
 				$renewal_order = wcs_create_renewal_order( $subscription );
 
 				if ( is_wp_error( $renewal_order ) ) {
-					throw new Exception( __( 'Error: Unable to create renewal order from scheduled payment. Please try again.', 'woocommerce-subscriptions' ) );
+					throw new Exception( sprintf( __( 'Error: Unable to create renewal order with note "%s"', 'woocommerce-subscriptions' ), $order_note ) );
 				}
 			}
 
@@ -114,7 +133,7 @@ class WC_Subscriptions_Manager {
 			} else {
 
 				if ( $subscription->is_manual() ) {
-					do_action( 'woocommerce_generated_manual_renewal_order', wcs_get_objects_property( $renewal_order, 'id' ) );
+					do_action( 'woocommerce_generated_manual_renewal_order', wcs_get_objects_property( $renewal_order, 'id' ), $subscription );
 				} else {
 					$renewal_order->set_payment_method( wc_get_payment_gateway_by_order( $subscription ) ); // We need to pass the payment gateway instance to be compatible with WC < 3.0, only WC 3.0+ supports passing the string name
 
@@ -123,7 +142,11 @@ class WC_Subscriptions_Manager {
 					}
 				}
 			}
+		} else {
+			$renewal_order = false;
 		}
+
+		return $renewal_order;
 	}
 
 	/**
@@ -754,8 +777,9 @@ class WC_Subscriptions_Manager {
 	}
 
 	/**
-	 * Clear all subscriptions attached to an order when it's deleted. Also make sure
-	 * all related scheduled actions are cancelled when deleting a susbcription.
+	 * Trash all subscriptions attached to an order when it's trashed.
+	 *
+	 * Also make sure all related scheduled actions are cancelled when deleting a subscription.
 	 *
 	 * @param int $post_id The post ID of the WC Subscription or WC Order being trashed
 	 * @since 1.0
@@ -768,6 +792,40 @@ class WC_Subscriptions_Manager {
 			foreach ( wcs_get_subscriptions_for_order( $post_id, array( 'order_type' => 'parent' ) ) as $subscription ) {
 				wp_trash_post( $subscription->get_id() );
 			}
+		}
+	}
+
+	/**
+	 * Untrash all subscriptions attached to an order when it's restored.
+	 * @param int $post_id The post ID of the WC Order being restored
+	 * @since 2.2.17
+	 */
+	public static function maybe_untrash_subscription( $post_id ) {
+		if ( 'shop_order' == get_post_type( $post_id ) ) {
+			foreach ( wcs_get_subscriptions_for_order( $post_id, array( 'order_type' => 'parent', 'subscription_status' => array( 'trash' ) ) ) as $subscription ) {
+				wp_untrash_post( $subscription->get_id() );
+			}
+		}
+	}
+
+	/**
+	 * Delete related subscriptions when an order is deleted.
+	 *
+	 * @author Jeremy Pry
+	 *
+	 * @param int $post_id The post ID being deleted.
+	 */
+	public static function maybe_delete_subscription( $post_id ) {
+		if ( 'shop_order' !== get_post_type( $post_id ) ) {
+			return;
+		}
+
+		/** @var WC_Subscription[] $subscriptions */
+		$subscriptions = wcs_get_subscriptions_for_order( $post_id, array(
+			'subscription_status' => array( 'any', 'trash' ),
+		) );
+		foreach ( $subscriptions as $subscription ) {
+			wp_delete_post( $subscription->get_id() );
 		}
 	}
 
@@ -1137,7 +1195,7 @@ class WC_Subscriptions_Manager {
 	}
 
 	/**
-	 * Returns the number of completed payments for a given subscription (including the intial payment).
+	 * Returns the number of completed payments for a given subscription (including the initial payment).
 	 *
 	 * @param string $subscription_key A subscription key of the form created by @see self::get_subscription_key()
 	 * @param int $user_id The ID of the user who owns the subscriptions. Although this parameter is optional, if you have the User ID you should pass it to improve performance.
@@ -1863,7 +1921,7 @@ class WC_Subscriptions_Manager {
 
 			// We've already processed the renewal
 			remove_action( 'woocommerce_scheduled_subscription_payment', __CLASS__ . '::prepare_renewal' );
-			remove_action( 'woocommerce_scheduled_subscription_payment', 'WC_Subscriptions_Payment_Gateways::gateway_scheduled_subscription_payment', 10, 1 );
+			remove_action( 'woocommerce_scheduled_subscription_payment', 'WC_Subscriptions_Payment_Gateways::gateway_scheduled_subscription_payment', 10 );
 		}
 	}
 
@@ -2302,5 +2360,3 @@ class WC_Subscriptions_Manager {
 		_deprecated_function( __METHOD__, '2.0' );
 	}
 }
-
-WC_Subscriptions_Manager::init();

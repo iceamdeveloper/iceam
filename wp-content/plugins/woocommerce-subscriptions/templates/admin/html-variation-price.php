@@ -2,6 +2,8 @@
 /**
  * Outputs a subscription variation's pricing fields for WooCommerce 2.3+
  *
+ * @version 2.2.12
+ *
  * @var int $loop
  * @var WP_POST $variation
  * @var WC_Product_Subscription_Variation $variation_product
@@ -16,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 <div class="variable_subscription_trial variable_subscription_pricing_2_3 show_if_variable-subscription variable_subscription_trial_sign_up">
 	<p class="form-row form-row-first form-field show_if_variable-subscription sign-up-fee-cell">
 		<label for="variable_subscription_sign_up_fee[<?php echo esc_attr( $loop ); ?>]"><?php printf( esc_html__( 'Sign-up fee (%s)', 'woocommerce-subscriptions' ), esc_html( get_woocommerce_currency_symbol() ) ); ?></label>
-		<input type="text" class="wc_input_price wc_input_subscription_intial_price" name="variable_subscription_sign_up_fee[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( WC_Subscriptions_Product::get_sign_up_fee( $variation_product ) ); ?>" placeholder="<?php echo esc_attr_x( 'e.g. 9.90', 'example price', 'woocommerce-subscriptions' ); ?>">
+		<input type="text" class="wc_input_price wc_input_subscription_intial_price wc_input_subscription_initial_price" name="variable_subscription_sign_up_fee[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( wc_format_localized_price( WC_Subscriptions_Product::get_sign_up_fee( $variation_product ) ) ); ?>" placeholder="<?php echo esc_attr_x( 'e.g. 9.90', 'example price', 'woocommerce-subscriptions' ); ?>">
 	</p>
 	<p class="form-row form-row-last show_if_variable-subscription">
 		<label for="variable_subscription_trial_length[<?php echo esc_attr( $loop ); ?>]">
@@ -26,7 +28,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		</label>
 		<input type="text" class="wc_input_subscription_trial_length" name="variable_subscription_trial_length[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( WC_Subscriptions_Product::get_trial_length( $variation_product ) ); ?>">
 
-		<label for="variable_subscription_period[<?php echo esc_attr( $loop ); ?>]" class="wcs_hidden_label"><?php esc_html_e( 'Subscription trial period:', 'woocommerce-subscriptions' ); ?></label>
+		<label for="variable_subscription_trial_period[<?php echo esc_attr( $loop ); ?>]" class="wcs_hidden_label"><?php esc_html_e( 'Subscription trial period:', 'woocommerce-subscriptions' ); ?></label>
 		<select name="variable_subscription_trial_period[<?php echo esc_attr( $loop ); ?>]" class="wc_input_subscription_trial_period">
 		<?php foreach ( wcs_get_available_time_periods() as $key => $value ) : ?>
 			<option value="<?php echo esc_attr( $key ); ?>" <?php selected( $key, WC_Subscriptions_Product::get_trial_period( $variation_product ) ); ?>><?php echo esc_html( $value ); ?></option>
@@ -42,8 +44,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 			printf( esc_html__( 'Subscription price (%s)', 'woocommerce-subscriptions' ), esc_html( get_woocommerce_currency_symbol() ) );
 			?>
 		</label>
-		<input type="text" class="wc_input_price wc_input_subscription_price" name="variable_subscription_price[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( WC_Subscriptions_Product::get_price( $variation_product ) ); ?>" placeholder="<?php echo esc_attr_x( 'e.g. 9.90', 'example price', 'woocommerce-subscriptions' ); ?>">
-		
+		<input type="text" class="wc_input_price wc_input_subscription_price" name="variable_subscription_price[<?php echo esc_attr( $loop ); ?>]" value="<?php echo esc_attr( wc_format_localized_price( WC_Subscriptions_Product::get_regular_price( $variation_product ) ) ); ?>" placeholder="<?php echo esc_attr_x( 'e.g. 9.90', 'example price', 'woocommerce-subscriptions' ); ?>">
+
 		<label for="variable_subscription_period_interval[<?php echo esc_attr( $loop ); ?>]" class="wcs_hidden_label"><?php esc_html_e( 'Billing interval:', 'woocommerce-subscriptions' ); ?></label>
 		<select name="variable_subscription_period_interval[<?php echo esc_attr( $loop ); ?>]" class="wc_input_subscription_period_interval">
 		<?php foreach ( wcs_get_subscription_period_interval_strings() as $key => $value ) : ?>
@@ -61,7 +63,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</p>
 	<p class="form-row form-row-last show_if_variable-subscription _subscription_length_field">
 		<label for="variable_subscription_length[<?php echo esc_attr( $loop ); ?>]">
-			<?php esc_html_e( 'Subscription length', 'woocommerce-subscriptions' ); ?>
+			<?php esc_html_e( 'Expire after', 'woocommerce-subscriptions' ); ?>
 			<?php echo wcs_help_tip( _x( 'Automatically expire the subscription after this length of time. This length is in addition to any free trial or amount of time provided before a synchronised first renewal date.', 'Subscription Length dropdown\'s description in pricing fields', 'woocommerce-subscriptions' ) ); ?>
 		</label>
 		<select name="variable_subscription_length[<?php echo esc_attr( $loop ); ?>]" class="wc_input_subscription_length">

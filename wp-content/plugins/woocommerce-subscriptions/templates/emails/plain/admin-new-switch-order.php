@@ -2,9 +2,9 @@
 /**
  * Admin new switch order email (plain text)
  *
- * @author	Brent Shepherd
+ * @author  Brent Shepherd
  * @package WooCommerce_Subscriptions/Templates/Emails/Plain
- * @version 1.5
+ * @version 1.5.0
  */
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly
@@ -35,7 +35,7 @@ foreach ( $subscriptions as $subscription ) {
 	do_action( 'woocommerce_subscriptions_email_order_details', $subscription, $sent_to_admin, $plain_text, $email );
 }
 
-add_filter( 'woocommerce_order_item_meta_end', 'WC_Subscriptions_Switcher::print_switch_link', 10 );
+add_filter( 'woocommerce_order_item_meta_end', 'WC_Subscriptions_Switcher::print_switch_link', 10, 3 );
 echo "\n=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=-=\n\n";
 
 do_action( 'woocommerce_email_customer_details', $order, $sent_to_admin, $plain_text, $email );

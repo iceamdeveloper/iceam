@@ -2,9 +2,9 @@
 /**
  * My Subscriptions section on the My Account page
  *
- * @author 		Prospress
- * @category 	WooCommerce Subscriptions/Templates
- * @version     2.0.0
+ * @author   Prospress
+ * @category WooCommerce Subscriptions/Templates
+ * @version  2.5.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,6 +31,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</thead>
 
 	<tbody>
+	<?php /** @var WC_Subscription $subscription */ ?>
 	<?php foreach ( $subscriptions as $subscription_id => $subscription ) : ?>
 		<tr class="order">
 			<td class="subscription-id order-number" data-title="<?php esc_attr_e( 'ID', 'woocommerce-subscriptions' ); ?>">
@@ -43,12 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 			<td class="subscription-next-payment order-date" data-title="<?php echo esc_attr_x( 'Next Payment', 'table heading', 'woocommerce-subscriptions' ); ?>">
 				<?php echo esc_attr( $subscription->get_date_to_display( 'next_payment' ) ); ?>
 				<?php if ( ! $subscription->is_manual() && $subscription->has_status( 'active' ) && $subscription->get_time( 'next_payment' ) > 0 ) : ?>
-					<?php
-					// translators: placeholder is the display name of a payment gateway a subscription was paid by
-					$payment_method_to_display = sprintf( __( 'Via %s', 'woocommerce-subscriptions' ), $subscription->get_payment_method_to_display() );
-					$payment_method_to_display = apply_filters( 'woocommerce_my_subscriptions_payment_method', $payment_method_to_display, $subscription );
-					?>
-				<br/><small><?php echo esc_attr( $payment_method_to_display ); ?></small>
+				<br/><small><?php echo esc_attr( $subscription->get_payment_method_to_display( 'customer' ) ); ?></small>
 				<?php endif; ?>
 			</td>
 			<td class="subscription-total order-total" data-title="<?php echo esc_attr_x( 'Total', 'Used in data attribute. Escaped', 'woocommerce-subscriptions' ); ?>">
@@ -63,13 +59,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 	</tbody>
 
 	</table>
-	<?php else : ?>
+		<?php if ( 1 < $max_num_pages ) : ?>
+			<div class="woocommerce-pagination woocommerce-pagination--without-numbers woocommerce-Pagination">
+			<?php if ( 1 !== $current_page ) : ?>
+				<a class="woocommerce-button woocommerce-button--previous woocommerce-Button woocommerce-Button--previous button" href="<?php echo esc_url( wc_get_endpoint_url( 'subscriptions', $current_page - 1 ) ); ?>"><?php esc_html_e( 'Previous', 'woocommerce-subscriptions' ); ?></a>
+			<?php endif; ?>
 
+			<?php if ( intval( $max_num_pages ) !== $current_page ) : ?>
+				<a class="woocommerce-button woocommerce-button--next woocommerce-Button woocommerce-Button--next button" href="<?php echo esc_url( wc_get_endpoint_url( 'subscriptions', $current_page + 1 ) ); ?>"><?php esc_html_e( 'Next', 'woocommerce-subscriptions' ); ?></a>
+			<?php endif; ?>
+			</div>
+		<?php endif; ?>
+	<?php else : ?>
 		<p class="no_subscriptions">
-			<?php
-			// translators: placeholders are opening and closing link tags to take to the shop page
-			printf( esc_html__( 'You have no active subscriptions. Find your first subscription in the %sstore%s.', 'woocommerce-subscriptions' ), '<a href="' . esc_url( apply_filters( 'woocommerce_subscriptions_message_store_url', get_permalink( wc_get_page_id( 'shop' ) ) ) ) . '">', '</a>' );
-			?>
+			<?php if ( 1 < $current_page ) :
+				printf( esc_html__( 'You have reached the end of subscriptions. Go to the %sfirst page%s.', 'woocommerce-subscriptions' ), '<a href="' . esc_url( wc_get_endpoint_url( 'subscriptions', 1 ) ) . '">', '</a>' );
+			else :
+				// translators: placeholders are opening and closing link tags to take to the shop page
+				printf( esc_html__( 'You have no active subscriptions. Find your first subscription in the %sstore%s.', 'woocommerce-subscriptions' ), '<a href="' . esc_url( apply_filters( 'woocommerce_subscriptions_message_store_url', get_permalink( wc_get_page_id( 'shop' ) ) ) ) . '">', '</a>' );
+			endif; ?>
 		</p>
 
 	<?php endif; ?>

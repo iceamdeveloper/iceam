@@ -5,13 +5,13 @@
  * Display the renewal order count and revenue that will be processed for all currently active subscriptions
  * for a given period of time in the future.
  *
- * @package		WooCommerce Subscriptions
- * @subpackage	WC_Subscriptions_Admin_Reports
- * @category	Class
- * @author		Prospress
- * @since		2.1
+ * @package    WooCommerce Subscriptions
+ * @subpackage WC_Subscriptions_Admin_Reports
+ * @category   Class
+ * @author     Prospress
+ * @since      2.1
  */
-class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
+class WCS_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 
 	public $chart_colours = array();
 
@@ -30,11 +30,6 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 
 		foreach ( $this->order_ids_recurring_totals as $r ) {
 
-			if ( strtotime( $r->scheduled_date ) >= $this->start_date  ) {
-				$total_renewal_revenue += $r->recurring_total;
-				$total_renewal_count   += $r->total_renewals;
-			}
-
 			$subscription_ids    = explode( ',', $r->subscription_ids );
 			$billing_intervals   = explode( ',', $r->billing_intervals );
 			$billing_periods     = explode( ',', $r->billing_periods );
@@ -45,6 +40,11 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 			foreach ( $subscription_ids as $key => $subscription_id ) {
 
 				$next_payment_timestamp = strtotime( $r->scheduled_date );
+
+				//Remove the time part of the end date, if there is one
+				if ( '0' !== $scheduled_ends[ $key ]  ) {
+					$scheduled_ends[ $key ] = date( 'Y-m-d', strtotime( $scheduled_ends[ $key ] ) );
+				}
 
 				// Keep calculating all the new payments until we hit the end date of the search
 				do {
@@ -65,11 +65,18 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 							}
 							$this->order_ids_recurring_totals[ $update_key ]->total_renewals  += 1;
 							$this->order_ids_recurring_totals[ $update_key ]->recurring_total += $subscription_totals[ $key ];
-							$total_renewal_revenue += $subscription_totals[ $key ];;
-							$total_renewal_count   += 1;
 						}
 					}
 				} while ( $next_payment_timestamp <= $this->end_date && isset( $scheduled_ends[ $key ] ) && ( 0 == $scheduled_ends[ $key ] || $next_payment_timestamp < strtotime( $scheduled_ends[ $key ] ) ) );
+			}
+		}
+
+		// Sum up the total revenue and total renewal count separately to avoid adding up multiple times.
+		foreach ( $this->order_ids_recurring_totals as $r ) {
+			if ( strtotime( $r->scheduled_date ) >= $this->start_date && strtotime( $r->scheduled_date ) <= $this->end_date ) {
+
+				$total_renewal_revenue += $r->recurring_total ;
+				$total_renewal_count   += $r->total_renewals;
 			}
 		}
 
@@ -112,7 +119,7 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 		// Query based on whole days, not minutes/hours so that we can cache the query for at least 24 hours
 		$base_query = $wpdb->prepare(
 			"SELECT
-				DATE_FORMAT(ms.meta_value, '%s') as scheduled_date,
+				DATE(ms.meta_value) as scheduled_date,
 				SUM(mo.meta_value) as recurring_total,
 				COUNT(mo.meta_value) as total_renewals,
 				group_concat(p.ID) as subscription_ids,
@@ -135,13 +142,13 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 				AND p.post_status = 'wc-active'
 				AND mo.meta_key = '_order_total'
 				AND ms.meta_key = '_schedule_next_payment'
-				AND ms.meta_value BETWEEN '%s' AND '%s'
+				AND ( ( ms.meta_value < '%s' AND me.meta_value = 0 ) OR ( me.meta_value > '%s' AND ms.meta_value < '%s' ) )
 				AND mi.meta_key = '_billing_interval'
 				AND mp.meta_key = '_billing_period'
 				AND me.meta_key = '_schedule_end '
 			GROUP BY {$this->group_by_query}
 			ORDER BY ms.meta_value ASC",
-			'%Y-%m-%d',
+			date( 'Y-m-d', strtotime( '+1 DAY', $this->end_date ) ),
 			date( 'Y-m-d', $this->start_date ),
 			date( 'Y-m-d', strtotime( '+1 DAY', $this->end_date ) )
 		);
@@ -359,7 +366,7 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 				}
 
 				// 3 months max for day view
-				if ( $interval > 3 ) {
+				if ( $interval >= 3 ) {
 					$this->chart_groupby  = 'month';
 				} else {
 					$this->chart_groupby  = 'day';
@@ -395,7 +402,7 @@ class WC_Report_Upcoming_Recurring_Revenue extends WC_Admin_Report {
 				$this->barwidth       = 60 * 60 * 24 * 1000;
 			break;
 			case 'month' :
-				$this->group_by_query = 'YEAR(ms.meta_value), MONTH(ms.meta_value)';
+				$this->group_by_query = 'YEAR(ms.meta_value), MONTH(ms.meta_value), DAY(ms.meta_value)';
 				$this->chart_interval = 0;
 				$min_date             = $this->start_date;
 				while ( ( $min_date = wcs_add_months( $min_date, '1' ) ) <= $this->end_date ) {

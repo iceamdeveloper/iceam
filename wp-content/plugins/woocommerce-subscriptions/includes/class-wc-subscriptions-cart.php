@@ -80,18 +80,11 @@ class WC_Subscriptions_Cart {
 		// Make sure cart product prices correctly include/exclude taxes
 		add_filter( 'woocommerce_cart_product_price', __CLASS__ . '::cart_product_price' , 10, 2 );
 
-		// Make sure cart totals are calculated when setting up the cart widget
-		add_action( 'wc_ajax_get_refreshed_fragments', __CLASS__ . '::pre_get_refreshed_fragments' , 1 );
-		add_action( 'wp_ajax_woocommerce_get_refreshed_fragments', __CLASS__ . '::pre_get_refreshed_fragments', 1 );
-		add_action( 'wp_ajax_nopriv_woocommerce_get_refreshed_fragments', __CLASS__ . '::pre_get_refreshed_fragments', 1, 1 );
-
-		add_action( 'woocommerce_ajax_added_to_cart', __CLASS__ . '::pre_get_refreshed_fragments', 1, 1 );
-
 		// Display grouped recurring amounts after order totals on the cart/checkout pages
 		add_action( 'woocommerce_cart_totals_after_order_total', __CLASS__ . '::display_recurring_totals' );
 		add_action( 'woocommerce_review_order_after_order_total', __CLASS__ . '::display_recurring_totals' );
 
-		add_action( 'woocommerce_add_to_cart_validation', __CLASS__ . '::check_valid_add_to_cart', 10, 6 );
+		add_filter( 'woocommerce_add_to_cart_validation', __CLASS__ . '::check_valid_add_to_cart', 10, 6 );
 
 		add_filter( 'woocommerce_cart_needs_shipping', __CLASS__ . '::cart_needs_shipping', 11, 1 );
 
@@ -122,6 +115,10 @@ class WC_Subscriptions_Cart {
 		add_filter( 'woocommerce_shipping_free_shipping_is_available', __CLASS__ . '::maybe_recalculate_shipping_method_availability', 10, 2 );
 
 		add_filter( 'woocommerce_add_to_cart_handler', __CLASS__ . '::add_to_cart_handler', 10, 2 );
+
+		add_action( 'woocommerce_cart_calculate_fees', __CLASS__ . '::apply_recurring_fees', 1000, 1 );
+
+		add_action( 'woocommerce_checkout_update_order_review', __CLASS__ . '::update_chosen_shipping_methods' );
 	}
 
 	/**
@@ -205,6 +202,10 @@ class WC_Subscriptions_Cart {
 			if ( 'none' == self::$calculation_type ) {
 
 				$sign_up_fee  = WC_Subscriptions_Product::get_sign_up_fee( $product );
+
+				// Extra check to make sure that the sign up fee is numeric before using it
+				$sign_up_fee = is_numeric( $sign_up_fee ) ? (float) $sign_up_fee : 0;
+
 				$trial_length = WC_Subscriptions_Product::get_trial_length( $product );
 
 				if ( $trial_length > 0 ) {
@@ -304,7 +305,12 @@ class WC_Subscriptions_Cart {
 			self::$cached_recurring_cart = $recurring_cart;
 
 			// No fees recur (yet)
-			$recurring_cart->fees = array();
+			if ( is_callable( array( $recurring_cart, 'fees_api' ) ) ) { // WC 3.2 +
+				$recurring_cart->fees_api()->remove_all_fees();
+			} else {
+				$recurring_cart->fees = array();
+			}
+
 			$recurring_cart->fee_total = 0;
 			WC()->shipping->reset_shipping();
 			self::maybe_restore_shipping_methods();
@@ -326,16 +332,42 @@ class WC_Subscriptions_Cart {
 		// We need to reset the packages and totals stored in WC()->shipping too
 		WC()->shipping->reset_shipping();
 		self::maybe_restore_shipping_methods();
-		WC()->cart->calculate_shipping();
+
+		// Only calculate the initial order cart shipping if we need to show shipping.
+		if ( WC()->cart->show_shipping() ) {
+			WC()->cart->calculate_shipping();
+		}
 
 		// We no longer need our backup of shipping methods
 		unset( WC()->session->wcs_shipping_methods );
 
 		// If there is no sign-up fee and a free trial, and no products being purchased with the subscription, we need to zero the fees for the first billing period
-		if ( 0 == self::get_cart_subscription_sign_up_fee() && self::all_cart_items_have_free_trial() ) {
-			foreach ( WC()->cart->get_fees() as $fee_index => $fee ) {
-				WC()->cart->fees[ $fee_index ]->amount = 0;
-				WC()->cart->fees[ $fee_index ]->tax = 0;
+		$remove_fees_from_cart = ( 0 == self::get_cart_subscription_sign_up_fee() && self::all_cart_items_have_free_trial() );
+
+		/**
+		 * Allow third-parties to override whether the fees will be removed from the initial order cart.
+		 *
+		 * @since 2.4.3
+		 * @param bool $remove_fees_from_cart Whether the fees will be removed. By default fees will be removed if there is no signup fee and all cart items have a trial.
+		 * @param WC_Cart $cart The standard WC cart object.
+		 * @param array $recurring_carts All the recurring cart objects.
+		 */
+		if ( apply_filters( 'wcs_remove_fees_from_initial_cart', $remove_fees_from_cart, $cart, $recurring_carts ) ) {
+			$cart_fees = WC()->cart->get_fees();
+
+			if ( WC_Subscriptions::is_woocommerce_pre( '3.2' ) ) {
+				foreach ( $cart_fees as $fee_index => $fee ) {
+					WC()->cart->fees[ $fee_index ]->amount = 0;
+					WC()->cart->fees[ $fee_index ]->tax = 0;
+				}
+			} else {
+				foreach ( $cart_fees as $fee ) {
+					$fee->amount = 0;
+					$fee->tax    = 0;
+					$fee->total  = 0;
+				}
+
+				WC()->cart->fees_api()->set_fees( $cart_fees );
 			}
 			WC()->cart->fee_total = 0;
 		}
@@ -400,9 +432,11 @@ class WC_Subscriptions_Cart {
 					$needs_shipping = false;
 				}
 			} elseif ( 'recurring_total' == self::$calculation_type ) {
-				if ( true == $needs_shipping && ! self::cart_contains_subscriptions_needing_shipping() ) {
+				$cart = ( isset( self::$cached_recurring_cart ) ) ? self::$cached_recurring_cart : WC()->cart;
+
+				if ( true == $needs_shipping && ! self::cart_contains_subscriptions_needing_shipping( $cart ) ) {
 					$needs_shipping = false;
-				} elseif ( false == $needs_shipping && self::cart_contains_subscriptions_needing_shipping() ) {
+				} elseif ( false == $needs_shipping && self::cart_contains_subscriptions_needing_shipping( $cart ) ) {
 					$needs_shipping = true;
 				}
 			}
@@ -591,16 +625,20 @@ class WC_Subscriptions_Cart {
 	 *
 	 * @since 1.5.4
 	 */
-	public static function cart_contains_subscriptions_needing_shipping() {
+	public static function cart_contains_subscriptions_needing_shipping( $cart = null ) {
 
 		if ( 'no' === get_option( 'woocommerce_calc_shipping' ) ) {
 			return false;
 		}
 
+		if ( null === $cart ) {
+			$cart = WC()->cart;
+		}
+
 		$cart_contains_subscriptions_needing_shipping = false;
 
 		if ( self::cart_contains_subscription() ) {
-			foreach ( WC()->cart->cart_contents as $cart_item_key => $values ) {
+			foreach ( $cart->cart_contents as $cart_item_key => $values ) {
 				$_product = $values['data'];
 				if ( WC_Subscriptions_Product::is_subscription( $_product ) && $_product->needs_shipping() && false === WC_Subscriptions_Product::needs_one_time_shipping( $_product ) ) {
 					$cart_contains_subscriptions_needing_shipping = true;
@@ -672,14 +710,14 @@ class WC_Subscriptions_Cart {
 			}
 
 			// Avoid infinite loop
-			remove_filter( 'woocommerce_cart_product_subtotal', __CLASS__ . '::get_formatted_product_subtotal', 11, 4 );
+			remove_filter( 'woocommerce_cart_product_subtotal', __CLASS__ . '::get_formatted_product_subtotal', 11 );
 
 			add_filter( $product_price_filter, 'WC_Subscriptions_Product::get_sign_up_fee_filter', 100, 2 );
 
 			// And get the appropriate sign up fee string
 			$sign_up_fee_string = $cart->get_product_subtotal( $product, $quantity );
 
-			remove_filter( $product_price_filter,  'WC_Subscriptions_Product::get_sign_up_fee_filter', 100, 2 );
+			remove_filter( $product_price_filter,  'WC_Subscriptions_Product::get_sign_up_fee_filter', 100 );
 
 			add_filter( 'woocommerce_cart_product_subtotal', __CLASS__ . '::get_formatted_product_subtotal', 11, 4 );
 
@@ -690,10 +728,13 @@ class WC_Subscriptions_Cart {
 				)
 			);
 
-			if ( false !== strpos( $product_subtotal, WC()->countries->inc_tax_or_vat() ) ) {
+			$inc_tax_or_vat_string = WC()->countries->inc_tax_or_vat();
+			$ex_tax_or_vat_string  = WC()->countries->ex_tax_or_vat();
+
+			if ( ! empty( $inc_tax_or_vat_string ) && false !== strpos( $product_subtotal, $inc_tax_or_vat_string ) ) {
 				$product_subtotal = str_replace( WC()->countries->inc_tax_or_vat(), '', $product_subtotal ) . ' <small class="tax_label">' . WC()->countries->inc_tax_or_vat() . '</small>';
 			}
-			if ( false !== strpos( $product_subtotal, WC()->countries->ex_tax_or_vat() ) ) {
+			if ( ! empty( $ex_tax_or_vat_string ) && false !== strpos( $product_subtotal, $ex_tax_or_vat_string ) ) {
 				$product_subtotal = str_replace( WC()->countries->ex_tax_or_vat(), '', $product_subtotal ) . ' <small class="tax_label">' .  WC()->countries->ex_tax_or_vat() . '</small>';
 			}
 
@@ -750,6 +791,17 @@ class WC_Subscriptions_Cart {
 	}
 
 	/**
+	 * Checks to see if payment method is required on a subscription product with a $0 initial payment.
+	 *
+	 * @since 2.5.0
+	 */
+	public static function zero_initial_payment_requires_payment() {
+
+		return 'yes' !== get_option( WC_Subscriptions_Admin::$option_prefix . '_zero_initial_payment_requires_payment', 'no' );
+
+	}
+
+	/**
 	 * Gets the cart calculation type flag
 	 *
 	 * @since 1.2
@@ -793,7 +845,11 @@ class WC_Subscriptions_Cart {
 					continue;
 				}
 
-				$sign_up_fee += WC_Subscriptions_Product::get_sign_up_fee( $cart_item['data'] );
+				$cart_item_sign_up_fee  = WC_Subscriptions_Product::get_sign_up_fee( $cart_item['data'] );
+				// Extra check to make sure that the sign up fee is numeric before using it
+				$cart_item_sign_up_fee = is_numeric( $cart_item_sign_up_fee ) ? (float) $cart_item_sign_up_fee : 0;
+
+				$sign_up_fee += $cart_item_sign_up_fee;
 			}
 		}
 
@@ -809,30 +865,43 @@ class WC_Subscriptions_Cart {
 	 */
 	public static function cart_needs_payment( $needs_payment, $cart ) {
 
-		if ( false === $needs_payment && self::cart_contains_subscription() && $cart->total == 0 && false === WC_Subscriptions_Switcher::cart_contains_switches() && 'yes' !== get_option( WC_Subscriptions_Admin::$option_prefix . '_turn_off_automatic_payments', 'no' ) ) {
+		// Skip checks if needs payment is already set or cart total not 0.
+		if ( false !== $needs_payment || 0 != $cart->total ) {
+			return $needs_payment;
+		}
 
-			$recurring_total = 0;
-			$is_one_period   = true;
-			$is_synced = false;
+		// Skip checks if new $0 initial payments don't require a payment method or cart has no subscriptions.
+		if ( ! self::zero_initial_payment_requires_payment() || ! self::cart_contains_subscription() ) {
+			return $needs_payment;
+		}
 
-			foreach ( WC()->cart->recurring_carts as $cart ) {
+		// Skip checks if cart contains subscription switches or automatic payments are disabled.
+		if ( false !== WC_Subscriptions_Switcher::cart_contains_switches() || 'yes' === get_option( WC_Subscriptions_Admin::$option_prefix . '_turn_off_automatic_payments', 'no' ) ) {
+			return $needs_payment;
+		}
 
-				$recurring_total += $cart->total;
+		$recurring_total = 0;
+		$is_one_period   = true;
+		$contains_synced = false;
+		$contains_expiring_limited_coupon = false;
 
-				$cart_length = wcs_cart_pluck( $cart, 'subscription_length' );
+		if ( ! empty( WC()->cart->recurring_carts ) ) {
+			foreach ( WC()->cart->recurring_carts as $recurring_cart ) {
+				$recurring_total    += $recurring_cart->total;
+				$subscription_length = wcs_cart_pluck( $recurring_cart, 'subscription_length' );
+				$contains_synced     = $contains_synced || (bool) WC_Subscriptions_Synchroniser::cart_contains_synced_subscription( $recurring_cart );
+				$contains_expiring_limited_coupon = $contains_expiring_limited_coupon || WC_Subscriptions_Coupon::recurring_cart_contains_expiring_coupon( $recurring_cart );
 
-				if ( 0 == $cart_length || wcs_cart_pluck( $cart, 'subscription_period_interval' ) != $cart_length ) {
+				if ( 0 == $subscription_length || wcs_cart_pluck( $recurring_cart, 'subscription_period_interval' ) != $subscription_length ) {
 					$is_one_period = false;
 				}
-
-				$is_synced = ( $is_synced || false != WC_Subscriptions_Synchroniser::cart_contains_synced_subscription( $cart ) ) ? true : false;
 			}
+		}
 
-			$has_trial = self::cart_contains_free_trial();
+		$needs_trial_payment = self::cart_contains_free_trial();
 
-			if ( $recurring_total > 0 && ( false === $is_one_period || true === $has_trial || ( false !== $is_synced && false == WC_Subscriptions_Synchroniser::is_today( WC_Subscriptions_Synchroniser::calculate_first_payment_date( $is_synced['data'], 'timestamp' ) ) ) ) ) {
-				$needs_payment = true;
-			}
+		if ( $contains_expiring_limited_coupon || $recurring_total > 0 && ( ! $is_one_period || $needs_trial_payment || $contains_synced ) ) {
+			$needs_payment = true;
 		}
 
 		return $needs_payment;
@@ -912,19 +981,6 @@ class WC_Subscriptions_Cart {
 		}
 
 		return $price;
-	}
-
-	/**
-	 * Make sure cart totals are calculated when the cart widget is populated via the get_refreshed_fragments() method
-	 * so that @see self::get_formatted_cart_subtotal() returns the correct subtotal price string.
-	 *
-	 * @since 1.5.11
-	 */
-	public static function pre_get_refreshed_fragments() {
-		if ( defined( 'DOING_AJAX' ) && true === DOING_AJAX && ! defined( 'WOOCOMMERCE_CART' ) ) {
-			define( 'WOOCOMMERCE_CART', true );
-			WC()->cart->calculate_totals();
-		}
 	}
 
 	/**
@@ -1123,9 +1179,14 @@ class WC_Subscriptions_Cart {
 						$added_invalid_notice = true;
 					}
 
-					WC()->checkout()->shipping_methods[ $recurring_shipping_package_key ] = '';
+					$shipping_methods[ $recurring_shipping_package_key ] = '';
 				}
 			}
+		}
+
+		// If there was an invalid recurring shipping method found, we need to apply the changes to WC()->checkout()->shipping_methods.
+		if ( $added_invalid_notice ) {
+			WC()->checkout()->shipping_methods = $shipping_methods;
 		}
 
 		self::$calculation_type   = $calculation_type;
@@ -1235,7 +1296,74 @@ class WC_Subscriptions_Cart {
 		return $is_available;
 	}
 
+	/**
+	 * Allow third-parties to apply fees which apply to the cart to recurring carts.
+	 *
+	 * @param WC_Cart
+	 * @since 2.2.16
+	 */
+	public static function apply_recurring_fees( $cart ) {
+
+		if ( ! empty( $cart->recurring_cart_key ) ) {
+
+			foreach ( WC()->cart->get_fees() as $fee ) {
+
+				if ( apply_filters( 'woocommerce_subscriptions_is_recurring_fee', false, $fee, $cart ) ) {
+					if ( is_callable( array( $cart, 'fees_api' ) ) ) { // WC 3.2 +
+						$cart->fees_api()->add_fee( $fee );
+					} else {
+						$cart->add_fee( $fee->name, $fee->amount, $fee->taxable, $fee->tax_class );
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Update the chosen recurring package shipping methods from posted checkout form data.
+	 *
+	 * Between requests, the presence of recurring package chosen shipping methods in posted
+	 * checkout data can change. For example, when the number of available shipping methods
+	 * change and cause the hidden elements (generated by @see wcs_cart_print_shipping_input())
+	 * to be displayed or not displayed.
+	 *
+	 * When this occurs, we need to remove those chosen shipping methods from the session so
+	 * that those packages no longer use the previously selected shipping method.
+	 *
+	 * @param string $encoded_form_data Encoded checkout form data.
+	 * @since 2.3.0
+	 */
+	public static function update_chosen_shipping_methods( $encoded_form_data ) {
+		$chosen_shipping_methods = WC()->session->get( 'chosen_shipping_methods', array() );
+
+		parse_str( $encoded_form_data, $form_data );
+
+		foreach ( $chosen_shipping_methods as $package_index => $method ) {
+			// Remove the chosen shipping methods for recurring packages which are no longer present in posted checkout data.
+			if ( ! is_numeric( $package_index ) && ! isset( $form_data['shipping_method'][ $package_index ] ) ) {
+				unset( $chosen_shipping_methods[ $package_index ] );
+			}
+		}
+
+		WC()->session->set( 'chosen_shipping_methods', $chosen_shipping_methods );
+	}
+
 	/* Deprecated */
+
+	/**
+	 * Make sure cart totals are calculated when the cart widget is populated via the get_refreshed_fragments() method
+	 * so that @see self::get_formatted_cart_subtotal() returns the correct subtotal price string.
+	 *
+	 * @since 1.5.11
+	 * @deprecated 2.5.0
+	 */
+	public static function pre_get_refreshed_fragments() {
+		wcs_deprecated_function( __METHOD__, '2.5.0' );
+		if ( defined( 'DOING_AJAX' ) && true === DOING_AJAX && ! defined( 'WOOCOMMERCE_CART' ) ) {
+			define( 'WOOCOMMERCE_CART', true );
+			WC()->cart->calculate_totals();
+		}
+	}
 
 	/**
 	 * Checks the cart to see if it contains a subscription product renewal.
@@ -1893,7 +2021,7 @@ class WC_Subscriptions_Cart {
 			'trial_period'          => self::get_cart_subscription_trial_period(),
 		);
 
-		$is_one_payment = ( self::get_cart_subscription_length() > 0 && self::get_cart_subscription_length() == self::get_cart_subscription_interval() ) ? true : false;
+		$is_one_payment = self::get_cart_subscription_length() > 0 && self::get_cart_subscription_length() == self::get_cart_subscription_interval();
 
 		// Override defaults when subscription is for one billing period
 		if ( $is_one_payment ) {
@@ -2058,4 +2186,3 @@ class WC_Subscriptions_Cart {
 		return $package_rates;
 	}
 }
-WC_Subscriptions_Cart::init();

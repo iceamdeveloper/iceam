@@ -32,6 +32,8 @@ class WCS_Download_Handler {
 
 		add_action( 'woocommerce_process_shop_order_meta', __CLASS__ . '::repair_permission_data', 60, 1 );
 
+		add_action( 'woocommerce_admin_created_subscription', array( __CLASS__, 'grant_download_permissions' ) );
+
 		add_action( 'deleted_post', __CLASS__ . '::delete_subscription_permissions' );
 
 		add_action( 'woocommerce_process_product_file_download_paths', __CLASS__ . '::grant_new_file_product_permissions', 11, 3 );
@@ -185,6 +187,17 @@ class WCS_Download_Handler {
 	}
 
 	/**
+	 * Gives customers access to downloadable products in a subscription.
+	 * Hooked into 'woocommerce_admin_created_subscription' to grant permissions to admin created subscriptions.
+	 *
+	 * @param WC_Subscription $subscription
+	 * @since 2.4.2
+	 */
+	public static function grant_download_permissions( $subscription ) {
+		wc_downloadable_product_permissions( $subscription->get_id() );
+	}
+
+	/**
 	 * Remove download permissions attached to a subscription when it is permenantly deleted.
 	 *
 	 * @since 2.0
@@ -217,17 +230,28 @@ class WCS_Download_Handler {
 
 		if ( ! empty( $new_download_ids ) ) {
 
-			$existing_permissions = $wpdb->get_col( $wpdb->prepare( "SELECT order_id from {$wpdb->prefix}woocommerce_downloadable_product_permissions WHERE product_id = %d GROUP BY order_id", $product_id ) );
+			$existing_permissions = $wpdb->get_results( $wpdb->prepare( "SELECT order_id, download_id from {$wpdb->prefix}woocommerce_downloadable_product_permissions WHERE product_id = %d", $product_id ) );
 			$subscriptions        = wcs_get_subscriptions_for_product( $product_id );
+
+			// Arrange download id permissions by order id
+			$permissions_by_order_id = array();
+
+			foreach ( $existing_permissions as $permission_data ) {
+
+				$permissions_by_order_id[ $permission_data->order_id ][] = $permission_data->download_id;
+			}
 
 			foreach ( $subscriptions as $subscription_id ) {
 
 				// Grant permissions to subscriptions which have no permissions for this product, pre WC3.0, or all subscriptions, post WC3.0, as WC doesn't grant them retrospectively anymore.
-				if ( ! in_array( $subscription_id, $existing_permissions ) || false === WC_Subscriptions::is_woocommerce_pre( '3.0' ) ) {
+				if ( ! in_array( $subscription_id, array_keys( $permissions_by_order_id ) ) || false === WC_Subscriptions::is_woocommerce_pre( '3.0' ) ) {
 					$subscription = wcs_get_subscription( $subscription_id );
 
 					foreach ( $new_download_ids as $download_id ) {
-						if ( $subscription && apply_filters( 'woocommerce_process_product_file_download_paths_grant_access_to_new_file', true, $download_id, $product_id, $subscription ) ) {
+
+						$has_permission = isset( $permissions_by_order_id[ $subscription_id ] ) && in_array( $download_id,  $permissions_by_order_id[ $subscription_id ] );
+
+						if ( $subscription && ! $has_permission && apply_filters( 'woocommerce_process_product_file_download_paths_grant_access_to_new_file', true, $download_id, $product_id, $subscription ) ) {
 							wc_downloadable_file_permission( $download_id, $product_id, $subscription );
 						}
 					}
@@ -236,4 +260,3 @@ class WCS_Download_Handler {
 		}
 	}
 }
-WCS_Download_Handler::init();
