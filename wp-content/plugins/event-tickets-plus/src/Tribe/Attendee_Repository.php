@@ -216,14 +216,18 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 			$value_clause = "'" . $wpdb->remove_placeholder_escape( $wpdb->_escape( $value ) ) . "'";
 		}
 
-		$rsvp_tribe_commerce_where = "
+		// Join purchaser tables that are needed.
+		$this->join_purchaser_tables();
+
+		$where_clauses = [];
+
+		// RSVP / Tribe Commerce clause.
+		$where_clauses[] = "
 			(
 				purchaser_meta.meta_key IN ( {$keys_in} )
 				AND purchaser_meta.meta_value {$value_operator} {$value_clause}
 			)
 		";
-
-		$where_clauses = [];
 
 		$has_wc  = class_exists( 'WooCommerce' );
 		$has_edd = defined( 'EDD_VERSION' ) && class_exists( 'Easy_Digital_Downloads' );
@@ -233,7 +237,7 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 			$this->filter_by_simple_meta_schema( $value );
 		}
 
-		if ( class_exists( 'WooCommerce' ) ) {
+		if ( $has_wc ) {
 			// WooCommerce support.
 
 			// Join purchaser tables that are needed.
@@ -254,11 +258,8 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 			";
 		}
 
-		if ( defined( 'EDD_VERSION' ) && class_exists( 'Easy_Digital_Downloads' ) ) {
+		if ( $has_edd ) {
 			// EDD support.
-
-			// Join purchaser tables that are needed.
-			$this->join_purchaser_tables();
 
 			$this->filter_query->join( "
 				LEFT JOIN {$wpdb->prefix}edd_customers purchaser_edd_customer
@@ -280,8 +281,6 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 
 		$this->filter_query->where( "
 			(
-				{$rsvp_tribe_commerce_where}
-				OR
 				{$where_clauses}
 			)
 		" );
@@ -340,14 +339,18 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 			$value_clause = "'" . $wpdb->remove_placeholder_escape( $wpdb->_escape( $value ) ) . "'";
 		}
 
-		$rsvp_tribe_commerce_where = "
+		// Join purchaser tables that are needed.
+		$this->join_purchaser_tables();
+
+		$where_clauses = [];
+
+		// RSVP / Tribe Commerce clause.
+		$where_clauses[] = "
 			(
 				purchaser_meta.meta_key IN ( {$keys_in} )
 				AND purchaser_meta.meta_value {$value_operator} {$value_clause}
 			)
 		";
-
-		$where_clauses = [];
 
 		$has_wc  = class_exists( 'WooCommerce' );
 		$has_edd = defined( 'EDD_VERSION' ) && class_exists( 'Easy_Digital_Downloads' );
@@ -360,9 +363,6 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 		if ( $has_wc ) {
 			// WooCommerce support.
 
-			// Join purchaser tables that are needed.
-			$this->join_purchaser_tables();
-
 			$where_clauses[] = "
 				(
 					purchaser_meta.meta_key = '_tribe_wooticket_order'
@@ -374,9 +374,6 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 
 		if ( $has_edd ) {
 			// EDD support.
-
-			// Join purchaser tables that are needed.
-			$this->join_purchaser_tables();
 
 			$this->filter_query->join( "
 				LEFT JOIN {$wpdb->prefix}edd_customers purchaser_edd_customer
@@ -409,8 +406,6 @@ class Tribe__Tickets_Plus__Attendee_Repository extends Tribe__Tickets__Attendee_
 
 		$this->filter_query->where( "
 			(
-				{$rsvp_tribe_commerce_where}
-				OR
 				{$where_clauses}
 			)
 		" );

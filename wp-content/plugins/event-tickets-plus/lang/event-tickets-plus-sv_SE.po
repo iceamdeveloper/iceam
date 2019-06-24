@@ -875,7 +875,7 @@ msgstr[1] "Ledsen, det kvarvarande biljettantalet är otillräckligt för att ge
 msgid "Your tickets from {site_title}"
 msgstr "Dina biljetter från {site_title}"
 
-#: src/Tribe/Attendees_List.php:307 src/Tribe/Attendees_List.php:308
+#: src/Tribe/Attendees_List.php:313 src/Tribe/Attendees_List.php:314
 msgid "Load all attendees"
 msgstr "Ladda alla deltagare"
 
@@ -1001,7 +1001,7 @@ msgstr ""
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: event-tickets-plus.php:57 src/Tribe/Main.php:339
 msgid "Event Tickets Plus"

@@ -15,12 +15,6 @@
 
 $events = $this->get( 'events' );
 
-/*
-	Adding this as a temprorary data structure.
-	@todo: This array should contain the month with real events.
-*/
-$month = apply_filters( 'tribe_events_views_v2_month_demo_data', [] );
-
 ?>
 
 <div class="tribe-common-l-container tribe-events-l-container">
@@ -42,7 +36,7 @@ $month = apply_filters( 'tribe_events_views_v2_month_demo_data', [] );
 
 					<?php for ( $day = 0; $day < 7; $day++ ) : ?>
 
-						<?php $this->template( 'month/day', [ 'day' => $day, 'week' => $week, 'month' => $month ] ); ?>
+						<?php $this->template( 'month/day', [ 'day' => $day, 'week' => $week ] ); ?>
 
 					<?php endfor; ?>
 
@@ -55,3 +49,4 @@ $month = apply_filters( 'tribe_events_views_v2_month_demo_data', [] );
 	</div>
 
 </div>
+

@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2019-05-08 09:29:58+0000\n"
+"PO-Revision-Date: 2019-06-12 20:42:30+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,41 +13,41 @@ msgstr ""
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:244
 msgid "Checked In!"
-msgstr ""
+msgstr "Eingecheckt!"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:233
 msgid "Ticket not checked in!"
-msgstr ""
+msgstr "Karte nicht eingechekt!"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:224
 msgid "Already checked in!"
-msgstr ""
+msgstr "Karte bereits eingecheckt!"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:215
 msgid "This attendee's ticket is not authorized to be Checked in"
-msgstr ""
+msgstr "Die Karte dieses Teilnehmers ist nicht berechtigt, eingecheckt zu werden"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:206
 msgid "An attendee is not found with this ID."
-msgstr ""
+msgstr "Kein Teilnehmer mit dieser ID gefunden."
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:196
 msgid "Security code is not valid!"
-msgstr ""
+msgstr "Sicherheitscode ist ungültig!"
 
 #: src/Tribe/Meta/Export.php:182
 msgid "Checked"
-msgstr ""
+msgstr "Geprüft"
 
 #: src/Tribe/Commerce/Attendance_Totals.php:67
 msgctxt "attendee summary"
 msgid "Cancelled:"
-msgstr ""
+msgstr "Storniert:"
 
 #: src/Tribe/Commerce/Attendance_Totals.php:65
 msgctxt "attendee summary"
 msgid "Total Tickets:"
-msgstr ""
+msgstr "Totale Anz. Karten:"
 
 #: src/Tribe/Main.php:441
 msgid "Attendee Registration page"
@@ -875,7 +875,7 @@ msgstr[1] "Entschuldigung, es gibt nicht genügend verfügbare Tickets um Ihre B
 msgid "Your tickets from {site_title}"
 msgstr "Ihre Karten von {site_title}"
 
-#: src/Tribe/Attendees_List.php:307 src/Tribe/Attendees_List.php:308
+#: src/Tribe/Attendees_List.php:313 src/Tribe/Attendees_List.php:314
 msgid "Load all attendees"
 msgstr "Alle Teilnehmenden laden"
 
@@ -1001,7 +1001,7 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: event-tickets-plus.php:57 src/Tribe/Main.php:339
 msgid "Event Tickets Plus"

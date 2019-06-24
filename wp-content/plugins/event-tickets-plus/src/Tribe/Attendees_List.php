@@ -207,6 +207,12 @@ class Tribe__Tickets_Plus__Attendees_List {
 			return;
 		}
 
+		$attendees_total = count( $attendees_list );
+
+		if ( empty( $attendees_total ) ) {
+			return;
+		}
+
 		include_once Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'attendees-list' );
 	}
 

@@ -875,7 +875,7 @@ msgstr[1] "Sorry, er is onvoldoende voorraad om je bestelling uit te voeren voor
 msgid "Your tickets from {site_title}"
 msgstr "Je tickets van {site_title}"
 
-#: src/Tribe/Attendees_List.php:307 src/Tribe/Attendees_List.php:308
+#: src/Tribe/Attendees_List.php:313 src/Tribe/Attendees_List.php:314
 msgid "Load all attendees"
 msgstr "Laad alle deelnemers"
 
@@ -1001,7 +1001,7 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: event-tickets-plus.php:57 src/Tribe/Main.php:339
 msgid "Event Tickets Plus"

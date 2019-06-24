@@ -12,17 +12,11 @@
  * @version 4.9.3
  *
  */
-$event    = $this->get( 'event' );
-$event_id = $event->ID;
+// $event    = $this->get( 'event' );
+// $event_id = $event->ID;
 ?>
-<div class="tribe-events-tooltip__content">
-	<div
-		id="tooltip_content-<?php echo esc_attr( $event_id ); ?>"
-		class="tribe-events-calendar-month__calendar-event-tooltip"
-		role="tooltip"
-	>
-		<?php $this->template( 'month/calendar-event/tooltip/featured-image', [ 'event' => $event ] ); ?>
-		<?php $this->template( 'month/calendar-event/tooltip/description', [ 'event' => $event ] ); ?>
-		<?php $this->template( 'month/calendar-event/tooltip/cta', [ 'event' => $event ] ); ?>
-	</div>
+<div class="tribe-events-calendar-month__calendar-event-tooltip">
+	<?php $this->template( 'month/calendar-event/tooltip/featured-image', [ 'event' => $event ] ); ?>
+	<?php $this->template( 'month/calendar-event/tooltip/description', [ 'event' => $event ] ); ?>
+	<?php /* RSVP Ticket CTA goes here */ ?>
 </div>

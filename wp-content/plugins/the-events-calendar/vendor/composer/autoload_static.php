@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52
+class ComposerStaticInit5ce369a6eb0c98361b55fe85cd99c7b3
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -61,6 +61,7 @@ class ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52
         'Tribe\\Events\\Views\\V2\\TestCase' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/TestCase.php',
         'Tribe\\Events\\Views\\V2\\TestCaseTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/TestCaseTest.php',
         'Tribe\\Events\\Views\\V2\\TestHtmlCase' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/TestHtmlCase.php',
+        'Tribe\\Events\\Views\\V2\\ThemeCompatibilityTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/ThemeCompatibilityTest.php',
         'Tribe\\Events\\Views\\V2\\Theme_Compatibility' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Theme_Compatibility.php',
         'Tribe\\Events\\Views\\V2\\Url' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Url.php',
         'Tribe\\Events\\Views\\V2\\UrlTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/UrlTest.php',
@@ -70,10 +71,6 @@ class ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52
         'Tribe\\Events\\Views\\V2\\View_Interface' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/View_Interface.php',
         'Tribe\\Events\\Views\\V2\\Views\\HTML\\LoaderTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/LoaderTest.php',
         'Tribe\\Events\\Views\\V2\\Views\\HTML\\MonthTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/MonthTest.php',
-        'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\CalendarEvent\\MonthCalendarEventDateTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/CalendarEvent/MonthCalendarEventDateTest.php',
-        'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\CalendarEvent\\MonthCalendarEventFeaturedImageTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/CalendarEvent/MonthCalendarEventFeaturedImageTest.php',
-        'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\CalendarEvent\\MonthCalendarEventTitleTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/CalendarEvent/MonthCalendarEventTitleTest.php',
-        'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\CalendarEvent\\MonthCalendarEventTooltipTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/CalendarEvent/MonthCalendarEventTooltipTest.php',
         'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\MonthDayTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/MonthDayTest.php',
         'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\MonthEventMultidayTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/MonthEventMultidayTest.php',
         'Tribe\\Events\\Views\\V2\\Views\\HTML\\Month\\MonthGridHeaderTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Views/V2/HTML/Month/MonthGridHeaderTest.php',
@@ -88,9 +85,9 @@ class ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInitb866a3ab9ee6be3ce1ed0cf476650f52::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5ce369a6eb0c98361b55fe85cd99c7b3::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5ce369a6eb0c98361b55fe85cd99c7b3::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit5ce369a6eb0c98361b55fe85cd99c7b3::$classMap;
 
         }, null, ClassLoader::class);
     }

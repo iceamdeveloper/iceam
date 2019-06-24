@@ -4,9 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8
+class ComposerStaticInitd108c5d967a9d7b12b338abfa6b07c58
 {
     public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'Tribe\\' => 6,
+        ),
         'F' => 
         array (
             'Firebase\\JWT\\' => 13,
@@ -14,6 +18,10 @@ class ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8
     );
 
     public static $prefixDirsPsr4 = array (
+        'Tribe\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/Tribe',
+        ),
         'Firebase\\JWT\\' => 
         array (
             0 => __DIR__ . '/..' . '/firebase/php-jwt/src',
@@ -42,6 +50,7 @@ class ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8
         'Firebase\\JWT\\ExpiredException' => __DIR__ . '/..' . '/firebase/php-jwt/src/ExpiredException.php',
         'Firebase\\JWT\\JWT' => __DIR__ . '/..' . '/firebase/php-jwt/src/JWT.php',
         'Firebase\\JWT\\SignatureInvalidException' => __DIR__ . '/..' . '/firebase/php-jwt/src/SignatureInvalidException.php',
+        'Tribe\\Traits\\Cache_User' => __DIR__ . '/../..' . '/src/Tribe/Traits/Cache_User.php',
         'tad_DI52_Container' => __DIR__ . '/..' . '/lucatume/di52/src/tad/DI52/Container.php',
         'tad_DI52_ContainerInterface' => __DIR__ . '/..' . '/lucatume/di52/src/tad/DI52/ContainerInterface.php',
         'tad_DI52_ProtectedValue' => __DIR__ . '/..' . '/lucatume/di52/src/tad/DI52/ProtectedValue.php',
@@ -54,10 +63,10 @@ class ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit44a097c405d985eacc2ea69ea9a57ed8::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitd108c5d967a9d7b12b338abfa6b07c58::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitd108c5d967a9d7b12b338abfa6b07c58::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitd108c5d967a9d7b12b338abfa6b07c58::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitd108c5d967a9d7b12b338abfa6b07c58::$classMap;
 
         }, null, ClassLoader::class);
     }

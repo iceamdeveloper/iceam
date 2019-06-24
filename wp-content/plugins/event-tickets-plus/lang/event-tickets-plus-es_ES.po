@@ -2,7 +2,7 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"PO-Revision-Date: 2018-11-12 16:23:40+0000\n"
+"PO-Revision-Date: 2019-06-12 20:41:43+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -13,57 +13,57 @@ msgstr ""
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:244
 msgid "Checked In!"
-msgstr ""
+msgstr "¡Registrado!"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:233
 msgid "Ticket not checked in!"
-msgstr ""
+msgstr "¡Entrada no registrada!"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:224
 msgid "Already checked in!"
-msgstr ""
+msgstr "¡Ya esta registrado!"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:215
 msgid "This attendee's ticket is not authorized to be Checked in"
-msgstr ""
+msgstr "Este tipo de  entrada no esta autorizada"
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:206
 msgid "An attendee is not found with this ID."
-msgstr ""
+msgstr "No hay ningún asistente con este ID."
 
 #: src/Tribe/REST/V1/Endpoints/QR.php:196
 msgid "Security code is not valid!"
-msgstr ""
+msgstr "¡El código de seguridad no válido!"
 
 #: src/Tribe/Meta/Export.php:182
 msgid "Checked"
-msgstr ""
+msgstr "Comrpobado"
 
 #: src/Tribe/Commerce/Attendance_Totals.php:67
 msgctxt "attendee summary"
 msgid "Cancelled:"
-msgstr ""
+msgstr "Cancelado:"
 
 #: src/Tribe/Commerce/Attendance_Totals.php:65
 msgctxt "attendee summary"
 msgid "Total Tickets:"
-msgstr ""
+msgstr "Entradas totales:"
 
 #: src/Tribe/Main.php:441
 msgid "Attendee Registration page"
-msgstr ""
+msgstr "Página de registro de asistentes"
 
 #: src/Tribe/Main.php:436
 msgid "Selected page <strong>must</strong> use the `[tribe_attendee_registration]` shortcode. While the shortcode is missing the default redirect will be used."
-msgstr ""
+msgstr "La página seleccionada <strong>debe</strong> usar el shortcode `[tribe_attendee_registration]`. Mientras falte el shortcode, se utilizará la redirección predeterminada."
 
 #: src/Tribe/Main.php:430
 msgid "Optional: select an existing page to act as your attendee registration page. <strong>Requires</strong> use of the `[tribe_attendee_registration]` shortcode and overrides the above template and URL slug."
-msgstr ""
+msgstr "Opcional: selecciona una página existente para la página de registro de asistentes. <strong>Necesita</strong> usar el shortcode `[tribe_attendee_registration]` para sobrescribir la plantilla y la slug."
 
 #: src/Tribe/Main.php:427
 msgid "You must create a page before using this functionality"
-msgstr ""
+msgstr "Debes crear una página antes de usar esta funcionalidad"
 
 #: src/Tribe/Main.php:417
 msgid "Choose a page or leave blank."
@@ -71,19 +71,19 @@ msgstr ""
 
 #: src/Tribe/Main.php:409
 msgid "Choose a page template to control the appearance of your attendee registration page."
-msgstr ""
+msgstr "Escoge una página para controlar la visualización de tu página de registro de asistentes."
 
 #: src/Tribe/Main.php:408
 msgid "Attendee Registration template"
-msgstr ""
+msgstr "Plantilla de registro de asistentes"
 
 #: src/Tribe/Main.php:400
 msgid "The slug used for building the URL for the Attendee Registration Info page."
-msgstr ""
+msgstr "Este slug será utilizada para construir la URL para tu página de información de registro de asistentes."
 
 #: src/Tribe/Main.php:399
 msgid "Attendee Registration URL slug"
-msgstr ""
+msgstr "slug de la URL del Registro de asistentes"
 
 #: src/Tribe/Main.php:385
 msgid "Same as Event Page Template"
@@ -91,43 +91,43 @@ msgstr ""
 
 #: src/Tribe/Main.php:381
 msgid "Default Page Template"
-msgstr ""
+msgstr "Página por defecto"
 
 #: src/Tribe/Commerce/WooCommerce/Settings.php:112
 msgid "Generate attendees and tickets immediately upon WooCommerce order status change. Depending on your PayPal settings, this can result in duplicated attendees."
-msgstr ""
+msgstr "Genere asistentes y tickets inmediatamente después del cambio de estado de orden de WooCommerce. Dependiendo de la configuración de PayPal, esto puede resultar en asistentes duplicados."
 
 #: src/Tribe/Commerce/WooCommerce/Settings.php:111
 msgid "Wait at least 5 seconds after WooCommerce order status change before generating attendees and tickets in order to prevent unwanted duplicates. <i>Recommended for anyone using PayPal with WooCommerce.</i>"
-msgstr ""
+msgstr "Esperar, al menos 5 segundos, después de que el estado del pedido de WooCommerce cambie al generar asistentes y entradas para prevenir duplicados no deseados. <i>Recomendado para el uso de PayPal con WooCommerce.</i>"
 
 #: src/Tribe/Commerce/WooCommerce/Settings.php:109
 msgid "Handling PayPal orders:"
-msgstr ""
+msgstr "Manejo de los pedidos de PayPal:"
 
 #: src/admin-views/edd-orders.php:82 src/admin-views/woocommerce-orders.php:78
 msgid "Total Tickets Ordered"
-msgstr ""
+msgstr "Total de entradas"
 
 #: src/admin-views/edd-orders.php:69 src/admin-views/woocommerce-orders.php:65
 msgid "Total Ticket Sales"
-msgstr ""
+msgstr "Total de entradas vendidas"
 
 #: src/admin-views/edd-orders.php:45 src/admin-views/woocommerce-orders.php:41
 msgid "Sales by Ticket Type"
-msgstr ""
+msgstr "Ventas por tipo de entrada"
 
 #. Plugin URI of the plugin/theme
 msgid "http://m.tri.be/1acc"
-msgstr ""
+msgstr "http://m.tri.be/1acc"
 
 #: src/functions/php-min-version.php:76
 msgid "Contact your Host or your system administrator and ask to upgrade to the latest version of PHP."
-msgstr ""
+msgstr "Contacta con tu Host o tu administrador y pide que actualice la última versión del PHP."
 
 #: src/functions/php-min-version.php:74
 msgid "To allow better control over dates, advanced security improvements and performance gain."
-msgstr ""
+msgstr "Para permitir un mejor control de las fechas, mejoras de seguridad avanzadas y aumento de rendimiento."
 
 #: src/functions/php-min-version.php:64
 msgid "<b>%1$s</b> requires <b>PHP %2$s</b> or higher."
@@ -875,7 +875,7 @@ msgstr[1] "Lo sentimos, no hay stock suficiente para completar tu pedido con res
 msgid "Your tickets from {site_title}"
 msgstr "Tus tickets de {site_title}"
 
-#: src/Tribe/Attendees_List.php:307 src/Tribe/Attendees_List.php:308
+#: src/Tribe/Attendees_List.php:313 src/Tribe/Attendees_List.php:314
 msgid "Load all attendees"
 msgstr "Cargar todos los asistentes"
 
@@ -1001,7 +1001,7 @@ msgstr "http://m.tri.be/28"
 msgid "Modern Tribe, Inc."
 msgstr "Modern Tribe, Inc."
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: event-tickets-plus.php:57 src/Tribe/Main.php:339
 msgid "Event Tickets Plus"

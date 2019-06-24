@@ -30,6 +30,13 @@
 
 :root {
 	/* -----------------------------------------------------------------------------
+	 * Borders - Radius
+	 * ----------------------------------------------------------------------------- */
+
+}
+
+:root {
+	/* -----------------------------------------------------------------------------
 	 * Box Shadows
 	 * ----------------------------------------------------------------------------- */
 }
@@ -98,6 +105,10 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - Caret Down
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - Caret Left
  * ----------------------------------------------------------------------------- */
 
@@ -106,7 +117,15 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - Caret Up
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - Check
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Day
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
@@ -122,11 +141,31 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - List
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Map
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Month
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Photo
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - Recurring
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
  * SVG - Search
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Week
  * ----------------------------------------------------------------------------- */
 
 :root {
@@ -293,10 +332,7 @@
 .tribe-events .tribe-events-l-container {
 		margin-bottom: 80px;
 		margin-top: 64px;
-		position: relative;
 	}
-
-/* @todo: making this relative so the loader can take its dimension. Check where do we want to place it. */
 
 /* Components */
 
@@ -329,47 +365,6 @@
 		font-weight: 400;
 		padding-left: 10px;
 
-	}
-
-/* Tooltip */
-
-/* -----------------------------------------------------------------------------
- *
- * Tooltip
- *
- * ----------------------------------------------------------------------------- */
-
-.tribe-events .tribe-events-tooltip__content {
-		position: absolute;
-		visibility: hidden; /* A11y purposes */
-	}
-
-/* Defining our tooltipster theme. */
-
-.tooltipster-base.tribe-events-tooltip-theme {
-	background-color: #FFFFFF;
-	border: 1px solid #D5D5D5;
-	box-shadow: 0 2px 12px 0 rgba(0,0,0, 0.14);
-	padding: 24px;
-	max-width: 254px;
-}
-
-.tooltipster-base.tribe-events-tooltip-theme .tooltipster-box {
-		background-color: transparent;
-		border: none;
-		border-radius: 0;
-		box-shadow: none;
-		margin: 0;
-	}
-
-.tooltipster-base.tribe-events-tooltip-theme .tooltipster-box .tooltipster-content {
-			color: #141827;
-			overflow: inherit;
-			padding: 0;
-		}
-
-.tooltipster-base.tribe-events-tooltip-theme .tooltipster-arrow {
-		display: none;
 	}
 
 /* Day marker */
@@ -629,10 +624,6 @@
 		position: relative;
 	}
 
-.tribe-events .tribe-events-calendar-month__calendar-event:first-of-type {
-			margin-top: 0;
-		}
-
 .tribe-events .tribe-events-calendar-month__calendar-event-featured-image-wrapper {
 		margin-bottom: 4px;
 	}
@@ -665,8 +656,16 @@
 		font-weight: 400;
 	}
 
-.tribe-events .tribe-events-calendar-month__calendar-event-title-link {
-		color: #141827;
+.tribe-events .tribe-events-calendar-month__calendar-event-tooltip {
+		background-color: #FFFFFF;
+		border: 1px solid #D5D5D5;
+		box-shadow: 0 2px 12px 0 rgba(0,0,0, 0.14);
+		display: none;
+		left: -40px;
+		padding: 24px;
+		position: absolute;
+		top: calc(100% + 8px);
+		width: calc(100% + 80px);
 	}
 
 .tribe-events .tribe-events-calendar-month__calendar-event-tooltip-featured-image-wrapper {
@@ -701,7 +700,7 @@
 		font-size: 16px;
 		line-height: 1.62;
 
-		padding: 8px 16px;
+		padding: 8px;
 	}
 
 .tribe-events .tribe-events-calendar-month__day-date-link {
@@ -736,10 +735,6 @@
 
 .tribe-events .tribe-events-calendar-month__day-date--disabled {
 		color: #D5D5D5;
-	}
-
-.tribe-events .tribe-events-calendar-month__day-events {
-		display: none;
 	}
 
 /* -----------------------------------------------------------------------------
@@ -804,7 +799,10 @@
 	 * ----------------------------------------------------------------------------- */
 
 .tribe-events .tribe-events-calendar-month__event-multiday {
-		display: none;
+		border-radius: 6px;
+		margin-bottom: 4px;
+		background-color: white;
+		overflow: hidden;
 	}
 
 .tribe-events .tribe-events-calendar-month__event-multiday-inner {
@@ -839,38 +837,14 @@
 		font-weight: 400;
 	}
 
-.tribe-events .tribe-events-calendar-month__event-multiday-width-1 {
-		width: 100%;
-	}
+/**
+ * Views Manager Loader required the views container to be position: relative;
+ * @todo move this to somewhere that makes sense
+ */
 
-.tribe-events .tribe-events-calendar-month__event-multiday-width-2 {
-		width: calc(200% + 2px);
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday-width-3 {
-		width: calc(300% + 3px);
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday-width-4 {
-		width: calc(400% + 4px);
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday-width-5 {
-		width: calc(500% + 5px);
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday-width-6 {
-		width: calc(600% + 6px);
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday-width-7 {
-		width: calc(700% + 7px);
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday--empty,
-	.tribe-events .tribe-events-calendar-month__event-multiday--hidden {
-		display: none;
-	}
+.tribe-events {
+	position: relative;
+}
 
 @media (min-width: 768px) {
 
@@ -995,11 +969,6 @@
 			line-height: 1.42;
 	}
 
-.tribe-events .tribe-events-calendar-month__day-events {
-			display: block;
-			padding: 0 16px 16px
-	}
-
 .tribe-events .tribe-events-calendar-month__week:first-of-type {
 				border-top: 1px solid #D5D5D5
 		}
@@ -1007,38 +976,5 @@
 .tribe-events .tribe-events-calendar-month__week {
 			border-left: 1px solid #D5D5D5
 	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday {
-			display: block;
-			border-radius: 6px;
-			background-color: white;
-			overflow: hidden;
-			position: absolute;
-			z-index: 99
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday--start {
-			border-radius: 6px 0 0 6px
-	}
-			.tribe-events .tribe-events-calendar-month__event-multiday--start.tribe-events-calendar-month__event-multiday--end {
-				border-radius: 6px;
-			}
-
-.tribe-events .tribe-events-calendar-month__event-multiday--end {
-			border-radius: 0 6px 6px 0
-	}
-			.tribe-events .tribe-events-calendar-month__event-multiday--end.tribe-events-calendar-month__event-multiday--start {
-				border-radius: 6px;
-			}
-
-.tribe-events .tribe-events-calendar-month__multiday-wrapper {
-			height: 19px;
-			margin-bottom: 4px;
-			position: relative
-	}
-
-.tribe-events .tribe-events-calendar-month__event-multiday--empty,
-	.tribe-events .tribe-events-calendar-month__event-multiday--hidden {
-			visibility: hidden
-	}
 		}
+

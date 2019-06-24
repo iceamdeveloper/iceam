@@ -878,7 +878,7 @@ msgstr[2] "Przykro nam, ale nie mamy wystarczających zasobów, by zrealizować 
 msgid "Your tickets from {site_title}"
 msgstr "Twoje bilety zakupione na stronie {site_title}"
 
-#: src/Tribe/Attendees_List.php:307 src/Tribe/Attendees_List.php:308
+#: src/Tribe/Attendees_List.php:313 src/Tribe/Attendees_List.php:314
 msgid "Load all attendees"
 msgstr "Załaduj wszystkich uczestników"
 
@@ -1004,7 +1004,7 @@ msgstr ""
 msgid "Modern Tribe, Inc."
 msgstr ""
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.5.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
 #: event-tickets-plus.php:57 src/Tribe/Main.php:339
 msgid "Event Tickets Plus"

@@ -4,7 +4,7 @@ Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, 
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 4.10.5
+Stable tag: 4.10.5.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,13 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.10.5.1] 2019-06-13 =
+
+* Fix - Correct broken attendee list in classic editor [128946]
+* Fix - Account for visitors getting to the WooCommerce cart or checkout screens in a manner other than our checkout flow, such as directly visiting the URL [128505]
+* Fix - Correctly query and join the necessary tables when WooCommerce or EDD are not activated for queries against `purchaser_name` or `purchaser_email` [128881]
+* Language - 0 new strings added, 2 updated, 0 fuzzied, and 0 obsoleted
 
 = [4.10.5] 2019-05-23 =
 
