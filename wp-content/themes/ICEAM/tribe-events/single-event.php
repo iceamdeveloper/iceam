@@ -107,7 +107,7 @@ $event_id = get_the_ID();
 					}
 				}
 				$eventId = get_the_ID();
-				$singleSignupRestricted = array(8390,8356,8480,7055,8483,7064);
+				$singleSignupRestricted = array(8390,8356,8480,7055);
 				if($eventId == (8480||7055||8483||7064)){
 					$ven = 'london';
 				} else {
