@@ -11,7 +11,7 @@ use \Aelia\WC\CurrencySwitcher\Subscriptions\Definitions;
 <div class="product_base_currency">
 	<div>
 		<?php
-			$product_base_currency_field = WC_Aelia_CurrencyPrices_Manager::FIELD_PRODUCT_BASE_CURRENCY;
+			$product_base_currency_field = 'subscription_' . WC_Aelia_CurrencyPrices_Manager::FIELD_PRODUCT_BASE_CURRENCY;
 			if(isset($currencyprices_manager->loop_idx)) {
 				$product_base_currency_field .= "[$loop]";
 			}
@@ -23,7 +23,7 @@ use \Aelia\WC\CurrencySwitcher\Subscriptions\Definitions;
 			}
 
 			woocommerce_wp_select(array(
-				'id' => 'subscription_' . $product_base_currency_field,
+				'id' => $product_base_currency_field,
 				'name' => $product_base_currency_field,
 				'class' => '',
 				'label' => __('Product base currency', Definitions::TEXT_DOMAIN),

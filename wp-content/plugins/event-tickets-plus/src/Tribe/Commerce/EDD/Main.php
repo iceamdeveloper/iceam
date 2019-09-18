@@ -669,7 +669,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		if ( '' !== $data['mode'] ) {
-			// In here is safe to check because we don't have unlimted = -1
+			// In here is safe to check because we don't have unlimited = -1
 			$status = ( 0 < $data['stock'] ) ? 'instock' : 'outofstock';
 
 			update_post_meta( $ticket->ID, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, $data['mode'] );
@@ -830,11 +830,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	}
 
 	/**
-	 * Returns all the tickets for an event
-	 *
-	 * @param int $post_id
-	 *
-	 * @return array
+	 * {@inheritDoc}
 	 */
 	protected function get_tickets( $post_id ) {
 
@@ -1053,6 +1049,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$purchased_statuses = tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'edd' );
 		$purchased     = $this->stock_control->get_purchased_inventory( $ticket_id, $purchased_statuses );
 		$pending       = $this->stock_control->count_incomplete_order_items( $ticket_id );
+		$refunded      = $this->stock_control->count_refunded_order_items( $ticket_id );
 		$product_stock = $this->get_stock_for_product( $product );
 		$stock         = ( '' === $product_stock ) ? Tribe__Tickets__Ticket_Object::UNLIMITED_STOCK : $product_stock;
 
@@ -1089,9 +1086,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$return->stock( $stock );
 		$return->qty_sold( $purchased );
 		$return->qty_pending( $pending );
-
-		// Removes pendings from total sold
-		$return->qty_sold( $purchased - $pending );
+		$return->qty_refunded( $refunded );
 
 		/**
 		 * Use this Filter to change any information you want about this ticket
@@ -1774,8 +1769,18 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	public function checkout_errors() {
 		$this->global_stock()->check_stock();
 
-		//run setup to prevent no statuses on ajax checkout
-		tribe( 'tickets.status' )->setup();
+		/**
+		 * Run setup to prevent no statuses on ajax checkout.
+		 *
+		 * @var Tribe__Tickets__Status__Manager $status
+		 */
+		$status = tribe( 'tickets.status' );
+		$status->setup();
+		// Run setup to prevent no statuses on ajax checkout.
+
+		/** @var Tribe__Tickets__Status__Manager $status */
+		$status = tribe( 'tickets.status' );
+		$status->setup();
 
 		foreach ( (array) edd_get_cart_contents() as $item ) {
 			$remaining = $this->stock_control->available_units( $item['id'] );
@@ -1784,7 +1789,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			// the other
 			if ( ! $remaining ) {
 				edd_set_error( 'no_stock_' . $item['id'], sprintf( __( '%s ticket is sold out', 'event-tickets-plus' ), get_the_title( $item['id'] ) ) );
-			} elseif ( self::UNLIMITED !== $remaining && $item['quantity'] > $remaining ) {
+			} elseif (
+				self::UNLIMITED !== $remaining
+				&& $item['quantity'] > $remaining
+			) {
 				edd_set_error( 'insufficient_stock_' . $item['id'], sprintf( __( 'Sorry! Only %d tickets remaining for %s', 'event-tickets-plus' ), $remaining, get_the_title( $item['id'] ) ) );
 			}
 		}

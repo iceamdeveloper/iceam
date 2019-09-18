@@ -61,6 +61,33 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Table extends WP_List_Table {
 	}//end __construct
 
 	/**
+	 * Overrides the list of CSS classes for the WP_List_Table table tag.
+	 * This function is not hookable in core, so it needs to be overridden!
+	 *
+	 * @since 4.10.6
+	 *
+	 * @return array List of CSS classes for the table tag.
+	 */
+	protected function get_table_classes() {
+		$classes = [ 'widefat', 'striped', 'orders', 'edd-orders' ];
+
+		if ( is_admin() ) {
+			$classes[] = 'fixed';
+		}
+
+		/**
+		 * Filters the default classes added to the EDD order report `WP_List_Table`.
+		 *
+		 * @since 4.10.6
+		 *
+		 * @param array $classes The array of classes to be applied.
+		 */
+		$classes = apply_filters( 'tribe_tickets_plus_edd_order_table_classes', $classes );
+
+		return $classes;
+	}
+
+	/**
 	 * Display the search box.
 	 * We don't want Core's search box, because we implemented our own jQuery based filter,
 	 * so this function overrides the parent's one and returns empty.
@@ -237,7 +264,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Table extends WP_List_Table {
 
 		foreach ( $tickets as $name => $quantity ) {
 
-			$output .= '<div class"tribe-line-item">' . esc_html( $quantity ) . ' - ' . esc_html( $name ) . '</div>';
+			$output .= '<div class="tribe-line-item">' . esc_html( $quantity ) . ' - ' . esc_html( $name ) . '</div>';
 		}
 
 		return $output;

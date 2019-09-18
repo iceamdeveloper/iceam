@@ -67,7 +67,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public $template_namespace = 'events-pro';
 
-		const VERSION = '4.7.3';
+		const VERSION = '4.7.7';
 
 		/**
 		 * The Events Calendar Required Version
@@ -110,10 +110,10 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_pro_scripts' ), 8 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
 
-			// Rewrite Related Filters
-			add_filter( 'tribe_events_pre_rewrite', array( $this, 'filter_add_routes' ), 5 );
-			add_filter( 'tribe_events_rewrite_base_slugs', array( $this, 'filter_add_base_slugs' ), 11 );
-			add_filter( 'tribe_events_rewrite_i18n_domains', array( $this, 'filter_add_i18n_pro_domain' ), 11 );
+			// Rewrite support.
+			tribe_register_provider( Tribe\Events\Pro\Rewrite\Provider::class );
+			// Context support.
+			tribe_register_provider( Tribe\Events\Pro\Service_Providers\Context::class );
 
 			add_action( 'tribe_settings_do_tabs', array( $this, 'add_settings_tabs' ) );
 			add_filter( 'tribe_settings_tab_fields', array( $this, 'filter_settings_tab_fields' ), 10, 2 );
@@ -839,77 +839,6 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public function set_default_value_strategy( $strategy ) {
 			return new Tribe__Events__Pro__Default_Values();
-		}
-
-		/**
-		 * Add rewrite routes for custom PRO stuff and views.
-		 *
-		 * @param Tribe__Events__Rewrite $rewrite The Tribe__Events__Rewrite object
-		 *
-		 * @return void
-		 */
-		public function filter_add_routes( $rewrite ) {
-			$rewrite
-				->single( array( '(\d{4}-\d{2}-\d{2})' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'eventDate' => '%2' ) )
-				->single( array( '(\d{4}-\d{2}-\d{2})', '(feed|rdf|rss|rss2|atom)' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'eventDate' => '%2', 'feed' => '%3' ) )
-				->single( array( '(\d{4}-\d{2}-\d{2})', '(\d+)', '(feed|rdf|rss|rss2|atom)' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'eventDate' => '%2', 'eventSequence' => '%3', 'feed' => '%4' ) )
-				->single( array( '(\d{4}-\d{2}-\d{2})', '(\d+)' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'eventDate' => '%2', 'eventSequence' => '%3' ) )
-				->single( array( '(\d{4}-\d{2}-\d{2})', 'embed' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'eventDate' => '%2', 'embed' => 1 ) )
-				->single( array( '{{ all }}' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'post_type' => Tribe__Events__Main::POSTTYPE, 'eventDisplay' => 'all', 'tribe_recurrence_list' => true ) )
-				->single( array( '(\d{4}-\d{2}-\d{2})', 'ical' ), array( Tribe__Events__Main::POSTTYPE => '%1', 'eventDate' => '%2', 'ical' => 1 ) )
-
-				->archive( array( '{{ week }}' ), array( 'eventDisplay' => 'week' ) )
-				->archive( array( '{{ week }}', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'featured' => true ) )
-				->archive( array( '{{ week }}', '(\d{2})' ), array( 'eventDisplay' => 'week', 'eventDate' => '%1' ) )
-				->archive( array( '{{ week }}', '(\d{2})', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'eventDate' => '%1', 'featured' => true ) )
-				->archive( array( '{{ week }}', '(\d{4}-\d{2}-\d{2})' ), array( 'eventDisplay' => 'week', 'eventDate' => '%1' ) )
-				->archive( array( '{{ week }}', '(\d{4}-\d{2}-\d{2})', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'eventDate' => '%1', 'featured' => true ) )
-
-				->tax( array( '{{ week }}' ), array( 'eventDisplay' => 'week' ) )
-				->tax( array( '{{ week }}', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'featured' => true ) )
-				->tax( array( '{{ week }}', '(\d{4}-\d{2}-\d{2})' ), array( 'eventDisplay' => 'week', 'eventDate' => '%2' ) )
-				->tax( array( '{{ week }}', '(\d{4}-\d{2}-\d{2})', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'eventDate' => '%2', 'featured' => true ) )
-
-				->tag( array( '{{ week }}' ), array( 'eventDisplay' => 'week' ) )
-				->tag( array( '{{ week }}', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'featured' => true ) )
-				->tag( array( '{{ week }}', '(\d{4}-\d{2}-\d{2})' ), array( 'eventDisplay' => 'week', 'eventDate' => '%2' ) )
-				->tag( array( '{{ week }}', '(\d{4}-\d{2}-\d{2})', '{{ featured }}' ), array( 'eventDisplay' => 'week', 'eventDate' => '%2', 'featured' => true ) )
-
-				->archive( array( '{{ photo }}' ), array( 'eventDisplay' => 'photo' ) )
-				->archive( array( '{{ photo }}', '{{ featured }}' ), array( 'eventDisplay' => 'photo', 'featured' => true ) )
-				->archive( array( '{{ photo }}', '(\d{4}-\d{2}-\d{2})' ), array( 'eventDisplay' => 'photo', 'eventDate' => '%1' ) )
-				->archive( array( '{{ photo }}', '(\d{4}-\d{2}-\d{2})', '{{ featured }}' ), array( 'eventDisplay' => 'photo', 'eventDate' => '%1', 'featured' => true ) )
-
-				->tax( array( '{{ photo }}' ), array( 'eventDisplay' => 'photo' ) )
-				->tax( array( '{{ photo }}', '{{ featured }}' ), array( 'eventDisplay' => 'photo', 'featured' => true ) )
-				->tag( array( '{{ photo }}' ), array( 'eventDisplay' => 'photo' ) )
-				->tag( array( '{{ photo }}', '{{ featured }}' ), array( 'eventDisplay' => 'photo', 'featured' => true ) );
-		}
-
-		/**
-		 * Add the required bases for the Pro Views
-		 * @param  array $bases  Bases that are already set
-		 * @return array         The modified version of the array of bases
-		 */
-		public function filter_add_base_slugs( $bases = array() ) {
-			// Support the original and translated forms for added robustness
-			$bases['all'] = array( 'all', $this->all_slug );
-			$bases['week']  = array( 'week', $this->weekSlug );
-			$bases['photo'] = array( 'photo', $this->photoSlug );
-
-			return $bases;
-		}
-
-		/**
-		 * We add the Pro to the Tranlations domains
-		 *
-		 * @param  array $bases  Domains that are already set
-		 * @return array         The modified version of the array of domains
-		 */
-		public function filter_add_i18n_pro_domain( $domains = array() ) {
-			$domains['tribe-events-calendar-pro'] = $this->pluginDir . 'lang/';
-
-			return $domains;
 		}
 
 		/**
@@ -2077,12 +2006,15 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			$this->weekSlug = sanitize_title( __( 'week', 'tribe-events-calendar-pro' ) );
 			$this->photoSlug = sanitize_title( __( 'photo', 'tribe-events-calendar-pro' ) );
 
+			tribe_singleton( 'events-pro.main', $this );
+
 			// Assets loader
 			tribe_singleton( 'events-pro.assets', 'Tribe__Events__Pro__Assets', array( 'register' ) );
 
 			tribe_singleton( 'events-pro.admin.settings', 'Tribe__Events__Pro__Admin__Settings', array( 'hook' ) );
 			tribe_singleton( 'events-pro.customizer.photo-view', 'Tribe__Events__Pro__Customizer__Photo_View' );
 			tribe_singleton( 'events-pro.recurrence.nav', 'Tribe__Events__Pro__Recurrence__Navigation', array( 'hook' ) );
+			tribe_singleton( 'events-pro.ical', 'Tribe__Events__Pro__iCal', [ 'hook' ] );
 
 			tribe_register_provider( 'Tribe__Events__Pro__Editor__Provider' );
 
@@ -2090,9 +2022,11 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			tribe( 'events-pro.customizer.photo-view' );
 			tribe( 'events-pro.assets' );
 			tribe( 'events-pro.recurrence.nav' );
+			tribe( 'events-pro.ical' );
 
 			tribe_register_provider( 'Tribe__Events__Pro__Service_Providers__ORM' );
 			tribe_register_provider( 'Tribe__Events__Pro__Service_Providers__RBE' );
+			tribe_register_provider( Tribe\Events\Pro\Views\V2\Service_Provider::class );
 		}
 
 		/**

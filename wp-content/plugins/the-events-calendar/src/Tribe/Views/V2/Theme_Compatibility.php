@@ -17,7 +17,7 @@ class Theme_Compatibility {
 	/**
 	 * List of themes which have compatibility.
 	 *
-	 * @since TBD
+	 * @since 4.9.4
 	 *
 	 * @var   array
 	 */
@@ -38,8 +38,8 @@ class Theme_Compatibility {
 	 * @return boolean
 	 */
 	public function is_compatibility_required() {
-		$template = get_template();
-		$stylesheet = get_stylesheet();
+		$template   = strtolower( get_template() );
+		$stylesheet = strtolower( get_stylesheet() );
 
 		// Prevents empty stylesheet or template
 		if ( empty( $template ) || empty( $stylesheet ) ) {
@@ -83,8 +83,8 @@ class Theme_Compatibility {
 	 */
 	public function get_body_classes() {
 		$classes      = [];
-		$child_theme  = get_stylesheet();
-		$parent_theme = get_template();
+		$child_theme  = strtolower( get_stylesheet() );
+		$parent_theme = strtolower( get_template() );
 
 		// Prevents empty stylesheet or template
 		if ( empty( $parent_theme ) || empty( $child_theme ) ) {
@@ -104,7 +104,7 @@ class Theme_Compatibility {
 	/**
 	 * Returns a list of themes registred for compatibility with our Views.
 	 *
-	 * @since  TBD
+	 * @since  4.9.4
 	 *
 	 * @return array An array of the themes registred.
 	 */
@@ -112,7 +112,7 @@ class Theme_Compatibility {
 		/**
 		 * Filters the list of themes that are registred for compatibility.
 		 *
-		 * @since TBD
+		 * @since 4.9.4
 		 *
 		 * @param array $registered An associative array of views in the shape `[ <slug> => <class> ]`.
 		 */

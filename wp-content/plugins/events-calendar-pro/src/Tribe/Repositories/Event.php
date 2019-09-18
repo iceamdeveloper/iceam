@@ -168,8 +168,8 @@ class Tribe__Events__Pro__Repositories__Event extends Tribe__Events__Repositorie
 	 *
 	 * @since 4.7
 	 *
-	 * @param bool $in_series Whether to filter events thate are part of a series (`true`)
-	 *                        or not (`false`).
+	 * @param bool|int $in_series A boolean to indicate whether to filter events that are part of a series (`true`)
+	 *                        or not (`false`); a parent post ID to filter by events in a specific series.
 	 *
 	 * @return array|null Null if getting events in series, an array of query arguments that should be
 	 *                    added to the query otherwise.
@@ -178,9 +178,22 @@ class Tribe__Events__Pro__Repositories__Event extends Tribe__Events__Repositorie
 		global $wpdb;
 
 		if ( (bool) $in_series ) {
+			if ( is_numeric( $in_series ) || $in_series instanceof WP_Post ) {
+				$parent_post_id = $in_series instanceof WP_Post ? $in_series->ID : absint( $in_series );
+				$children_clause = $wpdb->prepare( "{$wpdb->posts}.post_parent = %d", $parent_post_id );
+				$parent_clause   = $wpdb->prepare( "{$wpdb->posts}.ID = %d", $parent_post_id );
+			} else {
+				$children_clause = "{$wpdb->posts}.post_parent != 0";
+				$parent_clause   = "{$wpdb->posts}.post_parent = 0";
+			}
 			$this->filter_query->join( "JOIN {$wpdb->postmeta} in_series_meta ON {$wpdb->posts}.ID = in_series_meta.post_id " );
-			$this->filter_query->where( "{$wpdb->posts}.post_parent != 0
-				OR ( {$wpdb->posts}.post_parent = 0 AND in_series_meta.meta_key = '_EventRecurrence' AND in_series_meta.meta_value IS NOT NULL )" );
+			$this->filter_query->where( "{$children_clause}
+				OR ( 
+					{$parent_clause} 
+					AND in_series_meta.meta_key = '_EventRecurrence' 
+					AND in_series_meta.meta_value IS NOT NULL 
+				)"
+			);
 
 			return null;
 		}
@@ -800,7 +813,9 @@ class Tribe__Events__Pro__Repositories__Event extends Tribe__Events__Repositorie
 			// Lighten the query fetching IDs only.
 			$secondary_query->set( 'fields', 'ids' );
 			// Fetch ALL matching event IDs to override what limits the pagination would apply.
-			$secondary_query->set( 'posts_per_page', - 1 );
+			$secondary_query->set( 'posts_per_page', -1 );
+			// prevent paging so we avoid invalid SQL: LIMIT 0, -1 errors out
+			$secondary_query->set( 'nopaging', true );
 			// Order events, whatever the criteria applying to the main query, by start date.
 			$secondary_query->set( 'orderby', 'meta_value' );
 			$secondary_query->set( 'meta_key', '_EventStartDateUTC' );
@@ -831,7 +846,7 @@ class Tribe__Events__Pro__Repositories__Event extends Tribe__Events__Repositorie
 				 * 2. order them by start date in order
 				 */
 				$order = $secondary_query->get( 'order', 'ASC' );
-				$winners = array_reduce( $all_ids, function ( array $acc, array $result ) use ( $order ) {
+				$winners = array_reduce( $all_ids, static function ( array $acc, array $result ) use ( $order ) {
 					list( $post_id, $post_parent, $start_date ) = $result;
 					$post_id     = (int) $post_id;
 					$post_parent = (int) $post_parent;

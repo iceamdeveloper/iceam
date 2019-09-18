@@ -6,8 +6,12 @@
  *
  *     [your-theme]/tribe-events/meta/select.php
  *
- * @version 4.3.5
+ * @version 4.10.7
  *
+ * @since 4.3.5
+ * @since 4.10.7 Added var documentation for `$this`.
+ *
+ * @var Tribe__Tickets_Plus__Meta__Field__Select $this
  */
 $options = null;
 if ( isset( $field['extra'] ) && ! empty( $field['extra']['options'] ) ) {

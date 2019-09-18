@@ -7,7 +7,7 @@ class Tribe__Tickets_Plus__Plugin_Register extends Tribe__Abstract_Plugin_Regist
 	protected $main_class   = 'Tribe__Tickets_Plus__Main';
 	protected $dependencies = array(
 		'parent-dependencies' => array(
-			'Tribe__Tickets__Main' => '4.10.6-dev',
+			'Tribe__Tickets__Main' => '4.10.8-dev',
 		),
 	);
 

@@ -299,14 +299,14 @@ class Tribe__Tickets_Plus__Meta {
 	 *
 	 * @since 4.1
 	 *
-	 * @param int $unused_post_id ID of parent "event" post
-	 * @param Tribe__Tickets__Ticket_Object $ticket Ticket object
-	 * @param array $data Post data that was submitted
+	 * @param int                           $unused_post_id ID of parent "event" post
+	 * @param Tribe__Tickets__Ticket_Object $ticket         Ticket object
+	 * @param array                         $data           Post data that was submitted
 	 */
 	public function save_meta( $unused_post_id, $ticket, $data ) {
 		// Bail if we are not saving ticket input data.
 		if ( ! isset( $data['tribe-tickets-input'] ) ) {
-			return false;
+			return;
 		}
 
 		$data['tribe-tickets-input'] = array_filter( $data['tribe-tickets-input'] );

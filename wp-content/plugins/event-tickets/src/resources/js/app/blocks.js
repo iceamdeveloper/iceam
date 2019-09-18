@@ -13759,7 +13759,7 @@ var TICKET_TYPES_VALUES = [UNLIMITED, CAPPED, OWN];
 var TICKET_TYPES = (_TICKET_TYPES = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_TYPES, UNLIMITED, UNLIMITED), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_TYPES, SHARED, CAPPED), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_TYPES, INDEPENDENT, OWN), _TICKET_TYPES);
 
 var PREFIX = 'prefix';
-var SUFFIX = 'suffix';
+var SUFFIX = 'postfix';
 
 var PRICE_POSITIONS = [PREFIX, SUFFIX];
 
@@ -41875,12 +41875,12 @@ var template_MoveDelete = function MoveDelete(_ref) {
 		wp.element.createElement(
 			external_tribe_common_elements_["Button"],
 			{ type: 'button', onClick: moveRSVP, disabled: isDisabled },
-			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Move RSVP', 'events-tickets')
+			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Move RSVP', 'event-tickets')
 		),
 		wp.element.createElement(
 			external_tribe_common_elements_["Button"],
 			{ type: 'button', onClick: removeRSVP, disabled: isDisabled },
-			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Remove RSVP', 'events-tickets')
+			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Remove RSVP', 'event-tickets')
 		)
 	);
 };
@@ -43261,7 +43261,7 @@ var template_MoveModal = function (_PureComponent) {
 					isDismissible: false,
 					status: 'warning'
 				},
-				Object(external_var_wp_i18n_root_wp_i18n_["__"])('No posts found', 'events-tickets')
+				Object(external_var_wp_i18n_root_wp_i18n_["__"])('No posts found', 'event-tickets')
 			);
 		}, _temp), possibleConstructorReturn_default()(_this, _ret);
 	}
@@ -43284,7 +43284,7 @@ var template_MoveModal = function (_PureComponent) {
 				wp.element.createElement(
 					'label',
 					{ htmlFor: 'post_type' },
-					Object(external_var_wp_i18n_root_wp_i18n_["__"])('You can optionally focus on a specific post type:', 'events-tickets')
+					Object(external_var_wp_i18n_root_wp_i18n_["__"])('You can optionally focus on a specific post type:', 'event-tickets')
 				),
 				wp.element.createElement(external_tribe_common_elements_["Select"], {
 					id: 'post_type',
@@ -43295,7 +43295,7 @@ var template_MoveModal = function (_PureComponent) {
 				wp.element.createElement(
 					'label',
 					{ htmlFor: 'search' },
-					Object(external_var_wp_i18n_root_wp_i18n_["__"])('You can also enter keywords to help find the target event by title or description', 'events-tickets')
+					Object(external_var_wp_i18n_root_wp_i18n_["__"])('You can also enter keywords to help find the target event by title or description', 'event-tickets')
 				),
 				wp.element.createElement(external_tribe_common_elements_["Input"], {
 					id: 'search',
@@ -43306,7 +43306,7 @@ var template_MoveModal = function (_PureComponent) {
 				wp.element.createElement(
 					'label',
 					null,
-					Object(external_var_wp_i18n_root_wp_i18n_["__"])('Select the post you wish to move the ticket type to:', 'events-tickets')
+					Object(external_var_wp_i18n_root_wp_i18n_["__"])('Select the post you wish to move the ticket type to:', 'event-tickets')
 				),
 				this.renderPostTypes(),
 				wp.element.createElement(
@@ -43321,7 +43321,7 @@ var template_MoveModal = function (_PureComponent) {
 							disabled: !this.props.hasSelectedPost || this.props.isFetchingPosts,
 							onClick: this.props.onSubmit
 						},
-						Object(external_var_wp_i18n_root_wp_i18n_["__"])('Finish!', 'events-tickets')
+						Object(external_var_wp_i18n_root_wp_i18n_["__"])('Finish!', 'event-tickets')
 					)
 				)
 			);
@@ -43349,7 +43349,7 @@ template_MoveModal.propTypes = {
 	title: prop_types_default.a.string.isRequired
 };
 template_MoveModal.defaultProps = {
-	title: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Move Ticket Types', 'events-tickets')
+	title: Object(external_var_wp_i18n_root_wp_i18n_["__"])('Move Ticket Types', 'event-tickets')
 };
 /* harmony default export */ var move_modal_template = (template_MoveModal);
 // CONCATENATED MODULE: ./src/modules/elements/move-modal/container.js
@@ -46462,12 +46462,12 @@ var move_delete_template_MoveDelete = function MoveDelete(_ref) {
 		wp.element.createElement(
 			external_tribe_common_elements_["Button"],
 			{ type: 'button', onClick: moveTicket, disabled: isDisabled },
-			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Move Ticket', 'events-tickets')
+			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Move Ticket', 'event-tickets')
 		),
 		wp.element.createElement(
 			external_tribe_common_elements_["Button"],
 			{ type: 'button', onClick: removeTicket, disabled: isDisabled },
-			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Remove Ticket', 'events-tickets')
+			Object(external_var_wp_i18n_root_wp_i18n_["__"])('Remove Ticket', 'event-tickets')
 		)
 	);
 };
@@ -47249,7 +47249,7 @@ var ticket_container_mergeProps = function mergeProps(stateProps, dispatchProps,
 	description: Object(external_var_wp_i18n_root_wp_i18n_["__"])('A single configured ticket type.', 'event-tickets'),
 	icon: wp.element.createElement(icons["Tickets"], null),
 	category: 'tribe-tickets',
-	keywords: ['event', 'events-tickets', 'tribe'],
+	keywords: ['event', 'event-tickets', 'tribe'],
 
 	parent: ['tribe/tickets'],
 

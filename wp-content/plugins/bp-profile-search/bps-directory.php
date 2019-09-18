@@ -277,22 +277,22 @@ function bps_set_details ($codes)
 	}
 }
 
-add_action ('bp_directory_members_item', 'bps_display_details');
-function bps_display_details ()
+function bps_get_details ()
 {
 	global $bps_details;
 
 	$details = isset ($bps_details)? $bps_details: array ();
 	$details = apply_filters ('bps_details', $details);
-	foreach ($details as $code)
-	{
-		$f = bps_parsed_field ($code);
-		if (!isset ($f->get_value) || !is_callable ($f->get_value))  continue;
 
-		$label = (isset ($f->filter) && isset ($f->label))? $f->label: $f->name;
-		$value = call_user_func ($f->get_value, $f);
-		bps_call_template ('members/bps-field-value', array ($label, $value));
-	}
+	return $details;
+}
+
+add_action ('bp_directory_members_item', 'bps_display_details');
+function bps_display_details ()
+{
+	$details = bps_get_details ();
+	if (!empty ($details))
+		bps_call_template ('members/bps-details');
 }
 
 function bps_is_directory ()

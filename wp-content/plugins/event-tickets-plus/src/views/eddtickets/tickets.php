@@ -6,7 +6,9 @@
  *
  *     [your-theme]/tribe-events/eddtickets/tickets.php
  *
- * @version 4.9
+ * @since 4.10.7 Restrict quantity selectors to allowed purchase limit and removed unused variables.
+ *
+ * @version 4.10.7
  *
  * @var bool $must_login
  */
@@ -14,11 +16,12 @@ global $edd_options;
 
 $is_there_any_product         = false;
 $is_there_any_product_to_sell = false;
-$unavailability_messaging     = is_callable( array( $this, 'do_not_show_tickets_unavailable_message' ) );
-$stock_mananger               = Tribe__Tickets_Plus__Commerce__EDD__Main::get_instance()->stock();
+
+/** @var Tribe__Tickets__Tickets_Handler $handler */
+$handler = tribe( 'tickets.handler' );
 
 if ( ! empty( $tickets ) ) {
-	$tickets = tribe( 'tickets.handler' )->sort_tickets_by_menu_order( $tickets );
+	$tickets = $handler->sort_tickets_by_menu_order( $tickets );
 }
 
 ob_start();
@@ -37,15 +40,17 @@ ob_start();
 		<?php
 		foreach ( $tickets as $ticket ) {
 			/**
-			 * Changing any HTML to the `$ticket` Arguments you will need apply filters
+			 * Changing any HTML to the `$ticket` arguments you will need apply filters
 			 * on the `eddtickets_get_ticket` hook.
 			 */
 
+			if ( ! $ticket instanceof Tribe__Tickets__Ticket_Object ) {
+				continue;
+			}
+
 			$product   = edd_get_download( $ticket->ID );
-			$available = $ticket->available();
 
 			if ( $ticket->date_in_range() ) {
-
 				$is_there_any_product = true;
 
 				echo sprintf( '<input type="hidden" name="product_id[]"" value="%d">', esc_attr( $ticket->ID ) );
@@ -53,13 +58,16 @@ ob_start();
 				echo '<tr class="tribe-edd-ticket-row-' . absint( $ticket->ID ) . '">';
 				echo '<td width="75" class="edd quantity" data-product-id="' . esc_attr( $ticket->ID ) . '">';
 
+				$available = $handler->get_ticket_max_purchase( $ticket->ID );
 
-				if ( 0 !== $available ) {
-					$stock = $ticket->stock();
+				if ( 0 === $available ) {
+					echo '<span class="tickets_nostock">' . esc_html__( 'Out of stock!', 'event-tickets-plus' ) . '</span>';
+				} else {
 
-					$max = '';
-					if ( $ticket->managing_stock() ) {
-						$max = 'max="' . absint( $stock ) . '"';
+					if ( -1 === $available ) {
+						$max = '';
+					} else {
+						$max = 'max="' . esc_attr( $available ) . '"';
 					}
 
 					echo '<input type="number" class="edd-input" min="0" ' . $max . ' name="quantity_' . esc_attr( $ticket->ID ) . '" value="0" ' . disabled( $must_login, true, false ) . '/>';
@@ -78,9 +86,6 @@ ob_start();
 						</span>
 						<?php
 					}
-				}
-				else {
-					echo '<span class="tickets_nostock">' . esc_html__( 'Out of stock!', 'event-tickets-plus' ) . '</span>';
 				}
 
 				echo '</td>';

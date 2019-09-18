@@ -382,7 +382,7 @@ function apply_signup_coupons() {
  *
  **********************************************************************/
 
-add_action( 'init', 'wootickets_stop_sending_email' );
+// add_action( 'init', 'wootickets_stop_sending_email' );
 function wootickets_stop_sending_email() {
 	if ( class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' ) ) {
 		$woo = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();

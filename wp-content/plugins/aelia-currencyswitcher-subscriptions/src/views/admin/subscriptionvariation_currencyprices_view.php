@@ -25,9 +25,7 @@ $text_domain = WC_Aelia_CS_Subscriptions::$text_domain;
 $post_id = $currencyprices_manager->current_post->ID;
 $loop = $currencyprices_manager->loop_idx;
 
-echo '<tr>';
-echo '<td colspan="2">';
-echo '<div class="wc_aelia_cs_subscription_prices variation clearfix show_if_variable-subscription">';
+echo '<div class="form-row form-row-full wc_aelia_cs_subscription_prices variation clearfix show_if_variable-subscription">';
 // Display header of currency pricing section
 include('currencyprices_header.php');
 

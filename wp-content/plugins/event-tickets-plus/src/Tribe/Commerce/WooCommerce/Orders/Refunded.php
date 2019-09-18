@@ -91,10 +91,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Refunded {
 		$refunded_qty = 0;
 
 		foreach ( $refunded_order_post_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
 
-			$order = new WC_Order( $order_id );
+			if ( ! $order ) {
+				continue;
+			}
 
-			// increment the refund quanityty
+			// increment the refund quantity
 			$refunded_qty += (int) $order->get_item_count_refunded();
 		}
 

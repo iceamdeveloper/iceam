@@ -83,19 +83,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	protected function cart_get_global_stock_quantities() {
 		$cart        = WC()->cart;
 		$current     = $cart->get_cart_item_quantities();
-		$quantities  = array();
+		$quantities  = [];
 
 		foreach ( $cart->get_cart() as $cart_item ) {
-			$product    = $cart_item['data'];
-			$product_id = tribe( 'tickets-plus.commerce.woo' )->get_product_id( $product );
-			$event      = tribe( 'tickets-plus.commerce.woo' )->get_event_for_ticket( $product_id );
-
-			// Skip on no event
-			if ( ! $event ) {
+			if ( ! $cart_item['data'] instanceof WC_Product_Simple ) {
 				continue;
 			}
 
-			// Skip if it doesn't use global Stock
+			$product = $cart_item['data'];
+
+			$product_id = tribe( 'tickets-plus.commerce.woo' )->get_product_id( $product );
+
+			$event = tribe( 'tickets-plus.commerce.woo' )->get_event_for_ticket( $product_id );
+
+			// Skip on no event
+			if ( ! $event instanceof WP_Post ) {
+				continue;
+			}
+
+			// Skip if it doesn't use Global Stock
 			if ( ! tribe( 'tickets-plus.commerce.woo' )->uses_global_stock( $event->ID ) ) {
 				continue;
 			}
@@ -112,14 +118,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 				continue;
 			}
 
+			/** @var Tribe__Tickets__Ticket_Object $ticket */
 			$ticket = $tickets[ $product_id ];
 
 			// Skip on Unlimited Capacity
-			if ( -1 === $tickets[ $product_id ]->capacity() ) {
+			if ( -1 === $ticket->capacity() ) {
 				continue;
 			}
 
-			$mode = $tickets[ $product_id ]->global_stock_mode();
+			$mode = $ticket->global_stock_mode();
 
 			// We only need to accumulate the stock quantities of tickets using *global* stock
 			if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE === $mode ) {
@@ -128,7 +135,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 
 			// Make sure ticket caps haven't been exceeded
 			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $mode ) {
-				if ( $current[ $product_id ] > $tickets[ $product_id ]->capacity() ) {
+				if ( $current[ $product_id ] > $ticket->capacity() ) {
 					$this->cart_flag_capped_stock_error( $product_id );
 				}
 			}
@@ -326,12 +333,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	/**
 	 * Maybe Increase the Global Stock
 	 *
+	 * @see \Tribe__Tickets__Ticket_Object::global_stock_mode() Definitions for the various ways to account for stock.
+	 *
 	 * @since 4.10.4
 	 *
-	 * @param int $post_id                          the post or event id for the attendee
-	 * @param int $product_id                       the ticket-product id in WooCommerce
-	 * @param Tribe__Tickets__Ticket_Object $ticket a ticket object
-	 * @param int $stock_increase                   an interger to increase stock by
+	 * @param int                           $post_id        The post or event id for the attendee.
+	 * @param int                           $product_id     The ticket-product id in WooCommerce.
+	 * @param Tribe__Tickets__Ticket_Object $ticket         A ticket object.
+	 * @param int                           $stock_increase An integer to increase stock by.
 	 */
 	public function maybe_increase_global_stock( $post_id, $product_id, Tribe__Tickets__Ticket_Object $ticket, $stock_increase = 1) {
 

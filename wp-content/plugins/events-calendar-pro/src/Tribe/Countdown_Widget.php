@@ -164,13 +164,13 @@ if ( ! class_exists( 'Tribe__Events__Pro__Countdown_Widget' ) ) {
 				$event = tribe_events()
 					->where( 'ends_after', 'now' )
 					->where( 'hidden', false )
-					->order( 'ASC' )
+					->order_by( 'event_date', 'ASC' )
 					->first();
 			} elseif ( 'future-event' === $instance['type'] ) {
 				$event = tribe_events()
 					->where( 'starts_after', 'now' )
 					->where( 'hidden', false )
-					->order( 'ASC' )
+					->order_by( 'event_date', 'ASC' )
 					->first();
 			} else {
 				$event = get_post( $instance['event'] );

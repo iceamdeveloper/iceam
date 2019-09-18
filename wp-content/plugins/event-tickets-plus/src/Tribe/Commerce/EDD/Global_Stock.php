@@ -87,8 +87,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Global_Stock {
 			$product = get_post( $cart_item['id'] );
 			$event   = $edd_tickets->get_event_for_ticket( $product->ID );
 
-			// Skip if we are not looking at an event ticket
-			if ( ! $event ) {
+			// Skip on no event
+			if ( ! $event instanceof WP_Post ) {
 				continue;
 			}
 

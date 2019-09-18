@@ -1,6 +1,9 @@
 <?php
 
-if ( class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' ) || ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
+if (
+	class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' )
+	|| ! class_exists( 'Tribe__Tickets__Tickets' )
+) {
 	return;
 }
 
@@ -556,6 +559,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return array of WC_Email objects
 	 */
 	public function add_email_class_to_woocommerce( $classes ) {
+
+		if ( ! class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Email' ) ) {
+			return $classes;
+		}
+
 		$this->mailer                          = new Tribe__Tickets_Plus__Commerce__WooCommerce__Email();
 		$classes['Tribe__Tickets__Woo__Email'] = $this->mailer;
 
@@ -730,12 +738,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 */
 		$dispatch_statuses = apply_filters( 'event_tickets_woo_complete_order_stati', $dispatch_statuses );
 
-		$should_generate    = in_array( $order_status, $generation_statuses ) || in_array( 'immediate', $generation_statuses );
-		$should_dispatch    = in_array( $order_status, $dispatch_statuses ) || in_array( 'immediate', $dispatch_statuses );
+		$should_generate    = in_array( $order_status, $generation_statuses, true ) || in_array( 'immediate', $generation_statuses, true );
+		$should_dispatch    = in_array( $order_status, $dispatch_statuses, true ) || in_array( 'immediate', $dispatch_statuses, true );
 		$already_generated  = get_post_meta( $order_id, $this->order_has_tickets, true );
 		$already_dispatched = get_post_meta( $order_id, $this->mail_sent_meta_key, true );
 
-		$has_tickets = false;
+		$has_tickets       = false;
+		$created_attendees = false;
 
 		// Get the items purchased in this order
 		$order       = new WC_Order( $order_id );
@@ -836,6 +845,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 						$this->record_attendee_user_id( $attendee_id, $customer_id );
 						$order_attendee_id++;
+
+						$created_attendees = true;
 					}
 				}
 			}
@@ -859,7 +870,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		// Disallow the dispatch of emails before attendees have been created
-		$attendees_generated = $already_generated || $order_attendee_id;
+		$attendees_generated = $already_generated || $created_attendees;
 
 		if ( $has_tickets && $attendees_generated && ! $already_dispatched && $should_dispatch ) {
 			$this->complete_order( $order_id );
@@ -1148,7 +1159,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				$data['stock'] -= $totals['pending'] + $totals['sold'];
 			}
 
-			// In here is safe to check because we don't have unlimted = -1
+			// In here is safe to check because we don't have unlimited = -1
 			$status = ( 0 < $data['stock'] ) ? 'instock' : 'outofstock';
 
 			update_post_meta( $ticket->ID, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, $data['mode'] );
@@ -1260,9 +1271,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		// Ensure we know the event and product IDs (the event ID may not have been passed in)
 		if ( empty( $post_id ) ) {
-			$post_id = get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
+			$post_id = (int) get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
 		}
-		$product_id = get_post_meta( $ticket_id, $this->attendee_product_key, true );
+
+		$product_id = (int) get_post_meta( $ticket_id, $this->attendee_product_key, true );
 
 		/**
 		 * Use this Filter to choose if you want to trash tickets instead
@@ -1329,11 +1341,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * Returns all the tickets for an event
-	 *
-	 * @param int $post_id
-	 *
-	 * @return array
+	 * {@inheritDoc}
 	 */
 	public function get_tickets( $post_id ) {
 		$ticket_ids = $this->get_tickets_ids( $post_id );
@@ -2537,7 +2545,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return int
 	 */
 	private function get_refunded( $ticket_id ) {
-		return tribe( 'commerce.woo.order.refunded' )->get_count( $ticket_id );
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Refunded $refunded */
+		$refunded = tribe( 'commerce.woo.order.refunded' );
+
+		return $refunded->get_count( $ticket_id );
 	}
 
 	/**
@@ -2562,14 +2573,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * Filter the Quantity of max purchase for WooCommerce
+	 * Filter the maximum quantity allowed to purchase at a time for WooCommerce.
 	 *
-	 * @since  4.8.1
+	 * @since 4.8.1
 	 *
-	 * @param int                           $available Max Purchase number
-	 * @param Tribe__Tickets__Ticket_Object $ticket Ticket Object
+	 * @param int                           $available Max quantity.
+	 * @param Tribe__Tickets__Ticket_Object $ticket    Ticket Object.
 	 *
-	 * @return int
+	 * @return int Unlimited is `-1`. Zero is out of stock.
 	 */
 	public function filter_ticket_max_purchase( $available, $ticket ) {
 		// Prevent fails without ticket ID
@@ -2582,7 +2593,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			return $available;
 		}
 
-		if ( 'product' !== $ticket->post_type ) {
+		if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' !== $ticket->provider_class ) {
 			return $available;
 		}
 
@@ -2592,9 +2603,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$product = new WC_Product( $ticket->ID );
 		}
 
-		$stock        = $ticket->stock();
-		$max_quantity = $product->backorders_allowed() ? '' : $stock;
+		// Max Quantity will be unlimited if backorders are allowed, restricted to 1 if the product is
+		// constrained to be sold individually, or else set to the available stock quantity.
+		$max_quantity = $product->backorders_allowed() ? -1 : $product->get_stock_quantity();
 		$max_quantity = $product->is_sold_individually() ? 1 : $max_quantity;
+
+		// $product->get_stock_quantity() may return `null`
+		if ( ! is_numeric( $max_quantity ) ) {
+			$max_quantity = -1;
+		}
+
+		/**
+		 * If neither is unlimited (-1), set Max Quantity to the minimum.
+		 */
+		if (
+			-1 < $available
+			&& -1 < $max_quantity
+		) {
+			$max_quantity = min( $available, $max_quantity );
+		}
 
 		return $max_quantity;
 	}

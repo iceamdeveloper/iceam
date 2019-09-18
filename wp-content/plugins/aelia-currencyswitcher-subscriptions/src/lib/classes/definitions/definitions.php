@@ -18,5 +18,13 @@ class Definitions {
 	// @var string The plugin text domain
 	const TEXT_DOMAIN = 'wc-aelia-cs-subscriptions';
 
+	/**
+	 * The slug used to check for updates.
+	 *
+	 * @var string
+	 * @since 1.4.3.190630
+	 */
+	const PLUGIN_SLUG_FOR_UPDATES = 'aelia-currencyswitcher-subscriptions';
+
 	const ERR_INVALID_TEMPLATE = 1001;
 }

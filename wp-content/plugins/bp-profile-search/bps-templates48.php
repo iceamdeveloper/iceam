@@ -151,3 +151,31 @@ function bps_escaped_filters_data49 ()
 	do_action ('bps_before_filters', $F);
 	return $F;
 }
+
+function bps_escaped_details_data ()
+{
+	$F = new stdClass;
+	$F->fields = array ();
+
+	$details = bps_get_details ();
+	foreach ($details as $code)
+	{
+		$f = bps_parsed_field ($code);
+		if (!isset ($f->get_value) || !is_callable ($f->get_value))  continue;
+
+		$f->d_label = (isset ($f->filter) && isset ($f->label))? $f->label: $f->name;
+		call_user_func ($f->get_value, $f);
+
+		$f->d_label = esc_html ($f->d_label);
+		if (!is_array ($f->d_value))
+			$f->d_value = esc_html (stripslashes ($f->d_value));
+		else foreach ($f->d_value as $k => $value)
+			$f->d_value[$k] = esc_html (stripslashes ($value));
+
+		do_action ('bps_field_before_details', $f);
+		$F->fields[] = $f;
+	}
+
+	do_action ('bps_before_details', $F);
+	return $F;
+}

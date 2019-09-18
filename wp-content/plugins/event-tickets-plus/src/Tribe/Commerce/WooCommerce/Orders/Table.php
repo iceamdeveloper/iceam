@@ -58,6 +58,33 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	}//end __construct
 
 	/**
+	 * Overrides the list of CSS classes for the WP_List_Table table tag.
+	 * This function is not hookable in core, so it needs to be overridden!
+	 *
+	 * @since 4.10.6
+	 *
+	 * @return array List of CSS classes for the table tag.
+	 */
+	protected function get_table_classes() {
+		$classes = [ 'widefat', 'striped', 'orders', 'woocommerce-orders' ];
+
+		if ( is_admin() ) {
+			$classes[] = 'fixed';
+		}
+
+		/**
+		 * Filters the default classes added to the woocommerce order report `WP_List_Table`.
+		 *
+		 * @since 4.10.6
+		 *
+		 * @param array $classes The array of classes to be applied.
+		 */
+		$classes = apply_filters( 'tribe_tickets_plus_woocommerce_order_table_classes', $classes );
+
+		return $classes;
+	}
+
+	/**
 	 * Display the search box.
 	 * We don't want Core's search box, because we implemented our own jQuery based filter,
 	 * so this function overrides the parent's one and returns empty.
@@ -82,6 +109,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * Get a list of columns. The format is:
 	 * 'internal-name' => 'Title'
 	 *
+	 * @since 4.10.6 - add filter of the columns
+	 *
 	 * @return array
 	 */
 	public function get_columns() {
@@ -90,15 +119,19 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 			'purchaser' => __( 'Purchaser', 'event-tickets-plus' ),
 			'email'     => __( 'Email', 'event-tickets-plus' ),
 			'purchased' => __( 'Purchased', 'event-tickets-plus' ),
-			'address'   => __( 'Address', 'event-tickets-plus' ),
 			'date'      => __( 'Date', 'event-tickets-plus' ),
 			'status'    => __( 'Status', 'event-tickets-plus' ),
 		);
 
-		if ( self::event_fees( $this->event_id ) ) {
-			$columns['subtotal'] = __( 'Subtotal', 'event-tickets-plus' );
-			$columns['site_fee'] = __( 'Site Fee', 'event-tickets-plus' );
-		}
+		/**
+		 * Allow filtering of the columns in the WooCommmce Order|Sales Report
+		 *
+		 * @since 4.10.6
+		 *
+		 * @param array $columns  An array of columns
+		 * @param int   $event_id Event ID.
+		 */
+		$columns = apply_filters( 'tribe_tickets_plus_woocommerce_orders_columns', $columns, $this->event_id );
 
 		$columns['total'] = __( 'Total', 'event-tickets-plus' );
 
@@ -217,7 +250,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		foreach ( $tickets as $name => $quantity ) {
 
-			$output .= '<div class"tribe-line-item">' . esc_html( $quantity ) . ' - ' . esc_html( $name ) . '</div>';
+			$output .= '<div class="tribe-line-item">' . esc_html( $quantity ) . ' - ' . esc_html( $name ) . '</div>';
 		}
 
 		return $output;
@@ -271,27 +304,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	}//end column_order
 
 	/**
-	 * Handler for the subtotal column
-	 *
-	 * @param $item
-	 *
-	 * @return string
-	 */
-	public function column_subtotal( $item ) {
-		$total = 0;
-
-		foreach ( $this->valid_order_items[ $item['id'] ] as $line_item ) {
-			$total += $line_item['subtotal'];
-		}
-
-		if ( ! self::$pass_fees_to_user ) {
-			$total -= self::calc_site_fee( $total );
-		}
-
-		return tribe_format_currency( number_format( $total, 2 ) );
-	}//end column_subtotal
-
-	/**
 	 * Handler for the total column
 	 *
 	 * @param $item
@@ -307,31 +319,21 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 			}
 		}
 
-		if ( self::$pass_fees_to_user ) {
-			$total += $this->calc_site_fee( $total );
-		}
-
 		$post_id = Tribe__Utils__Array::get_in_any( array( $_GET, $_REQUEST ), 'event_id', null );
+
+		/**
+		 * Allow filtering of the WooCommerce Sales Report Total Column
+		 *
+		 * @since 4.10.6
+		 *
+		 * @param int   $order_total The order total.
+		 * @param array $item        An array of order data.
+		 * @param int   $post_id     Post type ID.
+		 */
+		$total = apply_filters( 'tribe_tickets_plus_woocommerce_filter_column_total', $total, $item, $post_id );
 
 		return tribe_format_currency( number_format( $total, 2 ), $post_id );
 	}//end column_total
-
-	/**
-	 * Handler for the site fees column
-	 *
-	 * @param $item
-	 *
-	 * @return string
-	 */
-	public function column_site_fee( $item ) {
-		$total = 0;
-
-		foreach ( $this->valid_order_items[ $item['id'] ] as $line_item ) {
-			$total += $line_item['subtotal'];
-		}
-
-		return tribe_format_currency( number_format( $this->calc_site_fee( $total ), 2 ) );
-	}//end column_site_fee
 
 	/**
 	 * Generates content for a single row of the table
@@ -355,7 +357,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 */
 	public static function get_orders( $event_id ) {
 		if ( ! $event_id ) {
-			return array();
+			return [];
 		}
 
 		if ( isset( self::$orders[ $event_id ] ) ) {
@@ -367,6 +369,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		$product_ids = tribe( 'tickets-plus.commerce.woo' )->get_tickets_ids( $event_id );
 		$order_ids_by_ticket = self::retrieve_orders_ids_from_a_product_id( $product_ids );
+
+		if ( empty( $order_ids_by_ticket ) ) {
+			return [];
+		}
+
+		$orders = [];
+
 		foreach ( $order_ids_by_ticket as $ticket ) {
 			foreach ( $ticket as $order_id ) {
 				if ( empty( $order_id ) ) {
@@ -411,8 +420,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 		foreach ( $product_ids as $id ) {
 			$sql = $wpdb->prepare( "
 						SELECT DISTINCT order_item.order_id
-						FROM {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta, 
-						     {$wpdb->prefix}woocommerce_order_items as order_item, 
+						FROM {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta,
+						     {$wpdb->prefix}woocommerce_order_items as order_item,
 						     {$wpdb->prefix}posts as p
 						WHERE  order_item.order_item_id = order_item_meta.order_item_id
 						AND order_item.order_id = p.ID
@@ -496,13 +505,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	}
 
 	/**
-	 * Return sales (sans fees) for the given event
+	 * Return sales for the given event.
 	 *
 	 * @param int $event_id Event post ID
 	 *
 	 * @return float
 	 */
 	public static function event_sales( $event_id ) {
+
 		$orders            = self::get_orders( $event_id );
 		$valid_order_items = self::get_valid_order_items_for_event( $event_id, $orders );
 
@@ -522,12 +532,28 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 				$order_total += $line_item['subtotal'];
 			}
 
-			if ( ! self::$pass_fees_to_user ) {
-				$order_total -= self::calc_site_fee( $order_total, self::$pass_fees_to_user );
-			}
+			/**
+			 * Allow filtering of Individual WooCommerce Order Totals in the Event Sales Total
+			 *
+			 * @since 4.10.6
+			 *
+			 * @param int $order_total  the order total
+			 * @param int     $event_id Event ID.
+			 */
+			$order_total = apply_filters( 'tribe_tickets_plus_woocommerce_filter_individual_order_totals_in_event_sales', $order_total, $event_id );
 
 			$total += $order_total;
 		}
+
+		/**
+		 * Allow filtering of the WooCommerce Order Sales Total
+		 *
+		 * @since 4.10.6
+		 *
+		 * @param int $total  the total sales for an order
+		 * @param int     $event_id Event ID.
+		 */
+		$total = apply_filters( 'tribe_tickets_plus_woocommerce_filter_report_event_sales_total', $total, $event_id );
 
 		return $total;
 	}
@@ -598,61 +624,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	}
 
 	/**
-	 * Return fees for the given event
-	 *
-	 * @param int $event_id Event post ID
-	 *
-	 * @return float
-	 */
-	public static function event_fees( $event_id ) {
-		$orders            = self::get_orders( $event_id );
-		$valid_order_items = self::get_valid_order_items_for_event( $event_id, $orders );
-
-		$fees = 0;
-
-		foreach ( $valid_order_items as $order_id => $order ) {
-			if ( 'cancelled' === $orders[ $order_id ]['status']
-			     || 'refunded' === $orders[ $order_id ]['status']
-			     || 'failed' === $orders[ $order_id ]['status']
-			) {
-				continue;
-			}
-
-			$order_total = 0;
-
-			foreach ( $order as $line_item ) {
-				$order_total += $line_item['subtotal'];
-			}
-
-			$fees += self::calc_site_fee( $order_total, self::$pass_fees_to_user );
-		}
-
-		return $fees;
-	}
-
-	/**
-	 * Return total revenue for the given event
-	 *
-	 * @param int $event_id Event post ID
-	 *
-	 * @return float
-	 */
-	public static function event_revenue( $event_id ) {
-		return self::event_sales( $event_id, self::$pass_fees_to_user ) + self::event_fees( $event_id, self::$pass_fees_to_user );
-	}
-
-	/**
-	 * Calculate site fees
-	 *
-	 * @param int $amount Total to calculate site fees on
-	 *
-	 * @return float
-	 */
-	public static function calc_site_fee( $amount ) {
-		return round( $amount * ( self::$fee_percent / 100 ), 2 ) + self::$fee_flat;
-	}
-
-	/**
 	 * Echoes the customer name.
 	 *
 	 * @param object $item The current item.
@@ -692,4 +663,119 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		return wc_get_order_status_name( $order->get_status() );
 	}
+
+	/**
+	 * Return fees for the given event
+	 *
+	 * @deprecated 4.10.6
+	 *
+	 * @param int $event_id Event post ID
+	 *
+	 * @return float
+	 */
+	public static function event_fees( $event_id ) {
+		_deprecated_function( __METHOD__, '4.10.6' );
+
+		$orders            = self::get_orders( $event_id );
+		$valid_order_items = self::get_valid_order_items_for_event( $event_id, $orders );
+
+		$fees = 0;
+
+		foreach ( $valid_order_items as $order_id => $order ) {
+			if ( 'cancelled' === $orders[ $order_id ]['status']
+			     || 'refunded' === $orders[ $order_id ]['status']
+			     || 'failed' === $orders[ $order_id ]['status']
+			) {
+				continue;
+			}
+
+			$order_total = 0;
+
+			foreach ( $order as $line_item ) {
+				$order_total += $line_item['subtotal'];
+			}
+
+			$fees += self::calc_site_fee( $order_total, self::$pass_fees_to_user );
+		}
+
+		return $fees;
+	}
+
+	/**
+	 * Return total revenue for the given event
+	 *
+	 * @deprecated 4.10.6
+	 *
+	 * @param int $event_id Event post ID
+	 *
+	 * @return float
+	 */
+	public static function event_revenue( $event_id ) {
+		_deprecated_function( __METHOD__, '4.10.6' );
+
+		return self::event_sales( $event_id, self::$pass_fees_to_user ) + self::event_fees( $event_id, self::$pass_fees_to_user );
+	}
+
+
+	/**
+	 * Calculate site fees
+	 *
+	 * @deprecated 4.10.6
+	 *
+	 * @param int $amount Total to calculate site fees on
+	 *
+	 * @return float
+	 */
+	public static function calc_site_fee( $amount ) {
+		_deprecated_function( __METHOD__, '4.10.6', 'tribe( \'events-community-tickets.fees\' )->calculate_event_fee( $events, $gateway ) and calculate_ticket_fee( $tickets, $gateway )' );
+
+		return round( $amount * ( self::$fee_percent / 100 ), 2 ) + self::$fee_flat;
+	}
+
+	/**
+	 * Handler for the subtotal column
+	 *
+	 * @deprecated 4.10.6
+	 *
+	 * @param $item
+	 *
+	 * @return string
+	 */
+	public function column_subtotal( $item ) {
+		_deprecated_function( __METHOD__, '4.10.6' );
+
+		$total = 0;
+
+		foreach ( $this->valid_order_items[ $item['id'] ] as $line_item ) {
+			$total += $line_item['subtotal'];
+		}
+
+		if ( ! self::$pass_fees_to_user ) {
+			$total -= self::calc_site_fee( $total );
+		}
+
+		return tribe_format_currency( number_format( $total, 2 ) );
+	}//end column_subtotal
+
+	/**
+	 * Handler for the site fees column
+	 *
+	 * @deprecated 4.10.6
+	 *
+	 * @param $item
+	 *
+	 * @return string
+	 */
+	public function column_site_fee( $item ) {
+		_deprecated_function( __METHOD__, '4.10.6' );
+
+		$total = 0;
+
+		foreach ( $this->valid_order_items[ $item['id'] ] as $line_item ) {
+			$total += $line_item['subtotal'];
+		}
+
+		return tribe_format_currency( number_format( $this->calc_site_fee( $total ), 2 ) );
+	}//end column_site_fee
+
 }//end class

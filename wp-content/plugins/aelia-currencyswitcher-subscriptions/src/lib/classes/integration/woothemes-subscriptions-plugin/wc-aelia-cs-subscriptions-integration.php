@@ -77,7 +77,7 @@ class Subscriptions_Integration {
 	 * @return WC_Aelia_CurrencySwitcher_Settings
 	 */
 	protected function currencyprices_manager() {
-		return WC_Aelia_CurrencyPrices_Manager::Instance();
+		return WC_Aelia_CurrencyPrices_Manager::instance();
 	}
 
 	/**
@@ -87,6 +87,17 @@ class Subscriptions_Integration {
 	 */
 	protected function enabled_currencies() {
 		return WC_Aelia_CurrencySwitcher::settings()->get_enabled_currencies();
+	}
+
+	/**
+	 * Callback for array_filter(). Returns true if the passed value is numeric.
+	 *
+	 * @param mixed value The value to check.
+	 * @return bool
+	 * @since 1.4.3.190630
+	 */
+	protected function keep_numeric($value) {
+		return is_numeric($value);
 	}
 
 	/**
@@ -316,6 +327,7 @@ class Subscriptions_Integration {
 			}
 		}
 	}
+
 	/**
 	 * Indicates if a product is being purchased as a renewal.
 	 *
@@ -342,6 +354,33 @@ class Subscriptions_Integration {
 		return !empty($product->aelia_product_renewal) ||
 					 !empty($product->aelia_product_resubscribe) ||
 					 !empty($product->aelia_product_switch);
+	}
+
+	/**
+	 * Indicates if a product is being purchased as a subscription switch.
+	 *
+	 * @param WC_Product product
+	 * @return bool
+	 * @since 1.4.6.190807
+	 * @link https://aelia.freshdesk.com/a/tickets/23356
+	 */
+	protected function is_subscription_switch($product) {
+		/* Look cart items containing a product being renewed or resubscribed.
+		 * When one is found, attach a flag to the product, to indicate that it's a
+		 * renewal/resubscribe. Since objects are passed by reference, if we "tack"
+		 * the flag on the same product that we got as an argument for this method,
+		 * then we will be able to retrieve it at the end of the function.
+		 *
+		 * Example
+		 * 1. Instance of Product X passed as an argument. It might not have the flag.
+		 * 2. Going through the cart, we find that one instance of Product X is being
+		 *    purchased as a renewal. We add the flag to the instance of that product.
+		 * 3. We check for the presence of the flag on the object passed as an argument.
+		 *    If we attached that flag in step #2, we will find it against the object.
+		 */
+		$this->tag_cart_resubscribes_and_renewals();
+
+		return !empty($product->aelia_product_switch);
 	}
 
 	public function __construct() {
@@ -552,6 +591,14 @@ class Subscriptions_Integration {
 			//);die();
 		}
 
+		// Filter out all the non-numeric prices for the variations. The remaining prices will be used to determine
+		// the minimum and maximum variation prices
+		// @since 1.4.3.190630
+		$variation_regular_prices = is_array($variation_regular_prices) ? array_filter($variation_regular_prices, array($this, 'keep_numeric')) : array();
+		$variation_sale_prices = is_array($variation_sale_prices) ? array_filter($variation_sale_prices, array($this, 'keep_numeric')) : array();
+		$variation_prices = is_array($variation_prices) ? array_filter($variation_prices, array($this, 'keep_numeric')) : array() ;
+		$variation_signup_prices = is_array($variation_signup_prices) ? array_filter($variation_signup_prices, array($this, 'keep_numeric')) : array() ;
+
 		$product->min_variation_regular_price = $currencyprices_manager->get_min_value($variation_regular_prices);
 		$product->max_variation_regular_price = $currencyprices_manager->get_max_value($variation_regular_prices);
 
@@ -568,9 +615,10 @@ class Subscriptions_Integration {
 		$product->price = $product->subscription_price;
 		$product->subscription_sign_up_fee = $product->min_subscription_sign_up_fee;
 
-		if(aelia_wc_version_is('>=', '3.0')) {
-			$product->set_price($product->price);
-		}
+		// @deprecated 1.4.4.190630
+		// if(aelia_wc_version_is('>=', '3.0')) {
+		// 	$product->set_price($product->price);
+		// }
 
 		if(!isset($product->max_variation_period)) {
 			$product->max_variation_period = '';
@@ -662,6 +710,12 @@ class Subscriptions_Integration {
 			if($this->product_requires_conversion($product, $selected_currency)) {
 				$product = $this->convert_product_prices($product, $selected_currency);
 			}
+		}
+
+		// Check that the subscription price exist and that nobody else changed
+		// it against the product, before returning it
+		// @since 1.4.5.190307
+		if(property_exists($product, 'subscription_price')) {
 			$subscription_price = $product->subscription_price;
 		}
 
@@ -676,19 +730,31 @@ class Subscriptions_Integration {
 	 * @return float
 	 */
 	public function woocommerce_subscriptions_product_sign_up_fee($subscription_sign_up_fee, $product) {
-		// Don't process signup fees for unsupported products or renewals
-		if($this->is_supported_subscription_product($product) && !$this->is_renewal_or_resubscribe_purchase($product)) {
+		// Don't process signup fees for unsupported products, renewals or subscription switches
+		if($this->is_supported_subscription_product($product) &&
+			!$this->is_subscription_switch($product) &&
+			!$this->is_renewal_or_resubscribe_purchase($product)) {
 			$selected_currency = $this->currencyprices_manager()->get_selected_currency();
 			if($this->product_requires_conversion($product, $selected_currency)) {
 				$product = $this->convert_product_prices($product, $selected_currency);
 			}
 
-			// Check that the sign up fee is numeric, before returning it. This is to
-			// prevent warnings being raised by the Subscriptions plugin, which takes
-			// fees "blindly"
-			// @since 1.3.10.180218
-			if(is_numeric($product->subscription_sign_up_fee)) {
-				$subscription_sign_up_fee =  (float)$product->subscription_sign_up_fee;
+			// Check that the sign up fee is numeric and that nobody else changed
+			// it against the product, before returning it.
+			// This is to prevent warnings being raised by the Subscriptions plugin, which takes
+			// fees "blindly" and doesn't check that the value is a valid number
+			// @since 1.4.5.190307
+
+			// IMPORTANT
+			// During subscriptions upgrades, the Subscriptions plugin calculates the pro-rated
+			// upgrade price (i.e. the price to be paid, taking into account what the customer already
+			// paid), and sets such upgrade price as a sign up fee. That value is automatically converted
+			// to the active currency and doesn't need further processing. Due to that, during switches,
+			// we cant' take the sign up fee from the product and convert it, as we would overwrite the
+			// pro-rates sign up fee.
+			// @since 1.4.6.190807
+			if(property_exists($product, 'subscription_sign_up_fee') && is_numeric($product->subscription_sign_up_fee)) {
+				$subscription_sign_up_fee = (float)$product->subscription_sign_up_fee;
 			}
 		}
 
@@ -733,6 +799,17 @@ class Subscriptions_Integration {
 		$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_REGULAR_CURRENCY_PRICES] = $_POST[self::FIELD_REGULAR_CURRENCY_PRICES];
 		$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_SALE_CURRENCY_PRICES] = $_POST[self::FIELD_SALE_CURRENCY_PRICES];
 
+		// Set the product/variation base currency to the value of the
+		// new "subscription base currency" field. This allows to keep the fields for
+		// simple and variable products separate from the subscriptions ones, and
+		// just "merge" the data as needed.
+		//
+		// @since 1.4.7.190828
+		// @link https://aelia.freshdesk.com/a/tickets/23439
+		$product_base_currency_field = 'subscription_' . WC_Aelia_CurrencyPrices_Manager::FIELD_PRODUCT_BASE_CURRENCY;
+		if(isset($_POST[$product_base_currency_field])) {
+			$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_PRODUCT_BASE_CURRENCY] = $_POST[$product_base_currency_field];
+		}
 
 		$this->currencyprices_manager()->process_product_meta($post_id);
 	}
@@ -767,6 +844,18 @@ class Subscriptions_Integration {
 		// Copy the currency prices from the fields dedicated to the variation inside the standard product fields
 		$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_VARIABLE_REGULAR_CURRENCY_PRICES] = $_POST[self::FIELD_VARIATION_REGULAR_CURRENCY_PRICES];
 		$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_VARIABLE_SALE_CURRENCY_PRICES] = $_POST[self::FIELD_VARIATION_SALE_CURRENCY_PRICES];
+
+		// Set the product/variation base currency to the value of the
+		// new "subscription base currency" field. This allows to keep the fields for
+		// simple and variable products separate from the subscriptions ones, and
+		// just "merge" the data as needed.
+		//
+		// @since 1.4.7.190828
+		// @link https://aelia.freshdesk.com/a/tickets/23439
+		$product_base_currency_field = 'subscription_' . WC_Aelia_CurrencyPrices_Manager::FIELD_PRODUCT_BASE_CURRENCY;
+		if(isset($_POST[$product_base_currency_field])) {
+			$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_PRODUCT_BASE_CURRENCY] = $_POST[$product_base_currency_field];
+		}
 
 		$currencyprices_manager->woocommerce_process_product_meta_variable($post_id);
 	}

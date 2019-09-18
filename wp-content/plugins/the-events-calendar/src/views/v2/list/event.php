@@ -9,34 +9,37 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.9.3
+ * @version 4.9.8
  *
  */
 
 $event    = $this->get( 'event' );
 $event_id = $event->ID;
 
-$classes = [ 'tribe-common-g-row', 'tribe-common-g-row--gutters', 'tribe-events-calendar-list__event' ];
-
-if ( tribe( 'tec.featured_events' )->is_featured( $event_id ) ) {
-	$classes[] = 'tribe-events-calendar-list__event--featured';
-}
+$classes = [ 'tribe-common-g-row', 'tribe-events-calendar-list__event-row' ];
+$classes['tribe-events-calendar-list__event-row--featured'] = tribe( 'tec.featured_events' )->is_featured( $event_id );
 
 ?>
-<article class="<?php echo esc_attr( implode( ' ', $classes ) ); ?>">
+<div <?php tribe_classes( $classes ) ?>>
 
-	<?php $this->template( 'list/event/featured-image', [ 'event' => $event ] ); ?>
+	<?php $this->template( 'list/event/date-tag', [ 'event' => $event ] ); ?>
 
-	<div class="tribe-events-calendar-list__event-details tribe-common-g-col">
+	<div class="tribe-events-calendar-list__event-wrapper tribe-common-g-col">
+		<article class="tribe-events-calendar-list__event tribe-common-g-row tribe-common-g-row--gutters">
+			<?php $this->template( 'list/event/featured-image', [ 'event' => $event ] ); ?>
 
-		<header class="tribe-events-calendar-list__event-header">
-			<?php $this->template( 'list/event/date', [ 'event' => $event ] ); ?>
-			<?php $this->template( 'list/event/title', [ 'event' => $event ] ); ?>
-			<?php $this->template( 'list/event/venue', [ 'event' => $event ] ); ?>
-		</header>
+			<div class="tribe-events-calendar-list__event-details tribe-common-g-col">
 
-		<?php $this->template( 'list/event/description', [ 'event' => $event ] ); ?>
+				<header class="tribe-events-calendar-list__event-header">
+					<?php $this->template( 'list/event/date', [ 'event' => $event ] ); ?>
+					<?php $this->template( 'list/event/title', [ 'event' => $event ] ); ?>
+					<?php $this->template( 'list/event/venue', [ 'event' => $event ] ); ?>
+				</header>
 
+				<?php $this->template( 'list/event/description', [ 'event' => $event ] ); ?>
+
+			</div>
+		</article>
 	</div>
 
-</article>
+</div>

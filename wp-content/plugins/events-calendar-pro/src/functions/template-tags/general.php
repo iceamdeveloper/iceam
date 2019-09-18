@@ -77,6 +77,12 @@ if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 				}
 			}
 
+			/**
+			 * Allows for filtering whether the specified event is recurring or not.
+			 *
+			 * @param boolean $recurring Whether the specified event is recurring or not.
+			 * @param int $post_id The post ID of the specificed event.
+			 */
 			return apply_filters( 'tribe_is_recurring_event', $recurring, $post_id );
 		}
 	}
@@ -106,10 +112,18 @@ if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 	 * @return string Summary of recurrence.
 	 */
 	if ( ! function_exists( 'tribe_get_recurrence_text' ) ) {
-		function tribe_get_recurrence_text( $postId = null ) {
-			$postId = Tribe__Events__Main::postIdHelper( $postId );
 
-			return apply_filters( 'tribe_get_recurrence_text', Tribe__Events__Pro__Recurrence__Meta::recurrenceToTextByPost( $postId ) );
+		function tribe_get_recurrence_text( $post_id = null ) {
+
+			$post_id = Tribe__Events__Main::postIdHelper( $post_id );
+
+			/**
+			 * Allow for filtering the textual version of event recurrence.
+			 *
+			 * @param string $recurrence_text The textual version of the specified event's recurrence details.
+			 * @param int $post_id The post ID of the specificed event.
+			 */
+			return apply_filters( 'tribe_get_recurrence_text', Tribe__Events__Pro__Recurrence__Meta::recurrenceToTextByPost( $post_id ), $post_id );
 		}
 	}
 
@@ -634,28 +648,28 @@ if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 	}
 
 	/**
-	 * show the recurring event info in a tooltip
+	 * Shows the recurring event info in a tooltip, including details of the start/end date/time.
 	 *
-	 * return the details of the start/end date/time
-	 *
-	 * @param int     $post_id
+	 * @param int $post_id
 	 *
 	 * @return string
-	 * @todo remove tribe_events_event_recurring_info_tooltip filter in 3.11
 	 */
 	function tribe_events_recurrence_tooltip( $post_id = null ) {
+
 		if ( empty( $post_id ) ) {
 			$post_id = get_the_ID();
 		}
+
 		$tooltip = '';
+
 		if ( tribe_is_recurring_event( $post_id ) ) {
 			$tooltip .= '<div class="recurringinfo">';
 			$tooltip .= '<div class="event-is-recurring">';
 			$tooltip .= '<span class="tribe-events-divider">|</span>';
-			$tooltip .= sprintf( __( 'Recurring %s', 'tribe-events-calendar-pro' ), tribe_get_event_label_singular() );
+			$tooltip .= sprintf( esc_html__( 'Recurring %s', 'tribe-events-calendar-pro' ), tribe_get_event_label_singular() );
 			$tooltip .= sprintf( ' <a href="%s">%s</a>',
 				esc_url( tribe_all_occurences_link( $post_id, false ) ),
-				__( '(See all)', 'tribe-events-calendar-pro' )
+				esc_html__( '(See all)', 'tribe-events-calendar-pro' )
 			);
 			$tooltip .= '<div id="tribe-events-tooltip-'. $post_id .'" class="tribe-events-tooltip recurring-info-tooltip">';
 			$tooltip .= '<div class="tribe-events-event-body">';
@@ -667,12 +681,13 @@ if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			$tooltip .= '</div>';
 		}
 
-		if ( has_filter( 'tribe_events_event_recurring_info_tooltip' ) ) {
-			_deprecated_function( "The 'tribe_get_related_events' filter", '3.9', " the 'tribe_events_recurrence_tooltip' filter" );
-			$tooltip = apply_filters( 'tribe_events_event_recurring_info_tooltip', $tooltip ); // for backwards-compat, will be removed
-		}
-
-		return apply_filters( 'tribe_events_recurrence_tooltip', $tooltip );
+		/**
+		 * Allows filtering the recurrence tooltip HTML for the specified event.
+		 *
+		 * @param string $tooltip The HTML of the recurrence tooltip for the specified event.
+		 * @param int $post_id The post ID of the event.
+		 */
+		return apply_filters( 'tribe_events_recurrence_tooltip', $tooltip, $post_id );
 	}
 
 	/*

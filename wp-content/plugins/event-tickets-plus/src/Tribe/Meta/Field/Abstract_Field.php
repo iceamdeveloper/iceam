@@ -7,6 +7,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 	public $slug;
 	public $required;
 	public $ticket_id;
+	public $post;
 	public $type;
 	public $extra = array();
 	public $field_type_name = array();
@@ -171,22 +172,38 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 		}
 
 		$value  = null;
-		$values = get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$values = (array) get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
+
+		if (
+			'checkbox' === $this->type
+			|| 'radio' === $this->type
+		) {
+			$value              = [];
+			$hashed_options_map = $this->get_hashed_options_map();
+
+			// Account for Checkboxes and Radios that had their keys md5 hashed (since v4.10.2)
+			foreach ( $hashed_options_map as $option_hash => $option_value ) {
+				if ( array_key_exists( $option_hash, $values ) ) {
+					$value[] = $option_value;
+				}
+			}
+		}
 
 		if ( 'checkbox' === $this->type ) {
-			foreach ( $this->extra['options'] as $label )  {
-				$slug = $this->slug . '_' . sanitize_title( $label );
-				if ( ! isset( $values[ $slug ] ) ) {
-					continue;
+			// Process multiple strings into Checkbox array (having values like `something_a = a + something_b = b` that would check 2 boxes for the "Something" checkboxes option)
+			foreach ( $values as $v_key => $v_value ) {
+				if ( $v_key === $this->slug . '_' . sanitize_title( $v_value ) ) {
+					$value[] = $v_value;
 				}
+			}
+		} elseif ( 'radio' === $this->type ) {
 
-				// Save the Slug for checking which were saved
-				$value[] = $slug;
+			if ( isset( $values[ $this->slug ] ) ) {
+				$value = $values[ $this->slug ];
+			} else {
+				$value  = null;
 			}
 
-			if ( ! is_array( $value ) ) {
-				$value = array();
-			}
 		} else {
 			if ( isset( $values[ $this->slug ] ) ) {
 				$value = $values[ $this->slug ];
@@ -194,6 +211,36 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Create a lookup map to use when rendering front-end input names as well as saving submitted data, allowing us
+	 * to find which submitted/hashed field option should be assigned the value.
+	 *
+	 * Used for Checkbox and Radio inputs in /wp-content/plugins/event-tickets-plus/src/views/meta/...
+	 *
+	 * @since 4.10.7
+	 *
+	 * @return array Key is the hash. Value is the text displayed to user. Key and value get saved (serialized) to
+	 *               post_meta so need to stay in this format for backwards compatibility (since 4.10.2 on Checkboxes
+	 *               and Radios).
+	 */
+	public function get_hashed_options_map() {
+		$map = [];
+
+		if ( ! empty( $this->extra['options'] ) ) {
+			foreach ( $this->extra['options'] as $option ) {
+				$hash = esc_attr(
+					$this->slug
+					. '_'
+					. md5( sanitize_title( $option ) )
+				);
+
+				$map[ $hash ] = wp_kses_post( $option );
+			}
+		}
+
+		return $map;
 	}
 
 	/**

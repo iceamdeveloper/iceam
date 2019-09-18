@@ -13671,7 +13671,7 @@ var TICKET_TYPES_VALUES = [UNLIMITED, CAPPED, OWN];
 var TICKET_TYPES = (_TICKET_TYPES = {}, babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_TYPES, UNLIMITED, UNLIMITED), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_TYPES, SHARED, CAPPED), babel_runtime_helpers_defineProperty__WEBPACK_IMPORTED_MODULE_0___default()(_TICKET_TYPES, INDEPENDENT, OWN), _TICKET_TYPES);
 
 var PREFIX = 'prefix';
-var SUFFIX = 'suffix';
+var SUFFIX = 'postfix';
 
 var PRICE_POSITIONS = [PREFIX, SUFFIX];
 

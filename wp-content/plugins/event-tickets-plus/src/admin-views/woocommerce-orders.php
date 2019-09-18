@@ -1,7 +1,40 @@
-<div class="wrap tribe-attendees-page">
+<?php
+/**
+ * Wether or not we should display order report title.
+ *
+ * @since  4.10.6
+ *
+ * @param  boolean $show_title (false) Whether or not to show the title.
+ */
+$show_title = apply_filters( 'tribe_tickets_order_report_show_title', false );
+
+/**
+ * Wether or not we should display order report title for WooCommerce orders.
+ *
+ * @since  4.10.6
+ *
+ * @param  boolean $show_title (false) Whether or not to show the title.
+ */
+$show_title = apply_filters( 'tribe_tickets_woocommerce_order_report_show_title', $show_title );
+
+$title = __( 'Orders Report', 'event-tickets-plus' );
+/**
+ * Allows filtering of the WooCommerce order report title.
+ *
+ * @since  4.10.6
+ *
+ * @param  string $title the title.
+ */
+$title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title );
+?>
+
+<div class="wrap tribe-report-page">
+	<?php if ( $show_title ) : ?>
+		<h1><?php echo esc_html( $title ); ?></h1>
+	<?php endif; ?>
 	<div id="icon-edit" class="icon32 icon32-tickets-orders"><br></div>
 
-	<div id="tribe-attendees-summary" class="welcome-panel">
+	<div id="tribe-order-summary" class="welcome-panel tribe-report-panel">
 		<div class="welcome-panel-content">
 			<div class="welcome-panel-column-container">
 
@@ -85,18 +118,18 @@
 						</div>
 					</div>
 
-					<div id="sales_breakdown_wrapper" class="tribe-event-meta-note">
+					<ul id="sales_breakdown_wrapper" class="tribe-event-meta-note">
 
 						<?php
 						/**
 						 * Add Completed Status First and Skip in Loop
 						 */
 						?>
-						<div>
+						<li>
 							<strong><?php esc_html_e( 'Completed', 'event-tickets-plus' ); ?>:</strong>
 							<?php echo esc_html( tribe_format_currency( number_format( $completed_status->get_line_total(), 2 ), $event_id ) ); ?>
 							<span id="total_issued">(<?php echo esc_html( $completed_status->get_qty() ); ?>)</span>
-						</div>
+						</li>
 
 						<?php
 						foreach ( $order_overview->statuses as $provider_key => $status ) {
@@ -111,42 +144,50 @@
 								continue;
 							}
 							?>
-							<div>
+							<li>
 								<strong><?php esc_html_e( $status->name, 'event-tickets-plus' ); ?>:</strong>
 								<?php echo esc_html( tribe_format_currency( number_format( $status->get_line_total(), 2 ), $event_id ) ); ?>
 								<span id="total_issued">(<?php echo esc_html( $status->get_qty() ); ?>)</span>
-							</div>
+							</li>
 							<?php
 
 						}
 						?>
-						<div>
+						<li>
 							<strong><?php esc_html_e( 'Discounts:', 'event-tickets-plus' ); ?></strong>
 							<?php
 							$sign = $discounts > 0 ? '-' : '';
 							echo esc_html( $sign . tribe_format_currency( number_format( $discounts, 2 ), $event_id ) );
 							?>
-						</div>
-					</div>
+						</li>
+					</ul>
 
 					<?php
-					if ( $event_fees ) {
+
+					/**
+					 * Fires after the order breakdown list (in the context of the WooCommerce Orders admin view).
+					 *
+					 * @param int $event the event id
+					 */
+					do_action( 'tribe_tickets_plus_woocommerce_sales_report_after_order_breakdown', $event_id );
+
+
+					if ( ! empty( $event_fees ) ) {
 						?>
-						<div class="tribe-event-meta tribe-event-meta-total-ticket-sales">
-							<strong><?php esc_html_e( 'Total Ticket Sales:', 'event-tickets-plus' ) ?></strong>
-							<?php echo esc_html( tribe_format_currency( number_format( $event_sales, 2 ), $event_id ) ); ?>
-						</div>
-						<div class="tribe-event-meta tribe-event-meta-total-site-fees">
-							<strong><?php esc_html_e( 'Total Site Fees:', 'event-tickets-plus' ) ?></strong>
-							<?php echo esc_html( tribe_format_currency( number_format( $event_fees, 2 ), $event_id ) ); ?>
-							<div class="tribe-event-meta-note">
-								<?php
-								echo apply_filters( 'tribe_events_orders_report_site_fees_note', '', $event, $organizer );
-								?>
-							</div>
+						<div class="tribe-event-meta-note">
+							<?php
+							/**
+							 * Filters to Add Report Site Fee Notes
+							 *
+							 * @deprecated 4.10.6
+							 *
+							 */
+							echo apply_filters_deprecated( 'tribe_events_orders_report_site_fees_note', '', $event, $organizer );
+							?>
 						</div>
 						<?php
 					}//end if
+
 					?>
 				</div>
 			</div>

@@ -200,7 +200,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 
 		$organizer   = get_user_by( 'id', $event->post_author );
 		$event_sales = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_sales( $event_id );
-		$event_fees  = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_fees( $event_id );
 		$discounts   = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_discounts( $event_id );
 
 		$tickets_sold  = array();

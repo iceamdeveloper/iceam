@@ -4,7 +4,7 @@ Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, 
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 4.10.5.1
+Stable tag: 4.10.7
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,32 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.10.7] 2019-09-16 =
+
+* Tweak - Reduced file size by removing .po files and directing anyone creating or editing local translations to translations.theeventscalendar.com [128053]
+* Tweak - Add class exists check for `Tribe__Tickets_Plus__Commerce__WooCommerce__Email` to prevent fatal error in rare cases [130183]
+* Tweak - Added filters: `tribe_tickets_plus_get_total_complete`, `tribe_tickets_plus_get_total_refunded`, `event_tickets_plus_commerce_edd_refunded_payment_statuses`
+* Tweak - Changed views: `eddtickets/tickets`, `meta/checkbox`, `meta/number`, `meta/radio`, `meta/select`, `meta/text`, `tickets-plus/orders-edit-meta`, `wootickets/tickets`
+* Fix - Adjust WooCommerce attendee totals to account for refunded (do not include refunded in completed) [126734]
+* Fix - Correctly check for attendees created just before sending ticket emails, which resolves ticket email problems when adding a ticket and then another product to the cart and checking out [130597]
+* Fix - Get each ticket's quantity available in a filterable way [119822]
+* Fix - Dependency checker now correctly identifies missing Event Tickets on activation or deactivation of Event Tickets with The Events Calendar active [123459]
+* Fix - Fix the attendee registration settings slugs used in the `retro_attendee_page_option` functionality [128264]
+* Fix - Check for available stock by using `_tribe_ticket_capacity` instead of `_stock` meta field in EDD [132585]
+* Fix - Resolved issue with saving Attendee Information checkbox and radio field values when editing them [131727]
+* Fix - Prevent PHP notices when an optional radio button is left empty in attendee information [134109]
+* Language - 1 new strings added, 36 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.10.6] 2019-08-22 =
+
+* Tweak - Don't duplicate IDs, correct templates as needed [131430]
+* Tweak - Remove fee calculation coding from WooCommerce Tickets Order Report and replace with filters for Community Tickets to utilize [128843]
+* Tweak - Added filters: `tribe_tickets_plus_edd_order_table_classes`, `tribe_tickets_plus_woocommerce_order_table_classes`, `tribe_tickets_plus_woocommerce_orders_columns`, `tribe_tickets_plus_woocommerce_filter_column_total`, `tribe_tickets_plus_woocommerce_filter_individual_order_totals_in_event_sales`, `tribe_tickets_plus_woocommerce_filter_report_event_sales_total`, `tribe_tickets_order_report_show_title`, `tribe_tickets_edd_order_report_show_title`, `tribe_tickets_edd_order_report_title`, `tribe_tickets_order_report_show_title`, `tribe_tickets_woocommerce_order_report_show_title`, `tribe_tickets_woocommerce_order_report_title`
+* Tweak - Removed filters: `tribe_events_orders_report_site_fees_note`
+* Tweak - Added actions: `tribe_tickets_plus_woocommerce_sales_report_after_order_breakdown`
+* Fix - Replace calculations in WC order report to utilize filters so Community Tickets (and other plugins) can add/modify them as needed. [130279]
+* Language - 1 new strings added, 18 updated, 0 fuzzied, and 2 obsoleted
 
 = [4.10.5.1] 2019-06-13 =
 

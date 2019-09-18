@@ -210,8 +210,10 @@
 	}
 
 .tribe-events-tickets tr {
+		display: -webkit-flex;
 		display: flex;
-		flex-flow: row wrap;
+		-webkit-flex-flow: row wrap;
+		        flex-flow: row wrap;
 	}
 
 .tribe-events-tickets tr:not(:first-child) {
@@ -219,7 +221,8 @@
 		}
 
 .tribe-events-tickets td {
-		flex: none;
+		-webkit-flex: none;
+		        flex: none;
 		padding: 8px 10px;
 		width: 100%;
 		word-break: normal;
@@ -231,7 +234,8 @@
 
 .tribe-events-tickets td.quantity,
 		.tribe-events-tickets td.woocommerce {
-			order: 2;
+			-webkit-order: 2;
+			        order: 2;
 		}
 
 .tribe-events-tickets td.quantity input[type="number"], .tribe-events-tickets td.woocommerce input[type="number"] {
@@ -243,7 +247,8 @@
 			}
 
 .tribe-events-tickets td.tickets_submit {
-			order: 3;
+			-webkit-order: 3;
+			        order: 3;
 		}
 
 .tribe-events-tickets td.tickets_submit .tribe-button {

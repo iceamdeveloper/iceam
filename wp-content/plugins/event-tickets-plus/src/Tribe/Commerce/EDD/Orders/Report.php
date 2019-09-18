@@ -314,7 +314,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 		$all_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'all', 'edd' );
 		$args = array(
 			'post_type'      => 'tribe_eddticket',
-			'posts_per_page' => - 1,
+			'posts_per_page' => -1,
 			'post_status'    => $all_statuses,
 			'meta_query'     => array(
 				array(

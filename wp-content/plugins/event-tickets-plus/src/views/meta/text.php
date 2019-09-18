@@ -6,8 +6,12 @@
  *
  *     [your-theme]/tribe-events/meta/text.php
  *
- * @version 4.3.5
+ * @version 4.10.7
  *
+ * @since 4.3.5
+ * @since 4.10.7 Added var documentation for `$this`.
+ *
+ * @var Tribe__Tickets_Plus__Meta__Field__Text $this
  */
 $multiline = isset( $field['extra'] ) && isset( $field['extra']['multiline'] ) ? $field['extra']['multiline'] : '';
 $option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attendee_id : '' );

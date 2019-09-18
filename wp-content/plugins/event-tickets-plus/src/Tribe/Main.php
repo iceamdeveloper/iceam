@@ -12,14 +12,14 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.10.5.1';
+		const VERSION = '4.10.7';
 
 		/**
 		 * Min required Tickets Core version
 		 *
 		 * @deprecated 4.10
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.10.6-dev';
+		const REQUIRED_TICKETS_VERSION = '4.10.7';
 
 		/**
 		 * Directory of the plugin
@@ -453,7 +453,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 		/**
 		 * Handle converting an old key to a new one, in this case
-		 * ticket-attendee-info-slug -> ticket-attendee-info-id
+		 * ticket-attendee-page-slug -> ticket-attendee-page-id
 		 *
 		 * @since 4.10.4
 		 *
@@ -464,15 +464,15 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 */
 		public function retro_attendee_page_option( $options ) {
 			// Don't migrate option if old option is not set.
-			if ( empty( $options['ticket-attendee-info-slug'] ) ) {
+			if ( empty( $options['ticket-attendee-page-slug'] ) ) {
 				return $options;
 			}
 
-			$slug = $options['ticket-attendee-info-slug'];
-			unset( $options['ticket-attendee-info-slug'] );
+			$slug = $options['ticket-attendee-page-slug'];
+			unset( $options['ticket-attendee-page-slug'] );
 
 			// ID is already set, just return $options without the slug.
-			if ( ! empty( $options['ticket-attendee-info-id'] ) ) {
+			if ( ! empty( $options['ticket-attendee-page-id'] ) ) {
 				return $options;
 			}
 
@@ -484,8 +484,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			}
 
 			// Set ID to the slug page's ID  and return $options without the slug.
-			$options['ticket-attendee-info-id'] = $page->ID;
-
+			$options['ticket-attendee-page-id'] = $page->ID;
 			return $options;
 		}
 

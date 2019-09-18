@@ -141,13 +141,13 @@ foreach ($F->fields as $f)
 ?>
 			<select style="min-width: 5em;" id="<?php echo $id; ?>" name="<?php echo $name.'[min]'; ?>">
 			<?php foreach ($f->options as $key => $label) { ?>
-				<option <?php if ($key == $value['min']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
+				<option <?php if ($key === $value['min']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
 			<?php } ?>
 			</select>
 			<span> - </span>
 			<select style="min-width: 5em;" name="<?php echo $name.'[max]'; ?>">
 			<?php foreach ($f->options as $key => $label) { ?>
-				<option <?php if ($key == $value['max']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
+				<option <?php if ($key === $value['max']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
 			<?php } ?>
 			</select><br>
 <?php
@@ -203,7 +203,7 @@ foreach ($F->fields as $f)
 ?>
 			<select id="<?php echo $id; ?>" name="<?php echo $name; ?>">
 			<?php foreach ($f->options as $key => $label) { ?>
-				<option <?php if ($key == $value) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
+				<option <?php if ($key === $value) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
 			<?php } ?>
 			</select><br>
 <?php
@@ -220,7 +220,7 @@ foreach ($F->fields as $f)
 	case 'radio':
 ?>
 			<?php foreach ($f->options as $key => $label) { ?>
-				<label><input type="radio" <?php if ($key == $value) echo 'checked="checked"'; ?>
+				<label><input type="radio" <?php if ($key === $value) echo 'checked="checked"'; ?>
 					name="<?php echo $name; ?>" value="<?php echo $key; ?>"> <?php echo $label; ?></label><br>
 			<?php } ?>
 			<a href="javascript:bps_clear_radio('<?php echo $id; ?>_wrap')"><?php echo __('Clear', 'buddypress'); ?></a><br>

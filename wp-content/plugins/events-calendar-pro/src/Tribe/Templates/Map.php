@@ -81,13 +81,24 @@ if ( ! class_exists( 'Tribe__Events__Pro__Templates__Map' ) ) {
 				'tribe_geoloc'   => true,
 			);
 
-			/*
-			 * In this context a value of `false` means "Show all events, featured or not".
-			 * A value of `true` means "Show only featured events".
-			 */
-			$featured = tribe( 'tec.featured_events' )->featured_events_requested();
-			if ( true === $featured ) {
+			// If the request is false or not set we assume the request is for all events, not just featured ones.
+			if (
+				tribe( 'tec.featured_events' )->featured_events_requested()
+				|| (
+					isset( $this->args['featured'] )
+					&& tribe_is_truthy( $this->args['featured'] )
+				)
+			) {
 				$args['featured'] = true;
+			} else {
+				/**
+				 * Unset due to how queries featured argument is expected to be non-existent.
+				 *
+				 * @see #127272
+				 */
+				if ( isset( $args['featured'] ) ) {
+					unset( $args['featured'] );
+				}
 			}
 
 			if ( (bool) tribe_get_request_var( 'tribeHideRecurrence' ) ) {
