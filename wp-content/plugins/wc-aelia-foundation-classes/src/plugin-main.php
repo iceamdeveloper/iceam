@@ -9,14 +9,13 @@ require_once('lib/classes/base/plugin/aelia-plugin.php');
 require_once('lib/classes/definitions/definitions.php');
 
 use Aelia\WC\AFC\Settings;
-//use Aelia\WC\AFC\Settings_Renderer;
 use Aelia\WC\AFC\Messages;
 
 /**
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.0.4.190201';
+	public static $version = '2.0.8.190822';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -194,17 +193,6 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 */
 	public function show_admin_messages() {
 		
-		// Inform admins about the new licensing system
-		// @since 1.9.10.171201
-		Messages::admin_message(
-			$this->_messages_controller->get_message(Definitions::NOTICE_NEW_LICENSING_SYSTEM),
-			array(
-				'level' => E_USER_NOTICE,
-				'code' => Definitions::NOTICE_NEW_LICENSING_SYSTEM,
-				'dismissable' => true,
-				'permissions' => 'manage_woocommerce',
-				'message_header' => __('New licensing system for your Aelia plugins', self::$text_domain),
-		));
 		
 	}
 

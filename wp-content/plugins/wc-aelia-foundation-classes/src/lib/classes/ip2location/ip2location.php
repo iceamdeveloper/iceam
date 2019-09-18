@@ -14,7 +14,7 @@ class IP2Location extends Base_Class {
 	protected $_db_reader;
 
 	// @var string URL to the geolocation database
-	const GEOLITE_DB = 'http://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
+	const GEOLITE_DB = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
 
 	//protected static $geoip_db_file = 'geolite-db/GeoLite2-Country.mmdb';
 	public static $geoip_db_file = 'GeoLite2-City.mmdb';
@@ -70,7 +70,10 @@ class IP2Location extends Base_Class {
 	 * @since 1.6.0.150724
 	 */
 	public static function install_database() {
-		if(!file_exists(self::geoip_db_file())) {
+		// Allow 3rd parties to alter the result of the "GeoIP database exist" check
+		// @since 2.0.8.190822
+		// @link https://aelia.freshdesk.com/a/tickets/23407
+		if(!apply_filters('wc_aelia_geoip_database_exists', file_exists(self::geoip_db_file()), self::geoip_db_file())) {
 			// Download and install the latest GeoIP database
 			$result = self::update_database();
 

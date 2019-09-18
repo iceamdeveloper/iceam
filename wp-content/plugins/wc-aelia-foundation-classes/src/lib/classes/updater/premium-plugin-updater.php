@@ -1399,7 +1399,7 @@ class Premium_Plugin_Updater extends Updater {
 			$license_key
 		);
 
-		if($action_response['response']['result'] === Definitions::RES_OK) {
+		if(isset($action_response['response']['result']) && ($action_response['response']['result'] === Definitions::RES_OK)) {
 			$license_data = array(
 				'license_key' => $license_key,
 				'license_status' => $action_response['response']['license']['site_status'],

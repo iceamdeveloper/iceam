@@ -44,7 +44,7 @@ jQuery(document).ready(function($) {
 			// we have to retrieve it from the WC parameters
 			// @since WC 3.1
 			var fragment_name = 'wc_fragments';
-			if(wc_cart_fragments_params && wc_cart_fragments_params.fragment_name) {
+			if((typeof wc_cart_fragments_params !== 'undefined') && wc_cart_fragments_params && wc_cart_fragments_params.fragment_name) {
 				fragment_name = wc_cart_fragments_params.fragment_name;
 			}
 

@@ -3,11 +3,11 @@ Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
 Requires at least: 3.6
-Tested up to: 5.0
+Tested up to: 5.2
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 2.6
-WC tested up to: 3.5.4
+WC tested up to: 3.7.0
 
 Adds a set of convenience classes that can simplify the development of other plugins for WooCommerce.
 
@@ -34,7 +34,7 @@ This product includes GeoLite2 data created by MaxMind, available from
 ##Requirements
 * WordPress 3.6 or later.
 * PHP 5.4 or later.
-* WooCommerce 2.4 or later
+* WooCommerce 2.6 or later
 
 ## Notes
 * This plugin is provided as-is, and it's not automatically covered by free support. See FAQ for more details.
@@ -66,6 +66,26 @@ Should you have any question about this product, please feel free to [contact us
 For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
 == Changelog ==
+
+= 2.0.8.190822 =
+* Improvement - Added filter `wc_aelia_geoip_database_exists`, to allow 3rd party to override the result of the check for the existence of the GeoIP database.
+* Updated supported WooCommerce versions.
+
+= 2.0.7.190809 =
+* Updated Yahnis Elsts Plugin Update Checker library.
+
+= 2.0.8.190715 =
+* Tweak - Set default URL of GeoIP database to HTTPS protocol.
+
+= 2.0.7.190613 =
+* Tweak - Improved error handling during deactivation of a premium licence.
+* Tweak - Added logging of errors occurring during the dismissal of admin messages.
+
+= 2.0.6.190322 =
+* Tweak - Added check on frontend script, to handle the case where the `wc_cart_fragments_params` variable has been removed by disabling WooCommerce's cart fragments.
+
+= 2.0.5.190301 =
+* Tweak - Improved error handling and logging in `Aelia\WC\Order` class, to handle the condition in which an invalid order ID is passed.
 
 = 2.0.4.190201 =
 * Fix - Removed notices caused by IP2Location logging.

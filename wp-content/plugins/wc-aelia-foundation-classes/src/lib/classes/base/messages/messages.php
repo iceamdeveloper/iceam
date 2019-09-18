@@ -224,6 +224,18 @@ class Messages {
 																				 WC_AeliaFoundationClasses::$text_domain),
 																			get_current_user_id(),
 																			$message_id);
+			global $wpdb;
+			$logger = WC_AeliaFoundationClasses::instance()->get_logger();
+
+			// Log the details of the failed dismissal, for easier debugging
+			// @since 2.0.7.190613
+			$logger->error(__('Could not track message dismissal to "aelia_messages" table.', WC_AeliaFoundationClasses::$text_domain), array(
+				'User ID' => get_current_user_id(),
+				'Message ID' => $message_id,
+				'WPDB Last Query' => $wpdb->last_query,
+				'WPDB Last Result' => $wpdb->last_result,
+				'WPDB Last Error' => $wpdb->last_error,
+			));
 		}
 		else {
 			$result['messages'][] = sprintf(__('Message dismissed successfully. User ID: ' .

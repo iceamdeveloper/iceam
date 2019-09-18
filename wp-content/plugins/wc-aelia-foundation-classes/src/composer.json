@@ -1,7 +1,7 @@
 {
 	"require": {
 		"geoip2/geoip2": "~2.0",
-		"yahnis-elsts/plugin-update-checker": "4.4",
+		"yahnis-elsts/plugin-update-checker": "4.7",
 		"nategood/httpful": "*",
 		"monolog/monolog": "^1.23"
   },

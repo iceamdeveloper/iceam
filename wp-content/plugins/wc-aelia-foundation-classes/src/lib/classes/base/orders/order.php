@@ -11,12 +11,33 @@ use \WC_Cache_Helper;
  */
 class Order extends \WC_Order {
 	/**
+	 * Returns the a logger instance.
+	 *
+	 * @return Aelia\WC\Logger
+	 * @since 2.0.5.190301
+	 */
+	protected function get_logger() {
+		return WC_AeliaFoundationClasses::instance()->get_logger();
+	}
+
+	/**
 	 * Get the order if ID is passed, otherwise the order is new and empty.
 	 *
 	 * @see WC_Order::__construct()
 	 */
 	public function __construct($id = '') {
-		parent::__construct($id);
+		try {
+			parent::__construct($id);
+		}
+		catch(\Exception $e) {
+			// Handle the condition in which an invalid order is requested, without crashing
+			// @since 2.0.5.190301
+			$this->get_logger()->error(__('Exception occurred while attempting to load an order.', WC_AeliaFoundationClasses::$text_domain), array(
+				'Order ID' => $id,
+				'Exception Code' => $e->getCode(),
+				'Exception Message' => $e->getMessage(),
+			));
+		}
 	}
 
 	/**
