@@ -108,8 +108,10 @@ $event_id = get_the_ID();
 				}
 				$eventId = get_the_ID();
 				$singleSignupRestricted = array(8390,8356,8480,7055,10710);
-				if($eventId == (8480||7055||8483||7064)){
+				if($eventId === (8480||7055||8483||7064)){
 					$ven = 'london';
+				} else if ($eventId === 10710) {
+					$ven = 'new-orleans';
 				} else {
 					$ven = 'potland';
 				}
@@ -133,11 +135,17 @@ $event_id = get_the_ID();
 							<h3>We're Sorry</h3>
 							<p>You must be a Diplomate to register for this course outside of a training module.</p>
 							
-							<p>Please
+							<p>Please 
 							<?php if ($user_ID == 0){ ?>
 								<a href="/my-courses/">login</a> or
 							<?php } ?>
-							view our <?php if($ven=='portland'){ ?><a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a><?php } else { ?><a href="/venue/iceam-london/">London ICEAM Course Modules.</a><?php } ?></p>
+							view our <?php if($ven=='portland'){ 
+								?><a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a><?php 
+							} else if ($ven == 'new-orleans'){ 
+								?><a href="/courses">Online Courses</a><?php 
+							} else { 
+								?><a href="/venue/iceam-london/">London ICEAM Course Modules.</a><?php 
+							} ?></p>
 						</div>
 				<?php } else if(in_array('Advanced',$term_names)){
 					// if the user is logged in as a diplomate or administrator or teacher
