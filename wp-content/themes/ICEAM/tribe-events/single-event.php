@@ -107,11 +107,13 @@ $event_id = get_the_ID();
 					}
 				}
 				$eventId = get_the_ID();
-				$singleSignupRestricted = array(8390,8356,8480,7055,10710);
+				$singleSignupRestricted = array(8390,8356,8480,7055,10710,10876);
 				if($eventId === (8480||7055||8483||7064)){
 					$ven = 'london';
 				} else if ($eventId === 10710) {
 					$ven = 'new-orleans';
+				} else if ($eventId === 10876) {
+					$ven = 'bamberg';
 				} else {
 					$ven = 'potland';
 				}
@@ -142,6 +144,8 @@ $event_id = get_the_ID();
 							view our <?php if($ven=='portland'){ 
 								?><a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a><?php 
 							} else if ($ven == 'new-orleans'){ 
+								?><a href="/courses">Online Courses</a><?php 
+							} else if ($ven == 'bamberg'){ 
 								?><a href="/courses">Online Courses</a><?php 
 							} else { 
 								?><a href="/venue/iceam-london/">London ICEAM Course Modules.</a><?php 
