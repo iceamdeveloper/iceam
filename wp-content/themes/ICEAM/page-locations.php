@@ -54,7 +54,7 @@ Template Name: Locations
 									<?php if ( tribe_embed_google_map() && tribe_address_exists() ) : ?>
 										<!-- Venue Map -->
 										<div class="tribe-events-map-wrap">
-											<?php echo tribe_get_embedded_map( $venue_id, '100%', '200px' ); ?>
+											<?php //echo tribe_get_embedded_map( $venue_id, '100%', '200px' ); ?>
 										</div><!-- .tribe-events-map-wrap -->
 									<?php endif; ?>
 									
