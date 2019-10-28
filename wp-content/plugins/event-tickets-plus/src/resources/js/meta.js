@@ -76,8 +76,8 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		var i = 0;
 		for ( ; i < diff; i++ ) {
 			var tweaked_template_html = template_html;
-			tweaked_template_html = template_html.replace( /tribe-tickets-meta\[\]/g, 'tribe-tickets-meta[' + ticket_id + '][' + ( current_count + i + 1 ) + ']' );
-			tweaked_template_html = tweaked_template_html.replace( /tribe-tickets-meta_([a-z0-9\-]+)_/g, 'tribe-tickets-meta_$1_' + ( current_count + i + 1 ) + '_' );
+			tweaked_template_html = template_html.replace( /tribe-tickets-meta\[\]/g, 'tribe-tickets-meta[' + ticket_id + '][' + ( current_count + i ) + ']' );
+			tweaked_template_html = tweaked_template_html.replace( /tribe-tickets-meta_([a-z0-9\-]+)_/g, 'tribe-tickets-meta_$1_' + ( current_count + i ) + '_' );
 			$fields.append( tweaked_template_html );
 		}
 	};

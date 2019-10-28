@@ -25,7 +25,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	public $orders_page;
 
 	/**
-	 * @var Tribe__Tickets__Commerce__EDD__Orders__Table
+	 * @var Tribe__Tickets_Plus__Commerce__EDD__Orders__Table
 	 */
 	public $orders_table;
 
@@ -39,11 +39,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	 * @return string The absolute URL.
 	 */
 	public static function get_tickets_report_link( $post ) {
-		$url = add_query_arg( array(
+		$url = add_query_arg( [
 			'post_type' => $post->post_type,
 			'page'      => self::$orders_slug,
 			'post_id'   => $post->ID,
-		), admin_url( 'edit.php' ) );
+		], admin_url( 'edit.php' ) );
 
 		return $url;
 	}
@@ -82,7 +82,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 			return $actions;
 		}
 
-		/** @var \Tribe__Tickets__Commerce__EDD__Main $edd */
+		/** @var \Tribe__Tickets_Plus__Commerce__EDD__Main $edd */
 		$edd = tribe( 'tickets-plus.commerce.edd' );
 
 		$has_tickets = count( $edd->get_tickets_ids( $post->ID ) );
@@ -150,14 +150,15 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	 *
 	 * @param string $url     a url for the order page for an event
 	 * @param int    $post_id the post id for the current event
+	 *
+	 * @return string
 	 */
 	public function filter_editor_orders_link( $url, $post_id ) {
-
 		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
 
 		if ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' === $provider ) {
 			$url = remove_query_arg( 'page', $url );
-			$url = add_query_arg( array( 'page' => 'edd-orders' ), $url );
+			$url = add_query_arg( [ 'page' => 'edd-orders' ], $url );
 		}
 
 		return $url;
@@ -229,23 +230,32 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 		$author     = get_user_by( 'id', $post->post_author );
 		$tickets    = Tribe__Tickets__Tickets::get_event_tickets( $post_id );
 
-		//Setup the ticket breakdown
-		$order_overview      = tribe( 'tickets.status' )->get_providers_status_classes( 'edd' );
-		$complete_statuses   = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'edd' );
-		$incomplete_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'count_incomplete', 'edd' );
+		/**
+		 * Setup the ticket breakdown
+		 *
+		 * @var Tribe__Tickets__Status__Manager $status_manager
+		 */
+		$status_manager = tribe( 'tickets.status' );
 
-		$tickets_sold = array();
+		$order_overview      = $status_manager->get_providers_status_classes( 'edd' );
+		$complete_statuses   = (array) $status_manager->get_statuses_by_action( 'count_completed', 'edd' );
+		$incomplete_statuses = (array) $status_manager->get_statuses_by_action( 'count_incomplete', 'edd' );
 
-		//update ticket item counts by order status
+		$tickets_sold = [];
+
+		/**
+		 * Update ticket item counts by order status
+		 *
+		 * @var Tribe__Tickets__Ticket_Object $ticket
+		 */
 		foreach ( $tickets as $ticket ) {
-
 			// Only Display if a EDD Ticket otherwise kick out
 			if ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' != $ticket->provider_class ) {
 				continue;
 			}
 
 			if ( empty( $tickets_sold[ $ticket->name ] ) ) {
-				$tickets_sold[ $ticket->name ] = array(
+				$tickets_sold[ $ticket->name ] = [
 					'ticket'     => $ticket,
 					'has_stock'  => ! $ticket->stock(),
 					'sku'        => get_post_meta( $ticket->ID, '_sku', true ),
@@ -254,7 +264,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 					'completed'  => 0,
 					'refunded'   => 0,
 					'incomplete' => 0,
-				);
+				];
 			}
 
 			$orders = $this->get_all_orders_by_download_id( $ticket->ID );
@@ -278,8 +288,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 						$tickets_sold[ $ticket->name ]['incomplete'] += $line_item['quantity'];
 					}
 
-					$order_overview->statuses[ $order->status_nicename ]->add_qty( $line_item['quantity'] );
-					$order_overview->statuses[ $order->status_nicename ]->add_line_total( $line_item['subtotal'] );
+					/** @var Tribe__Tickets__Status__Abstract $status_class */
+					$status_class = $order_overview->statuses[ $order->status_nicename ];
+					$status_class->add_qty( $line_item['quantity'] );
+					$status_class->add_line_total( $line_item['subtotal'] );
 					$order_overview->add_qty( $line_item['quantity'] );
 					$order_overview->add_line_total( $line_item['subtotal'] );
 				}

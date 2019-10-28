@@ -114,7 +114,11 @@ function bps_escaped_form_data49 ()
 		$f->error_message = esc_html ($f->error_message);
 
 		$options = array ();
-		foreach ($f->options as $key => $label)  $options[esc_attr ($key)] = esc_attr ($label);
+		foreach ($f->options as $key => $label)
+		{
+			if ($key === 0)  $key = ' 0';
+			$options[esc_attr ($key)] = esc_attr ($label);
+		}
 		$f->options = $options;
 	}
 

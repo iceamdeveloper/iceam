@@ -293,12 +293,14 @@ class Tribe__Tickets_Plus__Tickets_View {
 				'user' => $user_id,
 			];
 
-			$attendees = Tribe__Tickets__Tickets::get_event_attendees_by_args( $event_id, $args );
+			$attendee_data = Tribe__Tickets__Tickets::get_event_attendees_by_args( $event_id, $args );
+
+			$attendees = $attendee_data['attendees'];
 		}
 
 		$orders = [];
 
-		foreach ( $attendees['attendees'] as $attendee ) {
+		foreach ( $attendees as $attendee ) {
 			// Ignore RSVP if we don't tell it specifically
 			if (
 				'rsvp' === $attendee['provider_slug']

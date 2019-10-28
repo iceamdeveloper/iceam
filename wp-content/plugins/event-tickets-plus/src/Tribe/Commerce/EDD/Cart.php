@@ -95,6 +95,14 @@ class Tribe__Tickets_Plus__Commerce__EDD__Cart extends Tribe__Tickets_Plus__Comm
 			$tickets[ $item['id'] ] = $item['quantity'];
 		}
 
-		return $tickets;
+		/**
+		 * Allows for filtering the returned tickets for easier third-party plugin compatibility.
+		 *
+		 * @since 4.10.8
+		 *
+		 * @param array $tickets  List of tickets currently in the cart.
+		 * @param array $contents The EDD cart contents.
+		 */
+		return apply_filters( 'tribe_tickets_plus_edd_tickets_in_cart', $tickets, $contents );
 	}
 }

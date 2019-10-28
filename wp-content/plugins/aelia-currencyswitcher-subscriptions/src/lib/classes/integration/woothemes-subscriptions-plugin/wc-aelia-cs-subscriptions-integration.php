@@ -31,6 +31,16 @@ class Subscriptions_Integration {
 	protected static $_base_currency;
 
 	/**
+	 * The currency that should be set as active during
+	 * the processing of a renewal
+	 *
+	 * @var string
+	 * @since 1.4.8.190905
+	 * @link https://aelia.freshdesk.com/a/tickets/23457
+	 */
+	protected $subscription_renewal_currency;
+
+	/**
 	 * Logs a message.
 	 *
 	 * @param string message The message to log.
@@ -465,6 +475,8 @@ class Subscriptions_Integration {
 		add_filter('wc_aelia_currencyswitcher_prices_type_field_map', array($this, 'wc_aelia_currencyswitcher_prices_type_field_map'), 10, 2);
 		//add_action('wc_aelia_currencyswitcher_recalculate_cart_totals_after', array($this, 'wc_aelia_currencyswitcher_recalculate_cart_totals_after'), 10);
 
+		add_action('woocommerce_scheduled_subscription_payment', array($this, 'woocommerce_scheduled_subscription_payment'), 0);
+		add_action('woocommerce_renewal_order_payment_complete', array($this, 'woocommerce_renewal_order_payment_complete'), 999);
 
 		// Subscriptions 2.0 - Fix bug #1040
 		// Fix checkout currency during renewals
@@ -1244,5 +1256,52 @@ class Subscriptions_Integration {
 			return $date->format($format);
 		}
 		return date($format, $date);
+	}
+
+	/**
+	 * Sets the active currency before the processing of a renewal. This will
+	 * ensure that the correct currency settings, such as the number of decimals,
+	 * will be used.
+	 *
+	 * @param int $subscription_id
+	 * @since 1.4.8.190905
+	 * @link https://aelia.freshdesk.com/a/tickets/23457
+	 */
+	public function woocommerce_scheduled_subscription_payment($subscription_id) {
+		// Fetch the currency from the original subscription
+		$subscription = wcs_get_subscription($subscription_id);
+		// Store the active currency to be used during a renewal
+		$this->subscription_renewal_currency = $subscription->get_currency();
+
+		add_filter('wc_aelia_cs_selected_currency', array($this, 'set_active_currency_for_renewal'), 999);
+	}
+
+	/**
+	 * After a renewal has been paid, removes the filter that sets the active
+	 * currency. This restores the active currency that was set previously.
+	 *
+	 * @param int $order_id
+	 * @since 1.4.8.190905
+	 * @link https://aelia.freshdesk.com/a/tickets/23457
+	 */
+	public function woocommerce_renewal_order_payment_complete($order_id) {
+		// Reset the active currency to be used during a renewal
+		$this->subscription_renewal_currency = null;
+		remove_filter('wc_aelia_cs_selected_currency', array($this, 'set_active_currency_for_renewal'), 999);
+	}
+
+	/**
+	 * Sets the active currency during the processing of a renewal
+	 *
+	 * @param string $currency
+	 * @return string
+	 * @since 1.4.8.190905
+	 * @link set_active_currency_for_renewal
+	 */
+	public function set_active_currency_for_renewal($currency) {
+		if(!empty($this->subscription_renewal_currency)) {
+			$currency = $this->subscription_renewal_currency;
+		}
+		return $currency;
 	}
 }

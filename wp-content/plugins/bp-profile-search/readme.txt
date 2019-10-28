@@ -1,10 +1,10 @@
 === BP Profile Search ===
 Contributors: dontdream
 Tags: buddypress, directory, members, users, profile, search, filter
-Requires at least: 4.6
+Requires at least: 4.7
 Tested up to: 5.2
 Requires PHP: 5.3
-Stable tag: 5.1
+Stable tag: 5.2.1
 
 Member search and member directories for BuddyPress.
 
@@ -18,7 +18,7 @@ BP Profile Search is a member search and member directories plugin for BuddyPres
 	<li>The [bps_directory] shortcode to customize the BuddyPress Members directory, or to build additional member directories</li>
 </ul>
 
-Member directories also serve as results pages for your search forms.
+Each search form has a <em>target directory</em>. When you run a search, the form’s target directory is filtered, i.e. it is searched and also used to show the search results.
 
 = Build a search form =
 
@@ -27,17 +27,17 @@ With the form builder you can:
 <ul>
 	<li>Add, remove, and reorder the search fields</li>
 
-	<li>Use as search fields the BuddyPress profile fields, the <em>users</em> and <em>usermeta</em> data (including roles), and the user taxonomies (including BuddyPress member types)</li>
+	<li>Use as search fields the BuddyPress profile fields, the <em>users</em> and <em>usermeta</em> data (including roles), the BuddyPress user groups, and the user taxonomies (including BuddyPress member types)</li>
 
-	<li>Use a <em>search by distance</em> field when you install a free companion plugin, <a href="https://wordpress.org/plugins/bp-distance-search/">BP Distance Search</a></li>
+	<li>Use <em>search by distance</em> fields when you install the free companion plugin <a href="https://wordpress.org/plugins/bp-distance-search/">BP Distance Search</a></li>
 
 	<li>Select, for each search field, one of the available search modes</li>
 
-	<li>Select the BuddyPress Members directory, or one of the member directories built with this plugin, as the search results page</li>
+	<li>Select the BuddyPress Members directory, or one of the member directories built with this plugin, as the target directory</li>
 
 	<li>Select the form template to display your form</li>
 
-	<li>When in doubt, use the <em>Help</em> tab above the screen title</li>
+	<li>If in doubt, use the <em>Help</em> tab above the screen title</li>
 </ul>
 
 The form template works just like any other BuddyPress template. To override a form template, copy it to the 'buddypress/members' directory in your theme’s root, then edit the new copy according to your needs.
@@ -47,7 +47,7 @@ The form template works just like any other BuddyPress template. To override a f
 After you build your search form, you can display it:
 
 <ul>
-	<li>In its member directory, using the option <em>Add to Directory</em> in the form settings</li>
+	<li>In its target directory, using the option <em>Add to Directory</em> in the form settings</li>
 
 	<li>In a sidebar or widget area, using the widget <em>Profile Search</em></li>
 
@@ -56,12 +56,12 @@ After you build your search form, you can display it:
 
 = Run a search =
 
-On the front-end, when you hit the <em>Search</em> button in a form, BP Profile Search opens the member directory selected as the form's results page and shows your search results there. The <em>All Members</em> tab shows all the results, while the <em>My Friends</em> tab shows the results limited to your friends.
+On the front-end, when you hit the <em>Search</em> button in a form, BP Profile Search opens the form's target directory and filters it with your search filters. Both the <em>All Members</em> tab and the <em>My Friends</em> tab are filtered.
 
 Additionally, the plugin:
 
 <ul>
-	<li>Displays an <em>active filters</em> section containing the active search filters and a <em>Clear</em> button to clear the search</li>
+	<li>Displays an <em>active filters</em> section containing the active search filters and a <em>Clear</em> button to clear them</li>
 
 	<li>Displays for each member a <em>member details</em> section containing the values of the searched fields</li>
 
@@ -81,14 +81,12 @@ With the [bps_directory] shortcode you can:
 
 	<li>Add more sort options to a directory</li>
 
-	<li>Show additional member information in a directory, e.g. the value of profile fields</li>
+	<li>Show additional member information in each <em>member details</em> section, e.g. the value of profile fields</li>
 
 	<li>Use a different Members directory template for each directory</li>
 </ul>
 
 You can enter the shortcode in an empty page to build a new member directory, or you can enter it in the BuddyPress Members page to customize the BuddyPress Members directory.
-
-Member directories also serve as results pages so, if you need a customized results page, you can build a custom member directory and use it to show your search results.
 
 = Additional documentation =
 
@@ -102,7 +100,9 @@ Member directories also serve as results pages so, if you need a customized resu
 	<li><a href="https://dontdream.it/bp-profile-search/form-templates/">Form Templates</a></li>
 </ul>
 
-Requires at least BuddyPress 2.4 -- Tested up to BuddyPress 4.4.0
+Tested up to BuddyPress 5.0.0
+
+In the screenshots below, the <em>City</em> field is provided by the free companion plugin <a href="https://wordpress.org/plugins/bp-distance-search/">BP Distance Search</a>.
 
 == Installation ==
 
@@ -118,6 +118,10 @@ See the standard installation procedure, in [Managing Plugins](https://codex.wor
 
 == Changelog ==
 
+= 5.2.1 =
+* Fixed conflict with the BP Legacy group members template, introduced in 5.2
+= 5.2 =
+* Added search by group, to find members belonging to the selected group(s)
 = 5.1 =
 * Added the bps-details template, to customize the member details section
 * Removed the bps-field-value template, replaced by bps-details

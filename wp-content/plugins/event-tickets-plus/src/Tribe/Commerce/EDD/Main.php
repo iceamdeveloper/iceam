@@ -2057,8 +2057,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * @return bool `true` if at least one attendee was generated, `false` otherwise
 	 */
 	public function generate_attendees_for_order_entry( $order_id, array $item = array() ) {
-		$order_attendee_id = 0;
-
 		$product_id = isset( $item['id'] ) ? $item['id'] : false;
 		$optout     = (bool) isset( $item['item_number']['options'][ $this->attendee_optout_key ] ) ? $item['item_number']['options'][ $this->attendee_optout_key ] : false;
 
@@ -2121,11 +2119,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			 * @param int $product_id Product ID attendee is "purchasing"
 			 * @param int $order_attendee_id Attendee # for order
 			 */
-			do_action( 'event_tickets_edd_ticket_created', $attendee_id, $order_id, $product_id, $order_attendee_id );
+			do_action( 'event_tickets_edd_ticket_created', $attendee_id, $order_id, $product_id, $i );
 
 			$this->record_attendee_user_id( $attendee_id, $user_id );
 			$this->clear_attendees_cache( $post_id );
-			$order_attendee_id++;
 		}
 
 		return true;

@@ -4,7 +4,7 @@ Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, 
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.7
 Tested up to: 5.2
-Stable tag: 4.10.7
+Stable tag: 4.10.9
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,21 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.10.9] 2019-10-14 =
+
+* Fix - Attendees Report's "Orders" tab now displays amount sold and available regardless of amount, including for unlimited and zero remaining for Easy Digital Downloads and WooCommerce attendees [134108]
+* Fix - Prevent Attendee Registration saving from storing only the last attendee's information for all Easy Digital Downloads attendees [134408]
+* Language - 0 new strings added, 13 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.10.8] 2019-10-01 =
+
+* Tweak - Add compatibility for plugins that separate tickets into separate line items and allow filtering those tickets found in the cart [133639]
+* Tweak - Added filters: `tribe_tickets_plus_edd_tickets_in_cart`, `tribe_tickets_plus_woocommerce_tickets_in_cart`
+* Fix - Prevent PHP notices when updating Attendee Fields on the My Tickets Page [132829]
+* Fix - Prevent throwing notices on the orders view if there are no orders to show [127506]
+* Fix - Update outdated gradient direction syntax in `wootickets.pcss` [133243]
+* Language: 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
 
 = [4.10.7] 2019-09-16 =
 

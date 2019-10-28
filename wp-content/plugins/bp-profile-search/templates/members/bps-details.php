@@ -35,7 +35,7 @@ foreach ($F->fields as $f)
 
 	case 'date':
 		$value = strtotime ($value);
-		$value = date_i18n ('F j, Y', $value);
+		if (!empty ($value))  $value = date_i18n ('F j, Y', $value);
 		printf (__('%1$s: %2$s', 'bp-profile-search'), $label, $value);
 		break;
 

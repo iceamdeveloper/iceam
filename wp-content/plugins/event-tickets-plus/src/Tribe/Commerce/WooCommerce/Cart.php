@@ -134,16 +134,29 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 		$event_key = tribe( 'tickets-plus.commerce.woo' )->event_key;
 
 		foreach ( $contents as $item ) {
-			$woo_check = get_post_meta( $item['product_id'], $event_key, true );
+			$product_id = $item['product_id'];
+			$woo_check  = get_post_meta( $product_id, $event_key, true );
 
 			if ( empty( $woo_check ) ) {
 				continue;
 			}
 
-			$tickets[ $item['product_id'] ] = $item['quantity'];
+			if ( isset( $tickets[ $product_id ] ) ) {
+				$tickets[ $product_id ] += $item['quantity'];
+			} else {
+				$tickets[ $product_id ] = $item['quantity'];
+			}
 		}
 
-		return $tickets;
+		/**
+		 * Allows for filtering the returned tickets for easier third-party plugin compatibility.
+		 *
+		 * @since 4.10.8
+		 *
+		 * @param array $tickets  List of tickets currently in the cart.
+		 * @param array $contents The WooCommerce cart contents.
+		 */
+		return apply_filters( 'tribe_tickets_plus_woocommerce_tickets_in_cart', $tickets, $contents );
 	}
 
 	/**

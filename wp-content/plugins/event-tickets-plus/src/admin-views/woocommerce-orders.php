@@ -1,6 +1,11 @@
 <?php
 /**
- * Wether or not we should display order report title.
+ * @var Tribe__Tickets_Plus__Commerce__WooCommerce__Status_Manager $order_overview
+ * @var array                                                      $tickets_sold
+ */
+
+/**
+ * Whether or not we should display order report title.
  *
  * @since  4.10.6
  *
@@ -9,7 +14,7 @@
 $show_title = apply_filters( 'tribe_tickets_order_report_show_title', false );
 
 /**
- * Wether or not we should display order report title for WooCommerce orders.
+ * Whether or not we should display order report title for WooCommerce orders.
  *
  * @since  4.10.6
  *
@@ -76,14 +81,16 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 					</h3>
 					<?php
 					foreach ( $tickets_sold as $ticket_sold ) {
+						if ( ! $ticket_sold['ticket'] instanceof Tribe__Tickets__Ticket_Object ) {
+							continue;
+						}
 
-						//Only Display if a WooCommerce Ticket otherwise kick out
+						// Skip non-WooCommerce tickets.
 						if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' != $ticket_sold['ticket']->provider_class ) {
 							continue;
 						}
 
 						echo $order_overview->get_ticket_sale_infomation( $ticket_sold, $event_id );
-
 					}
 					?>
 				</div>
@@ -92,6 +99,7 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 					<div class="totals-header">
 						<h3>
 							<?php
+							/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Status__Complete $completed_status */
 							$completed_status = $order_overview->get_completed_status_class();
 							$totals_header = sprintf(
 								'%1$s: %2$s (%3$s)',
@@ -150,7 +158,6 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 								<span id="total_issued">(<?php echo esc_html( $status->get_qty() ); ?>)</span>
 							</li>
 							<?php
-
 						}
 						?>
 						<li>
@@ -186,7 +193,7 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 							?>
 						</div>
 						<?php
-					}//end if
+					} // end if
 
 					?>
 				</div>

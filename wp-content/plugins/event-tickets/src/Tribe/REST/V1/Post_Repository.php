@@ -654,10 +654,11 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		 *
 		 * @since 4.10.2
 		 *
-		 * @param bool  $always_show_attendees_data Whether to always show attendees data.
-		 * @param array $data                       Ticket REST data.
+		 * @param bool $always_show_attendees_data Whether to always show attendees data. By default, Admin and Editor
+		 *                                         can see this information.
+		 * @param array $data                      Ticket REST data.
 		 */
-		$always_show_attendees_data = apply_filters( 'tribe_tickets_rest_api_always_show_attendee_data', false, $data );
+		$always_show_attendees_data = apply_filters( 'tribe_tickets_rest_api_always_show_attendee_data', current_user_can( 'read_private_posts' ), $data );
 
 		// Check if we have an event or attendees block/shortcode.
 		if ( ! $always_show_attendees_data ) {
@@ -668,7 +669,10 @@ class Tribe__Tickets__REST__V1__Post_Repository
 
 			// Return if event is not showing attendees.
 			if (
-				( ! function_exists( 'has_block' ) || ! has_block( 'tribe/attendees', $event ) )
+				(
+					! function_exists( 'has_block' )
+					|| ! has_block( 'tribe/attendees', $event )
+				)
 				&& ! has_shortcode( $event->post_content, 'tribe_attendees_list' )
 				// In case has_shortcode does not work.
 				&& false === strpos( $event->post_content, '[tribe_attendees_list]' )
@@ -963,7 +967,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 					/** @var Tribe__Tickets__Commerce__Currency $currency */
 					$currency                 = tribe( 'tickets.commerce.currency' );
 					$ticket_object            = $this->get_ticket_object( $attendee['product_id'] );
-					$purchase_time            = Tribe__Utils__Array::get( $order_data, 'purchase_time', get_post_time( 'Y-m-d H:i:s', false, $attendee_id ) );
+					$purchase_time            = Tribe__Utils__Array::get( $order_data, 'purchase_time', get_post_time( Tribe__Date_Utils::DBDATETIMEFORMAT, false, $attendee_id ) );
 					$attendee_data['payment'] = array(
 						'provider'     => Tribe__Utils__Array::get( $order_data, 'provider_slug', $this->get_provider_slug( $provider ) ),
 						'price'        => $ticket_object->price,

@@ -1,6 +1,11 @@
 <?php
 /**
- * Wether or not we should display order report title.
+ * @var Tribe__Tickets_Plus__Commerce__EDD__Status_Manager   $order_overview
+ * @var array                                                $tickets_sold
+ */
+
+/**
+ * Whether or not we should display order report title.
  *
  * @since  4.10.6
  *
@@ -9,7 +14,7 @@
 $show_title = apply_filters( 'tribe_tickets_order_report_show_title', false );
 
 /**
- * Wether or not we should display order report title for EDD orders.
+ * Whether or not we should display order report title for EDD orders.
  *
  * @since  4.10.6
  *
@@ -80,14 +85,16 @@ $title = apply_filters( 'tribe_tickets_edd_order_report_title', $title );
 					</h3>
 					<?php
 					foreach ( $tickets_sold as $ticket_sold ) {
+						if ( ! $ticket_sold['ticket'] instanceof Tribe__Tickets__Ticket_Object ) {
+							continue;
+						}
 
-						//Only Display if a EDD Ticket otherwise kick out
+						// Skip non-EDD tickets.
 						if ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' != $ticket_sold['ticket']->provider_class ) {
 							continue;
 						}
 
 						echo $order_overview->get_ticket_sale_infomation( $ticket_sold, $post_id );
-
 					}
 					?>
 				</div>
@@ -96,6 +103,7 @@ $title = apply_filters( 'tribe_tickets_edd_order_report_title', $title );
 					<div class="totals-header">
 						<h3>
 							<?php
+							/** @var Tribe__Tickets_Plus__Commerce__EDD__Status__Complete $completed_status */
 							$completed_status = $order_overview->get_completed_status_class();
 							$totals_header = sprintf(
 								'%1$s: %2$s (%3$s)',
@@ -154,7 +162,6 @@ $title = apply_filters( 'tribe_tickets_edd_order_report_title', $title );
 								<span id="total_issued">(<?php echo esc_html( $status->get_qty() ); ?>)</span>
 							</li>
 							<?php
-
 						}
 						?>
 					</ul>

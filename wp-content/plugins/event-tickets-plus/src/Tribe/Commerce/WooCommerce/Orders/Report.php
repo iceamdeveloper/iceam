@@ -72,14 +72,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	 *
 	 * @param string $url     a url for the order page for an event
 	 * @param int    $post_id the post id for the current event
+	 *
+	 * @return string
 	 */
 	public function filter_editor_orders_link( $url, $post_id ) {
-
 		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
 
 		if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' === $provider ) {
 			$url = remove_query_arg( 'page', $url );
-			$url = add_query_arg( array( 'page' => 'tickets-orders' ), $url );
+			$url = add_query_arg( [ 'page' => 'tickets-orders' ], $url );
 		}
 
 		return $url;
@@ -88,7 +89,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 	/**
 	 * Filter the page slugs that the attendee resources will load to add the order page
 	 *
-	 * @param $page_slugs
+	 * @param array $slugs List of page slugs.
 	 *
 	 * @return array
 	 */
@@ -202,24 +203,34 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		$event_sales = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_sales( $event_id );
 		$discounts   = Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table::event_discounts( $event_id );
 
-		$tickets_sold  = array();
+		$tickets_sold  = [];
 		$total_sold    = 0;
 		$total_pending = 0;
 
-		//Setup the ticket breakdown
-		$order_overview      = tribe( 'tickets.status' )->get_providers_status_classes( 'woo' );
-		$complete_statuses   = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'woo' );
-		$incomplete_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'count_incomplete', 'woo' );
+		/**
+		 * Setup the ticket breakdown
+		 *
+		 * @var Tribe__Tickets__Status__Manager $status_manager
+		 */
+		$status_manager = tribe( 'tickets.status' );
 
+		$order_overview      = $status_manager->get_providers_status_classes( 'woo' );
+		$complete_statuses   = (array) $status_manager->get_statuses_by_action( 'count_completed', 'woo' );
+		$incomplete_statuses = (array) $status_manager->get_statuses_by_action( 'count_incomplete', 'woo' );
+
+		/**
+		 * Update ticket item counts by order status
+		 *
+		 * @var Tribe__Tickets__Ticket_Object $ticket
+		 */
 		foreach ( $tickets as $ticket ) {
-
 			// Only Display if a WooCommerce Ticket otherwise kick out
 			if ( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' != $ticket->provider_class ) {
 				continue;
 			}
 
 			if ( empty( $tickets_sold[ $ticket->name ] ) ) {
-				$tickets_sold[ $ticket->name ] = array(
+				$tickets_sold[ $ticket->name ] = [
 					'ticket'     => $ticket,
 					'has_stock'  => ! $ticket->stock(),
 					'sku'        => get_post_meta( $ticket->ID, '_sku', true ),
@@ -228,14 +239,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 					'completed'  => 0,
 					'refunded'   => 0,
 					'incomplete' => 0,
-				);
+				];
 			}
 
-			//update ticket item counts by order status
-			$tickets_sold[ $ticket->name ]['product_sales'] = $this->get_total_sales_per_productby_status( $ticket->ID );
+			// update ticket item counts by order status
+			$tickets_sold[ $ticket->name ]['product_sales'] = self::get_total_sales_per_productby_status( $ticket->ID );
 			foreach ( $tickets_sold[ $ticket->name ]['product_sales'] as $status => $product ) {
-				if ( $status && isset( $product[0] ) && is_object( $product[0] ) ) {
-
+				if (
+					$status
+					&& isset( $product[0] )
+					&& is_object( $product[0] )
+				) {
 					if ( in_array( $status, $complete_statuses, true ) ) {
 						$tickets_sold[ $ticket->name ]['completed'] += $product[0]->_qty;
 					}
@@ -244,11 +258,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 						$tickets_sold[ $ticket->name ]['incomplete'] += $product[0]->_qty;
 					}
 
-					$order_overview->statuses[ $status ]->add_qty( $product[0]->_qty );
-					$order_overview->statuses[ $status ]->add_line_total( $product[0]->_line_total );
+					/** @var Tribe__Tickets__Status__Abstract $status_class */
+					$status_class = $order_overview->statuses[ $status ];
+					$status_class->add_qty( $product[0]->_qty );
+					$status_class->add_line_total( $product[0]->_line_total );
 					$order_overview->add_qty( $product[0]->_qty );
 					$order_overview->add_line_total( $product[0]->_line_total );
-
 				}
 			}
 		}
@@ -259,7 +274,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 		$tabbed_view->render();
 
 		include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/woocommerce-orders.php';
-
 	}
 
 	/**
@@ -286,9 +300,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 			return false;
 		}
 
-		$order_items = array();
+		$order_items = [];
 
-		$order_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'all', 'woo' );
+		/** @var Tribe__Tickets__Status__Manager $status_manager */
+		$status_manager = tribe( 'tickets.status' );
+
+		$order_statuses = (array) $status_manager->get_statuses_by_action( 'all', 'woo' );
 
 		foreach ( $order_statuses as $order_status ) {
 
@@ -316,10 +333,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 				);
 
 			$order_items[ $order_status ] = $wpdb->get_results( $sql );
-
 		}
 
 		return $order_items;
-
 	}
 }

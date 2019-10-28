@@ -34,6 +34,9 @@ Should you need assistance, please feel free to [contact us](https://aelia.co/co
 
 == Changelog ==
 
+= 1.4.8.190905 =
+* Fix - Added logic to ensure that the correct currency is active during the processing of renewals.
+
 = 1.4.7.190828 =
 * Fix - Fixed glitch that caused a product's base currency to be overwritten by the one introduced by this integration addon.
 

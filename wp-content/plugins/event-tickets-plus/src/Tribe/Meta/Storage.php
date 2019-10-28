@@ -134,8 +134,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 
 		delete_transient( $transient );
 		$merged = $this->combine_new_and_saved_attendee_meta( $ticket_meta, $stored_ticket_meta );
-
-		$set = set_transient( $transient, $merged, $this->ticket_meta_expire_time );
+		$set    = set_transient( $transient, $merged, $this->ticket_meta_expire_time );
 
 		if ( ! $set ) {
 			return false;
@@ -178,15 +177,12 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 * @return array
 	 */
 	protected function combine_new_and_saved_attendee_meta( $new, $saved ) {
-
 		if ( empty( $saved ) ) {
 			return $new;
 		}
 
 		foreach ( $new as $ticket_id => $data ) {
-
 			$data = array_values( $data );
-
 			if ( isset( $saved[ $ticket_id ] ) && $saved[ $ticket_id ] !== $new[ $ticket_id ] ) {
 				// If there's already stored attendee meta for this ticket, add some more meta to that existing entry.
 				foreach ( $data as $meta_id => $meta_data ) {
@@ -197,7 +193,6 @@ class Tribe__Tickets_Plus__Meta__Storage {
 				$saved[ $ticket_id ] = $data;
 			}
 		}
-
 		return $saved;
 	}
 

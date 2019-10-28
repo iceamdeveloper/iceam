@@ -2713,7 +2713,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Renders the tabbed view header before the report.
 	 *
-	 * @param Tribe__Tickets__Tickets_Handler $handler
+	 * @param Tribe__Tickets__Attendees $handler
 	 */
 	public function render_tabbed_view( Tribe__Tickets__Attendees $handler ) {
 		$post = $handler->get_post();

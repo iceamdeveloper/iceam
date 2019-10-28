@@ -42714,13 +42714,14 @@ var template_RSVPActionDashboard = function (_PureComponent) {
 
 		_this.getActions = function () {
 			var _this$props = _this.props,
+			    created = _this$props.created,
 			    hasTicketsPlus = _this$props.hasTicketsPlus,
 			    hasRecurrenceRules = _this$props.hasRecurrenceRules,
 			    isLoading = _this$props.isLoading;
 
 
 			var actions = [wp.element.createElement(settings_action_button_container, null)];
-			if (hasTicketsPlus) {
+			if (created) {
 				actions.push(wp.element.createElement(attendees_action_button_container, null));
 			}
 			if (hasRecurrenceRules) {
@@ -43891,9 +43892,9 @@ var template_TicketsDashboardAction = function (_PureComponent) {
 
 			var actions = [wp.element.createElement(settings_container, null)];
 			if (hasCreatedTickets) {
-				if (hasTicketsPlus) {
-					actions.push(wp.element.createElement(attendees_container, null));
-				}
+
+				actions.push(wp.element.createElement(attendees_container, null));
+
 				if (hasOrdersPage) {
 					actions.push(wp.element.createElement(orders_container, null));
 				}
