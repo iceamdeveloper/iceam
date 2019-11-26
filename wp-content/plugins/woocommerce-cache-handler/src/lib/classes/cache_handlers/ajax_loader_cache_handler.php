@@ -159,6 +159,11 @@ class Ajax_Loader_Cache_Handler extends Base_Cache_Handler {
 		if(!empty($_REQUEST['product_ids']) && is_array($_REQUEST['product_ids'])) {
 			foreach($_REQUEST['product_ids'] as $product_id) {
 				$product = wc_get_product($product_id);
+				// Skip invalid products
+				// @since 1.0.11.191111
+				if(!$product instanceof \WC_Product) {
+					continue;
+				}
 				$product_prices_html[$product_id] = $product->get_price_html();
 			}
 		}

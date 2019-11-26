@@ -1,15 +1,16 @@
 <?php
+
 abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 
 	/**
 	 * @var array
 	 */
-	protected $active = array();
+	protected $active = [];
 
 	/**
 	 * @var array
 	 */
-	protected $query_search_options = array();
+	protected $query_search_options = [];
 
 	/**
 	 * Tribe__Tickets_Plus__APM__Abstract_Filter constructor.
@@ -18,13 +19,13 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 		$this->set_up_query_search_options();
 
 		$type = $this->type;
-		add_filter( 'tribe_custom_row' . $type, array( $this, 'form_row' ), 10, 4 );
-		add_filter( 'tribe_maybe_active' . $type, array( $this, 'maybe_set_active' ), 10, 3 );
-		add_action( 'tribe_after_parse_query', array( $this, 'parse_query' ), 10, 2 );
+		add_filter( 'tribe_custom_row' . $type, [ $this, 'form_row' ], 10, 4 );
+		add_filter( 'tribe_maybe_active' . $type, [ $this, 'maybe_set_active' ], 10, 3 );
+		add_action( 'tribe_after_parse_query', [ $this, 'parse_query' ], 10, 2 );
 
 		add_action(
 			'manage_' . Tribe__Events__Main::POSTTYPE . '_posts_custom_column',
-			array( $this, 'post_custom_column' ),
+			[ $this, 'post_custom_column' ],
 			10,
 			2
 		);
@@ -38,17 +39,18 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 	/**
 	 * Returns the markup to use for the row added to the filters.
 	 *
-	 * @param string $return The original output for the row.
-	 * @param string $key The filter identifying key.
-	 * @param arrray|string $value The current filter values.
-	 * @param bool $unused_filter Whether the filter is beind used or not.
+	 * @param string       $return        The original output for the row.
+	 * @param string       $key           The filter identifying key.
+	 * @param array|string $value         The current filter values.
+	 * @param bool         $unused_filter Whether the filter is being used or not.
 	 *
 	 * @return string
 	 */
 	public function form_row( $return, $key, $value, $unused_filter ) {
 		$value  = (array) $value;
 		$value  = wp_parse_args( $value,
-			array( 'is' => '', 'value' => '', $this->key() => true ) );
+			[ 'is' => '', 'value' => '', $this->key() => true ]
+		);
 		$return = tribe_select_field( 'is_' . $key, $this->query_search_options, $value['is'] );
 		$return .= sprintf( '<input name="%s" value="%s" type="text" />', $key, esc_attr( $value['value'] ) );
 
@@ -58,39 +60,55 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 	/**
 	 * Whether the filter should be set to active or not according to the current request.
 	 *
-	 * @param array $return The original return value.
-	 * @param string $key The filter identifying key.
-	 * @param array $filter An array of filter details.
+	 * @since 4.10.10 Account for 'unlimited' option (ignores, and therefore does not require, the text input value).
 	 *
-	 * @return array
+	 * @param array|false $return The original return value.
+	 * @param string      $key    The filter identifying key.
+	 * @param array       $filter An array of filter details.
+	 *
+	 * @return array|false
 	 */
 	public function maybe_set_active( $return, $key, $filter ) {
 		global $ecp_apm;
 
-		if ( isset( $_POST[ $key ] ) && isset( $_POST[ 'is_' . $key ] ) ) {
-			return array(
+		if (
+			isset( $_POST[ $key ] )
+			&& isset( $_POST[ 'is_' . $key ] )
+		) {
+			return [
 				'value'      => $_POST[ $key ],
 				'is'         => $_POST[ 'is_' . $key ],
 				$this->key() => true,
-			);
+			];
+		} elseif (
+			isset( $_POST[ $key ] )
+			&& 'unlimited' === $_POST[ $key ]
+		) {
+			return [
+				'value'      => $_POST[ $key ],
+				$this->key() => true,
+			];
 		}
 
 		$active_filters = $ecp_apm->filters->get_active();
 
-		if ( isset( $active_filters[ $key ] ) && isset( $active_filters[ 'is_' . $key ] ) ) {
-			return array(
+		if (
+			isset( $active_filters[ $key ] )
+			&& isset( $active_filters[ 'is_' . $key ] )
+		) {
+			return [
 				'value'      => $active_filters[ $key ],
 				'is'         => $active_filters[ 'is_' . $key ],
 				$this->key() => true,
-			);
+			];
 		}
 
 		return $return;
 	}
 
 	/**
-	 * Parses the current query and eventually hooks post results manipulation functions if the filter is active and
-	 * needs those.
+	 * Parses the current query and eventually hooks post results manipulation
+	 * functions if the filter is active and needs those.
 	 *
 	 * @param WP_Query $wp_query_current
 	 * @param array $active An array of active filters.
@@ -108,7 +126,7 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 			}
 		}
 
-		add_filter( 'posts_results', array( $this, 'filter_posts_results' ), 10, 1 );
+		add_filter( 'posts_results', [ $this, 'filter_posts_results' ], 10, 1 );
 	}
 
 	/**
@@ -122,13 +140,16 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 		global /** @var wpdb $wpdb */
 		$ecp_apm, $wpdb;
 		// run once
-		remove_filter( 'posts_results', array( $this, 'filter_posts_results' ), 10, 1 );
+		remove_filter( 'posts_results', [ $this, 'filter_posts_results' ], 10 );
 
 		foreach ( $this->active as $key => $active ) {
 			$constraint = $active['is'];
 			$value      = $active['value'];
 
-			if ( ! is_numeric( $value ) ) {
+			if ( 'unlimited' === $constraint ) {
+				$constraint = 'is';
+				$value      = -1;
+			} elseif ( ! is_numeric( $value ) ) {
 				continue;
 			}
 
@@ -163,6 +184,11 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 						unset( $posts[ $index ] );
 					}
 					break;
+				case 'unlimited':
+					if ( (int) $total_value !== -1 ) {
+						unset( $posts[ $index ] );
+					}
+					break;
 				case 'gte':
 					if ( $total_value < $value ) {
 						unset( $posts[ $index ] );
@@ -182,20 +208,39 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 	/**
 	 * Returns the value of the filter for a post.
 	 *
-	 * @param string $column A column identifier.
-	 * @param int $post_id
-	 *
-	 * @return int|void|WP_Error
+	 * @param string $column  A column identifier.
+	 * @param int    $post_id
 	 */
 	public function post_custom_column( $column, $post_id ) {
 		if ( $column !== $this->key() ) {
 			return;
 		}
 
-		echo esc_html( $this->get_total_value( $post_id ) );
+		$total_value = $this->get_total_value( $post_id, true );
+
+		if ( is_scalar( $total_value ) ) {
+			echo esc_html( $total_value );
+		}
 	}
 
 	/**
+	 * Returns the total numeric value of an event meta.
+	 *
+	 * E.g. the total tickets sales, stock.
+	 *
+	 * @since 4.10.10.
+	 *
+	 * @see tribe_tickets_get_readable_amount()
+	 * @see number_format_i18n()
+	 *
+	 * @param int|WP_Post $event
+	 * @param bool        $formatted_amount
+	 *
+	 * @return int|string|WP_Error
+	 */
+	public function get_total_value( $event, $formatted_amount = false ) {}
+
+		/**
 	 * Returns the filter identifying key.
 	 *
 	 * Workaround for missing late static binding.
@@ -203,5 +248,4 @@ abstract class Tribe__Tickets_Plus__APM__Abstract_Filter {
 	 * @return mixed
 	 */
 	abstract protected function key();
-
 }

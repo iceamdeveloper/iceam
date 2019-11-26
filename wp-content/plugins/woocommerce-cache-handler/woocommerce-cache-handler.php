@@ -3,13 +3,13 @@
 Plugin Name: WooCommerce Cache Handler
 Description: Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 Plugin URI: https://aelia.co
-Version: 1.0.10.190522
+Version: 1.0.11.191111
 Author: Aelia
 Author URI: https://aelia.co
 Text Domain: wc-cache-handler
 License: GPL-3.0
-WC requires at least: 2.4
-WC tested up to: 3.6.4
+WC requires at least: 3.0
+WC tested up to: 3.8.0
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/plugin-requirementscheck.php');
@@ -21,5 +21,5 @@ if(Cache_Handler_RequirementsChecks::factory()->check_requirements()) {
 	function woocommerce_cache_handler_check_for_updates() {
 		$GLOBALS['woocommerce-cache-handler']->check_for_updates(__FILE__);
 	}
-	add_action('admin_init', 'woocommerce_cache_handler_check_for_updates');
+	add_action('admin_init', 'woocommerce_cache_handler_check_for_updates', 5);
 }

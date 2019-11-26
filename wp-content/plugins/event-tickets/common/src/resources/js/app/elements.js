@@ -59838,8 +59838,8 @@ var element_ModalButton = function (_PureComponent) {
 			_this.props.isOpen === undefined && _this.setState({ isOpen: true });
 		};
 
-		_this.onRequestClose = function () {
-			_this.onClose();
+		_this.onRequestClose = function (e) {
+			_this.onClose(e);
 			_this.props.isOpen === undefined && _this.setState({ isOpen: false });
 		};
 
@@ -59847,8 +59847,16 @@ var element_ModalButton = function (_PureComponent) {
 			return _this.props.onOpen && _this.props.onOpen();
 		};
 
-		_this.onClose = function () {
-			return _this.props.onClose && _this.props.onClose();
+		_this.onClose = function (e) {
+			return _this.props.onClose && _this.props.onClose(e);
+		};
+
+		_this.preventClick = function (e) {
+			return e.stopPropagation();
+		};
+
+		_this.preventBlur = function (e) {
+			return e.stopPropagation();
 		};
 
 		_this.renderModal = function () {

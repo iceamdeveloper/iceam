@@ -12,7 +12,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.10.9';
+		const VERSION = '4.10.10';
 
 		/**
 		 * Min required Tickets Core version
@@ -98,6 +98,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->plugin_url  = plugins_url() . '/' . $this->plugin_dir;
 			$this->pue         = new Tribe__Tickets_Plus__PUE;
 
+			/** @see \Tribe__Events__Pro__Main::init_apm_filters() Is on priority 10. */
+			add_action( 'plugins_loaded', array( $this, 'apm_filters' ), 5 );
+
 			add_action( 'init', array( $this, 'init' ), 5 );
 
 			// CSV import needs to happen before P10@init but after P5@init
@@ -138,9 +141,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->tickets_view();
 			$this->qr();
 			$this->attendees_list();
-
-			$this->apm_filters();
-
 		}
 
 		/**
@@ -229,7 +229,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Object accessor method for APM filters.
 		 *
-		 * @return Tribe__Tickets_Plus__APM
+		 * @return null|Tribe__Tickets_Plus__APM
 		 */
 		public function apm_filters() {
 			if ( ! class_exists( 'Tribe_APM' ) ) {

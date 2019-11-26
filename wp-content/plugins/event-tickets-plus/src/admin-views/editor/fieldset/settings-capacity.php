@@ -1,11 +1,14 @@
 <?php
+/** @var Tribe__Tickets__Tickets_Handler $tickets_handler */
+$tickets_handler = tribe( 'tickets.handler' );
+
 $post_id                 = get_the_ID();
 $stock                   = Tribe__Tickets__Tickets::get_ticket_counts( $post_id );
-$shared_ticket_list      = tribe( 'tickets.handler' )->get_event_shared_tickets( $post_id );
-$independent_ticket_list = tribe( 'tickets.handler' )->get_event_independent_tickets( $post_id );
-$unlimited_ticket_list   = tribe( 'tickets.handler' )->get_event_unlimited_tickets( $post_id );
-$rsvp_ticket_list        = tribe( 'tickets.handler' )->get_event_rsvp_tickets( $post_id );
-$total_capacity          = tribe( 'tickets.handler' )->get_total_event_capacity( $post_id );
+$shared_ticket_list      = $tickets_handler->get_event_shared_tickets( $post_id );
+$independent_ticket_list = $tickets_handler->get_event_independent_tickets( $post_id );
+$unlimited_ticket_list   = $tickets_handler->get_event_unlimited_tickets( $post_id );
+$rsvp_ticket_list        = $tickets_handler->get_event_rsvp_tickets( $post_id );
+$total_capacity          = $tickets_handler->get_total_event_capacity( $post_id );
 $total_shared_tickets    = tribe_tickets_get_capacity( $post_id );
 ?>
 <table id="tribe_expanded_capacity_table" summary="capacity table" class="eventtable ticket_list tribe-tickets-editor-capacity-table eventForm tribe-tickets-editor-table striped fixed">
@@ -64,7 +67,7 @@ $total_shared_tickets    = tribe_tickets_get_capacity( $post_id );
 	<tr class="tribe-tickets-editor-table-row tribe-tickets-editor-table-row-capacity-unlimited">
 		<td><?php esc_html_e( 'Unlimited Capacity:', 'event-tickets-plus' ); ?></td>
 		<td>
-			<?php echo esc_html( tribe( 'tickets.handler' )->unlimited_term ); ?>
+			<?php echo esc_html( $tickets_handler->unlimited_term ); ?>
 		</td>
 		<td>
 			<?php if ( ! empty( $unlimited_ticket_list ) ) : ?>

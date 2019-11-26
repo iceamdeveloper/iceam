@@ -1,62 +1,38 @@
 <?php
 /*
- * Plugin Name: Sensei Course Progress
- * Version: 1.0.6
- * Plugin URI: http://www.woothemes.com/
- * Description: Sensei extension that displays the learner's progress in the current course/module in a widget on lesson pages.
- * Author: WooThemes
- * Author URI: http://www.woothemes.com/
- * Requires at least: 3.8
- * Tested up to: 4.3
+ * Plugin Name: Sensei LMS Course Progress
+ * Version: 2.0.1
+ * Plugin URI: https://woocommerce.com/products/sensei-course-progress/
+ * Description: Sensei LMS extension that displays the student's progress in the current course/module in a widget on lesson pages.
+ * Author: Automattic
+ * Author URI: https://automattic.com
+ * Requires at least: 4.9
+ * Requires PHP: 5.6
+ * Tested up to: 5.3
+ * Woo: 435833:ec0f55d8fa7c517dc1844f5c873a77da
  *
  * @package WordPress
- * @author WooThemes
+ * @author Automattic
  * @since 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * Required functions
- */
-if ( ! function_exists( 'woothemes_queue_update' ) ) {
-	require_once( 'woo-includes/woo-functions.php' );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-/**
- * Plugin updates
- */
-woothemes_queue_update( plugin_basename( __FILE__ ), 'ec0f55d8fa7c517dc1844f5c873a77da', 435833 );
+define( 'SENSEI_COURSE_PROGRESS_VERSION', '2.0.1' );
+define( 'SENSEI_COURSE_PROGRESS_PLUGIN_FILE', __FILE__ );
+define( 'SENSEI_COURSE_PROGRESS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-/**
- * Functions used by plugins
- */
-if ( ! class_exists( 'WooThemes_Sensei_Dependencies' ) ) {
-	require_once 'woo-includes/class-woothemes-sensei-dependencies.php';
+require_once dirname( __FILE__ ) . '/includes/class-sensei-course-progress-dependency-checker.php';
+
+if ( ! Sensei_Course_Progress_Dependency_Checker::are_system_dependencies_met() ) {
+	return;
 }
 
-/**
- * Sensei Detection
- */
-if ( ! function_exists( 'is_sensei_active' ) ) {
-  function is_sensei_active() {
-    return WooThemes_Sensei_Dependencies::sensei_active_check();
-  }
-}
+require_once dirname( __FILE__ ) . '/includes/class-sensei-course-progress.php';
 
-if( is_sensei_active() ) {
+// Load the plugin after all the other plugins have loaded.
+add_action( 'plugins_loaded', array( 'Sensei_Course_Progress', 'init' ), 5 );
 
-	require_once( 'includes/class-sensei-course-progress.php' );
-
-	/**
-	 * Returns the main instance of Sensei_Course_Progress to prevent the need to use globals.
-	 *
-	 * @since  1.0.0
-	 * @return object Sensei_Course_Progress
-	 */
-	function Sensei_Course_Progress() {
-		return Sensei_Course_Progress::instance( __FILE__, '1.0.6' );
-	}
-
-	Sensei_Course_Progress();
-}
+Sensei_Course_Progress::instance();

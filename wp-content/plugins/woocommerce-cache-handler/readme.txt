@@ -5,8 +5,8 @@ Requires at least: 4.0
 Tested up to: 4.8
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-WC requires at least: 2.4
-WC tested up to: 3.1.2
+WC requires at least: 3.0
+WC tested up to: 3.8.0
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
@@ -40,6 +40,10 @@ For more information about installation and management of plugins, please refer 
 1. **Settings > Options**. Miscellaneous options.
 
 == Changelog ==
+
+= 1.0.11.191111 =
+* Tweak - Added check in Ajax Loader, to ensure that only valid product ID are handled.
+* Updated supported WooCommerce versions.
 
 = 1.0.10.190522 =
 * Updated supported WooCommerce versions.

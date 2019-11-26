@@ -27,10 +27,10 @@ class Tribe__Tickets_Plus__APM {
 	 * Tribe__Tickets_Plus__APM constructor.
 	 */
 	public function __construct() {
-		add_action( 'tribe_events_pro_init_apm_filters', array( $this, 'init_apm_filters' ), 9 );
-		add_filter( 'tribe_events_pro_apm_filters_fallback_columns', array( $this, 'fallback_columns' ) );
-		add_filter( 'tribe_events_pro_apm_filters_args', array( $this, 'filter_args' ) );
-		add_filter( 'tribe_apm_column_headers', array( $this, 'column_headers' ) );
+		add_action( 'tribe_events_pro_init_apm_filters', [ $this, 'init_apm_filters' ], 9 );
+		add_filter( 'tribe_events_pro_apm_filters_fallback_columns', [ $this, 'fallback_columns' ] );
+		add_filter( 'tribe_events_pro_apm_filters_args', [ $this, 'filter_args' ] );
+		add_filter( 'tribe_apm_column_headers', [ $this, 'column_headers' ] );
 	}
 
 	/**
@@ -63,17 +63,19 @@ class Tribe__Tickets_Plus__APM {
 	 * @return array The modified filter arguments.
 	 */
 	public function filter_args( array $filter_args ) {
-		$filter_args[ Tribe__Tickets_Plus__APM__Sales_Filter::$key ] = array(
+		$filter_args[ Tribe__Tickets_Plus__APM__Sales_Filter::$key ] = [
 			'name'        => esc_html__( 'Ticket Sales', 'event-tickets-plus' ),
 			'custom_type' => 'custom_ticket_sales',
 			'sortable'    => 'true',
-		);
+			'cast'        => 'NUMERIC',
+		];
 
-		$filter_args[ Tribe__Tickets_Plus__APM__Stock_Filter::$key ] = array(
+		$filter_args[ Tribe__Tickets_Plus__APM__Stock_Filter::$key ] = [
 			'name'        => esc_html__( 'Ticket Stock', 'event-tickets-plus' ),
 			'custom_type' => 'custom_ticket_stock',
 			'sortable'    => 'true',
-		);
+			'cast'        => 'NUMERIC',
+		];
 
 		return $filter_args;
 	}
@@ -85,7 +87,7 @@ class Tribe__Tickets_Plus__APM {
 	 *
 	 * @return array
 	 */
-	public function column_headers( array $headers = array() ) {
+	public function column_headers( array $headers = [] ) {
 		$headers[ Tribe__Tickets_Plus__APM__Sales_Filter::$key ] = __( 'Sales', 'event-tickets-plus' );
 		$headers[ Tribe__Tickets_Plus__APM__Stock_Filter::$key ] = __( 'Stock', 'event-tickets-plus' );
 

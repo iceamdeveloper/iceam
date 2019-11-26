@@ -3,8 +3,8 @@
 Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, barry.hughes, bordoni, borkweb, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.7
-Tested up to: 5.2
-Stable tag: 4.10.9
+Tested up to: 5.3
+Stable tag: 4.10.10
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,16 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.10.10] 2019-11-13 =
+
+* Feature - Added an 'Unlimited' drop-down option to the Stock filter for Advanced Post Manager to avoid having to manually filter by '-1' [123365]
+* Feature - Stock and Sales values for Advanced Post Manager now display as formatted numbers (such as 'Unlimited' instead of '-1' stock and '2,520' instead of '2520' sales)
+* Fix - Adjust Stock and Sales filter values for Advanced Post Manager display [123365]
+* Fix - Avoid potential PHP fatal errors with Advanced Post Manager [120782]
+* Fix - Correct display value for Advanced Post Manager's Stock column for events with Global Stock [73766]
+* Fix - Unlimited stock events now appear when searching "Ticket Stock is at least ..." [73766]
+* Language - 0 new strings added, 16 updated, 0 fuzzied, and 0 obsoleted
 
 = [4.10.9] 2019-10-14 =
 

@@ -35142,16 +35142,10 @@ function baseClone(value, bitmask, customizer, key, object, stack) {
     value.forEach(function(subValue) {
       result.add(baseClone(subValue, bitmask, customizer, subValue, value, stack));
     });
-
-    return result;
-  }
-
-  if (isMap(value)) {
+  } else if (isMap(value)) {
     value.forEach(function(subValue, key) {
       result.set(key, baseClone(subValue, bitmask, customizer, key, value, stack));
     });
-
-    return result;
   }
 
   var keysFunc = isFull
@@ -42188,8 +42182,10 @@ var attendee_registration_container_mapDispatchToProps = function mapDispatchToP
 		onClick: function onClick() {
 			dispatch(rsvp["a" /* actions */].setRSVPIsModalOpen(true));
 		},
-		onClose: function onClose() {
-			dispatch(rsvp["a" /* actions */].setRSVPIsModalOpen(false));
+		onClose: function onClose(e) {
+			if (!e.target.classList.contains('components-modal__content')) {
+				dispatch(rsvp["a" /* actions */].setRSVPIsModalOpen(ownProps.clientId, false));
+			}
 		},
 		onIframeLoad: function onIframeLoad(iframe) {
 			var iframeWindow = iframe.contentWindow;
@@ -46754,8 +46750,14 @@ var attendees_registration_container_mapDispatchToProps = function mapDispatchTo
 		onClick: function onClick() {
 			dispatch(ticket["a" /* actions */].setTicketIsModalOpen(ownProps.clientId, true));
 		},
-		onClose: function onClose() {
-			dispatch(ticket["a" /* actions */].setTicketIsModalOpen(ownProps.clientId, false));
+		onClose: function onClose(e) {
+			if (!e.target.classList.contains('components-modal__content')) {
+				dispatch(ticket["a" /* actions */].setTicketIsModalOpen(ownProps.clientId, false));
+			}
+
+			if (e.type === 'click' && e.target.classList.contains('components-modal__screen-overlay')) {
+				dispatch(ticket["a" /* actions */].setTicketIsModalOpen(ownProps.clientId, false));
+			}
 		},
 		onIframeLoad: function onIframeLoad(iframe) {
 			var iframeWindow = iframe.contentWindow;
