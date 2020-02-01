@@ -226,6 +226,18 @@ jQuery(document).ready(function(){
         $status_selector.on("change", thingsy);
     }
 
+    //block russian emails
+    if(jQuery('#buddypress #signup_form').length){
+    	const submitButton = jQuery('#signup_submit');
+    	let email;
+    	jQuery('#signup_email').blur(function(){
+    		email = jQuery('#signup_email').val();
+    		if( email.substring(email.length-3,email.length) === '.ru' ){
+	    		submitButton.attr('disabled',true);
+    		}
+    	})
+    }
+
 	
 });
 
