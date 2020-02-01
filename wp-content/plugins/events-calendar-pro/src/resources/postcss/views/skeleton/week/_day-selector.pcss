@@ -8,14 +8,14 @@
 		padding-bottom: var(--spacer-3);
 		position: relative;
 
-		@media (--viewport-medium) {
+		.tribe-common--breakpoint-medium& {
 			@mixin hidden;
 		}
 	}
 
 	.tribe-events-pro-week-day-selector__days-list {
 		display: flex;
-		margin: 0 var(--spacer-2);
+		margin: 0 var(--spacer-3);
 	}
 
 	.tribe-events-pro-week-day-selector__days-list-item {
@@ -54,17 +54,17 @@
 
 	.tribe-events-pro-week-day-selector__prev,
 	.tribe-events-pro-week-day-selector__next {
-		background: center / contain no-repeat;
+		background: center / 9px 14px no-repeat;
 		display: block;
-		height: 14px;
+		height: 38px;
 		position: absolute;
 		transform: translateY(-50%);
-		width: 9px;
+		width: 24px;
 	}
 
 	.tribe-events-pro-week-day-selector__prev {
 		background-image: svg-inline(caret-left-secondary);
-		left: 0;
+		left: calc(var(--spacer-1) * -1);
 
 		&:hover,
 		&:focus {
@@ -74,7 +74,7 @@
 
 	.tribe-events-pro-week-day-selector__next {
 		background-image: svg-inline(caret-right-secondary);
-		right: 0;
+		right: calc(var(--spacer-1) * -1);
 
 		&:hover,
 		&:focus {

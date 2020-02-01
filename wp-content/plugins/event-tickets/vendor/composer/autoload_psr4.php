@@ -6,8 +6,8 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Tribe\\Tickets\\Events\\Views\\' => array($baseDir . '/tests/views_integration/Tribe/Tickets/Events/Views'),
+    'Tribe\\Tickets\\' => array($baseDir . '/src/Tribe'),
     'Tribe\\Tests\\Tickets\\' => array($baseDir . '/tests/_support'),
     'Tribe\\Tests\\Modules\\Tickets\\' => array($baseDir . '/tests/_support/Modules'),
-    'Tribe\\Events\\Tickets\\Views\\' => array($baseDir . '/tests/views_integration/Tribe/Events/Tickets/Views'),
-    'Tribe\\Events\\Tickets\\' => array($baseDir . '/src/Tribe'),
 );

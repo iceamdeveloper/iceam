@@ -3,13 +3,13 @@
  * View: Week View Type Separator
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/mobile-events/day/type-separator.php
+ * [your-theme]/tribe/events-pro/v2/week/mobile-events/day/type-separator.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  * @var string $type The type of separator, one of `ongoing` or `all_day`.
  */

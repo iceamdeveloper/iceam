@@ -48,6 +48,42 @@ tribe.events.views.mapEventsScroller = {};
 	};
 
 	/**
+	 * Scroll to element
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param {jQuery} $container jQuery object of view container.
+	 * @param {jQuery} $element   jQuery object of element to scroll to.
+	 *
+	 * @return {void}
+	 */
+	obj.scrollTo = function( $container, $element ) {
+		var $wrapper = $container.find( obj.selectors.mapEventCardsWrapperClass );
+		var offset = $element.offset().top - $wrapper.offset().top + $wrapper.scrollTop();
+		$wrapper.animate( { scrollTop: offset }, 'fast' );
+	};
+
+	/**
+	 * Check whether element is within view of scroller
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param {jQuery} $container jQuery object of view container.
+	 * @param {jQuery} $element   jQuery object of element to scroll to.
+	 *
+	 * @return {bool}
+	 */
+	obj.isWithinScrollView = function( $container, $element ) {
+		var $wrapper = $container.find( obj.selectors.mapEventCardsWrapperClass );
+
+		// calculate offsets, all offset should be positive or 0 to be within scroller view
+		var offsetTop = $element.offset().top - $wrapper.offset().top;
+		var offsetBottom = $wrapper.offset().top + $wrapper.height() - $element.offset().top - $element.height();
+
+		return 0 <= offsetTop && 0 <= offsetBottom;
+	};
+
+	/**
 	 * Deinitialize scroller
 	 *
 	 * @since 4.7.7
@@ -99,6 +135,7 @@ tribe.events.views.mapEventsScroller = {};
 	obj.deinit = function( event, jqXHR, settings ) {
 		var $container = event.data.container;
 		obj.deinitScroller( $container );
+		$container.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit );
 	};
 
 	/**

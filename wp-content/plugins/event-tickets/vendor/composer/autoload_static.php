@@ -4,19 +4,27 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7c2997ea5600be5982b22ee066bf5b5a
+class ComposerStaticInit075ecd0be984ecfcf342e6a5a462e28d
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
         array (
+            'Tribe\\Tickets\\Events\\Views\\' => 27,
+            'Tribe\\Tickets\\' => 14,
             'Tribe\\Tests\\Tickets\\' => 20,
             'Tribe\\Tests\\Modules\\Tickets\\' => 28,
-            'Tribe\\Events\\Tickets\\Views\\' => 27,
-            'Tribe\\Events\\Tickets\\' => 21,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'Tribe\\Tickets\\Events\\Views\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Tickets/Events/Views',
+        ),
+        'Tribe\\Tickets\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/Tribe',
+        ),
         'Tribe\\Tests\\Tickets\\' => 
         array (
             0 => __DIR__ . '/../..' . '/tests/_support',
@@ -25,29 +33,24 @@ class ComposerStaticInit7c2997ea5600be5982b22ee066bf5b5a
         array (
             0 => __DIR__ . '/../..' . '/tests/_support/Modules',
         ),
-        'Tribe\\Events\\Tickets\\Views\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Tickets/Views',
-        ),
-        'Tribe\\Events\\Tickets\\' => 
-        array (
-            0 => __DIR__ . '/../..' . '/src/Tribe',
-        ),
     );
 
     public static $classMap = array (
-        'Tribe\\Events\\Tickets\\Views\\V2\\Hooks' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Hooks.php',
-        'Tribe\\Events\\Tickets\\Views\\V2\\Models\\Tickets' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Models/Tickets.php',
-        'Tribe\\Events\\Tickets\\Views\\V2\\Partials\\Day_View\\Event\\CostTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Tickets/Views/V2/Partials/Day_View/Event/CostTest.php',
-        'Tribe\\Events\\Tickets\\Views\\V2\\Service_Provider' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Service_Provider.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Hooks' => __DIR__ . '/../..' . '/src/Tribe/Events/Views/V2/Hooks.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Models\\Tickets' => __DIR__ . '/../..' . '/src/Tribe/Events/Views/V2/Models/Tickets.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\Day_View\\Event\\CostTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/Day_View/Event/CostTest.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\List_View\\Event\\CostTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/List_View/Event/CostTest.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\Month_View\\Calendar_Body\\Day\\Calendar_Events\\Calendar_Event\\Tooltip\\CostTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/Month_View/Calendar_Body/Day/Calendar_Events/Calendar_Event/Tooltip/CostTest.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\Month_View\\Mobile_Events\\Mobile_Day\\Mobile_Event\\CostTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/Month_View/Mobile_Events/Mobile_Day/Mobile_Event/CostTest.php',
+        'Tribe\\Tickets\\Events\\Views\\V2\\Service_Provider' => __DIR__ . '/../..' . '/src/Tribe/Events/Views/V2/Service_Provider.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7c2997ea5600be5982b22ee066bf5b5a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7c2997ea5600be5982b22ee066bf5b5a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit7c2997ea5600be5982b22ee066bf5b5a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit075ecd0be984ecfcf342e6a5a462e28d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit075ecd0be984ecfcf342e6a5a462e28d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit075ecd0be984ecfcf342e6a5a462e28d::$classMap;
 
         }, null, ClassLoader::class);
     }

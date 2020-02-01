@@ -222,6 +222,7 @@ tribe.events.views.mapEvents = {};
 		var $container = event.data.container;
 		obj.deinitMap( $container );
 		obj.unbindEvents( $container );
+		$container.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit );
 	};
 
 	/**

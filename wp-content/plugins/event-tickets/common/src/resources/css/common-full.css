@@ -223,6 +223,24 @@
 		border-radius: 0;
 	}
 
+.tribe-theme-twentytwenty .tribe-common {
+
+	/* -------------------------------------------------------------------------
+	 * Reset Full Theme Overrides - Twenty Twenty
+	 * ------------------------------------------------------------------------- */
+	background-color: #FFFFFF;
+	letter-spacing: normal;
+}
+
+.tribe-theme-twentytwenty .tribe-common input,
+	.tribe-theme-twentytwenty .tribe-common textarea {
+		letter-spacing: normal;
+	}
+
+.tribe-theme-twentytwenty .tribe-common * {
+		word-break: normal;
+	}
+
 /* Utilities */
 
 /* -----------------------------------------------------------------------------
@@ -362,6 +380,10 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - Link
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - List
  * ----------------------------------------------------------------------------- */
 
@@ -370,7 +392,15 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - Mail
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - Map
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Map pin
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
@@ -383,6 +413,10 @@
 
 /* -----------------------------------------------------------------------------
  * SVG - No Map
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Phone
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
@@ -835,6 +869,7 @@
 			margin: 5px 0;
 			padding: 0;
 			position: relative;
+			-webkit-transition: background-color 0.2s ease;
 			transition: background-color 0.2s ease;
 			background-color: #334AFF;
 		}
@@ -846,6 +881,7 @@
 			margin: 5px 0;
 			padding: 0;
 			position: relative;
+			-moz-transition: background-color 0.2s ease;
 			transition: background-color 0.2s ease;
 			background-color: #334AFF;
 		}
@@ -962,7 +998,22 @@
 		border-bottom: 1px solid #D5D5D5;
 	}
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-form-control-text__input {
+			color: #141827;
+			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.62;
+			font-weight: 400;
+
+			border: 0;
+		}
+
 .tribe-common .tribe-common-form-control-text__input::-webkit-input-placeholder {
+			color: #727272;
+			font-style: normal;
+		}
+
+.tribe-common .tribe-common-form-control-text__input::-moz-placeholder {
 			color: #727272;
 			font-style: normal;
 		}
@@ -996,6 +1047,14 @@
 		}
 
 /* -------------------------------------------------------------------------
+	 * Theme Overrides - Twenty Twenty
+	 * ------------------------------------------------------------------------- */
+
+.tribe-theme-twentytwenty .tribe-common .tribe-common-form-control-text__input {
+			line-height: inherit;
+		}
+
+/* -------------------------------------------------------------------------
 	 * Theme Overrides - Enfold
 	 * ------------------------------------------------------------------------- */
 
@@ -1014,6 +1073,16 @@
 				border-bottom-color: #141827;
 				box-shadow: none;
 			}
+
+#top.tribe-theme-enfold .tribe-common.tribe-common--breakpoint-medium .tribe-common-form-control-text__input {
+			color: #141827;
+			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.62;
+			font-weight: 400;
+
+			border: 0;
+		}
 
 .tribe-common {
 
@@ -1065,6 +1134,7 @@
 		margin: 5px 0;
 		padding: 0;
 		position: relative;
+		-webkit-transition: background-color 0.2s ease;
 		transition: background-color 0.2s ease;
 
 		-webkit-appearance: none;
@@ -1088,6 +1158,7 @@
 			left: 0;
 			position: absolute;
 			top: -5px;
+			-webkit-transition: -webkit-transform 0.2s ease;
 			transition: -webkit-transform 0.2s ease;
 			transition: transform 0.2s ease;
 			transition: transform 0.2s ease, -webkit-transform 0.2s ease;
@@ -1198,7 +1269,8 @@
 		 * Theme Overrides - Twenty Nineteen
 		 * ------------------------------------------------------------------------- */
 
-.tribe-theme-twentynineteen .entry .tribe-common a {
+.tribe-theme-twentynineteen .tribe-common a,
+		.tribe-theme-twentynineteen .entry .tribe-common a {
 			text-decoration: none;
 		}
 
@@ -1215,6 +1287,7 @@
 
 .tribe-common .tribe-common-anchor {
 		border-bottom: 2px solid transparent;
+		-webkit-transition: border-color 0.2s ease;
 		transition: border-color 0.2s ease;
 	}
 
@@ -1227,6 +1300,7 @@
 .tribe-common .tribe-common-anchor-alt {
 		border-bottom: 2px solid #334AFF;
 		color: #141827;
+		-webkit-transition: color 0.2s ease;
 		transition: color 0.2s ease;
 	}
 
@@ -1239,6 +1313,7 @@
 
 .tribe-common .tribe-common-anchor-thin {
 		border-bottom: 1px solid transparent;
+		-webkit-transition: border-color 0.2s ease;
 		transition: border-color 0.2s ease;
 	}
 
@@ -1269,6 +1344,11 @@
 		line-height: 1.62;
 	}
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-b1 {
+			font-size: 16px;
+			line-height: 1.62;
+		}
+
 /* -------------------------------------------------------------------------
 	 *
 	 * Body
@@ -1294,6 +1374,11 @@
 		line-height: 1.38;
 	}
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-b2 {
+			font-size: 14px;
+			line-height: 1.62;
+		}
+
 .tribe-common .tribe-common-b2--bold {
 		font-weight: 700;
 	}
@@ -1310,6 +1395,11 @@
 		line-height: 1.5;
 	}
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-b3 {
+			font-size: 12px;
+			line-height: 1.38;
+		}
+
 .tribe-common .tribe-common-b3--bold {
 		font-weight: 700;
 	}
@@ -1318,13 +1408,28 @@
 	 * Body 1 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-b1--min-medium {
+			font-size: 16px;
+			line-height: 1.62;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Body 2 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-b2--min-medium {
+			font-size: 14px;
+			line-height: 1.62;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Body 3 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-b3--min-medium {
+			font-size: 12px;
+			line-height: 1.38;
+		}
 
 .tribe-common {
 
@@ -1353,6 +1458,7 @@
 		font-weight: 400;
 		font-weight: 700;
 		border-bottom: 2px solid transparent;
+		-webkit-transition: border-color 0.2s ease;
 		transition: border-color 0.2s ease;
 	}
 
@@ -1365,6 +1471,7 @@
 .tribe-common .tribe-common-cta--alt {
 		border-bottom: 2px solid #334AFF;
 		color: #141827;
+		-webkit-transition: color 0.2s ease;
 		transition: color 0.2s ease;
 	}
 
@@ -1378,6 +1485,7 @@
 .tribe-common .tribe-common-cta--thin-alt {
 		border-bottom: 1px solid #334AFF;
 		color: #141827;
+		-webkit-transition: color 0.2s ease;
 		transition: color 0.2s ease;
 	}
 
@@ -1428,6 +1536,11 @@
 		line-height: 1.42;
 	}
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h1 {
+			font-size: 42px;
+			line-height: 1.38;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Heading: h2
 	 * ------------------------------------------------------------------------- */
@@ -1439,6 +1552,11 @@
 		font-size: 24px;
 		line-height: 1.42;
 	}
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h2 {
+			font-size: 32px;
+			line-height: 1.38;
+		}
 
 /* -------------------------------------------------------------------------
 	 * Heading: h3
@@ -1452,6 +1570,11 @@
 		line-height: 1.5;
 	}
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h3 {
+			font-size: 28px;
+			line-height: 1.42;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Heading: h4
 	 * ------------------------------------------------------------------------- */
@@ -1463,6 +1586,11 @@
 		font-size: 20px;
 		line-height: 1.42;
 	}
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h4 {
+			font-size: 24px;
+			line-height: 1.42;
+		}
 
 /* -------------------------------------------------------------------------
 	 * Heading: h5
@@ -1487,6 +1615,11 @@
 		font-size: 16px;
 		line-height: 1.5;
 	}
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h6 {
+			font-size: 16px;
+			line-height: 1.62;
+		}
 
 /* -------------------------------------------------------------------------
 	 * Heading: h7
@@ -1516,21 +1649,46 @@
 	 * Heading: h3 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h3--min-medium {
+			font-size: 28px;
+			line-height: 1.42;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Heading: h4 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h4--min-medium {
+			font-size: 24px;
+			line-height: 1.42;
+		}
 
 /* -------------------------------------------------------------------------
 	 * Heading: h5 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h5--min-medium {
+			font-size: 18px;
+			line-height: 1.5;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Heading: h6 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
 
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h6--min-medium {
+			font-size: 16px;
+			line-height: 1.62;
+		}
+
 /* -------------------------------------------------------------------------
 	 * Heading: h7 for --viewport-medium
 	 * ------------------------------------------------------------------------- */
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-h7--min-medium {
+			font-size: 14px;
+			line-height: 1.62;
+		}
 
 /* -------------------------------------------------------------------------
 	 * Heading: alt style
@@ -1556,6 +1714,11 @@
 			line-height: 1.42;
 		}
 
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h1 {
+			font-size: 42px;
+			line-height: 1.38;
+		}
+
 /* -------------------------------------------------------------------------
 		 * Heading: h2
 		 * ------------------------------------------------------------------------- */
@@ -1566,6 +1729,11 @@
 			font-weight: 700;
 			font-size: 24px;
 			line-height: 1.42;
+		}
+
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h2 {
+			font-size: 32px;
+			line-height: 1.38;
 		}
 
 /* -------------------------------------------------------------------------
@@ -1580,6 +1748,11 @@
 			line-height: 1.5;
 		}
 
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h3 {
+			font-size: 28px;
+			line-height: 1.42;
+		}
+
 /* -------------------------------------------------------------------------
 		 * Heading: h4
 		 * ------------------------------------------------------------------------- */
@@ -1589,6 +1762,11 @@
 			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 			font-weight: 700;
 			font-size: 20px;
+			line-height: 1.42;
+		}
+
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h4 {
+			font-size: 24px;
 			line-height: 1.42;
 		}
 
@@ -1614,6 +1792,11 @@
 			font-weight: 700;
 			font-size: 16px;
 			line-height: 1.5;
+		}
+
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h6 {
+			font-size: 16px;
+			line-height: 1.62;
 		}
 
 /* -------------------------------------------------------------------------
@@ -1644,21 +1827,46 @@
 		 * Heading: h3 for --viewport-medium
 		 * ------------------------------------------------------------------------- */
 
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h3--min-medium {
+			font-size: 28px;
+			line-height: 1.42;
+		}
+
 /* -------------------------------------------------------------------------
 		 * Heading: h4 for --viewport-medium
 		 * ------------------------------------------------------------------------- */
+
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h4--min-medium {
+			font-size: 24px;
+			line-height: 1.42;
+		}
 
 /* -------------------------------------------------------------------------
 		 * Heading: h5 for --viewport-medium
 		 * ------------------------------------------------------------------------- */
 
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h5--min-medium {
+			font-size: 18px;
+			line-height: 1.5;
+		}
+
 /* -------------------------------------------------------------------------
 		 * Heading: h6 for --viewport-medium
 		 * ------------------------------------------------------------------------- */
 
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h6--min-medium {
+			font-size: 16px;
+			line-height: 1.62;
+		}
+
 /* -------------------------------------------------------------------------
 		 * Heading: h7 for --viewport-medium
 		 * ------------------------------------------------------------------------- */
+
+.tribe-theme-avada #main .tribe-common.tribe-common--breakpoint-medium .tribe-common-h7--min-medium {
+			font-size: 14px;
+			line-height: 1.62;
+		}
 
 /* -------------------------------------------------------------------------
 		 * Heading: alt style
@@ -1678,15 +1886,6 @@
 	 * Lists: Theme Overrides
 	 *
 	 * ----------------------------------------------------------------------------- */
-}
-
-.tribe-common {
-
-	/* -------------------------------------------------------------------------
-	 *
-	 * Button: Theme Overrides
-	 *
-	 * ------------------------------------------------------------------------- */
 }
 
 /* -------------------------------------------------------------------------
@@ -1710,6 +1909,22 @@
 .tribe-theme-twentyseventeen .tribe-common button:hover,
 			.tribe-theme-twentyseventeen .tribe-common button:focus {
 				background-color: transparent;
+			}
+
+/* -------------------------------------------------------------------------
+	 *
+	 * Button: Theme Overrides
+	 *
+	 * ------------------------------------------------------------------------- */
+
+.tribe-theme-twentytwenty .tribe-common button {
+			background-color: transparent;
+			text-transform: inherit;
+		}
+
+.tribe-theme-twentytwenty .tribe-common button:hover,
+			.tribe-theme-twentytwenty .tribe-common button:focus {
+				text-decoration: none;
 			}
 
 /* .tribe-common { */
@@ -1801,6 +2016,7 @@
 		border: 1px solid #D5D5D5;
 		border-radius: 4px;
 		text-align: center;
+		-webkit-transition: color 0.2s ease, border-color 0.2s ease;
 		transition: color 0.2s ease, border-color 0.2s ease;
 
 		color: #727272;
@@ -1817,6 +2033,10 @@
 .tribe-common .tribe-common-c-btn-border:active, .tribe-common a.tribe-common-c-btn-border:active {
 		border-color: #141827;
 	}
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-c-btn-border, .tribe-common--breakpoint-medium.tribe-common a.tribe-common-c-btn-border {
+			padding: 6px 15px;
+		}
 
 .tribe-common .tribe-common-c-btn-border:active,
 		.tribe-common .tribe-common-c-btn-border:focus,
@@ -1897,10 +2117,14 @@
 .tribe-common .tribe-common-c-btn-icon--border {
 		background-color: #FFFFFF;
 		border: 1px solid #D5D5D5;
-		align-items: center;
+		-webkit-box-align: center;
+		        align-items: center;
+		display: -webkit-inline-box;
 		display: inline-flex;
 		height: 56px;
-		justify-content: center;
+		-webkit-box-pack: center;
+		        justify-content: center;
+		-webkit-transition: none;
 		transition: none;
 		width: 56px;
 	}
@@ -1959,11 +2183,17 @@
 		border-radius: 4px;
 		color: #FFFFFF;
 		text-align: center;
+		-webkit-transition: background-color 0.2s ease;
 		transition: background-color 0.2s ease;
 
-		padding: 11px 20px 11px;
 		background-color: #334AFF;
+		padding: 11px 20px 11px;
+		width: 100%;
 	}
+
+.tribe-common--breakpoint-medium.tribe-common .tribe-common-c-btn, .tribe-common--breakpoint-medium.tribe-common a.tribe-common-c-btn {
+			width: auto;
+		}
 
 .tribe-common .tribe-common-c-btn:focus,
 		.tribe-common .tribe-common-c-btn:hover,
@@ -1986,6 +2216,20 @@
 
 .tribe-theme-twentyseventeen .tribe-common .tribe-common-c-btn:hover,
 			.tribe-theme-twentyseventeen .tribe-common .tribe-common-c-btn:focus {
+				background-color: rgba(51,74,255, 0.8);
+				color: #FFFFFF;
+			}
+
+/* -------------------------------------------------------------------------
+	 * Theme Overrides - Twenty Twenty
+	 * ------------------------------------------------------------------------- */
+
+.tribe-theme-twentytwenty .tribe-common .tribe-common-c-btn {
+			background-color: #334AFF;
+		}
+
+.tribe-theme-twentytwenty .tribe-common .tribe-common-c-btn:hover,
+			.tribe-theme-twentytwenty .tribe-common .tribe-common-c-btn:focus {
 				background-color: rgba(51,74,255, 0.8);
 				color: #FFFFFF;
 			}
@@ -2063,161 +2307,3 @@
 
 		100% {}
 	}
-
-@media (min-width: 768px) {
-
-.tribe-common .tribe-common-form-control-text__input {
-			color: #141827;
-			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-			font-size: 14px;
-			line-height: 1.62;
-			font-weight: 400;
-
-			border: 0
-	}
-
-#top.tribe-theme-enfold .tribe-common .tribe-common-form-control-text__input {
-				color: #141827;
-				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-				font-size: 14px;
-				line-height: 1.62;
-				font-weight: 400;
-
-				border: 0
-		}
-
-.tribe-common .tribe-common-b1 {
-			font-size: 16px;
-			line-height: 1.62
-	}
-
-.tribe-common .tribe-common-b2 {
-			font-size: 14px;
-			line-height: 1.62
-	}
-
-.tribe-common .tribe-common-b3 {
-			font-size: 12px;
-			line-height: 1.38
-	}
-
-.tribe-common .tribe-common-b1--min-medium {
-			font-size: 16px;
-			line-height: 1.62
-	}
-
-.tribe-common .tribe-common-b2--min-medium {
-			font-size: 14px;
-			line-height: 1.62
-	}
-
-.tribe-common .tribe-common-b3--min-medium {
-			font-size: 12px;
-			line-height: 1.38
-	}
-
-.tribe-common .tribe-common-h1 {
-			font-size: 42px;
-			line-height: 1.38
-	}
-
-.tribe-common .tribe-common-h2 {
-			font-size: 32px;
-			line-height: 1.38
-	}
-
-.tribe-common .tribe-common-h3 {
-			font-size: 28px;
-			line-height: 1.42
-	}
-
-.tribe-common .tribe-common-h4 {
-			font-size: 24px;
-			line-height: 1.42
-	}
-
-.tribe-common .tribe-common-h6 {
-			font-size: 16px;
-			line-height: 1.62
-	}
-
-.tribe-common .tribe-common-h3--min-medium {
-			font-size: 28px;
-			line-height: 1.42
-	}
-
-.tribe-common .tribe-common-h4--min-medium {
-			font-size: 24px;
-			line-height: 1.42
-	}
-
-.tribe-common .tribe-common-h5--min-medium {
-			font-size: 18px;
-			line-height: 1.5
-	}
-
-.tribe-common .tribe-common-h6--min-medium {
-			font-size: 16px;
-			line-height: 1.62
-	}
-
-.tribe-common .tribe-common-h7--min-medium {
-			font-size: 14px;
-			line-height: 1.62
-	}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h1 {
-				font-size: 42px;
-				line-height: 1.38
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h2 {
-				font-size: 32px;
-				line-height: 1.38
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h3 {
-				font-size: 28px;
-				line-height: 1.42
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h4 {
-				font-size: 24px;
-				line-height: 1.42
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h6 {
-				font-size: 16px;
-				line-height: 1.62
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h3--min-medium {
-				font-size: 28px;
-				line-height: 1.42
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h4--min-medium {
-				font-size: 24px;
-				line-height: 1.42
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h5--min-medium {
-				font-size: 18px;
-				line-height: 1.5
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h6--min-medium {
-				font-size: 16px;
-				line-height: 1.62
-		}
-
-.tribe-theme-avada #main .tribe-common .tribe-common-h7--min-medium {
-				font-size: 14px;
-				line-height: 1.62
-		}
-
-.tribe-common .tribe-common-c-btn-border,
-	.tribe-common a.tribe-common-c-btn-border {
-			padding: 6px 15px
-	}
-		}

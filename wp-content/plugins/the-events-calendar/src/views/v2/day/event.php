@@ -3,20 +3,20 @@
  * View: Day Event
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events/views/v2/day/event.php
+ * [your-theme]/tribe/events/v2/day/event.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.9.11
+ * @version 5.0.0
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
  *
  * @see tribe_get_event() For the format of the event object.
  */
 
-$classes = get_post_class( [ 'tribe-common-g-row', 'tribe-common-g-row--gutters', 'tribe-events-calendar-day__event' ], $event->ID );
+$classes = tribe_get_post_class( [ 'tribe-common-g-row', 'tribe-common-g-row--gutters', 'tribe-events-calendar-day__event' ], $event->ID );
 
 if ( $event->featured ) {
 	$classes[] = 'tribe-events-calendar-day__event--featured';

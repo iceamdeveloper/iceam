@@ -26,7 +26,7 @@ function bps_set_request ()
 		$cookie = apply_filters ('bps_cookie_name', 'bps_request');
 		if ($_REQUEST[BPS_FORM] != 'clear')
 		{
-			bps_clean_request ();
+//			bps_clean_request ();
 			$_REQUEST['bps_directory'] = bps_current_page ();
 			setcookie ($cookie, http_build_query ($_REQUEST), 0, COOKIEPATH);
 			bps_redirect_on_error ($_REQUEST);

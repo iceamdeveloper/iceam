@@ -3,7 +3,7 @@
  * View: Map View Nav Disabled Previous Button
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/map/event-cards/nav/prev-disabled.php
+ * [your-theme]/tribe/events-pro/v2/map/event-cards/nav/prev-disabled.php
  *
  * See more documentation about our views templating system.
  *
@@ -11,7 +11,7 @@
  *
  * @var string $link The URL to the previous page, if any, or an empty string.
  *
- * @version 4.7.8
+ * @version 5.0.0
  *
  */
 ?>

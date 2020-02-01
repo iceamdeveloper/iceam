@@ -549,7 +549,7 @@ class Settings_Renderer {
 		$attributes = get_value('attributes', $args, array());
 		$value = get_value('value', $args, '');
 
-		$hrml = $this->get_input_html('hidden', $field_id, $value, $attributes, $field_name);
+		$html = $this->get_input_html('hidden', $field_id, $value, $attributes, $field_name);
 		if($display) {
 			echo $html;
 		}
@@ -658,8 +658,9 @@ class Settings_Renderer {
 	 * @param string description The field description.
 	 * @param string css_class The CSS class to give to the rendered input field.
 	 * @param array attributes Additional HTML attributes.
+	 * @param string type The field type.
 	 */
-	protected function render_text_field($section, $field_id, $label, $description = '', $css_class = '', $attributes = array()) {
+	protected function render_text_field($section, $field_id, $label, $description = '', $css_class = '', $attributes = array(), $type = 'text') {
 		$value = $this->current_settings($field_id, $this->default_settings($field_id, ''));
 		add_settings_field(
 			$field_id,
@@ -672,6 +673,9 @@ class Settings_Renderer {
 				'id' => $field_id,
 				'label_for' => $field_id,
 				'value' => $value,
+				// Field type
+				// @since 2.0.9.191108
+				'type' => $type,
 				// Input field attributes
 				'attributes' => array_merge(array(
 					'class' => $css_class . ' ' . $field_id,

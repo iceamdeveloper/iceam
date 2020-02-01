@@ -3,11 +3,11 @@ Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
 Requires at least: 3.6
-Tested up to: 5.2
+Tested up to: 5.3
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 2.6
-WC tested up to: 3.7.0
+WC tested up to: 3.9.0
 
 Adds a set of convenience classes that can simplify the development of other plugins for WooCommerce.
 
@@ -28,8 +28,7 @@ The Aelia Foundation Classes add several classes that can simplify the developme
 
 * Aelia_WC_RequirementsChecks. Implements the logic to use for requirement checking. When requirements are not met, a message is displayed to the site administrators and the plugin doesn't run. Everything is handled gracefully, and displayed messages are clear also to non-technical users.
 
-This product includes GeoLite2 data created by MaxMind, available from
-[http://www.maxmind.com](http://www.maxmind.com).
+This product includes GeoLite2 data created by MaxMind, available from [https://www.maxmind.com](https://www.maxmind.com). By using this software, you agree to use the GeoLite2 exclusively according to the terms set in the GeoLite2 End User License Agreement, which is available here: https://www.maxmind.com/en/geolite2/eula. If you do not wish to accept the terms, you must stop using the software immediately.
 
 ##Requirements
 * WordPress 3.6 or later.
@@ -66,6 +65,22 @@ Should you have any question about this product, please feel free to [contact us
 For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
 == Changelog ==
+
+= 2.0.12.200101 =
+* Fix - Downgraded MaxMind GeoIP library to align it with the one used by WooCommerce.
+
+= 2.0.11.191231 =
+* Fix - Fixed invalid reference to the Definitions class in the Updater library.
+
+= 2.0.10.191231 =
+* Tweak - Updated logic to fetch the GeoIP database.
+* Updated supported WooCommerce versions.
+
+= 2.0.9.191108 =
+* Feature- Added support for custom field types to the internal settings API.
+* Fix - Fixed collation used to create table `aelia_dismissed_messages`.
+* Tweak - Optimised logic used to perform initialisation and cleanup on activate/deactivate events.
+* Updated supported WooCommerce versions.
 
 = 2.0.8.190822 =
 * Improvement - Added filter `wc_aelia_geoip_database_exists`, to allow 3rd party to override the result of the check for the existence of the GeoIP database.

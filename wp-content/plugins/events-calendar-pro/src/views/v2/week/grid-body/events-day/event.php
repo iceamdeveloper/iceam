@@ -3,13 +3,13 @@
  * View: Week View - Event
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body/events-day/event.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body/events-day/event.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version TBD
+ * @version 5.0.0
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
  *
@@ -34,13 +34,7 @@ if ( ! empty( $event->featured ) ) {
  */
 $classes = array_merge( array_values( $classes ), array_values( $event->classes ) );
 $classes = get_post_class( $classes, $event->ID );
-$display_tooltip = ! empty( $event->excerpt ) || ! empty( $event->cost ) || $event->thumbnail->exists;
-
-$data_js = [ 'tribe-events-pro-week-grid-event-link' ];
-
-if ( $display_tooltip ) {
-	$data_js[] = 'tribe-events-tooltip';
-}
+$data_js = [ 'tribe-events-pro-week-grid-event-link', 'tribe-events-tooltip' ];
 
 /**
  * Get start time in seconds
@@ -58,10 +52,8 @@ $start_time = Dates::time_between( $event->dates->start->format( 'Y-m-d 0:0:0' )
 		href="<?php echo esc_url( $event->permalink ); ?>"
 		class="tribe-events-pro-week-grid__event-link"
 		data-js="<?php echo esc_attr( implode( ' ', $data_js ) ); ?>"
-		<?php if ( $display_tooltip ) : ?>
-			data-tooltip-content="#tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
-			aria-describedby="tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
-		<?php endif; ?>
+		data-tooltip-content="#tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
+		aria-describedby="tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
 	>
 		<div class="tribe-events-pro-week-grid__event-link-inner">
 

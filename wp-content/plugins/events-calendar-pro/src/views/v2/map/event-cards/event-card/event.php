@@ -3,25 +3,23 @@
  * View: Map View - Single Event
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/map/event-cards/event-card/event.php
+ * [your-theme]/tribe/events-pro/v2/map/event-cards/event-card/event.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.8
+ * @version 5.0.0
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
+ * @var int     $index The index of the event card, starting from 0.
  *
  * @see tribe_get_event() For the format of the event object.
  *
  */
-
-$event_row_thumbnail_class = $event->thumbnail->exists ? 'tribe-events-pro-map__event-row--has-thumbnail' : '';
-
 ?>
 <div class="tribe-events-pro-map__event-wrapper tribe-common-g-col">
-	<article class="tribe-events-pro-map__event tribe-common-g-row tribe-events-pro-map__event-row--gutters <?php echo esc_attr( $event_row_thumbnail_class ); ?>">
+	<div class="tribe-events-pro-map__event tribe-common-g-row">
 
 		<div class="tribe-events-pro-map__event-details tribe-common-g-col">
 
@@ -30,11 +28,11 @@ $event_row_thumbnail_class = $event->thumbnail->exists ? 'tribe-events-pro-map__
 			<?php $this->template( 'map/event-cards/event-card/event/venue', [ 'event' => $event ] ); ?>
 			<?php $this->template( 'map/event-cards/event-card/event/distance', [ 'event' => $event ] ); ?>
 
-			<?php $this->template( 'map/event-cards/event-card/event/actions', [ 'event' => $event, 'index' => $index ] ); ?>
+			<?php $this->template( 'map/event-cards/event-card/actions', [ 'event' => $event, 'index' => $index, 'linked' => false ] ); ?>
 
 		</div>
 
 		<?php $this->template( 'map/event-cards/event-card/event/featured-image', [ 'event' => $event ] ); ?>
 
-	</article>
+	</div>
 </div>

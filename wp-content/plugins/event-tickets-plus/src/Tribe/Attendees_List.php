@@ -39,7 +39,6 @@ class Tribe__Tickets_Plus__Attendees_List {
 
 		// Unhook Event Ticket's "View your RSVPs" rendering logic so that we can re-render with ET+'s "Who's attending?" list.
 		add_action( 'init', array( $myself, 'unhook_event_tickets_order_link_logic' ) );
-		add_action( 'tribe_tickets_before_front_end_ticket_form', array( Tribe__Tickets__Tickets_View::instance(), 'inject_link_template' ), 4 );
 
 		// Add the Admin Option for removing the Attendees List
 		add_action( 'tribe_events_tickets_metabox_pre', array( $myself, 'render_admin_options' ) );
@@ -102,7 +101,8 @@ class Tribe__Tickets_Plus__Attendees_List {
 	/**
 	 * Renders the Administration option to hide Attendees List
 	 *
-	 * @param  int $post_id
+	 * @param int $post_id
+	 *
 	 * @return void
 	 */
 	public function render_admin_options( $post_id = null ) {
@@ -178,8 +178,8 @@ class Tribe__Tickets_Plus__Attendees_List {
 	public function unhook_event_tickets_order_link_logic() {
 		$tickets_view = Tribe__Tickets__Tickets_View::instance();
 
-		remove_action( 'tribe_events_single_event_after_the_meta', array( $tickets_view, 'inject_link_template' ), 4 );
-		remove_filter( 'the_content', array( $tickets_view, 'inject_link_template_the_content' ), 9 );
+		remove_action( 'tribe_events_single_event_after_the_meta', [ $tickets_view, 'inject_link_template' ], 4 );
+		remove_filter( 'the_content', [ $tickets_view, 'inject_link_template_the_content' ], 9 );
 	}
 
 	/**
@@ -214,6 +214,10 @@ class Tribe__Tickets_Plus__Attendees_List {
 		}
 
 		include_once Tribe__Tickets_Plus__Main::instance()->get_template_hierarchy( 'attendees-list' );
+
+		$tickets_view = Tribe__Tickets__Tickets_View::instance();
+
+		$tickets_view->inject_link_template();
 	}
 
 	/**

@@ -195,6 +195,7 @@ tribe.events.views.weekDaySelector = {};
 	obj.deinit = function( event, jqXHR, settings ) {
 		var $container = event.data.container;
 		obj.deinitDaySelector( $container );
+		$container.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit );
 	};
 
 	/**

@@ -507,7 +507,8 @@ if (!function_exists('ublk_session_start')) {
 
     function ublk_session_start() {
         if (session_id() == '') {
-            session_start();
+            session_start(['read_and_close' => true]);
+            // session_start();
         }
     }
 

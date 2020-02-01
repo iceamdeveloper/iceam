@@ -3,23 +3,23 @@
  * View: Week View - Grid Body
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.8
+ * @version 5.0.0
  *
- * @var array $multiday_events An array of each day multi-day events and more event count, if any, in the shape
- *                             `[ <Y-m-d> => [ 'events' => [ ...$multiday_events], 'more_events' => <int> ] ]`.
- * @var array $events An array of each day non multi-day events, if any, in the shape `[ <Y-m-d> => [ ...$events ] ]`.
+ * @var array $multiday_events     An array of each day multi-day events and more event count, if any, in the shape
+ *                                 `[ <Y-m-d> => [ 'events' => [ ...$multiday_events], 'more_events' => <int> ] ]`.
+ * @var bool  $has_multiday_events Boolean whether the week has multiday events or not.
+ * @var array $events              An array of each day non multi-day events, if any, in the shape `[ <Y-m-d> => [ ...$events ] ]`.
  */
-
 ?>
 <div class="tribe-events-pro-week-grid__body" role="rowgroup">
 
-	<?php if ( count( $multiday_events ) ) : ?>
+	<?php if ( count( $multiday_events ) && $has_multiday_events ) : ?>
 
 		<div class="tribe-events-pro-week-grid__multiday-events-row-outer-wrapper">
 			<div class="tribe-events-pro-week-grid__multiday-events-row-wrapper">

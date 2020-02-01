@@ -669,12 +669,16 @@ ul.plugins_list {
 .ublk-deactivation {
     padding-top: 5px;
     display: inline-block;
+    margin-left: 15px;
 }
 
 #wpcontent {
     overflow: hidden;
 }
 
+#TB_ajaxContent.ub_deactive_window {
+    margin: 0 auto;
+}
 @media screen and (max-width: 1200px) {
     
     #blocked-list .cover_form {

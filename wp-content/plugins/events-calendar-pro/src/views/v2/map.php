@@ -3,23 +3,25 @@
  * View: Map View
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/map.php
+ * [your-theme]/tribe/events-pro/v2/map.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  * @var  string  $rest_url             The REST URL.
  * @var  string  $rest_nonce           The REST nonce.
  * @var  int     $should_manage_url    int containing if it should manage the URL.
- * @var  array   $events               An array of the week events, in sequence.
+ * @var  array   $events               An array of the events, in sequence.
  * @var  string  $today_url            URL pointing to the today link for this view.
  * @var  string  $prev_url             URL pointing to the prev page link for this view.
  * @var  string  $next_url             URL pointing to the next page link for this view.
  * @var  array   $providers            Array with all the possible map providers available to the view.
  * @var  bool    $disable_event_search Boolean on whether to disable the event search.
+ * @var string[] $container_classes    Classes used for the container of the view.
+ * @var array    $container_data       An additional set of container `data` attributes.
  */
 
 $header_classes = [ 'tribe-events-header' ];
@@ -28,11 +30,14 @@ if ( empty( $disable_event_search ) ) {
 }
 ?>
 <div
-	class="tribe-common tribe-events tribe-events-view tribe-events-pro tribe-events-view--map"
+	<?php tribe_classes( $container_classes ); ?>
 	data-js="tribe-events-view"
 	data-view-rest-nonce="<?php echo esc_attr( $rest_nonce ); ?>"
 	data-view-rest-url="<?php echo esc_url( $rest_url ); ?>"
 	data-view-manage-url="<?php echo esc_attr( $should_manage_url ); ?>"
+	<?php foreach ( $container_data as $key => $value ) : ?>
+		data-view-<?php echo esc_attr( $key ) ?>="<?php echo esc_attr( $value ) ?>"
+	<?php endforeach; ?>
 >
 	<div class="tribe-common-l-container tribe-events-l-container">
 		<?php $this->template( 'components/loader', [ 'text' => __( 'Loading...', 'tribe-events-calendar-pro' ) ] ); ?>
@@ -60,6 +65,10 @@ if ( empty( $disable_event_search ) ) {
 			</div>
 		<?php endif; ?>
 
+		<?php $this->template( 'components/ical-link' ); ?>
+
 		<?php $this->template( 'components/after' ); ?>
 	</div>
 </div>
+
+<?php $this->template( 'components/breakpoints' ); ?>

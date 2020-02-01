@@ -4,16 +4,16 @@
  * View: Map View - Google Maps
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/map/map/google-maps.php
+ * [your-theme]/tribe/events-pro/v2/map/map/google-maps.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
- * @var array $events       An array of the week events, in sequence.
- * @var array $map_provider Array with data of map provider.
+ * @var array  $events       An array of the week events, in sequence.
+ * @var object $map_provider Object with data of map provider.
  */
 ?>
 <?php if ( empty( $map_provider->is_premium ) ) : ?>

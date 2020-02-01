@@ -3,17 +3,18 @@
  * View: Week View - Multiday Event
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body/multiday-events-day/multiday-event.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body/multiday-events-day/multiday-event.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version TBD
+ * @version 5.0.0
  *
- * @var WP_Post $event The current event post object.
- * @var string $week_start_date The week start date, in `Y-m-d` format.
- * @var string $today_date Today's date, in the `Y-m-d` format.
+ * @var WP_Post $event           The current event post object.
+ * @var string  $day             The current date being rendered, in `Y-m-d` format.
+ * @var string  $week_start_date The week start date, in `Y-m-d` format.
+ * @var string  $today_date      Today's date, in the `Y-m-d` format.
  *
  * @see tribe_get_event() for the additional properties added to the event post object.
  */
@@ -21,7 +22,7 @@
 use Tribe__Date_Utils as Dates;
 
 // Either it starts today or it starts before and this day is the first day of the week.
-$should_display = $event->dates->start_display->format( 'Y-m-d' ) === $day
+$should_display = in_array( $day, $event->displays_on, true )
                   || ( ! $event->starts_this_week && $week_start_date === $day );
 
 $classes = [ 'tribe-events-pro-week-grid__multiday-event' ];
@@ -35,8 +36,6 @@ if ( $event->dates->end_display->format( 'Y-m-d' ) < $today_date ) {
 	$classes[] = 'tribe-events-pro-week-grid__multiday-event--past';
 }
 
-$display_tooltip = ! empty( $event->excerpt ) || ! empty( $event->cost ) || $event->thumbnail->exists;
-
 if ( $should_display ) {
 	$classes[] = 'tribe-events-pro-week-grid__multiday-event--width-' . $event->this_week_duration;
 	$classes[] = 'tribe-events-pro-week-grid__multiday-event--display';
@@ -49,6 +48,8 @@ if ( $should_display ) {
 		$classes[] = 'tribe-events-pro-week-grid__multiday-event--end';
 	}
 }
+
+$classes = get_post_class( $classes, $event->ID );
 ?>
 <div class="tribe-events-pro-week-grid__multiday-event-wrapper">
 
@@ -63,11 +64,9 @@ if ( $should_display ) {
 			<a
 				href="<?php echo esc_url( $event->permalink ); ?>"
 				class="tribe-events-pro-week-grid__multiday-event-hidden-link"
-				<?php if ( $display_tooltip ) : ?>
-					data-js="tribe-events-tooltip"
-					data-tooltip-content="#tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
-					aria-describedby="tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
-				<?php endif; ?>
+				data-js="tribe-events-tooltip"
+				data-tooltip-content="#tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
+				aria-describedby="tribe-events-tooltip-content-<?php echo esc_attr( $event->ID ); ?>"
 			>
 				<?php if ( $event->featured ) : ?>
 					<em

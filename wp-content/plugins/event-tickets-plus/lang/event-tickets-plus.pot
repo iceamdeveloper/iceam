@@ -2,20 +2,20 @@
 # This file is distributed under the same license as the Event Tickets Plus package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Event Tickets Plus 4.10.10\n"
+"Project-Id-Version: Event Tickets Plus 4.11.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/event-tickets-"
 "plus\n"
-"POT-Creation-Date: 2019-11-08 03:28:03+00:00\n"
+"POT-Creation-Date: 2019-12-17 19:16:01+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2019-11-08 03:28\n"
+"PO-Revision-Date: 2019-12-17 19:16\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
-#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.10.10)  #-#-#-#-#
+#. #-#-#-#-#  event-tickets-plus.pot (Event Tickets Plus 4.11.1)  #-#-#-#-#
 #. Plugin Name of the plugin/theme
-#: event-tickets-plus.php:57 src/Tribe/Main.php:339
+#: event-tickets-plus.php:57 src/Tribe/Main.php:372
 msgid "Event Tickets Plus"
 msgstr ""
 
@@ -77,7 +77,18 @@ msgstr ""
 msgid "Stock"
 msgstr ""
 
-#: src/Tribe/Attendees_List.php:313 src/Tribe/Attendees_List.php:314
+#. translators: placeholders are html tags (and one link, translated above).
+#: src/Tribe/Admin/Notices.php:76
+msgid ""
+"%1$sEvent Tickets Plus%2$s%3$sWith this new version, we've made front-end "
+"style updates. If you have customized the Tickets section or the Attendee "
+"Registration page, this update will likely impact your customizations.%4$s "
+"We've also introduced a new Attendee Registration Information flow for "
+"ticket purchasers! If you use Attendee Registration, please select which "
+"user flow you prefer for your website in the %5$s.%6$s "
+msgstr ""
+
+#: src/Tribe/Attendees_List.php:317 src/Tribe/Attendees_List.php:318
 msgid "Load all attendees"
 msgstr ""
 
@@ -128,7 +139,6 @@ msgstr ""
 #: src/Tribe/CSV_Importer/Column_Names.php:70
 #: src/Tribe/CSV_Importer/Rows.php:52 src/Tribe/CSV_Importer/Rows.php:71
 #: src/Tribe/Commerce/WooCommerce/Email.php:15
-#: src/views/eddtickets/tickets.php:37 src/views/wootickets/tickets.php:51
 msgid "Tickets"
 msgstr ""
 
@@ -193,40 +203,45 @@ msgctxt "ticket provider"
 msgid "Easy Digital Downloads"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:530
-#: src/Tribe/Commerce/WooCommerce/Main.php:962
+#: src/Tribe/Commerce/EDD/Main.php:600
+#: src/Tribe/Commerce/WooCommerce/Main.php:1063
 msgid "You'll receive your tickets in another email."
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1236
-#: src/Tribe/Commerce/WooCommerce/Main.php:1939
+#: src/Tribe/Commerce/EDD/Main.php:1323
+#: src/Tribe/Commerce/WooCommerce/Main.php:2139
 msgid "(deleted)"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1615
-#: src/Tribe/Commerce/WooCommerce/Main.php:2320
+#: src/Tribe/Commerce/EDD/Main.php:1704
+#: src/Tribe/Commerce/WooCommerce/Main.php:2520
 msgid "Event sales report"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1666
+#: src/Tribe/Commerce/EDD/Main.php:1755
 msgid "Event"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1684
-#: src/Tribe/Commerce/WooCommerce/Main.php:2371
+#: src/Tribe/Commerce/EDD/Main.php:1773
+#: src/Tribe/Commerce/WooCommerce/Main.php:2571
 msgid "This is a ticket for the event:"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1791
+#: src/Tribe/Commerce/EDD/Main.php:1875
 msgid "%s ticket is sold out"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1796
+#: src/Tribe/Commerce/EDD/Main.php:1880
 msgid "Sorry! Only %d tickets remaining for %s"
 msgstr ""
 
-#: src/Tribe/Commerce/EDD/Main.php:1865
+#: src/Tribe/Commerce/EDD/Main.php:1949
 msgid "Print Ticket"
+msgstr ""
+
+#: src/Tribe/Commerce/EDD/Main.php:2323
+#: src/Tribe/Commerce/WooCommerce/Main.php:3388
+msgid "Edit attendee info"
 msgstr ""
 
 #: src/Tribe/Commerce/EDD/Orders/Report.php:100
@@ -366,31 +381,50 @@ msgstr ""
 msgid "Tickets email notification manually sent to user."
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:251
+#: src/Tribe/Commerce/WooCommerce/Main.php:269
 msgctxt "ticket provider"
 msgid "WooCommerce"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2040
+#: src/Tribe/Commerce/WooCommerce/Main.php:2240
 msgid "In trash (was %s)"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2046
+#: src/Tribe/Commerce/WooCommerce/Main.php:2246
 msgid "Deleted"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2095
+#: src/Tribe/Commerce/WooCommerce/Main.php:2295
 msgid "Unknown"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2491
+#: src/Tribe/Commerce/WooCommerce/Main.php:2691
 msgid "Resend tickets email"
 msgstr ""
 
-#: src/Tribe/Commerce/WooCommerce/Main.php:2794
+#: src/Tribe/Commerce/WooCommerce/Main.php:3005
 msgid ""
 "The ticket: %1$s, in your cart is no longer available or valid. You need to "
 "remove it from your cart in order to continue."
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:3307
+msgctxt ""
+"Attendee Registration notice heading text when Woo cart quantity changed"
+msgid "Updated Ticket Quantities"
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:3313
+msgctxt ""
+"Attendee Registration notice paragraph text when Woo cart quantity changed"
+msgid ""
+"You've arrived here because you updated ticket quantities in the Cart. "
+"Please verify your attendee information, then click \"Save Attendee Info\" "
+"in order to proceed to Checkout."
+msgstr ""
+
+#: src/Tribe/Commerce/WooCommerce/Main.php:3380
+msgid "Return to cart"
 msgstr ""
 
 #: src/Tribe/Commerce/WooCommerce/Orders/Report.php:130
@@ -451,59 +485,7 @@ msgstr ""
 msgid "As soon as an order is created"
 msgstr ""
 
-#: src/Tribe/Main.php:381
-msgid "Default Page Template"
-msgstr ""
-
-#: src/Tribe/Main.php:385
-msgid "Same as Event Page Template"
-msgstr ""
-
-#: src/Tribe/Main.php:399
-msgid "Attendee Registration URL slug"
-msgstr ""
-
-#: src/Tribe/Main.php:400
-msgid ""
-"The slug used for building the URL for the Attendee Registration Info page."
-msgstr ""
-
-#: src/Tribe/Main.php:408
-msgid "Attendee Registration template"
-msgstr ""
-
-#: src/Tribe/Main.php:409
-msgid ""
-"Choose a page template to control the appearance of your attendee "
-"registration page."
-msgstr ""
-
-#: src/Tribe/Main.php:417
-msgid "Choose a page or leave blank."
-msgstr ""
-
-#: src/Tribe/Main.php:427
-msgid "You must create a page before using this functionality"
-msgstr ""
-
-#: src/Tribe/Main.php:430
-msgid ""
-"Optional: select an existing page to act as your attendee registration page. "
-"<strong>Requires</strong> use of the `[tribe_attendee_registration]` "
-"shortcode and overrides the above template and URL slug."
-msgstr ""
-
-#: src/Tribe/Main.php:436
-msgid ""
-"Selected page <strong>must</strong> use the `[tribe_attendee_registration]` "
-"shortcode. While the shortcode is missing the default redirect will be used."
-msgstr ""
-
-#: src/Tribe/Main.php:441
-msgid "Attendee Registration page"
-msgstr ""
-
-#: src/Tribe/Main.php:500
+#: src/Tribe/Main.php:479
 msgid "Require users to log in before they purchase tickets"
 msgstr ""
 
@@ -596,16 +578,16 @@ msgstr ""
 msgid "Hide details %s"
 msgstr ""
 
-#: src/Tribe/Meta/Render.php:131
+#: src/Tribe/Meta/Render.php:149
 msgctxt "orphaned attendee meta data"
 msgid "Other attendee data:"
 msgstr ""
 
-#: src/Tribe/Meta/Render.php:179 src/admin-views/attendee-meta.php:2
+#: src/Tribe/Meta/Render.php:197 src/admin-views/attendee-meta.php:2
 msgid "Attendee Information"
 msgstr ""
 
-#: src/Tribe/Meta.php:545
+#: src/Tribe/Meta.php:553
 msgid "This ticket has custom Attendee Information fields"
 msgstr ""
 
@@ -1046,6 +1028,73 @@ msgstr ""
 msgid "Name this fieldset:"
 msgstr ""
 
+#: src/admin-views/ticket-settings.php:5
+msgid "Default Page Template"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:9
+msgid "Same as Event Page Template"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:20
+msgid "Choose a page or leave blank."
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:30
+msgid "You must create a page before using this functionality"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:33
+msgid ""
+"Optional: select an existing page to act as your attendee registration page. "
+"<strong>Requires</strong> use of the `[tribe_attendee_registration]` "
+"shortcode and overrides the above template and URL slug."
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:39
+msgid ""
+"Selected page <strong>must</strong> use the `[tribe_attendee_registration]` "
+"shortcode. While the shortcode is missing the default redirect will be used."
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:47
+msgid "Attendee Registration"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:51
+msgid "Attendee Registration Modal "
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:53
+msgctxt "checkbox to enable Attendee Registration Modal"
+msgid ""
+"Enabling the Attendee Registration Modal provides a new sales flow for "
+"purchasing tickets that include Attendee Registration. [%1$sLearn more%2$s]"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:68
+msgid "Attendee Registration URL slug"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:69
+msgid ""
+"The slug used for building the URL for the Attendee Registration Info page."
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:77
+msgid "Attendee Registration template"
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:78
+msgid ""
+"Choose a page template to control the appearance of your attendee "
+"registration page."
+msgstr ""
+
+#: src/admin-views/ticket-settings.php:86
+msgid "Attendee Registration page"
+msgstr ""
+
 #: src/admin-views/woocommerce-metabox-ecommerce.php:21
 msgid "Edit ticket in WooCommerce"
 msgstr ""
@@ -1092,32 +1141,6 @@ msgid_plural "%d people are attending %s"
 msgstr[0] ""
 msgstr[1] ""
 
-#: src/views/eddtickets/tickets.php:64 src/views/wootickets/tickets.php:119
-msgid "Out of stock!"
-msgstr ""
-
-#: src/views/eddtickets/tickets.php:82 src/views/wootickets/tickets.php:143
-msgid "%1$s available"
-msgstr ""
-
-#: src/views/eddtickets/tickets.php:121
-#: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
-#: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
-#: src/views/tpp/attendees-list-optout.php:35
-#: src/views/wootickets/tickets.php:192
-msgid "Don't list me on the public attendee list"
-msgstr ""
-
-#: src/views/eddtickets/tickets.php:139 src/views/wootickets/tickets.php:214
-msgid "Add to cart"
-msgstr ""
-
-#: src/views/eddtickets/tickets.php:148 src/views/wootickets/tickets.php:223
-msgid ""
-"You must have JavaScript activated to purchase tickets. Please enable "
-"JavaScript in your browser."
-msgstr ""
-
 #: src/views/login-to-purchase.php:16
 msgid "Log in to purchase"
 msgstr ""
@@ -1128,6 +1151,12 @@ msgstr ""
 
 #: src/views/meta.php:23
 msgid "Attendee"
+msgstr ""
+
+#: src/views/tickets-plus/attendee-list-checkbox-rsvp.php:16
+#: src/views/tickets-plus/attendee-list-checkbox-tickets.php:22
+#: src/views/tpp/attendees-list-optout.php:35
+msgid "Don't list me on the public attendee list"
 msgstr ""
 
 #: src/views/tickets-plus/email-qr.php:25
@@ -1156,10 +1185,6 @@ msgstr ""
 
 #: src/views/tickets-plus/orders-tickets.php:76
 msgid "Attendee %d"
-msgstr ""
-
-#: src/views/wootickets/tickets.php:163
-msgid "Free"
 msgstr ""
 
 #: tests/_data/classes/Dummy_Endpoint.php:54

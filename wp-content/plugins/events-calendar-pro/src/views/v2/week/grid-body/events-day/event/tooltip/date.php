@@ -3,24 +3,24 @@
  * View: Week View - Event Tooltip Date
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body/events-day/event/tooltip/date.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body/events-day/event/tooltip/date.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.10
+ * @version 5.0.0
  *
- * @var WP_Post $event        The event post object with properties added by the `tribe_get_event` function.
- * @var obj     $date_formats Object containing the date formats.
+ * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
  *
  * @see tribe_get_event() For the format of the event object.
  *
  */
 
-$display_end_date = $event->dates->start_display->format( 'H:i' ) !== $event->dates->end_display->format( 'H:i' );
-?>
+use Tribe__Date_Utils as Dates;
+$event_date_attr = $event->dates->start->format( Dates::DBDATEFORMAT );
 
+?>
 <div class="tribe-events-pro-week-grid__event-tooltip-datetime">
 	<?php if ( ! empty( $event->featured ) ) : ?>
 		<em
@@ -30,15 +30,9 @@ $display_end_date = $event->dates->start_display->format( 'H:i' ) !== $event->da
 		>
 		</em>
 	<?php endif; ?>
-	<time datetime="<?php echo $event->dates->start_display->format( 'H:i' ); ?>">
-		<?php echo $event->dates->start_display->format( 'g:i a' ); ?>
+	<time datetime="<?php echo esc_attr( $event_date_attr ); ?>">
+		<?php echo $event->schedule_details->value(); ?>
 	</time>
-	<?php if ( $display_end_date ) : ?>
-		<span class="tribe-events-pro-week-grid__event-tooltip-datetime-separator"><?php echo esc_html( $date_formats->time_range_separator ); ?></span>
-		<time datetime="<?php echo $event->dates->end_display->format( 'H:i' ); ?>">
-			<?php echo $event->dates->end_display->format( 'g:i a' ); ?>
-		</time>
-	<?php endif; ?>
 	<?php if ( ! empty( $event->recurring ) ) : ?>
 		<a
 			href="<?php echo esc_url( $event->permalink_all ); ?>"

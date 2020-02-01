@@ -82,9 +82,6 @@ class Tribe__Tickets_Plus__Commerce__PayPal__Meta extends Tribe__Tickets_Plus__M
 		// keep it short as PayPal has a number limit on custom arguments
 		$custom_args[ $this->attendee_meta_custom_key ] = $this->meta_id;
 
-		// we are sending a request out to PayPal to add the tickets to the cart so we clear the cookie
-		$this->storage->delete_cookie();
-
 		return $custom_args;
 	}
 

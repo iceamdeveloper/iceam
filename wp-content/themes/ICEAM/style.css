@@ -1425,6 +1425,20 @@ legend#field_33-1 {
 }
 
 
+#content button.tribe-tickets__item__quantity__remove, 
+#content button.tribe-tickets__item__quantity__add {
+    padding: 5px;
+    line-height: .5;
+    width: 20px;
+    margin: 0;
+}
+#content button.tribe-tickets__item__quantity__remove {
+    margin-left: 8px;
+} 
+#content button.tribe-tickets__item__quantity__add {
+    margin-right: 8px;
+}
+
 
 
 @media only screen and (max-width: 767px){

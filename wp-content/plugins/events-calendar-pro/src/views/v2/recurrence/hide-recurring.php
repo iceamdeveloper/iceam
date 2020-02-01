@@ -3,13 +3,13 @@
  * View: Top Bar Hide Recurring Events Toggle
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/recurrence/hide-recurring.php
+ * [your-theme]/tribe/events-pro/v2/recurrence/hide-recurring.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.5
+ * @version 5.0.0
  *
  */
 ?>

@@ -6,22 +6,22 @@
 		top: 0;
 		right: 1px;
 		width: calc(100% - 2px); /* adding 2 px horizontal spacing. */
+	}
 
-		/* If event is less than 1 hour */
-		&:not([class*="tribe-events-pro-week-grid__event--h-"]) {
+	/* If event is less than 1 hour */
+	[class*="tribe-events-pro-week-grid__event--h-0"] {
 
-			.tribe-events-pro-week-grid__event-link-inner {
-				padding: 2px var(--spacer-1);
-			}
+		.tribe-events-pro-week-grid__event-link-inner {
+			padding: 2px var(--spacer-1);
+		}
 
-			.tribe-events-pro-week-grid__event-datetime {
-				@mixin visually-hide;
-			}
+		.tribe-events-pro-week-grid__event-datetime {
+			@mixin visually-hide;
+		}
 
-			.tribe-events-pro-week-grid__event-title-featured-icon {
-				display: inline-block;
-				margin-right: var(--spacer-0);
-			}
+		.tribe-events-pro-week-grid__event-title-featured-icon {
+			display: inline-block;
+			margin-right: var(--spacer-0);
 		}
 	}
 
@@ -466,6 +466,7 @@
 
 	.tribe-events-pro-week-grid__event-title {
 		flex: auto;
+		margin: 0;
 	}
 
 	.tribe-events-pro-week-grid__event-datetime {

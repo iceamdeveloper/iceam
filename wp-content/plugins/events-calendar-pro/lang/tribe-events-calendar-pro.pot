@@ -1,14 +1,14 @@
-# Copyright (C) 2019 Modern Tribe
+# Copyright (C) 2020 Modern Tribe
 # This file is distributed under the same license as the The Events Calendar PRO package.
 msgid ""
 msgstr ""
-"Project-Id-Version: The Events Calendar PRO 4.7.10\n"
+"Project-Id-Version: The Events Calendar PRO 5.0.0\n"
 "Report-Msgid-Bugs-To: http://m.tri.be/191x\n"
-"POT-Creation-Date: 2019-11-20 05:11:54+00:00\n"
+"POT-Creation-Date: 2020-01-23 20:33:34+00:00\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2019-11-20 05:11\n"
+"PO-Revision-Date: 2020-01-23 20:33\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 
@@ -16,12 +16,12 @@ msgstr ""
 msgid "Events Calendar Pro"
 msgstr ""
 
-#: events-calendar-pro.php:171
+#: events-calendar-pro.php:172
 msgid ""
 "To begin using Events Calendar PRO, please install the latest version of"
 msgstr ""
 
-#: events-calendar-pro.php:173 events-calendar-pro.php:174
+#: events-calendar-pro.php:174 events-calendar-pro.php:175
 msgid "The Events Calendar"
 msgstr ""
 
@@ -50,24 +50,24 @@ msgstr ""
 #: src/views/v2/day/event/recurring.php:28
 #: src/views/v2/list/event/recurring.php:27
 #: src/views/v2/list/event/recurring.php:28
-#: src/views/v2/map/event-cards/event-card/event/date-time.php:76
-#: src/views/v2/map/event-cards/event-card/event/date-time.php:77
+#: src/views/v2/map/event-cards/event-card/event/date-time.php:73
+#: src/views/v2/map/event-cards/event-card/event/date-time.php:74
 #: src/views/v2/month/calendar-event/recurring.php:29
 #: src/views/v2/month/calendar-event/recurring.php:30
 #: src/views/v2/month/calendar-event/tooltip/recurring.php:29
 #: src/views/v2/month/calendar-event/tooltip/recurring.php:30
 #: src/views/v2/month/mobile-event/recurring.php:23
 #: src/views/v2/month/mobile-event/recurring.php:24
-#: src/views/v2/photo/event/date-time.php:58
 #: src/views/v2/photo/event/date-time.php:59
-#: src/views/v2/week/grid-body/events-day/event/date.php:44
+#: src/views/v2/photo/event/date-time.php:60
 #: src/views/v2/week/grid-body/events-day/event/date.php:45
-#: src/views/v2/week/grid-body/events-day/event/tooltip/date.php:49
-#: src/views/v2/week/grid-body/events-day/event/tooltip/date.php:50
+#: src/views/v2/week/grid-body/events-day/event/date.php:46
+#: src/views/v2/week/grid-body/events-day/event/tooltip/date.php:43
+#: src/views/v2/week/grid-body/events-day/event/tooltip/date.php:44
+#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:85
 #: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:86
-#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:87
+#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:109
 #: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:110
-#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:111
 #: src/views/v2/week/mobile-events/day/event/date.php:42
 #: src/views/v2/week/mobile-events/day/event/date.php:43
 msgid "Recurring"
@@ -162,12 +162,12 @@ msgstr ""
 msgid "Upcoming Events"
 msgstr ""
 
-#: src/Tribe/Assets.php:387
+#: src/Tribe/Assets.php:405
 msgctxt "Event title map marker prefix"
 msgid "%s: "
 msgstr ""
 
-#: src/Tribe/Assets.php:388
+#: src/Tribe/Assets.php:406
 msgid "Address: "
 msgstr ""
 
@@ -225,7 +225,7 @@ msgstr ""
 msgid "Related Events"
 msgstr ""
 
-#: src/Tribe/Editor.php:196 src/Tribe/Main.php:701
+#: src/Tribe/Editor.php:196 src/Tribe/Main.php:705
 #: src/admin-views/event-meta-options.php:3
 msgid "Additional Fields"
 msgstr ""
@@ -253,10 +253,12 @@ msgid "Distance unit"
 msgstr ""
 
 #: src/Tribe/Geo_Loc.php:202 src/Tribe/Geo_Loc_Filter.php:23
+#: src/Tribe/Views/V2/Views/Map_View.php:387
 msgid "Miles"
 msgstr ""
 
 #: src/Tribe/Geo_Loc.php:203 src/Tribe/Geo_Loc_Filter.php:26
+#: src/Tribe/Views/V2/Views/Map_View.php:383
 msgid "Kilometers"
 msgstr ""
 
@@ -282,7 +284,7 @@ msgstr ""
 msgid "Near"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:389 src/Tribe/Views/V2/Geo_Loc/Static_Handler.php:146
+#: src/Tribe/Geo_Loc.php:389 src/Tribe/Views/V2/Geo_Loc/Static_Handler.php:154
 msgid "Location"
 msgstr ""
 
@@ -364,91 +366,91 @@ msgstr ""
 msgid "Radio Buttons"
 msgstr ""
 
-#: src/Tribe/Main.php:218
+#: src/Tribe/Main.php:222
 msgid "Month/Week View"
 msgstr ""
 
-#: src/Tribe/Main.php:462 src/Tribe/Views/V2/Template/Title.php:40
+#: src/Tribe/Main.php:466 src/Tribe/Views/V2/Template/Title.php:40
 msgid "All %1$s for %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:468 src/Tribe/Views/V2/Template/Title.php:58
+#: src/Tribe/Main.php:472 src/Tribe/Views/V2/Template/Title.php:58
 msgid "%1$s for week of %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:528
+#: src/Tribe/Main.php:532
 msgctxt "debug recurrence"
 msgid "Unknown"
 msgstr ""
 
-#: src/Tribe/Main.php:546
+#: src/Tribe/Main.php:550
 msgctxt "debug recurrence"
 msgid "invalid date"
 msgstr ""
 
-#: src/Tribe/Main.php:577 src/Tribe/Main.php:590
+#: src/Tribe/Main.php:581 src/Tribe/Main.php:594
 msgctxt "debug recurrence"
 msgid "incorrect slug"
 msgstr ""
 
-#: src/Tribe/Main.php:612
+#: src/Tribe/Main.php:616
 msgctxt "debug recurrence"
 msgid ""
 "Invalid instance of a recurring event was requested ($1%s) redirecting to "
 "$2%s"
 msgstr ""
 
-#: src/Tribe/Main.php:699 src/admin-views/tribe-options-defaults.php:35
+#: src/Tribe/Main.php:703 src/admin-views/tribe-options-defaults.php:42
 msgid "Default Content"
 msgstr ""
 
-#: src/Tribe/Main.php:718
+#: src/Tribe/Main.php:722
 msgid "Hide related events"
 msgstr ""
 
-#: src/Tribe/Main.php:719
+#: src/Tribe/Main.php:723
 msgid "Remove related events from the single event view (with classic editor)"
 msgstr ""
 
-#: src/Tribe/Main.php:731
+#: src/Tribe/Main.php:735
 msgid "Week Day Format"
 msgstr ""
 
-#: src/Tribe/Main.php:732
+#: src/Tribe/Main.php:736
 msgid ""
 "Enter the format to use for week days. Used when showing days of the week in "
 "Week view."
 msgstr ""
 
-#: src/Tribe/Main.php:745
+#: src/Tribe/Main.php:749
 msgid "Hide weekends on Week View"
 msgstr ""
 
-#: src/Tribe/Main.php:746
+#: src/Tribe/Main.php:750
 msgid "Check this to only show weekdays on Week View"
 msgstr ""
 
-#: src/Tribe/Main.php:758
+#: src/Tribe/Main.php:762
 msgid "Enable the Before HTML (below) on shortcodes."
 msgstr ""
 
-#: src/Tribe/Main.php:759
+#: src/Tribe/Main.php:763
 msgid ""
 "Check this to show the Before HTML from the text area below on events "
 "displayed via shortcode."
 msgstr ""
 
-#: src/Tribe/Main.php:771
+#: src/Tribe/Main.php:775
 msgid "Enable the After HTML (below) on shortcodes."
 msgstr ""
 
-#: src/Tribe/Main.php:772
+#: src/Tribe/Main.php:776
 msgid ""
 "Check this to show the After HTML from the text area below on events "
 "displayed via shortcode."
 msgstr ""
 
-#: src/Tribe/Main.php:790
+#: src/Tribe/Main.php:794
 msgid ""
 "Thanks for buying Events Calendar PRO! From all of us at Modern Tribe, we "
 "sincerely appreciate it. If you're looking for help with Events Calendar "
@@ -457,14 +459,14 @@ msgid ""
 "get you there."
 msgstr ""
 
-#: src/Tribe/Main.php:802
+#: src/Tribe/Main.php:806
 msgid ""
 "If this is your first time using The Events Calendar Pro, you're in for a "
 "treat and are already well on your way to creating a first event. Here are "
 "some basics we've found helpful for users jumping into it for the first time:"
 msgstr ""
 
-#: src/Tribe/Main.php:805
+#: src/Tribe/Main.php:809
 msgid ""
 "%sOur New User Primer%s was designed for folks in your exact position. "
 "Featuring both step-by-step videos and written walkthroughs that feature "
@@ -472,7 +474,7 @@ msgid ""
 "no time."
 msgstr ""
 
-#: src/Tribe/Main.php:807
+#: src/Tribe/Main.php:811
 msgid ""
 "%sInstallation/Setup FAQs%s from our support page can help give an overview "
 "of what the plugin can and cannot do. This section of the FAQs may be "
@@ -480,7 +482,7 @@ msgid ""
 "the new user primer."
 msgstr ""
 
-#: src/Tribe/Main.php:809
+#: src/Tribe/Main.php:813
 msgid ""
 "Take care of your license key. Though not required to create your first "
 "event, you'll want to get it in place as soon as possible to guarantee your "
@@ -488,19 +490,19 @@ msgid ""
 "you don't have it handy."
 msgstr ""
 
-#: src/Tribe/Main.php:811
+#: src/Tribe/Main.php:815
 msgid ""
 "Otherwise, if you're feeling adventurous, you can get started by heading to "
 "the Events menu and adding your first event."
 msgstr ""
 
-#: src/Tribe/Main.php:824
+#: src/Tribe/Main.php:828
 msgid ""
 "Written documentation can only take things so far...sometimes, you need help "
 "from a real person. This is where our %ssupport forums%s come into play."
 msgstr ""
 
-#: src/Tribe/Main.php:825
+#: src/Tribe/Main.php:829
 msgid ""
 "Users who have purchased an Events Calendar PRO license are granted total "
 "access to our %spremium support forums%s. Unlike at the %sWordPress.org "
@@ -510,7 +512,7 @@ msgid ""
 "than 24-hours without a response."
 msgstr ""
 
-#: src/Tribe/Main.php:826
+#: src/Tribe/Main.php:830
 msgid ""
 "Our number one goal is helping you succeed, and to whatever extent possible, "
 "we'll help troubleshoot and guide your customizations or tweaks. While we "
@@ -520,7 +522,7 @@ msgid ""
 "as is often more importantly the case -- satisfied."
 msgstr ""
 
-#: src/Tribe/Main.php:827
+#: src/Tribe/Main.php:831
 msgid ""
 "Before posting a new thread, please do a search to make sure your issue "
 "hasn't already been addressed. When posting please make sure to provide as "
@@ -529,97 +531,97 @@ msgid ""
 "conflict could be at play in your initial message."
 msgstr ""
 
-#: src/Tribe/Main.php:1463
+#: src/Tribe/Main.php:1467
 msgid "Settings"
 msgstr ""
 
-#: src/Tribe/Main.php:1491
+#: src/Tribe/Main.php:1495
 msgid "Venue updated. <a href=\"%s\">View venue</a>"
 msgstr ""
 
 #. translators: %s: date and time of the revision
-#: src/Tribe/Main.php:1493
+#: src/Tribe/Main.php:1497
 msgid "Venue published. <a href=\"%s\">View venue</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1494
+#: src/Tribe/Main.php:1498
 msgid "Venue submitted. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1496
+#: src/Tribe/Main.php:1500
 msgid ""
 "Venue scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s"
 "\">Preview venue</a>"
 msgstr ""
 
 #. translators: Publish box date format, see http://php.net/date
-#: src/Tribe/Main.php:1498 src/Tribe/Main.php:1508
+#: src/Tribe/Main.php:1502 src/Tribe/Main.php:1512
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: src/Tribe/Main.php:1500
+#: src/Tribe/Main.php:1504
 msgid "Venue draft updated. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1502
+#: src/Tribe/Main.php:1506
 msgid "Organizer updated. <a href=\"%s\">View organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1503
+#: src/Tribe/Main.php:1507
 msgid "Organizer published. <a href=\"%s\">View organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1504
+#: src/Tribe/Main.php:1508
 msgid ""
 "Organizer submitted. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1506
+#: src/Tribe/Main.php:1510
 msgid ""
 "Organizer scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href="
 "\"%2$s\">Preview organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1510
+#: src/Tribe/Main.php:1514
 msgid ""
 "Organizer draft updated. <a target=\"_blank\" href=\"%s\">Preview organizer</"
 "a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1570
+#: src/Tribe/Main.php:1574
 msgid "Support"
 msgstr ""
 
-#: src/Tribe/Main.php:1572
+#: src/Tribe/Main.php:1576
 msgid "View All Add-Ons"
 msgstr ""
 
-#: src/Tribe/Main.php:1801
+#: src/Tribe/Main.php:1805
 msgid "Week"
 msgstr ""
 
-#: src/Tribe/Main.php:1819
+#: src/Tribe/Main.php:1823
 msgid "Photo"
 msgstr ""
 
-#: src/Tribe/Main.php:1836
+#: src/Tribe/Main.php:1840
 msgid "Week Of"
 msgstr ""
 
-#: src/Tribe/Main.php:1901
+#: src/Tribe/Main.php:1905
 msgid "Events Calendar PRO"
 msgstr ""
 
-#: src/Tribe/Main.php:2005
+#: src/Tribe/Main.php:2009
 msgid "all"
 msgstr ""
 
-#: src/Tribe/Main.php:2006 src/admin-views/event-recurrence.php:108
+#: src/Tribe/Main.php:2010 src/admin-views/event-recurrence.php:108
 #: src/admin-views/event-recurrence.php:372
 msgid "week"
 msgstr ""
 
-#: src/Tribe/Main.php:2007
+#: src/Tribe/Main.php:2011
 msgid "photo"
 msgstr ""
 
@@ -1074,7 +1076,7 @@ msgid "Times:"
 msgstr ""
 
 #: src/Tribe/Recurrence/Strings.php:13
-#: src/views/v2/photo/event/date-time.php:36
+#: src/views/v2/photo/event/date-time.php:37
 msgid "All day"
 msgstr ""
 
@@ -1869,6 +1871,16 @@ msgstr ""
 msgid "No results were found for events in or near <strong>\"%1$s\"</strong>."
 msgstr ""
 
+#: src/Tribe/Views/V2/Rewrite.php:34
+msgctxt "The archive for events, \"/venue/\" URL string component."
+msgid "venue"
+msgstr ""
+
+#: src/Tribe/Views/V2/Rewrite.php:35
+msgctxt "The archive for events, \"/organizer/\" URL string component."
+msgid "organizer"
+msgstr ""
+
 #: src/admin-views/custom-fields/gutenberg.php:3
 msgid "Use in Block Editor"
 msgstr ""
@@ -2299,98 +2311,100 @@ msgstr ""
 msgid "Which month will the event recur in?"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:6
-#: src/admin-views/tribe-options-defaults.php:15
+#: src/admin-views/tribe-options-defaults.php:13
+#: src/admin-views/tribe-options-defaults.php:21
 msgid "No Default"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:22
+#: src/admin-views/tribe-options-defaults.php:28
 msgid "Select a State"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:39
+#: src/admin-views/tribe-options-defaults.php:46
 msgid ""
 "<p>Choose the default venue & organizer. Set default address information to "
 "save time when entering a new venue or organizer.</p><p>You can override "
 "these settings as you enter a new event.</p>"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:51
+#: src/admin-views/tribe-options-defaults.php:58
 #: src/admin-views/widget-admin-advanced-list.php:39
 msgid "Organizer"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:55
+#: src/admin-views/tribe-options-defaults.php:62
 msgid "Default organizer"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:59
+#: src/admin-views/tribe-options-defaults.php:66
 msgid "No saved organizers yet."
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:68
+#: src/admin-views/tribe-options-defaults.php:75
 #: src/admin-views/widget-admin-advanced-list.php:32
 msgid "Venue"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:72
+#: src/admin-views/tribe-options-defaults.php:79
 msgid "Default venue"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:76
+#: src/admin-views/tribe-options-defaults.php:83
 msgid "No saved venues yet."
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:85
+#: src/admin-views/tribe-options-defaults.php:92
+#: src/views/v2/venue/meta/details/address.php:28
+#: src/views/v2/venue/meta/details/address.php:29
 msgid "Address"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:89
+#: src/admin-views/tribe-options-defaults.php:96
 msgid ""
 "You can use this setting to set specific, individual defaults for any new "
 "Venue you create (these will not be used for your default venue)."
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:93
+#: src/admin-views/tribe-options-defaults.php:100
 msgid "Default address"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:106
+#: src/admin-views/tribe-options-defaults.php:113
 msgid "Default city"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:119
+#: src/admin-views/tribe-options-defaults.php:126
 msgid "Default country"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:132
-#: src/admin-views/tribe-options-defaults.php:145
+#: src/admin-views/tribe-options-defaults.php:139
+#: src/admin-views/tribe-options-defaults.php:152
 msgid "Default state/province"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:158
+#: src/admin-views/tribe-options-defaults.php:165
 msgid "Default postal code/zip code"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:171
+#: src/admin-views/tribe-options-defaults.php:178
 msgid "Default phone"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:184
+#: src/admin-views/tribe-options-defaults.php:191
 msgid "Use a custom list of countries"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:187
+#: src/admin-views/tribe-options-defaults.php:194
 msgid ""
 "One country per line in the following format: <br>US, United States <br> UK, "
 "United Kingdom. <br> (Replaces the default list.)"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:209
+#: src/admin-views/tribe-options-defaults.php:216
 msgid "Options"
 msgstr ""
 
-#: src/admin-views/tribe-options-defaults.php:213
+#: src/admin-views/tribe-options-defaults.php:220
 msgid ""
 "If fields are left empty when they're submitted, automatically fill them in "
 "with these values."
@@ -2451,6 +2465,10 @@ msgid "Country"
 msgstr ""
 
 #: src/admin-views/widget-admin-advanced-list.php:38
+#: src/views/v2/organizer/meta/details/phone.php:28
+#: src/views/v2/organizer/meta/details/phone.php:29
+#: src/views/v2/venue/meta/details/phone.php:28
+#: src/views/v2/venue/meta/details/phone.php:29
 msgid "Phone"
 msgstr ""
 
@@ -2604,65 +2622,65 @@ msgid ""
 "latest version of PHP."
 msgstr ""
 
-#: src/functions/template-tags/general.php:156
+#: src/functions/template-tags/general.php:180
 msgid "Show only the first upcoming instance of recurring %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:213
-#: src/functions/template-tags/general.php:228
-#: src/functions/template-tags/general.php:243
-#: src/functions/template-tags/general.php:258
-#: src/functions/template-tags/general.php:273
-#: src/functions/template-tags/general.php:288
-#: src/functions/template-tags/general.php:303
-#: src/functions/template-tags/general.php:318
-#: src/functions/template-tags/general.php:333
+#: src/functions/template-tags/general.php:237
+#: src/functions/template-tags/general.php:252
+#: src/functions/template-tags/general.php:267
+#: src/functions/template-tags/general.php:282
+#: src/functions/template-tags/general.php:297
+#: src/functions/template-tags/general.php:312
+#: src/functions/template-tags/general.php:327
+#: src/functions/template-tags/general.php:342
+#: src/functions/template-tags/general.php:357
 msgid "No default set"
 msgstr ""
 
-#: src/functions/template-tags/general.php:215
+#: src/functions/template-tags/general.php:239
 msgid "The current default organizer is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:230
+#: src/functions/template-tags/general.php:254
 msgid "The current default venue is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:245
+#: src/functions/template-tags/general.php:269
 msgid "The current default address is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:260
+#: src/functions/template-tags/general.php:284
 msgid "The current default city is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:275
-#: src/functions/template-tags/general.php:290
+#: src/functions/template-tags/general.php:299
+#: src/functions/template-tags/general.php:314
 msgid "The current default state/province is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:305
+#: src/functions/template-tags/general.php:329
 msgid "The current default postal code/zip code is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:320
+#: src/functions/template-tags/general.php:344
 msgid "The current default country is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:335
+#: src/functions/template-tags/general.php:359
 msgid "The current default phone is: %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:530
-#: src/functions/template-tags/general.php:553
+#: src/functions/template-tags/general.php:554
+#: src/functions/template-tags/general.php:577
 msgid "Date out of range."
 msgstr ""
 
-#: src/functions/template-tags/general.php:669
+#: src/functions/template-tags/general.php:693
 msgid "Recurring %s"
 msgstr ""
 
-#: src/functions/template-tags/general.php:672
+#: src/functions/template-tags/general.php:696
 msgid "(See all)"
 msgstr ""
 
@@ -2729,8 +2747,7 @@ msgid "&larr; Back to %s"
 msgstr ""
 
 #: src/views/pro/week/loop-grid-allday.php:18
-#: src/views/v2/map/event-cards/event-card/event/date-time.php:30
-#: src/views/v2/map/event-cards/event-card/tooltip/date-time.php:27
+#: src/views/v2/map/event-cards/event-card/event/date-time.php:27
 #: src/views/v2/week/mobile-events/day/type-separator.php:22
 msgid "All Day"
 msgstr ""
@@ -2802,32 +2819,35 @@ msgstr ""
 msgid "In a location"
 msgstr ""
 
-#: src/views/v2/map/event-cards/event-card/event/actions/details.php:27
+#: src/views/v2/map/event-cards/event-card/actions/details-spacer.php:17
+#: src/views/v2/map/event-cards/event-card/actions/details.php:27
 msgid "Event Details"
 msgstr ""
 
-#: src/views/v2/map/event-cards/event-card/event/actions/directions.php:30
+#: src/views/v2/map/event-cards/event-card/actions/directions-spacer.php:24
+#: src/views/v2/map/event-cards/event-card/actions/directions.php:30
+#: src/views/v2/venue/meta/details/address.php:37
 msgid "Get Directions"
 msgstr ""
 
-#: src/views/v2/map/event-cards/event-card/event/date-time.php:46
-#: src/views/v2/map/event-cards/event-card/event/date-time.php:47
-#: src/views/v2/map/event-cards/event-card/event/date-time.php:51
-#: src/views/v2/map/event-cards/event-card/tooltip/date-time.php:45
-#: src/views/v2/map/event-cards/event-card/tooltip/date-time.php:46
-#: src/views/v2/photo/event/date-time.php:26
+#: src/views/v2/map/event-cards/event-card/event/date-time.php:43
+#: src/views/v2/map/event-cards/event-card/event/date-time.php:44
+#: src/views/v2/map/event-cards/event-card/event/date-time.php:48
+#: src/views/v2/map/event-cards/event-card/tooltip/date-time.php:28
+#: src/views/v2/map/event-cards/event-card/tooltip/date-time.php:29
 #: src/views/v2/photo/event/date-time.php:27
-#: src/views/v2/photo/event/date-time.php:31
-#: src/views/v2/week/grid-body/events-day/event/date.php:27
+#: src/views/v2/photo/event/date-time.php:28
+#: src/views/v2/photo/event/date-time.php:32
 #: src/views/v2/week/grid-body/events-day/event/date.php:28
+#: src/views/v2/week/grid-body/events-day/event/date.php:29
 #: src/views/v2/week/grid-body/events-day/event/title.php:24
 #: src/views/v2/week/grid-body/events-day/event/title.php:25
 #: src/views/v2/week/grid-body/events-day/event/tooltip/date.php:28
 #: src/views/v2/week/grid-body/events-day/event/tooltip/date.php:29
+#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:74
 #: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:75
-#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:76
+#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:98
 #: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:99
-#: src/views/v2/week/grid-body/multiday-events-day/multiday-event.php:100
 #: src/views/v2/week/mobile-events/day/event/date.php:24
 #: src/views/v2/week/mobile-events/day/event/date.php:25
 msgid "Featured"
@@ -2860,38 +2880,50 @@ msgstr ""
 msgid "Today"
 msgstr ""
 
-#: src/views/v2/map/map/no-venue-modal.php:29
-#: src/views/v2/map/map/no-venue-modal.php:32
+#: src/views/v2/map/map/no-venue-modal.php:41
+#: src/views/v2/map/map/no-venue-modal.php:44
 msgid "Close modal"
 msgstr ""
 
-#: src/views/v2/map/map/no-venue-modal.php:42
+#: src/views/v2/map/map/no-venue-modal.php:54
 msgid "This event doesn’t have a venue or address."
 msgstr ""
 
-#: src/views/v2/map/map/no-venue-modal.php:50
+#: src/views/v2/map/map/no-venue-modal.php:62
 msgid "View Event Details"
 msgstr ""
 
-#: src/views/v2/map/top-bar/datepicker.php:67
-#: src/views/v2/photo/top-bar/datepicker.php:67
-#: src/views/v2/week/top-bar/datepicker.php:61
+#: src/views/v2/map/top-bar/datepicker.php:85
+#: src/views/v2/photo/top-bar/datepicker.php:85
+#: src/views/v2/week/top-bar/datepicker.php:73
 msgid "Select date."
 msgstr ""
 
-#: src/views/v2/map.php:38 src/views/v2/photo.php:38 src/views/v2/week.php:36
+#: src/views/v2/map.php:43 src/views/v2/photo.php:43 src/views/v2/week.php:47
 msgid "Loading..."
 msgstr ""
 
+#: src/views/v2/organizer/meta/details/email.php:28
+#: src/views/v2/organizer/meta/details/email.php:29
+msgid "Email"
+msgstr ""
+
+#: src/views/v2/organizer/meta/details/website.php:28
+#: src/views/v2/organizer/meta/details/website.php:29
+#: src/views/v2/venue/meta/details/website.php:28
+#: src/views/v2/venue/meta/details/website.php:29
+msgid "Website"
+msgstr ""
+
 #. translators: %s: Event (plural or singular).
-#: src/views/v2/photo/nav/next-disabled.php:22
-#: src/views/v2/photo/nav/next.php:29
+#: src/views/v2/photo/nav/next-disabled.php:23
+#: src/views/v2/photo/nav/next.php:30
 msgid "Next %1$s"
 msgstr ""
 
 #. translators: %s: Event (plural or singular).
-#: src/views/v2/photo/nav/prev-disabled.php:22
-#: src/views/v2/photo/nav/prev.php:29
+#: src/views/v2/photo/nav/prev-disabled.php:23
+#: src/views/v2/photo/nav/prev.php:30
 msgid "Previous %1$s"
 msgstr ""
 
@@ -2912,7 +2944,7 @@ msgstr ""
 msgid "Previous week"
 msgstr ""
 
-#: src/views/v2/week/grid-body/multiday-events-day/more-events.php:21
+#: src/views/v2/week/grid-body/multiday-events-day/more-events.php:19
 msgid "+1 more"
 msgid_plural "+ %s more"
 msgstr[0] ""
@@ -2922,7 +2954,7 @@ msgstr[1] ""
 msgid "Toggle multiday events"
 msgstr ""
 
-#: src/views/v2/week/grid-header.php:19
+#: src/views/v2/week/grid-header.php:27
 msgid "Week of %s"
 msgstr ""
 

@@ -3,13 +3,13 @@
  * View: Week View Time Separator
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/mobile-events/day/time-separator.php
+ * [your-theme]/tribe/events-pro/v2/week/mobile-events/day/time-separator.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.8
+ * @version 5.0.0
  *
  * @var string $datetime The event datetime string, in the ISO 8601 format, e.g. `2019-01-01T00:00:00+00:00`.
  * @var string $formatted_time The time formatted according to the site settings.

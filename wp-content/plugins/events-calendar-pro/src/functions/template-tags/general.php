@@ -132,18 +132,42 @@ if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 	 *
 	 * Display link for all occurrences of an event (based on the currently queried event).
 	 *
-	 * @param int $postId (optional)
+	 * @since 3.0.0
+	 * @since 5.0.0 Introduced caching based on Post ID or Parent Post ID.
+	 *
+	 * @param int      $post_id (optional) Which post we are looking for the All link.
+	 * @param booolean $echo    (optional) Should be echoed along side returning the value.
+	 *
+	 * @return string  Link reference to all events in a recurrent event.
 	 */
 	if ( ! function_exists( 'tribe_all_occurences_link' ) ) {
-		function tribe_all_occurences_link( $postId = null, $echo = true ) {
-			$postId = Tribe__Events__Main::postIdHelper( $postId );
-			$tribe_ecp = Tribe__Events__Main::instance();
-			$link = apply_filters( 'tribe_all_occurences_link', $tribe_ecp->getLink( 'all', $postId ) );
-			if ( $echo ) {
-				echo $link;
-			} else {
-				return $link;
+		function tribe_all_occurences_link( $post_id = null, $echo = true ) {
+			$cache_key_links = __FUNCTION__ . ':links';
+			$cache_key_parent_ids = __FUNCTION__ . ':parent_ids';
+			$cache_links = tribe_get_var( $cache_key_links, [] );
+			$cache_parent_ids = tribe_get_var( $cache_key_parent_ids, [] );
+
+			$post_id = Tribe__Events__Main::postIdHelper( $post_id );
+
+			if ( ! isset( $cache_parent_ids[ $post_id ] ) ) {
+				$cache_parent_ids[ $post_id ] = wp_get_post_parent_id( $post_id );
+				tribe_set_var( $cache_key_parent_ids, $cache_parent_ids );
 			}
+
+			// The ID to cache will be diff depending on Parent or child post of recurrent event.
+			$cache_id = $cache_parent_ids[ $post_id ] ? $cache_parent_ids[ $post_id ] : $post_id;
+
+			if ( ! isset( $cache_links[ $cache_id ] ) ) {
+				$tribe_ecp = Tribe__Events__Main::instance();
+				$cache_links[ $cache_id ] = apply_filters( 'tribe_all_occurences_link', $tribe_ecp->getLink( 'all', $post_id ) );
+				tribe_set_var( $cache_key_links, $cache_links );
+			}
+
+			if ( $echo ) {
+				echo $cache_links[ $cache_id ];
+			}
+
+			return $cache_links[ $cache_id ];
 		}
 	}
 

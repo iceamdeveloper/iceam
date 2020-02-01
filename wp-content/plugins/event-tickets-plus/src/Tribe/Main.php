@@ -12,14 +12,28 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.10.10';
+		const VERSION = '4.11.1.1';
 
 		/**
 		 * Min required Tickets Core version
 		 *
 		 * @deprecated 4.10
 		 */
-		const REQUIRED_TICKETS_VERSION = '4.10.7';
+		const REQUIRED_TICKETS_VERSION = '4.11.1';
+
+		/**
+		 * Used to store the version history.
+		 *
+		 * @since 4.11.0
+		 */
+		public $version_history_slug = 'previous_event_tickets_plus_versions';
+
+		/**
+		 * Used to store the latest version.
+		 *
+		 * @since 4.11.0
+		 */
+		public $latest_version_slug = 'latest_event_tickets_plus_version';
 
 		/**
 		 * Directory of the plugin
@@ -107,7 +121,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			add_action( 'init', array( $this, 'csv_import_support' ), 6 );
 			add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
 			add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ), 5 );
-			add_filter( 'tribe_tickets_settings_tab_fields', array( $this, 'additional_ticket_settings' ) );
+			add_filter( 'tribe_tickets_settings_tab_fields', array( $this, 'tribe_tickets_plus_settings' ) );
 
 			// Unique ticket identifiers
 			add_action( 'event_tickets_rsvp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
@@ -141,6 +155,10 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->tickets_view();
 			$this->qr();
 			$this->attendees_list();
+
+			$this->apm_filters();
+			$this->maybe_set_event_tickets_plus_version();
+
 		}
 
 		/**
@@ -241,6 +259,21 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			}
 
 			return self::$apm_filters;
+		}
+
+		/**
+		 * Set the Event Tickets version in the options table if it's not already set.
+		 *
+		 * @since 4.11.0
+		 */
+		public function maybe_set_event_tickets_plus_version() {
+			if ( version_compare( Tribe__Settings_Manager::get_option( $this->latest_version_slug ), self::VERSION, '<' ) ) {
+				$previous_versions   = Tribe__Settings_Manager::get_option( $this->version_history_slug ) ?: [];
+				$previous_versions[] = Tribe__Settings_Manager::get_option( $this->latest_version_slug ) ?: '0';
+
+				Tribe__Settings_Manager::set_option( $this->version_history_slug, $previous_versions );
+				Tribe__Settings_Manager::set_option( $this->latest_version_slug, self::VERSION );
+			}
 		}
 
 		/**
@@ -368,7 +401,22 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		}
 
 		/**
+		 * Filter the tickets settings tab to include tickets plus settings
+		 *
+		 * @param $settings array Field settings for the tickets settings tab in the dashboard.
+		 *
+		 * @since 4.11.0
+		 */
+		public function tribe_tickets_plus_settings( $settings ) {
+			include $this->plugin_path . 'src/admin-views/ticket-settings.php';
+
+			return $settings;
+		}
+
+		/**
 		 * Add additional ticket settings to define slug and choose the template for the attendee info page.
+		 *
+		 * @deprecated 4.11.0
 		 *
 		 * @since 4.10.1
 		 *
@@ -377,78 +425,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 * @return array List of ticket fields with additional setting fields added.
 		 */
 		public function additional_ticket_settings( $tickets_fields ) {
-			$template_options = array(
-				'default' => esc_html__( 'Default Page Template', 'event-tickets' ),
-			);
+			_deprecated_function( __METHOD__, '4.11.0', 'tribe_tickets_plus_settings' );
 
-			if ( class_exists( 'Tribe__Events__Main' ) ) {
-				$template_options['same']  = esc_html__( 'Same as Event Page Template', 'event-tickets' );
-			}
-
-			$templates = get_page_templates();
-
-			ksort( $templates );
-
-			foreach ( array_keys( $templates ) as $template ) {
-				$template_options[ $templates[ $template ] ] = $template;
-			}
-
-			$options = array(
-				'ticket-attendee-info-slug' => array(
-					'type'                => 'text',
-					'label'               => esc_html__( 'Attendee Registration URL slug', 'event-tickets' ),
-					'tooltip'             => esc_html__( 'The slug used for building the URL for the Attendee Registration Info page.', 'event-tickets' ),
-					'size'                => 'medium',
-					'default'             => tribe( 'tickets.attendee_registration' )->get_slug(),
-					'validation_callback' => 'is_string',
-					'validation_type'     => 'slug',
-				),
-				'ticket-attendee-info-template' => array(
-					'type'            => 'dropdown',
-					'label'           => __( 'Attendee Registration template', 'event-tickets' ),
-					'tooltip'         => __( 'Choose a page template to control the appearance of your attendee registration page.', 'event-tickets' ),
-					'validation_type' => 'options',
-					'size'            => 'large',
-					'default'         => 'default',
-					'options'         => $template_options,
-				)
-			);
-
-			$page_options = [ '' => __( 'Choose a page or leave blank.', 'event-tickets' ) ];
-
-			$pages = get_pages();
-
-			if ( $pages ) {
-				foreach ( $pages as $page ) {
-					$page_options[ $page->ID ] = $page->post_title;
-				}
-			} else {
-				//if no pages, let the user know they need one
-				$page_options = [ '' => __( 'You must create a page before using this functionality', 'event-tickets' ) ];
-			}
-
-			$ar_page_description = __( 'Optional: select an existing page to act as your attendee registration page. <strong>Requires</strong> use of the `[tribe_attendee_registration]` shortcode and overrides the above template and URL slug.', 'event-tickets' );
-
-			$ar_page = tribe( 'tickets.attendee_registration' )->get_attendee_registration_page();
-
-			// this is hooked too early for has_shortcode() to work properly, so regex to the rescue!
-			if ( ! empty( $ar_page ) && ! preg_match( '/\[tribe_attendee_registration\/?\]/', $ar_page->post_content ) ) {
-				$ar_slug_description = __( 'Selected page <strong>must</strong> use the `[tribe_attendee_registration]` shortcode. While the shortcode is missing the default redirect will be used.', 'event-tickets' );
-			}
-
-			$options['ticket-attendee-page-id'] = [
-				'type'            => 'dropdown',
-				'label'           => __( 'Attendee Registration page', 'event-tickets' ),
-				'tooltip'         => $ar_page_description,
-				'validation_type' => 'options',
-				'size'            => 'large',
-				'default'         => 'default',
-				'options'         => $page_options,
-			];
-
-			$array_key = array_key_exists( 'ticket-commerce-form-location', $tickets_fields ) ? 'ticket-commerce-form-location' : 'ticket-enabled-post-types';
-
-			return Tribe__Main::array_insert_after_key( $array_key, $tickets_fields, $options );
+			$this->tribe_tickets_plus_settings( $tickets_fields );
 		}
 
 		/**

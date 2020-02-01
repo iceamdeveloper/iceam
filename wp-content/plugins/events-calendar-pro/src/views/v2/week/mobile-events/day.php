@@ -3,14 +3,14 @@
  * View: Week View Mobile Events Day
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/mobile-events/day.php
+ * [your-theme]/tribe/events-pro/v2/week/mobile-events/day.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  * @var string $day_date The day date, in the `Y-m-d` format.
  * @var array  $day The data for the day.
@@ -38,6 +38,18 @@ if (
 	id="tribe-events-pro-week-mobile-events-day-<?php echo esc_attr( $day_date ); ?>"
 	aria-hidden="<?php echo esc_attr( $hidden ); ?>"
 >
+	<?php if ( 0 === $day['found_events'] && ! empty( $day['message_mobile'] ) ) : ?>
+		<?php $this->template(
+			'components/messages',
+			[
+				'messages' => [
+					'notice' => [
+						$day['message_mobile']
+					]
+				]
+			]
+		); ?>
+	<?php endif; ?>
 
 	<?php foreach ( $day['event_times'] as $event_time => $time_content ) {
 
@@ -54,6 +66,7 @@ if (
 		}
 
 		foreach ( $time_content[ 'events' ] as $event ) {
+			$this->setup_postdata( $event );
 	 		$this->template( 'week/mobile-events/day/event', [ 'event' => $event ] );
 	 	}
 	 }

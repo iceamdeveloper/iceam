@@ -3,13 +3,13 @@
  * View: Month View - Calendar Event Tooltip Featured Image
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events/views/v2/month/calendar-body/day/calendar-events/calendar-event/tooltip/featured-image.php
+ * [your-theme]/tribe/events/v2/month/calendar-body/day/calendar-events/calendar-event/tooltip/featured-image.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.9.11
+ * @version 5.0.0
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
  *
@@ -23,7 +23,7 @@ if ( ! $event->thumbnail->exists ) {
 <div class="tribe-events-calendar-month__calendar-event-tooltip-featured-image-wrapper">
 	<a
 		href="<?php echo esc_url( $event->permalink ); ?>"
-		title="<?php echo esc_attr( get_the_title( $event->ID ) ); ?>"
+		title="<?php echo esc_attr( $event->title ); ?>"
 		rel="bookmark"
 		class="tribe-events-calendar-month__calendar-event-tooltip-featured-image-link"
 	>

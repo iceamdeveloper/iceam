@@ -113,7 +113,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Report {
 			return $actions;
 		}
 
-		if ( ! in_array( $post->post_type, Tribe__Tickets__Main::instance()->post_types() ) ) {
+		if ( ! in_array( $post->post_type, Tribe__Tickets__Main::instance()->post_types(), true ) ) {
 			return $actions;
 		}
 

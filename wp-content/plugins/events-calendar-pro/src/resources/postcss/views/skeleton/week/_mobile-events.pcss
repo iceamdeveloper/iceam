@@ -6,7 +6,7 @@
 
 	.tribe-events-pro-week-mobile-events {
 
-		@media (--viewport-medium) {
+		.tribe-common--breakpoint-medium& {
 			@mixin hidden;
 		}
 	}
@@ -44,7 +44,8 @@
 		margin-bottom: var(--spacer-3);
 	}
 
-	.tribe-events-pro-week-mobile-events__event-featured-image-link {
+	.tribe-events-pro-week-mobile-events__event-featured-image-link,
+	.tribe-events-pro-week-mobile-events__event-featured-image {
 		display: block;
 	}
 
@@ -58,7 +59,7 @@
 
 	.tribe-events-pro-week-mobile-events__event-datetime-wrapper,
 	.tribe-events-pro-week-mobile-events__event-title {
-		margin-bottom: var(--spacer-1);
+		margin: 0 0 var(--spacer-1);
 
 		&:last-child {
 			margin-bottom: 0;
@@ -77,5 +78,26 @@
 
 	.tribe-events-pro-week-mobile-events__event-venue {
 		margin-bottom: var(--spacer-1);
+	}
+
+	/* -----------------------------------------------------------------------------
+	 * Theme Overrides - Twenty Nineteen
+	 * ----------------------------------------------------------------------------- */
+
+	.tribe-theme-twentynineteen & {
+
+		.entry.tribe-events-pro-week-mobile-events__event {
+			margin-bottom: var(--spacer-5);
+			margin-top: var(--spacer-7);
+			padding-left: var(--grid-gutter-small);
+
+			&:last-child {
+				margin-bottom: var(--spacer-8);
+			}
+		}
+
+		.tribe-events-pro-week-mobile-events__event-time-separator + .entry.tribe-events-pro-week-mobile-events__event {
+			margin-top: var(--spacer-4);
+		}
 	}
 }

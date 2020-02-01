@@ -93,6 +93,7 @@ class Context extends \tad_DI52_ServiceProvider {
 						],
 						Tribe__Context::REQUEST_VAR => [ 'eventDate', 'tribe-bar-date' ],
 						Tribe__Context::QUERY_VAR   => 'eventDate',
+						Tribe__Context::WP_PARSED   => 'eventDate',
 					],
 					'write' => [
 						Tribe__Context::REQUEST_VAR => [ 'eventDate', 'tribe-bar-date' ],
@@ -141,12 +142,13 @@ class Context extends \tad_DI52_ServiceProvider {
 				],
 				'featured'             => [
 					'read'  => [
-						Tribe__Context::REQUEST_VAR => 'featured',
-						Tribe__Context::QUERY_VAR   => 'featured',
+						Tribe__Context::REQUEST_VAR      => 'featured',
+						Tribe__Context::QUERY_VAR        => 'featured',
+						Tribe__Context::WP_MATCHED_QUERY => 'featured',
 					],
 					'write' => [
-						Tribe__Context::REQUEST_VAR => 'featured',
-						Tribe__Context::QUERY_VAR   => 'featured',
+						Tribe__Context::REQUEST_VAR      => 'featured',
+						Tribe__Context::QUERY_VAR        => 'featured',
 					],
 				],
 				TEC::TAXONOMY          => [
@@ -177,8 +179,23 @@ class Context extends \tad_DI52_ServiceProvider {
 					 */
 					'read' => [
 						Tribe__Context::REQUEST_VAR => [ 'view', 'tribe_view', 'tribe_event_display', 'eventDisplay' ],
-						Tribe__Context::WP_PARSED   => [ 'eventDisplay' ],
-						Tribe__Context::QUERY_VAR   => 'eventDisplay',
+						Tribe__Context::WP_PARSED   => [ 'eventDisplay', 'tribe_event_display' ],
+						Tribe__Context::QUERY_VAR   => [ 'eventDisplay', 'tribe_event_display' ],
+					],
+				],
+				'tribe_event_display'   => [
+					/**
+					 * On V1 we depend on `tribe_event_display` to handle Plain permalink usage of `past` events.
+					 * The context need to be aware of where to read and write this from.
+					 */
+					'read' => [
+						Tribe__Context::REQUEST_VAR => [ 'tribe_event_display' ],
+						Tribe__Context::WP_PARSED   => [ 'tribe_event_display' ],
+						Tribe__Context::QUERY_VAR   => [ 'tribe_event_display' ],
+					],
+					'write' => [
+						Tribe__Context::REQUEST_VAR => [ 'tribe_event_display', 'event_display_mode' ],
+						Tribe__Context::QUERY_VAR   => [ 'tribe_event_display' ],
 					],
 				],
 				'keyword'              => [
@@ -313,6 +330,14 @@ class Context extends \tad_DI52_ServiceProvider {
 								return tribe_get_request_var( 'url', Tribe__Context::NOT_FOUND );
 							},
 						],
+					],
+				],
+				'view_request'         => [
+					'read'  => [
+						Tribe__Context::WP_MATCHED_QUERY => [ 'eventDisplay' ],
+						Tribe__Context::WP_PARSED        => [ 'eventDisplay' ],
+						Tribe__Context::REQUEST_VAR      => [ 'view', 'tribe_view', 'tribe_event_display', 'eventDisplay' ],
+						Tribe__Context::QUERY_VAR        => [ 'tribe_view', 'eventDisplay' ],
 					],
 				],
 			]

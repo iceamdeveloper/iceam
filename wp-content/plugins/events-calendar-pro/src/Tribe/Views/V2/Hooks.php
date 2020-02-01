@@ -33,14 +33,15 @@ use Tribe\Events\Pro\Views\V2\Views\Photo_View;
 use Tribe\Events\Pro\Views\V2\Views\Venue_View;
 use Tribe\Events\Pro\Views\V2\Views\Week_View;
 use Tribe\Events\Views\V2\Messages as TEC_Messages;
-use Tribe\Events\Views\V2\Template;
 use Tribe\Events\Views\V2\View;
 use Tribe\Events\Views\V2\View_Interface;
 use Tribe__Context as Context;
+use Tribe__Events__Main as TEC;
 use Tribe__Events__Organizer as Organizer;
 use Tribe__Events__Pro__Main as Plugin;
 use Tribe__Events__Rewrite as TEC_Rewrite;
 use Tribe__Events__Venue as Venue;
+use WP_REST_Request as Request;
 
 /**
  * Class Hooks.
@@ -69,18 +70,21 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	protected function add_actions() {
 		add_action( 'init', [ $this, 'action_disable_shortcode_v1' ], 15 );
 		add_action( 'init', [ $this, 'action_add_shortcodes' ], 20 );
-		add_action( 'tribe_template_after_include:events/components/top-bar/actions/content', [ $this, 'action_include_hide_recurring_events' ], 10, 3 );
-		add_action( 'tribe_template_after_include:events/components/events-bar/search/keyword', [ $this, 'action_include_location_form_field' ], 10, 3 );
-		add_action( 'tribe_template_after_include:events/day/event/date/meta', [ $this, 'action_include_day_event_recurring_icon' ], 10, 3 );
-		add_action( 'tribe_template_after_include:events/list/event/date/meta', [ $this, 'action_include_list_event_recurring_icon' ], 10, 3 );
-		add_action( 'tribe_template_after_include:events/month/calendar-body/day/calendar-events/calendar-event/date/meta', [ $this, 'action_include_month_calendar_event_recurring_icon' ], 10, 3 );
-		add_action( 'tribe_template_after_include:events/month/calendar-body/day/calendar-events/calendar-event/tooltip/date/meta', [ $this, 'action_include_month_calendar_event_tooltip_recurring_icon' ], 10, 3 );
-		add_action( 'tribe_template_after_include:events/month/mobile-events/mobile-day/mobile-event/date/meta', [ $this, 'action_include_month_mobile_event_recurring_icon' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/components/top-bar/actions/content', [ $this, 'action_include_hide_recurring_events' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/components/events-bar/search/keyword', [ $this, 'action_include_location_form_field' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/day/event/date/meta', [ $this, 'action_include_day_event_recurring_icon' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/list/event/date/meta', [ $this, 'action_include_list_event_recurring_icon' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/month/calendar-body/day/calendar-events/calendar-event/date/meta', [ $this, 'action_include_month_calendar_event_recurring_icon' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/month/calendar-body/day/calendar-events/calendar-event/tooltip/date/meta', [ $this, 'action_include_month_calendar_event_tooltip_recurring_icon' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/month/mobile-events/mobile-day/mobile-event/date/meta', [ $this, 'action_include_month_mobile_event_recurring_icon' ], 10, 3 );
 		add_action( 'tribe_events_views_v2_view_messages_before_render', [ $this, 'before_view_messages_render' ], 10, 3 );
 		add_action( 'wp_enqueue_scripts', [ $this, 'action_disable_assets_v1' ], 0 );
 		add_action( 'tribe_events_pro_shortcode_tribe_events_after_assets', [ $this, 'action_disable_shortcode_assets_v1' ] );
 		add_action( 'tribe_events_pre_rewrite', [ $this, 'on_pre_rewrite' ], 6 );
+
 		add_action( 'template_redirect', [ $this, 'on_template_redirect' ], 50 );
+		add_action( 'tribe_template_after_include:events/v2/components/breadcrumbs', [ $this, 'action_include_organizer_meta' ], 10, 3 );
+		add_action( 'tribe_template_after_include:events/v2/components/breadcrumbs', [ $this, 'action_include_venue_meta' ], 10, 3 );
 	}
 
 	/**
@@ -89,9 +93,9 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	 * @since 4.7.5
 	 */
 	protected function add_filters() {
+		add_filter( 'tribe_events_rewrite_base_slugs', [ $this, 'filter_add_rewrite_venue_organizer' ] );
 		add_filter( 'tribe_events_views', [ $this, 'filter_events_views' ] );
 		add_filter( 'tribe_events_views_v2_bootstrap_view_slug', [ $this, 'filter_bootstrap_view_slug' ], 10, 2 );
-		add_filter( 'tribe_template_path_list', [ $this, 'filter_template_path_list' ] );
 		add_filter( 'tribe_events_views_v2_view_repository_args', [ $this, 'filter_events_views_v2_view_repository_args' ], 10, 2 );
 		add_filter( 'tribe_events_views_v2_view_template_vars', [ $this, 'filter_events_views_v2_view_template_vars' ], 10, 2 );
 		add_filter( 'tribe_events_v2_view_title', [ $this, 'filter_tribe_events_v2_view_title' ], 10, 4 );
@@ -99,21 +103,41 @@ class Hooks extends \tad_DI52_ServiceProvider {
 		add_filter( 'tribe_events_views_v2_messages_map', [ $this, 'filter_tribe_events_views_v2_messages_map' ] );
 		add_filter( 'tribe_events_pro_geocode_rewrite_rules', [ $this, 'filter_geocode_rewrite_rules' ], 10, 3 );
 		add_filter( 'tribe_context_locations', [ $this, 'filter_context_locations' ] );
-		add_filter( 'tribe_events_views_v2_view_all_breadcrumbs', [ $this, 'filter_view_all_breadcrums' ], 10, 2 );
+		add_filter( 'tribe_events_views_v2_view_all_breadcrumbs', [ $this, 'filter_view_all_breadcrumbs' ], 10, 2 );
 		add_filter( 'tribe_events_views_v2_view_repository_args', [ $this, 'filter_view_repository_args' ], 10, 2 );
-		add_filter( 'tribe_events_views_v2_view_venue_breadcrumbs', [ $this, 'filter_view_venue_breadcrums' ], 10, 2 );
-		add_filter( 'tribe_events_views_v2_view_organizer_breadcrumbs', [ $this, 'filter_view_organizer_breadcrums' ], 10, 2 );
+		add_filter( 'tribe_events_views_v2_view_venue_breadcrumbs', [ $this, 'filter_view_venue_breadcrumbs' ], 10, 2 );
+		add_filter( 'tribe_events_views_v2_view_organizer_breadcrumbs', [ $this, 'filter_view_organizer_breadcrumbs' ], 10, 2 );
+		add_filter( 'redirect_canonical', [ $this, 'filter_prevent_canonical_redirect' ] );
+
+		add_filter( 'tribe_events_views_v2_rest_params', [ $this, 'filter_rest_request_view_slug' ], 10, 2 );
 
 		add_filter( 'tribe_events_views_v2_view_url', [ $this, 'filter_shortcode_view_url' ], 10, 3 );
 		add_filter( 'tribe_events_views_v2_view_next_url', [ $this, 'filter_shortcode_view_url' ], 10, 3 );
 		add_filter( 'tribe_events_views_v2_view_prev_url', [ $this, 'filter_shortcode_view_url' ], 10, 3 );
 		add_filter( 'tribe_events_views_v2_view_url_query_args', [ $this, 'filter_shortcode_view_url_query_args' ], 10, 3 );
+		add_filter( 'tribe_events_views_v2_view_context', [ $this, 'filter_shortcode_view_context' ], 10, 3 );
 
 		add_filter( 'tribe_events_views_v2_manager_default_view', [ $this, 'filter_shortcode_default_view' ] );
+
+		add_filter( 'tribe_events_views_v2_all_view_html_classes', [ $this, 'filter_add_events_pro_view_html_class' ] );
+		add_filter( 'tribe_events_views_v2_map_view_html_classes', [ $this, 'filter_add_events_pro_view_html_class' ] );
+		add_filter( 'tribe_events_views_v2_organizer_view_html_classes', [ $this, 'filter_add_events_pro_view_html_class' ] );
+		add_filter( 'tribe_events_views_v2_photo_view_html_classes', [ $this, 'filter_add_events_pro_view_html_class' ] );
+		add_filter( 'tribe_events_views_v2_venue_view_html_classes', [ $this, 'filter_add_events_pro_view_html_class' ] );
+		add_filter( 'tribe_events_views_v2_week_view_html_classes', [ $this, 'filter_add_events_pro_view_html_class' ] );
+
+		// This is the controlled version of the filtering method removed in the `remove_filters` method.
+		add_filter( 'tribe_events_event_schedule_details', [ $this, 'append_recurring_info_tooltip' ], 9, 2 );
+		add_filter( 'tribe_events_views_v2_view_html_classes', [ $this, 'filter_view_html_classes' ], 10, 3 );
+		add_filter( 'tribe_events_views_v2_view_data', [ $this, 'filter_view_data' ], 10, 3 );
+
+		// Let's filter AFTER Week View.
+		add_filter( 'tribe_rewrite_handled_rewrite_rules', [ $this, 'filter_handled_rewrite_rules' ], 20, 2 );
+		add_filter( 'tribe_events_rewrite_matchers_to_query_vars_map', [ $this, 'filter_rewrite_query_vars_map' ] );
 	}
 
 	/**
-	 * Remove the filters required by Pro Views v2.
+	 * Remove the filters not required by Pro Views v2.
 	 *
 	 * @since 4.7.9
 	 */
@@ -121,6 +145,10 @@ class Hooks extends \tad_DI52_ServiceProvider {
 
 		$plugin = Plugin::instance();
 
+		/*
+		 * This is removed here to be re-added in `add_filters` under the control of the `append_recurring_info_tooltip`
+		 * method of this class.
+		 */
 		remove_filter( 'tribe_events_event_schedule_details', [ $plugin, 'append_recurring_info_tooltip' ], 9, 2 );
 	}
 
@@ -150,25 +178,6 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	public function action_disable_shortcode_assets_v1() {
 		$pro_assets = $this->container->make( Pro_Assets::class );
 		$pro_assets->disable_v1();
-	}
-
-	/**
-	 * Filters the list of folders TEC will look up to find templates to add the ones defined by PRO.
-	 *
-	 * @since 4.7.5
-	 *
-	 * @param array $folders The current list of folders that will be searched template files.
-	 *
-	 * @return array The filtered list of folders that will be searched for the templates.
-	 */
-	public function filter_template_path_list( array $folders = [] ) {
-		$folders[] = [
-			'id'       => 'events-pro',
-			'priority' => 25,
-			'path'     => \Tribe__Events__Pro__Main::instance()->pluginPath . 'src/views/v2',
-		];
-
-		return $folders;
 	}
 
 	/**
@@ -328,6 +337,20 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
+	 * Filter the Rest Requests to point to the correct view when dealing with Venue and Organizer.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param  array   $params  Params received on the Request.
+	 * @param  Request $request Full WP Rest Request instance.
+	 *
+	 * @return array            Params after view slug is setup.
+	 */
+	public function filter_rest_request_view_slug( array $params, Request $request ) {
+		return $this->container->make( View_Filters::class )->filter_rest_request_view_slug( $params, $request );
+	}
+
+	/**
 	 * Filters the View repository args to parse and apply PRO specific View filters.
 	 *
 	 * @since 4.7.5
@@ -454,6 +477,32 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
+	 * Includes rewrite bases for Organizer and Venue.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param  array $bases Previous set of bases.
+	 *
+	 * @return array       Bases after adding the venue and organizer.
+	 */
+	public function filter_add_rewrite_venue_organizer( array $bases ) {
+		return $this->container->make( Rewrite::class )->add_base_rewrites( $bases );
+	}
+
+	/**
+	 * Filters the `redirect_canonical` to prevent any redirects on venue and organizer URLs.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param mixed $redirect_url URL which we will redirect to.
+	 *
+	 * @return string             Orginial URL redirect or False to prevent canonical redirect.
+	 */
+	public function filter_prevent_canonical_redirect( $redirect_url = null ) {
+		return $this->container->make( Rewrite::class )->filter_prevent_canonical_redirect( $redirect_url );
+	}
+
+	/**
 	 * Filters the geocode based rewrite rules to add Views v2 specific rules.
 	 *
 	 * Differently from other Views, the Map View sets up its rewrite rules in the
@@ -488,50 +537,50 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
-	 * Filters recurring view breadcrums
+	 * Filters recurring view breadcrumbs
 	 *
 	 * @since 4.7.9
 	 *
 	 * @param array $breadcrumbs The breadcrumbs array.
 	 * @param array $view        The instance of the view being rendered.
 	 *
-	 * @return array The filtered breadcrums
+	 * @return array The filtered breadcrumbs
 	 *
 	 * @see \Tribe\Events\Views\V2\View::get_breadcrumbs() for where this code is applying.
 	 */
-	public function filter_view_all_breadcrums( $breadcrumbs, $view ) {
+	public function filter_view_all_breadcrumbs( $breadcrumbs, $view ) {
 		return $this->container->make( All_View::class )->setup_breadcrumbs( $breadcrumbs, $view );
 	}
 
 	/**
-	 * Filters Organizer view breadcrums
+	 * Filters Organizer view breadcrumbs
 	 *
 	 * @since 4.7.9
 	 *
 	 * @param array $breadcrumbs The breadcrumbs array.
 	 * @param array $view        The instance of the view being rendered.
 	 *
-	 * @return array The filtered breadcrums
+	 * @return array The filtered breadcrumbs
 	 *
 	 * @see \Tribe\Events\Views\V2\View::get_breadcrumbs() for where this code is applying.
 	 */
-	public function filter_view_organizer_breadcrums( $breadcrumbs, $view ) {
+	public function filter_view_organizer_breadcrumbs( $breadcrumbs, $view ) {
 		return $this->container->make( Organizer_View::class )->setup_breadcrumbs( $breadcrumbs, $view );
 	}
 
 	/**
-	 * Filters Venue view breadcrums
+	 * Filters Venue view breadcrumbs
 	 *
 	 * @since 4.7.9
 	 *
 	 * @param array $breadcrumbs The breadcrumbs array.
 	 * @param array $view        The instance of the view being rendered.
 	 *
-	 * @return array The filtered breadcrums
+	 * @return array The filtered breadcrumbs
 	 *
 	 * @see \Tribe\Events\Views\V2\View::get_breadcrumbs() for where this code is applying.
 	 */
-	public function filter_view_venue_breadcrums( $breadcrumbs, $view ) {
+	public function filter_view_venue_breadcrumbs( $breadcrumbs, $view ) {
 		return $this->container->make( Venue_View::class )->setup_breadcrumbs( $breadcrumbs, $view );
 	}
 
@@ -564,6 +613,22 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
+	 * Alters the context of the view based on the shortcode params stored in the database based on the ID.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param  Context $view_context Context for this request.
+	 * @param  string  $view_slug    Slug of the view we are building.
+	 * @param  View    $instance     Which view instance we are dealing with.
+	 *
+	 * @return Context               Altered version of the context ready for shortcodes.
+	 */
+	public function filter_shortcode_view_context( $view_context, $view_slug, $instance ) {
+		return $this->container->make( Shortcodes\Tribe_Events::class )
+		                       ->filter_view_context( $view_context, $view_slug, $instance );
+	}
+
+	/**
 	 * Filters the View URL to add the shortcode query arg, if required.
 	 *
 	 * @since 4.7.9
@@ -579,11 +644,178 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
+	 * Filters the View HTML classes to add the pro required classes.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param   array  $html_classes  Array of classes used for this view.
+	 *
+	 * @return  array                 Array of classes after adding tribe-events-pro
+	 */
+	public function filter_add_events_pro_view_html_class( $classes ) {
+		$classes[] = 'tribe-events-pro';
+
+		return $classes;
+	}
+
+	/**
 	 * Fires on the `template_redirect` action to allow the conditional redirect, if required.
 	 *
 	 * @since 4.7.10
 	 */
 	public function on_template_redirect() {
 		$this->container->make( View_Filters::class )->on_template_redirect();
+	}
+
+	/**
+	 * Filters the event schedule details to add the recurring information tooltip.
+	 *
+	 * This is a controlled use of a filter we used on all event details rendering in v1, in v2 we only append that
+	 * tooltip to single events view.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param string $schedule_details The schedule details HTML, as built so far.
+	 * @param int    $event_id         The event post ID.
+	 *
+	 * @return string The filtered schedule details HTML.
+	 */
+	public function append_recurring_info_tooltip( $schedule_details, $event_id ) {
+		if ( ! is_singular( TEC::POSTTYPE ) ) {
+			return $schedule_details;
+		}
+
+		return Plugin::instance()->append_recurring_info_tooltip( $schedule_details, $event_id );
+	}
+
+	/**
+	 * Fires to include the organizer meta to the organizer view.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param string $file      Complete path to include the PHP File.
+	 * @param array  $name      Template name.
+	 * @param self   $template  Current instance of the Tribe__Template.
+	 *
+	 * @return string The organizer meta HTML.
+	 */
+	public function action_include_organizer_meta( $file, $name, $template ) {
+		$view      = $template->get_view();
+
+		if ( 'organizer' !== $view->get_slug() ) {
+			return;
+		}
+
+		$organizer = get_post( $view->get_post_id() );
+
+		if ( ! $organizer || Organizer::POSTTYPE !== $organizer->post_type ) {
+			return;
+		}
+
+		return $view->render_meta();
+	}
+
+	/**
+	 * Fires to include the venue meta to the venue view.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param string $file      Complete path to include the PHP File.
+	 * @param array  $name      Template name.
+	 * @param self   $template  Current instance of the Tribe__Template.
+	 *
+	 * @return string The venue meta HTML.
+	 */
+	public function action_include_venue_meta( $file, $name, $template ) {
+		$view    = $template->get_view();
+
+		if ( 'venue' !== $view->get_slug() ) {
+			return;
+		}
+
+		$venue   = tribe_get_venue_object( $view->get_post_id() );
+
+		if ( ! $venue || Venue::POSTTYPE !== $venue->post_type ) {
+			return;
+		}
+
+		return $view->render_meta();
+	}
+
+	/**
+	 * Filters the View HTML classes to add some related to PRO features.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array<string>  $html_classes The current View HTML classes.
+	 * @param string         $slug         The View registered slug.
+	 * @param View_Interface $view         The View currently rendering.
+	 *
+	 * @return array<string> The filtered HTML classes.
+	 */
+	public function filter_view_html_classes( $html_classes, $slug, $view ) {
+		$html_classes = $this->container->make( Shortcodes\Tribe_Events::class )
+		                                ->filter_view_html_classes( $html_classes, $slug, $view );
+
+		return $html_classes;
+	}
+
+	/**
+	 * Filters the View data attributes to add some related to PRO features.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array<string,string> $data The current View data attributes.
+	 * @param string               $slug The View registered slug.
+	 * @param View_Interface       $view The View currently rendering.
+	 *
+	 * @return array<string,string> The filtered View data attributes.
+	 */
+	public function filter_view_data( $data, $slug, $view ) {
+		$data = $this->container->make( Shortcodes\Tribe_Events::class )
+		                        ->filter_view_data( $data, $slug, $view );
+
+		return $data;
+	}
+
+	/**
+	 * Filters the handled rewrite rules, the one used to parse plain links into permalinks, to add the ones
+	 * managed by PRO.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<string,string> $handled_rules The handled rules, as produced by The Events Calendar base code; in
+	 *                                            the same format used by WordPress to store and manage rewrite rules.
+	 * @param array<string,string> $all_rules All the rewrite rules handled by WordPress.
+	 *
+	 * @return array<string,string> The filtered rewrite rules, including the ones handled by Events PRO; in the same
+	 *                              format used by WordPress to handle rewrite rules.
+	 *
+	 * @see Rewrite::filter_handled_rewrite_rules() for the implementation.
+	 */
+	public function filter_handled_rewrite_rules( array $handled_rewrite_rules = [], array $all_rewrite_rules = [] ) {
+		if ( empty( $all_rewrite_rules ) ) {
+			return $handled_rewrite_rules;
+		}
+
+		return $this->container->make( Rewrite::class )
+		                       ->filter_handled_rewrite_rules( $handled_rewrite_rules, $all_rewrite_rules );
+	}
+
+	/**
+	 * Filters the query vars map used by the Rewrite component to parse plain links into permalinks to add the elements
+	 * needed to support PRO components.
+	 *
+	 * @since TBD
+	 *
+	 * @param array<string,string> $query_vars_map The query variables map, as produced by The Events Calendar code.
+	 *                                             Shape is `[ <pattern> => <query_var> ].
+	 *
+	 * @return array<string,string> The query var map, filtered to add the query vars handled by PRO.
+	 *
+	 * @see   Rewrite::filter_rewrite_query_vars_map for the implementation.
+	 */
+	public function filter_rewrite_query_vars_map( array $query_vars_map = [] ) {
+		return $this->container->make( Rewrite::class )->filter_rewrite_query_vars_map( $query_vars_map );
 	}
 }

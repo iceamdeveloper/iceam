@@ -90,7 +90,11 @@ class Tribe__Tickets_Plus__Tickets_View {
 		 * @return array
 		 */
 		$tickets_in_cart = apply_filters( 'tribe_tickets_tickets_in_cart', [] );
-		$meta_up_to_date = tribe( 'tickets-plus.meta.contents' )->is_stored_meta_up_to_date( $tickets_in_cart );
+
+		/** @var Tribe__Tickets_Plus__Meta__Contents $contents */
+		$contents = tribe( 'tickets-plus.meta.contents' );
+
+		$meta_up_to_date = $contents->is_stored_meta_up_to_date( $tickets_in_cart );
 
 		wp_send_json_success( [
 			'meta_up_to_date' => $meta_up_to_date,
@@ -125,7 +129,9 @@ class Tribe__Tickets_Plus__Tickets_View {
 					continue;
 				}
 
-				$optout = empty( $_POST['optout'][ $order_id ] ) ? false : true;
+				$optout = isset( $_POST['optout'][ $order_id ] ) ? $_POST['optout'][ $order_id ] : 0;
+				$optout = filter_var( $optout, FILTER_VALIDATE_BOOLEAN );
+				$optout = (int) $optout;
 
 				foreach ( $attendees_by_order[ $order_id ] as $attendee ) {
 					if ( $user_id !== (int) $attendee['user_id'] ) {
@@ -232,6 +238,17 @@ class Tribe__Tickets_Plus__Tickets_View {
 			if ( $data != $values ) {
 				// Updates the meta information associated with individual attendees
 				update_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, $data );
+
+				/**
+				 * An Action fired when an Attendees Meta Data is Updated.
+				 *
+				 * @since 4.11.0
+				 *
+				 * @param array $data        An array of attendee meta that was saved for the attendee.
+				 * @param int   $attendee_id the ID of an attendee.
+				 * @param int   $event_id    the ID of an event.
+				 */
+				do_action( 'event_tickets_plus_attendee_meta_update', $data, $attendee_id, $event_id );
 			}
 		}
 	}

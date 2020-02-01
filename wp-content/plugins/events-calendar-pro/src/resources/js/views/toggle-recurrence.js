@@ -43,22 +43,6 @@ tribe.events.views.toggleRecurrence = {};
 	};
 
 	/**
-	 * Handles after toggle recurrence init theme event.
-	 *
-	 * @since  4.7.9
-	 *
-	 * @param  {Event}   event      event object for 'afterSetup.tribeEvents' event
-	 * @param  {integer} index      jQuery.each index param from 'afterSetup.tribeEvents' event
-	 * @param  {jQuery}  $container jQuery object of view container
-	 * @param  {object}  data       data object passed from 'afterSetup.tribeEvents' event
-	 *
-	 * @return {void}
-	 */
-	obj.init = function( event, index, $container, data ) {
-		$container.find( obj.selectors.toggleInput ).on( 'change.tribeEvents', obj.handleChangeInput );
-	};
-
-	/**
 	 * Handles after toggle recurrence change of input.
 	 *
 	 * @since 4.7.9
@@ -79,6 +63,44 @@ tribe.events.views.toggleRecurrence = {};
 		};
 
 		tribe.events.views.manager.request( data, $container );
+	};
+
+	/**
+	 * Deinitialize toggle recurrence JS.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param  {Event}       event    event object for 'afterSetup.tribeEvents' event
+	 * @param  {jqXHR}       jqXHR    Request object
+	 * @param  {PlainObject} settings Settings that this request was made with
+	 *
+	 * @return {void}
+	 */
+	obj.deinit = function( event, jqXHR, settings ) {
+		var $container = event.data.container;
+		$container
+			.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit )
+			.find( obj.selectors.toggleInput )
+			.off( 'change.tribeEvents', obj.handleChangeInput );
+	};
+
+	/**
+	 * Handles after toggle recurrence init theme event.
+	 *
+	 * @since  4.7.9
+	 *
+	 * @param  {Event}   event      event object for 'afterSetup.tribeEvents' event
+	 * @param  {integer} index      jQuery.each index param from 'afterSetup.tribeEvents' event
+	 * @param  {jQuery}  $container jQuery object of view container
+	 * @param  {object}  data       data object passed from 'afterSetup.tribeEvents' event
+	 *
+	 * @return {void}
+	 */
+	obj.init = function( event, index, $container, data ) {
+		$container
+			.on( 'beforeAjaxSuccess.tribeEvents', { container: $container }, obj.deinit )
+			.find( obj.selectors.toggleInput )
+			.on( 'change.tribeEvents', obj.handleChangeInput );
 	};
 
 	/**

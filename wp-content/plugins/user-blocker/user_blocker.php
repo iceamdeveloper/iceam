@@ -6,9 +6,9 @@
   Author: Solwin Infotech
   Author URI: https://www.solwininfotech.com/
   Copyright: Solwin Infotech
-  Version: 1.4
+  Version: 1.5
   Requires at least: 4.0
-  Tested up to: 5.2.2
+  Tested up to: 5.3.2
   License: GPLv2 or later
  */
 /**
@@ -61,12 +61,12 @@ if (!function_exists('ublk_plugin_setup')) {
             add_menu_page(esc_html__('User Blocker', 'user-blocker'), esc_html__('User Blocker', 'user-blocker'), 'manage_options', 'welcome_block_user', 'ublk_welcome_page', 'dashicons-admin-users');
 
         }        
-        $block_date_page = add_submenu_page('', esc_html__('Block User Date Wise', 'user-blocker'), esc_html__('Date Wise Block User', 'user-blocker'), 'manage_options', 'block_user_date', 'ublk_block_user_date_page', 'dashicons-admin-users');
-        $block_permanent = add_submenu_page('', esc_html__('Block User Permanent', 'user-blocker'), esc_html__('Permanently Block User', 'user-blocker'), 'manage_options', 'block_user_permenant', 'ublk_block_user_permenant_page', 'dashicons-admin-users');
-        add_submenu_page('block_user', esc_html__('Blocked User list', 'user-blocker'), esc_html__('Blocked User list', 'user-blocker'), 'manage_options', 'blocked_user_list', 'ublk_block_user_list_page', 'dashicons-admin-users');
-        $list_user_date = add_submenu_page('', esc_html__('Date Wise Blocked User list', 'user-blocker'), esc_html__('Date Wise Blocked User list', 'user-blocker'), 'manage_options', 'datewise_blocked_user_list', 'ublk_datewise_block_user_list_page', 'dashicons-admin-users');
-        $list_user_permanent = add_submenu_page('', esc_html__('Permanent Blocked User list', 'user-blocker'), esc_html__('Permanent Blocked User list', 'user-blocker'), 'manage_options', 'permanent_blocked_user_list', 'ublk_permanent_block_user_list_page', 'dashicons-admin-users');
-        $list_user_all = add_submenu_page('', esc_html__('All Type Blocked User list', 'user-blocker'), esc_html__('All Type Blocked User list', 'user-blocker'), 'manage_options', 'all_type_blocked_user_list', 'ublk_all_type_block_user_list_page', 'dashicons-admin-users');
+        $block_date_page = add_submenu_page('', esc_html__('Block User Date Wise', 'user-blocker'), esc_html__('Date Wise Block User', 'user-blocker'), 'manage_options', 'block_user_date', 'ublk_block_user_date_page', 1);
+        $block_permanent = add_submenu_page('', esc_html__('Block User Permanent', 'user-blocker'), esc_html__('Permanently Block User', 'user-blocker'), 'manage_options', 'block_user_permenant', 'ublk_block_user_permenant_page', 2);
+        add_submenu_page('block_user', esc_html__('Blocked User list', 'user-blocker'), esc_html__('Blocked User list', 'user-blocker'), 'manage_options', 'blocked_user_list', 'ublk_block_user_list_page', 3);
+        $list_user_date = add_submenu_page('', esc_html__('Date Wise Blocked User list', 'user-blocker'), esc_html__('Date Wise Blocked User list', 'user-blocker'), 'manage_options', 'datewise_blocked_user_list', 'ublk_datewise_block_user_list_page', 4);
+        $list_user_permanent = add_submenu_page('', esc_html__('Permanent Blocked User list', 'user-blocker'), esc_html__('Permanent Blocked User list', 'user-blocker'), 'manage_options', 'permanent_blocked_user_list', 'ublk_permanent_block_user_list_page', 5);
+        $list_user_all = add_submenu_page('', esc_html__('All Type Blocked User list', 'user-blocker'), esc_html__('All Type Blocked User list', 'user-blocker'), 'manage_options', 'all_type_blocked_user_list', 'ublk_all_type_block_user_list_page', 6);
 
         // Enqueue script in submenu page to fix the current menu indicator
         add_action("admin_footer-$block_date_page", function() {

@@ -9,6 +9,7 @@
 namespace Tribe\Events\Pro\Views\V2\Views;
 
 use Tribe\Events\Views\V2\Messages;
+use Tribe\Events\Views\V2\Utils\Stack;
 use Tribe\Events\Views\V2\Views\By_Day_View;
 use Tribe__Context as Context;
 use Tribe__Date_Utils as Dates;
@@ -41,6 +42,15 @@ class Week_View extends By_Day_View {
 	 * @var bool
 	 */
 	protected static $publicly_visible = true;
+
+	/**
+	 * Whether to hide the week-ends or not.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @var bool
+	 */
+	protected $hide_weekends = false;
 
 	/**
 	 * {@inheritDoc}
@@ -106,11 +116,12 @@ class Week_View extends By_Day_View {
 		$template_vars['days_of_week']              = $this->get_header_grid( $week_start, $week_end );
 		$template_vars['is_current_week']           = $this->is_current_week( $today_date, $week_start, $week_end );
 		$date_format                                = tribe_get_option( 'dateWithoutYearFormat', 'F Y' );
-		$template_vars['formatted_week_start_date'] = $week_start->format( $date_format );
-		$template_vars['formatted_week_end_date']   = $week_end->format( $date_format );
+		$template_vars['formatted_week_start_date'] = $week_start->format_i18n( $date_format );
+		$template_vars['formatted_week_end_date']   = $week_end->format_i18n( $date_format );
 		$template_vars['mobile_days']               = $this->get_mobile_days( $user_date );
 		$template_vars['days']                      = $this->get_grid_days( $user_date );
 		$template_vars['multiday_events']           = $list_ready_stack;
+		$template_vars['has_multiday_events']       = $this->get_has_multiday_events( $list_ready_stack );
 		$template_vars['events']                    = $events;
 
 		$template_vars['multiday_min_toggle'] = $stack_toggle_threshold;
@@ -123,6 +134,7 @@ class Week_View extends By_Day_View {
 			? $this->build_stack_toggle_controls( $stack )
 			: '';
 		$template_vars['messages']                 = $this->get_messages( $events );
+		$template_vars['hide_weekends']            = $this->hide_weekends;
 
 		return $template_vars;
 	}
@@ -139,9 +151,9 @@ class Week_View extends By_Day_View {
 	 *
 	 * @since 4.7.9
 	 *
-	 * @param \DateTime $today_date Today's date object.
-	 * @param \DateTime $week_start The week start date object.
-	 * @param \DateTime $week_end The week end date object.
+	 * @param \DateTimeInterface $today_date Today's date object.
+	 * @param \DateTimeInterface $week_start The week start date object.
+	 * @param \DateTimeInterface $week_end The week end date object.
 	 *
 	 * @return bool True if $today is part of the week.
 	 */
@@ -154,7 +166,7 @@ class Week_View extends By_Day_View {
 	 *
 	 * @since 4.7.7
 	 *
-	 * @param string|int|\DateTime $user_date The user date, it might have been set to the default value or be set
+	 * @param string|int|\DateTimeInterface $user_date The user date, it might have been set to the default value or be set
 	 *                                        explicitly.
 	 *
 	 * @return array An array of days of the week in the shape `[ <Y-m-d> => [ ...<day_mobile_data> ] ]`.
@@ -165,10 +177,15 @@ class Week_View extends By_Day_View {
 		$grid_days = parent::get_grid_days( $user_date );
 
 		foreach ( $grid_days as $date_string => $event_ids ) {
+			$message_mobile = count( $event_ids ) < 1
+				? Messages::for_key( 'day_no_results_found', date_i18n( tribe_get_date_format( true ), Dates::build_date_object( $date_string )->getTimestamp() ) )
+				: '';
+
 			$mobile_days[ $date_string ] = [
-				'date'         => $date_string,
-				'found_events' => count( $event_ids ),
-				'event_times'  => $this->parse_event_times( $event_ids ),
+				'date'           => $date_string,
+				'found_events'   => count( $event_ids ),
+				'event_times'    => $this->parse_event_times( $event_ids ),
+				'message_mobile' => $message_mobile,
 			];
 		}
 
@@ -254,17 +271,32 @@ class Week_View extends By_Day_View {
 
 		$raw_grid_days = parent::get_grid_days( $date, $force );
 
+		$raw_grid_days = $this->maybe_remove_weekends( $raw_grid_days );
+
 		foreach ( $raw_grid_days as $date_string => $event_ids ) {
 			$day_date = Dates::build_date_object( $date_string );
 
 			$grid_days[ $date_string ] = [
-				'datetime' => $date_string,
-				'weekday'  => date_i18n( 'D', $day_date->getTimestamp() ),
-				'daynum'   => $day_date->format( 'j' ),
+				'datetime'     => $date_string,
+				'weekday'      => date_i18n( 'D', $day_date->getTimestamp() ),
+				'daynum'       => $day_date->format( 'j' ),
+				'found_events' => count( $event_ids ),
 			];
 		}
 
 		return $grid_days;
+	}
+
+	/**
+	 * Week_View constructor.
+	 *
+	 * @since 5.0.0
+	 *
+	 * {@inheritDoc}
+	 */
+	public function __construct( Messages $messages, Stack $stack ) {
+		parent::__construct( $messages, $stack );
+		$this->hide_weekends = tribe_is_truthy( tribe_get_option( 'week_view_hide_weekends', false ) );
 	}
 
 	/**
@@ -283,6 +315,9 @@ class Week_View extends By_Day_View {
 		$grid_days = parent::get_grid_days( $user_date );
 
 		$stack = $this->stack->build_from_events( $grid_days );
+
+		$stack = $this->maybe_remove_weekends( $stack );
+
 		$week_stack = [];
 
 		foreach ( $stack as $day_date => $elements ) {
@@ -331,12 +366,14 @@ class Week_View extends By_Day_View {
 	protected function get_events( $user_date = null ) {
 		$days = parent::get_grid_days( $user_date );
 
+		$days = $this->maybe_remove_weekends( $days );
+
 		// Filter out multi-day and all-day events and cast each event to an decorated WP_Post event object.
 		foreach ( $days as $day => &$day_events ) {
 			$day_events = array_reduce( $day_events, function ( array $day_events, $event_id ) {
 				$event = tribe_get_event( $event_id );
 
-				if ( ! $event instanceof \WP_Post || $event->multiday || $event->all_day ) {
+				if ( ! $event instanceof \WP_Post || $event->multiday > 1 || $event->all_day ) {
 					return $day_events;
 				}
 
@@ -353,16 +390,38 @@ class Week_View extends By_Day_View {
 	}
 
 	/**
+	 * Returns whether the Week View has multiday events or not.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array $multiday_events
+	 *
+	 * @return bool True if week view has multiday events.
+	 */
+	protected function get_has_multiday_events( array $multiday_events ) {
+		$has_multiday_events = false;
+
+		foreach ( $multiday_events as $day => list( $day_multiday_events, $more_events ) ) {
+			if ( count( $day_multiday_events ) ) {
+				$has_multiday_events = true;
+				break;
+			}
+		}
+
+		return $has_multiday_events;
+	}
+
+	/**
 	 * Returns the Week View header grid, the one required to render the list of days at the top of the view.
 	 *
 	 * @since 4.7.8
 	 *
-	 * @param \DateTime $week_start The week start date object.
-	 * @param \DateTime $week_end The week end date object.
+	 * @param \DateTimeInterface $week_start The week start date object.
+	 * @param \DateTimeInterface $week_end The week end date object.
 	 *
-	 * @return array
+	 * @return array The week view header grid.
 	 */
-	protected function get_header_grid( \DateTime $week_start, \DateTime $week_end ) {
+	protected function get_header_grid( \DateTimeInterface $week_start, \DateTimeInterface $week_end ) {
 		$grid = [];
 
 		$one_day = new \DateInterval( 'P1D' );
@@ -379,6 +438,10 @@ class Week_View extends By_Day_View {
 
 		/** @var \DateTime $day */
 		foreach ( $interval as $day ) {
+			if ( $this->hide_weekends && in_array( (int) $day->format( 'w' ), [ 0, 6 ], true ) ) {
+				continue;
+			}
+
 			$day_y_m_d          = $day->format( 'Y-m-d' );
 			$day_url            = tribe_events_get_url( [ 'eventDisplay' => 'day', 'eventDate' => $day_y_m_d ] );
 
@@ -520,11 +583,6 @@ class Week_View extends By_Day_View {
 	protected function get_event_duration_class( \WP_Post $event ) {
 		$hours = (int) floor( $event->duration / 3600 );
 
-		if ( $hours < 1 ) {
-			// Do not add any class if the event lasts less than 1 hour.
-			return '';
-		}
-
 		$decimal_minutes = ( $event->duration % 3600 ) / 3600;
 
 		$duration_string = $hours;
@@ -578,17 +636,24 @@ class Week_View extends By_Day_View {
 	 * {@inheritDoc}
 	 */
 	public function prev_url( $canonical = false, array $passthru_vars = [] ) {
+		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
+			return $this->cached_urls[ __METHOD__ ];
+		}
+
 		// Setup the Default date for the Week view here.
 		$default_date = 'today';
 		$date         = $this->context->get( 'event_date', $default_date );
 		$current_date = Dates::build_date_object( $date );
 		list( $week_start ) = $this->calculate_grid_start_end( $current_date );
 
-		$prev_date = clone $week_start;
+		$prev_date = Dates::build_date_object( clone $week_start );
 		$prev_date->sub( new \DateInterval( 'P1W' ) );
+
 		// Let's make sure to prevent users from paginating endlessly back when we know there are no more events.
-		$earliest = tribe_get_option( 'earliest_date', $prev_date );
-		if ( $week_start <= Dates::build_date_object( $earliest ) ) {
+		$earliest = tribe_get_option( 'earliest_date', $prev_date->format( Dates::DBDATETIMEFORMAT ) );
+		$earliest = Dates::build_date_object( $earliest );
+
+		if ( $week_start <= $earliest ) {
 			// The earliest event happens on this week, stop.
 			return $this->filter_prev_url( $canonical, '' );
 		}
@@ -599,6 +664,8 @@ class Week_View extends By_Day_View {
 
 		$url = $this->filter_prev_url( $canonical, $url );
 
+		$this->cached_urls[ __METHOD__ ] = $url;
+
 		return $url;
 	}
 
@@ -606,6 +673,10 @@ class Week_View extends By_Day_View {
 	 * {@inheritDoc}
 	 */
 	public function next_url( $canonical = false, array $passthru_vars = [] ) {
+		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
+			return $this->cached_urls[ __METHOD__ ];
+		}
+
 		// Setup the Default date for the Week view here.
 		$default_date = 'today';
 		$date         = $this->context->get( 'event_date', $default_date );
@@ -619,7 +690,7 @@ class Week_View extends By_Day_View {
 		$next_date_utc->setTimezone( $utc );
 		// Let's make sure to prevent users from paginating endlessly forward when we know there are no more events.
 		$latest_ids          = tribe_get_option( 'latest_date_markers', [] );
-		$latest_end_date_utc = array_reduce( $latest_ids, static function ( \DateTime $latest_end, $event_id ) use ( $utc ) {
+		$latest_end_date_utc = array_reduce( $latest_ids, static function ( \DateTimeInterface $latest_end, $event_id ) use ( $utc ) {
 			$event_end_date_utc = get_post_meta( $event_id, '_EventEndDateUTC', true );
 			$date               = Dates::build_date_object( $event_end_date_utc, $utc );
 
@@ -637,20 +708,17 @@ class Week_View extends By_Day_View {
 
 		$url =  $this->filter_next_url( $canonical, $url );
 
-		return $url;
-	}
+		$this->cached_urls[ __METHOD__ ] = $url;
 
-	/**
-	 * {@inheritDoc}
-	 */
-	protected function get_url_date_format() {
-		return 'Y-m-d';
+		return $url;
 	}
 
 	/**
 	 * Removes the week number rules from the list of rewrite rules we handle and calls a callable.
 	 *
 	 * We remove the week number rule as it is ambiguous in its resolution and we're not currently supporting it.
+	 * To remove the rules we use a regular expression. On regular expressions.
+	 * This is not out of cruelty on the reader, but to support localizations of permalinks.
 	 *
 	 * @since 4.7.8
 	 *
@@ -660,10 +728,17 @@ class Week_View extends By_Day_View {
 	 */
 	protected function removing_week_number_rule( \Closure $fn ) {
 		$remove_week_number_rule = static function ( array $rules ) {
-			unset(
-				$rules['(?:events)/(?:week)/(\d{2})/?$'],
-				$rules['(?:events)/(?:week)/(\d{2})/(?:featured)/?$']
-			);
+			// The event archive slug can be controlled via settings and an option: let's account for that.
+			$events_slug = tribe_get_option( 'eventsSlug', 'events' );
+			// Match anything that looks like this: `(?:events)/(?:week|...)/(\d{2})/?$`.
+			$pattern = '/\\(\\?:' . $events_slug . '\\).*\\?:week.*\\/\\(\\\\d\\{2\\}\\)\\//um';
+
+			// Why a regular expression? We need to take into account localizations too.
+			if ( is_array( $rules ) && count( $rules ) ) {
+				$rules = array_filter( $rules, static function ( $rule ) use ( $events_slug, $pattern ) {
+					return ! preg_match( $pattern, $rule );
+				}, ARRAY_FILTER_USE_KEY );
+			}
 
 			return $rules;
 		};
@@ -706,4 +781,58 @@ class Week_View extends By_Day_View {
 		}
 	}
 
+	/**
+	 * Overrides the base View implementation to take into account Week View rewrite rules.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param string|int|\DateTimeInterface $date       The date to return the URL for.
+	 * @param array|string                  $query_args The query string or arguments to append to the URL.
+	 *
+	 * @return string The URL for the Week View on the date.
+	 */
+	public function url_for_query_args( $date = null, $query_args = null ) {
+		return $this->removing_week_number_rule( function () use ( $date, $query_args ) {
+			return parent::url_for_query_args( $date, $query_args );
+		} );
+	}
+
+	/**
+	 * Overrides the base method to take care of Week View special back-compatibility issues w/ week number support.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @inheritDoc}
+	 */
+	public function get_url( $canonical = false, $force = false ) {
+		return $this->removing_week_number_rule( function () use ( $canonical, $force ) {
+			return parent::get_url( $canonical, $canonical || $force );
+		} );
+	}
+
+	/**
+	 * Removes the week-ends from a result set if required by the settings.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array $days The days to prune.
+	 *
+	 * @return array The pruned days, if required.
+	 */
+	protected function maybe_remove_weekends( array $days ) {
+		if ( empty( $days || ! is_array( $days ) ) ) {
+			return $days;
+		}
+
+		if ( ! $this->hide_weekends ) {
+			return $days;
+		}
+
+		return array_filter( $days, static function ( $day ) {
+			$day_num = (int) Dates::build_date_object( $day )->format( 'w' );
+
+			// Sunday is `0`, Saturday is `6`.
+			return $day_num !== 0 && $day_num !== 6;
+		}, ARRAY_FILTER_USE_KEY );
+	}
 }

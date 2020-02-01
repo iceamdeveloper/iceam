@@ -15,7 +15,7 @@ use Aelia\WC\AFC\Messages;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.0.8.190822';
+	public static $version = '2.0.12.200101';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -295,14 +295,17 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		// Keep track of the fact that we are in the setup phase
 		$this->running_setup = true;
 		IP2Location::install_database();
+
+		// Register the deactivation hook
+		register_deactivation_hook($this->main_plugin_file, array($GLOBALS['wc-aelia-foundation-classes'], 'deactivate'));
 	}
 
 	/**
 	 * Performs cleanup operations when the plugin is uninstalled.
 	 *
-	 * @since 1.6.0.150724
+	 * @since 2.0.9.191108
 	 */
-	public function uninstall() {
+	public function deactivate() {
 		wp_clear_scheduled_hook('aelia_afc_geoip_updater');
 	}
 

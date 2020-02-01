@@ -1,5 +1,16 @@
 .tribe-events-pro {
 
+	/* If event 1 hour or less */
+	.tribe-events-pro-week-grid__event--h-1,
+	[class*="tribe-events-pro-week-grid__event--h-0"] {
+
+		.tribe-events-pro-week-grid__event-title {
+			overflow: hidden;
+			text-overflow: ellipsis;
+			white-space: nowrap;
+		}
+	}
+
 	.tribe-events-pro-week-grid__event--featured {
 
 		.tribe-events-pro-week-grid__event-link-inner {
@@ -80,12 +91,6 @@
 	 * Event details
 	 * ----------------------------------------------------------------------------- */
 
-	.tribe-events-pro-week-grid__event-title {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
 	.tribe-events-pro-week-grid__event-datetime {
 		@mixin mobile-body-3;
 
@@ -110,7 +115,7 @@
 		}
 	}
 
-	.tribe-events-calendar-month__calendar-event-tooltip-datetime {
+	.tribe-events-pro-week-grid__event-tooltip-datetime {
 		@mixin mobile-body-3;
 	}
 

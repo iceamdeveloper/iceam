@@ -135,28 +135,17 @@ tribe.events.views.weekMultidayToggle = {};
 		var containerIds = $toggleButton.attr( 'aria-controls' ).split( ' ' );
 		var togglesAndContainers = obj.getTogglesAndContainers( $multidayRow, containerIds );
 
-		$toggleButton
-			.on(
-				'click',
-				{
-					toggleButton: $toggleButton,
-					togglesAndContainers: togglesAndContainers,
-				},
-				obj.toggleMultidayEvents
-			);
+		$toggleButton.on( 'click', {
+			toggleButton: $toggleButton,
+			togglesAndContainers: togglesAndContainers,
+		}, obj.toggleMultidayEvents );
 
 		togglesAndContainers.forEach( function( item ) {
 			var $moreButton = item.header;
-
-			$moreButton
-				.on(
-					'click',
-					{
-						toggleButton: $toggleButton,
-						togglesAndContainers: togglesAndContainers,
-					},
-					obj.toggleMultidayEvents
-				);
+			$moreButton.on( 'click', {
+				toggleButton: $toggleButton,
+				togglesAndContainers: togglesAndContainers,
+			}, obj.toggleMultidayEvents );
 		} );
 	};
 
@@ -178,9 +167,8 @@ tribe.events.views.weekMultidayToggle = {};
 
 		$multidayRow
 			.find( obj.selectors.weekMultidayMoreButton )
-			.each( function( index, wrapper ) {
-				var $moreButton = $( wrapper );
-				$moreButton.off( 'click', obj.toggleMultidayEvents );
+			.each( function( index, moreButton ) {
+				$( moreButton ).off( 'click', obj.toggleMultidayEvents );
 		} );
 	};
 
@@ -196,7 +184,9 @@ tribe.events.views.weekMultidayToggle = {};
 	 * @return {void}
 	 */
 	obj.deinit = function( event, jqXHR, settings ) {
-		obj.deinitToggle( event.data.container );
+		var $container = event.data.container;
+		obj.deinitToggle( $container );
+		$container.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit );
 	};
 
 

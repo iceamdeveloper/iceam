@@ -149,7 +149,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		var $quantity = my.$ticket_form.find( '.quantity' );
 		var going = $( this ).val() === 'yes';
 		var ticket_id = parseInt( $quantity.data( 'product-id' ), 10 );
-		var quantity = going ? parseInt( $quantity.find( '.tribe-ticket-quantity' ).val() ) : 0;
+		var quantity = going ? parseInt( $quantity.find( '.tribe-tickets-quantity' ).val(), 10 ) : 0;
 
 		my.render_fields( ticket_id, quantity );
 	};

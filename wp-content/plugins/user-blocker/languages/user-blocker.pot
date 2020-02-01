@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: User Blocker\n"
-"POT-Creation-Date: 2019-07-15 16:33+0530\n"
+"POT-Creation-Date: 2019-11-04 10:26+0530\n"
 "PO-Revision-Date: 2017-06-24 14:12+0530\n"
 "Last-Translator: \n"
 "Language-Team: Solwin Infotech <info@solwininfotech.com>\n"
@@ -108,7 +108,7 @@ msgstr ""
 #: includes/user_blocker_blocked_users_list.php:1621
 #: includes/user_blocker_blocked_users_list.php:1705
 #: includes/user_blocker_blocked_users_list.php:1741
-#: includes/user_blocker_common_functions.php:589
+#: includes/user_blocker_common_functions.php:590
 msgid "Role"
 msgstr ""
 
@@ -432,7 +432,7 @@ msgstr ""
 #: includes/user_blocker_blocked_users_list.php:1339
 #: includes/user_blocker_blocked_users_list.php:1689
 #: includes/user_blocker_blocked_users_list.php:1725
-#: includes/user_blocker_common_functions.php:588
+#: includes/user_blocker_common_functions.php:589
 msgid "Username"
 msgstr ""
 
@@ -538,7 +538,7 @@ msgstr ""
 #: includes/user_blocker_block_users.php:1325
 #: includes/user_blocker_block_users.php:2034
 #: includes/user_blocker_block_users.php:2643
-#: includes/user_blocker_common_functions.php:565
+#: includes/user_blocker_common_functions.php:566
 msgid "Cancel"
 msgstr ""
 
@@ -608,14 +608,14 @@ msgid "Site URL, WP Version, PHP Info, Plugins & Themes Info"
 msgstr ""
 
 #: includes/user_blocker_block_users.php:1386
-#: includes/user_blocker_common_functions.php:562
+#: includes/user_blocker_common_functions.php:563
 msgid ""
 "By clicking this button, you agree with the storage and handling of your "
 "data as mentioned above by this website. (GDPR Compliance)"
 msgstr ""
 
 #: includes/user_blocker_block_users.php:1389
-#: includes/user_blocker_common_functions.php:566
+#: includes/user_blocker_common_functions.php:567
 msgid "Skip"
 msgstr ""
 
@@ -803,8 +803,8 @@ msgstr ""
 #: includes/user_blocker_blocked_users_list.php:1372
 #: includes/user_blocker_blocked_users_list.php:1646
 #: includes/user_blocker_blocked_users_list.php:1759
-#: includes/user_blocker_common_functions.php:740
-#: includes/user_blocker_common_functions.php:761
+#: includes/user_blocker_common_functions.php:741
+#: includes/user_blocker_common_functions.php:762
 msgid "Reset"
 msgstr ""
 
@@ -977,124 +977,124 @@ msgstr ""
 msgid "Settings"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:525
+#: includes/user_blocker_common_functions.php:526
 msgid ""
 "If you have a moment, please let us know why you are deactivating. We "
 "would like to help you in fixing the issue."
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:531
+#: includes/user_blocker_common_functions.php:532
 msgid "The plugin suddenly stopped working"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:536
+#: includes/user_blocker_common_functions.php:537
 msgid "The plugin was not working"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:541
+#: includes/user_blocker_common_functions.php:542
 msgid "Found other better plugin than this plugin"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:546
+#: includes/user_blocker_common_functions.php:547
 msgid "The plugin broke my site completely"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:551
+#: includes/user_blocker_common_functions.php:552
 msgid "No any reason"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:556
+#: includes/user_blocker_common_functions.php:557
 msgid "Other"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:564
+#: includes/user_blocker_common_functions.php:565
 msgid "Submit"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:564
+#: includes/user_blocker_common_functions.php:565
 msgid "Deactivate"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:566
+#: includes/user_blocker_common_functions.php:567
 msgid "Deactivate User Blocker"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:566
+#: includes/user_blocker_common_functions.php:567
 msgid " Deactivate"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:569
+#: includes/user_blocker_common_functions.php:570
 msgid "Would you like to give us a chance to help you?"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:571
+#: includes/user_blocker_common_functions.php:572
 msgid "Create a support ticket"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:586
-#: includes/user_blocker_common_functions.php:599
+#: includes/user_blocker_common_functions.php:587
+#: includes/user_blocker_common_functions.php:600
 msgid "Select User/Category: "
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:601
+#: includes/user_blocker_common_functions.php:602
 msgid "Users"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:602
+#: includes/user_blocker_common_functions.php:603
 msgid "Roles"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:619
-#: includes/user_blocker_common_functions.php:646
+#: includes/user_blocker_common_functions.php:620
+#: includes/user_blocker_common_functions.php:647
 msgid "Select Role: "
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:621
-#: includes/user_blocker_common_functions.php:648
+#: includes/user_blocker_common_functions.php:622
+#: includes/user_blocker_common_functions.php:649
 msgid "All Roles"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:684
-#: includes/user_blocker_common_functions.php:713
+#: includes/user_blocker_common_functions.php:685
+#: includes/user_blocker_common_functions.php:714
 msgid "items"
-msgstr ""
-
-#: includes/user_blocker_common_functions.php:687
-#: includes/user_blocker_common_functions.php:715
-msgid "Go to the first page"
 msgstr ""
 
 #: includes/user_blocker_common_functions.php:688
 #: includes/user_blocker_common_functions.php:716
+msgid "Go to the first page"
+msgstr ""
+
+#: includes/user_blocker_common_functions.php:689
+#: includes/user_blocker_common_functions.php:717
 msgid "Go to the previous page"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:690
+#: includes/user_blocker_common_functions.php:691
 msgid "Current page"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:691
-#: includes/user_blocker_common_functions.php:719
+#: includes/user_blocker_common_functions.php:692
+#: includes/user_blocker_common_functions.php:720
 msgid "of"
-msgstr ""
-
-#: includes/user_blocker_common_functions.php:694
-#: includes/user_blocker_common_functions.php:722
-msgid "Go to the next page"
 msgstr ""
 
 #: includes/user_blocker_common_functions.php:695
 #: includes/user_blocker_common_functions.php:723
-msgid "Go to the last page"
+msgid "Go to the next page"
 msgstr ""
 
-#: includes/user_blocker_common_functions.php:738
-#: includes/user_blocker_common_functions.php:759
-msgid "username or email or first name"
+#: includes/user_blocker_common_functions.php:696
+#: includes/user_blocker_common_functions.php:724
+msgid "Go to the last page"
 msgstr ""
 
 #: includes/user_blocker_common_functions.php:739
 #: includes/user_blocker_common_functions.php:760
+msgid "username or email or first name"
+msgstr ""
+
+#: includes/user_blocker_common_functions.php:740
+#: includes/user_blocker_common_functions.php:761
 msgid "Search"
 msgstr ""
 

@@ -11,12 +11,9 @@
 		}
 	}
 
-	.tribe-events-pro-map__event-card {
-		border: 1px solid transparent;
-	}
-
 	.tribe-events-pro-map__event-card-button {
 		border: 1px solid var(--color-border-default);
+		text-align: left;
 
 		&:hover,
 		&:focus {
@@ -53,7 +50,8 @@
 	}
 
 	.tribe-events-pro-map__event-datetime-featured-text {
-		@media (--viewport-medium) {
+
+		.tribe-common--breakpoint-medium& {
 			color: var(--color-accent-primary);
 			font-weight: var(--font-weight-bold);
 		}
@@ -68,7 +66,8 @@
 	}
 
 	.tribe-events-pro-map__event-distance {
-		@media (--viewport-medium) {
+
+		.tribe-common--breakpoint-medium& {
 			color: var(--color-text-secondary);
 		}
 	}

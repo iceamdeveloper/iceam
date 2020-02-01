@@ -1,6 +1,5 @@
 <?php
 
-
 /**
  * Class Tribe__Tickets_Plus__Updater
  *

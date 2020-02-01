@@ -9,10 +9,11 @@
 namespace Tribe\Events\Pro\Views\V2\Views;
 
 use Tribe\Events\Views\V2\View;
-use Tribe\Events\Views\V2\Views\List_Behavior;
+use Tribe\Events\Views\V2\Views\Traits\List_Behavior;
 use Tribe__Events__Main as TEC;
 use Tribe__Events__Rewrite as Rewrite;
 use Tribe__Utils__Array as Arr;
+use Tribe\Events\Views\V2\Utils;
 
 class Photo_View extends View {
 	use List_Behavior;
@@ -40,11 +41,15 @@ class Photo_View extends View {
 	 * {@inheritDoc}
 	 */
 	public function prev_url( $canonical = false, array $passthru_vars = [] ) {
+		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
+			return $this->cached_urls[ __METHOD__ ];
+		}
+
 		$current_page = (int) $this->context->get( 'page', 1 );
 		$display      = $this->context->get( 'event_display_mode', 'photo' );
 
 		if ( 'past' === $display ) {
-			$url = parent::next_url( $canonical, [ 'eventDisplay' => 'past' ] );
+			$url = parent::next_url( $canonical, [ Utils\View::get_past_event_display_key() => 'past' ] );
 		} elseif ( $current_page > 1 ) {
 			$url = parent::prev_url( $canonical );
 		} else {
@@ -53,6 +58,8 @@ class Photo_View extends View {
 
 		$url = $this->filter_prev_url( $canonical, $url );
 
+		$this->cached_urls[ __METHOD__ ] = $url;
+
 		return $url;
 	}
 
@@ -60,18 +67,24 @@ class Photo_View extends View {
 	 * {@inheritDoc}
 	 */
 	public function next_url( $canonical = false, array $passthru_vars = [] ) {
+		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
+			return $this->cached_urls[ __METHOD__ ];
+		}
+
 		$current_page = (int) $this->context->get( 'page', 1 );
 		$display      = $this->context->get( 'event_display_mode', 'photo' );
 
 		if ( $this->slug === $display || 'default' === $display ) {
 			$url = parent::next_url( $canonical );
 		} elseif ( $current_page > 1 ) {
-			$url = parent::prev_url( $canonical, [ 'eventDisplay' => 'past' ] );
+			$url = parent::prev_url( $canonical, [ Utils\View::get_past_event_display_key() => 'past' ] );
 		} else {
 			$url = $this->get_upcoming_url( $canonical );
 		}
 
 		$url = $this->filter_next_url( $canonical, $url );
+
+		$this->cached_urls[ __METHOD__ ] = $url;
 
 		return $url;
 	}
@@ -97,13 +110,18 @@ class Photo_View extends View {
 		] ) ) );
 
 		if ( $past->count() > 0 ) {
-			$past_url_object = clone $this->url->add_query_args( array_filter( [
+			$event_display_key = Utils\View::get_past_event_display_key();
+			$query_args        = [
 				'post_type'        => TEC::POSTTYPE,
-				'eventDisplay'     => 'past',
+				$event_display_key => 'past',
 				'eventDate'        => $event_date_var,
 				$this->page_key    => $page,
 				'tribe-bar-search' => $this->context->get( 'keyword' ),
-			] ) );
+			];
+
+			$query_args = $this->filter_query_args( $query_args, $canonical );
+
+			$past_url_object = clone $this->url->add_query_args( array_filter( $query_args ) );
 
 			$past_url = (string) $past_url_object;
 
@@ -120,7 +138,7 @@ class Photo_View extends View {
 			);
 
 			// We use the `eventDisplay` query var as a display mode indicator: we have to make sure it's there.
-			$url = add_query_arg( [ 'eventDisplay' => 'past' ], $canonical_url );
+			$url = add_query_arg( [ $event_display_key => 'past' ], $canonical_url );
 
 			// Let's re-add the `eventDate` if we had one and we're not already passing it with one of its aliases.
 			if ( ! (
@@ -152,18 +170,22 @@ class Photo_View extends View {
 		$event_date_var = $default_date === $date ? '' : $date;
 
 		$upcoming = tribe_events()->by_args( $this->setup_repository_args( $this->context->alter( [
-			'eventDisplay' => 'photo',
+			'eventDisplay' => $this->slug,
 			'paged'        => $page,
 		] ) ) );
 
 		if ( $upcoming->count() > 0 ) {
-			$upcoming_url_object = clone $this->url->add_query_args( array_filter( [
+			$query_args = [
 				'post_type'        => TEC::POSTTYPE,
-				'eventDisplay'     => 'photo',
+				'eventDisplay'     => $this->slug,
 				$this->page_key    => $page,
 				'eventDate'        => $event_date_var,
 				'tribe-bar-search' => $this->context->get( 'keyword' ),
-			] ) );
+			];
+
+			$query_args = $this->filter_query_args( $query_args, $canonical );
+
+			$upcoming_url_object = clone $this->url->add_query_args( array_filter( $query_args ) );
 
 			$upcoming_url = (string) $upcoming_url_object;
 
@@ -173,7 +195,7 @@ class Photo_View extends View {
 
 			// We've got rewrite rules handling `eventDate`, but not List. Let's remove it to build the URL.
 			$url = tribe( 'events.rewrite' )->get_clean_url(
-				remove_query_arg( [ 'eventDate' ], $upcoming_url )
+				remove_query_arg( [ 'eventDate', 'tribe_event_display' ], $upcoming_url )
 			);
 
 			// Let's re-add the `eventDate` if we had one and we're not already passing it with one of its aliases.
@@ -204,6 +226,7 @@ class Photo_View extends View {
 		$event_display = Arr::get( $context_arr, 'event_display_mode', Arr::get( $context_arr, 'event_display' ), 'current' );
 
 		if ( 'past' !== $event_display ) {
+			$args['order']       = 'ASC';
 			$args['ends_after'] = $date;
 		} else {
 			$args['order']       = 'DESC';
@@ -219,7 +242,13 @@ class Photo_View extends View {
 	protected function setup_template_vars() {
 		$template_vars = parent::setup_template_vars();
 
-		$template_vars['placeholder_url'] = trailingslashit( \Tribe__Events__Pro__Main::instance()->pluginUrl ) . 'src/resources/images/tribe-event-placeholder-image.svg';
+		$template_vars['placeholder_url'] = trailingslashit( \Tribe__Events__Pro__Main::instance()->pluginUrl )
+		                                    . 'src/resources/images/tribe-event-placeholder-image.svg';
+
+		if ( ! empty( $template_vars['events'] ) && 'past' === $this->context->get( 'event_display_mode' ) ) {
+			// Past events are fetched by in DESC start date, but shown in ASC order.
+			$template_vars['events'] = array_reverse( $template_vars['events'] );
+		}
 
 		$template_vars = $this->setup_datepicker_template_vars( $template_vars );
 

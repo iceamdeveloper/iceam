@@ -3,16 +3,17 @@
  * View: Map View - Tooltip
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/map/event-cards/event-card/tooltip.php
+ * [your-theme]/tribe/events-pro/v2/map/event-cards/event-card/tooltip.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.8
+ * @version 5.0.0
  *
  * @var array $events_by_venue A array with events grouped by Venue, it uses the Venue ID as index.
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
+ * @var array $events An array of the events, in sequence.
  *
  * @see tribe_get_event() For the format of the event object.
  */
@@ -45,7 +46,8 @@ $classes['tribe-events-pro-map__event-tooltip--has-slider'] = $has_multiple_even
 			>
 				<div class="tribe-events-pro-map__event-tooltip-slider-wrapper swiper-wrapper tribe-common-g-row">
 
-					<?php foreach( $events as $slide_index => $tooltip_event ) : ?>
+					<?php $slide_index = 0; ?>
+					<?php foreach( $events as $tooltip_event ) : ?>
 						<?php
 						// Skip any events not in this particular venue.
 						if ( ! in_array( $tooltip_event->ID, $selected_venue_obj->event_ids ) ) {
@@ -62,6 +64,7 @@ $classes['tribe-events-pro-map__event-tooltip--has-slider'] = $has_multiple_even
 							<?php $this->template( 'map/event-cards/event-card/tooltip/title', [ 'event' => (object) $tooltip_event ] ); ?>
 							<?php $this->template( 'map/event-cards/event-card/tooltip/venue', [ 'event' => (object) $tooltip_event ] ); ?>
 						</div>
+						<?php $slide_index += 1; ?>
 					<?php endforeach; ?>
 
 				</div>

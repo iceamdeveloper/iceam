@@ -2,7 +2,7 @@
 /*
 Plugin Name: The Events Calendar PRO
 Description: The Events Calendar PRO, a premium add-on to the open source The Events Calendar plugin (required), enables recurring events, custom attributes, venue pages, new widgets and a host of other premium features.
-Version: 4.7.10
+Version: 5.0.0.1
 Author: Modern Tribe, Inc.
 Author URI: http://m.tri.be/20
 Text Domain: tribe-events-calendar-pro
@@ -109,7 +109,8 @@ add_action( 'tribe_common_loaded', 'tribe_events_calendar_pro_init' );
 function tribe_events_calendar_pro_init() {
 
 	$classes_exist = class_exists( 'Tribe__Events__Main' ) && class_exists( 'Tribe__Events__Pro__Main' );
-	$version_ok = $classes_exist && tribe_check_plugin( 'Tribe__Events__Pro__Main' );
+	$plugins_check = tribe_check_plugin( 'Tribe__Events__Pro__Main' );
+	$version_ok    = $classes_exist && $plugins_check;
 
 	if ( class_exists( 'Tribe__Main' ) && ! is_admin() && ! class_exists( 'Tribe__Events__Pro__PUE__Helper' ) ) {
 		tribe_main_pue_helper();
@@ -209,6 +210,16 @@ function tribe_events_pro_deactivation( $network_deactivating ) {
 	require_once dirname( __FILE__ ) . '/src/Tribe/Main.php';
 	require_once dirname( __FILE__ ) . '/src/Tribe/Deactivation.php';
 	Tribe__Events__Pro__Main::deactivate( $network_deactivating );
+}
+/**
+ * Register Activation
+ */
+register_activation_hook( __FILE__, 'tribe_events_pro_activation' );
+function tribe_events_pro_activation() {
+	if ( ! is_network_admin()  ) {
+		// We set with a string to avoid having to include a file here.
+		set_transient( '_tribe_events_delayed_flush_rewrite_rules', 'yes', 0 );
+	}
 }
 
 /**

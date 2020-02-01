@@ -4,31 +4,35 @@ class Tribe__Tickets_Plus__Assets {
 	 * Enqueue scripts for front end
 	 *
 	 * @since 4.6
+	 * @since 4.11.1 Only load if in a tickets-enabled post context.
+	 *
+	 * @see   \tribe_tickets_is_enabled_post_context()
 	 */
 	public function enqueue_scripts() {
 		// Set up our base list of enqueues
-		$enqueue_array = array(
-			array( 'event-tickets-plus-tickets-css', 'tickets.css', array( 'dashicons' ) ),
-			array( 'jquery-deparam', 'vendor/jquery.deparam/jquery.deparam.js', array( 'jquery' ) ),
-			array( 'jquery-cookie', 'vendor/jquery.cookie/jquery.cookie.js', array( 'jquery' ) ),
-			array( 'event-tickets-plus-attendees-list-js', 'attendees-list.js', array( 'event-tickets-attendees-list-js' ) ),
-			array( 'event-tickets-plus-meta-js', 'meta.js', array( 'jquery-cookie', 'jquery-deparam' ) ),
-		);
+		$enqueue_array = [
+			[ 'event-tickets-plus-tickets-css', 'tickets.css', [ 'dashicons' ] ],
+			[ 'jquery-deparam', 'vendor/jquery.deparam/jquery.deparam.js', [ 'jquery' ] ],
+			[ 'jquery-cookie', 'vendor/jquery.cookie/jquery.cookie.js', [ 'jquery' ] ],
+			[ 'event-tickets-plus-attendees-list-js', 'attendees-list.js', [ 'event-tickets-attendees-list-js' ] ],
+			[ 'event-tickets-plus-meta-js', 'meta.js', [ 'jquery-cookie', 'jquery-deparam' ] ],
+		];
 
 		// and the engine...
 		tribe_assets(
 			tribe( 'tickets-plus.main' ),
 			$enqueue_array,
 			'wp_enqueue_scripts',
-			array(
-				'localize' => array(
+			[
+				'localize'     => [
 					'name' => 'TribeTicketsPlus',
-					'data' => array(
+					'data' => [
 						'ajaxurl'                  => admin_url( 'admin-ajax.php', ( is_ssl() ? 'https' : 'http' ) ),
 						'save_attendee_info_nonce' => wp_create_nonce( 'save_attendee_info' ),
-					),
-				),
-			)
+					],
+				],
+				'conditionals' => 'tribe_tickets_is_enabled_post_context',
+			]
 		);
 
 	}

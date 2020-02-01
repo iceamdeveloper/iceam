@@ -61,7 +61,8 @@ tribe.events.views.mapProviderGoogleMaps = {};
 	 * @type {PlainObject}
 	 */
 	obj.state = {
-		mapsScriptLoaded: false,
+		mapsScriptLoaded: 'undefined' !== typeof window.google && 'undefined' !== typeof window.google.maps,
+		zoom: 10,
 	};
 
 	/**
@@ -89,10 +90,14 @@ tribe.events.views.mapProviderGoogleMaps = {};
 			var activeEventCardWrapperSelector = '[data-event-id="' + eventId + '"]';
 
 			var $buttons = $container.find( mapEventsSelectors.eventCardButton );
-			var $button = $container.find( mapEventsSelectors.eventCardWrapper + activeEventCardWrapperSelector + ' ' + mapEventsSelectors.eventCardButton );
+			var $eventCardWrapper = $container.find( mapEventsSelectors.eventCardWrapper + activeEventCardWrapperSelector );
+			var $button = $eventCardWrapper.find( mapEventsSelectors.eventCardButton );
 
 			tribe.events.views.mapEvents.deselectAllEvents( $buttons );
 			tribe.events.views.mapEvents.selectEvent( $button );
+			if ( ! tribe.events.views.mapEventsScroller.isWithinScrollView( $container, $eventCardWrapper ) ) {
+				tribe.events.views.mapEventsScroller.scrollTo( $container, $eventCardWrapper );
+			}
 		};
 	};
 
@@ -129,6 +134,7 @@ tribe.events.views.mapProviderGoogleMaps = {};
 	 */
 	obj.deinitTooltipSlider = function( slider ) {
 		if ( slider && ! slider.destroyed ) {
+			slider.off( 'slideChange' );
 			slider.destroy();
 		}
 	};
@@ -297,6 +303,9 @@ tribe.events.views.mapProviderGoogleMaps = {};
 			// deselect all events and select active event
 			tribe.events.views.mapEvents.deselectAllEvents( $buttons );
 			tribe.events.views.mapEvents.selectEvent( $button );
+			if ( ! tribe.events.views.mapEventsScroller.isWithinScrollView( $container, $eventCardWrapper ) ) {
+				tribe.events.views.mapEventsScroller.scrollTo( $container, $eventCardWrapper );
+			}
 
 			// close previous tooltip and open selected event tooltip
 			var $tooltipTemplate = $eventCardWrapper.find( obj.selectors.eventTooltipTemplate );
@@ -449,11 +458,16 @@ tribe.events.views.mapProviderGoogleMaps = {};
 
 		// init markers from data structure
 		$.each( data.events_by_venue, function( venueId, venue ) {
+			if ( ! venue.geolocation ) {
+				return;
+			}
+
 			// create marker
 			var marker = new google.maps.Marker( {
 				position: new google.maps.LatLng( venue.geolocation.latitude, venue.geolocation.longitude ),
 				map: state.map,
 				eventIds: venue.event_ids,
+				icon: data.map_provider.map_pin_url,
 			} );
 
 			// add click listener for marker
@@ -475,8 +489,18 @@ tribe.events.views.mapProviderGoogleMaps = {};
 			} );
 		} );
 
-		// set map bounds based on markers
-		state.map.fitBounds( bounds );
+
+		if ( 1 === state.markers.length ) {
+			state.map.setCenter( state.markers[0].getPosition() );
+			state.map.setZoom( obj.state.zoom );
+		} else {
+			state.map.fitBounds( bounds );
+			google.maps.event.addListenerOnce( state.map, 'idle', function() {
+				if ( state.map.getZoom() > obj.state.zoom ) {
+					state.map.setZoom( obj.state.zoom );
+				}
+			} );
+		}
 
 		// save state to Google Maps premium
 		$googleMapsPremium.data( 'tribeEventsState', state );
@@ -566,8 +590,8 @@ tribe.events.views.mapProviderGoogleMaps = {};
 		var state = $googleMapsPremium.data( 'tribeEventsState' );
 
 		state.map = new google.maps.Map( $googleMapsPremium[0], {
-			zoom: 5, // @todo: figure out how to set initial zoom
-			center: new google.maps.LatLng( -34.397, 150.644 ), // @todo: fix this and set a lat lng
+			zoom: obj.state.zoom,
+			center: new google.maps.LatLng( 0, 0 ),
 		} );
 		state.map.addListener( 'click', obj.handleMapClick( $container, state.map ) );
 
@@ -750,6 +774,7 @@ tribe.events.views.mapProviderGoogleMaps = {};
 		var $container = event.data.container;
 		obj.deinitMap( $container );
 		$container.off( 'afterMapEventClick.tribeEvents', obj.handleEventClick );
+		$container.off( 'mapDeinit.tribeEvents', obj.deinit );
 	};
 
 	/**
@@ -769,6 +794,8 @@ tribe.events.views.mapProviderGoogleMaps = {};
 			return;
 		}
 
+		// set zoom level
+		obj.state.zoom = data.map_provider.zoom;
 		var isPremium = obj.setIsPremium( $container, data );
 
 		// If premium maps

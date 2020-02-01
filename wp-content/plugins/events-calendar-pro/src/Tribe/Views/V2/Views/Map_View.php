@@ -9,11 +9,12 @@
 namespace Tribe\Events\Pro\Views\V2\Views;
 
 use Tribe\Events\Views\V2\View;
-use Tribe\Events\Views\V2\Views\List_Behavior;
-use Tribe__Events__Google__Maps_API_Key as GMaps;
+use Tribe\Events\Pro\Views\V2\Maps;
+use Tribe\Events\Views\V2\Views\Traits\List_Behavior;
 use Tribe__Events__Main as TEC;
 use Tribe__Events__Rewrite as Rewrite;
 use Tribe__Utils__Array as Arr;
+use Tribe\Events\Views\V2\Utils;
 
 class Map_View extends View {
 	use List_Behavior;
@@ -38,14 +39,25 @@ class Map_View extends View {
 	protected static $publicly_visible = true;
 
 	/**
+	 * Indicates Map View supports the date as a query argument appended to its URL, not as part of a "pretty" URL.
+	 *
+	 * @var bool
+	 */
+	protected static $date_in_url = false;
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function prev_url( $canonical = false, array $passthru_vars = [] ) {
+		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
+			return $this->cached_urls[ __METHOD__ ];
+		}
+
 		$current_page = (int) $this->context->get( 'page', 1 );
 		$display      = $this->context->get( 'event_display_mode', $this->slug );
 
 		if ( 'past' === $display ) {
-			$url = parent::next_url( $canonical, [ 'eventDisplay' => 'past' ] );
+			$url = parent::next_url( $canonical, [ Utils\View::get_past_event_display_key() => 'past' ] );
 		} elseif ( $current_page > 1 ) {
 			$url = parent::prev_url( $canonical );
 		} else {
@@ -54,6 +66,8 @@ class Map_View extends View {
 
 		$url = $this->filter_prev_url( $canonical, $url );
 
+		$this->cached_urls[ __METHOD__ ] = $url;
+
 		return $url;
 	}
 
@@ -61,18 +75,24 @@ class Map_View extends View {
 	 * {@inheritDoc}
 	 */
 	public function next_url( $canonical = false, array $passthru_vars = [] ) {
+		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
+			return $this->cached_urls[ __METHOD__ ];
+		}
+
 		$current_page = (int) $this->context->get( 'page', 1 );
 		$display      = $this->context->get( 'event_display_mode', $this->slug );
 
 		if ( $this->slug === $display || 'default' === $display ) {
 			$url = parent::next_url( $canonical );
 		} elseif ( $current_page > 1 ) {
-			$url = parent::prev_url( $canonical, [ 'eventDisplay' => 'past' ] );
+			$url = parent::prev_url( $canonical, [ Utils\View::get_past_event_display_key() => 'past' ] );
 		} else {
 			$url = $this->get_upcoming_url( $canonical );
 		}
 
 		$url = $this->filter_next_url( $canonical, $url );
+
+		$this->cached_urls[ __METHOD__ ] = $url;
 
 		return $url;
 	}
@@ -98,13 +118,18 @@ class Map_View extends View {
 		] ) ) );
 
 		if ( $past->count() > 0 ) {
-			$past_url_object = clone $this->url->add_query_args( array_filter( [
+			$event_display_key = Utils\View::get_past_event_display_key();
+			$query_args        = [
 				'post_type'        => TEC::POSTTYPE,
-				'eventDisplay'     => 'past',
+				$event_display_key => 'past',
 				'eventDate'        => $event_date_var,
 				$this->page_key    => $page,
 				'tribe-bar-search' => $this->context->get( 'keyword' ),
-			] ) );
+			];
+
+			$query_args = $this->filter_query_args( $query_args, $canonical );
+
+			$past_url_object = clone $this->url->add_query_args( array_filter( $query_args ) );
 
 			$past_url = (string) $past_url_object;
 
@@ -121,7 +146,7 @@ class Map_View extends View {
 			);
 
 			// We use the `eventDisplay` query var as a display mode indicator: we have to make sure it's there.
-			$url = add_query_arg( [ 'eventDisplay' => 'past' ], $canonical_url );
+			$url = add_query_arg( [ $event_display_key => 'past' ], $canonical_url );
 
 			// Let's re-add the `eventDate` if we had one and we're not already passing it with one of its aliases.
 			if ( ! (
@@ -158,13 +183,17 @@ class Map_View extends View {
 		] ) ) );
 
 		if ( $upcoming->count() > 0 ) {
-			$upcoming_url_object = clone $this->url->add_query_args( array_filter( [
+			$query_args = [
 				'post_type'        => TEC::POSTTYPE,
 				'eventDisplay'     => $this->slug,
 				$this->page_key    => $page,
 				'eventDate'        => $event_date_var,
 				'tribe-bar-search' => $this->context->get( 'keyword' ),
-			] ) );
+			];
+
+			$query_args = $this->filter_query_args( $query_args, $canonical );
+
+			$upcoming_url_object = clone $this->url->add_query_args( array_filter( $query_args ) );
 
 			$upcoming_url = (string) $upcoming_url_object;
 
@@ -174,7 +203,7 @@ class Map_View extends View {
 
 			// We've got rewrite rules handling `eventDate`, but not List. Let's remove it to build the URL.
 			$url = tribe( 'events.rewrite' )->get_clean_url(
-				remove_query_arg( [ 'eventDate' ], $upcoming_url )
+				remove_query_arg( [ 'eventDate', 'tribe_event_display' ], $upcoming_url )
 			);
 
 			// Let's re-add the `eventDate` if we had one and we're not already passing it with one of its aliases.
@@ -205,6 +234,7 @@ class Map_View extends View {
 		$event_display_mode = Arr::get( $context_arr, 'event_display_mode', Arr::get( $context_arr, 'event_display' ), 'current' );
 
 		if ( 'past' !== $event_display_mode ) {
+			$args['order']       = 'ASC';
 			$args['ends_after'] = $date;
 		} else {
 			$args['order']       = 'DESC';
@@ -220,61 +250,35 @@ class Map_View extends View {
 	protected function setup_template_vars() {
 		$template_vars = parent::setup_template_vars();
 
-		// While we fetch events in DESC order, we want to show the results in ASC order in `past` display mode.
-		if (
-			! empty( $template_vars['events'] )
-			&& is_array( $template_vars['events'] )
-			&& 'past' === $this->context->get( 'event_display_mode', 'map' )
-		) {
+		$geoloc_search = $this->context->get( 'geoloc_search', false );
+
+		if ( false !== $geoloc_search ) {
+			$template_vars['events'] = $this->sort_events_by_distance( $template_vars['events'] );
+		} else {
+			$template_vars['events'] = $this->sort_events_by_display_mode( $template_vars['events'] );
+		}
+
+		if ( ! empty( $template_vars['events'] ) && 'past' === $this->context->get( 'event_display_mode' ) ) {
+			// Past events are fetched by in DESC start date, but shown in ASC order.
 			$template_vars['events'] = array_reverse( $template_vars['events'] );
 		}
 
-		$template_vars = $this->setup_map_provider( $template_vars );
+		$template_vars = tribe( Maps::class )->setup_map_provider( $template_vars );
 		$template_vars = $this->setup_events_by_venue( $template_vars );
 		$template_vars = $this->setup_datepicker_template_vars($template_vars);
 
-		return $template_vars;
-	}
-
-	/**
-	 * Setup the map provider for the map view, using the template variables.
-	 *
-	 * @since  4.7.8
-	 *
-	 * @param  array $template_vars Previous tempalte variables in which the providers will be added to.
-	 *
-	 * @return array
-	 */
-	protected function setup_map_provider( $template_vars ) {
-		$default_api_key = GMaps::$default_api_key;
-		$api_key         = (string) tribe_get_option( GMaps::$api_key_option_name, false );
-
-		if ( empty( $api_key ) ) {
-			// If an API key has not been set yet, set it now.
-			tribe_update_option( GMaps::$api_key_option_name, $default_api_key );
-			$api_key = $default_api_key;
-		}
-
-		$map_provider    = (object) [
-			'ID' => 'google_maps',
-			'api_key' => $api_key,
-			'is_premium' => ! tribe_is_using_basic_gmaps_api(),
-			'javascript_url' => 'https://maps.googleapis.com/maps/api/js',
-			'iframe_url' => 'https://www.google.com/maps/embed/v1/place',
-		];
-
-		$template_vars['map_provider'] = $map_provider;
+		$template_vars['show_distance'] = false !== $geoloc_search;
+		$template_vars['geoloc_unit']   = $this->setup_geoloc_unit();
 
 		return $template_vars;
 	}
-
 
 	/**
 	 * Setup the events by venue for the map view, using the template variables.
 	 *
 	 * @since  4.7.8
 	 *
-	 * @param  array $template_vars Previous tempalte variables in which the events by venue will be added to.
+	 * @param  array $template_vars Previous template variables in which the events by venue will be added to.
 	 *
 	 * @return array
 	 */
@@ -284,7 +288,12 @@ class Map_View extends View {
 		foreach( $template_vars['events'] as $event ) {
 			foreach ( $event->venues as $venue ) {
 				if ( empty( $template_vars['events_by_venue'][ $venue->ID ] ) ) {
-					$template_vars['events_by_venue'][ $venue->ID ] = $venue;
+					// WP_Post instances will be suppressed by the data filter, so we convert it to an object.
+					$template_vars['events_by_venue'][ $venue->ID ] = (object) [
+						'ID' => $venue->ID,
+						'geolocation' => $venue->geolocation,
+						'post_title' => $venue->post_title,
+					];
 					$template_vars['events_by_venue'][ $venue->ID ]->event_ids = [];
 				}
 
@@ -303,5 +312,90 @@ class Map_View extends View {
 	protected function on_page_reset() {
 		parent::on_page_reset();
 		$this->remove_past_query_args();
+	}
+
+	/**
+	 * Sorts the events by distance, in the specified direction.
+	 *
+	 * This method relies on geo-location resolution handlers to set the `geoloc_lat` and `geoloc_lng` in the Context,
+	 * if not set.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array  $events    The events to sort, if any.
+	 * @param string $direction The direction to sort events in, either `ASC` or `DESC`.
+	 *
+	 * @return array The sorted list of events if geolocation latitude and longitude information is available, else
+	 *               the original list of events.
+	 */
+	protected function sort_events_by_distance( $events, $direction = 'ASC' ) {
+		if ( empty( $events ) || ! is_array( $events ) ) {
+			return $events;
+		}
+
+		$geo_loc = \Tribe__Events__Pro__Geo_Loc::instance();
+
+		// These should have been set by the location search handlers, if not, bail.
+		$lat_from = $this->context->get( 'geoloc_lat', false );
+		$lng_from = $this->context->get( 'geoloc_lng', false );
+
+		if ( false === $lat_from && false === $lng_from ) {
+			return $events;
+		}
+
+		// Assign the distance in Kms.
+		$geo_loc->assign_distance_to_posts( $events, $lat_from, $lng_from );
+		// Convert the distance to the current unit.
+		array_walk( $events, static function ( \WP_Post $event ) {
+			$event->distance = tribe_get_distance_with_unit( $event->distance );
+		} );
+
+		return wp_list_sort( $events, 'distance', $direction );
+	}
+
+	/**
+	 * Reverses the events order if looking at the past view.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @param array $events An array of events to sort.
+	 *
+	 * @return array The array of sorted events.
+	 */
+	protected function sort_events_by_display_mode( $events ) {
+		if ( empty( $events ) || ! is_array( $events ) ) {
+			return $events;
+		}
+
+		$is_past = 'past' === $this->context->get( 'event_display_mode', 'map' );
+
+		if ( ! $is_past ) {
+			return $events;
+		}
+
+		return array_reverse( $events );
+	}
+
+	/**
+	 * Returns the localized version of the geo-location unit used to calculate and display distances.
+	 *
+	 * This value is not filtered here as template vars are already filtered.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @return string The localized version of the geo-location unit used to calculate and display distances.
+	 */
+	protected function setup_geoloc_unit() {
+		switch ( tribe_get_option( 'geoloc_default_unit', 'miles' ) ) {
+			case 'kms':
+				$localized_geoloc_unit = __( 'Kilometers', 'tribe-events-calendar-pro' );
+				break;
+			default:
+			case 'miles':
+				$localized_geoloc_unit = __( 'Miles', 'tribe-events-calendar-pro' );
+				break;
+		}
+
+		return $localized_geoloc_unit;
 	}
 }

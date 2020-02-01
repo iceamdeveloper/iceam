@@ -3,13 +3,13 @@
  * View: Week View - Multiday Events Row Header
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body/multiday-events-row-header.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body/multiday-events-row-header.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.10
+ * @version 5.0.0
  *
  * @var bool $multiday_display_toggle bool containing if we should display the multiday toggle.
  *

@@ -305,9 +305,11 @@ abstract class Updater extends Base_Class {
 														 '</pre>';
 				// Show the to the Shop Admininistrator
 				Messages::admin_message(
-					WC_AeliaFoundationClasses::$plugin_slug,
-					E_USER_ERROR,
-					$error_msg
+					$error_msg,
+					array(
+						'level' => E_USER_ERROR,
+						'code' => Definitions::ERROR_INVALID_PRODUCT_FOR_UPDATER,
+					)
 				);
 				return false;
 			}

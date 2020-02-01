@@ -1,6 +1,7 @@
 {
 	"require": {
 		"geoip2/geoip2": "~2.0",
+		"maxmind-db/reader": "1.4.1",
 		"yahnis-elsts/plugin-update-checker": "4.7",
 		"nategood/httpful": "*",
 		"monolog/monolog": "^1.23"

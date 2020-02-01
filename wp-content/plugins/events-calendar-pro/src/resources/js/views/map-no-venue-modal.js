@@ -104,10 +104,9 @@ tribe.events.views.mapNoVenueModal = {};
 	 */
 	obj.unbindEvents = function( $container ) {
 		$container
-			.find( obj.selectors.noVenueModal )
 			.off( 'openNoVenueModal.tribeEvents', obj.openNoVenueModal )
-			.off( 'closeNoVenueModal.tribeEvents', obj.closeNoVenueModal );
-		$container
+			.off( 'closeNoVenueModal.tribeEvents', obj.closeNoVenueModal )
+			.off( 'setNoVenueModalLink.tribeEvents', obj.setNoVenueModalLink )
 			.find( obj.selectors.noVenueModalClose )
 			.off( 'click', obj.closeNoVenueModal );
 	};
@@ -127,8 +126,7 @@ tribe.events.views.mapNoVenueModal = {};
 		$container
 			.on( 'openNoVenueModal.tribeEvents', { container: $container, modal: $modal }, obj.openNoVenueModal )
 			.on( 'closeNoVenueModal.tribeEvents', { container: $container, modal: $modal }, obj.closeNoVenueModal )
-			.on( 'setNoVenueModalLink.tribeEvents', { container: $container, modal: $modal }, obj.setNoVenueModalLink );
-		$container
+			.on( 'setNoVenueModalLink.tribeEvents', { container: $container, modal: $modal }, obj.setNoVenueModalLink )
 			.find( obj.selectors.noVenueModalClose )
 			.on( 'click', { container: $container, modal: $modal }, obj.closeNoVenueModal );
 	};
@@ -147,6 +145,7 @@ tribe.events.views.mapNoVenueModal = {};
 	obj.deinit = function( event, jqXHR, settings ) {
 		var $container = event.data.container;
 		obj.unbindEvents( $container );
+		$container.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit );
 	};
 
 	/**

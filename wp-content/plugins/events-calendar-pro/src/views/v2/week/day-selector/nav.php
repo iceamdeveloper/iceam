@@ -3,7 +3,7 @@
  * View: Week View - Day Selector Nav
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/day-selector/nav.php
+ * [your-theme]/tribe/events-pro/v2/week/day-selector/nav.php
  *
  * See more documentation about our views templating system.
  *
@@ -12,7 +12,7 @@
  * @var string $prev_url The URL to the previous page, if any, or an empty string.
  * @var string $next_url The URL to the next page, if any, or an empty string.
  *
- * @version 4.7.6
+ * @version 5.0.0
  *
  */
 ?>

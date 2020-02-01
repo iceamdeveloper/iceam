@@ -42998,16 +42998,17 @@ var header_image_container_mapStateToProps = function mapStateToProps(state) {
 
 var header_image_container_mapDispatchToProps = function mapDispatchToProps(dispatch) {
 	return {
-		onRemove: function onRemove() {
-			return dispatch(rsvp["a" /* actions */].deleteRSVPHeaderImage());
-		},
 		/**
    * Full payload from gutenberg media upload is not used,
    * only id, alt, and medium src are used for this specific case.
    */
 		onSelect: function onSelect(image) {
 			return dispatch(rsvp["a" /* actions */].updateRSVPHeaderImage(image));
+		},
+		onRemove: function onRemove() {
+			return dispatch(rsvp["a" /* actions */].deleteRSVPHeaderImage());
 		}
+
 	};
 };
 

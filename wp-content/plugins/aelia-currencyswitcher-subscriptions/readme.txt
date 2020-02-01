@@ -34,6 +34,9 @@ Should you need assistance, please feel free to [contact us](https://aelia.co/co
 
 == Changelog ==
 
+= 1.4.9.191219 =
+* Fix - Added logic to prevent unnecessary "Expected price property was not set" entries in Currency Switcher log.
+
 = 1.4.8.190905 =
 * Fix - Added logic to ensure that the correct currency is active during the processing of renewals.
 

@@ -170,12 +170,8 @@ tribe.events.views.weekEventLink = {};
 		$container
 			.find( obj.selectors.weekEventLink )
 			.each( function( index, link ) {
-				$( link )
-				.off( 'mouseenter touchstart', obj.handleMouseEnter )
-				.off( 'mouseleave touchstart', obj.handleMouseLeave )
-				.off( 'focus', obj.handleFocus )
-				.off( 'blur', obj.handleBlur );
-		} );
+				$( link ).off();
+			} );
 	};
 
 
@@ -198,7 +194,7 @@ tribe.events.views.weekEventLink = {};
 					.on( 'mouseleave touchstart', { target: $link }, obj.handleMouseLeave )
 					.on( 'focus', { target: $link }, obj.handleFocus )
 					.on( 'blur', { target: $link }, obj.handleBlur );
-		} );
+			} );
 	};
 
 	/**
@@ -213,7 +209,9 @@ tribe.events.views.weekEventLink = {};
 	 * @return {void}
 	 */
 	obj.deinit = function( event, jqXHR, settings ) {
-		obj.deinitEventLink( event.data.container );
+		var $container = event.data.container;
+		obj.deinitEventLink( $container );
+		$container.off( 'beforeAjaxSuccess.tribeEvents', obj.deinit );
 	};
 
 

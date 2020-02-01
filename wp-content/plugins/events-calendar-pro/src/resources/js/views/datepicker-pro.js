@@ -47,6 +47,7 @@ tribe.events.views.datepickerPro = {};
 		disabledClass: '.disabled',
 		focusedClass: '.focused',
 		hoveredClass: '.hovered',
+		currentClass: '.current',
 	};
 
 	/**
@@ -117,6 +118,11 @@ tribe.events.views.datepickerPro = {};
 					if ( $day.hasClass( obj.selectors.activeClass.className() ) ) {
 						$row.addClass( obj.selectors.activeClass.className() );
 					}
+
+					// if day has current class, add current class to row
+					if ( $day.hasClass( obj.selectors.currentClass.className() ) ) {
+						$row.addClass( obj.selectors.currentClass.className() );
+					}
 				} );
 		} );
 
@@ -137,6 +143,8 @@ tribe.events.views.datepickerPro = {};
 	obj.afterDeinit = function( event, jqXHR, settings ) {
 		var $container = event.data.container;
 		$container
+			.off( 'afterDatepickerDeinit.tribeEvents', obj.afterDeinit )
+			.off( 'handleMutationMonthChange.tribeEvents', obj.bindRowEvents )
 			.find( obj.selectors.input )
 			.off( 'show', obj.bindRowEvents );
 	};

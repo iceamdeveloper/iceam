@@ -8,9 +8,12 @@
 
 namespace Tribe\Events\Pro\Views\V2\Views;
 
+use Tribe\Events\Views\V2\Messages;
 use Tribe\Events\Views\V2\Views\List_View;
 use Tribe__Context as Context;
 use Tribe__Events__Main as TEC;
+use Tribe\Events\Pro\Rewrite\Rewrite as Rewrite;
+use Tribe\Events\Views\V2\Utils;
 
 /**
  * Class All_View
@@ -72,6 +75,18 @@ class All_View extends List_View {
 	protected $display_events_bar = false;
 
 	/**
+	 * All_View constructor.
+	 *
+	 * Overrides the base View constructor to change the rewrite handler.
+	 *
+	 * @param Messages $messages
+	 */
+	public function __construct( Messages $messages ) {
+		parent::__construct( $messages );
+		$this->rewrite = new Rewrite();
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function get_html() {
@@ -90,7 +105,8 @@ class All_View extends List_View {
 	 * {@inheritDoc}
 	 */
 	protected function get_past_url( $canonical = false, $page = 1 ) {
-		$query_args = [ 'eventDisplay' => 'past' ];
+		$event_display_key = Utils\View::get_past_event_display_key();
+		$query_args        = [ $event_display_key => 'past' ];
 
 		if ( $page > 1 ) {
 			$query_args['paged'] = $page;
@@ -131,7 +147,15 @@ class All_View extends List_View {
 	/**
 	 * {@inheritDoc}
 	 */
-	public function get_url( $canonical = false ) {
+	protected function get_show_datepicker_submit() {
+		$live_refresh = tribe_is_truthy( tribe_get_option( 'liveFiltersUpdate', true ) );
+		return empty( $live_refresh );
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	public function get_url( $canonical = false, $force = false ) {
 		$query_args = [
 			TEC::POSTTYPE           => $this->post_name,
 			'post_type'             => TEC::POSTTYPE,
@@ -148,12 +172,19 @@ class All_View extends List_View {
 		$url = add_query_arg( array_filter( $query_args ), home_url() );
 
 		if ( $canonical ) {
-			$url = tribe( 'events-pro.rewrite' )->get_clean_url( $url );
+			$url = tribe( 'events-pro.rewrite' )->get_clean_url( $url, $force );
 		}
 
+		$event_display_key = Utils\View::get_past_event_display_key();
 		$event_display_mode = $this->context->get( 'event_display_mode', false );
 		if ( 'past' === $event_display_mode ) {
-			$url = add_query_arg( [ 'eventDisplay' => $event_display_mode ], $url );
+			$url = add_query_arg( [ $event_display_key => $event_display_mode ], $url );
+		}
+
+		$event_date = $this->context->get( 'event_date', false );
+		if ( ! empty( $event_date ) ) {
+			// If there's a date set, then add it as a query argument.
+			$url = add_query_arg( [ 'tribe-bar-date' => $event_date ], $url );
 		}
 
 		$url = $this->filter_view_url( $canonical, $url );

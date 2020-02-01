@@ -78,18 +78,27 @@ class Tribe__Tickets_Plus__Meta__Render {
 			if ( 'checkbox' === $field->type && isset( $field->extra['options'] ) ) {
 				$values = array();
 				foreach ( $field->extra['options'] as $option ) {
+					if ( '' === $option ) {
+						continue;
+					}
+
 					// Support longer options by using the hash of the string.
 					$key = $field->slug . '_' . md5( sanitize_title( $option ) );
 
 					if ( ! isset( $meta_data[ $key ] ) ) {
 						// Support existing fields that did not save with md5 hash.
-						$key = $field->slug . '_' .  sanitize_title( $option );
+						$key = $field->slug . '_' . sanitize_title( $option );
 					}
 
 					if ( isset( $meta_data[ $key ] ) ) {
 						$values[] = $meta_data[ $key ];
 						unset( $orphaned_data[ $key ] );
 					}
+				}
+
+				// There were no values for this checkbox.
+				if ( empty( $values ) ) {
+					continue;
 				}
 
 				$value = implode( ', ', $values );
@@ -104,11 +113,13 @@ class Tribe__Tickets_Plus__Meta__Render {
 				$value = '&nbsp;';
 			}
 
-			$value = isset( $value ) ? wp_kses_post( $value ) : '&nbsp;';
-
 			$valid_meta_html .= '
-				<dt class="event-tickets-meta-label_' . sanitize_html_class( $field->slug ) . '">' . wp_kses_post( $field->label ) . '</dt>
-				<dd class="event-tickets-meta-data_' . sanitize_html_class( $field->slug ) . '">' . $value . '</dd>
+				<dt class="event-tickets-meta-label_' . sanitize_html_class( $field->slug ) . '">
+					' . wp_kses_post( $field->label ) . '
+				</dt>
+				<dd class="event-tickets-meta-data_' . sanitize_html_class( $field->slug ) . '">
+					' . wp_kses_post( $value ) . '
+				</dd>
 			';
 		}
 
@@ -117,6 +128,13 @@ class Tribe__Tickets_Plus__Meta__Render {
 		}
 
 		foreach ( $orphaned_data as $key => $value ) {
+			$value = trim( $value );
+
+			// There is no value for this meta.
+			if ( '' === $value ) {
+				continue;
+			}
+
 			$key = esc_html( $key );
 			$value = esc_html( $value );
 
@@ -182,19 +200,29 @@ class Tribe__Tickets_Plus__Meta__Render {
 			<?php
 			foreach ( $meta_fields as $field ) {
 				if ( 'checkbox' === $field->type && isset( $field->extra['options'] ) ) {
-					$values = array();
+					$values = [];
+
 					foreach ( $field->extra['options'] as $option ) {
+						if ( '' === $option ) {
+							continue;
+						}
+
 						// Support longer options by using the hash of the string.
 						$key = $field->slug . '_' . md5( sanitize_title( $option ) );
 
 						if ( ! isset( $meta_data[ $key ] ) ) {
 							// Support existing fields that did not save with md5 hash.
-							$key = $field->slug . '_' .  sanitize_title( $option );
+							$key = $field->slug . '_' . sanitize_title( $option );
 						}
 
 						if ( isset( $meta_data[ $key ] ) ) {
 							$values[] = $meta_data[ $key ];
 						}
+					}
+
+					// There were no values for this checkbox.
+					if ( empty( $values ) ) {
+						continue;
 					}
 
 					$value = implode( ', ', $values );
@@ -204,12 +232,15 @@ class Tribe__Tickets_Plus__Meta__Render {
 					continue;
 				}
 
+				if ( '' === trim( $value ) ) {
+					$value = '&nbsp;';
+				}
 				?>
 				<tr>
-					<th valign="top" class="event-tickets-meta-label_<?php echo esc_attr( $field->slug ); ?>" align="left" border="0" cellpadding="20" cellspacing="0" style="padding:0 20px; background:#f7f7f7;min-width:100px;">
+					<th valign="top" class="event-tickets-meta-label_<?php echo sanitize_html_class( $field->slug ); ?>" align="left" border="0" cellpadding="20" cellspacing="0" style="padding:0 20px; background:#f7f7f7;min-width:100px;">
 						<?php echo wp_kses_post( $field->label ); ?>
 					</th>
-					<td valign="top" class="event-tickets-meta-data_<?php echo esc_attr( $field->slug ); ?>" align="left" border="0" cellpadding="20" cellspacing="0" style="padding:0 20px; background:#f7f7f7;">
+					<td valign="top" class="event-tickets-meta-data_<?php echo sanitize_html_class( $field->slug ); ?>" align="left" border="0" cellpadding="20" cellspacing="0" style="padding:0 20px; background:#f7f7f7;">
 						<?php echo wp_kses_post( $value ); ?>
 					</td>
 				</tr>

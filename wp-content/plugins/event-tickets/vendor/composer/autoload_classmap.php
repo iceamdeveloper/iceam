@@ -6,8 +6,11 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
-    'Tribe\\Events\\Tickets\\Views\\V2\\Hooks' => $baseDir . '/src/Tribe/Views/V2/Hooks.php',
-    'Tribe\\Events\\Tickets\\Views\\V2\\Models\\Tickets' => $baseDir . '/src/Tribe/Views/V2/Models/Tickets.php',
-    'Tribe\\Events\\Tickets\\Views\\V2\\Partials\\Day_View\\Event\\CostTest' => $baseDir . '/tests/views_integration/Tribe/Events/Tickets/Views/V2/Partials/Day_View/Event/CostTest.php',
-    'Tribe\\Events\\Tickets\\Views\\V2\\Service_Provider' => $baseDir . '/src/Tribe/Views/V2/Service_Provider.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Hooks' => $baseDir . '/src/Tribe/Events/Views/V2/Hooks.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Models\\Tickets' => $baseDir . '/src/Tribe/Events/Views/V2/Models/Tickets.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\Day_View\\Event\\CostTest' => $baseDir . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/Day_View/Event/CostTest.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\List_View\\Event\\CostTest' => $baseDir . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/List_View/Event/CostTest.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\Month_View\\Calendar_Body\\Day\\Calendar_Events\\Calendar_Event\\Tooltip\\CostTest' => $baseDir . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/Month_View/Calendar_Body/Day/Calendar_Events/Calendar_Event/Tooltip/CostTest.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Partials\\Month_View\\Mobile_Events\\Mobile_Day\\Mobile_Event\\CostTest' => $baseDir . '/tests/views_integration/Tribe/Tickets/Events/Views/V2/Partials/Month_View/Mobile_Events/Mobile_Day/Mobile_Event/CostTest.php',
+    'Tribe\\Tickets\\Events\\Views\\V2\\Service_Provider' => $baseDir . '/src/Tribe/Events/Views/V2/Service_Provider.php',
 );

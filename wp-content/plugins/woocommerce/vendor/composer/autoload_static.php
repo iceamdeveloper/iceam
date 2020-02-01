@@ -4,9 +4,13 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit488be7b1670962be234e0102631712be
+class ComposerStaticInit67391cae52d09eb20edb64071380826e
 {
     public static $prefixLengthsPsr4 = array (
+        'M' => 
+        array (
+            'MaxMind\\Db\\' => 11,
+        ),
         'C' => 
         array (
             'Composer\\Installers\\' => 20,
@@ -21,6 +25,10 @@ class ComposerStaticInit488be7b1670962be234e0102631712be
     );
 
     public static $prefixDirsPsr4 = array (
+        'MaxMind\\Db\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/maxmind-db/reader/src/MaxMind/Db',
+        ),
         'Composer\\Installers\\' => 
         array (
             0 => __DIR__ . '/..' . '/composer/installers/src/Composer/Installers',
@@ -144,9 +152,9 @@ class ComposerStaticInit488be7b1670962be234e0102631712be
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit488be7b1670962be234e0102631712be::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit488be7b1670962be234e0102631712be::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit488be7b1670962be234e0102631712be::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit67391cae52d09eb20edb64071380826e::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit67391cae52d09eb20edb64071380826e::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit67391cae52d09eb20edb64071380826e::$classMap;
 
         }, null, ClassLoader::class);
     }

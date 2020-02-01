@@ -71,7 +71,12 @@ class Tribe__Tickets_Plus__Meta {
 		add_action( 'woocommerce_remove_cart_item', array( $this, 'clear_storage_on_remove_cart_item' ), 10, 2 );
 
 		// Check if the attendee registration cart has required meta
-		add_filter( 'tribe_tickets_attendee_registration_has_required_meta', array( $this, 'cart_has_required_meta' ), 20, 1 );
+		add_filter( 'tribe_tickets_attendee_registration_has_required_meta', array( $this, 'filter_cart_has_required_meta' ), 20, 2 );
+
+		// Commerce hooks.
+		add_filter( 'tribe_tickets_commerce_cart_get_data', [ $this, 'get_cart_data' ], 10, 3 );
+		add_filter( 'tribe_tickets_commerce_cart_get_ticket_meta', [ $this, 'get_ticket_meta' ], 10, 2 );
+		add_action( 'tribe_tickets_commerce_cart_update_ticket_meta', [ $this, 'update_ticket_meta' ], 10, 5 );
 
 		$this->meta_fieldset();
 		$this->render();
@@ -468,7 +473,10 @@ class Tribe__Tickets_Plus__Meta {
 	 * @return array
 	 */
 	public function get_meta_cookie_data( $product_id ) {
-		return $this->storage->get_meta_data_for( $product_id );
+		$meta_data = $this->storage->get_meta_data_for( $product_id );
+		$meta_data = $this->storage->remove_empty_values_recursive( $meta_data );
+
+		return $meta_data;
 	}
 
 	/**
@@ -524,7 +532,7 @@ class Tribe__Tickets_Plus__Meta {
 	 * @param int $product_id Commerce product ID
 	 */
 	public function clear_meta_cookie_data( $product_id ) {
-		$this->storage->clear_meta_data_for( $product_id );
+		$this->storage->delete_meta_data_for( $product_id );
 	}
 
 	/**
@@ -588,34 +596,46 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	/**
-	 * Checks if any of the cart tickets has required meta
+	 * Handle filtering `tribe_tickets_attendee_registration_has_required_meta` to determine whether any of the cart tickets has required meta.
+	 *
+	 * @since 4.11.0
+	 *
+	 * @param boolean $cart_has_required_meta Whether the cart has required meta.
+	 * @param array   $tickets_in_cart        The array containing the cart elements. Format array( 'ticket_id' => 'quantity' ).
+	 *
+	 * @return bool Whether any of the cart tickets has required meta.
+	 */
+	public function filter_cart_has_required_meta( $cart_has_required_meta, $tickets_in_cart ) {
+		return $this->cart_has_meta( $tickets_in_cart );
+	}
+
+	/**
+	 * Checks whether any of the cart tickets has required meta.
 	 *
 	 * @since 4.9
 	 *
-	 * @param array $cart_tickets
+	 * @param array $cart_tickets The array containing the cart elements. Format array( 'ticket_id' => 'quantity' ).
 	 *
-	 * @return bool
+	 * @return bool Whether any of the cart tickets has required meta.
 	 */
 	public function cart_has_required_meta( $cart_tickets ) {
-
 		// Bail if we don't receive an array
 		if ( ! is_array( $cart_tickets ) ) {
 			return false;
 		}
 
- 		// Bail if we receive an empty array
- 		if ( empty( $cart_tickets ) ) {
-	 		return false;
- 		}
+		// Bail if we receive an empty array
+		if ( empty( $cart_tickets ) ) {
+			return false;
+		}
 
- 		foreach ( $cart_tickets as $ticket_id => $quantity ) {
-	 		if ( $this->ticket_has_required_meta( $ticket_id ) ) {
+		foreach ( $cart_tickets as $ticket_id => $quantity ) {
+			if ( $this->ticket_has_required_meta( $ticket_id ) ) {
 				return true;
 			}
-	 	}
+		}
 
-	 	return false;
-
+		return false;
 	}
 
 	/**
@@ -629,6 +649,7 @@ class Tribe__Tickets_Plus__Meta {
 	 */
 	public function ticket_has_meta( $ticket_id ) {
 		$has_meta = get_post_meta( $ticket_id, self::ENABLE_META_KEY, true );
+
 		return ! empty( $has_meta ) && tribe_is_truthy( $has_meta );
 	}
 
@@ -829,7 +850,127 @@ class Tribe__Tickets_Plus__Meta {
 		}
 
 		if ( ! is_null( $product_id ) ) {
-			$this->storage->clear_meta_data_for( $product_id );
+			$this->storage->delete_meta_data_for( $product_id );
 		}
+	}
+
+	/**
+	 * Get ticket meta for Attendee Registration.
+	 *
+	 * @since 4.11.0
+	 *
+	 * @param array $meta    List of meta for each ticket for Attendee Registration.
+	 * @param array $tickets List of tickets with their ID and quantity.
+	 *
+	 * @return array List of meta for each ticket for Attendee Registration.
+	 */
+	public function get_ticket_meta( $meta, $tickets ) {
+		/** @var Tribe__Tickets_Plus__Meta__Contents $contents */
+		$contents = tribe( 'tickets-plus.meta.contents' );
+
+		// Get ticket IDs.
+		$tickets_for_meta = wp_list_pluck( $tickets, 'quantity', 'ticket_id' );
+
+		$stored_meta = $contents->get_ticket_stored_meta( $tickets_for_meta );
+
+		foreach ( $tickets as $ticket ) {
+			$ticket_id = (int) $ticket['ticket_id'];
+
+			$ticket_meta = isset( $stored_meta[ $ticket_id ] ) ? $stored_meta[ $ticket_id ] : [];
+
+			$meta_to_be_added = [
+				'ticket_id' => $ticket_id,
+				'provider'  => $ticket['provider'],
+				'items'     => [],
+			];
+
+			if ( ! is_array( $ticket_meta ) || empty( $ticket_meta[ $ticket_id ] ) ) {
+				$meta[] = $meta_to_be_added;
+
+				continue;
+			}
+
+			$meta_to_be_added['items'] = array_values( $ticket_meta[ $ticket_id ] );
+
+			$meta[] = $meta_to_be_added;
+		}
+
+		return $meta;
+	}
+
+	/**
+	 * Get cart data for Attendee Registration.
+	 *
+	 * @since 4.11.0
+	 *
+	 * @param array $data      Cart response data.
+	 * @param array $providers List of cart providers.
+	 * @param int   $post_id   Post ID for cart.
+	 *
+	 * @return array Cart data for Attendee Registration.
+	 */
+	public function get_cart_data( $data, $providers, $post_id ) {
+		$data['is_stored_meta_up_to_date'] = 1;
+		$data['attendee_registration_url'] = '';
+
+		if ( empty( $data['tickets'] ) ) {
+			return $data;
+		}
+
+		/** @var Tribe__Tickets_Plus__Meta__Contents $contents */
+		$contents = tribe( 'tickets-plus.meta.contents' );
+		$tickets  = $data['tickets'];
+
+		// Get ticket IDs.
+		$tickets_for_meta = wp_list_pluck( $tickets, 'quantity', 'ticket_id' );
+
+		$data['is_stored_meta_up_to_date'] = (int) $contents->is_stored_meta_up_to_date( $tickets_for_meta );
+
+		/** @var Tribe__Tickets__Attendee_Registration__Main $attendee_reg */
+		$attendee_reg = tribe( 'tickets.attendee_registration' );
+
+		$first_provider = current( $providers );
+
+		$data['attendee_registration_url'] = add_query_arg( 'provider', $first_provider, $attendee_reg->get_url() );
+
+		if ( ! empty( $post_id ) ) {
+			$data['attendee_registration_url'] = add_query_arg( 'tribe_tickets_post_id', (int) $post_id, $data['attendee_registration_url'] );
+		}
+
+		return $data;
+	}
+
+	/**
+	 * Update ticket meta from Attendee Registration.
+	 *
+	 * @since 4.11.0
+	 *
+	 * @param array   $meta     List of meta for each ticket to be saved for Attendee Registration.
+	 * @param array   $tickets  List of tickets with their ID and quantity.
+	 * @param string  $provider The cart provider.
+	 * @param int     $post_id  Post ID for the cart.
+	 * @param boolean $additive Whether to add or replace meta.
+	 */
+	public function update_ticket_meta( $meta, $tickets, $provider, $post_id, $additive ) {
+		$ticket_meta = [];
+
+		if ( $additive ) {
+			$ticket_meta = $this->storage->get_meta_data();
+		}
+
+		foreach ( $meta as $ticket ) {
+			$ticket_id = $ticket['ticket_id'];
+
+			if ( ! isset( $ticket_meta[ $ticket_id ] ) ) {
+				$ticket_meta[ $ticket_id ] = [];
+			}
+
+			foreach ( $ticket['items'] as $item ) {
+				$ticket_meta[ $ticket_id ][] = $item;
+			}
+		}
+
+		// Maybe set attendee meta cookie and handle saving of meta.
+		$this->storage->maybe_set_attendee_meta_cookie( $ticket_meta, $provider );
 	}
 }

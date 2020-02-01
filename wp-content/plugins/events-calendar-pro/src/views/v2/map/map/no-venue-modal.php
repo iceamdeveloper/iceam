@@ -3,20 +3,32 @@
  * View: Map View - No Venue Modal
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/map/map/no-venue-modal.php
+ * [your-theme]/tribe/events-pro/v2/map/map/no-venue-modal.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
- * @var array $map_provider Array with data of map provider.
+ * @var object $map_provider Object with data of map provider.
+ * @var array  $events       The array containing the events.
  */
+
+// Gets the first event.
+$event      = reset( $events );
 $is_premium = $map_provider->is_premium;
 
-$classes   = [ 'tribe-common-a11y-hidden', 'tribe-events-pro-map__no-venue-modal' ];
+$href      = '#';
+$classes   = [ 'tribe-events-pro-map__no-venue-modal' ];
 $classes[] = $is_premium ? 'tribe-events-pro-map__no-venue-modal--premium' : 'tribe-events-pro-map__no-venue-modal--default';
+
+// Verifies that is premium, first event exists, or first event has a venue.
+if ( $is_premium || empty( $event ) || ( isset( $event->venues ) && $event->venues->count() ) ) {
+	$classes[] = 'tribe-common-a11y-hidden';
+} else {
+	$href = $event->permalink;
+}
 ?>
 <div
 	<?php tribe_classes( $classes ); ?>
@@ -43,7 +55,7 @@ $classes[] = $is_premium ? 'tribe-events-pro-map__no-venue-modal--premium' : 'tr
 		</p>
 
 		<a
-			href="#"
+			href="<?php echo esc_url( $href ); ?>"
 			class="tribe-events-pro-map__no-venue-modal-link tribe-common-cta tribe-common-cta--thin-alt"
 			data-js="tribe-events-pro-map-no-venue-modal-link"
 		>

@@ -51,11 +51,15 @@
 
 .tribe-tickets-meta-field-header {
 	display: block;
+	font-weight: var(--font-weight-normal);
 }
 
 .tribe-tickets-meta-required header,
 	.tribe-tickets-meta-required label {
 		position: relative;
+		width: -webkit-max-content;
+		width: -moz-max-content;
+		width: max-content;
 	}
 
 .tribe-tickets-meta-required header h3 {
@@ -68,9 +72,8 @@
 		content: '*';
 		margin-left: .5em;
 		position: absolute;
-		top: 50%;
-		-webkit-transform: translateY(-50%);
-		        transform: translateY(-50%);
+		right: -.75em;
+		top: 0;
 	}
 
 .tribe-tickets-meta-required .tribe-options label:first-child::after {
@@ -263,6 +266,7 @@ a.tribe-attendees-list-showall {
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta label {
 		display: block;
+		font-weight: var(--font-weight-normal);
 	}
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="text"],
@@ -292,6 +296,30 @@ input[type=checkbox].tribe_show_attendees {
 	padding: 16px 10px;
 }
 
+.tribe-checkout-backlinks {
+	-webkit-align-items: flex-start;
+	        align-items: flex-start;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-flex-flow: column wrap;
+	        flex-flow: column wrap;
+	-webkit-justify-content: space-between;
+	        justify-content: space-between;
+}
+
+.tribe-checkout-backlinks a.tribe-checkout-backlink {
+	box-shadow: unset;
+	margin-bottom: .75em;
+	text-decoration: none;
+}
+
+.tribe-checkout-backlinks a.tribe-checkout-backlink:before {
+		content: '\f341';
+		font-family: 'dashicons';
+		margin-right: 5px;
+		vertical-align: middle;
+	}
+
 @media (min-width: 768px) {
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="text"],
@@ -304,5 +332,10 @@ input[type=checkbox].tribe_show_attendees {
 
 .edd.quantity {
 		width: 132px
+}
+
+.tribe-checkout-backlinks {
+		-webkit-flex-flow: row wrap;
+		        flex-flow: row wrap
 }
 		}

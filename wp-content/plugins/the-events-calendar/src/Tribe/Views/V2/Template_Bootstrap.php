@@ -11,8 +11,9 @@
 namespace Tribe\Events\Views\V2;
 
 use Tribe__Events__Main as TEC;
-use Tribe__Events__Rewrite as Rewrite;
+use Tribe__Events__Templates as V1_Event_Templates;
 use Tribe__Notices;
+use Tribe__Templates as V1_Templates;
 use Tribe__Utils__Array as Arr;
 use WP_Query;
 
@@ -54,7 +55,9 @@ class Template_Bootstrap {
 	 * @return void
 	 */
 	public function disable_v1() {
-		remove_action( 'plugins_loaded', [ 'Tribe__Events__Templates', 'init' ] );
+		remove_filter( 'tribe_events_before_html', [ TEC::instance(), 'before_html_data_wrapper' ] );
+		remove_filter( 'tribe_events_after_html', [ TEC::instance(), 'after_html_data_wrapper' ] );
+		remove_action( 'plugins_loaded', [ V1_Event_Templates::class, 'init' ] );
 	}
 
 	/**
@@ -94,8 +97,7 @@ class Template_Bootstrap {
 	}
 
 	/**
-	 * Detemines wether we are in a Single event page or not,
-	 * base only on global context.
+	 * Determines whether we are in a Single event page or not, base only on global context.
 	 *
 	 * @since  4.9.11
 	 *
@@ -107,9 +109,7 @@ class Template_Bootstrap {
 			'single-event' === tribe_context()->get( 'view' ),
 		];
 
-		$is_single_event = in_array( true, $conditions );
-
-		return $is_single_event;
+		return in_array( true, $conditions, true );
 	}
 
 	/**
@@ -124,6 +124,10 @@ class Template_Bootstrap {
 			Tribe__Notices::set_notice( 'event-past', sprintf( esc_html__( 'This %s has passed.', 'the-events-calendar' ), tribe_get_event_label_singular_lowercase() ) );
 		}
 		$setting = $this->get_template_setting();
+
+		// A number of TEC, and third-party, functions, depend on this. Let's fire it.
+		global $post, $wp_query;
+		do_action( 'the_post', $post, $wp_query );
 
 		ob_start();
 		if ( 'page' === $setting ) {
@@ -142,6 +146,25 @@ class Template_Bootstrap {
 	}
 
 	/**
+	 * Fetches the template for the Single Embed Event page using the legacy view system.
+	 *
+	 * @since  4.9.13
+	 *
+	 * @return string
+	 */
+	protected function get_v1_embed_template_path() {
+		global $post;
+		$query = tribe_get_global_query_object();
+
+		if ( ! tribe_is_showing_all() && tribe_is_past_event() ) {
+			Tribe__Notices::set_notice( 'event-past', sprintf( esc_html__( 'This %s has passed.', 'the-events-calendar' ), tribe_get_event_label_singular_lowercase() ) );
+		}
+
+		$template_path = V1_Event_Templates::getTemplateHierarchy( 'embed' );
+		return $template_path;
+	}
+
+	/**
 	 * Gets the View HTML
 	 *
 	 * @todo Stop handling kitchen sink template here.
@@ -155,11 +178,41 @@ class Template_Bootstrap {
 		$context   = tribe_context();
 		$view_slug = $context->get( 'view' );
 
-		if (
+		/**
+		 * Filters the HTML for the view before we do any other logic around that.
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param string          $pre_html  Allow pre-filtering the HTML that we will boostrap.
+		 * @param string          $view_slug The slug of the View that will be built, based on the context.
+		 * @param \Tribe__Context $context   Tribe context used to setup the view.
+		 * @param \WP_Query       $query     The current WP Query object.
+		 */
+		$pre_html = apply_filters( 'tribe_events_views_v2_bootstrap_pre_get_view_html', null, $view_slug, $query, $context );
+
+		if ( null !== $pre_html ) {
+			return $pre_html;
+		}
+
+		$should_display_single = (
 			'single-event' === $view_slug
 			&& ! tribe_is_showing_all()
-			&& ! \Tribe__Templates::is_embed()
-		) {
+			&& ! V1_Templates::is_embed()
+		);
+
+		/**
+		 * Filters when we display the single for events.
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param boolean         $should_display_single  If we are currently going to display single.
+		 * @param string          $view_slug              The slug of the View that will be built, based on the context.
+		 * @param \Tribe__Context $context                Tribe context used to setup the view.
+		 * @param \WP_Query       $query                  The current WP Query object.
+		 */
+		$should_display_single = apply_filters( 'tribe_events_views_v2_bootstrap_should_display_single', $should_display_single, $view_slug, $query, $context );
+
+		if ( $should_display_single ) {
 			$html = $this->get_v1_single_event_html();
 		} elseif ( isset( $query->query_vars['tribe_events_views_kitchen_sink'] ) ) {
 			$context = [
@@ -208,7 +261,24 @@ class Template_Bootstrap {
 			$query = tribe_get_global_query_object();
 		}
 
+		/**
+		 * Allows filtering if bootstrap should load.
+		 *
+		 * @since 5.0.0
+		 *
+		 * @param null|boolean    $should_load  Anything other then null will be returned after casting as bool.
+		 * @param \WP_Query       $query        The current WP Query object.
+		 */
+		$should_load = apply_filters( 'tribe_events_views_v2_bootstrap_pre_should_load', null, $query );
+		if ( null !== $should_load ) {
+			return (bool) $should_load;
+		}
+
 		if ( ! $query instanceof \WP_Query ) {
+			return false;
+		}
+
+		if ( is_404() ) {
 			return false;
 		}
 
@@ -232,10 +302,16 @@ class Template_Bootstrap {
 	 * @return string Path to the File that initalizes the template
 	 */
 	public function filter_template_include( $template ) {
-
 		// Determine if we should load bootstrap or bail.
 		if ( ! $this->should_load() ) {
 			return $template;
+		}
+
+		$context   = tribe_context();
+		$view_slug = $context->get( 'view' );
+
+		if ( V1_Templates::is_embed() || 'embed' === $view_slug ) {
+			return $this->get_v1_embed_template_path();
 		}
 
 		return $this->get_template_object()->get_path();
@@ -268,4 +344,45 @@ class Template_Bootstrap {
 
 		return $classes;
 	}
+
+	/**
+	 * Filter the template file in case we're in single event
+	 * and we need to use the theme overrides.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param string $file      Complete path to include the PHP File
+	 * @param array  $name      Template name
+	 * @param object $template  Instance of the Tribe__Template
+	 *
+	 * @return string
+	 */
+	public function filter_template_file( $file, $name, $template ) {
+		$template_name = end( $name );
+
+		// Bail when we dont are not loading 'default-template'.
+		if ( 'default-template' !== $template_name ) {
+			return $file;
+		}
+
+		if (
+			! is_singular( TEC::POSTTYPE )
+			&& 'single-event' !== tribe_context()->get( 'view' )
+		) {
+			return $file;
+		}
+
+		$theme_file = locate_template( 'tribe-events/default-template.php', false, false );
+
+		if ( ! $theme_file ) {
+			return $file;
+		}
+
+		if ( ! tribe_is_showing_all() && tribe_is_past_event() ) {
+			Tribe__Notices::set_notice( 'event-past', sprintf( esc_html__( 'This %s has passed.', 'the-events-calendar' ), tribe_get_event_label_singular_lowercase() ) );
+		}
+
+		return $theme_file;
+	}
+
 }

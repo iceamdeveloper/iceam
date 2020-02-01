@@ -3,15 +3,16 @@
  * View: Photo View - Single Event Date Time
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/photo/event/date-time.php
+ * [your-theme]/tribe/events-pro/v2/photo/event/date-time.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
+ * @var obj     $date_formats Object containing the date formats.
  *
  * @see tribe_get_event() For the format of the event object.
  */
@@ -42,7 +43,7 @@ $display_end_date = $event->dates->start_display->format( 'H:i' ) !== $event->da
 			<?php echo esc_html( $event->dates->start_display->format( $time_format ) ) ?>
 		</time>
 		<?php if ( $display_end_date ) : ?>
-			<span class="tribe-events-events-pro-photo__event-datetime-separator"> &mdash; </span>
+			<span class="tribe-events-events-pro-photo__event-datetime-separator"><?php echo esc_html( $date_formats->time_range_separator ); ?></span>
 			<time datetime="<?php echo esc_attr( $event->dates->end_display->format( 'H:i' ) ) ?>">
 				<?php echo esc_html( $event->dates->end_display->format( $time_format ) ) ?>
 			</time>

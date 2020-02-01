@@ -13,8 +13,13 @@
 	a.tribe-common-c-btn {
 		@mixin button-solid;
 
-		padding: 11px 20px 11px;
 		background-color: var(--color-accent-primary);
+		padding: 11px 20px 11px;
+		width: 100%;
+
+		.tribe-common--breakpoint-medium& {
+			width: auto;
+		}
 
 		&:focus,
 		&:hover {
@@ -43,6 +48,23 @@
 	.tribe-theme-twentyseventeen & {
 
 		.tribe-common-c-btn {
+
+			&:hover,
+			&:focus {
+				background-color: var(--color-accent-primary-hover);
+				color: var(--color-background);
+			}
+		}
+	}
+
+	/* -------------------------------------------------------------------------
+	 * Theme Overrides - Twenty Twenty
+	 * ------------------------------------------------------------------------- */
+
+	.tribe-theme-twentytwenty & {
+
+		.tribe-common-c-btn {
+			background-color: var(--color-accent-primary);
 
 			&:hover,
 			&:focus {

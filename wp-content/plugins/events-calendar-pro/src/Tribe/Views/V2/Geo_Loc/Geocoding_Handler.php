@@ -72,6 +72,8 @@ class Geocoding_Handler extends Base_Handler implements Handler_Interface {
 				'data'    => $geo_loc_data->get_error_data(),
 			] );
 
+			$repository_args['void_query'] = true;
+
 			return $repository_args;
 		}
 
@@ -80,7 +82,15 @@ class Geocoding_Handler extends Base_Handler implements Handler_Interface {
 			'data'   => $geo_loc_data->to_array(),
 		] );
 
-		$venues = $this->fencer->get_venues_in_geofence( $geo_loc_data->get_lat(), $geo_loc_data->get_lng() );
+		$lat = $geo_loc_data->get_lat();
+		$lng = $geo_loc_data->get_lng();
+
+		$context->safe_set( [
+			'geoloc_lat' => $lat,
+			'geoloc_lng' => $lng,
+		] );
+
+		$venues = $this->fencer->get_venues_in_geofence( $lat, $lng );
 
 		if ( $venues ) {
 			$repository_args['venue'] = (array) $venues;

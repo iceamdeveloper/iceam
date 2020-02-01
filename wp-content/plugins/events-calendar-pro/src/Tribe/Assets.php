@@ -6,6 +6,15 @@
  */
 class Tribe__Events__Pro__Assets {
 	/**
+	 * Caches the result of the `should_enqueue_frontend` check.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @var bool
+	 */
+	protected $should_enqueue_frontend;
+
+	/**
 	 * Registers and Enqueues the assets
 	 *
 	 * @since  4.4.30
@@ -362,16 +371,25 @@ class Tribe__Events__Pro__Assets {
 	 * When to enqueue the Pro Styles on the front-end
 	 *
 	 * @since  4.4.30
+	 * @since 5.0.0 Cache the check value.
 	 *
-	 * @return void
+	 * @return bool
 	 */
 	public function should_enqueue_frontend() {
+		if ( null !== $this->should_enqueue_frontend ) {
+			return $this->should_enqueue_frontend;
+		}
+
 		global $post;
 
-		return (
+		$should_enqueue = (
 			tribe_is_event_query()
 			|| ( $post instanceof WP_Post && has_shortcode( $post->post_content, 'tribe_events' ) )
 		);
+
+		$this->should_enqueue_frontend = $should_enqueue;
+
+		return $should_enqueue;
 	}
 
 	/**

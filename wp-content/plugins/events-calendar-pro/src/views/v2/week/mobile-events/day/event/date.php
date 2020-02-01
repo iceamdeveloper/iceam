@@ -3,13 +3,13 @@
  * View: Week View - Mobile Event Date
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/mobile-events/day/event/date.php
+ * [your-theme]/tribe/events-pro/v2/week/mobile-events/day/event/date.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  * @var WP_Post $event The event post object, decorated with additional properties by the `tribe_get_event` function.
  *
@@ -28,7 +28,7 @@
 	<?php endif; ?>
 	<time
 		class="tribe-events-pro-week-mobile-events__event-datetime"
-		datetime="<?php echo esc_attr( $event->dates->start->format( 'c' ) ); ?>"
+		datetime="<?php echo esc_attr( $event->dates->start_display->format( 'c' ) ); ?>"
 	>
 		<?php echo $event->schedule_details->escaped(); // Already escaped. ?>
 	</time>

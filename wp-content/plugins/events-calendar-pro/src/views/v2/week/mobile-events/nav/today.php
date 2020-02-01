@@ -3,7 +3,7 @@
  * View: Week View Nav Today Button
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/mobile-events/nav/today.php
+ * [your-theme]/tribe/events-pro/v2/week/mobile-events/nav/today.php
  *
  * See more documentation about our views templating system.
  *
@@ -11,7 +11,7 @@
  *
  * @var string $today_url The URL to the today page, if any, or an empty string.
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  */
 ?>

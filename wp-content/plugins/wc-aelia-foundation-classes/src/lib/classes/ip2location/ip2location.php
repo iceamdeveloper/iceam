@@ -14,7 +14,12 @@ class IP2Location extends Base_Class {
 	protected $_db_reader;
 
 	// @var string URL to the geolocation database
-	const GEOLITE_DB = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
+	//const GEOLITE_DB = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
+
+	// New temporary URL to serve the GeoIP database, to deal with the changes introduced by MaxMind
+	// @since 2.0.10.191231
+	// @link https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/
+	const GEOLITE_DB = 'http://geoip.aelia.co/Geolite2-City.mmdb.gz';
 
 	//protected static $geoip_db_file = 'geolite-db/GeoLite2-Country.mmdb';
 	public static $geoip_db_file = 'GeoLite2-City.mmdb';
@@ -86,11 +91,11 @@ class IP2Location extends Base_Class {
 																									 WC_AeliaFoundationClasses::$text_domain))) .
 					'&nbsp;' .
 					sprintf(__('If the error persists, please download the the database ' .
-										 'manually, from <a href="%1$s">%1$s</a>. Extract file ' .
+										 'manually, from <a href="%1$s">the MaxMind website</a> (you will need to create a free account on their site). Extract file ' .
 										 '<strong>%2$s</strong> from the archive and copy it to ' .
 										 '<code>%3$s</code>.',
 										 WC_AeliaFoundationClasses::$text_domain),
-									IP2Location::GEOLITE_DB,
+									'https://dev.maxmind.com/geoip/geoip2/geolite2/',
 									IP2Location::$geoip_db_file,
 									dirname(IP2Location::geoip_db_file())) .
 					'&nbsp;' .

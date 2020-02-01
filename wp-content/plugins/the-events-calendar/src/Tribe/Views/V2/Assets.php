@@ -12,7 +12,7 @@
 namespace Tribe\Events\Views\V2;
 
 use Tribe__Events__Main as Plugin;
-use Tribe\Events\Views\V2\Template_Bootstrap;
+use Tribe__Events__Templates;
 
 /**
  * Register
@@ -31,6 +31,15 @@ class Assets extends \tad_DI52_ServiceProvider {
 	 * @var string
 	 */
 	public static $group_key = 'events-views-v2';
+
+	/**
+	 * Caches the result of the `should_enqueue_frontend` check.
+	 *
+	 * @since 4.9.13
+	 *
+	 * @var bool
+	 */
+	protected $should_enqueue_frontend;
 
 	/**
 	 * Binds and sets up implementations.
@@ -139,6 +148,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 			[
 				'jquery',
 				'tribe-common',
+				'tribe-events-views-v2-breakpoints',
 			],
 			null,
 			[
@@ -253,6 +263,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 			[
 				'jquery',
 				'tribe-common',
+				'tribe-events-views-v2-viewport',
 				'tribe-events-views-v2-accordion',
 			],
 			null,
@@ -289,6 +300,43 @@ class Assets extends \tad_DI52_ServiceProvider {
 				'priority' => 10,
 			]
 		);
+
+		tribe_asset(
+			$plugin,
+			'tribe-events-views-v2-breakpoints',
+			'views/breakpoints.js',
+			[
+				'jquery',
+				'tribe-common',
+			],
+			'wp_enqueue_scripts',
+			[
+				'priority'     => 10,
+				'conditionals' => [ $this, 'should_enqueue_frontend' ],
+				'groups'       => [ static::$group_key ],
+				'in_footer'    => false,
+			]
+		);
+
+		$overrides_stylesheet = Tribe__Events__Templates::locate_stylesheet( 'tribe-events/tribe-events.css' );
+
+		if ( ! empty( $overrides_stylesheet ) ) {
+			tribe_asset(
+				$plugin,
+				'tribe-events-views-v2-override-style',
+				$overrides_stylesheet,
+				[
+					'tribe-common-full-style',
+					'tribe-events-views-v2-skeleton',
+				],
+				'wp_enqueue_scripts',
+				[
+					'priority'     => 10,
+					'conditionals' => [ $this, 'should_enqueue_frontend' ],
+					'groups'       => [ static::$group_key ],
+				]
+			);
+		}
 	}
 
 	/**
@@ -323,10 +371,14 @@ class Assets extends \tad_DI52_ServiceProvider {
 	 * Checks if we should enqueue frontend assets for the V2 views.
 	 *
 	 * @since 4.9.4
+	 * @since 4.9.13 Cache the check value.
 	 *
 	 * @return bool
 	 */
 	public function should_enqueue_frontend() {
+		if ( null !== $this->should_enqueue_frontend ) {
+			return $this->should_enqueue_frontend;
+		}
 
 		$should_enqueue = tribe( Template_Bootstrap::class )->should_load();
 
@@ -337,7 +389,11 @@ class Assets extends \tad_DI52_ServiceProvider {
 		 *
 		 * @param bool $should_enqueue
 		 */
-		return apply_filters( 'tribe_events_views_v2_assets_should_enqueue_frontend', $should_enqueue );
+		$should_enqueue =  apply_filters( 'tribe_events_views_v2_assets_should_enqueue_frontend', $should_enqueue );
+
+		$this->should_enqueue_frontend = $should_enqueue;
+
+		return $should_enqueue;
 	}
 
 

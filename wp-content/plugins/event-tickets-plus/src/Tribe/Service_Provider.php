@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class Tribe__Tickets_Plus__Service_Provider
  *
@@ -18,6 +19,7 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 	public function register() {
 		$this->container->singleton( 'tickets-plus.assets', new Tribe__Tickets_Plus__Assets() );
 		$this->container->singleton( 'tickets-plus.admin.views', 'Tribe__Tickets_Plus__Admin__Views' );
+		$this->container->singleton( 'tickets-plus.admin.notices', 'Tribe__Tickets_Plus__Admin__Notices', [ 'hook' ] );
 		$this->container->singleton( 'tickets-plus.editor', 'Tribe__Tickets_Plus__Editor', array( 'hook' ) );
 
 		$this->container->singleton( 'tickets-plus.commerce.warnings', new Tribe__Tickets_Plus__Commerce__Warnings );
@@ -66,12 +68,16 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 		tribe( 'tickets-plus.qr.site-settings' );
 		tribe( 'tickets-plus.promoter.observer' );
 
+		/** @var Tribe__Tickets_Plus__Assets $tickets_plus_main */
+		$tickets_plus_main = tribe( 'tickets-plus.assets' );
+
 		if ( is_admin() ) {
 			tribe( 'tickets-plus.admin.views' );
+			tribe( 'tickets-plus.admin.notices' );
 		}
 
-		tribe( 'tickets-plus.assets' )->enqueue_scripts();
-		tribe( 'tickets-plus.assets' )->admin_enqueue_scripts();
+		$tickets_plus_main->enqueue_scripts();
+		$tickets_plus_main->admin_enqueue_scripts();
 
 		add_filter( 'event_tickets_attendees_edd_checkin_stati', tribe_callback( 'tickets-plus.commerce.edd.checkin-stati', 'filter_attendee_ticket_checkin_stati' ), 10 );
 

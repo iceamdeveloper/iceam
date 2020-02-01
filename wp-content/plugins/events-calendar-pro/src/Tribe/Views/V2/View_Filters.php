@@ -11,8 +11,11 @@ namespace Tribe\Events\Pro\Views\V2;
 use Tribe\Events\Pro\Views\V2\Geo_Loc\Handler_Interface as Geo_Loc_Handler;
 use Tribe\Events\Views\V2\View_Interface;
 use Tribe__Context as Context;
-use Tribe__Events__Rewrite as Rewrite;
 use Tribe__Events__Main as TEC;
+use Tribe__Events__Rewrite as TEC_Rewrite;
+use WP_REST_Request as Request;
+use Tribe__Events__Organizer as Organizer;
+use Tribe__Events__Venue as Venue;
 
 /**
  * Class View_Filters
@@ -62,10 +65,42 @@ class View_Filters {
 
 		$is_location_search = $context->is( 'geoloc_search' );
 		if ( $is_location_search ) {
-			$repository_args = $this->geo_loc_handler->filter_repository_args( $repository_args, $context );
+			$repository_args = (array) $this->geo_loc_handler->filter_repository_args( $repository_args, $context );
 		}
 
 		return $repository_args;
+	}
+
+	/**
+	 * Filter the Rest Requests to point to the correct view when dealing with Venue and Organizer.
+	 *
+	 * @since  5.0.0
+	 *
+	 * @param  array   $params  Params received on the Request.
+	 * @param  Request $request Full WP Rest Request instance.
+	 *
+	 * @return array            Params after view slug is setup.
+	 */
+	public function filter_rest_request_view_slug( array $params, Request $request ) {
+		$post_types_map = [
+			Organizer::POSTTYPE => 'organizer',
+			Venue::POSTTYPE => 'venue',
+		];
+
+		$intersect_params = array_intersect( array_keys( $params ), array_keys( $post_types_map ) );
+		if ( ! count( $intersect_params ) ) {
+			return $params;
+		}
+
+		$post_type = reset( $intersect_params );
+
+		if ( empty( $post_types_map[ $post_type ] ) ) {
+			return $params;
+		}
+
+		$params['eventDisplay'] = $post_types_map[ $post_type ];
+
+		return $params;
 	}
 
 	/**
@@ -158,6 +193,8 @@ class View_Filters {
 			|| is_singular()
 			|| is_tax()
 			|| 'all' === tribe_context()->get( 'view' )
+			|| 'embed' === tribe_context()->get( 'view' )
+			|| is_front_page()
 		) {
 			return;
 		}
@@ -178,7 +215,7 @@ class View_Filters {
 			home_url()
 		);
 
-		$location = Rewrite::instance()->get_canonical_url( $ugly_url );
+		$location = TEC_Rewrite::instance()->get_canonical_url( $ugly_url );
 
 		wp_redirect(
 			$location,

@@ -37,6 +37,9 @@ abstract class Tribe__Tickets_Plus__Commerce__Abstract_Cart {
 			return $is_up_to_date;
 		}
 
-		return tribe( 'tickets-plus.meta.contents' )->is_stored_meta_up_to_date( $tickets );
+		/** @var Tribe__Tickets_Plus__Meta__Contents $contents */
+		$contents = tribe( 'tickets-plus.meta.contents' );
+
+		return $contents->is_stored_meta_up_to_date( $tickets );
 	}
 }

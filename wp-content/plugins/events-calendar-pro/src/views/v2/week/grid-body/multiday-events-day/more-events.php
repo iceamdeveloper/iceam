@@ -3,18 +3,16 @@
  * View: Week View - Multiday Events - More Events
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body/multiday-events-day/more-events.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body/multiday-events-day/more-events.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.8
- *
+ * @version 5.0.0
  *
  * @var string $multiday_toggle_controls A space-separated list of entries for the `aria-controls` attribute.
- * @var int $multiday_min_toggle The threshold after which multi-day events should be hidden under a "More" control.
- * @var int $more_events The number of events not showing in the stack due to the toggle.
+ * @var int    $more_events              The number of events not showing in the stack due to the toggle.
  */
 
 $more_text = sprintf(

@@ -270,6 +270,7 @@ function ublk_submit_optin(options) {
 function change_thickbox_size_ublk() {
     jQuery(document).find('#TB_window').width('700').height('420').css('margin-left', -700 / 2);
     jQuery(document).find('#TB_ajaxContent').width('640');
+    jQuery(document).find('#TB_ajaxContent').addClass('ub_deactive_window');
     var doc_height = jQuery(window).height();
     var doc_space = doc_height - 400;
     if (doc_space > 0) {

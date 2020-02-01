@@ -3,13 +3,13 @@
  * View: Week View - Events Row Header
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/grid-body/events-row-header.php
+ * [your-theme]/tribe/events-pro/v2/week/grid-body/events-row-header.php
  *
  * See more documentation about our views templating system.
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 4.7.5
+ * @version 5.0.0
  */
 ?>
 <div class="tribe-events-pro-week-grid__events-row-header" role="rowheader">

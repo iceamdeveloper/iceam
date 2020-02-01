@@ -1,11 +1,13 @@
 <?php
 
 class Tribe__Tickets_Plus__Meta__Contents {
-	public function get_ticket_stored_meta( $tickets = array() ) {
-		$stored_data = array();
+	public function get_ticket_stored_meta( $tickets = [] ) {
+		$stored_data = [];
 		$storage     = new Tribe__Tickets_Plus__Meta__Storage;
 
 		foreach ( $tickets as $ticket_id => $quantity ) {
+			$ticket_id = (int) $ticket_id;
+
 			$stored_data[ $ticket_id ] = $storage->get_meta_data_for( $ticket_id );
 		}
 
@@ -22,7 +24,7 @@ class Tribe__Tickets_Plus__Meta__Contents {
 	 * @param array $quantity_by_ticket_id Array indexed by ticket id with ticket quantities as the values
 	 * @return boolean
 	 */
-	public function is_stored_meta_up_to_date( $quantity_by_ticket_id = array() ) {
+	public function is_stored_meta_up_to_date( $quantity_by_ticket_id = [] ) {
 		// if there aren't any tickets, consider them up to date
 		if ( empty( $quantity_by_ticket_id ) ) {
 			return true;
@@ -30,10 +32,9 @@ class Tribe__Tickets_Plus__Meta__Contents {
 
 		$stored_data = $this->get_ticket_stored_meta( $quantity_by_ticket_id );
 		$meta        = Tribe__Tickets_Plus__Main::instance()->meta();
-		$up_to_date  = true;
 
 		foreach ( $quantity_by_ticket_id as $ticket_id => $quantity ) {
-			$data        = empty( $stored_data[ $ticket_id ] ) ? array() : $stored_data[ $ticket_id ];
+			$data        = empty( $stored_data[ $ticket_id ] ) ? [] : $stored_data[ $ticket_id ];
 			$ticket_meta = $meta->get_meta_fields_by_ticket( $ticket_id );
 
 			// Continue if the ticket doesn't have any meta
@@ -42,14 +43,10 @@ class Tribe__Tickets_Plus__Meta__Contents {
 			}
 
 			/**
-			 * Return false if the ticket has required meta but the data
-			 * for the ticket is empty or if the number of items stored for
-			 * the ticket is lower than the quantity in the cart
+			 * Return false if the data for the ticket is empty or if the number of items stored for
+			 * the ticket is different than the quantity in the cart.
 			 */
-			if (
-				$meta->ticket_has_required_meta( $ticket_id )
-					&& ( empty( $data[ $ticket_id ] ) || count( $data[ $ticket_id ] ) < $quantity )
-			) {
+			if ( empty( $data[ $ticket_id ] ) || count( $data[ $ticket_id ] ) !== $quantity ) {
 				return false;
 			}
 
@@ -57,6 +54,7 @@ class Tribe__Tickets_Plus__Meta__Contents {
 			foreach ( $ticket_meta as $meta_field ) {
 				$meta_slug = $meta_field->slug;
 
+				// Skip fields if they are not required.
 				if ( ! $meta->meta_is_required( $ticket_id, $meta_slug ) ) {
 					continue;
 				}
@@ -67,24 +65,37 @@ class Tribe__Tickets_Plus__Meta__Contents {
 					}
 
 					foreach ( $the_meta as $attendee_number => $meta_item ) {
-
-						// Give special treatment to checkboxes as they store differently
-						// from the rest of the fields.
+						/*
+						 * Give special treatment to checkboxes as they store
+						 * differently from the rest of the fields.
+						 */
 						if ( 'checkbox' === $meta_field->type ) {
+							$checkbox_values  = [];
+							$checkbox_options = [];
 
-							// If it's an array and it's not empty
-							// Means that the checkbox has values
-							// continue to the next element
-							if (
-								is_array( $meta_item )
-								&& ! empty( $meta_item )
-							) {
+							if ( ! empty( $meta_field->extra['options'] ) ) {
+								$checkbox_options = $meta_field->extra['options'];
+							}
+
+							foreach ( $checkbox_options as $checkbox_option ) {
+								$field_slug = sanitize_title( $meta_field->slug );
+								$field_slug .= '_' . md5( sanitize_title( $checkbox_option ) );
+
+								if ( isset( $meta_item[ $field_slug ] ) && '' !== $meta_item[ $field_slug ] ) {
+									$checkbox_values[] = $checkbox_option;
+								}
+							}
+
+							// Check if there are any checkbox values set for this field.
+							if ( ! empty( $checkbox_values ) ) {
 								continue;
 							}
 
+							// There's no checkbox value set if the $meta_item is not an array or it's empty.
 							return false;
 						}
 
+						// There's no value set if the field slug is not set or it's empty.
 						if (
 							! isset( $meta_item[ $meta_slug ] )
 							|| '' === $meta_item[ $meta_slug ]

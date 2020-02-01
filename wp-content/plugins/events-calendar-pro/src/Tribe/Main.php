@@ -42,10 +42,14 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		/** @var Tribe__Events__Pro__Recurrence__Queue_Processor */
 		public $queue_processor;
 
-		/** @var Tribe__Events__Pro__Recurrence__Queue_Realtime */
+		/**
+		 * @var Tribe__Events__Pro__Recurrence__Queue_Realtime
+		 */
 		public $queue_realtime;
 
-		/** @var Tribe__Events__Pro__Recurrence__Aggregator */
+		/**
+		 * @var Tribe__Events__Pro__Recurrence__Aggregator
+		 */
 		public $aggregator;
 
 		/**
@@ -67,7 +71,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public $template_namespace = 'events-pro';
 
-		const VERSION = '4.7.10';
+		const VERSION = '5.0.0.1';
 
 		/**
 		 * The Events Calendar Required Version
@@ -76,7 +80,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @deprecated 4.6
 		 *
 		 */
-		const REQUIRED_TEC_VERSION = '4.8.1-dev';
+		const REQUIRED_TEC_VERSION = '5.0.0.1';
 
 		private function __construct() {
 			$this->pluginDir = trailingslashit( basename( EVENTS_CALENDAR_PRO_DIR ) );
@@ -2012,14 +2016,17 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			tribe_singleton( 'events-pro.assets', 'Tribe__Events__Pro__Assets', array( 'register' ) );
 
 			tribe_singleton( 'events-pro.admin.settings', 'Tribe__Events__Pro__Admin__Settings', array( 'hook' ) );
-			tribe_singleton( 'events-pro.customizer.photo-view', 'Tribe__Events__Pro__Customizer__Photo_View' );
+
+			if ( ! tribe_events_views_v2_is_enabled() ) {
+				tribe_singleton( 'events-pro.customizer.photo-view', 'Tribe__Events__Pro__Customizer__Photo_View' );
+				tribe( 'events-pro.customizer.photo-view' );
+			}
 			tribe_singleton( 'events-pro.recurrence.nav', 'Tribe__Events__Pro__Recurrence__Navigation', array( 'hook' ) );
 			tribe_singleton( 'events-pro.ical', 'Tribe__Events__Pro__iCal', [ 'hook' ] );
 
 			tribe_register_provider( 'Tribe__Events__Pro__Editor__Provider' );
 
 			tribe( 'events-pro.admin.settings' );
-			tribe( 'events-pro.customizer.photo-view' );
 			tribe( 'events-pro.assets' );
 			tribe( 'events-pro.recurrence.nav' );
 			tribe( 'events-pro.ical' );
@@ -2028,6 +2035,8 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			tribe_register_provider( 'Tribe__Events__Pro__Service_Providers__RBE' );
 			tribe_register_provider( Tribe\Events\Pro\Views\V2\Service_Provider::class );
 			tribe_register_provider( Tribe\Events\Pro\Models\Service_Provider::class );
+			tribe_register_provider( Tribe__Events__Pro__Service_Providers__Templates::class );
+
 		}
 
 		/**

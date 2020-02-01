@@ -3,7 +3,7 @@
  * View: Week View - Day Selector Days
  *
  * Override this template in your own theme by creating a file at:
- * [your-theme]/tribe/events-pro/views/v2/week/day-selector/days.php
+ * [your-theme]/tribe/events-pro/v2/week/day-selector/days.php
  *
  * See more documentation about our views templating system.
  *
@@ -14,7 +14,7 @@
  * @var string $today_date      Today's date in `Y-m-d`.
  * @var string $week_start_date The week start date, in `Y-m-d` format.
  *
- * @version 4.7.9
+ * @version 5.0.0
  *
  */
 $selected    = 'false';

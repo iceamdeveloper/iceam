@@ -454,6 +454,10 @@ class Subscriptions_Integration {
 			add_filter('woocommerce_subscriptions_product_price', array($this, 'woocommerce_subscriptions_product_price'), 10, 2);
 			add_filter('woocommerce_subscriptions_product_sign_up_fee', array($this, 'woocommerce_subscriptions_product_sign_up_fee'), 10, 2);
 
+			// Suppress "missing property" notices for subscription products
+			// @since 1.4.9.191219
+			add_filter('wc_aelia_cs_product_should_have_property', array($this, 'wc_aelia_cs_product_should_have_property'), 10, 3);
+
 			// Coupon types
 			add_filter('wc_aelia_cs_coupon_types_to_convert', array($this, 'wc_aelia_cs_coupon_types_to_convert'), 10, 1);
 		}
@@ -771,6 +775,23 @@ class Subscriptions_Integration {
 		}
 
 		return $subscription_sign_up_fee;
+	}
+
+	/**
+	 * Suppress "missing property" for specific product types:
+	 * - Variable subscriptions don't have a regular price or a sale price.
+	 *
+	 * @param bool $should_have_property
+	 * @param WC_Product $product
+	 * @param string $property_name
+	 * @return bool
+	 * @since 1.4.9.191219
+	 */
+	public function wc_aelia_cs_product_should_have_property($should_have_property, $product, $property_name) {
+		if($product->is_type( 'variable-subscription' ) && in_array($property_name, array('regular_price', 'sale_price'))) {
+			$should_have_property = false;
+		}
+		return $should_have_property;
 	}
 
 	/**

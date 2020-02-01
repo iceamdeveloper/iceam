@@ -38,15 +38,16 @@ class WC_AeliaFoundationClasses_Install extends Aelia_Install {
 	protected function update_to_1_6_9_151103() {
 		$this->start_transaction();
 
+		$charset_collate = $this->wpdb->get_charset_collate();
 		try {
 			$table_name = $this->wpdb->prefix . 'aelia_dismissed_messages';
 			$SQL = "
 				CREATE TABLE IF NOT EXISTS `$table_name` (
 					`user_id` int NOT NULL,
-					`message_id` varchar(100) COLLATE utf8_unicode_ci NOT NULL DEFAULT '',
+					`message_id` varchar(100) NOT NULL DEFAULT '',
 					`date_updated` datetime DEFAULT NULL,
 					PRIMARY KEY (`user_id`, `message_id`)
-				) DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+				) {$charset_collate};
 			";
 			$result = $this->exec($SQL);
 

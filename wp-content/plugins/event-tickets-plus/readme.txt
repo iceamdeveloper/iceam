@@ -2,9 +2,9 @@
 
 Contributors: ModernTribe, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, barry.hughes, bordoni, borkweb, cliffpaulick, courane01, faction23, GeoffBel, geoffgraham, ggwicz, jbrinley, jentheo, leahkoerper, lucatume, mastromktg, MZAWeb, neillmcshea, nicosantos, patriciahillebrandt, peterchester, reid.peifer, roblagatta, ryancurban, shane.pearlman, tribecari, vicskf, zbtirrell
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
-Requires at least: 4.7
+Requires at least: 4.9
 Tested up to: 5.3
-Stable tag: 4.10.10
+Stable tag: 4.11.1.1
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,47 @@ Our Premium Plugins:
 * <a href="http://m.tri.be/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [4.11.1.1] 2020-01-30 =
+
+* Tweak - Remove duplicate ticket script to prevent conflicts. [ET-596]
+
+= [4.11.1] 2019-12-19 =
+
+* Tweak - Avoid loading plugin assets on post types that are not tickets-enabled post types [124403]
+* Tweak - Tweak styles around asterisk for required attendee registration inputs. [137285]
+* Tweak - Ensure font weight is standardized for attendee fields on single-event and tickets views. [137285]
+* Fix - WooCommerce tickets no longer show negative quantity available to purchase, such as if a ticket product is already oversold and backorders are not allowed [133432]
+* Language - 0 new strings added, 22 updated, 0 fuzzied, and 0 obsoleted
+
+= [4.11.0.2] 2019-12-12 =
+
+* Fix - Clean up the way we query pending orders for tickets, add caching to prevent repeated queries, and optimize meta calls for order information. [138485]
+* Fix - Update the WooCommerce minimum version as version prior to 3.7 are now incompatible. [138483]
+
+= [4.11.0.1] 2019-12-11 =
+
+* Fix - Prevent Composer Autoloader from taking too much time loading files and stop autoloading a class unnecessarily on each page load [138389]
+* Fix - Correct a bad `self` reference in `Tribe__Tickets_Plus__Commerce__WooCommerce__Meta` that could cause a fatal. [138383]
+
+= [4.11] 2019-12-10 =
+
+* Feature - Utilize the new `tribe-dialog` for WooCommerce & Easy Digital Downloads "Get Tickets" buttons [129434]
+* Feature - Add option to turn on/off Attendee Registration Modal. On by default _for new installs_ only [133048]
+* Feature - Detect changes of WooCommerce Ticket Products in the cart with AR fields and redirect to AR page on change [131139]
+* Feature - Use the block ticket template for WooCommerce and Easy Digital Downloads ticket views [132568]
+* Feature - Deprecate templates for WooCommerce and Easy Digital Downloads ticket views [132568]
+* Tweak - Change the way we add options to the ticket settings tab. [133048]
+* Tweak - Add ability to track installed version history. Added `$version_history_slug` and `$latest_version_slug` properties to `Tribe__Tickets_Plus__Main` [133048]
+* Tweak - Add links back to the Attendee Registration page from WooCommerce and Easy Digital Downloads checkout pages. [129449]
+* Tweak - Minimum required WordPress version updated to WordPress 4.9
+* Tweak - Added filters: `tribe_tickets_plus_edd_cart_url`, `tribe_tickets_plus_edd_checkout_url`, `woocommerce_add_to_cart_validation`, `tribe_tickets_plus_woo_checkout_url`, `tribe_tickets_plus_meta_storage_get_hash_cookie`, `tribe_tickets_plus_meta_storage_combine_new_and_saved_meta`
+* Tweak - Removed filters: `tribe_tickets_plus_hide_attendees_list_optout`, `tribe_events_tickets_woo_cart_class`, `tribe_events_tickets_woo_quantity_column_class`, `tribe_events_tickets_row_class`, `tribe_events_tickets_woo_quantity_column_class`, `tribe_tickets_plus_hide_attendees_list_optout`
+* Tweak - Added actions: `event_tickets_plus_edd_send_ticket_emails`, `tribe_tickets_plus_meta_storage_set_hash_cookie`, `tribe_tickets_plus_meta_storage_delete_hash_cookie`, `event_tickets_plus_attendee_meta_update`
+* Tweak - Removed actions: `wootickets_tickets_after_quantity_input`
+* Tweak - Changed views: `eddtickets/tickets`, `wootickets/tickets`
+* Fix - Make sure we're done processing RSVP attendee meta before we clear the cookie used to sync with the temporary transient meta. [138003]
+* Language - 3 new strings added, 5 updated, 0 fuzzied, and 0 obsoleted
 
 = [4.10.10] 2019-11-13 =
 
