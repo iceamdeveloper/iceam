@@ -27,7 +27,7 @@ class Toolset_Association_Cleanup_Post_Type extends Toolset_Wpdb_User {
 
 
 	/**
-	 * @param $post_type
+	 * @param string $post_type
 	 *
 	 * @return array
 	 */
@@ -48,7 +48,7 @@ class Toolset_Association_Cleanup_Post_Type extends Toolset_Wpdb_User {
 	}
 
 	/**
-	 * @param $post_type
+	 * @param string $post_type
 	 *
 	 * @return array
 	 */

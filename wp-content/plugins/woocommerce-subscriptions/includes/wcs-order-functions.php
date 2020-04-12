@@ -24,9 +24,9 @@ if ( ! defined( 'ABSPATH' ) ) {
  *		'customer_id' The user ID of a customer on the site.
  *		'product_id' The post ID of a WC_Product_Subscription, WC_Product_Variable_Subscription or WC_Product_Subscription_Variation object
  *		'order_id' The post ID of a shop_order post/WC_Order object which was used to create the subscription
- *		'subscription_status' Any valid subscription status. Can be 'any', 'active', 'cancelled', 'suspended', 'expired', 'pending' or 'trash'. Defaults to 'any'.
+ *		'subscription_status' Any valid subscription status. Can be 'any', 'active', 'cancelled', 'on-hold', 'expired', 'pending' or 'trash'. Defaults to 'any'.
  *		'order_type' Get subscriptions for the any order type in this array. Can include 'any', 'parent', 'renewal' or 'switch', defaults to parent.
- * @return array Subscription details in post_id => WC_Subscription form.
+ * @return WC_Subscription[] Subscription details in post_id => WC_Subscription form.
  * @since  2.0
  */
 function wcs_get_subscriptions_for_order( $order, $args = array() ) {
@@ -654,7 +654,7 @@ function wcs_get_order_item_name( $order_item, $include = array() ) {
 				$meta_key   = wc_attribute_label( wc_sanitize_taxonomy_name( $meta_key ) );
 				$meta_value = isset( $term->name ) ? $term->name : $meta_value;
 			} else {
-				$meta_key   = apply_filters( 'woocommerce_attribute_label', wc_attribute_label( $meta_key ), $meta_key );
+				$meta_key   = wc_attribute_label( $meta_key );
 			}
 
 			$attribute_strings[] = sprintf( '%s: %s', wp_kses_post( rawurldecode( $meta_key ) ), wp_kses_post( rawurldecode( $meta_value ) ) );
@@ -707,7 +707,7 @@ function wcs_get_line_item_name( $line_item ) {
 			$meta_key   = wc_attribute_label( wc_sanitize_taxonomy_name( $meta_key ) );
 			$meta_value = isset( $term->name ) ? $term->name : $meta_value;
 		} else {
-			$meta_key   = apply_filters( 'woocommerce_attribute_label', wc_attribute_label( $meta_key ), $meta_key );
+			$meta_key   = wc_attribute_label( $meta_key );
 		}
 
 		$item_meta_strings[] = sprintf( '%s: %s', rawurldecode( $meta_key ), rawurldecode( $meta_value ) );
@@ -796,7 +796,10 @@ function wcs_copy_order_item( $from_item, &$to_item ) {
 			) );
 			break;
 		case 'tax':
-			/** @var WC_Order_Item_Tax $from_item */
+			/**
+			 * @var WC_Order_Item_Tax $from_item
+			 * @var WC_Order_Item_Tax $to_item
+			 */
 			$to_item->set_props( array(
 				'rate_id'            => $from_item->get_rate_id(),
 				'label'              => $from_item->get_label(),
@@ -804,6 +807,12 @@ function wcs_copy_order_item( $from_item, &$to_item ) {
 				'tax_total'          => $from_item->get_tax_total(),
 				'shipping_tax_total' => $from_item->get_shipping_tax_total(),
 			) );
+
+			// WC 3.7.0+ Compatibility.
+			if ( is_callable( array( $from_item, 'get_rate_percent' ) ) ) {
+				$to_item->set_rate_percent( $from_item->get_rate_percent() );
+			}
+
 			break;
 		case 'fee':
 			/** @var WC_Order_Item_Fee $from_item */
@@ -895,4 +904,65 @@ function wcs_minutes_since_order_created( $order ) {
  */
 function wcs_seconds_since_order_created( $order ) {
 	return time() - $order->get_date_created()->getTimestamp();
+}
+
+/**
+ * Finds a corresponding subscription line item on an order.
+ *
+ * @since 2.6.0
+ *
+ * @param WC_Abstract_Order $order         The order object to look for the item in.
+ * @param WC_Order_Item $subscription_item The line item on the the subscription to find on the order.
+ * @param string $match_type               Optional. The type of comparison to make. Can be 'match_product_ids' to compare product|variation IDs or 'match_attributes' to also compare by item attributes on top of matching product IDs. Default 'match_product_ids'.
+ *
+ * @return WC_Order_Item|bool The order item which matches the subscription item or false if one cannot be found.
+ */
+function wcs_find_matching_line_item( $order, $subscription_item, $match_type = 'match_product_ids' ) {
+	$matching_item = false;
+
+	if ( 'match_attributes' === $match_type ) {
+		$subscription_item_attributes = wp_list_pluck( $subscription_item->get_formatted_meta_data( '_', true ), 'value', 'key' );
+	}
+
+	$subscription_item_canonical_product_id = wcs_get_canonical_product_id( $subscription_item );
+
+	foreach ( $order->get_items() as $order_item ) {
+		if ( wcs_get_canonical_product_id( $order_item ) !== $subscription_item_canonical_product_id ) {
+			continue;
+		}
+
+		// Check if we have matching meta key and value pairs loosely - they can appear in any order,
+		if ( 'match_attributes' === $match_type && wp_list_pluck( $order_item->get_formatted_meta_data( '_', true ), 'value', 'key' ) != $subscription_item_attributes ) {
+			continue;
+		}
+
+		$matching_item = $order_item;
+		break;
+	}
+
+	return $matching_item;
+}
+
+/**
+ * Checks if an order contains a product.
+ *
+ * @since 2.6.0
+ *
+ * @param WC_Order $order     An order object
+ * @param WC_Product $product A product object
+ *
+ * @return bool $order_has_product Whether the order contains a line item matching that product
+ */
+function wcs_order_contains_product( $order, $product ) {
+	$order_has_product = false;
+	$product_id        = wcs_get_canonical_product_id( $product );
+
+	foreach ( $order->get_items() as $line_item ) {
+		if ( wcs_get_canonical_product_id( $line_item ) === $product_id ) {
+			$order_has_product = true;
+			break;
+		}
+	}
+
+	return $order_has_product;
 }

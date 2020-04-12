@@ -1,6 +1,9 @@
 <?php
 
-
+/**
+ * Represents a single piece of information that would show in a cell of the Toolset Dashboard tables
+ * if all of its conditions are met.
+ */
 class Types_Information_Message {
 
 	protected $id;
@@ -11,9 +14,11 @@ class Types_Information_Message {
 	public $title;
 	public $description;
 
+
 	/**
 	 * Type Set & Get
-	 * @param $type
+	 *
+	 * @param $id
 	 */
 	public function set_id( $id ) {
 		$this->id = $id;
@@ -49,17 +54,23 @@ class Types_Information_Message {
 	/**
 	 * Use this to add multiple conditions at ounce.
 	 *
-	 * @param $conditions
-	 *
-	 * @return bool
+	 * @param string|Types_Helper_Condition|false $conditions
+	 * @return void
 	 */
 	public function add_conditions( $conditions ) {
-		if( $conditions === false )
-			return false;
+		if ( $conditions === false ) {
+			return;
+		}
 
-		if( is_array( $conditions ) ) {
-			foreach( $conditions as $condition ) {
-				$condition = new $condition();
+		if ( is_array( $conditions ) ) {
+			foreach ( $conditions as $condition_class_name ) {
+				$condition = new $condition_class_name();
+
+				// Allow for conditions from Toolset Common to be used as well.
+				if ( $condition instanceof Toolset_Condition_Interface ) {
+					$condition = new \OTGS\Toolset\Types\Helper\Condition\ToolsetConditionWrapper( $condition );
+				}
+
 				$this->add_condition( $condition );
 			}
 		} else {
@@ -73,7 +84,7 @@ class Types_Information_Message {
 	 *
 	 * @param Types_Helper_Condition $condition
 	 *
-	 * @return bool
+	 * @return Types_Information_Message
 	 */
 	public function add_condition( Types_Helper_Condition $condition ) {
 		$this->conditions[] = $condition;
@@ -87,10 +98,10 @@ class Types_Information_Message {
 	 * @return bool
 	 */
 	public function valid() {
-
 		foreach( $this->conditions as $condition ) {
-			if( ! $condition->valid() )
+			if( ! $condition->valid() ) {
 				return false;
+			}
 		}
 
 		return true;
@@ -152,12 +163,12 @@ class Types_Information_Message {
 	 * see /application/data/information
 	 *
 	 * @param array $data
-	 *
-	 * @return bool
+	 * @return void
 	 */
 	public function data_import( $data ) {
-		if( ! is_array( $data ) )
-			return false;
+		if ( ! is_array( $data ) ) {
+			return;
+		}
 
 		$default = array(
 			'id'            => false,

@@ -1,5 +1,9 @@
 <?php
 
+use OTGS\Toolset\Twig\Error\LoaderError;
+use OTGS\Toolset\Twig\Error\RuntimeError;
+use OTGS\Toolset\Twig\Error\SyntaxError;
+
 /**
  * Represents a single dialog box whose template will be rendered on the page when an instance of this class is
  * created. Enqueues all the assets needed for displaying it.
@@ -14,7 +18,7 @@ class Toolset_Twig_Dialog_Box extends Toolset_DialogBoxes {
 	/** @var array */
 	private $context;
 	
-	/** @var Twig_Environment */
+	/** @var OTGS\Toolset\Twig\Environment */
 	private $twig;
 	
 	/** @var string */
@@ -30,7 +34,7 @@ class Toolset_Twig_Dialog_Box extends Toolset_DialogBoxes {
 	 * Should be called during the 'current_screen' action, not sooner or later.
 	 *
 	 * @param string $dialog_id Unique ID (at least within the page) used to reference the dialog in JS.
-	 * @param Twig_Environment $twig Prepared Twig environment.
+	 * @param OTGS\Toolset\Twig\Environment $twig Prepared Twig environment.
 	 * @param array $context Twig context for the dialog template.
 	 * @param string $template_name Twig template name that will be recognized by the provided environment.
 	 * @param bool $late_register_assets Whether to run late_register_assets() or not.
@@ -59,10 +63,10 @@ class Toolset_Twig_Dialog_Box extends Toolset_DialogBoxes {
 	/**
 	 * Render a predefined Twig template.
 	 *
+	 * @throws LoaderError
+	 * @throws RuntimeError
+	 * @throws SyntaxError
 	 * @since 2.0
-	 * @throws Twig_Error_Loader  When the template cannot be found
-	 * @throws Twig_Error_Syntax  When an error occurred during compilation
-	 * @throws Twig_Error_Runtime
 	 */
 	public function template() {
 		printf(
@@ -91,7 +95,6 @@ class Toolset_Twig_Dialog_Box extends Toolset_DialogBoxes {
 			Types_Asset_Manager::get_instance()->register_toolset_style( $style );
 		}
 		*/
-
 		$asset_manager = Toolset_Assets_Manager::get_instance();
 
 		$scripts = $this->register_scripts( array() );

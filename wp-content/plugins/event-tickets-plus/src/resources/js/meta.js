@@ -21,7 +21,6 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 * Initializes the meta functionality
 	 */
 	my.init = function() {
-
 		$( '.tribe-list' ).on( 'click', '.attendee-meta.toggle', function() {
 			$( this )
 				.toggleClass( 'on' )
@@ -34,8 +33,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		this.$ticket_form
 			.on( 'change', '.tribe-tickets-order_status-row select', this.event.status_changed )
 			.on( 'change', '.quantity input, .quantity select', this.event.quantity_changed )
-			.on( 'keyup input', '.quantity input', this.event.quantity_changed )
-			.on( 'submit', this.event.handle_submission );
+			.on( 'keyup input', '.quantity input', this.event.quantity_changed );
 
 		this.$ticket_form.find( '.quantity input:not([type="hidden"]), .quantity select' ).each( function() {
 			my.set_quantity( $( this ) );
@@ -189,26 +187,6 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		// Ensure that it is a number and stop the keypress
 		if ( ( e.shiftKey || ( e.keyCode < 48 || e.keyCode > 57 ) ) && ( e.keyCode < 96 || e.keyCode > 105 ) ) {
 			e.preventDefault();
-		}
-	};
-
-	/**
-	 * Event to handle the submission action
-	 *
-	 * Validates required meta fields and stores meta data
-	 */
-	my.event.handle_submission = function( e ) {
-		var $form = $( this ).closest( 'form' );
-
-		if ( ! my.validate_meta( $form ) ) {
-			e.preventDefault();
-
-			$form.addClass( 'tribe-event-tickets-plus-meta-missing-required' );
-
-			$( 'html, body' ).animate( {
-				scrollTop: $form.offset().top
-			}, 300 );
-			return;
 		}
 	};
 

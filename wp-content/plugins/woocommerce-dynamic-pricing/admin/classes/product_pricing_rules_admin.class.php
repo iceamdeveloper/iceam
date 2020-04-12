@@ -12,16 +12,19 @@ class woocommerce_product_pricing_rules_admin {
 		if ( WC_Dynamic_Pricing_Compatibility::is_wc_version_gte_2_3() ) :
 			?>
             <li class="pricing_tab dynamic_pricing_options dynamic_pricing_options_23">
-                <a href="#dynamic_pricing_data"><span><?php _e( 'Dynamic Pricing', 'woocommerce-dynamic-pricing' ); ?></span></a></li>
+                <a href="#dynamic_pricing_data"><span><?php _e( 'Dynamic Pricing', 'woocommerce-dynamic-pricing' ); ?></span></a>
+            </li>
 
 		<?php elseif ( WC_Dynamic_Pricing_Compatibility::is_wc_version_gte_2_1() ) : ?>
             <li class="pricing_tab dynamic_pricing_options dynamic_pricing_options_21">
-                <a href="#dynamic_pricing_data"><?php _e( 'Dynamic Pricing', 'woocommerce-dynamic-pricing' ); ?></a></li>
+                <a href="#dynamic_pricing_data"><?php _e( 'Dynamic Pricing', 'woocommerce-dynamic-pricing' ); ?></a>
+            </li>
 		<?php else : ?>
             <li class="pricing_tab dynamic_pricing_options">
-                <a href="#dynamic_pricing_data"><?php _e( 'Dynamic Pricing', 'woocommerce-dynamic-pricing' ); ?></a></li>
+                <a href="#dynamic_pricing_data"><?php _e( 'Dynamic Pricing', 'woocommerce-dynamic-pricing' ); ?></a>
+            </li>
 
-			<?php
+		<?php
 		endif;
 	}
 
@@ -29,8 +32,9 @@ class woocommerce_product_pricing_rules_admin {
 		global $post;
 		$product           = wc_get_product( $post->ID );
 		$pricing_rule_sets = WC_Dynamic_Pricing_Compatibility::get_product_meta( $product, '_pricing_rules' );
+		$pricing_rule_sets = ! empty( $pricing_rule_sets ) ? $pricing_rule_sets : array();
 		?>
-        <div id="dynamic_pricing_data" class="panel woocommerce_options_panel">
+        <div id="dynamic_pricing_data" class="panel woocommerce_options_panel wc-metaboxes-wrapper hidden">
             <div id="woocommerce-pricing-rules-wrap" data-setindex="<?php echo count( $pricing_rule_sets ); ?>">
 				<?php $this->meta_box_javascript(); ?>
 				<?php if ( $pricing_rule_sets && is_array( $pricing_rule_sets ) && sizeof( $pricing_rule_sets ) > 0 ) : ?>
@@ -103,20 +107,20 @@ class woocommerce_product_pricing_rules_admin {
 					?>
                 </div>
 
-                <div id="woocommerce-pricing-variations-<?php echo $name; ?>" class="section">
-					<?php
-					$variation_index = 0;
-					if ( is_array( $variation_rules ) && count( $variation_rules ) > 0 ) {
-						$this->create_variation_selector( $variation_rules, $name );
-					} else {
-						$product_cats = array();
-						$this->create_variation_selector( null, $name );
-					}
-					?>
-                </div>
+
+				<?php
+				$variation_index = 0;
+				if ( is_array( $variation_rules ) && count( $variation_rules ) > 0 ) {
+					$this->create_variation_selector( $variation_rules, $name );
+				} else {
+					$product_cats = array();
+					$this->create_variation_selector( null, $name );
+				}
+				?>
+
 
                 <div id="woocommerce-pricing-mode-<?php echo $name; ?>" class="section">
-                    <label for="pricing_ruleset_mode_value_<?php echo $name . '_0'; ?>"><?php _e( 'Rule Processing Mode', 'woocommerce-dynamic-pricing' ); ?></label>
+                    <label for="pricing_ruleset_mode_value_<?php echo $name . '_0'; ?>"><?php _e( 'Rule Processing Mode:', 'woocommerce-dynamic-pricing' ); ?></label>
                     <select id="pricing_ruleset_mode_value_<?php echo $name . '_0'; ?>" name="pricing_rules[<?php echo $name; ?>][mode]" class="pricing_rule_mode">
                         <option <?php selected( 'continuous', $mode ); ?> value="continuous"><?php _e( 'Bulk', 'woocommerce-dynamic-pricing' ); ?></option>
                         <option <?php selected( 'block', $mode ); ?> value="block"><?php _e( 'Special Offer', 'woocommerce-dynamic-pricing' ); ?></option>
@@ -124,7 +128,7 @@ class woocommerce_product_pricing_rules_admin {
                 </div>
 
                 <div id="woocommerce-pricing-dates-<?php echo $name; ?>" class="section pricing-rule-date-fields">
-                    <label for="pricing_ruleset_dates_value_<?php echo $name . '_date_from'; ?>"><?php _e( 'Dates', 'woocommerce-dynamic-pricing' ); ?></label>
+                    <label for="pricing_ruleset_dates_value_<?php echo $name . '_date_from'; ?>"><?php _e( 'Dates: (Inclusive)', 'woocommerce-dynamic-pricing' ); ?></label>
                     <input value="<?php echo $date_from; ?>" type="text" class="short date_from" title="<?php _e( 'Leave both fields blank to not restrict this pricing group to a date range', 'woocommerce-dynamic-pricing' ); ?>" name="pricing_rules[<?php echo $name; ?>][date_from]" id="pricing_ruleset_dates_value_<?php echo $name . '_date_from'; ?>" value="" placeholder="<?php echo _x( 'From&hellip;', 'placeholder', 'woocommerce' ) ?> YYYY-MM-DD" maxlength="10" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])">
                     <input value="<?php echo $date_to; ?>" type="text" class="short date_to" title="<?php _e( 'Leave both fields blank to not restrict this pricing group to a date range', 'woocommerce-dynamic-pricing' ); ?>" name="pricing_rules[<?php echo $name; ?>][date_to]" id="pricing_ruleset_dates_value_<?php echo $name . '_date_to'; ?>" value="" placeholder="<?php echo _x( 'To&hellip;', 'placeholder', 'woocommerce' ); ?> YYYY-MM-DD" maxlength="10" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])">
                     <div class="clear"></div>
@@ -285,21 +289,16 @@ class woocommerce_product_pricing_rules_admin {
 				<?php do_action( 'woocommerce_dynamic_pricing_applies_to_options', 'advanced_product', $condition, $name, $condition_index ); ?>
             </select>
 
-            <div class="roles" style="<?php echo $div_style; ?>">
-				<?php $chunks = array_chunk( $all_roles, ceil( count( $all_roles ) / 3 ), true ); ?>
+            <div class="roles section" style="<?php echo $div_style; ?>">
 
-				<?php foreach ( $chunks as $chunk ) : ?>
-                    <ul class="list-column">
-						<?php foreach ( $chunk as $role_id => $role ) : ?>
-							<?php $role_checked = ( isset( $condition['args']['roles'] ) && is_array( $condition['args']['roles'] ) && in_array( $role_id, $condition['args']['roles'] ) ) ? 'checked="checked"' : ''; ?>
-                            <li>
-                                <label for="role_<?php echo $role_id; ?>" class="selectit">
-                                    <input <?php echo $role_checked; ?> type="checkbox" id="role_<?php echo $role_id; ?>" name="pricing_rules[<?php echo $name; ?>][conditions][<?php echo $condition_index; ?>][args][roles][]" value="<?php echo $role_id; ?>"/><?php echo $role['name']; ?>
-                                </label>
-                            </li>
-						<?php endforeach; ?>
-                    </ul>
-				<?php endforeach; ?>
+                <label for="pricing_rule_apply_to_<?php echo $name . '_' . $condition_index; ?>_roles"><?php _e('Roles:', 'woocommerce-dynamic-pricing'); ?></label>
+
+                <select style="width: 80%;" name="pricing_rules[<?php echo $name; ?>][conditions][<?php echo $condition_index; ?>][args][roles][]" id="pricing_rule_apply_to_<?php echo $name . '_' . $condition_index; ?>_roles" class="multiselect wc-enhanced-select" multiple="multiple">
+		            <?php foreach($all_roles as $role_id => $role): ?>
+			            <?php $role_checked = (isset( $condition['args']['roles'] ) && is_array( $condition['args']['roles'] ) && in_array( $role_id, $condition['args']['roles'] )) ? true : false; ?>
+                        <option <?php selected($role_checked); ?> value="<?php esc_attr_e($role_id); ?>"><?php esc_html_e($role['name']); ?></option>
+		            <?php endforeach; ?>
+                </select>
 
             </div>
 
@@ -319,9 +318,9 @@ class woocommerce_product_pricing_rules_admin {
 			return;
 		}
 
-		$product = wc_get_product($post_id);
+		$product = wc_get_product( $post_id );
 
-		if ( ! $product->has_child() ) {
+		if ( ! $product->is_type( 'variable' ) ) {
 			return;
 		}
 
@@ -329,34 +328,37 @@ class woocommerce_product_pricing_rules_admin {
 		$div_style      = ( $condition['args']['type'] != 'variations' ) ? 'display:none;' : '';
 		?>
 
-        <div>
-            <label for="pricing_rule_variations_<?php echo $name; ?>"><?php _e( 'Product / Variations:', 'woocommerce-dynamic-pricing' ); ?></label>
-            <select title="<?php _e( 'Choose what you would like to apply this pricing rule set to', 'woocommerce-dynamic-pricing' ); ?>" class="pricing_rule_variations" id="pricing_rule_variations_<?php echo $name; ?>" name="pricing_rules[<?php echo $name; ?>][variation_rules][args][type]">
-                <option <?php selected( 'product', $condition['args']['type'] ); ?> value="product"><?php _e( 'All Variations', 'woocommerce-dynamic-pricing' ); ?></option>
-                <option <?php selected( 'variations', $condition['args']['type'] ); ?> value="variations"><?php _e( 'Specific Variations', 'woocommerce-dynamic-pricing' ); ?></option>
-            </select>
+        <div id="woocommerce-pricing-variations-<?php echo $name; ?>" class="section">
+            <div>
+                <label for="pricing_rule_variations_<?php echo $name; ?>"><?php _e( 'Product / Variations:', 'woocommerce-dynamic-pricing' ); ?></label>
+                <select title="<?php _e( 'Choose what you would like to apply this pricing rule set to', 'woocommerce-dynamic-pricing' ); ?>" class="pricing_rule_variations" id="pricing_rule_variations_<?php echo $name; ?>" name="pricing_rules[<?php echo $name; ?>][variation_rules][args][type]">
+                    <option <?php selected( 'product', $condition['args']['type'] ); ?> value="product"><?php _e( 'All Variations', 'woocommerce-dynamic-pricing' ); ?></option>
+                    <option <?php selected( 'variations', $condition['args']['type'] ); ?> value="variations"><?php _e( 'Specific Variations', 'woocommerce-dynamic-pricing' ); ?></option>
+	                <?php do_action( 'woocommerce_dynamic_pricing_variation_options', 'advanced_product', $condition, $name ); ?>
+                </select>
 
-            <div class="variations" style="<?php echo $div_style; ?>">
-				<?php sort( $all_variations ); ?>
-				<?php $chunks = array_chunk( $all_variations, ceil( count( $all_variations ) / 3 ), true ); ?>
+                <div class="variations section" style="<?php echo $div_style; ?>">
 
-				<?php foreach ( $chunks as $chunk ) : ?>
+					<?php sort( $all_variations ); ?>
+                    <label for="pricing_rule_variations_<?php echo $name; ?>"><?php _e( 'Variations:', 'woocommerce-dynamic-pricing' ); ?></label>
 
-                    <ul class="list-column">
-						<?php foreach ( $chunk as $variation_id ) : ?>
-							<?php $variation_object = new WC_Product_Variation( $variation_id ); ?>
-							<?php $variation_checked = ( isset( $condition['args']['variations'] ) && is_array( $condition['args']['variations'] ) && in_array( $variation_id, $condition['args']['variations'] ) ) ? 'checked="checked"' : ''; ?>
-                            <li>
-                                <label for="variation_<?php echo $variation_id; ?>_<?php echo $name; ?>" class="selectit">
-                                    <input <?php echo $variation_checked; ?> type="checkbox" id="variation_<?php echo $variation_id; ?>_<?php echo $name; ?>" name="pricing_rules[<?php echo $name; ?>][variation_rules][args][variations][]" value="<?php echo $variation_id; ?>"/><?php _e( 'Variation ID:', 'woocommerce-dynamic-pricing' ); ?> <?php echo $variation_id; ?>
-                                </label>
-                            </li>
+                    <select style="width:80%;" name="pricing_rules[<?php echo $name; ?>][variation_rules][args][variations][]" class="multiselect wc-enhanced-select" multiple="multiple">
+						<?php foreach ( $all_variations as $variation_id ): ?>
+							<?php
+                            $variation_object = new WC_Product_Variation( $variation_id );
+							if ( $variation_object->get_sku() ) {
+								$identifier = $variation_object->get_sku();
+							} else {
+								$identifier = '#' . $variation_object->get_id();
+							}
+							$variation_title = wc_get_formatted_variation( $variation_object, true, true, true ); ?>
+							<?php $variation_checked = ( isset( $condition['args']['variations'] ) && is_array( $condition['args']['variations'] ) && in_array( $variation_id, $condition['args']['variations'] ) ) ? true : false; ?>
+                            <option <?php selected( $variation_checked ); ?> value="<?php esc_attr_e( $variation_id ); ?>"><?php esc_html_e($identifier . ' ' . $variation_object->get_name() ); ?></option>
 						<?php endforeach; ?>
-                    </ul>
-				<?php endforeach; ?>
-
+                    </select>
+                </div>
+                <div class="clear"></div>
             </div>
-            <div class="clear"></div>
         </div>
 		<?php
 	}
@@ -373,20 +375,19 @@ class woocommerce_product_pricing_rules_admin {
             <option title="<?php _e( 'Calculate quantity based on total amount of a category in the cart', 'woocommerce-dynamic-pricing' ); ?>" <?php selected( 'cat', $collector['type'] ); ?> value="cat"><?php _e( 'Quantity of Category', 'woocommerce-dynamic-pricing' ); ?></option>
         </select>
         <br/>
-        <div class="cats" style="<?php echo $div_style; ?>">
-			<?php $chunks = array_chunk( $terms, ceil( count( $terms ) / 3 ) ); ?>
-			<?php foreach ( $chunks as $chunk ) : ?>
-                <ul class="list-column">
-					<?php foreach ( $chunk as $term ) : ?>
-						<?php $term_checked = ( isset( $collector['args']['cats'] ) && is_array( $collector['args']['cats'] ) && in_array( $term->term_id, $collector['args']['cats'] ) ) ? 'checked="checked"' : ''; ?>
-                        <li>
-                            <label for="<?php echo $name; ?>_term_<?php echo $term->term_id; ?>" class="selectit">
-                                <input <?php echo $term_checked; ?> type="checkbox" id="<?php echo $name; ?>_term_<?php echo $term->term_id; ?>" name="pricing_rules[<?php echo $name; ?>][collector][args][cats][]" value="<?php echo $term->term_id; ?>"/><?php echo $term->name; ?>
-                            </label>
-                        </li>
-					<?php endforeach; ?>
-                </ul>
-			<?php endforeach; ?>
+        <div class="cats section" style="<?php echo $div_style; ?>">
+
+            <label style="margin-top:10px;">Categories to Count:</label>
+
+            <select style="width: 80%;" name="pricing_rules[<?php echo $name; ?>][collector][args][cats][]" class="multiselect wc-enhanced-select" multiple="multiple">
+		        <?php foreach($terms as $term): ?>
+			        <?php $term_checked = (isset( $collector['args']['cats'] ) && is_array( $collector['args']['cats'] ) && in_array( $term->term_id, $collector['args']['cats'] )) ? true : false; ?>
+
+                    <option <?php selected($term_checked); ?> value="<?php esc_attr_e($term->term_id); ?>"><?php esc_html_e($term->name); ?></option>
+
+		        <?php endforeach; ?>
+            </select>
+
             <div class="clear"></div>
         </div>
 
@@ -495,11 +496,11 @@ class woocommerce_product_pricing_rules_admin {
                         set_index: set_index,
                         post:<?php echo isset( $_GET['post'] ) ? $_GET['post'] : 0; ?>,
                         action: 'create_empty_ruleset'
-                    }
+                    };
 
                     $.post(ajaxurl, data, function (response) {
                         $('#woocommerce-pricing-rules-wrap').append(response);
-
+                        $(document.body).trigger('wc-enhanced-select-init');
                     });
                 });
 
@@ -605,9 +606,9 @@ class woocommerce_product_pricing_rules_admin {
                     html += '</td>';
                     html += '<td>';
                     html += '<select id="pricing_rule_type_value_' + name + '_' + $index + '" name="pricing_rules[' + name + '][rules][' + $index + '][type]">';
-                    html += '<option value="price_discount"><?php _e('Price Discount' ,'woocommerce-dynamic-pricing'); ?> </option>';
-                    html += '<option value="percentage_discount"><?php _e('Percentage Discount', 'woocommerce-dynamic-pricing'); ?></option>';
-                    html += '<option value="fixed_price"><?php _e('Fixed Price', 'woocommerce-dynamic-pricing'); ; ?></option>';
+                    html += '<option value="price_discount"><?php _e( 'Price Discount', 'woocommerce-dynamic-pricing' ); ?> </option>';
+                    html += '<option value="percentage_discount"><?php _e( 'Percentage Discount', 'woocommerce-dynamic-pricing' ); ?></option>';
+                    html += '<option value="fixed_price"><?php _e( 'Fixed Price', 'woocommerce-dynamic-pricing' ); ; ?></option>';
                     html += '</select>';
                     html += '</td>';
                     html += '<td>';
@@ -638,9 +639,9 @@ class woocommerce_product_pricing_rules_admin {
                     html += '</td>';
                     html += '<td>';
                     html += '<select name="pricing_rules[' + name + '][blockrules][' + $index + '][type]">';
-                    html += '<option value="price_discount"><?php _e('Price Discount', 'woocommerce-dynamic-pricing'); ?></option>';
-                    html += '<option value="percentage_discount"><?php _e('Percentage Discount', 'woocommerce-dynamic-pricing'); ?></option>';
-                    html += '<option value="fixed_price"><?php _e('Fixed Price', 'woocommerce-dynamic-pricing'); ?></option>';
+                    html += '<option value="price_discount"><?php _e( 'Price Discount', 'woocommerce-dynamic-pricing' ); ?></option>';
+                    html += '<option value="percentage_discount"><?php _e( 'Percentage Discount', 'woocommerce-dynamic-pricing' ); ?></option>';
+                    html += '<option value="fixed_price"><?php _e( 'Fixed Price', 'woocommerce-dynamic-pricing' ); ?></option>';
                     html += '</select>';
                     html += '</td>';
                     html += '<td>';
@@ -648,8 +649,8 @@ class woocommerce_product_pricing_rules_admin {
                     html += '</td>';
                     html += '<td>';
                     html += '<select name="pricing_rules[' + name + '][blockrules][' + $index + '][repeating]">';
-                    html += '<option value="no"><?php _e('No', 'woocommerce-dynamic-pricing'); ?></option>';
-                    html += '<option value="yes"><?php _e('Yes','woocommercer-dynamic-pricing'); ?></option>';
+                    html += '<option value="no"><?php _e( 'No', 'woocommerce-dynamic-pricing' ); ?></option>';
+                    html += '<option value="yes"><?php _e( 'Yes', 'woocommercer-dynamic-pricing' ); ?></option>';
                     html += '</select>';
                     html += '</td>';
                     html += '<td width="48">';
@@ -663,7 +664,7 @@ class woocommerce_product_pricing_rules_admin {
                 }
 
                 function DeleteRule(index, name) {
-                    if (confirm("<?php _e('Are you sure you would like to remove this price adjustment?', 'woocommerce-dynamic-pricing'); ?>")) {
+                    if (confirm("<?php _e( 'Are you sure you would like to remove this price adjustment?', 'woocommerce-dynamic-pricing' ); ?>")) {
                         $('#pricing_rule_row_' + name + '_' + index).remove();
 
                         var $index = $('tbody tr', "#woocommerce-pricing-rules-table-" + name).length;
@@ -676,7 +677,7 @@ class woocommerce_product_pricing_rules_admin {
                 }
 
                 function DeleteBlockRule($tr, $table) {
-                    if (confirm("<?php _e('Are you sure you would like to remove this price adjustment?', 'woocommerce-dynamic-pricing'); ?>")) {
+                    if (confirm("<?php _e( 'Are you sure you would like to remove this price adjustment?', 'woocommerce-dynamic-pricing' ); ?>")) {
                         $tr.remove();
 
                         var count = $('tr', $table).length;
@@ -689,7 +690,7 @@ class woocommerce_product_pricing_rules_admin {
                 }
 
                 function DeleteRuleSet(name) {
-                    if (confirm("<?php _e('Are you sure you would like to remove this price set?', 'woocommerce-dynamic-pricing'); ?>")) {
+                    if (confirm("<?php _e( 'Are you sure you would like to remove this price set?', 'woocommerce-dynamic-pricing' ); ?>")) {
                         $('#woocommerce-pricing-ruleset-' + name).slideUp().remove();
                     }
                 }

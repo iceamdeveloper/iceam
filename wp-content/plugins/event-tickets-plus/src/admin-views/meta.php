@@ -44,14 +44,28 @@
 				</div>
 
 				<p class="tribe_soft_note">
-					<?php esc_html_e( 'The name and contact info of the person acquiring tickets is collected by default', 'event-tickets-plus' ); ?>
+					<?php
+					echo esc_html( sprintf(
+						_x(
+							'The name and contact info of the person acquiring %s is collected by default.',
+							'Attendee Info',
+							'event-tickets-plus'
+						),
+						tribe_get_ticket_label_plural_lowercase( 'attendee_info' )
+					) );
+					?>
 				</p>
 
 				<?php if ( empty( $fieldset_form ) ) : ?>
 					<div class="tribe-tickets-input tribe-tickets-attendee-save-fieldset">
 						<label>
 							<input type="checkbox" name="tribe-tickets-save-fieldset" id="save_attendee_fieldset" value="on" class="ticket_field save_attendee_fieldset" data-tribe-toggle="tribe-tickets-attendee-saved-fieldset-name">
-							<?php esc_html_e( 'Save this fieldset for use on other tickets?', 'event-tickets-plus' ); ?>
+							<?php
+							esc_html( sprintf(
+								__( 'Save this fieldset for use on other %s?', 'event-tickets-plus' ),
+								tribe_get_ticket_label_plural_lowercase( 'fieldset' )
+							) );
+							?>
 						</label>
 					</div>
 					<div id="tribe-tickets-attendee-saved-fieldset-name" class="tribe-tickets-input tribe-tickets-attendee-saved-fieldset-name">

@@ -15,41 +15,73 @@ class WPToolset_Field_File extends WPToolset_Field_Textfield {
 
 	protected $_validation = array( 'required' );
 
+	/**
+	 * @var int The ID of the current post to attach files to
+	 */
+	private $parent_id = 0;
+
 	//protected $_defaults = array('filename' => '', 'button_style' => 'btn2');
 
 	public function init() {
 		WPToolset_Field_File::file_enqueue_scripts();
+		$this->set_current_parent_id();
 		$this->set_placeholder_as_attribute();
 	}
 
 	public static function file_enqueue_scripts() {
 		wp_register_script(
-			'wptoolset-field-file', WPTOOLSET_FORMS_RELPATH . '/js/file-wp35.js', array(
-			'jquery',
-			'jquery-masonry',
-		), WPTOOLSET_FORMS_VERSION, true
+			'wptoolset-field-file',
+			WPTOOLSET_FORMS_RELPATH . '/js/file-wp35.js',
+			array(
+				Toolset_Assets_Manager::SCRIPT_TOOLSET_MEDIA_FIELD_PROTOTYPE,
+			),
+			WPTOOLSET_FORMS_VERSION,
+			true
 		);
 
 		if ( ! wp_script_is( 'wptoolset-field-file', 'enqueued' ) ) {
 			wp_enqueue_script( 'wptoolset-field-file' );
 		}
 
-		// Note: we check whether the current_screen action has been fired because sometimes 
+		// Note: we check whether the current_screen action has been fired because sometimes
 		// some plugins might perform somethign that loads this field before get_current_screen() is defined.
 		// This happens with an image widget module of Jetpack, for example.
-		if ( 
-			Toolset_Utils::is_real_admin() 
+		if (
+			Toolset_Utils::is_real_admin()
 			&& did_action( 'current_screen' ) > 0
 		) {
 			$screen = get_current_screen();
-			if ( isset( $screen->parent_base ) && 'users' == $screen->parent_base ) {
+			// Even if the user doesn't have access to the "Users" admin menu, they may still be able to see their
+			// own profile (e.g. user fields for subscribers).
+			if ( isset( $screen, $screen->parent_base ) && in_array( $screen->parent_base, [ 'users', 'profile' ] ) ) {
 				wp_enqueue_media();
 			}
+
+			if ( isset( $screen, $screen->post_type, $screen->base ) && 'post' === $screen->base ) {
+				global $post;
+				if ( is_object( $post ) ) {
+					wp_enqueue_media( array( 'post' => $post->ID ) );
+				}
+			}
+		}
+	}
+
+	/**
+	 * Calculate the current post ID so media instances are binded to the right parent.
+	 *
+	 * @since 3.3.9
+	 */
+	private function set_current_parent_id() {
+		if (
+			Toolset_Utils::is_real_admin()
+			&& did_action( 'current_screen' ) > 0
+		) {
+			$screen = get_current_screen();
 
 			if ( isset( $screen->post_type ) && isset( $screen->base ) && 'post' == $screen->base ) {
 				global $post;
 				if ( is_object( $post ) ) {
-					wp_enqueue_media( array( 'post' => $post->ID ) );
+					$this->parent_id = $post->ID;
 				}
 			}
 		}
@@ -67,23 +99,18 @@ class WPToolset_Field_File extends WPToolset_Field_Textfield {
 	public function metaform() {
 		$value = $this->getValue();
 		$type = $this->getType();
-		$translated_type = '';
 		$form = array();
 		$preview = '';
 		$wpml_action = $this->getWPMLAction();
+		$attachment_id = null;
 
 		// Get attachment by guid
 		if ( ! empty( $value ) && is_string( $value ) ) {
-			global $wpdb;
-			$attachment_id = $wpdb->get_var(
-				$wpdb->prepare(
-					"SELECT ID FROM {$wpdb->posts} WHERE post_type = 'attachment' AND guid=%s", $value
-				)
-			);
+			$attachment_id = Toolset_Utils::get_attachment_id_by_url( $value );
 		}
 
 		// Set preview
-		if ( ! empty( $attachment_id ) ) {
+		if ( $attachment_id !== null ) {
 			$attributes = array();
 			$full = wp_get_attachment_image_src( $attachment_id, 'full' );
 			if ( ! empty( $full ) ) {
@@ -114,22 +141,6 @@ class WPToolset_Field_File extends WPToolset_Field_Textfield {
 			}
 		}
 
-		// Set button
-		switch ( $type ) {
-			case 'audio':
-				$translated_type = __( 'audio', 'wpv-views' );
-				break;
-			case 'image':
-				$translated_type = __( 'image', 'wpv-views' );
-				break;
-			case 'video':
-				$translated_type = __( 'video', 'wpv-views' );
-				break;
-			default:
-				$translated_type = __( 'file', 'wpv-views' );
-				break;
-		}
-
 		$wpcf_wpml_condition = defined( 'WPML_TM_VERSION' ) &&
 			intval( $wpml_action ) === 1 &&
 			function_exists( 'wpcf_wpml_post_is_original' ) &&
@@ -145,30 +156,83 @@ class WPToolset_Field_File extends WPToolset_Field_Textfield {
 			$button_status = ' disabled="disabled"';
 		}
 
-		$button = sprintf(
-			'<button class="js-wpt-file-upload button button-secondary" data-wpt-type="%s"%s>%s</button>', $type, $button_status, sprintf( __( 'Select %s', 'wpv-views' ), $translated_type )
+		$meta_data = array(
+			'metakey' => $this->getName(),
+			'title' => $this->getTitle(),
+			'parent' => $this->parent_id,
+			'type' => $type,
+			'multiple' => $this->isRepetitive(),
+			'preview' => '',
+			'select_label' => $this->get_select_label(),
+			'edit_label' => $this->get_edit_label(),
 		);
 
+		// Show the button to select/edit a file when we're on the front-end or when the user has a file upload capability.
+		// On the front-end, Forms temporarily allow file uploads on form submissions.
+		if ( ! Toolset_Utils::is_real_admin() || current_user_can( 'upload_files' ) ) {
+			/** @noinspection HtmlUnknownAttribute */
+			// Note the single quotes for the data-meta attribute. That's intentional.
+			$button = sprintf(
+				'<button class="js-wpt-file-upload js-toolset-media-field-trigger button button-secondary" data-meta=\'%s\' data-wpt-type="%s" %s>%s</button>',
+				esc_attr( wp_json_encode( $meta_data ) ),
+				$type,
+				$button_status,
+				( empty( $value ) ? $this->get_select_label() : $this->get_edit_label() )
+			);
+		} else {
+			// No upload permissions in the admin.
+			//
+			// Note that we are still going to allow the user to edit the custom field manually - they can add
+			// an URL manually. No button will be displayed, though.
+			$button = '';
+		}
+
 		// Set form
+		$form[] = array(
+			'#type' => 'markup',
+			'#markup' => '<div class="js-wpt-file-preview wpt-file-preview">' . $preview . '</div>',
+		);
+
 		$form[] = array(
 			'#type' => 'textfield',
 			'#name' => $this->getName(),
 			'#title' => $this->getTitle(),
 			'#description' => $this->getDescription(),
 			'#value' => $value,
-			'#suffix' => '&nbsp;' . $button,
+			'#suffix' => $button,
 			'#validate' => $this->getValidationData(),
 			'#repetitive' => $this->isRepetitive(),
 			'#attributes' => $this->getAttr(),
 			'wpml_action' => $wpml_action,
 		);
 
-		$form[] = array(
-			'#type' => 'markup',
-			'#markup' => '<div class="js-wpt-file-preview wpt-file-preview">' . $preview . '</div>',
-		);
-
 		return $form;
+	}
+
+	/**
+	 * Get the default label for the Media Manager button when selecting a value.
+	 *
+	 * @return string
+	 *
+	 * @since 3.3
+	 */
+	protected function get_select_label() {
+		if ( $this->isRepetitive() ) {
+			return __( 'Select file(s)', 'wpv-views' );
+		} else {
+			return __( 'Select file', 'wpv-views' );
+		}
+	}
+
+	/**
+	 * Get the default label for the Media Manager button when editing a value.
+	 *
+	 * @return string
+	 *
+	 * @since 3.3
+	 */
+	protected function get_edit_label() {
+		return __( 'Replace file', 'wpv-views' );
 	}
 
 }

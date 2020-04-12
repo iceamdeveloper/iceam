@@ -10,7 +10,7 @@ class woocommerce_taxonomy_pricing_rules_admin {
 	public function __construct($taxonomy) {
 	    $this->taxonomy = $taxonomy;
 
-		add_action( 'init', array(&$this, 'on_init') );
+		add_action( 'init', array(&$this, 'on_init'), 999 );
 		add_action( 'admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 100 );
 	}
 
@@ -231,7 +231,7 @@ class woocommerce_taxonomy_pricing_rules_admin {
 					</div>
 
 					<div id="woocommerce-pricing-mode-<?php echo $name; ?>" class="section">
-						<label for="pricing_ruleset_mode_value_<?php echo $name . '_0'; ?>"><?php _e( 'Rule Processing Mode', 'woocommerce-dynamic-pricing' ); ?></label><?php $this->get_description( 'mode' ); ?>
+						<label for="pricing_ruleset_mode_value_<?php echo $name . '_0'; ?>"><?php _e( 'Rule Processing Mode:', 'woocommerce-dynamic-pricing' ); ?></label><?php $this->get_description( 'mode' ); ?>
 						<select id="pricing_ruleset_mode_value_<?php echo $name . '_0'; ?>" name="pricing_rules[<?php echo $name; ?>][mode]" class="pricing_rule_mode">
 							<option <?php selected( 'continuous', $mode ); ?> value="continuous"><?php _e( 'Bulk', 'woocommerce-dynamic-pricing' ); ?></option>
 							<option <?php selected( 'block', $mode ); ?> value="block"><?php _e( 'Special Offer', 'woocommerce-dynamic-pricing' ); ?></option>
@@ -250,7 +250,7 @@ class woocommerce_taxonomy_pricing_rules_admin {
 					</div>
 
 					<div id="woocommerce-pricing-dates-<?php echo $name; ?>" class="section pricing-rule-date-fields">
-						<label for="pricing_ruleset_dates_value_<?php echo $name . '_date_from'; ?>"><?php _e( 'Dates', 'woocommerce-dynamic-pricing' ); ?></label>
+						<label for="pricing_ruleset_dates_value_<?php echo $name . '_date_from'; ?>"><?php _e( 'Dates: (Inclusive)', 'woocommerce-dynamic-pricing' ); ?></label>
 						<input value="<?php echo $date_from; ?>" type="text" class="short date_from" title="<?php _e( 'Leave both fields blank to not restrict this pricing group to a date range', 'woocommerce-dynamic-pricing' ); ?>" name="pricing_rules[<?php echo $name; ?>][date_from]" id="pricing_ruleset_dates_value_<?php echo $name . '_date_from'; ?>" value="" placeholder="<?php echo _x( 'From&hellip;', 'placeholder', 'woocommerce' ) ?> YYYY-MM-DD" maxlength="10" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])">
 						<input value="<?php echo $date_to; ?>" type="text" class="short date_to" title="<?php _e( 'Leave both fields blank to not restrict this pricing group to a date range', 'woocommerce-dynamic-pricing' ); ?>" name="pricing_rules[<?php echo $name; ?>][date_to]" id="pricing_ruleset_dates_value_<?php echo $name . '_date_to'; ?>" value="" placeholder="<?php echo _x( 'To&hellip;', 'placeholder', 'woocommerce' ); ?> YYYY-MM-DD" maxlength="10" pattern="[0-9]{4}-(0[1-9]|1[012])-(0[1-9]|1[0-9]|2[0-9]|3[01])">
 						<div class="clear"></div>
@@ -488,7 +488,7 @@ class woocommerce_taxonomy_pricing_rules_admin {
 				<td>
 					<select id="pricing_rule_type_value_<?php echo $name . '_' . $index; ?>" name="pricing_rules[<?php echo $name; ?>][rules][<?php echo $index; ?>][type]">
 						<option <?php selected( 'price_discount', $rule['type'] ); ?> value="price_discount"><?php _e('Price Discount' , 'woocommerce-dynamic-pricing' ); ?></option>
-						<option <?php selected( 'percentage_discount', $rule['type'] ); ?> value="percentage_discount"><?php _('Percentage Discount' , 'woocommerce-dynamic-pricing' ); ?></option>
+						<option <?php selected( 'percentage_discount', $rule['type'] ); ?> value="percentage_discount"><?php _e('Percentage Discount' , 'woocommerce-dynamic-pricing' ); ?></option>
 						<option <?php selected( 'fixed_price', $rule['type'] ); ?> value="fixed_price"><?php _e('Fixed Price' , 'woocommerce-dynamic-pricing' ); ?></option>
 					</select>
 				</td>
@@ -834,4 +834,3 @@ class woocommerce_taxonomy_pricing_rules_admin {
 		}
 
 	}
-	

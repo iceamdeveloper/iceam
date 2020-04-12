@@ -12,13 +12,13 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 	public $plural_label;
 
 	public function __construct() {
-		$this->plural_label = __( 'Ticket Fieldsets', 'event-tickets-plus' );
+		$this->plural_label = esc_html( sprintf( __( '%s Fieldsets', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'fieldsets' ) ) );
 
-		add_action( 'admin_menu', array( $this, 'add_menu_item' ), 11 );
-		add_action( 'save_post', array( $this, 'save_meta' ), 10, 3 );
+		add_action( 'admin_menu', [ $this, 'add_menu_item' ], 11 );
+		add_action( 'save_post', [ $this, 'save_meta' ], 10, 3 );
 		$this->register_posttype();
 
-		add_filter( 'wp_insert_post_data', array( $this, 'maybe_add_default_title' ), 10, 2 );
+		add_filter( 'wp_insert_post_data', [ $this, 'maybe_add_default_title' ], 10, 2 );
 	}
 
 	public function add_menu_item() {
@@ -56,39 +56,44 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 		}
 
 		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
+
 		$meta = $meta_object->build_field_array( null, $_POST );
 
 		update_post_meta( $post_id, self::META_KEY, $meta );
 	}
 
 	public function register_posttype() {
-		$args = array(
-			'label' => $this->plural_label,
-			'labels' => array(
-				'name' => $this->plural_label,
-				'singular_name' => __( 'Ticket Fieldset', 'event-tickets-plus' ),
-				'add_new_item' => __( 'Add New Ticket Fieldset', 'event-tickets-plus' ),
-				'edit_item' => __( 'Edit Ticket Fieldset', 'event-tickets-plus' ),
-				'new_item' => __( 'New Ticket Fieldset', 'event-tickets-plus' ),
-				'view_item' => __( 'View Ticket Fieldset', 'event-tickets-plus' ),
-				'search_items' => __( 'Search Ticket Fieldsets', 'event-tickets-plus' ),
-				'not_found' => __( 'No ticket fieldsets found', 'event-tickets-plus' ),
-				'not_found_in_trash' => __( 'No ticket fieldsets found in Trash', 'event-tickets-plus' ),
-				'all_items' => __( 'All Ticket Fieldsets', 'event-tickets-plus' ),
-				'archives' => __( 'Ticket Fieldset Archives', 'event-tickets-plus' ),
-				'insert_into_item' => __( 'Insert into ticket fieldset', 'event-tickets-plus' ),
-				'uploaded_to_this_item' => __( 'Uploaded to this ticket fieldset', 'event-tickets-plus' ),
-			),
-			'description' => 'Saved fieldsets for ticket custom meta',
-			'exclude_from_search' => true,
-			'menu_icon' => 'dashicons-tickets-alt',
-			'supports' => array(
+		$ticket_label_singular = tribe_get_ticket_label_singular( 'fieldsets' );
+
+		$ticket_label_singular_lower = tribe_get_ticket_label_singular_lowercase( 'fieldsets' );
+
+		$args = [
+			'label'                => $this->plural_label,
+			'labels'               => [
+				'name'                  => $this->plural_label,
+				'singular_name'         => esc_html( sprintf( __( '%s Fieldset', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'add_new_item'          => esc_html( sprintf( __( 'Add New %s Fieldset', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'edit_item'             => esc_html( sprintf( __( 'Edit %s Fieldset', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'new_item'              => esc_html( sprintf( __( 'New %s Fieldset', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'view_item'             => esc_html( sprintf( __( 'View %s Fieldset', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'search_items'          => esc_html( sprintf( __( 'Search %s Fieldsets', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'not_found'             => esc_html( sprintf( __( 'No %s fieldsets found', 'event-tickets-plus' ), $ticket_label_singular_lower ) ),
+				'not_found_in_trash'    => esc_html( sprintf( __( 'No %s fieldsets found in Trash', 'event-tickets-plus' ), $ticket_label_singular_lower ) ),
+				'all_items'             => esc_html( sprintf( __( 'All %s Fieldsets', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'archives'              => esc_html( sprintf( __( '%s Fieldset Archives', 'event-tickets-plus' ), $ticket_label_singular ) ),
+				'insert_into_item'      => esc_html( sprintf( __( 'Insert into %s fieldset', 'event-tickets-plus' ), $ticket_label_singular_lower ) ),
+				'uploaded_to_this_item' => esc_html( sprintf( __( 'Uploaded to this %s fieldset', 'event-tickets-plus' ), $ticket_label_singular_lower ) ),
+			],
+			'description'          => esc_html( sprintf( __( 'Saved fieldsets for %s custom meta', 'event-tickets-plus' ), $ticket_label_singular_lower ) ),
+			'exclude_from_search'  => true,
+			'menu_icon'            => 'dashicons-tickets-alt',
+			'supports'             => [
 				'title',
-			),
-			'show_ui' => true,
-			'show_in_menu' => false,
-			'register_meta_box_cb' => array( $this, 'register_metabox' ),
-		);
+			],
+			'show_ui'              => true,
+			'show_in_menu'         => false,
+			'register_meta_box_cb' => [ $this, 'register_metabox' ],
+		];
 
 		register_post_type( self::POSTTYPE, $args );
 	}
@@ -96,21 +101,21 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 	public function register_metabox( $fieldset ) {
 		add_meta_box(
 			self::POSTTYPE . '-metabox',
-			__( 'Custom Ticket Fields', 'event-tickets-plus' ),
-			array( $this, 'metabox' ),
+			esc_html( sprintf( __( 'Custom %s Fields', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'fieldset_label' ) ) ),
+			[ $this, 'metabox' ],
 			null
 		);
 	}
 
 	public function metabox( $fieldset ) {
-		$templates = array();
-		$meta = get_post_meta( $fieldset->ID, self::META_KEY, true );
-		$ticket_id = null;
+		$templates     = [];
+		$meta          = get_post_meta( $fieldset->ID, self::META_KEY, true );
+		$ticket_id     = null;
 		$fieldset_form = true;
 
 		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
 
-		$active_meta = array();
+		$active_meta = [];
 
 		if ( $meta ) {
 			foreach ( $meta as $field ) {
@@ -131,12 +136,14 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 	 * @return array
 	 */
 	public function get_fieldsets() {
-		$templates = get_posts( array(
-			'post_type' => self::POSTTYPE,
-			'orderby' => 'title',
-			'order' => 'ASC',
-			'posts_per_page' => -1,
-		) );
+		$templates = get_posts(
+			[
+				'post_type'      => self::POSTTYPE,
+				'orderby'        => 'title',
+				'order'          => 'ASC',
+				'posts_per_page' => - 1,
+			]
+		);
 
 		return $templates;
 	}
@@ -146,22 +153,20 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 	 *
 	 * @since 4.7.3
 	 *
-	 * @param $data array an array of post data
-	 * @param $postarr array An array of elements that make up a post to update or insert
+	 * @param $data    array An array of post data.
+	 * @param $postarr array An array of elements that make up a post to update or insert.
 	 *
 	 * @return array
 	 */
 	public function maybe_add_default_title( $data, $postarr ) {
-
 		if (
 			self::POSTTYPE === $data['post_type'] &&
 			empty( $data['post_title'] )
 		) {
 			$id                 = empty( $postarr['ID'] ) ? $data['post_date'] : $postarr['ID'];
-			$data['post_title'] = __( 'Ticket Fieldset', 'event-tickets-plus' ) . ' - ' . $id;
+			$data['post_title'] = esc_html( sprintf( __( '%s Fieldset', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'fieldsets' ) ) ) . ' - ' . $id;
 		}
 
 		return $data;
 	}
-
 }

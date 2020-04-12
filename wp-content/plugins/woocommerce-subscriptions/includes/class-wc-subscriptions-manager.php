@@ -125,15 +125,12 @@ class WC_Subscriptions_Manager {
 			}
 
 			if ( 0 == $renewal_order->get_total() ) {
-
-				$renewal_order->payment_complete();
-
-				$subscription->update_status( 'active' ); // don't call payment_complete() because technically, no payment was received
-
+				$renewal_order->payment_complete(); // We don't need to reactivate the subscription here because calling payment complete on the order will do that for us.
 			} else {
 
 				if ( $subscription->is_manual() ) {
 					do_action( 'woocommerce_generated_manual_renewal_order', wcs_get_objects_property( $renewal_order, 'id' ), $subscription );
+					$renewal_order->add_order_note( __( 'Manual renewal order awaiting customer payment.', 'woocommerce-subscriptions' ) );
 				} else {
 					$renewal_order->set_payment_method( wc_get_payment_gateway_by_order( $subscription ) ); // We need to pass the payment gateway instance to be compatible with WC < 3.0, only WC 3.0+ supports passing the string name
 
@@ -248,7 +245,7 @@ class WC_Subscriptions_Manager {
 	 * @since 1.0
 	 */
 	public static function process_subscription_payments_on_order( $order, $product_id = '' ) {
-
+		wcs_deprecated_function( __METHOD__, '2.6.0' );
 		$subscriptions = wcs_get_subscriptions_for_order( $order );
 
 		if ( ! empty( $subscriptions ) ) {
@@ -262,7 +259,7 @@ class WC_Subscriptions_Manager {
 	}
 
 	/**
-	 * This function should be called whenever a subscription payment has failed.
+	 * This function should be called whenever a subscription payment has failed on a parent order.
 	 *
 	 * The function is a convenience wrapper for @see self::process_subscription_payment_failure(), so if calling that
 	 * function directly, do not call this function also.
@@ -271,7 +268,7 @@ class WC_Subscriptions_Manager {
 	 * @since 1.0
 	 */
 	public static function process_subscription_payment_failure_on_order( $order, $product_id = '' ) {
-
+		wcs_deprecated_function( __METHOD__, '2.6.0' );
 		$subscriptions = wcs_get_subscriptions_for_order( $order );
 
 		if ( ! empty( $subscriptions ) ) {
@@ -823,6 +820,7 @@ class WC_Subscriptions_Manager {
 		/** @var WC_Subscription[] $subscriptions */
 		$subscriptions = wcs_get_subscriptions_for_order( $post_id, array(
 			'subscription_status' => array( 'any', 'trash' ),
+			'order_type'          => 'parent',
 		) );
 		foreach ( $subscriptions as $subscription ) {
 			wp_delete_post( $subscription->get_id() );
@@ -1204,8 +1202,8 @@ class WC_Subscriptions_Manager {
 	 * @deprecated 2.0
 	 */
 	public static function get_subscriptions_completed_payment_count( $subscription_key ) {
-		_deprecated_function( __METHOD__, '2.0', 'WC_Subscription::get_completed_payment_count()' );
-		return apply_filters( 'woocommerce_subscription_completed_payment_count', wcs_get_subscription_from_key( $subscription_key )->get_completed_payment_count(), $subscription_key );
+		_deprecated_function( __METHOD__, '2.0', 'WC_Subscription::get_payment_count()' );
+		return apply_filters( 'woocommerce_subscription_completed_payment_count', wcs_get_subscription_from_key( $subscription_key )->get_payment_count(), $subscription_key );
 	}
 
 	/**

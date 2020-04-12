@@ -16,6 +16,7 @@ use Tribe\Events\Views\V2\View_Interface;
 use Tribe\Utils\Element_Classes;
 use Tribe__Context as Context;
 use Tribe__Events__Main as TEC;
+use Tribe__Utils__Array as Arr;
 
 /**
  * Class for Shortcode Tribe_Events.
@@ -82,8 +83,10 @@ class Tribe_Events extends Shortcode_Abstract {
 	protected function toggle_view_hooks( $toggle ) {
 		if ( $toggle ) {
 			add_filter( 'tribe_events_views_v2_url_query_args', [ $this, 'filter_view_query_args' ], 15, 3 );
+			add_filter( 'tribe_events_filter_bar_views_v2_should_display_filters', '__return_false', 20 );
 		} else {
 			remove_filter( 'tribe_events_views_v2_url_query_args', [ $this, 'filter_view_query_args' ], 15 );
+			remove_filter( 'tribe_events_filter_bar_views_v2_should_display_filters', '__return_false', 20 );
 		}
 
 		/**
@@ -384,34 +387,10 @@ class Tribe_Events extends Shortcode_Abstract {
 	protected function args_to_context( array $arguments, Context $context ) {
 		$context_args = [];
 
-		$term = $term_value = null;
+		$category_input = Arr::get_first_set( $arguments, [ 'cat', 'category' ], false );
 
-		if ( ! empty( $arguments['cat'] ) ) {
-			$term = $term_value = $arguments['cat'];
-		}
-
-		if ( ! empty( $arguments['category'] ) ) {
-			$term = $term_value = $arguments['category'];
-		}
-
-		// Try by ID first.
-		if ( is_numeric( $term_value ) ) {
-			$term = get_term_by( 'id', $term_value, TEC::TAXONOMY );
-		}
-
-		// If numeric didn't work we look for slug.
-		if ( empty( $term->slug ) ) {
-			$term = get_term_by( 'slug', $term_value, TEC::TAXONOMY );
-		}
-
-		// If slug didn't work we look for name.
-		if ( empty( $term->slug ) ) {
-			$term = get_term_by( 'name', $term_value, TEC::TAXONOMY );
-		}
-
-		// Only save it if it returns a correct name.
-		if ( ! empty( $term->slug ) ) {
-			$context_args[ TEC::TAXONOMY ] = $term->slug;
+		if ( ! empty( $category_input ) ) {
+			$context_args['event_category'] = Arr::list_to_array( $category_input );
 		}
 
 		if ( ! empty( $arguments['date'] ) ) {
@@ -446,12 +425,10 @@ class Tribe_Events extends Shortcode_Abstract {
 	 * @return array The translated shortcode arguments.
 	 */
 	public function args_to_repository( array $repository_args, array $arguments, $context ) {
-		if ( isset( $arguments['cat'] ) ) {
-			$repository_args['category'] = $arguments['cat'];
-		}
+		$category_input = Arr::get_first_set( $arguments, [ 'cat', 'category' ], false );
 
-		if ( isset( $arguments['category'] ) ) {
-			$repository_args['category'] = $arguments['category'];
+		if ( ! empty( $category_input ) ) {
+			$repository_args['event_category'] = Arr::list_to_array( $category_input );
 		}
 
 		if ( isset( $arguments['date'] ) ) {

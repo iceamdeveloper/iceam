@@ -127,7 +127,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * @return string
 		 */
 		protected function get_update_url($plugin_slug) {
-			return 'http://wpupdate.aelia.co?action=get_metadata&slug=' . $plugin_slug;
+			return 'https://wpupdate.aelia.co?action=get_metadata&slug=' . $plugin_slug;
 		}
 
 		/**
@@ -673,14 +673,17 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * @since 1.6.3.15815
 		 */
 		public static function is_frontend() {
+			$ajax_action = isset($_REQUEST['action']) ? strtolower($_REQUEST['action']) : '';
+
 			return !is_admin() || (
 				self::doing_ajax() &&
-				!in_array(strtolower(get_value('action', $_REQUEST)), array(
+				!in_array($ajax_action, array(
 					// The following actions are called in the backend. If they are used, then
 					// we are in the backend, regardless of the fact that we are using Ajax
 					'woocommerce_load_variations',
 					'woocommerce_add_variation',
 					'woocommerce_remove_variations',
+					'woocommerce_save_variations',
 					'woocommerce_link_all_variations',
 					'woocommerce_bulk_edit_variations',
 					'woocommerce_json_search_products_and_variations',

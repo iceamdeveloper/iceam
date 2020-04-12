@@ -954,8 +954,34 @@ nav.post-entries {
     border-left: 2px solid #353537;
 }
 
+/*EVENTS WIDGET*/
+.tribe-common .tribe-tickets__item {
+    display: block;
+}
+.tribe-common .tribe-tickets__item > div {
+    display: block;
+    text-align: center;
+    padding: 5px 0;
+}
+.tribe-common .tribe-tickets__item .tribe-tickets-attendees-list-optout--wrapper {
+    display: none;
+}
+.tribe-common .tribe-tickets__item.show-optout .tribe-tickets-attendees-list-optout--wrapper {
+    display: block;
+}
+.tribe-common .tribe-tickets__footer {
+    display: block;
+    text-align: center;
+    padding-top: 10px;
+}
 
+.tribe-common .tribe-tickets__footer > div {
+    margin: 3px 0;
+}
 
+.entry .entry-content .tribe-common .tribe-tickets__item__extra__price, .tribe-common .tribe-tickets__item__extra__price > span {
+    display: block;
+}
 
 
 #footer {
@@ -1543,6 +1569,65 @@ form.standard-form.bps_form .editfield, form.standard-form.bps_form .editfield.f
 div#post-9383 .tribe-events-venue-details {display: none;}
 
 
+/*NEW FORM STYLING*/
+label.bps-label {font-family: 'Raleway', sans-serif;color: #767676;font-weight: 400;}
+
+label.bps-label span {
+    display: none;
+}
+
+.bps-textbox {
+    display: inline-block;
+    width: 100%;
+    float: left;
+}
+
+.bps-textbox input {
+    width: 97%;
+    border: 1px solid #ccc;
+    background: #fff;
+    border-radius: 0;
+    color: #737373;
+    font: inherit;
+    font-size: 100%;
+    padding: 8px;
+}
+
+div#field_1_contains_wrap {
+    clear: both;
+}
+.ui-accordion .ui-accordion-content#form_8248 {
+    background: none;
+    padding: 1em 0;
+    border: none;
+    width: 100%;
+}
+.ui-accordion .ui-accordion-content#form_8248 button {
+    margin-top: 16px;
+    width: 200px;
+}
+#field_any_contains_wrap em.bps-description {
+    font-family: 'Raleway',sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    padding: 10px 10px 30px 0;
+    display: inline-block;
+}
+.ui-accordion#bps_accordion_form_8248 .ui-accordion-header {
+    width: auto;
+    display: inline-block;
+    float: right;
+    margin-bottom: 20px;
+    background-color: #f36557;
+    color: white;
+    padding: 10px 30px;
+    text-transform: uppercase;
+    font-weight: bold;
+    font-size: 16px;
+    font-family: 'Lato', sans-serif;
+}
+.ui-accordion#bps_accordion_form_8248 .ui-accordion-header > span {display: none;}
+
 @media only screen and (min-width: 768px){
     
 
@@ -1812,6 +1897,15 @@ div#post-9383 .tribe-events-venue-details {display: none;}
         width: 32.33%;
         float:  left;
         margin-right:  1%;
+    }
+
+    /*NEW FORM STYLING*/
+    .bps-textbox {
+        width: 50%;
+    }
+    .ui-accordion#bps_accordion_form_8248 .ui-accordion-header {
+        margin-bottom: 50px;
+        margin-top: -50px;
     }
 
 }

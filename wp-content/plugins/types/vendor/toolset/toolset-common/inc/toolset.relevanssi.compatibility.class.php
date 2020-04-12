@@ -7,57 +7,58 @@
 */
 
 if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
-	
+
 	class Toolset_Relevanssi_Compatibility {
-		
+
 		function __construct() {
-			
+
 			$this->relevanssi_installed		= false;
 			$this->toolset_types_installed	= false;
 			$this->toolset_views_installed	= false;
-			
+
 			$this->toolset_settings_url		= '';
-			
+
 			$this->pending_to_add			= array();
 			$this->pending_to_remove		= array();
-			
+
 			add_action( 'init',				array( $this, 'init' ) );
-			
+
 		}
-		
+
 		function init() {
-			
+
 			if ( function_exists( 'relevanssi_init' ) ) {
 				$this->relevanssi_installed = true;
 			}
 			$this->toolset_types_installed = apply_filters( 'types_is_active', false );
 			$this->toolset_views_installed = apply_filters( 'toolset_is_views_available', false );
-			
+
 			if ( $this->toolset_types_installed ) {
 				// Toolset Common
-				
+
 				$this->register_assets();
 				add_action( 'toolset_menu_admin_enqueue_scripts',							array( $this, 'enqueue_scripts' ) );
-				
+
 				add_filter( 'toolset_filter_toolset_register_settings_section',				array( $this, 'register_relevanssi_settings_section' ), 120 );
-				add_filter( 'toolset_filter_toolset_register_settings_relevanssi_section',	array( $this, 'toolset_relevanssi_settings' ), 10, 2 );
-				add_action( 'wp_ajax_toolset_update_toolset_relevanssi_settings',			array( $this, 'toolset_update_toolset_relevanssi_settings' ) );
-				
+				add_filter( 'toolset_filter_toolset_register_settings_relevanssi_section',	array( $this, 'get_relevanssi_settings_gui' ), 10, 2 );
+				add_action( 'wp_ajax_toolset_list_toolset_relevanssi_compatible_fields', array( $this, 'list_relevanssi_compatible_fields' ) );
+				add_action( 'wp_ajax_toolset_update_toolset_relevanssi_settings',			array( $this, 'update_relevanssi_settings' ) );
+
 				$this->toolset_settings_url = admin_url( 'admin.php?page=toolset-settings&tab=relevanssi' );
-				
+
 				// Toolset Types
-				
+
 				add_filter( 'wpcf_form_field',												array( $this, 'types_extend_field_settings' ), 5, 3 );
 				add_filter( 'wpcf_field_pre_save',											array( $this, 'types_flag_field_on_save' ) );
 				add_action( 'wpcf_postmeta_fields_group_saved',								array( $this, 'types_store_fields_on_group_save' ) );
-				
+
 				add_action( 'admin_footer',													array( $this, 'types_manage_extended_field_settings' ), 25 );
-				
+
 				// Toolset Views
-				
-				if ( 
-					$this->toolset_views_installed 
-					&& $this->relevanssi_installed 
+
+				if (
+					$this->toolset_views_installed
+					&& $this->relevanssi_installed
 				) {
 					// Views queries compatibility
 					add_filter( 'wpv_filter_query',											array( $this, 'wpv_filter_query_compatibility' ), 99, 3 );
@@ -69,33 +70,42 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 					// Fix Relevanssi sorting as we were getting the Views objects one
 					// Note that we do not allow table sorting on Relevanssi searches for now
 					add_action( 'toolset_action_toolset_relevanssi_do_query_before',		array( $this, 'wpv_fix_relevanssi_orderby' ) );
+					// Apply native Relevanssi hooks to the query object
+					add_action( 'toolset_action_toolset_relevanssi_do_query_before', array( $this, 'relevanssi_modify_wp_query' ), 99 );
 					// Fix Relevanssi max_num_pages
 					add_action( 'toolset_action_toolset_relevanssi_do_query_processed',		array( $this, 'wpv_fix_relevanssi_max_num_pages' ) );
 					// Fix Relevanssi returning posts as objects but not as WP_Post objects
 					add_action( 'toolset_action_toolset_relevanssi_do_query_processed',		array( $this, 'wpv_fix_relevanssi_return_as_post_objects' ) );
+
+					// Auxiliar queries to calculate controls for frontend search forms, or counters:
+					// disable the Relevanssi query hijacking
+					add_action( 'wpv_action_wpv_before_extended_view_query_for_parametric_and_counters', array( $this, 'disable_relevanssi_query_for_parametric_and_counters' ) );
+					add_action( 'wpv_action_wpv_before_extended_archive_query_for_parametric_and_counters', array( $this, 'disable_relevanssi_query_for_parametric_and_counters' ) );
+					add_action( 'wpv_action_wpv_after_extended_view_query_for_parametric_and_counters', array( $this, 'restore_relevanssi_query_after_parametric_and_counters' ) );
+					add_action( 'wpv_action_wpv_after_extended_archive_query_for_parametric_and_counters', array( $this, 'restore_relevanssi_query_after_parametric_and_counters' ) );
 				}
 			}
-			
+
 		}
-		
+
 		/*
 		* ---------------------
 		* Toolset Common integration
 		* ---------------------
 		*/
-		
+
 		function register_assets() {
 			$toolset_bootstrap	= Toolset_Common_Bootstrap::getInstance();
 			$toolset_assets		= $toolset_bootstrap->assets_manager;
 			$toolset_assets->register_script(
-				'toolset-relevanssi-settings-script', 
-				$toolset_assets->get_assets_url() . '/res/js/toolset-settings-relevanssi.js', 
-				array( 'jquery', 'underscore' ), 
-				TOOLSET_VERSION, 
+				'toolset-relevanssi-settings-script',
+				$toolset_assets->get_assets_url() . '/res/js/toolset-settings-relevanssi.js',
+				array( 'jquery', 'underscore' ),
+				TOOLSET_VERSION,
 				true
 			);
 		}
-		
+
 		function enqueue_scripts( $page ) {
 			if ( $page == 'toolset-settings' ) {
 				$toolset_bootstrap	= Toolset_Common_Bootstrap::getInstance();
@@ -103,13 +113,13 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 				$toolset_assets->enqueue_scripts( 'toolset-relevanssi-settings-script' );
 			}
 		}
-		
+
 		/**
 		* Text search tab inside the Toolset Settings page.
 		*
 		* @since 2.2
 		*/
-		
+
 		function register_relevanssi_settings_section( $registered_sections ) {
 			$registered_sections['relevanssi'] = array(
 				'slug'	=> 'relevanssi',
@@ -117,30 +127,29 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			);
 			return $registered_sections;
 		}
-		
-		/**
-		* Text search tab content inside the Toolset Settings page.
-		*
-		* @since 2.2
-		*/
-		
-		function toolset_relevanssi_settings( $sections, $toolset_options ) {
-			
-			$section_content = '';
-			$text_search_documentation_link = 'https://toolset.com/documentation/user-guides/filtering-views-for-a-specific-text-string-search/?utm_source=viewsplugin&utm_campaign=views&utm_medium=views-text-search-settings&utm_term=Text Search documentation';
 
-			
+		/**
+		 * Text search tab content inside the Toolset Settings page.
+		 *
+		 * @param array $sections
+		 * @param array $toolset_options
+		 * @return array
+		 * @since 2.2
+		 */
+		function get_relevanssi_settings_gui( $sections, $toolset_options ) {
+
+			$section_content = '';
+			$text_search_documentation_link = 'https://toolset.com/documentation/user-guides/searching-texts-custom-fields-views-relevanssi/?utm_source=viewsplugin&utm_campaign=views&utm_medium=views-text-search-settings&utm_term=Text Search documentation';
+
 			if ( ! $this->relevanssi_installed ) {
-				
 				ob_start();
-				
 				?>
 				<div class="notice inline notice-warning notice-alt">
 					<p><?php _e( 'You need to install <strong>Relevanssi</strong>', 'wpv-views' ); ?></p>
 				</div>
 				<p>
 				<?php
-				echo sprintf( 
+				echo sprintf(
 					__( '%1$sRelevanssi%2$s plugin extends and improves the WordPress text search. Relevanssi allows to search in custom fields and returns the most relevant results first.', 'wpv-views' ),
 					'<a href="https://www.relevanssi.com/" target="_blank">',
 					'</a>'
@@ -165,154 +174,92 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 				?>
 				</p>
 				<?php
-				
+
 				$section_content = ob_get_clean();
-				
 			} else {
-			
 				$relevanssi_fields_to_index	= isset( $toolset_options['relevanssi_fields_to_index'] ) ? $toolset_options['relevanssi_fields_to_index'] : array();
-				$actual_fields_to_index		= array();
-				$indexable_fields			= array();
-				
-				$groups_args = array(
-					'domain' => 'posts',
-					'is_active' => true
-				);
-				$groups = apply_filters( 'types_query_groups', array(), $groups_args );
-
-				// Survive null output (error value)
-				if( ! is_array( $groups ) ) {
-					$groups = array();
-				}
-
-				/** @var Types_Field_Group $group */
-				foreach ( $groups as $group ) {
-					$args = array(
-						'domain' => 'posts',
-						'field_type' => array( 'textfield', 'textarea', 'wysiwyg' ),
-						'group_id' => $group->get_id()
-					);
-					$fields_in_group = apply_filters( 'types_filter_query_field_definitions', array(), $args );
-					if ( ! empty( $fields_in_group ) ) {
-						$indexable_fields[ $group->get_display_name() ] = $fields_in_group;
-					}
-				}
-				
-				
 				ob_start();
-				
-				if ( empty( $indexable_fields ) ) {
-					?>
-					<div class="notice inline notice-warning notice-alt">
-						<p>
-						<?php
-						echo sprintf(
-							__( '%1$sOnce you %2$ssetup textual custom fields in Types%3$s (single line, multiple lines, WYSIWYG), you will be able to include them in text searches here.', 'wpv-views' ),
-							'<i class="icon-types-logo ont-color-orange ont-icon-24" style="margin-right:5px;vertical-align:-2px;"></i>',
-							'<a href="' . admin_url( 'admin.php?page=wpcf-cf' ) . '">',
-							'</a>'
-						);
-						?>
-						</p>
-					</div>
+				?>
+				<h3>
+					<?php echo esc_html( __( 'Custom fields to include in text searches', 'wpv-views' ) ); ?>
+				</h3>
+				<div class="js-toolset-relevanssi-container">
 					<?php
-				} else {
+					if ( empty( $relevanssi_fields_to_index ) ) {
+						?>
+						<p><?php echo __( 'No fields will be included in text searches.', 'wpv-views' ); ?></p>
+						<?php
+					} else {
+						$relevanssi_fields_to_index = array_map( 'esc_html', $relevanssi_fields_to_index );
+						?>
+						<p>
+							<?php
+							echo sprintf(
+								__( 'The following fields will be included in text searches: %s.', 'wpv-views' ),
+								'<em>' . implode( ', ', $relevanssi_fields_to_index ) . '</em>'
+							);
+							?>
+						</p>
+						<?php
+					}
 					?>
+					<a href="#" class="button button-secondary js-toolset-relevanssi-summary-list-compatible-fields">
+						<?php echo __( 'Select fields to include', 'wpv-views' ); ?>
+					</a>
+				</div>
+
+				<div class="js-toolset-relevanssi-list-summary"<?php echo ( count( $relevanssi_fields_to_index ) > 0 ) ? '' : ' style="display:none"'; ?>>
 					<h3>
-						<?php echo esc_html( __( 'Select which custom fields to include in text searches', 'wpv-views' ) ); ?>
+						<?php echo esc_html( __( 'Update the Relevanssi settings and rebuild the index', 'wpv-views' ) ); ?>
 					</h3>
-					<div class="toolset-advanced-setting">
-						<?php
-						foreach( $indexable_fields as $indexable_fields_group_name => $indexable_fields_data ) {
-							?>
-							<h4><?php echo esc_html( $indexable_fields_group_name ); ?></h4>
-							<ul class="toolset-mightlong-list js-toolset-relevanssi-list">
-							<?php
-							foreach ( $indexable_fields_data as $indexable_field_candidate ) {
-								$candidate_checked = in_array( $indexable_field_candidate['meta_key'], $relevanssi_fields_to_index );
-								if ( $candidate_checked ) {
-									$actual_fields_to_index[] = $indexable_field_candidate['meta_key'];
-								}
-								?>
-								<li>
-									<label>
-										<input type="checkbox" name="toolset-relevanssi-list-item" class="js-toolset-relevanssi-list-item" value="<?php echo esc_attr( $indexable_field_candidate['meta_key'] ); ?>" <?php checked( $candidate_checked ); ?> autocomplete="off" />
-										<?php echo esc_html( $indexable_field_candidate['name'] ); ?>
-									</label>
-								</li>
-								<?php
-							}
-							?>
-							</ul>
-							<?php
-						}
-						?>
-					</div>
-					<div class="js-toolset-relevanssi-list-summary"<?php echo ( count( $actual_fields_to_index ) > 0 ) ? '' : ' style="display:none"'; ?>>
-						<h3>
-							<?php echo esc_html( __( 'Update the Relevanssi settings and rebuild the index', 'wpv-views' ) ); ?>
-						</h3>
-						<ol style="list-style-type:upper-roman">
-						<li>
-						<?php
-						_e( 'Copy this list of field names:', 'wpv-views' );
-						?>
-						<input type="text" 
-							readonly="readonly" 
-							class="js-toolset-relevanssi-list-summary-fields large-text" 
-							style="display:block;padding:5px 10px;transition: 0.5s linear;" 
-							value="<?php echo esc_attr( implode( ', ', $actual_fields_to_index ) ); ?>" 
-						/>
-						</li>
-						<li>
-						<?php
-						echo sprintf(
-							__( 'Paste into "Custom fields to index" in the %1$sRelevanssi settings%2$s. Remember to double check the post types included in the index, and notice that you can also add taxonomies to it.', 'wpv-views' ),
-							'<a href="' . admin_url( 'options-general.php?page=relevanssi/relevanssi.php#indexing' ) . '">',
-							'</a>'
-						);
-						?>
-						</li>
-						<li>
-						<?php
-						echo sprintf(
-							__( 'Click on "Save indexing options, erase index and rebuild the index" in the %1$sRelevanssi settings%2$s.', 'wpv-views' ),
-							'<a href="' . admin_url( 'options-general.php?page=relevanssi/relevanssi.php#indexing' ) . '">',
-							'</a>'
-						);
-						?>
-						</li>
-						</ol>
-						<p class="toolset-alert toolset-alert-info">
-						<?php
-						_e( 'Your site has one list of custom fields to index. This means that all the text searches will return results from these custom fields.', 'wpv-views' );
-						?>
-						</p>
-						<p>
-						<?php
-						echo sprintf(
-							__( 'See how to do this in the %1$sText Search documentation%2$s.', 'wpv-views' ),
-							'<a href="' . $text_search_documentation_link . '" target="_blank">',
-							'</a>'
-						);
-						?>
-						</p>
-					</div>
-					<div class="js-toolset-relevanssi-list-summary-empty"<?php echo ( count( $actual_fields_to_index ) == 0 ) ? '' : ' style="display:none"'; ?>>
-						<p class="toolset-alert toolset-alert-warning">
-						<?php
-						_e( 'You have not selected any field to be indexed in Relevanssi searches. Please select some below.', 'wpv-views' );
-						?>
-						</p>
-					</div>					
+					<ol style="list-style-type:upper-roman">
+					<li>
 					<?php
-					wp_nonce_field( 'toolset_relevanssi_settings_nonce', 'toolset_relevanssi_settings_nonce' );
-				}
-				
+					_e( 'Copy this list of field names:', 'wpv-views' );
+					?>
+					<input type="text"
+						readonly="readonly"
+						class="js-toolset-relevanssi-list-summary-fields large-text"
+						style="display:block;padding:5px 10px;transition: 0.5s linear;"
+						value="<?php echo esc_attr( implode( ', ', $relevanssi_fields_to_index ) ); ?>"
+					/>
+					</li>
+					<li>
+					<?php
+					echo sprintf(
+						__( 'Paste into "Custom fields to index" in the %1$sRelevanssi settings%2$s. Remember to double check the post types included in the index, and notice that you can also add taxonomies to it.', 'wpv-views' ),
+						'<a href="' . admin_url( 'options-general.php?page=relevanssi/relevanssi.php&tab=indexing' ) . '">',
+						'</a>'
+					);
+					?>
+					</li>
+					<li>
+					<?php
+					echo sprintf(
+						__( 'Click on "Save indexing options, erase index and rebuild the index" in the %1$sRelevanssi settings%2$s.', 'wpv-views' ),
+						'<a href="' . admin_url( 'options-general.php?page=relevanssi/relevanssi.php&tab=indexing' ) . '">',
+						'</a>'
+					);
+					?>
+					</li>
+					</ol>
+					<p>
+					<?php
+					echo sprintf(
+						__( 'See how to do this in the %1$sText Search documentation%2$s.', 'wpv-views' ),
+						'<a href="' . $text_search_documentation_link . '" target="_blank">',
+						'</a>'
+					);
+					?>
+					</p>
+				</div>
+				<?php
+
+				wp_nonce_field( 'toolset_relevanssi_settings_nonce', 'toolset_relevanssi_settings_nonce' );
+
 				$section_content = ob_get_clean();
-			
 			}
-			
+
 			$sections['relevanssi-settings'] = array(
 				'slug'		=> 'relevanssi-settings',
 				'title'		=> __( 'Text search in custom fields', 'wpv-views' ),
@@ -320,8 +267,111 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			);
 			return $sections;
 		}
-		
-		function toolset_update_toolset_relevanssi_settings() {
+
+		/**
+		 * Get the stucture to select which fields to include in the text searches.
+		 *
+		 * @since 3.4
+		 */
+		public function list_relevanssi_compatible_fields() {
+			if ( ! current_user_can( 'manage_options' ) ) {
+				$data = array(
+					'type' => 'capability',
+					'message' => __( 'You do not have permissions for that.', 'wpv-views' ),
+				);
+				wp_send_json_error( $data );
+			}
+			if (
+				! isset( $_GET['wpnonce'] )
+				|| ! wp_verify_nonce( $_GET['wpnonce'], 'toolset_relevanssi_settings_nonce' )
+			) {
+				$data = array(
+					'type' => 'nonce',
+					'message' => __( 'Your security credentials have expired. Please reload the page to get new ones.', 'wpv-views' ),
+				);
+				wp_send_json_error( $data );
+			}
+
+			$toolset_options = Toolset_Settings::get_instance();
+
+			$relevanssi_fields_to_index = isset( $toolset_options['relevanssi_fields_to_index'] ) ? $toolset_options['relevanssi_fields_to_index'] : array();
+			$indexable_fields = array();
+
+			// Get all fields in the right type,
+			// and then group them by fields groups.
+			$fields_definition_factory = Toolset_Field_Utils::get_definition_factory_by_domain( 'posts' );
+			$query_arguments = array(
+				'filter' => 'types',
+				'field_type' => array(
+					'textfield',
+					'textarea',
+					'wysiwyg',
+				),
+			);
+			$fields_definitions = $fields_definition_factory->query_definitions( $query_arguments );
+
+			foreach ( $fields_definitions as $field_definition ) {
+				$field_groups = $field_definition->get_associated_groups();
+				if ( ! empty( $field_groups ) ) {
+					if ( ! isset( $indexable_fields[ $field_groups[0]->get_display_name() ] ) ) {
+						$indexable_fields[ $field_groups[0]->get_display_name() ] = array();
+					}
+					$indexable_fields[ $field_groups[0]->get_display_name() ][] = $field_definition->get_definition_array();
+				}
+			}
+
+			ob_start();
+
+			if ( empty( $indexable_fields ) ) {
+				?>
+				<div class="notice inline notice-warning notice-alt">
+					<p>
+					<?php
+					echo sprintf(
+						__( '%1$sOnce you %2$ssetup textual custom fields in Types%3$s (single line, multiple lines, WYSIWYG), you will be able to include them in text searches here.', 'wpv-views' ),
+						'<i class="icon-types-logo ont-color-orange ont-icon-24" style="margin-right:5px;vertical-align:-2px;"></i>',
+						'<a href="' . admin_url( 'admin.php?page=wpcf-cf' ) . '">',
+						'</a>'
+					);
+					?>
+					</p>
+				</div>
+				<?php
+			} else {
+				?>
+				<div class="toolset-advanced-setting">
+					<?php
+					foreach ( $indexable_fields as $indexable_fields_group_name => $indexable_fields_data ) {
+						?>
+						<h4><?php echo esc_html( $indexable_fields_group_name ); ?></h4>
+						<ul class="toolset-mightlong-list js-toolset-relevanssi-list">
+						<?php
+						foreach ( $indexable_fields_data as $indexable_field_candidate ) {
+							$candidate_checked = in_array( $indexable_field_candidate['meta_key'], $relevanssi_fields_to_index, true );
+							?>
+							<li>
+								<label>
+									<input type="checkbox" name="toolset-relevanssi-list-item" class="js-toolset-relevanssi-list-item" value="<?php echo esc_attr( $indexable_field_candidate['meta_key'] ); ?>" <?php checked( $candidate_checked ); ?> autocomplete="off" />
+									<?php echo esc_html( $indexable_field_candidate['name'] ); ?>
+								</label>
+							</li>
+							<?php
+						}
+						?>
+						</ul>
+						<?php
+					}
+					?>
+				</div>
+				<?php
+			}
+
+			$section_content = ob_get_clean();
+
+			wp_send_json_success( array( 'content' => $section_content ) );
+		}
+
+		function update_relevanssi_settings() {
 			$toolset_options = Toolset_Settings::get_instance();
 			if ( ! current_user_can( 'manage_options' ) ) {
 				$data = array(
@@ -330,9 +380,9 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 				);
 				wp_send_json_error( $data );
 			}
-			if ( 
+			if (
 				! isset( $_POST["wpnonce"] )
-				|| ! wp_verify_nonce( $_POST["wpnonce"], 'toolset_relevanssi_settings_nonce' ) 
+				|| ! wp_verify_nonce( $_POST["wpnonce"], 'toolset_relevanssi_settings_nonce' )
 			) {
 				$data = array(
 					'type' => 'nonce',
@@ -345,13 +395,13 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			$toolset_options->save();
 			wp_send_json_success();
 		}
-		
+
 		/*
 		* ---------------------
 		* Types integration
 		* ---------------------
 		*/
-		
+
 		/**
 		* Types textfield, textarea and WYSIWYG extended field settings.
 		*
@@ -365,21 +415,21 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function types_extend_field_settings( $form, $data, $field_type = '' ) {
 			$meta_type	= isset( $data['meta_type'] ) ? $data['meta_type'] : '';
 			if (
-				'postmeta' == $meta_type 
+				'postmeta' == $meta_type
 				&& in_array( $field_type, array( 'textfield', 'textarea', 'wysiwyg' ) )
 			) {
 				$toolset_settings			= Toolset_Settings::get_instance();
 				$relevanssi_fields_to_index	= isset( $toolset_settings['relevanssi_fields_to_index'] ) ? $toolset_settings['relevanssi_fields_to_index'] : array();
 				$this_field_to_index		= ( isset( $data['meta_key'] ) && in_array( $data['meta_key'], $relevanssi_fields_to_index ) );
-				$this_field_description_style = $this_field_to_index ? 
-											'' : 
+				$this_field_description_style = $this_field_to_index ?
+											'' :
 											' style="display:none"';
 				$this_field_description		= '<span class="js-toolset-toggle-relevanssi-index-description"' . $this_field_description_style . '>' . sprintf(
-							__( 'Go to %1$sText Search settings%2$s to build the search index.', 'wpcf' ),
+							__( 'Go to %1$sText Search settings%2$s to build the search index.', 'wpv-views' ),
 							'<a href="' . esc_url( $this->toolset_settings_url ) . '" target="_blank">',
 							'</a>'
 						) . '</span>';
@@ -387,8 +437,8 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 						'#type' => 'checkbox',
 						'#name' => 'relevanssi_index',
 						'#inline' => true,
-						'#title' => __( 'Include in search', 'wpcf' ),
-						'#label' => __( 'Include this field in text searches throughout the site', 'wpcf' ),
+						'#title' => __( 'Include in search', 'wpv-views' ),
+						'#label' => __( 'Include this field in text searches throughout the site', 'wpv-views' ),
 						'#description' => $this_field_description,
 						'#attributes' => array(
 							'autocomplete'	=> 'off',
@@ -402,7 +452,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			}
 			return $form;
 		}
-		
+
 		/**
 		* Store the fields that need to be saved or deleted from the stored data when saving a fields group.
 		*
@@ -413,27 +463,27 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function types_flag_field_on_save( $field ) {
-			
+
 			$field_type	= isset( $field['type'] ) ? $field['type'] : '';
 			if ( in_array( $field_type, array( 'textfield', 'textarea', 'wysiwyg' ) ) ) {
-				
+
 				$toolset_settings			= Toolset_Settings::get_instance();
 				$relevanssi_fields_to_index	= isset( $toolset_settings['relevanssi_fields_to_index'] ) ? $toolset_settings['relevanssi_fields_to_index'] : array();
-				
+
 				if ( isset( $field['relevanssi_index'] ) ) {
 					unset( $field['relevanssi_index'] );
 					$this->pending_to_add[] = $field['slug'];
 				} else {
 					$this->pending_to_remove[] = $field['slug'];
 				}
-				
+
 			}
-			
+
 			return $field;
 		}
-		
+
 		/**
 		* Update the stored data once a fields group has been saved.
 		*
@@ -441,22 +491,22 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function types_store_fields_on_group_save( $group_id ) {
-			
-			if ( 
-				empty( $this->pending_to_add ) 
+
+			if (
+				empty( $this->pending_to_add )
 				&& empty( $this->pending_to_remove )
 			) {
 				return;
 			}
-			
+
 			$relevanssi_fields_to_remove	= array();
 			$relevanssi_fields_changed		= false;
-			
+
 			$toolset_settings			= Toolset_Settings::get_instance();
 			$relevanssi_fields_to_index	= isset( $toolset_settings['relevanssi_fields_to_index'] ) ? $toolset_settings['relevanssi_fields_to_index'] : array();
-			
+
 			// Note that the 'refresh' argument is temporary and will not me needed much longer
 			$args = array(
 				'domain'		=> 'posts',
@@ -466,7 +516,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			);
 			// https://onthegosystems.myjetbrains.com/youtrack/issue/types-742
 			$group_fields = apply_filters( 'types_filter_query_field_definitions', array(), $args );
-			
+
 			foreach ( $group_fields as $field ) {
 				if ( in_array( $field['slug'], $this->pending_to_add ) ) {
 					$real_custom_field_name = wpcf_types_get_meta_prefix( $field ) . $field['slug'];
@@ -483,18 +533,18 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 					}
 				}
 			}
-			
+
 			if ( count( $relevanssi_fields_to_remove ) > 0 ) {
 				$relevanssi_fields_to_index = array_diff( $relevanssi_fields_to_index, $relevanssi_fields_to_remove );
 				$relevanssi_fields_to_index = is_array( $relevanssi_fields_to_index ) ? array_values( $relevanssi_fields_to_index ) : array();
 			}
-			
+
 			if ( $relevanssi_fields_changed ) {
 				$toolset_settings->relevanssi_fields_to_index = $relevanssi_fields_to_index;
 				$toolset_settings->save();
 			}
 		}
-		
+
 		/**
 		* Manage the Relevanssi section behavior based on its state.
 		*
@@ -503,34 +553,34 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function types_manage_extended_field_settings() {
-			
+
 			$current_page = '';
 			if ( isset( $_GET['page'] ) ) {
 				$current_page = sanitize_text_field( $_GET['page'] );
 			}
-			
+
 			if ( ! $current_page == 'wpcf-edit' ) {
 				return;
 			}
-			
+
 			if ( wp_script_is( 'jquery' ) ) {
 				?>
 				<script type="text/javascript">
 					jQuery( document ).ready( function() {
 						jQuery( document ).on( 'change', '.js-toolset-toggle-relevanssi-index', function() {
-							
+
 							var thiz = jQuery( this ),
 								thiz_description = thiz.closest( 'td' ).find( '.js-toolset-toggle-relevanssi-index-description' );
-								
-							thiz_description.css( { 
+
+							thiz_description.css( {
 								'transition':	'all 0.5s',
-								'display':		'block' 
+								'display':		'block'
 							} );
-							
+
 							if ( thiz.prop( 'checked' ) ) {
-								
+
 								thiz_description
 									.fadeIn( 'fast', function() {
 										if ( ! thiz.hasClass( 'js-toolset-toggle-relevanssi-index-inited' ) ) {
@@ -553,11 +603,11 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 											}, 500 );
 										}
 									});
-									
+
 							} else {
-								
+
 								thiz_description.hide();
-								
+
 							}
 						});
 					});
@@ -565,13 +615,13 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 				<?php
 			}
 		}
-		
+
 		/*
 		* ---------------------
 		* Views integration
 		* ---------------------
 		*/
-		
+
 		/**
 		* wpv_filter_query_compatibility
 		*
@@ -582,7 +632,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function wpv_filter_query_compatibility( $query, $view_settings, $view_id ) {
 			if ( isset( $view_settings['search_mode'] ) ) {
 				$search_in = isset( $view_settings['post_search_content'] ) ? $view_settings['post_search_content'] : 'full_content';
@@ -593,51 +643,45 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 
 			return $query;
 		}
-		
+
 		/**
-		* wpv_filter_query_post_proccess_compatibility
-		*
-		* Enable Relevanssi when the search is set to only target post title or title plus content, as it was disabled.
-		* When set to target also extended data, replace the query with the one provided by Relevanssi.
-		*
-		* @since 2.2
-		*/
-		
+		 * Disable Relevanssi when the search is set to only target post title or title plus content, as it was disabled.
+		 * When set to target also extended data, replace the query with the one provided by Relevanssi.
+		 *
+		 * @param \WP_Query $post_query
+		 * @param array $view_settings
+		 * @param int $view_id
+		 * @return \WP_Query
+		 * @since 2.2
+		 * @since Views 2.8.5 Cover the case of Views searching by shortcode attribute.
+		 */
 		function wpv_filter_query_post_proccess_compatibility( $post_query, $view_settings, $view_id ) {
-			if ( 
-				isset( $view_settings['search_mode'] ) 
-				&& function_exists( 'relevanssi_prevent_default_request' ) 
-			) {
-				$search_in = isset( $view_settings['post_search_content'] ) ? $view_settings['post_search_content'] : 'full_content';
-				if ( $search_in == 'content_extended' ) {
-					// This modifies $post_query as it is passed by reference
-					if (
-						isset( $_GET['wpv_post_search'] ) 
-						&& ! empty( $_GET['wpv_post_search'] )
-					) {
-						// Modify the POSTed search
-						do_action( 'toolset_action_toolset_relevanssi_do_query_before', $post_query );
-						$relevanssi_posts = relevanssi_do_query( $post_query );
-						do_action( 'toolset_action_toolset_relevanssi_do_query_processed', $post_query );
-					} else if ( 
-						in_array( 'specific', $view_settings['search_mode'] ) 
-						&& isset( $view_settings['post_search_value'] ) 
-						&& ! empty( $view_settings['post_search_value'] )
-					) {
-						// Modify the specific search
-						//add_filter('posts_request', 'relevanssi_prevent_default_request', 10, 3 );
-						do_action( 'toolset_action_toolset_relevanssi_do_query_before', $post_query );
-						$relevanssi_posts = relevanssi_do_query( $post_query );
-						do_action( 'toolset_action_toolset_relevanssi_do_query_processed', $post_query );
-					}
-				} else {
-					add_filter('posts_request', 'relevanssi_prevent_default_request', 10, 3 );
-				}
+			$view_search_mode = toolset_getarr( $view_settings, 'search_mode' );
+			if ( empty( $view_search_mode ) ) {
+				return $post_query;
+			}
+
+			if ( ! function_exists( 'relevanssi_prevent_default_request' ) ) {
+				return $post_query;
+			}
+
+			if ( 'content_extended' !== toolset_getarr( $view_settings, 'post_search_content' ) ) {
+				add_filter('posts_request', 'relevanssi_prevent_default_request', 10, 3 );
+				return $post_query;
+			}
+
+			$queried_args = $post_query->query;
+			$queried_search_term = toolset_getarr( $queried_args, 's' );
+			if ( ! empty( $queried_search_term ) ) {
+				// This modifies $post_query as it is passed by reference
+				do_action( 'toolset_action_toolset_relevanssi_do_query_before', $post_query );
+				$relevanssi_posts = relevanssi_do_query( $post_query );
+				do_action( 'toolset_action_toolset_relevanssi_do_query_processed', $post_query );
 			}
 
 			return $post_query;
 		}
-		
+
 		/**
 		* wpv_extend_post_search_content_options
 		*
@@ -645,7 +689,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function wpv_extend_post_search_content_options( $options ) {
 			$options['content_extended'] = array(
 				'label'			=> __( 'Title, body and custom fields', 'wpv-views' ),
@@ -658,7 +702,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			);
 			return $options;
 		}
-		
+
 		/**
 		* wpv_fix_relevanssi_on_archive_loops
 		*
@@ -675,7 +719,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function wpv_fix_relevanssi_on_archive_loops( $query, $args ) {
 			if ( $query->query_vars["posts_per_page"] == -1 ) {
 				$query->max_num_pages = 1;
@@ -683,16 +727,16 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 			if ( ! function_exists( 'relevanssi_prevent_default_request' ) ) {
 				return;
 			}
-			
+
 			$do_relevanssi_query = false;
-			
+
 			if (
-				isset( $args['wpa_slug'] ) 
+				isset( $args['wpa_slug'] )
 				&& $args['wpa_slug'] != 'view_search-page'
 			) {
 				$wpa_settings = isset( $args['wpa_settings'] ) ? $args['wpa_settings'] : array();
-				if ( 
-					isset( $wpa_settings['search_mode'] ) 
+				if (
+					isset( $wpa_settings['search_mode'] )
 					&& isset( $_GET['wpv_post_search'] )
 					&& ! empty( $_GET['wpv_post_search'] )
 				) {
@@ -702,13 +746,13 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 					}
 				}
 			} else if (
-				is_search() 
+				is_search()
 				&& isset( $query->query_vars['s'] )
 				&& ! empty( $query->query_vars['s'] )
 			) {
 				$do_relevanssi_query = true;
 			}
-			
+
 			if ( $do_relevanssi_query ) {
 				do_action( 'toolset_action_toolset_relevanssi_do_query_before', $query );
 				$relevanssi_posts = relevanssi_do_query( $query );
@@ -746,7 +790,7 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 				}
 			}
 		}
-		
+
 		/**
 		 * wpv_fix_relevanssi_orderby
 		 *
@@ -755,11 +799,20 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		 *
 		 * @since 2.3.0
 		 */
-		
+
 		function wpv_fix_relevanssi_orderby( $query ) {
 			$query->set( 'orderby', null );
 		}
-		
+
+		/**
+		 * Apply native Relevanssi hooks to the query object before processing the search.
+		 *
+		 * @param WP_Query $query
+		 */
+		public function relevanssi_modify_wp_query( $query ) {
+			$query = apply_filters( 'relevanssi_modify_wp_query', $query );
+		}
+
 		/**
 		* wpv_fix_relevanssi_max_num_pages
 		*
@@ -767,16 +820,16 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.2
 		*/
-		
+
 		function wpv_fix_relevanssi_max_num_pages( $query ) {
-			if ( 
-				isset( $query->query_vars["posts_per_page"] ) 
-				&& $query->query_vars["posts_per_page"] == -1 
+			if (
+				isset( $query->query_vars["posts_per_page"] )
+				&& $query->query_vars["posts_per_page"] == -1
 			) {
 				$query->max_num_pages = 1;
 			}
 		}
-		
+
 		/**
 		* wpv_fix_relevanssi_return_as_post_objects
 		*
@@ -784,11 +837,39 @@ if ( ! class_exists( 'Toolset_Relevanssi_Compatibility' ) ) {
 		*
 		* @since 2.3
 		*/
-		
+
 		function wpv_fix_relevanssi_return_as_post_objects( $query ) {
 			if ( $query->posts ) {
 				$query->posts = array_map( 'get_post', $query->posts );
 			}
+		}
+
+		/**
+		 * When performing the Views auxiliar queries to calculate available search controls, or their counters,
+		 * disable the Relevanssi integration so all relevant results are included.
+		 */
+		public function disable_relevanssi_query_for_parametric_and_counters() {
+			add_filter( 'relevanssi_search_ok', array( $this, 'helper_return_false' ) );
+			add_filter( 'relevanssi_prevent_default_request', array( $this, 'helper_return_false' ) );
+		}
+
+		/**
+		 * When performing the Views auxiliar queries to calculate available search controls, or their counters,
+		 * disable the Relevanssi integration so all relevant results are included,
+		 * and restore it afterwards.
+		 */
+		public function restore_relevanssi_query_after_parametric_and_counters() {
+			remove_filter( 'relevanssi_search_ok', array( $this, 'helper_return_false' ) );
+			remove_filter( 'relevanssi_prevent_default_request', array( $this, 'helper_return_false' ) );
+		}
+
+		/**
+		 * Helper method so we can control the callback used to return false.
+		 *
+		 * @return bool
+		 */
+		public function helper_return_false() {
+			return false;
 		}
 
 	}

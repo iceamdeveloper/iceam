@@ -80,8 +80,16 @@ class WPToolset_Types
             'repetitive' => self::isRepetitive( $field ), // Is repetitive?
             'validation' => self::filterValidation( $field ), // Validation settings
             'conditional' => self::filterConditional( $field, $post_id, $_post_wpcf ), // Conditional settings
-            'placeholder' => isset($field['data']) && isset($field['data']['placeholder'])? $field['data']['placeholder']:null, // HTML5 placeholder
-            'user_default_value' => isset($field['data']) && isset($field['data']['user_default_value'])? $field['data']['user_default_value']:null, // HTML5 default_value
+			// HTML5 placeholder
+			'placeholder' => self::translate(
+				"field {$field['id']} placeholder",
+				isset( $field['data'] ) && isset( $field['data']['placeholder'] ) ? $field['data']['placeholder'] : ''
+			),
+			// HTML5 default_value
+			'user_default_value' => self::translate(
+				"field {$field['id']} default value",
+				isset( $field['data'] ) && isset( $field['data']['user_default_value'] ) ? $field['data']['user_default_value'] : ''
+			),
         );
 
         /* Specific field settings
@@ -135,6 +143,25 @@ class WPToolset_Types
                 }
             }
             break;
+
+            // Add a flag that indicates a file-type field.
+			//
+			// This is to address the terrible mess where we change the DOM for repeatable fields with javascript (sic!)
+			// by moving the field label out of the individual field values and placing it before them.
+			//
+			// Now, we need to do the same for the file-type fields even if they're single, which means we need to
+			// indicate that the field belongs to this category of types.
+			//
+			// Related pieces of code:
+			// - FormFactory::metaform(): Initialize the repeatable field controller if we have single file-type fields.
+			// - toolset-forms/templates/metaform.php: Add the 'js-wpt-field-with-files' HTML class when appropriate.
+			// - toolset-forms/js/repetitive.js: Rearrange the DOM for fields with the '.js-wpt-field-with-files' class as well.
+			case Toolset_Field_Type_Definition_Factory::IMAGE:
+			case Toolset_Field_Type_Definition_Factory::AUDIO:
+			case Toolset_Field_Type_Definition_Factory::FILE:
+			case Toolset_Field_Type_Definition_Factory::VIDEO:
+				$_field['is_field_with_files'] = true;
+				break;
         }
         // Radio adjust type name because form_factory class name contains 'Radios'
         if ( $field['type'] == 'radio' ) {
@@ -506,10 +533,13 @@ class WPToolset_Types
      */
     public static function translate($name, $string, $context = 'plugin Types')
     {
-        if ( !function_exists( 'icl_t' ) ) {
-            return $string;
-        }
-        return icl_t( $context, $name, stripslashes( $string ) );
+        return apply_filters(
+            'wpml_translate_single_string',
+            stripslashes( $string ),
+            $context,
+            $name,
+            apply_filters( 'wpml_current_language', NULL )
+        );
     }
 
     /**

@@ -13,8 +13,8 @@ add_filter( 'wpcf_fields_numeric_meta_box_form_value_display',
 
 /**
  * Register data (called automatically).
- * 
- * @return type 
+ *
+ * @return type
  */
 function wpcf_fields_numeric() {
 
@@ -74,22 +74,27 @@ function wpcf_fields_numeric_value_save_filter( $val ){
     return $val;
 }
 
+
 /**
- * wpcf_field_number_validation_fix
- *
- * Fix JS validation for field:numeric. Allow comma validation 
+ * Fix JS validation for field:numeric. Allow comma validation.
  */
-function wpcf_field_number_validation_fix(){
-    $locale = localeconv();
-    if ( $locale['decimal_point'] != '.' ) {
-        wp_enqueue_script( 'wpcf-numeric',
-                WPCF_EMBEDDED_RES_RELPATH
-                . '/js/numeric_fix.js', array('wptoolset-form-jquery-validation'), WPCF_VERSION );
-    }
+function wpcf_field_number_validation_fix() {
+	$locale = localeconv();
+	if ( '.' !== $locale['decimal_point'] ) {
+		wp_enqueue_script(
+			'wpcf-numeric',
+			WPCF_EMBEDDED_RES_RELPATH . '/js/numeric_fix.js',
+			array( 'validate' ),
+			WPCF_VERSION,
+			true
+		);
+	}
 }
 
 /**
  * Editor callback form.
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_numeric_editor_callback( $field, $settings ) {
     return array(
@@ -107,6 +112,8 @@ function wpcf_fields_numeric_editor_callback( $field, $settings ) {
 
 /**
  * Editor callback form submit.
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_numeric_editor_submit( $data, $field, $context ) {
     $add = '';
@@ -127,8 +134,8 @@ function wpcf_fields_numeric_editor_submit( $data, $field, $context ) {
 
 /**
  * View function.
- * 
- * @param type $params 
+ *
+ * @param type $params
  */
 function wpcf_fields_numeric_view( $params ) {
     $output = '';

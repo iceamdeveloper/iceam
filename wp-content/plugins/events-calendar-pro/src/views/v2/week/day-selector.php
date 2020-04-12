@@ -11,9 +11,14 @@
  *
  * @version 5.0.0
  *
+ * @var bool $hide_weekends Boolean on whether to hide weekends.
  */
+$classes = [ 'tribe-events-pro-week-day-selector' ];
+if ( $hide_weekends ) {
+	$classes[] = 'tribe-events-pro-week-day-selector--hide-weekends';
+}
 ?>
-<section class="tribe-events-pro-week-day-selector">
+<section <?php tribe_classes( $classes ); ?>>
 
 	<?php $this->template( 'week/day-selector/days' ); ?>
 

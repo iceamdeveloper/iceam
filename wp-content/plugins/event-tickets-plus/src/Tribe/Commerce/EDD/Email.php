@@ -10,12 +10,12 @@ class Tribe__Tickets_Plus__Commerce__EDD__Email {
 
 	public function __construct() {
 
-		$this->default_subject = __( 'Your tickets from {sitename}', 'event-tickets-plus' );
+		$this->default_subject = esc_html( sprintf( __( 'Your %s from {sitename}', 'event-tickets-plus' ), tribe_get_ticket_label_plural_lowercase( 'edd_email_default_subject' ) ) );
 
 		// Triggers for this email
-		add_action( 'eddtickets-send-tickets-email', array( $this, 'trigger' ) );
+		add_action( 'eddtickets-send-tickets-email', [ $this, 'trigger' ] );
 
-		add_filter( 'edd_settings_emails', array( $this, 'settings' ) );
+		add_filter( 'edd_settings_emails', [ $this, 'settings' ] );
 	}
 
 	/**
@@ -26,22 +26,22 @@ class Tribe__Tickets_Plus__Commerce__EDD__Email {
 	 * @return array
 	 */
 	public function settings( $settings ) {
-
-		$email_settings = array(
-			'tribe_ticket_email_heading' => array(
+		$email_settings = [
+			'tribe_ticket_email_heading' => [
 				'id' => 'tribe_ticket_email_heading',
-				'name' => '<strong>' . __( 'Tribe Ticket Emails', 'event-tickets-plus' ) . '</strong>',
-				'desc' => __( 'Configure the ticket receipt emails', 'event-tickets-plus' ),
+				'name' => '<strong>' . esc_html( sprintf( __( 'Tribe %s Emails', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'edd_email_heading_name' ) ) ) . '</strong>',
+				'desc' => esc_html( sprintf( __( 'Configure the %s receipt emails', 'event-tickets-plus' ), tribe_get_ticket_label_singular_lowercase( 'edd_email_heading_desc' ) ) ),
 				'type' => 'header',
-			),
-			'ticket_subject' => array(
+			],
+			'ticket_subject' => [
 				'id' => 'ticket_subject',
-				'name' => __( 'Tickets Email Subject', 'event-tickets-plus' ),
-				'desc' => __( 'Enter the subject line for the tickets receipt email', 'event-tickets-plus' ),
+				'name' => esc_html( sprintf( __( '%s Email Subject', 'event-tickets-plus' ), tribe_get_ticket_label_plural( 'edd_email_subject_name' ) ) ),
+				'desc' => esc_html( sprintf( __( 'Enter the subject line for the %s receipt email', 'event-tickets-plus' ), tribe_get_ticket_label_plural_lowercase( 'edd_email_subject_desc' ) ) ),
 				'type' => 'text',
 				'std'  => $this->default_subject,
-			),
-		);
+			],
+		];
+
 		return array_merge( $settings, $email_settings );
 	}
 
@@ -49,8 +49,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Email {
 	 * Trigger the tickets email
 	 *
 	 * @param int $payment_id
-	 *
-	 * @return string
 	 */
 	public function trigger( $payment_id = 0 ) {
 
@@ -85,7 +83,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Email {
 		$headers = apply_filters( 'edd_ticket_receipt_headers', $headers, $payment_id, $payment_data );
 
 		// Allow add-ons to add file attachments
-		$attachments = apply_filters( 'edd_ticket_receipt_attachments', array(), $payment_id, $payment_data );
+		$attachments = apply_filters( 'edd_ticket_receipt_attachments', [], $payment_id, $payment_data );
 
 		if ( apply_filters( 'edd_email_ticket_receipt', true ) ) {
 			wp_mail( $email, $subject, $message, $headers, $attachments );
@@ -107,5 +105,4 @@ class Tribe__Tickets_Plus__Commerce__EDD__Email {
 
 		return $eddtickets->generate_tickets_email_content( $attendees );
 	}
-
 }

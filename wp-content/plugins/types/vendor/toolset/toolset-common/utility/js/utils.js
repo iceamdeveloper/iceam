@@ -1,3 +1,4 @@
+/* eslint-disable */
 /**
  * @author Riccardo Strobbia
  * @version 1.4
@@ -881,53 +882,6 @@ WPV_Toolset.Utils.editor_utf8_decode = function (utftext) {
     return string;
 };
 
-// convert unicode character to its corresponding numeric entity
-WPV_Toolset.Utils.fixedCharCodeAt = function (str, idx) {
-    // ex. fixedCharCodeAt ('\uD800\uDC00', 0); // 65536
-    // ex. fixedCharCodeAt ('\uD800\uDC00', 1); // 65536
-    idx = idx || 0;
-    var code = str.charCodeAt(idx);
-    var hi, low;
-    if (0xD800 <= code && code <= 0xDBFF) { // High surrogate (could change last hex to 0xDB7F to treat high private surrogates as single characters)
-        hi = code;
-        low = str.charCodeAt(idx + 1);
-        if (isNaN(low)) {
-            throw 'High surrogate not followed by low surrogate in fixedCharCodeAt()';
-        }
-        return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;
-    }
-    if (0xDC00 <= code && code <= 0xDFFF) { // Low surrogate
-        // We return false to allow loops to skip this iteration since should have already handled high surrogate above in the previous iteration
-        return false;
-        /*hi = str.charCodeAt(idx-1);
-         low = code;
-         return ((hi - 0xD800) * 0x400) + (low - 0xDC00) + 0x10000;*/
-    }
-    return code;
-};
-
-WPV_Toolset.replace_unicode_characters = function (string) {
-    // remove accents, swap ñ for n, etc
-    var from = "ãàáäâẽèéëêìíïîõòóöôùúüûñç·/_,:;",
-        to = "aaaaaeeeeeiiiiooooouuuunc------";
-    for (var i = 0, l = from.length; i < l; i++) {
-        string = string.replace(new RegExp(from.charAt(i), 'g'), to.charAt(i));
-    }
-
-    var unicode = '!£$%&()=?^|#§';
-
-    for (var i = 0; i < unicode.length; i++) {
-        string = string.replace(new RegExp(unicode.charAt(i).regexEscape(), 'g'), WPV_Toolset.Utils.fixedCharCodeAt(unicode.charAt(i)));
-    }
-
-    return string;
-};
-
-// escapes regex characters for use in regex constructor
-String.prototype.regexEscape = function regexEscape() {
-    return this.replace(/[\.\?\+\*\^\$\|\(\{\[\]\\)]/g, '\\$&');
-};
-
 // THE TOOLTIP //
 ;
 (function ($, window, document, undefined) {
@@ -1077,7 +1031,7 @@ String.prototype.regexEscape = function regexEscape() {
 
      */
     var defaults = {
-            className: 'highlighted'
+            className: 'toolset-highlighted'
         },
         options = {};
 

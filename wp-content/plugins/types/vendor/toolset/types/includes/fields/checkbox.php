@@ -9,7 +9,7 @@
  * if the checkbox is checked or 'Selected'|'Not selected' HTML
  * will be rendered. If 'Selected'|'Not selected' HTML is not specified then
  * nothing is rendered.
- * 
+ *
  * Parameters:
  * 'raw' => 'true'|'false' (display raw data stored in DB, default false)
  * 'output' => 'html' (wrap data in HTML, optional)
@@ -21,14 +21,14 @@
  * In a theme use types_render_field("my-checkbox", $parameters)
  *
  * Link:
- * <a href="http://wp-types.com/documentation/functions/checkbox/">Types checkbox custom field</a>
- * 
+ * <a href="https://toolset.com/documentation/functions/checkbox/">Types checkbox custom field</a>
+ *
  */
 
 /**
  * Form data for group form.
- * 
- * @return type 
+ *
+ * @return type
  */
 function wpcf_fields_checkbox_insert_form( $form_data ) {
     $meta_type = isset($_GET['page']) && $_GET['page'] != 'wpcf-edit' ? 'usermeta' : 'postmeta';
@@ -73,7 +73,7 @@ function wpcf_fields_checkbox_insert_form( $form_data ) {
         '#default_value' => !empty( $form_data['data']['save_empty'] ) ? $form_data['data']['save_empty'] : 'no',
         '#options' => array(
             'yes' => array(
-                '#title' => __( 'save 0 to the database', 'wpcf' ),
+                '#title' => __( 'When unchecked, save 0 to the database', 'wpcf' ),
                 '#value' => 'yes',
                 '#attributes' => array('class' => 'wpcf-cb-save-empty-migrate', 'onclick' => $cb_migrate_save),
                 '#inline' => true,
@@ -81,7 +81,7 @@ function wpcf_fields_checkbox_insert_form( $form_data ) {
                 '#after' => '</li>',
             ),
             'no' => array(
-                '#title' => __( "don't save anything to the database", 'wpcf' ),
+                '#title' => __( 'When unchecked, don\'t save anything to the database', 'wpcf' ),
                 '#value' => 'no',
                 '#attributes' => array('class' => 'wpcf-cb-save-empty-migrate', 'onclick' => $cb_migrate_do_not_save),
                 '#inline' => true,

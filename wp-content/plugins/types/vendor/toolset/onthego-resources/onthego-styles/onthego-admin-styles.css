@@ -11,11 +11,13 @@ li#toolset_page_dd_layouts div.wp-menu-image:before,
 li#toplevel_page_dd_layouts .dashicons-admin-generic:before,
 li#toplevel_page_embedded-views div.wp-menu-image:before,
 li#toplevel_page_views div.wp-menu-image:before,
+li#toplevel_page_view-templates div.wp-menu-image:before,
 li#toplevel_page_ModuleManager_Modules div.wp-menu-image:before,
 li#toplevel_page_CRED_Forms div.wp-menu-image:before,
 li#toplevel_page_wpcf div.wp-menu-image:before,
 li#toplevel_page_types_access div.wp-menu-image:before,
 li#toplevel_page_CRED_Commerce div.wp-menu-image:before,
+li#toplevel_page_dd_layouts_edit .dashicons-admin-generic:before,
 li#toplevel_page_toolset-packager div.wp-menu-image:before,
 li#toplevel_page_toolset-settings div.wp-menu-image:before {
     font-family: "onthegosystems-icons"!important;

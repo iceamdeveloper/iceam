@@ -17,7 +17,11 @@ class Toolset_Field_Definition_User extends Toolset_Field_Definition {
 	 * @return Toolset_Field_Accessor_Abstract
 	 */
 	public function get_accessor( Toolset_Field_Instance $field_instance ) {
-		return new Toolset_Field_Accessor_Dummy();
+		return new \OTGS\Toolset\Common\Field\Accessor\Usermeta(
+			$field_instance->get_object_id(),
+			$this->get_meta_key(),
+			$this->is_repeatable()
+		);
 	}
 
 
@@ -72,11 +76,11 @@ class Toolset_Field_Definition_User extends Toolset_Field_Definition {
 	 * @param int $element_id Id of the object containing the field.
 	 *
 	 * @return Toolset_Field_Instance
-	 * @since m2m
+	 * @since Types 3.3
 	 * @throws InvalidArgumentException
 	 */
 	public function instantiate( $element_id ) {
-		throw new RuntimeException( 'Not implemented.' );
+		return new \OTGS\Toolset\Common\Field\Instance\User( $this, $element_id );
 	}
 
 

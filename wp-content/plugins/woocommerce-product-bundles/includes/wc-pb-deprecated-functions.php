@@ -13,8 +13,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 function wc_bundles_dropdown_variation_attribute_options( $args = array() ) {
-	_deprecated_function( __FUNCTION__ . '()', '4.13.1', 'WC_PB_Core_Compatibility::wc_dropdown_variation_attribute_options()' );
-	return WC_PB_Core_Compatibility::wc_dropdown_variation_attribute_options( $args );
+	_deprecated_function( __FUNCTION__ . '()', '4.13.1', 'wc_dropdown_variation_attribute_options()' );
+	return wc_dropdown_variation_attribute_options( $args );
 }
 
 function wc_bundles_get_price_decimals() {
@@ -23,8 +23,8 @@ function wc_bundles_get_price_decimals() {
 }
 
 function wc_bundles_get_product_terms( $product_id, $attribute_name, $args ) {
-	_deprecated_function( __FUNCTION__ . '()', '4.13.1', 'WC_PB_Core_Compatibility::wc_get_product_terms()' );
-	return WC_PB_Core_Compatibility::wc_get_product_terms( $product_id, $attribute_name, $args );
+	_deprecated_function( __FUNCTION__ . '()', '4.13.1', 'wc_get_product_terms()' );
+	return wc_get_product_terms( $product_id, $attribute_name, $args );
 }
 
 function wc_bundles_attribute_label( $arg ) {

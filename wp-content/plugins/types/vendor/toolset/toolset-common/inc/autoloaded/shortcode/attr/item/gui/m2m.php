@@ -6,8 +6,8 @@
  * @since m2m
  */
 class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gui_Base {
-	
-	
+
+
 	/**
 	 * Set options for post selectors on M2M relationships.
 	 *
@@ -18,46 +18,40 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 			$this->set_many_to_many_disabled();
 			return;
 		}
-		
+
 		if ( null === $this->current_post_object ) {
-			
-			if ( 
-				in_array( toolset_getget('get_page'), array( 'views-editor', 'view-archives-editor' ) ) 
+
+			if (
+				in_array( toolset_getget('get_page'), array( 'views-editor', 'view-archives-editor' ) )
 				|| (
-					is_admin() 
-					&& in_array( toolset_getget('page'), array( 'views-editor', 'view-archives-editor' ) ) 
+					is_admin()
+					&& in_array( toolset_getget('page'), array( 'views-editor', 'view-archives-editor' ) )
 				)
 			) {
 				$this->set_many_to_many_view_loop();
 				return;
 			}
-			
-			if ( 
-				in_array( toolset_getget('get_page'), array( 'ct-editor' ) ) 
-				|| (
-					is_admin() 
-					&& in_array( toolset_getget('page'), array( 'ct-editor' ) ) 
-				)
-			) {
+
+			if ( $this->is_editing_a_content_template() ) {
 				$this->set_many_to_many_content_template();
 				return;
 			}
-			
+
 			$this->set_many_to_many_disabled();
 			return;
-			
+
 		}
-		
+
 		if ( $this->current_post_object->name === $this->intermediary_type ) {
 			$this->set_many_to_many_current_intermediary();
 			return;
 		}
-		
+
 		$this->set_many_to_many_disabled();
 		return;
 	}
-	
-	
+
+
 	/**
 	 * Set a disabled option.
 	 *
@@ -73,8 +67,8 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 			$this
 		);
 		$option_parent->set_property( 'is_disabled', true );
-		$option_parent->set_property( 
-			'pointer_content', 
+		$option_parent->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -98,18 +92,18 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_parent->get_option();
-		
+
 		$option_child = new Toolset_Shortcode_Attr_Item_Gui_Option(
 			$this->relationship_definition,
 			Toolset_Relationship_Role::CHILD,
 			$this
 		);
 		$option_child->set_property( 'is_disabled', true );
-		$option_child->set_property( 
-			'pointer_content', 
+		$option_child->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -133,20 +127,20 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_child->get_option();
-		
+
 		if ( null != $this->intermediary_type ) {
-			
+
 			$option_intermediary = new Toolset_Shortcode_Attr_Item_Gui_Option(
 				$this->relationship_definition,
 				Toolset_Relationship_Role::INTERMEDIARY,
 				$this
 			);
 			$option_intermediary->set_property( 'is_disabled', true );
-			$option_intermediary->set_property( 
-				'pointer_content', 
+			$option_intermediary->set_property(
+				'pointer_content',
 				'<h3>' . sprintf(
 					__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 					$this->relationship_definition->get_display_name()
@@ -177,14 +171,14 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 					'<i class="fa fa-external-link"></i>',
 					'</a>'
-				) . '</p>' 
+				) . '</p>'
 			);
 			$this->options[] = $option_intermediary->get_option();
-			
+
 		}
 	}
-	
-	
+
+
 	/**
 	 * Set the post selector options in Views and WPAs loops.
 	 *
@@ -200,8 +194,8 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 			Toolset_Relationship_Role::PARENT,
 			$this
 		);
-		$option_parent->set_property( 
-			'pointer_content', 
+		$option_parent->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -225,17 +219,17 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_parent->get_option();
-		
+
 		$option_child = new Toolset_Shortcode_Attr_Item_Gui_Option(
 			$this->relationship_definition,
 			Toolset_Relationship_Role::CHILD,
 			$this
 		);
-		$option_child->set_property( 
-			'pointer_content', 
+		$option_child->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -259,17 +253,17 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_child->get_option();
-		
+
 		$option_intermediary = new Toolset_Shortcode_Attr_Item_Gui_Option(
 			$this->relationship_definition,
 			Toolset_Relationship_Role::INTERMEDIARY,
 			$this
 		);
-		$option_intermediary->set_property( 
-			'pointer_content', 
+		$option_intermediary->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -295,12 +289,12 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_intermediary->get_option();
 	}
-	
-	
+
+
 	/**
 	 * Set the post selector options in Content Templates.
 	 *
@@ -315,8 +309,8 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 			Toolset_Relationship_Role::PARENT,
 			$this
 		);
-		$option_parent->set_property( 
-			'pointer_content', 
+		$option_parent->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -340,17 +334,17 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_parent->get_option();
-		
+
 		$option_child = new Toolset_Shortcode_Attr_Item_Gui_Option(
 			$this->relationship_definition,
 			Toolset_Relationship_Role::CHILD,
 			$this
 		);
-		$option_child->set_property( 
-			'pointer_content', 
+		$option_child->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -374,20 +368,20 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_child->get_option();
-		
+
 		if ( null != $this->intermediary_type ) {
-			
+
 			$option_intermediary = new Toolset_Shortcode_Attr_Item_Gui_Option(
 				$this->relationship_definition,
 				Toolset_Relationship_Role::INTERMEDIARY,
 				$this
 			);
 			$option_intermediary->set_property( 'is_disabled', true );
-			$option_intermediary->set_property( 
-				'pointer_content', 
+			$option_intermediary->set_property(
+				'pointer_content',
 				'<h3>' . sprintf(
 					__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 					$this->relationship_definition->get_display_name()
@@ -417,14 +411,14 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 					'<i class="fa fa-external-link"></i>',
 					'</a>'
-				) . '</p>' 
+				) . '</p>'
 			);
 			$this->options[] = $option_intermediary->get_option();
-			
+
 		}
 	}
-	
-	
+
+
 	/**
 	 * Set the post selector options when editing an IPT.
 	 *
@@ -439,8 +433,8 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 			Toolset_Relationship_Role::PARENT,
 			$this
 		);
-		$option_parent->set_property( 
-			'pointer_content', 
+		$option_parent->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -448,17 +442,17 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 				__( 'You can display the related %1$s for the current %2$s.', 'wpv-views' ),
 				'<strong>' . $this->get_post_type_label_by_role( Toolset_Relationship_Role::PARENT, true ) . '</strong>',
 				'<strong>' . $this->get_post_type_label_by_role( Toolset_Relationship_Role::INTERMEDIARY, true ) . '</strong>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_parent->get_option();
-		
+
 		$option_child = new Toolset_Shortcode_Attr_Item_Gui_Option(
 			$this->relationship_definition,
 			Toolset_Relationship_Role::CHILD,
 			$this
 		);
-		$option_child->set_property( 
-			'pointer_content', 
+		$option_child->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (many-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -466,9 +460,9 @@ class Toolset_Shortcode_Attr_Item_Gui_M2m extends Toolset_Shortcode_Attr_Item_Gu
 				__( 'You can display the related %1$s for the current %2$s.', 'wpv-views' ),
 				'<strong>' . $this->get_post_type_label_by_role( Toolset_Relationship_Role::CHILD, true ) . '</strong>',
 				'<strong>' . $this->get_post_type_label_by_role( Toolset_Relationship_Role::INTERMEDIARY, true ) . '</strong>'
-			) . '</p>' 
+			) . '</p>'
 		);
 		$this->options[] = $option_child->get_option();
 	}
-	
+
 }

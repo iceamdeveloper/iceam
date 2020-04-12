@@ -53,6 +53,11 @@ abstract class Toolset_Field_Renderer_Preview_Base extends Toolset_Field_Rendere
 	public function render( $echo = false ) {
 
 		$field_value = $this->field->get_value();
+		if( ! is_array( $field_value ) ) {
+			// This shouldn't be happening, all field values (even for non-repeatable fields) should
+			// come in arrays.
+			$field_value = array( $field_value );
+		}
 
 		// Handle all fields as repetitive, we allways have array of individual field values.
 		$output_values = array();

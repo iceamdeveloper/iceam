@@ -111,7 +111,7 @@ class Tribe__Events__Pro__Advanced_List_Widget extends Tribe__Events__List_Widge
 	 *
 	 * @since 4.4.21
 	 *
-	 * @param mixed $filters The filter taxonomies to be analized.
+	 * @param mixed $filters The filter taxonomies to be analyzed.
 	 *
 	 * @return string A string representation of the filters or empty string if all are empty.
 	 */

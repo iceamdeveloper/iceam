@@ -1,52 +1,38 @@
 <?php
 /*
  * Plugin Name: Sensei Media Attachments
- * Version: 1.0.0
- * Plugin URI: http://www.woothemes.com/
- * Description: Enhance your lessons by attaching media files to lessons and courses in Sensei
- * Author: WooThemes
- * Author URI: http://www.woothemes.com/
+ * Version: 2.0.0
+ * Plugin URI: https://woocommerce.com/products/sensei-media-attachments/
+ * Description: Provide your students with easy access to additional learning materials, from audio files to slideshows and PDFs.
+ * Author: Automattic
+ * Author URI: https://automattic.com/
  * Requires at least: 3.5
- * Tested up to: 3.8
+ * Tested up to: 5.1
+ * Requires PHP: 5.6
+ * Woo: 290551:788647a9a1d8ef5c95371f0e69223a0f
  *
  * @package WordPress
- * @author WooThemes
+ * @author Automattic
  * @since 1.0.0
  */
 
-if ( ! defined( 'ABSPATH' ) ) exit;
-
-/**
- * Required functions
- */
-if ( ! function_exists( 'woothemes_queue_update' ) ) {
-	require_once( 'woo-includes/woo-functions.php' );
+if ( ! defined( 'ABSPATH' ) ) {
+	exit;
 }
 
-/**
- * Plugin updates
- */
-woothemes_queue_update( plugin_basename( __FILE__ ), '788647a9a1d8ef5c95371f0e69223a0f', '290551' );
+define( 'SENSEI_MEDIA_ATTACHMENTS_VERSION', '2.0.0' );
+define( 'SENSEI_MEDIA_ATTACHMENTS_PLUGIN_FILE', __FILE__ );
+define( 'SENSEI_MEDIA_ATTACHMENTS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-/**
- * Functions used by plugins
- */
-if ( ! class_exists( 'WooThemes_Sensei_Dependencies' ) ) {
-	require_once 'woo-includes/class-woothemes-sensei-dependencies.php';
+require_once dirname( __FILE__ ) . '/classes/class-sensei-media-attachments-dependency-checker.php';
+
+if ( ! Sensei_Media_Attachments_Dependency_Checker::are_system_dependencies_met() ) {
+	return;
 }
 
-/**
- * Sensei Detection
- */
-if ( ! function_exists( 'is_sensei_active' ) ) {
-  function is_sensei_active() {
-    return WooThemes_Sensei_Dependencies::sensei_active_check();
-  }
-}
+require_once dirname( __FILE__ ) . '/classes/class-sensei-media-attachments.php';
 
-if( is_sensei_active() ) {
-	require_once( 'classes/class-sensei-media-attachments.php' );
+// Load the plugin after all the other plugins have loaded.
+add_action( 'plugins_loaded', array( 'Sensei_Media_Attachments', 'init' ), 5 ) ;
 
-	global $sensei_media_attachments;
-	$sensei_media_attachments = new Sensei_Media_Attachments( __FILE__ );
-}
+Sensei_Media_Attachments::instance();

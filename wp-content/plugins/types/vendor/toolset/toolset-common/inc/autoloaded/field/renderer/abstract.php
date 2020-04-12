@@ -6,8 +6,13 @@ abstract class Toolset_Field_Renderer_Abstract {
 	/** @var null|Toolset_Field_Instance */
 	protected $field = null;
 
-	public function __construct( $field ) {
 
+	/**
+	 * Toolset_Field_Renderer_Abstract constructor.
+	 *
+	 * @param Toolset_Field_Instance $field
+	 */
+	public function __construct( $field ) {
 		// todo sanitize
 		$this->field = $field;
 	}
@@ -16,7 +21,7 @@ abstract class Toolset_Field_Renderer_Abstract {
 	/**
 	 * @param bool $echo
 	 *
-	 * @return string
+	 * @return string|array
 	 */
 	public abstract function render( $echo = false );
 

@@ -484,9 +484,10 @@ class Subscriptions_Integration {
 
 		// Subscriptions 2.0 - Fix bug #1040
 		// Fix checkout currency during renewals
-		// NOTE: as of 15/12/2015 this patch should no longer be needed.
-		//add_filter('woocommerce_order_again_cart_item_data', array($this, 'woocommerce_order_again_cart_item_data'), 10, 3);
-		//add_filter('woocommerce_checkout_init', array($this, 'maybe_override_currency'), 50);
+		// @link https://aelia.freshdesk.com/a/tickets/85291
+		// @link https://github.com/woocommerce/woocommerce-subscriptions/issues/1040
+		add_filter('woocommerce_order_again_cart_item_data', array($this, 'woocommerce_order_again_cart_item_data'), 10, 3);
+		add_filter('woocommerce_checkout_init', array($this, 'maybe_override_currency'), 50);
 
 		// Handle manual creation of subscription
 		// @since 1.3.8.171004
@@ -919,7 +920,7 @@ class Subscriptions_Integration {
 	 */
 	public function wc_aelia_currencyswitcher_recalculate_cart_totals_before() {
 		if(!WC_Subscriptions_Cart::cart_contains_subscription() &&
-			 !WC_Subscriptions_Cart::cart_contains_subscription_renewal()) {
+			 !wcs_cart_contains_renewal()) {
 			// Cart doesn't contain subscriptions
 			return;
 		}
@@ -948,6 +949,17 @@ class Subscriptions_Integration {
 	}
 
 	/**
+	 * Returns the currency from an order or a subscription.
+	 *
+	 * @param WC_Order order
+	 * @return string
+	 * @since 1.3.12.180308
+	 */
+	protected function get_order_currency(\WC_Order $order) {
+		return aelia_wc_version_is('>=', '3.0') ? $order->get_currency() : $order->get_order_currency();
+	}
+
+	/**
 	 * Alters the cart item associated to a renewal order, to keep track of the
 	 * currency in which the checkout should be performed.
 	 *
@@ -960,7 +972,7 @@ class Subscriptions_Integration {
 	public function woocommerce_order_again_cart_item_data($cart_item_data, $line_item, $subscription) {
 		// Keep track of the original currency, it will be needed at checkout
 		$cart_item_data['renewal_data_key'] = key($cart_item_data);
-		$cart_item_data['checkout_currency'] = $subscription->order->get_order_currency();
+		$cart_item_data['checkout_currency'] = $this->get_order_currency($subscription);
 		return $cart_item_data;
 	}
 

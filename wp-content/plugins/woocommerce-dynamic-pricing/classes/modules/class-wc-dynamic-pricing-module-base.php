@@ -31,9 +31,9 @@ abstract class WC_Dynamic_Pricing_Module_Base {
 			} else {
 
 				if ( apply_filters( 'wc_dynamic_pricing_get_use_sale_price', true, $filter_cart_item['data'] ) ) {
-					$result = WC()->cart->cart_contents[ $cart_item_key ]['data']->get_price('edit');
+					$result = WC()->cart->cart_contents[ $cart_item_key ]['data']->get_price( 'edit' );
 				} else {
-					$result = WC()->cart->cart_contents[ $cart_item_key ]['data']->get_regular_price('edit');
+					$result = WC()->cart->cart_contents[ $cart_item_key ]['data']->get_regular_price( 'edit' );
 				}
 			}
 		}
@@ -43,17 +43,27 @@ abstract class WC_Dynamic_Pricing_Module_Base {
 		return apply_filters( 'woocommerce_dynamic_pricing_get_price_to_discount', $result, $filter_cart_item, $cart_item_key );
 	}
 
-	protected function is_item_discounted( $cart_item, $cart_item_key ) {
+	protected function is_item_discounted( $cart_item, $cart_item_key, $set_id = false ) {
 		global $woocommerce;
+		if ( $set_id ) {
+			if ( isset( WC()->cart->cart_contents[ $cart_item_key ]['discounts']['applied_discounts'] ) && is_array( WC()->cart->cart_contents[ $cart_item_key ]['discounts']['applied_discounts'] ) ) {
+				$applied_rules = wp_list_pluck( WC()->cart->cart_contents[ $cart_item_key ]['discounts']['applied_discounts'], 'set_id' );
 
-		return isset( WC()->cart->cart_contents[ $cart_item_key ]['discounts'] );
+				return in_array( $set_id, $applied_rules );
+			} else {
+				return false;
+			}
+		} else {
+			return isset( WC()->cart->cart_contents[ $cart_item_key ]['discounts'] );
+		}
 	}
 
 	protected function is_cumulative( $cart_item, $cart_item_key, $default = false ) {
 		//Check to make sure the item has not already been discounted by this module.  This could happen if update_totals is called more than once in the cart. 
 		$cart = WC()->cart->get_cart();
+
 		if ( isset( $cart ) && is_array( $cart ) && isset( $cart[ $cart_item_key ]['discounts'] ) && in_array( $this->module_id, WC()->cart->cart_contents[ $cart_item_key ]['discounts']['by'] ) ) {
-			return false;
+			return apply_filters( 'woocommerce_dynamic_pricing_is_cumulative', $default, $this->module_id, $cart_item, $cart_item_key );
 		} else {
 			return apply_filters( 'woocommerce_dynamic_pricing_is_cumulative', $default, $this->module_id, $cart_item, $cart_item_key );
 		}
@@ -72,7 +82,7 @@ abstract class WC_Dynamic_Pricing_Module_Base {
 	 * @param $product WC_Product
 	 */
 	protected function get_product_category_ids( $product ) {
-		return WC_Dynamic_Pricing_Compatibility::get_product_category_ids($product);
+		return WC_Dynamic_Pricing_Compatibility::get_product_category_ids( $product );
 	}
 
 }

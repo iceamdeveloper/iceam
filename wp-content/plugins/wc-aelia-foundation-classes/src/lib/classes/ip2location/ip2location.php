@@ -19,7 +19,7 @@ class IP2Location extends Base_Class {
 	// New temporary URL to serve the GeoIP database, to deal with the changes introduced by MaxMind
 	// @since 2.0.10.191231
 	// @link https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/
-	const GEOLITE_DB = 'http://geoip.aelia.co/Geolite2-City.mmdb.gz';
+	const GEOLITE_DB = 'https://geoip.aelia.co/Geolite2-City.mmdb.gz';
 
 	//protected static $geoip_db_file = 'geolite-db/GeoLite2-Country.mmdb';
 	public static $geoip_db_file = 'GeoLite2-City.mmdb';
@@ -126,9 +126,7 @@ class IP2Location extends Base_Class {
 	public static function update_database() {
 		$afc = WC_AeliaFoundationClasses::instance();
 		if(!is_callable('gzopen')) {
-			$afc->log(__('Server does not support gzopen. The GeoIP ' .
-										'database could not be updated.',
-										WC_AeliaFoundationClasses::$text_domain));
+			$afc->get_logger()->warning(__('Server does not support gzopen. The GeoIP database could not be updated.', WC_AeliaFoundationClasses::$text_domain));
 			return false;
 		}
 
@@ -153,18 +151,20 @@ class IP2Location extends Base_Class {
 				$result = true;
 			}
 			else {
-				$afc->log(__('Unable to open downloaded GeoIP database file. ' .
-											'The GeoIP database could not be updated.', WC_AeliaFoundationClasses::$text_domain),
-									false);
+				$afc->get_logger()->error(__('Unable to open downloaded GeoIP database file. The GeoIP database could not be updated.', WC_AeliaFoundationClasses::$text_domain), array(
+					'GeoIP Database URL' => self::GEOLITE_DB,
+					'Temporary Downloaded File Path' => $tmp_database,
+					'Target File' => self::geoip_db_file(),
+				));
 				$result = false;
 			}
 			@unlink($tmp_database);
 		}
 		else {
-			$afc->log(sprintf(__('Unable to download GeoIP Database. Error: "%s".',
-														WC_AeliaFoundationClasses::$text_domain),
-												$tmp_database->get_error_message()),
-								false);
+			$afc->get_logger()->error(__('Unable to download GeoIP Database.', WC_AeliaFoundationClasses::$text_domain), array(
+				'GeoIP Database URL' => self::GEOLITE_DB,
+				'Error Message' => $tmp_database->get_error_message(),
+			));
 			$result = false;
 		}
 		return $result;

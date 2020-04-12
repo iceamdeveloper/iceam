@@ -75,10 +75,16 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 
 					foreach ( $this->available_rulesets as $set_id => $pricing_rule_set ) {
 
+						if ( ! $this->is_cumulative( $cart_item, $cart_item_key ) ) {
+							if ( $this->is_item_discounted( $cart_item, $cart_item_key, $set_id ) ) {
+								continue;
+							}
+						}
+
 						if ( $this->is_applied_to_product( $_product ) ) {
 							$rule = $pricing_rule_set;
 
-							$temp = $this->get_adjusted_price( $rule, $original_price );
+							$temp = $this->get_adjusted_price( $cart_item, $rule, $original_price );
 
 							if ( ! $price_adjusted || $temp < $price_adjusted ) {
 								$price_adjusted      = $temp;
@@ -98,14 +104,15 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 	}
 
 	public function is_applied_to_product( $_product ) {
-		if ( is_admin() && ! is_ajax() ) {
+		if ( is_admin() && ! is_ajax() && apply_filters( 'woocommerce_dynamic_pricing_skip_admin', true ) ) {
 			return false;
 		}
+
 
 		return true; //all products are eligibile for the discount.  Only eligibile rulesets for this user have been loaded.
 	}
 
-	private function get_adjusted_price( $rule, $price ) {
+	private function get_adjusted_price( $cart_item, $rule, $price ) {
 		$result = $price;
 
 		$amount       = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, null, $this );
@@ -118,10 +125,22 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 				break;
 			case 'percent_product':
 				$amount = $amount / 100;
-
-				$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
+				if ( $amount <= 1 ) {
+					$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
+				} else {
+					$result = round( ( floatval( $amount ) * $price ), (int) $num_decimals );
+				}
 				break;
 			case 'fixed_price':
+				if ( isset( $cart_item['_gform_total'] ) ) {
+					$amount += floatval( $cart_item['_gform_total'] );
+				}
+
+				if ( isset( $cart_item['addons_price_before_calc'] ) ) {
+					$addons_total = $price - $cart_item['addons_price_before_calc'];
+					$amount       += $addons_total;
+				}
+
 				$result = round( $amount, (int) $num_decimals );
 				break;
 			default:
@@ -172,7 +191,7 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 	 * Gets the discounted price for the shop.
 	 *
 	 * @param WC_Product $_product
-	 * @param float $working_price
+	 * @param float      $working_price
 	 *
 	 * @return bool|float|int|null
 	 */
@@ -188,7 +207,7 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 
 		//Need to process product rules that might have a 0 based quantity.
 
-		if ( $_product->get_type() == 'variation' ) {
+		if ( $_product->get_type() == 'variation' || $_product->get_type() == 'subscription_variation' ) {
 			if ( WC_Dynamic_Pricing_Compatibility::is_wc_version_gte_2_7() ) {
 				if ( ! isset( $this->_loaded_product_rules[ $_product->get_parent_id() ] ) ) {
 					$pricing_rule_sets                                         = apply_filters( 'dynamic_pricing_product_rules', WC_Dynamic_Pricing_Compatibility::get_product_meta( wc_get_product( $_product->get_parent_id() ), '_pricing_rules' ) );
@@ -200,12 +219,14 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 			}
 		} else {
 			if ( ! isset( $this->_loaded_product_rules[ $_product->get_id() ] ) ) {
-				$pricing_rule_sets = apply_filters( 'dynamic_pricing_product_rules', WC_Dynamic_Pricing_Compatibility::get_product_meta( $_product, '_pricing_rules' ) );
+				$pricing_rule_sets                                  = apply_filters( 'dynamic_pricing_product_rules', WC_Dynamic_Pricing_Compatibility::get_product_meta( $_product, '_pricing_rules' ) );
 				$this->_loaded_product_rules[ $_product->get_id() ] = $pricing_rule_sets;
 			}
 
 			$pricing_rule_sets = $this->_loaded_product_rules[ $_product->get_id() ];
 		}
+
+
 		if ( is_array( $pricing_rule_sets ) && sizeof( $pricing_rule_sets ) > 0 ) {
 			foreach ( $pricing_rule_sets as $pricing_rule_set ) {
 				$execute_rules        = false;
@@ -247,27 +268,21 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 					$execute_rules = true;
 				}
 
-				if ( isset( $pricing_rule_set['date_from'] ) && isset( $pricing_rule_set['date_to'] ) ) {
-					// Check date range
-					$from_date = empty( $pricing_rule_set['date_from'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $pricing_rule_set['date_from'] ), false ) );
-					$to_date   = empty( $pricing_rule_set['date_to'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $pricing_rule_set['date_to'] ), false ) );
-					$now       = current_time( 'timestamp' );
-
-					if ( $from_date && $to_date && ! ( $now >= $from_date && $now <= $to_date ) ) {
-						$execute_rules = false;
-					} elseif ( $from_date && ! $to_date && ! ( $now >= $from_date ) ) {
-						$execute_rules = false;
-					} elseif ( $to_date && ! $from_date && ! ( $now <= $to_date ) ) {
-						$execute_rules = false;
-					}
+				if ( $execute_rules && ( isset( $pricing_rule_set['date_from'] ) || isset( $pricing_rule_set['date_to'] ) ) ) {
+					$execute_rules = wc_dynamic_pricing_is_within_date_range( $pricing_rule_set['date_from'], $pricing_rule_set['date_to'] );
 				}
 
 				if ( $execute_rules ) {
 					$pricing_rules = $pricing_rule_set['rules'];
 					if ( is_array( $pricing_rules ) && sizeof( $pricing_rules ) > 0 ) {
 						foreach ( $pricing_rules as $rule ) {
-							if ( $rule['from'] == '0' ) {
 
+							if ( ! isset( $rule['from'] ) || empty( $rule['from'] ) ) {
+								$rule['from'] = 0;
+							}
+
+							$show_pricing_in_shop = apply_filters( 'woocommerce_dynamic_pricing_show_adjustments_in_shop', ( $rule['from'] == '0' || $rule['from']  == '1'), $rule, $_product );
+							if ( $show_pricing_in_shop ) {
 
 								//first rule matched takes precedence for the item. 
 								if ( ! $applied_rule ) {
@@ -280,9 +295,9 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 
 								//calcualte the lowest price for display
 								$price = $this->get_adjusted_price_by_product_rule( $rule, $a_working_price, $_product, $additional_price );
-								if ( $price && ! $lowest_price ) {
+								if ( ($price === 0.0 || $price ) && !$lowest_price ) {
 									$lowest_price = $price;
-								} elseif ( $price && $price < $lowest_price ) {
+								} elseif ( ($price === 0.0 || $price ) && $price < $lowest_price ) {
 									$lowest_price = $price;
 								}
 							}
@@ -296,7 +311,8 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 		if ( $process_discounts ) {
 			if ( ! $this->is_cumulative( $fake_cart_item, false ) ) {
 
-				if ( get_class( $_product ) == 'WC_Product' && $_product->is_type( 'variable' ) && $lowest_price ) {
+				//$product_class = get_class( $_product );
+				if ( $_product->is_type( 'variable' ) && ($lowest_price || $lowest_price === 0.0) ) {
 					return $lowest_price;
 				} elseif ( $applied_rule ) {
 					return $this->get_adjusted_price_by_product_rule( $applied_rule, $a_working_price, $_product, $additional_price );
@@ -305,11 +321,11 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 
 					$s_working_price = apply_filters( 'woocommerce_dyanmic_pricing_working_price', $working_price, 'membership', $fake_cart_item );
 
-					return $this->get_adjusted_price( $available_rule, $s_working_price );
+					return $this->get_adjusted_price( $fake_cart_item, $available_rule, $s_working_price );
 				}
 			} else {
 
-				$discounted_price = null;
+				$discounted_price = false;
 				if ( get_class( $_product ) == 'WC_Product' && $_product->is_type( 'variable' ) && $lowest_price ) {
 					$discounted_price = $lowest_price;
 				} elseif ( $applied_rule ) {
@@ -321,14 +337,14 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 
 					$s_working_price = apply_filters( 'woocommerce_dyanmic_pricing_working_price', $working_price, 'membership', $fake_cart_item );
 
-					return $this->get_adjusted_price( $available_rule, $s_working_price );
+					return $this->get_adjusted_price( $fake_cart_item, $available_rule, $s_working_price );
 				} else {
 					return $discounted_price;
 				}
 			}
 		}
 
-		return $working_price;
+		return $working_price === null ? false : $working_price;
 	}
 
 	private function get_adjusted_price_by_product_rule( $rule, $price, $_product, $additional_price = false ) {
@@ -337,46 +353,34 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 		$amount       = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, null, $this );
 		$num_decimals = apply_filters( 'woocommerce_dynamic_pricing_get_decimals', (int) get_option( 'woocommerce_price_num_decimals' ) );
 
-		$q = 0;
 
-		if ( $rule['from'] == '*' ) {
-			$rule['from'] = 0;
-		}
+		$this->discount_data['rule'] = $rule;
 
-		if ( $rule['to'] == '*' ) {
-			$rule['to'] = $q;
-		}
+		switch ( $rule['type'] ) {
+			case 'price_discount':
+				$adjusted = floatval( $price ) - floatval( $amount );
+				$result   = $adjusted >= 0 ? $adjusted : 0;
+				break;
+			case 'percentage_discount':
+				$amount = $amount / 100;
 
-		if ( $q >= $rule['from'] && $q <= $rule['to'] ) {
-			$this->discount_data['rule'] = $rule;
+				$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
+				break;
+			case 'fixed_price':
 
-			switch ( $rule['type'] ) {
-				case 'price_discount':
-					$adjusted = floatval( $price ) - floatval( $amount );
-					$result   = $adjusted >= 0 ? $adjusted : 0;
-					break;
-				case 'percentage_discount':
-					$amount = $amount / 100;
-
-					$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
-					break;
-				case 'fixed_price':
-
-					$tax_display_mode = get_option( 'woocommerce_tax_display_shop' );
-					if ( $additional_price ) {
-						$amount += floatval( $additional_price );
-					}
-					$fixed_price = round( $amount, (int) $num_decimals );
-					$result      = $tax_display_mode == 'incl' ? wc_get_price_including_tax( $_product, array( 'price' => $fixed_price ) ) : wc_get_price_excluding_tax( $_product, array( 'price' => $fixed_price ) );
-
-					break;
-				default:
-					$result = false;
-					break;
-			}
+				$tax_display_mode = get_option( 'woocommerce_tax_display_shop' );
+				if ( $additional_price ) {
+					$amount += floatval( $additional_price );
+				}
+				$fixed_price = round( $amount, (int) $num_decimals );
+				//$result      = $tax_display_mode == 'incl' ? wc_get_price_including_tax( $_product, array( 'price' => $fixed_price ) ) : wc_get_price_excluding_tax( $_product, array( 'price' => $fixed_price ) );
+				$result = $fixed_price;
+				break;
+			default:
+				$result = false;
+				break;
 		}
 
 		return $result;
 	}
-
 }

@@ -90,7 +90,7 @@ class Types_Admin_Usermeta_Groups_List_Table extends WP_List_Table
                         'wpcf');
                 }
                 else{
-                    $show_for = (count($show_for) == 0) ? __('Displayed for all users roles', 'wpcf') : ucwords(implode($show_for, ', '));
+                    $show_for = (count($show_for) === 0) ? __('Displayed for all users roles', 'wpcf') : ucwords( implode( ', ', $show_for ) );
                 }
                 return $show_for;
             case 'status':

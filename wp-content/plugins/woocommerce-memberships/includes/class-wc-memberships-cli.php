@@ -16,9 +16,8 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -29,15 +28,16 @@
  * @see WC_CLI
  *
  * @since 1.7.0
+ * @deprecated since 1.13.0
  */
 
-// Sanity check.
-if ( ! class_exists( 'WP_CLI_Command' ) ) {
+// Sanity check
+if ( ! class_exists( 'WP_CLI_Command', false ) ) {
 	return;
 }
 
 // WooCommerce v3.0 CLI implementation is different
-if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_CLI_Command' ) ) {
+if ( SkyVerge\WooCommerce\PluginFramework\v5_5_0\SV_WC_Plugin_Compatibility::is_wc_version_gte( '3.0' ) && ! class_exists( 'WC_CLI_Command', false ) ) {
 
 	/**
 	 * Re-introduce WooCommerce WC_CLI_Command for compatibility.
@@ -48,7 +48,7 @@ if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_
 	 *
 	 * @since WooCommerce 2.5.0
 	 */
-	class WC_CLI_Command extends WP_CLI_Command {
+	class WC_CLI_Command extends \WP_CLI_Command {
 
 		/**
 		 * Add common cli arguments to argument list before WP_Query is run.
@@ -225,11 +225,11 @@ if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_
 
 			try {
 
-				$datetime = new DateTime( $datetime, new DateTimeZone( 'UTC' ) );
+				$datetime = new \DateTime( $datetime, new \DateTimeZone( 'UTC' ) );
 
-			} catch ( Exception $e ) {
+			} catch ( \Exception $e ) {
 
-				$datetime = new DateTime( '@0' );
+				$datetime = new \DateTime( '@0' );
 
 			}
 
@@ -246,16 +246,16 @@ if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_
 		 */
 		protected function format_datetime( $timestamp, $convert_to_utc = false ) {
 			if ( $convert_to_utc ) {
-				$timezone = new DateTimeZone( wc_timezone_string() );
+				$timezone = new \DateTimeZone( wc_timezone_string() );
 			} else {
-				$timezone = new DateTimeZone( 'UTC' );
+				$timezone = new \DateTimeZone( 'UTC' );
 			}
 
 			try {
 				if ( is_numeric( $timestamp ) ) {
-					$date = new DateTime( "@{$timestamp}" );
+					$date = new \DateTime( "@{$timestamp}" );
 				} else {
-					$date = new DateTime( $timestamp, $timezone );
+					$date = new \DateTime( $timestamp, $timezone );
 				}
 
 				// convert to UTC by adjusting the time based on the offset of the site's timezone
@@ -263,8 +263,8 @@ if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_
 					$date->modify( -1 * $date->getOffset() . ' seconds' );
 				}
 
-			} catch ( Exception $e ) {
-				$date = new DateTime( '@0' );
+			} catch ( \Exception $e ) {
+				$date = new \DateTime( '@0' );
 			}
 
 			return $date->format( 'Y-m-d\TH:i:s\Z' );
@@ -453,7 +453,7 @@ if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_
 		 *
 		 * @deprecated since WooCommerce Memberships 1.8.0
 		 */
-		class WC_CLI_Exception extends Exception {
+		class WC_CLI_Exception extends \Exception {
 
 			/** @var string sanitized error code */
 			protected $error_code;
@@ -486,12 +486,35 @@ if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() && ! class_exists( 'WC_
 	}
 }
 
-class WC_Memberships_CLI extends WP_CLI_Command {}
+/**
+ * Memberships CLI handler.
+ *
+ * @since 1.7.0
+ * @deprecated since 1.13.0
+ */
+class WC_Memberships_CLI {}
 
-include_once __DIR__ . '/cli/class-wc-memberships-cli-command.php';
-include_once __DIR__ . '/cli/class-wc-memberships-cli-membership-plan.php';
-include_once __DIR__ . '/cli/class-wc-memberships-cli-user-membership.php';
+require_once __DIR__ . '/cli/class-wc-memberships-cli-command.php';
+require_once __DIR__ . '/cli/class-wc-memberships-cli-import-user-memberships.php';
+require_once __DIR__ . '/cli/class-wc-memberships-cli-membership-plan.php';
+require_once __DIR__ . '/cli/class-wc-memberships-cli-membership-plan-rule.php';
+require_once __DIR__ . '/cli/class-wc-memberships-cli-user-membership.php';
 
-WP_CLI::add_command( 'wc memberships',            'WC_Memberships_CLI' );
-WP_CLI::add_command( 'wc memberships membership', 'WC_Memberships_CLI_User_Membership' );
-WP_CLI::add_command( 'wc memberships plan',       'WC_Memberships_CLI_Membership_Plan' );
+// legacy commands for old style WP CLI (not mapped from the WC REST API)
+
+/* @deprecated: this is the legacy command now replaced by `wc user_membership <options>` */
+\WP_CLI::add_command( 'wc memberships membership', 'WC_Memberships_CLI_User_Membership' );
+/* @deprecated: this is the legacy command now replaced by `wc membership_plan <options>` */
+\WP_CLI::add_command( 'wc memberships plan',       'WC_Memberships_CLI_Membership_Plan' );
+/* @deprecated: these are legacy command to be replaced as we add support for membership rules in REST API */
+\WP_CLI::add_command( 'wc memberships plan rule',  'WC_Memberships_CLI_Membership_Plan_Rule' );
+\WP_CLI::add_command( 'wc memberships rule',       'WC_Memberships_CLI_Membership_Plan_Rule' ); // TODO: remove this when the above command can be fixed {CW 2018-11-14}
+
+// extended commands (not included with default WP CLI REST API mappings)
+
+// import memberships from CLI: `wc user_membership import <file> <options>`
+\WP_CLI::add_command(
+	'wc user_membership import',
+	[ '\\SkyVerge\\WooCommerce\\Memberships\\CLI\\Import_User_Memberships', 'import' ],
+	[ 'synopsis' => \SkyVerge\WooCommerce\Memberships\CLI\Import_User_Memberships::synopsis() ]
+);

@@ -1,8 +1,5 @@
 <?php
-/**
- *
- *
- */
+
 require_once 'class.textfield.php';
 
 class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
@@ -33,6 +30,7 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
          *
          * Terms with all fields as they are returned from wp_get_post_terms()
          * @since 1.8.8
+		 * @access private
          *
          * @param array terms
          * @param string name field
@@ -75,7 +73,7 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
     /**
      * function used when ajax is on in order to init taxonomies
      * @var static string $taxonomies_init_calls  Should contain initTaxonomies function calls for each taxonomy on form
-     * @return type
+     * @return string
      */
     public function initTaxonomyFunction() {
         static $taxonomies_init_calls;
@@ -90,7 +88,7 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 
     /**
      * metaform
-     * @return type
+     * @return array
      */
     public function metaform() {
 		$use_bootstrap = array_key_exists('use_bootstrap', $this->_data) && $this->_data['use_bootstrap'];
@@ -101,7 +99,18 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
         $shortcode_class = array_key_exists( 'class', $attributes ) ? $attributes['class'] : "";
 
         $metaform = array();
-        
+
+		$bootstrap_primary_button_class = 'btn btn-primary';
+		switch( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+			case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+				$bootstrap_secondary_button_class = ' btn btn-secondary ';
+				break;
+			default:
+				$bootstrap_secondary_button_class = ' btn btn-default' ;
+				break;
+		}
+
+
 		if ($this->output == 'bootstrap') {
 
 	        $metaform[] = array(
@@ -136,7 +145,6 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 	        );
 
 	        $after = $this->getMostPopularTermsAsBootstrap();
-	        $bootstrap_class = "btn btn-primary";
 
 	        /**
 	         * add button
@@ -148,27 +156,25 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 		        '#name' => "new_tax_button_" . $taxonomy,
 		        '#value' => apply_filters( 'toolset_button_add_text', esc_attr( $attributes['add_text'] ) ),
 		        '#attributes' => array(
-			        'class' => "wpt-taxonomy-add-new js-wpt-taxonomy-add-new {$bootstrap_class}",
+			        'class' => "wpt-taxonomy-add-new js-wpt-taxonomy-add-new {$bootstrap_primary_button_class}",
 			        'data-taxonomy' => $taxonomy,
 		        ),
 		        '#validate' => $this->getValidationData(),
 		        '#after' => $after
 	        );
 
-	        $after = "";
-	        $before = "";
 	        $show = isset( $attributes['show_popular'] ) && $attributes['show_popular'] == 'true';
 
-            $show_hide_taxonomy = "<a             
-            style='display:none;'
-            data-taxonomy='" . $this->getName() . "'
-            data-after-selector='js-show-popular-after' 
-            data-show-popular-text='" . apply_filters( 'toolset_button_show_popular_text', esc_attr( $attributes['show_popular_text'] ) ) . "' 
-            data-hide-popular-text='" . apply_filters( 'toolset_button_hide_popular_text', esc_attr( $attributes['hide_popular_text'] ) ) . "' 
-            class = 'popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide dashicons-before dashicons-plus-alt'  
-            data-output = '" . $this->output . "'   
-            role = 'button' 
-            name = 'sh_{$taxonomy}'                
+            $show_hide_taxonomy = "<a
+				style='display:none;'
+				data-taxonomy='" . esc_attr( $this->getName() ). "'
+				data-after-selector='js-show-popular-after'
+				data-show-popular-text='" . esc_attr( apply_filters( 'toolset_button_show_popular_text', esc_attr( $attributes['show_popular_text'] ) ) ) . "'
+				data-hide-popular-text='" . esc_attr( apply_filters( 'toolset_button_hide_popular_text', esc_attr( $attributes['hide_popular_text'] ) ) ) . "'
+				class = 'popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide dashicons-before dashicons-plus-alt'
+				data-output = '" . esc_attr( $this->output ) . "'
+				role = 'button'
+				name = 'sh_" . esc_attr( $taxonomy ) . "'
             >" . apply_filters( 'toolset_button_show_popular_text', esc_attr( $attributes['show_popular_text'] ) ) . "</a>";
 
 	        /**
@@ -181,7 +187,7 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 		        '#name' => "sh_" . $taxonomy,
 		        '#value' => apply_filters( 'toolset_button_show_popular_text', esc_attr( $attributes['show_popular_text'] ) ),
 		        '#attributes' => array(
-			        'class' => "popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide {$bootstrap_class}",
+			        'class' => "popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide {$bootstrap_primary_button_class}",
 			        'data-taxonomy' => $this->getName(),
 			        'data-show-popular-text' => apply_filters( 'toolset_button_show_popular_text', esc_attr( $attributes['show_popular_text'] ) ),
 			        'data-hide-popular-text' => apply_filters( 'toolset_button_hide_popular_text', esc_attr( $attributes['hide_popular_text'] ) ),
@@ -190,12 +196,12 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 			        'data-output' => $this->output
 		        ),
 		        '#before' => $show_hide_taxonomy,
-		        '#after' => $after . $this->initTaxonomyFunction(),
+		        '#after' => $this->initTaxonomyFunction(),
 	        );
 
         } else {
 
-	        $metaform[] = array(
+			$metaform[] = array(
 		        '#type' => 'hidden',
 		        '#title' => '',
 		        '#description' => '',
@@ -230,7 +236,7 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 		        '#name' => "new_tax_button_" . $taxonomy,
 		        '#value' => apply_filters('toolset_button_add_text', esc_attr($attributes['add_text'])),
 		        '#attributes' => array(
-			        'class' => $use_bootstrap ? 'btn btn-default wpt-taxonomy-add-new js-wpt-taxonomy-add-new' : 'wpt-taxonomy-add-new js-wpt-taxonomy-add-new',
+			        'class' => $use_bootstrap ? $bootstrap_secondary_button_class . ' wpt-taxonomy-add-new js-wpt-taxonomy-add-new' : 'wpt-taxonomy-add-new js-wpt-taxonomy-add-new',
 			        'data-taxonomy' => $taxonomy,
 		        ),
 		        '#validate' => $this->getValidationData(),
@@ -256,7 +262,7 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
 		        '#name' => "sh_" . $taxonomy,
 		        '#value' => apply_filters('toolset_button_show_popular_text', esc_attr($attributes['show_popular_text'])),
 		        '#attributes' => array(
-			        'class' => $use_bootstrap ? 'btn btn-default popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide' : 'popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide',
+			        'class' => $use_bootstrap ? $bootstrap_secondary_button_class . ' popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide' : 'popular wpt-taxonomy-popular-show-hide js-wpt-taxonomy-popular-show-hide',
 			        'data-taxonomy' => $this->getName(),
 			        'data-show-popular-text' => apply_filters('toolset_button_show_popular_text', esc_attr($attributes['show_popular_text'])),
 			        'data-hide-popular-text' => apply_filters('toolset_button_hide_popular_text', esc_attr($attributes['hide_popular_text'])),
@@ -328,7 +334,15 @@ class WPToolset_Field_Taxonomy extends WPToolset_Field_Textfield {
         }
         $add_sizes = $max > $min;
 
-        $bootstrap_class = 'well well-default';
+        switch( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+			case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+				// There's no well and well-default in BS4 anymore, our own styling is enough.
+				$bootstrap_class = '';
+				break;
+			default:
+				$bootstrap_class = 'well well-default';
+				break;
+		}
 
         $content = sprintf(
                 '<div class="shmpt-%s wpt-taxonomy-show-popular-list js-show-popular-after %s" style="display:none">', $this->getName(), $bootstrap_class

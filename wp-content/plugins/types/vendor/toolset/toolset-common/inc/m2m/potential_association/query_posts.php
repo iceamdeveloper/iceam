@@ -18,6 +18,10 @@ use OTGS\Toolset\Common\M2M\PotentialAssociation as potentialAssociation;
  */
 class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_Association_Query {
 
+
+	const POST_STATUS_AVAILABLE = 'is_available';
+
+
 	/** @var IToolset_Relationship_Definition */
 	private $relationship;
 
@@ -36,8 +40,11 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	/** @var Toolset_Relationship_Query_Factory */
 	private $query_factory;
 
-
+	/** @var Toolset_Element_Factory */
 	private $element_factory;
+
+	/** @var Toolset_Potential_Association_Query_Factory */
+	private $association_query_factory;
 
 
 	/**
@@ -54,8 +61,11 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	 *     - wp_query_override: array
 	 *     - exclude_elements: IToolset_Element[] Elements to exclude from the results and when checking
 	 *       whether the target element ($for_element) can accept another association.
+	 *     - post_status: string[]|string If provided, it will override the standard value ('publish'). POST_STATUS_AVAILABLE is
+	 *       also being accepted.
 	 * @param Toolset_Relationship_Query_Factory|null $query_factory_di
 	 * @param Toolset_Element_Factory|null $element_factory_di
+	 * @param Toolset_Potential_Association_Query_Factory|null $association_query_factory_di
 	 */
 	public function __construct(
 		IToolset_Relationship_Definition $relationship,
@@ -63,7 +73,8 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 		IToolset_Element $for_element,
 		$args,
 		Toolset_Relationship_Query_Factory $query_factory_di = null,
-		Toolset_Element_Factory $element_factory_di = null
+		Toolset_Element_Factory $element_factory_di = null,
+		Toolset_Potential_Association_Query_Factory $association_query_factory_di = null
 	) {
 		$this->relationship = $relationship;
 		$this->for_element = $for_element;
@@ -76,6 +87,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 
 		$this->query_factory = ( null === $query_factory_di ? new Toolset_Relationship_Query_Factory() : $query_factory_di );
 		$this->element_factory = ( null === $element_factory_di ? new Toolset_Element_Factory() : $element_factory_di );
+		$this->association_query_factory = $association_query_factory_di ?: new Toolset_Potential_Association_Query_Factory();
 	}
 
 
@@ -112,19 +124,21 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 			//
 			//
 			'post_type' => $this->get_target_post_types(),
-			'post_status' => 'publish',
+			'post_status' => $this->get_post_statuses(),
 			// just to make sure in case we mess with post_status in the future
 			'perm' => 'readable',
 			// the common use case is to get post titles and IDs
 			'fields' => 'all',
 
 			'posts_per_page' => $this->get_items_per_page(),
-			'paged' => $this->get_page()
+			'paged' => $this->get_page(),
 		);
 
 		$search_string = $this->get_search_string();
 		if( ! empty( $search_string ) ) {
 			$query_args['s'] = $search_string;
+			$query_args['orderby'] = 'title';
+			$query_args['order'] = 'ASC';
 		}
 
 		$elements_to_exclude = $this->get_exclude_elements();
@@ -137,7 +151,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 		$query_args = array_merge( $query_args, $this->get_additional_wp_query_args() );
 
 		// This is to prevent JOIN clause duplication between the classes that adjust the WP_Query clauses.
-		$join_manager = new potentialAssociation\JoinManager(
+		$join_manager = $this->association_query_factory->create_join_manager(
 			$this->relationship, $this->target_role, $this->for_element
 		);
 		$join_manager->hook();
@@ -169,8 +183,19 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 			$augment_query_for_cardinality_limits->before_query();
 		}
 
+		// Make sure the order of the results is correct. See the PostResultOrder class for details.
+		$augment_query_orderby = $this->query_factory->post_result_order_adjustments(
+			$this->relationship,
+			$this->target_role,
+			$this->for_element,
+			$join_manager
+		);
+		$augment_query_orderby->before_query();
+
 		$query = $this->query_factory->wp_query( $query_args );
 		$results = $query->get_posts();
+
+		$augment_query_orderby->after_query();
 
 		if( $check_distinct_relationships ) {
 			/** @noinspection PhpUndefinedVariableInspection */
@@ -211,6 +236,22 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 
 	private function get_page() {
 		return (int) toolset_getarr( $this->args, 'page' );
+	}
+
+
+	private function get_post_statuses() {
+		$post_status = toolset_getarr( $this->args, 'post_status' );
+		if( null === $post_status || empty( $post_status ) ) {
+			return array( 'publish' );
+		} elseif( is_string( $post_status ) ) {
+			if ( self::POST_STATUS_AVAILABLE === $post_status ) {
+				return array( 'publish', 'draft', 'pending', 'future' );
+			}
+
+			return array( $post_status );
+		}
+
+		return $post_status;
 	}
 
 
@@ -281,7 +322,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 	public function check_single_element( IToolset_Element $association_candidate, $check_is_already_associated = true ) {
 
 		if( ! $this->relationship->get_element_type( $this->target_role )->is_match( $association_candidate ) ) {
-			return new Toolset_Result( false, __( 'The element has a wrong type or a domain for this relationship.', 'wpcf' ) );
+			return new Toolset_Result( false, __( 'The element has a wrong type or a domain for this relationship.', 'wpv-views' ) );
 		}
 
 		if( $check_is_already_associated
@@ -289,7 +330,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 			&& $this->is_element_already_associated( $association_candidate )
 		) {
 			return new Toolset_Result( false,
-				__( 'These two elements are already associated and the relationship doesn\'t allow non-distinct associations.', 'wpcf' )
+				__( 'These two elements are already associated and the relationship doesn\'t allow non-distinct associations.', 'wpv-views' )
 			);
 		}
 
@@ -333,7 +374,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 			if( is_string( $filtered_result ) ) {
 				$message = esc_html( $filtered_result );
 			} else {
-				$message = __( 'The association was disabled by a third-party filter.', 'wpcf' );
+				$message = __( 'The association was disabled by a third-party filter.', 'wpv-views' );
 			}
 			return new Toolset_Result( false, $message );
 		}
@@ -384,7 +425,7 @@ class Toolset_Potential_Association_Query_Posts implements IToolset_Potential_As
 			$association_count = $this->get_number_of_already_associated_elements( $role, $element );
 			if( $association_count >= $maximum_limit ) {
 				$message = sprintf(
-					__( 'The element %s has already the maximum allowed amount of associations (%d) as %s in the relationship %s.', 'wpcf' ),
+					__( 'The element %s has already the maximum allowed amount of associations (%d) as %s in the relationship %s.', 'wpv-views' ),
 					$element->get_title(),
 					$maximum_limit, // this will be always a meaningful number - for INFINITY, this block is skipped entirely.
 					$this->relationship->get_role_name( $role ),

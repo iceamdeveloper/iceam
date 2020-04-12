@@ -9,19 +9,19 @@
  */
 final class Toolset_Field_Renderer_Purpose {
 
-	// Field preview (e.g. on a term listing page)
+	/** Field preview (e.g. on a term listing page). */
 	const PREVIEW = 'preview';
 
-	// Raw output
+	/** Raw output. */
 	const RAW = 'raw';
 
-	// Produces an input field
+	/** Produces an input field. */
 	const INPUT = 'input';
 
-	// Produces an input field which holds the related post id the name
+	/** Produces an input field which holds the related post id the name. */
 	const INPUT_REPEATABLE_GROUP = 'input-of-post';
 
-	// Value display
+	/** Value display. */
 	const DISPLAY = 'display';
 
 	/**
@@ -30,5 +30,8 @@ final class Toolset_Field_Renderer_Purpose {
 	 * @deprecated
 	 */
 	const TOOLSET_FORMS = 'toolset-forms';
+
+	/** Output for the rest API. */
+	const REST = 'rest';
 
 }

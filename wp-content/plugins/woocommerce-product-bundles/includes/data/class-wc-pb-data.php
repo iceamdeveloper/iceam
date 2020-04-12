@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundles Data filters and includes.
  *
  * @class    WC_PB_Data
- * @version  5.2.0
+ * @version  5.5.0
  */
 class WC_PB_Data {
 
@@ -30,14 +30,11 @@ class WC_PB_Data {
 		// Bundled Item Data CRUD class.
 		require_once( 'class-wc-bundled-item-data.php' );
 
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+		// Product Bundle CPT data store.
+		require_once( 'class-wc-product-bundle-data-store-cpt.php' );
 
-			// Product Bundle CPT data store.
-			require_once( 'class-wc-product-bundle-data-store-cpt.php' );
-
-			// Register the Product Bundle Custom Post Type data store.
-			add_filter( 'woocommerce_data_stores', array( __CLASS__, 'register_bundle_type_data_store' ), 10 );
-		}
+		// Register the Product Bundle Custom Post Type data store.
+		add_filter( 'woocommerce_data_stores', array( __CLASS__, 'register_bundle_type_data_store' ), 10 );
 	}
 
 	/**

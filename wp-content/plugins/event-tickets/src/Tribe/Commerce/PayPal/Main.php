@@ -361,55 +361,40 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 
 		tribe_assets(
 			$main,
-			array(
-				array(
+			[
+				[
 					'event-tickets-tpp-css',
 					'tpp.css',
-				),
-				array(
-					'event-tickets-tpp-js',
-					'tpp.js',
-					array(
-						'jquery',
-					),
-				),
-			),
+				],
+			],
 			null,
-			array(
-				'localize' => array(
-					'event-tickets-tpp-js',
-					'tribe_tickets_tpp_strings',
-					array(
-						'attendee' => _x( 'Attendee %1$s', 'Attendee number', 'event-tickets' ),
-					),
-				),
-			)
+			[]
 		);
 
 		// Admin assets
 		tribe_assets(
 			$main,
-			array(
-				array(
+			[
+				[
 					'event-tickets-tpp-admin-js',
 					'tpp-admin.js',
-					array(
+					[
 						'jquery',
 						'underscore',
-					),
-				),
-			),
+					],
+				],
+			],
 			'admin_enqueue_scripts',
-			array(
+			[
 				'conditionals' => 'is_admin',
-				'localize' => (object) array(
+				'localize' => (object) [
 					'name' => 'tribe_tickets_tpp_admin_strings',
-					'data' => array(
+					'data' => [
 						'complete'   => tribe( 'tickets.commerce.paypal.handler.ipn' )->get_config_status( 'label', 'complete' ),
 						'incomplete' => tribe( 'tickets.commerce.paypal.handler.ipn' )->get_config_status( 'label', 'incomplete' ),
-					),
-				),
-			)
+					],
+				],
+			]
 		);
 	}
 
@@ -426,7 +411,6 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 		}
 
 		wp_enqueue_style( 'event-tickets-tpp-css' );
-		wp_enqueue_script( 'event-tickets-tpp-js' );
 
 		// Check for override stylesheet
 		$user_stylesheet_url = Tribe__Templates::locate_stylesheet( 'tribe-events/tickets/tpp.css' );
@@ -1230,12 +1214,11 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 			return false;
 		}
 
-		// Updates if we should show Description
-		$ticket->show_description = isset( $ticket->show_description ) && tribe_is_truthy( $ticket->show_description ) ? 'yes' : 'no';
-
 		/** @var Tribe__Tickets__Tickets_Handler $tickets_handler */
 		$tickets_handler = tribe( 'tickets.handler' );
 
+		// Updates if we should show Description.
+		$ticket->show_description = isset( $ticket->show_description ) && tribe_is_truthy( $ticket->show_description ) ? 'yes' : 'no';
 		update_post_meta( $ticket->ID, $tickets_handler->key_show_description, $ticket->show_description );
 
 		// let's make sure float price values are formatted to "0.xyz"
@@ -1297,16 +1280,29 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 				// Makes sure it's an Int after this point
 				$data['event_capacity'] = (int) $data['event_capacity'];
 
+				$tickets_handler->remove_hooks();
+
 				// We need to update event post meta - if we've set a global stock
 				$event_stock->enable();
-				$event_stock->set_stock_level( $data['event_capacity'] );
+				$event_stock->set_stock_level( $data['event_capacity'], true );
 
 				// Update Event capacity
 				update_post_meta( $post_id, $tickets_handler->key_capacity, $data['event_capacity'] );
+				update_post_meta( $post_id, $event_stock::GLOBAL_STOCK_ENABLED, 1 );
+
+				$tickets_handler->add_hooks();
 			}
 		} else {
 			// If the Global Stock is configured we pull it from the Event
-			$data['event_capacity'] = tribe_tickets_get_capacity( $post_id );
+			$global_capacity = tribe_tickets_get_capacity( $post_id );
+
+			if ( ! empty( $data['event_capacity'] ) && $data['event_capacity'] !== $global_capacity ) {
+				// Update stock level with $data['event_capacity'].
+				$event_stock->set_stock_level( $data['event_capacity'], true );
+			} else {
+				// Set $data['event_capacity'] with what we know.
+				$data['event_capacity'] = $global_capacity;
+			}
 		}
 
 		// Default Capacity will be 0
@@ -1345,6 +1341,11 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 		// Makes sure it's an Int after this point
 		$data['stock'] = (int) $data['stock'];
 
+		// The only available value lower than zero is -1 which is unlimited.
+		if ( 0 > $data['stock'] ) {
+			$data['stock'] = -1;
+		}
+
 		$mode = isset( $data['mode'] ) ? $data['mode'] : 'own';
 
 		if ( '' !== $mode ) {
@@ -1353,7 +1354,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 				$data['stock'] -= $totals['pending'] + $totals['sold'];
 			}
 
-			// In here is safe to check because we don't have unlimted = -1
+			// In here is safe to check because we don't have unlimited = -1
 			$status = ( 0 < $data['stock'] ) ? 'instock' : 'outofstock';
 
 			update_post_meta( $ticket->ID, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, $mode );
@@ -1366,8 +1367,10 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 			if (
 				$event_stock->is_enabled()
 				&& Tribe__Tickets__Global_Stock::OWN_STOCK_MODE !== $mode
-				&& '' !== $data['capacity']
-				&& $data['capacity'] > $data['event_capacity']
+				&& (
+					'' === $data['capacity']
+					|| $data['event_capacity'] < $data['capacity']
+				)
 			) {
 				$data['capacity'] = $data['event_capacity'];
 			}

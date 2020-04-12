@@ -152,7 +152,7 @@ class WPCF_Field
          */
         if ( is_string( $cf ) ) {
             WPCF_Loader::loadInclude( 'fields' );
-            $_cf = wpcf_admin_fields_get_field( $this->__get_slug_no_prefix( $cf ) );
+            $_cf = wpcf_admin_fields_get_field( $this->get_slug_no_prefix( $cf ) );
             // Check if found without prefix
             if ( empty( $_cf ) ) {
                 $_cf = wpcf_admin_fields_get_field( $cf );
@@ -337,6 +337,7 @@ class WPCF_Field
          * It has no impact on frontend and covers a lot of cases
          * (e.g. user change mode from single to repetitive)
          *
+         * @refactor see /youtrack/issue/types-1454#comment=102-254285
          */
         do_action('wpcf_postmeta_before_delete', $this->post, $this->cf);
         delete_post_meta( $this->post->ID, $this->slug );
@@ -355,6 +356,15 @@ class WPCF_Field
         ) {
             $value = $this->cf['data']['set_value'];
         }
+
+		// Check for Post Reference Field
+		if( is_array( $this->cf ) && isset( $this->cf['type'] ) && $this->cf['type'] == 'post' ) {
+			// run the field save hooks
+			$this->_action_save( $this->cf, $value, null, $value );
+
+			// and abort as we do not want to store the post reference field on post meta
+			return;
+		}
 
         // Apply filters on the field value.
         $original_value = $value;
@@ -376,7 +386,7 @@ class WPCF_Field
 		    && preg_match( '/^0$/', $this->cf['data']['set_value'] )
 	    );
 
-        if ( ! $value_is_empty || $should_save_empty_value || $saving_zero_as_set_value ) {
+        if ( ! $value_is_empty || $should_save_empty_value || $saving_zero_as_set_value || $this->cf['type'] === 'post' ) {
 
             $mid = add_post_meta( $this->post->ID, $this->slug, $filtered_value );
             /*
@@ -747,20 +757,38 @@ class WPCF_Field
          *
          * We force checking our meta prefix
          */
-        $key = $this->__get_slug_no_prefix( $field_key );
+        $key = $this->get_slug_no_prefix( $field_key );
         return WPCF_Fields::isUnderControl( $key );
     }
 
     /**
      * Return slug.
      *
-     * @param type $meta_key
-     * @return type
+     * @param string $meta_key
+     * @return string
      */
-    function __get_slug_no_prefix( $meta_key ) {
+    function get_slug_no_prefix( $meta_key ) {
         return strpos( $meta_key, WPCF_META_PREFIX ) === 0 ? substr( $meta_key,
                         strlen( WPCF_META_PREFIX ) ) : $meta_key;
     }
+
+	/**
+	 * Backward compatibility
+	 * For PHP 7 we renamed the method __get_slug_no_prefix() to get_slug_no_prefix().
+	 * As both are public methods we apply this fallback for the case someone calls the old methods.
+	 *
+	 * @param $method
+	 * @param $arguments
+	 *
+	 * @return mixed
+	 */
+	public function __call( $method, $arguments ) {
+		switch ( $method ) {
+			case '__get_slug_no_prefix':
+				return $this->get_slug_no_prefix( $arguments );
+				break;
+		}
+	}
 
     /**
      * Returns altered element form name.
@@ -826,7 +854,7 @@ class WPCF_Termmeta_Field extends WPCF_Field
          */
         if ( is_string( $cf ) ) {
             WPCF_Loader::loadInclude( 'fields' );
-            $cf = types_get_field( $this->__get_slug_no_prefix( $cf ), 'termmeta' );
+            $cf = types_get_field( $this->get_slug_no_prefix( $cf ), 'termmeta' );
             if ( empty( $cf ) ) {
                 $this->_reset();
                 return false;

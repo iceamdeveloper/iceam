@@ -1,25 +1,13 @@
 <?php
-/*
- * Import Export Class
- */
 
-/**
- * Import Export Class
- * 
- * @since Types 1.2
- * @package Types
- * @subpackage Import Export
- * @version 0.1
- * @category core
- * @author srdjan <srdjan@icanlocalize.com>
- */
+
 class WPCF_Import_Export
 {
 
     /**
      * Meta keys that are used to generate checksum.
-     * 
-     * @var type 
+     *
+     * @var string[]
      */
     var $group_meta_keys = array(
         '_wpcf_conditional_display',
@@ -31,15 +19,15 @@ class WPCF_Import_Export
 
     /**
      * Restricted data - ommited from checksum, applies to all content types.
-     * 
-     * @var type 
+     *
+     * @var string[]
      */
     var $_remove_data_keys = array('id', 'ID', 'menu_icon', 'wpml_action',
         'wpcf-post-type', 'wpcf-tax', 'hash', 'checksum');
 
     /**
      * Required Group meta keys
-     * 
+     *
      * @todo Make sure only this is used to fetch required meta_keys
      * @return type
      */
@@ -49,7 +37,7 @@ class WPCF_Import_Export
 
     /**
      * Fetches required meta ny meta_key
-     * 
+     *
      * @param type $group_id
      * @return type
      */
@@ -74,7 +62,7 @@ class WPCF_Import_Export
 
     /**
      * Sort by key recursively.
-     * 
+     *
      * @param type $data
      * @return type
      */
@@ -90,7 +78,7 @@ class WPCF_Import_Export
 
     /**
      * Generates checksums for defined content types.
-     * 
+     *
      * @param type $type
      * @param type $item_id
      * @return type
@@ -115,6 +103,22 @@ class WPCF_Import_Export
                 $checksum = wpcf_get_custom_taxonomy_settings( $item_id );
                 break;
 
+            case 'relationship':
+	            $definition_repository = \Toolset_Relationship_Definition_Repository::get_instance();
+	            if( $relationship = $definition_repository->get_definition( $item_id ) ) {
+	            	$relationship_info = array(
+	            		'slug' => $relationship->get_slug(),
+			            'parent_domain' => $relationship->get_parent_domain(),
+			            'parent_type' => $relationship->get_parent_type(),
+			            'child_domain' => $relationship->get_child_domain(),
+			            'child_type' => $relationship->get_child_type(),
+			            'cardinality' => $relationship->get_cardinality(),
+			            'fields' => $relationship->get_association_field_definitions()
+		            );
+	            	return md5( maybe_serialize( $relationship_info ) );
+	            }
+	            return false;
+
             default:
                 /*
                  * Enable $this->generate_checksum('test');
@@ -130,49 +134,49 @@ class WPCF_Import_Export
             }
 
         }
-       
+
         //EMERSON: Remove empty conditional_display for consistent checksum computation with Module manager 1.1 during import
         if (isset($checksum['data']['conditional_display'])) {
         	if (empty($checksum['data']['conditional_display'])) {
-        		 
+
         		unset($checksum['data']['conditional_display']);
         	}
         }
 
         //EMERSON: Convert to integer value to provide correct checksum computation of this field during Module manager 1.1. import
         if (isset($checksum['data']['repetitive'])) {
-        
+
         	$checksum['data']['repetitive']=(integer)$checksum['data']['repetitive'];
         }
 
         //EMERSON: Remove __types_id and __types_title to provide correct checksum computation of CPT during Module manager 1.1. import
         if ((isset($checksum['__types_id'])) || (isset($checksum['__types_title']))) {
-        
+
         	unset($checksum['__types_id']);
         	unset($checksum['__types_title']);
         }
-        
+
         //EMERSON: Change custom taxonomies data type to integer to provide correct hashes for MM 1.1.
         if ((isset($checksum['taxonomies'])) && (!(empty($checksum['taxonomies'])))) {
-        	
+
         	foreach ($checksum['taxonomies'] as $tax_module_passed_name=>$tax_module_passed_value) {
-        		
+
         		if ($tax_module_passed_name!='category') {
-        			
+
         			$checksum['taxonomies'][$tax_module_passed_name]=(integer)$checksum['taxonomies'][$tax_module_passed_name];
-        			
+
         		}
-        		
+
         	}
 
-        }       
+        }
 
-        return md5( maybe_serialize( $this->ksort_by_string( $checksum ) ) );        
+        return md5( maybe_serialize( $this->ksort_by_string( $checksum ) ) );
     }
 
     /**
      * Generates and compares checksums.
-     * 
+     *
      * @param type $type
      * @param type $item_id
      * @param type $import_checksum Imported checksum
@@ -187,7 +191,7 @@ class WPCF_Import_Export
 
     /**
      * Checks if item exists.
-     * 
+     *
      * @param type $type
      * @param type $item_id
      * @return boolean
@@ -209,6 +213,11 @@ class WPCF_Import_Export
             case 'custom_taxonomy':
                 $check = wpcf_get_custom_taxonomy_settings( $item_id );
                 break;
+
+	        case 'relationship':
+		        $definition_repository = \Toolset_Relationship_Definition_Repository::get_instance();
+		        $check = $definition_repository->get_definition( $item_id );
+		        break;
 
             default:
                 return false;

@@ -34,8 +34,6 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 
 		// QR code support
 		$this->container->singleton( 'tickets-plus.qr.site-settings', 'Tribe__Tickets_Plus__QR__Settings', array( 'hook' ) );
-		// Promoter
-		$this->container->singleton( 'tickets-plus.promoter.observer', 'Tribe__Tickets_Plus__Promoter_Observer', array( 'hook' ) );
 
 		// Meta
 		$this->container->singleton( 'tickets-plus.meta.contents', 'Tribe__Tickets_Plus__Meta__Contents' );
@@ -66,7 +64,6 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 	protected function hook() {
 		tribe( 'tickets-plus.editor' );
 		tribe( 'tickets-plus.qr.site-settings' );
-		tribe( 'tickets-plus.promoter.observer' );
 
 		/** @var Tribe__Tickets_Plus__Assets $tickets_plus_main */
 		$tickets_plus_main = tribe( 'tickets-plus.assets' );

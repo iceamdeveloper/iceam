@@ -15,7 +15,7 @@ if ( typeof WPV_Toolset.add_qt_editor_buttons !== 'function' ) {
     WPV_Toolset.add_qt_editor_buttons = function( qt_instance, editor_instance ) {
         QTags._buttonsInit();
 		WPV_Toolset.CodeMirror_instance[qt_instance.id] = editor_instance;
-        
+
         for ( var button_name in qt_instance.theButtons ) {
 			if ( qt_instance.theButtons.hasOwnProperty( button_name ) ) {
 				qt_instance.theButtons[button_name].old_callback = qt_instance.theButtons[button_name].callback;
@@ -42,7 +42,7 @@ if ( typeof WPV_Toolset.add_qt_editor_buttons !== 'function' ) {
 						if ( typeof WPViews.shortcodes_gui === "undefined" ) {
 							return;
 						}
-                        WPV_Toolset.activeUrlEditor = ed;                        
+                        WPV_Toolset.activeUrlEditor = ed;
 						var id = jQuery( c ).attr( 'id' ),
                         t = this;
                         window.wpcfActiveEditor = id;
@@ -62,7 +62,7 @@ if ( typeof WPV_Toolset.add_qt_editor_buttons !== 'function' ) {
 							}
 							if ( ret === false ) {
 								t.tagStart = '';
-								t.tagEnd = false;                
+								t.tagEnd = false;
 								if ( ! ed.openTags ) {
 									ed.openTags = [];
 								}
@@ -79,7 +79,7 @@ if ( typeof WPV_Toolset.add_qt_editor_buttons !== 'function' ) {
 							}
 						} else {
 							// last resort, no selection and no open tags
-							// so prompt for input and just open the tag           
+							// so prompt for input and just open the tag
 							t.tagStart = '';
 							t.tagEnd = false;
 							if ( ! ed.openTags ) {
@@ -93,7 +93,7 @@ if ( typeof WPV_Toolset.add_qt_editor_buttons !== 'function' ) {
 					}
                 }
                 else if ( qt_instance.theButtons[button_name].id == 'close' ) {
-                    
+
                 } else if ( qt_instance.theButtons[button_name].id == 'link' ) {
 					var t = this;
 					qt_instance.theButtons[button_name].callback = function ( b, c, d, e ) {
@@ -217,6 +217,7 @@ jQuery(document).ready(function(){
     //        document.cookie = "wpcfActiveEditor="+window.wpcfActiveEditor+"; expires=Monday, 31-Dec-2020 23:59:59 GMT; path="+wpcf_cookiepath+"; domain="+wpcf_cookiedomain+";";
     });
     // CRED notifications V icon - set active editor - needed for notifications V icons
+    // Deprecated, remove after Forms 2.1 is released
     jQuery(document).on('click','input[id^="credmailsubject"]', function(){
 	    window.wpcfActiveEditor = jQuery(this).attr('id');
     });
@@ -225,6 +226,8 @@ jQuery(document).ready(function(){
     });
     /*
      * Handle the "Add Field" boxes - some layout changes.
+     *
+     * @deprecated TO REMOVE
      */
     jQuery('.wpv_add_fields_button').on('click', function(e) {
 
@@ -720,6 +723,8 @@ function insert_b64_shortcode_to_editor(b64_shortcode, text_area) {
 
 /**
  * Filtering elements from search boxes with JS
+ *
+ * @since 3.3.1 Include the new groups selector classname; otherwise search will not work.
  */
 function wpv_on_search_filter(el) {
     // get search text
@@ -728,7 +733,9 @@ function wpv_on_search_filter(el) {
 
     // get parent on DOM to find items and hide/show Search
     var parent = el.parentNode.parentNode;
-    var searchItems = jQuery(parent).find('.group .item');
+	var searchItems = jQuery( parent ).find( '.group .item' );
+
+	searchItems = searchItems.add( jQuery( parent ).find( '.toolset-shortcodes-gui-dialog-group .item' ) );
 
     jQuery(parent).find('.search_clear').css('display', (searchText == '') ? 'none' : 'inline');
 
@@ -749,7 +756,9 @@ function wpv_on_search_filter(el) {
 }
 
 /**
- * @TODO Document this
+ * SHow or hide a link to a group from the top list, on demand.
+ *
+ * @since 3.3.1 Include the new groups selector classname; otherwise this will not work.
  */
 function wpv_hide_top_groups(parent) {
     var groupTitles = jQuery(parent).find('.group-title');
@@ -766,11 +775,13 @@ function wpv_hide_top_groups(parent) {
         var id = jQuery(this).data('id');
         if(!visibleGroup) {
             jQuery(this).hide();
-            jQuery(this).closest('.group').hide();
+            jQuery(this).closest( '.group' ).hide();
+            jQuery(this).closest( '.toolset-shortcodes-gui-dialog-group' ).hide();
             jQuery('.editor-addon-top-link[data-id="'+id+'"]').hide();
         } else {
             jQuery(this).show();
-            jQuery(this).closest('.group').show();
+            jQuery(this).closest( '.group' ).show();
+            jQuery(this).closest( '.toolset-shortcodes-gui-dialog-group' ).show();
             jQuery('.editor-addon-top-link[data-id="'+id+'"]').show();
         }
     });

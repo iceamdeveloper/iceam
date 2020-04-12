@@ -1,3 +1,4 @@
+/* eslint-disable */
 var Types = Types || {};
 
 Types.page = Types.page || {};
@@ -18,6 +19,7 @@ Types.page.editTaxonomy.Class = function($) {
     var self = this;
 
     self.init = function() {
+    	self.initTaxonomySlugChecker();
         self.initRewriteSlugChecker();
     };
 
@@ -33,7 +35,7 @@ Types.page.editTaxonomy.Class = function($) {
     self.initRewriteSlugChecker = function() {
         var rewriteSlugInput = $('input[name="ct[rewrite][slug]"]');
 
-        if (rewriteSlugInput.length == 0) {
+        if ( rewriteSlugInput.length === 0 ) {
             return;
         }
 
@@ -66,10 +68,68 @@ Types.page.editTaxonomy.Class = function($) {
         }
     };
 
+	/**
+	 * Check an already used taxonomy slug for conflicts.
+	 *
+	 * Note that checking new values before saving is handled in legacy code (look for 'ajax_wpcf_is_reserved_name').
+	 *
+	 * @since 3.3.8
+	 */
+	self.initTaxonomySlugChecker = function() {
+		var taxonomySlugInput = $('input[name="ct[slug]"]');
+
+		if ( taxonomySlugInput.length === 0 ) {
+			return;
+		}
+
+		// We're only checking against the static, read-only value.
+		// That means the warning will only display when the value is already in use.
+		//
+		// Validation before saving is already implemented, so no new taxonomy should be saved this way.
+		var taxonomySlugHiddenInput = $('input[name="ct[wpcf-tax]"]');
+		if ( taxonomySlugHiddenInput.length === 0 ) {
+			return;
+		}
+
+		var getErrorLabel = function() {
+			return taxonomySlugInput.parent().find('label.wpcf-form-error.types-slug-conflict');
+		};
+
+		var removeExistingErrorLabel = function() {
+			var errorLabel = getErrorLabel();
+			if (0 !== errorLabel.length) {
+				errorLabel.remove();
+			}
+		};
+
+		var checker = Types.slugConflictChecker.build(
+			taxonomySlugHiddenInput,
+			['taxonomy_slugs'],
+			'taxonomy_slugs',
+			taxonomySlugHiddenInput.val(),
+			$('input[name="types_check_slug_conflicts_nonce"]').val(),
+			function (isConflict, displayMessage) {
+
+				removeExistingErrorLabel();
+
+				if (isConflict) {
+					taxonomySlugInput.after(
+						'<label class="wpcf-form-error types-slug-conflict">' + displayMessage + '</label>'
+					);
+				}
+			}
+		);
+
+		// Checking only on initialization.
+		if (taxonomySlugHiddenInput.val().length > 0) {
+			checker.check();
+		}
+
+		taxonomySlugInput.on( 'change', _.debounce( removeExistingErrorLabel, 1000 ) );
+	};
+
     $(document).ready(self.init);
 };
 
 
 Types.page.editTaxonomy.main = new Types.page.editTaxonomy.Class(jQuery);
-
-

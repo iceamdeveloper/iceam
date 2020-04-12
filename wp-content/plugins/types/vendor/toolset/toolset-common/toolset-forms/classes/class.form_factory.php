@@ -58,21 +58,21 @@ class FormFactory extends FormAbstract {
             $load_cred_bootstrap_css = true;
 
             if ( is_array( $cred_cred_settings ) ) {
-                if ( 
-					array_key_exists( 'dont_load_cred_css', $cred_cred_settings ) 
-					&& $cred_cred_settings['dont_load_cred_css'] == "0" 
+                if (
+					array_key_exists( 'dont_load_cred_css', $cred_cred_settings )
+					&& $cred_cred_settings['dont_load_cred_css'] == "0"
 				) {
                     $load_cred_legacy_css = true;
                 }
-                if ( 
-					array_key_exists( 'dont_load_bootstrap_cred_css', $cred_cred_settings ) 
-					&& $cred_cred_settings['dont_load_bootstrap_cred_css'] === "1" 
+                if (
+					array_key_exists( 'dont_load_bootstrap_cred_css', $cred_cred_settings )
+					&& $cred_cred_settings['dont_load_bootstrap_cred_css'] === "1"
 				) {
                     $load_cred_bootstrap_css = false;
                 }
 				if (
-		            array_key_exists( 'use_bootstrap', $cred_cred_settings )
-		            && $cred_cred_settings['use_bootstrap']
+					// Note: the use_bootstrap parameter is deprecated and used only for legacy forms, not to be re-used for any purpose!
+					( array_key_exists( 'use_bootstrap', $cred_cred_settings ) && $cred_cred_settings['use_bootstrap'] )
 	            ) {
 		            $this->_use_bootstrap = true;
 	            }
@@ -210,10 +210,18 @@ class FormFactory extends FormAbstract {
      */
     public function metaform($config, $global_name_field, $value) {
         /**
-         * add bootstrap config to every field
+         * add bootstrap, media and Toolset buttons config to every field
          */
 		$config['use_bootstrap'] = $this->theForm->form_settings['use_bootstrap'];
-        $config[ 'has_media_button' ] = $this->theForm->form_settings[ 'has_media_button' ];
+        $config['has_media_button'] = isset( $this->theForm->form_settings['has_media_button'] )
+            ? $this->theForm->form_settings['has_media_button']
+            : false;
+        $config['has_toolset_buttons'] = isset( $this->theForm->form_settings['has_toolset_buttons'] )
+            ? $this->theForm->form_settings['has_toolset_buttons']
+			: false;
+		$config['has_media_manager'] = isset( $this->theForm->form_settings['has_media_manager'] )
+			? $this->theForm->form_settings['has_media_manager']
+			: false;
 
         /**
          * WMPL configuration
@@ -265,7 +273,7 @@ class FormFactory extends FormAbstract {
             if ( !empty( $config['repetitive'] ) ) {
                 $_gnf = $_cfg['name'] = "{$global_name_field}[{$count}]";
             }
-            //CHECKGEN			
+            //CHECKGEN
             if ( isset( $_cfg['validation'] ) &&
                     is_array( $_cfg['validation'] ) &&
                     count( $_cfg['validation'] ) > 0 &&
@@ -279,7 +287,8 @@ class FormFactory extends FormAbstract {
                 $form = $field->metaform();
                 // Set $config['validate'] to trigger PHP validation
                 // when rendering metaform
-                if ( !empty($_cfg[ 'validate' ]) &&
+				if ( !empty($_cfg[ 'validate' ]) &&
+					! $this->skip_field_validation( $field ) &&
                     is_wp_error($valid = $this->validateField($field, $val))
                 ) {
                     $key = key($form);
@@ -325,6 +334,15 @@ class FormFactory extends FormAbstract {
                 $this->_repetitive()->add($config, $tpl);
             }
         }
+
+        // If we're dealing with a file-type field, initialize the controller for repeatable fields.
+		// We need it because it enqueues the "repetitive.js" script that rearranges the field label and
+		// puts it to the right place. If we have only single fields on the page, that would not happen otherwise.
+		//
+		// See WPToolset_Types::filterField for further information.
+        if( toolset_getarr( $config, 'is_field_with_files' ) ) {
+        	$this->_repetitive();
+		}
 
         return !empty($htmlArray) ? $this->_tpl($config, $htmlArray) : '';
     }
@@ -431,7 +449,26 @@ class FormFactory extends FormAbstract {
         return $o;
     }
 
-    static $_validate_flag = array();
+	static $_validate_flag = array();
+
+	/**
+	 * Skip the automatic validation for a field, because it is managed somewhere else.
+	 *
+	 * @param \FieldAbstract $field
+	 * @return bool
+	 * @since Forms 2.4
+	 */
+	public function skip_field_validation( $field ) {
+		if (
+			'password' === $field->getType()
+			&& 'user_pass2' === $field->getName()
+		) {
+			// The validation of the field to repeat a password is done entirely on Toolset Forms
+			return true;
+		}
+
+		return false;
+	}
 
     public function validateField( $field, $value )
     {

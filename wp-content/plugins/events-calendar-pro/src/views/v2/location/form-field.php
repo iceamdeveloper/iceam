@@ -9,7 +9,7 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.1
  */
 ?>
 <div
@@ -27,5 +27,6 @@
 		name="tribe-events-views[tribe-bar-location]"
 		value="<?php echo esc_attr( tribe_events_template_var( [ 'bar', 'location' ], '' ) ); ?>"
 		placeholder="<?php esc_attr_e( 'In a location', 'tribe-events-calendar-pro' ); ?>"
+		aria-label="<?php printf( esc_attr__( 'Enter Location. Search for %s by Location.', 'tribe-events-calendar-pro' ), tribe_get_event_label_plural() ); ?>"
 	/>
 </div>

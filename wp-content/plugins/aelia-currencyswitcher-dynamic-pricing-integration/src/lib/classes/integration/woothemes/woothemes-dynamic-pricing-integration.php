@@ -235,7 +235,7 @@ class Dynamic_Pricing_Integration {
 				foreach($pricing_rules as $rule_idx => $rule_settings) {
 					// If rule involves a fixed price, then such price must be converted into
 					// the selected currency
-					if(in_array($rule_settings['type'], array('fixed_product', 'fixed_price'))) {
+					if(in_array($rule_settings['type'], array('fixed_product'))) {
 						$rule_settings['amount'] = $this->convert($rule_settings['amount']);
 					}
 					$rule_set['rules'][$rule_idx] = $rule_settings;
@@ -281,7 +281,7 @@ class Dynamic_Pricing_Integration {
 				foreach($pricing_rules as $rule_idx => $rule_settings) {
 					// If rule involves a fixed price, then such price must be converted into
 					// the selected currency
-					if(in_array($rule_settings['type'], array('fixed_adjustment', 'fixed_price'))) {
+					if(in_array($rule_settings['type'], array('fixed_product'))) {
 						$rule_settings['amount'] = $this->convert($rule_settings['amount']);
 					}
 
@@ -375,7 +375,7 @@ class Dynamic_Pricing_Integration {
 
 				// If rule involves a fixed price, then such price must be converted into
 				// the selected currency
-				if(in_array($discount['type'], array('fixed_product', 'fixed_price'))) {
+				if(in_array($discount['type'], array('fixed_product'))) {
 					$discount['amount'] = $this->convert($discount['amount']);
 				}
 

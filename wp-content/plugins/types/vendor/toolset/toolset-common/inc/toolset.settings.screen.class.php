@@ -1,31 +1,27 @@
 <?php
 
-if ( ! defined( 'WPT_SETTINGS_SCREEN' ) ) {
-    define( 'WPT_SETTINGS_SCREEN', true );
-}
-
-/**
-* Toolset_Settings_Screen
-*
-* Generic class for the shared settings entry for the Toolset family.
-*
-* @since 1.9
-*/
+use \OTGS\Toolset\Common\Settings\BootstrapSetting;
 
 if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 
+	/**
+	 * Toolset_Settings_Screen
+	 *
+	 * Generic class for the shared settings entry for the Toolset family.
+	 *
+	 * @since 1.9
+	 */
     class Toolset_Settings_Screen {
 
-		function __construct() {
-			
-			add_filter( 'toolset_filter_register_common_page_slug', 	array( $this, 'register_settings_page_slug' ) );
-			
-            add_action( 'admin_init',									array( $this, 'admin_init' ) );
-			
-			add_filter( 'toolset_filter_register_menu_pages',			array( $this, 'register_settings_page_in_menu' ), 60 );
-			
-			add_action( 'init', 										array( $this, 'init' ) );
-			
+
+		/**
+		 * Toolset_Settings_Screen constructor.
+		 */
+		public function __construct() {
+			add_filter( 'toolset_filter_register_common_page_slug', array( $this, 'register_settings_page_slug' ) );
+			add_action( 'admin_init', array( $this, 'admin_init' ) );
+			add_filter( 'toolset_filter_register_menu_pages', array( $this, 'register_settings_page_in_menu' ), 60 );
+			add_action( 'init', array( $this, 'init' ) );
 		}
 		
 		public function register_settings_page_slug( $slugs ) {
@@ -51,13 +47,12 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 
 		function init() {
 			// Admin bar settings
-			add_filter( 'toolset_filter_toolset_register_settings_general_section',	array( $this, 'toolset_admin_bar_settings' ), 10, 2 );
-			add_action( 'wp_ajax_toolset_update_toolset_admin_bar_options',			array( $this, 'toolset_update_toolset_admin_bar_options' ) );
-			add_filter( 'toolset_filter_force_unset_shortcode_generator_option',	array( $this, 'force_unset_shortcode_generator_option_to_disable' ), 99 );
+			add_filter( 'toolset_filter_toolset_register_settings_general_section', array( $this, 'toolset_admin_bar_settings' ), 10, 2 );
+			add_action( 'wp_ajax_toolset_update_toolset_admin_bar_options', array( $this, 'toolset_update_toolset_admin_bar_options' ) );
+			add_filter( 'toolset_filter_force_unset_shortcode_generator_option', array( $this, 'force_unset_shortcode_generator_option_to_disable' ), 99 );
 
-			add_filter( 'toolset_filter_toolset_register_settings_general_section',	array( $this, 'toolset_bootstrap_options' ), 30 );
-			add_action( 'wp_ajax_toolset_update_bootstrap_version_status',							array( $this, 'toolset_update_bootstrap_version_status' ) );
-
+			add_filter( 'toolset_filter_toolset_register_settings_general_section', array( $this, 'toolset_bootstrap_options' ), 30 );
+			add_action( 'wp_ajax_toolset_update_bootstrap_version_status', array( $this, 'toolset_update_bootstrap_version_status' ) );
 		}
 
 
@@ -148,7 +143,6 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 		function toolset_admin_bar_settings( $sections, $toolset_options ) {
 			$toolset_admin_bar_menu_show = ( isset( $toolset_options['show_admin_bar_shortcut'] ) && $toolset_options['show_admin_bar_shortcut'] == 'off' ) ? false : true;
 			$toolset_shortcodes_generator = ( isset( $toolset_options['shortcodes_generator'] ) && in_array( $toolset_options['shortcodes_generator'], array( 'unset', 'disable', 'editor', 'always' ) ) ) ? $toolset_options['shortcodes_generator'] : 'unset';
-			$section_content = '';
 			ob_start();
 			?>
 			<h3><a name="shortcodes-settings" href="#"></a><?php echo __( 'Toolset shortcodes menu in the admin bar', 'wpv-views' ); ?></h3>
@@ -268,32 +262,48 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 				<?php
 
 				$version_options = array(
-
-
 					array(
-						'label' => __( 'The theme or another plugin is already loading Bootstrap 2.0', 'wpv-views' ),
-						'value' => 2
+						'label' => __( 'The theme or another plugin is already loading Bootstrap 3', 'wpv-views' ),
+						'value' => BootstrapSetting::BS3_EXTERNAL,
 					),
 					array(
-						'label' => __( 'The theme or another plugin is already loading Bootstrap 3.0', 'wpv-views' ),
-						'value' => 3
+						'label' => __( 'The theme or another plugin is already loading Bootstrap 4', 'wpv-views' ),
+						'value' => BootstrapSetting::BS4_EXTERNAL,
 					),
 					array(
-						'label' =>  __( 'Toolset should load Bootstrap 3.0', 'wpv-views' ),
-						'value' => '3.toolset'
+						'label' => __( 'Toolset should load Bootstrap 3', 'wpv-views' ),
+						'value' => BootstrapSetting::BS3_TOOLSET,
+					),
+					array(
+						'label' => __( 'Toolset should load Bootstrap 4', 'wpv-views' ),
+						'value' => BootstrapSetting::BS4_TOOLSET,
 					),
 					array(
 						'label' => __( 'This site is not using Bootstrap CSS', 'wpv-views' ),
-						'value' => -1
-					)
+						'value' => BootstrapSetting::NO_BOOTSTRAP,
+					),
 				);
+
+				// Display the Bootstrap 2 option only when it's already selected. Otherwise, we won't support this anymore.
+				if( BootstrapSetting::BS2_EXTERNAL === $settings->toolset_bootstrap_version ) {
+					array_unshift( $version_options, [
+						'label' => __( 'The theme or another plugin is already loading Bootstrap 2 (deprecated)', 'wpv-views' ),
+						'value' => BootstrapSetting::BS2_EXTERNAL,
+					] );
+				}
 
 				foreach( $version_options as $option ) {
 
 					printf(
-						'<li><label class="js-tolset-option-%s"><input type="radio" name="wpv-bootstrap-version" class="js-toolset-bootstrap-version" value="%s" %s %s autocomplete="off" />%s</label></li>',
-						str_replace(".","",$option['value']),
-						$option['value'],
+						'<li>
+							<label class="js-tolset-option-%s">
+								<input type="radio" name="wpv-bootstrap-version" 
+									class="js-toolset-bootstrap-version" value="%s" %s %s autocomplete="off" />
+								%s
+							</label>
+						</li>',
+						esc_attr( str_replace( '.', '', $option['value'] ) ),
+						esc_attr( $option['value'] ),
 						checked( $option['value'], $settings->toolset_bootstrap_version, false ),
 						disabled( $is_disabled, true, false ),
 						$option['label']
@@ -305,19 +315,21 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 			</ul>
 
 			<?php echo $disabled_message; ?>
+
 			<p>
 				<?php
 				echo sprintf(
-					__( 'Get more details in the <a href="%1$s" title="%2$s">documentation page</a>.', 'wpv-views' ),
+					__( 'Get more details in the <a href="%1$s" title="%2$s" target="_blank">documentation page <i class="fa fa-external-link " aria-hidden="true"></i></a>.', 'wpv-views' ),
 					'https://toolset.com/documentation/user-guides/view-layouts-101/' ,
 					esc_attr( __( 'Documentation on the Bootstrap Layouts', 'wpv-views' ) )
 				);
 				?>
 			</p>
+
 			<?php
+
 			wp_nonce_field( 'toolset_bootstrap_version_nonce', 'toolset_bootstrap_version_nonce' );
-			?>
-			<?php
+
 			$section_content = ob_get_clean();
 
 			$sections['bootstrap-settings'] = array(
@@ -335,7 +347,6 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 		 * 	wpnonce:	wpv_bootstrap_version_nonce
 		 * 	status:		1|2|3|3.toolset|-1
 		 */
-
 		function toolset_update_bootstrap_version_status() {
 			$settings = Toolset_Settings::get_instance();
 			if ( ! current_user_can( 'manage_options' ) ) {
@@ -345,10 +356,8 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 				);
 				wp_send_json_error( $data );
 			}
-			if (
-				! isset( $_POST["wpnonce"] )
-				|| ! wp_verify_nonce( $_POST["wpnonce"], 'toolset_bootstrap_version_nonce' )
-			) {
+
+			if ( ! wp_verify_nonce( toolset_getpost( 'wpnonce' ), 'toolset_bootstrap_version_nonce' ) ) {
 				$data = array(
 					'type' => 'nonce',
 					'message' => __( 'Your security credentials have expired. Please reload the page to get new ones.', 'wpv-views' )
@@ -356,19 +365,16 @@ if ( ! class_exists( 'Toolset_Settings_Screen', false ) ) {
 				wp_send_json_error( $data );
 			}
 
-			$status = in_array($_POST['status'], array( 1, 2, 3, '3.toolset', -1 ));
-			if ( null != $status ) {
-				$settings->toolset_bootstrap_version = $_POST['status'];
-				$settings->save();
-				wp_send_json_success();
-			} else {
+			$status = toolset_getpost( 'status' );
+			// phpcs:ignore WordPress.PHP.StrictInArray.FoundNonStrictFalse
+			if ( ! in_array( $status, BootstrapSetting::VALID_VALUES, false ) ) {
 				wp_send_json_error();
+				return;
 			}
+			$settings->toolset_bootstrap_version = $status;
+			$settings->save();
 			wp_send_json_success();
 		}
-
-
-
 	}
 
 }

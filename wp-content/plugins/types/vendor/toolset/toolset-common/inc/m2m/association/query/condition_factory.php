@@ -1,5 +1,8 @@
 <?php
 
+use OTGS\Toolset\Common\M2M\Association\Query\Condition\HasAutodeletableIntermediaryPost;
+use OTGS\Toolset\Common\PostStatus;
+
 /**
  * A factory for IToolset_Association_Query_Condition implementations.
  *
@@ -14,6 +17,7 @@ class Toolset_Association_Query_Condition_Factory {
 	 * The whole statement will evaluate to true if at least one of provided conditions is true.
 	 *
 	 * @param IToolset_Association_Query_Condition[] $operands
+	 *
 	 * @return IToolset_Association_Query_Condition
 	 */
 	public function do_or( $operands ) {
@@ -27,6 +31,7 @@ class Toolset_Association_Query_Condition_Factory {
 	 * The whole statement will evaluate to true if all provided conditions are true.
 	 *
 	 * @param IToolset_Association_Query_Condition[] $operands
+	 *
 	 * @return IToolset_Association_Query_Condition
 	 */
 	public function do_and( $operands ) {
@@ -132,7 +137,6 @@ class Toolset_Association_Query_Condition_Factory {
 	}
 
 
-
 	/**
 	 * Condition to query associations that do not contain a particular element in a particular role.
 	 *
@@ -162,20 +166,23 @@ class Toolset_Association_Query_Condition_Factory {
 	/**
 	 * Condition to query associations by a status of an element in a particular role.
 	 *
-	 * @param string $status
+	 * @param string|string[] $status
 	 * @param IToolset_Relationship_Role $for_role
 	 * @param Toolset_Association_Query_Table_Join_Manager $join_manager
 	 * @param Toolset_Association_Query_Element_Selector_Provider $element_selector_provider
+	 *
+	 * @param PostStatus $post_status
 	 *
 	 * @return IToolset_Association_Query_Condition
 	 */
 	public function element_status(
 		$status, IToolset_Relationship_Role $for_role,
 		Toolset_Association_Query_Table_Join_Manager $join_manager,
-		Toolset_Association_Query_Element_Selector_Provider $element_selector_provider
+		Toolset_Association_Query_Element_Selector_Provider $element_selector_provider,
+		PostStatus $post_status
 	) {
 		return new Toolset_Association_Query_Condition_Element_Status(
-			$status, $for_role, $join_manager, $element_selector_provider
+			$status, $for_role, $join_manager, $element_selector_provider, $post_status
 		);
 	}
 
@@ -345,10 +352,10 @@ class Toolset_Association_Query_Condition_Factory {
 	/**
 	 * Condition that a relationship has a certain origin.
 	 *
-	 * @param string                                       $origin Origin: wizard, ...
+	 * @param string $origin Origin: wizard, ...
 	 * @param Toolset_Association_Query_Table_Join_Manager $join_manager Join manager.
 	 *
-	 * @return IToolset_Relationship_Query_Condition
+	 * @return IToolset_Association_Query_Condition
 	 */
 	public function has_origin( $origin, Toolset_Association_Query_Table_Join_Manager $join_manager ) {
 		return new Toolset_Association_Query_Condition_Relationship_Origin( $origin, $join_manager );
@@ -362,5 +369,42 @@ class Toolset_Association_Query_Condition_Factory {
 	 */
 	public function not( IToolset_Association_Query_Condition $condition ) {
 		return new Toolset_Query_Condition_Not( $condition );
- }
+	}
+
+
+	/**
+	 * @param int[] $element_ids
+	 * @param string $domain
+	 * @param IToolset_Relationship_Role $for_role
+	 * @param Toolset_Association_Query_Element_Selector_Provider $element_selector_provider
+	 * @param bool $query_original_element
+	 * @param bool $translate_provided_ids
+	 *
+	 * @return Toolset_Association_Query_Condition_Multiple_Elements
+	 */
+	public function multiple_elements(
+		$element_ids,
+		$domain,
+		IToolset_Relationship_Role $for_role,
+		Toolset_Association_Query_Element_Selector_Provider $element_selector_provider,
+		$query_original_element,
+		$translate_provided_ids
+	) {
+		return new Toolset_Association_Query_Condition_Multiple_Elements(
+			$element_ids, $domain, $for_role, $element_selector_provider, $query_original_element, $translate_provided_ids
+		);
+	}
+
+
+	/**
+	 * Instantiate HasAutodeletableIntermediaryPost.
+	 *
+	 * @param bool $expected_value Value of the condition.
+	 * @param Toolset_Association_Query_Table_Join_Manager $join_manager The join manager object from the association query.
+	 *
+	 * @return HasAutodeletableIntermediaryPost
+	 */
+	public function has_autodeletable_intermediary_post( $expected_value, Toolset_Association_Query_Table_Join_Manager $join_manager ) {
+		return new HasAutodeletableIntermediaryPost( $expected_value, $join_manager );
+	}
 }

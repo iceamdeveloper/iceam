@@ -201,15 +201,18 @@ function types_get_fields_by_group( $group, $only_active = 'only_active' ){
     return $cache[$cache_key];
 }
 
+
 /**
  * Gets posts that belongs to current post.
- * 
- * @global type $post
- * @param type $post_type
- * @param type $args
- * @return type 
+ *
+ * NOTE: this function is still used by the refactored m2m ready function "types_child_posts"
+ *
+ * @param $post_type
+ * @param $args
+ *
+ * @return array|mixed
  */
-function types_child_posts( $post_type, $args = array() ) {
+function legacy_types_child_posts( $post_type, $args = array() ) {
 
     static $cache = array();
     
@@ -222,7 +225,8 @@ function types_child_posts( $post_type, $args = array() ) {
     if ( empty( $post->ID ) ) {
         return array();
     }
-    
+
+    // phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
     $cache_key = md5( $post->ID . serialize( func_get_args() ) );
     if ( isset( $cache[$cache_key] ) ) {
         return $cache[$cache_key];

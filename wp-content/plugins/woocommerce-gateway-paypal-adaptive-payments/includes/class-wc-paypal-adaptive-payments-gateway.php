@@ -15,11 +15,12 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 	public function __construct() {
 		global $woocommerce;
 
-		$this->id                = 'paypal-adaptive-payments';
-		$this->icon              = apply_filters( 'woocommerce_paypal_ap_icon', plugins_url( 'assets/images/paypal.png', plugin_dir_path( __FILE__ ) ) );
-		$this->has_fields        = false;
-		$this->method_title      = __( 'PayPal Adaptive Payments', 'woocommerce-gateway-paypal-adaptive-payments' );
-		$this->order_button_text = __( 'Proceed to PayPal', 'woocommerce-gateway-paypal-adaptive-payments' );
+		$this->id                  = 'paypal-adaptive-payments';
+		$this->icon                = apply_filters( 'woocommerce_paypal_ap_icon', plugins_url( 'assets/images/paypal.png', plugin_dir_path( __FILE__ ) ) );
+		$this->has_fields          = false;
+		$this->method_title        = __( 'PayPal Adaptive Payments', 'woocommerce-gateway-paypal-adaptive-payments' );
+        $this->method_description  = __( 'PayPal Adaptive Payments handles payments between a sender of a payment and one or more receivers of the payment. It’s possible to split the order total with secondary receivers, so you can pay commissions or partners.');
+		$this->order_button_text   = __( 'Proceed to PayPal', 'woocommerce-gateway-paypal-adaptive-payments' );
 
 		// API URLs.
 		$this->api_prod_url        = 'https://svcs.paypal.com/AdaptivePayments/';
@@ -242,10 +243,12 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 	 * @return array           PayPal payment arguments.
 	 */
 	protected function generate_payment_args( $order ) {
+		$pre_wc_30 = version_compare( WC_VERSION, '3.0', '<' );
+
 		$args = array(
-			'actionType'         => 'CREATE',
+			'actionType'         => 'PAY',
 			'currencyCode'       => get_woocommerce_currency(),
-			'trackingId'         => $this->invoice_prefix . $order->id,
+			'trackingId'         => $this->invoice_prefix . ( $pre_wc_30 ? $order->id : $order->get_id() ),
 			'returnUrl'          => str_replace( '&amp;', '&', $this->get_return_url( $order ) ),
 			'cancelUrl'          => str_replace( '&amp;', '&', $order->get_cancel_order_url() ),
 			'ipnNotificationUrl' => $this->notify_url,
@@ -302,7 +305,7 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 		}
 
 		// Set receiver list.
-		if ( $commission == $order->order_total && 'parallel' == $this->method ) {
+		if ( $commission == $order->get_total() && 'parallel' == $this->method ) {
 
 			$args['receiverList'] = array(
 				'receiver' => array_values( $receivers )
@@ -313,13 +316,13 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 			// Primary receiver / store owner.
 			if ( 'chained' == $this->method ) {
 				$primary_receiver = array(
-					'amount'  => number_format( $order->order_total, 2, '.', '' ),
+					'amount'  => number_format( $order->get_total(), 2, '.', '' ),
 					'email'   => $this->receiver_email,
 					'primary' => 'true'
 				);
 			} else {
 				$primary_receiver = array(
-					'amount' => number_format( $order->order_total - $commission, 2, '.', '' ),
+					'amount' => number_format( $order->get_total() - $commission, 2, '.', '' ),
 					'email'  => $this->receiver_email,
 				);
 			}
@@ -336,7 +339,7 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 			$args['receiverList'] = array(
 				'receiver' => array(
 					array(
-						'amount' => number_format( $order->order_total, 2, '.', '' ),
+						'amount' => number_format( $order->get_total(), 2, '.', '' ),
 						'email'  => $this->receiver_email
 					)
 				)
@@ -351,9 +354,10 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 	/**
 	 * Set PayPal payment options.
 	 *
-	 * @param string $pay_key
+	 * @param string   $pay_key The pay key that identifies the payment
+	 * @param WC_Order $order   Order object
 	 */
-	protected function set_payment_options( $pay_key ) {
+	protected function set_payment_options( $pay_key, $order ) {
 
 		$data = array(
 			'payKey'          => $pay_key,
@@ -366,8 +370,65 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 			),
 			'senderOptions'   => array(
 				'referrerCode' => 'WooThemes_Cart'
-			)
+			),
 		);
+
+		// Set data for receiverOptions (receiver and invoiceData).
+		// In redirect flow this won't affect line items display in PayPal review
+		// page, but should be displayed when embedded flow is used. Keep the
+		// passed info here when implementing #20.
+		$receivers = array();
+		foreach ( $order->get_items() as $item ) {
+			if ( ! $item['qty'] ) {
+				continue;
+			}
+
+			$product_id        = $item['product_id'];
+			$product           = wc_get_product( $product_id );
+			$product_receivers = get_post_meta( $product_id, '_paypal_adaptive_receivers', true );
+			$product_receivers = array_filter( explode( PHP_EOL, $product_receivers ) );
+
+			$invoice_item = array(
+				'name'      => $product->get_title(),
+				'price'     => $order->get_line_total( $item ),
+				'itemCount' => $item['qty'],
+				'itemPrice' => $product->get_price(),
+			);
+
+			// Primary receiver always retrieve all items info.
+			if ( ! isset( $receivers[ $this->receiver_email ] ) ) {
+				$receivers[ $this->receiver_email ] = array(
+					'receiver'    => array( 'email' => $this->receiver_email ),
+					'invoiceData' => array( 'item' => array(), 'totalTax' => $order->get_total_tax(), 'totalShipping' => $order->get_total_shipping() ),
+				);
+			}
+			$receivers[ $this->receiver_email ]['invoiceData']['item'][] = $invoice_item;
+
+			if ( ! is_array( $product_receivers ) || empty( $product_receivers ) ) {
+				continue;
+			}
+
+			foreach ( $product_receivers as $receiver ) {
+				$receiver = array_map( 'sanitize_text_field', array_filter( explode( '|', $receiver ) ) );
+				if ( ! is_array( $receiver ) || empty( $receiver ) ) {
+					continue;
+				}
+
+				$email = $receiver[0];
+				if ( ! isset( $receivers[ $email ] ) ) {
+					$receivers[ $email ] = array(
+						'receiver'    => array( 'email' => $email ),
+						'invoiceData' => array( 'item' => array() ),
+					);
+				}
+
+				$receivers[ $email ]['invoiceData']['item'][] = $invoice_item;
+			}
+		}
+
+		if ( ! empty( $receivers ) ) {
+			$data['receiverOptions'] = array_values( $receivers );
+		}
 
 		if ( '' != $this->header_image ) {
 			$data['displayOptions']['headerImageUrl'] = $this->header_image;
@@ -463,7 +524,7 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 				}
 
 				// Just set the payment options.
-				$this->set_payment_options( $pay_key );
+				$this->set_payment_options( $pay_key, $order );
 
 				return array(
 					'success' => true,
@@ -574,11 +635,11 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 		}
 
 		// Get the order data.
-		$order = new WC_Order( $order_id );
+		$order = wc_get_order( $order_id );
 
 		// Checks whether the invoice number matches the order.
 		// If true processes the payment.
-		if ( $order->id === $order_id ) {
+		if ( $order ) {
 			$status = esc_attr( $posted['status'] );
 
 			if ( 'yes' == $this->debug ) {
@@ -596,15 +657,15 @@ class WC_PayPal_Adaptive_Payments_Gateway extends WC_Payment_Gateway {
 					break;
 				case 'COMPLETED' :
 					// Check order not already completed.
-					if ( $order->status == 'completed' ) {
+					if ( $order->get_status() == 'completed' ) {
 						if ( 'yes' == $this->debug ) {
-							$this->log->add( $this->id, 'Aborting, Order #' . $order->id . ' is already complete.' );
+							$this->log->add( $this->id, 'Aborting, Order #' . $order_id . ' is already complete.' );
 						}
 						exit;
 					}
 
 					if ( ! empty( $posted['sender_email'] ) ) {
-						update_post_meta( $order->id, 'Payer PayPal address', sanitize_text_field( $posted['sender_email'] ) );
+						update_post_meta( $order_id, 'Payer PayPal address', sanitize_text_field( $posted['sender_email'] ) );
 					}
 
 					$order->add_order_note( __( 'The payment was successful.', 'woocommerce-gateway-paypal-adaptive-payments' ) );

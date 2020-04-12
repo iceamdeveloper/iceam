@@ -541,62 +541,6 @@
 
 /* -----------------------------------------------------------------------------
 	 *
-	 * Button: Link
-	 *
-	 * Example:
-	 * <button class="tribe-common-c-btn-link">...</button>
-	 * <a href="#" class="tribe-common-c-btn-link">...</a>
-	 *
-	 * ----------------------------------------------------------------------------- */
-
-.tribe-common .tribe-common-c-btn-link,
-	.tribe-common a.tribe-common-c-btn-link {
-		color: #141827;
-		font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-		font-size: 14px;
-		line-height: 1.62;
-		font-weight: 400;
-		border: 0;
-		cursor: pointer;
-		display: inline-block;
-		height: auto;
-		padding: 0;
-		text-decoration: none;
-		width: auto;
-		background-color: transparent;
-		text-align: center;
-		text-decoration: underline;
-		transition: color 0.2s ease;
-
-		color: #334AFF;
-		padding: 11px 20px;
-		width: 100%;
-	}
-
-.tribe-common .tribe-common-c-btn-link:hover,
-	.tribe-common .tribe-common-c-btn-link:focus,
-	.tribe-common a.tribe-common-c-btn-link:hover,
-	.tribe-common a.tribe-common-c-btn-link:focus {
-		background-color: transparent;
-	}
-
-.tribe-common .tribe-common-c-btn-link:focus,
-		.tribe-common .tribe-common-c-btn-link:hover,
-		.tribe-common a.tribe-common-c-btn-link:focus,
-		.tribe-common a.tribe-common-c-btn-link:hover {
-			color: rgba(51,74,255, 0.8);
-		}
-
-.tribe-common .tribe-common-c-btn-link:active, .tribe-common a.tribe-common-c-btn-link:active {
-			color: rgba(51,74,255, 0.9);
-		}
-
-.tribe-common .tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
-			color: rgba(51,74,255, 0.07);
-		}
-
-/* -----------------------------------------------------------------------------
-	 *
 	 * Button: Small
 	 *
 	 * Example:
@@ -605,11 +549,75 @@
 	 *
 	 * ----------------------------------------------------------------------------- */
 
-.tribe-common .tribe-common-c-btn--small,
-	.tribe-common a.tribe-common-c-btn--small {
-		padding: 11px 14px;
-		width: auto;
+.tribe-common button.tribe-common-c-btn--small, .tribe-common input[type="button"].tribe-common-c-btn--small, .tribe-common input[type="submit"].tribe-common-c-btn--small, .tribe-common a.tribe-common-c-btn--small {
+			background-color: #334AFF;
+			padding: 11px 14px;
+			width: auto;
+		}
+
+/* -----------------------------------------------------------------------------
+	 *
+	 * Button: Link
+	 *
+	 * Example:
+	 * <button class="tribe-common-c-btn-link">...</button>
+	 * <a href="#" class="tribe-common-c-btn-link">...</a>
+	 *
+	 * ----------------------------------------------------------------------------- */
+
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+			color: #141827;
+			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.62;
+			font-weight: 400;
+			border: 0;
+			cursor: pointer;
+			display: inline-block;
+			height: auto;
+			padding: 0;
+			text-decoration: none;
+			width: auto;
+			background-color: transparent;
+			text-align: center;
+			text-decoration: underline;
+			transition: color 0.2s ease;
+
+			background-color: transparent;
+			color: #334AFF;
+			padding: 11px 20px;
+			width: 100%;
+		}
+
+.tribe-common button.tribe-common-c-btn-link:hover,
+	.tribe-common button.tribe-common-c-btn-link:focus,
+	.tribe-common input[type="button"].tribe-common-c-btn-link:hover,
+	.tribe-common input[type="button"].tribe-common-c-btn-link:focus,
+	.tribe-common input[type="submit"].tribe-common-c-btn-link:hover,
+	.tribe-common input[type="submit"].tribe-common-c-btn-link:focus,
+	.tribe-common a.tribe-common-c-btn-link:hover,
+	.tribe-common a.tribe-common-c-btn-link:focus {
+		background-color: transparent;
 	}
+
+.tribe-common button.tribe-common-c-btn-link:focus,
+			.tribe-common button.tribe-common-c-btn-link:hover,
+			.tribe-common input[type="button"].tribe-common-c-btn-link:focus,
+			.tribe-common input[type="button"].tribe-common-c-btn-link:hover,
+			.tribe-common input[type="submit"].tribe-common-c-btn-link:focus,
+			.tribe-common input[type="submit"].tribe-common-c-btn-link:hover,
+			.tribe-common a.tribe-common-c-btn-link:focus,
+			.tribe-common a.tribe-common-c-btn-link:hover {
+				color: rgba(51,74,255, 0.8);
+			}
+
+.tribe-common button.tribe-common-c-btn-link:active, .tribe-common input[type="button"].tribe-common-c-btn-link:active, .tribe-common input[type="submit"].tribe-common-c-btn-link:active, .tribe-common a.tribe-common-c-btn-link:active {
+				color: rgba(51,74,255, 0.9);
+			}
+
+.tribe-common button.tribe-common-c-btn-link:disabled, .tribe-common input[type="button"].tribe-common-c-btn-link:disabled, .tribe-common input[type="submit"].tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
+				color: rgba(51,74,255, 0.07);
+			}
 
 /**
  * Ticket block view styles
@@ -654,7 +662,7 @@
 		display: grid;
 		-ms-grid-columns:  10fr 1fr;
 		grid-template-columns: 10fr 1fr;
-		-ms-grid-rows: auto;
+		-ms-grid-rows: 1fr 1.5fr;
 		grid-template-rows: auto;
 		margin: 0;
 		padding: 12px 0 16px;
@@ -662,6 +670,13 @@
 
 .tribe-common .tribe-tickets__item[data-available="false"], .entry .entry-content .tribe-common .tribe-tickets__item[data-available="false"] {
 			opacity: .5;
+		}
+
+.tribe-common .tribe-tickets__item.show-optout, .entry .entry-content .tribe-common .tribe-tickets__item.show-optout {
+			-ms-grid-columns:  10fr 1fr;
+			grid-template-columns: 10fr 1fr;
+			-ms-grid-rows: 1fr 1.5fr 1fr 1fr;
+			grid-template-rows: auto;
 		}
 
 .tribe-common .tribe-tickets__item--inactive + .tribe-tickets__item--inactive, .entry .entry-content .tribe-common .tribe-tickets__item--inactive + .tribe-tickets__item--inactive {
@@ -779,8 +794,15 @@
 	}
 
 .tribe-common .tribe-tickets__item__extra__price, .entry .entry-content .tribe-common .tribe-tickets__item__extra__price {
+		font-weight: 700;
 		white-space: nowrap;
 	}
+
+.tribe-common .tribe-tickets__item__extra__price .tribe-tickets__original_price, .entry .entry-content .tribe-common .tribe-tickets__item__extra__price .tribe-tickets__original_price {
+			color: #727272;
+			font-weight: 400;
+			text-decoration: line-through;
+		}
 
 .tribe-common .tribe-tickets__item__extra__available + .tribe-tickets__item__details__summary, .entry .entry-content .tribe-common .tribe-tickets__item__extra__available + .tribe-tickets__item__details__summary {
 		-ms-grid-column: 3;
@@ -821,6 +843,8 @@
 		background-color: transparent;
 		color: #BABABA;
 		display: inline-block;
+		font-size: 24px;
+		font-weight: 400;
 		margin-bottom: 4px;
 		width: 12px;
 	}
@@ -940,12 +964,19 @@
 
 .tribe-common .tribe-tickets-attendees-list-optout--wrapper, .entry .entry-content .tribe-common .tribe-tickets-attendees-list-optout--wrapper {
 		display: none;
+		-ms-grid-column: 1;
+		-ms-grid-column-span: 3;
 		grid-column: 1/span all;
+		-ms-grid-row: 4;
 		grid-row: 4;
 	}
 
 .tribe-common .tribe-tickets-attendees-list-optout--wrapper label, .entry .entry-content .tribe-common .tribe-tickets-attendees-list-optout--wrapper label {
 			font-size: 12px;
+		}
+
+.tribe-common .tribe-tickets__item.show-optout .tribe-tickets-attendees-list-optout--wrapper, .entry .entry-content .tribe-common .tribe-tickets__item.show-optout .tribe-tickets-attendees-list-optout--wrapper {
+			display: block;
 		}
 
 /*
@@ -999,16 +1030,51 @@
 		font-weight: 700;
 	}
 
-.tribe-common .tribe-tickets__buy, .entry .entry-content .tribe-common .tribe-tickets__buy {
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button,
+	.tribe-common .tribe-tickets__buy,
+	.entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button,
+	.entry .entry-content .tribe-common .tribe-tickets__buy {
+		color: #141827;
+		font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+		font-size: 14px;
+		line-height: 1.62;
+		font-weight: 400;
+		font-weight: 700;
+		border: 0;
+		cursor: pointer;
+		display: inline-block;
+		height: auto;
+		padding: 0;
+		text-decoration: none;
+		width: auto;
+		border-radius: 4px;
+		color: #FFFFFF;
+		text-align: center;
+		transition: background-color 0.2s ease;
 		margin: 0;
 	}
 
-.tribe-common .tribe-tickets__buy.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn {
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn, .tribe-common .tribe-tickets__buy.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn {
 			white-space: nowrap;
 			margin-left: auto;
 		}
 
-.tribe-common .tribe-tickets__buy.tribe-common-c-btn:disabled, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn:disabled {
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:focus,
+			.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:hover,
+			.tribe-common .tribe-tickets__buy.tribe-common-c-btn:focus,
+			.tribe-common .tribe-tickets__buy.tribe-common-c-btn:hover,
+			.entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:focus,
+			.entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:hover,
+			.entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn:focus,
+			.entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn:hover {
+				background-color: rgba(51,74,255, 0.8);
+			}
+
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:active, .tribe-common .tribe-tickets__buy.tribe-common-c-btn:active, .entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:active, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn:active {
+				background-color: rgba(51,74,255, 0.9);
+			}
+
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:disabled, .tribe-common .tribe-tickets__buy.tribe-common-c-btn:disabled, .entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn:disabled, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn:disabled {
 				background-color: #334AFF;
 				cursor: not-allowed;
 			}
@@ -1405,7 +1471,8 @@
 	Modal-cart specific styles
 	*/
 
-.tribe-common .tribe-modal__wrapper--ar, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar {
+		background-color: #FFFFFF;
 		border-radius: 0;
 		height: 100%;
 		max-width: 100vw;
@@ -1413,21 +1480,21 @@
 		width: 800px;
 	}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal--ar__title, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal--ar__title {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal--ar__title, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal--ar__title {
 			line-height: 1;
 		}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-tickets__notice--error, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-tickets__notice--error {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__notice--error, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__notice--error {
 			display: none;
 		}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item {
 				-ms-grid-columns:  5fr 1fr 1fr 2fr;
 				grid-template-columns: 5fr 1fr 1fr 2fr;
 				padding-top: 16px;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap {
 				-webkit-align-self: stretch;
 				        align-self: stretch;
 				display: -webkit-flex;
@@ -1441,12 +1508,12 @@
 				white-space: nowrap;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total {
 				-webkit-align-self: center;
 				        align-self: center;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap {
 				-webkit-align-content: center;
 				        align-content: center;
 				-webkit-align-self: stretch;
@@ -1455,7 +1522,7 @@
 				width: 20px;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove {
 				background-color: transparent;
 				background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cg fill='none' fill-rule='evenodd' stroke-linecap='square' stroke-width='1.5' transform='translate(1 1)'%3E%3Cpath stroke='%23BABABA' d='M10.91 5.09l-5.82 5.82M10.91 10.91L5.09 5.09'/%3E%3Ccircle cx='8' cy='8' r='8' stroke='%23BABABA'/%3E%3C/g%3E%3C/svg%3E");
 				background-position: center center;
@@ -1466,17 +1533,17 @@
 				width: 20px;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:hover,
-				.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:focus,
-				.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:hover,
-				.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:focus {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:hover,
+				.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:focus,
+				.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:hover,
+				.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove:focus {
 					background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cg fill='none' fill-rule='evenodd' stroke-linecap='square' stroke-width='1.5' transform='translate(1 1)'%3E%3Cpath stroke='%23727272' d='M10.91 5.09l-5.82 5.82M10.91 10.91L5.09 5.09'/%3E%3Ccircle cx='8' cy='8' r='8' stroke='%23727272'/%3E%3C/g%3E%3C/svg%3E");
 					background-position: center center;
 					background-repeat: no-repeat;
 					background-size: contain;
 				}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title {
 				font-size: 12px;
 				line-height: 1.38;
 
@@ -1486,7 +1553,7 @@
 				grid-row: 1;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title.tribe-tickets--no-description, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title.tribe-tickets--no-description {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title.tribe-tickets--no-description, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title.tribe-tickets--no-description {
 					align-self: center;
 					-ms-grid-row: 1;
 					-ms-grid-row-span: 2;
@@ -1494,7 +1561,7 @@
 					padding-top: 0;
 				}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra {
 				-webkit-align-items: center;
 				        align-items: center;
 				display: -webkit-flex;
@@ -1513,20 +1580,21 @@
 				text-align: center;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price {
 				color: #141827;
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-size: 14px;
 				font-weight: 400;
 				line-height: 1.62;
+				font-weight: 700;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__available, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__available {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__available, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__available {
 				display: none !important;
 				visibility: hidden;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary {
 				-ms-grid-column: 1;
 				grid-column: 1;
 				-ms-grid-row: 2;
@@ -1534,7 +1602,7 @@
 				padding-left: 0;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content {
 				-ms-grid-column: 1;
 				-ms-grid-column-span: 4;
 				grid-column: 1 / span 4;
@@ -1543,7 +1611,7 @@
 				margin: var(--sapcer-0 ) 0;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity {
 				color: #141827;
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-weight: 700;
@@ -1560,7 +1628,7 @@
 				grid-row: 1 / span 2;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number {
 				color: #141827;
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-size: 12px;
@@ -1573,27 +1641,27 @@
 				width: 44px;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity {
 				color: #141827;
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-size: 12px;
 				font-weight: 400;
 				line-height: 1.38;
-					font-weight: 700;
+				font-weight: 400;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-attendees-list-optout--wrapper, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-attendees-list-optout--wrapper {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-attendees-list-optout--wrapper, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-attendees-list-optout--wrapper {
 				display: none;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
-			.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
+			.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove {
 				display: none;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap {
 				color: #141827;
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-size: 14px;
@@ -1609,10 +1677,10 @@
 				padding-left: 4px;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
-			.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
+			.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total {
 				color: #141827;
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-size: 14px;
@@ -1620,15 +1688,15 @@
 				line-height: 1.62;
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form {
 			margin-bottom: 24px;
 		}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-tickets__attendee__title, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-tickets__attendee__title {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__attendee__title, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__attendee__title {
 			margin-bottom: 8px;
 		}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-block__tickets__item__attendee__fields__footer__divider, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-block__tickets__item__attendee__fields__footer__divider {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-block__tickets__item__attendee__fields__footer__divider, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-block__tickets__item__attendee__fields__footer__divider {
 			color: #727272;
 			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 			margin-right: 16px;
@@ -1636,10 +1704,10 @@
 
 /* Hide the cart button and divider text for TC */
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-tickets__attendee__fields__footer_cart-button,
-			.tribe-common .tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-block__tickets__item__attendee__fields__footer__divider,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-tickets__attendee__fields__footer_cart-button,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-block__tickets__item__attendee__fields__footer__divider {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-tickets__attendee__fields__footer_cart-button,
+			.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-block__tickets__item__attendee__fields__footer__divider,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-tickets__attendee__fields__footer_cart-button,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__item__attendee__fields__form--tpp .tribe-block__tickets__item__attendee__fields__footer__divider {
 				display: none;
 			}
 
@@ -1650,10 +1718,10 @@
 				padding: 0
 		}
 
-.tribe-common .tribe-common-c-btn-link,
-	.tribe-common a.tribe-common-c-btn-link {
-			width: auto
-	}
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+				background-color: transparent;
+				width: auto
+		}
 
 .tribe-common.tribe-tickets {
 		padding: 24px 24px 20px
@@ -1664,9 +1732,16 @@
 	 }
 
 .tribe-common .tribe-tickets__item, .entry .entry-content .tribe-common .tribe-tickets__item {
-			-ms-grid-columns:  6.5fr 2fr 1fr;
-			grid-template-columns: 6.5fr 2fr 1fr
+			-ms-grid-columns:  6.5fr 2fr;
+			grid-template-columns: 6.5fr 2fr;
+			-ms-grid-rows: 1fr 1.5fr 1fr
 	}
+
+.tribe-common .tribe-tickets__item.show-optout, .entry .entry-content .tribe-common .tribe-tickets__item.show-optout {
+				-ms-grid-columns:  6.5fr 2fr 1fr;
+				grid-template-columns: 6.5fr 2fr 1fr;
+				-ms-grid-rows: 1fr 1.5fr 1fr
+		}
 
 .tribe-common .tribe-tickets__item__content__title, .entry .entry-content .tribe-common .tribe-tickets__item__content__title {
 			line-height: 1
@@ -1726,6 +1801,11 @@
 			grid-row: 1
 	}
 
+.tribe-common .tribe-tickets-attendees-list-optout--wrapper, .entry .entry-content .tribe-common .tribe-tickets-attendees-list-optout--wrapper {
+			-ms-grid-row: 3;
+			grid-row: 3
+	}
+
 .tribe-common .tribe-tickets-attendees-list-optout--wrapper label, .entry .entry-content .tribe-common .tribe-tickets-attendees-list-optout--wrapper label {
 				font-size: 14px
 		}
@@ -1734,7 +1814,7 @@
 			margin-left: 24px
 	}
 
-.tribe-common .tribe-tickets__buy.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn {
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn, .tribe-common .tribe-tickets__buy.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn {
 				margin-left: 28px
 		}
 
@@ -1814,22 +1894,22 @@
 			margin-bottom: 20px
 	}
 
-.tribe-common .tribe-modal__wrapper--ar, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar {
 			border-radius: 4px;
 			height: auto
 	}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal--ar__title, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal--ar__title {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal--ar__title, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal--ar__title {
 				font-size: 20px
 		}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item {
 					-ms-grid-columns:  1fr 11fr 2fr 2fr 2fr;
 					grid-template-columns: 1fr 11fr 2fr 2fr 2fr;
 					padding-top: 12px
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__remove__wrap {
 					-webkit-align-items: center;
 					        align-items: center;
 					display: -webkit-flex;
@@ -1843,7 +1923,7 @@
 					        justify-content: center
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__content__title {
 					font-size: 16px;
 					line-height: 1.62;
 
@@ -1851,29 +1931,29 @@
 					grid-column: 2
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra {
 					-ms-grid-column: 3;
 					grid-column: 3;
 					margin-right: 8px
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__extra__price {
 					font-size: 16px;
 					line-height: 1.62
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__summary {
 					-ms-grid-column: 2;
 					grid-column: 2
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__details__content {
 					-ms-grid-column: 2;
 					-ms-grid-column-span: 2;
 					grid-column: 2 / span 2
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity {
 					font-size: 16px;
 					line-height: 1.62;
 
@@ -1881,7 +1961,7 @@
 					grid-column: 4
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__number {
 					font-size: 14px;
 					line-height: 1.62;
 					border: 0;
@@ -1890,20 +1970,20 @@
 					width: 30px
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets-quantity {
 					font-size: 16px;
 					line-height: 1.62
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
-			.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
+			.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__add,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__quantity__remove {
 					display: inline-block;
 					margin-bottom: 0
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__item__total__wrap {
 					font-size: 16px;
 					line-height: 1.62;
 
@@ -1911,15 +1991,15 @@
 					grid-column: 5
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
-			.tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
-			.entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
+			.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__quantity,
+			.entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__footer__total {
 					font-size: 16px;
 					line-height: 1.62
 			}
 
-.tribe-common .tribe-modal__wrapper--ar .tribe-tickets__attendee__title, .entry .entry-content .tribe-common .tribe-modal__wrapper--ar .tribe-tickets__attendee__title {
+.tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__attendee__title, .entry .entry-content .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__attendee__title {
 				margin-bottom: 16px
 		}
 			}
@@ -1929,7 +2009,7 @@
 
 @media(min-width: 500px) {
 
-.tribe-common .tribe-tickets__buy.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn {
+.tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn, .tribe-common .tribe-tickets__buy.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__attendee__fields__footer_checkout-button.tribe-common-c-btn, .entry .entry-content .tribe-common .tribe-tickets__buy.tribe-common-c-btn {
 				margin-left: 16px
 		}
 			}

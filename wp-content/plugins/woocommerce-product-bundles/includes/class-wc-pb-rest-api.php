@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Add custom REST API fields.
  *
  * @class    WC_PB_REST_API
- * @version  5.2.0
+ * @version  6.1.2
  */
 class WC_PB_REST_API {
 
@@ -27,18 +27,13 @@ class WC_PB_REST_API {
 	private static $product_fields = array(
 		'bundle_layout' => array( 'get', 'update' ),
 		'bundled_by'    => array( 'get' ),
-		'bundled_items' => array( 'get' )
+		'bundled_items' => array( 'get', 'update' )
 	);
 
 	/**
 	 * Setup order class.
 	 */
 	public static function init() {
-
-		// Creating/updating bundled items with the REST API is only possible if using WC 2.7+.
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
-			self::$product_fields[ 'bundled_items' ][] = 'update';
-		}
 
 		// Register WP REST API custom product fields.
 		add_action( 'rest_api_init', array( __CLASS__, 'register_product_fields' ), 0 );
@@ -55,14 +50,29 @@ class WC_PB_REST_API {
 	 */
 	public static function filter_order_fields() {
 
-		// Filter WC REST API order response content to add bundle container/children references.
-		add_filter( 'woocommerce_rest_prepare_shop_order', array( __CLASS__, 'filter_order_response' ), 10, 3 );
+		// Modify product bundle responses to return prices with the string data type.
+		add_filter( 'woocommerce_rest_prepare_product_object', array( __CLASS__, 'filter_product_response' ), 10, 2 );
+
+		// Schema.
 		add_filter( 'woocommerce_rest_shop_order_schema', array( __CLASS__, 'filter_order_schema' ) );
+		add_filter( 'woocommerce_rest_shop_subscription_schema', array( __CLASS__, 'filter_order_schema' ) );
+
+		// Modify order responses to include extra line item parent/child relationships and data.
+		// v1.
+		add_filter( 'woocommerce_rest_prepare_shop_order', array( __CLASS__, 'filter_order_response' ), 10, 3 );
+		add_filter( 'woocommerce_rest_prepare_shop_subscription', array( __CLASS__, 'filter_order_response' ), 10, 3 );
+		// v2.
+		add_filter( 'woocommerce_rest_prepare_shop_order_object', array( __CLASS__, 'filter_order_response' ), 10, 3 );
 
 		// Add bundle configuration data as meta for later post-processing.
 		add_action( 'woocommerce_rest_set_order_item', array( __CLASS__, 'set_order_item' ), 10, 2 );
-		// Modify order contents to include bundled items.
+
+		// Make it possible to add entire bundles to orders via the REST API.
+		// v1.
 		add_filter( 'woocommerce_rest_pre_insert_shop_order', array( __CLASS__, 'add_bundle_to_order' ), 10, 2 );
+		add_filter( 'woocommerce_rest_pre_insert_shop_subscription', array( __CLASS__, 'add_bundle_to_order' ), 10, 2 );
+		// v2.
+		add_filter( 'woocommerce_rest_pre_insert_shop_order_object', array( __CLASS__, 'add_bundle_to_order' ), 10, 2 );
 	}
 
 	/*
@@ -70,6 +80,31 @@ class WC_PB_REST_API {
 	| Products.
 	|--------------------------------------------------------------------------
 	*/
+
+	/**
+	 * Filters WC REST API product responses to cast prices to string, as per the schema.
+	 *
+	 * @since  6.1.1
+	 *
+	 * @param  WP_REST_Response   $response
+	 * @param  WC_Data            $product
+	 * @return WP_REST_Response
+	 */
+	public static function filter_product_response( $response, $product ) {
+
+		if ( $product->is_type( 'bundle' ) ) {
+
+			$data = $response->get_data();
+
+			$data[ 'price' ]         = strval( $data[ 'price' ] );
+			$data[ 'regular_price' ] = strval( $data[ 'regular_price' ] );
+			$data[ 'sale_price' ]    = strval( $data[ 'sale_price' ] );
+
+			$response->set_data( $data );
+		}
+
+		return $response;
+	}
 
 	/**
 	 * Register custom REST API fields for product requests.
@@ -104,13 +139,16 @@ class WC_PB_REST_API {
 			'bundle_layout'              => array(
 				'description' => __( 'Single-product details page layout. Applicable for bundle-type products only.', 'woocommerce-product-bundles' ),
 				'type'        => 'string',
-				'enum'        => array( 'default', 'tabular' ),
+				'enum'        => array_keys( WC_Product_Bundle::get_layout_options() ),
 				'context'     => array( 'view', 'edit' )
 			),
 			'bundled_by'                 => array(
 				'description' => __( 'List of product bundle IDs that contain this product.', 'woocommerce-product-bundles' ),
 				'type'        => 'array',
 				'context'     => array( 'view', 'edit' ),
+				'items'       => array(
+					'type'       => 'integer'
+				),
 				'readonly'    => true
 			),
 			'bundled_items'              => array(
@@ -148,7 +186,7 @@ class WC_PB_REST_API {
 						),
 						'quantity_max'                          => array(
 							'description' => __( 'Maximum bundled item quantity.', 'woocommerce-product-bundles' ),
-							'type'        => 'integer',
+							'type'        => '',
 							'context'     => array( 'view', 'edit' )
 						),
 						'priced_individually'                   => array(
@@ -204,6 +242,9 @@ class WC_PB_REST_API {
 						'allowed_variations'                    => array(
 							'description' => __( 'List of enabled variation IDs, applicable when variations filtering is active.', 'woocommerce-product-bundles' ),
 							'type'        => 'array',
+							'items'       => array(
+								'type'       => 'integer'
+							),
 							'context'     => array( 'view', 'edit' )
 						),
 						'override_default_variation_attributes' => array(
@@ -336,7 +377,8 @@ class WC_PB_REST_API {
 			$product      = wc_get_product( $product_id );
 			$product_type = $product->get_type();
 		} elseif ( $response instanceof WC_Product ) {
-			$product_id   = WC_PB_Core_Compatibility::get_id( $response );
+			$product_id   = $response->get_id();
+			$product      = $response;
 			$product_type = $response->get_type();
 		}
 
@@ -346,24 +388,11 @@ class WC_PB_REST_API {
 			// Set bundle layout.
 			if ( 'bundle_layout' === $field_name ) {
 
-				if ( WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
+				$product->set_layout( $field_value );
+				$product->save();
 
-					$product->set_layout( $field_value );
-					$product->save();
-
-				} else {
-
-					$field_value = in_array( $field_value, array( 'default', 'tabular' ) ) ? $field_value : 'default';
-					update_post_meta( $product_id, '_wc_pb_layout_style', strval( $field_value ) );
-				}
-
-			// Set bundled items (WC 2.7+ only).
+			// Set bundled items.
 			} elseif ( 'bundled_items' === $field_name ) {
-
-				// Updating shouldn't be registered for WC < 2.7, but oh well.
-				if ( ! WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ) {
-					throw new WC_REST_Exception( 'woocommerce_rest_unsupported_bundle_field', __( 'WooCommerce 2.7+ is required to create/update bundled items.', 'woocommerce-product-bundles' ), 400 );
-				}
 
 				$new     = array();
 				$updated = array();
@@ -497,7 +526,7 @@ class WC_PB_REST_API {
 	private static function get_product_field( $key, $product ) {
 
 		$product_type = $product->get_type();
-		$product_id   = WC_PB_Core_Compatibility::get_id( $product );
+		$product_id   = $product->get_id();
 
 		switch ( $key ) {
 
@@ -506,7 +535,7 @@ class WC_PB_REST_API {
 				$value = '';
 
 				if ( 'bundle' === $product_type ) {
-					$value = WC_PB_Core_Compatibility::is_wc_version_gte_2_7() ? $product->get_layout( 'edit' ) : get_post_meta( $product_id, '_wc_pb_layout_style', true );
+					$value = $product->get_layout( 'edit' );
 				}
 
 			break;
@@ -743,6 +772,9 @@ class WC_PB_REST_API {
 				'description' => __( 'Item IDs of bundled line items, applicable if the item is a Bundle container.', 'woocommerce-product-bundles' ),
 				'type'        => 'array',
 				'context'     => array( 'view', 'edit' ),
+				'items'       => array(
+					'type'       => 'integer'
+				),
 				'readonly'    => true
 			),
 			'bundled_item_title' => array(
@@ -820,10 +852,31 @@ class WC_PB_REST_API {
 				$bundle   = $item->get_product();
 				$quantity = $item->get_quantity();
 
-				$items_to_remove[] = $item;
+				// Preserve props and meta.
 
-				WC_PB()->order->add_bundle_to_order( $bundle, $order, $quantity, array( 'configuration' => $apply_configuration ) );
+				$args = array(
+					'configuration' => $apply_configuration,
+					'meta_data'     => $item->get_meta_data()
+				);
+
+				foreach ( $item->get_data_keys() as $key ) {
+
+					$fn = 'get_' . $key;
+
+					if ( in_array( $key, array( 'name', 'tax_class', 'subtotal', 'subtotal_tax', 'total', 'total_tax', 'taxes' ) ) && is_callable( array( $item, $fn ) ) ) {
+						$args[ $key ] = $item->$fn( 'edit' );
+					}
+				}
+
+				// Add new configuration.
+
+				$result = WC_PB()->order->add_bundle_to_order( $bundle, $order, $quantity, $args );
+
 				$item->delete_meta_data( '_bundle_configuration' );
+
+				if ( ! is_wp_error( $result ) ) {
+					$items_to_remove[] = $item;
+				}
 			}
 		}
 
@@ -837,6 +890,116 @@ class WC_PB_REST_API {
 		return $order;
 	}
 
+
+	/**
+	 * Converts a posted bundle configuration to a format understood by 'WC_PB_Cart::validate_bundle_configuration'.
+	 *
+	 * @since  5.8.0
+	 *
+	 * @param  WC_Product_Bundle  $bundle
+	 * @param  array              $posted_configuration
+	 * @return array
+	 */
+	public static function parse_posted_bundle_configuration( $bundle, $posted_configuration ) {
+
+		$configuration = array();
+
+		foreach ( $posted_configuration as $bundled_item_configuration ) {
+
+			// 'WC_PB_Cart::validate_bundle_configuration' expects the array to be indexed by bundled item ID.
+			if ( ! empty( $bundled_item_configuration[ 'bundled_item_id' ] ) ) {
+				$bundled_item_id                   = absint( $bundled_item_configuration[ 'bundled_item_id' ] );
+				$configuration[ $bundled_item_id ] = array_diff_key( $bundled_item_configuration, array( 'bundled_item_id' => 1, 'optional_selected' => 1, 'attributes' => 1 ) );
+			} else {
+				continue;
+			}
+
+			// 'WC_PB_Cart::validate_bundle_configuration expects' 'optional_selected' to be 'yes'|'no', not boolean.
+			if ( ! empty( $bundled_item_configuration[ 'optional_selected' ] ) ) {
+				$configuration[ $bundled_item_id ][ 'optional_selected' ] = true === $bundled_item_configuration[ 'optional_selected' ] ? 'yes' : 'no';
+			}
+
+			// 'WC_PB_Cart::validate_bundle_configuration' expects posted attributes in 'WC_Cart::add_to_cart' format.
+			if ( ! empty( $bundled_item_configuration[ 'attributes' ] ) && is_array( $bundled_item_configuration[ 'attributes' ] ) ) {
+
+				if ( empty( $bundled_item_configuration[ 'bundled_item_id' ] ) ) {
+					continue;
+				}
+
+				$bundled_item = $bundle->get_bundled_item( absint( $bundled_item_configuration[ 'bundled_item_id' ] ) );
+
+				if ( ! $bundled_item ) {
+					continue;
+				}
+
+				$parent_attributes = $bundled_item->product->get_attributes();
+				$posted_attributes = $bundled_item_configuration[ 'attributes' ];
+				$attributes        = array();
+
+				foreach ( $parent_attributes as $parent_attribute ) {
+
+					if ( ! $parent_attribute->get_variation() ) {
+						continue;
+					}
+
+					$attribute_label = wc_attribute_label( $parent_attribute->get_name() );
+					$attribute_name  = $parent_attribute->get_name();
+
+					$variation_attribute_name = wc_variation_attribute_name( $attribute_name );
+
+					foreach ( $posted_attributes as $posted_attribute ) {
+
+						$found_attribute = false;
+
+						// Locate attribute.
+						if ( isset( $posted_attribute[ 'name' ] ) ) {
+							if ( stripslashes( $posted_attribute[ 'name' ] ) === $attribute_label ) {
+								$found_attribute = true;
+							} elseif ( wc_sanitize_taxonomy_name( stripslashes( $posted_attribute[ 'name' ] ) ) === str_replace( 'pa_', '', wc_sanitize_taxonomy_name( $attribute_name ) ) ) {
+								$found_attribute = true;
+							}
+						}
+
+						if ( $found_attribute ) {
+
+							// Get the slug from the name posted to the API.
+							if ( $parent_attribute->is_taxonomy() ) {
+
+								$attribute_value = isset( $posted_attribute[ 'option' ] ) ? wc_clean( stripslashes( $posted_attribute[ 'option' ] ) ) : '';
+
+								// First, attempt to get the attribute value term by name.
+								$term = get_term_by( 'name', $attribute_value, $attribute_name );
+
+								// Then, attempt to get it by slug.
+								if ( ! $term || is_wp_error( $term ) ) {
+									$term = get_term_by( 'slug', $attribute_value, $attribute_name );
+								}
+
+								// We should have a result at this point.
+								if ( $term && ! is_wp_error( $term ) ) {
+									$value = $term->slug;
+								// If not, just quit and store a sanitized version of whatever was posted.
+								} else {
+									$value = sanitize_title( $attribute_value );
+								}
+
+							} else {
+								$value = html_entity_decode( wc_clean( stripslashes( $posted_attribute[ 'option' ] ) ), ENT_QUOTES, get_bloginfo( 'charset' ) );
+							}
+
+							$attributes[ $variation_attribute_name ] = $value;
+							break;
+						}
+					}
+				}
+
+				$configuration[ $bundled_item_id ][ 'attributes' ] = $attributes;
+			}
+		}
+
+		return $configuration;
+	}
+
 	/**
 	 * Save bundle configuration data on item for later processing.
 	 *
@@ -845,97 +1008,23 @@ class WC_PB_REST_API {
 	 */
 	public static function set_order_item( $item, $posted_item_data ) {
 
-		$action = ! empty( $posted[ 'id' ] ) ? 'update' : 'create';
+		$action = ! empty( $posted_item_data[ 'id' ] ) ? 'update' : 'create';
 
-		if ( 'create' === $action && ! empty( $posted_item_data[ 'bundle_configuration' ] ) ) {
+		if ( 'create' === $action && ! empty( $posted_item_data[ 'bundle_configuration' ] ) && is_array( $posted_item_data[ 'bundle_configuration' ] ) ) {
 
-			$bundle        = $item->get_product();
-			$quantity      = $item->get_quantity();
-			$configuration = array();
+			$product  = $item->get_product();
+			$quantity = $item->get_quantity();
 
-			if ( $bundle && $bundle->is_type( 'bundle' ) ) {
+			if ( $product && $product->is_type( 'bundle' ) ) {
 
-				foreach ( $posted_item_data[ 'bundle_configuration' ] as $bundled_item_configuration ) {
+				$configuration = self::parse_posted_bundle_configuration( $product, $posted_item_data[ 'bundle_configuration' ] );
 
-					// 'WC_PB_Cart::validate_bundle_configuration' expects the array to be indexed by bundled item ID.
-					if ( ! empty( $bundled_item_configuration[ 'bundled_item_id' ] ) ) {
-						$bundled_item_id                   = absint( $bundled_item_configuration[ 'bundled_item_id' ] );
-						$configuration[ $bundled_item_id ] = array_diff_key( $bundled_item_configuration, array( 'bundled_item_id' => 1, 'optional_selected' => 1, 'attributes' => 1 ) );
-					} else {
-						continue;
-					}
-
-					// 'WC_PB_Cart::validate_bundle_configuration expects' 'optional_selected' to be 'yes'|'no', not boolean.
-					if ( ! empty( $bundled_item_configuration[ 'optional_selected' ] ) ) {
-						$configuration[ $bundled_item_id ][ 'optional_selected' ] = true === $bundled_item_configuration[ 'optional_selected' ] ? 'yes' : 'no';
-					}
-
-					// 'WC_PB_Cart::validate_bundle_configuration' expects posted attributes in 'WC_Cart::add_to_cart' format.
-					if ( ! empty( $bundled_item_configuration[ 'attributes' ] ) && is_array( $bundled_item_configuration[ 'attributes' ] ) ) {
-
-						if ( empty( $bundled_item_configuration[ 'bundled_item_id' ] ) ) {
-							continue;
-						}
-
-						$bundled_item = $bundle->get_bundled_item( absint( $bundled_item_configuration[ 'bundled_item_id' ] ) );
-
-						if ( ! $bundled_item ) {
-							continue;
-						}
-
-						$posted_attributes = $bundled_item_configuration[ 'attributes' ];
-						$cart_attributes   = array();
-						$attributes        = $bundled_item->product->get_attributes();
-
-						foreach ( $attributes as $attribute ) {
-
-							if ( ! $attribute->get_variation() ) {
-								continue;
-							}
-
-							$attribute_label = wc_attribute_label( $attribute->get_name() );
-							$attribute_name  = $attribute->get_name();
-
-							$variation_attribute_name = wc_variation_attribute_name( $attribute_name );
-
-							foreach ( $posted_attributes as $posted_attribute ) {
-
-								$found_value = false;
-
-								// Find key.
-								if ( isset( $posted_attribute[ 'name' ] ) ) {
-									if ( stripslashes( $posted_attribute[ 'name' ] ) === $attribute_label ) {
-										$found_value = true;
-									} elseif ( wc_sanitize_taxonomy_name( stripslashes( $posted_attribute[ 'name' ] ) ) === str_replace( 'pa_', '', wc_sanitize_taxonomy_name( $attribute_name ) ) ) {
-										$found_value = true;
-									}
-								}
-
-								if ( $found_value ) {
-									// Get value.
-									if ( $attribute->is_taxonomy() ) {
-										$value = sanitize_title( stripslashes( $posted_attribute[ 'option' ] ) );
-									} else {
-										$value = wc_clean( stripslashes( $posted_attribute[ 'option' ] ) );
-									}
-
-									$cart_attributes[ $variation_attribute_name ] = $value;
-									break;
-								}
-							}
-						}
-
-						$configuration[ $bundled_item_id ][ 'attributes' ] = $cart_attributes;
-					}
-				}
-
-				if ( WC_PB()->cart->validate_bundle_configuration( $bundle, $quantity, $configuration, 'add-to-order' ) ) {
+				if ( WC_PB()->cart->validate_bundle_configuration( $product, $quantity, $configuration, 'add-to-order' ) ) {
 
 					$item->update_meta_data( '_bundle_configuration', $configuration );
 
 				} else {
 
-					wc_clear_notices();
 					$message = __( 'The submitted bundle configuration could not be added to this order.', 'woocommerce-product-bundles' );
 					throw new WC_REST_Exception( 'woocommerce_rest_invalid_bundle_configuration', $message, 400 );
 				}
@@ -967,18 +1056,21 @@ class WC_PB_REST_API {
 	 *
 	 * @since  5.0.0
 	 *
-	 * @param  WP_REST_Response  $response
-	 * @param  WP_Post           $post
-	 * @param  WP_REST_Request   $request
+	 * @param  WP_REST_Response   $response
+	 * @param  WP_Post | WC_Data  $object
+	 * @param  WP_REST_Request    $request
 	 * @return WP_REST_Response
 	 */
-	public static function filter_order_response( $response, $post, $request ) {
+	public static function filter_order_response( $response, $object, $request ) {
 
 		if ( $response instanceof WP_HTTP_Response ) {
 
+			if ( $object instanceof WP_Post ) {
+				$object = wc_get_order( $object );
+			}
+
 			$order_data = $response->get_data();
-			$order      = wc_get_order( $post );
-			$order_data = self::get_extended_order_data( $order_data, $order );
+			$order_data = self::get_extended_order_data( $order_data, $object );
 
 			$response->set_data( $order_data );
 		}

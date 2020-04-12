@@ -50,6 +50,7 @@ class Maps {
 		];
 
 		$template_vars['map_provider'] = $map_provider;
+		$template_vars['enable_maps']  = tribe_get_option( 'embedGoogleMaps', true );
 
 		return $template_vars;
 	}

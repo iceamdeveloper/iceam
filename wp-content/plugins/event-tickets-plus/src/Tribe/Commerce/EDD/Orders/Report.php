@@ -97,9 +97,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 
 		$actions['tickets_orders'] = sprintf(
 			'<a title="%s" href="%s">%s</a>',
-			sprintf( esc_html__( 'See EDD purchases for this %s', 'event-tickets' ), $post_type ),
+			sprintf( esc_html_x( 'See EDD purchases for this %s', 'order row action', 'event-tickets-plus' ), $post_type ),
 			esc_url( $url ),
-			esc_html__( 'Orders', 'event-tickets-plus' )
+			esc_html_x( 'Orders', 'order row action', 'event-tickets-plus' )
 		);
 
 		return $actions;
@@ -199,13 +199,12 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	 *
 	 * @param $admin_title
 	 *
-	 *
 	 * @return string
 	 */
 	public function orders_admin_title( $admin_title ) {
 		if ( ! empty( $_GET['post_id'] ) ) {
 			$event       = get_post( absint( $_GET['post_id'] ) );
-			$admin_title = sprintf( esc_html_x( '%s - EDD Orders', 'Browser title', 'event-tickets' ), $event->post_title );
+			$admin_title = sprintf( esc_html_x( '%s - EDD Orders', 'Browser title', 'event-tickets-plus' ), $event->post_title );
 		}
 
 		return $admin_title;
@@ -305,7 +304,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 		$this->orders_table->prepare_items();
 
 		ob_start();
-		$this->orders_table->search_box( __( 'Search Orders', 'event-tickets' ), 'event-tickets-plus' );
+		$this->orders_table->search_box( __( 'Search Orders', 'event-tickets-plus' ), 'event-tickets-plus' );
 		$this->orders_table->display();
 		$table = ob_get_clean();
 

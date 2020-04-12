@@ -9,12 +9,17 @@
  *
  * @link {INSERT_ARTICLE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.1
  *
  */
 ?>
 <li class="tribe-events-c-nav__list-item tribe-events-c-nav__list-item--next">
-	<button class="tribe-events-c-nav__next tribe-common-b2" disabled>
+	<button
+		class="tribe-events-c-nav__next tribe-common-b2"
+		aria-label="<?php esc_attr_e( 'Next week', 'tribe-events-calendar-pro' ); ?>"
+		title="<?php esc_attr_e( 'Next week', 'tribe-events-calendar-pro' ); ?>"
+		disabled
+	>
 		<?php esc_html_e( 'Next', 'tribe-events-calendar-pro' ); ?>
 	</button>
 </li>

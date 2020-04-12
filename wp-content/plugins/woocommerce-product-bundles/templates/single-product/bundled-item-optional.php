@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?><label class="bundled_product_optional_checkbox">
-	<input class="bundled_product_checkbox" type="checkbox" name="<?php echo $bundle_fields_prefix; ?>bundle_selected_optional_<?php echo $bundled_item->item_id; ?>" value="" <?php checked( $bundled_item->is_optional_checked() && $bundled_item->is_in_stock(), true ); echo $bundled_item->is_in_stock() ? '' : 'disabled="disabled"' ; ?> /> <?php
+	<input class="bundled_product_checkbox" type="checkbox" name="<?php echo $bundle_fields_prefix; ?>bundle_selected_optional_<?php echo $bundled_item->get_id(); ?>" value="" <?php checked( $bundled_item->is_optional_checked() && $bundled_item->is_in_stock(), true ); echo $bundled_item->is_in_stock() ? '' : 'disabled="disabled"' ; ?> /> <?php
 
 	$price_html         = $bundled_item->product->get_price_html();
 	$label_price        = $bundled_item->is_priced_individually() && $price_html ? sprintf( __( ' for %s', 'woocommerce-product-bundles' ), '<span class="price">' . $price_html . '</span>' ) : '';

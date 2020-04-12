@@ -6,9 +6,15 @@
 var wptRep = (function ($) {
     var count = {};
     function initRepetitiveFields() {
-        // Reorder label and description for repetitive
+        // Reorder label and description for repeatable fields.
         // Note that we target usual labels and descriptions but a classname can be used to keep some auxiliar items
-        $('.js-wpt-repetitive').each(function () {
+		//
+		// Adjusted to also always do the same reordering for single file-type fields (see WPToolset_Types::filterField).
+		//
+		// Update: Include most fields into this (js-wpt-field-extract-label), so that the label position is consistent.
+		//
+		// @refactoring KILL THIS WITH FIRE
+        $('.js-wpt-repetitive, .js-wpt-field-with-files, .js-wpt-field-extract-label').each(function () {
             var $this = $(this),
                 $parent;
             if ($('body').hasClass('wp-admin')) {
@@ -25,11 +31,6 @@ var wptRep = (function ($) {
             } else {// This happens on the backend
                 $parent = $this.find('.js-wpt-field-items');
             }
-            if ($(this).find('.js-wpt-repdelete').length > 1) {
-                $(this).find('.js-wpt-repdelete').show();
-            } else if ($(this).find('.js-wpt-repdelete').length == 1) {
-                $(this).find('.js-wpt-repdelete').hide();
-            }
             _toggleCtl($parent);
         });
 
@@ -41,7 +42,7 @@ var wptRep = (function ($) {
         
         // Add field
         $(document).off('click', '.js-wpt-repadd', null);
-        $(document).on('click', '.js-wpt-repadd', function (e) {
+        $(document).on('click', '.js-wpt-repadd', function( e, $insertAfterThis ) {
             e.preventDefault();
             var $this = $(this),
                     parent,
@@ -74,8 +75,6 @@ var wptRep = (function ($) {
                 while ($('[name*="[' + _count + ']"]', $parent).length > 0) {
                     _count++;
                 }
-                // Insert the template before the button
-                $this.before(tpl.html().replace(/\[%%(\d+)%%\]/g, '[' + _count + ']'));
             } else {
                 /**
                  * template
@@ -97,10 +96,16 @@ var wptRep = (function ($) {
                 while ($('[name*="[' + _count + ']"]', $parent).length > 0) {
                     _count++;
                 }
-                // Insert the template before the button
-                $this.before(tpl.html().replace(/\[%%(\d+)%%\]/g, '[' + _count + ']'));
+                
 
             }
+			// Insert the template before the button, unless there is a node to insert this after
+			var tplToInsert = tpl.html().replace(/\[%%(\d+)%%\]/g, '[' + _count + ']')
+			if ( typeof $insertAfterThis !== 'undefined' ) {
+				$insertAfterThis.after( tplToInsert );
+			} else {
+				$this.before( tplToInsert );
+			}
             wptCallbacks.addRepetitive.fire($parent);
             _toggleCtl($parent);
             $this.trigger('blur');// To prevent it from staying on the active state
@@ -116,29 +121,31 @@ var wptRep = (function ($) {
         // Delete field
         $(document).off('click', '.js-wpt-repdelete', null);
         $(document).on('click', '.js-wpt-repdelete', function (e) {
-            //$('.js-wpt-field-items').on('click', '.js-wpt-repdelete', function (e) {
             e.preventDefault();
             $parent = $(this).closest('.js-wpt-field-items');
             if ($('body').hasClass('wp-admin')) {
                 var $this = $(this), value;
-                // Allow deleting if more than one field item
-                if ($('.js-wpt-field-item', $parent).length > 1) {
-                    var formID = $this.parents('form').attr('id');
-                    $this.parents('.js-wpt-field-item').remove();
-                    wptCallbacks.removeRepetitive.fire(formID);
-                }
-                /**
-                 * if image, try delete images
-                 * TODO check this, I do not like using parent() for this kind of things
-                 */
-                if ('image' == $this.data('wpt-type')) {
-                    value = $this.parent().parent().find('input').val();
-                    $parent.parent().append(
-                            '<input type="hidden" name="wpcf[delete-image][]" value="'
-                            + value
-                            + '"/>'
-                            );
-                }
+				var isNotLastItemToDelete = ( $( '.js-wpt-field-item', $parent ).length > 1 );
+				if (isNotLastItemToDelete) {
+					// Allow deleting if there's more than one field item
+					$this.parents( '.js-wpt-field-item' ).remove();
+				} else {
+					// If it's the last item, just clear it.
+					$this.parent().parent().find( 'input, textarea' ).val( null );
+					$this.parent().find( '.js-wpt-file-preview' ).html( null );
+				}
+
+				var formID = $this.parents( 'form' ).attr( 'id' );
+				wptCallbacks.removeRepetitive.fire( formID );
+
+				// if image, try delete images
+				// TODO check this, I do not like using parent() for this kind of things
+				if ('image' === $this.data( 'wpt-type' )) {
+					value = $this.parent().parent().find( 'input' ).val();
+					$parent.parent().append(
+						'<input type="hidden" name="wpcf[delete-image][]" value="' + value + '"/>',
+					);
+				}
             } else {
                 if ($('.wpt-repctl', $parent).length > 1) {
                     $(this).closest('.wpt-repctl').remove();
@@ -148,32 +155,52 @@ var wptRep = (function ($) {
             _toggleCtl($parent);
             return false;
         });
+
+        // When the user clicks on an empty file preview, find the "Select file" button and do the same as
+		// if they clicked on that instead.
+		$(document).on('click', '.js-wpt-file-preview:not(:has(img))', function() {
+			$(this).parent().find('button.js-wpt-file-upload').click();
+		});
     }
     function _toggleCtl($sortable) {
         var sorting_count;
+        var isInAdmin = false;
         if ($('body').hasClass('wp-admin')) {
             sorting_count = $('.js-wpt-field-item', $sortable).length;
+            isInAdmin = true;
         } else {
             sorting_count = $('.wpt-repctl', $sortable).length;
         }
         if (sorting_count > 1) {
-            $('.js-wpt-repdelete', $sortable).prop('disabled', false).show();
+			if( ! isInAdmin ) {
+				$('.js-wpt-repdelete', $sortable).prop('disabled', false).show();
+			}
             $('.js-wpt-repdrag', $sortable).css({opacity: 1, cursor: 'move'}).show();
             if (!$sortable.hasClass('ui-sortable')) {
-                $sortable.sortable({
-                    handle: '.js-wpt-repdrag',
-                    axis: 'y',
-                    stop: function (event, ui) {
-                        $sortable.find('.js-wpt-repadd').detach().appendTo($sortable);
-                    }
-                });
+            	var parameters = {
+					stop: function (event, ui) {
+						$sortable.find('.js-wpt-repadd').detach().appendTo($sortable);
+					}
+				};
+
+            	// Items in fields with files need to be draggable in both axes, while other repeatable
+				// fields only need the vertical one. We also need them to be draggable only by the specific
+				// handle and not by the file preview as well.
+            	if(0 === $sortable.parents('.js-wpt-field-with-files').length) {
+            		parameters.axis = 'y';
+            		parameters.handle = '.js-wpt-repdrag';
+				}
+
+                $sortable.sortable(parameters);
             }
         } else {
-            $('.js-wpt-repdelete', $sortable).prop('disabled', true).hide();
-            $('.js-wpt-repdrag', $sortable).css({opacity: 0.5, cursor: 'default'}).hide();
-            if ($sortable.hasClass('ui-sortable')) {
-                $sortable.sortable('destroy');
-            }
+			if (!isInAdmin) {
+				$( '.js-wpt-repdelete', $sortable ).prop( 'disabled', true ).hide();
+			}
+			$( '.js-wpt-repdrag', $sortable ).css( { opacity: 0.5, cursor: 'default' } ).hide();
+			if ($sortable.hasClass( 'ui-sortable' )) {
+				$sortable.sortable( 'destroy' );
+			}
         }
     }
     function _countIt(_count, id) {

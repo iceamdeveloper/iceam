@@ -64,9 +64,9 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 	 */
 	public function print_totals() {
 		$args = [
-			'total_sold_label'        => _x( 'Total Tickets:', 'attendee summary', 'event-tickets' ),
-			'total_complete_label'    => _x( 'Complete:', 'attendee summary', 'event-tickets' ),
-			'total_cancelled_label'   => _x( 'Cancelled:', 'attendee summary', 'event-tickets' ),
+			'total_sold_label'        => esc_html( sprintf( _x( 'Total %s:', 'attendee summary', 'event-tickets-plus' ), tribe_get_ticket_label_plural( 'attendance_totals' ) ) ),
+			'total_complete_label'    => _x( 'Complete:', 'attendee summary', 'event-tickets-plus' ),
+			'total_cancelled_label'   => _x( 'Cancelled:', 'attendee summary', 'event-tickets-plus' ),
 			'total_sold'              => $this->get_total_sold(),
 			'total_complete'          => $this->get_total_complete(),
 			'total_cancelled'         => $this->get_total_cancelled(),
@@ -77,7 +77,9 @@ class Tribe__Tickets_Plus__Commerce__Attendance_Totals extends Tribe__Tickets__A
 			'total_refunded_tooltip'  => $this->get_total_refunded_tooltip(),
 		];
 
-		tribe( 'tickets.admin.views' )->template( 'attendees-totals-list', $args, true );
+		/** @var Tribe__Tickets__Admin__Views $admin_views */
+		$admin_views = tribe( 'tickets.admin.views' );
+		$admin_views->template( 'attendees-totals-list', $args, true );
 	}
 
 	/**

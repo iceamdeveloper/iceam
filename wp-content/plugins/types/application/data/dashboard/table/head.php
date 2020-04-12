@@ -8,11 +8,11 @@ $question_marks = array(
 
 	'fields' => array(
 		'id'            => 'fields',
-		'title'         => __( 'Fields', 'wpcf' ),
+		'title'         => __( 'Custom fields', 'wpcf' ),
 		'description'   => array(
 			array(
 				'type' => 'paragraph',
-				'content' => __( 'A list of all Post Fields and their attachment to the Post Types.', 'wpcf' )
+				'content' => __( 'A list of all Custom Post Fields and their attachment to the Post Types.', 'wpcf' )
 			),
 			array(
 				'type'   => 'link',
@@ -124,6 +124,13 @@ else if( class_exists( 'FLBuilderLoader' ) ) {
 // Layouts
 else if( defined( 'WPDDL_DEVELOPMENT' ) || defined( 'WPDDL_PRODUCTION' ) ) {
 	$question_marks['template']['description'][1]['label'] = __( 'Creating templates with Layouts', 'wpcf' );
+}
+
+// Remove Views if Toolset Blocks is active
+// TODO Use the Toolset_Condition_Plugin_Toolset_Blocks_Active condition here, after we update it to work properly
+$is_toolset_blocks_available = ( 'blocks' === apply_filters( 'toolset_views_flavour_installed', 'classic' ) );
+if ( $is_toolset_blocks_available ) {
+	unset( $question_marks['views'] );
 }
 
 return $question_marks;

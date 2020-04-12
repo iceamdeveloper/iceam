@@ -110,7 +110,22 @@ class Types_Helper_Placeholder {
 
 	private static function get_post_edit_views_archive() {
 		$url = admin_url() . 'admin.php?page=view-archives-editor&view_id='
-				. Types_Helper_Condition_Views_Archive_Exists::get_template_id();
+		       . Types_Helper_Condition_Views_Archive_Exists::get_template_id();
+
+		/**
+		 * Filters the edit link for WordPress Archives located in the Toolset Dashboard, to also handle WordPress Archives
+		 * created by the WordPress Archive block.
+		 *
+		 * @param  string     $wpa_edit_link
+		 * @param  int|null   $wpa_id
+		 *
+		 * @return string
+		 */
+		$url = apply_filters(
+			'wpv_filter_wpa_edit_link',
+			$url,
+			Types_Helper_Condition_Views_Archive_Exists::get_template_id()
+		);
 
 		return self::add_referer( $url );
 	}
@@ -217,8 +232,12 @@ class Types_Helper_Placeholder {
 		if( $views = Types_Helper_Condition_Views_Views_Exist::get_views_of_post_type() ) {
 			$output = '<ul>';
 			foreach( $views as $view ) {
-				$view_edit_link = admin_url() . 'admin.php?page=views-editor&view_id=' . $view['id'];
-				$output .= '<li><a href="'. self::add_referer( $view_edit_link )  . '">'. $view['name'].'</a></li>';
+				$maybe_gutenberg_view = get_post_meta( $view['id'], '_wpv_is_gutenberg_view', true );
+				$is_gutenberg_view = ! $maybe_gutenberg_view ? false : true;
+				if ( ! $is_gutenberg_view ) {
+					$view_edit_link = admin_url() . 'admin.php?page=views-editor&view_id=' . $view['id'];
+					$output .= '<li><a href="'. self::add_referer( $view_edit_link )  . '">'. $view['name'].'</a></li>';
+				}
 			}
 			$output .= '</ul>';
 

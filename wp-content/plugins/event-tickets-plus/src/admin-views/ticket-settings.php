@@ -51,17 +51,18 @@ $attendee_options = [
 		'label'           => esc_html__( 'Attendee Registration Modal ', 'event-tickets-plus' ),
 		'tooltip' => sprintf(
 			esc_html_x(
-				'Enabling the Attendee Registration Modal provides a new sales flow for purchasing tickets that include Attendee Registration. [%1$sLearn more%2$s]',
+				'Enabling the Attendee Registration Modal provides a new sales flow for purchasing %1$s that include Attendee Registration. [%2$sLearn more%3$s]',
 				'checkbox to enable Attendee Registration Modal',
 				'event-tickets-plus'
 			),
+			esc_html( tribe_get_ticket_label_plural_lowercase( 'modal_notice_tooltip' ) ),
 			'<a href="http://m.tri.be/attendee-registration" target="_blank">',
 			'</a>'
 		),
 		'size'            => 'medium',
 		'default'         => $modal_version_check,
 		'validation_type' => 'boolean',
-		'attributes'      => array( 'id' => 'ticket-attendee-enable-modal' ),
+		'attributes'      => [ 'id' => 'ticket-attendee-enable-modal' ],
 	],
 	'ticket-attendee-info-slug'     => [
 		'type'                => 'text',

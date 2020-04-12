@@ -1,21 +1,7 @@
 <?php
-/**
- *
- * Loader class
- *
- *
- */
 
-/**
- * Loader Class
- *
- * @since Types 1.2
- * @package Types
- * @subpackage Classes
- * @version 0.2
- * @category Loader
- * @author srdjan <srdjan@icanlocalize.com>
- */
+// phpcs:disable
+
 class WPCF_Loader
 {
 
@@ -27,23 +13,22 @@ class WPCF_Loader
 
     public static function init( $settings = array() ) {
         self::$__settings = (array) $settings;
-        self::__registerScripts();
-        self::__registerStyles();
-        self::__toolset();
+        self::registerScripts();
+        self::registerStyles();
         add_action( 'admin_print_scripts', array('WPCF_Loader', 'renderJsSettings'), 5 );
 		add_filter( 'the_posts', array('WPCF_Loader', 'wpcf_cache_complete_postmeta') );
 		add_filter( 'wpcf_fields_postmeta_value_save', array( 'WPCF_Loader', 'wpcf_sanitize_postmeta_values_on_save' ) );
 		add_filter( 'wpcf_fields_usermeta_value_save', array( 'WPCF_Loader', 'wpcf_sanitize_usermeta_values_on_save' ) );
     }
-	
+
 	/**
 	* Sanitize fields values on save
 	*
 	*/
-	
+
 	public static function wpcf_sanitize_postmeta_values_on_save( $value ) {
 		if (
-			current_user_can( 'unfiltered_html' ) 
+			current_user_can( 'unfiltered_html' )
 			&& wpcf_get_settings('postmeta_unfiltered_html') != 'off'
 		) {
 			return $value;
@@ -56,10 +41,10 @@ class WPCF_Loader
 		}
 		return $value;
 	}
-	
+
 	public static function wpcf_sanitize_usermeta_values_on_save( $value ) {
 		if (
-			current_user_can( 'unfiltered_html' ) 
+			current_user_can( 'unfiltered_html' )
 			&& wpcf_get_settings('usermeta_unfiltered_html') != 'off'
 		) {
 			return $value;
@@ -117,7 +102,7 @@ class WPCF_Loader
     /**
      * Register scripts.
      */
-    private static function __registerScripts() {
+    private static function registerScripts() {
         $min = '';//WPCF_DEBUG ? '-min' : '';
         wp_register_script( 'types',
 	        WPCF_EMBEDDED_RES_RELPATH . '/js/basic.js',
@@ -133,9 +118,6 @@ class WPCF_Loader
         }
         wp_register_script( 'types-utils',
                 WPCF_EMBEDDED_RES_RELPATH . "/js/utils{$min}.js", array('jquery'),
-                WPCF_VERSION, true );
-        wp_register_script( 'types-wp-views',
-                WPCF_EMBEDDED_RES_RELPATH . '/js/wp-views.js', array('jquery'),
                 WPCF_VERSION, true );
         global $pagenow;
         // Exclude on post edit screen
@@ -157,8 +139,13 @@ class WPCF_Loader
 //        wp_register_script( 'types-js-validation',
 //                WPCF_EMBEDDED_RES_RELPATH . '/js/jquery-form-validation/types.js',
 //                array('types-jquery-validation-additional'), WPCF_VERSION, true );
-		wp_register_script( 'types-export-import', WPCF_EMBEDDED_RES_RELPATH . '/js/export-import.js',
-                array( 'jquery' ), WPCF_VERSION, true );
+		wp_register_script(
+			'types-export-import',
+			WPCF_EMBEDDED_RES_RELPATH . '/js/export-import.js',
+			[ 'jquery', Types_Asset_Manager::SCRIPT_POINTER ],
+			WPCF_VERSION,
+			true
+		);
 		wp_register_script( 'types-settings', WPCF_EMBEDDED_RES_RELPATH . '/js/settings.js',
                 array( 'jquery', 'underscore' ), WPCF_VERSION, true );
 		$settings_script_texts = array(
@@ -170,7 +157,7 @@ class WPCF_Loader
     /**
      * Register styles.
      */
-    private static function __registerStyles() {
+    private static function registerStyles() {
         wp_register_style( 'types',
                 WPCF_EMBEDDED_RES_RELPATH . '/css/basic.css', array(),
                 WPCF_VERSION );
@@ -313,17 +300,6 @@ class WPCF_Loader
             var types = ' . json_encode( $settings ) . ';
             //]]>
         </script>';
-    }
-
-    /**
-     * Toolset loading.
-     */
-    private static function __toolset() {
-        // Views
-        if ( defined( 'WPV_VERSION' ) ) {
-            self::loadClass( 'wpviews' );
-            WPCF_WPViews::init();
-        }
     }
 
 }

@@ -14,7 +14,7 @@
  * @var string $today_date      Today's date in `Y-m-d`.
  * @var string $week_start_date The week start date, in `Y-m-d` format.
  *
- * @version 5.0.0
+ * @version 5.0.3
  *
  */
 $selected    = 'false';
@@ -30,6 +30,8 @@ if (
 	$day_classes[] = 'tribe-events-pro-week-day-selector__day--active';
 }
 
+/* translators: events (plural) */
+$label = sprintf( __( 'Has %s', 'tribe-events-calendar-pro' ), tribe_get_event_label_plural_lowercase() );
 ?>
 <li class="tribe-events-pro-week-day-selector__days-list-item">
 	<button
@@ -43,8 +45,8 @@ if (
 		<?php if ( ! empty( $day['found_events'] ) ) : ?>
 			<em
 				class="tribe-events-pro-week-day-selector__events-icon"
-				aria-label="<?php esc_attr_e( 'Has events', 'tribe-events-calendar-pro' ); ?>"
-				title="<?php esc_attr_e( 'Has events', 'tribe-events-calendar-pro' ); ?>"
+				aria-label="<?php echo esc_attr( $label ); ?>"
+				title="<?php echo esc_attr( $label ); ?>"
 			>
 			</em>
 		<?php endif; ?>

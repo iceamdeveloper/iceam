@@ -71,7 +71,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 */
 		public $template_namespace = 'events-pro';
 
-		const VERSION = '5.0.0.1';
+		const VERSION = '5.0.3';
 
 		/**
 		 * The Events Calendar Required Version
@@ -80,7 +80,7 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 		 * @deprecated 4.6
 		 *
 		 */
-		const REQUIRED_TEC_VERSION = '5.0.0.1';
+		const REQUIRED_TEC_VERSION = '5.0.2';
 
 		private function __construct() {
 			$this->pluginDir = trailingslashit( basename( EVENTS_CALENDAR_PRO_DIR ) );
@@ -113,11 +113,6 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			add_action( 'tribe_venues_enqueue', array( $this, 'admin_enqueue_scripts' ) );
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_pro_scripts' ), 8 );
 			add_action( 'wp_enqueue_scripts', array( $this, 'enqueue_styles' ) );
-
-			// Rewrite support.
-			tribe_register_provider( Tribe\Events\Pro\Rewrite\Provider::class );
-			// Context support.
-			tribe_register_provider( Tribe\Events\Pro\Service_Providers\Context::class );
 
 			add_action( 'tribe_settings_do_tabs', array( $this, 'add_settings_tabs' ) );
 			add_filter( 'tribe_settings_tab_fields', array( $this, 'filter_settings_tab_fields' ), 10, 2 );
@@ -2037,6 +2032,14 @@ if ( ! class_exists( 'Tribe__Events__Pro__Main' ) ) {
 			tribe_register_provider( Tribe\Events\Pro\Models\Service_Provider::class );
 			tribe_register_provider( Tribe__Events__Pro__Service_Providers__Templates::class );
 
+			// Rewrite support.
+			tribe_register_provider( Tribe\Events\Pro\Rewrite\Provider::class );
+
+			// Context support.
+			tribe_register_provider( Tribe\Events\Pro\Service_Providers\Context::class );
+
+			// Customizer support.
+			tribe_register_provider( Tribe\Events\Pro\Service_Providers\Customizer::class );
 		}
 
 		/**

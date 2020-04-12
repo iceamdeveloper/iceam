@@ -1,10 +1,7 @@
-/** * * Use this file only for scripts needed in full version.
- * Before moving from embedded JS - make sure it's needed only here.
- *
- *
- */
+/* eslint-disable */
+
 jQuery(document).ready(function($){
-    
+
     $('a.current').each( function() {
         var href = $(this).attr('href');
         if ('undefined' != typeof(href) && href.match(/page=wpcf\-edit(\-(type|usermeta))?/)) {
@@ -21,7 +18,7 @@ jQuery(document).ready(function($){
      * http://www.mkyong.com/jquery/how-to-create-a-tooltips-with-jquery/
      */
     var changeTooltipPosition = function(event) {
-        var tooltipX = event.pageX - 8;
+        var tooltipX = event.pageX + 2;
         var tooltipY = event.pageY + 8;
         $('div.tooltip').css({top: tooltipY, left: tooltipX});
     };

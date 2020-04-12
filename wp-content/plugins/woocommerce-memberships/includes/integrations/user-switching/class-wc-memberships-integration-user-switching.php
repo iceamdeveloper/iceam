@@ -16,16 +16,17 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Integration class for User Switching plugin
+ * Integration class for User Switching plugin.
  *
  * @since 1.0.0
  */
@@ -33,7 +34,7 @@ class WC_Memberships_Integration_User_Switching {
 
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @since 1.0.0
 	 */
@@ -55,14 +56,15 @@ class WC_Memberships_Integration_User_Switching {
 
 
 	/**
-	 * Customize membership plan row actions
+	 * Customizes membership plan row actions.
 	 *
 	 * @since 1.0.0
-	 * @param array $actions Array of post actions
-	 * @param \WP_Post $post Post object
+	 *
+	 * @param array $actions array of post actions
+	 * @param \WP_Post $post post object
 	 * @return array
 	 */
-	public function customize_membership_plan_row_actions( $actions, WP_Post $post ) {
+	public function customize_membership_plan_row_actions( $actions, \WP_Post $post ) {
 		global $typenow;
 
 		if ( 'wc_membership_plan' !== $typenow ) {
@@ -79,7 +81,7 @@ class WC_Memberships_Integration_User_Switching {
 
 
 	/**
-	 * View site as a member of a particular plan
+	 * Handles viewing the site as a member of a particular plan.
 	 *
 	 * @since 1.0.0
 	 */
@@ -105,13 +107,13 @@ class WC_Memberships_Integration_User_Switching {
 		$username = uniqid( 'wcm_' );
 
 		/**
-		 * Filter temporary user data
+		 * Filter temporary user data.
 		 *
-		 * Allows adjusting the data for a temporary user, which is
-		 * created to allow viewing the site as a member of a particular
-		 * membership plan
+		 * Allows adjusting the data for a temporary user,
+		 * which is created to allow viewing the site as a member of a particular membership plan
 		 *
 		 * @since 1.0.0
+		 *
 		 * @param array $data
 		 * @param \WC_Memberships_Membership_Plan $plan
 		 */
@@ -163,10 +165,11 @@ class WC_Memberships_Integration_User_Switching {
 
 
 	/**
-	 * Remove temporary user
+	 * Removes the temporary user.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param int $user_id
-	 * @since 1.0.0
 	 */
 	public function remove_temp_user( $user_id = null ) {
 

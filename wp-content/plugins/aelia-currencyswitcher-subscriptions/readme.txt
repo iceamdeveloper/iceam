@@ -1,11 +1,11 @@
 === WooCommerce Currency Switcher - Subscriptions Integration ===
 Tags: woocommerce, currency switcher, subscriptions, integration
 Requires at least: 3.6
-Tested up to: 5.2
+Tested up to: 5.4
 icense: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 3.7.0
+WC tested up to: 4.0
 
 Implements the integration between [Aelia Currency Switcher](http://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Subscriptions plugin](http://www.woothemes.com/products/woocommerce-subscriptions/).
 
@@ -33,6 +33,14 @@ This is a free plugin, and it's provided as is, without explicit or implicit gua
 Should you need assistance, please feel free to [contact us](https://aelia.co/contact) andto avail of our paid support service (standard charges apply).
 
 == Changelog ==
+
+= 1.4.11.200310 =
+* Restored patch to force currency during the processing of manual renewals.
+* Updated supported WooCommerce versions.
+
+= 1.4.10.200225 =
+* Tweak - Replaced call to deprecated method `WC_Subscriptions_Cart::cart_contains_subscription_renewal()` with call to function `wcs_cart_contains_renewal()`.
+* Updated supported WooCommerce versions.
 
 = 1.4.9.191219 =
 * Fix - Added logic to prevent unnecessary "Expected price property was not set" entries in Currency Switcher log.

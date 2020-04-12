@@ -40,6 +40,7 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 		return $return;
 	}
 	$overwrite_settings = isset( $_POST['overwrite-settings'] );
+	$overwrite_toolset_common_settings = isset( $_POST[ Types_Import_Export::XML_KEY_TOOLSET_COMMON_SETTINGS ] );
 	$overwrite_groups   = isset( $_POST['overwrite-groups'] );
 	$overwrite_fields   = isset( $_POST['overwrite-fields'] );
 	$overwrite_types    = isset( $_POST['overwrite-types'] );
@@ -49,7 +50,7 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 	$delete_types       = isset( $_POST['delete-types'] );
 	$delete_tax         = isset( $_POST['delete-tax'] );
 
-	if ( 'wpvdemo' == $context && ! empty( $args ) ) {
+	if ( 'wpvdemo' === $context && ! empty( $args ) ) {
 		/**
 		 * allow overwrite
 		 */
@@ -63,9 +64,7 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 		$data           = $data_installer->wpvdemo();
 	}
 
-	/**
-	 * process settings
-	 */
+	// process settings
 	if ( $overwrite_settings && isset( $data->settings ) ) {
 		$wpcf_settings = wpcf_get_settings();
 		foreach ( wpcf_admin_import_export_simplexml2array( $data->settings ) as $key => $value ) {
@@ -78,14 +77,48 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 		);
 	}
 
+	// Process Toolset Common settings.
+	//
+	//
+	if( $overwrite_toolset_common_settings ) {
+		if( isset( $data->{Types_Import_Export::XML_KEY_TOOLSET_COMMON_SETTINGS} ) ) {
+			$ie = Types_Import_Export::get_instance();
+			$result = $ie->import_toolset_common_settings( (string) $data->{Types_Import_Export::XML_KEY_TOOLSET_COMMON_SETTINGS} );
+			$return[] = [
+				'type' => $result->is_success() ? 'success' : 'error',
+				'content' => $result->has_message()
+					? $result->get_message()
+					: __( 'Toolset settings have been updated.', 'wpcf' ),
+			];
+		} else {
+			$return[] = [
+				'type' => 'success',
+				'content' => __( 'Toolset settings are not present in the import file.', 'wpcf' ),
+			];
+		}
+	}
+
+	// post type force insert (used for RFG post types, when the RFG is imported)
+	$post_type_force_insert = array();
+
+	// check this is called by types import page
+	$is_called_by_import_page = toolset_getget( 'page', false ) === 'toolset-export-import';
+
 	// Process groups
 	$groups_check = array();
+	$groups_update_fields_string_after_import = array();
 	if ( ! empty( $data->groups ) ) {
 		$groups = array();
 		// Set insert data from XML
 		foreach ( $data->groups->group as $group ) {
 			$group                  = wpcf_admin_import_export_simplexml2array( $group );
 			$groups[ $group['ID'] ] = $group;
+
+			if( $is_called_by_import_page ) {
+				// apply defaults if called by types import
+				$groups[ $group['ID'] ]['add']    = false;
+				$groups[ $group['ID'] ]['update'] = false;
+			}
 		}
 
 		// Set insert data from POST
@@ -98,7 +131,9 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 				$groups[ $group_id ]['update'] = ( isset( $group['update'] ) && $group['update'] == 'update' ) ? true
 					: false;
 			}
-		} else {
+
+		} elseif( ! $is_called_by_import_page ) {
+			// this else is not used by Types, but can be important for other callers like Module Manager
 			foreach ( $groups as $group_id => $group ) {
 				$groups[ $group_id ]['add']    = true;
 				$groups[ $group_id ]['update'] = false;
@@ -125,6 +160,13 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 				$post['post_name'] = $group['__types_id'];
 			}
 			if ( ( isset( $group['add'] ) && $group['add'] ) ) {
+
+				if( isset( $group['meta'] )
+					&& isset( $group['meta']['_types_repeatable_field_group_post_type'] ) ) {
+					// RFG, add post type to list of forced imported post types
+					$post_type_force_insert[] = $group['meta']['_types_repeatable_field_group_post_type'];
+				}
+
 				$post_to_update = $wpdb->get_var(
 					$wpdb->prepare(
 						"SELECT ID FROM $wpdb->posts WHERE post_title = %s AND post_type = %s",
@@ -218,6 +260,8 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 									}
 								}
 							}
+						} elseif( '_wp_types_group_fields' == $meta_key ) {
+							$groups_update_fields_string_after_import[$group_wp_id] = $meta_value;
 						}
 						update_post_meta( $group_wp_id, $meta_key, $meta_value );
 					}
@@ -299,6 +343,14 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 		}
 	}
 
+	// Rename links to RFGs on _wp_types_group_fields
+	// This must be done after all groups are imported / deleted
+	$rfg_service = new Types_Field_Group_Repeatable_Service();
+	foreach ( $groups_update_fields_string_after_import as $group_id => $fields_string ) {
+		$fields_string = $rfg_service->on_import_fields_string( $fields_string );
+		update_post_meta( $group_id, '_wp_types_group_fields', $fields_string );
+	}
+
 	// Process fields
 
 	$fields_check    = array();
@@ -317,7 +369,14 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 			} else {
 				$fields[ $field['id'] ] = $field;
 			}
+
+			if( $is_called_by_import_page ) {
+				// apply defaults if called by types import
+				$fields[ $field['id'] ]['add']    = false;
+				$fields[ $field['id'] ]['update'] = false;
+			}
 		}
+
 		// Set insert data from POST
 		if ( ! empty( $_POST['fields'] ) ) {
 			foreach ( $_POST['fields'] as $field_id => $field ) {
@@ -411,6 +470,12 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 		foreach ( $data->user_groups->group as $group ) {
 			$group                  = wpcf_admin_import_export_simplexml2array( $group );
 			$groups[ $group['ID'] ] = $group;
+
+			if( $is_called_by_import_page ) {
+				// apply defaults if called by types import
+				$groups[ $group['ID'] ]['add']    = false;
+				$groups[ $group['ID'] ]['update'] = false;
+			}
 		}
 		// Set insert data from POST
 		if ( ! empty( $_POST['user_groups'] ) ) {
@@ -422,7 +487,8 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 				$groups[ $group_id ]['update'] = ( isset( $group['update'] ) && $group['update'] == 'update' ) ? true
 					: false;
 			}
-		} else {
+		} elseif( ! $is_called_by_import_page ) {
+			// this else is not used by Types, but can be important for other callers like Module Manager
 			foreach ( $groups as $group_id => $group ) {
 				$groups[ $group_id ]['add']    = true;
 				$groups[ $group_id ]['update'] = false;
@@ -625,6 +691,12 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 			} else {
 				$fields[ $field['id'] ] = $field;
 			}
+
+			if( $is_called_by_import_page ) {
+				// apply defaults if called by types import
+				$fields[ $field['id'] ]['add']    = false;
+				$fields[ $field['id'] ]['update'] = false;
+			}
 		}
 		// Set insert data from POST
 		if ( ! empty( $_POST['user_fields'] ) ) {
@@ -724,21 +796,21 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 	}
 
 	$term_group_results = $ie_controller->process_field_group_import_per_domain(
-		Types_Field_Utils::DOMAIN_TERMS,
+		Toolset_Field_Utils::DOMAIN_TERMS,
 		$data,
 		'term_groups',
 		$overwrite_groups,
 		$delete_groups,
-		wpcf_ensarr( wpcf_getpost( 'term_groups' ) ),
+		toolset_ensarr( toolset_getpost( 'term_groups' ) ),
 		$args
 	);
 
 	$term_field_results = $ie_controller->process_field_definition_import_per_domain(
-		Types_Field_Utils::DOMAIN_TERMS,
+		Toolset_Field_Utils::DOMAIN_TERMS,
 		$data,
 		'term_fields',
 		$delete_fields,
-		wpcf_ensarr( wpcf_getpost( 'term_fields' ) ),
+		toolset_ensarr( toolset_getpost( 'term_fields' ) ),
 		$args
 	);
 
@@ -755,11 +827,17 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 			$type = wpcf_admin_import_export_simplexml2array( $type );
 			// Set if submitted in 'types' context
 			if ( $context == 'types' ) {
-				if ( isset( $_POST['types'][ $type['id'] ] ) ) {
+				if ( isset( $_POST['types'][ $type['id'] ] ) || in_array( $type['id'], $post_type_force_insert ) ) {
 					$types[ $type['id'] ] = $type;
 				}
 			} else {
 				$types[ $type['id'] ] = $type;
+			}
+
+			if( $is_called_by_import_page ) {
+				// apply defaults if called by types import
+				$types[ $type['id'] ]['add']    = false;
+				$types[ $type['id'] ]['update'] = false;
 			}
 		}
 		// Set insert data from POST
@@ -773,6 +851,19 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 					: false;
 			}
 		}
+
+		// Forced Post Types to insert
+		if( ! empty( $post_type_force_insert ) ) {
+			foreach( $post_type_force_insert as $post_type ) {
+				if ( ! isset( $types[ $post_type ] ) ) {
+					continue;
+				}
+
+				$types[ $post_type ]['add']    = true;
+				$types[ $post_type ]['update'] = true;
+			}
+		}
+
 		// Insert types
 		foreach ( $types as $type_id => $type ) {
 			// User choices on import/update process (TBT toolset-based themes)
@@ -840,6 +931,12 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 				}
 			} else {
 				$taxonomies[ $taxonomy['id'] ] = $taxonomy;
+			}
+
+			if( $is_called_by_import_page ) {
+				// apply defaults if called by types import
+				$taxonomies[ $taxonomy['id'] ]['add']    = false;
+				$taxonomies[ $taxonomy['id'] ]['update'] = false;
 			}
 		}
 		// Set insert data from POST
@@ -915,7 +1012,7 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 	}
 	update_option( WPCF_OPTION_NAME_CUSTOM_TAXONOMIES, $taxonomies_existing );
 
-	// Add relationships
+	// Add relationships (LEGACY RELATIONSHIPS)
 	if ( ! empty( $data->post_relationships ) && ! empty( $_POST['post_relationship'] ) ) {
 		$relationship_existing = get_option( 'wpcf_post_relationship', array() );
 		/**
@@ -938,6 +1035,161 @@ function wpcf_admin_import_data( $data = '', $redirect = true, $context = 'types
 				'content' => __( 'Post relationships settings were not imported because it contained unsecured data. You should re-export your Types settings using the latest version of Types',
 					'wpcf' )
 			);
+		}
+	}
+
+	// Add m2m relationships
+	if( ! empty( $data->m2m_relationships ) ) {
+		do_action( 'toolset_do_m2m_full_init' );
+		$relationship_repository = Toolset_Relationship_Definition_Repository::get_instance();
+		$post_type_repository = Toolset_Post_Type_Repository::get_instance();
+
+		// Refresh all post types of the repository
+		// also we initialise the Toolset_Post_Type_Repository after we imported Post Types it can happen that
+		// these post types are not loaded, because Toolset_Post_Type_Repository is a Singleton and could
+		// be loaded before. (Happened with CRED - CRED is on review for this strange behaviour, but to
+		// be save for the future it's better to have a refresh here)
+		$post_type_repository->refresh_all_post_types();
+
+		// all required keys - trust is good, control is better
+		$dependency_keys = array( 'slug', 'parent_types', 'child_types',
+			'intermediary_type', 'display_name_plural', 'display_name_singular',
+			'cardinality_parent_max', 'cardinality_child_max', 'needs_legacy_support' );
+
+		foreach ( $data->m2m_relationships as $relationships ) {
+			$relationships = (array) $relationships;
+			$intermediary_post_type = null;
+
+			foreach ( $relationships as $relationship ) {
+				$relationship = (array) $relationship;
+
+				if( $is_called_by_import_page
+					&& ! isset( $_POST['m2m-relationships'][$relationship['slug']] )
+					&& $relationship['origin'] != 'repeatable_group'
+					&& $relationship['origin'] != 'post_reference_field'
+				) {
+					// on Types import page user did not select to import relationship
+					// (rfg / prf are checked later agains the related fields)
+					continue;
+				}
+
+				// For Wizard relationships: check that user wants to import this relationship
+				// if there is no $_POST we do the import (the user had no choice/GUI -> import done by hook)
+				if( $relationship['origin'] == 'wizard'
+				    && (
+				    	isset( $_POST['m2m-relationships'][$relationship['slug']] )
+				        && ! $_POST['m2m-relationships'][$relationship['slug']]
+				    )
+				) {
+					continue;
+				}
+
+				// For RFG relationships: check user import choice of related RFG
+				if( $relationship['origin'] == 'repeatable_group' ) {
+					$child_types = (array) $relationship['child_types'];
+
+					foreach( $child_types as $child_type => $true ) {
+						if( ! in_array( $child_type, $post_type_force_insert ) ) {
+							// post type of rfg is not imported = rfg not imported = no need to import rfg relationship
+							continue 2;
+						}
+					}
+				}
+
+				// For PRF relationships: check user import choice of related PRF
+				// if there is no $_POST we do the import (the user had no choice/GUI -> import done by hook)
+				if( $relationship['origin'] == 'post_reference_field'
+				    && (
+					    isset( $_POST['fields'][$relationship['slug']] )
+					    && isset( $_POST['fields'][$relationship['slug']]['add'] )
+					    && ! $_POST['fields'][$relationship['slug']]['add']
+				    )
+				) {
+					continue;
+				}
+
+				try {
+					// check required values are available
+					foreach( $dependency_keys as $key ) {
+						if( ! isset( $relationship[$key] ) ) {
+							throw new Exception( __( 'Incompatible export file.', 'wpcf' ) );
+						}
+					}
+
+					// get parent type (throws Exception if not available)
+					foreach( $relationship['parent_types'] as $post_type_slug => $isset ) {
+						// currently we only support one type, so there is only one item to loop
+						$parent_type = Toolset_Relationship_Element_Type::build_for_post_type(
+							sanitize_title( $post_type_slug ) );
+					}
+					// for the case of an empty $relationship['parent_types'] array
+					if( ! isset( $parent_type ) ) {
+						throw new Exception( __( 'Parent Post Type missing.', 'wpcf' ) );
+					}
+
+					// get child type (throws Exception if not available)
+					foreach( $relationship['child_types'] as $post_type_slug => $isset ) {
+						// currently we only support one type, so there is only one item to loop
+						$child_type = Toolset_Relationship_Element_Type::build_for_post_type(
+							sanitize_title( $post_type_slug ) );
+					}
+					// for the case of an empty $relationship['child_types'] array
+					if( ! isset( $child_type ) ) {
+						throw new Exception( __( 'Child Post Type missing.', 'wpcf' ) );
+					}
+
+					// check for intermediary type (m2m)
+					if ( ! empty( $relationship['intermediary_type'] ) ) {
+						/** @var $intermediary_post_type Toolset_Post_Type_From_Types */
+						if( ! $intermediary_post_type = $post_type_repository->get( $relationship['intermediary_type'] ) ) {
+							throw new Exception( __( 'Intermediary Post Type missing.', 'wpcf' ) );
+						};
+					}
+
+
+					/** @var Toolset_Relationship_Definition $definition */
+					$definition = $relationship_repository->create_definition( $relationship['slug'], $parent_type, $child_type, false );
+					$definition->set_display_name( $relationship['display_name_plural'] );
+					$definition->set_display_name_singular( $relationship['display_name_singular'] );
+
+					$cardinality = new Toolset_Relationship_Cardinality(
+						$relationship['cardinality_parent_max'],
+						$relationship['cardinality_child_max']
+					);
+					$definition->set_cardinality( $cardinality );
+					$definition->is_distinct( true );
+					$definition->set_origin( $relationship['origin'] );
+					$legacy_support = $relationship['needs_legacy_support'] ? true : false;
+					$definition->set_legacy_support_requirement( $legacy_support );
+					if ( isset( $intermediary_post_type ) ) {
+						$definition->get_driver()->set_intermediary_post_type(
+							$intermediary_post_type, $intermediary_post_type->is_public() );
+					}
+
+					// check if relationship is disabled
+					if( isset( $relationship['is_active'] ) && ! $relationship['is_active'] ) {
+						$definition->is_active( false );
+					}
+
+					$relationship_repository->persist_definition( $definition );
+
+					$return[] = array(
+						'type'    => 'success',
+						'content' => sprintf(
+										 // This is the success message pattern of all elements
+							             __( 'Relationship "%s" added', 'wpcf' )
+							             , $relationship['slug'] )
+					);
+
+				} catch( Exception $e ) {
+					$return[] = array(
+						'type'    => 'error',
+						'content' => sprintf(
+							__( 'Relationship "%s" could not be imported.', 'wpcf' )
+							, $relationship['slug'] ) . ' '. $e->getMessage()
+					);
+				}
+			}
 		}
 	}
 

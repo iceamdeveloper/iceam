@@ -6,12 +6,14 @@
  *
  *     [your-theme]/tribe-events/tickets-plus/orders-edit-meta.php
  *
- * @since 4.4.3
- * @since 4.10.2 Set global for whether or not a ticket has any meta fields to show
- * @since 4.10.7 Rearranged some variables
+ * @since   4.4.3
+ * @since   4.10.2 Set global for whether or not a ticket has any meta fields to show.
+ * @since   4.10.7 Rearranged some variables.
+ * @since   4.11.2 Use customizable ticket name functions.
  *
- * @version 4.10.7
+ * @version 4.11.2
  */
+
 global $tribe_my_tickets_have_meta;
 
 /**
@@ -22,7 +24,16 @@ $ticket = get_post( $attendee['product_id'] );
 
 if ( ! $ticket instanceof WP_Post ) {
 	?>
-		<p><?php esc_html_e( 'Ticket deleted: attendee info cannot be updated.', 'event-tickets-plus' ); ?></p>
+	<p>
+		<?php
+		echo esc_html(
+			sprintf(
+				__( '%s deleted: attendee info cannot be updated.', 'event-tickets-plus' ),
+				tribe_get_ticket_label_singular( 'orders_edit_meta' )
+			)
+		);
+		?>
+	</p>
 	<?php
 
 	return;

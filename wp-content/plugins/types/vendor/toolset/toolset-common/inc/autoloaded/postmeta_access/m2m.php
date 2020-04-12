@@ -69,29 +69,33 @@ class Toolset_Postmeta_Access_M2m {
 		add_action( 'toolset_deactivate_postmeta_access_m2m', array( $this, 'deactivate_postmeta_access_m2m' ) );
 	}
 
+
 	/**
 	 * Transform a postmeta adding action into an association creation.
 	 *
 	 * @param $object_id int ID of the object metadata is for
-	 * @param @meta_key string Metadata key
+	 * @param $meta_key string Metadata key
 	 * @param $_meta_value mixed Metadata value
 	 *
 	 * @since m2m
+	 * @throws Toolset_Element_Exception_Element_Doesnt_Exist
 	 */
 	public function add_post_meta( $object_id, $meta_key, $_meta_value ) {
 		// It has to run update_post_meta because the IPT could exist and needs to be deleted.
 		$this->update_post_meta( null, $object_id, $meta_key, $_meta_value );
 	}
 
+
 	/**
 	 * Transform a postmeta updating action into an association updating.
 	 *
 	 * @param $meta_id int ID of the metadata entry to update
 	 * @param $object_id int ID of the object metadata is for
-	 * @param @meta_key string Metadata key
+	 * @param $meta_key string Metadata key
 	 * @param $_meta_value mixed Metadata value
 	 *
 	 * @since m2m
+	 * @throws Toolset_Element_Exception_Element_Doesnt_Exist
 	 */
 	public function update_post_meta( $meta_id, $object_id, $meta_key, $_meta_value ) {
 		$parent_type = $this->get_parent_type_from_meta_key( $meta_key );
@@ -297,6 +301,8 @@ class Toolset_Postmeta_Access_M2m {
 	/**
 	 * Get a specific association given a child, and a relationship.
 	 * Works because legacy relationships are one-to-many, hence the child can only have one associated parent.
+	 * 
+	 * Note that we avoid the associations cache, for complete compatibility with Forms.
 	 *
 	 * @param $elationship_slug string The relationship slug
 	 * @param $child_id int The child ID
@@ -308,6 +314,7 @@ class Toolset_Postmeta_Access_M2m {
 	private function get_association( $relationshup_slug, $child_id ) {
 		$association_query = new Toolset_Association_Query_V2();
 		$associations = $association_query
+			->use_cache( false )
 			->add( $association_query->relationship_slug( $relationshup_slug ) )
 			->limit( 1 )
 			->add( $association_query->element_id_and_domain( $child_id, Toolset_Element_Domain::POSTS, new Toolset_Relationship_Role_Child() ) )
@@ -323,17 +330,20 @@ class Toolset_Postmeta_Access_M2m {
 	 * Get a specific association parent ID given a child, and a relationship.
 	 * Works because legacy relationships are one-to-many, hence the child can only have one associated parent.
 	 *
-	 * @param $elationship_slug string The relationship slug
+	 * Note that we avoid the associations cache, for complete compatibility with Forms.
+	 *
+	 * @param $relationship_slug string The relationship slug
 	 * @param $child_id int The child ID
 	 *
 	 * @return null|int
 	 *
 	 * @since m2m
 	 */
-	private function get_association_parent_id( $relationshup_slug, $child_id ) {
+	private function get_association_parent_id( $relationship_slug, $child_id ) {
 		$association_query = new Toolset_Association_Query_V2();
 		$associations_ids = $association_query
-			->add( $association_query->relationship_slug( $relationshup_slug ) )
+			->use_cache( false )
+			->add( $association_query->relationship_slug( $relationship_slug ) )
 			->return_element_ids( new Toolset_Relationship_Role_Parent() )
 			->limit( 1 )
 			->add( $association_query->element_id_and_domain( $child_id, Toolset_Element_Domain::POSTS, new Toolset_Relationship_Role_Child() ) )

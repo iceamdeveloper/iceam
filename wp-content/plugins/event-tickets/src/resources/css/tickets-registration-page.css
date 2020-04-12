@@ -541,62 +541,6 @@
 
 /* -----------------------------------------------------------------------------
 	 *
-	 * Button: Link
-	 *
-	 * Example:
-	 * <button class="tribe-common-c-btn-link">...</button>
-	 * <a href="#" class="tribe-common-c-btn-link">...</a>
-	 *
-	 * ----------------------------------------------------------------------------- */
-
-.tribe-common .tribe-common-c-btn-link,
-	.tribe-common a.tribe-common-c-btn-link {
-		color: #141827;
-		font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-		font-size: 14px;
-		line-height: 1.62;
-		font-weight: 400;
-		border: 0;
-		cursor: pointer;
-		display: inline-block;
-		height: auto;
-		padding: 0;
-		text-decoration: none;
-		width: auto;
-		background-color: transparent;
-		text-align: center;
-		text-decoration: underline;
-		transition: color 0.2s ease;
-
-		color: #334AFF;
-		padding: 11px 20px;
-		width: 100%;
-	}
-
-.tribe-common .tribe-common-c-btn-link:hover,
-	.tribe-common .tribe-common-c-btn-link:focus,
-	.tribe-common a.tribe-common-c-btn-link:hover,
-	.tribe-common a.tribe-common-c-btn-link:focus {
-		background-color: transparent;
-	}
-
-.tribe-common .tribe-common-c-btn-link:focus,
-		.tribe-common .tribe-common-c-btn-link:hover,
-		.tribe-common a.tribe-common-c-btn-link:focus,
-		.tribe-common a.tribe-common-c-btn-link:hover {
-			color: rgba(51,74,255, 0.8);
-		}
-
-.tribe-common .tribe-common-c-btn-link:active, .tribe-common a.tribe-common-c-btn-link:active {
-			color: rgba(51,74,255, 0.9);
-		}
-
-.tribe-common .tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
-			color: rgba(51,74,255, 0.07);
-		}
-
-/* -----------------------------------------------------------------------------
-	 *
 	 * Button: Small
 	 *
 	 * Example:
@@ -605,11 +549,75 @@
 	 *
 	 * ----------------------------------------------------------------------------- */
 
-.tribe-common .tribe-common-c-btn--small,
-	.tribe-common a.tribe-common-c-btn--small {
-		padding: 11px 14px;
-		width: auto;
+.tribe-common button.tribe-common-c-btn--small, .tribe-common input[type="button"].tribe-common-c-btn--small, .tribe-common input[type="submit"].tribe-common-c-btn--small, .tribe-common a.tribe-common-c-btn--small {
+			background-color: #334AFF;
+			padding: 11px 14px;
+			width: auto;
+		}
+
+/* -----------------------------------------------------------------------------
+	 *
+	 * Button: Link
+	 *
+	 * Example:
+	 * <button class="tribe-common-c-btn-link">...</button>
+	 * <a href="#" class="tribe-common-c-btn-link">...</a>
+	 *
+	 * ----------------------------------------------------------------------------- */
+
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+			color: #141827;
+			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.62;
+			font-weight: 400;
+			border: 0;
+			cursor: pointer;
+			display: inline-block;
+			height: auto;
+			padding: 0;
+			text-decoration: none;
+			width: auto;
+			background-color: transparent;
+			text-align: center;
+			text-decoration: underline;
+			transition: color 0.2s ease;
+
+			background-color: transparent;
+			color: #334AFF;
+			padding: 11px 20px;
+			width: 100%;
+		}
+
+.tribe-common button.tribe-common-c-btn-link:hover,
+	.tribe-common button.tribe-common-c-btn-link:focus,
+	.tribe-common input[type="button"].tribe-common-c-btn-link:hover,
+	.tribe-common input[type="button"].tribe-common-c-btn-link:focus,
+	.tribe-common input[type="submit"].tribe-common-c-btn-link:hover,
+	.tribe-common input[type="submit"].tribe-common-c-btn-link:focus,
+	.tribe-common a.tribe-common-c-btn-link:hover,
+	.tribe-common a.tribe-common-c-btn-link:focus {
+		background-color: transparent;
 	}
+
+.tribe-common button.tribe-common-c-btn-link:focus,
+			.tribe-common button.tribe-common-c-btn-link:hover,
+			.tribe-common input[type="button"].tribe-common-c-btn-link:focus,
+			.tribe-common input[type="button"].tribe-common-c-btn-link:hover,
+			.tribe-common input[type="submit"].tribe-common-c-btn-link:focus,
+			.tribe-common input[type="submit"].tribe-common-c-btn-link:hover,
+			.tribe-common a.tribe-common-c-btn-link:focus,
+			.tribe-common a.tribe-common-c-btn-link:hover {
+				color: rgba(51,74,255, 0.8);
+			}
+
+.tribe-common button.tribe-common-c-btn-link:active, .tribe-common input[type="button"].tribe-common-c-btn-link:active, .tribe-common input[type="submit"].tribe-common-c-btn-link:active, .tribe-common a.tribe-common-c-btn-link:active {
+				color: rgba(51,74,255, 0.9);
+			}
+
+.tribe-common button.tribe-common-c-btn-link:disabled, .tribe-common input[type="button"].tribe-common-c-btn-link:disabled, .tribe-common input[type="submit"].tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
+				color: rgba(51,74,255, 0.07);
+			}
 
 /**
  * Compatibility
@@ -742,6 +750,7 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 			body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__item__extra__price {
 				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
 				font-size: 14px;
+				font-weight: 700;
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-ticket-quantity {
@@ -888,6 +897,14 @@ body.page-tribe-attendee-registration .tribe-common-c-loader {
 		top: 0;
 	}
 
+/* -------------------------------------------------------------------------
+	 * Theme Overrides - Twenty twenty
+	 * ------------------------------------------------------------------------- */
+
+body.page-tribe-attendee-registration.tribe-theme-twentytwenty .entry-content .tribe-tickets__registration {
+			max-width: 960px !important;
+		 }
+
 /* Theme overrides */
 
 .page-tribe-attendee-registration .wrap {
@@ -902,10 +919,10 @@ body.page-tribe-attendee-registration .tribe-common-c-loader {
 				padding: 0
 		}
 
-.tribe-common .tribe-common-c-btn-link,
-	.tribe-common a.tribe-common-c-btn-link {
-			width: auto
-	}
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+				background-color: transparent;
+				width: auto
+		}
 
 body.page-tribe-attendee-registration * {
 			max-width: none

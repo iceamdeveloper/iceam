@@ -16,12 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) or exit;
  *
  * @since 1.7.0
  */
-class WC_Memberships_Meta_Box_View_Membership_Note extends WC_Memberships_Meta_Box_View  {
+class WC_Memberships_Meta_Box_View_Membership_Note extends \WC_Memberships_Meta_Box_View  {
 
 
 	/**

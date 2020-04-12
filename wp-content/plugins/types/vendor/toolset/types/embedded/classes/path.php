@@ -84,11 +84,12 @@ final class WPCF_Path
             return realpath( $path );
 
         // whether $path is unix or not
-        $unipath = strlen( $path ) == 0 || $path{0} != '/';
+        $unipath = $path === '' || $path[0] !== '/';
 
         // attempts to detect if path is relative in which case, add cwd
-        if ( strpos( $path, ':' ) === false && $unipath )
-            $path = getcwd() . DIRECTORY_SEPARATOR . $path;
+        if ( $unipath && strpos( $path, ':' ) === false ) {
+			$path = getcwd() . DIRECTORY_SEPARATOR . $path;
+		}
 
         // resolve path parts (single dot, double dot and double delimiters)
         $path = str_replace( array('/', '\\'), DIRECTORY_SEPARATOR, $path );
@@ -259,7 +260,7 @@ final class WPCF_Path
         return $url;
     }
 
-    public static function getFileUrl( $__FILE__ = null, $use_baseurl = true )
+    public static function getFileUrl( $__FILE__ = null, $use_baseurl = true, $add_port_to_host_url = true )
     {
         self::fixServerVars();
 
@@ -275,7 +276,7 @@ final class WPCF_Path
 
         $docroot = self::getDocRoot( $manual );
 
-        $baseurl = $use_baseurl ? self::getBaseUrl() : self::getHostUrl();
+        $baseurl = $use_baseurl ? self::getBaseUrl() : self::getHostUrl( $add_port_to_host_url );
 
         if ( 0 === strpos( $__FILE__, $docroot ) ) {
             return self::_join_paths( $baseurl, self::str_after( $__FILE__, $docroot ) );

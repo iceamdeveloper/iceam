@@ -12,11 +12,19 @@ use Aelia\WC\Messages;
  * Aelia Currency Switcher Dynamic Pricing Integration plugin.
  **/
 class WC_Aelia_CS_Dynamic_Pricing_Plugin extends Aelia_Plugin {
-	public static $version = '1.0.4.181213';
+	public static $version = '1.0.5.190426';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
 	public static $plugin_name = 'WooCommerce Aelia Currency Switcher - Dynamic Pricing Integration';
+
+	/**
+	 * The slug used to check for updates.
+	 *
+	 * @var string
+	 * @since x.x
+	 */
+	public static $slug_for_update_check = Definitions::PLUGIN_SLUG_FOR_UPDATES;
 
 	public static function factory() {
 		// Load Composer autoloader
@@ -47,8 +55,28 @@ class WC_Aelia_CS_Dynamic_Pricing_Plugin extends Aelia_Plugin {
 		$this->initialize_integration();
 	}
 
+	/**
+	 * Initialises the integration with the Dynamic Pricing plugin.
+	 */
 	protected function initialize_integration() {
 		$this->dynamic_pricing_integration = new Dynamic_Pricing_Integration();
+	}
+
+	/**
+	 * Registers the plugin for automatic updates.
+	 *
+	 * @param array The array of the plugins to update, structured as follows:
+	 * array(
+	 *   'free' => <Array of free plugins>,
+	 *   'premium' => <Array of premium plugins, which require licence activation>,
+	 * )
+	 * @return array The array of plugins to update, with the details of this
+	 * plugin added to it.
+	 * @since x.x
+	 */
+	public function wc_aelia_afc_register_plugins_to_update(array $plugins_to_update) {
+		$plugins_to_update['free'][self::$plugin_slug] = $this;
+		return $plugins_to_update;
 	}
 }
 

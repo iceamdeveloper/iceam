@@ -9,7 +9,7 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.3
  *
  * @var string $multiday_toggle_controls A space-separated list of entries for the `aria-controls` attribute.
  */
@@ -23,6 +23,14 @@
 	data-js="tribe-events-pro-week-multiday-toggle-button"
 >
 	<span class="tribe-common-a11y-visual-hide">
-		<?php esc_html_e( 'Toggle multiday events', 'tribe-events-calendar-pro' ); ?>
+		<?php
+		echo esc_html(
+			sprintf(
+				/* translators: %s: events (plural) */
+				__( 'Toggle multiday %s', 'tribe-events-calendar-pro' ),
+				tribe_get_event_label_plural_lowercase()
+			)
+		);
+		?>
 	</span>
 </button>

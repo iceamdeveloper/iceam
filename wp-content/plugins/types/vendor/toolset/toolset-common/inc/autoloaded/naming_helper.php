@@ -13,7 +13,7 @@ class Toolset_Naming_Helper {
 	private static $instance;
 
 	public static function get_instance() {
-		if( null == self::$instance ) {
+		if( null === self::$instance ) {
 			self::$instance = new self();
 		}
 
@@ -31,12 +31,17 @@ class Toolset_Naming_Helper {
 	const DOMAIN_TAXONOMY_REWRITE_SLUGS = 'taxonomy_rewrite_slugs';
 	const DOMAIN_POST_TYPE_SLUGS = 'post_type_slugs';
 	const DOMAIN_RELATIONSHIPS = 'relationships';
+	const DOMAIN_TAXONOMY_SLUGS = 'taxonomy_slugs';
 
 	// This is determined by the wp_posts table structure.
 	const MAX_POST_TYPE_SLUG_LENGTH = 20;
 
 
-	// See https://codex.wordpress.org/Reserved_Terms
+	/**
+	 * Reserved terms (keywords).
+	 *
+	 * @link https://codex.wordpress.org/Reserved_Terms
+	 */
 	private $reserved_terms = array(
 		'attachment',
 		'attachment_id',
@@ -114,6 +119,7 @@ class Toolset_Naming_Helper {
 		'term',
 		'terms',
 		'theme',
+		'themes', // This is not on the official list but it also causes issues.
 		'title',
 		'type',
 		'w',
@@ -137,7 +143,8 @@ class Toolset_Naming_Helper {
 			self::DOMAIN_POST_TYPE_REWRITE_SLUGS => 'check_slug_conflicts_in_post_type_rewrite_rules',
 			self::DOMAIN_TAXONOMY_REWRITE_SLUGS => 'check_slug_conflicts_in_taxonomy_rewrite_rules',
 			self::DOMAIN_POST_TYPE_SLUGS => 'check_post_type_slug_conflicts',
-			self::DOMAIN_RELATIONSHIPS => 'check_relationship_slug_conflicts'
+			self::DOMAIN_RELATIONSHIPS => 'check_relationship_slug_conflicts',
+			self::DOMAIN_TAXONOMY_SLUGS => 'check_taxonomy_slug_conflicts',
 		);
 	}
 
@@ -173,23 +180,23 @@ class Toolset_Naming_Helper {
 			} else {
 				$slug = toolset_getarr( $post_type, 'slug' );
 				$is_permalink_rewriting_enabled = (bool) toolset_getnest( $post_type, array( 'rewrite', 'enabled' ) );
-				$is_custom_slug_used = ( toolset_getnest( $post_type, array( 'rewrite', 'custom' ) ) == 'custom' );
+				$is_custom_slug_used = ( toolset_getnest( $post_type, array( 'rewrite', 'custom' ) ) === 'custom' );
 				$rewrite_slug = toolset_getnest( $post_type, array( 'rewrite', 'slug' ) );
 			}
 
-			if( $slug == $exclude_id ) {
+			if( $slug === (string) $exclude_id ) {
 				continue;
 			}
 
 			if( $is_permalink_rewriting_enabled ) {
 				$conflict_candidate = ( $is_custom_slug_used ? $rewrite_slug : $slug );
 
-				if( $conflict_candidate == $value ) {
+				if( $conflict_candidate === (string) $value ) {
 
 					$conflict = array(
 						'conflicting_id' => $slug,
 						'message' => sprintf(
-							__( 'The same value is already used in permalink rewrite rules for the custom post type "%s". Using it again can cause issues with permalinks.', 'wpcf' ),
+							__( 'The same value is already used in permalink rewrite rules for the custom post type "%s". Using it again can cause issues with permalinks.', 'wpv-views' ),
 							esc_html( $slug )
 						)
 					);
@@ -237,7 +244,7 @@ class Toolset_Naming_Helper {
 				$rewrite_slug = toolset_getnest( $taxonomy, array( 'rewrite', 'slug' ) );
 			}
 
-			if( $slug == $exclude_id ) {
+			if( $slug === (string) $exclude_id ) {
 				continue;
 			}
 
@@ -247,12 +254,12 @@ class Toolset_Naming_Helper {
 			if( $is_permalink_rewriting_enabled ) {
 				$conflict_candidate = ( $is_custom_slug_used ? $rewrite_slug : $slug );
 
-				if( $conflict_candidate == $value ) {
+				if( $conflict_candidate === (string) $value ) {
 
 					$conflict = array(
 						'conflicting_id' => $slug,
 						'message' => sprintf(
-							__( 'The same value is already used in permalink rewrite rules for the taxonomy "%s". Using it again can cause issues with permalinks.', 'wpcf' ),
+							__( 'The same value is already used in permalink rewrite rules for the taxonomy "%s". Using it again can cause issues with permalinks.', 'wpv-views' ),
 							esc_html( $slug )
 						)
 					);
@@ -278,14 +285,16 @@ class Toolset_Naming_Helper {
 	 * @return array|false
 	 * @since m2m
 	 */
-	public function check_post_type_slug_conflicts( $value, $ignored = null ) {
+	public function check_post_type_slug_conflicts(
+		$value, /** @noinspection PhpUnusedParameterInspection */ $ignored = null
+	) {
 
 		// Handle terms reserved by WordPress.
-		if( in_array( $value, $this->reserved_terms ) ) {
+		if( in_array( $value, $this->reserved_terms, true ) ) {
 			$conflict = array(
 				'conflicting_id' => $value,
 				'message' => sprintf(
-					__( 'The post type slug "%s" is reserved by WordPress.', 'wpcf' ),
+					__( 'The post type slug "%s" is reserved by WordPress.', 'wpv-views' ),
 					esc_html( $value )
 				)
 			);
@@ -302,14 +311,13 @@ class Toolset_Naming_Helper {
 			$conflict = array(
 				'conflicting_id' => $value,
 				'message' => sprintf(
-					__( 'The post type slug "%s" is already registered or defined by Types.', 'wpcf' ),
+					__( 'The post type slug "%s" is already registered or defined by Types.', 'wpv-views' ),
 					esc_html( $value )
 				)
 			);
 
 			return $conflict;
 		}
-
 
 		global $wpdb;
 		$conflicting_page = $wpdb->get_var(
@@ -322,7 +330,7 @@ class Toolset_Naming_Helper {
 			$conflict = array(
 				'conflicting_id' => $value,
 				'message' => sprintf(
-					__( 'The post type slug "%s" cannot be used because there is already a page by that name.', 'wpcf' ),
+					__( 'The post type slug "%s" cannot be used because there is already a page by that name.', 'wpv-views' ),
 					esc_html( $value )
 				)
 			);
@@ -330,6 +338,38 @@ class Toolset_Naming_Helper {
 			return $conflict;
 		}
 
+		return false;
+	}
+
+
+	/**
+	 * Check for taxonomy slug conflicts.
+	 *
+	 * NOTE: At the moment, we only check for reserved terms in WordPress.
+	 * Extend the implementation when needed.
+	 *
+	 * @param string $value
+	 * @param null $ignored
+	 *
+	 * @return array|false
+	 * @since Types 3.3.8
+	 */
+	public function check_taxonomy_slug_conflicts( $value, /** @noinspection PhpUnusedParameterInspection */ $ignored = null ) {
+		// Handle terms reserved by WordPress.
+		if ( in_array( $value, $this->reserved_terms, true ) ) {
+			$conflict = array(
+				'conflicting_id' => $value,
+				'message' => sprintf(
+					// translators: Taxonomy slug.
+					__( 'The taxonomy slug "%s" is a keyword reserved by WordPress and cannot be used.', 'wpv-views' ),
+					esc_html( $value )
+				),
+			);
+
+			return $conflict;
+		}
+
+		// No conflicts.
 		return false;
 	}
 
@@ -343,7 +383,6 @@ class Toolset_Naming_Helper {
 	public function check_relationship_slug_conflicts( $value, $ignored = null ) {
 
 		// todo define reserved keywords
-
 		$m2m_controller = Toolset_Relationship_Controller::get_instance();
 		$m2m_controller->initialize_full();
 
@@ -351,11 +390,11 @@ class Toolset_Naming_Helper {
 		$relationships = $query->get_results();
 
 		foreach( $relationships as $relationship_definition ) {
-			if( $relationship_definition->get_slug() == $value ) {
+			if( $relationship_definition->get_slug() === $value ) {
 				$conflict = array(
 					'conflicting_id' => $value,
 					'message' => sprintf(
-						__( 'The relationship slug "%s" is already being used.', 'wpcf' ),
+						__( 'The relationship slug "%s" is already being used.', 'wpv-views' ),
 						$value
 					)
 				);
@@ -384,7 +423,7 @@ class Toolset_Naming_Helper {
 			throw new InvalidArgumentException( 'Domain not supported.' );
 		}
 
-		$conflict = call_user_func( array( $this, $domain_to_method[ $domain ] ), $value, $exclude_id );
+		$conflict = $this->{$domain_to_method[ $domain ]}( $value, $exclude_id );
 
 		return ( false === $conflict );
 	}
@@ -462,7 +501,7 @@ class Toolset_Naming_Helper {
 	 *
 	 * @param string $slug_candidate
 	 *
-	 * @return string Unique post type slug.
+	 * @return string|null Unique post type slug or null if it cannot be determined.
 	 */
 	public function generate_unique_post_type_slug( $slug_candidate ) {
 
@@ -471,7 +510,11 @@ class Toolset_Naming_Helper {
 
 		do {
 			$slug_candidate = substr( $slug_candidate_base, 0, $trimming_length );
-			$slug_candidate = $this->generate_unique_slug( $slug_candidate, null, self::DOMAIN_POST_TYPE_SLUGS );
+			$next_candidate = $this->generate_unique_slug( $slug_candidate, null, self::DOMAIN_POST_TYPE_SLUGS );
+			if ( null === $next_candidate ) {
+				return null;
+			}
+			$slug_candidate = $next_candidate;
 			--$trimming_length;
 		} while( strlen( $slug_candidate ) > self::MAX_POST_TYPE_SLUG_LENGTH && $trimming_length > 0 );
 

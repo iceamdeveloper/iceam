@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitec55bf4ac43f02a0caa3dfbccfeddc15
+class ComposerStaticInit301cea39269259027dd0a851582df2a4
 {
     public static $classMap = array (
         'Aelia\\WC\\Cache_Handler\\Ajax_Loader_Cache_Handler' => __DIR__ . '/../..' . '/lib/classes/cache_handlers/ajax_loader_cache_handler.php',
@@ -21,7 +21,7 @@ class ComposerStaticInitec55bf4ac43f02a0caa3dfbccfeddc15
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInitec55bf4ac43f02a0caa3dfbccfeddc15::$classMap;
+            $loader->classMap = ComposerStaticInit301cea39269259027dd0a851582df2a4::$classMap;
 
         }, null, ClassLoader::class);
     }

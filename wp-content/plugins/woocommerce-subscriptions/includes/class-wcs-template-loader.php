@@ -12,6 +12,7 @@ class WCS_Template_Loader {
 		add_action( 'woocommerce_subscription_details_table', array( __CLASS__, 'get_subscription_details_template' ) );
 		add_action( 'woocommerce_subscription_totals_table', array( __CLASS__, 'get_subscription_totals_template' ) );
 		add_action( 'woocommerce_subscription_totals_table', array( __CLASS__, 'get_order_downloads_template' ), 20 );
+		add_action( 'woocommerce_subscription_totals', array( __CLASS__, 'get_subscription_totals_table_template' ), 10, 4 );
 	}
 
 	/**
@@ -61,5 +62,41 @@ class WCS_Template_Loader {
 		if ( $subscription->has_downloadable_item() && $subscription->is_download_permitted() ) {
 			wc_get_template( 'order/order-downloads.php', array( 'downloads' => $subscription->get_downloadable_items(), 'show_title' => true ) );
 		}
+	}
+
+	/**
+	 * Gets the subscription totals table.
+	 *
+	 * @since 2.6.0
+	 *
+	 * @param WC_Subscription $subscription     The subscription to print the totals table for.
+	 * @param bool  $include_item_removal_links Whether the remove line item links should be included.
+	 * @param array $totals                     The subscription totals rows to be displayed.
+	 * @param bool  $include_switch_links       Whether the line item switch links should be included.
+	 */
+	public static function get_subscription_totals_table_template( $subscription, $include_item_removal_links, $totals, $include_switch_links = true ) {
+
+		// If the switch links shouldn't be printed, remove the callback which prints them.
+		if ( false === $include_switch_links ) {
+			$callback_detached = remove_action( 'woocommerce_order_item_meta_end', 'WC_Subscriptions_Switcher::print_switch_link' );
+		}
+
+		wc_get_template( 'myaccount/subscription-totals-table.php', array( 'subscription' => $subscription, 'allow_item_removal' => $include_item_removal_links, 'totals' => $totals ), '', plugin_dir_path( WC_Subscriptions::$plugin_file ) . 'templates/' );
+
+		// Reattach the callback if it was successfully removed.
+		if ( false === $include_switch_links && $callback_detached ) {
+			add_action( 'woocommerce_order_item_meta_end', 'WC_Subscriptions_Switcher::print_switch_link', 10, 3 );
+		}
+	}
+
+	/**
+	 * Gets the subscription receipt template content.
+	 *
+	 * @since 3.0.0
+	 *
+	 * @param WC_Subscription $subscription The subscription to display the receipt for.
+	 */
+	public static function get_subscription_receipt_template( $subscription ) {
+		wc_get_template( 'checkout/subscription-receipt.php', array( 'subscription' => $subscription ), '', plugin_dir_path( WC_Subscriptions::$plugin_file ) . 'templates/' );
 	}
 }

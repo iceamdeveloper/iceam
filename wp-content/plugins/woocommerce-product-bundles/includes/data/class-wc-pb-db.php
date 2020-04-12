@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundles DB API for manipulating bundled item data in the database.
  *
  * @class    WC_PB_DB
- * @version  5.1.3
+ * @version  6.0.0
  */
 class WC_PB_DB {
 
@@ -36,10 +36,11 @@ class WC_PB_DB {
 		$wpdb->tables[]         = 'woocommerce_bundled_itemmeta';
 	}
 
-
-	/*---------------------*/
-	/*  Bundled Items      */
-	/*---------------------*/
+	/*
+	|--------------------------------------------------------------------------
+	| Bundled Items.
+	|--------------------------------------------------------------------------
+	*/
 
 	/**
 	 * Query bundled item data from the DB.
@@ -52,6 +53,7 @@ class WC_PB_DB {
 	 *         - 'id=>bundle_id': map of bundled item ids / bundle ids,
 	 *         - 'id=>product_id': map of bundled item ids / bundled product ids,
 	 *         - 'objects': WC_Bundled_Item_Data objects.
+	 *         - 'count': count.
 	 *
 	 *     @type  int|array  $bundled_item_id  Bundled item id(s) in WHERE clause.
 	 *     @type  int|array  $product_id       Bundled product id(s) in WHERE clause.
@@ -67,7 +69,7 @@ class WC_PB_DB {
 		global $wpdb;
 
 		$args = wp_parse_args( $args, array(
-			'return'          => 'all', // 'ids' | 'id=>bundle_id' | 'id=>product_id' | 'objects'
+			'return'          => 'all', // 'ids' | 'id=>bundle_id' | 'id=>product_id' | 'objects' | 'count'
 			'bundled_item_id' => 0,
 			'product_id'      => 0,
 			'bundle_id'       => 0,
@@ -79,10 +81,12 @@ class WC_PB_DB {
 
 		if ( in_array( $args[ 'return' ], array( 'ids', 'objects' ) ) ) {
 			$select = $table . '.bundled_item_id';
+		} elseif ( 'count' === $args[ 'return' ] ) {
+			$select = 'COUNT(' . $table . '.bundled_item_id' . ')';
 		} elseif ( 'id=>bundle_id' === $args[ 'return' ] ) {
 			$select = $table . '.bundled_item_id, ' . $table . '.bundle_id';
 		} else {
-			$select = $table . '.*';
+			$select = '*';
 		}
 
 		$sql      = "SELECT " . $select . " FROM {$table}";
@@ -150,6 +154,13 @@ class WC_PB_DB {
 		// Assemble and run the query.
 
 		$sql .= $join . $where . $order_by;
+
+		if ( 'count' === $args[ 'return' ] ) {
+
+			$result = $wpdb->get_var( $sql );
+
+			return $result ? $result : 0;
+		}
 
 		$results = $wpdb->get_results( $sql );
 
@@ -255,7 +266,7 @@ class WC_PB_DB {
 			$item = new WC_Bundled_Item_Data( $item );
 		}
 
-		if ( is_object( $item ) && $item->get_id() && ! empty( $data ) && is_array( $data ) ) {
+		if ( is_object( $item ) && $item->get_id() && $item->get_bundle_id() && ! empty( $data ) && is_array( $data ) ) {
 			$item->set_all( $data );
 			return $item->save();
 		}
@@ -276,10 +287,11 @@ class WC_PB_DB {
 		}
 	}
 
-
-	/*---------------------*/
-	/*  Item Meta          */
-	/*---------------------*/
+	/*
+	|--------------------------------------------------------------------------
+	| Bundled Item Meta.
+	|--------------------------------------------------------------------------
+	*/
 
 	/**
 	 * Add bundled item meta to the DB. Unique only.
@@ -293,10 +305,10 @@ class WC_PB_DB {
 	public static function add_bundled_item_meta( $item_id, $meta_key, $meta_value ) {
 		if ( $meta_id = add_metadata( 'bundled_item', $item_id, $meta_key, $meta_value, true ) ) {
 
-			$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $item_id;
+			$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $item_id;
 			wp_cache_delete( $cache_key, 'bundled_item_meta' );
 
-			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+			WC_PB_Core_Compatibility::invalidate_cache_group( 'bundled_data_items' );
 
 			return $meta_id;
 		}
@@ -326,10 +338,10 @@ class WC_PB_DB {
 	public static function update_bundled_item_meta( $item_id, $meta_key, $meta_value, $prev_value = '' ) {
 		if ( update_metadata( 'bundled_item', $item_id, $meta_key, $meta_value, $prev_value ) ) {
 
-			$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $item_id;
+			$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $item_id;
 			wp_cache_delete( $cache_key, 'bundled_item_meta' );
 
-			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+			WC_PB_Core_Compatibility::invalidate_cache_group( 'bundled_data_items' );
 
 			return true;
 		}
@@ -348,59 +360,123 @@ class WC_PB_DB {
 	public static function delete_bundled_item_meta( $item_id, $meta_key, $meta_value = '', $delete_all = false ) {
 		if ( delete_metadata( 'bundled_item', $item_id, $meta_key, $meta_value, $delete_all ) ) {
 
-			$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $item_id;
+			$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $item_id;
 			wp_cache_delete( $cache_key, 'bundled_item_meta' );
 
-			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+			WC_PB_Core_Compatibility::invalidate_cache_group( 'bundled_data_items' );
 
 			return true;
 		}
 		return false;
 	}
 
-
-	/*----------------------*/
-	/*  Item Meta Helpers   */
-	/*----------------------*/
+	/*
+	|--------------------------------------------------------------------------
+	| Bulk operations.
+	|--------------------------------------------------------------------------
+	*/
 
 	/**
-	 * Clears the 'stock_status' and 'max_stock' meta.
+	 * Bulk update bundled item meta in the DB.
 	 *
-	 * @param  mixed  $where
+	 * @since  5.8.0
+	 *
+	 * @param  array   $item_ids
+	 * @param  string  $meta_key
+	 * @param  mixed   $meta_value
+	 * @return boolean
 	 */
-	public static function flush_stock_cache( $where = '' ) {
+	public static function bulk_update_bundled_item_meta( $bundled_item_ids, $meta_key, $meta_value ) {
 
 		global $wpdb;
 
-		if ( empty( $where ) ) {
+		if ( ! empty( $bundled_item_ids ) ) {
 
 			$wpdb->query( "
-				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
-				WHERE meta_key IN ( 'stock_status', 'max_stock' )
+				UPDATE {$wpdb->prefix}woocommerce_bundled_itemmeta
+				SET meta_value = '" . wc_clean( $meta_value ) . "'
+				WHERE meta_key = '" . $meta_key . "'
+				AND bundled_item_id IN ( " . implode( ',', $bundled_item_ids ) . " )
 			" );
 
-			WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_item_meta' );
-
-		} else {
-
-			if ( is_array( $where ) ) {
-				$bundled_item_ids = array_map( 'absint' , $where );
-				WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_item_meta' );
-			} else {
-				$where            = absint( $where );
-				$bundled_item_ids = array( $where );
-				$cache_key        = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $where;
+			foreach ( $bundled_item_ids as $bundled_item_id ) {
+				$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $bundled_item_id;
 				wp_cache_delete( $cache_key, 'bundled_item_meta' );
 			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Flush bundled items stock meta.
+	 *
+	 * @since  5.8.0
+	 *
+	 * @param  array  $bundled_item_ids
+	 */
+	public static function bulk_delete_bundled_item_stock_meta( $bundled_item_ids = array() ) {
+
+		global $wpdb;
+
+		if ( ! empty( $bundled_item_ids ) ) {
 
 			$wpdb->query( "
 				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
 				WHERE meta_key IN ( 'stock_status', 'max_stock' )
 				AND bundled_item_id IN (" . implode( ',', $bundled_item_ids ) . ")
 			" );
-		}
 
-		WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
+			foreach ( $bundled_item_ids as $bundled_item_id ) {
+				$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $bundled_item_id;
+				wp_cache_delete( $cache_key, 'bundled_item_meta' );
+			}
+
+		} else {
+
+			$wpdb->query( "
+				DELETE FROM {$wpdb->prefix}woocommerce_bundled_itemmeta
+				WHERE meta_key IN ( 'stock_status', 'max_stock' )
+			" );
+
+			WC_PB_Core_Compatibility::invalidate_cache_group( 'bundled_item_meta' );
+		}
+	}
+
+	/*
+	|--------------------------------------------------------------------------
+	| Deprecated methods.
+	|--------------------------------------------------------------------------
+	*/
+
+	public static function delete_bundled_items_stock_meta( $map = '' ) {
+
+		_deprecated_function( __METHOD__ . '()', '5.8.0' );
+
+		global $wpdb;
+
+		if ( empty( $map ) ) {
+
+			self::bulk_delete_bundled_item_stock_meta();
+
+			$data_store = WC_Data_Store::load( 'product-bundle' );
+			$data_store->reset_bundled_items_stock_status();
+
+		} elseif ( is_array( $map ) ) {
+
+			$bundled_item_ids = array_map( 'absint' , array_keys( $map ) );
+			$bundle_ids       = array_map( 'absint' , $map );
+
+			self::bulk_delete_bundled_item_stock_meta( $bundled_item_ids );
+
+			$data_store = WC_Data_Store::load( 'product-bundle' );
+			$data_store->reset_bundled_items_stock_status( $bundle_ids );
+		}
+	}
+
+	public static function flush_stock_cache( $where = '' ) {
+		_deprecated_function( __METHOD__ . '()', '5.5.0', __CLASS__ . '::delete_bundled_items_stock_meta()' );
+		return self::delete_bundled_items_stock_meta( $where );
 	}
 }
 

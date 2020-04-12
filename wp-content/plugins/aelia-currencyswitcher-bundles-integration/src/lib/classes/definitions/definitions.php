@@ -18,5 +18,13 @@ class Definitions {
 	// @var string The plugin text domain
 	const TEXT_DOMAIN = 'wc-aelia-cs-bundles-integration';
 
+	/**
+	 * The slug used to check for updates.
+	 *
+	 * @var string
+	 * @since 1.2.4.190703
+	 */
+	const PLUGIN_SLUG_FOR_UPDATES = 'aelia-currencyswitcher-bundles-integration';
+
 	const ERR_INVALID_TEMPLATE = 1001;
 }

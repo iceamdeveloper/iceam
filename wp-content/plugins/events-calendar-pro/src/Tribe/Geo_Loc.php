@@ -296,7 +296,7 @@ class Tribe__Events__Pro__Geo_Loc {
 			$venues[] = $posts;
 		}
 
-		$found = array_merge( ...$venues );
+		$found = array_unique( array_merge( ...$venues ), SORT_REGULAR );
 
 		$query              = new WP_Query();
 		$query->found_posts = count( $found );
@@ -1367,13 +1367,7 @@ class Tribe__Events__Pro__Geo_Loc {
 	 * @return string
 	 */
 	private function fix_geoloc_data_button() {
-		$settings = Tribe__Settings::instance();
-		$url      = apply_filters( 'tribe_settings_url', add_query_arg( array(
-					'post_type' => Tribe__Events__Main::POSTTYPE,
-					'page'      => $settings->adminSlug,
-				), admin_url( 'edit.php' ) ) );
-		$url      = add_query_arg( array( 'geoloc_fix_venues' => '1' ), $url );
-		$url      = wp_nonce_url( $url, 'geoloc_fix_venues' );
+		$url = $this->get_fix_venues_url();
 
 		return sprintf( '<a href="%s" class="button">%s</a>', esc_url( $url ), __( 'Fix venues data', 'tribe-events-calendar-pro' ) );
 	}
@@ -1413,7 +1407,10 @@ class Tribe__Events__Pro__Geo_Loc {
 			set_transient( '_tribe_geoloc_fix_needed', 1, DAY_IN_SECONDS );
 		}
 
-		add_action( 'admin_notices', array( $this, 'show_offer_to_fix_notice' ) );
+		if ( ! Tribe__Admin__Notices::instance()->showing_notice( 'failed-venue-geocode-resolution' ) ) {
+			// The notice about failed Venue fixing contains the same link, let's not show this one.
+			add_action( 'admin_notices', array( $this, 'show_offer_to_fix_notice' ) );
+		}
 	}
 
 	/**
@@ -1494,6 +1491,8 @@ class Tribe__Events__Pro__Geo_Loc {
 			$updated = self::instance()->save_venue_geodata( $venue->ID, $data, true );
 
 			if ( false === $updated ) {
+				$this->show_venue_failure_notice( $venue );
+
 				/**
 				 * There is an issue that, most likely, will prevent any update to any Venue from happening.
 				 * Let's stop; the inner methods should provide feedback to the user by means of a transient notice.
@@ -1572,5 +1571,70 @@ class Tribe__Events__Pro__Geo_Loc {
 			),
 			'https://www.google.com/maps/search/'
 		);
+	}
+
+	/**
+	 * Returns the URL to fix the Venues information.
+	 *
+	 * @since 5.0.1
+	 *
+	 * @return string The URL to fix the Venues.
+	 */
+	private function get_fix_venues_url() {
+		$settings = Tribe__Settings::instance();
+		$url      = apply_filters( 'tribe_settings_url', add_query_arg( array(
+			'post_type' => Tribe__Events__Main::POSTTYPE,
+			'page'      => $settings->adminSlug,
+		), admin_url( 'edit.php' ) ) );
+		$url      = add_query_arg( array( 'geoloc_fix_venues' => '1' ), $url );
+		$url      = wp_nonce_url( $url, 'geoloc_fix_venues' );
+
+		return $url;
+	}
+
+	/**
+	 * Shows a transient notice to the user to allow the manual fixing of the problematic Venue address details.
+	 *
+	 * @since 5.0.1
+	 *
+	 * @param \WP_Post $venue The problematic Venue post object.
+	 */
+	protected function show_venue_failure_notice( \WP_Post $venue ) {
+		$venue_edit_link = sprintf(
+			'<a href="%s" target="_blank">%s</a>',
+			esc_attr( get_edit_post_link( $venue->ID ) ),
+			esc_html_x(
+				'update the venue address or use latitude & longitude',
+				'The text of the link that will take the user to the Venue edit screen.',
+				'tribe-events-calendar-pro'
+			)
+		);
+
+		$fix_link = sprintf(
+			'<a href="%s" target="_blank">%s</a>',
+			esc_attr( $this->get_fix_venues_url() ),
+			esc_html_x(
+				'try again',
+				'The text of the link that will trigger an attempt to fix the Venues geolocation information.',
+				'tribe-events-calendar-pro'
+			)
+		);
+
+		$html = sprintf(
+			'<p>' .
+			_x(
+				'Geolocation could not be fixed for the Venue “%s” (ID: %d). Please %s and %s.',
+				'tribe-events-calendar-pro'
+			) . '</p>',
+			$venue->post_title,
+			$venue->ID,
+			$venue_edit_link,
+			$fix_link
+		);
+		$arguments = [ 'type' => 'warning', 'dismiss' => true ];
+		$slug      = 'failed-venue-geocode-resolution';
+
+		// Show it immediately.
+		tribe_notice( $slug, $html, $arguments );
 	}
 }

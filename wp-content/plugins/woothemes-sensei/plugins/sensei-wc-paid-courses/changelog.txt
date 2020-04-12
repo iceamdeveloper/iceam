@@ -1,0 +1,76 @@
+*** Changelog ***
+
+2019.12.16 - version 1.2.4
+* Fix: PHP warning for anonymous user when viewing lesson not attached to a course - #289
+* Fix: Add missing "Add to Cart" translation string - #288
+* Fix: Conflict with WooCommerce Blocks plugin - #286
+* Tweak: Remove @woocommerce/block-library dependency - #294
+
+2019.11.28 - version 1.2.3
+* Fix: PHP error when calling functions on variable that is not a WC_Product - #275
+* Fix: Conflict with WooCommerce Blocks plugin - #276
+
+2019.11.21 - version 1.2.2
+* Fix: Prevent possibility of fatal error on Courses page - #266
+
+2019.10.28 - version 1.2.1
+* Fix: My Courses page error when selling product bundle - #262
+* Fix: "Class not found" error when viewing single course page for a course sold using a product bundle - #264
+
+2019.10.23 - version 1.2.0
+* New: Sanitize `_course_woocommerce_product` in REST API - #240
+* New: Add notice for double-attached product to Course Edit page - #246, #253
+* New: Show notice on Edit Membership Plan page when course is double-attached to product - #228, #253
+* New: Include memberships on order cancellation and completion enrollment checks - #242
+* New: Expand confirmation notice to contain memberships - #250
+* New: Include membership courses in email confirmation - #239
+* New: Show notice when user adds product to cart they already have access to via a membership - #229
+* New: Add Membership courses to product courses - #237
+* Tweak: Refactor product course access - #232
+* Tweak: Prevent checking for missing language pack index on every admin request - #222
+* Fix: Add purchased course check on learner profile and my courses page - #236
+* Fix: Remove user from membership course when order is refunded or cancelled - #225
+* Fix: Enroll user in course during subscription check when they have an active subscription - #244
+* Fix: Fix course access on cancelled subscription - #249
+
+2019.09.03 - version 1.1.0
+* New: Add new method for fetching multiple course product IDs - #120, #143
+* New: Add course product ID meta to REST API - #122
+* New: Add block editor asset build system - #124
+* New: Add course block editor sidebar - #127
+* New: Add products to course archive and category pages - #154, #164, #193, #197, #212
+* New: Remove product dropdown from "Course" meta box on lesson page - #155
+* New: Add REST API endpoint for block editor sidebar - #149
+* New: Show product info when course membership restricted by course category - #185
+* New: Deprecate `assign_user_to_unassigned_purchased_courses` and `start_purchased_courses_for_user` functions - #173
+* New: Show multiple products on the Courses admin page - #192, #213
+* New: Update course product metabox in classic editor to support multiple products - #158
+* New: Add product cards to single course page - #186, #198
+* Tweak: Don't remove user from course when subscription is cancelled - #125
+* Tweak: Update Unpurchased Courses shortcode to include course memberships - #129
+* Tweak: Hide membership notice and show excerpt on course archive and course category pages - #163
+* Tweak: Remove membership notice on single course page - #168
+* Tweak: Add multiple product support to enrol user with valid order in a course when visiting the single course page - #165
+* Tweak: Add multiple product support for removing user from course once all orders are cancelled - #174
+* Tweak: Add multiple product support for enrolling user in course once an order is completed - #175
+* Tweak: Show message to complete purchase if any of the products attached to a course are in the cart - #170
+* Tweak: Add multiple product support for viewing lesson video - #167
+* Tweak: Allow user to purchase product if they are not taking all the courses attached to the product - #171
+* Tweak: Don't show purchase details if products attached to a course are not published - #172
+* Tweak: Add multiple product support to enrol user with valid order in a course when visiting the learner profile page - #162
+* Tweak: Add multiple product support for subscriptions - #183, #202
+* Fix: PHP notice when activating subscription - #126
+* Fix: Remove double notice when adding course to cart - #148
+* Fix: Content not showing on the single course page for course memberships on unsupported themes - #189
+* Fix: Purchase button displays incorrect price for product in Draft status - #196
+
+2019.06.25 - version 1.0.2
+* Fix: PHP fatal error when adding Sensei shortcode to a shortcode block - #113
+
+2019.06.17 - version 1.0.1
+* New: Log that extension is installed - #96
+* Fix: Show confirmation notice on the Order Received page - #99
+* Fix: Replace call to deprecated WC Memberships method - #100
+
+2019.05.22 - version 1.0.0
+* Initial version.

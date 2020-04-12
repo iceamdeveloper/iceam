@@ -1,4 +1,17 @@
 <?php
+/**
+ * This describes the "Template" column of Toolset Dashboard.
+ *
+ * Every element of the top-level array (let's call it a case) is evaluated according to specified
+ * conditions (which may be either subclasses of \Types_Helper_Condition or implementations
+ * of \Toolset_Condition_Interface) and if ALL conditions match, the "description" element is selected
+ * (used to render the output of a particular table cell).
+ *
+ * The output of all selected cases will then be concatenated in the order in which they're defined here.
+ *
+ * Explore Types_Page_Dashboard::get_dashboard_types_table() for further context.
+ */
+
 return array(
 	/* Layouts, integrated, template missing*/
 	'layouts-integrated-template-missing' => array(
@@ -8,6 +21,7 @@ return array(
 
 		'conditions'=> array(
 			'Types_Helper_Condition_Layouts_Active',
+			'\OTGS\Toolset\Common\Condition\Views\IsClassicFlavourOrInactive',
 			'Types_Helper_Condition_Layouts_Compatible',
 			'Types_Helper_Condition_Layouts_Template_Missing'
 		),
@@ -32,6 +46,7 @@ return array(
 
 		'conditions'=> array(
 			'Types_Helper_Condition_Layouts_Active',
+			'\OTGS\Toolset\Common\Condition\Views\IsClassicFlavourOrInactive',
 			'Types_Helper_Condition_Layouts_Template_Exists'
 		),
 
@@ -49,7 +64,7 @@ return array(
 		'type' => 'template',
 
 		'conditions'=> array(
-			'Types_Helper_Condition_Layouts_Missing',
+			'\OTGS\Toolset\Common\Condition\Layouts\IsMissingOrToolsetBlocksActive',
 			'Types_Helper_Condition_Views_Template_Exists'
 		),
 
@@ -88,6 +103,7 @@ return array(
 
 		'conditions'=> array(
 			'Types_Helper_Condition_Layouts_Active',
+			'\OTGS\Toolset\Common\Condition\Views\IsClassicFlavourOrInactive',
 			'Types_Helper_Condition_Layouts_Template_Missing',
 			'Types_Helper_Condition_Single_No_Fields',
 		),
@@ -112,6 +128,7 @@ return array(
 
 		'conditions'=> array(
 			'Types_Helper_Condition_Layouts_Active',
+			'\OTGS\Toolset\Common\Condition\Views\IsClassicFlavourOrInactive',
 			'Types_Helper_Condition_Layouts_Template_Missing',
 			'Types_Helper_Condition_Single_Exists'
 		),
@@ -139,6 +156,7 @@ return array(
 
 		'conditions'=> array(
 			'Types_Helper_Condition_Layouts_Active',
+			'\OTGS\Toolset\Common\Condition\Views\IsClassicFlavourOrInactive',
 			'Types_Helper_Condition_Layouts_Template_Missing'
 		),
 
@@ -224,15 +242,14 @@ return array(
 					'description' => array(
 						array(
 							'type' => 'paragraph',
-							'content' => __( 'Toolset plugins let you design templates for single items (%POST-LABEL-SINGULAR% pages),
-                    with all the fields that you need to display.', 'wpcf' )
+							'content' => __( 'To design templates, you need to activate Toolset Views plugin.', 'wpcf' )
 						),
 						array(
 							'type'   => 'link',
 							'class'  => 'button-primary types-button',
 							'external' => true,
-							'label'  => __( 'Learn about creating templates with Toolset', 'wpcf' ),
-							'target' => Types_Helper_Url::get_url( 'creating-templates-with-toolset', 'popup' ),
+							'label'  => __('Download Toolset Views from your Toolset account', 'wpcf' ),
+							'target' => Types_Helper_Url::get_url( 'toolset-account-downloads', 'popup' ),
 						),
 					)
 				)
@@ -265,7 +282,7 @@ return array(
 		'priority' => 'important',
 
 		'conditions'=> array(
-			'Types_Helper_Condition_Layouts_Missing',
+			'\OTGS\Toolset\Common\Condition\Layouts\IsMissingOrToolsetBlocksActive',
 			'Types_Helper_Condition_Views_Template_Missing',
 			'Types_Helper_Condition_Single_No_Fields',
 		),
@@ -289,7 +306,7 @@ return array(
 		'type' => 'template',
 
 		'conditions'=> array(
-			'Types_Helper_Condition_Layouts_Missing',
+			'\OTGS\Toolset\Common\Condition\Layouts\IsMissingOrToolsetBlocksActive',
 			'Types_Helper_Condition_Views_Template_Missing',
 			'Types_Helper_Condition_Single_Exists'
 		),
@@ -315,7 +332,7 @@ return array(
 		'priority' => 'important',
 
 		'conditions'=> array(
-			'Types_Helper_Condition_Layouts_Missing',
+			'\OTGS\Toolset\Common\Condition\Layouts\IsMissingOrToolsetBlocksActive',
 			'Types_Helper_Condition_Views_Template_Missing'
 		),
 

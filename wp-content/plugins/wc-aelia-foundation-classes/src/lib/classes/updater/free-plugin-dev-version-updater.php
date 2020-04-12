@@ -25,6 +25,6 @@ class Free_Plugin_Dev_Version_Updater extends Free_Plugin_Updater {
 	 * @return string
 	 */
 	protected function get_api_call_url(array $args) {
-		return 'http://wpupdate-dev.aelia.co?action=get_metadata&slug=' . $args['slug'];
+		return 'https://wpupdate-dev.aelia.co?action=get_metadata&slug=' . $args['slug'];
 	}
 }

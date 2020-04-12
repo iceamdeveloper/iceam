@@ -9,7 +9,7 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.3
  *
  */
 ?>
@@ -27,6 +27,14 @@
 		class="tribe-common-form-control-toggle__label tribe-events-c-top-bar__hide-recurring-label"
 		for="hide-recurring"
 	>
-		<?php esc_html_e( 'Hide Recurring Events', 'tribe-events-calendar-pro' ); ?>
+		<?php
+		echo esc_html(
+			sprintf(
+				/* translators: %s: Events (plural) */
+				__( 'Hide Recurring %s', 'tribe-events-calendar-pro' ),
+				tribe_get_event_label_plural()
+			)
+		);
+		?>
 	</label>
 </div>

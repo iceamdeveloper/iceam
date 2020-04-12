@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 5.0.0
+ * @version 5.5.0
  */
 
 // Exit if accessed directly.
@@ -16,9 +16,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+/** WC Core action. */
 do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 
-<form method="post" enctype="multipart/form-data" class="cart cart_group bundle_form <?php echo 'layout_' . $product->get_layout(); ?>"><?php
+<form method="post" enctype="multipart/form-data" class="cart cart_group bundle_form <?php echo esc_attr( $classes ); ?>"><?php
 
 	/**
 	 * 'woocommerce_before_bundled_items' action.
@@ -30,7 +31,7 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 	foreach ( $bundled_items as $bundled_item ) {
 
 		/**
-		 * 'woocommerce_bundled_item_details' hook
+		 * 'woocommerce_bundled_item_details' action.
 		 *
 		 * @hooked wc_pb_template_bundled_item_details_wrapper_open  -   0
 		 * @hooked wc_pb_template_bundled_item_thumbnail             -   5
@@ -47,52 +48,18 @@ do_action( 'woocommerce_before_add_to_cart_form' ); ?>
 	/**
 	 * 'woocommerce_after_bundled_items' action.
 	 *
-	 * @param WC_Product_Bundle $product
+	 * @param  WC_Product_Bundle  $product
 	 */
-	do_action( 'woocommerce_after_bundled_items', $product ); ?>
+	do_action( 'woocommerce_after_bundled_items', $product );
 
-	<div class="cart bundle_data bundle_data_<?php echo $product_id; ?>" data-bundle_price_data="<?php echo esc_attr( json_encode( $bundle_price_data ) ); ?>" data-bundle_id="<?php echo $product_id; ?>"><?php
-
-		if ( $product->is_purchasable() ) {
-
-			/**
-			 * 'woocommerce_before_add_to_cart_button' action.
-			 */
-			do_action( 'woocommerce_before_add_to_cart_button' );
-
-			?><div class="bundle_wrap">
-				<div class="bundle_price"></div>
-				<div class="bundle_error" style="display:none"><ul class="msg woocommerce-info"></ul></div>
-				<div class="bundle_availability"><?php
-
-					// Availability html.
-					echo $availability_html;
-
-				?></div>
-				<div class="bundle_button"><?php
-
-					/**
-					 * woocommerce_bundles_add_to_cart_button hook.
-					 *
-					 * @hooked wc_pb_template_add_to_cart_button - 10
-					 */
-					do_action( 'woocommerce_bundles_add_to_cart_button' );
-
-				?></div>
-				<input type="hidden" name="add-to-cart" value="<?php echo $product_id; ?>" />
-			</div><?php
-
-			/** WC Core action. */
-			do_action( 'woocommerce_after_add_to_cart_button' );
-
-		} else {
-
-			?><div class="bundle_unavailable woocommerce-info"><?php
-				echo __( 'This product is currently unavailable.', 'woocommerce-product-bundles' );
-			?></div><?php
-		}
-
-	?></div><?php
+	/**
+	 * 'woocommerce_bundles_add_to_cart_wrap' action.
+	 *
+	 * @since  5.5.0
+	 *
+	 * @param  WC_Product_Bundle  $product
+	 */
+	do_action( 'woocommerce_bundles_add_to_cart_wrap', $product );
 
 ?></form><?php
 	/** WC Core action. */

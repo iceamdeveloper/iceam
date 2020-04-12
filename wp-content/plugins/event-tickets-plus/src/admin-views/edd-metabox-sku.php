@@ -22,7 +22,16 @@
 		value="<?php echo esc_attr( $sku ); ?>"
 	/>
 	<p class="description ticket_form_right">
-		<?php esc_html_e( 'A unique identifying code for each ticket type you\'re selling', 'event-tickets-plus' ); ?>
+		<?php
+		echo esc_html( sprintf(
+			_x(
+				'A unique identifying code for each %s type you\'re selling',
+				'EDD SKU',
+				'event-tickets-plus'
+			),
+			tribe_get_ticket_label_singular_lowercase( 'sku' )
+		) );
+		?>
 	</p>
 </div>
 <?php

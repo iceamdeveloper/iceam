@@ -24,6 +24,7 @@
  * that breaks the PHP 5.2 compatibility.
  *
  * The original author of this class:
+ *
  * @author Fabien Potencier <fabien@symfony.com>
  *
  * @since 2.2
@@ -31,58 +32,51 @@
  */
 class Toolset_Twig_Autoloader {
 
+
+	/** @var string[]|null Autoloader classmap (once loaded). */
+	private static $classmap;
+
+
 	/**
 	 * Registers Types_Twig_Autoloader as an SPL autoloader if Twig_Autoloader isn't already registered.
 	 *
 	 * @param bool $prepend Whether to prepend the autoloader or not.
+	 *
+	 * @throws Exception Coming from spl_autoload_register().
 	 */
 	public static function register( $prepend = false ) {
-		$autoloaders = spl_autoload_functions();
-		foreach ( $autoloaders as $autoloader ) {
-
-			// Resign if we detect Twig_Autoloader
-			if ( is_array( $autoloader )
-				&& 2 == count( $autoloader )
-				&& is_string( $autoloader[0] )
-				&& 'Twig_Autoloader' == $autoloader[0]
-				&& is_string( $autoloader[1] )
-				&& 'autoload' == $autoloader[1]
-			) {
-				return;
-			}
-		}
-
-		// Also resign if it's simply possible to load a Twig Environment class already.
-		// That probably means a composer autoloader is managing this.
-		if( class_exists( 'Twig_Environment', true ) ) {
-			return;
-		}
-
 		if ( PHP_VERSION_ID < 50300 ) {
 			spl_autoload_register( array( __CLASS__, 'autoload' ) );
 		} else {
 			spl_autoload_register( array( __CLASS__, 'autoload' ), true, $prepend );
 		}
 
+		self::$classmap = include __DIR__ . '/twig_autoload_classmap.php';
 	}
 
 
 	/**
 	 * Handles autoloading of classes.
 	 *
-	 * @param string $class A class name.
+	 * @param string $class_name A class name.
+	 *
+	 * @return bool|mixed
 	 */
-	public static function autoload( $class ) {
-		if ( 0 !== strpos( $class, 'Twig' ) ) {
-			return;
+	public static function autoload( $class_name ) {
+		if ( ! array_key_exists( $class_name, self::$classmap ) ) {
+			return false; // Not our class.
 		}
 
-		// Modified path to Twig in Toolset.
-		$file = TOOLSET_COMMON_PATH . '/lib/' . str_replace( array( '_', "\0" ), array( '/', '' ), $class . '.php' );
+		$file_name = self::$classmap[ $class_name ];
 
-		if ( is_file( $file ) ) {
-			/** @noinspection PhpIncludeInspection */
-			require $file;
+		// Replace require_once by include_once, so that we avoid uncatchable errors, and use @ to suppress warnings.
+		// phpcs:ignore WordPress.PHP.NoSilencedErrors.Discouraged
+		if ( ! @include_once $file_name ) {
+			// The file should have been there but it isn't. Perhaps we're dealing with a case-insensitive file system.
+			// If we don't succeed even with lowercase, let the warning manifest - no "@".
+			return include_once strtolower( $file_name );
 		}
+
+		return true;
 	}
 }

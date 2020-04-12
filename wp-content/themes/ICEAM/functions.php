@@ -110,7 +110,7 @@ add_filter( 'excerpt_length', 'custom_excerpt_length', 999 );
  *
  **********************************************************************/
 
-add_filter( 'sensei_display_start_course_form', __return_false);
+add_filter( 'sensei_display_start_course_form', '__return_false');
 
 
 

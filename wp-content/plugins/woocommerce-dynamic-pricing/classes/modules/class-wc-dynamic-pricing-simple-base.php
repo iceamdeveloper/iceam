@@ -28,7 +28,7 @@ abstract class WC_Dynamic_Pricing_Simple_Base extends WC_Dynamic_Pricing_Module_
 				//Returning true from the filter would cause the discount to be applied more than once. 
 				
 				return false;
-			} elseif ( count( array_intersect( array('simple_category', 'simple_membership', 'simple_group'), WC()->cart->cart_contents[$cart_item_key]['discounts']['by'] ) ) > 0 ) {
+			} elseif ( count( array_intersect( array('simple_category', 'simple_membership', 'simple_group', 'simple_taxonomy'), WC()->cart->cart_contents[$cart_item_key]['discounts']['by'] ) ) > 0 ) {
 				$cumulative = true;
 			}
 		} else {

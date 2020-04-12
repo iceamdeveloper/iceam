@@ -42,6 +42,7 @@
  * I added "/* @var My_Fantastic_Class $singleton *\/" above to let the IDE know that $singleton
  * is a object of My_Fantastic_Class object. This way IDE's autocomplete still works.
  *
+ * @deprecated Use DIC (Auryn) to handle singletons instead.
  *
  * @since 2.6.3
  */
@@ -69,12 +70,13 @@ class Toolset_Singleton_Factory {
 		}
 
 		// get all arguments
+		// phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
 		$arguments = func_get_args();
 
 		// drop $class argument
 		array_shift( $arguments );
 
-		self::$instances[$class] = new $class( ... $arguments );
+		self::$instances[$class] = new $class( ... $arguments ); // @codingStandardsIgnoreLine because this file gets loaded only in PHP 5.6+
 
 		return self::$instances[ $class ];
 	}

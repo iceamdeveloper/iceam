@@ -93,6 +93,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	 * Maybe set the empty checkout URL to our known checkout URL.
 	 *
 	 * @since 4.11.0
+	 * @since 4.11.2 Do not add 'provider' to checkout URL if no tickets in the Cart.
 	 *
 	 * @param string $checkout_url Checkout URL.
 	 *
@@ -109,8 +110,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 
 		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo */
 		$woo = tribe( 'tickets-plus.commerce.woo' );
-		$ticket_provider = $woo->attendee_object;
-		$checkout_url  = add_query_arg( 'provider', $ticket_provider, $checkout_url );
+
+		if ( $this->get_tickets_in_cart( [], $woo->attendee_object ) ) {
+			$checkout_url = add_query_arg( 'provider', $woo->attendee_object, $checkout_url );
+		}
 
 		return $checkout_url;
 	}

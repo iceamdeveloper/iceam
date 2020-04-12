@@ -32,44 +32,71 @@ class WPToolset_Field_Radios extends FieldFactory {
                     'radio-' . sanitize_title($option['title']),
                 );
 
-                if ( $output == 'bootstrap' ) {
-					$classes[] = 'radio';
+                if ( $output === 'bootstrap' ) {
+                	switch( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+						case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+							$classes[] = 'form-check';
+							break;
+						default:
+							$classes[] = 'radio';
+							break;
+					}
 				}
 
-				/** * filter: cred_checkboxes_class
-                 ** @param array $clases current array of classes
-                 ** @parem array $option current option
-                 ** @param string field type
-                 *
-                 * @return array
-                 */
-                $classes = apply_filters('cred_item_li_class', $classes, $option, 'radio');
-                if ( $output == 'bootstrap' ) {$one_option_data['#before'] = sprintf(
-                        '<li class="%s"><label class="wpt-form-label wpt-form-checkbox-label">', implode(' ', $classes)
-                );
-                $one_option_data['#after'] = $option['title'] . '</label></li>';
-                //moved error from element to before prefix
-                $one_option_data['#pattern'] = '<BEFORE><ERROR><PREFIX><ELEMENT><SUFFIX><DESCRIPTION><AFTER>';
-            }else {
-            $one_option_data['#before'] = sprintf(
-             '<li class="%s">', implode( ' ', $classes )
-             );
-             $one_option_data['#after'] = '</li>';
-//            moved error from element to before prefix
-                $one_option_data['#pattern'] = '<BEFORE><ERROR><PREFIX><ELEMENT><LABEL><SUFFIX><DESCRIPTION><AFTER>';
+				/**
+				 * cred_checkboxes_class
+				 *
+				 * @param array $clases current array of classes
+				 * @parem array $option current option
+				 * @param string field type
+				 *
+				 * @return array
+				 */
+				$classes = apply_filters( 'cred_item_li_class', $classes, $option, 'radio' );
+				if ( $output === 'bootstrap' ) {
+					switch( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+						case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+							$one_option_data['#before'] = sprintf(
+								'<li class="%s">',
+								implode( ' ', $classes )
+							);
+							$one_option_data['#after'] = sprintf(
+								'<label class="wpt-form-label wpt-form-checkbox-label form-check-label">%s</label></li>',
+								$option['title']
+							);
+							//moved error from element to before prefix
+							$one_option_data['#pattern'] = '<BEFORE><ERROR><PREFIX><ELEMENT><SUFFIX><DESCRIPTION><AFTER>';
+							$one_option_data['#attributes'] = array( 'class' => 'form-check-input' );
+							break;
+						default:
+							$one_option_data['#before'] = sprintf(
+								'<li class="%s"><label class="wpt-form-label wpt-form-checkbox-label">', implode( ' ', $classes )
+							);
+							$one_option_data['#after'] = $option['title'] . '</label></li>';
+							//moved error from element to before prefix
+							$one_option_data['#pattern'] = '<BEFORE><ERROR><PREFIX><ELEMENT><SUFFIX><DESCRIPTION><AFTER>';
+							break;
+					}
+				} else {
+					$one_option_data['#before'] = sprintf(
+						'<li class="%s">', implode( ' ', $classes )
+					);
+					$one_option_data['#after'] = '</li>';
+					//            moved error from element to before prefix
+					$one_option_data['#pattern'] = '<BEFORE><ERROR><PREFIX><ELEMENT><LABEL><SUFFIX><DESCRIPTION><AFTER>';
 				}
 			}
 
-            /**
-             * add to options array
-             */
-            $options[] = $one_option_data;
+			/**
+			 * add to options array
+			 */
+			$options[] = $one_option_data;
         }
         /**
-         * for user fields we reset title and description to avoid double 
+         * for user fields we reset title and description to avoid double
          * display
          */
-        $title = $this->getTitle();
+        $title = $this->getTitle( false, true );
         if (empty($title)) {
             $title = $this->getTitle(true);
         }

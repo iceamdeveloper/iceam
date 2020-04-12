@@ -30,13 +30,54 @@ class WPToolset_Forms_Validation {
     );
 
     function __construct($formID, $formSET) {
-        $this->__formID = trim( $formID, '#' );
+    	$this->__formID = trim( $formID, '#' );
         $this->__formSET = $formSET;
 
-        // Register
-        wp_register_script( 'wptoolset-form-jquery-validation', WPTOOLSET_FORMS_RELPATH . '/lib/js/jquery-form-validation/jquery.validate.js', array('jquery'), WPTOOLSET_FORMS_VERSION, true );
-        wp_register_script( 'wptoolset-form-jquery-validation-additional', WPTOOLSET_FORMS_RELPATH . '/lib/js/jquery-form-validation/additional-methods.min.js', array('wptoolset-form-jquery-validation'), WPTOOLSET_FORMS_VERSION, true );
-	    wp_register_script( 'wptoolset-form-validation', WPTOOLSET_FORMS_RELPATH . '/js/validation.js', array( 'wptoolset-form-jquery-validation-additional', 'underscore', 'toolset-utils', 'toolset-event-manager', 'icl_editor-script' ), WPTOOLSET_FORMS_VERSION, true );
+        // WARNING
+		// The handle name "wptoolset-form-jquery-validation" is deprecated and should be replaced by the
+		// standard handle for the jQuery validation plugin, which is "validate", in order to
+		// prevent conflicts with third-party software.
+		//
+		// We're keeping the old handle registered as well, in case we miss some code that might
+		// depend on it: A validation that is broken in combination with specific plugins is still
+		// much better than validation that is broken always.
+		//
+		// Note: Keep in sync with assets in Toolset_Assets_Manager class.
+		wp_register_script(
+			'validate',
+			WPTOOLSET_FORMS_RELPATH . '/lib/js/jquery-form-validation/jquery.validate.js',
+			array( 'jquery' ),
+			'1.8.1',
+			true
+		);
+		wp_register_script(
+			'wptoolset-form-jquery-validation',
+			WPTOOLSET_FORMS_RELPATH . '/lib/js/jquery-form-validation/jquery.validate.js',
+			array( 'jquery' ),
+			'1.8.1',
+			true
+		);
+
+		wp_register_script(
+			'wptoolset-form-jquery-validation-additional',
+			WPTOOLSET_FORMS_RELPATH . '/lib/js/jquery-form-validation/additional-methods.min.js',
+			array( 'validate' ),
+			TOOLSET_COMMON_VERSION,
+			true
+		);
+		wp_register_script(
+			'wptoolset-form-validation',
+			WPTOOLSET_FORMS_RELPATH . '/js/validation.js',
+			array(
+				'wptoolset-form-jquery-validation-additional',
+				'underscore',
+				'toolset-utils',
+				'toolset-event-manager',
+				'icl_editor-script',
+			),
+			TOOLSET_COMMON_VERSION,
+			true
+		);
 
         $my_formID = str_replace( "-", "_", $formID );
         wp_localize_script( 'wptoolset-form-validation', 'cred_settings_' . $my_formID, array(
@@ -201,7 +242,11 @@ class WPToolset_Forms_Validation {
         switch ($field_type) {
             case 'skype':
                 // Check the emptiness of skype name only, ignore the rest.
-                return $this->is_field_semantically_empty( toolset_getarr( $value, 'skypename' ), 'textfield' );
+				if( is_array( $value ) ) {
+					// legacy skype storage
+					return $this->is_field_semantically_empty( toolset_getarr( $value, 'skypename' ), 'textfield' );
+				}
+	            return ( is_null( $value ) || $value === false || $value === '' );
             default:
                 return ( is_null( $value ) || $value === false || $value === '' );
         }
@@ -238,7 +283,16 @@ class WPToolset_Forms_Validation {
         $rule = $this->_map_rule_js_to_php( $rule );
 
         if ( 'skype' == $rule ) {
-            return $validator->custom( $args[0]['skypename'], '/^([a-zA-Z0-9\,\.\-\_]+)$/' );
+        	$value_to_validate = is_array( $args[0] ) && isset( $args[0]['skypename'] )
+		        ? $args[0]['skypename'] // legacy
+	            : $args[0]; // 3.2
+
+	        return $validator->custom( $value_to_validate, '/^([a-zA-Z0-9\:\,\.\-\_]+)$/' );
+        }
+
+        if ( 'username' == $rule ) {
+            $value_to_validate = isset( $args[0] ) ? $args[0] : '';
+            return validate_username( $value_to_validate );
         }
 
         if ( is_callable( array($validator, $rule) ) ) {
@@ -271,11 +325,20 @@ class WPToolset_Forms_Validation {
     }
 
     /**
-     * Renders JSON data.
-     */
-    public function renderJsonData() {
-        printf( '<script type="text/javascript">wptValidationForms.push("#%s");</script>', $this->__formID ? $this->__formID : uniqid( 'form_' ) );
-    }
+	 * Renders JSON data.
+	 */
+	public function renderJsonData() {
+		// Note: wptValidationForms needs to be approached carefully because
+		// the script validation.js (SCRIPT_WPTOOLSET_FORM_VALIDATION), where it is defined,
+		// may be deferred when using a CDN, for example.
+		printf(
+			'<script type="text/javascript">
+				var wptValidationForms = wptValidationForms || [];
+				wptValidationForms.push("#%s");
+			</script>',
+			$this->__formID ? $this->__formID : uniqid( 'form_' )
+		);
+	}
 
 	/**
 	 * Callback for a deprecated action.

@@ -12,8 +12,14 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-// Single product template for Product Bundles.
+// Single product template for Product Bundles. Form location: Default.
 add_action( 'woocommerce_bundle_add_to_cart', 'wc_pb_template_add_to_cart' );
+
+// Single product template for Product Bundles. Form location: After summary.
+add_action( 'woocommerce_after_single_product_summary', 'wc_pb_template_add_to_cart_after_summary', -1000 );
+
+// Single product add-to-cart buttons area template for Product Bundles.
+add_action( 'woocommerce_bundles_add_to_cart_wrap', 'wc_pb_template_add_to_cart_wrap' );
 
 // Single product add-to-cart button template for Product Bundles.
 add_action( 'woocommerce_bundles_add_to_cart_button', 'wc_pb_template_add_to_cart_button' );
@@ -49,7 +55,8 @@ add_action( 'woocommerce_bundled_item_details', 'wc_pb_template_bundled_item_det
 add_action( 'woocommerce_after_bundled_item_cart_details', 'wc_pb_template_default_bundled_item_qty' );
 
 // Bundled variation template.
-add_action( 'woocommerce_bundled_single_variation', 'wc_pb_template_single_variation', 100, 2 );
+add_action( 'woocommerce_bundled_single_variation', 'wc_pb_template_single_variation', 10, 2 );
+add_action( 'woocommerce_bundled_single_variation', 'wc_pb_template_single_variation_template', 20, 2 );
 
 // Open and close table.
 add_action( 'woocommerce_before_bundled_items', 'wc_pb_template_before_bundled_items', 100 );

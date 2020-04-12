@@ -10,35 +10,54 @@
 class Toolset_User_Editors_Editor_Divi
 	extends Toolset_User_Editors_Editor_Abstract {
 
+	const DIVI_SCREEN_ID = 'divi';
 	const DIVI_BUILDER_OPTION_NAME = '_et_pb_use_builder';
 	const DIVI_BUILDER_OPTION_VALUE = 'on';
 
-	protected $id = 'divi';
+	/**
+	 * @var string
+	 */
+	protected $id = self::DIVI_SCREEN_ID;
+
+	/**
+	 * @var string
+	 */
 	protected $name = 'Divi Builder';
+
+	/**
+	 * @var string
+	 */
 	protected $option_name = '_toolset_user_editors_divi_template';
 
+	/**
+	 * @var string
+	 */
 	protected $logo_class = 'toolset-divi-logo-for-ct-button';
 
 	public function initialize() {
 		if ( apply_filters( 'wpv_filter_is_native_editor_for_cts', false ) ) {
-			add_action( 'edit_form_after_editor', array( $this, 'register_assets_for_backend_editor' ) );
-
 			// register medium slug
 			add_filter( 'et_builder_post_types', array( $this, 'support_medium' ) );
 			add_filter( 'et_builder_module_post_types', array( $this, 'support_medium' ) );
 		}
 
-		add_action( 'toolset_update_divi_builder_post_meta', array( $this, 'update_divi_builder_post_meta' ), 10, 2 );
+		$this->set_extra_postmeta_support();
+	}
+
+	/**
+	 * Initialize logic after checking that the user editor is available.
+	 *
+	 * @since 3.4.8
+	 */
+	public function after_editor_added() {
+		if ( apply_filters( 'wpv_filter_is_native_editor_for_cts', false ) ) {
+			add_action( 'edit_form_after_editor', array( $this, 'register_assets_for_backend_editor' ) );
+		}
 
 		add_action( 'wp_loaded', array( $this, 'add_filter_for_divi_modules_for_cts' ) );
 
-		add_filter( 'get_post_metadata', array( $this, 'maybe_post_uses_divi_built_ct' ), 10, 4 );
-
-		if (
-			isset( $this->medium )
-			&& $this->medium->get_id()
-		) {
-			$this->update_divi_builder_post_meta( $this->medium->get_id(), 'ct_editor_choice' );
+		if ( $this->tc_bootstrap->get_request_mode() === $this->constants->constant( 'Toolset_Common_Bootstrap::MODE_FRONTEND' ) ) {
+			add_filter( 'get_post_metadata', array( $this, 'maybe_post_uses_divi_built_ct' ), 10, 4 );
 		}
 	}
 
@@ -46,14 +65,35 @@ class Toolset_User_Editors_Editor_Divi
 		add_filter( 'et_builder_module_post_types', array( $this, 'support_medium' ) );
 	}
 
-	public function update_divi_builder_post_meta( $post_id, $key ) {
-		if ( array_key_exists( $key, $_REQUEST ) ) {
-			if ( $this->get_id() == sanitize_text_field( $_REQUEST[ $key ] ) ) {
-				update_post_meta( $post_id, self::DIVI_BUILDER_OPTION_NAME, sanitize_text_field( self::DIVI_BUILDER_OPTION_VALUE ) );
-			} else {
-				delete_post_meta( $post_id, self::DIVI_BUILDER_OPTION_NAME );
-			}
-		}
+	/**
+	 * Add support for managing extra postmeta keys when setting this user editor.
+	 *
+	 * @since Views 3.1
+	 */
+	public function set_extra_postmeta_support() {
+		parent::set_extra_postmeta_support();
+
+		add_action( 'toolset_update_divi_builder_post_meta', array( $this, 'update_extra_post_meta_from_request' ), 10, 2 );
+	}
+
+	/**
+	 * Set the extra postmeta for this given user editor.
+	 *
+	 * @param int $post_id ID of the related CT
+	 * @since Views 3.1
+	 */
+	public function update_extra_post_meta( $post_id ) {
+		update_post_meta( $post_id, self::DIVI_BUILDER_OPTION_NAME, self::DIVI_BUILDER_OPTION_VALUE );
+	}
+
+	/**
+	 * Delete the extra postmeta for this given user editor.
+	 *
+	 * @param int $post_id ID of the related CT
+	 * @since Views 3.1
+	 */
+	public function delete_extra_post_meta( $post_id ) {
+		delete_post_meta( $post_id, self::DIVI_BUILDER_OPTION_NAME );
 	}
 
 	public function required_plugin_active() {
@@ -103,9 +143,14 @@ class Toolset_User_Editors_Editor_Divi
 	 * @param  string $meta_key   The key of the meta.
 	 * @param  bool   $single     Whether to return a single value.
 	 * @return mixed
+	 *
+	 * @since 3.0.1 Narrow down the cases where this hijacking is applied as it is basically needed only on the frontend.
+	 *              The problem was that when the hijacking also happened in the backend, Divi builder was force-used for
+	 *              post/pages that don't actually use the builder but were assigned to a Content Template that is built
+	 *              with it.
 	 */
 	public function maybe_post_uses_divi_built_ct( $meta_value, $post_id, $meta_key, $single ) {
-		if ( $meta_key === self::DIVI_BUILDER_OPTION_NAME ) {
+		if ( $meta_key === $this->constants->constant( 'Toolset_User_Editors_Editor_Divi::DIVI_BUILDER_OPTION_NAME' ) ) {
 			$ct_id = get_post_meta( $post_id, '_views_template', true );
 			if ( $ct_id ) {
 				$meta_value = get_post_meta( $ct_id, self::DIVI_BUILDER_OPTION_NAME, true );

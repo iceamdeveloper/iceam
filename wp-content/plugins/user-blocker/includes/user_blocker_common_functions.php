@@ -287,9 +287,9 @@ if (!function_exists('ublk_display_support_section')) {
                     <div class="pro-content">
                         <strong class="ual_advertisement_legend"><?php _e('Blog Designer Pro', 'user-blocker'); ?></strong>
                         <ul class="advertisementContent">
-                            <li><?php _e("40+ Beautiful Blog Templates", 'user-blocker') ?></li>
-                            <li><?php _e("5 Unique Timeline Templates", 'user-blocker') ?></li>
-                            <li><?php _e("100+ Blog Layout Variations", 'user-blocker') ?></li>
+                            <li><?php _e("50 Beautiful Blog Templates", 'user-blocker') ?></li>
+                            <li><?php _e("10+ Unique Timeline Templates", 'user-blocker') ?></li>
+                            <li><?php _e("200+ Blog Layout Variations", 'user-blocker') ?></li>
                             <li><?php _e("Single Post Design options", 'user-blocker') ?></li>
                             <li><?php _e("Category, Tag, Author Layouts", 'user-blocker') ?></li>
                             <li><?php _e("Post Type & Taxonomy Filter", 'user-blocker') ?></li>

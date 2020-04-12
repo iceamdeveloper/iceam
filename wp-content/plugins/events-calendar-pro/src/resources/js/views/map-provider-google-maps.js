@@ -219,14 +219,16 @@ tribe.events.views.mapProviderGoogleMaps = {};
 
 		if ( ! isPremium ) {
 			// set google maps default iframe src
+			var $googleMapsDefault = $container.find( obj.selectors.googleMapsDefault );
 			var $eventCardWrapper = $button.closest( obj.selectors.eventCardWrapper );
+			var currentSrc = $googleMapsDefault.attr( 'src' );
 			var src = $eventCardWrapper.attr( 'data-src' );
 			$container.trigger( 'closeNoVenueModal.tribeEvents' );
 
 			// If data-src exists for iframe (event has venue)
-			if ( src ) {
-				$container.find( obj.selectors.googleMapsDefault ).attr( 'src', src );
-			} else {
+			if ( src && currentSrc !== src ) {
+				$googleMapsDefault.attr( 'src', src );
+			} else if ( ! src ) {
 				// If data-src does not exist for iframe (event does not have venue)
 				var detailsLink = $eventCardWrapper.find( obj.selectors.eventActionLinkDetails ).attr( 'href' );
 

@@ -12,13 +12,15 @@
  * @version 0.1
  * @category Field
  * @author srdjan <srdjan@icanlocalize.com>
+ *
+ * @since m2m Probably DEPRECATED
  */
 class WPCF_Editor
 {
 
     /**
      * Settings.
-     * @var type 
+     * @var type
      */
     private $_settings = array();
 
@@ -87,7 +89,7 @@ class WPCF_Editor
      * @param string $shortcode
      */
     function frame( $field, $meta_type = 'postmeta', $post_id = -1,
-            $shortcode = null, $callback = false, $views_meta = false ) {
+            $shortcode = null, $callback = false, $views_meta = false, $post_type = false ) {
 
         global $wp_version, $wpcf;
 
@@ -190,10 +192,24 @@ class WPCF_Editor
             $this->_data['supports'][] = 'post_id';
         }
 
-        // Get parents
-        if ( !empty( $this->_post->ID ) ) {
-            $this->_data['parents'] = WPCF_Relationship::get_parents( $this->_post );
-        }
+		$is_m2m_activated = apply_filters( 'toolset_is_m2m_enabled', false );
+
+		// Get parents.
+		if ( ! $is_m2m_activated ) {
+			if ( ! empty( $this->_post->ID ) ) {
+				$this->_data['parents'] = WPCF_Relationship::get_parents( $this->_post );
+			}
+		} else {
+			// When in a new content post is null.
+			if ( ! $this->_post ) {
+				$this->_post = new StdClass();
+				$this->_post->post_type = $post_type;
+			}
+			// Get related.
+			$this->_data['related'] = WPCF_Relationship::get_related( $this->_post, $field );
+			// Get intermediate.
+			$this->_data['intermediate'] = WPCF_Relationship::get_intermediate( $this->_post, $field );
+		}
 
         // Set icons
         $icons = array(
@@ -235,7 +251,7 @@ class WPCF_Editor
         /**
          * Show or hide separator.
          *
-         * Filter allow to hide separator choosing tab when we do not need 
+         * Filter allow to hide separator choosing tab when we do not need
          * this tab in Types shortcode GUI
          *
          * @since 1.9.0
@@ -297,34 +313,27 @@ class WPCF_Editor
      *
      * Function should return shortcode string.
      */
-    function _thickbox_check_submit() {
+    public function _thickbox_check_submit() {
         if ( !empty( $_POST['__types_editor_nonce'] )
                 && wp_verify_nonce( $_POST['__types_editor_nonce'],
                         'types_editor_frame' ) ) {
 
-            $function = 'wpcf_fields_' . strtolower( $this->field['type'] )
-                    . '_editor_submit';
+            $function = 'wpcf_fields_' . strtolower( $this->field['type'] ) . '_editor_submit';
 
-            $shortcode = '';
             if ( function_exists( $function ) ) {
-                /*
-                 * Callback
-                 */
-                $shortcode = call_user_func( $function, $_POST, $this->field, $this->_meta_type );
-            } else {
-                /*
-                 * Generic
-                 */
-                if ( $this->_meta_type == 'usermeta' ) {
-                    $add = wpcf_get_usermeta_form_addon_submit();
-                    $shortcode = wpcf_usermeta_get_shortcode( $this->field, $add );
-				} elseif ( $this->_meta_type == 'termmeta' ) {
-                    $add = wpcf_get_termmeta_form_addon_submit();
-                    $shortcode = wpcf_termmeta_get_shortcode( $this->field, $add );
-                } else {
-                    $shortcode = wpcf_fields_get_shortcode( $this->field );
-                }
-            }
+            	// This will be sanitized differently depending on the field type
+				// in each wpcf_fields_{$field_type}_editor_submit() function.
+            	$submitted_data = $_POST;
+                $shortcode = $function( $submitted_data, $this->field, $this->_meta_type );
+            } elseif ( $this->_meta_type == 'usermeta' ) {
+				$add = wpcf_get_usermeta_form_addon_submit();
+				$shortcode = wpcf_usermeta_get_shortcode( $this->field, $add );
+			} elseif ( $this->_meta_type == 'termmeta' ) {
+				$add = wpcf_get_termmeta_form_addon_submit();
+				$shortcode = wpcf_termmeta_get_shortcode( $this->field, $add );
+			} else {
+				$shortcode = wpcf_fields_get_shortcode( $this->field );
+			}
 
             if ( !empty( $shortcode ) ) {
                 /**
@@ -345,7 +354,9 @@ class WPCF_Editor
             }
 
             wpcf_admin_ajax_footer();
-            die();
+						if ( ! defined( 'TOOLSET_TESTS_SITE_URL' ) ) { // Unit tests.
+            	die();
+						}
         }
     }
 
@@ -389,14 +400,21 @@ class WPCF_Editor
                     $shortcode );
         }
         if ( isset( $data['post_id'] ) && $data['post_id'] != 'current' ) {
-            $post_id = 'id=';
-            if ( $data['post_id'] == 'post_id' ) {
+            $post_id = 'item=';
+            switch ( $data['post_id'] ) {
+              case 'post_id':
                 $post_id .= '"' . preg_replace( '/[^\d]+/', '', $data['specific_post_id'] ) . '"';
-            } else if ( $data['post_id'] == 'parent' ) {
+                break;
+              case 'parent':
                 $post_id .= '"$parent"';
-            } else if ( $data['post_id'] == 'related' ) {
-                $post_id .= '"$' . esc_attr(trim( strval( $data['related_post'] ) )) . '"';
-            } else {
+                break;
+              case 'related':
+                $post_id .= '"' . esc_attr( trim( strval( $data['related_post'] ) ) ) . '"';
+                break;
+              case 'intermediate':
+                $post_id .= '"' . esc_attr( trim( strval( $data['intermediate_post'] ) ) ) . '"';
+                break;
+              default:
                 $post_id .= '"' . preg_replace( '/[^\d]+/', '', $data['post_id'] ) . '"';
             }
             $shortcode = preg_replace( '/\[types([^\]]*)/', '$0 ' . $post_id,
@@ -416,7 +434,7 @@ class WPCF_Editor
 
     /**
      * Checks if feature is supported.
-     * 
+     *
      * @param type $feature
      * @return type
      */
@@ -426,7 +444,7 @@ class WPCF_Editor
 
     /**
      * Converts shortcode string to array of parameters.
-     * 
+     *
      * @param type $shortcode
      */
     function shortcodeToParameters( $shortcode ) {
@@ -541,9 +559,9 @@ class WPCF_Editor
 
     /**
      * Sanitize value before writing to JS.
-     * 
-     * @param type $value
-     * @return type
+     *
+     * @param array|string $value
+     * @return string
      */
     public static function sanitizeParams( $value, $is_array = false ) {
         if ( $is_array === 'array' && is_array( $value ) ) {

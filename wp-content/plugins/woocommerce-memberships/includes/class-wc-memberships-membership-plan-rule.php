@@ -16,165 +16,1060 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Membership Plan Rule class
+ * Membership Plan Rule.
  *
- * This class represents a single membership plan rule, eg a content
- * restriction rule, purchasing discount rule, etc.
- *
+ * This class represents an individual Membership Plan rule.
+ * Rules can be of content or product restriction type or purchasing discount type.
  *
  * @since 1.0.0
  */
 class WC_Memberships_Membership_Plan_Rule {
 
 
-	/** @var array Rule data */
-	private $data = array();
+	/** @var string the rule unique ID (alphanumerical value) */
+	private $id = '';
+
+	/** @var int the ID of the plan the rule belongs to */
+	private $membership_plan_id = 0;
+
+	/** @var null (yes/no) whether the rule is active (for example discounts) */
+	private $active = '';
+
+	/** @var string the rule type: e.g. `content_restriction`, `product_restriction`, `purchasing_discount` */
+	private $rule_type = '';
+
+	/** @var string the content type the rule applies to (normally: `post_type` or `taxonomy`) */
+	private $content_type = '';
+
+	/** @var string the name of the content type the rule applies to */
+	private $content_type_name = '';
+
+	/** @var int[] array of object ids (e.g. posts, products, terms) the rule applies to */
+	private $object_ids = array();
+
+	/** @var int[] memoized array of children ids which aren't directly included in the rule data but gathered hierarchically */
+	private $children_ids = array();
+
+	/** @var string discount type ('percentage' or 'amount') */
+	private $discount_type = '';
+
+	/** @var string discount amount */
+	private $discount_amount = '';
+
+	/** @var string rule access type */
+	private $access_type = '';
+
+	/** @var string rule access schedule (immediate or delayed) */
+	private $access_schedule = '';
+
+	/** @var string (yes/no) whether the rule excludes subscriptions trial periods */
+	private $access_schedule_exclude_trial = '';
 
 
 	/**
-	 * Setup rule
+	 * Sets up the rule object when instantiated with arguments to be turned into properties.
 	 *
 	 * @since 1.0.0
-	 * @param array $data Rule data
+	 *
+	 * @param array $data rule data
 	 */
-	public function __construct( array $data ) {
+	public function __construct( $data = array() ) {
 
-		$this->data = $data;
+		$data = wp_parse_args( (array) $data, $this->get_default_data() );
+
+		foreach ( $data as $property => $value ) {
+			if ( property_exists( $this, $property ) ) {
+				$this->$property = $value;
+			}
+		}
 	}
 
 
 	/**
-	 * Meta-method for returning, setting, checking rule data, currently:
+	 * Returns the rule default data.
 	 *
-	 * + id
-	 * + membership_plan_id
-	 * + content_type
-	 * + content_type_name
-	 * + object_ids
-	 * + access_schedule (content & product restriction rules only)
-	 * + access_schedule_exclude_trial (content & product restriction rules only)
-	 * + access_type (product restriction rules only)
-	 * + discount_type (purchasing discount rules only)
-	 * + discount_amount (purchasing discount rules only)
-	 * + active (purchasing discount rules only)
+	 * @since 1.9.0
 	 *
-	 * sample usage:
-	 *
-	 * `$email = $rule->get_id()`
-	 *
-	 * TODO refactor this and try avoid using __call, makes harder to test or navigate code in IDEs {FN 2016-04-26}
-	 *
-	 * @since 1.0.0
-	 * @param string $method called method
-	 * @param array $args method arguments
-	 * @return string|bool
+	 * @return array associative array
 	 */
-	public function __call( $method, $args ) {
+	private function get_default_data() {
+		global $post;
 
-		// get_* method
-		if ( 0 === strpos( $method, 'get_' ) ) {
-
-			$method = str_replace( 'get_', '', $method );
-
-			return $this->get_rule_value( $method );
-		}
-
-		// set_* method
-		if ( 0 === strpos( $method, 'set_' ) ) {
-
-			$method = str_replace( 'set_', '', $method );
-
-			$this->data[ $method ] = $args[0];
-		}
-
-		// has_* method
-		if ( 0 === strpos( $method, 'has_' ) ) {
-
-			$method = str_replace( 'has_', '', $method );
-
-			return isset( $this->data[ $method ] );
-		}
-
-		return null;
+		return array(
+			'id'                            => '',
+			'membership_plan_id'            => $post && 'wc_membership_plan' === get_post_type( $post ) ? (int) $post->ID : 0,
+			'active'                        => '',
+			'rule_type'                     => '',
+			'content_type'                  => '',
+			'content_type_name'             => '',
+			'object_ids'                    => array(),
+			'discount_type'                 => '',
+			'discount_amount'               => '',
+			'access_type'                   => '',
+			'access_schedule'               => 'immediate',
+			'access_schedule_exclude_trial' => '',
+		);
 	}
 
 
 	/**
-	 * Get the specified rule value or return an empty string if
-	 * the specified info does not exist
+	 * Returns the the whole rule data as associative array.
 	 *
 	 * @since 1.0.0
-	 * @param string $key key for rule data, e.g. `id`
-	 * @return mixed rule value
-	 */
-	private function get_rule_value( $key ) {
-		return isset( $this->data[ $key ] ) ? $this->data[ $key ] : '';
-	}
-
-
-	/**
-	 * Get the raw rule data
-	 *
-	 * @since 1.0.0
-	 * @return array Raw data
+	 * @return array associative array
 	 */
 	public function get_raw_data() {
-		return $this->data;
+
+		$defaults = $this->get_default_data();
+		$raw_data = array();
+
+		foreach ( array_keys( $defaults ) as $key ) {
+			if ( property_exists( $this, $key ) ) {
+				$raw_data[ $key ] = $this->$key;
+			}
+		}
+
+		return $raw_data;
 	}
 
 
 	/**
-	 * Get access schedule amount
+	 * Returns the rule unique identifier.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	public function get_id() {
+		return $this->id;
+	}
+
+
+	/**
+	 * Sets the rule ID.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string|null $id if not passed, will generate a random new ID
+	 */
+	public function set_id( $id = null ) {
+
+		if ( null === $id ) {
+			$this->id = uniqid( 'rule_', false );
+		} elseif ( is_string( $id ) ) {
+			$this->id = $id;
+		}
+	}
+
+
+	/**
+	 * Checks if this rule has an ID.
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool
+	 */
+	public function has_id() {
+		return ! empty( $this->id );
+	}
+
+
+	/**
+	 * Checks if this rule is new (has no set ID).
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return bool
+	 */
+	public function is_new() {
+		return ! $this->has_id();
+	}
+
+
+	/**
+	 * Checks if the rule belongs to a plan that is in the bin.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function is_trashed() {
+
+		$is_trashed = false;
+
+		if ( $plan = $this->get_membership_plan() ) {
+			$is_trashed = 'trash' === $plan->post->post_status;
+		}
+
+		return $is_trashed;
+	}
+
+
+
+	/**
+	 * Returns the current rule type.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string e.g. 'content_restriction', 'product_restriction', 'purchasing_discount'
+	 */
+	public function get_rule_type() {
+		return $this->rule_type;
+	}
+
+
+	/**
+	 * Sets the rule type.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $type
+	 */
+	public function set_rule_type( $type ) {
+
+		$this->rule_type = $type;
+	}
+
+
+	/**
+	 * Returns the ID of the membership plan the rule belongs to.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return int
+	 */
+	public function get_membership_plan_id() {
+		return (int) $this->membership_plan_id;
+	}
+
+
+	/**
+	 * Sets the plan the rule belongs to.
+	 *
+	 * @param int $id
+	 */
+	public function set_membership_plan_id( $id ) {
+
+		if ( is_numeric( $id ) && wc_memberships_get_membership_plan( $id ) ) {
+			$this->membership_plan_id = (int) $id;
+		}
+	}
+
+
+	/**
+	 * Returns the membership plan the rule belongs to.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return false|null|\WC_Memberships_Integration_Subscriptions_Membership_Plan|\WC_Memberships_Membership_Plan
+	 */
+	public function get_membership_plan() {
+		return $this->membership_plan_id > 0 ? wc_memberships_get_membership_plan( $this->membership_plan_id ) : null;
+	}
+
+
+	/**
+	 * Checks if the rule has a valid membership plan ID.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function has_membership_plan_id() {
+		return $this->get_membership_plan_id() > 0;
+	}
+
+
+	/**
+	 * Checks if the rule is tied a to a valid membership plan.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function has_membership_plan() {
+
+		return $this->has_membership_plan_id() && $this->get_membership_plan() instanceof \WC_Memberships_Membership_Plan;
+	}
+
+
+	/**
+	 * Returns the rule content type and content type name as a composite string target.
+	 *
+	 * @see \WC_Memberships_Membership_Plan_Rule::get_content_type_key() alias, kept for legacy reasons too
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string|null
+	 */
+	public function get_target() {
+		return $this->get_content_type_key();
+	}
+
+
+	/**
+	 * Sets content type and content type name using a shorthand form.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string|array $content_target
+	 */
+	public function set_target( $content_target ) {
+
+		if ( is_array( $content_target ) && isset( $content_target['content_type'], $content_target['content_type_name'] ) ) {
+
+			$this->set_content_type( $content_target['content_type'] );
+			$this->set_content_type_name( $content_target['content_type_name'] );
+
+		} elseif ( is_string( $content_target ) ) {
+
+			$content_target = explode( '|', $content_target );
+
+			if ( isset( $content_target[0], $content_target[1] ) ) {
+
+				$this->set_content_type( $content_target[0] );
+				$this->set_content_type_name( $content_target[1] );
+			}
+		}
+	}
+
+
+	/**
+	 * Returns a content type key, suitable for HTML select option.
+	 *
+	 * Combines content_type and content type name into a single key so that it can be used as a HTML select option value.
+	 *
+	 * @see \WC_Memberships_Membership_Plan_Rule::get_target() alias
+	 *
+	 * @since 1.0.0
+	 *
+	 * @return string|null pipe `|` separated content type key, for example: "post_type|product"
+	 */
+	public function get_content_type_key() {
+
+		$content_type      = $this->get_content_type();
+		$content_type_name = $this->get_content_type_name();
+
+		return $content_type && $content_type_name ? $content_type . '|' . $content_type_name : null;
+	}
+
+
+	/**
+	 * Returns the content type targeted by this rule (e.g. 'post_type').
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	public function get_content_type() {
+		return $this->content_type;
+	}
+
+
+	/**
+	 * Sets the rule content type target.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param $type
+	 */
+	public function set_content_type( $type ) {
+
+		$this->content_type = wc_memberships()->get_rules_instance()->is_valid_rule_content_type( $type ) ? $type : '';
+	}
+
+
+	/**
+	 * Checks which is the rule target content type.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string|array $type the content type as one or more known kinds
+	 * @return bool
+	 */
+	public function is_content_type( $type ) {
+		return $this->is_type( $type, 'content' );
+	}
+
+
+	/**
+	 * Gets the rule content type object.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return null|\WP_Post_Type|\WP_Taxonomy
+	 */
+	public function get_content_type_object() {
+
+		$object = null;
+
+		if ( $this->is_content_type( 'taxonomy' ) ) {
+			$object = get_taxonomy( $this->content_type_name );
+		} elseif ( $this->is_content_type( 'post_type' ) ) {
+			$object = get_post_type_object( $this->content_type_name );
+		}
+
+		return is_object( $object ) ? $object : null;
+	}
+
+
+	/**
+	 * Gets the rule content type labels.
+	 *
+	 * @see get_post_type_labels()
+	 * @see get_taxonomy_labels()
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return \stdClass
+	 */
+	public function get_content_type_labels() {
+
+		$labels = null;
+		$object = $this->get_content_type_object();
+
+		if ( $object instanceof \WP_Post_Type ) {
+			$labels = get_post_type_labels( $object );
+		} elseif ( $object instanceof \WP_Taxonomy ) {
+			$labels = get_taxonomy_labels( $object );
+		}
+
+		return is_object( $labels ) ? $labels : null;
+	}
+
+
+	/**
+	 * Returns the content type name targeted by the rule (e.g. 'post').
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	public function get_content_type_name() {
+		return $this->content_type_name;
+	}
+
+
+	/**
+	 * Sets the content type name targeted by the rule.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $name
+	 */
+	public function set_content_type_name( $name ) {
+
+		$this->content_type_name = wc_memberships()->get_rules_instance()->is_valid_rule_content_type_name( $name, $this->rule_type ) ? $name : '';
+	}
+
+
+	/**
+	 * Checks which is the content type name.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string|array $name one or more known content type names (e.g. 'product', 'post'...)
+	 * @return bool
+	 */
+	public function is_content_type_name( $name ) {
+		return $this->is_type( $name, 'content_name' );
+	}
+
+
+	/**
+	 * Returns the rule target object IDs.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return int[]
+	 */
+	public function get_object_ids() {
+
+		$object_ids = ! empty( $this->object_ids ) && is_array( $this->object_ids ) ? array_map( 'absint', $this->object_ids ) : array();
+
+		return array_unique( $object_ids );
+	}
+
+
+	/**
+	 * Sets the rule target object IDS.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param int[] $object_ids
+	 */
+	public function set_object_ids( array $object_ids ) {
+
+		$this->object_ids = array();
+
+		if ( ! empty( $object_ids ) && is_array( $object_ids ) ) {
+			$this->object_ids = array_unique( array_map( 'absint', $object_ids ) );
+		}
+	}
+
+
+	/**
+	 * Checks if the rule has any object IDs attached to it.
+	 *
+	 * Alias for `has_objects()`.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function has_object_ids() {
+		return $this->has_objects();
+	}
+
+
+	/**
+	 * Checks if this rule has any object IDs attached to it.
+	 *
+	 * Alias for `has_object_ids()`.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function has_objects() {
+
+		$object_ids = $this->get_object_ids();
+
+		return is_array( $object_ids ) && ! empty( $object_ids );
+	}
+
+
+	/**
+	 * Wipes the rule object IDs.
+	 *
+	 * @since 1.9.0
+	 */
+	public function delete_object_ids() {
+
+		$this->set_object_ids( array() );
+	}
+
+
+	/**
+	 * Gets any children IDs of the rule object IDs.
+	 *
+	 * Only works if the object is hierarchical (like a taxonomy or the page post type).
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return int[] array of post IDs or term IDs
+	 */
+	public function get_object_children_ids() {
+
+		if ( empty( $this->children_ids ) && $this->has_object_ids() ) {
+
+			$children = array( array() );
+
+			switch ( $this->get_content_type() ) {
+
+				case 'post_type' :
+
+					foreach ( $this->get_object_ids() as $post_id ) {
+						$children[] = $this->get_grandchildren( $post_id );
+					}
+
+				break;
+
+				case 'taxonomy' :
+
+					foreach ( $this->get_object_ids() as $term_id ) {
+
+						$children_ids = get_term_children( $term_id, $this->get_content_type_name() );
+
+						if ( is_array( $children_ids ) ) {
+							$children[] = $children_ids;
+						}
+					}
+
+				break;
+			}
+
+			$this->children_ids = array_unique( array_map( 'absint', call_user_func_array( 'array_merge', $children ) ) );
+		}
+
+		return $this->children_ids;
+	}
+
+
+	/**
+	 * Gets all grandchildren of a given post.
+	 *
+	 * Helper method, do not open to public:
+	 * @see \get_children() only retrieves direct children, but we want the whole line of descendants.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int $ancestor_id ancestor post ID
+	 * @return int[] array of descendant post IDs (won't include the ancestor ID)
+	 */
+	private function get_grandchildren( $ancestor_id ) {
+
+		$descendants = array( array() );
+		$children    = get_posts( array(
+			'nopaging'    => true,
+			'fields'      => 'ids',
+			'post_status' => 'publish',
+			'post_type'   => $this->get_content_type_name(),
+			'post_parent' => $ancestor_id,
+		) );
+
+		foreach ( $children as $child_id ) {
+
+			// recursion to catch all grandchildren
+			$grandchildren = $this->get_grandchildren( $child_id );
+
+			if ( ! empty( $grandchildren ) ) {
+				$descendants[] = $grandchildren;
+			}
+		}
+
+		return array_unique( array_merge( $children, call_user_func_array( 'array_merge', $descendants ) ) );
+	}
+
+
+	/**
+	 * Returns the rule access schedule.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	public function get_access_schedule() {
+		return $this->access_schedule;
+	}
+
+
+	/**
+	 * Sets the rule access schedule.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $schedule
+	 */
+	public function set_access_schedule( $schedule ) {
+		$this->access_schedule = $schedule;
+	}
+
+
+	/**
+	 * Checks if the access schedule does not apply for subscription trials.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return null|bool
+	 */
+	public function is_access_schedule_excluding_trial() {
+		return 'yes' === $this->access_schedule_exclude_trial;
+	}
+
+
+	/**
+	 * Set the rule access schedule TO NOT APPLY during subscriptions trials.
+	 *
+	 * @since 1.9.0
+	 */
+	public function set_access_schedule_exclude_trial() {
+
+		$this->access_schedule_exclude_trial = 'yes';
+	}
+
+
+	/**
+	 * Checks if the access schedule does apply for subscription trials.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return null|bool
+	 */
+	public function is_access_schedule_including_trial() {
+		return ! $this->is_access_schedule_excluding_trial();
+	}
+
+
+	/**
+	 * Sets the rule access schedule TO APPLY during subscriptions trials.
+	 *
+	 * @since 1.9.0
+	 */
+	public function set_access_schedule_include_trial() {
+
+		$this->access_schedule_exclude_trial = 'no';
+	}
+
+
+	/**
+	 * Returns the rule access type (products).
+	 *
+	 * @return string 'view' or 'purchase'
+	 */
+	public function get_access_type() {
+		return $this->access_type;
+	}
+
+
+	/**
+	 * Sets the rule access type (for products).
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $type
+	 */
+	public function set_access_type( $type ) {
+		$this->access_type = $type;
+	}
+
+
+	/**
+	 * Checks which is the product access type.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string 'view' or 'purchase'
+	 * @return bool
+	 */
+	public function is_access_type( $type ) {
+		return $this->is_type( $type, 'access' );
+	}
+
+
+	/**
+	 * Sets the discount.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param float|int|string $discount
+	 */
+	public function set_discount( $discount ) {
+
+		if ( Framework\SV_WC_Helper::str_ends_with( $discount, '%' ) ) {
+			$discount_type   = 'percentage';
+			$discount_amount = preg_replace( '/[^0-9,.]/', '', trim( str_replace( ',', '.', $discount ) ) );
+			$discount_amount = is_numeric( $discount_amount ) ? (float) $discount_amount : '';
+		} else {
+			$discount_type   = 'amount';
+			$discount_amount = is_numeric( $discount ) ? (float) $discount : '';
+		}
+
+		if ( is_numeric( $discount_amount ) ) {
+			$this->set_discount_type( $discount_type );
+			$this->set_discount_amount( $discount_amount );
+		} else {
+			$this->delete_discount();
+		}
+	}
+
+
+	/**
+	 * Deletes the rule discount data.
+	 *
+	 * @since 1.9.0
+	 */
+	public function delete_discount() {
+
+		$this->set_discount_type( '' );
+		$this->delete_discount_amount();
+	}
+
+
+	/**
+	 * Returns the discount.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return float|int|string numerical if fixed amount or string if percentage or no discount
+	 */
+	public function get_discount() {
+
+		$discount = '';
+
+		if ( $this->has_discount() ) {
+			$discount = $this->get_discount_amount() . ( $this->is_discount_type( 'percentage' ) ? '%' : '' );
+		}
+
+		return $discount;
+	}
+
+
+	/**
+	 * Checks if the rule has a discount set.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function has_discount() {
+
+		$amount = $this->get_discount_amount();
+
+		return $this->is_type( 'purchasing_discount' ) && is_numeric( $amount ) && 0 !== $amount;
+	}
+
+
+	/**
+	 * Returns the rule product discount type.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	public function get_discount_type() {
+		return $this->discount_type;
+	}
+
+
+	/**
+	 * Sets the rule product discount type.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $type
+	 */
+	public function set_discount_type( $type ) {
+
+		$this->discount_type = wc_memberships()->get_rules_instance()->is_valid_discount_type( $type ) ? $type : '';
+	}
+
+
+	/**
+	 * Checks if the rule discount is of a known type.
+	 *
+	 * @param string|array $type
+	 * @return bool
+	 */
+	public function is_discount_type( $type ) {
+		return $this->is_type( $type, 'discount' );
+	}
+
+
+	/**
+	 * Returns the rule discount amount.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return string
+	 */
+	public function get_discount_amount() {
+		return $this->discount_amount;
+	}
+
+
+	/**
+	 * Sets the rule discount amount.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param $amount
+	 */
+	public function set_discount_amount( $amount ) {
+
+		$this->discount_amount = is_numeric( $amount ) ? $amount : '';
+	}
+
+
+	/**
+	 * Deletes the rule discount amount.
+	 *
+	 * @since 1.9.0
+	 */
+	public function delete_discount_amount() {
+
+		$this->set_discount_amount( '' );
+	}
+
+
+	/**
+	 * Checks if rule has active status (e.g. if a discount is active).
+	 *
+	 * @return bool
+	 */
+	public function is_active() {
+		return 'yes' === $this->active;
+	}
+
+
+	/**
+	 * Checks if the rule is inactive.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function is_inactive() {
+		return ! $this->is_active();
+	}
+
+
+	/**
+	 * Sets the rule as active.
+	 *
+	 * @since 1.9.0
+	 */
+	public function set_active() {
+
+		$this->active = 'yes';
+	}
+
+
+	/**
+	 * Sets the rule as inactive.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @return bool
+	 */
+	public function set_inactive() {
+
+		return $this->active = 'no';
+	}
+
+
+	/**
+	 * Checks a value type.
+	 *
+	 * Normally you'd use one of these methods:
+	 *
+	 * @see \WC_Memberships_Membership_Plan_Rule::is_content_type()
+	 * @see \WC_Memberships_Membership_Plan_Rule::is_content_type_name()
+	 * @see \WC_Memberships_Membership_Plan_Rule::is_access_type()
+	 * @see \WC_Memberships_Membership_Plan_Rule::is_discount_type()
+	 *
+	 * When used directly, it makes sense to just check the rule type, without using the second argument.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string|array $type type or name to check
+	 * @param string $which entity to check, when left blank (default null) it will check the rule type
+	 * @return bool
+	 */
+	public function is_type( $type, $which = null ) {
+
+		$which = null === $which ? 'rule' : $which;
+
+		switch ( $which ) {
+			case 'access' :
+				$the_type = $this->access_type;
+			break;
+			case 'content' :
+				$the_type = $this->content_type;
+			break;
+			case 'content_name' :
+				$the_type = $this->content_type_name;
+			break;
+			case 'discount' :
+				$the_type = $this->discount_type;
+			break;
+			case 'rule' :
+				$the_type = $this->rule_type;
+			break;
+			default :
+				$the_type = false;
+			break;
+		}
+
+		if ( empty( $the_type ) ) {
+			$is_type = false;
+		} else {
+			$is_type = is_array( $type ) ? in_array( $the_type, $type, true ) : $the_type === $type;
+		}
+
+		return $is_type;
+	}
+
+
+	/**
+	 * Determines and returns the rule priority.
+	 *
+	 * The priority will be determined by the type of content the rule applies to.
+	 *
+	 * * 10 = post type
+	 * * 20 = taxonomy
+	 * * 30 = term
+	 * * 40 = post
+	 *
+	 * A higher number means a higher priority.
+	 *
+	 * @since 1.1.0
+	 *
+	 * @return int
+	 */
+	public function get_priority() {
+
+		$priority     = 0;
+		$object_ids   = $this->get_object_ids();
+		$content_type = $this->get_content_type();
+
+		if ( 'post_type' === $content_type ) {
+			$priority = ! empty( $object_ids ) ? 40 : 10;
+		} elseif ( 'taxonomy' === $content_type ) {
+			$priority = ! empty( $object_ids ) ? 30 : 20;
+		}
+
+		/**
+		 * Filter rule priority.
+		 *
+		 * @since 1.1.0
+		 *
+		 * @param int $priority a numerical priority similar to WordPress hooks
+		 * @param \WC_Memberships_Membership_Plan_Rule $rule the current rule
+		 */
+		return apply_filters( 'wc_memberships_rule_priority', $priority, $this );
+	}
+
+
+	/**
+	 * Returns the access schedule amount.
 	 *
 	 * Returns the amount part of the schedule.
-	 * For example, returns '5' for the schedule '5 days'
+	 * For example, returns '5' for the schedule '5 days'.
 	 *
 	 * @since 1.0.0
-	 * @return int|string Amount or empty string if no schedule
+	 *
+	 * @return int|string amount or empty string if no schedule
 	 */
 	public function get_access_schedule_amount() {
-
-		$parts = explode( ' ', $this->get_access_schedule() );
-
-		return isset( $parts[1] ) ? (int) $parts[0] : '';
+		return ! $this->grants_immediate_access() ? wc_memberships_parse_period_length( $this->get_access_schedule(), 'amount' ) : '';
 	}
 
 
 	/**
-	 * Get access schedule period
+	 * Returns the access schedule period.
 	 *
 	 * Returns the period part of the access schedule.
-	 * For example, returns 'days' for the schedule '5 days'
+	 * For example, returns 'days' for the schedule '5 days'.
 	 *
 	 * @since 1.0.0
-	 * @return int|string Access schedule period
+	 *
+	 * @return int|string access schedule period
 	 */
 	public function get_access_schedule_period() {
-
-		$parts = explode( ' ', $this->get_access_schedule() );
-
-		return isset( $parts[1] ) ? $parts[1] : $parts[0];
+		return ! $this->grants_immediate_access() ? wc_memberships_parse_period_length( $this->get_access_schedule(), 'period' ) : '';
 	}
 
 
 	/**
-	 * Get rule access start time
+	 * Returns the rule access start time.
 	 *
-	 * Returns the access start time this rule grants or a piece of content,
-	 * based on the input time
+	 * Returns the access start time this rule grants or a piece of content, based on the input time.
 	 *
 	 * @since 1.0.0
-	 * @param int $from_time Timestamp for the time the access start time should be calculated from
-	 * @return int Access start time as a timestamp
+	 *
+	 * @param int $from_time timestamp for the time the access start time should be calculated from
+	 * @return int access start time as a timestamp
 	 */
 	public function get_access_start_time( $from_time ) {
 
@@ -190,12 +1085,13 @@ class WC_Memberships_Membership_Plan_Rule {
 		}
 
 		/**
-		 * Filter rule access start time
+		 * Filter rule access start time.
 		 *
 		 * @since 1.0.0
-		 * @param int $access_time Access time, as a timestamp
-		 * @param int $from_time From time, as a timestamp
-		 * @param \WC_Memberships_Membership_Plan_Rule $rule The rule object
+		 *
+		 * @param int $access_time access time, as a timestamp
+		 * @param int $from_time from time, as a timestamp
+		 * @param \WC_Memberships_Membership_Plan_Rule $rule the rule object
 		 */
 		$access_time = apply_filters( 'wc_memberships_rule_access_start_time', $access_time, $from_time, $this );
 
@@ -205,37 +1101,7 @@ class WC_Memberships_Membership_Plan_Rule {
 
 
 	/**
-	 * Get content type key, suitable for HTML select option
-	 *
-	 * Combines content_type and content type name into a single
-	 * key so that it can be used as a HTML select option value.
-	 *
-	 * @since 1.0.0
-	 * @return string|null Content type key, example: "post_type|product"
-	 */
-	public function get_content_type_key() {
-
-		$content_type      = $this->get_content_type();
-		$content_type_name = $this->get_content_type_name();
-
-		return ( $content_type && $content_type_name ) ? $content_type . '|' . $content_type_name : null;
-	}
-
-
-	/**
-	 * Check if the content type exists
-	 *
-	 * @since 1.1.0
-	 * @return bool
-	 */
-	public function content_type_exists() {
-		// Content is either a taxonomy or a post type.
-		return 'post_type' === $this->get_content_type() ? post_type_exists( $this->get_content_type_name() ) : taxonomy_exists( $this->get_content_type_name() );
-	}
-
-
-	/**
-	 * Check if this rule applies to a key-value combination
+	 * Checks if this rule applies to a key-value combination
 	 *
 	 * @since 1.0.0
 	 * @param string $key Content type key
@@ -244,25 +1110,18 @@ class WC_Memberships_Membership_Plan_Rule {
 	 */
 	public function applies_to( $key, $value = null ) {
 
-		$has_key = 'has_' . $key;
-		$get_key = 'get_' . $key;
-
 		switch ( $key ) {
 
-			// Special handling for object IDs
 			case 'object_id':
 			case 'object_ids':
-
-				$rule_value = $this->get_object_ids();
-				$rule_value = is_bool( $rule_value ) || null === $rule_value ? array() : (array) $rule_value;
-				$applies    = ! empty( $rule_value ) && in_array( $value, $rule_value, false );
-
+				$object_ids = $this->get_object_ids();
+				$applies    = in_array( $value, $object_ids, false );
 			break;
 
 			default:
-				$applies = $this->$has_key() && $this->$get_key() == $value;
+				$raw_data = $this->get_raw_data();
+				$applies  = isset( $raw_data[ $key ] ) && $raw_data[ $key ] === $value;
 			break;
-
 		}
 
 		return $applies;
@@ -270,77 +1129,11 @@ class WC_Memberships_Membership_Plan_Rule {
 
 
 	/**
-	 * Check if this rule applies to multiple object IDs
+	 * Checks if this rule grants immediate access to restricted content
 	 *
 	 * @since 1.0.0
-	 * @return bool True, if applies to multiple object IDs, false otherwise
-	 */
-	public function applies_to_multiple_objects() {
-
-		$object_ids = $this->get_object_ids();
-
-		return is_array( $object_ids ) && count( $object_ids ) > 1;
-	}
-
-
-	/**
-	 * Check if this rule applies to a single object ID
 	 *
-	 * @since 1.0.0
-	 * @param int $object_id Optional object ID to check against.
-	 * @return bool True, if applies to a single (optionally provided) object ID, false otherwise
-	 */
-	public function applies_to_single_object( $object_id = null ) {
-
-		$object_ids = $this->get_object_ids();
-
-		return is_array( $object_ids )
-		       && count( $object_ids ) === 1
-		       && ( $object_id ? $this->applies_to( 'object_id', $object_id ) : true );
-	}
-
-
-	/**
-	 * Check if this rule is active (purchasing discount only)
-	 *
-	 * @since 1.0.0
-	 * @return bool True, if active, false otherwise
-	 */
-	public function is_active() {
-		return $this->get_rule_value( 'active' ) === 'yes';
-	}
-
-
-	/**
-	 * Check if this rule is new (has no ID)
-	 *
-	 * @since 1.0.0
-	 * @return bool True, if new, false otherwise
-	 */
-	public function is_new() {
-		return ! $this->get_id();
-	}
-
-
-	/**
-	 * Check if this rule has any object IDs attached to it
-	 *
-	 * @since 1.0.0
-	 * @return bool True, if has objects, false otherwise
-	 */
-	public function has_objects() {
-
-		$object_ids = $this->get_object_ids();
-
-		return is_array( $object_ids ) && ! empty( $object_ids );
-	}
-
-
-	/**
-	 * Check if this rule grants immediate access to restricted content
-	 *
-	 * @since 1.0.0
-	 * @return bool True, if immediate access, false otherwise
+	 * @return bool
 	 */
 	public function grants_immediate_access() {
 		return $this->get_access_schedule() === 'immediate';
@@ -348,167 +1141,48 @@ class WC_Memberships_Membership_Plan_Rule {
 
 
 	/**
-	 * Utility method for getting the label for an object ID from this rule
+	 * Checks if the current user can edit this rule.
+	 *
+	 * Evaluates the user's capability for the rule content type.
 	 *
 	 * @since 1.0.0
-	 * @param int $object_id Object ID
-	 * @return string|null Object label or null, if could not find object label
-	 */
-	public function get_object_label( $object_id ) {
-
-		$label = null;
-
-		if ( in_array( $object_id, $this->get_object_ids(), false ) ) {
-
-			switch ( $this->get_content_type() ) {
-
-				// Get post title
-				case 'post_type':
-
-					if ( 'product' === $this->get_content_type_name() ) {
-
-						$product = wc_get_product( $object_id );
-
-						if ( $product ) {
-
-							if ( SV_WC_Plugin_Compatibility::is_wc_version_lt_3_0() ) {
-
-								if ( isset( $product->post ) && in_array( $product->post->post_type, array( 'product', 'product_variation' ), true ) ) {
-									$label = strip_tags( $product->get_formatted_name() );
-								}
-
-							} else {
-
-								if ( $product->is_type( 'variation' ) ) {
-									$post_data = get_post( $product->get_parent_id() );
-								} else {
-									$post_data = get_post( $product->get_id() );
-								}
-
-								if ( isset( $post_data->post_type ) && in_array( $post_data->post_type, array( 'product', 'product_variation' ), true ) ) {
-									$label = strip_tags( $product->get_formatted_name() );
-								}
-							}
-						}
-
-					} else {
-
-						$label = get_the_title( $object_id );
-					}
-
-				break;
-
-				// Get taxonomy name
-				case 'taxonomy':
-
-					$term = get_term( $object_id, $this->get_content_type_name() );
-
-					if ( ! is_wp_error( $term ) && $term ) {
-						$label = $term->name;
-					}
-
-				break;
-
-			}
-		}
-
-		return $label;
-	}
-
-
-	/**
-	 * Check if the current user can edit this rule
 	 *
-	 * Checks user's capability for the rule content type
-	 *
-	 * @since 1.0.0
-	 * @return bool True, if can edit, false otherwise
+	 * @return bool
 	 */
 	public function current_user_can_edit() {
-
-		// Users can always edit a new rule that has no content type key set yet
-		if ( ! $this->get_content_type_key() ) {
-			return true;
-		}
-
-		return current_user_can( 'wc_memberships_edit_rule', $this->get_id() );
+		// users can always edit a new rule that has no content type key set yet
+		return ! $this->get_content_type_key() ? true : current_user_can( 'wc_memberships_edit_rule', $this->get_id() );
 	}
 
 
 	/**
-	 * Check if the current context allows editing this rule
+	 * Checks if the current context allows editing this rule
 	 *
-	 * Context allows editing if the global $post ID matches the
-	 * rule membership plan ID or if the rule only applies to the
-	 * global $post ID.
+	 * Context allows editing if the global $post ID matches the rule membership plan ID or if the rule only applies to the global $post ID.
 	 *
 	 * @since 1.0.0
-	 * @return bool True, if context allows editing, false otherwise
+	 *
+	 * @return bool
 	 */
 	public function current_context_allows_editing() {
 		global $post;
 
-		return $post ? $this->get_membership_plan_id() == $post->ID || $this->applies_to_single_object( $post->ID ) : false;
-	}
+		$allow_edit = false;
 
+		if ( $post ) {
 
-	/**
-	 * Get object search action name for admin screens
-	 *
-	 * @since 1.0.0
-	 * @return string
-	 */
-	public function get_object_search_action_name() {
+			$allow_edit = $this->get_membership_plan_id() === (int) $post->ID;
 
-		if ( 'taxonomy' === $this->get_content_type() ) {
-			$action = 'wc_memberships_json_search_terms';
-		} else {
-			if ( 'product' === $this->get_content_type_name() ) {
-				$action = 'woocommerce_json_search_products_and_variations';
-			} else {
-				$action = 'wc_memberships_json_search_posts';
+			if ( ! $allow_edit ) {
+
+				$object_ids = $this->get_object_ids();
+				$allow_edit = is_array( $object_ids )
+				              && count( $object_ids ) === 1
+				              && $this->applies_to( 'object_id', $post->ID );
 			}
 		}
 
-		return $action;
-	}
-
-
-	/**
-	 * Get rule priority.
-	 *
-	 * The priority will be determined by the type of content the rule applies to.
-	 *
-	 * * 10 = post type
-	 * * 20 = taxonomy
-	 * * 30 = term
-	 * * 40 = post
-	 *
-	 * A higher number means a higher priority.
-	 *
-	 * @since 1.1.0
-	 * @return int
-	 */
-	public function get_priority() {
-
-		$priority     = 0;
-		$object_ids   = $this->get_object_ids();
-		$content_type = $this->get_content_type();
-
-		if ( 'post_type' === $content_type && ! empty( $object_ids ) ) {
-			$priority = ! empty( $object_ids ) ? 40 : 10;
-		} elseif ( 'taxonomy' === $content_type ) {
-			$priority = ! empty( $object_ids ) ? 30 : 20;
-		}
-
-		/**
-		 * Filter rule priority
-		 *
-		 * @since 1.1.0
-		 * @param int $priority
-		 * @param \WC_Memberships_Membership_Plan_Rule $rule
-		 */
-		return apply_filters( 'wc_memberships_rule_priority', $priority, $this );
+		return $allow_edit;
 	}
 
 

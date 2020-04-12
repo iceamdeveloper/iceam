@@ -1,4 +1,40 @@
-*** Sensei Certificates Changelog ***
+*** Changelog ***
+
+2020.03.20 - version 2.0.2
+* Fix: Certificate display issue when using non-Latin characters - #211
+
+2020.03.12 - version 2.0.1
+* New: Rename plugin to Sensei LMS Certificates - #195
+* Tweak: Remove certificates and templates from public search queries - #183
+* Tweak: Retrieve absolute image path via get_attached_file - #199
+* Tweak: Only load CSS on pages that require it - #205
+* Tweak: Replace use of deprecated course_query function - #207
+* Fix: Ensure font files can be accessed when plugin is copied to another site - #193
+* Fix: Localize placeholder text when editing certificate template - #206
+* Fix: Don't hide template positioning box when clicking off it - #204
+
+2019.04.25 - version 2.0.0
+* New: Add dependency check for minimum Sensei (1.11.0) and PHP (5.6) versions - #171
+* New: Add certificate link to course completion emails - #174
+* New: Add Hungarian translation (@amroland) - #170, #177
+* Tweak: Check dependencies and perform the majority of plugin loading tasks after other plugins have loaded - #175
+* Tweak: Use Woo header for plugin updates - #172
+* Fix: Disable viewing of certificates for courses without a certificate template - #173
+
+2018.12.06 - version 1.1.1
+* Fixes JavaScript error when editing a certificate template
+* Adds additional string escaping throughout the plugin
+* Fixes minor issue with restoring trashed certificate templates
+* Add translations for Russian and French
+
+2018.07.23 - version 1.1.0
+* Make date formatting for certificates follow the WP date format by default
+* Fix certificates menu position for Teacher users
+
+2017.11.01 - version 1.0.17
+* Fix fatal on plugin activation
+* Remove unnecessary .pot file
+* Make placeholders translatable in post_type_setup
 
 2017.05.03 - version 1.0.16
 * Fix fatal when activating certificates for the first time

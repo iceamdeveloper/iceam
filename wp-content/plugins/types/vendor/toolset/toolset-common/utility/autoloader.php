@@ -108,19 +108,26 @@ final class Toolset_Common_Autoloader {
 	 * @since m2m
 	 */
 	public function autoload( $class_name ) {
-
-		if( array_key_exists( $class_name, $this->classmap ) ) {
-			$file_name = $this->classmap[ $class_name ];
-
-			// If this causes an error, blame the one who filled the $classmap.
-			require_once $file_name; 
-
-			return true;
+		if( ! array_key_exists( $class_name, $this->classmap ) ) {
+			return false; // Not our class.
 		}
 
-		return false;
+		$file_name = $this->classmap[ $class_name ];
+
+		// Replace require_once by include_once, so that we avoid uncatchable errors, and use @ to suppress warnings.
+		/** @noinspection UsingInclusionOnceReturnValueInspection */
+		$include_result = @include_once $file_name;
+
+		// Make sure that the file *actually* doesn't exist even if include_once returns a falsy value - it might be
+		// a value from the file itself.
+		if ( ! $include_result && ! file_exists( $file_name ) ) {
+			// The file should have been there but it isn't. Perhaps we're dealing with a case-insensitive file system.
+			// If we don't succeed even with lowercase, let the warning manifest - no "@".
+			/** @noinspection UsingInclusionOnceReturnValueInspection */
+			return include_once strtolower( $file_name );
+		}
+
+		return true;
 	}
-
-
 
 }

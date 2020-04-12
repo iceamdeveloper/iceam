@@ -5,7 +5,7 @@
 */
 
 if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
-    
+
     class Toolset_Enlimbo_Forms
     {
 
@@ -107,9 +107,9 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Checks if form is submitted.
-         * 
+         *
          * @param type $id
-         * @return type 
+         * @return type
          */
         public function isSubmitted($id = '')
         {
@@ -122,8 +122,8 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Loops over elements and validates them.
-         * 
-         * @param type $elements 
+         *
+         * @param type $elements
          */
         public function validate(&$elements)
         {
@@ -164,8 +164,8 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Validates element.
-         * 
-         * @param type $element 
+         *
+         * @param type $element
          */
         public function validateElement(&$element)
         {
@@ -179,8 +179,8 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Checks if there are errors.
-         * 
-         * @return type 
+         *
+         * @return type
          */
         public function isError()
         {
@@ -197,8 +197,8 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Renders form.
-         * 
-         * @return type 
+         *
+         * @return type
          */
         public function renderForm()
         {
@@ -208,9 +208,9 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Counts element types.
-         * 
+         *
          * @param type $type
-         * @return type 
+         * @return type
          */
         private function _count($type) {
             if (!isset($this->_count[$type])) {
@@ -236,9 +236,9 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Renders elements.
-         * 
-         * @param type $elements
-         * @return type 
+         *
+         * @param mixed $elements
+         * @return string
          */
         public function renderElements($elements)
         {
@@ -267,7 +267,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
          * Depending on element type, it calls class methods.
          *
          * @param array $element
-         * @return HTML formatted output
+         * @return string formatted output
          */
         public function renderElement($element)
         {
@@ -324,7 +324,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
                     // Append class values
                     if ($attribute == 'class') {
                         $value = $value . ' ' . $class . $error_class;
-						
+
                     }
                     // Set return string
                     $attributes .= ' ' . $attribute . '="' . $value . '"';
@@ -332,7 +332,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
             }
             if (!isset($element['#attributes']['class'])) {
 				$is_default_element = isset( $element['#default_value'] ) && $element['#default_value'] ? ' wpcf-default-value-input' : '';
-				
+
                 $attributes .= ' class="' . $class . $error_class . $is_default_element . '"';
             }
             return $attributes;
@@ -564,7 +564,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
          */
         public function checkbox($element)
         {
-			
+
             $element['#type'] = 'checkbox';
             $element = $this->_setRender($element);
             $element['_render']['element'] = '<input type="checkbox" id="'
@@ -585,7 +585,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
             if (!empty($element['#attributes']['#disabled'])) {
                 $element['_render']['element'] .= ' disabled="disabled"';
             }
-			
+
             $element['_render']['element'] .= ' />';
             $pattern = isset($element['#pattern']) ? $element['#pattern'] : '<BEFORE><PREFIX><ELEMENT>&nbsp;<LABEL><ERROR><SUFFIX><DESCRIPTION><AFTER>';
             $output = $this->_pattern($pattern, $element);
@@ -700,7 +700,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
             $element['#type'] = 'select';
             $element = $this->_setRender($element);
 			$multiple = isset( $element['#multiple'] ) ? $element['#multiple'] : '';
-			
+
             $element['_render']['element'] = '<select '.$multiple.' id="' . $element['#id']
                     . '" name="' . $element['#name'] . '"'
                     . $element['_attributes_string'] . ">\r\n";
@@ -713,7 +713,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
                     $value['#value'] = $this->_count['select'] . '-' . $count;
                     $count += 1;
                 }
-				
+
                 $value['#type'] = 'option';
                 $element['_render']['element'] .= '<option value="'
                         . htmlspecialchars($value['#value']) . '"';
@@ -730,7 +730,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 				if ( isset( $value['#disable'] ) ) {
 					$element['_render']['element'] .= ' disabled="disabled"';
 				}
-                
+
                 $element['_render']['element'] .= $this->_setElementAttributes($value);
                 $element['_render']['element'] .= '>';
                 $element['_render']['element'] .= isset($value['#title']) ? $value['#title'] : $value['#value'];
@@ -916,7 +916,7 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 
         /**
          * Searches and returns submitted data for element.
-         * 
+         *
          * @param type $element
          * @return type mixed
          */
@@ -927,8 +927,11 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
                 if ($element['#type'] == 'file') {
                     return $_FILES[$name]['tmp_name'];
                 }
-                return isset($_REQUEST[$name]) ? sanitize_text_field( $_REQUEST[$name] ) : in_array($element['#type'],
-                                array('textfield', 'textarea')) ? '' : 0;
+
+				/** @noinspection NestedTernaryOperatorInspection */
+				return isset( $_REQUEST[ $name ] )
+					? sanitize_text_field( $_REQUEST[ $name ] )
+					: ( in_array( $element['#type'], array( 'textfield', 'textarea' ) ) ? '' : 0 );
             }
 
             $parts = explode('[', $name);
@@ -977,26 +980,26 @@ if ( ! class_exists('Toolset_Enlimbo_Forms', false ) ) {
 if ( ! class_exists( 'Toolset_Enlimbo_Forms_Control', false ) ) {
 
 	class Toolset_Enlimbo_Forms_Control extends Toolset_Enlimbo_Forms {
-		
+
 		private $_urlParam = '';
-			 
+
 		public function isSubmitted($id = '')    {
 			if(!empty($id)) {
 				$this->_urlParam = $id;
 			}
-			
+
 			if(empty($this->_urlParam)) {
 				return false;
 			}
-			
+
 			return isset($_GET[$this->_urlParam]);
 		}
-		
+
 		public function renderElements($elements) {
 			if(isset($elements['field'])) {
 				$this->_urlParam = $elements['field']['#name'];
 			}
-			
+
 			return parent::renderElements($elements);
 		}
 	}

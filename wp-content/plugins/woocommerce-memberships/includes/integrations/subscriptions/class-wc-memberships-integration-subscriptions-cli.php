@@ -16,17 +16,17 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+
 /**
- * WooCommerce Memberships CLI Subscriptions extension
+ * WooCommerce Memberships CLI Subscriptions extension.
  *
- * Extends Memberships WP CLI support for user memberships and plans
- * with Subscriptions-specific properties via WordPress hooks
+ * Extends Memberships WP CLI support for user memberships and plans with Subscriptions-specific properties via WordPress hooks.
  *
  * @since 1.7.0
  */
@@ -34,8 +34,7 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Extend the Memberships WP CLI support
-	 * with Subscriptions specific fields
+	 * Extends the Memberships WP CLI support with Subscriptions specific fields.
 	 *
 	 * @since 1.7.0
 	 */
@@ -64,14 +63,18 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Check if there is at least one subscription product that grants access
-	 * among the products specified in CLI command to create or update a plan
+	 * Checks if there is at least one subscription product that grants access.
+	 *
+	 * Executes the check on the products specified in CLI command to create or update a plan.
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param array $data
 	 * @return bool
 	 */
 	private function plan_has_subscription_product( $data ) {
+
+		$has_subscription = false;
 
 		if ( ! empty( $data['product'] ) ) {
 
@@ -81,25 +84,25 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 				foreach ( $product_ids as $product_id ) {
 
-					$product = wc_get_product( $product_id );
-
-					if ( $product->is_type( array( 'subscription', 'subscription_variation', 'variable-subscription' ) ) ) {
-						return true;
+					if ( \WC_Subscriptions_Product::is_subscription( $product_id ) ) {
+						$has_subscription = true;
+						break;
 					}
 				}
 			}
 		}
 
-		return false;
+		return $has_subscription;
 	}
 
 
 	/**
-	 * Validate Subscription data before creating a membership plan
+	 * Validates Subscription data before creating a membership plan.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param array $data
 	 * @return array
 	 * @throws \WC_CLI_Exception
@@ -109,7 +112,7 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 		if ( isset( $data['subscription_length'] ) ) {
 
 			if ( ! $this->plan_has_subscription_product( $data ) ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_no_subscription_product_that_grants_access', 'If you want to use subscription-specific arguments for the plan data, you need to specify at least one subscription product that grants access.' );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_no_subscription_product_that_grants_access', 'If you want to use subscription-specific arguments for the plan data, you need to specify at least one subscription product that grants access.' );
 			}
 
 			$length = sanitize_text_field( $data['length'] );
@@ -120,7 +123,7 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 			} elseif ( '' === $length ) {
 
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_subscription_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_subscription_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
 
 			} else {
 
@@ -128,7 +131,7 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 				$length_period = wc_memberships_parse_period_length( $length, 'period' );
 
 				if ( ! is_int( $length_amount ) || $length_amount < 1 || empty( $length_period ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_subscription_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_subscription_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
 				}
 
 				$data['subscription_length'] = $length_amount . ' ' . $length_period;
@@ -138,18 +141,18 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 		if ( isset( $data['subscription_start_date'] ) || isset( $data['subscription_end_date'] ) ) {
 
 			if ( ! $this->plan_has_subscription_product( $data ) ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_no_subscription_product_that_grants_access', 'If you want to use subscription-specific arguments for the plan data, you need to specify at least one subscription product that grants access.' );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_no_subscription_product_that_grants_access', 'If you want to use subscription-specific arguments for the plan data, you need to specify at least one subscription product that grants access.' );
 			}
 
 			$start_date = isset( $data['subscription_start_date'] ) ? wc_memberships_parse_date( $data['subscription_start_date'], 'mysql' ) : date( 'Y-m-d H:i:s', current_time( 'timestamp' ) );
 			$end_date   = isset( $data['subscription_end_date'] )   ? wc_memberships_parse_date( $data['subscription_end_date'],  'mysql' )  : null;
 
 			if ( ! $start_date ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_subscription_start_date', sprintf( 'Membership Plan start date "%s" is not valid. Must be a non-empty YYYY-MM-DD value. Can be omitted and current date will be used.', $data['start_date'] ) );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_subscription_start_date', sprintf( 'Membership Plan start date "%s" is not valid. Must be a non-empty YYYY-MM-DD value. Can be omitted and current date will be used.', $data['start_date'] ) );
 			} elseif( ! $end_date ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_subscription_end_date', sprintf( 'Membership Plan end date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['end_date'] ) );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_subscription_end_date', sprintf( 'Membership Plan end date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['end_date'] ) );
 			} elseif ( isset( $data['subscription_length'] ) ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_plan_subscription_length_conflict', 'You cannot define a plan subscription length and fixed subscription start or end dates at the same time.' );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_plan_subscription_length_conflict', 'You cannot define a plan subscription length and fixed subscription start or end dates at the same time.' );
 			}
 
 			$data['subscription_start_date'] = $start_date;
@@ -161,17 +164,18 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Save or update subscription access information of a membership plan
+	 * Saves or updates subscription access information of a membership plan.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
-	 * @param \WC_Memberships_Membership_Plan $membership_plan Membership plan being saved or updated
-	 * @param array $data Array of membership plan data
+	 *
+	 * @param \WC_Memberships_Membership_Plan $membership_plan membership plan being saved or updated
+	 * @param array $data array of membership plan data
 	 */
 	public function set_subscription_tied_membership_length( $membership_plan, $data ) {
 
-		$membership_plan = new WC_Memberships_Integration_Subscriptions_Membership_Plan( $membership_plan->post );
+		$membership_plan = new \WC_Memberships_Integration_Subscriptions_Membership_Plan( $membership_plan->post );
 
 		$membership_plan->delete_access_length();
 		$membership_plan->delete_access_start_date();
@@ -200,11 +204,12 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Validate Subscription data before creating a user membership
+	 * Validates Subscription data before creating a user membership.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param array $data
 	 * @return array
 	 * @throws \WC_CLI_Exception
@@ -215,11 +220,11 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 			$subscription = wcs_get_subscription( $data['subscription'] );
 
-			if ( ! $subscription instanceof WC_Subscription ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_subscription_not_found', sprintf( 'Subscription %s not found.', $data['subscription'] ) );
+			if ( ! $subscription instanceof \WC_Subscription ) {
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_subscription_not_found', sprintf( 'Subscription %s not found.', $data['subscription'] ) );
 			}
 
-			$data['subscription'] = (int) SV_WC_Order_Compatibility::get_prop( $subscription, 'id' );
+			$data['subscription'] = (int) $subscription->get_id();
 		}
 
 		return $data;
@@ -227,17 +232,18 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Save or update subscription data of a user membership
+	 * Saves or updates subscription data of a user membership.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
-	 * @param \WC_Memberships_User_Membership $user_membership The user membership object being created or updated
-	 * @param array $data Array of membership data
+	 *
+	 * @param \WC_Memberships_User_Membership $user_membership the user membership object being created or updated
+	 * @param array $data array of membership data
 	 */
 	public function tie_subscription_to_membership( $user_membership, $data ) {
 
-		$subscription_membership = new WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
+		$subscription_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
 
 		if ( isset( $data['subscription'] ) && $data['subscription'] > 0 ) {
 
@@ -254,11 +260,12 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Membership plan default fields
+	 * Filters membership plan default fields in CLI to add subscription information.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param array $default_fields
 	 * @return array
 	 */
@@ -271,11 +278,12 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * User Membership default fields
+	 * Filters user membership default fields in CLI to add subscription information.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param array $default_fields
 	 * @return array
 	 */
@@ -288,19 +296,20 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Get membership plan data
+	 * Returns membership plan data adjusted with subscription data.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
-	 * @param array $membership_plan_data The plan data
-	 * @param \WC_Memberships_Membership_Plan $membership_plan The plan object
+	 *
+	 * @param array $membership_plan_data the plan data
+	 * @param \WC_Memberships_Membership_Plan $membership_plan the plan object
 	 * @return array
 	 */
 	public function get_membership_plan_data( $membership_plan_data, $membership_plan ) {
 
 		if (    is_array( $membership_plan_data )
-		     && $membership_plan instanceof WC_Memberships_Membership_Plan ) {
+		     && $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
 
 			$integration      = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
 			$has_subscription = $integration->has_membership_plan_subscription( $membership_plan->get_id() );
@@ -313,22 +322,23 @@ class WC_Memberships_Integration_Subscriptions_CLI {
 
 
 	/**
-	 * Get membership plan data
+	 * Returns membership plan data adjusted with subscription data.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
-	 * @param array $user_membership_data The user membership data
-	 * @param \WC_Memberships_User_Membership $user_membership The user membership object
+	 *
+	 * @param array $user_membership_data the user membership data
+	 * @param \WC_Memberships_User_Membership $user_membership the user membership object
 	 * @return array
 	 */
 	public function get_user_membership_data( $user_membership_data, $user_membership ) {
 
 		if (    is_array( $user_membership_data )
-		     && $user_membership instanceof WC_Memberships_User_Membership ) {
+		     && $user_membership instanceof \WC_Memberships_User_Membership ) {
 
 			$integration     = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-			$subscription_id = $integration->get_user_membership_subscription_id( $user_membership->get_id() );
+			$subscription_id = $integration ? $integration->get_user_membership_subscription_id( $user_membership->get_id() ) : null;
 
 			$user_membership_data['subscription_id'] = $subscription_id ? (int) $subscription_id : '';
 			$user_membership_data['subscription']    = $subscription_id ? (int) $subscription_id : '';

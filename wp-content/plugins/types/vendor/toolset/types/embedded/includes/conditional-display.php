@@ -6,8 +6,11 @@
 /*
  * Post page filters
  */
+
+use OTGS\Toolset\Common\Field\Group\GroupDisplayResult;
+
 add_filter( 'wpcf_post_edit_field', 'wpcf_cd_post_edit_field_filter', 10, 4 );
-add_filter( 'wpcf_post_groups', 'wpcf_cd_post_groups_filter', 10, 3 );
+add_filter( 'wpcf_post_groups', 'wpcf_cd_post_groups_filter', 10, 4 );
 
 /*
  *
@@ -29,25 +32,26 @@ if ( !function_exists( 'wpv_filter_parse_date' ) ) {
     require_once WPCF_EMBEDDED_TOOLSET_ABSPATH . '/toolset-common/wpv-filter-date-embedded.php';
 }
 
-require_once WPTOOLSET_FORMS_ABSPATH . '/classes/class.conditional.php';
-require_once WPTOOLSET_FORMS_ABSPATH . '/classes/class.types.php';
-
 /**
  * Filters groups on post edit page.
  *
- * @param type $groups
- * @param type $post
- * @return type
+ * @param $groups
+ * @param $post
+ * @param $context
+ * @param GroupDisplayResult[]|null $selected_group_display_results
+ *
+ * @return mixed
  */
-function wpcf_cd_post_groups_filter( $groups, $post, $context ) {
-    if ( $context != 'group' ) {
+function wpcf_cd_post_groups_filter( $groups, $post, $context, $selected_group_display_results = null ) { // FIXME take into account
+    if ( $context !== 'group' ) {
         return $groups;
-    }
+	}
 
+	require_once WPTOOLSET_FORMS_ABSPATH . '/classes/class.conditional.php';
+	require_once WPTOOLSET_FORMS_ABSPATH . '/classes/class.types.php';
 
     foreach ( $groups as $key => &$group ) {
 
-        $conditions = null;
         if (
             array_key_exists( 'conditional_display', $group )
             && array_key_exists( 'conditions', $group['conditional_display'] )
@@ -57,83 +61,100 @@ function wpcf_cd_post_groups_filter( $groups, $post, $context ) {
             $conditions = get_post_meta( $group['id'], '_wpcf_conditional_display', true );
         }
 
-        if ( !empty( $conditions['conditions'] )
-             || ( isset( $conditions['custom_use'] )
-                  && $conditions['custom_use'] == 1
-                  && isset( $conditions['custom'] )
-                  && !empty( $conditions['custom'] )
-             )
-        ) {
-            $meta_box_id = "wpcf-group-{$group['slug']}";
-            $prefix = 'wpcf-';
-            $suffix = '';
+        $has_standard_condition = !empty( $conditions['conditions'] );
+        $has_custom_condition = (
+        	isset( $conditions['custom_use'] )
+			&& $conditions['custom_use'] == 1
+			&& isset( $conditions['custom'] )
+			&& !empty( $conditions['custom'] )
+		);
+        $has_data_dependent_condition = $has_custom_condition || $has_standard_condition;
 
-            $cond = array();
-            $cond_values = array();
-            if (isset( $post->ID ) && $post->ID) {
-                $cond_values = get_post_custom( $post->ID );
-            }
-            $_cond_values = array();
+        if ( ! $has_data_dependent_condition ) {
+			continue;
+		}
 
-            foreach ( $cond_values as $k => $v ) {
-                $v = maybe_unserialize( $v[0] );
-                /**
-                 * if data is too complex - skip it
-                 */
-                if ( is_array( $v) ) {
-                    $v = array_shift($v);
-                    if ( is_array($v) || ( is_object( $v ) && ! method_exists( $v, '__toString' ) ) ) {
-                        continue;
-                    }
-                    $v = strval( $v);
-                }
-                $_cond_values[$k . $suffix] = $v;
-            }
-            unset( $cond_values );
-            $cond = array();
-            if ( !empty( $conditions['custom_use'] ) ) {
-                if ( !empty( $conditions['custom'] ) ) {
-                    $custom = WPToolset_Types::getCustomConditional($conditions['custom']);
-                    $passed = WPToolset_Forms_Conditional::evaluateCustom($custom['custom'], $_cond_values);
-                    $cond = array(
-                        'custom' => $custom['custom'],
-                        'custom_use' => true
-                    );
-                }
-            } else {
-                $cond = array(
-                    'relation' => $conditions['relation'],
-                    'conditions' => array(),
-                    'values' => $_cond_values,
-                );
-                foreach ( $conditions['conditions'] as $d ) {
-                    $c_field = types_get_field( $d['field'] );
-                    if ( !empty( $c_field ) ) {
-                        $_c = array(
-                            'id' => wpcf_types_get_meta_prefix( $c_field ) . $d['field'] . $suffix,
-                            'type' => $c_field['type'],
-                            'operator' => $d['operation'],
-                            'args' => array($d['value']),
-                        );
-                        $cond['conditions'][] = $_c;
-                    }
-                }
-                $passed = wptoolset_form_conditional_check( array( 'conditional' => $cond ) );
-            }
-            $data = array(
-                'id' => $meta_box_id,
-                'conditional' => $cond,
-            );
-            wptoolset_form_add_conditional( 'post', $data );
-            if ( !isset( $passed ) || !$passed ) {
-                $group['_conditional_display'] = 'failed';
-            } else {
-                $group['_conditional_display'] = 'passed';
-            }
-        }
+        // If not explicitly clear, we do require the frontend evaluation.
+		//
+		// But we *don't* render it and don't let it influence the group visibility if it is already clear
+		// that the group needs to be displayed under the current circumstances (e.g. because of the post type,
+		// assigned terms or used template).
+        $no_frontend_evaluation_required = (
+        	null !== $selected_group_display_results
+			&& array_key_exists( $group['slug'], $selected_group_display_results )
+			&& ! $selected_group_display_results[ $group['slug'] ]->requires_browser_evaluation()
+		);
+
+        if( $no_frontend_evaluation_required ) {
+        	continue;
+		}
+
+		$meta_box_id = "wpcf-group-{$group['slug']}";
+		$suffix = '';
+		$cond_values = array();
+		if (isset( $post->ID ) && $post->ID) {
+			$cond_values = get_post_custom( $post->ID );
+		}
+		$_cond_values = array();
+
+		foreach ( $cond_values as $condition_key => $condition_value ) {
+			$condition_value = maybe_unserialize( $condition_value[0] );
+			// if data is too complex - skip it
+			if ( is_array( $condition_value) ) {
+				$condition_value = array_shift($condition_value);
+				if ( is_array($condition_value) || ( is_object( $condition_value ) && ! method_exists( $condition_value, '__toString' ) ) ) {
+					continue;
+				}
+				$condition_value = strval( $condition_value);
+			}
+			$_cond_values[$condition_key . $suffix] = $condition_value;
+		}
+		unset( $cond_values );
+		$cond = array();
+		if ( !empty( $conditions['custom_use'] ) ) {
+			if ( !empty( $conditions['custom'] ) ) {
+				$custom = WPToolset_Types::getCustomConditional($conditions['custom']);
+				$passed = WPToolset_Forms_Conditional::evaluateCustom($custom['custom'], $_cond_values);
+				$cond = array(
+					'custom' => $custom['custom'],
+					'custom_use' => true
+				);
+			}
+		} else {
+			$cond = array(
+				'relation' => $conditions['relation'],
+				'conditions' => array(),
+				'values' => $_cond_values,
+			);
+			foreach ( $conditions['conditions'] as $d ) {
+				$c_field = types_get_field( $d['field'] );
+				if ( !empty( $c_field ) ) {
+					$_c = array(
+						'id' => wpcf_types_get_meta_prefix( $c_field ) . $d['field'] . $suffix,
+						'type' => $c_field['type'],
+						'operator' => $d['operation'],
+						'args' => array($d['value']),
+					);
+					$cond['conditions'][] = $_c;
+				}
+			}
+			$passed = wptoolset_form_conditional_check( array( 'conditional' => $cond ) );
+		}
+		$data = array(
+			'id' => $meta_box_id,
+			'conditional' => $cond,
+		);
+		wptoolset_form_add_conditional( 'post', $data );
+		if ( !isset( $passed ) || !$passed ) {
+			$group['_conditional_display'] = 'failed';
+		} else {
+			$group['_conditional_display'] = 'passed';
+		}
+
     }
     return $groups;
 }
+
 
 /**
  * Checks if there is conditional display.
@@ -143,14 +164,14 @@ function wpcf_cd_post_groups_filter( $groups, $post, $context ) {
  * Since Types 1.2 this functin is simplified and should stay that way.
  * It's important core action.
  *
+ * @param $element
+ * @param $field
+ * @param $post
+ * @param string $context
  *
- * @param type $element
- * @param type $field
- * @param type $post
- * @return type
+ * @return mixed
  */
-function wpcf_cd_post_edit_field_filter( $element, $field, $post,
-        $context = 'group' ) {
+function wpcf_cd_post_edit_field_filter( $element, $field, $post, $context = 'group' ) {
 
     // Do not use on repetitive
     if ( defined( 'DOING_AJAX' ) && $context == 'repetitive' ) {
@@ -199,7 +220,7 @@ function wpcf_cd_post_edit_field_filter( $element, $field, $post,
 /**
  * Operations.
  *
- * @return type
+ * @return array
  */
 function wpcf_cd_admin_operations() {
     return array(
@@ -218,8 +239,8 @@ function wpcf_cd_admin_operations() {
 /**
  * Compares values.
  *
- * @param type $operation
- * @return type
+ * @param $operation
+ * @return bool
  */
 function wpcf_cd_admin_compare( $operation ) {
     $args = func_get_args();
@@ -287,11 +308,11 @@ function wpcf_cd_add_field_js() {
  *
  * @todo still used by group.
  *
- * @param type $null
- * @param type $object_id
- * @param type $meta_key
- * @param type $single
- * @return type
+ * @param $null
+ * @param $object_id
+ * @param $meta_key
+ * @param $single
+ * @return mixed
  */
 function wpcf_cd_meta_ajax_validation_filter( $null, $object_id, $meta_key, $single )
 {
@@ -312,9 +333,9 @@ function wpcf_cd_meta_ajax_validation_filter( $null, $object_id, $meta_key, $sin
  *
  * Leave element as not_valid (it will prevent saving) just remove warning.
  *
- * @global type $wpcf
- * @param type $_error
- * @param type $_not_valid
+ * @global $wpcf
+ * @param $_error
+ * @param $_not_valid
  * @return boolean
  */
 function wpcf_conditional_post_form_error_filter( $_error, $_not_valid ) {

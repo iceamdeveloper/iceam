@@ -10,7 +10,7 @@
 //      );
 /**
  * API call.
- * 
+ *
  * @param type $img
  * @param type $args
  * @return type
@@ -44,7 +44,7 @@ function types_image_resize( $img, $args = array() ) {
 
 /**
  * API call.
- * 
+ *
  * @param type $img
  * @param type $args
  * @return type
@@ -55,7 +55,7 @@ function types_image_crop( $img, $args = array() ) {
 
 /**
  * Types Image View class.
- * 
+ *
  * @todo introduce __construct() to return static
  */
 class Types_Image_View
@@ -67,7 +67,7 @@ class Types_Image_View
 
     /**
      * Construct.
-     * 
+     *
      * @return type
      */
     private function __construct() {
@@ -77,7 +77,7 @@ class Types_Image_View
 
     /**
      * Returns instance.
-     * 
+     *
      * @return type
      */
     public static function getInstance() {
@@ -89,7 +89,7 @@ class Types_Image_View
 
     /**
      * Resize public method.
-     * 
+     *
      * @param type $img
      * @param type $args
      * @return type
@@ -99,12 +99,12 @@ class Types_Image_View
             return $cached;
         }
         return self::$__cache->setCache( func_get_args(),
-                        self::__resizeImg( $img, $args ) );
+                        self::resizeImg( $img, $args ) );
     }
 
     /**
      * Crop public method.
-     * 
+     *
      * @param type $img
      * @param type $args
      * @return type
@@ -115,13 +115,13 @@ class Types_Image_View
 
     /**
      * Private resize method.
-     * 
+     *
      * @param type $img
      * @param type $destination
      * @param type $args
      * @return type
      */
-    private static function __resizeImg( $img, $args = array() ) {
+    private static function resizeImg( $img, $args = array() ) {
         if ( is_wp_error( $check = self::$__utils->checkEditRequirements( $img ) ) ) {
             return $check;
         }
@@ -185,7 +185,7 @@ class Types_Image_View
             }
         }
         /*
-         * 
+         *
          * Cropping
          */
         $imgRes = self::$__utils->loadImg( $img );
@@ -262,7 +262,7 @@ class Types_Image_View
 
         /* COMMENTED OUT TO NOT USE INDEXED COLORS FOR RESIZED PNGs, EVEN IF THE SOURCE HAS INDEXED COLORS.
          * REASON: TRANSPARENT SUPPORT NOT WORKING 100% AFTER RESIZING USING INDEXED COLORS
-         * 
+         *
         // convert from full colors to index colors, like original PNG.
         if ( IMAGETYPE_PNG == $imgData->imagetype && function_exists( 'imageistruecolor' ) && !imageistruecolor( $imgRes ) ) {
             imagetruecolortopalette( $new_image, false,
@@ -329,7 +329,7 @@ class Types_Image_Utils
 
     /**
      * Construct.
-     * 
+     *
      * @return type
      */
     private function __construct() {
@@ -341,8 +341,8 @@ class Types_Image_Utils
 
     /**
      * Returns instance.
-     * 
-     * @return type
+     *
+     * @return Types_Image_Utils
      */
     public static function getInstance() {
         if ( is_null( self::$__singleton ) ) {
@@ -353,7 +353,7 @@ class Types_Image_Utils
 
     /**
      * Checks if all requirements for editing image are set.
-     * 
+     *
      * @return \WP_Error|boolean
      */
     public static function checkEditRequirements( $img ) {
@@ -377,46 +377,64 @@ class Types_Image_Utils
         return self::$__cache->setCache( 'check_edit_requirements', true );
     }
 
-    /**
-     * Determines current writable path.
-     * 
-     * @param type $img
-     * @return type
-     */
-    public static function getWritablePath( $img = null ) {
-        if ( !is_null( $img ) ) {
-            if ( $cached = self::$__cache->getCache( "writable_path_$img" ) ) {
-                return $cached;
-            }
-            $dir = dirname( $img ) . DIRECTORY_SEPARATOR;
-            if ( !is_writable( $dir ) || !is_dir( $dir ) ) {
-                return self::$__cache->setCache( "writable_path_$img",
-                                new WP_Error( __CLASS__ . '::' . __METHOD__,
-                                'Destination dir not writable' ) );
-            }
-            return self::$__cache->setCache( "writable_path_$img", $dir );
-        }
-        if ( $cached = self::$__cache->getCache( 'temp_writable_path' ) ) {
-            return $cached;
-        }
-        $upload_info = self::uploadInfo();
-        if ( !$upload_info ) {
-            return self::$__cache->setCache( 'temp_writable_path',
-                            new WP_Error( __CLASS__ . '::' . __METHOD__,
-                            'WP upload dir error' ) );
-        }
-        $dir = $upload_info['basedir'] . DIRECTORY_SEPARATOR . self::DESTINATION_DIR . DIRECTORY_SEPARATOR;
-        if ( !wp_mkdir_p( $dir ) || !is_writable( $dir ) || !is_dir( $dir ) ) {
-            return self::$__cache->setCache( 'temp_writable_path',
-                            new WP_Error( __CLASS__ . '::' . __METHOD__,
-                            'Can not create writable dir' ) );
-        }
-        return self::$__cache->setCache( 'temp_writable_path', $dir );
-    }
+
+	/**
+	 * Determines current writable path.
+	 *
+	 * @param $img
+	 * @param bool $create_if_missing
+	 *
+	 * @return mixed
+	 */
+	public static function getWritablePath( $img = null, $create_if_missing = true ) {
+		if ( ! is_null( $img ) ) {
+			if ( $cached = self::$__cache->getCache( "writable_path_$img" ) ) {
+				return $cached;
+			}
+			$dir = dirname( $img ) . DIRECTORY_SEPARATOR;
+			if ( ! is_writable( $dir ) || ! is_dir( $dir ) ) {
+				return self::$__cache->setCache(
+					"writable_path_$img",
+					new WP_Error( __CLASS__ . '::' . __METHOD__, 'Destination dir not writable' )
+				);
+			}
+
+			return self::$__cache->setCache( "writable_path_$img", $dir );
+		}
+		if ( $cached = self::$__cache->getCache( 'temp_writable_path' ) ) {
+			return $cached;
+		}
+		$upload_info = self::uploadInfo();
+		if ( ! $upload_info ) {
+			return self::$__cache->setCache(
+				'temp_writable_path',
+				new WP_Error( __CLASS__ . '::' . __METHOD__, 'WP upload dir error' )
+			);
+		}
+		$dir = $upload_info['basedir'] . DIRECTORY_SEPARATOR . self::DESTINATION_DIR . DIRECTORY_SEPARATOR;
+
+		if ( ! $create_if_missing && ! file_exists( $dir ) ) {
+			// Do not create the directory if missing.
+			return null;
+		}
+
+		if (
+			! is_writable( $dir )
+			|| ! is_dir( $dir )
+			|| ! wp_mkdir_p( $dir )
+		) {
+			return self::$__cache->setCache(
+				'temp_writable_path',
+				new WP_Error( __CLASS__ . '::' . __METHOD__, 'Can not create writable dir' )
+			);
+		}
+
+		return self::$__cache->setCache( 'temp_writable_path', $dir );
+	}
 
     /**
      * Checks if image is valid.
-     * 
+     *
      * @param type $img
      * @return type
      * @throws Exception
@@ -455,7 +473,7 @@ class Types_Image_Utils
             $url = self::normalizeAttachmentUrl( $img );
         } else {
             WPCF_Loader::loadClass( 'path' );
-            $url = WPCF_Path::getFileUrl( $img, false ) . '/' . basename( $img );
+            $url = WPCF_Path::getFileUrl( $img, false, false ) . '/' . basename( $img );
         }
         $data = array(
             'width' => $width,
@@ -472,7 +490,7 @@ class Types_Image_Utils
 
     /**
      * Loads image resource.
-     * 
+     *
      * @param type $img
      * @return null
      */
@@ -490,7 +508,7 @@ class Types_Image_Utils
     /**
      * i18n friendly version of basename(), copy from wp-includes/formatting.php
      * to solve bug with windows
-     * 
+     *
      * @param type $path
      * @param type $suffix
      * @return type
@@ -502,7 +520,7 @@ class Types_Image_Utils
 
     /**
      * Convert hex to RGB.
-     * 
+     *
      * @param type $hex
      * @return type
      */
@@ -522,7 +540,7 @@ class Types_Image_Utils
 
     /**
      * WP upload dir.
-     * 
+     *
      * @staticvar null $upload_info
      * @return array|false
      */
@@ -555,7 +573,7 @@ class Types_Image_Utils
 
     /**
      * Returns realpath if applicable.
-     * 
+     *
      * @param string $path Absolute path to file
      */
     public static function realpath( $path ) {
@@ -581,7 +599,7 @@ class Types_Image_Utils
 
     /**
      * Returns path to file relative to upload_dir.
-     * 
+     *
      * @param $file Absolute path to file
      * @return string '2014/01/img.jpg'
      */
@@ -600,53 +618,76 @@ class Types_Image_Utils
         return $file;
     }
 
-    /**
-     * Get absolute path from URL.
-     * 
-     * @param type $imgUrl
-     */
-    public static function getAbsPath( $imgUrl ) {
-        $upload_dir = wp_upload_dir();
-        $parsed = parse_url( $imgUrl );
-        $parsed_wp = parse_url( get_site_url() );
-        if ( $upload_dir ) {
-            $upload_dir_parsed = parse_url( $upload_dir['baseurl'] );
-            // This works for regular installation and main blog on multisite
-            if ( (!is_multisite() || is_main_site()) && strpos( $parsed['path'],
-                            $upload_dir_parsed['path'] ) === 0 ) {
-                if ( !empty( $parsed_wp['path'] ) ) {
-                    $abspath = dirname( str_replace( $parsed_wp['path'] . '/',
-                                    ABSPATH, $parsed['path'] ) );
-                } else {
-                    $abspath = ABSPATH . dirname( $parsed['path'] );
-                }
-                $abspath .= DIRECTORY_SEPARATOR . basename( $imgUrl );
-                // Check Multisite
-            } else if ( is_multisite() && !is_main_site() ) {
-                $multisite_parsed = explode( '/files/', $parsed['path'] );
-                if ( isset( $multisite_parsed[1] ) ) {
-                    $abspath = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . dirname( $multisite_parsed[1] ) . DIRECTORY_SEPARATOR . basename( $imgUrl );
-                }
-            }
-        }
+	/**
+	 * Get absolute path from URL.
+	 *
+	 * @param string $imgUrl
+	 *
+	 * @return string
+	 */
+	public static function getAbsPath( $imgUrl ) {
+		$upload_dir = wp_upload_dir();
+		$img_url_parts = parse_url( $imgUrl );
 
-        // Manual upload
-        if ( empty( $abspath ) ) {
-            if ( !empty( $parsed_wp['path'] ) ) {
-                $abspath = dirname( str_replace( $parsed_wp['path'] . '/',
-                                ABSPATH, $parsed['path'] ) );
-            } else {
-                $abspath = ABSPATH . dirname( $parsed['path'] );
-            }
-            $abspath .= DIRECTORY_SEPARATOR . basename( $imgUrl );
-        }
+		if ( $upload_dir
+			&& array_key_exists( 'baseurl', $upload_dir )
+			&& array_key_exists( 'basedir', $upload_dir )
+			&& ! empty( $upload_dir['baseurl'] )
+		    && ! empty( $upload_dir['basedir'] )
+		) {
+			$upload_dir_url_parts = parse_url( $upload_dir['baseurl'] );
 
-        return $abspath;
-    }
+			// The baseurl may be some custom URL which doesn't necessarily contain a path.
+			// E.g. "http://images.mydomain.tld"
+			if ( ! array_key_exists( 'path', $upload_dir_url_parts ) ) {
+				$upload_dir_url_parts['path'] = '';
+			}
+
+			// Singlesite or Main site of Multisite
+			if (
+				// Pass if the path part of the base upload URL is empty - in that case $img_url_parts['path'] only
+				// contains the subpath.
+				( '' === $upload_dir_url_parts['path'] || 0 === strpos( $img_url_parts['path'], $upload_dir_url_parts['path'] ) )
+				&& ( ! is_multisite() || is_main_site() )
+			) {
+				// get dirname of relative image path -> '/wp-content/uploads/2018/07'
+				$image_relative_dir = dirname( $img_url_parts['path'] );
+
+				// substract the base dir of the $image_relative_dir -> '/2018/07'
+				$image_relative_dir_without_base = substr( $image_relative_dir, strlen( $upload_dir_url_parts['path'] ) );
+
+				// create the absolute path -> '/var/www/example.com/wp-content/uploads/2018/07/image-100x100.png'
+				$image_absolute_path = $upload_dir['basedir']
+				                       . $image_relative_dir_without_base
+				                       . DIRECTORY_SEPARATOR
+				                       . basename( $imgUrl );
+				// Check Multisite
+			} else if ( is_multisite() && !is_main_site() ) {
+				$multisite_parsed = explode( '/files/', $img_url_parts['path'] );
+				if ( isset( $multisite_parsed[1] ) ) {
+					$image_absolute_path = $upload_dir['basedir'] . DIRECTORY_SEPARATOR . dirname( $multisite_parsed[1] ) . DIRECTORY_SEPARATOR . basename( $imgUrl );
+				}
+			}
+		}
+
+		// Manual upload
+		$parsed_wp = parse_url( get_site_url() );
+		if ( empty( $image_absolute_path ) ) {
+			if ( !empty( $parsed_wp['path'] ) ) {
+				$image_absolute_path = dirname( str_replace( $parsed_wp['path'] . '/',
+					ABSPATH, $img_url_parts['path'] ) );
+			} else {
+				$image_absolute_path = ABSPATH . dirname( $img_url_parts['path'] );
+			}
+			$image_absolute_path .= DIRECTORY_SEPARATOR . basename( $imgUrl );
+		}
+
+		return $image_absolute_path;
+	}
 
     /**
      * Checks if file is in upload path.
-     * 
+     *
      * @param type $imgUrl
      * @return boolean
      */
@@ -685,7 +726,7 @@ class Types_Image_Utils
 
     /**
      * Checks if file is on same domain.
-     * 
+     *
      * @param type $imgUrl
      * @return type
      */
@@ -694,7 +735,7 @@ class Types_Image_Utils
         $parsed = parse_url( $imgUrl );
         /**
          * if 'host' do not exists as key in array $parsed,
-         * then it is relative url and is always on same 
+         * then it is relative url and is always on same
          * domain, then return true
          */
         if ( !array_key_exists('host', $parsed) ) {
@@ -713,7 +754,7 @@ class Types_Image_Utils
             $parsed_wp['domain'] = $regs['domain'];
         } else {
             $parsed_wp['domain'] = $parsed_wp['host'];
-        } 
+        }
         return $parsed['domain'] == $parsed_wp['domain'];
     }
 
@@ -729,7 +770,7 @@ class Types_Image_Model
 
     /**
      * Init.
-     * 
+     *
      * @return type
      */
     public function __construct( $img ) {
@@ -738,7 +779,7 @@ class Types_Image_Model
 
     /**
      * Returns image object.
-     * 
+     *
      * @return type
      */
     public function getImg() {
@@ -757,32 +798,38 @@ class Types_Cache
 
     /**
      * Returns adjusted cache key.
-     * 
-     * @param type $key
-     * @return type
+     *
+     * @param $key
+     * @return
      */
-    private function __getCacheKey( $key ) {
+    private function getCacheKey( $key ) {
         return md5( maybe_serialize( $key ) );
     }
 
-    /**
-     * Returns cache if available, otherwise false.
-     * 
-     * @param type $key
-     */
+
+	/**
+	 * Returns cache if available, otherwise false.
+	 *
+	 * @param $key
+	 *
+	 * @return bool|mixed
+	 */
     public function getCache( $key ) {
-        $cache_key = $this->__getCacheKey( $key );
+        $cache_key = $this->getCacheKey( $key );
         return isset( $this->__cache[$cache_key] ) ? $this->__cache[$cache_key] : false;
     }
 
-    /**
-     * Sets cache.
-     * 
-     * @param type $key
-     * @param type $data
-     */
+
+	/**
+	 * Sets cache.
+	 *
+	 * @param $key
+	 * @param $data
+	 *
+	 * @return mixed
+	 */
     public function setCache( $key, $data ) {
-        $this->__cache[$this->__getCacheKey( $key )] = $data;
+        $this->__cache[$this->getCacheKey( $key )] = $data;
         return $data;
     }
 
@@ -799,7 +846,7 @@ class Types_Error extends WP_Error
 
     /**
      * Init function.
-     * 
+     *
      * @param $code
      * @param $message
      * @param $data
@@ -811,7 +858,7 @@ class Types_Error extends WP_Error
 
     /**
      * Adds error and debug data.
-     * 
+     *
      * @param $message
      * @param $data
      */
@@ -824,6 +871,7 @@ class Types_Error extends WP_Error
 	            $data = $message->error_data;
             }
         } else {
+        	// phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.Changed
             $db = debug_backtrace();
             $code = "{$db[1]['class']}::{$db[1]['function']}()";
         }
@@ -840,7 +888,7 @@ class Types_Error extends WP_Error
 
     /**
      * Returns errors (all codes).
-     * 
+     *
      * @return type
      */
     public function getErrors() {
@@ -849,7 +897,7 @@ class Types_Error extends WP_Error
 
     /**
      * Checks if has errors.
-     * 
+     *
      * @return type
      */
     public function hasErrors() {

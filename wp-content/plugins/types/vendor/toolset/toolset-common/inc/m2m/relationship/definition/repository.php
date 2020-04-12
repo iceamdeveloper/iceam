@@ -126,30 +126,21 @@ class Toolset_Relationship_Definition_Repository {
 
 		do_action( 'toolset_before_delete_relationship', $slug );
 
-		// fixme: abstract this away
 		if( $do_cleanup ) {
-			// delete associations of relationship
-			$toolset_results[] = $this->get_database_operations()->delete_associations_by_relationship( $definition->get_row_id() );
-
-			$intermediary_post_type = $definition->get_intermediary_post_type();
-			if( null !== $intermediary_post_type ) {
-				$post_type_repository = Toolset_Post_Type_Repository::get_instance();
-				$intermediary_post_type = $post_type_repository->get( $intermediary_post_type );
-				if( $intermediary_post_type instanceof IToolset_Post_Type_From_Types ) {
-					$group_factory = Toolset_Field_Group_Post_Factory::get_instance();
-					$groups = $group_factory->get_groups_by_post_type( $intermediary_post_type->get_slug() );
-					foreach( $groups as $group ) {
-						wp_delete_post( $group->get_id() );
-					}
-
-					$post_type_repository->delete( $intermediary_post_type );
-				}
-			}
+			$relationship_cleanup = new \OTGS\Toolset\Common\Relationships\Relationship\Cleanup(
+				$definition,
+				$this->get_database_operations(),
+				new Toolset_Association_Cleanup_Factory(),
+				Toolset_Cron::get_instance(),
+				Toolset_Post_Type_Repository::get_instance(),
+				Toolset_Field_Group_Post_Factory::get_instance()
+			);
+			$relationship_cleanup->do_cleanup();
 		}
 		unset( $this->definitions[ $slug ] );
 		$this->get_definition_persistence()->delete_definition( $definition );
 
-		$toolset_results[] = new Toolset_Result( true, sprintf( __( 'Relationship "%s" has been deleted.', 'wpcf' ), $slug ) );
+		$toolset_results[] = new Toolset_Result( true, sprintf( __( 'Relationship "%s" has been deleted.', 'wpv-views' ), $slug ) );
 
 		// No "after_delete_relationship" action as long as we have to save_relationships() manually. This can change in the future.
 
@@ -175,7 +166,7 @@ class Toolset_Relationship_Definition_Repository {
 	 * @since m2m
 	 */
 	public function definition_exists( $slug ) {
-		return array_key_exists( $slug, $this->definitions );
+		return ( ( is_string( $slug ) || is_int( $slug ) ) && array_key_exists( $slug, $this->definitions ) );
 	}
 
 
@@ -297,11 +288,16 @@ class Toolset_Relationship_Definition_Repository {
 	/**
 	 * Update a single relationship definition.
 	 *
-	 * @param Toolset_Relationship_Definition $relationship_definition
+	 * @param IToolset_Relationship_Definition $relationship_definition
+	 *
 	 * @since 2.5.2
+	 * @return Toolset_Result
 	 */
-	public function persist_definition( Toolset_Relationship_Definition $relationship_definition ) {
-		$this->get_definition_persistence()->persist_definition( $relationship_definition );
+	public function persist_definition( IToolset_Relationship_Definition $relationship_definition ) {
+		if( ! $relationship_definition instanceof Toolset_Relationship_Definition ) {
+			throw new RuntimeException( 'Unable to persist a foreign relationship definition object.' );
+		}
+		return $this->get_definition_persistence()->persist_definition( $relationship_definition );
 	}
 
 
@@ -389,7 +385,7 @@ class Toolset_Relationship_Definition_Repository {
 		return new Toolset_Result(
 			true,
 			sprintf(
-				__( 'Relationship slug was successfully renamed from "%s" to "%s".', 'wpcf' ),
+				__( 'Relationship slug was successfully renamed from "%s" to "%s".', 'wpv-views' ),
 				$previous_slug,
 				$new_slug
 			)

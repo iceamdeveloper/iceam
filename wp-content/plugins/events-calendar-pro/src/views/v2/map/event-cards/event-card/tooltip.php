@@ -63,6 +63,7 @@ $classes['tribe-events-pro-map__event-tooltip--has-slider'] = $has_multiple_even
 							<?php $this->template( 'map/event-cards/event-card/tooltip/date-time', [ 'event' => (object) $tooltip_event ] ); ?>
 							<?php $this->template( 'map/event-cards/event-card/tooltip/title', [ 'event' => (object) $tooltip_event ] ); ?>
 							<?php $this->template( 'map/event-cards/event-card/tooltip/venue', [ 'event' => (object) $tooltip_event ] ); ?>
+							<?php $this->template( 'map/event-cards/event-card/tooltip/cost', [ 'event' => (object) $tooltip_event ] ); ?>
 						</div>
 						<?php $slide_index += 1; ?>
 					<?php endforeach; ?>
@@ -75,6 +76,7 @@ $classes['tribe-events-pro-map__event-tooltip--has-slider'] = $has_multiple_even
 			<?php $this->template( 'map/event-cards/event-card/tooltip/date-time', [ 'event' => $event ] ); ?>
 			<?php $this->template( 'map/event-cards/event-card/tooltip/title', [ 'event' => $event ] ); ?>
 			<?php $this->template( 'map/event-cards/event-card/tooltip/venue', [ 'event' => $event ] ); ?>
+			<?php $this->template( 'map/event-cards/event-card/tooltip/cost', [ 'event' => $event ] ); ?>
 		<?php endif; ?>
 	</div>
 </script>

@@ -14,7 +14,7 @@ class Aelia_WC_CS_Subscriptions_RequirementsChecks extends Aelia_WC_Requirements
 
 	// @var array An array of WordPress plugins (name => version) required by the plugin.
 	protected $required_plugins = array(
-		'WooCommerce' => '2.4',
+		'WooCommerce' => '2.6',
 		'Aelia Foundation Classes for WooCommerce' => array(
 			'version' => '1.7.5.160722',
 			'extra_info' => 'You can get the plugin <a href="http://bit.ly/WC_AFC_S3">from our site</a>, free of charge.',

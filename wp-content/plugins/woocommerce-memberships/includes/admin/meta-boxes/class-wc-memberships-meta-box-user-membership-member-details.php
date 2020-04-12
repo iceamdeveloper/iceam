@@ -16,12 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,11 +30,11 @@ defined( 'ABSPATH' ) or exit;
  *
  * @since 1.0.0
  */
-class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Memberships_Meta_Box {
+class WC_Memberships_Meta_Box_User_Membership_Member_Details extends \WC_Memberships_Meta_Box {
 
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @since 1.7.0
 	 */
@@ -50,9 +50,10 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 
 
 	/**
-	 * Get the meta box title
+	 * Returns the meta box title.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @return string
 	 */
 	public function get_title() {
@@ -61,12 +62,13 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 
 
 	/**
-	 * Display the member details meta box
+	 * Displays the member details meta box.
+	 *
+	 * @since 1.0.0
 	 *
 	 * @param \WP_Post $post
-	 * @since 1.0.0
 	 */
-	public function output( WP_Post $post ) {
+	public function output( \WP_Post $post ) {
 
 		// prepare variables
 		$this->post            = $post;
@@ -81,11 +83,12 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 		}
 
 		/**
-		 * Fires at the beginning of the member details meta box
+		 * Fires at the beginning of the member details meta box.
 		 *
 		 * @since 1.0.0
-		 * @param int $user_id The member (user) ID
-		 * @param int $user_membership_id The post id of the user membership post
+		 *
+		 * @param int $user_id the member (user) ID
+		 * @param int $user_membership_id the post id of the user membership post
 		 */
 		do_action( 'wc_memberships_before_user_membership_member_details', $user->ID, $user_membership->get_id() );
 
@@ -141,13 +144,14 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends WC_Membersh
 		<?php
 
 		/**
-		 * Fires at the end of the member detail meta box
+		 * Fires at the end of the member detail meta box.
 		 *
 		 * @since 1.0.0
-		 * @param int $user_id The member (user) ID
-		 * @param int $user_membership_id The post id of the user membership post
+		 *
+		 * @param int $user_id the member (user) ID
+		 * @param int $user_membership_id the post id of the user membership post
 		 */
-		do_action( 'wc_memberships_after_user_membership_member_details', $user->ID, $user_membership->get_user_id() );
+		do_action( 'wc_memberships_after_user_membership_member_details', $user->ID, $user_membership->get_id() );
 	}
 
 

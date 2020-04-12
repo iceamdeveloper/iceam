@@ -70,7 +70,7 @@ class WC_Product_Variable_Subscription extends WC_Product_Variable {
 	public function single_add_to_cart_text() {
 
 		if ( $this->is_purchasable() && $this->is_in_stock() ) {
-			$text = get_option( WC_Subscriptions_Admin::$option_prefix . '_add_to_cart_button_text', __( 'Sign Up Now', 'woocommerce-subscriptions' ) );
+			$text = get_option( WC_Subscriptions_Admin::$option_prefix . '_add_to_cart_button_text', __( 'Sign up now', 'woocommerce-subscriptions' ) );
 		} else {
 			$text = parent::add_to_cart_text(); // translated "Read More"
 		}
@@ -86,16 +86,21 @@ class WC_Product_Variable_Subscription extends WC_Product_Variable {
 	 * @return string
 	 */
 	public function get_price_html( $price = '' ) {
+		$prices                 = $this->get_variation_prices( true );
+		$min_price_variation_id = $this->get_meta( '_min_price_variation_id' );
 
-		$prices = $this->get_variation_prices( true );
+		if ( empty( $min_price_variation_id ) ) {
+			WC_Subscriptions_Product::variable_subscription_product_sync( $this );
+			$min_price_variation_id = $this->get_meta( '_min_price_variation_id' );
+		}
 
-		if ( empty( $prices['price'] ) ) {
+		if ( empty( $prices['price'] ) || ! $min_price_variation_id ) {
 			return apply_filters( 'woocommerce_variable_empty_price_html', '', $this );
 		}
 
 		$tax_display_mode = get_option( 'woocommerce_tax_display_shop' );
 
-		$price = WC_Subscriptions_Product::get_price( $this->get_meta( '_min_price_variation_id' ) );
+		$price = WC_Subscriptions_Product::get_price( $min_price_variation_id );
 		$price = 'incl' == $tax_display_mode ? wcs_get_price_including_tax( $this, array( 'price' => $price ) ) : wcs_get_price_excluding_tax( $this, array( 'price' => $price ) );
 		$price = $this->get_price_prefix( $prices ) . wc_price( $price ) . $this->get_price_suffix();
 		$price = apply_filters( 'woocommerce_variable_price_html', $price, $this );

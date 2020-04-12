@@ -61,7 +61,7 @@ class Toolset_Renderer {
 	private $files;
 
 
-	/** @var Twig_Environment[] */
+	/** @var \OTGS\Toolset\Twig\Environment[] */
 	private $twig_environments = array();
 
 
@@ -101,9 +101,6 @@ class Toolset_Renderer {
 	 * @param bool $echo Should the output be echoed?
 	 *
 	 * @return string
-	 * @throws Twig_Error_Loader In case of incorrect Twig configuration.
-	 * @throws Twig_Error_Runtime In case of incorrect Twig configuration.
-	 * @throws Twig_Error_Syntax In case of incorrect Twig configuration.
 	 */
 	public function render( IToolset_Output_Template $template, $context, $echo = true ) {
 
@@ -169,18 +166,22 @@ class Toolset_Renderer {
 	 * @param array $context
 	 *
 	 * @return string
-	 * @throws Twig_Error_Loader In case of incorrect Twig configuration.
-	 * @throws Twig_Error_Runtime In case of incorrect Twig configuration.
-	 * @throws Twig_Error_Syntax In case of incorrect Twig configuration.
+	 * @throws \OTGS\Toolset\Common\Renderer\RenderingException;
 	 */
 	private function render_twig_template( Toolset_Output_Template_Twig $template, $context ) {
-
-		$twig = $this->get_twig(
-			$template->get_twig_namespaces(),
-			$template->get_twig_environment_hash()
-		);
-
-		return $twig->render( $template->get_name(), $context );
+		try {
+			$twig = $this->get_twig(
+				$template->get_twig_namespaces(),
+				$template->get_twig_environment_hash()
+			);
+			return $twig->render( $template->get_name(), $context );
+		} catch ( \OTGS\Toolset\Twig\Error\Error $e ) {
+			throw new \OTGS\Toolset\Common\Renderer\RenderingException(
+				'Unexpected error occurred when rendering a template.',
+				0,
+				$e
+			);
+		}
 	}
 
 
@@ -211,9 +212,9 @@ class Toolset_Renderer {
 	 * @param string[] $namespaces
 	 * @param string $hash
 	 *
-	 * @return Twig_Environment In case of incorrect Twig configuration.
+	 * @return \OTGS\Toolset\Twig\Environment
+	 * @throws \OTGS\Toolset\Twig\Error\LoaderError In case of incorrect Twig configuration.
 	 * @since m2m
-	 * @throws Twig_Error_Loader In case of incorrect Twig configuration.
 	 */
 	private function get_twig( $namespaces, $hash ) {
 		if( ! array_key_exists( $hash, $this->twig_environments ) ) {
@@ -222,6 +223,19 @@ class Toolset_Renderer {
 		}
 
 		return $this->twig_environments[ $hash ];
+	}
+
+
+	/**
+	 * Shortcut to Toolset_Gui_Base::get_twig_context_base() to reduce number of injected dependencies in other classes.
+	 *
+	 * @param string $template
+	 * @param array $js_model_data
+	 *
+	 * @return array
+	 */
+	public function get_twig_context_base( $template, $js_model_data ) {
+		return $this->get_gui_base()->get_twig_context_base( $template, $js_model_data );
 	}
 
 

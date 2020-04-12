@@ -159,7 +159,9 @@ function wpcf_admin_common_only_show($form)
                     'label' => __('Description', 'wpcf'),
                 ),
                 'repetitive' => array(
-                    'value' => isset($data['repetitive']) && $data['repetitive']['#default_value']? __('Allow multiple-instances of this field', 'wpcf'):__('This field can have only one value', 'wpcf'),
+					'value' => isset( $data['repetitive'] ) && $data['repetitive']['#default_value']
+						? __( 'Allow multiple instances of this field', 'wpcf' )
+						: __( 'This field can have only one value', 'wpcf' ),
                     'label' => __('Repetitive', 'wpcf'),
                 ),
             );

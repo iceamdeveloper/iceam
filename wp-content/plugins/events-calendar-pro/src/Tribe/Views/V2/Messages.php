@@ -35,9 +35,9 @@ class Messages {
 	 * @return array The filtered message map, including PRO Views specific messages.
 	 */
 	public function filter_map( array $map = [] ) {
-		// translators: the placeholder is the location, as the user entered it in the bar.
+		// translators: %1$s: Events (plural), %2$s: the location, as the user entered it in the bar.
 		$map['no_results_found_w_location'] = __(
-			'No results were found for events in or near <strong>"%1$s"</strong>.',
+			'No results were found for %1$s in or near <strong>"%2$s"</strong>.',
 			'tribe-events-calendar-pro'
 		);
 		$map['week_no_results_found']       = __(
@@ -49,13 +49,28 @@ class Messages {
 			'There were no results found for <strong>"%s"</strong> this week. Try searching another week.',
 			'the-events-calendar'
 		);
-		// translators: the placeholder is the location search string, as the user entered it.
+		// translators: %1$s: Events (plural), %2$s: the location search string, as the user entered it.
 		$map['week_no_results_found_w_location'] = __(
-			'No results were found for events in or near <strong>"%s"</strong> this week. Try searching another week.',
+			'No results were found for %1$s in or near <strong>"%2$s"</strong> this week. Try searching another week.',
 			'the-events-calendar'
 		);
 
 		return $map;
+	}
+
+	/**
+	 * Filters the array of keys of the messages that need the events label.
+	 *
+	 * @since 5.0.3
+	 *
+	 * @param array $need_events_label_keys Array of keys of the messages that need the events label.
+	 *
+	 * @return array The filtered array of keys, including PRO Views specific keys.
+	 */
+	public function filter_need_events_label_keys( array $need_events_label_keys = [] ) {
+		array_push( $need_events_label_keys, 'no_results_found_w_location', 'week_no_results_found_w_location' );
+
+		return $need_events_label_keys;
 	}
 
 	/**

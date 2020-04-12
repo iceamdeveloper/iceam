@@ -13,7 +13,7 @@
  * @var string $next_url The URL to the next page, if any, or an empty string.
  * @var string $today_url The URL to the today page, if any, or an empty string.
  *
- * @version 5.0.0
+ * @version 5.0.1
  *
  */
 ?>
@@ -27,7 +27,7 @@
 		}
 		?>
 
-		<?php $this->template( 'map/event-cards/nav/today', [ 'link' => $today_url ] ); ?>
+		<?php $this->template( 'map/event-cards/nav/today' ); ?>
 
 		<?php
 		if ( ! empty( $next_url ) ) {

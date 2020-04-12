@@ -126,6 +126,14 @@ class Tribe__Events__Pro__Recurrence__Meta {
 			}
 		}
 
+		tribe_asset(
+			Tribe__Events__Pro__Main::instance(),
+			Tribe__Events__Main::POSTTYPE . '-recurrence',
+			'events-recurrence.css',
+			[ 'tribe-select2-css', 'tribe-common-admin' ],
+			null
+		);
+
 		/**
 		 * Register Notices
 		 */
@@ -675,12 +683,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 	 * Localizes recurrence JS data
 	 */
 	public static function enqueue_recurrence_data( $post_id = null ) {
-		wp_enqueue_style(
-			Tribe__Events__Main::POSTTYPE . '-recurrence',
-			tribe_events_pro_resource_url( 'events-recurrence.css' ),
-			array( 'tribe-select2-css', 'tribe-common-admin' ),
-			apply_filters( 'tribe_events_pro_css_version', Tribe__Events__Pro__Main::VERSION )
-		);
+		wp_enqueue_style( Tribe__Events__Main::POSTTYPE . '-recurrence' );
 
 		if ( $post_id ) {
 			// convert array to variables that can be used in the view
@@ -1785,7 +1788,7 @@ class Tribe__Events__Pro__Recurrence__Meta {
 		if ( $id == 'general' ) {
 
 			// we want to inject the hiding subsequent occurrences into the general section directly after "Live update AJAX"
-			$args = Tribe__Main::array_insert_after_key( 'liveFiltersUpdate', $args, array(
+			$args = Tribe__Main::array_insert_after_key( 'postsPerPage', $args, array(
 				'hideSubsequentRecurrencesDefault' => array(
 					'type'            => 'checkbox_bool',
 					'label'           => __( 'Recurring event instances', 'tribe-events-calendar-pro' ),

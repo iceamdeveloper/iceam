@@ -19,7 +19,7 @@ class WCS_Upgrade_Notice_Manager {
 	 *
 	 * @var string
 	 */
-	protected static $version = '2.5.0';
+	protected static $version = '3.0.0';
 
 	/**
 	 * The number of times the notice will be displayed before being dismissed automatically.
@@ -77,38 +77,33 @@ class WCS_Upgrade_Notice_Manager {
 			return;
 		}
 
-		$version     = _x( '2.5', 'plugin version number used in admin notice', 'woocommerce-subscriptions' );
+		$version     = _x( '3.0', 'plugin version number used in admin notice', 'woocommerce-subscriptions' );
 		$dismiss_url = wp_nonce_url( add_query_arg( 'dismiss_upgrade_notice', self::$version ), 'dismiss_upgrade_notice', '_wcsnonce' );
 		$notice      = new WCS_Admin_Notice( 'notice notice-info', array(), $dismiss_url );
 		$features    = array(
 			array(
-				'title'       => __( 'New options to allow customers to sign up without a credit card', 'woocommerce-subscriptions' ),
-				'description' => __( 'Allow customers to access free trial and other $0 subscription products without needing to enter their credit card details on sign up.', 'woocommerce-subscriptions' ),
+				'title'       => __( 'Improved scheduled action data storage', 'woocommerce-subscriptions' ),
+				'description' => __( 'Scheduled action data, which was previously stored in the WordPress post tables, has been moved to a custom database table. Amongst other benefits, this will greatly improve the performance of processing scheduled actions such as subscription payments.', 'woocommerce-subscriptions' ),
 			),
 			array(
-				'title'       => __( 'Improved subscription payment method information', 'woocommerce-subscriptions' ),
-				'description' => __( 'Customers can now see more information about what payment method will be used for future payments.', 'woocommerce-subscriptions' ),
-			),
-			array(
-				'title'       => __( 'Auto-renewal toggle', 'woocommerce-subscriptions' ),
-				'description' => sprintf( __( 'Enabled via a setting, this new feature will allow your customers to turn on and off automatic payments from the %sMy Account > View Subscription%s pages.', 'woocommerce-subscriptions' ), '<strong>', '</strong>' ),
-			),
-			array(
-				'title'       => __( 'Update all subscription payment methods', 'woocommerce-subscriptions' ),
-				'description' => __( "Customers will now have the option to update all their subscriptions when they are changing one of their subscription's payment methods - provided the payment gateway supports it.", 'woocommerce-subscriptions' ),
+				'title'       => __( 'Increased processing rate for scheduled payments', 'woocommerce-subscriptions' ),
+				'description' => sprintf(
+					__( 'Previous versions of Subscriptions relied on %sWP Cron%s to process subscription payments and other scheduled events. In 3.0, these events will now run on admin request with loopback support. This will significantly increase the throughput of payment processing.', 'woocommerce-subscriptions' ),
+					'<a href="https://docs.woocommerce.com/document/subscriptions/develop/complete-guide-to-scheduled-events-with-subscriptions/#section-2">', '</a>'
+				),
 			),
 		);
 
 		// translators: placeholder is Subscription version string ('2.3')
-		$notice->set_heading( sprintf( __( 'Welcome to Subscriptions %s', 'woocommerce-subscriptions' ), $version ) );
+		$notice->set_heading( sprintf( __( 'Welcome to WooCommerce Subscriptions %s!', 'woocommerce-subscriptions' ), $version ) );
 		$notice->set_content_template( 'update-welcome-notice.php', plugin_dir_path( WC_Subscriptions::$plugin_file ) . 'includes/upgrades/templates/', array(
 			'version'  => $version,
 			'features' => $features,
 		) );
 		$notice->set_actions( array(
 			array(
-				'name' => __( 'Learn More', 'woocommerce-subscriptions' ),
-				'url'  => 'https://docs.woocommerce.com/document/subscriptions/version-2-5/',
+				'name' => __( 'Learn more', 'woocommerce-subscriptions' ),
+				'url'  => 'https://docs.woocommerce.com/document/subscriptions/whats-new-in-subscriptions-3-0/',
 			),
 		) );
 

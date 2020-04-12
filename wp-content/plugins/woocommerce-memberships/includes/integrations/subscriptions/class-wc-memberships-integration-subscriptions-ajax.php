@@ -16,16 +16,17 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Ajax integration class for WooCommerce Subscriptions
+ * AJAX integration class for WooCommerce Subscriptions.
  *
  * @since 1.6.0
  */
@@ -33,13 +34,13 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 
 
 	/**
-	 * Add ajax callbacks.
+	 * Adds AJAX callbacks.
 	 *
 	 * @since 1.6.0
 	 */
 	public function __construct() {
 
-		// Admin-only callbacks:
+		// admin-only callbacks:
 		add_action( 'wp_ajax_wc_memberships_membership_plan_has_subscription_product', array( $this, 'ajax_plan_has_subscription' ) );
 		add_action( 'wp_ajax_wc_memberships_delete_membership_and_subscription',       array( $this, 'delete_membership_with_subscription' ) );
 		add_action( 'wp_ajax_wc_memberships_edit_membership_subscription_link',        array( $this, 'search_subscriptions_by_id_or_customers' ) );
@@ -47,7 +48,7 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 
 
 	/**
-	 * Check if a plan has a subscription product.
+	 * Checks if a plan has a subscription product.
 	 *
 	 * Responds with an array of subscription products, if any.
 	 *
@@ -68,14 +69,9 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 		$subscription_products = array();
 
 		foreach ( $product_ids as $product_id ) {
-			$product = wc_get_product( $product_id );
 
-			if ( ! $product ) {
-				continue;
-			}
-
-			if ( $product->is_type( array( 'subscription', 'variable-subscription', 'subscription_variation' ) ) ) {
-				$subscription_products[] = $product->get_id();
+			if ( \WC_Subscriptions_Product::is_subscription( $product_id ) ) {
+				$subscription_products[] = (int) $product_id;
 			}
 		}
 
@@ -84,10 +80,9 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 
 
 	/**
-	 * Delete a membership with its associated subscription.
+	 * Deletes a membership with its associated subscription.
 	 *
-	 * Ajax callback to delete both a membership and a subscription
-	 * from the user memberships admin edit screen.
+	 * Ajax callback to delete both a membership and a subscription from the user memberships admin edit screen.
 	 *
 	 * @internal
 	 *
@@ -105,16 +100,14 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 			if ( $user_membership = wc_memberships_get_user_membership( $user_membership_id ) ) {
 
 				$integration  = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-				$subscription = $integration->get_subscription_from_membership( $user_membership->get_id() );
+				$subscription = $integration ? $integration->get_subscription_from_membership( $user_membership->get_id() ) : null;
 
-				if ( $subscription instanceof WC_Subscription && $subscription_id === (int) SV_WC_Order_Compatibility::get_prop( $subscription, 'id' ) ) {
+				if ( $subscription instanceof \WC_Subscription && $subscription_id === (int) $subscription->get_id() ) {
 
-					$results = array(
-						'delete-subscription' => wp_delete_post( $subscription_id ),
+					wp_send_json_success( [
+						'delete-subscription'    => wp_delete_post( $subscription_id ),
 						'delete-user-membership' => wp_delete_post( $user_membership_id ),
-					);
-
-					wp_send_json_success( $results );
+					] );
 				}
 			}
 		}

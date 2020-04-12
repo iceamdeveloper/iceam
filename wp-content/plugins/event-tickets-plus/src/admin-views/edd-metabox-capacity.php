@@ -1,15 +1,49 @@
 <?php
 /**
  * @var Tribe__Tickets_Plus__Commerce__EDD__Main $this
- * @var string $global_stock_mode
- * @var int $global_stock_cap
+ * @var string                                   $global_stock_mode
+ * @var int                                      $global_stock_cap
  */
 $provider = get_class( $this );
+
 $has_event_capacity = ! is_null( $event_capacity );
 
 if ( $this->supports_global_stock() ) {
 	$capped = Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $global_stock_mode;
+
 	$value_global_mode = $capped ? Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE : Tribe__Tickets__Global_Stock::GLOBAL_STOCK_MODE;
+
+	$shared_capacity_text = sprintf(
+		__( 'Share capacity with other %s', 'event-tickets-plus' ),
+		tribe_get_ticket_label_plural_lowercase( 'edd_metabox_capacity' )
+	);
+
+	$shared_capacity_title_text = sprintf(
+		__( 'Shared capacity %1$s types share a common pool of %2$s for all attendees', 'event-tickets-plus' ),
+		tribe_get_ticket_label_singular_lowercase( 'edd_metabox_capacity' ),
+		tribe_get_ticket_label_plural_lowercase( 'edd_metabox_capacity' )
+	);
+
+	$stock_capacity_error_text = sprintf(
+		__( '%s shared capacity cannot be greater than Event Capacity.', 'event-tickets-plus' ),
+		tribe_get_ticket_label_singular( 'edd_metabox_capacity' )
+	);
+
+	$single_ticket_capacity_label_text = sprintf(
+		__( 'Set capacity for this %s only', 'event-tickets-plus' ),
+		tribe_get_ticket_label_singular_lowercase( 'edd_metabox_capacity' )
+	);
+
+	$ticket_type_capacity_title_text = sprintf(
+		__( '%1$s capacity will only be used by attendees buying this %2$s type', 'event-tickets-plus' ),
+		tribe_get_ticket_label_singular( 'edd_metabox_capacity' ),
+		tribe_get_ticket_label_singular_lowercase( 'edd_metabox_capacity' )
+	);
+
+	$capacity_error_text = sprintf(
+		__( 'Please set the Capacity for this %s.', 'event-tickets-plus' ),
+		tribe_get_ticket_label_singular_lowercase( 'edd_metabox_capacity' )
+	);
 	?>
 	<fieldset
 		id="<?php echo $provider; ?>_ticket_global_stock"
@@ -30,8 +64,9 @@ if ( $this->supports_global_stock() ) {
 					value="<?php echo esc_attr( $value_global_mode ); ?>"
 					<?php checked( $global_stock_mode, $value_global_mode ); ?>
 				>
-				<?php esc_html_e( 'Share capacity with other tickets', 'event-tickets-plus' ); ?>
-				<span class="dashicons dashicons-editor-help" title="<?php esc_attr_e( 'Shared capacity ticket types share a common pool of tickets for all attendees', 'event-tickets-plus' ); ?>"></span>
+				<?php echo esc_html( $shared_capacity_text ); ?>
+				<span class="dashicons dashicons-editor-help" title="<?php echo esc_attr( $shared_capacity_title_text ); ?>">
+				</span>
 			</label>
 			<div
 				id="<?php echo $provider; ?>_global_stock_block"
@@ -74,7 +109,7 @@ if ( $this->supports_global_stock() ) {
 						size="7"
 						value="<?php echo esc_attr( $global_stock_mode === $value_global_mode || $capacity >= 0 ? $capacity : null ); ?>"
 						data-validation-is-less-or-equal-to=".tribe-ticket-field-event-capacity"
-						data-validation-error="<?php esc_attr_e( 'Ticket shared capacity cannot be bigger then Event Capacity.', 'event-tickets-plus' ); ?>"
+						data-validation-error="<?php echo esc_attr( $stock_capacity_error_text ); ?>"
 						<?php echo ! is_null( $event_capacity ) ? 'max="' . esc_attr( $event_capacity ) . '"' : '' ?>
 						<?php echo ! is_null( $event_capacity ) ? 'placeholder="' . esc_attr( $event_capacity ) . '"' : '' ?>
 					/>
@@ -99,8 +134,8 @@ if ( $this->supports_global_stock() ) {
 					value="own"
 					<?php checked( $global_stock_mode, 'own' ); ?>
 				>
-				<?php esc_html_e( 'Set capacity for this ticket only', 'event-tickets-plus' ); ?>
-				<span class="dashicons dashicons-editor-help" title="<?php esc_attr_e( 'Ticket capacity will only be used by attendees buying this ticket type', 'event-tickets-plus' ); ?>"></span>
+				<?php echo esc_html( $single_ticket_capacity_label_text ); ?>
+				<span class="dashicons dashicons-editor-help" title="<?php echo esc_attr( $ticket_type_capacity_title_text ); ?>"></span>
 			</label>
 			<div
 				id="<?php echo $provider; ?>_own_stock_block"
@@ -118,7 +153,7 @@ if ( $this->supports_global_stock() ) {
 						size="7"
 						value="<?php echo esc_attr( $capacity >= 0 ? $capacity : null ); ?>"
 						data-validation-is-required
-						data-validation-error="<?php esc_attr_e( 'Please set the Capacity for this ticket.', 'event-tickets-plus' ); ?>"
+						data-validation-error="<?php echo esc_attr( $capacity_error_text ); ?>"
 					/>
 				</div>
 			</div>
@@ -145,5 +180,4 @@ if ( $this->supports_global_stock() ) {
 		</div>
 	</fieldset>
 	<?php
-
 }

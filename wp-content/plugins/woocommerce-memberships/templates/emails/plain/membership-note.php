@@ -16,9 +16,8 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Templates
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2016, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -31,7 +30,7 @@ defined( 'ABSPATH' ) or exit;
  * @type string $membership_note Membership note
  * @type \WC_Memberships_User_Membership $user_membership User Membership
  *
- * @version 1.0.0
+ * @version 1.12.0
  * @since 1.0.0
  */
 
@@ -45,4 +44,4 @@ echo wptexturize( $membership_note ) . "\n\n";
 
 echo "----------\n\n";
 
-echo apply_filters( 'woocommerce_email_footer_text', get_option( 'woocommerce_email_footer_text' ) );
+echo (string) apply_filters( 'woocommerce_email_footer_text', get_option( 'woocommerce_email_footer_text', '' ) );

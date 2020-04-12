@@ -8,7 +8,7 @@
  * We try to do this as little as possible, but it does happen.
  * When this occurs the version of the template file will be bumped and the readme will list any important changes.
  *
- * @version 5.0.0
+ * @version 5.5.4
  */
 
 // Exit if accessed directly.
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-?><div class="cart" data-title="<?php echo esc_attr( $bundled_item->get_raw_title() ); ?>" data-optional_suffix="<?php echo $bundled_item->is_optional() && $bundle->contains( 'mandatory' ) ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ), $bundled_item, $bundle ) : ''; ?>" data-optional="<?php echo $bundled_item->is_optional() ? 'yes' : 'no'; ?>" data-type="<?php echo $bundled_product->get_type(); ?>" data-bundled_item_id="<?php echo $bundled_item->item_id; ?>" data-product_id="<?php echo $bundled_product_id; ?>" data-bundle_id="<?php echo $bundle_id; ?>">
+?><div class="cart" data-title="<?php echo esc_attr( $bundled_item->get_title() ); ?>" data-product_title="<?php echo esc_attr( $bundled_item->get_product()->get_title() ); ?>" data-visible="<?php echo $bundled_item->is_visible() ? 'yes' : 'no'; ?>" data-optional_suffix="<?php echo $bundled_item->is_optional() && $bundle->contains( 'mandatory' ) ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ), $bundled_item, $bundle ) : ''; ?>" data-optional="<?php echo $bundled_item->is_optional() ? 'yes' : 'no'; ?>" data-type="<?php echo $bundled_item->get_product()->get_type(); ?>" data-bundled_item_id="<?php echo $bundled_item->get_id(); ?>" data-custom_data="<?php echo esc_attr( json_encode( $custom_product_data ) ); ?>" data-product_id="<?php echo $bundled_item->get_product()->get_id(); ?>" data-bundle_id="<?php echo $bundle->get_id(); ?>">
 	<div class="bundled_item_wrap">
 		<div class="bundled_item_cart_content">
 			<div class="bundled_item_cart_details"><?php
@@ -38,7 +38,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 				 * @param mixed           $bundled_product_id
 				 * @param WC_Bundled_Item $bundled_item
 				 */
-				do_action( 'woocommerce_bundled_product_add_to_cart', $bundled_product_id, $bundled_item );
+				do_action( 'woocommerce_bundled_product_add_to_cart', $bundled_item->get_product()->get_id(), $bundled_item );
 
 			?></div>
 			<div class="bundled_item_after_cart_details bundled_item_button"><?php

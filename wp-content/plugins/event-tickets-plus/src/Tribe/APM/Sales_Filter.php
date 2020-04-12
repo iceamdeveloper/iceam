@@ -89,5 +89,4 @@ class Tribe__Tickets_Plus__APM__Sales_Filter extends Tribe__Tickets_Plus__APM__A
 		// return the sum
 		return $sum;
 	}
-
 }

@@ -12,10 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-
 if ( ! class_exists( 'WC_Report_Stock' ) ) {
-	$wc_reports_path = untrailingslashit( plugin_dir_path( WC_PLUGIN_FILE ) ) . '/includes/admin/reports/';
-	require_once( $wc_reports_path . 'class-wc-report-stock.php' );
+	require_once( WC_ABSPATH . 'includes/admin/reports/class-wc-report-stock.php' );
 }
 
 /**
@@ -23,7 +21,7 @@ if ( ! class_exists( 'WC_Report_Stock' ) ) {
  *
  * Handles reporting of bundles with an "Insufficient stock" status.
  *
- * @version  5.0.0
+ * @version  5.10.0
  */
 class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 
@@ -54,12 +52,17 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 		$this->items     = array();
 
 		/*
-		 * First, update any bundled items without stock meta.
+		 * First, sync any bundled items without stock meta.
 		 */
-		if ( ! defined( 'WC_PB_DEBUG_STOCK_CACHE' ) ) {
+		if ( ! defined( 'WC_PB_DEBUG_STOCK_PARENT_SYNC' ) && ! defined( 'WC_PB_DEBUG_STOCK_SYNC' ) ) {
+
+			$data_store = WC_Data_Store::load( 'product-bundle' );
+			$sync_ids   = $data_store->get_bundled_items_stock_status_ids( 'unsynced' );
+
+		} elseif ( ! defined( 'WC_PB_DEBUG_STOCK_SYNC' ) ) {
 
 			$sync_ids = WC_PB_DB::query_bundled_items( array(
-				'return'          => 'ids',
+				'return'          => 'id=>bundle_id',
 				'meta_query'      => array(
 					array(
 						'key'     => 'stock_status',
@@ -71,17 +74,16 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 		} else {
 
 			$sync_ids = WC_PB_DB::query_bundled_items( array(
-				'return' => 'ids'
+				'return' => 'id=>bundle_id'
 			) );
 		}
 
 		if ( ! empty( $sync_ids ) ) {
-			foreach ( $sync_ids as $bundled_item_id ) {
-				// Create a 'WC_Bundled_Item' instance to re-sync and update the bundled item stock meta.
-				$bundled_item = wc_pb_get_bundled_item( $bundled_item_id );
-
-				if ( $bundled_item ) {
-					$bundled_item->sync_stock();
+			foreach ( $sync_ids as $id ) {
+				if ( ( $product = wc_get_product( $id ) ) && $product->is_type( 'bundle' ) ) {
+					if ( $product->sync_bundled_items_stock_status() ) {
+						$product->get_data_store()->save_bundled_items_stock_status( $product );
+					}
 				}
 			}
 		}
@@ -91,6 +93,7 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 		 */
 		$insufficient_stock_results = WC_PB_DB::query_bundled_items( array(
 			'return'          => 'all',
+			'bundle_id'       => ! empty( $_GET[ 'bundle_id' ] ) ? absint( $_GET[ 'bundle_id' ] ) : 0,
 			'order_by'        => array( 'bundle_id' => 'ASC', 'menu_order' => 'ASC' ),
 			'meta_query'      => array(
 				array(
@@ -116,6 +119,8 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 				'fields'      => 'ids',
 				'numberposts' => -1
 			) );
+
+			$insufficient_stock_results = array_filter( $insufficient_stock_results, array( $this, 'clean_missing_bundles' ) );
 
 			uasort( $insufficient_stock_results, array( $this, 'order_by_bundle_title' ) );
 
@@ -144,10 +149,22 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 	}
 
 	/**
+	 * Clean up missing bundles.
+	 *
+	 * @since  5.10.0
+	 *
+	 * @param  array  $a
+	 * @return boolean
+	 */
+	private function clean_missing_bundles( $result ) {
+		return in_array( $result[ 'bundle_id' ], $this->ordered_bundle_ids );
+	}
+
+	/**
 	 * Sorting callback - see 'get_items'.
 	 *
-	 * @param  array $a
-	 * @param  array $b
+	 * @param  array  $a
+	 * @param  array  $b
 	 * @return integer
 	 */
 	private function order_by_bundle_title( $a, $b ) {
@@ -173,12 +190,11 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 	public function get_columns() {
 
 		$columns = array(
-			'title'                 => __( 'Bundled product', 'woocommerce-product-bundles' ),
-			'bundle_title'          => __( 'Bundle', 'woocommerce-product-bundles' ),
-			'available_stock_level' => __( 'Units available', 'woocommerce-product-bundles' ),
-			'required_stock_level'  => __( 'Units required', 'woocommerce-product-bundles' ),
-			'stock_status'          => __( 'Stock status', 'woocommerce' ),
-			'wc_actions'            => __( 'Actions', 'woocommerce' ),
+			'title'                => __( 'Bundled product', 'woocommerce-product-bundles' ),
+			'bundle_title'         => __( 'Bundle', 'woocommerce-product-bundles' ),
+			'required_stock_level' => __( 'Units required', 'woocommerce-product-bundles' ),
+			'stock_status'         => __( 'Stock status', 'woocommerce' ),
+			'wc_actions'           => __( 'Actions', 'woocommerce' ),
 		);
 
 		return $columns;
@@ -210,7 +226,7 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 		} elseif ( 'bundle_title' === $column_name ) {
 
 			$bundled_item = $item->bundled_item;
-			$edit_link    = get_edit_post_link( $bundled_item->bundle_id );
+			$edit_link    = get_edit_post_link( $bundled_item->get_bundle_id() );
 			$title        = $bundled_item->get_bundle()->get_title();
 
 			echo '<a class="item" href="' . esc_url( $edit_link ) . '">' . esc_html( $title ) . '</a>';
@@ -218,11 +234,6 @@ class WC_PB_Report_Insufficient_Stock extends WC_Report_Stock {
 		} elseif ( 'required_stock_level' === $column_name ) {
 
 			echo $item->bundled_item->get_quantity();
-
-		} elseif ( 'available_stock_level' === $column_name ) {
-
-			$available_stock = $item->bundled_item->get_max_stock();
-			echo is_numeric( $available_stock ) ? $available_stock : '0';
 
 		} else {
 			parent::column_default( $item, $column_name );

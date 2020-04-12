@@ -10,15 +10,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	public $enabled;
 
 	public function __construct() {
-
 		$this->id             = 'wootickets';
-		$this->title          = __( 'Tickets', 'event-tickets-plus' );
-		$this->description    = __( 'Email the user will receive after a completed order with the tickets they purchased.', 'event-tickets-plus' );
-		$this->subject        = __( 'Your tickets from {site_title}', 'event-tickets-plus' );
+		$this->title          = esc_html( tribe_get_ticket_label_plural( 'woo_email_title' ) );
+		$this->description    = esc_html( sprintf(
+			__( 'Email the user will receive after a completed order with the %s they purchased.', 'event-tickets-plus' ),
+			tribe_get_ticket_label_plural_lowercase( 'woo_email_description' )
+		) );
+		$this->subject        = esc_html( sprintf(
+			__( 'Your %s from {site_title}', 'event-tickets-plus' ),
+			tribe_get_ticket_label_plural_lowercase( 'woo_email_subject' )
+		) );
 		$this->customer_email = true;
 
 		// Triggers for this email
-		add_action( 'wootickets-send-tickets-email', array( $this, 'trigger' ) );
+		add_action( 'wootickets-send-tickets-email', [ $this, 'trigger' ] );
 
 		// Call parent constuctor
 		parent::__construct();
@@ -112,10 +117,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 		 *
 		 * @param array  $attachments  An array of full path file names.
 		 * @param int    $this->id     The email method ID.
-		 * @param object $this->object Object this email is for, for example a
-		 *                             customer, product, or email.
+		 * @param object $this->object Object this email is for, for example a customer, product, or email.
 		 */
-		return apply_filters( 'tribe_tickets_plus_woo_email_attachments', array(), $this->id, $this->object );
+		return apply_filters( 'tribe_tickets_plus_woo_email_attachments', [], $this->id, $this->object );
 	}
 
 	/**
@@ -138,15 +142,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	 * Initialise Settings Form Fields
 	 */
 	public function init_form_fields() {
-		$this->form_fields = array(
-			'subject' => array(
+		$this->form_fields = [
+			'subject' => [
 				'title'       => __( 'Subject', 'woocommerce' ),
 				'type'        => 'text',
 				'description' => sprintf( __( 'Defaults to <code>%s</code>', 'woocommerce' ), $this->subject ),
 				'placeholder' => '',
 				'default'     => '',
-			),
-		);
+			],
+		];
 	}
 
 	/**
@@ -155,6 +159,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	 * @since 4.7.3
 	 *
 	 * @param int $order_id The WooCommerce order ID.
+	 *
+	 * @return bool|int|WP_Error
 	 */
 	public function maybe_add_order_note_for_manual_email( $order_id ) {
 
@@ -168,7 +174,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 
 		return wc_create_order_note(
 			$order_id,
-			esc_html__( 'Tickets email notification manually sent to user.', 'event-tickets-plus' ),
+			esc_html( sprintf(
+				__( '%s email notification manually sent to user.', 'event-tickets-plus' ),
+				tribe_get_ticket_label_plural( 'woo_email_order_note' )
+			) ),
 			false,
 			false
 		);

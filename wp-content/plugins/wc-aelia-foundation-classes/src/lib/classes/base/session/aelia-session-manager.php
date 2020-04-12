@@ -153,6 +153,16 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		}
 
 		/**
+		 * Indicates if secure cookies should be used.
+		 *
+		 * @return bool
+		 * @since 2.0.16.200317
+		 */
+		protected static function use_secure_cookies() {
+			return wc_site_is_https() && is_ssl();
+		}
+
+		/**
 		 * Set a cookie. This method is a wrapper for setcookie() function, which
 		 * automatically uses WordPress constants.
 		 *
@@ -164,7 +174,14 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		 * calls (no script access).
 		 * @since 1.5.11.150507
 		 */
-		public static function set_cookie($name, $value, $expire = 0, $secure = false, $httponly = false) {
+		public static function set_cookie($name, $value, $expire = 0, $secure = null, $httponly = false) {
+			// If the "secure cookies" argument was not specified, use secure
+			// cookies when the site is using HTTPS and SSL
+			// @since 2.0.16.200317
+			if($secure === null) {
+				$secure = self::use_secure_cookies();
+			}
+
 			// Allow to change the cookie before setting it
 			// @since 1.9.12.180104
 			$cookie_data = apply_filters('wc_aelia_afc_session_set_cookie', array(
@@ -179,9 +196,16 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 				'httponly' => $httponly,
 			));
 
-			if(!headers_sent()) {
+			// Don't try to set a cookie when its data is clearly not valid
+			// @since 2.0.13.200131
+			// @link https://aelia.freshdesk.com/a/tickets/84200
+			if(empty($cookie_data) || !is_array($cookie_data)) {
+				return;
+			}
+
+			if(!headers_sent($file, $line)) {
 				// Check that the cookie data is valid, before setting the cookie
-				//// @since 1.9.18.180319
+				// @since 1.9.18.180319
 				if(!empty($cookie_data) && is_array($cookie_data)) {
 					setcookie($cookie_data['name'],
 										$cookie_data['value'],
@@ -195,8 +219,8 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 				}
 			}
 			elseif(defined('WP_DEBUG') && WP_DEBUG) {
-				headers_sent($file, $line);
-				trigger_error("{$name} cookie cannot be set - headers already sent by {$file} on line {$line}", E_USER_NOTICE);
+				$file = empty($file) ? 'unknown' : '';
+				trigger_error("{$name} cookie cannot be set - headers already sent by file '{$file}' on line {$line}", E_USER_NOTICE);
 			}
 		}
 

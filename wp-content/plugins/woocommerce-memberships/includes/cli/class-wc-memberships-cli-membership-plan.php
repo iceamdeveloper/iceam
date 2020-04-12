@@ -16,22 +16,24 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+
 /**
- * Manage Membership Plans
+ * Manage Membership Plans from WP CLI.
  *
  * @since 1.7.0
+ * @deprecated since 1.13.0
  */
-class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
+class WC_Memberships_CLI_Membership_Plan extends \WC_Memberships_CLI_Command {
 
 
 	/**
-	 * Create a Membership Plan
+	 * Create a Membership Plan.
 	 *
 	 * ## OPTIONS
 	 *
@@ -53,6 +55,8 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 	 * * length
 	 * * start_date
 	 * * end_date
+	 * * members_area_sections
+	 * * rules
 	 *
 	 * ## EXAMPLES
 	 *
@@ -66,6 +70,8 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
+	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
@@ -83,14 +89,14 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 			if ( ! isset( $data['name'] ) ) {
 
-				throw new WC_CLI_Exception( 'woocommerce_memberships_missing_plan_name', sprintf( 'Missing parameter "%s".', 'name' ) );
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_missing_plan_name', sprintf( 'Missing parameter "%s".', 'name' ) );
 
 			} else {
 
 				$name = sanitize_text_field(  $data['name'] );
 
 				if ( '' === $name ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_name', sprintf( 'Invalid Membership Plan name "%s".', $data['name'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_name', sprintf( 'Invalid Membership Plan name "%s".', $data['name'] ) );
 				}
 			}
 
@@ -102,7 +108,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 			if ( isset( $data['status'] ) ) {
 
 				if ( ! in_array( trim( $data['status'] ), array( 'draft', 'publish' ), true ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_status', sprintf( 'Invalid Membership Plan status "%s".', $data['status'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_status', sprintf( 'Invalid Membership Plan status "%s".', $data['status'] ) );
 				} else {
 					$post_args['post_status'] = trim( $data['status'] );
 				}
@@ -119,7 +125,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				$slug = sanitize_title( $data['slug'] );
 
 				if ( '' === $slug ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_slug', sprintf( 'Slug "%s" is not valid.', $data['slug'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_slug', sprintf( 'Slug "%s" is not valid.', $data['slug'] ) );
 				}
 			}
 
@@ -133,12 +139,12 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				} elseif ( in_array( $data['access'], $access_methods, true ) ) {
 					$access_method = $data['access'];
 				} else {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_access_method', sprintf( 'Membership Plan type "%s" is not a recognized type.', $data['access'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_access_method', sprintf( 'Membership Plan type "%s" is not a recognized type.', $data['access'] ) );
 				}
 
 				// conflict between access method and defined products
 				if ( 'purchase' !== $access_method && ! empty( $data['product'] ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_access_method_conflict', sprintf( 'If you define products that grant access, the Membership access method can only be "purchase" and cannot be "%s". You can still assign the membership manually.', $data['access'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_access_method_conflict', sprintf( 'If you define products that grant access, the Membership access method can only be "purchase" and cannot be "%s". You can still assign the membership manually.', $data['access'] ) );
 				}
 			}
 
@@ -151,13 +157,13 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				$end_date   = isset( $data['end_date'] )   ? $this->parse_membership_date( $data['end_date']   ) : date( 'Y-m-d H:i:s', strtotime( 'tomorrow', strtotime( $start_date ) ) );
 
 				if ( ! $start_date || strlen( $data['start_date'] ) !== 10 ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_start_date', sprintf( 'Membership Plan start date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['start_date'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_start_date', sprintf( 'Membership Plan start date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['start_date'] ) );
 				} elseif( ! $end_date || strlen( $data['end_date'] ) !== 10 ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_end_date', sprintf( 'Membership Plan end date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['end_date'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_end_date', sprintf( 'Membership Plan end date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['end_date'] ) );
 				} elseif ( strtotime( $start_date ) > strtotime( $end_date ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_fixed_dates_conflict', sprintf( 'Membership Plan start date %1$s cannot be set after end date in %2$s', $start_date, $end_date ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_fixed_dates_conflict', sprintf( 'Membership Plan start date %1$s cannot be set after end date in %2$s', $start_date, $end_date ) );
 				} elseif ( isset( $data['length'] ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_plan_length_conflict', 'You cannot define a plan length and fixed start or end dates at the same time.' );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_plan_length_conflict', 'You cannot define a plan length and fixed start or end dates at the same time.' );
 				}
 			}
 
@@ -169,17 +175,17 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				$length = sanitize_text_field( $data['length'] );
 
 				if ( '' === $length ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
 				}
 
 				// maybe add a final 's' if it's omitted
-				$length = ! SV_WC_Helper::str_ends_with( $length, 's' ) ? $length . 's' : $length;
+				$length = ! Framework\SV_WC_Helper::str_ends_with( $length, 's' ) ? $length . 's' : $length;
 
 				$length_amount = wc_memberships_parse_period_length( $length, 'amount' );
 				$length_period = wc_memberships_parse_period_length( $length, 'period' );
 
 				if ( ! is_int( $length_amount ) || $length_amount < 1 || empty( $length_period ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
 				}
 			}
 
@@ -197,9 +203,9 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 						$product = wc_get_product( (int) $product_id );
 
-						if ( ! $product instanceof WC_Product ) {
+						if ( ! $product instanceof \WC_Product ) {
 
-							WP_CLI::warning( "Product $product_id is not a valid product." );
+							\WP_CLI::warning( "Product $product_id is not a valid product." );
 
 							$error_ids[] = $product_id;
 						}
@@ -215,23 +221,23 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 							$message = sprintf( 'Products %s are not valid products.', wc_memberships_list_items( $error_ids, 'and' ) );
 						}
 
-						throw new WC_CLI_Exception( 'woocommerce_memberships_products_not_found', $message );
+						throw new \WC_CLI_Exception( 'woocommerce_memberships_products_not_found', $message );
 					}
 				}
 
 				$access_method = 'purchase';
 			}
 
-			$post_id = wp_insert_post( $post_args );
+			$post_id = wp_insert_post( $post_args, true );
 
-			if ( is_wp_error( $post_id ) ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_cannot_create_membership_plan', $post_id->get_error_message() );
+			if ( 0 === $post_id || is_wp_error( $post_id ) ) {
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_cannot_create_membership_plan', $post_id->get_error_message() );
 			}
 
 			$membership_plan = wc_memberships_get_membership_plan( $post_id );
 
-			if ( ! $membership_plan instanceof WC_Memberships_Membership_Plan ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_cannot_create_membership_plan', "Could not create a valid Membership Plan with post ID $post_id." );
+			if ( ! $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_cannot_create_membership_plan', "Could not create a valid Membership Plan with post ID $post_id." );
 			}
 
 			$membership_plan->set_access_method( $access_method );
@@ -261,38 +267,52 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 					'ID'        => $post_id,
 					'post_type' => 'wc_membership_plan',
 					'post_name' => wp_unique_post_slug( $slug, $post_id, $post->post_status, $post->post_type, $post->post_parent ),
-				) );
+				), true );
 
-				if ( is_wp_error( $updated ) ) {
-					WP_CLI::warning( 'Could not set the slug "%1$s" for Membership Plan %2$s, auto-generated "%3$s" has been used instead.', $slug, $post_id, $post->post_name );
+				if ( 0 === $updated || is_wp_error( $updated ) ) {
+					\WP_CLI::warning( 'Could not set the slug "%1$s" for Membership Plan %2$s, auto-generated "%3$s" has been used instead.', $slug, $post_id, $post->post_name );
 				}
 			}
 
+			if ( empty( $data['members_area_sections'] ) ) {
+				$membership_plan->set_members_area_sections();
+			} else {
+				$membership_plan->set_members_area_sections( array_map( 'trim', explode( ',', $data['members_area_sections'] ) ) );
+			}
+
+			if ( ! empty( $data['rules'] ) ) {
+
+				$rules = json_decode( $data['rules'], true );
+
+				$this->set_membership_plan_rules( $membership_plan, $rules );
+			}
+
 			/**
-			 * Upon creating a Membership Plan via CLI
+			 * Upon creating a Membership Plan via CLI.
 			 *
 			 * @since 1.7.0
+			 *
 			 * @param \WC_Memberships_Membership_Plan $membership_plan
 			 * @param array $data
 			 */
 			do_action( 'wc_memberships_cli_create_membership_plan', $membership_plan, $data );
 
-			WP_CLI::success( sprintf( 'Created Membership Plan %s.', $membership_plan->get_id() ) );
+			\WP_CLI::success( sprintf( 'Created Membership Plan %s.', $membership_plan->get_id() ) );
 
-		} catch ( WC_CLI_Exception $e ) {
+		} catch ( \WC_CLI_Exception $e ) {
 
-			WP_CLI::error( $e->getMessage() );
+			\WP_CLI::error( $e->getMessage() );
 		}
 	}
 
 
 	/**
-	 * Update one or more Membership Plans
+	 * Update one or more Membership Plans.
 	 *
 	 * ## OPTIONS
 	 *
 	 * <id>
-	 * : Membership Plan ID
+	 * : Membership Plan ID or name
 	 *
 	 * [--<field>=<value>]
 	 * : One or more fields to update
@@ -307,6 +327,8 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
+	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
@@ -314,7 +336,8 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 		try {
 
-			$id = $args[0];
+			// plan ID or name
+			$id = is_numeric( $args[0] ) ? (int) $args[0] : $args[0];
 
 			/**
 			 * Filter arguments when updating a Membership Plan via CLI
@@ -327,8 +350,8 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 			$membership_plan = wc_memberships_get_membership_plan( $id );
 
-			if ( ! $membership_plan instanceof WC_Memberships_Membership_Plan ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_membership_plan_not_found', sprintf( 'Membership Plan %s not found.', $id ) );
+			if ( ! $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_membership_plan_not_found', sprintf( 'Membership Plan %s not found.', $id ) );
 			}
 
 			$post_args = array(
@@ -341,7 +364,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				$name = sanitize_text_field( $data['name'] );
 
 				if ( '' === $name ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_name', sprintf( 'Invalid Membership Plan name "%s".', $data['name'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_name', sprintf( 'Invalid Membership Plan name "%s".', $data['name'] ) );
 				} else {
 					$post_args['post_title'] = $name;
 				}
@@ -356,7 +379,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				}
 
 				if ( '' === $slug ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_slug', sprintf( 'Membership Plan slug "%s" is not valid.', $data['slug'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_slug', sprintf( 'Membership Plan slug "%s" is not valid.', $data['slug'] ) );
 				} else {
 					$post_args['post_name'] = $slug;
 				}
@@ -365,7 +388,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 			if ( ! empty( $data['status'] ) ) {
 
 				if ( ! in_array( trim( $data['status'] ), array( 'draft', 'pending', 'publish' ), true ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_status', sprintf( 'Invalid Membership Plan status "%s".', $data['status'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_plan_status', sprintf( 'Invalid Membership Plan status "%s".', $data['status'] ) );
 				} else {
 					$post_args['post_status'] = trim( $data['status'] );
 				}
@@ -383,12 +406,12 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				} elseif ( in_array( $data['access'], $access_methods, true ) ) {
 					$access_method = $data['access'];
 				} else {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_invalid_access_method', sprintf( 'Membership Plan type "%s" is not a recognized type.', $data['access'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_invalid_access_method', sprintf( 'Membership Plan type "%s" is not a recognized type.', $data['access'] ) );
 				}
 
 				// conflict between access method and defined products
 				if ( 'purchase' !== $access_method && ! empty( $data['product'] ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_access_method_conflict', sprintf( 'If you define products that grant access, the Membership type can only be "purchase" and cannot be "%s". You can still assign the membership manually.', $data['access'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_access_method_conflict', sprintf( 'If you define products that grant access, the Membership type can only be "purchase" and cannot be "%s". You can still assign the membership manually.', $data['access'] ) );
 				}
 			}
 
@@ -410,13 +433,13 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				}
 
 				if ( ! $access_start_date || ( isset( $data['start_date'] ) && strlen( $data['start_date'] ) !== 10 ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_start_date', sprintf( 'Membership Plan start date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['start_date'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_start_date', sprintf( 'Membership Plan start date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['start_date'] ) );
 				} elseif( ! $access_end_date || ( isset( $data['end_date'] ) && strlen( $data['end_date'] ) !== 10 ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_end_date', sprintf( 'Membership Plan end date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['end_date'] ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_end_date', sprintf( 'Membership Plan end date "%s" is not valid. Must be a non-empty YYYY-MM-DD value.', $data['end_date'] ) );
 				} elseif ( strtotime( $access_start_date ) > strtotime( $access_end_date ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_fixed_dates_conflict', sprintf( 'Membership Plan start date %1$s cannot be set after end date in %2$s', $access_start_date, $access_end_date ) );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_fixed_dates_conflict', sprintf( 'Membership Plan start date %1$s cannot be set after end date in %2$s', $access_start_date, $access_end_date ) );
 				} elseif ( isset( $data['length'] ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_plan_length_conflict', 'You cannot define a plan length and fixed start or end dates at the same time' );
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_plan_length_conflict', 'You cannot define a plan length and fixed start or end dates at the same time' );
 				}
 			}
 
@@ -433,17 +456,17 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 					$length = sanitize_text_field( $data['length'] );
 
 					if ( '' === $length ) {
-						throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
+						throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
 					}
 
 					// maybe add a final 's' if it's omitted
-					$length = ! SV_WC_Helper::str_ends_with( $length, 's' ) ? $length . 's' : $length;
+					$length = ! Framework\SV_WC_Helper::str_ends_with( $length, 's' ) ? $length . 's' : $length;
 
 					$length_amount = wc_memberships_parse_period_length( $length, 'amount' );
 					$length_period = wc_memberships_parse_period_length( $length, 'period' );
 
 					if ( ! is_int( $length_amount ) || $length_amount < 1 || empty( $length_period ) ) {
-						throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
+						throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_plan_length', sprintf( 'Membership Plan length "%s" is not valid. Must be "unlimited" or in "<amount> <period>" format.', $data['length'] ) );
 					} else {
 						$access_length = $length_amount . ' ' . $length_period;
 					}
@@ -470,9 +493,9 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 							$product = wc_get_product( (int) $product_id );
 
-							if ( ! $product instanceof WC_Product ) {
+							if ( ! $product instanceof \WC_Product ) {
 
-								WP_CLI::warning( "Product $product_id is not a valid product." );
+								\WP_CLI::warning( "Product $product_id is not a valid product." );
 
 								$error_ids[] = $product_id;
 							}
@@ -488,7 +511,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 								$message = sprintf( 'Products %s are not valid products.', wc_memberships_list_items( $error_ids, 'and' ) );
 							}
 
-							throw new WC_CLI_Exception( 'woocommerce_memberships_products_not_found', $message );
+							throw new \WC_CLI_Exception( 'woocommerce_memberships_products_not_found', $message );
 						}
 					}
 				}
@@ -498,10 +521,10 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 			if ( ! empty( $post_args ) ) {
 
-				$updated = wp_update_post( $post_args );
+				$updated = wp_update_post( $post_args, true );
 
-				if ( is_wp_error( $updated ) ) {
-					throw new WC_CLI_Exception( 'woocommerce_memberships_cli_cannot_update_membership_plan', $updated->get_error_message() );
+				if ( 0 === $updated || is_wp_error( $updated ) ) {
+					throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_cannot_update_membership_plan', $updated->get_error_message() );
 				}
 			}
 
@@ -543,31 +566,139 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 				}
 			}
 
+			if ( isset( $data['members_area_sections'] ) ) {
+
+				if ( '' === trim( $data['members_area_sections'] ) ) {
+					$membership_plan->set_members_area_sections( array() );
+				} else {
+					$membership_plan->set_members_area_sections( array_map( 'trim', explode( ',', $data['members_area_sections'] ) ) );
+				}
+			}
+
+			if ( ! empty( $data['rules'] ) ) {
+
+				$rules = json_decode( $data['rules'], true );
+
+				$this->set_membership_plan_rules( $membership_plan, $rules );
+			}
+
 			/**
-			 * Upon updating a Membership Plan via CLI
+			 * Upon updating a Membership Plan via CLI.
 			 *
 			 * @since 1.7.0
+			 *
 			 * @param \WC_Memberships_Membership_Plan $membership_plan
 			 * @param array $data
 			 */
 			do_action( 'wc_memberships_cli_update_membership_plan', $membership_plan, $data );
 
-			WP_CLI::success( sprintf( 'Updated Membership Plan %s.', $membership_plan->get_id() ) );
+			\WP_CLI::success( sprintf( 'Updated Membership Plan %s.', $membership_plan->get_id() ) );
 
-		} catch ( WC_CLI_Exception $e ) {
+		} catch ( \WC_CLI_Exception $e ) {
 
-			WP_CLI::error( $e->getMessage() );
+			\WP_CLI::error( $e->getMessage() );
 		}
 	}
 
 
 	/**
-	 * Get a Membership Plan
+	 * Sets rules for a given Membership Plan.
+	 *
+	 * @since 1.12.3
+	 * @deprecated since 1.13.0
+	 *
+	 * @param \WC_Memberships_Membership_Plan $membership_plan plan to set rules for
+	 * @param array $rules associative array of rules data
+	 * @return \WC_Memberships_Membership_Plan_Rule[] set rules
+	 */
+	protected function set_membership_plan_rules( \WC_Memberships_Membership_Plan $membership_plan, array $rules ) {
+
+		$set_rules = array();
+
+		foreach ( $rules as $rule_type => $rule_data ) {
+
+			if ( ! is_array( $rule_data ) || ! in_array( $rule_type, array( 'content_restriction', 'product_restriction', 'purchasing_discount' ), true ) ) {
+				continue;
+			}
+
+			$rule = new \WC_Memberships_Membership_Plan_Rule();
+
+			$rule->set_id();
+			$rule->set_membership_plan_id( $membership_plan->get_id() );
+			$rule->set_rule_type( $rule_type );
+
+			if ( 'purchasing_discount' === $rule_type ) {
+
+				$rule->set_inactive();
+
+				if ( isset( $rule_data['discount'] ) ) {
+
+					$rule->set_discount( $rule_data['discount'] );
+
+					if ( isset( $rule_data['active'] ) && in_array( $rule_data['active'], array( 'yes', true ), true ) ) {
+						$rule->set_active();
+					}
+				}
+			}
+
+			if ( isset( $rule_data['target'] ) ) {
+
+				$rule->set_target( $rule_data['target'] );
+
+			} elseif ( isset( $rule_data['content_type'], $rule_data['content_type_name'] ) ) {
+
+				$rule->set_content_type( $rule_data['content_type'] );
+				$rule->set_content_type_name( $rule_data['content_type_name'] );
+
+			} else {
+
+				continue;
+			}
+
+			if ( ! empty( $rule_data['object_ids'] ) ) {
+
+				$ids = is_string( $rule_data['object_ids'] ) ? explode( ',', $rule_data['object_ids'] ) : (array) $rule_data['object_ids'];
+
+				$rule->set_object_ids( $ids );
+			}
+
+			if ( ! empty( $rule_data['access_type'] ) ) {
+				$rule->set_access_type( $rule_data['access_type'] );
+			}
+
+			if ( ! empty( $rule_data['access_schedule'] ) ) {
+				$rule->set_access_schedule( $rule_data['access_schedule'] );
+			}
+
+			$access_exclude_trial = ! empty( $rule_data['access_exclude_trial'] ) && in_array( $rule_data['access_exclude_trial'], array( 'yes', true ), true );
+			$access_include_trial = ! empty( $rule_data['access_include_trial'] ) && in_array( $rule_data['access_include_trial'], array( 'yes', true ), true );
+
+			if ( $access_exclude_trial && ! $access_include_trial ) {
+				$rule->set_access_schedule_exclude_trial();
+			} elseif ( $access_include_trial && ! $access_exclude_trial ) {
+				$rule->set_access_schedule_include_trial();
+			}
+
+			$set_rules[] = $rule;
+		}
+
+		if ( ! empty( $set_rules ) ) {
+			$membership_plan->set_rules( $set_rules );
+		} else {
+			\WP_CLI::warning( 'Could not parse rules to set for Membership Plan %1$s.', $membership_plan->get_id() );
+		}
+
+		return $set_rules;
+	}
+
+
+	/**
+	 * Get a Membership Plan.
 	 *
 	 * ## OPTIONS
 	 *
 	 * <id>
-	 * : Membership Plan ID to look for
+	 * : Membership Plan ID or plan name to look for
 	 *
 	 * [--field=<field>]
 	 * : Instead of returning the whole Membership Plan fields, returns the value of a single fields
@@ -586,21 +717,27 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 	 *
 	 *     wp wc memberships plan get 123
 	 *
+	 *     wp wc memberships plan get "Golden Membership"
+	 *
 	 *     wp wc memberships plan get 123 --fields=id
 	 *
 	 *
 	 * @since 1.7.0
-	 * @param int[] $args Only the first id will be used
-	 * @param array $assoc_args Formatting arguments
+	 * @deprecated since 1.13.0
+	 *
+	 * @param int[] $args only the first id will be used
+	 * @param array $assoc_args formatting arguments
 	 */
 	public function get( $args, $assoc_args ) {
 
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc membership_plan get' ) );
+
 		try {
 
-			$membership_plan = wc_memberships_get_membership_plan( (int) $args[0] );
+			$membership_plan = wc_memberships_get_membership_plan( is_numeric( $args[0] ) ? (int) $args[0] : $args[0] );
 
-			if ( ! $membership_plan instanceof WC_Memberships_Membership_Plan ) {
-				throw new WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_membership_plan', sprintf( 'Invalid Membership Plan "%s".', $args[0] ) );
+			if ( ! $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
+				throw new \WC_CLI_Exception( 'woocommerce_memberships_cli_invalid_membership_plan', sprintf( 'Membership Plan "%s" invalid or not found.', $args[0] ) );
 			}
 
 			$membership_plan_data = $this->get_membership_plan_data( $membership_plan );
@@ -608,17 +745,19 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 			$formatter = $this->get_formatter( $assoc_args );
 			$formatter->display_item( $membership_plan_data );
 
-		} catch ( WC_CLI_Exception $e ) {
+		} catch ( \WC_CLI_Exception $e ) {
 
-			WP_CLI::error( $e->getMessage() );
+			\WP_CLI::error( $e->getMessage() );
 		}
 	}
 
 
 	/**
-	 * Get default format fields that will be used in `list` and `get` subcommands
+	 * Get default format fields that will be used in `list` and `get` subcommands.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
+	 *
 	 * @return string
 	 */
 	protected function get_default_format_fields() {
@@ -635,9 +774,10 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 		$default_fields[] = 'members_count';
 
 		/**
-		 * Memberships Plan default format fields used in WP CLI
+		 * Memberships Plan default format fields used in WP CLI.
 		 *
 		 * @since 1.7.0
+		 *
 		 * @param array $default_fields
 		 */
 		$default_fields = apply_filters( 'wc_memberships_cli_membership_plan_default_fields', $default_fields );
@@ -647,9 +787,11 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 
 	/**
-	 * Get Membership Plan data
+	 * Get Membership Plan data.
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
+	 *
 	 * @param \WC_Memberships_Membership_Plan $membership_plan
 	 * @return array
 	 */
@@ -657,7 +799,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 		$membership_plan_data = '';
 
-		if ( $membership_plan instanceof WC_Memberships_Membership_Plan ) {
+		if ( $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
 
 			$product_ids   = $membership_plan->get_product_ids();
 			$access_length = $membership_plan->get_human_access_length();
@@ -680,11 +822,12 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 		}
 
 		/**
-		 * Filter the membership plan data for Memberships CLI
+		 * Filter the membership plan data for Memberships CLI.
 		 *
 		 * @since 1.7.0
-		 * @param array $membership_plan_data The plan data passed to CLI
-		 * @param \WC_Memberships_Membership_Plan $membership_plan The membership plan
+		 *
+		 * @param array $membership_plan_data the plan data passed to CLI
+		 * @param \WC_Memberships_Membership_Plan $membership_plan the membership plan
 		 */
 		$membership_plan_data = apply_filters( 'wc_memberships_cli_membership_plan_data', $membership_plan_data, $membership_plan );
 
@@ -693,7 +836,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 
 	/**
-	 * List Membership Plans
+	 * List Membership Plans.
 	 *
 	 * ## OPTIONS
 	 *
@@ -735,10 +878,14 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 	 * @subcommand list
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
+	 *
 	 * @param array $args
 	 * @param array $assoc_args
 	 */
 	public function list_( $args, $assoc_args ) {
+
+		\WP_CLI::warning( $this->get_deprecation_warning( 'wp wc membership_plan list' ) );
 
 		$query_args = $this->get_list_query_args( $assoc_args );
 		$formatter  = $this->get_formatter( $assoc_args );
@@ -760,12 +907,14 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 
 	/**
-	 * Get query args for list subcommand
+	 * Get query args for list subcommand.
 	 *
 	 * @see WC_Memberships_CLI_Membership_Plan::list__()
 	 *
 	 * @since 1.7.0
-	 * @param array $args Args from command line
+	 * @deprecated since 1.13.0
+	 *
+	 * @param array $args arguments from command line
 	 * @return array
 	 */
 	protected function get_list_query_args( $args ) {
@@ -781,11 +930,13 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 
 	/**
-	 * Format posts from WP_Query result to items
+	 * Format posts from WP_Query result to items.
 	 *
 	 * @since 1.7.0
-	 * @param \WP_Post[] $posts Array of post objects
-	 * @return array Items
+	 * @deprecated since 1.13.0
+	 *
+	 * @param \WP_Post[] $posts array of post objects
+	 * @return array items
 	 */
 	protected function format_posts_to_items( $posts ) {
 
@@ -795,7 +946,7 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 			$membership_plan = wc_memberships_get_membership_plan( $post->ID );
 
-			if ( ! $membership_plan instanceof WC_Memberships_Membership_Plan ) {
+			if ( ! $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
 				continue;
 			}
 
@@ -807,44 +958,50 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 
 
 	/**
-	 * Delete Membership Plans
+	 * Delete Membership Plans.
 	 *
 	 * ## OPTIONS
 	 *
 	 * <id>...
-	 * : The Membership Plan ID to delete
+	 * : The ID or the plan name of the Membership Plan to delete
 	 *
 	 * ## EXAMPLES
 	 *
 	 *     wp wc memberships plan delete 123
 	 *
+	 *     wp wc memberships plan delete "Golden Membership"
+	 *
 	 *     wp wc memberships plan delete $(wp wc memberships plan list --format=ids)
 	 *
 	 *
 	 * @since 1.7.0
+	 * @deprecated since 1.13.0
+	 *
 	 * @param int|int[] $args
 	 * @param array $assoc_args
 	 */
 	public function delete( $args, $assoc_args ) {
 
 		$exit_code = 0;
+		$args      = ! is_array( $args ) ? (array) $args : $args;
 
 		foreach ( $args as $membership_plan_id ) {
 
-			$membership_plan = wc_memberships_get_membership_plan( $membership_plan_id );
+			$membership_plan = wc_memberships_get_membership_plan( is_numeric( $membership_plan_id ) ? (int) $membership_plan_id : $membership_plan_id );
 
-			if ( ! $membership_plan instanceof WC_Memberships_Membership_Plan ) {
-				WP_CLI::warning( "Failed deleting Membership Plan $membership_plan_id: not a Membership Plan." );
+			if ( ! $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
+				\WP_CLI::warning( "Failed deleting Membership Plan $membership_plan_id: not a Membership Plan." );
 				continue;
 			} elseif ( $membership_plan->get_memberships_count() > 0 ) {
-				WP_CLI::warning( "Failed deleting Membership Plan $membership_plan_id: cannot delete plan with members - delete members first." );
+				\WP_CLI::warning( "Failed deleting Membership Plan $membership_plan_id: cannot delete plan with members - delete members first." );
 				continue;
 			}
 
 			/**
-			 * Upon deleting a Membership Plan via CLI
+			 * Upon deleting a Membership Plan via CLI.
 			 *
 			 * @since 1.7.0
+			 *
 			 * @param int $membership_plan_id
 			 */
 			do_action( 'wc_memberships_cli_delete_membership_plan', $membership_plan_id );
@@ -852,10 +1009,10 @@ class WC_Memberships_CLI_Membership_Plan extends WC_Memberships_CLI_Command {
 			$success = wp_delete_post( $membership_plan_id, true );
 
 			if ( $success ) {
-				WP_CLI::success( "Deleted Membership Plan $membership_plan_id." );
+				\WP_CLI::success( "Deleted Membership Plan $membership_plan_id." );
 			} else {
 				$exit_code++;
-				WP_CLI::warning( "Failed deleting Membership Plan $membership_plan_id." );
+				\WP_CLI::warning( "Failed deleting Membership Plan $membership_plan_id." );
 			}
 		}
 

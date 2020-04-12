@@ -20,8 +20,37 @@ function wpcf_fields_image() {
 }
 
 
-add_filter( 'wpcf_fields_type_image_value_get', 'wpcf_fields_image_value_filter' );
-add_filter( 'wpcf_fields_type_image_value_save', 'wpcf_fields_image_value_filter' );
+/**
+ * When saving an image field with a value that corresponds to an attachment ID, ensure that the URL
+ * corresponds to the original image version and not to a scaled-down one.
+ *
+ * This becomes especially relevant since WordPress 5.3:
+ *
+ * @link https://make.wordpress.org/core/2019/10/09/introducing-handling-of-big-images-in-wordpress-5-3/
+ *
+ * Note: This is happening during a save operation in the admin only, so performance is not a critical concern here.
+ *
+ * @since 3.3.7
+ */
+add_filter( 'wpcf_fields_type_image_value_save', static function( $image_url_or_urls ) {
+	if ( function_exists( 'wp_get_original_image_path' ) ) {
+		$update_single_url = static function( $image_url ) {
+			$attachment_id = attachment_url_to_postid( $image_url );
+			if ( $attachment_id ) {
+				$image_url = wp_get_original_image_url( $attachment_id );
+			}
+			return $image_url;
+		};
+
+		// It's a trap! We may receive multiple values here.
+		if ( is_string( $image_url_or_urls ) ) {
+			$image_url_or_urls = $update_single_url( $image_url_or_urls );
+		} elseif ( is_array( $image_url_or_urls ) ) {
+			$image_url_or_urls = array_map( $update_single_url, $image_url_or_urls );
+		}
+	}
+	return $image_url_or_urls;
+} );
 
 // Do not wrap if 'url' is TRUE
 add_filter( 'types_view', 'wpcf_fields_image_view_filter', 10, 6 );
@@ -57,6 +86,8 @@ function wpcf_fields_image_valid_extension()
  * @param $post
  *
  * @return array
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_image_editor_callback(
 	$field, $data, /** @noinspection PhpUnusedParameterInspection */ $context, $post
@@ -169,6 +200,8 @@ function wpcf_fields_image_editor_callback(
 
 /**
  * Editor callback form submit.
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_image_editor_submit( $data, $field, $context ) {
 
@@ -297,7 +330,7 @@ function wpcf_fields_image_view( $params ) {
     }
 
     // Compatibility with old parameters
-    $old_param = isset( $params['proportional'] ) && $params['proportional'] == 'true' ? 'proportional' : 'crop';
+    $old_param = isset( $params['proportional'] ) && $params['proportional'] ? 'proportional' : 'crop';
     $resize = isset( $params['resize'] ) ? $params['resize'] : $old_param;
 
     // Pre-configured size (use WP function) IF NOT CROPPED
@@ -307,8 +340,8 @@ function wpcf_fields_image_view( $params ) {
         if( $image_data['is_attachment'] === true ) {
 	        $image_data['is_attachment'] = wpcf_image_is_attachment( $image_data['fullrelpath'] );
         }
-	    
-        if ( isset( $params['url'] ) && $params['url'] == 'true' ) {
+
+        if ( isset( $params['url'] ) && $params['url'] ) {
             $image_url = wp_get_attachment_image_src( $image_data['is_attachment'], $params['size'] );
             if ( !empty( $image_url[0] ) ) {
                 $output = $image_url[0];
@@ -688,33 +721,41 @@ function wpcf_fields_image_get_data( $image ) {
     return $data;
 }
 
-/**
- * Strips GET vars from value.
- *
- * @param type $value
- * @return type
- */
-function wpcf_fields_image_value_filter( $value ) {
-    if ( is_string( $value ) && !apply_filters('wpcf_allow_questionmark_in_image_url', false) ) {
-        return strtok( $value, '?' );
-    }
-    return $value;
-}
 
 /**
  * Gets cache directory.
  *
+ * @param bool $suppress_filters
+ * @param bool $create_if_missing
+ *
  * @return \WP_Error
  */
-function wpcf_fields_image_get_cache_directory( $suppress_filters = false ) {
+function wpcf_fields_image_get_cache_directory( $suppress_filters = false, $create_if_missing = true ) {
     WPCF_Loader::loadView( 'image' );
     $utils = Types_Image_Utils::getInstance();
-    $cache_dir = $utils->getWritablePath();
+    $cache_dir = $utils->getWritablePath( null, $create_if_missing );
     if ( is_wp_error( $cache_dir ) ) {
         return $cache_dir;
     }
     if ( !$suppress_filters ) {
-        $cache_dir = apply_filters( 'types_image_cache_dir', $cache_dir );
+
+		/**
+		 * types_image_cache_dir
+		 *
+		 * Overwrite the path of a directory used for resized image cache.
+		 *
+		 * @param string $cache_dir Absolute path of the cache directory. Must exist and must be writable.
+		 *
+		 * @since unknown
+		 */
+		$cache_dir = apply_filters( 'types_image_cache_dir', $cache_dir );
+
+		if ( ! $create_if_missing && ! file_exists( $cache_dir ) ) {
+			// The cache directory doesn't exist but we explictly don't want it to be created.
+			return null;
+		}
+
+		// Make sure the directory actually exists.
         if ( !wp_mkdir_p( $cache_dir ) ) {
             return new WP_Error(
                 'wpcf_image_cache_dir',
@@ -799,8 +840,8 @@ function wpcf_fields_image_get_remote( $url ) {
             return new WP_Error( 'wpcf_image_cache_file_error',
                 sprintf(
                     __( 'Remote server returned error response %1$d %2$s', 'wpcf' ),
-                    esc_html( $resp['response'] ),
-                    get_status_header_desc( $resp['response'] ) 
+                    esc_html( $resp['response']['message'] ),
+                    get_status_header_desc( $resp['response'] )
                 )
             );
         }
@@ -1090,7 +1131,7 @@ function wpcf_image_add_to_library( $post, $abspath ){
 
 /**
  * Class WPCF_Guid_Id
- * 
+ *
  * @since 2.2.12 Temporary solution to speed up image fields
  */
 class WPCF_Guid_Id {
@@ -1165,13 +1206,27 @@ class WPCF_Guid_Id {
 
 		$table_guid_id = $this->get_table_name();
 
-		$this->wpdb->query(
-			$this->wpdb->prepare(
-				"INSERT INTO $table_guid_id (guid,post_id) VALUES (%s,%d) ON DUPLICATE KEY UPDATE guid=%s, post_id=%d",
-				$guid, $post_id,
-				$guid, $post_id
-			)
-		);
+		if ( $post_id ) {
+			$this->wpdb->query(
+				$this->wpdb->prepare(
+					"INSERT INTO $table_guid_id (guid,post_id) VALUES (%s,%d) ON DUPLICATE KEY UPDATE guid=%s, post_id=%d",
+					$guid, $post_id,
+					$guid, $post_id
+				)
+			);
+		} else {
+			// As GUID is not the primary key we first delete any entry with that GUID.
+			// Shouldn't really happen, as this is should only being called when the GUID not exists.
+			// But as this is a public function, better doing it the save way.
+			$this->wpdb->delete( $table_guid_id, array( 'guid' => $guid ) );
+			$this->wpdb->query(
+				$this->wpdb->prepare(
+					"INSERT INTO $table_guid_id (guid) VALUES (%s)",
+					$guid
+				)
+			);
+		}
+
 	}
 
 	/**
@@ -1219,23 +1274,73 @@ class WPCF_Guid_Id {
 
 	/**
 	 * Get post_id by guid
+	 *
 	 * @param $guid
 	 *
-	 * @return null|string
+	 * @param bool $allow_to_return_null NULL can be stored on the table to also have faster results for invalid images.
+	 *		- With false (default for backward compatibility) the method will return false when the post_id is NULL.
+	 *		- With true the method will return NULL instead of false when the post_id is NULL.
+	 *
+	 * @return null|string|false
 	 */
-	public function get_id_by_guid( $guid ) {
+	public function get_id_by_guid( $guid, $allow_to_return_null = false ) {
 		if( ! $this->is_table_available ) {
 			return false;
 		}
 
 		$table_guid_id = $this->get_table_name();
 
-		return $this->wpdb->get_var(
+		$guid_id_row = $this->wpdb->get_row(
 			$this->wpdb->prepare(
 				"SELECT post_id FROM $table_guid_id WHERE guid=%s LIMIT 1",
 				$guid
 			)
 		);
+
+		// We need to distinguish between no result being returned and an actual NULL value
+		// existing in the post_id column of an existing row. That's why we can't use get_var().
+		//
+		// If the row doesn't exist yet, we will indicate it by returning FALSE.
+		$post_id = ( null === $guid_id_row ? false : $guid_id_row->post_id );
+
+		if ( empty( $post_id ) ) {
+			if ( $post_id === null && $allow_to_return_null ) {
+				// Post ID is NULL, and requester wants to have NULL as return.
+				return null;
+			}
+			return false;
+		}
+
+		$post = get_post( $post_id );
+
+		$is_attachment_valid = (
+			$post instanceof \WP_Post
+			&& $post->guid === $guid
+		);
+
+		// Last resort to handle an edge case when the computed GUID doesn't match the
+		// GUID of the attachment... but the actual file subpath does.
+		//
+		// This can happen when the attachment is altered after its creation, presumably
+		// by some third-party software.
+		//
+		// It will cost us one extra query but that's better than missing the attachment
+		// metadata.
+		if ( ! $is_attachment_valid ) {
+			$attached_file_subpath = get_post_meta( $post_id, '_wp_attached_file', true );
+			$is_attachment_valid = (
+				$attached_file_subpath === substr( $guid, - strlen( $attached_file_subpath ) )
+			);
+		}
+
+		if ( ! $is_attachment_valid ) {
+			// no post for the post id OR guid does not match
+			$this->delete_by_post_id( $post_id );
+			return false;
+		}
+
+		// all good
+		return $post_id;
 	}
 
 	/**
@@ -1303,13 +1408,23 @@ class WPCF_Guid_Id {
 	}
 
 	/**
+	 * Check if table exit
+	 * @return bool
+	 */
+	private function table_exists() {
+		$table_guid_id = $this->get_table_name();
+
+		return $this->wpdb->get_var( "SHOW TABLES LIKE '$table_guid_id'" ) === $table_guid_id;
+	}
+
+	/**
 	 * @return array|void
 	 */
 	private function create_table_if_not_exist() {
 		$table_guid_id = $this->get_table_name();
 		$option_key_table_could_not_be_created = '_types-error-on-create-table-' . $table_guid_id;
 
-		if( $this->wpdb->get_var( "SHOW TABLES LIKE '$table_guid_id'" ) == $table_guid_id) {
+		if( $this->table_exists() ) {
 			// table already exists
 			return true;
 		}
@@ -1321,7 +1436,7 @@ class WPCF_Guid_Id {
 
 		$query = "CREATE TABLE {$table_guid_id} (
 			`guid` varchar(190) NOT NULL DEFAULT '',
-			`post_id` bigint(20) NOT NULL,
+			`post_id` bigint(20) DEFAULT NULL,
 			UNIQUE KEY `post_id` (`post_id`),
 			KEY `guid` (`guid`)
 		) " . $this->wpdb->get_charset_collate() . ";";
@@ -1331,7 +1446,7 @@ class WPCF_Guid_Id {
 		@dbDelta( $query ); // error on dbDelta not catchable
 		ob_end_clean();
 
-		if( $this->wpdb->get_var( "SHOW TABLES LIKE '$table_guid_id'" ) == $table_guid_id) {
+		if( $this->table_exists() ) {
 			// table successfully created
 			return true;
 		}
@@ -1341,6 +1456,32 @@ class WPCF_Guid_Id {
 
 		return false;
 	}
+
+
+	/**
+	 * Truncate the table if it exists.
+	 *
+	 * @return Toolset_Result
+	 * @since 3.3.8
+	 */
+	public function truncate() {
+		if ( ! $this->is_table_available ) {
+			return new Toolset_Result( false, __( 'The toolset_post_guid_id table doesn\'t exist.', 'wpcf' ) );
+		}
+
+		$table_guid_id = $this->get_table_name();
+
+		$this->wpdb->query( "TRUNCATE TABLE $table_guid_id" );
+
+		if ( '' !== $this->wpdb->last_error ) {
+			return new Toolset_Result(
+				false,
+				$this->wpdb->last_error
+			);
+		}
+
+		return new Toolset_Result( true );
+	}
 }
 
 // make sure hooks are loaded
@@ -1349,9 +1490,9 @@ WPCF_Guid_Id::get_instance();
 /**
  * Checks if image is attachment.
  *
- * @global object $wpdb
- * @param type $guid
- * @return type
+ * @param $guid
+ * @return null|string
+ * @deprecated Use Toolset_Utils::get_attachment_id_by_url() instead.
  */
 function wpcf_image_is_attachment( $guid ) {
 	$wpcf_guid_id = WPCF_Guid_Id::get_instance();

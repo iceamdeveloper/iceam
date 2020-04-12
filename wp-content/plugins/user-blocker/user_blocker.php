@@ -2,13 +2,13 @@
 /**
   Plugin Name: User Blocker
   Plugin URI: https://wordpress.org/plugins/user-blocker/
-  Description: Block your unwanted site users except admin based on day, time and date or permanently   .
+  Description: Block your unwanted site users except admin based on day, time and date or permanently.
   Author: Solwin Infotech
   Author URI: https://www.solwininfotech.com/
   Copyright: Solwin Infotech
-  Version: 1.5
+  Version: 1.5.1
   Requires at least: 4.0
-  Tested up to: 5.3.2
+  Tested up to: 5.4
   License: GPLv2 or later
  */
 /**

@@ -88,7 +88,7 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 	 *
 	 * @return null|Toolset_Field_Definition Field definition or null if it can't be loaded.
 	 */
-	final public function load_field_definition( $field_key ) {
+	public function load_field_definition( $field_key ) {
 
 		if( ! array_key_exists( $field_key, $this->field_definitions ) ) {
 			$this->field_definitions[ $field_key ] = $this->load_field_definition_from_database( $field_key );
@@ -234,7 +234,7 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 	 *     managed by Types.
 	 */
 	private function get_fields_from_options() {
-		return wpcf_admin_fields_get_fields( false, false, false, $this->get_option_name() );
+		return $this->safe_wpcf_admin_fields_get_fields( false, false, false, $this->get_option_name() );
 	}
 
 
@@ -253,7 +253,7 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 			unset( $this->field_definitions[ $field_slug ] );
 		}
 
-		wpcf_admin_fields_get_fields( false, false, false, $this->get_option_name(), false, true );
+		$this->safe_wpcf_admin_fields_get_fields( false, false, false, $this->get_option_name(), false, true );
 	}
 
 
@@ -288,8 +288,9 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 
 	/**
 	 * @return string[] Slugs of fields that have a definition in Types.
+	 * @since 3.4 Make this method public.
 	 */
-	private function get_types_field_slugs() {
+	public function get_types_field_slugs() {
 		$fields_from_options = $this->get_fields_from_options();
 		$field_slugs = array();
 		foreach ( $fields_from_options as $field_configuration ) {
@@ -299,6 +300,22 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 			}
 		}
 		return array_unique( $field_slugs );
+	}
+
+	/**
+	 * @return string[] Meta keys of fields that have a definition in Types.
+	 * @since 3.4.1
+	 */
+	public function get_types_field_meta_keys() {
+		$fields_from_options = $this->get_fields_from_options();
+		$field_meta_keys = array();
+		foreach ( $fields_from_options as $field_configuration ) {
+			$meta_key = toolset_getarr( $field_configuration, 'meta_key' );
+			if( !empty( $meta_key ) ) {
+				$field_meta_keys[] = $meta_key;
+			}
+		}
+		return array_unique( $field_meta_keys );
 	}
 
 
@@ -675,7 +692,7 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 		Types_Main::get_instance()->require_legacy_functions();
 
 		// Clear the underlying legacy cache.
-		wpcf_admin_fields_get_fields( false, false, false, $this->get_option_name(), false, true );
+		$this->safe_wpcf_admin_fields_get_fields( false, false, false, $this->get_option_name(), false, true );
 	}
 
 
@@ -705,4 +722,39 @@ abstract class Toolset_Field_Definition_Factory implements Toolset_Field_Definit
 	}
 
 
+	/**
+	 * A proxy for safely calling wpcf_admin_fields_get_fields().
+	 *
+	 * If Types is not active and this function is not defined, we'll do nothing and just return an empty result.
+	 * Please note that this is a temporary workaround that should go away with toolsetcommon-402.
+	 *
+	 * @see wpcf_admin_fields_get_fields for further information.
+	 *
+	 * @param bool $only_active
+	 * @param bool $disabled_by_type
+	 * @param bool $strictly_active
+	 * @param string $option_name
+	 * @param bool $use_cache
+	 * @param bool $clear_cache
+	 *
+	 * @return array
+	 *
+	 * @since 3.4.1
+	 */
+	private function safe_wpcf_admin_fields_get_fields(
+		$only_active = false,
+		$disabled_by_type = false,
+		$strictly_active = false,
+		$option_name = 'wpcf-fields',
+		$use_cache = true,
+		$clear_cache = false
+	) {
+		if ( ! function_exists( 'wpcf_admin_fields_get_fields' ) ) {
+			return array();
+		}
+
+		return wpcf_admin_fields_get_fields(
+			$only_active, $disabled_by_type, $strictly_active, $option_name, $use_cache, $clear_cache
+		);
+	}
 }

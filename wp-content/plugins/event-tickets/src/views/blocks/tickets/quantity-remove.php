@@ -11,10 +11,12 @@
  * @link {INSERT_ARTICLE_LINK_HERE}
  *
  * @since 4.9.3
- * @since TBD Updated the button to include a type - helps avoid submitting forms unintentionally.
+ * @since 4.11.3 Updated the button to include a type - helps avoid submitting forms unintentionally.
+ * @since 4.11.4 Added accessibility classes to screen reader text element.
  *
- * @version TBD
+ * @version 4.11.4
  *
+ * @var $this Tribe__Tickets__Editor__Template
  */
 
 $ticket = $this->get( 'ticket' );
@@ -27,7 +29,8 @@ $button_title = sprintf(
 	type="submit"
 	class="tribe-tickets__item__quantity__remove"
 	title="<?php echo esc_attr( $button_title ); ?>"
+	type="button"
 >
-	<span class="screen-reader-text"><?php echo esc_html( $button_title ); ?></span>
+	<span class="screen-reader-text tribe-common-a11y-visual-hide"><?php echo esc_html( $button_title ); ?></span>
 	<?php echo esc_html_x( '-', 'A minus sign, remove ticket.', 'event-tickets' ); ?>
 </button>

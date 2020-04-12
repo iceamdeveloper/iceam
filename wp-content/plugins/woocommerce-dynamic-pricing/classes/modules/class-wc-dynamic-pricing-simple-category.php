@@ -68,19 +68,8 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 					$execute_rules = true;
 				}
 
-				if ( isset( $pricing_rule_set['date_from'] ) && isset( $pricing_rule_set['date_to'] ) ) {
-					// Check date range
-					$from_date = empty( $pricing_rule_set['date_from'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $pricing_rule_set['date_from'] ), false ) );
-					$to_date   = empty( $pricing_rule_set['date_to'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $pricing_rule_set['date_to'] ), false ) );
-					$now       = current_time( 'timestamp' );
-
-					if ( $from_date && $to_date && ! ( $now >= $from_date && $now <= $to_date ) ) {
-						$execute_rules = false;
-					} elseif ( $from_date && ! $to_date && ! ( $now >= $from_date ) ) {
-						$execute_rules = false;
-					} elseif ( $to_date && ! $from_date && ! ( $now <= $to_date ) ) {
-						$execute_rules = false;
-					}
+				if ( $execute_rules && ( isset( $pricing_rule_set['date_from'] ) || isset( $pricing_rule_set['date_to'] ) ) ) {
+					$execute_rules = wc_dynamic_pricing_is_within_date_range( $pricing_rule_set['date_from'], $pricing_rule_set['date_to'] );
 				}
 
 				if ( $execute_rules && isset( $pricing_rule_set['collector']['args']['cats'][0] ) ) {
@@ -117,10 +106,16 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 
 				foreach ( $this->available_rulesets as $set_id => $pricing_rule_set ) {
 
+					if ( ! $this->is_cumulative( $cart_item, $cart_item_key ) ) {
+						if ( $this->is_item_discounted( $cart_item, $cart_item_key, $set_id ) ) {
+							continue;
+						}
+					}
+
 					if ( $this->is_applied_to_product( $_product, $pricing_rule_set['collector']['args']['cats'][0] ) ) {
 						$rule = $pricing_rule_set['rules'][0];
 
-						$temp = $this->get_adjusted_price( $rule, $original_price );
+						$temp = $this->get_adjusted_price( $cart_item, $rule, $original_price );
 
 						if ( ! $price_adjusted || $temp < $price_adjusted ) {
 							$price_adjusted      = $temp;
@@ -139,9 +134,11 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 	}
 
 	public function is_applied_to_product( $_product, $cat_id = false ) {
-		if ( is_admin() && ! is_ajax() ) {
+
+		if ( is_admin() && ! is_ajax() && apply_filters( 'woocommerce_dynamic_pricing_skip_admin', true ) ) {
 			return false;
 		}
+
 
 		$cat_id = is_array( $cat_id ) ? $cat_id : array( $cat_id );
 
@@ -157,10 +154,14 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 		return apply_filters( 'woocommerce_dynamic_pricing_is_applied_to', $process_discounts, $_product, $this->module_id, $this, $cat_id );
 	}
 
-	private function get_adjusted_price( $rule, $price ) {
+	private function get_adjusted_price( $cart_item, $rule, $price ) {
 		$result = false;
 
-		$amount       = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, null, $this );
+		$amount = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', trim( $rule['amount'] ), $rule, null, $this );
+		if ( $amount === null || $amount === "" || ! is_numeric( $amount ) ) {
+			return false;
+		}
+
 		$num_decimals = apply_filters( 'woocommerce_dynamic_pricing_get_decimals', (int) get_option( 'woocommerce_price_num_decimals' ) );
 
 		switch ( $rule['type'] ) {
@@ -172,10 +173,23 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 			case 'percentage_discount':
 			case 'percent_product':
 				$amount = $amount / 100;
+				if ( $amount <= 1 ) {
+					$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
+				} else {
+					$result = round( ( floatval( $amount ) * $price ), (int) $num_decimals );
+				}
 
-				$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
 				break;
 			case 'fixed_price':
+				if ( isset( $cart_item['_gform_total'] ) ) {
+					$amount += floatval( $cart_item['_gform_total'] );
+				}
+
+				if ( isset( $cart_item['addons_price_before_calc'] ) ) {
+					$addons_total = $price - $cart_item['addons_price_before_calc'];
+					$amount       += $addons_total;
+				}
+
 				$result = round( $amount, (int) $num_decimals );
 				break;
 			default:
@@ -211,6 +225,19 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 								}
 							}
 						}
+					} elseif ( $condition['args']['applies_to'] == 'groups' && isset( $condition['args']['groups'] ) && is_array( $condition['args']['groups'] ) ) {
+						if ( is_user_logged_in() && class_exists( 'Groups_User' ) ) {
+							$groups_user = new Groups_User( get_current_user_id() );
+							foreach ( $condition['args']['groups'] as $group ) {
+								$current_group = Groups_Group::read( $group );
+								if ( $current_group ) {
+									if ( Groups_User_Group::read( $groups_user->user->ID, $current_group->group_id ) ) {
+										$result = 1;
+										break;
+									}
+								}
+							}
+						}
 					}
 				}
 				break;
@@ -222,6 +249,7 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 	}
 
 	public function get_discounted_price_for_shop( $_product, $working_price ) {
+		$fake_cart_item   = array( 'data' => $_product );
 		$price_adjusted   = false;
 		$applied_rule     = false;
 		$applied_rule_set = false;
@@ -231,24 +259,29 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 		if ( $rulesets && count( $rulesets ) ) {
 			foreach ( $rulesets as $set_id => $pricing_rule_set ) {
 				if ( ! isset( $pricing_rule_set['mode'] ) || ( isset( $pricing_rule_set['mode'] ) && $pricing_rule_set['mode'] != 'block' ) ) {
-					$process_discounts = apply_filters( 'woocommerce_dynamic_pricing_process_product_discounts', true, $_product, 'simple_category', $this, array( 'data' => $_product ) );
+					$process_discounts = apply_filters( 'woocommerce_dynamic_pricing_process_product_discounts', true, $_product, 'simple_category', $this, $fake_cart_item );
 					if ( $process_discounts ) {
+
+						//3.1.19 - make sure the item is in the collectors in addition to the targets.
+						$collectors = array_map( 'intval', $pricing_rule_set['collector']['args']['cats'] );
 						//Grab targets from advanced category discounts so we properly show 0 based discounts for targets, not for the collector category values. 
-						$cats_to_check = isset( $pricing_rule_set['targets'] ) ? array_map( 'intval', $pricing_rule_set['targets'] ) : $pricing_rule_set['collector']['args']['cats'][0];
-						if ( $this->is_applied_to_product( $_product, $cats_to_check ) ) {
+						$cats_to_check           = isset( $pricing_rule_set['targets'] ) ? array_map( 'intval', $pricing_rule_set['targets'] ) : array_map( 'intval', $pricing_rule_set['collector']['args']['cats'] );
+						$product_is_in_collector = count( array_intersect( $collectors, $cats_to_check ) ) > 0;
+						if ( $product_is_in_collector && $this->is_applied_to_product( $_product, $cats_to_check ) ) {
 							$rule = array_shift( $pricing_rule_set['rules'] );
 
-							if ( ! isset( $rule['from'] ) ) {
+							if ( ! isset( $rule['from'] ) || empty( $rule['from'] ) ) {
 								$rule['from'] = 0;
 							}
 
-							if ( $rule['from'] == '0' ) {
-								$temp = $this->get_adjusted_price( $rule, $working_price );
+							$show_pricing_in_shop = apply_filters( 'woocommerce_dynamic_pricing_show_adjustments_in_shop', ( $rule['from'] == '0' || $rule['from'] == '1' ), $rule, $_product );
+							if ( $show_pricing_in_shop ) {
+								$temp = $this->get_adjusted_price( $fake_cart_item, $rule, $working_price );
 
 								if ( ! $price_adjusted || $temp < $price_adjusted ) {
-									$price_adjusted   = $temp;
-									$applied_rule     = $rule;
-									$applied_rule_set = $pricing_rule_set;
+									$price_adjusted = $temp;
+
+									//return $price_adjusted;//Only process first rule, @since 3.1.7
 								}
 							}
 						}

@@ -5,11 +5,11 @@ Plugin URI: https://aelia.co/
 Description: Dynamic Pricing integration for Aelia Currency Switcher for WooCommerce
 Author: Aelia <support@aelia.co>
 Author URI: https://aelia.co
-Version: 1.0.4.181213
+Version: 1.0.5.190426
 Text Domain: wc-aelia-cs-dynamic-pricing-integration
 Domain Path: /languages
 WC requires at least: 2.6
-WC tested up to: 3.5.2
+WC tested up to: 3.6.2
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-cs-dynamic-pricing-requirementscheck.php');
@@ -17,9 +17,9 @@ require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-cs-dynamic-p
 if(Aelia_WC_CS_Dynamic_Pricing_RequirementsChecks::factory()->check_requirements()) {
 	require_once dirname(__FILE__) . '/src/plugin-main.php';
 
-	// Check for plugin updates (only when in Admin pages)
-	function wc_aelia_cs_dynamic_pricing_check_for_updates() {
-		$GLOBALS['wc-aelia-cs-dynamic-pricing-integration']->check_for_updates(__FILE__, 'aelia-currencyswitcher-dynamic-pricing-integration');
-	}
-	add_action('admin_init', 'wc_aelia_cs_dynamic_pricing_check_for_updates');
+	// Set the path and name of the main plugin file (i.e. this file), for update
+	// checks. This is needed because this is the main plugin file, but the updates
+	// will be checked from within plugin-main.php
+	// @since 1.0.5.190426
+	$GLOBALS['wc-aelia-cs-dynamic-pricing-integration']->set_main_plugin_file(__FILE__);
 }

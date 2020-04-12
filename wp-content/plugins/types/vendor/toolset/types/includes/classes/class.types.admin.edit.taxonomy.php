@@ -4,27 +4,14 @@ require_once WPCF_INC_ABSPATH . '/classes/class.types.admin.page.php';
 require_once WPCF_INC_ABSPATH.'/classes/class.types.admin.taxonomies.php';
 include_once WPCF_INC_ABSPATH.'/common-functions.php';
 
-/**
- * Summary.
- *
- * Description.
- *
- * @since x.x.x
- * @access (for functions: only use if private)
- *
- * @see Function/method/class relied on
- * @link URL
- * @global type $varname Description.
- * @global type $varname Description.
- *
- * @param type $var Description.
- * @param type $var Optional. Description.
- * @return type Description.
- */
 class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
 {
 
-    public function __construct()
+	/** @var Types_Admin_Taxonomies */
+	private $taxonomies;
+
+
+	public function __construct()
     {
         $this->taxonomies = new Types_Admin_Taxonomies();
     }
@@ -75,23 +62,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         add_action('wpcf_closedpostboxes', array($this, 'closedpostboxes'));
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     public function form()
     {
         $this->save();
@@ -100,7 +70,7 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
 	    //
 	    // This must be done after all post types and taxonomies are registered, and they can be registered properly
 	    // only on 'init'. So after making changes, we need to reload the page and THEN flush.
-	    if( '1' == wpcf_getget( 'flush', '0' ) ) {
+	    if( '1' == toolset_getget( 'flush', '0' ) ) {
 		    flush_rewrite_rules();
 	    }
 
@@ -302,23 +272,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         return wpcf_admin_common_only_show($form);
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     function box_submitdiv()
     {
         $form = array();
@@ -406,23 +359,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         echo $form->renderForm();
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     public function box_options()
     {
         $form = array();
@@ -512,14 +448,14 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
             '#title' => 'query_var',
             '#description' => __( 'Disable to prevent queries like "mysite.com/?taxonomy=example". Enable to use queries like "mysite.com/?taxonomy=example". Enable and set a value to use queries like "mysite.com/?query_var_value=example"', 'wpcf' ) . '<br />' . __( 'Default: true - set to $taxonomy.', 'wpcf' ),
             '#default_value' => !empty( $this->ct['query_var_enabled'] ),
-            '#after' => '<div id="wpcf-types-form-queryvar-toggle"' . $hidden . '><input type="text" name="ct[query_var]" value="' . $query_var . '" class="regular-text wpcf-form-textfield form-textfield textfield" /><div class="description wpcf-form-description wpcf-form-description-checkbox description-checkbox">' . __( 'Optional', 'wpcf' ) . '. ' . __( 'String to customize query var', 'wpcf' ) . '</div></div>',
+            '#after' => '<div id="wpcf-types-form-queryvar-toggle" ' . $hidden . '><input type="text" name="ct[query_var]" value="' . $query_var . '" class="regular-text wpcf-form-textfield form-textfield textfield" /><div class="description wpcf-form-description wpcf-form-description-checkbox description-checkbox">' . __( 'Optional', 'wpcf' ) . '. ' . __( 'String to customize query var', 'wpcf' ) . '</div></div>',
             '#inline' => true,
         );
         $form['update_count_callback'] = array(
             '#type' => 'textfield',
             '#name' => 'ct[update_count_callback]',
             '#title' => 'update_count_callback', 'wpcf',
-            '#description' => __( 'Function name that will be called to update the count of an associated $object_type, such as post, is updated.', 'wpcf' ) . '<br />' . __( 'Default: None.', 'wpcf' ),
+            '#description' => __( 'Custom function to set the taxonomies post count.', 'wpcf' ) . '<br />' . __( 'Default: None.', 'wpcf' ),
             '#value' => !empty( $this->ct['update_count_callback'] ) ? $this->ct['update_count_callback'] : '',
             '#inline' => true,
             '#attributes' => array(
@@ -527,14 +463,27 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
             ),
         );
 
-        $form['show_in_rest'] = array(
-            '#type' => 'checkbox',
-            '#name' => 'ct[show_in_rest]',
-            '#default_value' => !empty( $this->ct['show_in_rest'] ),
-            '#title' => __( 'show_in_rest', 'wpcf' ),
-            '#description' => __( 'Whether to expose this taxonomy in the REST API.', 'wpcf' ) . '<br />' . __( 'Default: false.', 'wpcf' ),
-            '#inline' => true,
-        );
+        $block_editor_available = new Toolset_Condition_Plugin_Gutenberg_Active();
+		if( $block_editor_available->is_met() ) {
+			// gutenberg active, in this case we have "show_in_rest" active by default, add an option to force disabling
+			$form['show_in_rest_force_disable'] = array(
+				'#type' => 'checkbox',
+				'#name' => 'ct[show_in_rest_force_disable]',
+				'#default_value' => !empty( $this->ct['show_in_rest_force_disable'] ),
+				'#title' => __( 'Disable show_in_rest', 'wpcf' ),
+				'#description' => __( 'IMPORTANT: The block editor requires "show_in_rest". Disabling it will no longer show the taxonomy on the block editor.', 'wpcf' ) . '<br />' . __( 'Default: false.', 'wpcf' ),
+				'#inline' => true,
+			);
+		} else {
+			$form['show_in_rest'] = array(
+				'#type' => 'checkbox',
+				'#name' => 'ct[show_in_rest]',
+				'#default_value' => !empty( $this->ct['show_in_rest'] ),
+				'#title' => __( 'show_in_rest', 'wpcf' ),
+				'#description' => __( 'Whether to expose this taxonomy in the REST API.', 'wpcf' ) . '<br />' . __( 'Default: false.', 'wpcf' ),
+				'#inline' => true,
+			);
+		}
 
         $form['rest_base'] = array(
             '#type' => 'textfield',
@@ -577,23 +526,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         echo $form->renderForm();
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     public function box_labels()
     {
         $labels = array(
@@ -691,36 +623,24 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         echo $form->renderForm();
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
-    public function box_post_types()
-    {
-        global $wpcf;
+    public function box_post_types() {
         $form = array();
         $post_types = get_post_types( '', 'objects' );
         $options = array();
 
         $supported = $this->taxonomies->get_post_types_supported_by_taxonomy($this->ct['slug']);
+        $excluded_post_types = new Toolset_Post_Type_Exclude_List();
 
         foreach ( $post_types as $post_type_slug => $post_type ) {
-            if ( in_array( $post_type_slug, $wpcf->excluded_post_types ) || !$post_type->show_ui ) {
+            if ( $excluded_post_types->is_excluded( $post_type_slug ) || !$post_type->show_ui ) {
                 continue;
             }
+
+            $post_type_helper = new Types_Post_Type_Helper( $post_type_slug );
+            if( $post_type_helper->has_special_purpose() ) {
+            	continue;
+            }
+
             $options[$post_type_slug] = array(
                 '#name' => 'ct[supports][' . $post_type_slug . ']',
                 '#title' => $post_type->labels->name,
@@ -748,23 +668,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         echo $form->renderForm();
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     public function box_taxonomy_type()
     {
         $form = array();
@@ -790,23 +693,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         echo $form->renderForm();
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     private function save()
     {
         if ( !isset( $_POST['ct'] ) ) {
@@ -874,7 +760,7 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
 
         // Check reserved name
         $reserved = wpcf_is_reserved_name( $tax, 'taxonomy' ) && !$tax_is_built_in;
-        if ( is_wp_error( $reserved ) ) {
+        if ( $reserved instanceof WP_Error ) {
             wpcf_admin_message( $reserved->get_error_message(), 'error' );
             return false;
         }
@@ -1039,23 +925,6 @@ class Types_Admin_Edit_Taxonomy extends Types_Admin_Page
         die();
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     public function closedpostboxes( $screen_base )
     {
         if ( 'toolset_page_wpcf-edit-tax' != $screen_base ) {

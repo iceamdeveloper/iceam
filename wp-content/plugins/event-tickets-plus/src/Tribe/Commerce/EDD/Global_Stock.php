@@ -105,13 +105,15 @@ class Tribe__Tickets_Plus__Commerce__EDD__Global_Stock {
 				continue;
 			}
 
+			$ticket_stock_mode = $tickets[ $product->ID ]->global_stock_mode();
+
 			// We only need to accumulate the stock quantities of tickets using *global* stock
-			if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE === $tickets[ $product->ID ]->global_stock_mode() ) {
+			if ( in_array( $ticket_stock_mode, [ Tribe__Tickets__Global_Stock::OWN_STOCK_MODE, '' ], true ) ) {
 				continue;
 			}
 
 			// This is also a great opportunity to test and see if ticket caps have been exceeded
-			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $tickets[ $product->ID ]->global_stock_mode() ) {
+			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket_stock_mode ) {
 
 				$ticket_capacity = tribe_tickets_get_capacity( $product->ID ) - $tickets[ $product->ID ]->qty_sold();
 

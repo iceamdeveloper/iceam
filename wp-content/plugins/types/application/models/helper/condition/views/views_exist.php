@@ -11,43 +11,52 @@ class Types_Helper_Condition_Views_Views_Exist extends Types_Helper_Condition_Vi
 
 	public function valid() {
 		// false if views not active
-		if( ! parent::valid() )
+		if ( ! parent::valid() ) {
 			return false;
+		}
 
 		global $wpdb;
 
 		$cpt = Types_Helper_Condition::get_post_type();
 
-		if( isset( self::$views_per_post_type[$cpt->name] ) )
+		if ( isset( self::$views_per_post_type[ $cpt->name ] ) ) {
 			return true;
+		}
 
-		// @todo check with Juan if views has a get_views_of_post_type() function
-		$views_settings = $wpdb->get_results( "SELECT meta_value, post_id FROM $wpdb->postmeta WHERE meta_key = '_wpv_settings'" );
+		// @todo use wpv_get_available_views API filter and optimize the performance here
+		// $available_views = toolset_ensarr( apply_filters( 'wpv_get_available_views', [] ) );
+		$views_settings = $wpdb->get_results(
+			"SELECT postmeta.meta_value, postmeta.post_id, post.post_title as title
+			FROM $wpdb->postmeta AS postmeta
+				JOIN $wpdb->posts AS post ON ( postmeta.post_id = post.ID )
+			WHERE postmeta.meta_key = '_wpv_settings'
+				AND post.post_status NOT IN ('draft', 'trash')"
+		);
 
-		foreach( $views_settings as $setting ) {
+		foreach ( $views_settings as $setting ) {
 			$setting->meta_value = unserialize( $setting->meta_value );
-			if( ! isset( $setting->meta_value['view-query-mode'] )
-			    || $setting->meta_value['view-query-mode'] != 'normal' ) {
+			if (
+				! isset( $setting->meta_value['view-query-mode'] )
+				|| $setting->meta_value['view-query-mode'] !== 'normal'
+			) {
 				// no "View"
 				continue;
 			}
 
-			if( isset( $setting->meta_value['post_type'] )
-			    && in_array( $cpt->name, $setting->meta_value['post_type'] ) ) {
-
-				if( get_post_status( $setting->post_id) == 'trash' )
-					continue;
-
-				$title = get_the_title( $setting->post_id );
-				self::$views_per_post_type[$cpt->name][] = array(
-					'id'    => $setting->post_id,
-					'name'  => $title
+			if (
+				isset( $setting->meta_value['post_type'] )
+				&& in_array( $cpt->name, $setting->meta_value['post_type'] )
+			) {
+				self::$views_per_post_type[ $cpt->name ][] = array(
+					'id' => $setting->post_id,
+					'name' => $setting->title,
 				);
 			}
 		}
 
-		if( isset( self::$views_per_post_type[$cpt->name] ) )
+		if ( isset( self::$views_per_post_type[ $cpt->name ] ) ) {
 			return true;
+		}
 
 		return false;
 	}
@@ -55,8 +64,9 @@ class Types_Helper_Condition_Views_Views_Exist extends Types_Helper_Condition_Vi
 	public static function get_views_of_post_type() {
 		$cpt = Types_Helper_Condition::get_post_type();
 
-		if( isset( self::$views_per_post_type[$cpt->name] ) )
-			return self::$views_per_post_type[$cpt->name];
+		if ( isset( self::$views_per_post_type[ $cpt->name ] ) ) {
+			return self::$views_per_post_type[ $cpt->name ];
+		}
 
 		return false;
 	}

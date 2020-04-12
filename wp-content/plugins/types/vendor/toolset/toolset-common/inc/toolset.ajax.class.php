@@ -3,35 +3,37 @@
 /**
  * Main AJAX call controller for Toolset.
  *
- * 
+ *
  * When DOING_AJAX, you need to run initialize() to register the callbacks, only creating an instance will not be enough.
  *
- * 
+ *
  * When implementing AJAX actions here, please follow these rules:
  *
  * 1.  All AJAX action names are automatically prefixed with 'wp_ajax_{$plugin_name}_'. Only lowercase characters
  *     and underscores can be used.
- * 
+ *
  *     $plugin_name is in this case 'toolset' but it may be different in subclasses.
- * 
+ *
  * 2.  Action names (without a prefix) should be defined as constants, and be part of array returned
  *     by get_callback_names().
- * 
- * 3.  For each action, there should be a dedicated class implementing the Toolset_Ajax_Handler_Interface. 
- * 
- *     Name of the class must be {$capitalized_plugin_name}_Ajax_Handler_{$capitalized_action_name}. 
- * 
- *     So for example, for a hook to 'wp_ajax_types_field_control_action' you need to create a class 
+ *
+ * 3.  For each action, there should be a dedicated class implementing the Toolset_Ajax_Handler_Interface.
+ *
+ *     Name of the class must be {$capitalized_plugin_name}_Ajax_Handler_{$capitalized_action_name}.
+ *
+ *     So for example, for a hook to 'wp_ajax_types_field_control_action' you need to create a class
  *     'Types_Ajax_Handler_Field_Control_Action'.
- * 
+ *
  * 4.  All callbacks must use the ajax_begin() and ajax_finish() methods.
- * 
- * 
+ *
+ *
  * When creating subclasses, you only need to do following:
- * 
+ *
  * - Override get_plugin_slug().
  * - Override get_callback_names().
  * - Override additional_ajax_init() if you need to.
+ *
+ * @refactoring Alternatively, allow namespace usage for handler classes (also considering subclasses of Toolset_Ajax).
  *
  * @since m2m
  */
@@ -45,6 +47,22 @@ class Toolset_Ajax {
 	const DELIMITER = '_';
 
 
+	const CALLBACK_MIGRATE_TO_M2M = 'migrate_to_m2m';
+	const CALLBACK_SELECT2_SUGGEST_POSTS_BY_TITLE = 'select2_suggest_posts_by_title';
+	const CALLBACK_SELECT2_SUGGEST_POSTS_BY_POST_TYPE = 'select2_suggest_posts_by_post_type';
+	const CALLBACK_SELECT2_SUGGEST_TERMS = 'select2_suggest_terms';
+	const CALLBACK_SELECT2_SUGGEST_USERS = 'select2_suggest_users';
+	const CALLBACK_GET_POST_BY_ID = 'get_post_by_id';
+	const CALLBACK_GET_TERM_BY_ID = 'get_term_by_id';
+	const CALLBACK_GET_USER_BY_ID = 'get_user_by_id';
+	const CALLBACK_GET_VIEW_BLOCK_PREVIEW = 'get_view_block_preview';
+	const CALLBACK_GET_CONTENT_TEMPLATE_BLOCK_PREVIEW = 'get_content_template_block_preview';
+	const CALLBACK_INTERMEDIARY_POST_CLEANUP = 'intermediary_post_cleanup';
+	const CALLBACK_CODE_SNIPPETS_ACTION = 'code_snippets_action';
+	const CALLBACK_GET_VIEW_CUSTOM_SEARCH_STATUS = 'get_view_custom_search_status';
+	const CALLBACK_CLEAR_POST_GUID_ID_CACHE = 'clear_post_guid_id_cache';
+
+	/** @var Toolset_Ajax */
 	private static $instance;
 
 
@@ -69,35 +87,15 @@ class Toolset_Ajax {
 		$instance->additional_ajax_init();
 	}
 
-
-	const CALLBACK_MIGRATE_TO_M2M = 'migrate_to_m2m';
-
-	const CALLBACK_SELECT2_SUGGEST_POSTS_BY_TITLE = 'select2_suggest_posts_by_title';
-
-	const CALLBACK_SELECT2_SUGGEST_POSTS_BY_POST_TYPE = 'select2_suggest_posts_by_post_type';
-
-	const CALLBACK_SELECT2_SUGGEST_TERMS = 'select2_suggest_terms';
-
-	const CALLBACK_SELECT2_SUGGEST_USERS = 'select2_suggest_users';
-
-	const CALLBACK_GET_POST_BY_ID = 'get_post_by_id';
-
-	const CALLBACK_GET_TERM_BY_ID = 'get_term_by_id';
-
-	const CALLBACK_GET_USER_BY_ID = 'get_user_by_id';
-	
-	const CALLBACK_GET_VIEW_BLOCK_PREVIEW = 'get_view_block_preview';
-	const CALLBACK_GET_CONTENT_TEMPLATE_BLOCK_PREVIEW = 'get_content_template_block_preview';
-
-	const CALLBACK_INTERMEDIARY_POST_CLEANUP = 'intermediary_post_cleanup';
-
-
 	protected function get_callback_names() {
 		return array(
 			self::CALLBACK_MIGRATE_TO_M2M,
 			self::CALLBACK_INTERMEDIARY_POST_CLEANUP,
 			self::CALLBACK_GET_VIEW_BLOCK_PREVIEW,
 			self::CALLBACK_GET_CONTENT_TEMPLATE_BLOCK_PREVIEW,
+			self::CALLBACK_CODE_SNIPPETS_ACTION,
+			self::CALLBACK_GET_VIEW_CUSTOM_SEARCH_STATUS,
+			self::CALLBACK_CLEAR_POST_GUID_ID_CACHE,
 		);
 	}
 
@@ -111,6 +109,7 @@ class Toolset_Ajax {
 			self::CALLBACK_GET_POST_BY_ID,
 			self::CALLBACK_GET_TERM_BY_ID,
 			self::CALLBACK_GET_USER_BY_ID,
+			self::CALLBACK_GET_VIEW_CUSTOM_SEARCH_STATUS,
 		);
 	}
 
@@ -230,7 +229,20 @@ class Toolset_Ajax {
 
 		// Obtain an instance of the handler class.
 		try {
-			/** @var Toolset_Ajax_Handler_Interface $handler */
+			/** @var \OTGS\Toolset\Common\Auryn\Injector $dic */
+			$dic = apply_filters( 'toolset_dic', false );
+			// This is pretty important because $this may be a subclass of Toolset_Ajax, not Toolset_Ajax itself.
+			$dic->share( $this );
+			// If the handler doesn't override the constructor, it will have "Toolset_Ajax $ajax_manager" as the
+			// first parameter. But when the handler belongs to a plugin, we want to inject the plugin's AJAX manager
+			// and not the one from Toolset Common.
+			$handler = $dic->make( $class_name, array( ':ajax_manager' => $this ) );
+		} catch ( \OTGS\Toolset\Common\Auryn\InjectionException $injection_exception ) {
+			// For some reason, we're unable to instantiate the class with DIC. Use the old way, assuming
+			// the handler constructor is handling everything on its own.
+			//
+			// This happens mostly when the constructor contains other parameters than just the $ajax_manager, and
+			// these parameters have typehints or missing default values, which the DIC is unable to solve.
 			$handler = new $class_name( $this );
 		} catch ( Exception $e ) {
 			// The handler class could not have been instantiated, resign.
@@ -342,7 +354,21 @@ class Toolset_Ajax {
 	 *
 	 * @since 2.0
 	 */
-	public function ajax_finish( $response, $is_success = true ) {
+	public function ajax_finish( $response = array(), $is_success = true ) {
+
+		/**
+		 * toolset_before_ajax_finish
+		 *
+		 * Announce that an AJAX call in Toolset is about to be completed.
+		 *
+		 * @param string $action Name of the AJAX action.
+		 * @param array $response Custom response data.
+		 * @param bool $is_success Indication of success or failure.
+		 *
+		 * @since Types 3.3
+		 */
+		do_action( 'toolset_before_ajax_finish', toolset_getarr( $_REQUEST, 'action' ), $response, $is_success );
+
 		if ( $is_success ) {
 			wp_send_json_success( $response );
 		} else {
@@ -352,10 +378,10 @@ class Toolset_Ajax {
 
 
 	/**
-	 * Handles all initialization of except AJAX callbacks itself that is needed when
-	 * we're DOING_AJAX.
+	 * Handles all initialization that is needed when doing AJAX,
+	 * except the actual AJAX callbacks.
 	 *
-	 * Since this is executed on every AJAX call, make sure it's as lightweight as possible.
+	 * Note that this gets fired when the class is intialized, not only during AJAX calls.
 	 *
 	 * @since m2m
 	 */

@@ -9,7 +9,7 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.3
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
  *
@@ -24,5 +24,13 @@
 	class="tribe-events-c-small-cta__link tribe-common-cta tribe-common-cta--thin-alt"
 	data-js="tribe-events-pro-map-event-actions-link-details"
 >
-	<?php esc_html_e( 'Event Details', 'tribe-events-calendar-pro' ); ?>
+	<?php
+	echo esc_html(
+		sprintf(
+			/* translators: %s: Event (singular) */
+			__( '%s Details', 'tribe-events-calendar-pro' ),
+			tribe_get_event_label_singular()
+		)
+	);
+	?>
 </a>

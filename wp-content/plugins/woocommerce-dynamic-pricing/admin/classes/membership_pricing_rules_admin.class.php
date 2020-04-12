@@ -17,13 +17,13 @@ class woocommerce_membership_pricing_rules_admin {
 			<?php settings_errors(); ?>
             <form method="post" action="options.php">
 				<?php settings_fields( '_s_membership_pricing_rules' ); ?>
-				<?php $pricing_rules = get_option( '_s_membership_pricing_rules' ); ?>
+                    <?php $pricing_rules = get_option( '_s_membership_pricing_rules' ); ?>
 
                 <table class="widefat">
                     <thead>
                     <th><?php _e( 'Enabled', 'woocommerce-dynamic-pricing' ); ?></th>
                     <th>
-						<?php _e( 'Role', 'woocommerce-dynamic-pricing' ); ?>Role
+						<?php _e( 'Role', 'woocommerce-dynamic-pricing' ); ?>
                     </th>
                     <th>
 						<?php _e( 'Type', 'woocommerce-dynamic-pricing' ); ?>

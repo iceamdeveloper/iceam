@@ -1106,8 +1106,8 @@ class Enlimbo_Forms_Wpcf
     /**
      * Searches and returns submitted data for element.
      * 
-     * @param type $element
-     * @return type mixed
+     * @param array $element
+     * @return string|int
      */
     public function getSubmittedData( $element )
     {
@@ -1116,8 +1116,9 @@ class Enlimbo_Forms_Wpcf
             if ( $element['#type'] == 'file' ) {
                 return $_FILES[$name]['tmp_name'];
             }
-            return isset( $_REQUEST[$name] ) ? sanitize_text_field( $_REQUEST[$name] ) : in_array( $element['#type'],
-                            array('textfield', 'textarea') ) ? '' : 0;
+            return isset( $_REQUEST[$name] )
+				? sanitize_text_field( $_REQUEST[$name] )
+				: ( in_array( $element['#type'], array('textfield', 'textarea') ) ? '' : 0 );
         }
 
         if ( !function_exists('getSubmittedDataTrim')) {

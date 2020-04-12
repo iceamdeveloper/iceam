@@ -1,17 +1,22 @@
 <?php
 /**
- * WooThemes Sensei Uninstall
+ * Sensei Uninstall.
  *
  * Uninstalls the plugin and associated data.
  *
- * @package WordPress
- * @subpackage Sensei
- * @category Core
- * @author WooThemes
+ * @package sensei-compat
+ * @since   1.0.0
+ */
+
+if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
+	exit();
+}
+
+require_once __DIR__ . '/plugins/sensei-lms/uninstall.php';
+
+/**
+ * Runs when the compatibility plugin is uninstalled.
+ *
  * @since 1.0.0
  */
-if( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) exit();
-
-$token = 'woothemes-sensei';
-delete_option( 'skip_install_sensei_pages' );
-delete_option( 'sensei_installed' );
+do_action( 'sensei_compat_plugin_uninstall' );

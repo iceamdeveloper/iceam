@@ -76,7 +76,12 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 				</div>
 				<div class="welcome-panel-column welcome-panel-middle">
 					<h3>
-						<?php esc_html_e( 'Sales by Ticket Type', 'event-tickets-plus' ); ?>
+						<?php
+						echo esc_html( sprintf(
+							__( 'Sales by %s Type', 'event-tickets-plus' ),
+							tribe_get_ticket_label_singular( 'woo_orders' )
+						) );
+						?>
 						<?php echo $order_overview->get_sale_by_ticket_tooltip(); ?>
 					</h3>
 					<?php
@@ -103,7 +108,7 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 							$completed_status = $order_overview->get_completed_status_class();
 							$totals_header = sprintf(
 								'%1$s: %2$s (%3$s)',
-								__( 'Total Ticket Sales', 'event-tickets-plus' ),
+								sprintf( __( 'Total %s Sales', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'woo_orders' ) ),
 								tribe_format_currency( number_format( $completed_status->get_line_total(), 2 ), $event_id ),
 								$completed_status->get_qty()
 							);
@@ -116,7 +121,7 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 							<?php
 							$totals_header = sprintf(
 								'%1$s: %2$s (%3$s)',
-								__( 'Total Tickets Ordered', 'event-tickets-plus' ),
+								sprintf( __( 'Total %s Ordered', 'event-tickets-plus' ), tribe_get_ticket_label_plural( 'woo_orders' ) ),
 								tribe_format_currency( number_format( $order_overview->get_line_total(), 2 ), $event_id ),
 								$order_overview->get_qty()
 							);

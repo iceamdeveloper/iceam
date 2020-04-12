@@ -1,4 +1,118 @@
 *** Dynamic Pricing Changelog ***
+2020.04.08 - version 3.1.19
+    * Update:  Only show adjustments in the shop for advanced category rules when the product is in both the categories to count as well as the categories to adjust.
+
+2020.03.30 - version 3.1.18
+        * Fix:  Correct issue with discounts being show in the shop when minimum quantity was not reached.
+
+2020.03.30 - version 3.1.17
+    * Fix:  Correct issue with discounts being show in the shop when minimum quantity was not reached.
+
+2020.03.27 - version 3.1.16
+    * New: New filter to disable applying pricing rules in the shop when the quantity is 0, or 1.  Basically the adjustment will only show up in the cart.
+        add_filter('woocommerce_dynamic_pricing_show_adjustments_in_shop', '__return_false');
+    * Update:  Allow 0 based fixed prices to set the price of the product in the shop.
+    * Update:  New filters to allow for custom taxonomy modules for processing.  Used specifically for variation attribute targeting.
+
+2019.07.23 - version 3.1.15
+    * Fix:  Fix issue when applying special offer discounts to specific variations based on variation quantity count.
+    * Update:  Added the ability to add a percentage greater than 100 in the order total module to add a percentage up-charge.
+    * Fix:  Fix issue in 3.1.14 where apache was throwing headers already sent errors due to a space before the opening <?php tag
+
+2019.07.22 - version 3.1.14
+    * Update:  Modify plugin url to allow for symlinks.
+    * Update:  Update Membership Plan selector to the enhanced WC select box.
+    * Update:  Allow percent increases for product prices for simple rules.
+    * Update:  Add woocommerce_dynamic_pricing_get_rule_amount to the simple groups module.
+    * Update:  Modify rules so that rules which are based on quantity of 1 will show in the store before adding to the cart.
+
+2019.01.07 - version 3.1.13
+    * Fix:  Fix issue where rules were being loaded for roles other than the logged on users role.
+
+2019.01.03 - version 3.1.12
+    * Fix:  Fix issue where discounted prices were being shown when in an invalid state.
+
+2019.01.02 - version 3.1.11
+    * Update:  Fix date ranges so they are localized to the WordPress time.
+    * Update:  Update date range calculation to be inclusive.  Sales start at 00:00:01 and end at 23:59:59 on the selected dates.
+    * Update:  Modify some labels to maintain consistency.
+    * Update:  If cart item has deposits set, return the price being requested so deposit prices are not filtered twice.
+    * Update:  Add WooCommerce Product Options totals back onto products with Fixed Price adjustments.
+
+2018.10.23 - version 3.1.10
+    * Update:  Check for null cart items in sorting function.  Should never happen unless a plugin or theme is incorrectly loading the cart.
+    * Update:  Tested to WC 3.5
+
+2018.10.08 - version 3.1.9
+    * New:  Included a new collector module to allow inclusive ( AND ) for advanced category rules.  Since this is a unusual use case a filter is needed to enable.
+        -- add_filter('wc_dynamic_pricing_get_collector_object', function($collector, $type) { return 'WC_Dynamic_Pricing_Collector_Category_Inclusive'; }, 10, 2);
+    * Fix:  Include check that categories have been selected before attempting count.
+
+2018.09.18 - version 3.1.8
+    * Update:  Added an argument to the quantity collector filter, which now passes in the rule set.
+    * Update:  Properly sort cart items for discounting in ascending order.
+    * Update:  Use multiselect fields instead of checkboxes in Advanced Category Rules.
+    * Update:  Use multiselect fields instead of checkboxes in Advanced Product Rules.
+    * Update:  Use multiselect fields instead of checkboxes in Order Total Pricing.
+    * Update:  Use variation names instead of variation ID's only in Advanced Product Rules.
+    * Fix: Fix issue with the woocommerce_dynamic_pricing_count_categories_for_cart_item filter where the wrong cart item was being passed.
+
+2018.08.03 - version 3.1.7
+    * Update: Include 0 based pricing for advanced category rules when using Groups.
+    * Fix:  Fix issue where Mix and Match product children product titles were incorrectly being set to the parent name.
+    * New:  Allow WooCommerce Memberships to be used for advanced pricing rules, "Applies To".
+    * Fix:  Double check a variations parent exists before getting it's categories.
+
+2018.04.25 - version 3.1.6
+    * Fix:  Fix issue where prices were not discounted in the shop for Variable Subscription products.
+    * Update:  Add filter to disable cumulative simple rules.  add_filter('woocommerce_dynamic_pricing_is_cumulative', '__return_false');
+    * Update:  Skip cached prices when $force_calculation is passed into on_get_price();
+    * Update:  Don't preform tax calculations on fixed price adjustments, WooCommerce already does the calculations for us.
+
+2018.02.09 - version 3.1.5
+    * Fix:  Non repeating advanced product special offer rules calculations when the Receive quantity is larger than the cart item quantity.
+    * Update:  Check cart exists in context tracker before use.
+    * Fix:  Fix issue with mini cart again for WC 3.3.1
+
+2018.02.01 - version 3.1.4
+    * Fix:  Fix category counter for WC < 3.0
+    * Fix:  Check for a valid cart item in the counter before counting categories.
+    * Fix:  Fix Advanced Category Rules where decimal separator is a comma.
+    * Update: Update tested to WC 3.3.0, WP 4.9.2, copy @ 2018
+
+2017.11.22 - version 3.1.3
+    * Fix:  Check product exists before attempting to load pricing rules.
+    * Update:  Added filter, wc_dynamic_pricing_flag_is_on_sale, to indicate if the extension should flag adjusted products as on sale.
+                default is true.
+    * Update:  Added filter, wc_dynamic_pricing_check_coupons, to determine if Dynamic Pricing should check coupons excluding sale items for discounts.
+                default is true.
+    * Update:  Add full ability to use custom taxonomies as discount types.
+    * Fix:  Fix custom taxonomy counting for all custom taxonomies, including Product Brands.
+    * Fix:  Added compatibility with WC 3.2.4, 3.2.5
+
+
+2017.10.24 - version 3.1.2
+    * Fix: Fix mini-cart refresh since WC 3.2
+
+2017.10.03 - version 3.1.1
+    * Fix:  Fix issue where Special Offer rules were not set as valid for valid users.
+    * Update:  Added .pot files for translators
+
+2017.08.29 - version 3.1.0
+    * Update:  No longer need to force re-calculate totals on session loaded, fixes issues with VAT Number Extension.
+
+2017.07.24 - version 3.0.12
+    * Update:  Update woocommerce_dynamic_pricing_process_product_discounts in advanced totals with correct parameters.
+
+2017.07.18 - version 3.0.11
+    * Fix:  Fix integration with Product Bundles.  Important Update
+
+2017.07.17 - version 3.0.10
+    * Fix:  Fix deprecated warning for $coupon->exclude_sale_items();
+    * Fix:  Fix issue where advanced category discounts would not accept 1% as the discount amount.
+    * Fix:  Fix issue where bundled products not priced individually would have rules applied when part of a bundle.
+    * Fix:  Add woocommerce_dynamic_pricing_process_product_discounts filter to special offer advanced category discount rules.
+
 2017.06.08 - version 3.0.9
     * Update:  Cache loaded product rules for performance improvements.
     * Update:  Update text domain to woocommerce-dynamic-pricing.

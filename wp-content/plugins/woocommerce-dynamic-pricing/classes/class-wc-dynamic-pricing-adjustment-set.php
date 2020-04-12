@@ -23,6 +23,8 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 
 			$this->pricing_rules = $set_data['rules'];
 		}
+
+
 	}
 
 	public function is_targeted_product( $product_id, $variation_id = false ) {
@@ -72,7 +74,7 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 				$conditions_met += $result;
 			}
 
-
+			$execute_rules = false;
 			if ( $this->set_data['conditions_type'] == 'all' ) {
 				$execute_rules = $conditions_met == count( $pricing_conditions );
 			} elseif ( $this->set_data['conditions_type'] == 'any' ) {
@@ -83,20 +85,9 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 			$execute_rules = true;
 		}
 
-		if ( isset( $this->set_data['date_from'] ) && isset( $this->set_data['date_to'] ) ) {
+		if ( $execute_rules && ( isset( $this->set_data['date_from'] ) || isset( $this->set_data['date_to'] ) ) ) {
 			// Check date range
-
-			$from_date = empty( $this->set_data['date_from'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $this->set_data['date_from'] ), false ) );
-			$to_date   = empty( $this->set_data['date_to'] ) ? false : strtotime( date_i18n( 'Y-m-d 00:00:00', strtotime( $this->set_data['date_to'] ), false ) );
-			$now       = current_time( 'timestamp' );
-
-			if ( $from_date && $to_date && ! ( $now >= $from_date && $now <= $to_date ) ) {
-				$execute_rules = false;
-			} elseif ( $from_date && ! $to_date && ! ( $now >= $from_date ) ) {
-				$execute_rules = false;
-			} elseif ( $to_date && ! $from_date && ! ( $now <= $to_date ) ) {
-				$execute_rules = false;
-			}
+			$execute_rules = wc_dynamic_pricing_is_within_date_range( $this->set_data['date_from'], $this->set_data['date_to'] );
 		}
 
 		return $execute_rules;
@@ -104,6 +95,13 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 
 	public function get_collector() {
 		return $this->set_data['collector'];
+	}
+
+	/**
+	 * @return WC_Dynamic_Pricing_Collector
+	 */
+	public function get_collector_object() {
+		return new WC_Dynamic_Pricing_Collector( $this->set_data['collector'] );
 	}
 
 }

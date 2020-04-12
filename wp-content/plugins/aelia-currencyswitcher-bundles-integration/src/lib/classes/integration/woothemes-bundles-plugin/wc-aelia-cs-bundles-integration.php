@@ -131,7 +131,8 @@ class Bundles_Integration {
 
 		// Ensure that bundled cart items have the correct price
 		// @since 1.0.3.160326
-		add_filter('woocommerce_add_cart_item', array( $this, 'woocommerce_add_cart_item'), 20, 2);
+		add_filter('woocommerce_add_cart_item', array( $this, 'woocommerce_add_cart_item'), 50, 2);
+		add_filter('woocommerce_get_cart_item_from_session', array( $this, 'woocommerce_get_cart_item_from_session'), 50, 1);
 
 		// Admin UI
 		// TODO Implement Admin UI for Bundles 4.x
@@ -181,25 +182,6 @@ class Bundles_Integration {
 	}
 
 	/**
-	 * Converts all the prices of a given product in the currently selected
-	 * currency.
-	 *
-	 * @param WC_Product product The product whose prices should be converted.
-	 * @return WC_Product
-	 */
-	protected function convert_product_prices($product) {
-		$selected_currency = self::selected_currency();
-		$base_currency = self::base_currency();
-
-		if(empty($product->currency) || ($product->currency != $selected_currency)) {
-			$product = self::currencyprices_manager()->convert_product_prices($product, $selected_currency);
-			$product->currency = $selected_currency;
-		}
-
-		return $product;
-	}
-
-	/**
 	 * Callback to perform the conversion of bundle prices into selected currencu.
 	 *
 	 * @param callable $convert_callback A callable, or null.
@@ -212,7 +194,7 @@ class Bundles_Integration {
 		);
 
 		// Determine the conversion method to use
-		$method_key = get_value(get_class($product), $method_keys, '');
+		$method_key = isset($method_keys[get_class($product)]) ? $method_keys[get_class($product)] : '';
 		$convert_method = 'convert_' . $method_key . '_product_prices';
 
 		if(!method_exists($this, $convert_method)) {
@@ -379,15 +361,30 @@ class Bundles_Integration {
 		}
 
 		//// Debug
-		//var_dump(
-		//	$bundle_base_regular_prices_in_currency,
-		//	"BASE CURRENCY $product_base_currency",
-		//	"BASE REGULAR PRICE {$product->base_regular_price}",
-		//	"BASE SALE PRICE {$product->base_sale_price}",
-		//	"BASE PRICE {$product->base_price}"
-		//);
+		// var_dump(
+		// 	$bundle_base_regular_prices_in_currency,
+		// 	"BASE CURRENCY $product_base_currency",
+		// 	"BASE REGULAR PRICE {$product->base_regular_price}",
+		// 	"BASE SALE PRICE {$product->base_sale_price}",
+		// 	"BASE PRICE {$product->base_price}"
+		// );die();
 
 		return $product;
+	}
+
+	/**
+	 * Indicates if a product requires conversion.
+	 *
+	 * @param WC_Product product The product to process.
+	 * @param string currency The target currency for which product prices will
+	 * be requested.
+	 * @return bool
+	 * @since 1.2.5.200205
+	 */
+	protected function product_requires_conversion($product, $currency) {
+		// If the product is already in the target currency, it doesn't require
+		// conversion
+		return empty($product->currency) || ($product->currency != $currency);
 	}
 
 	/**
@@ -398,12 +395,18 @@ class Bundles_Integration {
 	 * @return WC_Product_Bundle The product with converted prices.
 	 */
 	public function convert_bundle_product_prices(WC_Product_Bundle $product, $currency) {
+		// If the product doesn't require conversion, just return it
+		// @since 1.2.5.200205
+		// @link https://aelia.freshdesk.com/a/tickets/84184
+		if(!$this->product_requires_conversion($product, $currency)) {
+			return $product;
+		}
+
 		if($this->is_bundle_priced_individually($product)) {
 			$this->convert_bundle_base_prices($product, $currency);
 		}
 		else {
 			$product = self::currencyprices_manager()->convert_simple_product_prices($product, $currency);
-
 		}
 
 		return $product;
@@ -473,14 +476,13 @@ class Bundles_Integration {
 	}
 
 	/**
-	 * When a bundle is static-priced, the price of all bundled items is set to 0.
+	 * Sets the prices of a bundled item.
 	 *
-	 * @param array cart_item  Cart item data.
-	 * @param  string cart_key  Cart item key.
-	 * @return array The cart item data, with prices eventually set to zero.
-	 * @since 1.0.3.160326
+	 * @param array $cart_item
+	 * @return array
+	 * @since 1.2.4.190703
 	 */
-	public function woocommerce_add_cart_item($cart_item, $cart_key) {
+	protected function set_bundled_item_prices($cart_item) {
 		if($this->is_bundled_cart_item($cart_item)) {
 			if($bundle_container_item = $this->get_bundled_cart_item_container($cart_item)) {
 				$bundle = $bundle_container_item['data'];
@@ -491,9 +493,9 @@ class Bundles_Integration {
 				// zero (the parant bundle's price is what matters, in this case)
 				if($bundle->has_bundled_item($bundled_item_id) &&
 					 !$this->is_bundle_priced_individually($bundle)) {
-					$cart_item[ 'data' ]->regular_price = 0;
-					$cart_item[ 'data' ]->price = 0;
-					$cart_item[ 'data' ]->sale_price = '';
+					$cart_item['data']->regular_price = 0;
+					$cart_item['data']->price = 0;
+					$cart_item['data']->sale_price = '';
 				}
 			}
 		}
@@ -501,11 +503,37 @@ class Bundles_Integration {
 	}
 
 	/**
+	 * When a bundle is static-priced, sets the price of all bundled items to 0.
+	 *
+	 * @param array cart_item  Cart item data.
+	 * @param  string cart_key  Cart item key.
+	 * @return array The cart item data, with prices eventually set to zero.
+	 * @since 1.0.3.160326
+	 */
+	public function woocommerce_add_cart_item($cart_item, $cart_key) {
+		return $this->set_bundled_item_prices($cart_item);
+	}
+
+	/**
+	 * Updates the price of a bundled item after it's loaded from the cart
+	 * session. When a bundle is static-priced, sets the price of all bundled items to 0.
+	 *
+	 * @param array cart_item Cart item data.
+	 * @return array The cart item data, with prices eventually set to zero.
+	 * @since 1.2.4.190703
+	 */
+	public function woocommerce_get_cart_item_from_session($cart_item) {
+		return $this->set_bundled_item_prices($cart_item);
+	}
+
+	/**
 	 * Converts the prices of a bundle after it has been synchronised with the
 	 * underlying data and bundled items.
+	 * Fixes issue reported at https://aelia.freshdesk.com/a/tickets/23218.
 	 *
 	 * @param WC_Bundle product A bundle product.
 	 * @since 1.1.0.161211
+	 * @link https://aelia.freshdesk.com/a/tickets/23218
 	 */
 	public function woocommerce_bundles_synced_bundle($product) {
 		$this->convert_bundle_product_prices($product, get_woocommerce_currency());

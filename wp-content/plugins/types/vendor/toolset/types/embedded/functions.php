@@ -1,4 +1,7 @@
 <?php
+// phpcs:disable
+// Legacy file! Remove this line only if feeling very brave.
+
 /*
  * Basic and init functions.
  * Since Types 1.2 moved from /embedded/types.php
@@ -61,6 +64,9 @@ function wpcf_get_file_relpath($file)
 
 /**
  * after_setup_theme hook.
+ *
+ * WARNING, this *does not* run during the after_setup_theme action but most probably earlier (called
+ * directly from the legacy bootstrap file). Too afraid to touch it at the moment.
  */
 function wpcf_embedded_after_setup_theme_hook()
 {
@@ -99,7 +105,7 @@ function wpcf_init_custom_types_taxonomies()
         require_once WPCF_EMBEDDED_INC_ABSPATH . '/custom-taxonomies.php';
         wpcf_custom_taxonomies_init();
     }
-	
+
     // register post types
 	$post_type_option = new Types_Utils_Post_Type_Option();
     $custom_types = $post_type_option->get_post_types();
@@ -313,8 +319,9 @@ function wpcf_compare_wp_version($version = '3.2.1', $operator = '>')
 /**
  * Gets post type with data to which belongs.
  *
- * @param type $post_type
- * @return type
+ * @param $post_type
+ * @return mixed
+ * @deprecated Since 2.3. Use toolset_get_related_post_types() instead.
  */
 function wpcf_pr_get_belongs($post_type)
 {
@@ -325,8 +332,10 @@ function wpcf_pr_get_belongs($post_type)
 /**
  * Gets all post types and data that owns.
  *
- * @param type $post_type
- * @return type
+ * @param $post_type
+ *
+ * @return array|false
+ * @deprecated Since 2.3. Use toolset_get_related_post_types() instead.
  */
 function wpcf_pr_get_has($post_type)
 {
@@ -337,9 +346,12 @@ function wpcf_pr_get_has($post_type)
 /**
  * Gets individual post ID to which queried post belongs.
  *
- * @param type $post_id
- * @param type $post_type Post Type of owner
- * @return type
+ * @param $post_id
+ * @param string $post_type Post Type of owner
+ *
+ * @return mixed
+ *
+ * @deprecated Since 2.3.
  */
 function wpcf_pr_post_get_belongs($post_id, $post_type)
 {
@@ -349,9 +361,12 @@ function wpcf_pr_post_get_belongs($post_id, $post_type)
 /**
  * Gets all posts that belong to queried post, grouped by post type.
  *
- * @param type $post_id
- * @param type $post_type
- * @return type
+ * @deprecated Since 2.3.
+ *
+ * @param $post_id
+ * @param null $post_type_q
+ *
+ * @return array|mixed
  */
 function wpcf_pr_post_get_has($post_id, $post_type_q = null)
 {
@@ -409,8 +424,16 @@ function wpcf_save_settings($settings)
  */
 function wpcf_admin_can_be_repetitive($type)
 {
-    return !in_array( $type,
-                    array('checkbox', 'checkboxes', 'wysiwyg', 'radio', 'select') );
+	// for post reference field
+	if( $type == 'post' ) {
+		$factory = new Types_Field_Type_Post_Factory();
+		$field = $factory->get_field();
+
+		return $field->is_repeatable();
+	}
+
+	// all other fields
+    return ! in_array( $type, array('checkbox', 'checkboxes', 'wysiwyg', 'radio', 'select' ) );
 }
 
 /**
@@ -512,7 +535,7 @@ function wpcf_enqueue_scripts()
 {
     if( !is_admin() )
         return;
-    
+
     if ( !wpcf_is_embedded() ) {
         /**
          * Basic JS
@@ -549,7 +572,7 @@ function wpcf_enqueue_scripts()
     wp_localize_script( 'wpcf-js-embedded', 'WPCF_basic', array(
         'field_already_in_use' => sprintf( __( '%s This field is locked because the same field is added multiple times to this post. %s%s%s you can set the value%s', 'wpcf' ),'<small style="display: block;">', '<a href="#" class="focus_correct_field" data-field-slug="##DATA-FIELD-ID##" >','Here', '</a>','</small>'),
     ));
-    
+
     /*
      *
      * Basic CSS
@@ -846,7 +869,7 @@ function wpcf_get_all_fields_slugs($fields)
 /**
  * Get buuild in taxonomies.
  *
- * This is a wrapper for WordPress get_taxonomies() function. It gets public 
+ * This is a wrapper for WordPress get_taxonomies() function. It gets public
  * build-in taxonomies.
  *
  * @since 1.9.0

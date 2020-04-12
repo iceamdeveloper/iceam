@@ -20,11 +20,12 @@ class WCS_Limiter {
 		add_action( 'woocommerce_product_options_advanced', __CLASS__ . '::admin_edit_product_fields' );
 
 		// Only attach limited subscription purchasability logic on the front end.
-		if ( ! is_admin() ) {
+		if ( wcs_is_frontend_request() ) {
 			add_filter( 'woocommerce_subscription_is_purchasable', __CLASS__ . '::is_purchasable_switch', 12, 2 );
 			add_filter( 'woocommerce_subscription_variation_is_purchasable', __CLASS__ . '::is_purchasable_switch', 12, 2 );
 			add_filter( 'woocommerce_subscription_is_purchasable', __CLASS__ . '::is_purchasable_renewal', 12, 2 );
 			add_filter( 'woocommerce_subscription_variation_is_purchasable', __CLASS__ . '::is_purchasable_renewal', 12, 2 );
+			add_filter( 'woocommerce_valid_order_statuses_for_order_again', array( __CLASS__, 'filter_order_again_statuses_for_limited_subscriptions' ) );
 		}
 	}
 
@@ -36,7 +37,7 @@ class WCS_Limiter {
 	public static function admin_edit_product_fields() {
 		global $post;
 
-		echo '<div class="options_group limit_subscription show_if_subscription show_if_variable-subscription">';
+		echo '<div class="options_group limit_subscription show_if_subscription show_if_variable-subscription hidden">';
 
 		// Only one Subscription per customer
 		woocommerce_wp_select( array(
@@ -270,4 +271,45 @@ class WCS_Limiter {
 		return self::$order_awaiting_payment_for_product[ $product_id ];
 	}
 
+	/**
+	 * Filters the order statuses that enable the order again button and functionality.
+	 *
+	 * This function will return no statuses if the order contains non purchasable or limited products.
+	 *
+	 * @since 3.0.2
+	 *
+	 * @param array $statuses The order statuses that enable the order again button.
+	 * @return array $statuses An empty array if the order contains limited products, otherwise the default statuses are returned.
+	 */
+	public static function filter_order_again_statuses_for_limited_subscriptions( $statuses ) {
+		global $wp;
+
+		if ( is_view_order_page() ) {
+			$order = wc_get_order( absint( $wp->query_vars['view-order'] ) );
+		} elseif ( is_order_received_page() ) {
+			$order = wc_get_order( absint( $wp->query_vars['order-received'] ) );
+		}
+
+		if ( empty( $order ) ) {
+			return $statuses;
+		}
+
+		$is_purchasable = true;
+
+		foreach ( $order->get_items() as $line_item ) {
+			$product = $line_item->get_product();
+
+			if ( WC_Subscriptions_Product::is_subscription( $product ) && wcs_is_product_limited_for_user( $product ) ) {
+				$is_purchasable = false;
+				break;
+			}
+		}
+
+		// If all products are purchasable, return the default statuses, otherwise return no statuses.
+		if ( $is_purchasable ) {
+			return $statuses;
+		} else {
+			return array();
+		}
+	}
 }

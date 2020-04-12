@@ -37,7 +37,7 @@ class Tribe__Tickets_Plus__Attendees_List {
 		// This will include before the RSVP
 		add_action( 'tribe_tickets_before_front_end_ticket_form', array( $myself, 'render' ), 4 );
 
-		// Unhook Event Ticket's "View your RSVPs" rendering logic so that we can re-render with ET+'s "Who's attending?" list.
+		// Unhook Event Ticket's "View your RSVP's" rendering logic so that we can re-render with ET+'s "Who's attending?" list.
 		add_action( 'init', array( $myself, 'unhook_event_tickets_order_link_logic' ) );
 
 		// Add the Admin Option for removing the Attendees List

@@ -35,7 +35,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	public function __construct() {
 		add_action( 'woocommerce_check_cart_items', array( $this, 'cart_check_stock' ) );
 		add_action( 'woocommerce_reduce_order_stock', array( $this, 'stock_equalize' ) );
-		add_action( 'wootickets_ticket_deleted', array( $this, 'increase_global_stock_on_delete' ), 10, 3 );
+
+		/*
+		 * This currently causes a fatal error because it needs a ticket object but the ticket has already been deleted.
+		 *
+		 * See [GTRIA-77] for more details. This ticket was created to follow up on the temporary workaround.
+		 */
+		//add_action( 'wootickets_ticket_deleted', array( $this, 'increase_global_stock_on_delete' ), 10, 3 );
 	}
 
 	/**
@@ -126,15 +132,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 				continue;
 			}
 
-			$mode = $ticket->global_stock_mode();
+			$ticket_stock_mode = $ticket->global_stock_mode();
 
 			// We only need to accumulate the stock quantities of tickets using *global* stock
-			if ( Tribe__Tickets__Global_Stock::OWN_STOCK_MODE === $mode ) {
+			if ( in_array( $ticket_stock_mode, [ Tribe__Tickets__Global_Stock::OWN_STOCK_MODE, '' ], true ) ) {
 				continue;
 			}
 
 			// Make sure ticket caps haven't been exceeded
-			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $mode ) {
+			if ( Tribe__Tickets__Global_Stock::CAPPED_STOCK_MODE === $ticket_stock_mode ) {
 				if ( $current[ $product_id ] > $ticket->capacity() ) {
 					$this->cart_flag_capped_stock_error( $product_id );
 				}
@@ -324,7 +330,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	 * @param int $product_id the ticket-product id in WooCommerce
 	 */
 	public function increase_global_stock_on_delete( $ticket_id, $post_id, $product_id ) {
-
 		$ticket  = tribe( 'tickets-plus.commerce.woo' )->get_ticket( $post_id, $product_id );
 
 		$this->maybe_increase_global_stock( $post_id, $product_id, $ticket );

@@ -450,7 +450,7 @@ class WCS_Admin_Post_Types {
 		switch ( $column ) {
 			case 'status' :
 				// The status label
-				$column_content = sprintf( '<mark class="%s tips" data-tip="%s">%s</mark>', sanitize_title( $the_subscription->get_status() ), wcs_get_subscription_status_name( $the_subscription->get_status() ), wcs_get_subscription_status_name( $the_subscription->get_status() ) );
+				$column_content = sprintf( '<mark class="subscription-status order-status status-%1$s %1$s tips" data-tip="%2$s"><span>%3$s</span></mark>', sanitize_title( $the_subscription->get_status() ), wcs_get_subscription_status_name( $the_subscription->get_status() ), wcs_get_subscription_status_name( $the_subscription->get_status() ) );
 
 				$post_type_object = get_post_type_object( $post->post_type );
 
@@ -538,7 +538,7 @@ class WCS_Admin_Post_Types {
 				}
 
 				if ( ! empty( $customer_tip ) ) {
-					echo '<div class="tips" data-tip="' . esc_attr( $customer_tip ) . '">';
+					echo '<div class="tips" data-tip="' . wc_sanitize_tooltip( $customer_tip ) . '">'; // XSS ok.
 				}
 
 				// This is to stop PHP from complaining
@@ -596,9 +596,15 @@ class WCS_Admin_Post_Types {
 
 			case 'recurring_total' :
 				$column_content .= esc_html( strip_tags( $the_subscription->get_formatted_order_total() ) );
-
+				$column_content .= '<small class="meta">';
 				// translators: placeholder is the display name of a payment gateway a subscription was paid by
-				$column_content .= '<small class="meta">' . esc_html( sprintf( __( 'Via %s', 'woocommerce-subscriptions' ), $the_subscription->get_payment_method_to_display() ) ) . '</small>';
+				$column_content .= esc_html( sprintf( __( 'Via %s', 'woocommerce-subscriptions' ), $the_subscription->get_payment_method_to_display() ) );
+
+				if ( WC_Subscriptions::is_duplicate_site() && $the_subscription->has_payment_gateway() && ! $the_subscription->get_requires_manual_renewal() ) {
+					$column_content .= WCS_Staging::get_payment_method_tooltip( $the_subscription );
+				}
+
+				$column_content .= '</small>';
 				break;
 
 			case 'start_date':
@@ -1072,7 +1078,7 @@ class WCS_Admin_Post_Types {
 		$item_html .= wp_kses( $item_name, array( 'a' => array( 'href' => array() ) ) );
 
 		if ( $item_meta_html ) {
-			$item_html .= wcs_help_tip( $item_meta_html );
+			$item_html .= wcs_help_tip( $item_meta_html, true );
 		}
 
 		$item_html .= '</div>';
@@ -1100,7 +1106,7 @@ class WCS_Admin_Post_Types {
 				echo wp_kses( $item_name, array( 'a' => array( 'href' => array() ) ) );
 
 				if ( $item_meta_html ) {
-					echo wcs_help_tip( $item_meta_html );
+					echo wcs_help_tip( $item_meta_html, true );
 				} ?>
 			</td>
 		</tr>

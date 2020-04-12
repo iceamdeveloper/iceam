@@ -57,7 +57,7 @@ class Toolset_User_Editors_Medium_Screen_Content_Template_Frontend
 			$views_settings	= WPV_Settings::get_instance();
 			$wpv_options	= $views_settings->get();
 			$term = $wp_query->get_queried_object();
-			if( array_key_exists( 'views_template_loop_' . $term->taxonomy, $wpv_options ) ) {
+			if( $term && array_key_exists( 'views_template_loop_' . $term->taxonomy, $wpv_options ) ) {
 				return $wpv_options['views_template_loop_' . $term->taxonomy];
 			}
 		}

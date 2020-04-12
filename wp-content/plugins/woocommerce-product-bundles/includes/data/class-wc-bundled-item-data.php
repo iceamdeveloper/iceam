@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Could be modified to extend WC_Data in the future. For now, all required functionality is self-contained to maintain WC back-compat.
  *
  * @class    WC_Bundled_Item_Data
- * @version  5.2.0
+ * @version  5.7.4
  */
 
 class WC_Bundled_Item_Data {
@@ -276,7 +276,9 @@ class WC_Bundled_Item_Data {
 	public function set_meta_data( $data ) {
 		if ( ! empty( $data ) && is_array( $data ) ) {
 			foreach ( $data as $key => $value ) {
-				$this->meta_data[ $key ] = $this->sanitize_meta_value( $value, $key );
+				if ( $this->has_meta_value( $value ) ) {
+					$this->meta_data[ $key ] = $this->sanitize_meta_value( $value, $key );
+				}
 			}
 		}
 	}
@@ -382,6 +384,20 @@ class WC_Bundled_Item_Data {
 
 		$this->save_meta_data();
 
+		if ( $this->get_bundle_id() ) {
+
+			// Clear WC_Bundled_Item_Data objects from cache.
+			$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_data_items' ) . $this->get_bundle_id();
+			wp_cache_delete( $cache_key, 'bundled_data_items' );
+
+			// Clear WC_Bundled_Item objects from cache.
+			WC_PB_Helpers::cache_invalidate( 'wc_bundled_item_' . $this->get_id() . '_' . $this->get_bundle_id() );
+
+		} else {
+
+			WC_PB_Core_Compatibility::invalidate_cache_group( 'bundled_data_items' );
+		}
+
 		return $this->get_id();
 	}
 
@@ -439,7 +455,11 @@ class WC_Bundled_Item_Data {
 	 * @param  string  $value
 	 */
 	public function update_meta( $key, $value ) {
-		$this->meta_data[ $key ] = $this->sanitize_meta_value( $value, $key );
+		if ( is_null( $value ) ) {
+			$this->delete_meta( $key );
+		} else {
+			$this->meta_data[ $key ] = $this->sanitize_meta_value( $value, $key );
+		}
 	}
 
 	/**
@@ -452,7 +472,7 @@ class WC_Bundled_Item_Data {
 	}
 
 	/**
-	 * Read Meta Data from the database.
+	 * Read meta data from the database.
 	 */
 	protected function read_meta_data() {
 
@@ -463,8 +483,9 @@ class WC_Bundled_Item_Data {
 			return;
 		}
 
-		$cache_key   = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
-		$cached_meta = ! defined( 'WC_PB_DEBUG_OBJECT_CACHE' ) ? wp_cache_get( $cache_key, 'bundled_item_meta' ) : false;
+		$use_cache   = ! defined( 'WC_PB_DEBUG_OBJECT_CACHE' ) && $this->get_id() && $this->get_bundle_id();
+		$cache_key   = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
+		$cached_meta = $use_cache ? wp_cache_get( $cache_key, 'bundled_item_meta' ) : false;
 
 		if ( false !== $cached_meta ) {
 			$this->meta_data = $cached_meta;
@@ -480,10 +501,15 @@ class WC_Bundled_Item_Data {
 			", $this->get_id() ) );
 
 			foreach ( $raw_meta_data as $meta ) {
-				$this->meta_data[ $meta->meta_key ] = $this->sanitize_meta_value( $meta->meta_value, $meta->meta_key ) ;
+				if ( defined( 'WC_PB_DEBUG_STOCK_SYNC' ) && 'stock_status' === $meta->meta_key ) {
+					continue;
+				}
+				$this->meta_data[ $meta->meta_key ] = $this->sanitize_meta_value( $meta->meta_value, $meta->meta_key );
 			}
 
-			wp_cache_set( $cache_key, $this->meta_data, 'bundled_item_meta' );
+			if ( $use_cache ) {
+				wp_cache_set( $cache_key, $this->meta_data, 'bundled_item_meta' );
+			}
 		}
 	}
 
@@ -502,8 +528,20 @@ class WC_Bundled_Item_Data {
 
 		$updated_meta_keys = array();
 
-		// Update or delete meta from the db depending on their presence.
+		// Update or delete meta from the db.
 		if ( ! empty( $raw_meta_data ) ) {
+
+			// Min quantity changed? Invalidate stock status.
+			foreach ( $raw_meta_data as $meta ) {
+				if ( 'quantity_min' === $meta->meta_key ) {
+					if ( isset( $this->meta_data[ 'quantity_min' ] ) && absint( $meta->meta_value ) !== absint( $this->meta_data[ 'quantity_min' ] ) ) {
+						unset( $this->meta_data[ 'stock_status' ] );
+						unset( $this->meta_data[ 'max_stock' ] );
+					}
+				}
+			}
+
+			// Update or delete meta from the db depending on their presence.
 			foreach ( $raw_meta_data as $meta ) {
 				if ( isset( $this->meta_data[ $meta->meta_key ] ) && null !== $this->meta_data[ $meta->meta_key ] && ! in_array( $meta->meta_key, $updated_meta_keys ) ) {
 					update_metadata_by_mid( 'bundled_item', $meta->meta_id, $this->meta_data[ $meta->meta_key ], $meta->meta_key );
@@ -523,10 +561,9 @@ class WC_Bundled_Item_Data {
 			}
 		}
 
-		$cache_key = WC_PB_Core_Compatibility::wc_cache_helper_get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
+		// Clear meta cache.
+		$cache_key = WC_Cache_Helper::get_cache_prefix( 'bundled_item_meta' ) . $this->get_id();
 		wp_cache_delete( $cache_key, 'bundled_item_meta' );
-
-		WC_PB_Core_Compatibility::wc_cache_helper_incr_cache_prefix( 'bundled_data_items' );
 
 		$this->read_meta_data();
 	}

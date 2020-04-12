@@ -1,8 +1,8 @@
 === WooCommerce Dynamic Pricing ===
-Contributors: lcuasstark
+Contributors: lucasstark
 Tags: woocommerce, price
 Requires at least: 3.0
-Tested up to: 4.6.1
+Tested up to: 5.0.2
 
 WooCommerce Dynamic Pricing
 

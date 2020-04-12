@@ -1,5 +1,7 @@
 <?php
 
+use OTGS\Toolset\Common\Auryn\Injector;
+
 /**
  * Provide interoperability with other plugins or themes when needed.
  *
@@ -58,6 +60,24 @@ class Types_Interop_Mediator {
 				'is_needed' => array( $this, 'is_the7_active' ),
 				'class_name' => 'The7'
 			),
+			array(
+				'is_needed' => function() {
+					return function_exists( 'sg_cachepress_purge_cache' );
+				},
+				'init_callback' => function( Injector $dic ) {
+					$dic->make( '\OTGS\Toolset\Types\Controller\Interop\Handler\SiteGroundOptimizer' )
+						->initialize();
+				}
+			),
+			array(
+				'is_needed' => function() {
+					return defined( 'LITESPEED_ON' );
+				},
+				'init_callback' => function( Injector $dic ) {
+					$dic->make( '\OTGS\Toolset\Types\Controller\Interop\Handler\LiteSpeedCache' )
+						->initialize();
+				}
+			)
 		);
 
 		return $interop_handlers;
@@ -84,8 +104,14 @@ class Types_Interop_Mediator {
 			$is_needed = call_user_func( $handler_definition['is_needed'] );
 
 			if ( $is_needed ) {
-				$handler_class_name = 'Types_Interop_Handler_' . $handler_definition['class_name'];
-				call_user_func( $handler_class_name . '::initialize' );
+
+				$init_callback = toolset_getarr( $handler_definition, 'init_callback' );
+				if( is_callable( $init_callback ) ) {
+					$init_callback( toolset_dic() );
+				} else {
+					$handler_class_name = 'Types_Interop_Handler_' . $handler_definition['class_name'];
+					call_user_func( $handler_class_name . '::initialize' );
+				}
 			}
 		}
 	}

@@ -856,24 +856,31 @@ class Premium_Plugin_Updater extends Updater {
 													__('HTTP Error occurred.', self::$text_domain));
 		}
 
+		// Check if the response is empty
 		if(empty($api_response['response']['code'])) {
-			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNEXPECTED_RESPONSE,
-													__('Remote server did not return a response code. Unable ' .
+			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_RESPONSE_EMPTY,
+													__('The remote licensing server did not return a response code. Unable ' .
 														 'to determine the result of the request.', self::$text_domain));
 		}
 
+		// Check if the remote server replied "not authorized"
+		// @since 2.0.16.200317
 		if($api_response['response']['code'] == 401) {
-			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNSUCCESSFUL,
-													__('Request declined by the license server. Please check that the license code is valid and that the license is active.', self::$text_domain));
+			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNAUTHORIZED,
+													__('The remote licensing server returned a "not authorised" response.', self::$text_domain) .
+													' ' .
+													__('Please check that the license code is valid and that the license is active.', self::$text_domain));
 		}
 
+		// Check if the remote server replied with an error
 		if($api_response['response']['code'] !== 200) {
 			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNSUCCESSFUL,
 													__('Request failed. Please check log file for more information.', self::$text_domain));
 		}
 
+		// Check if the remote server didn't return a response
 		if(empty($api_response['body']) || (json_decode($api_response['body'], true) === null)) {
-			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNSUCCESSFUL,
+			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNEXPECTED_RESPONSE,
 													__('Remote server returned an empty or invalid response.', self::$text_domain));
 		}
 

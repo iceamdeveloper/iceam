@@ -1,3 +1,5 @@
+/* eslint-disable */
+
 var Types = Types || {};
 
 /**
@@ -73,18 +75,18 @@ Types.slugConflictChecker = new function() {
      * Build a slug config checker for a specific scenario.
      *
      * @param element A jQuery element that should be observed for slug conflicts.
-     * @param {[string]} domains Possible domains of slug conflicts. Check Types_Ajax_Handler_Check_Slug_Conflicts 
+     * @param {[string]} domains Possible domains of slug conflicts. Check Types_Ajax_Handler_Check_Slug_Conflicts
      *     for details.
      * @param {string} currentDomain Domain of the object that is being edited.
      * @param {string|int} currentId ID of the object that is being edited (it needs to be skipped while checking
      *     for conflicts).
      * @param {string} nonce A valid nonce for the types_check_slug_conflicts AJAX call.
-     * @param {function(isSuccess:bool,displayMessage:string|undefined)} callback Function that handles checking result. 
+     * @param {function(isSuccess:bool,displayMessage:string|undefined)} callback Function that handles checking result.
      * @returns {Checker} The initialized checker object.
      * @since 2.1
      */
     self.build = function(element, domains, currentDomain, currentId, nonce, callback) {
-        return new Checker(element, domains, currentDomain, currentId, nonce, callback); 
+        return new Checker(element, domains, currentDomain, currentId, nonce, callback);
     };
-    
+
 };

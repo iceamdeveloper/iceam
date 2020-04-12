@@ -63,23 +63,7 @@ class Types_Admin_Taxonomies extends Types_Admin_Page
     {
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
+
     public function get()
     {
         if (!empty($this->taxonomies_array) ) {
@@ -118,23 +102,6 @@ class Types_Admin_Taxonomies extends Types_Admin_Page
         return $taxonomies;
     }
 
-    /**
-     * Summary.
-     *
-     * Description.
-     *
-     * @since x.x.x
-     * @access (for functions: only use if private)
-     *
-     * @see Function/method/class relied on
-     * @link URL
-     * @global type $varname Description.
-     * @global type $varname Description.
-     *
-     * @param type $var Description.
-     * @param type $var Optional. Description.
-     * @return type Description.
-     */
     public function get_post_types_supported_by_taxonomy($taxonomy)
     {
         $supported = array();

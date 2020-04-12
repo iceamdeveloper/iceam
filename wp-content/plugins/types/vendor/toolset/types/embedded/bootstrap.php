@@ -29,8 +29,7 @@ if ( !defined( 'WPCF_VERSION' ) ) {
  * Forced priority
  */
 if ( !defined( 'TYPES_INIT_PRIORITY' ) ) {
-    // Early start ( some plugins use 'init' with priority 0 ).
-    define( 'TYPES_INIT_PRIORITY', -1 );
+    define( 'TYPES_INIT_PRIORITY', 1 );
 }
 
 /**
@@ -68,7 +67,7 @@ if ( !defined('WPCF_AUTHOR' )){
 add_action( 'init', 'wpcf_embedded_init', TYPES_INIT_PRIORITY );
 
 /**
- * register_post_type & register_taxonomy - must be with default pririty to 
+ * register_post_type & register_taxonomy - must be with default pririty to
  * handle defult taxonomies
  */
 /**
@@ -113,6 +112,8 @@ wpcf_embedded_after_setup_theme_hook();
  */
 $GLOBALS['wpcf'] = new stdClass();
 
+// load fields functions (required to be loaded pre init as Elementor Pro demands on it)
+require_once WPCF_EMBEDDED_INC_ABSPATH . '/fields.php';
 
 /**
  * Main init hook.
@@ -132,10 +133,10 @@ function wpcf_embedded_init() {
     $types_instances['init_queued'] = '#' . did_action( 'init' );
     $types_instances['init_priority'] = TYPES_INIT_PRIORITY;
     $types_instances['forced_embedded'] = defined( 'TYPES_LOAD_EMBEDDED' ) && TYPES_LOAD_EMBEDDED;
-	
+
 	// Localization
 	new Toolset_Localization( 'wpcf', WPCF_EMBEDDED_ABSPATH . '/locale', 'types-%s' );
-	
+
 	// Toolset Forms
 	if ( ! defined( 'WPTOOLSET_FORMS_VERSION' ) ) {
 		$toolset_common_bootstrap = Toolset_Common_Bootstrap::get_instance();
@@ -241,6 +242,9 @@ function wpcf_embedded_init() {
         require_once WPCF_EMBEDDED_ABSPATH . '/frontend.php';
     }
 
+	/**
+	 * @deprecated Nest for deprecated code. Avoid new usages if possible.
+	 */
     global $wpcf;
 
     /*
@@ -272,16 +276,16 @@ function wpcf_embedded_init() {
 
     // Set usermeta field object
     $wpcf->usermeta_field = new WPCF_Usermeta_Field();
-	
+
 	// Set termmeta field object
 	$wpcf->termmeta_field = new WPCF_Termmeta_Field();
-	
+
 	// Set repeater object
     $wpcf->repeater = new WPCF_Repeater();
 
     // Set usermeta repeater object
     $wpcf->usermeta_repeater = new WPCF_Usermeta_Repeater();
-	
+
 	// Set termmeta repeater object
 	$wpcf->termmeta_repeater = new WPCF_Termmeta_Repeater();
 
@@ -310,9 +314,13 @@ function wpcf_embedded_init() {
     );
     // 'attachment' = Media
     //
-    $wpcf->excluded_post_types = array(
+
+	// IMPORTANT: If you're about update this, please make corresponding changes also
+	// in Toolset_Post_Type_Exclude_List.
+	$wpcf->excluded_post_types = array(
         'cred-form',
         'cred-user-form',
+		'cred_rel_form',
 	    'custom_css',
 	    'customize_changeset',
         'dd_layouts',

@@ -11,7 +11,7 @@
  *
  * @var string $link The URL to the next page, if any, or an empty string.
  *
- * @version 5.0.0
+ * @version 5.0.1
  *
  */
 ?>
@@ -21,6 +21,8 @@
 		rel="next"
 		class="tribe-events-c-nav__next tribe-common-b2"
 		data-js="tribe-events-view-link"
+		aria-label="<?php esc_attr_e( 'Next week', 'tribe-events-calendar-pro' ); ?>"
+		title="<?php esc_attr_e( 'Next week', 'tribe-events-calendar-pro' ); ?>"
 	>
 		<?php esc_html_e( 'Next', 'tribe-events-calendar-pro' ); ?>
 	</a>

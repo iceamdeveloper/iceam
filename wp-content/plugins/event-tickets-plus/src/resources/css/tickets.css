@@ -51,7 +51,7 @@
 
 .tribe-tickets-meta-field-header {
 	display: block;
-	font-weight: var(--font-weight-normal);
+	font-weight: var(--font-weight-regular);
 }
 
 .tribe-tickets-meta-required header,
@@ -266,7 +266,7 @@ a.tribe-attendees-list-showall {
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta label {
 		display: block;
-		font-weight: var(--font-weight-normal);
+		font-weight: var(--font-weight-regular);
 	}
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="text"],

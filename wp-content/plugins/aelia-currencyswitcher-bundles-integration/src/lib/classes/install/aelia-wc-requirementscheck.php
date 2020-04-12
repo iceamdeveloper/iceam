@@ -63,7 +63,7 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 
 		// @var array An array of WordPress plugins (name => version) required by the plugin.
 		protected $required_plugins = array(
-			'WooCommerce' => '2.0.10',
+			'WooCommerce' => '2.6',
 			//'Aelia Foundation Classes for WooCommerce' => array(
 			//	'version' => '1.8.3.170202',
 			//	'extra_info' => 'You can get the plugin <a href="http://bit.ly/WC_AFC_S3">from our site</a>, free of charge.',

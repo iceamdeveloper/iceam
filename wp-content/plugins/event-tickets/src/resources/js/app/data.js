@@ -6374,7 +6374,7 @@ var includes_default = /*#__PURE__*/__webpack_require__.n(includes);
 var effects = __webpack_require__(0);
 
 // EXTERNAL MODULE: external {"var":"wp.data","root":["wp","data"]}
-var external_var_wp_data_root_wp_data_ = __webpack_require__(20);
+var external_var_wp_data_root_wp_data_ = __webpack_require__(18);
 
 // EXTERNAL MODULE: external {"var":"wp.blocks","root":["wp","blocks"]}
 var external_var_wp_blocks_root_wp_blocks_ = __webpack_require__(111);
@@ -6392,7 +6392,7 @@ var utils = __webpack_require__(8);
 var external_tribe_common_data_ = __webpack_require__(31);
 
 // EXTERNAL MODULE: ./src/modules/data/shared/move/types.js
-var move_types = __webpack_require__(19);
+var move_types = __webpack_require__(20);
 
 // EXTERNAL MODULE: ./src/modules/data/shared/move/selectors.js
 var selectors = __webpack_require__(28);
@@ -7600,7 +7600,7 @@ function fetchTicketsHeaderImage(action) {
 }
 
 function updateTicketsHeaderImage(action) {
-	var image, postId, body, _ref14, response, headerImage;
+	var image, postId, body, slug, postType, restBase, _ref14, response, headerImage;
 
 	return regenerator_default.a.wrap(function updateTicketsHeaderImage$(_context12) {
 		while (1) {
@@ -7624,9 +7624,12 @@ function updateTicketsHeaderImage(action) {
 					return Object(effects["e" /* put */])(rsvp_actions["setRSVPIsSettingsLoading"](true));
 
 				case 10:
-					_context12.next = 12;
+					slug = Object(external_var_wp_data_root_wp_data_["select"])('core/editor').getCurrentPostType();
+					postType = Object(external_var_wp_data_root_wp_data_["select"])('core').getPostType(slug);
+					restBase = postType.rest_base;
+					_context12.next = 15;
 					return Object(effects["b" /* call */])(wpREST, {
-						path: 'tribe_events/' + postId,
+						path: restBase + '/' + postId,
 						headers: {
 							'Content-Type': 'application/json'
 						},
@@ -7636,12 +7639,12 @@ function updateTicketsHeaderImage(action) {
 						}
 					});
 
-				case 12:
+				case 15:
 					_ref14 = _context12.sent;
 					response = _ref14.response;
 
 					if (!response.ok) {
-						_context12.next = 20;
+						_context12.next = 23;
 						break;
 					}
 
@@ -7654,43 +7657,43 @@ function updateTicketsHeaderImage(action) {
       * @todo: until rsvp and tickets header image can be separated, they need to be linked
       */
 
-					_context12.next = 18;
+					_context12.next = 21;
 					return Object(effects["e" /* put */])(actions["setTicketsHeaderImage"](headerImage));
 
-				case 18:
-					_context12.next = 20;
+				case 21:
+					_context12.next = 23;
 					return Object(effects["e" /* put */])(rsvp_actions["setRSVPHeaderImage"](headerImage));
 
-				case 20:
-					_context12.next = 24;
+				case 23:
+					_context12.next = 27;
 					break;
 
-				case 22:
-					_context12.prev = 22;
+				case 25:
+					_context12.prev = 25;
 					_context12.t0 = _context12['catch'](5);
 
-				case 24:
-					_context12.prev = 24;
-					_context12.next = 27;
+				case 27:
+					_context12.prev = 27;
+					_context12.next = 30;
 					return Object(effects["e" /* put */])(actions["setTicketsIsSettingsLoading"](false));
 
-				case 27:
-					_context12.next = 29;
+				case 30:
+					_context12.next = 32;
 					return Object(effects["e" /* put */])(rsvp_actions["setRSVPIsSettingsLoading"](false));
 
-				case 29:
-					return _context12.finish(24);
+				case 32:
+					return _context12.finish(27);
 
-				case 30:
+				case 33:
 				case 'end':
 					return _context12.stop();
 			}
 		}
-	}, _marked12, this, [[5, 22, 24, 30]]);
+	}, _marked12, this, [[5, 25, 27, 33]]);
 }
 
 function deleteTicketsHeaderImage() {
-	var postId, body, _ref15, response;
+	var postId, body, slug, postType, restBase, _ref15, response;
 
 	return regenerator_default.a.wrap(function deleteTicketsHeaderImage$(_context13) {
 		while (1) {
@@ -7713,9 +7716,12 @@ function deleteTicketsHeaderImage() {
 					return Object(effects["e" /* put */])(rsvp_actions["setRSVPIsSettingsLoading"](true));
 
 				case 9:
-					_context13.next = 11;
-					return Object(effects["b" /* call */])(wpREST, {
-						path: 'tribe_events/' + postId,
+					slug = Object(external_var_wp_data_root_wp_data_["select"])('core/editor').getCurrentPostType();
+					postType = Object(external_var_wp_data_root_wp_data_["select"])('core').getPostType(slug);
+					restBase = postType.rest_base;
+					_context13.next = 14;
+					return Object(effects["b" /* call */])(external_tribe_common_utils_["api"].wpREST, {
+						path: restBase + '/' + postId,
 						headers: {
 							'Content-Type': 'application/json'
 						},
@@ -7725,48 +7731,48 @@ function deleteTicketsHeaderImage() {
 						}
 					});
 
-				case 11:
+				case 14:
 					_ref15 = _context13.sent;
 					response = _ref15.response;
 
 					if (!response.ok) {
-						_context13.next = 18;
+						_context13.next = 21;
 						break;
 					}
 
-					_context13.next = 16;
+					_context13.next = 19;
 					return Object(effects["e" /* put */])(actions["setTicketsHeaderImage"](header_image["a" /* DEFAULT_STATE */]));
 
-				case 16:
-					_context13.next = 18;
+				case 19:
+					_context13.next = 21;
 					return Object(effects["e" /* put */])(rsvp_actions["setRSVPHeaderImage"](reducers_header_image["a" /* DEFAULT_STATE */]));
 
-				case 18:
-					_context13.next = 22;
+				case 21:
+					_context13.next = 25;
 					break;
 
-				case 20:
-					_context13.prev = 20;
+				case 23:
+					_context13.prev = 23;
 					_context13.t0 = _context13['catch'](4);
 
-				case 22:
-					_context13.prev = 22;
-					_context13.next = 25;
+				case 25:
+					_context13.prev = 25;
+					_context13.next = 28;
 					return Object(effects["e" /* put */])(actions["setTicketsIsSettingsLoading"](false));
 
-				case 25:
-					_context13.next = 27;
+				case 28:
+					_context13.next = 30;
 					return Object(effects["e" /* put */])(rsvp_actions["setRSVPIsSettingsLoading"](false));
 
-				case 27:
-					return _context13.finish(22);
+				case 30:
+					return _context13.finish(25);
 
-				case 28:
+				case 31:
 				case 'end':
 					return _context13.stop();
 			}
 		}
-	}, _marked13, this, [[4, 20, 22, 28]]);
+	}, _marked13, this, [[4, 23, 25, 31]]);
 }
 
 function setTicketDetails(action) {
@@ -10830,7 +10836,7 @@ var regenerator = __webpack_require__(11);
 var regenerator_default = /*#__PURE__*/__webpack_require__.n(regenerator);
 
 // EXTERNAL MODULE: external {"var":"wp.data","root":["wp","data"]}
-var external_var_wp_data_root_wp_data_ = __webpack_require__(20);
+var external_var_wp_data_root_wp_data_ = __webpack_require__(18);
 
 // EXTERNAL MODULE: ./node_modules/redux-saga/es/effects.js + 1 modules
 var effects = __webpack_require__(0);
@@ -10842,7 +10848,7 @@ var ticket_actions = __webpack_require__(10);
 var reducers_header_image = __webpack_require__(61);
 
 // EXTERNAL MODULE: ./src/modules/data/shared/move/types.js
-var types = __webpack_require__(19);
+var types = __webpack_require__(20);
 
 // EXTERNAL MODULE: ./src/modules/data/shared/move/selectors.js
 var selectors = __webpack_require__(28);
@@ -11687,7 +11693,7 @@ function fetchRSVPHeaderImage(action) {
 }
 
 function updateRSVPHeaderImage(action) {
-	var image, postId, body, _ref6, response, headerImage;
+	var image, postId, body, slug, postType, restBase, _ref6, response, headerImage;
 
 	return regenerator_default.a.wrap(function updateRSVPHeaderImage$(_context16) {
 		while (1) {
@@ -11711,9 +11717,12 @@ function updateRSVPHeaderImage(action) {
 					return Object(effects["e" /* put */])(ticket_actions["setTicketsIsSettingsLoading"](true));
 
 				case 10:
-					_context16.next = 12;
+					slug = Object(external_var_wp_data_root_wp_data_["select"])('core/editor').getCurrentPostType();
+					postType = Object(external_var_wp_data_root_wp_data_["select"])('core').getPostType(slug);
+					restBase = postType.rest_base;
+					_context16.next = 15;
 					return Object(effects["b" /* call */])(external_tribe_common_utils_["api"].wpREST, {
-						path: 'tribe_events/' + postId,
+						path: restBase + '/' + postId,
 						headers: {
 							'Content-Type': 'application/json'
 						},
@@ -11723,12 +11732,12 @@ function updateRSVPHeaderImage(action) {
 						}
 					});
 
-				case 12:
+				case 15:
 					_ref6 = _context16.sent;
 					response = _ref6.response;
 
 					if (!response.ok) {
-						_context16.next = 20;
+						_context16.next = 23;
 						break;
 					}
 
@@ -11741,43 +11750,43 @@ function updateRSVPHeaderImage(action) {
       * @todo: until rsvp and tickets header image can be separated, they need to be linked
       */
 
-					_context16.next = 18;
+					_context16.next = 21;
 					return Object(effects["e" /* put */])(actions["setRSVPHeaderImage"](headerImage));
 
-				case 18:
-					_context16.next = 20;
+				case 21:
+					_context16.next = 23;
 					return Object(effects["e" /* put */])(ticket_actions["setTicketsHeaderImage"](headerImage));
 
-				case 20:
-					_context16.next = 24;
+				case 23:
+					_context16.next = 27;
 					break;
 
-				case 22:
-					_context16.prev = 22;
+				case 25:
+					_context16.prev = 25;
 					_context16.t0 = _context16['catch'](5);
 
-				case 24:
-					_context16.prev = 24;
-					_context16.next = 27;
+				case 27:
+					_context16.prev = 27;
+					_context16.next = 30;
 					return Object(effects["e" /* put */])(actions["setRSVPIsSettingsLoading"](false));
 
-				case 27:
-					_context16.next = 29;
+				case 30:
+					_context16.next = 32;
 					return Object(effects["e" /* put */])(ticket_actions["setTicketsIsSettingsLoading"](false));
 
-				case 29:
-					return _context16.finish(24);
+				case 32:
+					return _context16.finish(27);
 
-				case 30:
+				case 33:
 				case 'end':
 					return _context16.stop();
 			}
 		}
-	}, _marked16, this, [[5, 22, 24, 30]]);
+	}, _marked16, this, [[5, 25, 27, 33]]);
 }
 
 function deleteRSVPHeaderImage() {
-	var postId, body, _ref7, response;
+	var postId, body, slug, postType, restBase, _ref7, response;
 
 	return regenerator_default.a.wrap(function deleteRSVPHeaderImage$(_context17) {
 		while (1) {
@@ -11800,9 +11809,12 @@ function deleteRSVPHeaderImage() {
 					return Object(effects["e" /* put */])(ticket_actions["setTicketsIsSettingsLoading"](true));
 
 				case 9:
-					_context17.next = 11;
+					slug = Object(external_var_wp_data_root_wp_data_["select"])('core/editor').getCurrentPostType();
+					postType = Object(external_var_wp_data_root_wp_data_["select"])('core').getPostType(slug);
+					restBase = postType.rest_base;
+					_context17.next = 14;
 					return Object(effects["b" /* call */])(external_tribe_common_utils_["api"].wpREST, {
-						path: 'tribe_events/' + postId,
+						path: restBase + '/' + postId,
 						headers: {
 							'Content-Type': 'application/json'
 						},
@@ -11812,48 +11824,48 @@ function deleteRSVPHeaderImage() {
 						}
 					});
 
-				case 11:
+				case 14:
 					_ref7 = _context17.sent;
 					response = _ref7.response;
 
 					if (!response.ok) {
-						_context17.next = 18;
+						_context17.next = 21;
 						break;
 					}
 
-					_context17.next = 16;
+					_context17.next = 19;
 					return Object(effects["e" /* put */])(actions["setRSVPHeaderImage"](header_image["a" /* DEFAULT_STATE */]));
 
-				case 16:
-					_context17.next = 18;
+				case 19:
+					_context17.next = 21;
 					return Object(effects["e" /* put */])(ticket_actions["setTicketsHeaderImage"](reducers_header_image["a" /* DEFAULT_STATE */]));
 
-				case 18:
-					_context17.next = 22;
+				case 21:
+					_context17.next = 25;
 					break;
 
-				case 20:
-					_context17.prev = 20;
+				case 23:
+					_context17.prev = 23;
 					_context17.t0 = _context17['catch'](4);
 
-				case 22:
-					_context17.prev = 22;
-					_context17.next = 25;
+				case 25:
+					_context17.prev = 25;
+					_context17.next = 28;
 					return Object(effects["e" /* put */])(actions["setRSVPIsSettingsLoading"](false));
 
-				case 25:
-					_context17.next = 27;
+				case 28:
+					_context17.next = 30;
 					return Object(effects["e" /* put */])(ticket_actions["setTicketsIsSettingsLoading"](false));
 
-				case 27:
-					return _context17.finish(22);
+				case 30:
+					return _context17.finish(25);
 
-				case 28:
+				case 31:
 				case 'end':
 					return _context17.stop();
 			}
 		}
-	}, _marked17, this, [[4, 20, 22, 28]]);
+	}, _marked17, this, [[4, 23, 25, 31]]);
 }
 
 //
@@ -13538,8 +13550,14 @@ var asEffect = {
 };
 
 /***/ }),
-/* 18 */,
-/* 19 */
+/* 18 */
+/***/ (function(module, exports) {
+
+module.exports = wp.data;
+
+/***/ }),
+/* 19 */,
+/* 20 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -13595,12 +13613,6 @@ var FETCH_POST_CHOICES_ERROR = _moderntribe_tickets_data_utils__WEBPACK_IMPORTED
 var MOVE_TICKET = _moderntribe_tickets_data_utils__WEBPACK_IMPORTED_MODULE_0__[/* PREFIX_TICKETS_STORE */ "n"] + '/MOVE_TICKET';
 var MOVE_TICKET_SUCCESS = _moderntribe_tickets_data_utils__WEBPACK_IMPORTED_MODULE_0__[/* PREFIX_TICKETS_STORE */ "n"] + '/MOVE_TICKET_SUCCESS';
 var MOVE_TICKET_ERROR = _moderntribe_tickets_data_utils__WEBPACK_IMPORTED_MODULE_0__[/* PREFIX_TICKETS_STORE */ "n"] + '/MOVE_TICKET_ERROR';
-
-/***/ }),
-/* 20 */
-/***/ (function(module, exports) {
-
-module.exports = wp.data;
 
 /***/ }),
 /* 21 */,
@@ -14049,7 +14061,7 @@ var hasSelectedPost = Object(reselect__WEBPACK_IMPORTED_MODULE_1__["createSelect
 /* harmony import */ var babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var lodash_some__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(113);
 /* harmony import */ var lodash_some__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(lodash_some__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(20);
+/* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(18);
 /* harmony import */ var _wordpress_data__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(_wordpress_data__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var redux_saga_effects__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(0);
 /* harmony import */ var redux_saga__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(73);
@@ -15237,7 +15249,7 @@ module.exports = function (bitmap, value) {
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "c", function() { return showModal; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "a", function() { return hideModal; });
 /* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "b", function() { return setModalData; });
-/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(19);
+/* harmony import */ var _types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(20);
 /* eslint-disable camelcase */
 /**
  * Internal Dependencies
@@ -31138,7 +31150,7 @@ function watchers() {
 
 /* harmony default export */ var blocks = (blocks_reducer);
 // EXTERNAL MODULE: ./src/modules/data/shared/move/types.js
-var move_types = __webpack_require__(19);
+var move_types = __webpack_require__(20);
 
 // CONCATENATED MODULE: ./src/modules/data/shared/move/reducers/posts.js
 
@@ -31326,7 +31338,7 @@ var slicedToArray_default = /*#__PURE__*/__webpack_require__.n(slicedToArray);
 var es = __webpack_require__(73);
 
 // EXTERNAL MODULE: external {"var":"wp.data","root":["wp","data"]}
-var external_var_wp_data_root_wp_data_ = __webpack_require__(20);
+var external_var_wp_data_root_wp_data_ = __webpack_require__(18);
 
 // EXTERNAL MODULE: external "tribe.common.utils"
 var external_tribe_common_utils_ = __webpack_require__(3);

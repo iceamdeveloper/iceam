@@ -1,16 +1,16 @@
 <?php
 
+use OTGS\Toolset\Common\Utils\Attachments;
+use OTGS\Toolset\Common\Utils\TypesGuidIdGateway;
 /**
  * Field type definition.
  *
  * This represents a single field type like "email", "audio", "checkbox" and so on. This class must be instantiated
  * exclusively through Toolset_Field_Type_Definition_Factory.
  *
- * TODO consider using register_meta() to protect fields' values.
- *
  * @since 2.0
  */
-class Toolset_Field_Type_Definition {
+class Toolset_Field_Type_Definition implements \OTGS\Toolset\Common\PublicAPI\CustomFieldTypeDefinition {
 
 
 	/**
@@ -46,11 +46,11 @@ class Toolset_Field_Type_Definition {
 	 */
 	public function __construct( $field_type_slug, $args ) {
 
-		if( sanitize_title( $field_type_slug ) != $field_type_slug ) {
+		if ( sanitize_title( $field_type_slug ) != $field_type_slug ) {
 			throw new InvalidArgumentException( 'Invalid field type slug.' );
 		}
 
-		if( ! is_array( $args ) ) {
+		if ( ! is_array( $args ) ) {
 			throw new InvalidArgumentException( 'Wrong arguments provided.' );
 		}
 
@@ -64,11 +64,19 @@ class Toolset_Field_Type_Definition {
 	}
 
 
-	public function get_slug() { return $this->field_type_slug; }
+	public function get_slug() {
+		return $this->field_type_slug;
+	}
 
-	public function get_display_name() { return $this->display_name; }
 
-	public function get_description() { return $this->description; }
+	public function get_display_name() {
+		return $this->display_name;
+	}
+
+
+	public function get_description() {
+		return $this->description;
+	}
 
 
 	/**
@@ -76,8 +84,11 @@ class Toolset_Field_Type_Definition {
 	 *
 	 * @return bool
 	 * @since 2.0
+	 * @deprecated Use can_be_repeating() instead.
 	 */
-	public function can_be_repetitive() { return true; }
+	public function can_be_repetitive() {
+		return true;
+	}
 
 
 	/**
@@ -87,11 +98,12 @@ class Toolset_Field_Type_Definition {
 	 *
 	 * @param null|string $argument_name Specific argument name or null to return all arguments.
 	 * @param string $default Default value when a specific argument is not set.
+	 *
 	 * @return array|mixed
 	 * @since 2.0
 	 */
 	public function get_args( $argument_name = null, $default = '' ) {
-		if( null == $argument_name ) {
+		if ( null == $argument_name ) {
 			return $this->args;
 		} else {
 			return toolset_getarr( $this->args, $argument_name, $default );
@@ -109,12 +121,12 @@ class Toolset_Field_Type_Definition {
 	 */
 	public function get_icon_classes() {
 		$fa_class = $this->get_args( 'font-awesome', null );
-		if( null != $fa_class ) {
+		if ( null != $fa_class ) {
 			return sprintf( 'fa fa-%s', esc_attr( $fa_class ) );
 		}
 
 		$types_class = $this->get_args( 'types-field-image', null );
-		if( null != $types_class ) {
+		if ( null != $types_class ) {
 			return sprintf( 'types-field-icon types-field-icon-%s', esc_attr( $types_class ) );
 		}
 
@@ -126,7 +138,9 @@ class Toolset_Field_Type_Definition {
 	 * Perform field type-specific sanitization of the field definition array.
 	 *
 	 * @link https://git.onthegosystems.com/toolset/types/wikis/database-layer/field-definition-arrays
+	 *
 	 * @param $definition_array
+	 *
 	 * @return array Sanitized definition array
 	 * @since 2.1
 	 */
@@ -141,6 +155,7 @@ class Toolset_Field_Type_Definition {
 	 * Should be used only by sanitize_field_definition_array().
 	 *
 	 * @param array $definition_array
+	 *
 	 * @return array
 	 * @since 2.1
 	 */
@@ -158,7 +173,8 @@ class Toolset_Field_Type_Definition {
 		$definition_array['description'] = toolset_getarr( $definition_array, 'description' );
 
 		// meta_key: default to wpcf-{$slug}
-		$definition_array['meta_key'] = toolset_getarr( $definition_array, 'meta_key', Toolset_Field_Definition::FIELD_META_KEY_PREFIX . $definition_array['slug'] );
+		$definition_array['meta_key'] = toolset_getarr( $definition_array, 'meta_key', Toolset_Field_Definition::FIELD_META_KEY_PREFIX
+			. $definition_array['slug'] );
 
 		// data: must be an array
 		$definition_array['data'] = toolset_ensarr( toolset_getarr( $definition_array, 'data' ) );
@@ -179,7 +195,9 @@ class Toolset_Field_Type_Definition {
 	 * Note: This is a WIP, currently it sanitizes only very specific cases. It should be extended in the future.
 	 *
 	 * @link https://git.onthegosystems.com/toolset/types/wikis/database-layer/field-definition-arrays
+	 *
 	 * @param array $definition_array Field definition array
+	 *
 	 * @return array Field definition array that is safe to be used even with legacy code.
 	 * @since 2.0
 	 */
@@ -191,6 +209,7 @@ class Toolset_Field_Type_Definition {
 		 * Allow for additional field definition array sanitization before the standard one runs.
 		 *
 		 * @param mixed $definition_array
+		 *
 		 * @return array
 		 * @since 2.1
 		 */
@@ -208,6 +227,7 @@ class Toolset_Field_Type_Definition {
 		 * Allow for additional field definition array sanitization after the standard one runs.
 		 *
 		 * @param array $definition_array
+		 *
 		 * @return array
 		 * @since 2.1
 		 */
@@ -223,13 +243,14 @@ class Toolset_Field_Type_Definition {
 	 * Numeric field will override this and do the opposite instead.
 	 *
 	 * @param array $definition_array
+	 *
 	 * @return array
 	 * @since 2.0
 	 */
 	protected function sanitize_numeric_validation( $definition_array ) {
 
 		// This is what wpcf_admin_custom_fields_change_type() was doing.
-		if( isset( $definition_array['data']['validate']['number'] ) ) {
+		if ( isset( $definition_array['data']['validate']['number'] ) ) {
 			unset( $definition_array['data']['validate']['number'] );
 		}
 
@@ -245,6 +266,7 @@ class Toolset_Field_Type_Definition {
 	 * @param string $default Default value for the element if not set or invalid.
 	 * @param null|array $allowed If an array, defines the set of allowed values for the element.
 	 * @param null|string $nested_key If not null, the element will be taken from $source[$nested_key][$element_name].
+	 *
 	 * @return array Updated source array.
 	 * @since 2.1
 	 */
@@ -252,7 +274,7 @@ class Toolset_Field_Type_Definition {
 		$src_array = ( null == $nested_key ? $source : $source[ $nested_key ] );
 		$value = toolset_getarr( $src_array, $element_name, $default, $allowed );
 
-		if( null == $nested_key ) {
+		if ( null == $nested_key ) {
 			$source[ $element_name ] = $value;
 		} else {
 			$source[ $nested_key ][ $element_name ] = $value;
@@ -275,18 +297,21 @@ class Toolset_Field_Type_Definition {
 	 * @throws RuntimeException
 	 * @since m2m
 	 */
-	public function get_renderer( $purpose, /** @noinspection PhpUnusedParameterInspection */ $environment, $field, $renderer_args = array() ) {
+	public function get_renderer(
+		$purpose, /** @noinspection PhpUnusedParameterInspection */
+		$environment, $field, $renderer_args = array()
+	) {
 
 		$incoming_field_type = $field->get_field_type();
-		if( $incoming_field_type->get_slug() != $this->get_slug() ) {
+		if ( $incoming_field_type->get_slug() != $this->get_slug() ) {
 			throw new InvalidArgumentException();
 		}
 
-		switch( $purpose ) {
+		switch ( $purpose ) {
 			case Toolset_Field_Renderer_Purpose::PREVIEW:
 
 				// Provide correct renderers for field types that don't have their own type definition class.
-				switch( $this->get_slug() ) {
+				switch ( $this->get_slug() ) {
 
 					case Toolset_Field_Type_Definition_Factory::GOOGLE_ADDRESS:
 						return new Toolset_Field_Renderer_Preview_Address( $field, $renderer_args );
@@ -314,12 +339,14 @@ class Toolset_Field_Type_Definition {
 
 					default:
 						return new Toolset_Field_Renderer_Preview_Textfield( $field, $renderer_args );
-						break;
 				}
+				break;
 
 			case Toolset_Field_Renderer_Purpose::DISPLAY:
-			case Toolset_Field_Renderer_Purpose::RAW:
 				throw new RuntimeException( 'Not implemented.' );
+
+			case Toolset_Field_Renderer_Purpose::RAW:
+				return new \OTGS\Toolset\Common\Field\Renderer\Raw( $field );
 
 			case Toolset_Field_Renderer_Purpose::TOOLSET_FORMS:
 			case Toolset_Field_Renderer_Purpose::INPUT:
@@ -330,6 +357,7 @@ class Toolset_Field_Type_Definition {
 				);
 				$renderer = new Toolset_Field_Renderer_Toolset_Forms( $field );
 				$renderer->setup( $renderer_config );
+
 				return $renderer;
 
 			case Toolset_Field_Renderer_Purpose::INPUT_REPEATABLE_GROUP:
@@ -340,11 +368,42 @@ class Toolset_Field_Type_Definition {
 				);
 				$renderer = new Toolset_Field_Renderer_Toolset_Forms_Repeatable_Group( $field );
 				$renderer->setup( $renderer_config );
+
 				return $renderer;
+
+			case Toolset_Field_Renderer_Purpose::REST:
+				switch ( $this->get_slug() ) {
+					case Toolset_Field_Type_Definition_Factory::AUDIO:
+					case Toolset_Field_Type_Definition_Factory::FILE:
+					case Toolset_Field_Type_Definition_Factory::VIDEO:
+					case Toolset_Field_Type_Definition_Factory::IMAGE:
+						return new \OTGS\Toolset\Common\Field\Renderer\Rest\Attachment(
+							$field,
+							new Attachments( new TypesGuidIdGateway() )
+						);
+					case Toolset_Field_Type_Definition_Factory::CHECKBOXES:
+						return new \OTGS\Toolset\Common\Field\Renderer\Rest\Checkboxes( $field );
+					case Toolset_Field_Type_Definition_Factory::DATE:
+						return new \OTGS\Toolset\Common\Field\Renderer\Rest\Date( $field );
+					case Toolset_Field_Type_Definition_Factory::SKYPE:
+						return new \OTGS\Toolset\Common\Field\Renderer\Rest\Skype( $field );
+					default:
+						return new \OTGS\Toolset\Common\Field\Renderer\Rest\Raw( $field );
+				}
+				break;
 
 			default:
 				throw new InvalidArgumentException();
 		}
 	}
 
+
+	/**
+	 * @inheritDoc
+	 * @return bool
+	 * @since Types 3.3.5
+	 */
+	public function can_be_repeating() {
+		return $this->can_be_repetitive();
+	}
 }

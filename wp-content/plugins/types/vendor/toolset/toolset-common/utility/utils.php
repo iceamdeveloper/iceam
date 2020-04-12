@@ -45,7 +45,7 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 					defined( 'DOING_AJAX' )
 					&& DOING_AJAX
 					&& isset( $_REQUEST['action'] )
-					&& in_array( $_REQUEST['action'], self::get_ajax_actions_array_to_exclude_on_frontend() )
+					&& in_array( $_REQUEST['action'], self::get_ajax_actions_array_to_exclude_on_frontend(), true )
 				)
 			);
 
@@ -60,7 +60,13 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 		 * @since 2.5.0
 		 */
 		public static function get_ajax_actions_array_to_exclude_on_frontend() {
-			return array( 'wpv_get_view_query_results', 'wpv_get_archive_query_results', 'render_element_changed' );
+			return array(
+				'wpv_get_view_query_results',
+				'wpv_get_archive_query_results',
+				'render_element_changed',
+				'toolset_get_cred_form_block_preview',
+				'cred_submit_form',
+			);
 		}
 
 		/**
@@ -231,7 +237,7 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 		 * "0" is also a valid value that we need to take into account.
 		 *
 		 * @param $field_value
-		 ** @return bool
+		 * @return bool
 		 *
 		 * @since 2.2.3
 		 */
@@ -245,52 +251,16 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 		/**
 		 * Return an ID of an attachment by searching the database with the file URL.
 		 *
-		 * First checks to see if the $url is pointing to a file that exists in
-		 * the wp-content directory. If so, then we search the database for a
-		 * partial match consisting of the remaining path AFTER the wp-content
-		 * directory. Finally, if a match is found the attachment ID will be
-		 * returned.
-		 *
-		 * Taken from:
-		 *
-		 * @link http://frankiejarrett.com/get-an-attachment-id-by-url-in-wordpress/
-		 *
-		 * @param string $url URL of the file.
-		 *
-		 * @return int|null Attachment ID if it exists.
 		 * @since 2.2.9
+		 * @deprecated Use \OTGS\Toolset\Common\Utils\Attachments::get_attachment_id_by_url() instead.
+		 *
+		 * @param string $url
+		 * @return int|null
 		 */
 		public static function get_attachment_id_by_url( $url ) {
+			$attachment_utils = new \OTGS\Toolset\Common\Utils\Attachments( new \OTGS\Toolset\Common\Utils\TypesGuidIdGateway() );
 
-			// Split the $url into two parts with the wp-content directory as the separator.
-			$parsed_url = explode( parse_url( WP_CONTENT_URL, PHP_URL_PATH ), $url );
-
-			// Get the host of the current site and the host of the $url, ignoring www.
-			$this_host = str_ireplace( 'www.', '', parse_url( home_url(), PHP_URL_HOST ) );
-			$file_host = str_ireplace( 'www.', '', parse_url( $url, PHP_URL_HOST ) );
-
-			// Return nothing if there aren't any $url parts or if the current host and $url host do not match.
-			$attachment_path = toolset_getarr( $parsed_url, 1 );
-			if ( ! isset( $attachment_path ) || empty( $attachment_path ) || ( $this_host != $file_host ) ) {
-				return null;
-			}
-
-			// Now we're going to quickly search the DB for any attachment GUID with a partial path match.
-			// Example: /uploads/2013/05/test-image.jpg
-			global $wpdb;
-
-			$query = $wpdb->prepare(
-				"SELECT ID FROM $wpdb->posts WHERE post_type = 'attachment' AND guid LIKE %s",
-				'%' . $attachment_path
-			);
-
-			$attachment = $wpdb->get_col( $query );
-
-			if ( is_array( $attachment ) && ! empty( $attachment ) ) {
-				return (int) array_shift( $attachment );
-			}
-
-			return null;
+			return $attachment_utils->get_attachment_id_by_url( $url );
 		}
 
 
@@ -357,7 +327,7 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 
 		    // Use the native solution if available (which will happen in the vast majority of most cases).
 		    if( function_exists( 'mb_convert_case' ) && defined( 'MB_CASE_TITLE' ) ) {
-		        return mb_convert_case( $callback, MB_CASE_TITLE );
+		        return mb_convert_case( $callback, MB_CASE_TITLE, 'UTF-8' );
             }
 
             // mb_convert_case() works this way - it also capitalizes first letters after numbers
@@ -376,6 +346,19 @@ if ( ! class_exists( 'Toolset_Utils', false ) ) {
 			}
 
 			return $result;
+		}
+
+
+		/**
+		 * Trim whitespace from the beginning and end of the string and reduce all internal
+		 * whitespace characters to a single space.
+		 *
+		 * @param $string
+		 * @return string
+		 * @since 3.0.3
+		 */
+		public static function trim_deep( $string ) {
+			return trim( preg_replace( '/\s+/', ' ', $string ) );
 		}
 	}
 
@@ -708,7 +691,7 @@ if ( ! function_exists( 'toolset_getarr' ) ) {
 	 * Checks if the key is set in the source array. If not, default value is returned. Optionally validates against array
 	 * of allowed values and returns default value if the validation fails.
 	 *
-	 * @param array $source The source array.
+	 * @param array|ArrayAccess $source The source array.
 	 * @param string $key The key to be retrieved from the source array.
 	 * @param mixed $default Default value to be returned if key is not set or the value is invalid. Optional.
 	 *     Default is empty string.

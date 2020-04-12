@@ -16,33 +16,43 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * User Memberships class
+ * User Memberships handler.
  *
- * This class handles general user memberships related functionality
+ * This class handles general user memberships related functionality.
  *
  * @since 1.0.0
  */
 class WC_Memberships_User_Memberships {
 
 
-	/** @var string helper pending note for a user membership */
-	private $membership_status_transition_note;
+	/** @var array cached user memberships by user ID and query args */
+	private $user_memberships = array();
+
+	/** @var array cached user membership \WP_Post objects for given plans indexed by user ID and plan ID */
+	private $user_membership_post_by_plan = array();
+
+	/** @var array cached user membership \WP_Post objects indexed by post ID */
+	private $user_membership_post_by_id = array();
 
 	/** @var array memoization helper is user member check */
 	private $is_user_member = array();
 
+	/** @var string helper pending note for a user membership */
+	private $membership_status_transition_note;
+
 
 	/**
-	 * Constructor
+	 * Memberships handler constructor.
 	 *
 	 * @since 1.0.0
 	 */
@@ -59,20 +69,220 @@ class WC_Memberships_User_Memberships {
 		add_action( 'trashed_post',                      array( $this, 'handle_order_trashed' ) );
 		add_action( 'woocommerce_order_status_refunded', array( $this, 'handle_order_refunded' ) );
 
+		// prevent User Membership notes (ie. comments on user memberships posts) from showing where not supposed to
+		add_filter( 'comments_clauses',   array( $this, 'exclude_membership_notes_from_queries' ) );
+		add_action( 'comment_feed_join',  array( $this, 'exclude_membership_notes_from_feed_join' ) );
+		add_action( 'comment_feed_where', array( $this, 'exclude_membership_notes_from_feed_where' ) );
+		add_filter( 'wp_count_comments',  array( $this, 'exclude_membership_notes_from_comments_count' ), 999, 2 );
+
 		// expiration events handling
 		add_action( 'wc_memberships_user_membership_expiry',           array( $this, 'trigger_expiration_events' ), 10, 1 );
 		add_action( 'wc_memberships_user_membership_expiring_soon',    array( $this, 'trigger_expiration_events' ), 10, 1 );
 		add_action( 'wc_memberships_user_membership_renewal_reminder', array( $this, 'trigger_expiration_events' ), 10, 1 );
+
+		// activate delayed User Memberships
+		add_action( 'wc_memberships_activate_delayed_user_membership', [ $this, 'activate_delayed_user_memberships' ] );
 	}
 
 
 	/**
-	 * Get all user memberships
+	 * Creates a new user membership or renews an existing one.
+	 *
+	 * Returns a new user membership object on success which can then be used to add additional data.
+	 * Throws an exception on errors.
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param array $args array of arguments
+	 * @param string $action either 'create' or 'renew' -- when in doubt, use 'create'
+	 * @return \WC_Memberships_User_Membership
+	 * @throws Framework\SV_WC_Plugin_Exception throws an exception if a user membership could not be created or the related plan is invalid or not found
+	 */
+	public function create_user_membership( $args = array(), $action = 'create' ) {
+
+		$args = wp_parse_args( $args, array(
+			'user_membership_id' => 0,
+			'plan_id'            => 0,
+			'user_id'            => 0,
+			'product_id'         => 0,
+			'order_id'           => 0,
+		) );
+
+		$new_membership_data = array(
+			'post_parent'    => (int) $args['plan_id'],
+			'post_author'    => (int) $args['user_id'],
+			'post_type'      => 'wc_user_membership',
+			'post_status'    => 'wcm-active',
+			'comment_status' => 'open',
+		);
+
+		$updating = false;
+
+		if ( (int) $args['user_membership_id'] > 0 ) {
+			$updating                  = true;
+			$new_membership_data['ID'] = (int) $args['user_membership_id'];
+		}
+
+		/**
+		 * Filter new membership data, used when a product purchase grants access.
+		 *
+		 * @since 1.0.0
+		 * @param array $data
+		 * @param array $args array of User Membership arguments {
+		 *     @type int $user_id the user id the membership is assigned to
+		 *     @type int $product_id the product id that grants access (optional)
+		 *     @type int $order_id the order id that contains the product that granted access (optional)
+		 * }
+		 */
+		$new_post_data = apply_filters( 'wc_memberships_new_membership_data', $new_membership_data, array(
+			'user_id'    => (int) $args['user_id'],
+			'product_id' => (int) $args['product_id'],
+			'order_id'   => (int) $args['order_id'],
+		) );
+
+		// bail out if a plan cannot be found before setting a new user membership
+		if ( ! wc_memberships_get_membership_plan( $args['plan_id'] ) ) {
+			/* translators: Placeholder: %d - membership plan ID */
+			throw new Framework\SV_WC_Plugin_Exception( sprintf( __( 'Cannot create User Membership: Membership Plan with ID %d does not exist', 'woocommerce-memberships' ), (int) $args['plan_id'] ) );
+		}
+
+		if ( $updating ) {
+
+			// do not modify the post status yet on renewals
+			unset( $new_post_data['post_status'] );
+
+			$user_membership_id = wp_update_post( $new_post_data, true );
+
+		} else {
+
+			$user_membership_id = wp_insert_post( $new_post_data, true );
+		}
+
+		// bail out on error
+		if ( 0 === $user_membership_id || is_wp_error( $user_membership_id ) ) {
+			/* translators: Placeholder: %s - error message(s) */
+			throw new Framework\SV_WC_Plugin_Exception( sprintf( __( 'Cannot create User Membership: %s.', 'woocommerce-memberships' ), implode( ', ', $user_membership_id->get_error_messages() ) ) );
+		}
+
+		// get the user membership object to set properties on
+		$user_membership = $this->get_user_membership( $user_membership_id );
+
+		// this shouldn't happen, yet ensure $user_membership isn't null
+		if ( ! $user_membership instanceof \WC_Memberships_User_Membership ) {
+			/* translators: Placeholder: %s - membership plan ID */
+			throw new Framework\SV_WC_Plugin_Exception( sprintf( __( 'Cannot create User Membership #%d.', 'woocommerce-memberships' ), $user_membership_id ) );
+		}
+
+		// save/update product id that granted access
+		if ( (int) $args['product_id'] > 0 ) {
+			$user_membership->set_product_id( $args['product_id'] );
+		}
+
+		// save/update the order id that contained the access granting product
+		if ( (int) $args['order_id'] > 0 ) {
+			$user_membership->set_order_id( $args['order_id'] );
+		}
+
+		$this->prune_object_caches();
+
+		// get the user membership object again, since the product and the order just set might influence the object filtering (e.g. Subscriptions)
+		/** @see \WC_Memberships_Integration_Subscriptions_Abstract::get_user_membership() */
+		$user_membership = $this->get_user_membership( $user_membership_id );
+		// get the membership plan object to get some properties from
+		$membership_plan = wc_memberships_get_membership_plan( (int) $args['plan_id'], $user_membership );
+
+		// Save or update the membership start date,
+		// but only if the membership is not active yet (ie. is not being renewed);
+		// also do a sanity check for delayed memberships:
+		if ( 'renew' !== $action ) {
+
+			$start_date = $membership_plan->is_access_length_type( 'fixed' ) ? $membership_plan->get_access_start_date() : current_time( 'mysql', true );
+
+			$user_membership->set_start_date( $start_date );
+
+		} elseif ( ! $user_membership->has_status( 'delayed' ) && $user_membership->get_start_date( 'timestamp' ) > strtotime( 'tomorrow', current_time( 'timestamp', true ) ) ) {
+
+			$user_membership->update_status( 'delayed' );
+		}
+
+		// Calculate membership end date based on membership length,
+		// early renewals add to the existing membership length,
+		// normal cases calculate membership length from "now" (UTC).
+		$now        = current_time( 'timestamp', true );
+		$is_expired = $user_membership->is_expired();
+
+		if ( 'renew' === $action && ! $is_expired ) {
+			$end = $user_membership->get_end_date( 'timestamp' );
+			$now = ! empty( $end ) ? $end : $now;
+		}
+
+		// obtain the relative end date based on the membership plan
+		$end_date = $membership_plan->get_expiration_date( $now, $args );
+
+		// save/update the membership end date
+		$user_membership->set_end_date( $end_date );
+
+		// finally, re-activate successfully renewed memberships after setting new dates
+		if ( 'renew' === $action && $user_membership->is_in_active_period() ) {
+
+			if ( $is_expired ) {
+
+				$user_membership->update_status( 'active' );
+
+			} elseif ( $user_membership->has_status( 'cancelled' ) ) {
+
+				/**
+				 * Toggles whether to renew a cancelled user membership.
+				 *
+				 * @param bool $renew_cancelled_membership whether to renew a cancelled membership, default true
+				 * @param \WC_Memberships_User_Membership $user_membership the cancelled user membership being renewed
+				 * @param array $args arguments used in the renewal process
+				 */
+				$renew_cancelled_membership = (bool) apply_filters( 'wc_memberships_renew_cancelled_membership', true, $user_membership, $args );
+
+				if ( true === $renew_cancelled_membership ) {
+
+					$user_membership->update_status( 'active' );
+				}
+			}
+		}
+
+		/**
+		 * Fires after a user has been granted membership access.
+		 *
+		 * This action hook is similar to `wc_memberships_user_membership_saved`
+		 * but doesn't fire when memberships are manually created from admin.
+		 * @see \WC_Memberships_User_Memberships::save_user_membership()
+		 *
+		 * @since 1.3.0
+		 *
+		 * @param \WC_Memberships_Membership_Plan $membership_plan the plan that user was granted access to
+		 * @param array $args array of User Membership arguments {
+		 *     @type int $user_id the user ID the membership is assigned to
+		 *     @type int $user_membership_id the user membership ID being saved
+		 *     @type bool $is_update whether this is a post update or a newly created membership
+		 * }
+		 */
+		do_action( 'wc_memberships_user_membership_created', $membership_plan, array(
+			'user_id'            => $args['user_id'],
+			'user_membership_id' => $user_membership->get_id(),
+			'is_update'          => $updating,
+		) );
+
+		$this->prune_object_caches();
+
+		return $user_membership;
+	}
+
+
+	/**
+	 * Returns all user memberships.
 	 *
 	 * @since 1.0.0
-	 * @param int $user_id Optional. Defaults to current user.
-	 * @param array $args
-	 * @return \WC_Memberships_User_Membership[]|null array of user memberships
+	 *
+	 * @param int|\WP_User $user_id optional, defaults to current user
+	 * @param array $args optional arguments
+	 * @return \WC_Memberships_User_Membership[] array of user memberships
 	 */
 	public function get_user_memberships( $user_id = null, $args = array() ) {
 
@@ -90,126 +300,186 @@ class WC_Memberships_User_Memberships {
 
 		if ( ! $user_id ) {
 			$user_id = get_current_user_id();
+		} elseif ( $user_id instanceof \WP_User ) {
+			$user_id = $user_id->ID;
 		}
 
-		if ( ! $user_id ) {
-			return null;
-		}
-
-		$posts_args = array(
-			'author'      => $user_id,
-			'post_type'   => 'wc_user_membership',
-			'post_status' => $args['status'],
-			'nopaging'    => true,
-		);
-
-		$posts            = get_posts( $posts_args );
 		$user_memberships = array();
 
-		if ( ! empty( $posts ) ) {
+		if ( is_numeric( $user_id ) && $user_id > 0 ) {
 
-			foreach ( $posts as $post ) {
-				$user_memberships[] = wc_memberships_get_user_membership( $post );
+			$posts_args = array(
+				'author'      => $user_id,
+				'post_type'   => 'wc_user_membership',
+				'post_status' => $args['status'],
+				'nopaging'    => true,
+			);
+
+			$cache_key = http_build_query( $posts_args );
+
+			if ( ! isset( $this->user_memberships[ $user_id ][ $cache_key ] ) ) {
+
+				$posts = get_posts( $posts_args );
+
+				foreach ( $posts as $post ) {
+					if ( $user_membership = $this->get_user_membership( $post ) ) {
+						$user_memberships[] = $user_membership;
+					}
+				}
+
+				$this->user_memberships[ $user_id ][ $cache_key ] = $user_memberships;
 			}
+
+			$user_memberships = $this->user_memberships[ $user_id ][ $cache_key ];
 		}
 
-		return ! empty( $user_memberships ) ? $user_memberships : null;
+		return $user_memberships;
 	}
 
 
 	/**
-	 * Get a User Membership
+	 * Returns a User Membership.
 	 *
-	 * Supports getting user membership by membership id, post object
-	 * or a combination of the user id and membership plan id/slug/post object
-	 *
-	 * If no $id is provided, defaults to getting the membership for the current user
+	 * Supports getting user membership by membership id, post object or a combination of the user id and membership plan id/slug/post object.
+	 * If no $id is provided, defaults to getting the membership for the current user.
 	 *
 	 * @since 1.0.0
-	 * @param int|\WC_Memberships_User_Membership $id Optional: post object or post ID of the User Membership, or user id
-	 * @param int|string|\WC_Memberships_Membership_Plan Optional : Membership Plan slug, post object or related post id
-	 * @return false|\WC_Memberships_User_Membership
+	 *
+	 * @param int|\WC_Memberships_User_Membership $id optional: post object or post ID of the User Membership, or user ID
+	 * @param int|string|\WC_Memberships_Membership_Plan optional: Membership Plan slug, post object or related post ID
+	 * @return \WC_Memberships_User_Membership|null
 	 */
 	public function get_user_membership( $id = null, $plan = null ) {
 
 		// if a plan is provided, try to find the User Membership using user ID + plan ID
 		if ( $plan ) {
 
-			$user_id         = ! empty( $id ) ? (int) $id : get_current_user_id();
+			if ( $id instanceof \WP_User ) {
+				$user_id = $id->ID;
+			} else {
+				$user_id = ! empty( $id ) ? (int) $id : get_current_user_id();
+			}
+
 			$membership_plan = wc_memberships_get_membership_plan( $plan );
 
 			// bail out if no user ID or membership plan
 			if ( ! $membership_plan || ! $user_id || 0 === $user_id ) {
-				return false;
+				return null;
 			}
 
-			$args = array(
-				'author'      => $user_id,
-				'post_type'   => 'wc_user_membership',
-				'post_parent' => $membership_plan->get_id(),
-				'post_status' => 'any',
-			);
+			$plan_id = (int) $membership_plan->get_id();
 
-			$user_memberships = get_posts( $args );
-			$post             = ! empty( $user_memberships ) ? $user_memberships[0] : null;
+			if ( ! isset( $this->user_membership_post_by_plan[ $user_id ][ $plan_id ] ) ) {
 
-			// otherwise, try to get user membership directly
+				$user_memberships = get_posts( array(
+					'author'      => $user_id,
+					'post_type'   => 'wc_user_membership',
+					'post_parent' => $plan_id,
+					'post_status' => 'any',
+				) );
+
+				$this->user_membership_post_by_plan[ $user_id ][ $plan_id ] = ! empty( $user_memberships ) ? $user_memberships[0] : null;
+			}
+
+			$post = $this->user_membership_post_by_plan[ $user_id ][ $plan_id ];
+
+		// otherwise, try to get user membership directly
 		} else {
 
-			$post = $id;
+			$user_membership_id   = 0;
+			$user_membership_post = $post = null;
 
-			if ( false === $post ) {
-				// try getting from global
-				$post = $GLOBALS['post'];
-			} elseif ( is_numeric( $post ) ) {
-				// try getting by ID
-				$post = get_post( $post );
-			} elseif ( $post instanceof WC_Memberships_User_Membership ) {
-				// try getting from a \WC_Memberships_User_Membership object instance
-				$post = get_post( $post->get_id() );
-			} elseif ( ! $post instanceof WP_Post ) {
-				$post = null;
+			if ( is_numeric( $id ) ) {
+				$user_membership_id   = (int) $id;
+			} elseif ( $id instanceof \WP_Post ) {
+				$user_membership_post = $id;
+				$user_membership_id   = (int) $id->ID;
+			} elseif ( $id instanceof \WC_Memberships_User_Membership ) {
+				$user_membership_post = $id->post;
+				$user_membership_id   = $id->get_id();
+			} elseif ( false === $id && $GLOBALS['post'] instanceof \WP_Post ) {
+				$user_membership_post = $GLOBALS['post'];
+				$user_membership_id   = (int) $GLOBALS['post']->ID;
+			}
+
+			if ( $user_membership_id > 0 ) {
+
+				if ( ! isset( $this->user_membership_post_by_id[ $user_membership_id ] ) ) {
+					$this->user_membership_post_by_id[ $user_membership_id ] = $user_membership_post instanceof \WP_Post ? $user_membership_post : get_post( $user_membership_id );
+				}
+
+				$post = $this->user_membership_post_by_id[ $user_membership_id ];
 			}
 		}
 
 		// if no acceptable post is found, bail out
 		if ( ! $post || 'wc_user_membership' !== get_post_type( $post ) ) {
-			return false;
+			return null;
 		}
 
-		$user_membership = new WC_Memberships_User_Membership( $post );
+		$user_membership = new \WC_Memberships_User_Membership( $post );
 
 		/**
-		 * Get a user membership
+		 * Filter the user membership.
+		 *
+		 * This is an important filter as it's also used internally when the membership is connected to Subscriptions.
 		 *
 		 * @since 1.7.0
-		 * @param \WC_Memberships_User_Membership $user_membership The user membership
-		 * @param \WP_Post $post The user membership post object
-		 * @param int $id The user membership id or the user id if $plan is not null
-		 * @param null|\WC_Memberships_Membership_Plan $plan Optional, the membership plan object
+		 *
+		 * @param \WC_Memberships_User_Membership $user_membership the user membership
+		 * @param \WP_Post $post the user membership post object
+		 * @param int $id the user membership ID or the user ID if $plan is not null
+		 * @param null|\WC_Memberships_Membership_Plan $plan optional, the membership plan object
 		 */
 		return apply_filters( 'wc_memberships_user_membership', $user_membership, $post, $id, $plan );
 	}
 
 
 	/**
-	 * Get user membership by order ID
+	 * Prunes object caches for stored memberships.
+	 *
+	 * @since 1.9.8
+	 *
+	 * @param null|\WC_Memberships_User_Membership $user_membership
+	 */
+	private function prune_object_caches( $user_membership = null ) {
+
+		if ( $user_membership instanceof \WC_Memberships_User_Membership ) {
+
+			unset(
+				$this->user_memberships[ $user_membership->get_user_id() ],
+				$this->user_membership_post_by_plan[ $user_membership->get_user_id() ],
+				$this->user_membership_post_by_id[ $user_membership->get_id() ]
+			);
+
+		}  else {
+
+			unset( $this->user_memberships, $this->user_membership_post_by_plan, $this->user_membership_post_by_id );
+
+			$this->user_memberships = $this->user_membership_post_by_plan = $this->user_membership_post_by_id = array();
+		}
+	}
+
+
+	/**
+	 * Returns a user membership from an order ID.
 	 *
 	 * @since 1.0.1
-	 * @param int|\WC_Order $order Order object or ID
+	 *
+	 * @param int|\WC_Order $order order object or ID
 	 * @return null|\WC_Memberships_User_Membership[]
 	 */
 	public function get_user_membership_by_order_id( $order ) {
 
 		if ( is_numeric( $order ) ) {
 			$order_id = (int) $order;
-		} elseif ( $order instanceof WC_Order || $order instanceof WC_Order_Refund ) {
-			$order_id = (int) SV_WC_Order_Compatibility::get_prop( $order, 'id' );
+		} elseif ( $order instanceof \WC_Order || $order instanceof \WC_Order_Refund ) {
+			$order_id = (int) $order->get_id();
 		} else {
 			return null;
 		}
 
-		$user_memberships_query = new WP_Query( array(
+		$user_memberships_query = new \WP_Query( array(
 			'fields'      => 'ids',
 			'nopaging'    => true,
 			'post_type'   => 'wc_user_membership',
@@ -238,14 +508,14 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Check if user is a member of one particular or any membership plan
+	 * Checks if user is a member of one particular or any membership plan.
 	 *
 	 * @since 1.0.0
-	 * @param int|\WP_User $user_id Optional, defaults to current user
-	 * @param int|string|\WC_Memberships_Membership_Plan $membership_plan Optional: membership plan id, object or slug;
-	 *                                                                    leave empty to check if the user is a member of any plan
-	 * @param bool|string $check_if_active Optional additional check to see if the member has currently active access (pass param as true or 'active') or delayed access (use 'delayed')
-	 * @param bool $cache Whether to use cached results (default true)
+	 *
+	 * @param int|\WP_User $user_id optional, defaults to current user
+	 * @param int|string|\WC_Memberships_Membership_Plan $membership_plan optional: membership plan ID, object or slug - leave empty to check if the user is a member of any plan
+	 * @param bool|string $check_if_active optional additional check to see if the member has currently active access (pass param as true or 'active') or delayed access (use 'delayed')
+	 * @param bool $cache whether to use cached results (default true)
 	 * @return bool
 	 */
 	public function is_user_member( $user_id = null, $membership_plan = null, $check_if_active = false, $cache = true ) {
@@ -269,7 +539,7 @@ class WC_Memberships_User_Memberships {
 
 		if ( is_numeric( $membership_plan ) ) {
 			$plan_id = $membership_plan;
-		} elseif ( $membership_plan instanceof WC_Memberships_Membership_Plan ) {
+		} elseif ( $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
 			$plan_id = $membership_plan->get_id();
 		}
 
@@ -340,7 +610,7 @@ class WC_Memberships_User_Memberships {
 				$user_membership = $this->get_user_membership( $user_id, $membership_plan );
 				$is_member       = (bool) $user_membership;
 
-				if ( $is_member && $must_be_active_member ) {
+				if ( $user_membership && $must_be_active_member ) {
 
 					$is_member = $user_membership->is_active() && $user_membership->is_in_active_period();
 
@@ -360,13 +630,13 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Check if user is a member with active access of one particular or any membership plan
+	 * Checks if user is a member with active access of one particular or any membership plan
 	 *
 	 * @since 1.0.0
-	 * @param int|\WP_User $user_id Optional, defaults to current user
-	 * @param int|string $membership_plan Optional: membership plan ID or slug;
-	 *                                     leave empty to check if the user is a member of any plan
-	 * @param bool $cache Whether to use cache results (default true)
+	 *
+	 * @param int|\WP_User $user_id optional, defaults to current user
+	 * @param int|string $membership_plan optional: membership plan ID or slug - leave empty to check if the user is a member of any plan
+	 * @param bool $cache whether to use cache results (default true)
 	 * @return bool
 	 */
 	public function is_user_active_member( $user_id = null, $membership_plan = null, $cache = true ) {
@@ -375,14 +645,15 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Check if user is an active member of one particular or any membership plan
-	 * but has not gained access yet because the start date of the plan is in the future
+	 * Checks if user is an active member of one particular or any membership plan but is delayed.
+	 *
+	 * This is when a member has not gained access yet because the start date of the plan is in the future.
 	 *
 	 * @since 1.7.0
-	 * @param int|\WP_User $user_id Optional, defaults to current user
-	 * @param int|string $membership_plan Optional: membership plan ID or slug;
-	 *                                     leave empty to check if the user is a member of any plan
-	 * @param bool $cache Whether to use cache results (default true)
+	 *
+	 * @param int|\WP_User $user_id optional, defaults to current user
+	 * @param int|string $membership_plan optional: membership plan ID or slug - leave empty to check if the user is a member of any plan
+	 * @param bool $cache whether to use cache results (default true)
 	 * @return bool
 	 */
 	public function is_user_delayed_member( $user_id = null, $membership_plan = null, $cache = true ) {
@@ -391,18 +662,17 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Check if user is either a member with active or delayed access
-	 * of one particular or any membership plan
+	 * Checks if user is either a member with active or delayed access of one particular or any membership plan.
 	 *
 	 * Note: this isn't the equivalent of doing `! wc_memberships_is_user_active_member()`
 	 * @see \WC_Memberships_User_Memberships::is_user_active_member()
 	 * @see \WC_Memberships_User_Memberships::is_user_delayed_member()
 	 *
 	 * @since 1.7.0
-	 * @param int|\WP_User $user_id Optional, defaults to current user
-	 * @param int|string $membership_plan Optional: membership plan ID or slug;
-	 *                                     leave empty to check if the user is a member of any plan
-	 * @param bool $cache Whether to use cache results (default true)
+	 *
+	 * @param int|\WP_User $user_id optional, defaults to current user
+	 * @param int|string $membership_plan optional: membership plan ID or slug - leave empty to check if the user is a member of any plan
+	 * @param bool $cache whether to use cache results (default true)
 	 * @return bool
 	 */
 	public function is_user_active_or_delayed_member( $user_id = null, $membership_plan = null, $cache = true ) {
@@ -412,14 +682,53 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Get the earliest date a user has been a member of any plan
+	 * Returns the total count of user membership notes.
+	 *
+	 * @since 1.10.1
+	 *
+	 * @param null|int|\WC_Memberships_User_Membership optional user membership to return count for, otherwise returns a global count
+	 * @return int
+	 */
+	public function get_user_membership_notes_count( $user_membership = null ) {
+		global $wpdb;
+
+		$user_membership = is_numeric( $user_membership ) ? $this->get_user_membership( $user_membership ) : $user_membership;
+
+		if ( $user_membership instanceof \WC_Memberships_User_Membership ) {
+
+			$count = count( $user_membership->get_notes() );
+
+		} else {
+
+			$count = $wpdb->get_var( "
+				SELECT COUNT(comment_ID)
+    			FROM $wpdb->comments
+    			WHERE comment_post_ID in (
+      				SELECT ID
+      				FROM $wpdb->posts
+      				WHERE post_type = 'wc_user_membership'
+      			)
+  			" );
+		}
+
+		return is_numeric( $count ) ? max( 0, (int) $count ) : 0;
+	}
+
+
+	/**
+	 * Returns the earliest date a user has been a member of any plan.
 	 *
 	 * @since 1.7.0
-	 * @param int $user_id The WP_User id
-	 * @param string $format The format the date should be, either 'timestamp', 'mysql' or php date format (default timestamp)
-	 * @return int|string|null Timestamp, date string or null if error or user isn't a member
+	 *
+	 * @param \WP_User|int $user_id the user ID or object
+	 * @param string $format the format the date should be, either 'timestamp', 'mysql' or php date format (default timestamp)
+	 * @return int|string|null timestamp, date string or null if error or user isn't a member
 	 */
 	public function get_user_member_since_date( $user_id, $format = 'timestamp' ) {
+
+		if ( $user_id instanceof \WP_User ) {
+			$user_id = $user_id->ID;
+		}
 
 		if ( ! is_numeric( $user_id ) ) {
 			return null;
@@ -428,14 +737,11 @@ class WC_Memberships_User_Memberships {
 		$user_memberships = $this->get_user_memberships( $user_id );
 		$member_since     = null;
 
-		if ( ! empty( $user_memberships ) ) {
+		foreach ( $user_memberships as $user_membership ) {
 
-			foreach ( $user_memberships as $user_membership ) {
+			if ( ! $member_since || $member_since > $user_membership->get_start_date( 'timestamp' ) ) {
 
-				if ( ! $member_since || $member_since > $user_membership->get_start_date( 'timestamp' ) ) {
-
-					$member_since = $user_membership->get_start_date( 'timestamp' );
-				}
+				$member_since = $user_membership->get_start_date( 'timestamp' );
 			}
 		}
 
@@ -444,12 +750,13 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Get the earliest local date a user has been a member of any plan
+	 * Returns the earliest local date a user has been a member of any plan.
 	 *
 	 * @since 1.7.0
-	 * @param int $user_id The WP_User id
-	 * @param string $format The format the date should be, either 'timestamp', 'mysql' or php date format (default timestamp)
-	 * @return int|string|null Timestamp, date string or null if error or user isn't a member
+	 *
+	 * @param int $user_id the user ID
+	 * @param string $format the format the date should be, either 'timestamp', 'mysql' or php date format (default timestamp)
+	 * @return int|string|null timestamp, date string or null if error or user isn't a member
 	 */
 	public function get_user_member_since_local_date( $user_id, $format = 'timestamp' ) {
 
@@ -462,12 +769,15 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Get all user membership statuses
+	 * Returns all user membership statuses.
 	 *
 	 * @since 1.0.0
-	 * @return array associative array of statuses
+	 *
+	 * @param bool $with_labels whether to output label data (default true)
+	 * @param bool $with_prefix whether to output status keys shorthands or prefixed status keys (default)
+	 * @return array
 	 */
-	public function get_user_membership_statuses() {
+	public function get_user_membership_statuses( $with_labels = true, $with_prefix = true ) {
 
 		$statuses = array(
 
@@ -516,101 +826,148 @@ class WC_Memberships_User_Memberships {
 		);
 
 		/**
-		 * Filter user membership statuses
+		 * Filters user membership statuses.
 		 *
 		 * @since 1.0.0
-		 * @param array $statuses Associative array of statuses and labels
-		 * @return array
+		 *
+		 * @param array $statuses associative array of statuses and their arguments
 		 */
-		return apply_filters( 'wc_memberships_user_membership_statuses', $statuses );
+		$statuses = (array) apply_filters( 'wc_memberships_user_membership_statuses', $statuses );
+
+		if ( false === $with_prefix ) {
+
+			foreach ( $statuses as $status_key => $data ) {
+
+				unset( $statuses[ $status_key ] );
+
+				$short_key = str_replace( 'wcm-', '', $status_key );
+
+				$statuses[ $short_key ] = $data;
+			}
+		}
+
+		return false === $with_labels ? array_keys( $statuses ) : $statuses;
 	}
 
 
 	/**
-	 * Get valid membership statuses to be considered as active
+	 * Checks if a string is a valid User Membership status.
+	 *
+	 * @since 1.10.0
+	 *
+	 * @param string $status
+	 * @return bool
+	 */
+	public function is_user_membership_status( $status ) {
+
+		$is_status = false;
+
+		if ( ! empty( $status ) && $statuses = $this->get_user_membership_statuses() ) {
+
+			// maybe add a 'wcm-' prefix
+			$status = Framework\SV_WC_Helper::str_starts_with( $status, 'wcm-' ) ? $status : 'wcm-' . $status;
+
+			$is_status = array_key_exists( $status, $statuses );
+		}
+
+		return $is_status;
+	}
+
+
+	/**
+	 * Returns valid membership statuses to be considered as active.
 	 *
 	 * @since 1.7.0
-	 * @return array
+	 *
+	 * @return string[] array of statuses
 	 */
 	public function get_active_access_membership_statuses() {
 
 		/**
-		 * Filter user membership statuses that have access
+		 * Filter user membership statuses that have access.
 		 *
 		 * @since 1.7.0
-		 * @param string[] $statuses Array of statuses
+		 *
+		 * @param string[] $statuses array of statuses
 		 */
-		return (array) apply_filters( 'wc_memberships_active_access_membership_statuses', array(
+		return array_unique( (array) apply_filters( 'wc_memberships_active_access_membership_statuses', [
 			'active',
 			'complimentary',
+			'free_trial',
 			'pending',
-		) );
+		] ) );
 	}
 
 
 	/**
-	 * Get valid statuses for renewing a user membership on frontend
+	 * Returns valid statuses for renewing a user membership on frontend.
 	 *
 	 * @since 1.7.0
-	 * @return string[] Array of statuses
+	 *
+	 * @return string[] array of statuses
 	 */
 	public function get_valid_user_membership_statuses_for_renewal() {
 
 		/**
-		 * Filter the valid statuses for renewing a user membership on frontend
+		 * Filter the valid statuses for renewing a user membership on frontend.
 		 *
 		 * @since 1.0.0
-		 * @param array $statuses Array of statuses valid for renewal
+		 *
+		 * @param string[] $statuses array of statuses valid for renewal
 		 */
-		return (array) apply_filters( 'wc_memberships_valid_membership_statuses_for_renewal', array(
+		return array_unique( (array) apply_filters( 'wc_memberships_valid_membership_statuses_for_renewal', [
 			'active',
 			'cancelled',
 			'expired',
 			'paused',
-		) );
+		] ) );
 	}
 
 
 	/**
-	 * Get valid statuses for cancelling a user membership from frontend
+	 * Returns valid statuses for cancelling a user membership from frontend.
 	 *
 	 * @since 1.7.0
-	 * @return string[] Array of statuses
+	 *
+	 * @return string[] array of statuses
 	 */
 	public function get_valid_user_membership_statuses_for_cancellation() {
 
 		/**
-		 * Filter the valid statuses for cancelling a user membership on frontend
+		 * Filter the valid statuses for cancelling a user membership on frontend.
 		 *
 		 * @since 1.0.0
-		 * @param array $statuses Array of statuses valid for cancellation
+		 *
+		 * @param string[] $statuses array of statuses valid for cancellation
 		 */
-		return (array) apply_filters( 'wc_memberships_valid_membership_statuses_for_cancel', array(
+		return array_unique( (array) apply_filters( 'wc_memberships_valid_membership_statuses_for_cancel', [
 			'active',
 			'delayed',
-		) );
+			'free_trial',
+		] ) );
 	}
 
 
 	/**
-	 * Adjust new user membership post data
+	 * Adjusts a new user membership post data.
 	 *
 	 * @internal
 	 *
 	 * @since 1.6.0
-	 * @param array $data Original post data
-	 * @return array $data Modified post data
+	 *
+	 * @param array $data original post data
+	 * @return array $data modified post data
 	 */
 	public function adjust_user_membership_post_data( $data ) {
 
 		if ( 'wc_user_membership' === $data['post_type'] ) {
 
-			// Password-protected user membership posts
+			// password-protected user membership posts
 			if ( ! $data['post_password'] ) {
 				$data['post_password'] = uniqid( 'um_', false );
 			}
 
-			// Make sure the passed in user ID is used as post author
+			// make sure the passed in user ID is used as post author
 			if ( isset( $_GET['user'] ) && 'auto-draft' === $data['post_status'] ) {
 				$data['post_author'] = absint( $_GET['user'] );
 			}
@@ -621,156 +978,194 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Handle post status transitions for user memberships
+	 * Handles post status transitions for user memberships.
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.0
-	 * @param string $new_status New status slug
-	 * @param string $old_status Old status slug
-	 * @param \WP_Post $post Related WP_Post object
+	 *
+	 * @param string $new_status new status slug
+	 * @param string $old_status old status slug
+	 * @param \WP_Post $post related WP_Post object
 	 */
-	public function transition_post_status( $new_status, $old_status, WP_Post $post ) {
+	public function transition_post_status( $new_status, $old_status, $post ) {
 
-		if ( 'wc_user_membership' !== $post->post_type || $new_status === $old_status ) {
-			return;
-		}
+		// skip if:
+		if (
+			   ! $post                                   // undetermined post (likely an error)
+			|| 'wc_user_membership' !== $post->post_type // not a membership
+			|| $new_status === $old_status               // not a status update
+			|| 'new' === $old_status                     // new post
+			|| 'auto-draft' === $old_status              // auto-draft
+		) {
 
-		// skip for new posts and auto drafts
-		if ( 'new' === $old_status || 'auto-draft' === $old_status ) {
 			return;
 		}
 
 		$user_membership = $this->get_user_membership( $post );
 
-		$old_status = str_replace( 'wcm-', '', $old_status );
-		$new_status = str_replace( 'wcm-', '', $new_status );
+		$this->prune_object_caches( $user_membership );
 
-		/* translators: Placeholders: Membership status changed from status A (%1$s) to status B (%2$s) */
-		$status_note   = sprintf( __( 'Membership status changed from %1$s to %2$s.', 'woocommerce-memberships' ), wc_memberships_get_user_membership_status_name( $old_status ), wc_memberships_get_user_membership_status_name( $new_status ) );
-		$optional_note = $this->get_membership_status_transition_note();
+		if ( $user_membership ) {
 
-		// prepend optional note to status note, if provided
-		$note = $optional_note ? $optional_note . ' ' . $status_note : $status_note;
+			$old_status = str_replace( 'wcm-', '', $old_status );
+			$new_status = str_replace( 'wcm-', '', $new_status );
 
-		$user_membership->add_note( $note );
+			/* translators: Placeholders: Membership status changed from status A (%1$s) to status B (%2$s) */
+			$status_note   = sprintf( __( 'Membership status changed from %1$s to %2$s.', 'woocommerce-memberships' ), wc_memberships_get_user_membership_status_name( $old_status ), wc_memberships_get_user_membership_status_name( $new_status ) );
+			$optional_note = $this->get_membership_status_transition_note();
 
-		switch ( $new_status ) {
+			// prepend optional note to status note, if provided
+			$note = $optional_note ? $optional_note . ' ' . $status_note : $status_note;
 
-			case 'cancelled':
+			$user_membership->add_note( $note );
 
-				$user_membership->set_cancelled_date( current_time( 'mysql', true ) );
-				$user_membership->unschedule_expiration_events();
+			switch ( $new_status ) {
 
-			break;
+				case 'cancelled':
 
-			case 'expired':
+					$user_membership->cancel_membership();
+					$user_membership->unschedule_expiration_events();
 
-				// Loose check to see if this was a manually triggered expiration.
-				$end_date = $user_membership->get_end_date( 'timestamp' );
+				break;
 
-				// If manually expired, set expire date to now and reschedule
-				// expiration events (also when previously cancelled).
-				if ( $end_date > 0 && current_time( 'timestamp', true ) < $end_date ) {
-					$user_membership->set_end_date( current_time( 'mysql', true ) );
-				} elseif ( 'cancelled' === $old_status ) {
-					$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
-				}
+				case 'expired':
 
-			break;
+					// loose check to see if this was a manually triggered expiration
+					$end_date = $user_membership->get_end_date( 'timestamp' );
 
-			case 'paused':
+					// if manually expired, set expire date to now and reschedule expiration events (also when previously cancelled)
+					if ( $end_date > 0 && current_time( 'timestamp', true ) < $end_date ) {
+						$user_membership->set_end_date( current_time( 'mysql', true ) );
+					} elseif ( 'cancelled' === $old_status ) {
+						$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
+					}
 
-				$now = current_time( 'mysql', true );
+				break;
 
-				$user_membership->set_paused_date( $now );
+				case 'paused':
 
-				// Delayed memberships should disregard intervals at all.
-				if ( 'delayed' !== $old_status ) {
-					$user_membership->set_paused_interval( 'start', strtotime( $now ) );
-				}
+					$user_membership->pause_membership();
 
-				// Restore expiration events if the Membership was cancelled.
-				if ( 'cancelled' === $old_status ) {
-					$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
-				}
+					// delayed memberships should disregard intervals at all
+					if ( 'delayed' !== $old_status ) {
+						$user_membership->set_paused_interval( 'start', current_time( 'mysql', true ) );
+					}
 
-			break;
+					// restore expiration events if the Membership was cancelled
+					if ( 'cancelled' === $old_status ) {
+						$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
+					}
 
-			case 'active':
+				break;
 
-				if ( 'delayed' === $old_status ) {
+				case 'active':
 
-					// For sanity, delayed membership which are now active
-					// shouldn't ever had any of these set.
-					$user_membership->delete_paused_date();
-					$user_membership->delete_paused_intervals();
+					if ( 'delayed' === $old_status ) {
 
-				} elseif ( $user_membership->get_paused_date() ) {
+						// delayed membership which are now active shouldn't ever had any of these set:
+						$user_membership->delete_paused_date();
+						$user_membership->delete_paused_intervals();
 
-					// Save the new membership end date and remove the paused date:
-					// this means that if the membership was paused, or, for example,
-					// paused and then cancelled, and then re-activated, the time paused
-					// will be added to the expiry date, so that the end date is pushed back.
-					$user_membership->set_end_date( $user_membership->get_end_date() );
-					$user_membership->set_paused_interval( 'end', current_time( 'timestamp', true ) );
-					$user_membership->delete_paused_date();
+						// trigger activation email
+						if ( $emails_instance = wc_memberships()->get_emails_instance() ) {
+							$emails_instance->send_membership_activated_email( $user_membership->get_id() );
+						}
 
-				} elseif ( 'cancelled' === $old_status ) {
+					} elseif ( $user_membership->get_paused_date() ) {
 
-					// Restore expiration events if previously cancelled.
-					$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
-				}
+						// Save the new membership end date and remove the paused date:
+						// this means that if the membership was paused, or, for example,
+						// paused and then cancelled, and then re-activated, the time paused
+						// will be added to the expiry date, so that the end date is pushed back.
+						$user_membership->set_end_date( $user_membership->get_end_date() );
+						$user_membership->set_paused_interval( 'end', current_time( 'timestamp', true ) );
+						$user_membership->delete_paused_date();
 
-			break;
+					} elseif ( 'cancelled' === $old_status ) {
 
-			default :
+						$cancelled_date = $user_membership->get_cancelled_date( 'timestamp' );
 
-				// Restore expiration events if the Membership was cancelled.
-				if ( 'cancelled' === $old_status ) {
-					$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
-				}
+						// create a paused interval spanning from the cancellation date to reactivation date (now)
+						if ( null !== $cancelled_date ) {
 
-			break;
+							$paused_intervals = $user_membership->get_paused_intervals();
 
+							// make sure the last interval is closed
+							if ( ! empty( $paused_intervals ) ) {
+
+								end( $paused_intervals );
+								$last_resumed = current( $paused_intervals );
+
+								if ( empty( $last_resumed ) )  {
+									$user_membership->set_paused_interval( 'end', $cancelled_date );
+								}
+							}
+
+							$user_membership->set_paused_interval( 'start', $cancelled_date );
+						}
+
+						/* @see \WC_Memberships_User_Membership::get_total_time() this may be helpful to calculate drip */
+						$user_membership->set_paused_interval( 'end', current_time( 'timestamp', true ) );
+
+						// restore expiration events if previously cancelled
+						$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
+					}
+
+				break;
+
+				default :
+
+					// restore expiration events if the Membership was cancelled
+					if ( 'cancelled' === $old_status ) {
+						$user_membership->schedule_expiration_events( $user_membership->get_end_date( 'timestamp' ) );
+					}
+
+				break;
+
+			}
+
+			/**
+			 * Fires when user membership status is updated.
+			 *
+			 * @since 1.0.0
+			 *
+			 * @param \WC_Memberships_User_Membership $user_membership the membership
+			 * @param string $old_status old status, without the `wcm-` prefix
+			 * @param string $new_status new status, without the `wcm-` prefix
+			 */
+			do_action( 'wc_memberships_user_membership_status_changed', $user_membership, $old_status, $new_status );
+
+			$this->prune_object_caches( $user_membership );
 		}
-
-		/**
-		 * Fires when user membership status is updated
-		 *
-		 * @since 1.0.0
-		 * @param \WC_Memberships_User_Membership $user_membership The membership
-		 * @param string $old_status Old status, without the wcm- prefix
-		 * @param string $new_status New status, without the wcm- prefix
-		 */
-		do_action( 'wc_memberships_user_membership_status_changed', $user_membership, $old_status, $new_status );
 	}
 
 
 	/**
-	 * Set membership status transition note
+	 * Sets a user membership status transition note.
 	 *
-	 * Set a note to be saved along with the general "status changed from %s to %s" note
-	 * when the status of a user membership changes.
+	 * Sets a note to be saved along with the general "status changed from %s to %s" note when the status of a user membership changes.
 	 *
 	 * @since 1.0.0
-	 * @param string $note Note
+	 *
+	 * @param string $note note content
 	 */
 	public function set_membership_status_transition_note( $note ) {
+
 		$this->membership_status_transition_note = $note;
 	}
 
 
 	/**
-	 * Get membership status transition note
+	 * Returns the membership status transition note.
 	 *
-	 * Gets the note and resets it, so it does not interfere with
-	 * any following status transitions.
+	 * Gets the note and resets it, so it does not interfere with any following status transitions.
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.0
-	 * @return string $note Note
+	 *
+	 * @return string $note note content
 	 */
 	public function get_membership_status_transition_note() {
 
@@ -783,11 +1178,79 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Trigger user membership expiration events
+	 * Activates delayed memberships, if found.
+	 *
+	 * Used mainly as a callback for an Action Scheduler task callback.
+	 * Third parties can use this public method to manually activate delayed memberships too.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param array $args optional arguments (may be used in callback or directly: accepts WP_Query arguments)
+	 */
+	public function activate_delayed_user_memberships( $args = [] ) {
+
+		if ( ! is_array( $args ) ) {
+			$args = [];
+		} elseif ( isset( $args['user_membership_id'] ) ) {
+			$args['p'] = (int) $args['user_membership_id'];
+			unset( $args['user_membership_id'] );
+		}
+
+		$args['post_type']   = 'wc_user_membership';
+		$args['post_status'] = 'wcm-delayed';
+
+		// if a specific post search is included, this must be in an action scheduler callback context
+		if ( empty( $args['p'] ) ) {
+
+			/**
+			 * Filters the number of delayed memberships that will be queried for activation on each batch.
+			 *
+			 * @since 1.12.0
+			 *
+			 * @param int $batch default 20
+			 * @param array $args optional arguments
+			 */
+			$args['posts_per_page'] = max( 1, (int) apply_filters( 'wc_memberships_activate_delayed_user_memberships_batch', ! empty( $args['posts_per_page'] ) ? (int) $args['posts_per_page'] : 20, $args ) );
+
+			// set meta query to look for memberships with a start date in the past
+			if ( ! isset( $args['meta_query'] ) || ! is_array( $args['meta_query'] ) ) {
+				$args['meta_query'] = [];
+			}
+
+			$args['meta_query'][] = [
+				'key'     => '_start_date',
+				'value'   => date( 'Y-m-d H:i:s', current_time( 'timestamp', true ) ),
+				'compare' => '<=',
+				'type'    => 'DATETIME'
+			];
+
+			if ( count( $args['meta_query'] ) > 1 ) {
+				$args['meta_query']['relation'] = 'AND';
+			}
+		}
+
+		// look for memberships whose status is delayed and the start date is set in the past or matches now
+		$user_membership_posts = get_posts( $args );
+
+		foreach ( $user_membership_posts as $post ) {
+
+			$user_membership = $this->get_user_membership( $post );
+
+			// this simple check will also trigger an evaluation if the membership should stay delayed or activated instead
+			if ( $user_membership && ! $user_membership->is_delayed() ) {
+				$this->prune_object_caches( $user_membership );
+			}
+		}
+	}
+
+
+	/**
+	 * Triggers user membership expiration events.
 	 *
 	 * @since 1.7.0
-	 * @param array $args Expiration event args
-	 * @param string $force_event Event to trigger, only when calling the method directly and not as hook callback
+	 *
+	 * @param array $args expiration event args
+	 * @param string $force_event event to trigger, only when calling the method directly and not as hook callback
 	 */
 	public function trigger_expiration_events( $args, $force_event = '' ) {
 
@@ -798,6 +1261,7 @@ class WC_Memberships_User_Memberships {
 			return;
 		}
 
+		// you may fire when ready
 		if ( $emails_instance = wc_memberships()->get_emails_instance() ) {
 
 			if ( 'wc_memberships_user_membership_expiring_soon' === $current_filter ) {
@@ -809,6 +1273,13 @@ class WC_Memberships_User_Memberships {
 				$user_membership = $this->get_user_membership( $user_membership_id );
 
 				if ( $user_membership ) {
+
+					// Bail if a legacy cron event is running on a membership in an active period.
+					// This allows the legacy cron events to run on memberships which should expire accounting for failed upgrade routines.
+					if ( defined( 'DOING_CRON' ) && $user_membership->is_in_active_period() ) {
+						return;
+					}
+
 					$user_membership->expire_membership();
 				}
 
@@ -823,40 +1294,107 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Callback for save_post when a user membership is created or updated
+	 * Returns the number of days before expiration when a membership should trigger an expiring soon event.
 	 *
-	 * Triggers `wc_memberships_user_membership_saved` action
+	 * @see \WC_Memberships_User_Membership::schedule_expiration_events()
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return int number of days (min. 1)
+	 */
+	public function get_ending_soon_days() {
+
+		return $this->get_event_days( 'ending-soon' );
+	}
+
+
+	/**
+	 * Returns the number of days after expiration when a membership should trigger a renewal reminder event.
+	 *
+	 * @see \WC_Memberships_User_Membership::expire_membership()
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return int number of days (min. 1)
+	 */
+	public function get_renewal_reminder_days() {
+
+		return $this->get_event_days( 'renewal-reminder' );
+	}
+
+
+	/**
+	 * Returns the days setting before or after an event should be triggered for a membership.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @param string $which_event which event to get days setting for
+	 * @return int number of days (default min. 1)
+	 */
+	private function get_event_days( $which_event ) {
+
+		$value = $default = 1;
+		$email = $key = null;
+
+		if ( 'ending-soon' === $which_event ) {
+			$email   = 'WC_Memberships_User_Membership_Ending_Soon_Email';
+			$key     = 'send_days_before';
+			$default = 3;
+		} elseif ( 'renewal-reminder' === $which_event ) {
+			$email   = 'WC_Memberships_User_Membership_Renewal_Reminder_Email';
+			$key     = 'send_days_after';
+			$default = 1;
+ 		}
+
+ 		if ( $email && $key ) {
+
+			$email_setting = get_option( "woocommerce_{$email}_settings", array() );
+
+			if ( $email_setting && isset( $email_setting[ $key ] ) && is_numeric( $email_setting[ $key ] ) ) {
+				$value = max( 1, absint( $email_setting[ $key ] ) );
+			} else {
+				$value = $default;
+			}
+	    }
+
+		return $value;
+	}
+
+
+	/**
+	 * Callback for save_post when a user membership is created or updated.
+	 *
+	 * Triggers `wc_memberships_user_membership_saved` action.
 	 * @see \wc_memberships_create_user_membership()
 	 *
 	 * @internal
 	 *
 	 * @since 1.3.8
-	 * @param int $post_id WP_Post id
-	 * @param WP_Post $post Post object
-	 * @param bool $update Whether we are updating or creating a new post
+	 *
+	 * @param int $post_id the post ID
+	 * @param WP_Post $post the post object
+	 * @param bool $update whether we are updating or creating a new post
 	 */
 	public function save_user_membership( $post_id, $post, $update ) {
 
-		if ( 'wc_user_membership' === get_post_type( $post ) && ( $user_membership = wc_memberships_get_user_membership( $post_id ) ) ) {
+		if ( 'wc_user_membership' === get_post_type( $post ) && ( $user_membership = $this->get_user_membership( $post_id ) ) ) {
 
 			/**
 			 * Fires after a user has been granted membership access.
 			 *
-			 * This hook is similar to `wc_memberships_user_membership_created`
-			 * but will also fire when a membership is manually created in admin
+			 * This hook is similar to `wc_memberships_user_membership_created`,
+			 * but will also fire when a membership is manually created in admin,
 			 * or upon an import or via command line interface, etc.
-			 *
 			 * @see \wc_memberships_create_user_membership()
 			 *
 			 * @since 1.3.8
-			 * @param \WC_Memberships_Membership_Plan $membership_plan The plan that user was granted access to.
-			 * @param array $args
-			 * @param array $args {
-			 *     Array of User Membership arguments:
 			 *
-			 *     @type int $user_id The user id the membership is assigned to.
-			 *     @type int $user_membership_id The user membership id being saved.
-			 *     @type bool $is_update Whether this is a post update or a newly created membership.
+			 * @param \WC_Memberships_Membership_Plan $membership_plan the plan that user was granted access to.
+			 * @param array $args
+			 * @param array $args array of contextual arguments {
+			 *     @type int $user_id the user ID the membership is assigned to.
+			 *     @type int $user_membership_id the user membership id being saved.
+			 *     @type bool $is_update whether this is a post update or a newly created membership.
 			 * }
 			 */
 			do_action( 'wc_memberships_user_membership_saved', $user_membership->get_plan(), array(
@@ -864,37 +1402,37 @@ class WC_Memberships_User_Memberships {
 				'user_membership_id' => $user_membership->get_id(),
 				'is_update'          => $update,
 			) );
+
+			$this->prune_object_caches( $user_membership );
 		}
 	}
 
 
 	/**
-	 * Delete user memberships if a user is deleted
+	 * Deletes related user memberships when a matching user is deleted.
 	 *
 	 * @since 1.0.0
-	 * @param int $user_id Id of a user being deleted
+	 *
+	 * @param int $user_id ID of a member being deleted
 	 */
 	public function delete_user_memberships( $user_id ) {
 
 		$user_memberships = $this->get_user_memberships( $user_id );
 
-		if ( ! empty( $user_memberships ) ) {
-
-			foreach ( $user_memberships as $membership ) {
-
-				wp_delete_post( $membership->get_id() );
-			}
+		foreach ( $user_memberships as $membership ) {
+			wp_delete_post( $membership->get_id() );
 		}
 	}
 
 
 	/**
-	 * Delete related data when a user membership is deleted
+	 * Deletes related data when a user membership is deleted.
 	 *
 	 * @internal
 	 *
 	 * @since 1.7.0
-	 * @param int $post_id Post object id of the user membership being deleted
+	 *
+	 * @param int $post_id post object ID of the user membership being deleted
 	 */
 	public function delete_related_data( $post_id ) {
 
@@ -903,45 +1441,66 @@ class WC_Memberships_User_Memberships {
 			return;
 		}
 
+		$this->prune_object_caches();
+
 		// delete scheduled events
-		if ( $user_membership = wc_memberships_get_user_membership( $post_id ) ) {
+		if ( $user_membership = $this->get_user_membership( $post_id ) ) {
+
+			/**
+			 * Fires before a user membership is deleted.
+			 *
+			 * @since 1.11.0
+			 *
+			 * @param \WC_Memberships_User_Membership $user_membership membership object
+			 */
+			do_action( 'wc_memberships_user_membership_deleted', $user_membership );
+
 			$user_membership->unschedule_expiration_events();
+			$user_membership->unschedule_activation_events();
+
+			$this->prune_object_caches( $user_membership );
+
 		}
 	}
 
 
 	/**
-	 * Cancel user membership when the associated order is trashed
+	 * Cancels a user membership when the associated order is trashed.
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.1
-	 * @param int $order_id \WC_Order post id being trashed
+	 *
+	 * @param int $order_id \WC_Order post ID of the order being trashed
 	 */
 	public function handle_order_trashed( $order_id ) {
+
 		$this->handle_order_cancellation( $order_id, __( 'Membership cancelled because the associated order was trashed.', 'woocommerce-memberships' ) );
 	}
 
 
 	/**
-	 * Cancel user membership when the associated order is refunded
+	 * Cancels a user membership when the associated order is refunded.
 	 *
 	 * @internal
 	 *
 	 * @since 1.0.1
-	 * @param int $order_id \WC_Order id being refunded
+	 *
+	 * @param int $order_id ID of the order being refunded
 	 */
 	public function handle_order_refunded( $order_id ) {
+
 		$this->handle_order_cancellation( $order_id, __( 'Membership cancelled because the associated order was refunded.', 'woocommerce-memberships' ) );
 	}
 
 
 	/**
-	 * Handle a cancellation due to an order event
+	 * Handles a cancellation due to an order event.
 	 *
 	 * @since 1.6.0
-	 * @param int $order_id \WC_Order id associated to the User Membership
-	 * @param string $note Cancellation message
+	 *
+	 * @param int $order_id order ID associated to the User Membership
+	 * @param string $note cancellation message
 	 */
 	private function handle_order_cancellation( $order_id, $note ) {
 
@@ -959,71 +1518,119 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Backwards compatibility handler for deprecated methods
+	 * Excludes user membership notes from queries and RSS feeds.
 	 *
-	 * TODO remove these by version 2.0.0 {FN 2017-01-13}
+	 * @internal
 	 *
-	 * @since 1.7.0
-	 * @param string $method Method called
-	 * @param void|string|array|mixed $args Optional argument(s)
-	 * @return null|void|mixed
+	 * @since 1.9.0
+	 *
+	 * @param array $clauses
+	 * @return array
 	 */
-	public function __call( $method, $args ) {
+	public function exclude_membership_notes_from_queries( $clauses ) {
+		global $wpdb, $typenow;
 
-		$called = "wc_memberships()->get_user_memberships()->{$method}()";
-
-		switch ( $method ) {
-
-			/** @deprecated since 1.6.0 */
-			case 'user_membership_post_date' :
-				_deprecated_function( $called, '1.6.0', 'wc_memberships()->get_user_memberships_instance()->user_membership_post_data()' );
-				return $this->adjust_user_membership_post_data( isset( $args[0] ) ? $args[0] : $args );
-
-			/** @deprecated since 1.7.0 */
-			case 'expire_user_membership' :
-
-				_deprecated_function( $called, '1.7.0', 'wc_memberships_get_user_membership()->expire_membership()' );
-
-				$user_membership_id = is_array( $args ) && isset( $args[0] ) ? $args[0] : $args;
-				$user_membership    = wc_memberships_get_user_membership( $user_membership_id );
-
-				if ( $user_membership instanceof WC_Memberships_User_Membership ) {
-					$user_membership->expire_membership();
-				}
-
-				return null;
-
-			/** @deprecated since 1.7.0 */
-			case 'exclude_membership_notes_from_queries' :
-				_deprecated_function( $called, '1.7.0', 'wc_memberships()->get_query_instance()->exclude_membership_notes_from_queries()' );
-				return wc_memberships()->get_query_instance()->exclude_membership_notes_from_queries( isset( $args[0] ) ? $args[0] : $args );
-
-			/** @deprecated since 1.7.0 */
-			case 'exclude_membership_notes_from_feed_join' :
-				_deprecated_function( $called, '1.7.0', 'wc_memberships()->get_query_instance()->exclude_membership_notes_from_feed_join()' );
-				return wc_memberships()->get_query_instance()->exclude_membership_notes_from_feed_join( isset( $args[0] ) ? $args[0] : $args );
-
-			/** @deprecated since 1.7.0 */
-			case 'exclude_membership_notes_from_feed_where' :
-				_deprecated_function( $called, '1.7.0', 'wc_memberships()->get_query_instance()->exclude_membership_notes_from_feed_where()' );
-				return wc_memberships()->get_query_instance()->exclude_membership_notes_from_feed_where( isset( $args[0] ) ? $args[0] : $args );
-
-			/** @deprecated since 1.8.0 */
-			case 'is_user_non_inactive_member' :
-
-				_deprecated_function( $called, '1.8.0', 'wc_memberships_is_user_active_or_delayed_member()' );
-
-				$user_id = isset( $args[0] ) ? $args[0] : null;
-				$plan    = isset( $args[1] ) ? $args[1] : null;
-
-				return $this->is_user_active_or_delayed_member( $user_id, $plan );
-
-			default :
-				// you're probably doing it wrong
-				trigger_error( 'Call to undefined property ' . __CLASS__ . '::' . $method, E_USER_ERROR );
-				return null;
-
+		// don't hide when viewing user memberships in admin
+		if ( 'wc_user_membership' === $typenow && is_admin() && current_user_can( 'manage_woocommerce' ) ) {
+			return $clauses;
 		}
+
+		if ( ! $clauses['join'] ) {
+			$clauses['join'] = '';
+		}
+
+		if ( false === strpos( $clauses['join'], "JOIN $wpdb->posts" ) ) {
+			$clauses['join'] .= " LEFT JOIN $wpdb->posts ON comment_post_ID = $wpdb->posts.ID ";
+		}
+
+		if ( $clauses['where'] ) {
+			$clauses['where'] .= ' AND ';
+		}
+
+		$clauses['where'] .= " $wpdb->posts.post_type <> 'wc_user_membership' ";
+
+		return $clauses;
+	}
+
+
+	/**
+	 * Excludes user membership notes from queries and RSS feeds.
+	 *
+	 * @internal
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $join
+	 * @return string
+	 */
+	public function exclude_membership_notes_from_feed_join( $join ) {
+		global $wpdb;
+
+		if ( ! strstr( $join, $wpdb->posts ) ) {
+			$join = " LEFT JOIN $wpdb->posts ON $wpdb->comments.comment_post_ID = $wpdb->posts.ID ";
+		}
+
+		return $join;
+	}
+
+
+	/**
+	 * Excludes user membership notes from queries and RSS feeds.
+	 *
+	 * @internal
+	 *
+	 * @since 1.9.0
+	 *
+	 * @param string $where
+	 * @return string
+	 */
+	public function exclude_membership_notes_from_feed_where( $where ) {
+		global $wpdb;
+
+		if ( $where ) {
+			$where .= ' AND ';
+		}
+
+		$where .= " $wpdb->posts.post_type <> 'wc_user_membership' ";
+
+		return $where;
+	}
+
+
+	/**
+	 * Excludes user membership notes from the comments count totals.
+	 *
+	 * @internal
+	 *
+	 * @since 1.10.1
+	 *
+	 * @param \stdClass $counts comment counts stored in an object
+	 * @param int $post_id optional, whether the counts are related to a specific post and not global (0)
+	 * @return \stdClass
+	 */
+	public function exclude_membership_notes_from_comments_count( $counts, $post_id = 0 ) {
+
+		if ( 0 === $post_id ) {
+
+			$notes = $this->get_user_membership_notes_count();
+
+			if ( $notes > 0 ) {
+				$counts->all      = max( 0, (int) $counts->all - $notes );
+				$counts->approved = max( 0, (int) $counts->approved - $notes );
+			}
+
+		} elseif ( is_numeric( $post_id ) && $post_id > 0 && 'wc_user_membership' === get_post_type( $post_id ) ) {
+
+			$new_counts = new stdClass();
+
+			foreach ( array_keys( (array) $counts ) as $count ) {
+				$new_counts->$count = 0;
+			}
+
+			$counts = $new_counts;
+		}
+
+		return $counts;
 	}
 
 

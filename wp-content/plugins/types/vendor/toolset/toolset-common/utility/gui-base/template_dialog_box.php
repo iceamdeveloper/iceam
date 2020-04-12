@@ -87,9 +87,9 @@ class Toolset_Template_Dialog_Box extends Toolset_DialogBoxes {
 	 * Render a predefined Twig template.
 	 *
 	 * @since 2.0
-	 * @throws Twig_Error_Loader In case of incorrect Twig configuration.
-	 * @throws Twig_Error_Runtime In case of incorrect Twig configuration.
-	 * @throws Twig_Error_Syntax In case of incorrect Twig configuration.
+	 * @throws \OTGS\Toolset\Twig\Error\LoaderError
+	 * @throws \OTGS\Toolset\Twig\Error\RuntimeError
+	 * @throws \OTGS\Toolset\Twig\Error\SyntaxError
 	 */
 	public function template() {
 		printf(

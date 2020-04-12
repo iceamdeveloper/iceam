@@ -61,9 +61,9 @@ function wpcf_custom_taxonomies_init()
     $custom_taxonomies = get_option( WPCF_OPTION_NAME_CUSTOM_TAXONOMIES, array() );
     if ( !empty( $custom_taxonomies ) ) {
         foreach ( $custom_taxonomies as $taxonomy => $data ) {
-            if ( 
-				! isset( $data['_builtin'] ) 
-				|| ! $data['_builtin'] 
+            if (
+				! isset( $data['_builtin'] )
+				|| ! $data['_builtin']
 			) {
                 wpcf_custom_taxonomies_register( $taxonomy, $data );
             }
@@ -157,6 +157,18 @@ function wpcf_custom_taxonomies_register( $taxonomy, $data ) {
 		$object_types = array();
 	}
 
+
+	$block_editor_available = new Toolset_Condition_Plugin_Gutenberg_Active();
+	if( $block_editor_available->is_met() ) {
+		// >= WP 5.0 or Gutenberg plugin active
+		// force show_in_rest for taxonomies
+		$data['show_in_rest'] = 1;
+	}
+
+	if( isset( $data['show_in_rest_force_disable'] ) && $data['show_in_rest_force_disable'] ) {
+		$data['show_in_rest'] = false;
+	}
+
 	$data = apply_filters( 'types_taxonomy', $data, $taxonomy );
 
 	// Set labels
@@ -172,6 +184,9 @@ function wpcf_custom_taxonomies_register( $taxonomy, $data ) {
 
 		foreach ( $data['labels'] as $label_key => $label ) {
 			$data['labels'][ $label_key ] = $label = stripslashes( $label );
+
+			// Allows several instances of %s in the label.
+			$label = str_replace( '%s', '%1$s', $label );
 
 			switch ( $label_key ) {
 

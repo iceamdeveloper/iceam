@@ -16,37 +16,38 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * View for a membership recent activity note
+ * View for a membership recent activity note.
  *
  * @since 1.7.0
  */
-class WC_Memberships_Meta_Box_View_Membership_Recent_Activity_Note extends WC_Memberships_Meta_Box_View {
+class WC_Memberships_Meta_Box_View_Membership_Recent_Activity_Note extends \WC_Memberships_Meta_Box_View {
 
 
 	/**
-	 * HTML Output
+	 * Outputs HTML.
 	 *
 	 * @since 1.7.0
+	 *
 	 * @param array $args
 	 */
 	public function output( $args = array() ) {
 
-		// get args
-		$membership_plan = isset( $args['plan'] )            ? $args['plan']            : null;
-		$note            = isset( $args['note'] )            ? $args['note']            : null;
-		$note_classes    = isset( $args['note_classes'] )    ? $args['note_classes']    : array( 'note' );
+		// parse args
+		$membership_plan = isset( $args['plan'] )         ? $args['plan']         : null;
+		$note            = isset( $args['note'] )         ? $args['note']         : null;
+		$note_classes    = isset( $args['note_classes'] ) ? $args['note_classes'] : array( 'note' );
 
-		if ( is_object( $membership_plan ) && is_object( $note ) ) :
+		if ( $membership_plan instanceof \WC_Memberships_Membership_Plan && is_object( $note ) ) :
 
 			?>
 			<li rel="<?php echo absint( $note->comment_ID ) ; ?>" class="<?php echo implode( ' ', array_map( 'sanitize_html_class', $note_classes ) ); ?>">
@@ -55,7 +56,7 @@ class WC_Memberships_Meta_Box_View_Membership_Recent_Activity_Note extends WC_Me
 					<?php
 
 					/* translators: Placeholder: %s - the plan name if a plan has been removed */
-					$plan_name    = $membership_plan ? $membership_plan->get_name() : __( '[Plan removed]', 'woocommerce-memberships' );
+					$plan_name    = $membership_plan ? $membership_plan->get_formatted_name() : __( '[Plan removed]', 'woocommerce-memberships' );
 
 					/* translators: Placeholders: %1$s - Membership Plan Name, %2$s - Membership note. Example "Gold Plan: Membership cancelled" */
 					$note_content = wpautop( sprintf( __( '%1$s: %2$s', 'woocommerce-memberships' ),

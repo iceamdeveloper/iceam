@@ -17,12 +17,22 @@ class Toolset_Field_Definition_Post extends Toolset_Field_Definition {
 	 * @return Toolset_Field_Accessor_Abstract
 	 */
 	public function get_accessor( Toolset_Field_Instance $field_instance ) {
-		return new Toolset_Field_Accessor_Postmeta_Field(
-			$field_instance->get_object_id(),
-			$this->get_meta_key(),
-			$this->get_is_repetitive(),
-			$field_instance
-		);
+		switch( $this->get_type_slug() ) {
+			case Toolset_Field_Type_Definition_Factory::POST:
+				// We need a specialized accessor for the post reference, because the value is not taken from
+				// the postmeta.
+				return new \OTGS\Toolset\Common\Field\Accessor\PostReference(
+					$field_instance->get_object_id(),
+					$this
+				);
+			default:
+				return new Toolset_Field_Accessor_Postmeta_Field(
+					$field_instance->get_object_id(),
+					$this->get_meta_key(),
+					$this->is_repeatable(),
+					$field_instance
+				);
+		}
 	}
 	
 

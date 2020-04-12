@@ -9,7 +9,7 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.1
  *
  */
 ?>
@@ -19,6 +19,8 @@
 		rel="prev"
 		class="tribe-events-pro-week-day-selector__prev"
 		data-js="tribe-events-view-link"
+		aria-label="<?php esc_attr_e( 'Previous week', 'tribe-events-calendar-pro' ); ?>"
+		title="<?php esc_attr_e( 'Previous week', 'tribe-events-calendar-pro' ); ?>"
 	>
 		<span class="tribe-common-a11y-visual-hide">
 			<?php esc_html_e( 'Previous week', 'tribe-events-calendar-pro' ); ?>

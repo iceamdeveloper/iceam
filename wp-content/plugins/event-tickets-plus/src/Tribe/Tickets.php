@@ -20,7 +20,6 @@ abstract class Tribe__Tickets_Plus__Tickets extends Tribe__Tickets__Tickets {
 		$meta_store->maybe_set_attendee_meta_cookie();
 	}
 
-
 	/**
 	 * Returns the amount of global stock set for the event.
 	 *

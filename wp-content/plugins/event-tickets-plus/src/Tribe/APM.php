@@ -64,14 +64,14 @@ class Tribe__Tickets_Plus__APM {
 	 */
 	public function filter_args( array $filter_args ) {
 		$filter_args[ Tribe__Tickets_Plus__APM__Sales_Filter::$key ] = [
-			'name'        => esc_html__( 'Ticket Sales', 'event-tickets-plus' ),
+			'name'        => esc_html( sprintf( __( '%s Sales', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'apm_sales_filter_name' ) ) ),
 			'custom_type' => 'custom_ticket_sales',
 			'sortable'    => 'true',
 			'cast'        => 'NUMERIC',
 		];
 
 		$filter_args[ Tribe__Tickets_Plus__APM__Stock_Filter::$key ] = [
-			'name'        => esc_html__( 'Ticket Stock', 'event-tickets-plus' ),
+			'name'        => esc_html( sprintf( __( '%s Stock', 'event-tickets-plus' ), tribe_get_ticket_label_singular( 'apm_stock_filter_name' ) ) ),
 			'custom_type' => 'custom_ticket_stock',
 			'sortable'    => 'true',
 			'cast'        => 'NUMERIC',
@@ -132,7 +132,7 @@ class Tribe__Tickets_Plus__APM {
 	 * @return Tribe__Tickets_Plus__Commerce__Sales_Counter|Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
 	 */
 	public function sales_counter() {
-		_deprecated_method( __METHOD__, '4.6', 'Tribe__Tickets_Plus__APM__Sales_Filter::get_total_value()' );
+		_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__APM__Sales_Filter::get_total_value()' );
 		return new Tribe__Tickets_Plus__Commerce__Sales_Counter( Tribe__Tickets_Plus__Main::instance()->commerce_loader() );
 	}
 
@@ -144,7 +144,7 @@ class Tribe__Tickets_Plus__APM {
 	 * @return Tribe__Tickets_Plus__Commerce__Stock_Counter|Tribe__Tickets_Plus__Commerce__Total_Provider_Interface
 	 */
 	public function stock_counter() {
-		_deprecated_method( __METHOD__, '4.6', 'Tribe__Tickets_Plus__APM__Stock_Filter::get_total_value()' );
+		_deprecated_function( __METHOD__, '4.6', 'Tribe__Tickets_Plus__APM__Stock_Filter::get_total_value()' );
 		return new Tribe__Tickets_Plus__Commerce__Stock_Counter( Tribe__Tickets_Plus__Main::instance()->commerce_loader() );
 	}
 }

@@ -6,7 +6,7 @@
 
 /*
  * Child tables on post edit screen handling.
- * 
+ *
  * @type tChildTable._L10.Anonym$0
  */
 var tChildTable = (function($) {
@@ -405,18 +405,10 @@ jQuery(document).ready(function($) {
                     if (typeof data.conditionals != 'undefined' && typeof wptCond != 'undefined') {
                         wptCond.addConditionals(data.conditionals);
                     }
-                    if ('undefined' != typeof data.child_id) {
-                        $('#types-child-row-' + data.child_id).on('click', '.js-wpt-file-upload', function (event) {
-                            wptFile.bindOpen($(this), false);
-                        });
-                    }
                 }
                 $button.next().fadeOut(function () {
                     $(this).remove();
                 });
-                if ('undefined' != typeof wptFile) {
-                    wptFile.init();
-                }
                 /**
                  * select2
                  */
@@ -731,9 +723,6 @@ jQuery(document).ready(function($) {
                         if (typeof wptCallbacks != 'undefined') {
                             wptCallbacks.reset.fire('#' + rowId);
                         }
-                        if ('undefined' != typeof wptFile) {
-                            wptFile.init();
-                        }
                     }
                     if (typeof data.conditionals != 'undefined' && typeof wptCond != 'undefined') {
                         wptCond.addConditionals(data.conditionals);
@@ -826,9 +815,6 @@ jQuery(document).ready(function($) {
                     }
                     if (typeof data.conditionals != 'undefined' && typeof wptCond != 'undefined') {
                         wptCond.addConditionals(data.conditionals);
-                    }
-                    if ('undefined' != typeof wptFile) {
-                        wptFile.init();
                     }
                     /**
                      * rebind images
@@ -1006,7 +992,7 @@ jQuery(document).ready(function($) {
         });
     });
     /*
-     * 
+     *
      * Init
      */
     wpcfRelationshipInit('', 'init');
@@ -1069,7 +1055,7 @@ function wpcfBindSelect2For( element ) {
 	var $ = jQuery,
 		options = element.find( 'option' ),
 		element_s2_instance;
-	
+
 	if ( options.length < 16 ) {
 		element_s2_instance = element.toolset_select2({
 			allowClear: true,

@@ -72,58 +72,6 @@ jQuery(document).ready(function(){
     });
     
     jQuery('#post').submit(function(){
-        
-        //
-        //
-        //
-        //
-        // TODO Remove
-        // Checking unique repetitive values removed
-        // Types 1.2
-        //
-        //        var passed = true;
-        //        var checkedArr = new Array();
-        //        jQuery('.wpcf-repetitive-wrapper').each(function(){
-        //            var parent = jQuery(this);
-        //            var parentID = parent.attr('id');
-        //            var childParentProcessed = false;
-        //            checkedArr[parentID] = new Array();
-        //            parent.find('.wpcf-repetitive').each(function(index, value){
-        //                var toContinue = true;
-        //                if (jQuery(this).hasClass('radio')) {
-        //                    var childParent = jQuery(this).parents('.form-item-radios');
-        //                    var childParentId = childParent.attr('id');
-        //                    if (childParentProcessed != childParentId) {
-        //                        var currentValue = childParent.find(':checked').val();
-        //                        childParentProcessed = childParentId;
-        //                    } else {
-        //                        toContinue = false;
-        //                    }
-        //                } else {
-        //                    var currentValue = jQuery(this).val();
-        //                }
-        //                if (toContinue) {
-        //                    if (jQuery.inArray(currentValue, checkedArr[parentID]) > -1) {
-        //                        passed = false;
-        //                        if (jQuery(this).hasClass('wpcf-repetitive-error') == false) {
-        //                            jQuery(this).before('<div class="wpcf-form-error-unique-value wpcf-form-error">'+wpcfFormRepetitiveUniqueValuesCheckText+'</div>').focus();
-        //                            jQuery(this).addClass('wpcf-repetitive-error');
-        //                        }
-        //                    }
-        //                    checkedArr[parentID].push(currentValue);
-        //                }
-        //            });
-        //        });
-        //        if (passed == false) {
-        //            // Bind message fade out
-        //            jQuery('.wpcf-repetitive').on('click', function(){
-        //                jQuery(this).removeClass('wpcf-repetitive-error');
-        //                jQuery(this).parents('.wpcf-repetitive-wrapper').find('.wpcf-form-error-unique-value').fadeOut(function(){
-        //                    jQuery(this).remove();
-        //                });
-        //            });
-        //            return false;
-        //        }
         jQuery('#post .wpcf-cd-failed, #post .wpcf-cd-group-failed').remove();
     });
     

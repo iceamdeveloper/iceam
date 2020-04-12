@@ -30,11 +30,23 @@ function wpcf_cd_form_field_filter( $form, $data )
      * new group or new field
      */
     if (!isset( $data['group_id'] ) ) {
+    	switch( toolset_getarr( $data, 'meta_type' ) ) {
+			case 'termmeta':
+				$message = __( 'Conditional display is not supported for Term fields.', 'wpcf' );
+				break;
+			case 'usermeta':
+				$message = __( 'Conditional display is not supported for User fields.', 'wpcf' );
+				break;
+			default:
+			case 'postmeta':
+				$message = __( 'You will be able to set conditional field display once this group is saved.', 'wpcf' );
+				break;
+		}
         return $form + array(
             'cd_not_available' => array(
                 '#type' => 'notice',
                 '#title' => __( 'Conditional display', 'wpcf' ),
-                '#markup' => __( 'You will be able to set conditional field display once this group is saved.', 'wpcf' ),
+                '#markup' => $message,
                 '#pattern' => '<tr class="wpcf-border-top"><td><LABEL></td><td><ERROR><BEFORE><ELEMENT><AFTER>',
             ),
         );
@@ -660,7 +672,7 @@ function wpcf_conditional_get_curent($data)
                     mktime( 0, 0, 0, $condition['date'], $condition['month'], $condition['year'] )
                 );
             }
-            
+
             /* remove operators description */
             $operation = preg_replace( '#\([^)]+\)#', '', $operation );
 

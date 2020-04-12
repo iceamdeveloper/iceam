@@ -137,6 +137,7 @@ class All_View extends List_View {
 			return $args;
 		}
 
+		$args['hide_subsequent_recurrences'] = false;
 		$args['in_series'] = $post_id;
 		$this->post_name   = $post_name;
 		$this->post_id     = $post_id;
@@ -148,8 +149,8 @@ class All_View extends List_View {
 	 * {@inheritDoc}
 	 */
 	protected function get_show_datepicker_submit() {
-		$live_refresh = tribe_is_truthy( tribe_get_option( 'liveFiltersUpdate', true ) );
-		return empty( $live_refresh );
+		$live_refresh = tribe_get_option( 'liveFiltersUpdate', 'automatic' );
+		return 'manual' === $live_refresh;
 	}
 
 	/**

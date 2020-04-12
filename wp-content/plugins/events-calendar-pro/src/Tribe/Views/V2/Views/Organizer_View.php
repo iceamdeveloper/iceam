@@ -73,7 +73,7 @@ class Organizer_View extends List_View {
 	 *
 	 * Overrides the base View constructor to use PRO Rewrite handler.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * {@inheritDoc}
 	 */
@@ -112,8 +112,10 @@ class Organizer_View extends List_View {
 	 * {@inheritDoc}
 	 */
 	public function prev_url( $canonical = false, array $passthru_vars = [] ) {
-		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
-			return $this->cached_urls[ __METHOD__ ];
+		$cache_key = __METHOD__ . '_' . md5( wp_json_encode( func_get_args() ) );
+
+		if ( isset( $this->cached_urls[ $cache_key ] ) ) {
+			return $this->cached_urls[ $cache_key ];
 		}
 
 		$current_page = (int) $this->context->get( 'page', 1 );
@@ -129,7 +131,7 @@ class Organizer_View extends List_View {
 
 		$url = $this->filter_prev_url( $canonical, $url );
 
-		$this->cached_urls[ __METHOD__ ] = $url;
+		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
 	}
@@ -138,8 +140,10 @@ class Organizer_View extends List_View {
 	 * {@inheritDoc}
 	 */
 	public function next_url( $canonical = false, array $passthru_vars = [] ) {
-		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
-			return $this->cached_urls[ __METHOD__ ];
+		$cache_key = __METHOD__ . '_' . md5( wp_json_encode( func_get_args() ) );
+
+		if ( isset( $this->cached_urls[ $cache_key ] ) ) {
+			return $this->cached_urls[ $cache_key ];
 		}
 
 		$current_page = (int) $this->context->get( 'page', 1 );
@@ -155,7 +159,7 @@ class Organizer_View extends List_View {
 
 		$url = $this->filter_next_url( $canonical, $url );
 
-		$this->cached_urls[ __METHOD__ ] = $url;
+		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
 	}
@@ -310,8 +314,8 @@ class Organizer_View extends List_View {
 	 * {@inheritDoc}
 	 */
 	protected function get_show_datepicker_submit() {
-		$live_refresh = tribe_is_truthy( tribe_get_option( 'liveFiltersUpdate', true ) );
-		return empty( $live_refresh );
+		$live_refresh = tribe_get_option( 'liveFiltersUpdate', 'automatic' );
+		return 'manual' === $live_refresh;
 	}
 
 	/**
@@ -395,7 +399,7 @@ class Organizer_View extends List_View {
 	/**
 	 * Updates the URL query arguments for the Organizer View to correctly build its URls.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * {@inheritDoc}
 	 */

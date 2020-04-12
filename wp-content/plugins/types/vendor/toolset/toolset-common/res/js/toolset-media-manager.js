@@ -8,57 +8,56 @@
 
 var Toolset = Toolset || {};
 
-var Toolset = Toolset  || {};
 if ( typeof Toolset.mediaManager === "undefined" ) {
     Toolset.mediaManager = {};
 }
 
 Toolset.mediaManager.Class = function( $ ) {
-	
+
 	var self = this;
-	
+
 	self.wpMediaEditor = wp.media.editor;
-	
+
 	self.editorSelector = '.js-toolset-editor-media-manager';
 	self.inputSelector  = '.js-toolset-input-media-manager';
-	
+
 	self.instances = {
 		editor: {},
 		input:  {}
 	};
-	
+
 	self.getPostId = function( $mediaButton ) {
 		var referredId = $mediaButton.data( 'postid' ),
 			postId = 0;
-		
+
 		if ( referredId ) {
 			postId = parseInt( referredId ) || 0;
 		}
-		
+
 		return postId;
 	};
-	
+
 	self.setTarget = function( $mediaButton ) {
 		var targetId = $mediaButton.data( 'target' );
-		
+
 		if ( targetId ) {
 			window.wpcfActiveEditor = targetId;
 		}
 	};
-	
+
 	self.getInstanceKey = function( postId ) {
 		return 'toolsetMediaFor' + postId;
 	};
-	
+
 	self.setEditorMediaManagerEvents = function( instanceKey ) {
 		// Watch changes in wp-includes/js/media-editor.js
 		var workflow = self.instances.editor[ instanceKey ];
-		
+
 		self.instances.editor[ instanceKey ].on( 'insert', function() {
-			
+
 			var state = self.instances.editor[ instanceKey ].state(),
 				selection = state.get( 'selection' );
-				
+
 			if ( ! selection ) {
 				return;
 			}
@@ -118,33 +117,33 @@ Toolset.mediaManager.Class = function( $ ) {
 			}
 		}, self.wpMediaEditor );
 	};
-	
+
 	$( document ).on( 'click', self.editorSelector, function( e ) {
 		e.preventDefault();
 		var $mediaButton = $( this ),
 			postId = self.getPostId( $mediaButton ),
 			instanceKey = self.getInstanceKey( postId );
-		
+
 		self.setTarget( $mediaButton );
-		
+
 		if ( _.has( self.instances.editor, instanceKey ) ) {
 			self.instances.editor[ instanceKey ].open();
 			return;
 		}
-		
+
 		wp.media.model.settings.post.id = postId;
-		
+
 		self.instances.editor[ instanceKey ] = wp.media({
 			className: 'media-frame js-toolset-media-frame',
 			frame: 'post'
 		});
-		
+
 		self.setEditorMediaManagerEvents( instanceKey );
-		
+
 		self.instances.editor[ instanceKey ].open();
-		
+
 	});
-	
+
 };
 
 jQuery( document ).ready( function( $ ) {

@@ -29,4 +29,5 @@ if ( ! metadata_exists( 'post', $post_id, Tribe__Tickets_Plus__Attendees_List::H
 			<?php checked( $show_attendees ); ?>
 		>
 	</label>
+	<p class="description"><?php esc_html_e( 'Show a list of attendees, filtered by those who opt out during purchase.', 'event-tickets-plus' ); ?></p>
 </p>

@@ -13,11 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 if ( ! class_exists( 'WP_Async_Request', false ) ) {
-	include_once( 'libraries/wp-async-request.php' );
+	include_once( WC_ABSPATH . 'includes/libraries/wp-async-request.php' );
 }
 
 if ( ! class_exists( 'WP_Background_Process', false ) ) {
-	include_once( 'libraries/wp-background-process.php' );
+	include_once( WC_ABSPATH . 'includes/libraries/wp-background-process.php' );
 }
 
 /**
@@ -27,14 +27,32 @@ if ( ! class_exists( 'WP_Background_Process', false ) ) {
  * updates in the background.
  *
  * @class    WC_PB_Background_Updater
- * @version  5.0.0
+ * @version  5.7.1
  */
 class WC_PB_Background_Updater extends WP_Background_Process {
 
 	/**
-	 * @var string
+	 * Initiate new background process.
 	 */
-	protected $action = 'wc_pb_updater';
+	public function __construct() {
+
+		// Uses unique prefix per blog so each blog has its own queue.
+		$this->prefix = 'wp_' . get_current_blog_id();
+		$this->action = 'wc_pb_updater';
+
+		parent::__construct();
+	}
+
+	/**
+	 * Returns the cron action identifier.
+	 *
+	 * @since  5.7.1
+	 *
+	 * @return string
+	 */
+	public function get_cron_hook_identifier() {
+		return $this->cron_hook_identifier;
+	}
 
 	/**
 	 * Dispatch updater.
@@ -82,8 +100,8 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 	 *
 	 * @return boolean
 	 */
-	public function is_updating() {
-		return false === $this->is_queue_empty();
+	public function is_update_queued() {
+		return ! empty( $this->data ) || false === $this->is_queue_empty();
 	}
 
 	/**
@@ -140,7 +158,7 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 			if ( -1 === $result ) {
 				$message = sprintf( '- Restarting %s callback.', $callback );
 				// Add this to ensure the task gets restarted right away.
-				add_filter( 'wp_wc_pb_updater_time_exceeded', '__return_true' );
+				add_filter( $this->identifier . '_time_exceeded', '__return_true' );
 			} elseif ( -2 === $result ) {
 				$message = sprintf( '- Requeuing %s callback.', $callback );
 			} else {
@@ -150,6 +168,9 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 			WC_PB_Core_Compatibility::log( $message, 'info', 'wc_pb_db_updates' );
 
 		} else {
+
+			$result = false;
+
 			WC_PB_Core_Compatibility::log( sprintf( '- Could not find %s callback.', $callback ), 'notice', 'wc_pb_db_updates' );
 		}
 

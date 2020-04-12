@@ -42,18 +42,18 @@ abstract class Toolset_Ajax_Handler_Abstract implements Toolset_Ajax_Handler_Int
 	protected function get_ajax_manager() {
 		return $this->ajax_manager;
 	}
-	
-	
+
+
 	protected function ajax_begin( $arguments ) {
-		$am = $this->get_am();
+		$am = $this->get_ajax_manager();
 		return $am->ajax_begin( $arguments );
 	}
-	
-	
-	protected function ajax_finish( $response, $is_success = true ) {
-		$am = $this->get_am();
+
+
+	protected function ajax_finish( $response = array(), $is_success = true ) {
+		$am = $this->get_ajax_manager();
 		$am->ajax_finish( $response, $is_success );
 	}
-	
-	
+
+
 }

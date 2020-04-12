@@ -45,8 +45,10 @@ class Toolset_Page_Troubleshooting {
 
 		$context = $this->build_page_context();
 
+		/** @noinspection PhpUnhandledExceptionInspection */
 		$twig = $this->get_twig();
 
+		/** @noinspection PhpUnhandledExceptionInspection */
 		echo $twig->render( '@troubleshooting/main.twig', $context );
 		
 	}
@@ -75,7 +77,8 @@ class Toolset_Page_Troubleshooting {
 	/**
 	 * Retrieve a Twig environment initialized by the Toolset GUI base.
 	 *
-	 * @return Twig_Environment
+	 * @return \OTGS\Toolset\Twig\Environment
+	 * @throws \OTGS\Toolset\Twig\Error\LoaderError
 	 * @since m2m
 	 */
 	private function get_twig() {
@@ -100,7 +103,7 @@ class Toolset_Page_Troubleshooting {
 		$js_model_data = array(
 			'sections' => $troubleshooting_sections,
 			'strings' => array(
-				'confirmUnload' => __( 'There is an action in progress. Please do not leave or reload this page until it finishes.', 'wpcf' )
+				'confirmUnload' => __( 'There is an action in progress. Please do not leave or reload this page until it finishes.', 'wpv-views' )
 			)
 		);
 		$gui_base = Toolset_Gui_Base::get_instance();

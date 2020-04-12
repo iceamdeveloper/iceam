@@ -5,21 +5,44 @@
  */
 $has_output_bootstrap = (isset( $cfg['attribute']['output'] ) && $cfg['attribute']['output'] == 'bootstrap');
 
-if ( is_admin() ) {
+if ( Toolset_Utils::is_real_admin() ) {
     $child_div_classes = array('js-wpt-field-items');
 	if (  ! $has_output_bootstrap && $cfg['use_bootstrap'] && in_array( $cfg['type'], array( 'date', 'select' ) ) ) {
 		$child_div_classes[] = 'form-inline';
 	}
-	$field_additional_classes = apply_filters('toolset_field_additional_classes', '', $cfg);
-    ?><div class="js-wpt-field wpt-field js-wpt-<?php echo $cfg['type']; ?> wpt-<?php echo $cfg['type']; ?><?php if ( @$cfg['repetitive'] ) echo ' js-wpt-repetitive wpt-repetitive'; ?><?php echo $field_additional_classes; ?>" data-wpt-type="<?php echo $cfg['type']; ?>" data-wpt-id="<?php echo $cfg['id']; ?>">
+
+	$is_repeatable = (bool) toolset_getarr( $cfg, 'repetitive' );
+
+	// Distinguish fields that store URLs to any type of files (audio, image, video, file, ...).
+	// See WPToolset_Types::filterField for further information.
+	$is_field_with_files = (bool) toolset_getarr( $cfg, 'is_field_with_files' );
+
+	$needs_label_extracted = ! in_array( $cfg['type'], array( 'checkboxes', 'checkbox', 'radios' ), true );
+
+	$field_outer_div_classes = array(
+		'js-wpt-field',
+		'wpt-field',
+		'js-wpt-' . $cfg['type'],
+		'wpt-' . $cfg['type'],
+		$is_repeatable ? 'js-wpt-repetitive wpt-repetitive' : '',
+		$is_field_with_files ? 'js-wpt-field-with-files' : '',
+		$needs_label_extracted ? 'js-wpt-field-extract-label' : '',
+		apply_filters( 'toolset_field_additional_classes', '', $cfg ),
+	);
+
+	?>
+	<div class="<?php echo esc_attr( implode( ' ', $field_outer_div_classes ) ); ?>"
+		data-wpt-type="<?php echo $cfg['type']; ?>"
+		data-wpt-id="<?php echo $cfg['id']; ?>"
+	>
     <div class="<?php echo implode( ' ', $child_div_classes ); ?>">
 		<?php
 		foreach ( $html as $out ):
 			include 'metaform-item.php';
 		endforeach;
 		?>
-		<?php if ( @$cfg['repetitive'] ): ?>
-            <a href="#" class="js-wpt-repadd wpt-repadd button button-small button-primary-toolset" data-wpt-type="<?php echo $cfg['type']; ?>" data-wpt-id="<?php echo $cfg['id']; ?>"><?php echo apply_filters( 'toolset_button_add_repetition_text', __( 'Add new', 'wpv-views' ), $cfg ); ?></a>
+		<?php if ( $is_repeatable ): ?>
+	      <a class="js-wpt-repadd wpt-repadd button button-primary-toolset" data-wpt-type="<?php echo $cfg['type']; ?>" data-wpt-id="<?php echo $cfg['id']; ?>"><?php echo apply_filters( 'toolset_button_add_repetition_text', __( 'Add new', 'wpv-views' ), $cfg ); ?></a>
 		<?php endif; ?>
     </div>
     </div>
@@ -34,7 +57,7 @@ if ( is_admin() ) {
     /**
 	 * Get the field extra classnames, coming from checks in validation and conditionals.
 	 *
-	 * Used to adjust the data-initial-conditional attribute by getting the field extra classnames 
+	 * Used to adjust the data-initial-conditional attribute by getting the field extra classnames
 	 * and checking whether it contains a "wpt-hidden" bit.
 	 *
 	 * @note This might need a deeper review, since we are getting here some classnames that we ditch entirely

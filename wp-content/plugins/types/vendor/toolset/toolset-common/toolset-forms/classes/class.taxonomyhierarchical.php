@@ -24,6 +24,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 			 * Terms with all fields as they are returned from wp_get_post_terms()
 			 *
 			 * @since 1.8.8
+			 * @access private
 			 *
 			 * @param array terms
 			 * @param string name field
@@ -45,6 +46,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 * array of current values of taxonomy hierarichical field
 		 *
 		 * @since 1.8.8
+		 * @access private
 		 *
 		 * @param array values
 		 * @param string name field
@@ -57,6 +59,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 * Array object of build terms with html and styling of taxonomy hierarichical field
 		 *
 		 * @since 1.8.8
+		 * @access private
 		 *
 		 * @param array buildTerms
 		 * @param string name field
@@ -79,6 +82,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 * Array object of children elements of taxonomy hierarichical field
 		 *
 		 * @since 1.8.8
+		 * @access private
 		 *
 		 * @param array children term
 		 * @param string name field
@@ -91,6 +95,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 * Array object of elements name of taxonomy hierarichical field
 		 *
 		 * @since 1.8.8
+		 * @access private
 		 *
 		 * @param array names
 		 * @param string name field
@@ -162,6 +167,15 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 */
 		$add_text_button_value = apply_filters( 'toolset_button_add_text', esc_attr( $attributes['add_text'] ) );
 
+		switch( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+			case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+				$bootstrap_secondary_button_class = ' btn btn-secondary ';
+				break;
+			default:
+				$bootstrap_secondary_button_class = ' btn btn-default' ;
+				break;
+		}
+
 		if ( $this->output == 'bootstrap' ) {
 			/**
 			 * Input Text/Selectbox Parent container
@@ -210,8 +224,6 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 				'#validate' => $this->getValidationData(),
 			);
 
-			$bootstrap_class = "btn btn-default";
-
 			/**
 			 * The add button
 			 */
@@ -224,7 +236,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 				'#attributes' => array(
 					'data-taxonomy' => $taxonomy_name,
 					'data-build_what' => $build_what,
-					'class' => "wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new {$bootstrap_class}",
+					'class' => "wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new {$bootstrap_secondary_button_class}",
 					'data-output' => $this->output,
 				),
 				'#validate' => $this->getValidationData(),
@@ -236,13 +248,13 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 			$bootstrap_button = "<a
 			style='display:none;'
             data-taxonomy='{$taxonomy_name}'
-            data-after-selector='js-wpt-hierarchical-taxonomy-add-new-{$taxonomy_name}' 
-            data-open='" . $add_new_text_button_value . "' 
-            data-close='" . $cancel_button_value . "' 
-            data-output='" . $this->output . "'     
-            class = '{$class}'  
-            role = 'button' 
-            name = 'btn_{$taxonomy_name}' 
+            data-after-selector='js-wpt-hierarchical-taxonomy-add-new-{$taxonomy_name}'
+            data-open='" . $add_new_text_button_value . "'
+            data-close='" . $cancel_button_value . "'
+            data-output='" . $this->output . "'
+            class = '{$class}'
+            role = 'button'
+            name = 'btn_{$taxonomy_name}'
             >{$add_new_text_button_value}</a>";
 
 			$metaform[] = array(
@@ -264,7 +276,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 					'data-after-selector' => 'js-wpt-hierarchical-taxonomy-add-new-' . $taxonomy_name,
 					'data-open' => $add_new_text_button_value,
 					'data-close' => $cancel_button_value, // TODO adjust the button value depending on open/close action
-					'class' => $use_bootstrap ? 'btn btn-default wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide' : 'wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide',
+					'class' => $use_bootstrap ? $bootstrap_secondary_button_class . ' wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide' : 'wpt-hierarchical-taxonomy-add-new-show-hide js-wpt-hierarchical-taxonomy-add-new-show-hide',
 				),
 				'#validate' => $this->getValidationData(),
 			);
@@ -330,7 +342,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 				'#attributes' => array(
 					'data-taxonomy' => $taxonomy_name,
 					'data-build_what' => $build_what,
-					'class' => $use_bootstrap ? 'btn btn-default wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new' : 'wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new',
+					'class' => $use_bootstrap ? $bootstrap_secondary_button_class . ' wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new' : 'wpt-hierarchical-taxonomy-add-new js-wpt-hierarchical-taxonomy-add-new',
 				),
 				'#validate' => $this->getValidationData(),
 				'#after' => '</div>',
@@ -343,6 +355,7 @@ class WPToolset_Field_Taxonomyhierarchical extends WPToolset_Field_Textfield {
 		 * Toolset Cancel button
 		 *
 		 * @since 1.8.8
+		 * @access private
 		 *
 		 * @param array metaform
 		 * @param string name_field

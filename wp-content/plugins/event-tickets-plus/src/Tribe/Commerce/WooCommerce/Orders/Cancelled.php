@@ -45,12 +45,33 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Cancelled {
 	 */
 	public function __construct( $ticket_id ) {
 		if ( ! is_numeric( $ticket_id ) ) {
-			throw new InvalidArgumentException( 'Ticket post ID must be an int or a numeric string.' );
+			throw new InvalidArgumentException(
+				esc_html(
+					sprintf(
+						__(
+							'%s post ID must be an int or a numeric string.',
+							'event-tickets-plus'
+						),
+						tribe_get_ticket_label_singular( 'woo_orders_cancelled_exception' )
+					)
+				)
+			);
 		}
 
 		$ticket_post = get_post( $ticket_id );
 		if ( empty( $ticket_post ) ) {
-			throw new InvalidArgumentException( 'Ticket with ID ' . $ticket_id . ' does not exist.' );
+			throw new InvalidArgumentException(
+				esc_html(
+					sprintf(
+						__(
+							'%1$s with ID %2$s does not exist.',
+							'event-tickets-plus'
+						),
+						tribe_get_ticket_label_singular( 'woo_orders_cancelled_exception' ),
+						esc_html( $ticket_id )
+					)
+				)
+			);
 		}
 
 		$this->ticket_id = $ticket_id;

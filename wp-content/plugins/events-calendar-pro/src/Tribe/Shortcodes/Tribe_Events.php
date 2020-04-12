@@ -1,4 +1,7 @@
 <?php
+
+use Tribe__Utils__Array as Arr;
+
 /**
  * Represents individual [tribe_events] shortcodes.
  *
@@ -275,8 +278,25 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 			'post_type'         => Tribe__Events__Main::POSTTYPE,
 			'eventDate'         => $eventDate_param,
 			'eventDisplay'      => $this->get_attribute( 'view' ),
-			'tribe_events_cat'  => $this->atts[ 'category' ],
 		];
+
+		$category_input = Arr::get_first_set( $this->atts, [ 'category', 'cat' ], false );
+
+		if ( false !== $category_input ) {
+			$terms = Arr::list_to_array( $category_input );
+
+			if ( count( $terms ) > 1 ) {
+				$arguments['tax_query'] = [
+					Tribe__Events__Main::TAXONOMY => [
+						'taxonomy' => Tribe__Events__Main::TAXONOMY,
+						'field'    => 'slug',
+						'terms'    => Arr::list_to_array( $category_input ),
+					]
+				];
+			} else {
+				$arguments[ Tribe__Events__Main::TAXONOMY ] = reset( $terms );
+			}
+		}
 
 		$arguments['featured'] = $this->is_attribute_truthy( 'featured' ) ? true : null;
 
@@ -284,7 +304,7 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 	}
 
 	/**
-	 * Take care of common setup needs including enqueing various assets required by the default views.
+	 * Take care of common setup needs including enqueuing various assets required by the default views.
 	 */
 	public function prepare_default() {
 		/**
@@ -566,7 +586,8 @@ class Tribe__Events__Pro__Shortcodes__Tribe_Events {
 		$this->get_template_object()->add_input_hash();
 		$attributes[] = 'id="tribe-events"';
 		$attributes[] = 'class="' . $this->get_wrapper_classes() . '"';
-		$attributes[] = 'data-live_ajax="' . absint( tribe_get_option( 'liveFiltersUpdate', true ) ) . '"';
+		$live_update  = 'automatic' === tribe_get_option( 'liveFiltersUpdate', 'automatic' ) ? 1 : 0;
+		$attributes[] = 'data-live_ajax="' . absint( $live_update ) . '"';
 		$attributes[] = 'data-datepicker_format="' . tribe_get_option( 'datepickerFormat' ) . '"';
 
 		if ( isset( $this->atts['featured'] ) && tribe_is_truthy( $this->atts['featured'] ) ) {

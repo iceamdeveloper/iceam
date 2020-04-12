@@ -16,18 +16,19 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Membership Emails class
+ * Membership Emails handler.
  *
- * This class handles all email-related functionality in Memberships
+ * This class handles all email-related functionality in Memberships.
  *
  * @since 1.0.0
  */
@@ -35,11 +36,14 @@ class WC_Memberships_Emails {
 
 
 	/**
-	 * Set up membership emails
+	 * Sets up membership emails.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
+
+		// load email classes
+		add_action( 'woocommerce_loaded', array( $this, 'init_emails' ) );
 
 		// add emails
 		add_filter( 'woocommerce_email_classes', array( $this, 'get_email_classes' ) );
@@ -55,11 +59,42 @@ class WC_Memberships_Emails {
 
 
 	/**
-	 * Get Memberships emails classes
+	 * Initializes Memberships email classes.
+	 *
+	 * @since 1.11.0
+	 */
+	public function init_emails() {
+
+		// loads the base WooCommerce Email class the Memberships abstraction is based on
+		if ( ! class_exists( 'WC_Email' ) ) {
+
+			WC()->mailer();
+		}
+
+		// loads the Memberships Email abstract class
+		if ( ! class_exists( 'WC_Memberships_User_Membership_Email' ) ) {
+
+			require_once( wc_memberships()->get_plugin_path() . '/includes/emails/abstract-wc-memberships-user-membership-email.php' );
+		}
+
+		// loads and initializes individual Memberships Emails objects
+		foreach ( $this->get_email_class_names( true ) as $class_name => $include_path ) {
+
+			if ( ! class_exists( $class_name ) && is_readable( wc_memberships()->get_plugin_path() . $include_path ) ) {
+
+				$this->$class_name = wc_memberships()->load_class( $include_path, $class_name );
+			}
+		}
+	}
+
+
+	/**
+	 * Returns Memberships emails classes.
 	 *
 	 * @since 1.7.0
-	 * @param bool $include_paths Whether to return an associative array with class paths
-	 * @return array Indexed or Associative array
+	 *
+	 * @param bool $include_paths whether to return an associative array with class paths
+	 * @return array indexed or associative array
 	 */
 	public function get_email_class_names( $include_paths = false )  {
 
@@ -68,6 +103,7 @@ class WC_Memberships_Emails {
 			'WC_Memberships_User_Membership_Ending_Soon_Email'      => '/includes/emails/class-wc-memberships-user-membership-ending-soon-email.php',
 			'WC_Memberships_User_Membership_Ended_Email'            => '/includes/emails/class-wc-memberships-user-membership-ended-email.php',
 			'WC_Memberships_User_Membership_Renewal_Reminder_Email' => '/includes/emails/class-wc-memberships-user-membership-renewal-reminder-email.php',
+			'WC_Memberships_User_Membership_Activated_Email'        => '/includes/emails/class-wc-memberships-user-membership-activated-email.php',
 		);
 
 		return true !== $include_paths ? array_keys( $email_classes ) : $email_classes;
@@ -75,34 +111,20 @@ class WC_Memberships_Emails {
 
 
 	/**
-	 * Add custom memberships emails to WC emails
+	 * Adds custom memberships emails to WC emails.
 	 *
 	 * @since 1.7.0
-	 * @param array $emails Optional, associative array of email objects
-	 * @return \WC_Email[]|\WC_Memberships_Emails[] Associative array with email objects as values
+	 *
+	 * @param array $emails optional, associative array of email objects
+	 * @return \WC_Email[]|\WC_Memberships_Emails[] associative array with email objects as values
 	 */
 	public function get_email_classes( $emails = array() ) {
 
-		// applies when this method is called directly and not as WooCommerce hook callback
-		if ( empty( $emails ) && ! class_exists( 'WC_Email' ) ) {
-			WC()->mailer();
-		}
+		// init emails if uninitialized
+		$this->init_emails();
 
-		require_once( wc_memberships()->get_plugin_path() . '/includes/emails/abstract-wc-memberships-user-membership-email.php' );
-
-		foreach ( $this->get_email_class_names( true ) as $class => $path ) {
-
-			$file = wc_memberships()->get_plugin_path() . $path;
-
-			if ( is_readable( $file ) ) {
-
-				require_once( $file );
-
-				if ( class_exists( $class ) ) {
-
-					$emails[ $class ] = new $class();
-				}
-			}
+		foreach ( $this->get_email_class_names() as $class ) {
+			$emails[ $class ] = $this->$class;
 		}
 
 		return $emails;
@@ -110,11 +132,106 @@ class WC_Memberships_Emails {
 
 
 	/**
-	 * Get a membership email default content
+	 * Returns the instance of an email handler.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @param string $which_email email class name
+	 * @return null|\WC_Memberships_User_Membership_Email
+	 */
+	private function get_email_instance( $which_email ) {
+
+		$email = null;
+
+		if ( is_string( $which_email ) ) {
+
+			// init emails if uninitialized
+			$this->init_emails();
+
+			if ( empty( $this->$which_email ) ) {
+				$emails = $this->get_email_classes();
+				$email  = isset( $emails[ $which_email ] ) ? $emails[ $which_email ] : null;
+			} else {
+				$email  = $this->$which_email;
+			}
+		}
+
+		return $email;
+	}
+
+
+	/**
+	 * Returns the membership note email handler instance.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return null|\WC_Memberships_User_Membership_Note_Email
+	 */
+	public function get_user_membership_note_email_instance() {
+
+		return $this->get_email_instance( 'WC_Memberships_User_Membership_Note_Email' );
+	}
+
+
+	/**
+	 * Returns the membership ending soon email handler instance.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return null|\WC_Memberships_User_Membership_Ending_Soon_Email
+	 */
+	public function get_user_membership_ending_soon_email_instance() {
+
+		return $this->get_email_instance( 'WC_Memberships_User_Membership_Ending_Soon_Email' );
+	}
+
+
+	/**
+	 * Returns the membership ended email handler instance.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return null|\WC_Memberships_User_Membership_Ended_Email
+	 */
+	public function get_user_membership_ended_email_instance() {
+
+		return $this->get_email_instance( 'WC_Memberships_User_Membership_Ended_Email' );
+	}
+
+
+	/**
+	 * Returns the renewal reminder email handler instance.
+	 *
+	 * @since 1.11.0
+	 *
+	 * @return null|\WC_Memberships_User_Membership_Renewal_Reminder_Email
+	 */
+	public function get_user_membership_renewal_reminder_email_instance() {
+
+		return $this->get_email_instance( 'WC_Memberships_User_Membership_Renewal_Reminder_Email' );
+	}
+
+
+	/**
+	 * Returns the activated delayed membership email handler instance.
+	 *
+	 * @since 1.12.0
+	 *
+	 * @return null|\WC_Memberships_User_Membership_Renewal_Reminder_Email
+	 */
+	public function get_user_membership_activated_email_instance() {
+
+		return $this->get_email_instance( 'WC_Memberships_User_Membership_Activated_Email' );
+	}
+
+
+	/**
+	 * Returns a membership email's default content.
 	 *
 	 * @since 1.7.0
-	 * @param string $email
-	 * @return string May contain HTML
+	 *
+	 * @param string $email the email
+	 * @return string may contain HTML
 	 */
 	public function get_email_default_content( $email ) {
 
@@ -132,11 +249,12 @@ class WC_Memberships_Emails {
 
 
 	/**
-	 * Send a user membership email
+	 * Sends a user membership email.
 	 *
 	 * @since 1.7.0
-	 * @param string $email The type of membership email to send
-	 * @param mixed $args The param to pass to the email to be sent
+	 *
+	 * @param string $email the type of membership email to send
+	 * @param mixed $args the param to pass to the email to be sent
 	 */
 	public function send_email( $email, $args ) {
 
@@ -153,65 +271,87 @@ class WC_Memberships_Emails {
 
 
 	/**
-	 * Send expiring soon email for a user membership
+	 * Sends a membership activated email for a user membership.
+	 *
+	 * @see \WC_Memberships_User_Membership_Activated_Email
+	 *
+	 * @since 1.12.0
+	 *
+	 * @param int $user_membership_id ID of the activated membership
+	 */
+	public function send_membership_activated_email( $user_membership_id ) {
+
+		$this->send_email( 'WC_Memberships_User_Membership_Activated_Email', $user_membership_id );
+	}
+
+
+	/**
+	 * Sends an expiring soon email for a user membership.
 	 *
 	 * @see \WC_Memberships_Membership_Ending_Soon_Email
 	 *
 	 * @since 1.7.0
-	 * @param int $user_membership_id Id of the expiring membership
+	 *
+	 * @param int $user_membership_id ID of the expiring membership
 	 */
 	public function send_membership_ending_soon_email( $user_membership_id ) {
+
 		$this->send_email( 'WC_Memberships_User_Membership_Ending_Soon_Email', $user_membership_id );
 	}
 
 
 	/**
-	 * Send ended email for a user membership
+	 * Sends a membership ended email for a user membership.
 	 *
 	 * @see \WC_Memberships_Membership_Ended_Email
 	 *
 	 * @since 1.7.0
-	 * @param int $user_membership_id Id of the expired membership
+	 *
+	 * @param int $user_membership_id ID of the expired membership
 	 */
 	public function send_membership_ended_email( $user_membership_id ) {
+
 		$this->send_email( 'WC_Memberships_User_Membership_Ended_Email', $user_membership_id );
 	}
 
 
 	/**
-	 * Send renewal reminder email for a user membership
+	 * Sends a renewal reminder email for a user membership.
 	 *
 	 * @see \WC_Memberships_Membership_Renewal_Reminder_Email
 	 *
 	 * @since 1.7.0
-	 * @param int $user_membership_id Id of the expired membership
+	 *
+	 * @param int $user_membership_id ID of the expired membership
 	 */
 	public function send_membership_renewal_reminder_email( $user_membership_id ) {
+
 		$this->send_email( 'WC_Memberships_User_Membership_Renewal_Reminder_Email', $user_membership_id );
 	}
 
 
 	/**
-	 * Send a new user membership note notification for the member
+	 * Send a new user membership note notification for the member.
 	 *
 	 * @since 1.7.0
-	 * @param array $args {
-	 *     Array of arguments passed to the email object:
 	 *
-	 *     @type int $user_membership_id The user membership the email is for
-	 *     @type string $membership_note The contents of the note to send
+	 * @param array $args array of arguments passed to the email object {	 *
+	 *     @type int $user_membership_id the user membership the email is for
+	 *     @type string $membership_note the contents of the note to send
 	 * }
 	 */
 	public function send_new_membership_note_email( array $args ) {
+
 		$this->send_email( 'WC_Memberships_User_Membership_Note_Email', $args );
 	}
 
 
 	/**
-	 * Get merge tags help strings
+	 * Return merge tags help strings.
 	 *
 	 * @since 1.7.0
-	 * @return string[] Array of text strings
+	 *
+	 * @return string[] array of text strings
 	 */
 	public function get_emails_merge_tags_help() {
 
@@ -240,6 +380,9 @@ class WC_Memberships_Emails {
 			/* translators: Placeholder: %s - merge tag */
 			sprintf( __( '%s inserts the time difference between now and the date when the membership expires or has expired (e.g. "2 days", or "1 week", etc.).', 'woocommerce-memberships' ),
 				'<strong><code>{membership_expiry_time_diff}</code></strong>' ),
+			/* translators: Placeholder: %s - merge tag */
+			sprintf( __( '%s inserts a plain URL to the members area to view the membership.', 'woocommerce-memberships' ),
+				'<strong><code>{membership_view_url}</code></strong>' ),
 			/* translators: Placeholder: %s - merge tag */
 			sprintf( __( '%s inserts a plain membership renewal URL.', 'woocommerce-memberships' ),
 				'<strong><code>{membership_renewal_url}</code></strong>' ),

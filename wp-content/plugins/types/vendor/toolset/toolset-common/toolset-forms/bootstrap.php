@@ -1,6 +1,9 @@
 <?php
 
+/** @deprecated This may not be defined at all times. Use TOOLSET_COMMON_VERSION instead */
 define('WPTOOLSET_FORMS_VERSION', '0.1.2');
+
+/** @deprecated This may not be defined at all times. Use TOOLSET_COMMON_PATH . '/toolset-forms' instead */
 define('WPTOOLSET_FORMS_ABSPATH', dirname(__FILE__));
 
 require_once WPTOOLSET_FORMS_ABSPATH . '/api.php';
@@ -9,15 +12,18 @@ require_once WPTOOLSET_FORMS_ABSPATH . '/api.php';
  * check we are as a embedded?
  */
 if (defined('WPCF_RUNNING_EMBEDDED') && WPCF_RUNNING_EMBEDDED) {
+	/** @deprecated This may not be defined at all times. */
     define('WPTOOLSET_FORMS_RELPATH', wpcf_get_file_url(__FILE__, false));
 }
 /**
  * setup WPTOOLSET_FORMS_RELPATH for plugin
  */
 if (!defined('WPTOOLSET_FORMS_RELPATH')) {
-    define('WPTOOLSET_FORMS_RELPATH', plugins_url('', __FILE__));
+	/** @deprecated This may not be defined at all times. */
+    define('WPTOOLSET_FORMS_RELPATH' , plugins_url('', __FILE__));
 }
 if (!defined('WPTOOLSET_COMMON_PATH')) {
+	/** @deprecated This may not be defined at all times. */
     define('WPTOOLSET_COMMON_PATH', plugin_dir_path(__FILE__));
 }
 
@@ -49,7 +55,9 @@ class WPToolset_Forms_Bootstrap {
         require_once WPTOOLSET_FORMS_ABSPATH . '/classes/class.date.scripts.php';
         new WPToolset_Field_Date_Scripts();
 
-        add_action('pre_get_posts', array($this, 'pre_get_posts'));
+		add_action('pre_get_posts', array($this, 'pre_get_posts'));
+
+		add_filter( 'wp_prepare_attachment_for_js', array( $this, 'keep_original_image_size_after_wp53' ), 10, 3 );
     }
 
     // returns HTML
@@ -118,8 +126,7 @@ class WPToolset_Forms_Bootstrap {
         }
         $date = adodb_mktime(0, 0, 0, substr($date, 2, 2), substr($date, 0, 2), substr($date, 4, 4));
         $date_format = str_replace('\\\\', '\\', $date_format);
-        echo json_encode(array('display' => adodb_date($date_format, $date), 'timestamp' => $date));
-        die();
+		wp_send_json( array( 'display' => adodb_date( $date_format, $date ), 'timestamp' => $date ) );
     }
 
     /**
@@ -181,9 +188,9 @@ class WPToolset_Forms_Bootstrap {
         $results = $wpdb->get_results(
                 $wpdb->prepare(
                         "SELECT name FROM {$wpdb->terms} t {$tax_join}
-				WHERE t.name LIKE %s 
+				WHERE t.name LIKE %s
 				{$tax_where}
-				ORDER BY name DESC 
+				ORDER BY name DESC
 				LIMIT 5", $values_to_prepare
                 )
         );
@@ -319,7 +326,74 @@ class WPToolset_Forms_Bootstrap {
             $query->set('post_type', $cpt_to_add);
         }
         return;
-    }
+	}
+
+	/**
+	 * Filter the data returned to the media library dialog to include the original image URL.
+	 *
+	 * WordPress 5.3 includes a new feature to scale down large images,
+	 * but image fields in Toolset need to be filled with the original image URL.
+	 * As this data is not available for our media modal scripts, we need to brute force it in.
+	 *
+	 * @param array $response
+	 * @param WP_Post $attachment
+	 * @param array|bool $meta
+	 * @return array
+	 * @since 3.4.9
+	 */
+	public function keep_original_image_size_after_wp53( $response, $attachment, $meta ) {
+		if ( ! is_array( $meta ) ) {
+			return $response;
+		}
+		// Only filter if the original image URL exists in the arguments.
+		if ( ! array_key_exists( 'original_image', $meta ) ) {
+			return $response;
+		}
+
+		// Only filter when uploading or querying attachments from a Toolset field.
+		$current_action = toolset_getpost( 'action' );
+		$toolset_media_management_origin = false;
+
+		switch ( $current_action ) {
+			case 'query-attachments':
+				$toolset_media_management_origin = (bool) toolset_getnest( $_POST, array( 'query', 'toolset_media_management_origin' ), false );
+				break;
+			case 'upload-attachment':
+				$toolset_media_management_origin = (bool) toolset_getpost( 'toolset_media_management_origin', false );
+				break;
+			default:
+				return $response;
+		}
+
+		if ( false === $toolset_media_management_origin ) {
+			return $response;
+		}
+
+		// Inspired in wp_prepare_attachment_for_js located in wp-includes/media.php
+		if ( false !== strpos( $attachment->post_mime_type, '/' ) ) {
+			list( $type, $subtype ) = explode( '/', $attachment->post_mime_type );
+		} else {
+			list( $type, $subtype ) = array( $attachment->post_mime_type, '' );
+		}
+
+		// Only filter if this is an image.
+		if ( 'image' !== $type ) {
+			return $response;
+		}
+
+		$base_url = str_replace( wp_basename( $response['url'] ), '', $response['url'] );
+
+		// Set a proper new size,
+		// note that we lack dimensions plus orientation: we do not care.
+		$response['sizes']['toolsetOriginal'] = array(
+			'url' => $base_url . $meta['original_image'],
+			'width' => '',
+			'height' => '',
+			'orientation' => '',
+		);
+
+		return $response;
+	}
 
 }
 

@@ -29,7 +29,7 @@ class Free_Plugin_Updater extends Updater {
 	 * @return string
 	 */
 	protected function get_api_call_url(array $args) {
-		return 'http://wpupdate.aelia.co?action=get_metadata&slug=' . $args['slug'];
+		return 'https://wpupdate.aelia.co?action=get_metadata&slug=' . $args['slug'];
 	}
 
 	/**

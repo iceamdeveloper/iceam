@@ -49,7 +49,7 @@ class Tribe__Tickets_Plus__CSV_Importer__Rows {
 	 */
 	public function filter_import_options_rows( array $import_options ) {
 		if ( $this->commerce_loader->is_woocommerce_active() ) {
-			$import_options['tickets_woo'] = esc_html__( 'Tickets', 'event-tickets-plus' );
+			$import_options['tickets_woo'] = esc_html( tribe_get_ticket_label_plural( 'csv_importer_rows' ) );
 		}
 
 		return $import_options;
@@ -68,7 +68,7 @@ class Tribe__Tickets_Plus__CSV_Importer__Rows {
 		}
 
 		$post_type = get_post_type_object( Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance()->ticket_object );
-		$post_type->labels->name = __( 'Tickets', 'event-tickets-plus' );
+		$post_type->labels->name = esc_html( tribe_get_ticket_label_plural( 'csv_importer_rows' ) );
 		$post_types[] = $post_type;
 		return $post_types;
 	}

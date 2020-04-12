@@ -9,19 +9,19 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @var string $link The URL to the today page, if any, or an empty string.
- *
- * @version 5.0.0
- *
  * @var string $today_url The URL to the today, current, version of the View.
+ *
+ * @version 5.0.1
+ *
  */
-
 ?>
 <li class="tribe-events-c-nav__list-item tribe-events-c-nav__list-item--today">
 	<a
-		href="<?php echo esc_url( $link ); ?>"
+		href="<?php echo esc_url( $today_url ); ?>"
 		class="tribe-events-c-nav__today tribe-common-b3"
 		data-js="tribe-events-view-link"
+		aria-label="<?php esc_attr_e( 'Click to select today\'s date', 'tribe-events-calendar-pro' ); ?>"
+		title="<?php esc_attr_e( 'Click to select today\'s date', 'tribe-events-calendar-pro' ); ?>"
 	>
 		<?php esc_html_e( 'Today', 'tribe-events-calendar-pro' ); ?>
 	</a>

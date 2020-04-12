@@ -1,19 +1,19 @@
 === WooCommerce Product Bundles ===
 
-Contributors: franticpsyx
+Contributors: SomewhereWarm
 Tags: woocommerce, product, bundle, bundles, kits, simple, variable, configurable
-Requires at least: 4.1
-Tested up to: 4.7
-Stable tag: 5.3.1
-WC requires at least: 2.4
-WC tested up to: 3.0
+Requires at least: 4.4
+Tested up to: 5.3
+Stable tag: 6.1.5
+WC requires at least: 3.1
+WC tested up to: 4.0
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
-WooCommerce extension for creating simple product bundles, kits and assemblies.
+Offer product bundles, bulk discount packages and assembled products.
 
 == Description ==
 
-Product Bundles is probably the most straightforward WooCommerce extension for creating simple product packages: With Bundles you can quickly build complex products and create bulk discount combos by mixing simple and variable products. Downloadable and virtual products are also supported, while Product Bundles support many popular WooCommerce extensions, such as Product Add-ons, Subscriptions and Composite Products.
+Create assembled products and product bundles by grouping simple, variable and subscription products.
 
-Read the full documentation [here](http://docs.woocommerce.com/document/bundles/).
+Looking for help? Read the full documentation [here](http://docs.woocommerce.com/document/bundles/).

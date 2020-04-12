@@ -12,6 +12,10 @@ jQuery(document).ready(function($){
 				return decodeURIComponent(results[1].replace(/\+/g, ' '));
 			}
 		},
+		daysInMonth: function( month ) {
+			// Intentionally choose a non-leap year because we want february to have only 28 days.
+			return new Date(Date.UTC(2001, month, 0)).getUTCDate();
+		},
 		showHideSubscriptionMeta: function(){
 			if ($('select#product-type').val()==WCSubscriptions.productType) {
 				$('.show_if_simple').show();
@@ -42,7 +46,7 @@ jQuery(document).ready(function($){
 				$('.hide_if_variable').hide();
 				$('.show_if_variable-subscription').show();
 				$('.hide_if_variable-subscription').hide();
-				$( 'input#_manage_stock' ).change();
+				$.showOrHideStockFields();
 
 				// Make the sale price row full width
 				$('.sale_price_dates_fields').prev('.form-row').addClass('form-row-full').removeClass('form-row-last');
@@ -53,11 +57,18 @@ jQuery(document).ready(function($){
 					$( '.show_if_variable-subscription' ).hide();
 					$( '.show_if_variable' ).show();
 					$( '.hide_if_variable' ).hide();
-					$( 'input#_manage_stock' ).change();
+					$.showOrHideStockFields();
 				}
 
 				// Restore the sale price row width to half
 				$('.sale_price_dates_fields').prev('.form-row').removeClass('form-row-full').addClass('form-row-last');
+			}
+		},
+		showOrHideStockFields : function(){
+			if ( $( 'input#_manage_stock' ).is( ':checked' ) ) {
+				$( 'div.stock_fields' ).show();
+			} else {
+				$( 'div.stock_fields' ).hide();
 			}
 		},
 		setSubscriptionLengths: function(){
@@ -143,7 +154,7 @@ jQuery(document).ready(function($){
 				if ($('select#product-type').val()=='variable-subscription') {
 					var $container = periodField.closest('.woocommerce_variable_attributes').find('.variable_subscription_sync');
 				} else {
-					$container = periodField.closest('#general_product_data').find('.subscription_sync')
+					$container = periodField.closest('#general_product_data').find('.subscription_sync');
 				}
 
 				var $syncWeekMonthContainer = $container.find('.subscription_sync_week_month'),
@@ -163,16 +174,17 @@ jQuery(document).ready(function($){
 
 				if('day'==billingPeriod) {
 					$syncWeekMonthSelect.val(0);
-					$syncAnnualContainer.find('input[type="number"]').val(0);
+					$syncAnnualContainer.find('input[type="number"]').val(0).trigger('change');
 				} else {
 					if('year'==billingPeriod) {
 						// Make sure the year sync fields are reset
-						$syncAnnualContainer.find('input[type="number"]').val(0);
+						$syncAnnualContainer.find('input[type="number"]').val(0).trigger('change');
 						// And the week/month field has no option selected
 						$syncWeekMonthSelect.val(0);
 					} else {
 						// Make sure the year sync value is 0
-						$syncAnnualContainer.find('input[type="number"]').val(0);
+						$syncAnnualContainer.find('input[type="number"]').val(0).trigger('change');
+
 						// And the week/month field has the appropriate options
 						$syncWeekMonthSelect.empty();
 						$.each(WCSubscriptions.syncOptions[billingPeriod], function(key,description) {
@@ -195,6 +207,7 @@ jQuery(document).ready(function($){
 					if ($varSubField.length > 0) { // Variation
 						var matches = $varSubField.attr('name').match(/\[(.*?)\]/);
 						$subscriptionPeriodElement = $('[name="variable_subscription_period['+matches[1]+']"]');
+
 						if ($('select#product-type').val()=='variable-subscription') {
 							$slideSwitch = true;
 						}
@@ -426,6 +439,22 @@ jQuery(document).ready(function($){
 		$.setTrialPeriods();
 	});
 
+	// Handles changes to sync date select/input for yearly subscription products.
+	$('#woocommerce-product-data').on('change', '[name^="_subscription_payment_sync_date_day"], [name^="variable_subscription_payment_sync_date_day"]', function() {
+		if ( 0 == $(this).val() ) {
+			$(this).siblings('[name^="_subscription_payment_sync_date_month"], [name^="variable_subscription_payment_sync_date_month"]').val(0);
+			$(this).prop('disabled', true);
+		}
+	}).on('change', '[name^="_subscription_payment_sync_date_month"], [name^="variable_subscription_payment_sync_date_month"]', function() {
+		var $syncDayOfMonthInput = $(this).siblings('[name^="_subscription_payment_sync_date_day"], [name^="variable_subscription_payment_sync_date_day"]');
+
+		if ( 0 < $(this).val() ) {
+			$syncDayOfMonthInput.val(1).attr({step: "1", min: "1", max: $.daysInMonth($(this).val())}).prop('disabled', false);
+		} else {
+			$syncDayOfMonthInput.val(0).trigger('change');
+		}
+	});
+
 	$('body').bind('woocommerce-product-type-change',function(){
 		$.showHideSubscriptionMeta();
 		$.showHideVariableSubscriptionMeta();
@@ -554,30 +583,33 @@ jQuery(document).ready(function($){
 		return data;
 	});
 
-	var $allowSwitching = $( document.getElementById( 'woocommerce_subscriptions_allow_switching' ) );
-	var $syncRenewals = $( document.getElementById( 'woocommerce_subscriptions_sync_payments' ) );
+	var $allowSwitching = $( document.getElementById( 'woocommerce_subscriptions_allow_switching' ) ),
+		$syncRenewals   = $( document.getElementById( 'woocommerce_subscriptions_sync_payments' ) );
 
 	// We're on the Subscriptions settings page
 	if ( $allowSwitching.length > 0 ) {
-		var allowSwitchingVal = $allowSwitching.val(),
-			$switchSettingsRows = $allowSwitching.parents( 'tr' ).siblings( 'tr' ),
-			$prorateFirstRenewal = $( document.getElementById( 'woocommerce_subscriptions_prorate_synced_payments' ) ),
-			$syncRows = $syncRenewals.parents( 'tr' ).siblings( 'tr' ),
-			$daysNoFeeRow = $( document.getElementById( 'woocommerce_subscriptions_days_no_fee' ) ).parents( 'tr' ),
+		var allowSwitchingEnabled   = $allowSwitching.find( 'input:checked' ).length,
+			$switchSettingsRows     = $allowSwitching.parents( 'tr' ).siblings( 'tr' ),
+			$prorateFirstRenewal    = $( document.getElementById( 'woocommerce_subscriptions_prorate_synced_payments' ) ),
+			$syncRows               = $syncRenewals.parents( 'tr' ).siblings( 'tr' ),
+			$daysNoFeeRow           = $( document.getElementById( 'woocommerce_subscriptions_days_no_fee' ) ).parents( 'tr' ),
 			$suspensionExtensionRow = $( '#woocommerce_subscriptions_recoup_suspension' ).parents( 'tr' );
 
 		// No animation for initial hiding when switching is disabled.
-		if ( 'no' === allowSwitchingVal ) {
+		if ( 0 === allowSwitchingEnabled ) {
 			$switchSettingsRows.hide();
 		}
 
-		$allowSwitching.on( 'change', function() {
-			if ( 'no' === $( this ).val() ) {
+		$allowSwitching.find( 'input' ).on( 'change', function() {
+
+			var isEnabled = $allowSwitching.find( 'input:checked' ).length;
+
+			if ( 0 === isEnabled ) {
 				$switchSettingsRows.fadeOut();
-			} else if ( 'no' === allowSwitchingVal ) { // switching was previously disabled, so settings will be hidden
+			} else if ( 0 === allowSwitchingEnabled ) { // switching was previously disabled, so settings will be hidden
 				$switchSettingsRows.fadeIn();
 			}
-			allowSwitchingVal = $( this ).val();
+			allowSwitchingEnabled = isEnabled;
 		} );
 
 		// Show/hide suspension extension setting

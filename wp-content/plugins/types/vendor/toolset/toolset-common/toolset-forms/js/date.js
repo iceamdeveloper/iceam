@@ -94,7 +94,9 @@ var wptDate = (function ($) {
                 data += '&action=wpt_localize_extended_date';
                                 
                 $.post(wptDateData.ajaxurl, data, function (response) {
-                    response = $.parseJSON(response);
+					if (typeof ( response ) === 'string' || response instanceof String) {
+						response = $.parseJSON( response );
+					}
                     if (el_aux.length > 0) {
                         el_aux.val(response['timestamp']).trigger('wptDateSelect');
                     }

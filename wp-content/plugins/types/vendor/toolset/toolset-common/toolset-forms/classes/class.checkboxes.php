@@ -50,8 +50,15 @@ class WPToolset_Field_Checkboxes extends FieldFactory {
 						'checkbox-' . sanitize_title( $option['title'] ),
 					);
 
-					if ( $output == 'bootstrap' ) {
-						$classes[] = 'checkbox';
+					if ( $output === 'bootstrap' ) {
+						switch ( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+							case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+								$classes[] = 'form-check';
+								break;
+							default:
+								$classes[] = 'checkbox';
+								break;
+						}
 					}
 
 					/**
@@ -66,12 +73,31 @@ class WPToolset_Field_Checkboxes extends FieldFactory {
 					 * @return array
 					 */
 					$classes = apply_filters( 'cred_item_li_class', $classes, $option, 'checkboxes' );
-					if ( $output == 'bootstrap' ) {
-						$_options[ $option_key ]['#before'] = sprintf(
-							'<li class="%s"><label class="wpt-form-label wpt-form-checkbox-label">', implode( ' ', $classes )
-						);
-						$_options[ $option_key ]['#after'] = stripslashes( $option['title'] ) . '</label></li>';
-						$_options[ $option_key ]['#pattern'] = '<BEFORE><PREFIX><ELEMENT><ERROR><SUFFIX><DESCRIPTION><AFTER>';
+					if ( $output === 'bootstrap' ) {
+						switch( Toolset_Settings::get_instance()->bootstrap_version_numeric ) {
+							case \OTGS\Toolset\Common\Settings\BootstrapSetting::NUMERIC_BS4:
+								$_options[ $option_key ]['#before'] = sprintf(
+									'<li class="%s form-check">',
+									implode( ' ', $classes )
+								);
+								$_options[ $option_key ]['#after'] = sprintf(
+									'<label class="wpt-form-label wpt-form-checkbox-label form-check-label">%s</label></li>',
+									stripslashes( $option['title'] )
+								);
+								$_options[ $option_key ]['#pattern'] = '<BEFORE><PREFIX><ELEMENT><ERROR><SUFFIX><DESCRIPTION><AFTER>';
+								$_options[ $option_key ]['#attributes'] = array_merge(
+									toolset_ensarr( $_options[ $option_key ]['#attributes'] ),
+									array( 'class' => 'form-check-input' )
+								);
+								break;
+							default:
+								$_options[ $option_key ]['#before'] = sprintf(
+									'<li class="%s"><label class="wpt-form-label wpt-form-checkbox-label">', implode( ' ', $classes )
+								);
+								$_options[ $option_key ]['#after'] = stripslashes( $option['title'] ) . '</label></li>';
+								$_options[ $option_key ]['#pattern'] = '<BEFORE><PREFIX><ELEMENT><ERROR><SUFFIX><DESCRIPTION><AFTER>';
+								break;
+						}
 					} else {
 						$_options[ $option_key ]['#before'] = sprintf(
 							'<li class="%s">', implode( ' ', $classes )

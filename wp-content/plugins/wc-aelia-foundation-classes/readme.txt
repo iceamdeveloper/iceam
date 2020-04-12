@@ -2,14 +2,14 @@
 Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
-Requires at least: 3.6
-Tested up to: 5.3
+Requires at least: 4.0
+Tested up to: 5.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 2.6
-WC tested up to: 3.9.0
+WC tested up to: 4.0.1
 
-Adds a set of convenience classes that can simplify the development of other plugins for WooCommerce.
+Adds a set of classes that can simplify the development of other plugins for WooCommerce.
 
 == Description ==
 The Aelia Foundation Classes add several classes that can simplify the development of plugins for WooCommerce. Some of the available classes are listed below.
@@ -20,7 +20,7 @@ The Aelia Foundation Classes add several classes that can simplify the developme
 * `Order`. An extended Order class, which includes methods to retrieve attributes of orders generated in multi-currency setups.
 * `Settings`. Allows to manage the settings of a plugin. The class does not rely on WooCommerce Settings API.
 * `Settings_Renderer`. Allows to render the settings interface for a plugin. The can automatically render a tabbed interface, using jQuery UI.
-* `Logger`. A convenience Logger class.
+* `Logger`. A Logger class.
 * `Aelia_Plugin`. A base plugin class, which other plugins can extend. The class implements convenience methods to access plugin settings, WooCommerce settings, common paths and URLs, and automatically load CSS and JavaScript files when needed.
 * `Semaphore`. Implements a simple semaphore logic, which can be used to prevent race conditions in operations that cannot run concurrently.
 
@@ -31,7 +31,7 @@ The Aelia Foundation Classes add several classes that can simplify the developme
 This product includes GeoLite2 data created by MaxMind, available from [https://www.maxmind.com](https://www.maxmind.com). By using this software, you agree to use the GeoLite2 exclusively according to the terms set in the GeoLite2 End User License Agreement, which is available here: https://www.maxmind.com/en/geolite2/eula. If you do not wish to accept the terms, you must stop using the software immediately.
 
 ##Requirements
-* WordPress 3.6 or later.
+* WordPress 4.0 or later.
 * PHP 5.4 or later.
 * WooCommerce 2.6 or later
 
@@ -65,6 +65,21 @@ Should you have any question about this product, please feel free to [contact us
 For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
 == Changelog ==
+
+= 2.0.16.200317 =
+* Tweak - Improved error handling during automatic updates of premium plugins.
+* Tweak - Added check to set secure cookies automatically, when the site is using HTTPS and SSL.
+
+= 2.0.15.200310 =
+* Updated supported WooCommerce versions.
+
+= 2.0.14.200214 =
+* Tweak - Improved error logging during automatic update of GeoIP database.
+
+= 2.0.13.200131 =
+* Tweak - Added possibility to stop setting a cookie in `Aelia_SessionManager` class.
+* Tweak - Improved notice message displayed when cookies can't be set due to the headers having already been sent.
+* Updated supported WooCommerce versions.
 
 = 2.0.12.200101 =
 * Fix - Downgraded MaxMind GeoIP library to align it with the one used by WooCommerce.

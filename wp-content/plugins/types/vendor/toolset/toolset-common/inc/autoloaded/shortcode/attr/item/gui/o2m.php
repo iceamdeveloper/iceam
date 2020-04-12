@@ -6,8 +6,8 @@
  * @since m2m
  */
 class Toolset_Shortcode_Attr_Item_Gui_O2m extends Toolset_Shortcode_Attr_Item_Gui_Base {
-	
-	
+
+
 	/**
 	 * Set options for post selectors on O2M relationships.
 	 *
@@ -15,19 +15,25 @@ class Toolset_Shortcode_Attr_Item_Gui_O2m extends Toolset_Shortcode_Attr_Item_Gu
 	 */
 	protected function set_options() {
 		$origin = $this->relationship_definition->get_origin()->get_origin_keyword();
-		
-		if ( Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD === $origin ) {
-			$this->set_parent_reference_option();
-		} else {
-			$this->set_parent_option();
-			$this->set_child_option();
+
+		switch ( $origin ) {
+			case Toolset_Relationship_Origin_Post_Reference_Field::ORIGIN_KEYWORD:
+				$this->set_parent_reference_option();
+				break;
+			case Toolset_Relationship_Origin_Repeatable_Group::ORIGIN_KEYWORD:
+				$this->set_parent_repeatable_group_option();
+				break;
+			default:
+				$this->set_parent_option();
+				$this->set_child_option();
+				break;
 		}
 	}
-	
+
 	protected function set_parent_reference_option() {
-		if ( 
-			null === $this->current_post_object 
-			|| ! in_array( $this->current_post_object->name, $this->parent_types ) 
+		if (
+			null === $this->current_post_object
+			|| ! in_array( $this->current_post_object->name, $this->parent_types )
 		) {
 			$option = new Toolset_Shortcode_Attr_Item_Gui_Option(
 				$this->relationship_definition,
@@ -35,26 +41,46 @@ class Toolset_Shortcode_Attr_Item_Gui_O2m extends Toolset_Shortcode_Attr_Item_Gu
 				$this
 			);
 			$this->options[] = $option->get_option();
-		
+
 		}
 	}
-	
+
+	/**
+	 * Register o2m relationships defined as RFGs.
+	 *
+	 * @since Views 2.9.3
+	 */
+	protected function set_parent_repeatable_group_option() {
+		if (
+			null === $this->current_post_object
+			|| ! in_array( $this->current_post_object->name, $this->parent_types, true )
+		) {
+			$option = new Toolset_Shortcode_Attr_Item_Gui_Option(
+				$this->relationship_definition,
+				Toolset_Relationship_Role::PARENT,
+				$this
+			);
+			$this->options[] = $option->get_option();
+
+		}
+	}
+
 	protected function set_parent_option() {
-		if ( 
-			null === $this->current_post_object 
-			|| ! in_array( $this->current_post_object->name, $this->parent_types ) 
+		if (
+			null === $this->current_post_object
+			|| ! in_array( $this->current_post_object->name, $this->parent_types )
 		) {
 			$option = new Toolset_Shortcode_Attr_Item_Gui_Option(
 				$this->relationship_definition,
 				Toolset_Relationship_Role::PARENT,
 				$this
 			);
-			
+
 			$this->options[] = $option->get_option();
-		
+
 		}
 	}
-	
+
 	private function set_child_option() {
 		$option = new Toolset_Shortcode_Attr_Item_Gui_Option(
 			$this->relationship_definition,
@@ -62,8 +88,8 @@ class Toolset_Shortcode_Attr_Item_Gui_O2m extends Toolset_Shortcode_Attr_Item_Gu
 			$this
 		);
 		$option->set_property( 'is_disabled', true );
-		$option->set_property( 
-			'pointer_content', 
+		$option->set_property(
+			'pointer_content',
 			'<h3>' . sprintf(
 				__( '%1$s (one-to-many relationship)', 'wpv-views' ),
 				$this->relationship_definition->get_display_name()
@@ -87,10 +113,10 @@ class Toolset_Shortcode_Attr_Item_Gui_O2m extends Toolset_Shortcode_Attr_Item_Gu
 					. '" target="_blank">',
 				'<i class="fa fa-external-link"></i>',
 				'</a>'
-			) . '</p>' 
+			) . '</p>'
 		);
-		
+
 		$this->options[] = $option->get_option();
 	}
-	
+
 }

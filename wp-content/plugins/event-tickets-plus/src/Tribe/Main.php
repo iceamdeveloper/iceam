@@ -12,7 +12,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '4.11.1.1';
+		const VERSION = '4.11.4';
 
 		/**
 		 * Min required Tickets Core version
@@ -113,22 +113,22 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->pue         = new Tribe__Tickets_Plus__PUE;
 
 			/** @see \Tribe__Events__Pro__Main::init_apm_filters() Is on priority 10. */
-			add_action( 'plugins_loaded', array( $this, 'apm_filters' ), 5 );
+			add_action( 'plugins_loaded', [ $this, 'apm_filters' ], 5 );
 
-			add_action( 'init', array( $this, 'init' ), 5 );
+			add_action( 'init', [ $this, 'init' ], 5 );
 
 			// CSV import needs to happen before P10@init but after P5@init
-			add_action( 'init', array( $this, 'csv_import_support' ), 6 );
-			add_filter( 'tribe_support_registered_template_systems', array( $this, 'add_template_updates_check' ) );
-			add_action( 'tribe_events_tickets_attendees_event_details_top', array( $this, 'setup_attendance_totals' ), 5 );
-			add_filter( 'tribe_tickets_settings_tab_fields', array( $this, 'tribe_tickets_plus_settings' ) );
+			add_action( 'init', [ $this, 'csv_import_support' ], 6 );
+			add_filter( 'tribe_support_registered_template_systems', [ $this, 'add_template_updates_check' ] );
+			add_action( 'tribe_events_tickets_attendees_event_details_top', [ $this, 'setup_attendance_totals' ], 5 );
+			add_filter( 'tribe_tickets_settings_tab_fields', [ $this, 'tribe_tickets_plus_settings' ] );
 
 			// Unique ticket identifiers
-			add_action( 'event_tickets_rsvp_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
-			add_action( 'event_ticket_woo_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
-			add_action( 'event_ticket_edd_attendee_created', array( Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ), 10, 2 );
+			add_action( 'event_tickets_rsvp_attendee_created', [ Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ], 10, 2 );
+			add_action( 'event_ticket_woo_attendee_created', [ Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ], 10, 2 );
+			add_action( 'event_ticket_edd_attendee_created', [ Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ], 10, 2 );
 
-			add_action( 'admin_init', array( $this, 'run_updates' ), 10, 0 );
+			add_action( 'admin_init', [ $this, 'run_updates' ], 10, 0 );
 
 			add_filter( 'tribe-events-save-options', [ $this, 'retro_attendee_page_option' ] );
 		}
@@ -145,6 +145,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			// REST API v1
 			tribe_register_provider( 'Tribe__Tickets_Plus__REST__V1__Service_Provider' );
+
+			// Promoter
+			tribe_register_provider( Tribe__Tickets_Plus__Service_Providers__Promoter::class );
 
 			$this->commerce_loader();
 			$this->bind_implementations();
@@ -168,7 +171,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 */
 		public function bind_implementations() {
 			// Privacy
-			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', array( 'hook' ) );
+			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', [ 'hook' ] );
 
 			// Blocks editor
 			tribe_register_provider( 'Tribe__Tickets_Plus__Editor__Provider' );
@@ -343,19 +346,19 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$column_names_filter  = Tribe__Tickets_Plus__CSV_Importer__Column_Names::instance( $commerce_loader );
 			$importer_rows_filter = Tribe__Tickets_Plus__CSV_Importer__Rows::instance( $commerce_loader );
 
-			add_filter( 'tribe_events_import_options_rows', array( $importer_rows_filter, 'filter_import_options_rows' ) );
-			add_filter( 'tribe_aggregator_csv_post_types', array( $importer_rows_filter, 'filter_csv_post_types' ) );
+			add_filter( 'tribe_events_import_options_rows', [ $importer_rows_filter, 'filter_import_options_rows' ] );
+			add_filter( 'tribe_aggregator_csv_post_types', [ $importer_rows_filter, 'filter_csv_post_types' ] );
 
 			if ( $commerce_loader->is_woocommerce_active() ) {
 				Tribe__Tickets_Plus__CSV_Importer__Woo::instance();
 
-				add_filter( 'tribe_event_import_product_column_names', array( $column_names_filter, 'filter_tickets_woo_column_names' ) );
+				add_filter( 'tribe_event_import_product_column_names', [ $column_names_filter, 'filter_tickets_woo_column_names' ] );
 
-				add_filter( 'tribe_events_import_tickets_woo_importer', array( 'Tribe__Tickets_Plus__CSV_Importer__Tickets_Importer', 'woo_instance' ), 10, 2 );
-				add_filter( 'tribe_event_import_tickets_woo_column_names', array( $column_names_filter, 'filter_tickets_woo_column_names' ) );
+				add_filter( 'tribe_events_import_tickets_woo_importer', [ 'Tribe__Tickets_Plus__CSV_Importer__Tickets_Importer', 'woo_instance' ], 10, 2 );
+				add_filter( 'tribe_event_import_tickets_woo_column_names', [ $column_names_filter, 'filter_tickets_woo_column_names' ] );
 			}
 
-			add_filter( 'tribe_events_import_type_titles_map', array( $column_names_filter, 'filter_import_type_titles_map' ) );
+			add_filter( 'tribe_events_import_type_titles_map', [ $column_names_filter, 'filter_import_type_titles_map' ] );
 		}
 
 		/**
@@ -369,11 +372,11 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			// ET+ views can be in one of a range of different subdirectories (eddtickets, wootickets
 			// etc) so we will tell the template checker to simply look in views/tribe-events and work
 			// things out from there
-			$plugins[ __( 'Event Tickets Plus', 'event-tickets-plus' ) ] = array(
+			$plugins[ __( 'Event Tickets Plus', 'event-tickets-plus' ) ] = [
 				self::VERSION,
 				$this->plugin_path . 'src/views',
 				trailingslashit( get_stylesheet_directory() ) . 'tribe-events',
-			);
+			];
 
 			return $plugins;
 		}
@@ -391,7 +394,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 				$template .= '.php';
 			}
 
-			if ( $theme_file = locate_template( array( 'tribe-events/' . $template ) ) ) {
+			if ( $theme_file = locate_template( [ 'tribe-events/' . $template ] ) ) {
 				$file = $theme_file;
 			} else {
 				$file = $this->plugin_path . 'src/views/' . $template;

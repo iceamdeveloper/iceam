@@ -16,15 +16,27 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Used to create and store a product_id / variation_id representation of a product collection based on the included items' inventory requirements.
  *
  * @class    WC_PB_Stock_Manager
- * @version  5.1.0
+ * @version  5.8.0
  */
 class WC_PB_Stock_Manager {
 
+	/**
+	 * Stock managed items.
+	 * @var array
+	 */
 	private $items;
+
+	/**
+	 * Product managing the collection.
+	 * @var WC_Product|false
+	 */
 	public $product;
 
+	/**
+	 * Contructor.
+	 * @param boolean|WC_Product  $product
+	 */
 	public function __construct( $product = false ) {
-
 		$this->product = $product;
 		$this->items   = array();
 	}
@@ -129,23 +141,14 @@ class WC_PB_Stock_Manager {
 	}
 
 	/**
-	 * Validate that all managed items in the collection are in stock.
+	 * Product quantities already in cart.
 	 *
-	 * @param  int  $bundle_id
-	 * @return boolean
+	 * @since  5.8.0
+	 *
+	 * @return array
 	 */
-	public function validate_stock() {
+	private function get_quantities_in_cart() {
 
-		$managed_items = $this->get_managed_items();
-
-		if ( empty( $managed_items ) ) {
-			return true;
-		}
-
-		$bundle_id    = WC_PB_Core_Compatibility::get_id( $this->product );
-		$bundle_title = $this->product->get_title();
-
-		// Product quantities already in cart.
 		$quantities_in_cart = WC()->cart->get_cart_item_quantities();
 
 		// If we are updating a bundle in-cart, subtract the bundled item cart quantites that belong to the bundle being updated, since it's going to be removed later on.
@@ -183,6 +186,31 @@ class WC_PB_Stock_Manager {
 			}
 		}
 
+		return $quantities_in_cart;
+	}
+
+	/**
+	 * Validate that all managed items in the collection are in stock.
+	 *
+	 * @throws Exception
+	 *
+	 * @param  array  $args
+	 * @return boolean
+	 */
+	public function validate_stock( $args = array() ) {
+
+		$context         = isset( $args[ 'context' ] ) ? $args[ 'context' ] : 'add-to-cart';
+		$throw_exception = isset( $args[ 'throw_exception' ] ) && $args[ 'throw_exception' ];
+
+		$managed_items = $this->get_managed_items();
+
+		if ( empty( $managed_items ) ) {
+			return true;
+		}
+
+		$bundle_id    = $this->product->get_id();
+		$bundle_title = $this->product->get_title();
+
 		// Stock Validation.
 		foreach ( $managed_items as $managed_item_id => $managed_item ) {
 
@@ -194,95 +222,104 @@ class WC_PB_Stock_Manager {
 				$product_data = wc_get_product( $managed_item_id );
 
 				if ( ! $product_data ) {
-					return false;
+					continue;
 				}
 
 				$product_title = '' !== $managed_item[ 'title' ] ? $managed_item[ 'title' ] : $product_data->get_title();
 
 				// Sanity check.
 				if ( $product_data->is_sold_individually() && $quantity > 1 ) {
-					wc_add_notice( sprintf( __( '&quot;%1$s&quot; cannot be added to the cart &mdash; only 1 &quot;%2$s&quot; may be purchased.', 'woocommerce-product-bundles' ), $bundle_title, $product_title ), 'error' );
-					return false;
+
+					$reason = sprintf( __( 'Only 1 &quot;%s&quot; may be purchased.', 'woocommerce-product-bundles' ), $product_title );
+
+					if ( 'add-to-cart' === $context ) {
+						$notice = sprintf( __( '&quot;%1$s&quot; cannot be added to your cart. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
+					} else {
+						$notice = $reason;
+					}
+
+					throw new Exception( $notice );
 				}
 
-				$is_variable   = 'variable' === $product_data->get_type() || 'variable-subscription' === $product_data->get_type() || 'variation' === $product_data->get_type();
-				$configuration = '';
-
-				if ( false === $managed_item[ 'is_secret' ] && 'variation' === $product_data->get_type() && WC_PB_Core_Compatibility::is_wc_version_gte_2_5() ) {
-					$configuration = sprintf( _x( ' (%s)', 'suffix', 'woocommerce-product-bundles' ), WC_PB_Core_Compatibility::wc_get_formatted_variation( $product_data, true ) );
+				if ( false === $managed_item[ 'is_secret' ] && 'variation' === $product_data->get_type() ) {
+					$product_title = WC_PB_Helpers::format_product_title( $product_title, '', wc_get_formatted_variation( $product_data, true, false ) );
 				}
 
 				// Stock check - only check if we're managing stock and backorders are not allowed.
 				if ( ! $product_data->is_in_stock() ) {
 
-					if ( $is_variable ) {
-						$error = sprintf( __( '&quot;%1$s&quot; cannot be added to the cart &ndash; the chosen &quot;%2$s&quot; variation%3$s is out of stock.', 'woocommerce-product-bundles' ), $bundle_title, $product_title, $configuration );
+					$reason = sprintf( __( '&quot;%s&quot; is out of stock.', 'woocommerce-product-bundles' ), $product_title );
+
+					if ( 'add-to-cart' === $context ) {
+						$notice = sprintf( __( '&quot;%1$s&quot; cannot be added to your cart. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
+					} elseif ( 'cart' === $context ) {
+						$notice = sprintf( __( '&quot;%1$s&quot; cannot be purchased. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
 					} else {
-						$error = sprintf( __( '&quot;%1$s&quot; cannot be added to the cart &ndash; &quot;%2$s&quot; is out of stock.', 'woocommerce-product-bundles' ), $bundle_title, $product_title );
+						$notice = $reason;
 					}
 
-					throw new Exception( $error );
+					throw new Exception( $notice );
 
 				} elseif ( ! $product_data->has_enough_stock( $quantity ) ) {
 
-					if ( $is_variable ) {
-						$error = sprintf(__( '&quot;%1$s&quot; cannot be added to the cart &ndash; the chosen &quot;%2$s&quot; variation%3$s does not have enough stock (%4$s remaining).', 'woocommerce-product-bundles' ), $bundle_title, $product_title, $configuration, $product_data->get_stock_quantity() );
+					$reason = sprintf( __( 'There is not enough stock of &quot;%1$s&quot; (%2$s remaining).', 'woocommerce-product-bundles' ), $product_title, $product_data->get_stock_quantity() );
+
+					if ( 'add-to-cart' === $context ) {
+						$notice = sprintf( __( '&quot;%1$s&quot; cannot be added to your cart. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
+					} elseif ( 'cart' === $context ) {
+						$notice = sprintf( __( '&quot;%1$s&quot; cannot be purchased. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
 					} else {
-						$error = sprintf( __( '&quot;%1$s&quot; cannot be added to the cart because there is not enough stock of &quot;%2$s&quot; (%3$s remaining).', 'woocommerce-product-bundles' ), $bundle_title, $product_title, $product_data->get_stock_quantity() );
+						$notice = $reason;
 					}
 
-					throw new Exception( $error );
+					throw new Exception( $notice );
 				}
 
 				// Stock check - this time accounting for whats already in-cart.
 				if ( $product_data->managing_stock() ) {
 
-					// Variations.
-					if ( $is_variable ) {
+					$quantities_in_cart = $this->get_quantities_in_cart();
 
-						if ( isset( $quantities_in_cart[ $managed_item_id ] ) && ! $product_data->has_enough_stock( $quantities_in_cart[ $managed_item_id ] + $quantity ) ) {
+					if ( isset( $quantities_in_cart[ $managed_item_id ] ) && ! $product_data->has_enough_stock( $quantities_in_cart[ $managed_item_id ] + $quantity ) ) {
 
-							$error = sprintf(
-								'<a href="%s" class="button wc-forward">%s</a> %s',
-								WC()->cart->get_cart_url(),
-								__( 'View Cart', 'woocommerce' ),
-								sprintf( __( '&quot;%1$s&quot; cannot be added to the cart because the chosen &quot;%2$s&quot; variation%3$s does not have enough stock &mdash; we have %4$s in stock and you already have %5$s in your cart.', 'woocommerce-product-bundles' ), $bundle_title, $product_title, $configuration, $product_data->get_stock_quantity(), $quantities_in_cart[ $managed_item_id ] )
-							);
+						$reason = sprintf( __( 'There is not enough stock of &quot;%1$s&quot; (%2$s in stock, %3$s in your cart).', 'woocommerce-product-bundles' ), $product_title, $product_data->get_stock_quantity(), $quantities_in_cart[ $managed_item_id ] );
 
-							throw new Exception( $error );
+						if ( 'add-to-cart' === $context ) {
+							$notice = sprintf( __( '&quot;%1$s&quot; cannot be added to your cart. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
+						} elseif ( 'cart' === $context ) {
+							$notice = sprintf( __( '&quot;%1$s&quot; cannot be purchased. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
+						} else {
+							$notice = $reason;
 						}
 
-					// Products.
-					} else {
+						$error = sprintf( '<a href="%s" class="button wc-forward">%s</a> %s', wc_get_cart_url(), __( 'View Cart', 'woocommerce' ), $notice );
 
-						if ( isset( $quantities_in_cart[ $managed_item_id ] ) && ! $product_data->has_enough_stock( $quantities_in_cart[ $managed_item_id ] + $quantity ) ) {
-
-							$error = sprintf(
-								'<a href="%s" class="button wc-forward">%s</a> %s',
-								WC()->cart->get_cart_url(),
-								__( 'View Cart', 'woocommerce' ),
-								sprintf( __( '&quot;%1$s&quot; cannot be added to the cart because there is not enough stock of &quot;%2$s&quot; &mdash; we have %3$s in stock and you already have %4$s in your cart.', 'woocommerce-product-bundles' ), $bundle_title, $product_title, $product_data->get_stock_quantity(), $quantities_in_cart[ $managed_item_id ] )
-							);
-
-							throw new Exception( $error );
-						}
+						throw new Exception( $error );
 					}
 				}
 
 			} catch ( Exception $e ) {
 
-				if ( $e->getMessage() ) {
+				$error = $e->getMessage();
 
-					if ( $managed_item[ 'is_secret' ] ) {
-						$error = sprintf( __( '&quot;%1$s&quot; cannot be added to the cart &ndash; the product is currently unavailable.', 'woocommerce-product-bundles' ), $bundle_title );
+				if ( $managed_item[ 'is_secret' ] ) {
+
+					$reason = __( 'The product is currently unavailable.', 'woocommerce-product-bundles' );
+
+					if ( 'add-to-cart' === $context ) {
+						$error = sprintf( __( '&quot;%1$s&quot; cannot be added to your cart. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
+					} elseif ( 'cart' === $context ) {
+						$error = sprintf( __( '&quot;%1$s&quot; cannot be purchased. %2$s', 'woocommerce-product-bundles' ), $bundle_title, $reason );
 					} else {
-						$error = $e->getMessage();
+						$error = $reason;
 					}
-
-					wc_add_notice( $error, 'error' );
 				}
 
-				return false;
+				if ( $throw_exception ) {
+					throw new Exception( $error );
+				} else {
+					return false;
+				}
 			}
 		}
 
@@ -295,7 +332,7 @@ class WC_PB_Stock_Manager {
  * These 2 will differ only if stock for a variation is managed by its parent.
  *
  * @class    WC_PB_Stock_Manager_Item
- * @version  5.1.0
+ * @version  5.10.0
  * @since    4.8.7
  */
 class WC_PB_Stock_Manager_Item {
@@ -309,23 +346,13 @@ class WC_PB_Stock_Manager_Item {
 
 	public function __construct( $product, $variation = false, $quantity = 1, $args = array() ) {
 
-		$this->product_id   = is_object( $product ) ? WC_PB_Core_Compatibility::get_id( $product ) : $product;
-		$this->variation_id = is_object( $variation ) ? WC_PB_Core_Compatibility::get_id( $variation ) : $variation;
+		$this->product_id   = is_object( $product ) ? $product->get_id() : $product;
+		$this->variation_id = is_object( $variation ) ? $variation->get_id() : $variation;
 		$this->quantity     = $quantity;
 		$this->bundled_item = isset( $args[ 'bundled_item' ] ) ? $args[ 'bundled_item' ] : false;
 
-		if ( $this->variation_id ) {
-
-			$variation = is_object( $variation ) ? $variation : wc_get_product( $variation );
-
-			// If stock is managed at variation level.
-			if ( $variation && $variation->managing_stock() ) {
-				$this->managed_by_id = $this->variation_id;
-			// Otherwise stock is managed by the parent.
-			} else {
-				$this->managed_by_id = $this->product_id;
-			}
-
+		if ( $this->variation_id && ( $variation = is_object( $variation ) ? $variation : wc_get_product( $variation ) ) ) {
+			$this->managed_by_id = $variation->get_stock_managed_by_id();
 		} else {
 			$this->managed_by_id = $this->product_id;
 		}

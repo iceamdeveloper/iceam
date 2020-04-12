@@ -4,38 +4,61 @@
  *
  * @since 2.6.0
  */
-
 class Toolset_Blocks {
+	const TOOLSET_GUTENBERG_BLOCKS_CATEGORY_SLUG = 'toolset';
+
 	public function load_blocks() {
-		if (
-			! $this->is_gutenberg_active()
-			|| ! $this->is_toolset_ready_for_gutenberg()
-		) {
+		$gutenberg_active = new Toolset_Condition_Plugin_Gutenberg_Active();
+
+		if ( ! $gutenberg_active->is_met() ) {
 			return;
 		}
 
-		// Load Toolset View Gutenberg Block
-		$view_block = new Toolset_Blocks_View();
-		$view_block->init_hooks();
+		$this->init_hooks();
 
-		// Load Toolset View Gutenberg Block
-		$ct_block = new Toolset_Blocks_Content_Template();
-		$ct_block->init_hooks();
+		$toolset_blocks = array(
+			// Toolset_Blocks_Custom_HTML_Extension::BLOCK_NAME,
+			Toolset_Blocks_Paragraph_Extension::BLOCK_NAME,
+		);
 
-		// Load Toolset Custom HTML core Gutenberg Block extension
-		$custom_html_block = new Toolset_Blocks_Custom_HTML();
-		$custom_html_block->init_hooks();
-	}
+		$factory = new Toolset_Gutenberg_Block_Factory();
+		new Toolset_Gutenberg_Block_REST_Helper();
 
-	public function is_gutenberg_active() {
-		// return defined( 'GUTENBERG_VERSION' ) || defined( 'GUTENBERG_DEVELOPMENT_MODE' );
-		return function_exists( 'register_block_type' );
-	}
-
-	public function is_toolset_ready_for_gutenberg() {
-		if ( version_compare( WPV_VERSION, '2.6-b1', '>' ) ) {
-			return true;
+		foreach ( $toolset_blocks as $toolset_block_name ) {
+			$block = $factory->get_block( $toolset_block_name );
+			if ( null !== $block ) {
+				$block->init_hooks();
+			};
 		}
-		return false;
+	}
+
+	/**
+	 * Initialize common hooks for the Toolset Gutenberg blocks.
+	 */
+	public function init_hooks() {
+		add_filter( 'block_categories', array( $this, 'register_toolset_block_category' ) );
+	}
+
+	/**
+	 * Registers the Toolset Gutenberg blocks category.
+	 *
+	 * @param array $categories The array with the categories of the Gutenberg widgets.
+	 *
+	 * @return array
+	 */
+	public function register_toolset_block_category( $categories ) {
+		if ( ! array_search( 'toolset', array_column( $categories, 'slug' ), true ) ) {
+			$categories = array_merge(
+				$categories,
+				array(
+					array(
+						'slug'  => 'toolset',
+						'title' => __( 'Toolset', 'wpv-views' ),
+					),
+				)
+			);
+		}
+
+		return $categories;
 	}
 }

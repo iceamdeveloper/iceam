@@ -11,7 +11,7 @@
  *
  * @var string $link The URL to the next page, if any, or an empty string.
  *
- * @version 5.0.0
+ * @version 5.0.1
  *
  */
 ?>
@@ -21,5 +21,18 @@
 		rel="next"
 		class="tribe-events-c-nav__next tribe-common-b3"
 		data-js="tribe-events-view-link"
-	><?php esc_html_e( 'Next', 'tribe-events-calendar-pro' ); ?></a>
+		aria-label="<?php echo esc_attr( sprintf( __( 'Next %1$s', 'tribe-events-calendar-pro' ), tribe_get_event_label_plural() ) ); ?>"
+		title="<?php echo esc_attr( sprintf( __( 'Next %1$s', 'tribe-events-calendar-pro' ), tribe_get_event_label_plural() ) ); ?>"
+	>
+		<span class="tribe-events-c-nav__next-label">
+			<?php
+				$events_label = '<span class="tribe-events-c-nav__next-label-plural tribe-common-a11y-visual-hide">' . tribe_get_event_label_plural() . '</span>';
+				echo wp_kses(
+					/* translators: %s: Event (plural or singular). */
+					sprintf( __( 'Next %1$s', 'tribe-events-calendar-pro' ), $events_label ),
+					[ 'span' => [ 'class' => [] ] ]
+				);
+			?>
+		</span>
+	</a>
 </li>

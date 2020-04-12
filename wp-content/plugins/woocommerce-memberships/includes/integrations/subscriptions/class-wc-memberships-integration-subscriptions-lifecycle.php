@@ -16,11 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -33,7 +34,7 @@ class WC_Memberships_Integration_Subscriptions_Lifecycle {
 
 
 	/**
-	 * Add lifecycle hooks.
+	 * Adds Memberships/Subscriptions lifecycle hooks.
 	 *
 	 * @since 1.6.0
 	 */
@@ -48,31 +49,33 @@ class WC_Memberships_Integration_Subscriptions_Lifecycle {
 
 
 	/**
-	 * Handle subscriptions activation.
+	 * Handle Subscriptions plugin activation.
 	 *
 	 * @internal
 	 *
 	 * @since 1.6.0
 	 */
 	public function handle_activation() {
+
 		$this->update_subscription_memberships();
 	}
 
 
 	/**
-	 * Handle subscriptions deactivation.
+	 * Handles Subscriptions plugin deactivation.
 	 *
 	 * @internal
 	 *
 	 * @since 1.6.0
 	 */
 	public function handle_deactivation() {
+
 		$this->pause_free_trial_subscription_memberships();
 	}
 
 
 	/**
-	 * Pause subscription-based memberships.
+	 * Pauses subscription-based memberships.
 	 *
 	 * Find any memberships that are on free trial and pause them.
 	 *
@@ -82,19 +85,19 @@ class WC_Memberships_Integration_Subscriptions_Lifecycle {
 	 */
 	public function pause_free_trial_subscription_memberships() {
 
-		// Get user memberships on free trial status.
+		// get user memberships on free trial status
 		$posts = get_posts( array(
 			'post_type'   => 'wc_user_membership',
 			'post_status' => 'wcm-free_trial',
 			'nopaging'    => true,
 		) );
 
-		// Bail out if there are no memberships on free trial.
+		// bail out if there are no memberships on free trial
 		if ( empty( $posts ) ) {
 			return;
 		}
 
-		// Pause the memberships found.
+		// pause the memberships found
 		foreach ( $posts as $post ) {
 
 			$user_membership = wc_memberships_get_user_membership( $post );
@@ -104,10 +107,9 @@ class WC_Memberships_Integration_Subscriptions_Lifecycle {
 
 
 	/**
-	 * Re-activate subscription-based memberships.
+	 * Re-activates subscription-based memberships.
 	 *
-	 * Find any memberships tied to a subscription that are paused,
-	 * which may need to be re-activated or put back on trial.
+	 * Find any memberships tied to a subscription that are paused, which may need to be re-activated or put back on trial.
 	 *
 	 * @internal
 	 *
@@ -115,74 +117,58 @@ class WC_Memberships_Integration_Subscriptions_Lifecycle {
 	 */
 	public function update_subscription_memberships() {
 
-		// Get the Subscriptions integration instance.
-		$integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
+		if ( $integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance() ) {
 
-		// Sanity check.
-		if ( null === $integration ) {
-			return;
-		}
+			$background_handler  = $integration->get_utilities_instance()->get_activation_background_instance();
+			$user_membership_ids = get_posts( array(
+				'post_type'    => 'wc_user_membership',
+				'fields'       => 'ids',
+				'nopaging'     => true,
+				'post_status'  => 'any',
+				'meta_key'     => '_subscription_id',
+				'meta_value'   => '0',
+				'meta_compare' => '>',
+			) );
 
-		$args = array(
-			'post_type'    => 'wc_user_membership',
-			'nopaging'     => true,
-			'post_status'  => 'any',
-			'meta_key'     => '_subscription_id',
-			'meta_value'   => '0',
-			'meta_compare' => '>',
-		);
+			// bother only if we have memberships in the first place...
+			if ( ! empty( $user_membership_ids ) ) {
 
-		$posts = get_posts( $args );
+				$single_run = true;
 
-		// Bail out if there are no memberships to work with.
-		if ( empty( $posts ) ) {
-			return;
-		}
+				// will process this in background only if environment allows it...
+				if ( $background_handler && $background_handler->test_connection() ) {
 
-		foreach ( $posts as $post ) {
+					$single_run    = false;
+					$existing_jobs = $background_handler->get_jobs();
 
-			$user_membership = new WC_Memberships_Integration_Subscriptions_User_Membership( $post );
+					// delete past existing jobs
+					if ( ! empty( $existing_jobs ) )  {
 
-			// Get the related subscription.
-			$subscription = $integration->get_subscription_from_membership( $user_membership->get_id() );
+						foreach ( $existing_jobs as $past_job ) {
 
-			if ( ! $subscription ) {
-				continue;
-			}
-
-			$subscription_status = $integration->get_subscription_status( $subscription );
-
-			// If statuses do not match, update.
-			if ( ! $integration->has_subscription_same_status( $subscription, $user_membership ) ) {
-
-				// Special handling for paused memberships which might be put on free trial.
-				if ( 'active' === $subscription_status && 'paused' === $user_membership->get_status() ) {
-
-					// Get trial end timestamp.
-					$trial_end = $integration->get_subscription_event_time( $subscription, 'trial_end' );
-
-					// If there is no trial end date or the trial end date is past
-					// And the Subscription is active, activate the membership
-					if ( ! $trial_end || current_time( 'timestamp', true ) >= $trial_end ) {
-						$user_membership->activate_membership( __( 'Membership activated because WooCommerce Subscriptions was activated.', 'woocommerce-memberships' ) );
-					// Otherwise, put the membership on free trial.
-					} else {
-						$user_membership->update_status( 'free_trial', __( 'Membership free trial activated because WooCommerce Subscriptions was activated.', 'woocommerce-memberships' ) );
-						$user_membership->set_free_trial_end_date( date( 'Y-m-d H:i:s', $trial_end ) );
+							$background_handler->delete_job( $past_job );
+						}
 					}
 
-				// All other membership statuses: simply update the status.
-				} else {
+					$job = $background_handler->create_job( array(
+						'user_membership_ids' => $user_membership_ids,
+					) );
 
-					$integration->update_related_membership_status( $subscription, $user_membership, $subscription_status );
+					if ( $job ) {
+						$background_handler->dispatch();
+					} else {
+						$single_run = true;
+					}
 				}
-			}
 
-			$end_date = $integration->get_subscription_event_date( $subscription, 'end' );
+				// ...otherwise attempt to process all memberships in one go (original approach)
+				if ( $single_run ) {
 
-			// End date has changed.
-			if ( strtotime( $end_date ) !== $user_membership->get_end_date( 'timestamp' ) ) {
-				$user_membership->set_end_date( $end_date );
+					foreach ( $user_membership_ids as $user_membership_id ) {
+
+						$background_handler->process_item( $user_membership_id );
+					}
+				}
 			}
 		}
 	}

@@ -17,7 +17,7 @@ use Aelia\WC\Cache_Handler\Messages;
  * Main plugin class.
  **/
 class Cache_Handler extends Aelia_Plugin {
-	public static $version = '1.0.11.191111';
+	public static $version = '1.0.12.200323';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;

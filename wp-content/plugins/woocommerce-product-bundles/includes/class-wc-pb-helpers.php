@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Helper Functions.
  *
  * @class    WC_PB_Helpers
- * @version  5.2.0
+ * @version  6.1.5
  */
 class WC_PB_Helpers {
 
@@ -31,13 +31,23 @@ class WC_PB_Helpers {
 	 * Simple runtime cache getter.
 	 *
 	 * @param  string  $key
+	 * @param  string  $group_key
 	 * @return mixed
 	 */
-	public static function cache_get( $key ) {
+	public static function cache_get( $key, $group_key = '' ) {
+
 		$value = null;
-		if ( isset( self::$cache[ $key ] ) ) {
+
+		if ( $group_key ) {
+
+			if ( $group_id = self::cache_get( $group_key . '_id' ) ) {
+				$value = self::cache_get( $group_key . '_' . $group_id . '_' . $key );
+			}
+
+		} elseif ( isset( self::$cache[ $key ] ) ) {
 			$value = self::$cache[ $key ];
 		}
+
 		return $value;
 	}
 
@@ -46,10 +56,23 @@ class WC_PB_Helpers {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
+	 * @param  string  $group_key
 	 * @return void
 	 */
-	public static function cache_set( $key, $value ) {
-		self::$cache[ $key ] = $value;
+	public static function cache_set( $key, $value, $group_key = '' ) {
+
+		if ( $group_key ) {
+
+			if ( null === ( $group_id = self::cache_get( $group_key . '_id' ) ) ) {
+				$group_id = md5( $group_key );
+				self::cache_set( $group_key . '_id', $group_id );
+			}
+
+			self::$cache[ $group_key . '_' . $group_id . '_' . $key ] = $value;
+
+		} else {
+			self::$cache[ $key ] = $value;
+		}
 	}
 
 	/**
@@ -57,11 +80,37 @@ class WC_PB_Helpers {
 	 *
 	 * @param  string  $key
 	 * @param  mixed   $value
+	 * @param  string  $group_key
 	 * @return void
 	 */
-	public static function cache_delete( $key ) {
-		if ( isset( self::$cache[ $key ] ) ) {
+	public static function cache_delete( $key, $group_key = '' ) {
+
+		if ( $group_key ) {
+
+			if ( $group_id = self::cache_get( $group_key . '_id' ) ) {
+				self::cache_delete( $group_key . '_' . $group_id . '_' . $key );
+			}
+
+		} elseif ( isset( self::$cache[ $key ] ) ) {
 			unset( self::$cache[ $key ] );
+		}
+	}
+
+	/**
+	 * Simple runtime group cache invalidator.
+	 *
+	 * @since  5.7.4
+	 *
+	 * @param  string  $key
+	 * @param  string  $group_key
+	 * @param  mixed   $value
+	 * @return void
+	 */
+	public static function cache_invalidate( $group_key ) {
+
+		if ( $group_id = self::cache_get( $group_key . '_id' ) ) {
+			$group_id = md5( $group_key . '_' . $group_id );
+			self::cache_set( $group_key . '_id', $group_id );
 		}
 	}
 
@@ -112,7 +161,7 @@ class WC_PB_Helpers {
 
 		$title = $product->get_title();
 		$sku   = $product->get_sku();
-		$id    = WC_PB_Core_Compatibility::get_id( $product );
+		$id    = $product->get_id();
 
 		if ( $sku ) {
 			$identifier = $sku;
@@ -126,11 +175,11 @@ class WC_PB_Helpers {
 	/**
 	 * Return a formatted product title based on variation id.
 	 *
-	 * @param  int   $item_id
-	 * @param  bool  $use_name
+	 * @param  int     $item_id
+	 * @param  string  $format
 	 * @return string
 	 */
-	public static function get_product_variation_title( $variation, $use_name = false ) {
+	public static function get_product_variation_title( $variation, $format = 'flat' ) {
 
 		if ( ! is_object( $variation ) ) {
 			$variation = wc_get_product( $variation );
@@ -140,17 +189,17 @@ class WC_PB_Helpers {
 			return false;
 		}
 
-		if ( $use_name ) {
+		if ( 'core' === $format || true === $format ) {
 
 			$title = $variation->get_formatted_name();
 
 		} else {
 
-			$description = WC_PB_Core_Compatibility::wc_get_formatted_variation( $variation, true );
+			$description = wc_get_formatted_variation( $variation, true );
 
 			$title = $variation->get_title();
 			$sku   = $variation->get_sku();
-			$id    = WC_PB_Core_Compatibility::get_id( $variation );
+			$id    = $variation->get_id();
 
 			if ( $sku ) {
 				$identifier = $sku;
@@ -158,7 +207,7 @@ class WC_PB_Helpers {
 				$identifier = '#' . $id;
 			}
 
-			$title = self::format_product_title( $title, $identifier, $description, WC_PB_Core_Compatibility::is_wc_version_gte_2_7() );
+			$title = self::format_product_title( $title, $identifier, $description, true );
 		}
 
 		return $title;
@@ -228,5 +277,73 @@ class WC_PB_Helpers {
 		$title_string = sprintf( _x( '%1$s%2$s%3$s%4$s', 'title, quantity, price, suffix', 'woocommerce-product-bundles' ), $title, $quantity_string, $price_string, $suffix_string );
 
 		return $title_string;
+	}
+
+	/**
+	 * Comma separated list of item names, with final comma replaced by 'and'.
+	 *
+	 * @since  5.5.0
+	 *
+	 * @param  array  $items
+	 * @return string
+	 */
+	public static function format_list_of_items( $items ) {
+
+		$item_string = '';
+		$count       = sizeof( $items );
+		$loop        = 1;
+
+		foreach ( $items as $key => $item ) {
+			if ( $count === 1 || $loop === 1 ) {
+				$item_string = $item;
+			} elseif ( $loop === $count ) {
+				$item_string = sprintf( _x( '%1$s and %2$s', 'string list item last separator', 'woocommerce-product-bundles' ), $item_string, $item );
+			} else {
+				$item_string = sprintf( _x( '%1$s, %2$s', 'string list item separator', 'woocommerce-product-bundles' ), $item_string, $item );
+			}
+			$loop++;
+		}
+
+		return $item_string;
+	}
+
+	/**
+	 * Array of allowed HTML tags per case.
+	 *
+	 * @since  6.1.5
+	 *
+	 * @param  string  $case
+	 * @return array
+	 */
+	public static function get_allowed_html( $case ) {
+
+		$allowed_html = array();
+
+		switch ( $case ) {
+			case 'inline':
+				$allowed_html = array(
+
+					// Formatting.
+					'strong' => array(),
+					'em'     => array(),
+					'b'      => array(),
+					'i'      => array(),
+					'span'   => array(
+						'class' => array()
+					),
+
+					// Links.
+					'a'      => array(
+						'href'   => array(),
+						'target' => array()
+					)
+				);
+				break;
+
+			default:
+				break;
+		}
+
+		return $allowed_html;
 	}
 }

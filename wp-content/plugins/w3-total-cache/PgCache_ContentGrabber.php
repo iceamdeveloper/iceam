@@ -198,7 +198,7 @@ class PgCache_ContentGrabber {
 		}
 
 		// TODO: call modifies object state, rename method at least
-		$this->_caching = $this->_can_cache();
+		$this->_caching = $this->_can_read_cache();
 		global $w3_late_init;
 
 		if ( $this->_debug ) {
@@ -423,7 +423,7 @@ class PgCache_ContentGrabber {
 		$response_headers = $this->_get_response_headers();
 
 		// TODO: call modifies object state, rename method at least
-		$original_can_cache = $this->_can_cache2( $buffer, $response_headers );
+		$original_can_cache = $this->_can_write_cache( $buffer, $response_headers );
 		$can_cache = apply_filters( 'w3tc_can_cache', $original_can_cache, $this, $buffer );
 		if ( $can_cache != $original_can_cache ) {
 			$this->cache_reject_reason = 'Third-party plugin has modified caching activity';
@@ -508,7 +508,7 @@ class PgCache_ContentGrabber {
 	 *
 	 * @return boolean
 	 */
-	private function _can_cache() {
+	private function _can_read_cache() {
 		/**
 		 * Don't cache in console mode
 		 */
@@ -637,7 +637,7 @@ class PgCache_ContentGrabber {
 	 * @param string  $buffer
 	 * @return boolean
 	 */
-	private function _can_cache2( $buffer, $response_headers ) {
+	private function _can_write_cache( $buffer, $response_headers ) {
 		/**
 		 * Skip if caching is disabled
 		 */
@@ -768,11 +768,17 @@ class PgCache_ContentGrabber {
 			// when cache key is normalized, since that cause redirect loop
 
 			if ( $this->_get_page_key( $this->_page_key_extension ) ==
-					$this->_get_page_key( $page_key_extension, $response_headers['kv']['Location'] ) ) {
+					$this->_get_page_key( $this->_page_key_extension, $response_headers['kv']['Location'] ) ) {
 				$this->cache_reject_reason = 'Normalization redirect';
 				$this->process_status = 'miss_normalization_redirect';
 				return false;
 			}
+		}
+
+		if ( isset( $_SERVER['REQUEST_METHOD'] ) && $_SERVER['REQUEST_METHOD'] == 'HEAD' ) {
+			$this->cache_reject_reason = 'HEAD request';
+			$this->process_status = 'miss_request_method';
+			return;
 		}
 
 		return true;
@@ -1439,8 +1445,15 @@ class PgCache_ContentGrabber {
 		// key url part
 		if ( $request_url ) {
 			$parts = parse_url( $request_url );
-			$key_urlpart = $parts['host'] .
-				( isset( $parts['port'] ) ? ':' . $parts['port'] : '' ) .
+
+			if ( isset( $parts['host'] ) ) {
+				$key_urlpart = $parts['host'] .
+					( isset( $parts['port'] ) ? ':' . $parts['port'] : '' );
+			} else {
+				$key_urlpart = $this->_request_host;
+			}
+
+			$key_urlpart .=
 				( isset( $parts['path'] ) ? $parts['path'] : '' ) .
 				( isset( $parts['query'] ) ? '?' . $parts['query'] : '' );
 		} else {

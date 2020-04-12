@@ -1,17 +1,20 @@
 <?php
 /**
  * Plugin Name: WooCommerce PayPal Adaptive Payments
- * Plugin URI: http://www.woothemes.com/products/paypal-adaptive-payments/
+ * Plugin URI: https://woocommerce.com/products/paypal-adaptive-payments/
  * Description: PayPal Adaptive Payments integration for WooCommerce
- * Version: 1.1.5
- * Author: WooThemes
- * Author URI: http://woothemes.com
+ * Version: 1.1.11
+ * Author: WooCommerce
+ * Author URI: https://woocommerce.com
  * Text Domain: woocommerce-gateway-paypal-adaptive-payments
  * Domain Path: /languages
+ * WC tested up to: 3.7
+ * WC requires at least: 2.6
+ * Tested up to: 5.0
  *
  * @package  WC_PayPal_Adaptive_Payments
  * @category Core
- * @author   WooThemes
+ * Woo: 442373:307e9af43581a11b4b6cb05525e2dd65
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -42,7 +45,7 @@ class WC_PayPal_Adaptive_Payments {
 	 *
 	 * @var string
 	 */
-	const VERSION = '1.1.5';
+	const VERSION = '1.1.11';
 
 	/**
 	 * Instance of this class.
@@ -55,8 +58,11 @@ class WC_PayPal_Adaptive_Payments {
 	 * Initialize the plugin public actions.
 	 */
 	private function __construct() {
-		// Load plugin text domain
+		// Load plugin text domain.
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
+
+		// Add custom links on plugin action links.
+		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), array( $this, 'plugin_action_links' ) );
 
 		// Checks with WooCommerce is installed.
 		if ( class_exists( 'WC_Payment_Gateway' ) ) {
@@ -97,10 +103,31 @@ class WC_PayPal_Adaptive_Payments {
 	}
 
 	/**
+	 * Add settings, docs, and support links in plugin action links.
+	 *
+	 * @since 1.1.6
+	 *
+	 * @param array $links Plugin action links
+	 *
+	 * @return array Plugin action links
+	 */
+	public function plugin_action_links( $links ) {
+		$setting_link = admin_url( 'admin.php?page=wc-settings&tab=checkout&section=paypal-adaptive-payments' );
+
+		$plugin_links = array(
+			'<a href="' . $setting_link . '">' . __( 'Settings', 'woocommerce-gateway-paypal-adaptive-payments' ) . '</a>',
+			'<a href="https://docs.woocommerce.com/document/paypal-adaptive-payments/">' . __( 'Docs', 'woocommerce-gateway-paypal-adaptive-payments' ) . '</a>',
+			'<a href="http://support.woothemes.com/">' . __( 'Support', 'woocommerce-gateway-paypal-adaptive-payments' ) . '</a>',
+		);
+		return array_merge( $plugin_links, $links );
+	}
+
+	/**
 	 * Includes.
 	 */
 	private function includes() {
 		include_once 'includes/class-wc-paypal-adaptive-payments-gateway.php';
+		include_once 'includes/class-wc-paypal-adaptive-payments-privacy.php';
 	}
 
 	/**

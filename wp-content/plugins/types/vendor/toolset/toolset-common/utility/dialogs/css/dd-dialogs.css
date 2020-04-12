@@ -192,13 +192,6 @@
     border-width: 1px 1px 0 1px;
     border-radius: 2px 2px 0 0;
     background: #e5e5e5;
-    background: -moz-linear-gradient(top,  #e5e5e5 0%, #f4f4f4 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e5e5e5), color-stop(100%,#f4f4f4));
-    background: -webkit-linear-gradient(top,  #e5e5e5 0%,#f4f4f4 100%);
-    background: -o-linear-gradient(top,  #e5e5e5 0%,#f4f4f4 100%);
-    background: -ms-linear-gradient(top,  #e5e5e5 0%,#f4f4f4 100%);
-    background: linear-gradient(to bottom,  #e5e5e5 0%,#f4f4f4 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e5e5e5', endColorstr='#f4f4f4',GradientType=0 );
 }
 
 .ddl-dialog .layout-css-editor .code-editor-toolbar {
@@ -1166,13 +1159,6 @@ li.grid-category{}
     font-weight: bold;
     cursor: pointer;
     background: #e5e5e5;
-    background: -moz-linear-gradient(top,  #e5e5e5 0%, #f4f4f4 100%);
-    background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,#e5e5e5), color-stop(100%,#f4f4f4));
-    background: -webkit-linear-gradient(top,  #e5e5e5 0%,#f4f4f4 100%);
-    background: -o-linear-gradient(top,  #e5e5e5 0%,#f4f4f4 100%);
-    background: -ms-linear-gradient(top,  #e5e5e5 0%,#f4f4f4 100%);
-    background: linear-gradient(to bottom,  #e5e5e5 0%,#f4f4f4 100%);
-    filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#e5e5e5', endColorstr='#f4f4f4',GradientType=0 );
 }
 .ddl-form .wpv-toggle-toggler-icon {
     display: inline-block;

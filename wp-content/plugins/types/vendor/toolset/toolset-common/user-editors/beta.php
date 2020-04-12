@@ -29,11 +29,19 @@ $available_editors = array(
 	),
 	'Toolset_User_Editors_Editor_Avada' => array(
 		'backend' => 'Toolset_User_Editors_Editor_Screen_Avada_Backend',
+		'frontend' => 'Toolset_User_Editors_Editor_Screen_Avada_Frontend',
 	),
 	'Toolset_User_Editors_Editor_Divi' => array(
 		'backend' => 'Toolset_User_Editors_Editor_Screen_Divi_Backend',
 		'frontend' => 'Toolset_User_Editors_Editor_Screen_Divi_Frontend',
 	),
+
+	/*
+	// Closing the Layouts integration as a Content Template builder for now, in order for it to come with improved UX.
+	'Toolset_User_Editors_Editor_Layouts' => array(
+		'backend' => 'Toolset_User_Editors_Editor_Screen_Layouts_Backend',
+	),
+	*/
 );
 
 if ( version_compare( WPV_VERSION, '2.6-b1', '>' ) ) {
@@ -42,19 +50,31 @@ if ( version_compare( WPV_VERSION, '2.6-b1', '>' ) ) {
 	);
 }
 
+$dic = apply_filters( 'toolset_dic', false );
+
 foreach ( $available_editors as $editor_main_class => $editor_screen_classes ) {
-	$editor = new $editor_main_class( $medium );
-	if ( method_exists( $editor,'initialize' ) ) {
-		$editor->initialize();
-	}
+	$editor = $dic->make( $editor_main_class, array( ':medium' => $medium ) );
+
+	// This runs even if the user editor will not be available:
+	// checks against Toolset_User_Editors_Editor_Interface::required_plugin_active
+	// are done on the Toolset_User_Editors_Manager::add_editor call below.
+	$editor->initialize();
 
 	if ( $editor_setup->add_editor( $editor ) ) {
 		foreach ( $editor_screen_classes as $key => $editor_screen_class ) {
-			$new_editor_screen_class = new $editor_screen_class();
+			$new_editor_screen_class = $dic->make(
+				$editor_screen_class,
+				array(
+					':editor' => $editor,
+					':medium' => $medium,
+				)
+			);
+
 			$new_editor_screen_class->initialize();
 			$editor->add_screen( $key, $new_editor_screen_class );
-
 		}
+
+		$editor->after_editor_added();
 	}
 }
 

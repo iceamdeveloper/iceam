@@ -8,13 +8,13 @@
 
 namespace Tribe\Events\Pro\Views\V2\Views;
 
-use Tribe\Events\Views\V2\View;
 use Tribe\Events\Pro\Views\V2\Maps;
+use Tribe\Events\Views\V2\Messages;
+use Tribe\Events\Views\V2\Utils;
+use Tribe\Events\Views\V2\View;
 use Tribe\Events\Views\V2\Views\Traits\List_Behavior;
 use Tribe__Events__Main as TEC;
-use Tribe__Events__Rewrite as Rewrite;
 use Tribe__Utils__Array as Arr;
-use Tribe\Events\Views\V2\Utils;
 
 class Map_View extends View {
 	use List_Behavior;
@@ -46,11 +46,25 @@ class Map_View extends View {
 	protected static $date_in_url = false;
 
 	/**
+	 * Map_View constructor.
+	 *
+	 * @since 5.0.1
+	 *
+	 * {@inheritDoc}
+	 */
+	public function __construct( Messages $messages = null ) {
+		parent::__construct($messages);
+		$this->rewrite = tribe( 'events.rewrite' );
+	}
+
+	/**
 	 * {@inheritDoc}
 	 */
 	public function prev_url( $canonical = false, array $passthru_vars = [] ) {
-		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
-			return $this->cached_urls[ __METHOD__ ];
+		$cache_key = __METHOD__ . '_' . md5( wp_json_encode( func_get_args() ) );
+
+		if ( isset( $this->cached_urls[ $cache_key ] ) ) {
+			return $this->cached_urls[ $cache_key ];
 		}
 
 		$current_page = (int) $this->context->get( 'page', 1 );
@@ -66,7 +80,7 @@ class Map_View extends View {
 
 		$url = $this->filter_prev_url( $canonical, $url );
 
-		$this->cached_urls[ __METHOD__ ] = $url;
+		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
 	}
@@ -75,8 +89,10 @@ class Map_View extends View {
 	 * {@inheritDoc}
 	 */
 	public function next_url( $canonical = false, array $passthru_vars = [] ) {
-		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
-			return $this->cached_urls[ __METHOD__ ];
+		$cache_key = __METHOD__ . '_' . md5( wp_json_encode( func_get_args() ) );
+
+		if ( isset( $this->cached_urls[ $cache_key ] ) ) {
+			return $this->cached_urls[ $cache_key ];
 		}
 
 		$current_page = (int) $this->context->get( 'page', 1 );
@@ -92,7 +108,7 @@ class Map_View extends View {
 
 		$url = $this->filter_next_url( $canonical, $url );
 
-		$this->cached_urls[ __METHOD__ ] = $url;
+		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
 	}
@@ -138,7 +154,7 @@ class Map_View extends View {
 			}
 
 			// We've got rewrite rules handling `eventDate` and `eventDisplay`, but not List. Let's remove it.
-			$canonical_url = Rewrite::instance()->get_clean_url(
+			$canonical_url = $this->rewrite->get_clean_url(
 				add_query_arg(
 					[ 'eventDisplay' => $this->slug ],
 					remove_query_arg( [ 'eventDate' ], $past_url )
@@ -251,8 +267,9 @@ class Map_View extends View {
 		$template_vars = parent::setup_template_vars();
 
 		$geoloc_search = $this->context->get( 'geoloc_search', false );
+		$show_distance = ! empty( $geoloc_search );
 
-		if ( false !== $geoloc_search ) {
+		if ( $show_distance ) {
 			$template_vars['events'] = $this->sort_events_by_distance( $template_vars['events'] );
 		} else {
 			$template_vars['events'] = $this->sort_events_by_display_mode( $template_vars['events'] );
@@ -267,7 +284,7 @@ class Map_View extends View {
 		$template_vars = $this->setup_events_by_venue( $template_vars );
 		$template_vars = $this->setup_datepicker_template_vars($template_vars);
 
-		$template_vars['show_distance'] = false !== $geoloc_search;
+		$template_vars['show_distance'] = $show_distance;
 		$template_vars['geoloc_unit']   = $this->setup_geoloc_unit();
 
 		return $template_vars;

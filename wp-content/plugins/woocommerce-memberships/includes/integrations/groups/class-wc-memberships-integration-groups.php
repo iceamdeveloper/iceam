@@ -16,16 +16,17 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Integration class for Groups plugin
+ * Integration class for Groups plugin.
  *
  * @since 1.0.0
  */
@@ -33,7 +34,7 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Constructor
+	 * Constructor.
 	 *
 	 * @since 1.0.0
 	 */
@@ -57,9 +58,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Add Groups integration settings
+	 * Adds Groups integration settings.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param array $settings
 	 * @return array
 	 */
@@ -93,7 +95,7 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Add Groups Import settings page
+	 * Adds Groups Import settings page.
 	 *
 	 * @since 1.0.0
 	 */
@@ -113,9 +115,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Add Memberships admin menu items
+	 * Adds Memberships admin menu items
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param string $title Admin title
 	 * @return string Modified title
 	 */
@@ -130,7 +133,7 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Render groups import page
+	 * Renders groups import page.
 	 *
 	 * @since 1.0.0
 	 */
@@ -246,7 +249,7 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Remove groups access restriction field from Memberships screens
+	 * Removes groups access restriction field from Memberships screens.
 	 *
 	 * @since 1.0.0
 	 */
@@ -261,7 +264,7 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Import members from groups
+	 * Imports members from groups.
 	 *
 	 * @since 1.0.0
 	 */
@@ -324,9 +327,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Import user membership from group membership
+	 * Imports user membership from group membership.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param int $user_id
 	 * @param int $group_id
 	 * @param int $plan_id
@@ -340,7 +344,9 @@ class WC_Memberships_Integration_Groups {
 		}
 
 		/**
-		 * Filter new membership data, used when importing membership from Groups
+		 * Filter new membership data, used when importing membership from Groups.
+		 *
+		 * @since 1.0.0
 		 *
 		 * @param array $data
 		 * @param array $args
@@ -357,7 +363,7 @@ class WC_Memberships_Integration_Groups {
 		) );
 
 		// create a new membership
-		$user_membership_id = wp_insert_post( $data );
+		$user_membership_id = wp_insert_post( $data, true );
 
 		// bail out on failure
 		if ( is_wp_error( $user_membership_id ) ) {
@@ -392,7 +398,7 @@ class WC_Memberships_Integration_Groups {
 		$user_membership->set_end_date( $end_date );
 
 		// add membership note
-		$group = Groups_Group::read( $group_id );
+		$group = \Groups_Group::read( $group_id );
 		/* translators: %s - Group name, %d Group ID */
 		$user_membership->add_note( sprintf( __( 'Membership imported from Group "%s" (ID #%d)' ), $group->name, $group_id ) );
 
@@ -401,9 +407,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Output button type settings field
+	 * Outputs button type settings field
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param array $value
 	 */
 	public function admin_wc_memberships_groups_button( $value ) {
@@ -418,7 +425,7 @@ class WC_Memberships_Integration_Groups {
 		}
 
 		// description handling
-		$field_description = WC_Admin_Settings::get_field_description( $value );
+		$field_description = \WC_Admin_Settings::get_field_description( $value );
 
 		?>
 		<tr valign="top">
@@ -441,9 +448,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Get all the groups
+	 * Returns all the groups.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @return array
 	 */
 	private function get_groups() {
@@ -455,9 +463,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Get all groups for a specific user
+	 * Returns all groups for a specific user.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param int $user_id
 	 * @return array
 	 */
@@ -469,9 +478,10 @@ class WC_Memberships_Integration_Groups {
 
 
 	/**
-	 * Get all users of a group
+	 * Returns all users of a group.
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param int $group_id
 	 * @return array
 	 */

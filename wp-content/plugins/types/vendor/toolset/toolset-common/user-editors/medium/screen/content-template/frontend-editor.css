@@ -23,7 +23,7 @@
 }
 
 .fl-builder .ui-widget-overlay {
-    z-index: 1000001 !important;
+    z-index: 1000001;
 }
 
 .fl-builder-bar-content {

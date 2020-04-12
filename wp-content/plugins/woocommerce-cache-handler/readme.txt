@@ -2,11 +2,11 @@
 Tags: woocommerce, multi-currency, multiple currency, caching
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Requires at least: 4.0
-Tested up to: 4.8
+Tested up to: 5.4
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 3.8.0
+WC tested up to: 4.0.1
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
@@ -20,7 +20,7 @@ Implements a workaround to allow plugins to work with caching systems that don't
 
 * WordPress 4.0 or newer.
 * PHP 5.3 or newer.
-* WooCommerce 2.4.x to 3.3.x.
+* WooCommerce 3.0 or newer
 * [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or later.
 
 == Frequently Asked Questions ==
@@ -40,6 +40,9 @@ For more information about installation and management of plugins, please refer 
 1. **Settings > Options**. Miscellaneous options.
 
 == Changelog ==
+
+= 1.0.12.200323 =
+* Updated supported WooCommerce versions.
 
 = 1.0.11.191111 =
 * Tweak - Added check in Ajax Loader, to ensure that only valid product ID are handled.

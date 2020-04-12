@@ -1,37 +1,33 @@
 .wpcf-group-area{
-	float:left;
-	width:100%;
 	clear:both;
 	margin-top:20px;	
 }
-.wpcf-profile-field-line{
+.wpcf-profile-field-line {
 	position:relative;
-	float:left;
-	width:100%;
-	margin-top:20px;
+}
+.wpcf-profile-field-line:after {
+	content: '';
+	display: table;
+	clear: both;
 }
 
-.wpcf-repeater-profile-line-left{
-	width: 20%;
-	margin-right:10px;
-	float:left;	
-}
-.wpcf-repeater-profile-line-right{
-	width: 70%;
-	float:left;	
-}
-.wpcf-profile-line-left{
-	width: 20%;
-	margin-right:10px;
-	float:left;
-}
-.wpcf-profile-line-right{
-	width: 70%;
-	float:left;
-}
-.wpcf-profile-line-right img{
-	max-width:40%;
-	height:auto;
+@media (min-width: 783px) {
+	.wpcf-repeater-profile-line-left,
+	.wpcf-profile-line-left {
+		width: 200px;
+		margin-right: 10px;
+		float: left;
+	}
+	.wpcf-repeater-profile-line-right,
+	.wpcf-profile-line-right {
+		width: -webkit-calc(100% - 210px);
+		width: calc(100% - 210px);
+		float: left;
+	}
+	.wpcf-repeater-profile-line-right .wpt-repetitive .ui-sortable,
+	.wpcf-profile-line-right .wpt-repetitive .ui-sortable {
+		margin-top: 0;
+	}
 }
 .wpcf-fields-form .CodeMirror-wrap
 {
@@ -56,7 +52,6 @@
 }
 .widefat{
 	position:relative;
-	
 }
 #wpcf-admin-styles-box td{
 	padding-bottom:10px;	

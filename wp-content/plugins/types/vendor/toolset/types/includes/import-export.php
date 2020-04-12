@@ -1,9 +1,5 @@
 <?php
-/*
- * Import/export data.
- *
- *
- */
+
 require_once WPCF_EMBEDDED_INC_ABSPATH . '/import-export.php';
 
 function wpcf_admin_export_form() {
@@ -18,8 +14,8 @@ function wpcf_admin_export_form() {
 		'#name'			=> 'types_export',
 		'#value'		=> __( 'Export', 'wpcf' ),
 		'#attributes'	=> array('class' => 'button-primary'),
-		'#before' 		=> '<p>' 
-						. __( 'Download all custom fields, post types and taxonomies created by Types plugin.', 'wpcf' ) 
+		'#before' 		=> '<p>'
+						. __( 'Download all custom fields, post types and taxonomies created by Types plugin.', 'wpcf' )
 						. '</p>'
 						. '<p class="toolset-update-button-wrap">',
 		'#after'		=> '</p>'
@@ -59,7 +55,7 @@ function wpcf_admin_import_form() {
 			'#before'			=> '<div class="js-types-import-method">',
 			'#after'			=> '</div>'
 		);
-		
+
 		$form['types-import-file'] = array(
 			'#type'			=> 'file',
 			'#name'			=> 'types-import-file',
@@ -69,7 +65,7 @@ function wpcf_admin_import_form() {
 			'#inline'		=> true,
 			'#attributes'	=> $attributes,
 		);
-		
+
 		$form['type-import-before-textarea'] = array(
 			'#type'		=> 'markup',
 			'#markup'	=> '<div class="toolset-advanced-setting js-types-import-method-extra js-types-import-method-extra-text hidden">'
@@ -91,7 +87,7 @@ function wpcf_admin_import_form() {
 			'#type'		=> 'markup',
 			'#markup'	=> '</div>'
 		);
-		
+
 		$form['types-import-submit'] = array(
 			'#type'			=> 'submit',
 			'#name'			=> 'types-import-submit',
@@ -105,7 +101,7 @@ function wpcf_admin_import_form() {
 			'#before'		=> '<p class="toolset-update-button-wrap">',
 			'#after'		=> '</p>',
 		);
-		
+
 		$form['types-import-step'] = array(
 			'#type' => 'hidden',
 			'#name' => 'types-import-step',
@@ -124,13 +120,13 @@ function wpcf_admin_import_confirmation_form() {
 	if ( isset( $_POST['types-import-step'] ) ) {
 		$mode = 'none';
 		$data = '';
-		if ( 
-			! empty( $_POST['types-import-submit'] ) 
+		if (
+			! empty( $_POST['types-import-submit'] )
 			&& (
 				! empty( $_POST['types-import-method'] )
 				&& $_POST['types-import-method'] == 'file'
 			)
-			&& ! empty( $_FILES['types-import-file']['tmp_name'] ) 
+			&& ! empty( $_FILES['types-import-file']['tmp_name'] )
 		) {
 			if ( $_FILES['types-import-file']['type'] == 'text/xml' ) {
 				$_FILES['types-import-file']['name'] .= '.txt';
@@ -192,13 +188,13 @@ function wpcf_admin_import_confirmation_form() {
 				'#value' => $cache_key,
 			);
 			$mode = 'file';
-		} elseif ( 
-			! empty( $_POST['types-import-submit'] ) 
+		} elseif (
+			! empty( $_POST['types-import-submit'] )
 			&& (
 				! empty( $_POST['types-import-method'] )
 				&& $_POST['types-import-method'] == 'text'
 			)
-			&& ! empty( $_POST['types-import-text'] ) 
+			&& ! empty( $_POST['types-import-text'] )
 		) {
 			$data = stripslashes( $_POST['types-import-text'] );
 			if ( preg_match( '/encoding=("[^"]*"|\'[^\']*\')/s', $data, $match ) ) {
@@ -265,22 +261,21 @@ function wpcf_admin_import_confirmation_form() {
 
 function wpcf_admin_import_final_data() {
 	$return = array();
-	if ( 
-		extension_loaded( 'simplexml' ) 
-		&& isset( $_POST['types-import-final'] )
-		&& isset( $_POST['types_import_wpnonce'] ) 
+	if (
+		isset( $_POST['types-import-final'], $_POST['types_import_wpnonce'] )
+		&& extension_loaded( 'simplexml' )
 		&& wp_verify_nonce( $_POST['types_import_wpnonce'], 'wpcf_import' )
 	) {
-		if ( $_POST['types-import-mode'] == 'file' && !empty( $_POST['types-import-file'] ) ) {
+		if ( $_POST['types-import-mode'] === 'file' && !empty( $_POST['types-import-file'] ) ) {
 			$file = get_transient( sanitize_text_field( $_POST['types-import-file'] ) );
 			if ( file_exists($file) ) {
 				$info = pathinfo($file);
-				$is_zip = $info['extension'] == 'zip' ? true : false;
+				$is_zip = ( $info['extension'] === 'zip' );
 				if ( $is_zip ) {
 					$zip = zip_open($file);
 					if ( is_resource( $zip ) ) {
 						while ( ($zip_entry = zip_read( $zip )) !== false ) {
-							if ( zip_entry_name( $zip_entry ) == 'settings.xml' ) {
+							if ( zip_entry_name( $zip_entry ) === 'settings.xml' ) {
 								$data = @zip_entry_read( $zip_entry, zip_entry_filesize( $zip_entry ) );
 							}
 						}
@@ -297,7 +292,7 @@ function wpcf_admin_import_final_data() {
 
 				@unlink($file);
 
-				if ( $data ) {
+				if ( isset( $data ) && $data ) {
 					$return = wpcf_admin_import_data( $data, false );
 				} else {
 					$return[] = array(
@@ -604,46 +599,59 @@ function wpcf_admin_import_export_settings($data)
     $form = array();
     $form['title'] = array(
         '#type' => 'markup',
-        '#markup' => '<h2>' . __( 'General Settings', 'wpcf' ) . '</h2>',
+        '#markup' => '<h2>' . __( 'General settings', 'wpcf' ) . '</h2>',
     );
+
+	$form[ Types_Import_Export::XML_KEY_TOOLSET_COMMON_SETTINGS ] = array(
+		'#type' => 'checkbox',
+		'#title' => __( 'Overwrite general Toolset settings.', 'wpcf' ),
+		'#name' => Types_Import_Export::XML_KEY_TOOLSET_COMMON_SETTINGS,
+		'#inline' => true,
+		'#after' => sprintf(
+			' <i class="fa fa-question-circle icon-question-sign js-show-tooltip" data-header="%s" data-content="%s"></i><br />',
+			esc_attr( __( 'Overwrite general Toolset settings.', 'wpcf') ),
+			esc_attr( __( 'These settings include values from the General tab in Toolset Settings, like the active version of Bootstrap.', 'wpcf') )
+		),
+	);
+
     $form['overwrite-settings'] = array(
         '#type' => 'checkbox',
-        '#title' => __( 'Overwrite settings', 'wpcf' ),
+        '#title' => __( 'Overwrite Types settings.', 'wpcf' ),
         '#name' => 'overwrite-settings',
         '#inline' => true,
         '#after' => '<br />',
     );
-    $form['overwrite-or-add-groups'] = array(
+	$form['overwrite-or-add-groups'] = array(
         '#type' => 'checkbox',
-        '#title' => __( 'Bulk overwrite groups if exist', 'wpcf' ),
+        '#title' => __( 'Bulk overwrite field groups if they already exist.', 'wpcf' ),
         '#name' => 'overwrite-groups',
         '#inline' => true,
         '#after' => '<br />',
     );
     $form['delete-groups'] = array(
         '#type' => 'checkbox',
-        '#title' => __( "Delete group if don't exist", 'wpcf' ),
+        '#title' => __( 'Delete a field group if it doesn\'t exist in the import file.', 'wpcf' ),
         '#name' => 'delete-groups',
         '#inline' => true,
         '#after' => '<br />',
     );
     $form['delete-fields'] = array(
         '#type' => 'checkbox',
-        '#title' => __( "Delete field if don't exist", 'wpcf' ),
+        '#title' => __( 'Delete a custom field if doesn\'t exist in the import file.', 'wpcf' ),
         '#name' => 'delete-fields',
         '#inline' => true,
         '#after' => '<br />',
     );
     $form['delete-types'] = array(
         '#type' => 'checkbox',
-        '#title' => __( "Delete Post Type if don't exist", 'wpcf' ),
+        '#title' => __( 'Delete a post type if it doesn\'t exist in the import file.', 'wpcf' ),
         '#name' => 'delete-types',
         '#inline' => true,
         '#after' => '<br />',
     );
     $form['delete-tax'] = array(
         '#type' => 'checkbox',
-        '#title' => __( "Delete Taxonomy if don't exist", 'wpcf' ),
+        '#title' => __( 'Delete a taxonomy if it doesn\'t exist in the import file.', 'wpcf' ),
         '#name' => 'delete-tax',
         '#inline' => true,
         '#after' => '<br />',
@@ -662,6 +670,10 @@ function wpcf_admin_import_export_settings($data)
         return false;
     }
 //    $data = new SimpleXMLElement($data);
+
+	// Collection of all post types which are for RFG
+	$rfg_post_types = array();
+
     // Check groups
     if ( !empty( $data->groups ) ) {
         $form['title-1'] = array(
@@ -671,31 +683,53 @@ function wpcf_admin_import_export_settings($data)
         $groups_check = array();
         foreach ( $data->groups->group as $group ) {
             $group = (array) $group;
+
+	        // clean dead RFG (beta relict)
+	        if ( is_object( $group['post_title'] ) && $group['post_title']->count() === 0 ) {
+		        continue;
+	        }
+
+            // For RFG
+			$is_rfg = isset( $group['meta'] );
+	        if( $is_rfg && property_exists( $group['meta'], '_types_repeatable_field_group_post_type' ) ) {
+	        	// collect post type
+		        $rfg_post_types[] = $group['meta']->_types_repeatable_field_group_post_type;
+	        }
+
+	        $title = '<strong>' . esc_html( $group['post_title'] ) . '</strong>';
+	        $title .= $is_rfg
+		        ? ' <i>(' . __( 'Repeatable Field Group', 'wpcf' ) . ')</i>'
+		        : '';
+
             $form['group-add-' . $group['ID']] = array(
                 '#type' => 'checkbox',
                 '#name' => 'groups[' . $group['ID'] . '][add]',
                 '#default_value' => true,
-                '#title' => '<strong>' . esc_html( $group['post_title'] ) . '</strong>',
+                '#title' => $title,
                 '#inline' => true,
                 '#after' => '<br />',
             );
-            $post = $wpdb->get_var(
-                $wpdb->prepare(
-                    "SELECT ID FROM $wpdb->posts WHERE post_title = %s AND post_type = %s",
-                    $group['post_title'],
-                    $group['post_type']
-                )
-            );
+	        $post = $wpdb->get_var(
+		        $wpdb->prepare(
+			        "SELECT ID FROM $wpdb->posts WHERE post_title = %s AND post_type = %s",
+			        $group['post_title'],
+			        $group['post_type']
+		        )
+	        );
             if ( !empty( $post ) ) {
+            	$options = array( __( 'Update', 'wpcf' ) => 'update' );
+
+            	if( ! $is_rfg ) {
+            		// allow create new only for non RFGs
+            		$options[ __( 'Create new', 'wpcf' ) ] = 'add';
+	            }
+
                 $form['group-add-' . $group['ID']]['#after'] = wpcf_form_simple(
                         array('group-add-update-' . $group['ID'] => array(
                                 '#type' => 'radios',
                                 '#name' => 'groups[' . $group['ID'] . '][update]',
                                 '#inline' => true,
-                                '#options' => array(
-                                    __( 'Update', 'wpcf' ) => 'update',
-                                    __( 'Create new', 'wpcf' ) => 'add'
-                                ),
+                                '#options' => $options,
                                 '#default_value' => 'update',
                                 '#before' => '<br />',
                                 '#after' => '<br />',
@@ -897,6 +931,10 @@ function wpcf_admin_import_export_settings($data)
         $types_to_be_deleted = array();
         foreach ( $data->types->type as $type ) {
             $type = (array) $type;
+	        if( in_array( $type['id'], $rfg_post_types ) ) {
+		        // Post Type of RFG - will be imported with the related RFG
+		        continue;
+	        }
             $form['type-add-' . $type['id']] = array(
                 '#type' => 'checkbox',
                 '#name' => 'types[' . $type['id'] . '][add]',
@@ -909,6 +947,11 @@ function wpcf_admin_import_export_settings($data)
         }
 
         foreach ( $types_existing as $type_id => $type ) {
+	        if( in_array( $type_id, $rfg_post_types ) ) {
+		        // Post Type of RFG
+		        continue;
+	        }
+
             if ( !in_array( $type_id, $types_check ) ) {
                 $types_to_be_deleted['<strong>' . $type['labels']['name'] . '</strong>'] = $type_id;
             }
@@ -926,6 +969,71 @@ function wpcf_admin_import_export_settings($data)
             );
         }
     }
+
+	// Relationships
+	if( ! empty( $data->m2m_relationships ) ) {
+		$form['m2m-title'] = array(
+			'#type' => 'markup',
+			'#markup' => '<h2>' . __( 'Relationships', 'wpcf' ) . '</h2>',
+		);
+
+		if ( ! apply_filters( 'toolset_is_m2m_enabled', false ) ) {
+			// m2m is not active - user must activate it to import new relationships
+			$form['m2m-not-active'] = array(
+				'#type' => 'markup',
+				'#markup' => '<div class="toolset-alert toolset-alert-error" style="line-height:1.5;">'
+				             . sprintf( __( 'The export contains new formated relationships, but your site has relationships that use the old storage. <a href="%s"><b>Migrate to the new relationship system</b></a> and start the import process again to import the relationships of your export.', 'wpcf' ),
+					              admin_url( 'admin.php?page=types-relationships' ) )
+				             . '</div>',
+			);
+		} else {
+			// m2m active
+			do_action( 'toolset_do_m2m_full_init' );
+			$relationship_repository = Toolset_Relationship_Definition_Repository::get_instance();
+			foreach( $data->m2m_relationships as $relationships ) {
+				$relationships = (array) $relationships;
+
+				foreach( $relationships as $relationship ) {
+					$relationship = (array) $relationship;
+
+					if( $relationship['origin'] == 'post_reference_field'
+						|| $relationship['origin'] == 'repeatable_group' ) {
+						// PRF and RFG relationships will be imported when the PRF / RFG is imported
+						continue;
+					}
+
+					if( $relationship_repository->get_definition( $relationship['slug'] ) ) {
+						// relationship already exist
+						$form['m2m-relationship-already-exists-' . $relationship['id'] ] = array(
+							'#type' => 'markup',
+							'#markup' => '<div><i class="fa fa-check-square-o"></i> '
+							             . sprintf( __( '<b>%s</b> already exists.', 'wpcf' ), $relationship['display_name_plural']  )
+							             . '</div>',
+							'#type' => 'checkbox',
+							'#name' => 'm2m-relationships-exists[' . $relationship['id'] . ']',
+							'#default_value' => false,
+							'#title' => sprintf( __( '<b>%s</b> <i>(already exists)</i>', 'wpcf' ), $relationship['display_name_plural']  ),
+							'#inline' => true,
+							'#attributes' => array(
+									'disabled' => 'disabled',
+							),
+							'#after' => '<br />',
+						);
+						continue;
+					}
+
+					$form['m2m-relationship-add-' . $relationship['id'] ] = array(
+						'#type' => 'checkbox',
+						'#name' => 'm2m-relationships[' . $relationship['slug'] . ']',
+						'#default_value' => true,
+						'#title' => '<strong>' . $relationship['display_name_plural'] . '</strong>',
+						'#inline' => true,
+						'#after' => '<br />',
+					);
+				}
+			}
+		}
+	}
 
     // Check taxonomies
     if ( !empty( $data->taxonomies ) ) {
@@ -990,7 +1098,7 @@ function wpcf_admin_import_export_settings($data)
 
 /**
  * Add form inputs related to term field group and field definition import.
- * 
+ *
  * @param SimpleXMLElement $data Import data from XML
  * @return array Enlimbo form elements (yuck).
  * @since 2.1
@@ -1006,7 +1114,7 @@ function wpcf_admin_import_export_settings_for_terms( $data ) {
 			'#markup' => '<h2>' . __( 'Term field groups to be added or updated', 'wpcf' ) . '</h2>',
 		);
 
-		$group_factory = Types_Field_Group_Term_Factory::get_instance();
+		$group_factory = Toolset_Field_Group_Term_Factory::get_instance();
 
 		$groups_check = array();
 		foreach ( $data->term_groups->group as $group ) {
@@ -1028,7 +1136,7 @@ function wpcf_admin_import_export_settings_for_terms( $data ) {
 				array(
 					'name' => $group_slug,
 					'post_type' => $group['post_type']
-				) 
+				)
 			);
 
 			$group_already_exists = ( count( $existing_groups ) > 0 );
@@ -1054,7 +1162,7 @@ function wpcf_admin_import_export_settings_for_terms( $data ) {
 			$groups_check[] = $group_slug;
 		}
 
-		$groups_existing = get_posts( array( 'post_type' => Types_Field_Group_Term::POST_TYPE, 'post_status' => null ) );
+		$groups_existing = get_posts( array( 'post_type' => Toolset_Field_Group_Term::POST_TYPE, 'post_status' => null ) );
 
 		if ( !empty( $groups_existing ) ) {
 			$groups_to_be_deleted = array();
@@ -1083,7 +1191,7 @@ function wpcf_admin_import_export_settings_for_terms( $data ) {
 			'#type' => 'markup',
 			'#markup' => '<h2>' . __( 'Term fields to be added/updated', 'wpcf' ) . '</h2>',
 		);
-		$fields_existing = wpcf_admin_fields_get_fields( false, false, false, WPCF_Field_Definition_Factory_Term::FIELD_DEFINITIONS_OPTION );
+		$fields_existing = wpcf_admin_fields_get_fields( false, false, false, Toolset_Field_Definition_Factory_Term::FIELD_DEFINITIONS_OPTION );
 		$fields_check = array();
 		$fields_to_be_deleted = array();
 		foreach ( $data->term_fields->field as $field ) {

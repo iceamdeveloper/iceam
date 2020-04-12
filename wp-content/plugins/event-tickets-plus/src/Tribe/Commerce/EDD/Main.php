@@ -380,8 +380,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 */
 	public function register_eddtickets_type() {
 
-		$args = array(
-			'label'           => 'Tickets',
+		$args = [
+			'label'           => esc_html( tribe_get_ticket_label_plural( 'edd_post_type_label' ) ),
 			'public'          => false,
 			'show_ui'         => false,
 			'show_in_menu'    => false,
@@ -390,7 +390,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			'capability_type' => 'post',
 			'has_archive'     => false,
 			'hierarchical'    => true,
-		);
+		];
 
 		register_post_type( $this->attendee_object, $args );
 	}
@@ -597,9 +597,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		if ( ! $has_tickets )
 			return $email_body;
 
-		$message = __( "You'll receive your tickets in another email.", 'event-tickets-plus' );
+		$message = esc_html( sprintf( __( "You'll receive your %s in another email.", 'event-tickets-plus' ), tribe_get_ticket_label_plural_lowercase( 'edd_email_confirmation' ) ) );
 		return $email_body . '<br/>' . apply_filters( 'eddtickets_email_message', $message );
-
 	}
 
 	/**
@@ -611,7 +610,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 *
 	 * @return bool
 	 */
-	public function save_ticket( $post_id, $ticket, $raw_data = array() ) {
+	public function save_ticket( $post_id, $ticket, $raw_data = [] ) {
 		// assume we are updating until we find out otherwise
 		$save_type = 'update';
 
@@ -619,14 +618,14 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$save_type = 'create';
 
 			/* Create main product post */
-			$args = array(
+			$args = [
 				'post_status'  => 'publish',
 				'post_type'    => $this->ticket_object,
 				'post_author'  => get_current_user_id(),
 				'post_content' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => tribe_get_request_var( 'menu_order', -1 ),
-			);
+			];
 
 			$ticket->ID = wp_insert_post( $args );
 
@@ -634,12 +633,12 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			add_post_meta( $ticket->ID, $this->event_key, $post_id );
 
 		} else {
-			$args = array(
+			$args = [
 				'ID'           => $ticket->ID,
 				'post_content' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => $ticket->menu_order,
-			);
+			];
 
 			$ticket->ID = wp_update_post( $args );
 		}
@@ -648,20 +647,24 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			return false;
 		}
 
+		/** @var Tribe__Tickets__Tickets_Handler $tickets_handler */
+		$tickets_handler = tribe( 'tickets.handler' );
+
 		// Updates if we should show Description
 		$ticket->show_description = isset( $ticket->show_description ) && tribe_is_truthy( $ticket->show_description ) ? 'yes' : 'no';
-		update_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_show_description, $ticket->show_description );
+
+		update_post_meta( $ticket->ID, $tickets_handler->key_show_description, $ticket->show_description );
 
 		// Fetches all Ticket Form Datas
-		$data = Tribe__Utils__Array::get( $raw_data, 'tribe-ticket', array() );
+		$data = Tribe__Utils__Array::get( $raw_data, 'tribe-ticket', [] );
 
 		// Before merging with defaults check the stock data provided
 		$stock_provided = ! empty( $data['stock'] ) && '' !== trim( $data['stock'] );
 
 		// By default it is an Unlimited Stock without Global stock
-		$defaults = array(
+		$defaults = [
 			'mode' => 'own',
-		);
+		];
 
 		$data = wp_parse_args( $data, $defaults );
 
@@ -669,6 +672,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$data['mode'] = filter_var( $data['mode'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH );
 
 		// Fetch the Global stock Instance for this Event
+		/**
+		 * @var Tribe__Tickets__Global_Stock $event_stock
+		 */
 		$event_stock = new Tribe__Tickets__Global_Stock( $post_id );
 
 		// Only need to do this if we haven't already set one - they shouldn't be able to edit it from here otherwise
@@ -685,16 +691,29 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				// Makes sure it's an Int after this point
 				$data['event_capacity'] = (int) $data['event_capacity'];
 
+				$tickets_handler->remove_hooks();
+
 				// We need to update event post meta - if we've set a global stock
 				$event_stock->enable();
-				$event_stock->set_stock_level( $data['event_capacity'] );
+				$event_stock->set_stock_level( $data['event_capacity'], true );
 
 				// Update Event capacity
-				update_post_meta( $post_id, tribe( 'tickets.handler' )->key_capacity, $data['event_capacity'] );
+				update_post_meta( $post_id, $tickets_handler->key_capacity, $data['event_capacity'] );
+				update_post_meta( $post_id, $event_stock::GLOBAL_STOCK_ENABLED, 1 );
+
+				$tickets_handler->add_hooks();
 			}
 		} else {
 			// If the Global Stock is configured we pull it from the Event
-			$data['event_capacity'] = tribe_tickets_get_capacity( $post_id );
+			$global_capacity = tribe_tickets_get_capacity( $post_id );
+
+			if ( ! empty( $data['event_capacity'] ) && $data['event_capacity'] !== $global_capacity ) {
+				// Update stock level with $data['event_capacity'].
+				$event_stock->set_stock_level( $data['event_capacity'], true );
+			} else {
+				// Set $data['event_capacity'] with what we know.
+				$data['event_capacity'] = $global_capacity;
+			}
 		}
 
 		// Default Capacity will be 0
@@ -738,11 +757,18 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$data['stock'] = -1;
 		}
 
-		if ( '' !== $data['mode'] ) {
+		$mode = isset( $data['mode'] ) ? $data['mode'] : 'own';
+
+		if ( '' !== $mode ) {
+			if ( 'update' === $save_type ) {
+				$totals         = $tickets_handler->get_ticket_totals( $ticket->ID );
+				$data['stock'] -= $totals['pending'] + $totals['sold'];
+			}
+
 			// In here is safe to check because we don't have unlimited = -1
 			$status = ( 0 < $data['stock'] ) ? 'instock' : 'outofstock';
 
-			update_post_meta( $ticket->ID, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, $data['mode'] );
+			update_post_meta( $ticket->ID, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, $mode );
 			update_post_meta( $ticket->ID, '_stock', $data['stock'] );
 			update_post_meta( $ticket->ID, '_stock_status', $status );
 			update_post_meta( $ticket->ID, '_backorders', 'no' );
@@ -751,9 +777,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			// Prevent Ticket Capacity from going higher then Event Capacity
 			if (
 				$event_stock->is_enabled()
-				&& Tribe__Tickets__Global_Stock::OWN_STOCK_MODE !== $data['mode']
-				&& '' !== $data['capacity']
-				&& $data['capacity'] > $data['event_capacity']
+				&& Tribe__Tickets__Global_Stock::OWN_STOCK_MODE !== $mode
+				&& (
+					'' === $data['capacity']
+					|| $data['event_capacity'] < $data['capacity']
+				)
 			) {
 				$data['capacity'] = $data['event_capacity'];
 			}
@@ -772,7 +800,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		if ( '' !== $data['capacity'] ) {
 			// Update Ticket capacity
-			update_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_capacity, $data['capacity'] );
+			update_post_meta( $ticket->ID, $tickets_handler->key_capacity, $data['capacity'] );
 		}
 
 		update_post_meta( $ticket->ID, 'ticket_price', $ticket->price );
@@ -790,14 +818,14 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			}
 
 			$ticket->start_date  = date( Tribe__Date_Utils::DBDATETIMEFORMAT, strtotime( $start_date ) );
-			$previous_start_date = get_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_start_date, true );
+			$previous_start_date = get_post_meta( $ticket->ID, $tickets_handler->key_start_date, true );
 
 			// Only update when we are modifying
 			if ( $ticket->start_date !== $previous_start_date ) {
-				update_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_start_date, $ticket->start_date );
+				update_post_meta( $ticket->ID, $tickets_handler->key_start_date, $ticket->start_date );
 			}
 		} else {
-			delete_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_start_date );
+			delete_post_meta( $ticket->ID, $tickets_handler->key_start_date );
 		}
 
 		if ( ! empty( $raw_data['ticket_end_date'] ) ) {
@@ -808,11 +836,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			}
 
 			$ticket->end_date  = date( Tribe__Date_Utils::DBDATETIMEFORMAT, strtotime( $end_date ) );
-			$previous_end_date = get_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_end_date, true );
+			$previous_end_date = get_post_meta( $ticket->ID, $tickets_handler->key_end_date, true );
 
 			// Only update when we are modifying
 			if ( $ticket->end_date !== $previous_end_date ) {
-				update_post_meta( $ticket->ID, tribe( 'tickets.handler' )->key_end_date, $ticket->end_date );
+				update_post_meta( $ticket->ID, $tickets_handler->key_end_date, $ticket->end_date );
 			}
 		} else {
 			delete_post_meta( $ticket->ID, '_ticket_end_date' );
@@ -825,20 +853,24 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		/**
 		 * Generic action fired after saving a ticket (by type)
 		 *
-		 * @param int Post ID of post the ticket is tied to
-		 * @param Tribe__Tickets__Ticket_Object Ticket that was just saved
-		 * @param array Ticket data
-		 * @param string Commerce engine class
+		 * @since 4.7
+		 *
+		 * @param int                           $post_id  Post ID of post the ticket is tied to
+		 * @param Tribe__Tickets__Ticket_Object $ticket   Ticket that was just saved
+		 * @param array                         $raw_data Ticket data
+		 * @param string                        $class    Commerce engine class
 		 */
 		do_action( 'event_tickets_after_' . $save_type . '_ticket', $post_id, $ticket, $raw_data, __CLASS__ );
 
 		/**
 		 * Generic action fired after saving a ticket
 		 *
-		 * @param int Post ID of post the ticket is tied to
-		 * @param Tribe__Tickets__Ticket_Object Ticket that was just saved
-		 * @param array Ticket data
-		 * @param string Commerce engine class
+		 * @since 4.7
+		 *
+		 * @param int                           $post_id  Post ID of post the ticket is tied to
+		 * @param Tribe__Tickets__Ticket_Object $ticket   Ticket that was just saved
+		 * @param array                         $raw_data Ticket data
+		 * @param string                        $class    Commerce engine class
 		 */
 		do_action( 'event_tickets_after_save_ticket', $post_id, $ticket, $raw_data, __CLASS__ );
 
@@ -1148,6 +1180,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$return->report_link      = $this->get_ticket_reports_link( null, $ticket_id );
 		$return->show_description = $return->show_description();
 		$return->capacity         = tribe_tickets_get_capacity( $ticket_id );
+		$return->sku              = get_post_meta( $ticket_id, '_sku', true );
 
 		$start_date = get_post_meta( $ticket_id, '_ticket_start_date', true );
 		$end_date   = get_post_meta( $ticket_id, '_ticket_end_date', true );
@@ -1166,7 +1199,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		$return->manage_stock( is_numeric( $product_stock ) );
 		$return->global_stock_mode( get_post_meta( $ticket_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_MODE, true ) );
-		$return->global_stock_cap( get_post_meta( $ticket_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, true ) );
+		$capped = get_post_meta( $ticket_id, Tribe__Tickets__Global_Stock::TICKET_STOCK_CAP, true );
+
+		if ( '' !== $capped ) {
+			$return->global_stock_cap( $capped );
+		}
 
 		$return->stock( $stock );
 		$return->qty_sold( $purchased );
@@ -1243,7 +1280,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$ticket_product = $ticket_product->ID;
 		}
 
-		if ( null === ( $product = get_post( $ticket_product ) ) ) {
+		if ( null === get_post( $ticket_product ) ) {
 			return false;
 		}
 
@@ -1768,7 +1805,17 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		$post_id = get_post_meta( get_the_ID(), $this->event_key, true );
 		if ( ! empty( $post_id ) ) {
-			echo sprintf( '%s <a href="%s">%s</a>', __( 'This is a ticket for the event:', 'event-tickets-plus' ), esc_url( get_edit_post_link( $post_id ) ), esc_html( get_the_title( $post_id ) ) );
+			$text = esc_html( sprintf(
+				__( 'This is a %s for the event:', 'event-tickets-plus' ),
+				tribe_get_ticket_label_singular_lowercase( 'edd_meta_box' )
+			) );
+
+			echo sprintf(
+				'%s <a href="%s">%s</a>',
+				$text,
+				esc_url( get_edit_post_link( $post_id ) ),
+				esc_html( get_the_title( $post_id ) )
+			);
 		}
 	}
 

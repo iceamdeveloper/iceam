@@ -37,7 +37,7 @@ class Toolset_User_Editors_Medium_Content_Template
 
 		if( ! $this->get_id() )
 			return false;
-		
+
 		$content_template_id  = wpv_getget( 'ct_id' );
 
 		if( $editor_choice = get_post_meta( $content_template_id, $this->option_name_editor_choice, true ) ) {
@@ -50,8 +50,9 @@ class Toolset_User_Editors_Medium_Content_Template
 			delete_post_meta( $content_template_id, 'wpv_ct_editor_choice' );
 			return $editor_choice;
 		} elseif( get_post_type( $content_template_id ) == $this->slug ) {
-			update_post_meta( $content_template_id, $this->option_name_editor_choice, 'basic' );
-			return 'basic';
+			$views_settings = WPV_Settings::get_instance();
+			update_post_meta( $content_template_id, $this->option_name_editor_choice, $views_settings->default_user_editor );
+			return $views_settings->default_user_editor;
 		}
 
 		return false;
@@ -64,7 +65,7 @@ class Toolset_User_Editors_Medium_Content_Template
 	 * @since 2.3.0 Covers the frontend PHP templates for Content Templates assigned to single pages.
 	 */
 	public function get_frontend_templates() {
-		
+
 		if( $this->allowed_templates !== null )
 			return $this->allowed_templates;
 
@@ -137,7 +138,7 @@ class Toolset_User_Editors_Medium_Content_Template
 		foreach( $content_template_usages as $usage => $ct_id ) {
 			if ( 'views_template_for_page' == $usage ) {
 				// Content Templates assigned to single pages demand a speial management,
-				// since they are indeed single posts but with special templates in the 
+				// since they are indeed single posts but with special templates in the
 				// native WordPress PHP templates hierarchy.
 				// Note that there is no CT for the non-existing pages archive loop at all.
 				$single_page_template_hierarchy = array(
@@ -184,11 +185,11 @@ class Toolset_User_Editors_Medium_Content_Template
 				}
 			}
 		}
-		
+
 		// Make sure that the stored template path is in the allowed ones, or force it otherwise
 		$allowed_paths = wp_list_pluck( $this->allowed_templates, 'path' );
 		$current_template = get_post_meta( (int) $_GET['ct_id'], $this->manager->get_active_editor()->get_option_name(), true );
-		
+
 		if ( isset( $_GET['ct_id'] ) ) {
 			if ( empty( $allowed_paths ) ) {
 				$settings_to_store = array(
@@ -200,8 +201,8 @@ class Toolset_User_Editors_Medium_Content_Template
 				update_post_meta( (int) $_GET['ct_id'], $this->manager->get_active_editor()->get_option_name(), $settings_to_store );
 			} else {
 				if (
-					! isset( $current_template['template_path'] ) 
-					|| ! in_array( $current_template['template_path'], $allowed_paths ) 
+					! isset( $current_template['template_path'] )
+					|| ! in_array( $current_template['template_path'], $allowed_paths )
 				) {
 					$slide_allowed_template = array_slice( $this->allowed_templates, 0, 1 );
 					$first_allowed_template = array_shift( $slide_allowed_template );
@@ -214,7 +215,7 @@ class Toolset_User_Editors_Medium_Content_Template
 				update_post_meta( (int) $_GET['ct_id'], $this->manager->get_active_editor()->get_option_name(), $settings_to_store );
 				}
 			}
-		
+
 		}
 
 		return $this->allowed_templates;
@@ -224,12 +225,12 @@ class Toolset_User_Editors_Medium_Content_Template
 		$views_settings	= WPV_Settings::get_instance();
 		$views_options	= $views_settings->get();
 		$views_options	= array_filter( $views_options, array( $this, 'filter_templates_by_template_id' ) );
-		
+
 		if ( isset( $_GET['ct_id'] ) ) {
-			
-			if ( 
-				isset( $_GET['preview_post_type'] ) 
-				&& is_array( $_GET['preview_post_type'] ) 
+
+			if (
+				isset( $_GET['preview_post_type'] )
+				&& is_array( $_GET['preview_post_type'] )
 				&& ! empty ( $_GET['preview_post_type'] )
 			) {
 				$preview_post_type = array_map( 'sanitize_text_field', $_GET['preview_post_type'] );
@@ -237,10 +238,10 @@ class Toolset_User_Editors_Medium_Content_Template
 					$views_options[ 'view_loop_preview_post_type_' . $prev_cpt ] = (int) $_GET['ct_id'];
 				}
 			}
-			
-			if ( 
-				isset( $_GET['preview_post_type_archive'] ) 
-				&& is_array( $_GET['preview_post_type_archive'] ) 
+
+			if (
+				isset( $_GET['preview_post_type_archive'] )
+				&& is_array( $_GET['preview_post_type_archive'] )
 				&& ! empty ( $_GET['preview_post_type_archive'] )
 			) {
 				$preview_post_type_archive = array_map( 'sanitize_text_field', $_GET['preview_post_type_archive'] );
@@ -248,10 +249,10 @@ class Toolset_User_Editors_Medium_Content_Template
 					$views_options[ 'view_wpa_loop_preview_post_type_' . $prev_cpt ] = (int) $_GET['ct_id'];
 				}
 			}
-			
-			if ( 
-				isset( $_GET['preview_taxonomy_archive'] ) 
-				&& is_array( $_GET['preview_taxonomy_archive'] ) 
+
+			if (
+				isset( $_GET['preview_taxonomy_archive'] )
+				&& is_array( $_GET['preview_taxonomy_archive'] )
 				&& ! empty ( $_GET['preview_taxonomy_archive'] )
 			) {
 				$preview_taxonomy_archive = array_map( 'sanitize_text_field', $_GET['preview_taxonomy_archive'] );
@@ -259,9 +260,9 @@ class Toolset_User_Editors_Medium_Content_Template
 					$views_options[ 'view_wpa_loop_preview_taxonomy_' . $prev_cpt ] = (int) $_GET['ct_id'];
 				}
 			}
-			
+
 			// @todo implement the rest of the Layout Loop usages
-			
+
 		}
 
 		return $views_options;
@@ -322,12 +323,12 @@ class Toolset_User_Editors_Medium_Content_Template
 	public function page_reload_after_backend_save() {
 		add_action( 'admin_print_footer_scripts', array( $this, '_action_page_reload_after_backend_save' ) );
 	}
-	
+
 	/**
 	* @todo refactor this, it should not happen this way. If after saving a section we need to reload, we set it on a caninical way.
 	* ALso, this should NOT happen any time a CT setting is saved, just when a CT usage chnage is...
 	*/
-	
+
 	public function _action_page_reload_after_backend_save() {
 		echo "<script>jQuery( document ).on('ct_saved', function() { location.reload(); });</script>";
 	}

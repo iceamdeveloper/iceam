@@ -43,6 +43,12 @@ function wpcf_admin_menu_edit_user_fields_hook() {
 	wp_enqueue_style( 'wpcf-usermeta',
 		WPCF_EMBEDDED_RES_RELPATH . '/css/usermeta.css' );
 
+	// Toolset GUI Base dependencies
+	Toolset_Common_Bootstrap::get_instance()->register_gui_base();
+	Toolset_Gui_Base::get_instance()->init();
+	wp_enqueue_style( Toolset_Gui_Base::STYLE_GUI_BASE );
+	wp_enqueue_script( Toolset_Gui_Base::SCRIPT_GUI_JQUERY_COLLAPSIBLE );
+
 	// MAIN
 	wp_enqueue_script( 'wpcf-fields-form',
 		WPCF_EMBEDDED_RES_RELPATH
@@ -54,7 +60,7 @@ function wpcf_admin_menu_edit_user_fields_hook() {
 	wp_enqueue_script(
 		'wpcf-admin-fields-form',
 		WPCF_RES_RELPATH . '/js/fields-form.js',
-		array(),
+		array( Toolset_Assets_Manager::SCRIPT_UTILS, 'wp-pointer' ),
 		WPCF_VERSION
 	);
 
@@ -170,82 +176,6 @@ add_action( 'edit_user_profile', 'wpcf_admin_user_profile_load_hook' );
 add_action( 'personal_options_update', 'wpcf_admin_user_profile_save_hook' );
 add_action( 'edit_user_profile_update', 'wpcf_admin_user_profile_save_hook' );
 
-
-
-/**
- * Add usermeta groups to post editor
- */
-add_filter( 'editor_addon_menus_types', 'wpcf_admin_post_add_usermeta_to_editor_js' );
-
-/*
-* #################################################
-* WHAT THE HELL IS THIS - START
-* #################################################
-*/
-add_action( 'load-post.php', '__wpcf_usermeta_test', PHP_INT_MAX );
-add_action( 'load-post-new.php', '__wpcf_usermeta_test', PHP_INT_MAX );
-
-function __wpcf_usermeta_test()
-{
-    require_once WPCF_EMBEDDED_INC_ABSPATH . '/fields-post.php';
-    $field['id'] = md5( 'date' . time() );
-    $here = array(basename( $_SERVER['REQUEST_URI'] ), basename( $_SERVER['SCRIPT_FILENAME'] ));
-    global $post;
-    // Get post_type
-    if ( $post ) {
-        $post_type = get_post_type( $post );
-    } else if ( !empty( $_GET['post'] ) ) {
-        $post_type = get_post_type( sanitize_text_field( $_GET['post'] ) );
-    } else if ( !empty( $_GET['post_type'] ) ) {
-        $post_type = esc_html( sanitize_text_field( $_GET['post_type'] ) );
-    }
-    if ( ( $here[0] == ('index.php' || 'wp-admin')) && ( $here[1] != 'index.php') ) {
-
-        /** This action is documented in embedded/bootstrap.php */
-        $post_types_without_meta_boxes = apply_filters(
-            'toolset_filter_exclude_own_post_types',
-            array('view', 'view-template', 'cred-form', 'cred-user-form')
-        );
-
-        if (
-            isset( $post_type )
-            && in_array( $post_type, $post_types_without_meta_boxes )
-        ) {
-            return;
-        }
-        wpcf_admin_post_add_to_editor( $field );
-    }
-}
-
-if ( !isset( $_GET['post_type'] ) && isset( $_GET['post'] ) ) {
-    $post_type = get_post_type( sanitize_text_field( $_GET['post'] ) );
-} else if (
-    isset( $_GET['post_type'] )
-    && in_array( $_GET['post_type'], get_post_types( array('show_ui' => true) ) ) 
-) {
-    $post_type = sanitize_text_field( $_GET['post_type'] );
-}
-
-/*
- *
- * This is not needed for Views 1.3
- * Kept for compatibility with older versions
- */
-if ( isset( $post_type ) && in_array( $post_type,
-                array('view', 'view-template', 'cred-form', 'cred-user-form') ) ) {
-    add_filter( 'editor_addon_menus_wpv-views',
-            'wpcf_admin_post_add_usermeta_to_editor_js', 20 );
-    require_once WPCF_EMBEDDED_INC_ABSPATH . '/fields-post.php';
-    add_action( 'admin_footer', 'wpcf_admin_post_js_validation' );
-    //wpcf_enqueue_scripts();
-}
-
-/*
-* #################################################
-* WHAT THE HELL IS THIS - END
-* #################################################
-*/
-
 /**
  * Get current logged user ID
  *
@@ -259,72 +189,6 @@ function wpcf_usermeta_get_user( $method = '' ){
     }
 
     return $user_id;
-}
-
-/**
- * Add User Fields to editor
- *
- * @author Gen gen.i@icanlocalize.com
- * @since Types 1.3
- */
-function wpcf_admin_post_add_usermeta_to_editor_js( $menu, $views_callback = false ){
-    global $wpcf;
-
-    $post = apply_filters( 'wpcf_filter_wpcf_admin_get_current_edited_post', null );
-    if ( ! $post ) {
-        $post = (object) array('ID' => -1);
-    }
-
-    $groups = wpcf_admin_fields_get_groups( TYPES_USER_META_FIELD_GROUP_CPT_NAME );
-    $user_id = wpcf_usermeta_get_user();
-    if ( !empty( $groups ) ) {
-        $item_styles = array();
-        foreach ( $groups as $group_id => $group ) {
-            if ( empty( $group['is_active'] ) ) {
-                continue;
-            }
-			$group_name = sprintf( __( '%s (Usermeta fields)', 'wpcf' ) , $group['name'] );
-            $fields = wpcf_admin_fields_get_fields_by_group( $group['id'],
-                    'slug', true, false, true, TYPES_USER_META_FIELD_GROUP_CPT_NAME,
-                    'wpcf-usermeta' );
-
-            if ( !empty( $fields ) ) {
-                foreach ( $fields as $field_id => $field ) {
-                    // Use field class
-                    $wpcf->usermeta_field->set( $user_id, $field );
-
-                    // Get field data
-                    $data = (array) $wpcf->usermeta_field->config;
-
-                    // Get inherited field
-                    if ( isset( $data['inherited_field_type'] ) ) {
-                        $inherited_field_data = wpcf_fields_type_action( $data['inherited_field_type'] );
-                    }
-
-                    $callback = 'wpcfFieldsEditorCallback(\'' . $field['id']
-                            . '\', \'usermeta\', ' . $post->ID . ')';
-
-                    // Added for Views:users filter Vicon popup
-                    if ( $views_callback ){
-                        $callback = 'wpcfFieldsEditorCallback(\'' . $field['id']
-                            . '\', \'views-usermeta\', ' . $post->ID . ')';
-                    }
-
-                    $menu[$group_name][stripslashes( $field['name'] )] = array(stripslashes(wp_kses_post($field['name'])), trim( wpcf_usermeta_get_shortcode( $field ),
-                                '[]' ), $group_name, $callback);
-                }
-                /*
-                 * Since Types 1.2
-                 * We use field class to enqueue JS and CSS
-                 */
-                $wpcf->usermeta_field->enqueue_script();
-                $wpcf->usermeta_field->enqueue_style();
-            }
-        }
-    }
-
-    return $menu;
-
 }
 
 /**
@@ -378,13 +242,13 @@ function wpcf_admin_fields_usermeta_styles()
         $user_role = false;
         if ( !empty( $user_id ) ) {
             $user_info = get_userdata($user_id);
-            $user_role = isset($user_info->roles) ? array_shift($user_info->roles) : 'subscriber';
+            $user_roles = isset( $user_info->roles ) ? $user_info->roles : array( 'subscriber' );
             unset($user_info);
         }
         foreach ( $groups as $group ) {
             if ( !empty($user_id) ) {
                 $for_users = wpcf_admin_get_groups_showfor_by_group($group['id']);
-                if ( !empty($for_users) && !in_array($user_role, $for_users) ) {
+                if ( !empty($for_users) && empty( array_intersect( $user_roles, $for_users ) ) ) {
                     continue;
                 }
             }
@@ -421,66 +285,78 @@ function wpcf_admin_user_profile_save_hook( $user_id )
 class Usermeta_Access
 {
 
+	/**
+	 * Note that this property will be initialized only if Access is active.
+	 *
+	 * @var array|string
+	 */
     public static $user_groups = '';
 
     /**
      * Initialize plugin enviroment
      */
     public function __construct() {
+		if ( ! function_exists( 'wpcf_access_register_caps' ) ) {
+			// Nothing to do because Access is not active.
+			return;
+		}
+
         // setup custom capabilities
         self::$user_groups = wpcf_admin_fields_get_groups(TYPES_USER_META_FIELD_GROUP_CPT_NAME);
-        //If access plugin installed
-        if ( function_exists( 'wpcf_access_register_caps' ) ) { // integrate with Toolset Access
-            if ( !empty( self::$user_groups ) ) {
-				$access_version = apply_filters( 'toolset_access_version_installed', '1.0' );
-				// Since 2.1 we can define a custom tab on Access >= 2.1
-				if ( version_compare( $access_version, '2.0' ) > 0 ) {
-					// Add Types Fields tab
-					add_filter( 'types-access-tab', array( 'Usermeta_Access', 'register_access_types_fields_tab' ) );
-					//Add Usermeta Fields area
-					add_filter( 'types-access-area-for-types-fields',
-							array('Usermeta_Access', 'register_access_usermeta_area'),
-							20, 2 );
-				} else {
-					//Add Usermeta Fields area
-					add_filter( 'types-access-area',
-							array('Usermeta_Access', 'register_access_usermeta_area'),
-							10, 2 );
-				}
-                //Add Usermeta Fields groups
-                add_filter( 'types-access-group',
-                        array('Usermeta_Access', 'register_access_usermeta_groups'),
-                        10, 2 );
-                //Add Usermeta Fields caps to groups
-                add_filter( 'types-access-cap',
-                        array('Usermeta_Access', 'register_access_usermeta_caps'),
-                        10, 3 );
-            }
-        }
+
+		if ( empty( self::$user_groups ) ) {
+			return;
+		}
+
+		$access_version = apply_filters( 'toolset_access_version_installed', '1.0' );
+		// Since 2.1 we can define a custom tab on Access >= 2.1
+		if ( version_compare( $access_version, '2.0' ) > 0 ) {
+			// Add Types Fields tab
+			add_filter( 'types-access-tab', array( 'Usermeta_Access', 'register_access_types_fields_tab' ) );
+			//Add Usermeta Fields area
+			add_filter(
+				'types-access-area-for-types-fields',
+				array( 'Usermeta_Access', 'register_access_usermeta_area' ),
+				20, 2
+			);
+		} else {
+			//Add Usermeta Fields area
+			add_filter(
+				'types-access-area',
+				array( 'Usermeta_Access', 'register_access_usermeta_area' ),
+				10, 2
+			);
+		}
+		//Add Usermeta Fields groups
+		add_filter(
+			'types-access-group',
+			array( 'Usermeta_Access', 'register_access_usermeta_groups' ),
+			10, 2
+		);
+		//Add Usermeta Fields caps to groups
+		add_filter(
+			'types-access-cap',
+			array( 'Usermeta_Access', 'register_access_usermeta_caps' ),
+			10, 3
+		);
+
     }
 
     // register custom CRED Frontend capabilities specific to each group
     public static function register_access_usermeta_caps( $caps, $area_id,
             $group_id )
     {
-        $USERMETA_ACCESS_AREA_NAME = __( 'User Meta Fields Frontend Access', 'wpcf' );
         $USERMETA_ACCESS_AREA_ID = '__USERMETA_FIELDS';
         $default_role = 'guest'; //'administrator';
         //List of caps with default permissions
         $usermeta_caps = array(
-           /* array('view_own_on_site', $default_role, __( 'View own fields on site', 'wpcf' )),
-            array('view_others_on_site', $default_role, __( 'View others fields on site', 'wpcf' )),*/
             array('view_own_in_profile', $default_role, __( 'View own fields in profile', 'wpcf' )),
             array('modify_own', $default_role, __( 'Modify own fields', 'wpcf' )),
-                /*
-                  array('view_others_in_profile',$default_role,__('View others fields in profile','wpcf')),
-                  array('modify_others_','administrator',__('Modify others fields','wpcf')), */
         );
         if ( $area_id == $USERMETA_ACCESS_AREA_ID ) {
             $fields_groups = wpcf_admin_fields_get_groups( TYPES_USER_META_FIELD_GROUP_CPT_NAME );
             if ( !empty( $fields_groups ) ) {
                 foreach ( $fields_groups as $group ) {
-                    $USERMETA_ACCESS_GROUP_NAME = $group['name'] . ' Access Group';
                     $USERMETA_ACCESS_GROUP_ID = '__USERMETA_FIELDS_GROUP_' . $group['slug'];
                     if ( $group_id == $USERMETA_ACCESS_GROUP_ID ) {
                         for ( $i = 0; $i < count( $usermeta_caps ); $i++ ) {
@@ -501,7 +377,6 @@ class Usermeta_Access
     // register a new Types Access Group within Area for Usermeta Fields Groups Frontend capabilities
     public static function register_access_usermeta_groups( $groups, $id )
     {
-        $USERMETA_ACCESS_AREA_NAME = __( 'User Meta Fields Frontend Access', 'wpcf' );
         $USERMETA_ACCESS_AREA_ID = '__USERMETA_FIELDS';
 
         if ( $id == $USERMETA_ACCESS_AREA_ID ) {
@@ -517,7 +392,7 @@ class Usermeta_Access
         }
         return $groups;
     }
-	
+
 	/**
 	* Register a custom tab on the Access Control admin page, for Types fields.
 	*
@@ -526,7 +401,7 @@ class Usermeta_Access
 	*
 	* @since 2.1
 	*/
-	
+
 	public static function register_access_types_fields_tab( $tabs ) {
 		$tabs['types-fields'] = __( 'Types Fields', 'wp-cred' );
 		return $tabs;
@@ -554,52 +429,65 @@ class Usermeta_Access
 class Post_Fields_Access
 {
 
-    /**
-     * Initialize plugin enviroment
-     */
-    public static $fields_groups = '';
+	/**
+	 * Note that this property will be initialized only if Access is active.
+	 *
+	 * @var array|string
+	 */
+	public static $fields_groups = '';
 
-    public function __construct() {
-    	//Get list of groups
-    	self::$fields_groups = wpcf_admin_fields_get_groups();
-        // setup custom capabilities
-        //If access plugin installed
-        if ( function_exists( 'wpcf_access_register_caps' ) ) { // integrate with Types Access
-            if ( !empty( self::$fields_groups ) ) {
-				$access_version = apply_filters( 'toolset_access_version_installed', '1.0' );
-				// Since 2.1 we can define a custom tab on Access >= 2.1
-				if ( version_compare( $access_version, '2.0' ) > 0 ) {
-					// Add Types Fields tab
-					add_filter( 'types-access-tab', array( 'Post_Fields_Access', 'register_access_types_fields_tab' ) );
-					//Add Usermeta Fields area
-					add_filter( 'types-access-area-for-types-fields',
-							array('Post_Fields_Access', 'register_access_fields_area'),
-							10, 2 );
-				} else {
-					//Add Usermeta Fields area
-					add_filter( 'types-access-area',
-							array('Post_Fields_Access', 'register_access_fields_area'),
-							10, 2 );
-				}
-                //Add Fields groups
-                add_filter( 'types-access-group',
-                        array('Post_Fields_Access', 'register_access_fields_groups'),
-                        10, 2 );
 
-                //Add Fields caps to groups
-                add_filter( 'types-access-cap',
-                        array('Post_Fields_Access', 'register_access_fields_caps'),
-                        10, 3 );
-				//}
-            }
-        }
-    }
+	public function __construct() {
+		// setup custom capabilities
+		if ( ! function_exists( 'wpcf_access_register_caps' ) ) {
+			// Nothing to do because Access is not active.
+			return;
+		}
+
+		// integrate with Types Access
+		// Get list of groups - at this point we already know we need it.
+		self::$fields_groups = wpcf_admin_fields_get_groups();
+
+		if ( empty( self::$fields_groups ) ) {
+			return;
+		}
+
+		$access_version = apply_filters( 'toolset_access_version_installed', '1.0' );
+		// Since 2.1 we can define a custom tab on Access >= 2.1
+		if ( version_compare( $access_version, '2.0' ) > 0 ) {
+			// Add Types Fields tab
+			add_filter( 'types-access-tab', array( 'Post_Fields_Access', 'register_access_types_fields_tab' ) );
+			// Add Usermeta Fields area
+			add_filter(
+				'types-access-area-for-types-fields',
+				array( 'Post_Fields_Access', 'register_access_fields_area' ),
+				10, 2
+			);
+		} else {
+			//Add Usermeta Fields area
+			add_filter(
+				'types-access-area',
+				array( 'Post_Fields_Access', 'register_access_fields_area' ),
+				10, 2
+			);
+		}
+		//Add Fields groups
+		add_filter(
+			'types-access-group',
+			array( 'Post_Fields_Access', 'register_access_fields_groups' ),
+			10, 2
+		);
+
+		//Add Fields caps to groups
+		add_filter(
+			'types-access-cap',
+			array( 'Post_Fields_Access', 'register_access_fields_caps' ),
+			10, 3
+		);
+	}
 
     // register custom CRED Frontend capabilities specific to each group
-    public static function register_access_fields_caps( $caps, $area_id,
-            $group_id )
-    {
-        $FIELDS_ACCESS_AREA_NAME = __( 'Post Custom Fields Frontend Access', 'wpcf' );
+    public static function register_access_fields_caps( $caps, $area_id, $group_id ) {
         $FIELDS_ACCESS_AREA_ID = '__FIELDS';
         $default_role = 'guest'; //'administrator';
         //List of caps with default permissions
@@ -612,7 +500,6 @@ class Post_Fields_Access
 
             if ( !empty( self::$fields_groups ) ) {
                 foreach ( self::$fields_groups as $group ) {
-                    $FIELDS_ACCESS_GROUP_NAME = $group['name'] . ' Access Group';
                     $FIELDS_ACCESS_GROUP_ID = '__FIELDS_GROUP_' . $group['slug'];
                     if ( $group_id == $FIELDS_ACCESS_GROUP_ID ) {
                         for ( $i = 0; $i < count( $fields_caps ); $i++ ) {
@@ -633,7 +520,6 @@ class Post_Fields_Access
     // register a new Types Access Group within Area for Post Fields Groups Frontend capabilities
     public static function register_access_fields_groups( $groups, $id )
     {
-        $FIELDS_ACCESS_AREA_NAME = __( 'Post Fields Frontend Access', 'wpcf' );
         $FIELDS_ACCESS_AREA_ID = '__FIELDS';
 
         if ( $id == $FIELDS_ACCESS_AREA_ID ) {
@@ -648,20 +534,21 @@ class Post_Fields_Access
         }
         return $groups;
     }
-	
+
+
 	/**
-	* Register a custom tab on the Access Control admin page, for Types fields.
-	*
-	* @param $tabs
-	* @return $tabs
-	*
-	* @since 2.1
-	*/
-	
+	 * Register a custom tab on the Access Control admin page, for Types fields.
+	 *
+	 * @param $tabs
+	 *
+	 * @since 2.1
+	 * @return mixed
+	 */
 	public static function register_access_types_fields_tab( $tabs ) {
 		$tabs['types-fields'] = __( 'Types Fields', 'wp-cred' );
 		return $tabs;
 	}
+
 
     // register a new Types Access Area for Post Fields Groups Frontend capabilities
     public static function register_access_fields_area( $areas,

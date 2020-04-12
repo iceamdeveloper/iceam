@@ -15,6 +15,7 @@ use Tribe\Events\Views\V2\Utils;
 use Tribe\Events\Views\V2\View;
 use Tribe\Events\Views\V2\Views\Traits\List_Behavior;
 use Tribe__Context as Context;
+use Tribe__Events__Rewrite as Rewrite;
 use Tribe__Events__Venue as Venue;
 use Tribe__Utils__Array as Arr;
 
@@ -76,7 +77,7 @@ class Venue_View extends View {
 	 *
 	 * Overrides the base View constructor to use PRO Rewrite handler.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * {@inheritDoc}
 	 */
@@ -115,8 +116,10 @@ class Venue_View extends View {
 	 * {@inheritDoc}
 	 */
 	public function prev_url( $canonical = false, array $passthru_vars = [] ) {
-		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
-			return $this->cached_urls[ __METHOD__ ];
+		$cache_key = __METHOD__ . '_' . md5( wp_json_encode( func_get_args() ) );
+
+		if ( isset( $this->cached_urls[ $cache_key ] ) ) {
+			return $this->cached_urls[ $cache_key ];
 		}
 
 		$current_page = (int) $this->context->get( 'page', 1 );
@@ -132,7 +135,7 @@ class Venue_View extends View {
 
 		$url = $this->filter_prev_url( $canonical, $url );
 
-		$this->cached_urls[ __METHOD__ ] = $url;
+		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
 	}
@@ -141,8 +144,10 @@ class Venue_View extends View {
 	 * {@inheritDoc}
 	 */
 	public function next_url( $canonical = false, array $passthru_vars = [] ) {
-		if ( isset( $this->cached_urls[ __METHOD__ ] ) ) {
-			return $this->cached_urls[ __METHOD__ ];
+		$cache_key = __METHOD__ . '_' . md5( wp_json_encode( func_get_args() ) );
+
+		if ( isset( $this->cached_urls[ $cache_key ] ) ) {
+			return $this->cached_urls[ $cache_key ];
 		}
 
 		$current_page = (int) $this->context->get( 'page', 1 );
@@ -158,7 +163,7 @@ class Venue_View extends View {
 
 		$url = $this->filter_next_url( $canonical, $url );
 
-		$this->cached_urls[ __METHOD__ ] = $url;
+		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
 	}
@@ -310,8 +315,8 @@ class Venue_View extends View {
 	 * {@inheritDoc}
 	 */
 	protected function get_show_datepicker_submit() {
-		$live_refresh = tribe_is_truthy( tribe_get_option( 'liveFiltersUpdate', true ) );
-		return empty( $live_refresh );
+		$live_refresh = tribe_get_option( 'liveFiltersUpdate', 'automatic' );
+		return 'manual' === $live_refresh;
 	}
 
 	/**
@@ -410,6 +415,8 @@ class Venue_View extends View {
 		$template_vars = parent::setup_template_vars();
 		$template_vars = tribe( Maps::class )->setup_map_provider( $template_vars );
 
+		$template_vars['show_map'] = tribe_embed_google_map( $this->post_id );
+
 		// While we fetch events in DESC order, we want to show the results in ASC order in `past` display mode.
 		if (
 			! empty( $template_vars['events'] )
@@ -427,7 +434,7 @@ class Venue_View extends View {
 	/**
 	 * Updates the URL query arguments for the Venue View to correctly build its URls.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * {@inheritDoc}
 	 */

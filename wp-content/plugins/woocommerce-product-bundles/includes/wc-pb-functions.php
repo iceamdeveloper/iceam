@@ -1,6 +1,6 @@
 <?php
 /**
- * Product Bundles API functions
+ * Product Bundles global functions
  *
  * @author   SomewhereWarm <info@somewherewarm.gr>
  * @package  WooCommerce Product Bundles
@@ -12,9 +12,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-/*---------------*/
-/*  Products     */
-/*---------------*/
+/*
+|--------------------------------------------------------------------------
+| Products.
+|--------------------------------------------------------------------------
+*/
 
 /**
  * Create a WC_Bundled_Item instance.
@@ -58,19 +60,19 @@ function wc_pb_get_bundled_item( $item, $parent = false ) {
 function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 
 	if ( is_object( $product ) ) {
-		$product_id = $product->is_type( 'variation' ) ? WC_PB_Core_Compatibility::get_parent_id( $product ) : WC_PB_Core_Compatibility::get_id( $product );
+		$product_id = $product->is_type( 'variation' ) ? $product->get_parent_id() : $product->get_id();
 	} else {
 		$product_id = absint( $product );
 	}
 
-	$allow_cache = $allow_cache && ! defined( 'WC_PB_DEBUG_TRANSIENTS' ) && ! defined( 'WC_PB_UPDATING' );
+	$use_cache = $allow_cache && ! defined( 'WC_PB_DEBUG_TRANSIENTS' ) && ! defined( 'WC_PB_UPDATING' );
 
 	$transient_name             = 'wc_bundled_product_data';
 	$transient_version          = WC_Cache_Helper::get_transient_version( 'product' );
 	$bundled_product_data_array = get_transient( $transient_name );
 	$bundled_product_data       = false;
 
-	if ( $allow_cache && is_array( $bundled_product_data_array ) && isset( $bundled_product_data_array[ $product_id ] ) && is_array( $bundled_product_data_array[ $product_id ] ) && isset( $bundled_product_data_array[ $product_id ][ 'bundle_ids' ] ) && is_array( $bundled_product_data_array[ $product_id ][ 'bundle_ids' ] ) ) {
+	if ( $use_cache && is_array( $bundled_product_data_array ) && isset( $bundled_product_data_array[ $product_id ] ) && is_array( $bundled_product_data_array[ $product_id ] ) && isset( $bundled_product_data_array[ $product_id ][ 'bundle_ids' ] ) && is_array( $bundled_product_data_array[ $product_id ][ 'bundle_ids' ] ) ) {
 		if ( isset( $bundled_product_data_array[ $product_id ][ 'version' ] ) && $transient_version === $bundled_product_data_array[ $product_id ][ 'version' ] ) {
 			$bundled_product_data = $bundled_product_data_array[ $product_id ][ 'bundle_ids' ];
 		}
@@ -113,6 +115,7 @@ function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 				}
 			}
 
+			delete_transient( $transient_name );
 			set_transient( $transient_name, $bundled_product_data_array, DAY_IN_SECONDS * 30 );
 		}
 	}
@@ -120,10 +123,11 @@ function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 	return $bundled_product_data;
 }
 
-
-/*---------------*/
-/*  Cart         */
-/*---------------*/
+/*
+|--------------------------------------------------------------------------
+| Cart.
+|--------------------------------------------------------------------------
+*/
 
 /**
  * Given a bundled cart item, find and return its container cart item - the Bundle - or its cart id when the $return_id arg is true.
@@ -138,7 +142,7 @@ function wc_pb_get_bundled_product_map( $product, $allow_cache = true ) {
 function wc_pb_get_bundled_cart_item_container( $bundled_cart_item, $cart_contents = false, $return_id = false ) {
 
 	if ( ! $cart_contents ) {
-		$cart_contents = WC()->cart->cart_contents;
+		$cart_contents = isset( WC()->cart ) ? WC()->cart->cart_contents : array();
 	}
 
 	$container = false;
@@ -168,7 +172,7 @@ function wc_pb_get_bundled_cart_item_container( $bundled_cart_item, $cart_conten
 function wc_pb_get_bundled_cart_items( $container_cart_item, $cart_contents = false, $return_ids = false ) {
 
 	if ( ! $cart_contents ) {
-		$cart_contents = WC()->cart->cart_contents;
+		$cart_contents = isset( WC()->cart ) ? WC()->cart->cart_contents : array();
 	}
 
 	$bundled_cart_items = array();
@@ -249,10 +253,11 @@ function wc_pb_is_bundle_container_cart_item( $cart_item ) {
 	return $is_bundle;
 }
 
-
-/*---------------*/
-/*  Orders       */
-/*---------------*/
+/*
+|--------------------------------------------------------------------------
+| Orders.
+|--------------------------------------------------------------------------
+*/
 
 /**
  * Given a bundled order item, find and return its container order item - the Bundle - or its order item id when the $return_id arg is true.
@@ -266,48 +271,59 @@ function wc_pb_is_bundle_container_cart_item( $cart_item ) {
  */
 function wc_pb_get_bundled_order_item_container( $bundled_order_item, $order = false, $return_id = false ) {
 
-	$container = false;
+	$result = false;
 
 	if ( wc_pb_maybe_is_bundled_order_item( $bundled_order_item ) ) {
 
-		if ( false === $order ) {
-			if ( is_callable( array( $bundled_order_item, 'get_order' ) ) ) {
+		$container = WC_PB_Helpers::cache_get( 'order_item_container_' . $bundled_order_item->get_id() );
 
-				$order_id = $bundled_order_item->get_order_id();
-				$order    = WC_PB_Helpers::cache_get( 'order_' . $order_id );
+		if ( null === $container ) {
 
-				if ( null === $order ) {
-					$order = $bundled_order_item->get_order();
-					WC_PB_Helpers::cache_set( 'order_' . $order_id, $order );
+			if ( false === $order ) {
+				if ( is_callable( array( $bundled_order_item, 'get_order' ) ) ) {
+
+					$order_id = $bundled_order_item->get_order_id();
+					$order    = WC_PB_Helpers::cache_get( 'order_' . $order_id );
+
+					if ( null === $order ) {
+						$order = $bundled_order_item->get_order();
+						WC_PB_Helpers::cache_set( 'order_' . $order_id, $order );
+					}
+
+				} else {
+					$msg = 'get_order() is not callable on the supplied $order_item. No $order object given.';
+					_doing_it_wrong( __FUNCTION__ . '()', $msg, '5.3.0' );
 				}
+			}
 
-			} else {
-				$msg = 'get_order() is not callable on the supplied $order_item. No $order object given.';
-				_doing_it_wrong( __FUNCTION__ . '()', $msg, '5.3.0' );
+			$order_items = is_object( $order ) ? $order->get_items( 'line_item' ) : $order;
+
+			if ( ! empty( $order_items ) ) {
+				foreach ( $order_items as $order_item_id => $order_item ) {
+
+					$is_container = false;
+
+					if ( isset( $order_item[ 'bundle_cart_key' ] ) ) {
+						$is_container = $bundled_order_item[ 'bundled_by' ] === $order_item[ 'bundle_cart_key' ];
+					} else {
+						$is_container = isset( $order_item[ 'stamp' ] ) && $order_item[ 'stamp' ] === $bundled_order_item[ 'stamp' ] && ! isset( $order_item[ 'bundled_by' ] );
+					}
+
+					if ( $is_container ) {
+						WC_PB_Helpers::cache_set( 'order_item_container_' . $bundled_order_item->get_id(), $order_item );
+						$container = $order_item;
+						break;
+					}
+				}
 			}
 		}
 
-		$order_items = is_object( $order ) ? $order->get_items( 'line_item' ) : $order;
-
-		if ( ! empty( $order_items ) ) {
-			foreach ( $order_items as $order_item_id => $order_item ) {
-
-				$is_container = false;
-
-				if ( isset( $order_item[ 'bundle_cart_key' ] ) ) {
-					$is_container = $bundled_order_item[ 'bundled_by' ] === $order_item[ 'bundle_cart_key' ];
-				} else {
-					$is_container = isset( $order_item[ 'stamp' ] ) && $order_item[ 'stamp' ] === $bundled_order_item[ 'stamp' ] && ! isset( $order_item[ 'bundled_by' ] );
-				}
-
-				if ( $is_container ) {
-					$container = $return_id ? $order_item_id : $order_item;
-				}
-			}
+		if ( $container && is_callable( array( $container, 'get_id' ) ) ) {
+			$result = $return_id ? $container->get_id() : $container;
 		}
 	}
 
-	return $container;
+	return $result;
 }
 
 /**
@@ -381,7 +397,7 @@ function wc_pb_get_bundled_order_items( $container_order_item, $order = false, $
  * @param  WC_Order  $order
  * @return boolean
  */
-function wc_pb_is_bundled_order_item( $order_item, $order ) {
+function wc_pb_is_bundled_order_item( $order_item, $order = false ) {
 
 	$is_bundled = false;
 
@@ -429,4 +445,22 @@ function wc_pb_is_bundle_container_order_item( $order_item ) {
 	}
 
 	return $is_bundle;
+}
+
+/*
+|--------------------------------------------------------------------------
+| Conditionals.
+|--------------------------------------------------------------------------
+*/
+
+/**
+ * True if the current single product page is of a bundle-type product.
+ *
+ * @since  5.7.0
+ *
+ * @return boolean
+ */
+function wc_pb_is_product_bundle() {
+	global $product;
+	return function_exists( 'is_product' ) && is_product() && ! empty( $product ) && is_callable( array( $product, 'is_type' ) ) && $product->is_type( 'bundle' );
 }

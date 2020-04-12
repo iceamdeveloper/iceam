@@ -16,24 +16,23 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+
 defined( 'ABSPATH' ) or exit;
 
-if ( ! class_exists( 'WC_Memberships_Membership_Note_Email' ) ) :
-
 /**
- * Membership Note Order Email
+ * Membership Note Order Email.
  *
- * Membership note emails are sent when you add a membership note and notify the member
+ * Membership note emails are sent when you add a membership note and notify the member.
  *
  * @since 1.0.0
  */
-class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Membership_Email {
+class WC_Memberships_User_Membership_Note_Email extends \WC_Memberships_User_Membership_Email {
 
 
 	/** @private object Membership note */
@@ -41,18 +40,19 @@ class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Memb
 
 
 	/**
-	 * Constructor
+	 * Email constructor.
 	 *
 	 * @since 1.0.0
 	 */
 	public function __construct() {
 
-		$this->id             = __CLASS__;
+		$this->id            = __CLASS__;
+		$this->plan_editable = false;
 
-		$this->title          = __( 'Membership note', 'woocommerce-memberships' );
-		$this->description    = __( 'Membership note emails are sent when you add a membership note and notify member.', 'woocommerce-memberships' );
-		$this->subject        = __( 'Note added to your {site_title} membership', 'woocommerce-memberships');
-		$this->heading        = __( 'A note has been added about your membership', 'woocommerce-memberships');
+		$this->title       = __( 'Membership note', 'woocommerce-memberships' );
+		$this->description = __( 'Membership note emails are sent when you add a membership note and notify member.', 'woocommerce-memberships' );
+		$this->subject     = __( 'Note added to your {site_title} membership', 'woocommerce-memberships');
+		$this->heading     = __( 'A note has been added about your membership', 'woocommerce-memberships');
 
 		$this->template_html  = 'emails/membership-note.php';
 		$this->template_plain = 'emails/plain/membership-note.php';
@@ -63,9 +63,10 @@ class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Memb
 
 
 	/**
-	 * Trigger the membership note email
+	 * Triggers the Membership Note email
 	 *
 	 * @since 1.0.0
+	 *
 	 * @param array $args Optional
 	 */
 	public function trigger( $args ) {
@@ -85,7 +86,7 @@ class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Memb
 		}
 
 		// sanity checks
-		if (    ! $this->object instanceof WC_Memberships_User_Membership
+		if (    ! $this->object instanceof \WC_Memberships_User_Membership
 		     ||   empty( $this->membership_note )
 		     || ! $this->is_enabled()
 		     || ! $this->get_recipient() ) {
@@ -98,9 +99,9 @@ class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Memb
 
 
 	/**
-	 * Email settings form fields
+	 * Filters the email settings form fields.
 	 *
-	 * Extends and overrides parent method
+	 * Extends and overrides parent method.
 	 *
 	 * @since 1.7.0
 	 */
@@ -115,13 +116,15 @@ class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Memb
 
 			// adds a subject merge tag hint in field description
 			$form_fields['subject']['desc_tip']    = $form_fields['subject']['description'];
-			$form_fields['subject']['description'] = sprintf( __( '%s inserts your site name.', 'woocommerce-memberships' ), '<strong><code>{site_name}</code></strong>' );
+			/* translators: Placeholder: %s - merge tag */
+			$form_fields['subject']['description'] = sprintf( __( '%s inserts your site name.', 'woocommerce-memberships' ), '<strong><code>{site_title}</code></strong>' );
 		}
 
 		if ( isset( $form_fields['heading'] ) ) {
 
 			// adds a heading merge tag hint in field description
 			$form_fields['heading']['desc_tip']    = $form_fields['heading']['description'];
+			/* translators: Placeholder: %s - merge tag */
 			$form_fields['heading']['description'] = sprintf( __( '%s inserts the membership plan name.', 'woocommerce-memberships' ), '<strong><code>{membership_plan}</code></strong>' );
 		}
 
@@ -131,49 +134,24 @@ class WC_Memberships_User_Membership_Note_Email extends WC_Memberships_User_Memb
 
 
 	/**
-	 * Get email HTML content
+	 * Returns the arguments that should be passed to an email template.
 	 *
-	 * @since 1.0.0
-	 * @return string HTML content
-	 */
-	public function get_content_html() {
-
-		ob_start();
-
-		wc_get_template( $this->template_html, array(
-			'user_membership' => $this->object,
-			'email_heading'   => $this->get_heading(),
-			'membership_note' => $this->membership_note,
-			'sent_to_admin'   => false,
-			'plain_text'      => false
-		) );
-
-		return ob_get_clean();
-	}
-
-
-	/**
-	 * Get email plain text content
+	 * @since 1.12.0
 	 *
-	 * @since 1.0.0
-	 * @return string Plain text content
+	 * @param array $args default args
+	 * @return array associative array
 	 */
-	public function get_content_plain() {
+	protected function get_template_args( $args = array() ) {
 
-		ob_start();
-
-		wc_get_template( $this->template_plain, array(
+		return array(
 			'user_membership' => $this->object,
-			'email_heading'   => $this->get_heading(),
 			'membership_note' => $this->membership_note,
-			'sent_to_admin'   => false,
-			'plain_text'      => true
-		) );
-
-		return ob_get_clean();
+			'email'           => $this,
+			'email_heading'   => $this->get_heading(),
+			'email_body'      => $this->get_body(),
+			'sent_to_admin'   => $this->sent_to_admin,
+		);
 	}
 
 
 }
-
-endif;

@@ -11,7 +11,9 @@ class Types_Taxonomy {
 
 	protected $name;
 
-	public function __construct( $taxonomy ) {
+	protected $constants;
+
+	public function __construct( $taxonomy, Toolset_Constants $constants = null ) {
 		if( is_object( $taxonomy ) && isset( $taxonomy->name ) ) {
 			$this->wp_taxonomy = $taxonomy;
 			$this->name        = $taxonomy->name;
@@ -22,6 +24,8 @@ class Types_Taxonomy {
 			if( $registered )
 				$this->wp_taxonomy = $registered;
 		}
+
+		$this->constants = $constants ?: new Toolset_Constants();
 	}
 
 	public function __isset( $property ) {
@@ -57,4 +61,22 @@ class Types_Taxonomy {
 	public function get_edit_link() {
 		return admin_url() . 'admin.php?page=wpcf-edit-tax&wpcf-tax=' . $this->get_name();
 	}
+
+	/** @noinspection PhpUnused because this is used in Twig (tbody-row.twig) */
+	/**
+	 * Check if the taxonomy comes from a third-party source (it's neither built in nor from Types).
+	 *
+	 * @return bool
+	 * @since 3.3.7
+	 */
+	public function is_third_party() {
+		$result = (
+			! $this->wp_taxonomy->_builtin
+			&& ! in_array( $this->get_name(), array_keys( get_option( $this->constants->constant( 'WPCF_OPTION_NAME_CUSTOM_TAXONOMIES' ) ) ) )
+		);
+
+		return $result;
+	}
+
+
 }

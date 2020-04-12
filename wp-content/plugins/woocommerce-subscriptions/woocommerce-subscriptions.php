@@ -3,15 +3,15 @@
  * Plugin Name: WooCommerce Subscriptions
  * Plugin URI: https://www.woocommerce.com/products/woocommerce-subscriptions/
  * Description: Sell products and services with recurring payments in your WooCommerce Store.
- * Author: Prospress Inc.
- * Author URI: https://prospress.com/
- * Version: 2.5.6
+ * Author: WooCommerce
+ * Author URI: https://woocommerce.com/
+ * Version: 3.0.3
  *
- * WC requires at least: 3.0
- * WC tested up to: 3.6
+ * WC requires at least: 3.0.9
+ * WC tested up to: 4.0
  * Woo: 27147:6115e6d7e297b623a169fdcf5728b224
  *
- * Copyright 2017 Prospress, Inc.  (email : freedoms@prospress.com)
+ * Copyright 2019 WooCommerce
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @package		WooCommerce Subscriptions
- * @author		Prospress Inc.
+ * @author		WooCommerce.
  * @since		1.0
  */
 
@@ -73,6 +73,7 @@ WC_Subscriptions_Product::init();
 WC_Subscriptions_Admin::init();
 WC_Subscriptions_Manager::init();
 WC_Subscriptions_Cart::init();
+WC_Subscriptions_Cart_Validator::init();
 WC_Subscriptions_Order::init();
 WC_Subscriptions_Renewal_Order::init();
 WC_Subscriptions_Checkout::init();
@@ -82,6 +83,7 @@ WC_Subscriptions_Change_Payment_Gateway::init();
 WC_Subscriptions_Payment_Gateways::init();
 WCS_PayPal_Standard_Change_Payment_Method::init();
 WC_Subscriptions_Switcher::init();
+WC_Subscriptions_Tracker::init();
 WCS_Upgrade_Logger::init();
 new WCS_Cart_Renewal();
 new WCS_Cart_Resubscribe();
@@ -94,11 +96,15 @@ WCS_Admin_System_Status::init();
 WCS_Upgrade_Notice_Manager::init();
 WCS_Staging::init();
 WCS_Permalink_Manager::init();
+WCS_Custom_Order_Item_Manager::init();
+WCS_Early_Renewal_Modal_Handler::init();
+WCS_Dependent_Hook_Manager::init();
 
 // Some classes run init on a particular hook.
 add_action( 'init', array( 'WC_Subscriptions_Synchroniser', 'init' ) );
 add_action( 'after_setup_theme', array( 'WC_Subscriptions_Upgrader', 'init' ), 11 );
 add_action( 'init', array( 'WC_PayPal_Standard_Subscriptions', 'init' ), 11 );
+add_action( 'init', array( 'WCS_WC_Admin_Manager', 'init' ), 11 );
 
 /**
  * The main subscriptions class.
@@ -113,7 +119,7 @@ class WC_Subscriptions {
 
 	public static $plugin_file = __FILE__;
 
-	public static $version = '2.5.6';
+	public static $version = '3.0.3';
 
 	public static $wc_minimum_supported_version = '3.0';
 
@@ -149,14 +155,11 @@ class WC_Subscriptions {
 
 		register_deactivation_hook( __FILE__, __CLASS__ . '::deactivate_woocommerce_subscriptions' );
 
-		// Override the WC default "Add to Cart" text to "Sign Up Now" (in various places/templates)
+		// Override the WC default "Add to cart" text to "Sign up now" (in various places/templates)
 		add_filter( 'woocommerce_order_button_text', __CLASS__ . '::order_button_text' );
 		add_action( 'woocommerce_subscription_add_to_cart', __CLASS__ . '::subscription_add_to_cart', 30 );
 		add_action( 'woocommerce_variable-subscription_add_to_cart', __CLASS__ . '::variable_subscription_add_to_cart', 30 );
 		add_action( 'wcopc_subscription_add_to_cart', __CLASS__ . '::wcopc_subscription_add_to_cart' ); // One Page Checkout compatibility
-
-		// Ensure a subscription is never in the cart with products
-		add_filter( 'woocommerce_add_to_cart_validation', __CLASS__ . '::maybe_empty_cart', 10, 5 );
 
 		// Enqueue front-end styles, run after Storefront because it sets the styles to be empty
 		add_filter( 'woocommerce_enqueue_styles', __CLASS__ . '::enqueue_styles', 100, 1 );
@@ -375,7 +378,7 @@ class WC_Subscriptions {
 					'ajax_url'               => esc_url( WC()->ajax_url() ),
 					'subscription_id'        => $subscription->get_id(),
 					'add_payment_method_msg' => __( 'To enable automatic renewals for this subscription, you will first need to add a payment method.', 'woocommerce-subscriptions' ) . "\n\n" . __( 'Would you like to add a payment method now?', 'woocommerce-subscriptions' ),
-					'auto_renew_nonce'       => wp_create_nonce( "toggle-auto-renew-{$subscription->get_id()}" ),
+					'auto_renew_nonce'       => WCS_My_Account_Auto_Renew_Toggle::can_user_toggle_auto_renewal( $subscription ) ? wp_create_nonce( "toggle-auto-renew-{$subscription->get_id()}" ) : false,
 					'add_payment_method_url' => esc_url( $subscription->get_change_payment_method_url() ),
 					'has_payment_gateway'    => $subscription->has_payment_gateway() && wc_get_payment_gateway_by_order( $subscription )->supports( 'subscriptions' ),
 				);
@@ -465,9 +468,11 @@ class WC_Subscriptions {
 	 *
 	 * If multiple purchase flag is set, allow them to be added at the same time.
 	 *
+	 * @deprecated 2.6.0
 	 * @since 1.0
 	 */
 	public static function maybe_empty_cart( $valid, $product_id, $quantity, $variation_id = '', $variations = array() ) {
+		wcs_deprecated_function( __METHOD__, '2.6.0', 'WC_Subscriptions_Cart_Validator::maybe_empty_cart()' );
 
 		$is_subscription                 = WC_Subscriptions_Product::is_subscription( $product_id );
 		$cart_contains_subscription      = WC_Subscriptions_Cart::cart_contains_subscription();
@@ -490,19 +495,19 @@ class WC_Subscriptions {
 			}
 		} elseif ( $is_subscription && wcs_cart_contains_renewal() && ! $multiple_subscriptions_possible && ! $manual_renewals_enabled ) {
 
-			self::remove_subscriptions_from_cart();
+			WC_Subscriptions_Cart::remove_subscriptions_from_cart();
 
 			wc_add_notice( __( 'A subscription renewal has been removed from your cart. Multiple subscriptions can not be purchased at the same time.', 'woocommerce-subscriptions' ), 'notice' );
 
 		} elseif ( $is_subscription && $cart_contains_subscription && ! $multiple_subscriptions_possible && ! $manual_renewals_enabled && ! WC_Subscriptions_Cart::cart_contains_product( $canonical_product_id ) ) {
 
-			self::remove_subscriptions_from_cart();
+			WC_Subscriptions_Cart::remove_subscriptions_from_cart();
 
 			wc_add_notice( __( 'A subscription has been removed from your cart. Due to payment gateway restrictions, different subscription products can not be purchased at the same time.', 'woocommerce-subscriptions' ), 'notice' );
 
 		} elseif ( $cart_contains_subscription && 'yes' != get_option( WC_Subscriptions_Admin::$option_prefix . '_multiple_purchase', 'no' ) ) {
 
-			self::remove_subscriptions_from_cart();
+			WC_Subscriptions_Cart::remove_subscriptions_from_cart();
 
 			wc_add_notice( __( 'A subscription has been removed from your cart. Products and subscriptions can not be purchased at the same time.', 'woocommerce-subscriptions' ), 'notice' );
 
@@ -514,26 +519,24 @@ class WC_Subscriptions {
 			}
 		}
 
-		return $valid;
+		return WC_Subscriptions_Cart_Validator::maybe_empty_cart( $valid, $product_id, $quantity, $variation_id, $variations );
 	}
 
 	/**
 	 * Removes all subscription products from the shopping cart.
 	 *
+	 * @deprecated 2.6.0
 	 * @since 1.0
 	 */
 	public static function remove_subscriptions_from_cart() {
+		wcs_deprecated_function( __METHOD__, '2.6.0', 'WC_Subscriptions_Cart::remove_subscriptions_from_cart()' );
 
-		foreach ( WC()->cart->cart_contents as $cart_item_key => $cart_item ) {
-			if ( WC_Subscriptions_Product::is_subscription( $cart_item['data'] ) ) {
-				WC()->cart->set_quantity( $cart_item_key, 0 );
-			}
-		}
+		WC_Subscriptions_Cart::remove_subscriptions_from_cart();
 	}
 
 	/**
 	 * For a smoother sign up process, tell WooCommerce to redirect the shopper immediately to
-	 * the checkout page after she clicks the "Sign Up Now" button
+	 * the checkout page after she clicks the "Sign up now" button
 	 *
 	 * Only enabled if multiple checkout is not enabled.
 	 *
@@ -569,7 +572,7 @@ class WC_Subscriptions {
 	}
 
 	/**
-	 * Override the WooCommerce "Place Order" text with "Sign Up Now"
+	 * Override the WooCommerce "Place order" text with "Sign up now"
 	 *
 	 * @since 1.0
 	 */
@@ -577,7 +580,7 @@ class WC_Subscriptions {
 		global $product;
 
 		if ( WC_Subscriptions_Cart::cart_contains_subscription() ) {
-			$button_text = get_option( WC_Subscriptions_Admin::$option_prefix . '_order_button_text', __( 'Sign Up Now', 'woocommerce-subscriptions' ) );
+			$button_text = get_option( WC_Subscriptions_Admin::$option_prefix . '_order_button_text', __( 'Sign up now', 'woocommerce-subscriptions' ) );
 		}
 
 		return $button_text;
@@ -739,7 +742,7 @@ class WC_Subscriptions {
 				update_option( WC_Subscriptions_admin::$option_prefix . '_paypal_debugging_default_set', 'true' );
 			}
 
-			add_option( WC_Subscriptions_Admin::$option_prefix . '_is_active', true );
+			update_option( WC_Subscriptions_Admin::$option_prefix . '_is_active', true );
 
 			set_transient( self::$activation_transient, true, 60 * 60 );
 
@@ -830,8 +833,8 @@ class WC_Subscriptions {
 			$notice->display();
 		} else {
 			WCS_Early_Renewal_Manager::init();
+			require_once( dirname( __FILE__ ) . '/includes/early-renewal/wcs-early-renewal-functions.php' );
 			if ( WCS_Early_Renewal_Manager::is_early_renewal_enabled() ) {
-				require_once( dirname( __FILE__ ) . '/includes/early-renewal/wcs-early-renewal-functions.php' );
 				new WCS_Cart_Early_Renewal();
 			}
 		}
@@ -893,7 +896,7 @@ class WC_Subscriptions {
 						// translators: 1$-2$: opening and closing <strong> tags. 3$-4$: opening and closing link tags for learn more. Leads to duplicate site article on docs. 5$-6$: Opening and closing link to production URL. 7$: Production URL .
 						esc_html__( 'It looks like this site has moved or is a duplicate site. %1$sWooCommerce Subscriptions%2$s has disabled automatic payments and subscription related emails on this site to prevent duplicate payments from a staging or test environment. %1$sWooCommerce Subscriptions%2$s considers %5$s%7$s%6$s to be the site\'s URL. %3$sLearn more &raquo;%4$s.', 'woocommerce-subscriptions' ),
 						'<strong>', '</strong>',
-						'<a href="http://docs.woocommerce.com/document/subscriptions/faq/#section-39" target="_blank">', '</a>',
+						'<a href="https://docs.woocommerce.com/document/subscriptions-handles-staging-sites/" target="_blank">', '</a>',
 						'<a href="' . esc_url( self::get_site_url_from_source( 'subscriptions_install' ) ) . '" target="_blank">', '</a>',
 						esc_url( self::get_site_url_from_source( 'subscriptions_install' ) )
 					)
@@ -1029,7 +1032,7 @@ class WC_Subscriptions {
 		// Let the default source be WP
 		if ( 'subscriptions_install' === $source ) {
 			$site_url = self::get_site_url();
-		} elseif ( defined( 'WP_SITEURL' ) ) {
+		} elseif ( ! is_multisite() && defined( 'WP_SITEURL' ) ) {
 			$site_url = WP_SITEURL;
 		} else {
 			$site_url = get_site_url();
@@ -1370,4 +1373,3 @@ class WC_Subscriptions {
 }
 
 WC_Subscriptions::init( $wcs_autoloader );
-

@@ -20,12 +20,19 @@ class Types_Ajax extends Toolset_Ajax {
 	const CALLBACK_SETTINGS_ACTION = 'settings_action';
 	const CALLBACK_M2M_MIGRATION_PREVIEW_RELATIONSHIPS = 'm2m_migration_preview_relationships';
 	const CALLBACK_M2M_MIGRATION_PREVIEW_ASSOCIATIONS = 'm2m_migration_preview_associations';
+	const CALLBACK_M2M_SCAN_LEGACY_CUSTOM_CODE = 'm2m_scan_legacy_custom_code';
 	const CALLBACK_CUSTOM_FIELDS_ACTION = 'custom_fields_action';
 	const CALLBACK_RELATIONSHIPS_ACTION = 'relationships_action';
+	const CALLBACK_DELETE_INTERMEDIARY_POST_TYPE_ACTION = 'delete_intermediary_post_type';
 	const CALLBACK_RELATED_CONTENT_ACTION = 'related_content_action';
 	const CALLBACK_FIELD_GROUP_EDIT_ACTION = 'field_group_edit_action';
 	const CALLBACK_REPEATABLE_GROUP = 'repeatable_group';
 	const CALLBACK_POST_REFERENCE_FIELD = 'post_reference_field';
+	const CALLBACK_INTERMEDIARY_PARENT_CHILD = 'intermediary_parent_child';
+	const CALLBACK_ASSOCIATIONS_IMPORT = 'associations_import';
+	const CALLBACK_MERGE_RELATIONSHIPS = 'merge_relationships';
+	const CALLBACK_SET_EDITOR_MODE = 'set_editor_mode';
+	const CALLBACK_REEVALUATE_DISPLAYED_FIELD_GROUPS = 'reevaluate_displayed_field_groups';
 
 
 	private static $callbacks = array(
@@ -40,6 +47,13 @@ class Types_Ajax extends Toolset_Ajax {
 		self::CALLBACK_FIELD_GROUP_EDIT_ACTION,
 		self::CALLBACK_REPEATABLE_GROUP,
 		self::CALLBACK_POST_REFERENCE_FIELD,
+		self::CALLBACK_M2M_SCAN_LEGACY_CUSTOM_CODE,
+		self::CALLBACK_DELETE_INTERMEDIARY_POST_TYPE_ACTION,
+		self::CALLBACK_INTERMEDIARY_PARENT_CHILD,
+		self::CALLBACK_ASSOCIATIONS_IMPORT,
+		self::CALLBACK_MERGE_RELATIONSHIPS,
+		self::CALLBACK_SET_EDITOR_MODE,
+		self::CALLBACK_REEVALUATE_DISPLAYED_FIELD_GROUPS,
 	);
 
 
@@ -102,6 +116,7 @@ class Types_Ajax extends Toolset_Ajax {
 	 * so that it saves term fields (if there are any).
 	 *
 	 * @since 2.1
+	 * @codeCoverageIgnore Interacts with legacy code.
 	 */
 	public function prepare_for_term_creation() {
 
@@ -114,7 +129,7 @@ class Types_Ajax extends Toolset_Ajax {
 		// will not lead to any errors - it gives up gracefully.
 		$action = toolset_getpost( 'action' );
 		$screen = toolset_getpost( 'screen', null );
-		if( 'add-tag' == $action && null !== $screen ) {
+		if( 'add-tag' === $action && null !== $screen ) {
 			WPCF_GUI_Term_Field_Editing::initialize();
 		}
 
@@ -131,13 +146,14 @@ class Types_Ajax extends Toolset_Ajax {
 	 * @param string $meta_key Meta key.
 	 * @param mixed $_meta_value Meta value. We expect it to be an array.
 	 * @since 2.1
+	 * @codeCoverageIgnore Interacts with legacy code.
 	 */
 	public function capture_columnshidden_update(
 		/** @noinspection PhpUnusedParameterInspection */ $meta_id, $object_id, $meta_key, $_meta_value )
 	{
 		// We're looking for a meta_key that looks like "manage{$page_name}columnshidden".
 		$txt_columnshidden = 'columnshidden';
-		$is_columnshidden_option = ( 0 == strcmp( $txt_columnshidden, substr( $meta_key, strlen( $txt_columnshidden ) * -1 ) ) );
+		$is_columnshidden_option = ( 0 === strcmp( $txt_columnshidden, substr( $meta_key, strlen( $txt_columnshidden ) * -1 ) ) );
 
 		if( $is_columnshidden_option ) {
 
@@ -149,7 +165,7 @@ class Types_Ajax extends Toolset_Ajax {
 			// Determine if we're editing a taxonomy
 			$txt_edit = 'edit-';
 			$txt_edit_len = strlen( $txt_edit );
-			$is_tax_edit_page = ( 0 == strcmp( $txt_edit, substr( $page_name, 0, $txt_edit_len ) ) );
+			$is_tax_edit_page = ( 0 === strcmp( $txt_edit, substr( $page_name, 0, $txt_edit_len ) ) );
 
 			// This is not 100% certain but attempting to handle a taxonomy that doesn't exist does no harm.
 			if( $is_tax_edit_page ) {

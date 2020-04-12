@@ -9,7 +9,7 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @version 5.0.3
  *
  * @var object $map_provider Object with data of map provider.
  * @var array  $events       The array containing the events.
@@ -51,7 +51,16 @@ if ( $is_premium || empty( $event ) || ( isset( $event->venues ) && $event->venu
 		<div class="tribe-events-pro-map__no-venue-modal-icon tribe-common-svgicon tribe-common-svgicon--no-map"></div>
 
 		<p class="tribe-events-pro-map__no-venue-modal-text tribe-common-h5 tribe-common-h--alt">
-			<?php esc_html_e( 'This event doesn’t have a venue or address.', 'tribe-events-calendar-pro' ); ?>
+			<?php
+			echo esc_html(
+				sprintf(
+					/* translators: %1$s: event (singular), %2$s: Venue (singular) */
+					__( 'This %1$s doesn’t have a %2$s or address.', 'tribe-events-calendar-pro' ),
+					tribe_get_event_label_singular_lowercase(),
+					tribe_get_venue_label_singular()
+				)
+			);
+			?>
 		</p>
 
 		<a
@@ -59,7 +68,15 @@ if ( $is_premium || empty( $event ) || ( isset( $event->venues ) && $event->venu
 			class="tribe-events-pro-map__no-venue-modal-link tribe-common-cta tribe-common-cta--thin-alt"
 			data-js="tribe-events-pro-map-no-venue-modal-link"
 		>
-			<?php esc_html_e( 'View Event Details', 'tribe-events-calendar-pro' ); ?>
+			<?php
+			echo esc_html(
+				sprintf(
+					/* translators: %s: Event (singular) */
+					__( 'View %s Details', 'tribe-events-calendar-pro' ),
+					tribe_get_event_label_singular()
+				)
+			);
+			?>
 		</a>
 	</div>
 </div>

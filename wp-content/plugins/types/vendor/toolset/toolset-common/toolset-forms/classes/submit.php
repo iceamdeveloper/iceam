@@ -128,7 +128,7 @@ if (isset($_REQUEST['nonce']) && check_ajax_referer('ajax_nonce', 'nonce', false
                         foreach ($errors as $fname => $err) {
                             $data = array('result' => false, 'error' => $fname . ': ' . $err);
                         }
-                        echo json_encode($data);
+                        wp_send_json( $data );
                         die;
                     } else {
                         foreach ($_FILES as $file) {
@@ -197,5 +197,4 @@ if (isset($_REQUEST['nonce']) && check_ajax_referer('ajax_nonce', 'nonce', false
     $data = array('result' => false, 'error' => __('Upload Error: Invalid NONCE', 'wpv-views'));
 }
 
-echo json_encode($data);
-?>
+wp_send_json( $data );

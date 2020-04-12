@@ -16,12 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) or exit;
  *
  * @since 1.7.0
  */
-class WC_Memberships_Meta_Box_View_Content_Restriction_Rules extends WC_Memberships_Meta_Box_View {
+class WC_Memberships_Meta_Box_View_Content_Restriction_Rules extends \WC_Memberships_Meta_Box_View {
 
 
 	/**
@@ -82,7 +82,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rules extends WC_Membersh
 			<?php
 
 			// load content restriction rule view object
-			require( wc_memberships()->get_plugin_path() . '/includes/admin/meta-boxes/views/class-wc-memberships-meta-box-view-content-restriction-rule.php' );
+			require_once( wc_memberships()->get_plugin_path() . '/includes/admin/meta-boxes/views/class-wc-memberships-meta-box-view-content-restriction-rule.php' );
 
 			// get the rules to output in meta box inputs
 			$content_restriction_rules = $this->meta_box->get_content_restriction_rules();
@@ -90,7 +90,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rules extends WC_Membersh
 			// output content restriction rule views
 			foreach ( $content_restriction_rules as $index => $rule ) {
 
-				$view = new WC_Memberships_Meta_Box_View_Content_Restriction_Rule( $this->meta_box, $rule );
+				$view = new \WC_Memberships_Meta_Box_View_Content_Restriction_Rule( $this->meta_box, $rule );
 				$view->output( array( 'index' => $index ) );
 			}
 
@@ -98,7 +98,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rules extends WC_Membersh
 			$membership_plans = $this->meta_box->get_available_membership_plans();
 
 			?>
-			<tbody class="norules <?php if ( count( $content_restriction_rules ) > 1 ) : ?>hide<?php endif; ?>">
+			<tbody class="norules <?php if ( count( $membership_plans ) > 0 && count( $content_restriction_rules ) > 1 ) : ?>hide<?php endif; ?>">
 				<tr>
 					<td colspan="<?php echo ( 'wc_membership_plan' === $this->post->post_type ) ? 4 : 3; ?>">
 						<?php

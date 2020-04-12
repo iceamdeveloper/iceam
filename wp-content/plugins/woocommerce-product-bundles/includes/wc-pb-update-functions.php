@@ -112,6 +112,10 @@ function wc_pb_update_300() {
 	}
 }
 
+function wc_pb_update_300_db_version() {
+	WC_PB_Install::update_db_version( '3.0.0' );
+}
+
 function wc_pb_update_500_delete_unused_meta() {
 
 	global $wpdb;
@@ -124,7 +128,7 @@ function wc_pb_update_500_delete_unused_meta() {
 	" );
 }
 
-function wc_pb_update_500_main( $updater ) {
+function wc_pb_update_500_main( $updater = false ) {
 
 	global $wpdb;
 
@@ -141,9 +145,11 @@ function wc_pb_update_500_main( $updater ) {
 		foreach ( $bundles as $index => $bundle ) {
 
 			// Make sure we are nowhere close to memory & PHP timeout limits - check state every 20 migrated products.
-			if ( $index % 20 === 19 ) {
-				if ( $updater->time_exceeded() || $updater->memory_exceeded() ) {
-					return -1;
+			if ( is_object( $updater ) ) {
+				if ( $index % 20 === 19 ) {
+					if ( $updater->time_exceeded() || $updater->memory_exceeded() ) {
+						return -1;
+					}
 				}
 			}
 
@@ -156,7 +162,7 @@ function wc_pb_update_500_main( $updater ) {
 
 				// Get product type.
 
-				$product_type = WC_PB_Core_Compatibility::get_product_type( $bundle_id );
+				$product_type = WC_Product_Factory::get_product_type( $bundle_id );
 
 				// Delete existing data left over from previous runs.
 
@@ -364,7 +370,11 @@ function wc_pb_update_v4_meta_to_v5( $bundled_item_data, $args = array() ) {
 	return array_filter( $bundled_item_meta );
 }
 
-function wc_pb_update_510_main( $updater ) {
+function wc_pb_update_500_db_version() {
+	WC_PB_Install::update_db_version( '5.0.0' );
+}
+
+function wc_pb_update_510_main( $updater = false ) {
 
 	global $wpdb;
 
@@ -385,9 +395,11 @@ function wc_pb_update_510_main( $updater ) {
 			foreach ( $bundles as $index => $bundle ) {
 
 				// Make sure we are nowhere close to memory & PHP timeout limits - check state every 20 migrated products.
-				if ( $index % 20 === 19 ) {
-					if ( $updater->time_exceeded() || $updater->memory_exceeded() ) {
-						return -1;
+				if ( is_object( $updater ) ) {
+					if ( $index % 20 === 19 ) {
+						if ( $updater->time_exceeded() || $updater->memory_exceeded() ) {
+							return -1;
+						}
 					}
 				}
 
@@ -414,4 +426,8 @@ function wc_pb_update_510_delete_unused_meta() {
 		DELETE FROM {$wpdb->postmeta}
 		WHERE meta_key = '_wc_sw_min_price'
 	" );
+}
+
+function wc_pb_update_510_db_version() {
+	WC_PB_Install::update_db_version( '5.1.0' );
 }

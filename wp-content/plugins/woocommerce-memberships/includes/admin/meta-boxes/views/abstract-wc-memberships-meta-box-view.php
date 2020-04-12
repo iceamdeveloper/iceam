@@ -16,12 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -70,7 +70,7 @@ abstract class WC_Memberships_Meta_Box_View {
 
 		$this->meta_box            = $meta_box;                         // the current meta box instance
 
-		if ( $this->meta_box instanceof WC_Memberships_Meta_Box ) {
+		if ( $this->meta_box instanceof \WC_Memberships_Meta_Box ) {
 
 			$this->post            = $meta_box->get_post();             // used in all contexts
 			$this->product         = $meta_box->get_product();          // used in product edit screen context

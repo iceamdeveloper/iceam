@@ -20,9 +20,7 @@ function wpcf_admin_userprofile_init($user_id){
 		$user_id = new stdClass();
 		$user_id->ID = 0;
 	}
-	$current_user_roles = isset( $user_id->roles ) ? $user_id->roles : array( 'subscriber' );
-	$current_user_roles = array_values( $current_user_roles );
-	$user_role = array_shift( $current_user_roles );
+	$user_roles = isset( $user_id->roles ) ? $user_id->roles : array( 'subscriber' );
 	$groups = wpcf_admin_usermeta_get_groups_fields();
 	$wpcf_active = false;
     $profile_only_preview = '';
@@ -33,7 +31,7 @@ function wpcf_admin_userprofile_init($user_id){
 			$for_users = wpcf_admin_get_groups_showfor_by_group($group['id']);
 			$profile_only_preview = '';
 			if ( count($for_users) != 0){
-				if ( !in_array($user_role,$for_users)){
+				if ( empty( array_intersect( $user_roles, $for_users ) ) ){
 					continue;
 				}
 				else{
@@ -67,7 +65,7 @@ function wpcf_admin_userprofile_init($user_id){
             // Process fields
 			if ( empty($profile_only_preview) ){
 
-				$group_wpml = new Types_Wpml_Field_Group( Types_Field_Group_User_Factory::load( $group['slug'] ) );
+				$group_wpml = new Types_Wpml_Field_Group( Toolset_Field_Group_User_Factory::load( $group['slug'] ) );
 
                 if ( defined( 'WPTOOLSET_FORMS_VERSION' ) ) {
                     $errors = get_user_meta( $user_id->ID, '__wpcf-invalid-fields',
@@ -78,8 +76,8 @@ function wpcf_admin_userprofile_init($user_id){
                     if ( empty( $group['fields'] ) ) continue;
 
                     $output = '<div class="wpcf-group-area wpcf-group-area_'
-                    . $group['slug'] . '">' . "\n\n" . '<h3>'
-                    . $group_wpml->translate_name() . '</h3>' . "\n\n";
+                    . $group['slug'] . '">' . "\n\n" . '<h2>'
+                    . $group_wpml->translate_name() . '</h2>' . "\n\n";
 
                     if ( !empty( $group['description'] ) ) {
                         $output .= '<span>' . wpautop( $group_wpml->translate_description() )
@@ -200,7 +198,7 @@ function wpcf_usermeta_preview_profile( $user_id, $group, $echo = ''){
 	global $wpcf;
 	//print_r($group);exit;
 	$fields = $group['fields'];
-	$group_wpml = new Types_Wpml_Field_Group( Types_Field_Group_User_Factory::load( $group['slug'] ) );
+	$group_wpml = new Types_Wpml_Field_Group( Toolset_Field_Group_User_Factory::load( $group['slug'] ) );
 
 	$group_output = '<div class="wpcf-group-area wpcf-group-area-' . $group['slug'] . '">' . "\n\n";
 	$group_output .=  '<h3 class="wpcf-group-header-'. $group['slug'] .'">'. $group_wpml->translate_name() .'</h3>'. "\n\n";
@@ -415,10 +413,10 @@ function wpcf_admin_userprofilesave_init( $user_id ) {
 function wpcf_admin_render_fields( $group, $user_id, $echo = '') {
 
 	global $wpcf;
-	$group_wpml = new Types_Wpml_Field_Group( Types_Field_Group_User_Factory::load( $group['slug'] ) );
+	$group_wpml = new Types_Wpml_Field_Group( Toolset_Field_Group_User_Factory::load( $group['slug'] ) );
 
 	$output = '<div class="wpcf-group-area wpcf-group-area_' . $group['slug'] . '">' . "\n\n";
-	$output .= '<h3>'. $group_wpml->translate_name() .'</h3>' . "\n\n";
+	$output .= '<h2>'. $group_wpml->translate_name() .'</h2>' . "\n\n";
 	if ( !empty( $group['fields'] ) ) {
         // Display description
         if ( !empty( $group['description'] ) ) {

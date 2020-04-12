@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10
+class ComposerStaticInit285288cb8b751f9b06982fbbe625a224
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -39,6 +39,7 @@ class ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10
         'Tribe\\Events\\Pro\\Models\\Service_Provider' => __DIR__ . '/../..' . '/src/Tribe/Models/Service_Provider.php',
         'Tribe\\Events\\Pro\\Rewrite\\Provider' => __DIR__ . '/../..' . '/src/Tribe/Rewrite/Provider.php',
         'Tribe\\Events\\Pro\\Rewrite\\Rewrite' => __DIR__ . '/../..' . '/src/Tribe/Rewrite/Rewrite.php',
+        'Tribe\\Events\\Pro\\Service_Providers\\Customizer' => __DIR__ . '/../..' . '/src/Tribe/Service_Providers/Customizer.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Assets' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Assets.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Geo_Loc\\Base_Handler' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Geo_Loc/Base_Handler.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Geo_Loc\\Geo_Loc_TestCase' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Geo_Loc/Geo_Loc_TestCase.php',
@@ -76,6 +77,7 @@ class ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10
         'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\Event\\TitleTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/Event/TitleTest.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\Event\\VenueTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/Event/VenueTest.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\TooltipTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/TooltipTest.php',
+        'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\Tooltip\\CostTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/Tooltip/CostTest.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\Tooltip\\Date_TimeTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/Tooltip/Date_TimeTest.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\Tooltip\\NavigationTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/Tooltip/NavigationTest.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Partials\\Map_View\\Event_Cards\\Event_Card\\Tooltip\\TitleTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Partials/Map_View/Event_Cards/Event_Card/Tooltip/TitleTest.php',
@@ -210,10 +212,10 @@ class ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10
         'Tribe\\Events\\Pro\\Views\\V2\\Views\\Partials\\Month_Calendar_Event_Tooltip_Recurring_Icon' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Partials/Month_Calendar_Event_Tooltip_Recurring_Icon.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Views\\Partials\\Month_Mobile_Event_Recurring_Icon' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Partials/Month_Mobile_Event_Recurring_Icon.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Views\\Photo_View' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Photo_View.php',
+        'Tribe\\Events\\Pro\\Views\\V2\\Views\\Photo_ViewTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Views/Photo_ViewTest.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Views\\Venue_View' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Venue_View.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Views\\Week_View' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Week_View.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Views\\Week_ViewTest' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Views/Week_ViewTest.php',
-        'Tribe\\Events\\Pro\\Views\\V2\\Views\\events' => __DIR__ . '/../..' . '/tests/views_integration/Tribe/Events/Pro/Views/V2/Views/Photo_ViewTest.php',
         'Tribe\\Tests\\Modules\\Pro\\Acceptance\\Options' => __DIR__ . '/../..' . '/tests/_support/Modules/Acceptance/Options.php',
         'Tribe\\Tests\\Modules\\Pro\\Acceptance\\Theme' => __DIR__ . '/../..' . '/tests/_support/Modules/Acceptance/Theme.php',
         'Tribe\\Tests\\Modules\\Pro\\Acceptance\\Widgets' => __DIR__ . '/../..' . '/tests/_support/Modules/Acceptance/Widgets.php',
@@ -223,9 +225,9 @@ class ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit7cde56e18fe7d2aceeadb0ef8a785e10::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit285288cb8b751f9b06982fbbe625a224::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit285288cb8b751f9b06982fbbe625a224::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit285288cb8b751f9b06982fbbe625a224::$classMap;
 
         }, null, ClassLoader::class);
     }

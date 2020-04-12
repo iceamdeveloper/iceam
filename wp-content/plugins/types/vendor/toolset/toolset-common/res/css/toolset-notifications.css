@@ -52,7 +52,7 @@ span.toolset-alert {
 	.toolset-alert .button {
 		text-shadow: none;
 	}
-	
+
 	.toolset-alert .toolset-rounded-icon {
 		width: 25px;
 		height: 25px;
@@ -73,7 +73,7 @@ span.toolset-alert {
 	.toolset-alert-success .toolset-alert-header {
 	 	color: #468847;
 	}
-	
+
 	.toolset-alert-success .toolset-rounded-icon {
 		background: #468847;
 	}
@@ -83,12 +83,19 @@ span.toolset-alert {
 	background-color: #f2dede;
 	color: #b94a48;
 }
+.toolset-alert-error-simple {
+	border-color: transparent;
+	background-color: transparent;
+	color: #b94a48;
+}
 
-	.toolset-alert-error .toolset-alert-header {
+	.toolset-alert-error .toolset-alert-header,
+	.toolset-alert-error-simple .toolset-alert-header {
 	 	color: #b94a48;
 	}
-	
-	.toolset-alert-error .toolset-rounded-icon {
+
+	.toolset-alert-error .toolset-rounded-icon,
+	.toolset-alert-error-simple .toolset-rounded-icon {
 		background: #b94a48;
 	}
 
@@ -101,7 +108,7 @@ span.toolset-alert {
 	.toolset-alert-info .toolset-alert-header {
 		color: #3a87ad;
 	}
-	
+
 	.toolset-alert-info .toolset-rounded-icon {
 		background: #3a87ad;
 	}
@@ -170,7 +177,7 @@ span.toolset-alert {
 			margin-inline-start: 160px;
 		}
 	}
-	
+
 	.toolset-help-content a {
 		text-decoration: underline;
 	}
@@ -294,12 +301,8 @@ span.toolset-alert {
 }
 
 /*highlight search */
-.highlighted {
+.toolset-highlighted {
     font-weight:bold;
-
-}
-
-.highlighted {
     padding:1px 4px;
     margin:0 -4px;
 }

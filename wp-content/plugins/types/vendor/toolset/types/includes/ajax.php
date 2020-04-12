@@ -177,7 +177,7 @@ function wpcf_ajax( $fallthrough )
             $field = sanitize_text_field( $_GET['field'] );
             wpcf_admin_fields_delete_field($field,TYPES_USER_META_FIELD_GROUP_CPT_NAME,'wpcf-usermeta');
         }
-        echo json_encode(array(
+        wp_send_json(array(
             'output' => ''
         ));
         break;
@@ -189,7 +189,7 @@ function wpcf_ajax( $fallthrough )
             $fields[$_GET['field_id']]['data']['removed_from_history'] = 1;
             wpcf_admin_fields_save_fields($fields, true, 'wpcf-usermeta');
         }
-        echo json_encode(array(
+		wp_send_json(array(
             'output' => ''
         ));
         break;
@@ -199,7 +199,7 @@ function wpcf_ajax( $fallthrough )
         require_once WPCF_INC_ABSPATH . '/usermeta.php';
         $success = wpcf_admin_fields_deactivate_group(intval($_GET['group_id']), TYPES_USER_META_FIELD_GROUP_CPT_NAME);
         if ($success) {
-            echo json_encode(
+			wp_send_json(
                 array(
                     'output' => __('Group deactivated', 'wpcf'),
                     'execute' => 'reload',
@@ -217,7 +217,7 @@ function wpcf_ajax( $fallthrough )
         require_once WPCF_INC_ABSPATH . '/usermeta.php';
         $success = wpcf_admin_fields_activate_group(intval($_GET['group_id']), TYPES_USER_META_FIELD_GROUP_CPT_NAME);
         if ($success) {
-            echo json_encode(
+			wp_send_json(
                 array(
                     'output' => __('Group activated', 'wpcf'),
                     'execute' => 'reload',
@@ -237,7 +237,7 @@ function wpcf_ajax( $fallthrough )
         $redirect = wpcf_ajax_group_delete_redirect();
 
         wpcf_admin_fields_delete_group(intval($_GET['group_id']), TYPES_USER_META_FIELD_GROUP_CPT_NAME);
-        echo json_encode( $redirect );
+		wp_send_json( $redirect );
 
         break;
 
@@ -276,7 +276,7 @@ function wpcf_ajax( $fallthrough )
         require_once WPCF_INC_ABSPATH . '/fields.php';
         $success = wpcf_admin_fields_deactivate_group(intval($_GET['group_id']));
         if ($success) {
-            echo json_encode(
+			wp_send_json(
                 array(
                     'output' => __('Group deactivated', 'wpcf'),
                     'execute' => 'reload',
@@ -292,7 +292,7 @@ function wpcf_ajax( $fallthrough )
         require_once WPCF_INC_ABSPATH . '/fields.php';
         $success = wpcf_admin_fields_activate_group(intval($_GET['group_id']));
         if ($success) {
-            echo json_encode(
+			wp_send_json(
                 array(
                     'output' => __('Group activated', 'wpcf'),
                     'execute' => 'reload',
@@ -310,14 +310,14 @@ function wpcf_ajax( $fallthrough )
         $redirect = wpcf_ajax_group_delete_redirect();
         wpcf_admin_fields_delete_group(intval($_GET['group_id']));
 
-        echo json_encode( $redirect );
+		wp_send_json( $redirect );
         break;
 
 	    case 'deactivate_term_group':
 		    require_once WPCF_INC_ABSPATH . '/fields.php';
-		    $success = wpcf_admin_fields_deactivate_group(intval($_GET['group_id']), Types_Field_Group_Term::POST_TYPE);
+		    $success = wpcf_admin_fields_deactivate_group(intval($_GET['group_id']), Toolset_Field_Group_Term::POST_TYPE);
 		    if ($success) {
-			    echo json_encode(
+				wp_send_json(
 				    array(
 					    'output' => __('Group deactivated', 'wpcf'),
 					    'execute' => 'reload',
@@ -331,9 +331,9 @@ function wpcf_ajax( $fallthrough )
 
 	    case 'activate_term_group':
 		    require_once WPCF_INC_ABSPATH . '/fields.php';
-		    $success = wpcf_admin_fields_activate_group(intval($_GET['group_id']), Types_Field_Group_Term::POST_TYPE);
+		    $success = wpcf_admin_fields_activate_group(intval($_GET['group_id']), Toolset_Field_Group_Term::POST_TYPE);
 		    if ($success) {
-			    echo json_encode(
+				wp_send_json(
 				    array(
 					    'output' => __('Group activated', 'wpcf'),
 					    'execute' => 'reload',
@@ -349,9 +349,9 @@ function wpcf_ajax( $fallthrough )
 		    require_once WPCF_INC_ABSPATH . '/fields.php';
 
             $redirect = wpcf_ajax_group_delete_redirect();
-		    wpcf_admin_fields_delete_group(intval($_GET['group_id']), Types_Field_Group_Term::POST_TYPE);
+		    wpcf_admin_fields_delete_group(intval($_GET['group_id']), Toolset_Field_Group_Term::POST_TYPE);
 
-            echo json_encode( $redirect );
+			wp_send_json( $redirect );
 
 		    break;
 
@@ -364,7 +364,7 @@ function wpcf_ajax( $fallthrough )
         $custom_types[$post_type]['disabled'] = 1;
         $custom_types[$post_type][TOOLSET_EDIT_LAST] = time();
         update_option(WPCF_OPTION_NAME_CUSTOM_TYPES, $custom_types);
-        echo json_encode(
+			wp_send_json(
             array(
                 'output' => __('Post Type deactivated', 'wpcf'),
                 'execute' => 'reload',
@@ -382,7 +382,7 @@ function wpcf_ajax( $fallthrough )
         unset($custom_types[$post_type]['disabled']);
         $custom_types[$post_type][TOOLSET_EDIT_LAST] = time();
         update_option(WPCF_OPTION_NAME_CUSTOM_TYPES, $custom_types);
-        echo json_encode(
+		wp_send_json(
             array (
                 'output' => __('Post Type activated', 'wpcf'),
                 'execute' => 'reload',
@@ -448,7 +448,7 @@ function wpcf_ajax( $fallthrough )
         }
         update_option(WPCF_OPTION_NAME_CUSTOM_TYPES, $post_types);
         wpcf_admin_deactivate_content('post_type', $post_type);
-        echo json_encode(
+		wp_send_json(
             array(
                 'output' => '',
                 'execute' => 'reload',
@@ -502,7 +502,7 @@ function wpcf_ajax( $fallthrough )
             }
             update_option(WPCF_OPTION_NAME_CUSTOM_TAXONOMIES, $custom_taxonomies);
 
-            echo json_encode(array(
+			wp_send_json(array(
                 'execute' => 'reload',
                 'wpcf_nonce_ajax_callback' => wp_create_nonce('execute'),
             ));
@@ -567,7 +567,7 @@ function wpcf_ajax( $fallthrough )
                  */
                 update_option(WPCF_OPTION_NAME_CUSTOM_TYPES, $custom_types);
             }
-            echo json_encode(array(
+			wp_send_json(array(
                 'execute' => 'reload',
                 'wpcf_nonce_ajax_callback' => wp_create_nonce('execute'),
             ));
@@ -610,7 +610,7 @@ function wpcf_ajax( $fallthrough )
         $custom_taxonomies[$custom_taxonomy]['disabled'] = 1;
         $custom_taxonomies[$custom_taxonomy][TOOLSET_EDIT_LAST] = time();
         update_option(WPCF_OPTION_NAME_CUSTOM_TAXONOMIES, $custom_taxonomies);
-        echo json_encode(
+		wp_send_json(
             array(
                 'output' => __('Taxonomy deactivated', 'wpcf'),
                 'execute' => 'reload',
@@ -647,7 +647,7 @@ function wpcf_ajax( $fallthrough )
         $custom_taxonomies[$custom_taxonomy]['disabled'] = 0;
         $custom_taxonomies[$custom_taxonomy][TOOLSET_EDIT_LAST] = time();
         update_option(WPCF_OPTION_NAME_CUSTOM_TAXONOMIES, $custom_taxonomies);
-        echo json_encode(
+		wp_send_json(
             array (
                 'output' => __('Taxonomy activated', 'wpcf'),
                 'execute' => 'reload',
@@ -673,7 +673,7 @@ function wpcf_ajax( $fallthrough )
                 ? admin_url( 'admin.php?page=toolset-dashboard' )
                 : admin_url( 'admin.php?page=wpcf-ctt' );
 
-            echo json_encode(
+			wp_send_json(
                 array(
                     'output' => '',
                     'execute' => 'redirect',
@@ -683,7 +683,7 @@ function wpcf_ajax( $fallthrough )
             );
             // on listing page
         } else {
-            echo json_encode(
+			wp_send_json(
                 array(
                     'output' => '',
                     'execute' => 'reload',
@@ -710,7 +710,7 @@ function wpcf_ajax( $fallthrough )
         $element = wpcf_fields_radio_get_option($value);
         $id = array_shift($element);
         $element_txt = wpcf_fields_radio_get_option_alt_text($id, $value);
-        echo json_encode(
+		wp_send_json(
             array(
                 'output' => wpcf_form_simple($element),
                 'execute' => 'append',
@@ -730,7 +730,7 @@ function wpcf_ajax( $fallthrough )
         }
         require_once WPCF_INC_ABSPATH . '/fields/select.php';
         $element = wpcf_fields_select_get_option(esc_html(urldecode($_GET['parent_name'])));
-        echo json_encode(array(
+		wp_send_json(array(
             'output' => wpcf_form_simple($element)
         ));
         break;
@@ -745,9 +745,7 @@ function wpcf_ajax( $fallthrough )
         require_once WPCF_INC_ABSPATH . '/fields/checkboxes.php';
         $value = esc_html(urldecode($_GET['parent_name']));
         $element = wpcf_fields_checkboxes_get_option($value);
-        $id = array_shift($element);
-        $element_txt = wpcf_fields_checkboxes_get_option_alt_text($id, $value);
-        echo json_encode(array(
+		wp_send_json(array(
             'output' => wpcf_form_simple($element),
             'wpcf_nonce_ajax_callback' => wp_create_nonce('execute'),
         ));
@@ -777,7 +775,7 @@ function wpcf_ajax( $fallthrough )
         if (isset($_GET['field'])) {
             wpcf_admin_fields_delete_field(sanitize_text_field($_GET['field']));
         }
-        echo json_encode(array(
+		wp_send_json(array(
             'output' => ''
         ));
         break;
@@ -789,7 +787,7 @@ function wpcf_ajax( $fallthrough )
             $fields[$_GET['field_id']]['data']['removed_from_history'] = 1;
             wpcf_admin_fields_save_fields($fields, true);
         }
-        echo json_encode(array(
+		wp_send_json(array(
             'output' => ''
         ));
         break;
@@ -802,7 +800,7 @@ function wpcf_ajax( $fallthrough )
             if (isset($_GET['group'])) {
                 $output = wpcf_form_simple(wpcf_cd_admin_form_single_filter(array(),
                     array(), null, true));
-                echo json_encode(array(
+				wp_send_json(array(
                     'output' => $output,
                 ));
             } else {
@@ -811,7 +809,7 @@ function wpcf_ajax( $fallthrough )
                 $output = wpcf_form_simple(wpcf_cd_admin_form_single_filter($data,
                     array(), null, false));
                 if (!empty($data['id'])) {
-                    echo json_encode(array(
+					wp_send_json(array(
                         'output' => $output,
                     ));
                 } else {
@@ -917,7 +915,7 @@ function wpcf_ajax( $fallthrough )
                         }
             }
         }
-        echo json_encode(array(
+		wp_send_json(array(
             'output' => $output,
         ));
         break;
@@ -976,16 +974,14 @@ function wpcf_ajax_helper_get_post_type()
 
 function wpcf_ajax_helper_print_error_and_die()
 {
-    echo json_encode(array(
+	wp_send_json(array(
         'output' => __('Missing required data.', 'wpcf'),
     ));
-    die;
 }
 
 function wpcf_ajax_helper_verification_failed_and_die()
 {
-    echo json_encode(array(
+	wp_send_json(array(
         'output' => __('Verification failed.', 'wpcf'),
     ));
-    die;
 }

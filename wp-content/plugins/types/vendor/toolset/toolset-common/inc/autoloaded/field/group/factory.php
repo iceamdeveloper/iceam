@@ -1,5 +1,10 @@
 <?php
 
+use \OTGS\Toolset\Common\WpQueryFactory;
+
+use \OTGS\Toolset\Common\WpPostFactory;
+
+
 /**
  * Abstract factory for field group classes.
  *
@@ -11,6 +16,29 @@
  * @since 1.9
  */
 abstract class Toolset_Field_Group_Factory {
+
+
+	/** @var WpQueryFactory  */
+	protected $wp_query_factory;
+
+	/** @var WpPostFactory  */
+	protected $wp_post_factory;
+
+
+	/**
+	 * @var array Array of field group instances for this post type, indexed by names (post slugs).
+	 */
+	private $field_groups = array();
+
+
+	/**
+	 * @var WP_Post[][] Cache for WP_Post objects representing field groups.
+	 *
+	 * Access only through get_cache_for_query_args(), set_cache_for_query_args() or reset_query_cache().
+	 *
+	 * @since Types 3.3
+	 */
+	private $group_query_cache = array();
 
 
 	/**
@@ -29,12 +57,13 @@ abstract class Toolset_Field_Group_Factory {
 	}
 
 
-	protected function __construct() {
+	protected function __construct( WpQueryFactory $wp_query_factory = null, WpPostFactory $wp_post_factory = null ) {
+		$this->wp_query_factory = $wp_query_factory ?: new WpQueryFactory();
+		$this->wp_post_factory = $wp_post_factory ?: new WpPostFactory();
+
 		add_action( 'wpcf_field_group_renamed', array( $this, 'field_group_renamed' ), 10, 2 );
+		add_action( 'wpcf_group_updated', array( $this, 'reset_query_cache' ) );
 	}
-
-
-	final private function __clone() { }
 
 
 	/**
@@ -47,11 +76,11 @@ abstract class Toolset_Field_Group_Factory {
 	 */
 	public static function get_factory_by_domain( $domain ) {
 		switch( $domain ) {
-			case Toolset_Field_Utils::DOMAIN_POSTS:
+			case Toolset_Element_Domain::POSTS:
 				return Toolset_Field_Group_Post_Factory::get_instance();
-			case Toolset_Field_Utils::DOMAIN_USERS:
+			case Toolset_Element_Domain::USERS:
 				return Toolset_Field_Group_User_Factory::get_instance();
-			case Toolset_Field_Utils::DOMAIN_TERMS:
+			case Toolset_Element_Domain::TERMS:
 				return Toolset_Field_Group_Term_Factory::get_instance();
 			default:
 				throw new InvalidArgumentException( 'Invalid field domain.' );
@@ -66,6 +95,14 @@ abstract class Toolset_Field_Group_Factory {
 
 
 	/**
+	 * Get the name of the domain for which this factory is intended.
+	 *
+	 * @return string
+	 */
+	abstract public function get_domain();
+
+
+	/**
 	 * @return string Name of the class that represents this field group type (and that will be instantiated). It must
 	 * be a child of Toolset_Field_Group.
 	 */
@@ -77,22 +114,26 @@ abstract class Toolset_Field_Group_Factory {
 	 *
 	 * @param int|string|WP_Post $field_group Numeric ID of the post, post slug or a post object.
 	 *
+	 * @param bool $force_query_by_name Useful to query field groups with numbers only title
+	 *
 	 * @return null|WP_Post Requested post object when the post exists and has correct post type. Null otherwise.
 	 */
-	final protected function get_post( $field_group ) {
+	final protected function get_post( $field_group, $force_query_by_name = false ) {
 
 		$fg_post = null;
 
-		// http://stackoverflow.com/questions/2559923/shortest-way-to-check-if-a-variable-contains-positive-integer-using-php
-		if ( is_scalar( $field_group ) && ( $field_group == (int) $field_group ) && ( (int) $field_group > 0 ) ) {
-			$fg_post = WP_Post::get_instance( $field_group );
-		} else if ( is_string( $field_group ) ) {
-			$query = new WP_Query( array( 'post_type' => $this->get_post_type(), 'name' => $field_group, 'posts_per_page' => 1 ) );
-			if( $query->have_posts() ) {
-				$fg_post = $query->get_posts();
-				$fg_post = $fg_post[0];
-			}
+		// when $force_query_by_name is not used, check if a post id is given
+		if ( ! $force_query_by_name && ( ctype_digit( $field_group ) || is_int( $field_group ) ) && (int) $field_group > 0 ) {
+			// query by post id
+			$fg_post = $this->wp_post_factory->load( $field_group );
+		} else if ( $fg_post = $this->get_field_group_by_name( $field_group ) ) {
+			// field group found
+			return $fg_post;
+		} else if ( $rfg_post = $this->get_repeatable_field_group_by_name( $field_group ) ) {
+			// rfg found
+			return $rfg_post;
 		} else {
+			// object is already given
 			$fg_post = $field_group;
 		}
 
@@ -103,16 +144,69 @@ abstract class Toolset_Field_Group_Factory {
 		}
 	}
 
+	/**
+	 * Get Field Group by name (does not include RFGs)
+	 * @param $field_group_name
+	 *
+	 * @return false|WP_Post
+	 */
+	private function get_field_group_by_name( $field_group_name ) {
+		return $this->_get_group_post_by_name( $field_group_name );
+	}
 
 	/**
-	 * @var array Array of field group instances for this post type, indexed by names (post slugs).
+	 * Get RFG by name
+	 * @param $field_group_name
+	 *
+	 * @return false|WP_Post
 	 */
-	private $field_groups = array();
+	private function get_repeatable_field_group_by_name( $field_group_name ) {
+		return $this->_get_group_post_by_name( $field_group_name, true );
+	}
+
+	/**
+	 * Returns post for field group or false if no field group is found.
+	 * To search for a RFG the second paramaeter must be true
+	 *
+	 * @param $field_group_name
+	 * @param bool $rfg Search for RFG
+	 *
+	 * @return false|WP_Post
+	 */
+	private function _get_group_post_by_name( $field_group_name, $rfg = false ) {
+		if( is_object( $field_group_name ) ) {
+			return false;
+		}
+		$query_args = array(
+			'post_type' => $this->get_post_type(),
+			'name' => $field_group_name,
+			'posts_per_page' => 1
+		);
+
+		if( $rfg ) {
+			// rfgs have the post status 'hidden'
+			$query_args['post_status'] = 'hidden';
+		}
+
+		$posts = $this->get_cache_for_query_args( $query_args );
+
+		if( null === $posts ) {
+			$query = $this->wp_query_factory->create( $query_args );
+			$posts = $query->posts;
+			$this->set_cache_for_query_args( $query_args, $posts );
+		}
+
+		if( empty( $posts ) ) {
+			return false;
+		}
+
+		return array_pop( $posts );
+	}
 
 
 	/**
 	 * @param string $field_group_name Name of the field group.
-	 * 
+	 *
      * @return null|Toolset_Field_Group Field group instance or null if it's not cached.
 	 */
 	private function get_from_cache( $field_group_name ) {
@@ -122,7 +216,7 @@ abstract class Toolset_Field_Group_Factory {
 
 	/**
 	 * Save a field group instance to cache.
-	 * 
+	 *
 	 * @param Toolset_Field_Group $field_group
 	 */
 	private function save_to_cache( $field_group ) {
@@ -144,14 +238,15 @@ abstract class Toolset_Field_Group_Factory {
 	 *
 	 * @param int|string|WP_Post $field_group_source Post ID of the field group, it's name or a WP_Post object.
 	 *
+	 * @param bool $force_query_by_name
+	 *
 	 * @return null|Toolset_Field_Group Field group or null if it can't be loaded.
 	 */
-	final public function load_field_group( $field_group_source ) {
-
+	final public function load_field_group( $field_group_source, $force_query_by_name = false ) {
 		$post = null;
 
 		// If we didn't get a field group name, we first need to get the post so we can look into the cache.
-		if( !is_string( $field_group_source ) ) {
+		if ( ! is_string( $field_group_source ) ) {
 			$post = $this->get_post( $field_group_source );
 			if( null == $post ) {
 				// There is no such post (or has wrong type).
@@ -170,7 +265,7 @@ abstract class Toolset_Field_Group_Factory {
 
 		// We might already have the post by now.
 		if( null == $post ) {
-			$post = $this->get_post( $field_group_source );
+			$post = $this->get_post( $field_group_source, $force_query_by_name );
 		}
 
 		// There is no such post (or has wrong type).
@@ -187,6 +282,7 @@ abstract class Toolset_Field_Group_Factory {
 		}
 
 		$this->save_to_cache( $field_group );
+
 		return $field_group;
 	}
 
@@ -202,6 +298,8 @@ abstract class Toolset_Field_Group_Factory {
 			$this->clear_from_cache( $original_name );
 			$this->save_to_cache( $field_group );
 		}
+
+		$this->reset_query_cache();
 	}
 
 
@@ -244,6 +342,8 @@ abstract class Toolset_Field_Group_Factory {
 		// Store the mandatory postmeta, just to be safe. I'm not sure about invariants here.
 		update_post_meta( $post_id, Toolset_Field_Group::POSTMETA_FIELD_SLUGS_LIST, '' );
 
+		$this->reset_query_cache();
+
 		$field_group = $this->load_field_group( $post_id );
 
 		if( null === $purpose ) {
@@ -260,14 +360,15 @@ abstract class Toolset_Field_Group_Factory {
 	/**
 	 * Get field groups based on query arguments.
 	 *
-	 * @param array $query_args Optional. Arguments for the WP_Query that will be applied on the underlying posts.
+	 * @param array $query_args Optional arguments for the WP_Query that will be applied on the underlying posts.
 	 *     Post type query is added automatically.
-	 *     Additional arguments are allowed:
+	 *     Additional arguments are allowed.
 	 *     - 'types_search': String for extended search. See WPCF_Field_Group::is_match() for details.
 	 *     - 'is_active' bool: If defined, only active/inactive field groups will be returned.
 	 *     - 'purpose' string: See Toolset_Field_Group::get_purpose(). Default is Toolset_Field_Group::PURPOSE_GENERIC.
 	 *        Special value '*' will return groups of all purposes.
-	 * 
+	 *     - 'assigned_to_post_type' string: For post field groups only, filter results by being assinged to a particular post type.
+	 *
 	 * @return Toolset_Field_Group[]
 	 * @since 1.9
 	 * @since m2m Added the 'purpose' argument.
@@ -279,13 +380,14 @@ abstract class Toolset_Field_Group_Factory {
 		$search_string = toolset_getarr( $query_args, 'types_search' );
 		$is_active = toolset_getarr( $query_args, 'is_active', null );
 		$purpose = toolset_getarr( $query_args, 'purpose', Toolset_Field_Group::PURPOSE_GENERIC );
+		$assigned_to_post_type = toolset_getarr( $query_args, 'assigned_to_post_type', null );
 
 		// Query posts
 		$query_args = array_merge( $query_args, array( 'post_type' => $this->get_post_type(), 'posts_per_page' => -1 ) );
 		$meta_query = array();
 
 		// Group's "activeness" is defined by the post status.
-		if( null !== $is_active ) {
+		if( null !== $is_active && ! isset( $query_args['post_status'] ) ) {
 			unset( $query_args['is_active'] );
 			$query_args['post_status'] = ( $is_active ? 'publish' : 'draft' );
 		}
@@ -314,8 +416,15 @@ abstract class Toolset_Field_Group_Factory {
 			$query_args['meta_query'] = $meta_query;
 		}
 
-		$query = new WP_Query( $query_args );
-		$posts = $query->get_posts();
+		$query_args['ignore_sticky_posts'] = true;
+
+		$posts = $this->get_cache_for_query_args( $query_args );
+
+		if( null === $posts ) {
+			$query = $this->wp_query_factory->create( $query_args );
+			$posts = $query->posts;
+			$this->set_cache_for_query_args( $query_args, $posts );
+		}
 
 		// Transform posts into Toolset_Field_Group
 		$all_groups = array();
@@ -339,13 +448,23 @@ abstract class Toolset_Field_Group_Factory {
 			}
 		}
 
+		// Filter groups by being assigned to a post type
+		if ( $this->get_domain() === Toolset_Element_Domain::POSTS && null !== $assigned_to_post_type ) {
+			$selected_groups = array_filter(
+				$selected_groups,
+				function ( Toolset_Field_Group_Post $field_group ) use ( $assigned_to_post_type ) {
+					return $field_group->is_assigned_to_type( $assigned_to_post_type );
+				}
+			);
+		}
+
 		return $selected_groups;
 	}
 
 
 	/**
 	 * Get a map of all field group slugs to their display names.
-	 * 
+	 *
 	 * @return string[]
 	 * @since 2.0
 	 */
@@ -356,6 +475,85 @@ abstract class Toolset_Field_Group_Factory {
 			$group_names[ $group->get_slug() ] = $group->get_display_name();
 		}
 		return $group_names;
+	}
+
+
+	/**
+	 * Retrieve groups that should be displayed with a certain element, taking all possible conditions into account.
+	 *
+	 * @param IToolset_Element $element Element of the domain matching the field group.
+	 * @return Toolset_Field_Group[]
+	 * @throws InvalidArgumentException On invalid input (e.g. if the element's domain doesn't match the factory domain).
+	 * @since Types 3.3
+	 */
+	abstract public function get_groups_for_element( IToolset_Element $element );
+
+
+	/**
+	 * Recursively sort a multidimensional associative array by its keys.
+	 *
+	 * @param array &$array_to_sort Array to be sorted.
+	 * @since Types 3.3
+	 */
+	private function recursive_ksort( & $array_to_sort ) {
+		foreach( $array_to_sort as $key => $value ) {
+			if( is_array( $value ) ) {
+				$this->recursive_ksort( $value );
+				$array_to_sort[ $key ] = $value;
+			}
+		}
+		ksort( $array_to_sort );
+	}
+
+
+	/**
+	 * Convert an array with query arguments to a cache key.
+	 *
+	 * @param array $query_args
+	 * @return string
+	 * @since Types 3.3
+	 */
+	private function query_args_to_cache_key( $query_args ) {
+		$this->recursive_ksort( $query_args );
+		return md5( json_encode( $query_args ) );
+	}
+
+
+	/**
+	 * @param array $query_args
+	 *
+	 * @return WP_Post[]|null
+	 * @since Types 3.3
+	 */
+	private function get_cache_for_query_args( $query_args ) {
+		$cache_key = $this->query_args_to_cache_key( $query_args );
+		if( ! array_key_exists( $cache_key, $this->group_query_cache ) ) {
+			return null;
+		}
+
+		return $this->group_query_cache[ $cache_key ];
+	}
+
+
+	/**
+	 * @param array $query_args
+	 * @param WP_Post[] $value
+	 * @since Types 3.3
+	 */
+	private function set_cache_for_query_args( $query_args, $value ) {
+		$cache_key = $this->query_args_to_cache_key( $query_args );
+		$this->group_query_cache[ $cache_key ] = $value;
+	}
+
+
+	/**
+	 * Clear the query cache. This must be called after every field group change that isn't immediately followed by a
+	 * page reload.
+	 *
+	 * @since Types 3.3
+	 */
+	public function reset_query_cache() {
+		$this->group_query_cache = array();
 	}
 
 }

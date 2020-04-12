@@ -10,7 +10,7 @@
 
 /**
  * Register data (called automatically).
- * 
+ *
  * @return array
  */
 function wpcf_fields_checkboxes() {
@@ -32,8 +32,8 @@ add_filter( 'wpv_condition_end',
 
 /**
  * Form data for post edit page.
- * 
- * @param type $field 
+ *
+ * @param type $field
  *
  * @deprecated seems
  */
@@ -65,6 +65,8 @@ function wpcf_fields_checkboxes_meta_box_form( $field, $field_object ) {
 
 /**
  * Editor callback form.
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_checkboxes_editor_callback( $field, $settings ) {
     $data = array();
@@ -95,6 +97,8 @@ function wpcf_fields_checkboxes_editor_callback( $field, $settings ) {
 
 /**
  * Editor callback form submit.
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_checkboxes_editor_submit( $data, $field, $context ) {
     $add = '';
@@ -168,8 +172,8 @@ function wpcf_fields_checkboxes_editor_submit( $data, $field, $context ) {
 
 /**
  * View function.
- * 
- * @param type $params 
+ *
+ * @param type $params
  */
 function wpcf_fields_checkboxes_view( $params ) {
     $option = array();
@@ -180,7 +184,7 @@ function wpcf_fields_checkboxes_view( $params ) {
     }
 
     /*
-     * 
+     *
      * NO OPTION specified
      * loop over all options and display all of them
      */
@@ -188,7 +192,7 @@ function wpcf_fields_checkboxes_view( $params ) {
         $separator = isset( $params['separator'] ) ? html_entity_decode( $params['separator'] ) : ', ';
         foreach ( $params['field_value'] as $name => &$value ) {
             /*
-             * 
+             *
              * Set option
              */
             if ( isset( $params['field']['data']['options'][$name] ) ) {
@@ -199,7 +203,7 @@ function wpcf_fields_checkboxes_view( $params ) {
                 continue;
             }
             /*
-             * 
+             *
              * Set output according to settings.
              * 'db' or 'value'
              */
@@ -225,13 +229,13 @@ function wpcf_fields_checkboxes_view( $params ) {
                 unset( $params['field_value'][$name] );
             }
         }
-        $output = implode( array_values( $params['field_value'] ), $separator );
+        $output = implode( $separator, array_values( $params['field_value'] ) );
         return empty( $output ) ? '__wpcf_skip_empty' : stripslashes($output);
     }
 
     /*
-     * 
-     * 
+     *
+     *
      * OPTION specified - set required option.
      */
     $i = 0;
@@ -265,12 +269,12 @@ function wpcf_fields_checkboxes_view( $params ) {
     }
 
     /*
-     * 
+     *
      * MAIN settings
      * 'db'      - Use 'set_value' as render value
      * 'value'   - Use values set in Group form data 'display_value_selected'
      *                  or 'display_value_not_selected'
-     * 
+     *
      * Only set if it matches settings.
      * Otherwise leave empty and '__wpcf_skip_empty' will be returned.
      *
@@ -278,7 +282,7 @@ function wpcf_fields_checkboxes_view( $params ) {
 
     if ( isset($option['data']) && $option['data']['display'] == 'db' ) {
         /*
-         * 
+         *
          * Only if NOT unchecked!
          */
         if ( !empty( $option['data']['set_value'] )
@@ -290,7 +294,7 @@ function wpcf_fields_checkboxes_view( $params ) {
         }
     } else if ( isset($option['data']) && $option['data']['display'] == 'value' ) {
         /*
-         * 
+         *
          * Checked
          */
         if ( $option['value'] != '__wpcf_unchecked' ) {
@@ -301,8 +305,8 @@ function wpcf_fields_checkboxes_view( $params ) {
                 $output = wpcf_translate( 'field ' . $params['field']['id'] . ' option ' . $option['key'] . ' display value selected', $output );
             }
             /*
-             * 
-             * 
+             *
+             *
              * Un-checked
              */
         } else if ( isset( $option['data']['display_value_not_selected'] ) ) {
@@ -322,9 +326,9 @@ function wpcf_fields_checkboxes_view( $params ) {
 
 /**
  * This marks child posts checkboxes.
- * 
+ *
  * Because if all unchecked, on submit there won't be any data.
- * 
+ *
  * @param string $form
  * @param type $cf
  * @return string
@@ -343,7 +347,7 @@ function wpcf_filds_checkboxes_relationship_form_filter( $form, $cf ) {
 
 /**
  * Triggers post_meta filter.
- * 
+ *
  * @param type $post
  * @return type
  */
@@ -354,7 +358,7 @@ function wpcf_fields_checkboxes_wpv_conditional_trigger( $post ) {
 
 /**
  * Returns string.
- * 
+ *
  * @global type $wpcf
  * @param type $null
  * @param type $object_id
@@ -365,7 +369,7 @@ function wpcf_fields_checkboxes_wpv_conditional_trigger( $post ) {
 function wpcf_fields_checkboxes_conditional_filter_post_meta( $null, $object_id,
         $meta_key, $single ) {
     global $wpcf;
-    $field = wpcf_admin_fields_get_field( $wpcf->field->__get_slug_no_prefix( $meta_key ) );
+    $field = wpcf_admin_fields_get_field( $wpcf->field->get_slug_no_prefix( $meta_key ) );
     if ( !empty( $field ) && $field['type'] == 'checkboxes' ) {
         $_meta = maybe_unserialize( wpcf_get_post_meta( $object_id, $meta_key,
                         $single ) );
@@ -384,7 +388,7 @@ function wpcf_fields_checkboxes_conditional_filter_post_meta( $null, $object_id,
 
 /**
  * Triggers post_meta filter.
- * 
+ *
  * @param type $post
  * @return type
  */

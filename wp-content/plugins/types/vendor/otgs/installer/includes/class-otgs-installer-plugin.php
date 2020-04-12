@@ -15,6 +15,10 @@ class OTGS_Installer_Plugin {
 	private $external_repo;
 	private $is_lite;
 	private $repo;
+	private $id;
+	private $installed_version;
+	private $channel;
+	private $tested;
 
 	public function __construct( array $params = array() ) {
 		foreach ( get_object_vars( $this ) as $property => $value ) {
@@ -106,6 +110,34 @@ class OTGS_Installer_Plugin {
 	 */
 	public function get_external_repo() {
 		return $this->external_repo;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_id() {
+		return $this->id;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_installed_version() {
+		return $this->installed_version;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_channel() {
+		return $this->channel;
+	}
+
+	/**
+	 * @return string
+	 */
+	public function get_tested() {
+		return $this->tested;
 	}
 
 	/**

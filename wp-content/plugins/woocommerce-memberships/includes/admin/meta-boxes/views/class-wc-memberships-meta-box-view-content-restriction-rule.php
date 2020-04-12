@@ -16,12 +16,12 @@
  * versions in the future. If you wish to customize WooCommerce Memberships for your
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
- * @package   WC-Memberships/Admin/Meta-Boxes
  * @author    SkyVerge
- * @category  Admin
- * @copyright Copyright (c) 2014-2017, SkyVerge, Inc.
+ * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
+
+use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -30,7 +30,7 @@ defined( 'ABSPATH' ) or exit;
  *
  * @since 1.7.0
  */
-class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Memberships_Meta_Box_View {
+class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends \WC_Memberships_Meta_Box_View {
 
 
 	/**
@@ -41,7 +41,8 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 	 */
 	public function output( $args = array() ) {
 
-		$index = $this->get_rule_index( $args );
+		$context = $this->rule->get_membership_plan_id() === (int) $this->post->ID ? 'membership_plan' : 'post';
+		$index   = $this->get_rule_index( $args );
 
 		?>
 		<tbody class="rule content-restriction-rule content-restriction-rule-<?php echo esc_attr( $index ); ?> <?php if ( ! $this->rule->current_user_can_edit() || ! $this->rule->current_context_allows_editing() ) : ?>disabled<?php endif; ?>">
@@ -52,7 +53,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 					<p class="form-field">
 						<label for="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_checkbox"><?php esc_html_e( 'Select', 'woocommerce-memberships' ); ?>:</label>
 
-						<?php if ( ( $this->rule->current_user_can_edit() && $this->rule->current_context_allows_editing() ) || ! $this->rule->content_type_exists() ) : ?>
+						<?php if ( ( $this->rule->current_user_can_edit() && $this->rule->current_context_allows_editing() ) || ! wc_memberships()->get_rules_instance()->rule_content_type_exists( $this->rule ) ) : ?>
 
 							<input
 								type="checkbox"
@@ -79,7 +80,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 							value=""
 						/>
 
-						<?php if ( (int) $this->rule->get_membership_plan_id() !== (int) $this->post->ID && $this->rule->has_objects() ) : ?>
+						<?php if ( 'post' === $context && $this->rule->has_objects() ) : ?>
 
 							<?php foreach ( $this->rule->get_object_ids() as $id ) : ?>
 
@@ -95,7 +96,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 					</p>
 				</th>
 
-				<?php if ( (int) $this->rule->get_membership_plan_id() === (int) $this->post->ID ) : ?>
+				<?php if ( 'membership_plan' === $context ) : ?>
 
 					<td class="content-restriction-content-type content-type-column">
 						<p class="form-field">
@@ -111,10 +112,10 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 
 							// afterwards we need to prefix post_type/taxonomy names (values) with | pipes,
 							// so that if a post type and taxonomy share a name we can still distinguish between them
-							foreach ( wc_memberships()->get_admin_instance()->get_valid_post_types_for_content_restriction() as $post_type_name => $post_type ) {
+							foreach ( \WC_Memberships_Admin_Membership_Plan_Rules::get_valid_post_types_for_content_restriction_rules() as $post_type_name => $post_type ) {
 								$content_restriction_content_type_options['post_types'][ 'post_type|' . $post_type_name ] = $post_type;
 							}
-							foreach ( wc_memberships()->get_admin_instance()->get_valid_taxonomies_for_content_restriction() as $taxonomy_name => $taxonomy ) {
+							foreach ( \WC_Memberships_Admin_Membership_Plan_Rules::get_valid_taxonomies_for_content_restriction_rules() as $taxonomy_name => $taxonomy ) {
 								$content_restriction_content_type_options['taxonomies'][ 'taxonomy|' . $taxonomy_name ]   = $taxonomy;
 							}
 
@@ -137,7 +138,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 									<?php endforeach; ?>
 								</optgroup>
 
-								<?php if ( ! $this->rule->is_new() && ! $this->rule->content_type_exists() ) : ?>
+								<?php if ( ! $this->rule->is_new() && ! wc_memberships()->get_rules_instance()->rule_content_type_exists( $this->rule ) ) : ?>
 									<option value="<?php echo esc_attr( $this->rule->get_content_type_key() ); ?>" selected><?php echo esc_html( $this->rule->get_content_type_key() ); ?></option>
 								<?php endif; ?>
 
@@ -149,58 +150,23 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 					<td class="content-restriction-objects objects-column">
 						<p class="form-field">
 							<label for="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_object_ids"><?php esc_html_e( 'Title', 'woocommerce-memberships' ); ?>:</label>
-
-							<?php if ( SV_WC_Plugin_Compatibility::is_wc_version_gte_3_0() ) : ?>
-
-								<select
-									name="_content_restriction_rules[<?php echo esc_attr( $index ); ?>][object_ids][]"
-									id="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_object_ids"
-									class="wc-memberships-object-search js-object-ids"
-									style="width: 90%;"
-									multiple="multiple"
-									data-placeholder="<?php esc_attr_e( 'Search&hellip; or leave blank to apply to all', 'woocommerce-memberships' ); ?>"
-									data-action="<?php echo esc_attr( $this->rule->get_object_search_action_name() ); ?>"
-									<?php if ( ! $this->rule->current_user_can_edit() ) : ?>disabled<?php endif; ?>>
-									<?php if ( $this->rule->has_objects() ) : ?>
-										<?php foreach ( $this->rule->get_object_ids() as $object_id ) : ?>
-											<?php if ( $this->rule->get_object_label( $object_id ) ) : ?>
-												<option value="<?php echo $object_id; ?>" selected><?php echo esc_html( $this->rule->get_object_label( $object_id ) ); ?></option>
-											<?php endif; ?>
-										<?php endforeach; ?>
-									<?php endif; ?>
-								</select>
-
-							<?php else : ?>
-
-								<input
-									type="hidden"
-									name="_content_restriction_rules[<?php echo esc_attr( $index ); ?>][object_ids]"
-									id="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_object_ids"
-									class="wc-memberships-object-search js-object-ids"
-									style="width: 90%;"
-									data-placeholder="<?php esc_attr_e( 'Search&hellip; or leave blank to apply to all', 'woocommerce-memberships' ); ?>"
-									data-action="<?php echo esc_attr( $this->rule->get_object_search_action_name() ); ?>"
-									data-multiple="true"
-									data-selected="<?php
-										$json_ids = array();
-
-										if ( $this->rule->has_objects() ) {
-
-											foreach ( $this->rule->get_object_ids() as $object_id ) {
-
-												if ( $this->rule->get_object_label( $object_id ) ) {
-													$json_ids[ $object_id ] = wp_kses_post( html_entity_decode( $this->rule->get_object_label( $object_id ) ) );
-												}
-											}
-										}
-
-										echo esc_attr( wp_json_encode( $json_ids ) ); ?>"
-									value="<?php echo esc_attr( implode( ',', array_keys( $json_ids ) ) ); ?>"
-									<?php if ( ! $this->rule->current_user_can_edit() ) : ?>disabled<?php endif; ?>
-								/>
-
-							<?php endif; ?>
-
+							<select
+								name="_content_restriction_rules[<?php echo esc_attr( $index ); ?>][object_ids][]"
+								id="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_object_ids"
+								class="wc-memberships-object-search js-object-ids"
+								style="width: 90%;"
+								multiple="multiple"
+								data-placeholder="<?php esc_attr_e( 'Search&hellip; or leave blank to apply to all', 'woocommerce-memberships' ); ?>"
+								data-action="<?php echo esc_attr( \WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_search_action( $this->rule ) ); ?>"
+								<?php if ( ! $this->rule->current_user_can_edit() ) : ?>disabled<?php endif; ?>>
+								<?php if ( $this->rule->has_objects() ) : ?>
+									<?php foreach ( $this->rule->get_object_ids() as $object_id ) : ?>
+										<?php if ( $object_label = \WC_Memberships_Admin_Membership_Plan_Rules::get_rule_object_label( $this->rule, $object_id, true ) ) : ?>
+											<option value="<?php echo $object_id; ?>" selected><?php echo esc_html( $object_label ); ?></option>
+										<?php endif; ?>
+									<?php endforeach; ?>
+								<?php endif; ?>
+							</select>
 						</p>
 					</td>
 
@@ -213,6 +179,8 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 							<select
 								name="_content_restriction_rules[<?php echo esc_attr( $index ); ?>][membership_plan_id]"
 								id="_content_restriction_rules_<?php echo esc_attr( $index ); ?>_membership_plan_id"
+								class="<?php echo '__INDEX__' !== $index ? 'wc-enhanced-select' : ''; ?> membership-plan wide"
+								style="width:100%;"
 								<?php if ( ! $this->rule->current_user_can_edit() || ! $this->rule->current_context_allows_editing() ) : ?>disabled<?php endif; ?>>
 								<?php foreach ( $this->meta_box->get_membership_plan_options() as $id => $label ) : ?>
 									<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $id, $this->rule->get_membership_plan_id() ); ?>><?php echo esc_html( $label ); ?></option>
@@ -322,7 +290,7 @@ class WC_Memberships_Meta_Box_View_Content_Restriction_Rule extends WC_Membershi
 					<td class="check-column"></td>
 					<td colspan="<?php echo ( 'wc_membership_plan' === $this->post->post_type ) ? 4 : 3; ?>">
 
-						<?php if ( ! $this->rule->is_new() && ! $this->rule->content_type_exists() ) : ?>
+						<?php if ( ! $this->rule->is_new() && ! wc_memberships()->get_rules_instance()->rule_content_type_exists( $this->rule ) ) : ?>
 
 							<span class="description"><?php esc_html_e( 'This rule applies to a content type created by a plugin or theme that has been deactivated or deleted.', 'woocommerce-memberships' ); ?></span>
 

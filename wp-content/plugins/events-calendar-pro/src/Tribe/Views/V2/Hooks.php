@@ -101,6 +101,7 @@ class Hooks extends \tad_DI52_ServiceProvider {
 		add_filter( 'tribe_events_v2_view_title', [ $this, 'filter_tribe_events_v2_view_title' ], 10, 4 );
 		add_filter( 'tribe_events_views_v2_view_url', [ $this, 'filter_tribe_events_views_v2_view_url' ], 10, 3 );
 		add_filter( 'tribe_events_views_v2_messages_map', [ $this, 'filter_tribe_events_views_v2_messages_map' ] );
+		add_filter( 'tribe_events_views_v2_messages_need_events_label_keys', [ $this, 'filter_tribe_events_views_v2_messages_need_events_label_keys' ] );
 		add_filter( 'tribe_events_pro_geocode_rewrite_rules', [ $this, 'filter_geocode_rewrite_rules' ], 10, 3 );
 		add_filter( 'tribe_context_locations', [ $this, 'filter_context_locations' ] );
 		add_filter( 'tribe_events_views_v2_view_all_breadcrumbs', [ $this, 'filter_view_all_breadcrumbs' ], 10, 2 );
@@ -134,6 +135,9 @@ class Hooks extends \tad_DI52_ServiceProvider {
 		// Let's filter AFTER Week View.
 		add_filter( 'tribe_rewrite_handled_rewrite_rules', [ $this, 'filter_handled_rewrite_rules' ], 20, 2 );
 		add_filter( 'tribe_events_rewrite_matchers_to_query_vars_map', [ $this, 'filter_rewrite_query_vars_map' ] );
+		add_filter( 'tribe_events_rewrite_rules_custom', [ $this, 'filter_events_rewrite_rules_custom' ], 20 );
+
+		add_filter( 'tribe_events_filter_bar_views_v2_should_display_filters', [ $this, 'filter_hide_filter_bar_organizer_venue' ], 10, 2 );
 	}
 
 	/**
@@ -217,6 +221,10 @@ class Hooks extends \tad_DI52_ServiceProvider {
 			Venue::POSTTYPE     => 'venue',
 		];
 		$post_type  = $context->get( 'post_type', $slug );
+
+		if ( empty( $post_type ) ) {
+			return $slug;
+		}
 
 		return isset( $post_types[ $post_type ] ) ? $post_types[ $post_type ] : $slug;
 	}
@@ -436,6 +444,19 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
+	 * Filters the keys of the messages set up by The Events Calendar to add PRO Views specific keys.
+	 *
+	 * @since 5.0.3
+	 *
+	 * @param array $need_events_label_keys Array of keys of the messages set up by The Events Calendar.
+	 *
+	 * @return array The filtered array of keys, including PRO Views specific keys that need events label.
+	 */
+	public function filter_tribe_events_views_v2_messages_need_events_label_keys( array $need_events_label_keys ) {
+		return $this->container->make( Messages::class )->filter_need_events_label_keys( $need_events_label_keys );
+	}
+
+	/**
 	 * Filters the user-facing messages a View will print on the frontend to add PRO specific messages.
 	 *
 	 * @since 4.7.9
@@ -473,7 +494,9 @@ class Hooks extends \tad_DI52_ServiceProvider {
 			return;
 		}
 
-		$this->container->make( Rewrite::class )->add_rewrites( $rewrite );
+		/** @var Rewrite $rewrites_handler */
+		$rewrites_handler = $this->container->make( Rewrite::class );
+		$rewrites_handler->add_rewrites( $rewrite );
 	}
 
 	/**
@@ -529,8 +552,10 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	 *
 	 * @since 4.7.9
 	 *
-	 * @param array           $repository_args An array of repository arguments that will be set for all Views.
-	 * @param \Tribe__Context $context         The current render context object.
+	 * @param array<string,mixed> $repository_args An array of repository arguments that will be set for all Views.
+	 * @param \Tribe__Context     $context         The current render context object.
+	 *
+	 * @return array<string,mixed> The filtered repository arguments.
 	 */
 	public function filter_view_repository_args( $repository_args, $context ) {
 		return $this->container->make( Shortcodes\Tribe_Events::class )->filter_view_repository_args( $repository_args, $context );
@@ -782,7 +807,7 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	 * Filters the handled rewrite rules, the one used to parse plain links into permalinks, to add the ones
 	 * managed by PRO.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * @param array<string,string> $handled_rules The handled rules, as produced by The Events Calendar base code; in
 	 *                                            the same format used by WordPress to store and manage rewrite rules.
@@ -806,7 +831,7 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	 * Filters the query vars map used by the Rewrite component to parse plain links into permalinks to add the elements
 	 * needed to support PRO components.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * @param array<string,string> $query_vars_map The query variables map, as produced by The Events Calendar code.
 	 *                                             Shape is `[ <pattern> => <query_var> ].
@@ -817,5 +842,46 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	 */
 	public function filter_rewrite_query_vars_map( array $query_vars_map = [] ) {
 		return $this->container->make( Rewrite::class )->filter_rewrite_query_vars_map( $query_vars_map );
+	}
+
+	/**
+	 * Filters the should display filters for organizer and venue views.
+	 *
+	 * @since 5.0.1
+	 *
+	 * @param bool           $should_display_filters Boolean on whether to display filters or not.
+	 * @param View_Interface $view                   The View currently rendering.
+	 *
+	 * @return bool
+	 */
+	public function filter_hide_filter_bar_organizer_venue( $should_display_filters, $view ) {
+		$slug = $view->get_slug();
+
+		if ( ! in_array( $slug, [ 'organizer', 'venue' ] ) ) {
+			return $should_display_filters;
+		}
+
+		return false;
+	}
+
+	/**
+	 * Filters The Events Calendar custom rewrite rules to fix the order and relative position of some and play
+	 * nice with Views v2 canonical URL needs.
+	 *
+	 * @since 5.0.3
+	 *
+	 * @param array<string,string> $rewrite_rules An array of The Events Calendar custom rewrite rules, in the same
+	 *                                            format used by WordPress: a map of each rule regular expression to the
+	 *                                            corresponding query string.
+	 *
+	 * @return array<string,string> The input map of The Events Calendar rewrite rules, updated to satisfy the needs
+	 *                              of Views v2 canonical URL building.
+	 */
+	public function filter_events_rewrite_rules_custom( $rewrite_rules ) {
+		if ( ! is_array( $rewrite_rules ) ) {
+			return $rewrite_rules;
+		}
+
+		return $this->container->make( Rewrite::class )->filter_events_rewrite_rules_custom( $rewrite_rules );
 	}
 }

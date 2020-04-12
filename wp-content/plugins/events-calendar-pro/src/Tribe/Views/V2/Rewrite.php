@@ -9,6 +9,7 @@
 
 namespace Tribe\Events\Pro\Views\V2;
 
+use Tribe__Events__Main as TEC;
 use Tribe__Events__Organizer as Organizer;
 use Tribe__Events__Rewrite as TEC_Rewrite;
 use Tribe__Events__Venue as Venue;
@@ -157,8 +158,13 @@ class Rewrite {
 
 		$pagination_rules = [];
 		foreach ( $rules as $regex => $rewrite ) {
-			$key                      = rtrim( $regex, '/?$' ) . '/' . $page_base . '/(\\d+)/?$';
-			$value                    = add_query_arg( [ 'paged' => '$matches[1]' ], $rewrite );
+			$key            = rtrim( $regex, '/?$' ) . '/' . $page_base . '/(\\d+)/?$';
+			$is_tax_rule    = preg_match( '/(' . TEC::TAXONOMY . '|tag)=\$matches/', $rewrite );
+			$page_match_pos = $is_tax_rule ? 3 : 1;
+			$value          = false !== strpos( $rewrite, '?' ) ?
+				$rewrite . '&paged=$matches[' . $page_match_pos . ']'
+				: '?paged=$matches[' . $page_match_pos . ']';
+
 			$pagination_rules[ $key ] = $value;
 		}
 
@@ -170,7 +176,7 @@ class Rewrite {
 	 * Filters the handled rewrite rules, the one used to parse plain links into permalinks, to add the ones
 	 * managed by PRO.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * @param array<string,string> $handled_rules The handled rules, as produced by The Events Calendar base code; in
 	 *                                            the same format used by WordPress to store and manage rewrite rules.
@@ -195,7 +201,7 @@ class Rewrite {
 	 * Filters the query vars map used by the Rewrite component to parse plain links into permalinks to add the elements
 	 * needed to support PRO components.
 	 *
-	 * @since TBD
+	 * @since 5.0.1
 	 *
 	 * @param array<string,string> $query_vars_map The query variables map, as produced by The Events Calendar code.
 	 *                                             Shape is `[ <pattern> => <query_var> ].
@@ -207,5 +213,50 @@ class Rewrite {
 		$query_vars_map['organizer'] = Organizer::POSTTYPE;
 
 		return $query_vars_map;
+	}
+
+	/**
+	 * Filters The Events Calendar custom rewrite rules to fix the order and relative position of some and play
+	 * nice with Views v2 canonical URL needs.
+	 *
+	 * The operations performed by this method are pretty expensive (filtering and sorting preserving keys) and is
+	 * meant to be used once when rewrite rules are generated. It's NOT the kind of method that should run on each
+	 * request.
+	 *
+	 * @since 5.0.3
+	 *
+	 * @param array<string,string> $rewrite_rules An array of The Events Calendar custom rewrite rules, in the same
+	 *                                            format used by WordPress: a map of each rule regular expression to the
+	 *                                            corresponding query string.
+	 *
+	 * @return array<string,string> The input map of The Events Calendar rewrite rules, updated to satisfy the needs
+	 *                              of Views v2 canonical URL building.
+	 */
+	public function filter_events_rewrite_rules_custom( array $rewrite_rules ) {
+		$rules_by_type = [ 'map' => [], 'week' => [], 'other' => [] ];
+
+		// Divide the rules by type. Using the view slug is fine as it's in the query var, thus not translated.
+		foreach ( $rewrite_rules as $regex => $query_string ) {
+			if ( false !== strpos( $query_string, 'eventDisplay=map' ) ) {
+				$rules_by_type['map'][ $regex ] = $query_string;
+				continue;
+			}
+
+			if ( false !== strpos( $query_string, 'eventDisplay=week' ) ) {
+				if ( false !== strpos( $regex, '/(\d{2})/?$' ) ) {
+					// Discard week number rules: we do not support them in Views v2.
+					continue;
+				}
+				$rules_by_type['week'][ $regex ] = $query_string;
+				continue;
+			}
+
+			$rules_by_type['other'][ $regex ] = $query_string;
+		}
+
+		// Sort the rules to be map, week and others.
+		$rewrite_rules = $rules_by_type['map'] + $rules_by_type['week'] + $rules_by_type['other'];
+
+		return $rewrite_rules;
 	}
 }

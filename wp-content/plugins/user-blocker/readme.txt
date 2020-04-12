@@ -2,8 +2,8 @@
 Contributors: solwininfotech, sanjaydabhoya
 Tags: block user, disable users, restrict user, deactivate users, deny user, login blocker, block user permanently, block user accounts, disable user accounts, deactivate user accounts, deny user accounts, restrict user accounts, prevent user access, restrict user access, user status manager, user access manager, manage user status, manage user access, user management, wordpress users, login block, block login, deny login, prevent login, restrict login, restrict access, stop login, wordpress security.
 Requires at least: 4.0
-Tested up to: 5.3.2
-Stable tag: 1.5
+Tested up to: 5.4
+Stable tag: 1.5.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -85,6 +85,11 @@ All admin users have same rights to block and unblock user by available categori
 7. Blocked User List
 
 == Changelog ==
+
+= 1.5.1 =
+Release date: February 14th, 2020
+
+* Updated: Make compatible with WordPress 5.4
 
 = 1.5 =
 Release date: December 19th, 2019

@@ -1,10 +1,9 @@
 === WooCommerce Memberships ===
-Author: woothemes, skyverge
+Author: skyverge
 Tags: woocommerce
 Requires at least: 4.4
-Tested up to: 4.8
-WC requires at least: 2.5.5
-WC tested up to: 3.1.1
+Tested up to: 5.4
+Requires PHP: 5.6
 
 See https://docs.woocommerce.com/document/woocommerce-memberships/ for full documentation.
 

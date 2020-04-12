@@ -15,6 +15,9 @@
 class Toolset_Association_Cleanup_Dangling_Intermediary_Posts extends Toolset_Wpdb_User {
 
 
+	const OPTION_POST_TYPES_TO_DELETE = 'toolset_deleted_ipts';
+
+
 	/** @var Toolset_Relationship_Query_Factory */
 	private $query_factory;
 
@@ -76,6 +79,9 @@ class Toolset_Association_Cleanup_Dangling_Intermediary_Posts extends Toolset_Wp
 		}
 
 		$this->deleted_posts = count( $post_ids );
+		if( ! $this->has_remaining_posts() ) {
+			$this->clear_deletion_by_post_types();
+		}
 	}
 
 
@@ -131,6 +137,12 @@ class Toolset_Association_Cleanup_Dangling_Intermediary_Posts extends Toolset_Wp
 			$query = "
 				SELECT SQL_CALC_FOUND_ROWS post.ID 
 				FROM {$this->wpdb->posts} AS post
+					# Exclude intermediary posts belonging to a relationship that isn't supposed to delete them automatically
+					JOIN {$this->table_name->relationship_table()} AS relationship
+						ON (
+							post.post_type = relationship.intermediary_type
+							AND relationship.autodelete_intermediary = 1
+						)
 					LEFT JOIN {$this->table_name->association_table()} AS association
 						ON (post.ID = association.intermediary_id)
 					LEFT JOIN {$icl_translations} AS translation
@@ -160,12 +172,28 @@ class Toolset_Association_Cleanup_Dangling_Intermediary_Posts extends Toolset_Wp
 			$query = "
 				SELECT SQL_CALC_FOUND_ROWS post.ID
 				FROM {$this->wpdb->posts} AS post
+					# Exclude intermediary posts belonging to a relationship that isn't supposed to delete them automatically
+					JOIN {$this->table_name->relationship_table()} AS relationship
+						ON (
+							post.post_type = relationship.intermediary_type
+							AND relationship.autodelete_intermediary = 1
+						)
 					LEFT JOIN {$this->table_name->association_table()} AS association
 						ON (post.ID = association.intermediary_id)
 				WHERE
 					association.intermediary_id IS NULL
 					AND post.post_type IN ({$ipts})  
 				LIMIT {$limit}";
+		}
+
+		$post_types_to_delete_by = $this->get_post_types_to_delete_by();
+		if( ! empty( $post_types_to_delete_by ) ) {
+			$in_ipts = '\'' . implode( '\', \'', esc_sql( $post_types_to_delete_by ) ) . '\'';
+			$query = "($query) UNION (
+				SELECT post_by_type.ID
+				FROM {$this->wpdb->posts} AS post_by_type
+				WHERE post_by_type.post_type IN ({$in_ipts})
+			) LIMIT {$limit}";
 		}
 
 		return $query;
@@ -184,6 +212,23 @@ class Toolset_Association_Cleanup_Dangling_Intermediary_Posts extends Toolset_Wp
 		);
 
 		return $query->get_results();
+	}
+
+
+	public function mark_deletion_by_post_type( $post_type_slug ) {
+		$post_types_to_delete = $this->get_post_types_to_delete_by();
+		$post_types_to_delete[] = $post_type_slug;
+		update_option( self::OPTION_POST_TYPES_TO_DELETE, array_unique( $post_types_to_delete ), false );
+	}
+
+
+	private function get_post_types_to_delete_by() {
+		return toolset_ensarr( get_option( self::OPTION_POST_TYPES_TO_DELETE ) );
+	}
+
+
+	private function clear_deletion_by_post_types() {
+		delete_option( self::OPTION_POST_TYPES_TO_DELETE );
 	}
 
 }

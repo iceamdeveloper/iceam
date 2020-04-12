@@ -33,13 +33,13 @@ class Toolset_Relationship_Definition_Translator {
 	 */
 	public function to_database_row( $definition ) {
 
-		$defintion_array = $definition->get_definition_array();
+		$definition_array = $definition->get_definition_array( false );
 
 		$row = array(
 			'slug' => $definition->get_slug(),
-			'display_name_plural' => $definition->get_display_name(),
-			'display_name_singular' => $definition->get_display_name_singular(),
-			'driver' => $defintion_array[ Toolset_Relationship_Definition::DA_DRIVER ],
+			'display_name_plural' => $definition->get_display_name( false ),
+			'display_name_singular' => $definition->get_display_name_singular( false ),
+			'driver' => $definition_array[ Toolset_Relationship_Definition::DA_DRIVER ],
 			'parent_domain' => $definition->get_parent_type()->get_domain(),
 			'parent_types' => $definition->get_element_type_set_id( Toolset_Relationship_Role::PARENT ),
 			'child_domain' => $definition->get_child_type()->get_domain(),
@@ -56,12 +56,13 @@ class Toolset_Relationship_Definition_Translator {
 			'role_name_parent' => $definition->get_role_name( Toolset_Relationship_Role::PARENT ),
 			'role_name_child' => $definition->get_role_name( Toolset_Relationship_Role::CHILD ),
 			'role_name_intermediary' => $definition->get_role_name( Toolset_Relationship_Role::INTERMEDIARY ),
-			'role_label_parent_singular' => $definition->get_role_label_singular( Toolset_Relationship_Role::PARENT ),
-			'role_label_child_singular' => $definition->get_role_label_singular( Toolset_Relationship_Role::CHILD ),
-			'role_label_parent_plural' => $definition->get_role_label_plural( Toolset_Relationship_Role::PARENT ),
-			'role_label_child_plural' => $definition->get_role_label_plural( Toolset_Relationship_Role::CHILD ),
+			'role_label_parent_singular' => $definition->get_role_label_singular( Toolset_Relationship_Role::PARENT, false ),
+			'role_label_child_singular' => $definition->get_role_label_singular( Toolset_Relationship_Role::CHILD, false ),
+			'role_label_parent_plural' => $definition->get_role_label_plural( Toolset_Relationship_Role::PARENT, false ),
+			'role_label_child_plural' => $definition->get_role_label_plural( Toolset_Relationship_Role::CHILD, false ),
 			'needs_legacy_support' => ( $definition->needs_legacy_support() ? 1 : 0 ),
 			'is_active' => ( $definition->is_active() ? 1 : 0 ),
+			'autodelete_intermediary' => ( $definition->is_autodeleting_intermediary_posts() ? 1 : 0 ),
 		);
 
 		return $row;
@@ -124,6 +125,7 @@ class Toolset_Relationship_Definition_Translator {
 			),
 			Toolset_Relationship_Definition::DA_NEEDS_LEGACY_SUPPORT => (bool) $row->needs_legacy_support,
 			Toolset_Relationship_Definition::DA_IS_ACTIVE => (bool) $row->is_active,
+			Toolset_Relationship_Definition::DA_AUTODELETE_INTERMEDIARY => (bool) $row->autodelete_intermediary,
 			Toolset_Relationship_Definition::DA_ORIGIN => maybe_unserialize( $row->origin ),
 		);
 
@@ -179,6 +181,7 @@ class Toolset_Relationship_Definition_Translator {
 			'%s', // role_name_child_plural
 			'%d', // needs_legacy_support
 			'%d', // is_active
+			'%d', // autodelete_intermediary
 		);
 	}
 

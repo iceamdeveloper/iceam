@@ -22,17 +22,21 @@ function wpcf_fields_file() {
     );
 }
 
+
 /**
  * Form data for post edit page.
  *
  * @global object $wpdb
  *
- * @param type $field
+ * @param $field
+ *
+ * @return array
  */
 function wpcf_fields_file_meta_box_form( $field ) {
     add_thickbox();
     $button_text = sprintf( __( 'Select %s', 'wpcf' ), $field['type'] );
     // Set ID
+	// phpcs:ignore PHPCompatibility.FunctionUse.ArgumentFunctionsReportCurrentValue.NeedsInspection
     $element_id = 'wpcf-fields-' . wpcf_unique_id( serialize( func_get_args() ) );
     $attachment_id = false;
 
@@ -172,6 +176,8 @@ function wpcf_fields_file_view( $params ) {
  *
  * @global object $wpdb
  *
+ * @since m2m Probably DEPRECATED
+ *
  */
 function wpcf_fields_file_editor_callback( $field, $data, $meta_type, $post ) {
 
@@ -216,6 +222,8 @@ function wpcf_fields_file_editor_callback( $field, $data, $meta_type, $post ) {
 
 /**
  * Editor callback form submit.
+ *
+ * @since m2m Probably DEPRECATED
  */
 function wpcf_fields_file_editor_submit( $data, $field, $context ) {
     $add = '';
