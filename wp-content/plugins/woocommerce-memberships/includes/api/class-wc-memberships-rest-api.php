@@ -23,7 +23,7 @@
 
 namespace SkyVerge\WooCommerce\Memberships;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -217,24 +217,6 @@ class REST_API extends Framework\REST_API {
 	public function get_membership_plans( $version = null ) {
 
 		return $this->get_instance( 'membership_plans', $version );
-	}
-
-
-	/**
-	 * Gets the webhooks handler instance.
-	 *
-	 * TODO remove this deprecated method by May 2020 or by version 2.0.0 {FN 2019-05-29}
-	 *
-	 * @since 1.11.0
-	 * @deprecated since 1.13.1
-	 *
-	 * @return \SkyVerge\WooCommerce\Memberships\API\Webhooks
-	 */
-	public function get_webhooks() {
-
-		_deprecated_function( __METHOD__, '1.13.1', 'wc_memberships()->get_webhooks_instance()' );
-
-		return $this->get_plugin()->get_webhooks_instance();
 	}
 
 

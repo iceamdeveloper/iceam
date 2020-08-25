@@ -1,13 +1,11 @@
 <?php
 
-class Tribe__Tickets_Plus__Attendees_List {
+use Tribe\Tickets\Events\Attendees_List;
 
-	/**
-	 * Meta key to hold the if the Post has Attendees List hidden
-	 *
-	 * @var string
-	 */
-	const HIDE_META_KEY = '_tribe_hide_attendees_list';
+/**
+ * Class Tribe__Tickets_Plus__Attendees_List
+ */
+class Tribe__Tickets_Plus__Attendees_List extends Attendees_List {
 
 	/**
 	 * Get (and instantiate, if necessary) the instance of the class
@@ -56,46 +54,21 @@ class Tribe__Tickets_Plus__Attendees_List {
 	}
 
 	/**
-	 * Verify if users has the option to hide the Attendees list, applies a good filter
+	 * Determine if we need to hide the attendees list.
 	 *
-	 * @param  int|WP_Post  $post
-	 * @return boolean
+	 * @param int|WP_Post $post   The post object or ID.
+	 * @param boolean     $strict Whether to strictly check the meta value.
+	 *
+	 * @return bool Whether the attendees list is hidden.
 	 */
-	public static function is_hidden_on( $post ) {
-		if ( is_numeric( $post ) ) {
-			$post = WP_Post::get_instance( $post );
-		}
-
-		if ( ! $post instanceof WP_Post ) {
-			return false;
-		}
-
-		$is_hidden = get_post_meta( $post->ID, self::HIDE_META_KEY, true );
-
-		// By default non-existent meta will be an empty string
-		if ( '' === $is_hidden ) {
-			/**
-			 * Default to hide - which is unchecked but stored as true (1) in the Db for backwards compat.
-			 *
-			 * @since 4.5.1
-			 */
-			$is_hidden = true;
-		} else {
-			/**
-			 * Invert logic for backwards compat.
-			 *
-			 * @since 4.5.1
-			 */
-			$is_hidden = ! $is_hidden;
-		}
-
+	public static function is_hidden_on( $post, $strict = true ) {
 		/**
-		 * Use this to filter and hide the Attendees List for a specific post or all of them
+		 * Use this to filter and hide the Attendees List for a specific post or all of them.
 		 *
-		 * @param bool $is_hidden
-		 * @param WP_Post $post
+		 * @param bool    $is_hidden Whether the attendees list is hidden.
+		 * @param WP_Post $post      The post object.
 		 */
-		return apply_filters( 'tribe_tickets_plus_hide_attendees_list', $is_hidden, $post );
+		return apply_filters( 'tribe_tickets_plus_hide_attendees_list', parent::is_hidden_on( $post ), $post );
 	}
 
 	/**
@@ -113,6 +86,8 @@ class Tribe__Tickets_Plus__Attendees_List {
 
 	/**
 	 * Wrapper to create the Shortcode with the Attendees List
+	 *
+	 * @todo Move to using Common-extended \Tribe\Tickets\Plus\Service_Providers\Shortcode.
 	 *
 	 * @param  array $atts
 	 * @return string
@@ -195,8 +170,8 @@ class Tribe__Tickets_Plus__Attendees_List {
 		}
 
 		if (
-			'tribe_tickets_before_front_end_ticket_form' === current_filter() &&
-			self::is_hidden_on( $event )
+			'tribe_tickets_before_front_end_ticket_form' === current_filter()
+			&& self::is_hidden_on( $event )
 		) {
 			return;
 		}
@@ -224,24 +199,27 @@ class Tribe__Tickets_Plus__Attendees_List {
 	 * Returns an Array ready for printing of the Attendees List
 	 *
 	 * @param WP_Post|int $post_id Post object or ID.
-	 * @param  int        $limit   Limit of attendees to be retrieved.
+	 * @param int         $limit   Limit of attendees to be retrieved.
 	 *
 	 * @return array
 	 */
 	public function get_attendees( $post_id, $limit = 20 ) {
-		$post   = get_post( $post_id );
-		$output = [];
+		/**
+		 * Allow for adjusting the limit of attendees fetched from the database for the front-end "Who's Attending?" list.
+		 *
+		 * @since 4.10.5
+		 *
+		 * @param int $limit_attendees Number of attendees to retrieve. Default is no limit -1.
+		 */
+		$limit_attendees = (int) apply_filters( 'tribe_tickets_plus_attendees_list_limit_attendees', - 1 );
 
-		if ( ! $post instanceof WP_Post ) {
-			return $output;
+		$attendees_to_display = $this->get_attendees_for_post( $post_id, $limit_attendees );
+
+		if ( empty( $attendees_to_display ) ) {
+			return [];
 		}
 
-		$args = [
-			'by' => [
-				// Exclude people who have opted out or not specified optout.
-				'optout' => 'no_or_none',
-			],
-		];
+		$output = [];
 
 		/**
 		 * Allow for adjusting the limit of attendees retrieved for the front-end "Who's Attending?" list.
@@ -252,67 +230,30 @@ class Tribe__Tickets_Plus__Attendees_List {
 		 */
 		$limit = (int) apply_filters( 'tribe_tickets_plus_attendees_list_limit', $limit );
 
-		/**
-		 * Allow for adjusting the limit of attendees fetched from the database for the front-end "Who's Attending?" list.
-		 *
-		 * @since 4.10.5
-		 *
-		 * @param int $limit_attendees Number of attendees to retrieve. Default is no limit -1.
-		 */
-		$limit_attendees = (int) apply_filters( 'tribe_tickets_plus_attendees_list_limit_attendees', -1 );
-
-		if ( 0 < $limit_attendees ) {
-			$args['per_page'] = $limit_attendees;
-		}
-
-		$attendees  = Tribe__Tickets__Tickets::get_event_attendees( $post->ID, $args );
-		$emails     = [];
 		$has_broken = false;
 
-		// Bail if there are no attendees
-		if ( empty( $attendees ) || ! is_array( $attendees ) ) {
-			return $output;
-		}
-
-		$excluded_statuses = [
-			'no',
-			'failed',
-		];
-
-		foreach ( $attendees as $key => $attendee ) {
-			// Skip when we already have another email like this one.
-			if ( in_array( $attendee['purchaser_email'], $emails, true ) ) {
-				continue;
-			}
-
-			// Skip "Failed" orders and folks who've RSVPed as "Not Going".
-			if ( in_array( $attendee['order_status'], $excluded_statuses, true ) ) {
-				continue;
-			}
-
+		foreach ( $attendees_to_display as $key => $attendee ) {
 			if ( ! $has_broken && is_numeric( $limit ) && $limit < $key + 1 ) {
 				$has_broken = true;
 			}
 
-			$html = '';
+			$class = $has_broken ? 'hidden' : 'shown';
 
-			if ( $has_broken ) {
-				$html .= '<span class="tribe-attendees-list-hidden">';
-			} else {
-				$html .= '<span class="tribe-attendees-list-shown">';
-			}
-
-			$html .= get_avatar( $attendee['purchaser_email'], 40, '', $attendee['purchaser_name'] );
-			$html .= '</span>';
-
-			$emails[] = $attendee['purchaser_email'];
-
-			$output[ $attendee['attendee_id'] ] = $html;
+			$output[ $attendee['attendee_id'] ] = sprintf(
+				'<span class="tribe-attendees-list-%1$s">%2$s</span>',
+				$class,
+				get_avatar( $attendee['purchaser_email'], 40, '', $attendee['purchaser_name'] )
+			);
 		}
 
 		if ( $has_broken ) {
 			$output['show-more'] = sprintf(
-				'<a href="#show-all-attendees" data-offset="%1$s" title="%2$s" class="tribe-attendees-list-showall avatar">%3$s</a>',
+				'<a href="#show-all-attendees"
+					data-offset="%1$s"
+					title="%2$s"
+					class="tribe-attendees-list-showall avatar">
+					%3$s
+				</a>',
 				esc_attr( $limit ),
 				esc_attr__( 'Load all attendees', 'event-tickets-plus' ),
 				get_avatar( '', 40, '', esc_attr__( 'Load all attendees', 'event-tickets-plus' ) )

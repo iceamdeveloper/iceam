@@ -2,7 +2,7 @@
 /**
  * WC_PB_Addons_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.11.4
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product Addons Compatibility.
  *
- * @version  6.0.4
+ * @version  6.2.4
  */
 class WC_PB_Addons_Compatibility {
 
@@ -366,8 +366,12 @@ class WC_PB_Addons_Compatibility {
 			return $cart_item;
 		}
 
+		$bundled_item    = WC_PB_Helpers::get_runtime_prop( $cart_item[ 'data' ], 'bundled_cart_item' );
 		$bundled_item_id = $cart_item[ 'bundled_item_id' ];
-		$bundled_item    = $bundle->get_bundled_item( $bundled_item_id );
+
+		if ( is_null( $bundled_item ) ) {
+			$bundled_item = $bundle->get_bundled_item( $bundled_item_id );
+		}
 
 		if ( ! $bundled_item ) {
 			return $cart_item;
@@ -426,10 +430,14 @@ class WC_PB_Addons_Compatibility {
 
 		if ( $bundle_container_item = wc_pb_get_bundled_cart_item_container( $cart_item ) ) {
 
-			$adjust          = false;
-			$bundle          = $bundle_container_item[ 'data' ];
-			$bundled_item_id = $cart_item[ 'bundled_item_id' ];
-			$bundled_item    = $bundle->get_bundled_item( $bundled_item_id );
+			$adjust       = false;
+			$bundled_item = WC_PB_Helpers::get_runtime_prop( $cart_item[ 'data' ], 'bundled_cart_item' );
+
+			if ( is_null( $bundled_item ) ) {
+				$bundle          = $bundle_container_item[ 'data' ];
+				$bundled_item_id = $cart_item[ 'bundled_item_id' ];
+				$bundled_item    = $bundle->get_bundled_item( $bundled_item_id );
+			}
 
 			// Only let add-ons adjust prices if PB doesn't modify bundled item prices in any way.
 			if ( $bundled_item->is_priced_individually() && ! $bundled_item->get_discount( 'cart' ) ) {

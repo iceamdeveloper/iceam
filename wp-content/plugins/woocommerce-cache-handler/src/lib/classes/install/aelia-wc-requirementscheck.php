@@ -8,6 +8,14 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 	 */
 	class Aelia_WC_RequirementsChecks {
 		/**
+		 * The KB url with the instructions to address "missing requirements" messages.
+		 *
+		 * @var string
+		 * @since 1.8.3.170202
+		 */
+		const MISSING_REQUIREMENTS_GUIDE_URL = 'https://aelia.freshdesk.com/solution/articles/3000063640-how-to-fix-the-message-saying-that-a-plugin-could-not-be-loaded-during-to-missing-requirements-';
+
+		/**
 		 * The text domain for the messages displayed by the class. This property must
 		 * be overridden by descendant classes and it should match the text domain
 		 * of the plugin that is going to check the requirements.
@@ -40,7 +48,7 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 		 *
 		 * @var string
 		 */
-		protected $required_php_version = '5.3';
+		protected $required_php_version = '5.4';
 
 		// @var array An array of PHP extensions required by the plugin
 		protected $required_extensions = array(
@@ -57,12 +65,13 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 		protected $required_plugins = array(
 			'WooCommerce' => '2.0.10',
 			//'Aelia Foundation Classes for WooCommerce' => array(
-			//	'version' => '1.0.0.140508',
-			//	'extra_info' => 'You can get the plugin <a href="http://dev.pathtoenlightenment.net/downloads/wc-aelia-foundation-classes.zip">from our site</a>, free of charge.',
-			//	The URL from where the plugin can be downloaded and installed automatically
-			//	'url' => 'http://somesite.com/some/path/plugin.zip',
+			//	'version' => '1.8.3.170202',
+			//	'extra_info' => 'You can get the plugin <a href="http://bit.ly/WC_AFC_S3">from our site</a>, free of charge.',
+			//	'autoload' => true,
+			//	'url' => 'http://bit.ly/WC_AFC_S3',
 			//),
 		);
+
 
 		// @var array An array with the details of the required plugins.
 		protected $required_plugins_info = array();
@@ -183,7 +192,13 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 		 */
 		protected function check_required_plugins($autoload_plugins = true) {
 			foreach($this->required_plugins as $plugin_name => $plugin_requirements) {
-				$plugin_info = $this->get_wp_plugin_info($plugin_name);
+				// Allow 3rd parties to override the details of the required plugin. This can be useful
+				// if the plugin has been renamed, or if the system where the Aelia plugins are running
+				// is already designed to ensure that all requirements are met, even though checking the
+				// plugin headers might indicate otherwise.
+				// @since 2.0.16.200428
+				// @link https://aelia.freshdesk.com/a/tickets/87135
+				$plugin_info = apply_filters('wc_aelia_afc_required_plugin_info', $this->get_wp_plugin_info($plugin_name), $plugin_name, $plugin_requirements);
 
 				$message = '';
 				if(!is_array($plugin_info)) {
@@ -238,7 +253,7 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 		public function check_requirements() {
 			$this->requirements_errors = array();
 			if(PHP_VERSION < $this->required_php_version) {
-				$this->requirements_errors[] = sprintf(__('Plugin requires PHP %s or greater.', 'wc-aelia-eu-vat-assistant'),
+				$this->requirements_errors[] = sprintf(__('Plugin requires PHP %s or newer.', 'wc-aelia-eu-vat-assistant'),
 																							 $this->required_php_version);
 			}
 
@@ -293,9 +308,39 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 		 */
 		protected function installed_plugins() {
 			if(empty(self::$_installed_plugins)) {
+				// Ensure that the custom WC headers are added to the data returned by get_plugins()
+				// @since 2.0.16.200428
+				add_filter('extra_plugin_headers', array(__CLASS__, 'add_wc_plugin_headers'));
+
 				self::$_installed_plugins = get_plugins();
+
+				// Remove the custom filter, as it's no longer needed. The result of get_plugins()
+				// is cached by WordPress
+				// @since 2.0.16.200428
+				remove_filter('extra_plugin_headers', array(__CLASS__, 'add_wc_plugin_headers'));
 			}
 			return self::$_installed_plugins;
+		}
+
+		/**
+		 * Adds WooCommerce headers when reading plugin headers.
+		 *
+		 * WHY
+		 * This is needed to avoid issues caused by WordPress caching a list of plugin
+		 * headers that don't contain the custom WC headers. Without such custom headers,
+		 * WC is not able to detect which plugins are installed. This can cause errors in
+		 * the management of subscriptions with WooCommerce.com.
+		 *
+		 * @param array $headers Headers.
+		 * @return array
+		 * @since 2.0.16.200428
+		 * @link https://aelia.freshdesk.com/a/tickets/87180
+		 */
+		public static function add_wc_plugin_headers($headers) {
+			$headers[] = 'WC requires at least';
+			$headers[] = 'WC tested up to';
+			$headers[] = 'Woo';
+			return $headers;
 		}
 
 		/**
@@ -463,24 +508,40 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 					display: inline-block;
 					visibility: visible;
 				}
+
+				.wc_aelia.what_is_this {
+					font-weight: normal;
+					text-decoration: none;
+				}
+
+				.wc_aelia.what_is_this:hover {
+					text-decoration: underline;
+				}
 			</style>
 			<div class="wc_aelia message error fade">
 				<h4 class="wc_aeliamessage_header" style="margin: 1em 0 0 0"><?php
 					echo sprintf(__('Plugin "%s" could not be loaded due to missing requirements.', 'wc-aelia-eu-vat-assistant'),
 											 $this->plugin_name);
-				?></h4>
-			<ul style="list-style: disc inside">
-				<li><?php
-					echo implode('</li><li>', $this->requirements_errors);
-				?></li>
-			</ul>
-			<p class="info"><?php
-				echo __('Please review the missing requirements listed above, and ensure ' .
-								'that all necessary plugins and PHP extensions are installed and ' .
-								'loaded correctly. This plugin will work automatically as soon as all the ' .
-								'requirements are met. If you need assistance on this matter, please ' .
-								'<a href="https://aelia.freshdesk.com/helpdesk/tickets/new">contact our ' .
-								'Support team</a>.', 'wc-aelia-eu-vat-assistant');
+					?>
+					<span class=""><?php
+					?>
+					[<a class="wc_aelia what_is_this" target="_blank" href="<?php echo self::MISSING_REQUIREMENTS_GUIDE_URL; ?>"><?php
+						echo __('How do I solve this?', 'wc-aelia-eu-vat-assistant');
+					?></a>]
+					</span>
+				</h4>
+				<ul style="list-style: disc inside">
+					<li><?php
+						echo implode('</li><li>', $this->requirements_errors);
+					?></li>
+				</ul>
+				<p class="info"><?php
+					echo __('Please review the missing requirements listed above, and ensure ' .
+									'that all necessary plugins and PHP extensions are installed and ' .
+									'loaded correctly. This plugin will work automatically as soon as all the ' .
+									'requirements are met. If you need assistance on this matter, please ' .
+									'<a href="https://aelia.freshdesk.com/helpdesk/tickets/new">contact our ' .
+									'Support team</a>.', 'wc-aelia-eu-vat-assistant');
 				?></p>
 			</div>
 			<?php

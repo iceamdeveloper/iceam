@@ -1,24 +1,14 @@
 <?php
+
+use Tribe\Tickets\Events\Service_Provider as Events_Service_Provider;
+use Tribe\Tickets\Promoter\Service_Provider as Promoter_Service_Provider;
+
 class Tribe__Tickets__Main {
 
 	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '4.11.5';
-
-	/**
-	 * Min required The Events Calendar version
-	 *
-	 * @deprecated 4.10
-	 */
-	const MIN_TEC_VERSION = '5.0.0-dev';
-
-	/**
-	 * Min required version of Tribe Common
-	 *
-	 * @deprecated 4.10
-	 */
-	const MIN_COMMON_VERSION = '4.11.0-dev';
+	const VERSION = '4.12.3.1';
 
 	/**
 	 * Used to store the version history.
@@ -307,10 +297,13 @@ class Tribe__Tickets__Main {
 		 */
 		$this->init_autoloading();
 
-		// Start Up Common
+		// Start Up Common.
 		Tribe__Main::instance();
 
 		add_action( 'tribe_common_loaded', [ $this, 'bootstrap' ], 0 );
+
+		// Customizer support.
+		tribe_register_provider( Tribe\Tickets\Service_Providers\Customizer::class );
 	}
 
 	/**
@@ -319,9 +312,7 @@ class Tribe__Tickets__Main {
 	 * @since 4.10
 	 */
 	public function bootstrap() {
-		Tribe__Main::instance( $this )->load_text_domain( 'event-tickets', $this->plugin_dir . 'lang/' );
-
-		// Initialize the Service Provider for Tickets
+		// Initialize the Service Provider for Tickets.
 		tribe_register_provider( 'Tribe__Tickets__Service_Provider' );
 
 		$this->hooks();
@@ -362,8 +353,11 @@ class Tribe__Tickets__Main {
 
 		tribe_singleton( 'tickets.theme-compatibility', 'Tribe__Tickets__Theme_Compatibility' );
 
-		// Attendee Registration Page
+		// Attendee Registration Page.
 		tribe_register_provider( 'Tribe__Tickets__Attendee_Registration__Service_Provider' );
+
+		// Event Tickets Provider to manage Events.
+		tribe_register_provider( Events_Service_Provider::class );
 
 		// ORM
 		tribe_register_provider( 'Tribe__Tickets__Service_Providers__ORM' );
@@ -381,6 +375,9 @@ class Tribe__Tickets__Main {
 
 		// Views V2
 		tribe_register_provider( Tribe\Tickets\Events\Views\V2\Service_Provider::class );
+
+		// Promoter
+		tribe_register_provider( Promoter_Service_Provider::class );
 	}
 
 	/**
@@ -527,6 +524,8 @@ class Tribe__Tickets__Main {
 	 * set up hooks for this class
 	 */
 	public function hooks() {
+		add_action( 'tribe_load_text_domains', [ $this, 'load_text_domain' ] );
+
 		add_action( 'init', [ $this, 'init' ] );
 
 		// connect upgrade script
@@ -680,6 +679,17 @@ class Tribe__Tickets__Main {
 		];
 
 		return $plugins;
+	}
+
+	/**
+	 * Load the Event Tickets text domain after Tribe Common's.
+	 *
+	 * @since 4.12.0
+	 *
+	 * @return bool
+	 */
+	public function load_text_domain() {
+		return Tribe__Main::instance( $this )->load_text_domain( 'event-tickets', $this->plugin_dir . 'lang/' );
 	}
 
 	/**

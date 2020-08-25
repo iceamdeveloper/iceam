@@ -2,7 +2,7 @@
 /**
  * WC_PB_Product_Prices class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Price functions and hooks.
  *
  * @class    WC_PB_Product_Prices
- * @version  6.1.3
+ * @version  6.3.3
  */
 class WC_PB_Product_Prices {
 
@@ -92,7 +92,7 @@ class WC_PB_Product_Prices {
 		 * @param  string  $method  Method to use for calculating cart item discounts. Values: 'filters' | 'props'.
 		 */
 		$discount_method = apply_filters( 'woocommerce_bundled_cart_item_discount_method', 'filters' );
- 		return in_array( $discount_method, array( 'filters', 'props' ) ) ? $discount_method : 'filters';
+		return in_array( $discount_method, array( 'filters', 'props' ) ) ? $discount_method : 'filters';
 	}
 
 	/**
@@ -441,10 +441,15 @@ class WC_PB_Product_Prices {
 
 		if ( $bundled_item ) {
 
-			$show = false;
+			$prices_equal = ! $show;
+			$show         = false;
 
 			if ( $bundled_item->is_priced_individually() && $bundled_item->is_price_visible( 'product' ) ) {
 				$show = true;
+				// If the product is optional and all prices are equal, then the prices is already displayed in "Add for $XXX".
+				if ( $bundled_item->is_optional() && $prices_equal ) {
+					$show = false;
+				}
 			}
 		}
 

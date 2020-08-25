@@ -141,10 +141,10 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 			// not using permalinks
 			// e.g. /?page_id=123&members_area
 			$url = add_query_arg(
-				array(
+				[
 					'page_id' => $my_account_page_id,
 					$endpoint => '',
-				),
+				],
 				trailingslashit( $my_account_url )
 			);
 		}
@@ -163,9 +163,9 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 				// not using permalinks
 				// e.g. /?page_id=123&members_area=123
 				$url = add_query_arg(
-					array(
+					[
 						$endpoint => $membership_plan_id,
-					),
+					],
 					remove_query_arg( $endpoint, $url )
 				);
 			}
@@ -191,19 +191,22 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 
 				if ( $using_permalinks ) {
 
-					// Using permalinks:
-					// e.g. /my-account/members-area/123/my-membership-content/2
+					// append a trailing slash to the page number, if present
+					$paged .= '' !== $paged ? '/' : '';
+
+					// using permalinks:
+					// e.g. /my-account/members-area/123/my-membership-content/2/
 					$url = trailingslashit( $url ) . "{$members_area_section}/{$paged}";
 
 				} else {
 
-					$url_args = array( 'members_area_section' => $members_area_section );
+					$url_args = [ 'members_area_section' => $members_area_section ];
 
 					if ( $paged > 0 )  {
 						$url_args['members_area_section_page'] = $paged;
 					}
 
-					// Not using permalinks:
+					// not using permalinks:
 					// e.g. /?page_id=123&members_area=456&members_area_section=my_membership_content&members_area_section_page=2
 					$url = add_query_arg( $url_args, $url );
 				}
@@ -216,7 +219,7 @@ function wc_memberships_get_members_area_url( $membership_plan = null, $members_
 			foreach ( $query_strings as $query_string ) {
 
 				$arg = explode( '=', $query_string );
-				$url = add_query_arg( array( $arg[0] => isset( $arg[1] ) ? $arg[1] : '' ), $url );
+				$url = add_query_arg( [ $arg[0] => isset( $arg[1] ) ? $arg[1] : '' ], $url );
 			}
 		}
 	}

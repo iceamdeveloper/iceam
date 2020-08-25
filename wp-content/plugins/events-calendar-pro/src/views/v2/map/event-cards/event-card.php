@@ -18,7 +18,6 @@
  * @see tribe_get_event() For the format of the event object.
  *
  */
-use Tribe__Date_Utils as Date;
 
 $wrapper_classes = [ 'tribe-events-pro-map__event-card-wrapper' ];
 
@@ -33,10 +32,14 @@ if ( empty( $map_provider->is_premium ) ) {
 	$wrapper_classes['tribe-events-pro-map__event-card-wrapper--active'] = 0 === $index;
 
 	if ( $event->venues->count() ) {
-		$iframe_url = add_query_arg( [
-			'key' => $map_provider->api_key,
-			'q'   => urlencode( $event->venues->first()->geolocation->address ),
-		], $map_provider->iframe_url );
+		$venue      = $event->venues->first();
+		$iframe_url = add_query_arg(
+			[
+				'key' => $map_provider->api_key,
+				'q'   => urlencode( $venue->geolocation->address ),
+			],
+			$map_provider->iframe_url
+		);
 
 		$data_src_attr = 'data-src="' . esc_url( $iframe_url ) . '"';
 	}

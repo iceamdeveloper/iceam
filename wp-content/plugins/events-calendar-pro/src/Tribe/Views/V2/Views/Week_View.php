@@ -11,6 +11,7 @@ namespace Tribe\Events\Pro\Views\V2\Views;
 use Tribe\Events\Views\V2\Messages;
 use Tribe\Events\Views\V2\Utils\Stack;
 use Tribe\Events\Views\V2\Views\By_Day_View;
+use Tribe\Events\Views\V2\Views\Traits\With_Fast_Forward_Link;
 use Tribe__Context as Context;
 use Tribe__Date_Utils as Dates;
 use Tribe__Events__Timezones as Timezones;
@@ -23,6 +24,7 @@ use Tribe__Events__Timezones as Timezones;
  * @package Tribe\Events\PRO\Views\V2\Views
  */
 class Week_View extends By_Day_View {
+	use With_Fast_Forward_Link;
 
 	/**
 	 * Slug for this view
@@ -178,7 +180,7 @@ class Week_View extends By_Day_View {
 
 		foreach ( $grid_days as $date_string => $event_ids ) {
 			$message_mobile = count( $event_ids ) < 1
-				? Messages::for_key( 'day_no_results_found', date_i18n( tribe_get_date_format( true ), Dates::build_date_object( $date_string )->getTimestamp() ) )
+				? Messages::for_key( 'day_no_results_found', date_i18n( tribe_get_date_format( true ), Dates::build_date_object( $date_string )->getTimestamp() ), null )
 				: '';
 
 			$mobile_days[ $date_string ] = [
@@ -236,10 +238,10 @@ class Week_View extends By_Day_View {
 				continue;
 			}
 
-			/** @var \DateTimeImmutable $start */
+			/** @var \Tribe\Utils\Date_I18n_Immutable $start */
 			$start = $use_site_timezone ? $event->dates->start->setTimezone( $site_timezone ) : $event->dates->start;
+			$time  = $start->setTime( (int) $start->format( 'G' ), 0, 0 )->format_i18n( $time_format );
 
-			$time = date_i18n( $time_format, $start->getTimestamp() );
 			// ISO 8601 format, e.g. `2019-01-01T00:00:00+00:00`.
 			$datetime = $start->format( 'c' );
 
@@ -278,7 +280,7 @@ class Week_View extends By_Day_View {
 
 			$grid_days[ $date_string ] = [
 				'datetime'     => $date_string,
-				'weekday'      => date_i18n( 'D', $day_date->getTimestamp() ),
+				'weekday'      => $day_date->format_i18n( 'D' ),
 				'daynum'       => $day_date->format( 'j' ),
 				'found_events' => count( $event_ids ),
 			];
@@ -448,7 +450,7 @@ class Week_View extends By_Day_View {
 			$grid[ $day_y_m_d ] = [
 				'full_date'    => $day->format( tribe_get_option( 'date_with_year', Dates::DATEONLYFORMAT ) ),
 				'datetime'     => $day_y_m_d,
-				'weekday'      => date_i18n( 'D', $day->getTimestamp() + $day->getOffset() ),
+				'weekday'      => $day->format_i18n( 'D' ),
 				'daynum'       => $day->format( 'j' ),
 				'day_url'      => $day_url,
 				'found_events' => count( $events[ $day_y_m_d ] ) + count( $stack[ $day_y_m_d ]['events'] ),
@@ -771,17 +773,34 @@ class Week_View extends By_Day_View {
 					Messages::TYPE_NOTICE,
 					Messages::for_key( 'week_no_results_found_w_location', trim( $location ) )
 				);
-			} elseif ( $keyword ) {
+
+				return;
+			}
+
+			if ( $keyword ) {
 				$this->messages->insert(
 					Messages::TYPE_NOTICE,
 					Messages::for_key( 'week_no_results_found_w_keyword', trim( $keyword ) )
 				);
-			} else {
+
+				return;
+			}
+
+			$ff_link = $this->get_fast_forward_link( true );
+
+			if ( ! empty( $ff_link ) ) {
 				$this->messages->insert(
 					Messages::TYPE_NOTICE,
-					Messages::for_key( 'week_no_results_found' )
+					Messages::for_key( 'week_no_results_found_w_ff_link', $ff_link )
 				);
+
+				return;
 			}
+
+			$this->messages->insert(
+				Messages::TYPE_NOTICE,
+				Messages::for_key( 'week_no_results_found' )
+			);
 		}
 	}
 

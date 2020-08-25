@@ -10,6 +10,7 @@ namespace Sensei_WC_Paid_Courses\Frontend;
 
 use Sensei_Utils;
 use Sensei_WC;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -39,34 +40,28 @@ final class Lessons {
 	 * @since 1.0.0
 	 */
 	public function init() {
-		add_filter( 'sensei_lesson_show_course_signup_notice', [ $this, 'do_show_course_signup_notice' ], 10, 2 );
 		add_filter( 'sensei_lesson_preview_title_text', [ $this, 'lesson_preview_title_text' ], 10, 2 );
 	}
 
 	/**
 	 * Filter if we should show the course sign up notice on the lesson page.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param bool $show_course_signup_notice True if we should show the sign up notice.
 	 * @param int  $course_id                 Post ID for the course.
 	 * @return bool
 	 */
 	public function do_show_course_signup_notice( $show_course_signup_notice, $course_id ) {
-		// If the course is not purchasable, just return the current value in the filter.
-		if ( ! Sensei_WC::is_course_purchasable( $course_id ) ) {
-			return $show_course_signup_notice;
-		}
+		_deprecated_function( __METHOD__, '2.0.0' );
 
-		// Show our notice if the user either isn't logged in or is but hasn't started course.
-		if ( ! is_user_logged_in() || ! Sensei_Utils::user_started_course( $course_id, get_current_user_id() ) ) {
-			add_filter( 'sensei_lesson_course_signup_notice_message', [ $this, 'course_signup_notice_message' ], 10, 3 );
-			return true;
-		}
-
-		return false;
+		return $show_course_signup_notice;
 	}
 
 	/**
 	 * Filter the course sign up notice message on the lesson page.
+	 *
+	 * @deprecated 2.0.0
 	 *
 	 * @param string $message     Message to show user.
 	 * @param int    $course_id   Post ID for the course.
@@ -74,8 +69,9 @@ final class Lessons {
 	 * @return string
 	 */
 	public function course_signup_notice_message( $message, $course_id, $course_link ) {
-		// translators: Placeholder is a link to the Course.
-		return sprintf( esc_html__( 'Please purchase the %1$s before starting the lesson.', 'sensei-wc-paid-courses' ), $course_link );
+		_deprecated_function( __METHOD__, '2.0.0' );
+
+		return $message;
 	}
 
 	/**

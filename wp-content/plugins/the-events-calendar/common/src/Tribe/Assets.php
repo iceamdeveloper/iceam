@@ -201,7 +201,7 @@ class Tribe__Assets {
 			}
 
 			/**
-			 * Allows developers to hook-in and prevent an asset from been loaded.
+			 * Allows developers to hook-in and prevent an asset from being loaded.
 			 *
 			 * @since 4.3
 			 *
@@ -211,7 +211,7 @@ class Tribe__Assets {
 			$enqueue = apply_filters( 'tribe_asset_enqueue', $enqueue, $asset );
 
 			/**
-			 * Allows developers to hook-in and prevent an asset from been loaded
+			 * Allows developers to hook-in and prevent an asset from being loaded.
 			 *
 			 * @since 4.3
 			 *
@@ -324,10 +324,12 @@ class Tribe__Assets {
 			return false;
 		}
 
+		$script_debug = defined( 'SCRIPT_DEBUG' ) && tribe_is_truthy( SCRIPT_DEBUG );
+
 		// Strip the plugin URL and make this relative.
 		$relative_location = str_replace( $base_url, '', $url );
 
-		if ( defined( 'SCRIPT_DEBUG' ) &&  SCRIPT_DEBUG ) {
+		if ( $script_debug ) {
 			// Add the actual url after having the min file added.
 			$urls[] = $relative_location;
 		}
@@ -335,13 +337,11 @@ class Tribe__Assets {
 		// If needed add the Min Files.
 		if ( substr( $relative_location, -3, 3 ) === '.js' ) {
 			$urls[] = substr_replace( $relative_location, '.min', - 3, 0 );
-		}
-
-		if ( substr( $relative_location, -4, 4 ) === '.css' ) {
+		} elseif ( substr( $relative_location, -4, 4 ) === '.css' ) {
 			$urls[] = substr_replace( $relative_location, '.min', - 4, 0 );
 		}
 
-		if ( ! defined( 'SCRIPT_DEBUG' ) || ( defined( 'SCRIPT_DEBUG' ) && ! SCRIPT_DEBUG )  ) {
+		if ( ! $script_debug ) {
 			// Add the actual url after having the min file added.
 			$urls[] = $relative_location;
 		}
@@ -672,5 +672,53 @@ class Tribe__Assets {
 	 */
 	public function exists( $slug ) {
 		return is_object( $this->get( $slug ) ) ? true : false;
+	}
+
+	/**
+	 * Prints the `script` (JS) and `link` (CSS) HTML tags associated with one or more assets groups.
+	 *
+	 * The method will force the scripts and styles to print overriding their registration and conditional.
+	 *
+	 * @since 4.12.6
+	 *
+	 * @param string|array $group Which group(s) should be enqueued.
+	 * @param bool         $echo  Whether to print the group(s) tag(s) to the page or not; default to `true` to
+	 *                            print the HTML `script` (JS) and `link` (CSS) tags to the page.
+	 *
+	 * @return string The `script` and `link` HTML tags produced for the group(s).
+	 */
+	public function print_group( $group, $echo = true ) {
+		$all_assets = $this->get();
+		$groups     = (array) $group;
+		$to_print   = array_filter( $all_assets, static function ( $asset ) use ( $groups ) {
+			return isset( $asset->groups ) && array_intersect( $asset->groups, $groups );
+		} );
+		$by_type    = array_reduce( $to_print, static function ( array $acc, \stdClass $asset ) {
+			$acc[ $asset->type ][] = $asset->slug;
+
+			return $acc;
+		}, [ 'css' => [], 'js' => [] ] );
+
+
+		// Make sure each script is registered.
+		foreach ( $to_print as $slug => $data ){
+			if ( $data->is_registered ){
+				continue;
+			}
+			'js' === $data->type
+				? wp_register_script( $slug, $data->file, $data->deps, $data->version )
+				: wp_register_style( $slug, $data->file, $data->deps, $data->version );
+		}
+
+		ob_start();
+		wp_scripts()->do_items( $by_type['js'] );
+		wp_styles()->do_items( $by_type['css'] );
+		$tags = ob_get_clean();
+
+		if ( $echo ) {
+			echo $tags;
+		}
+
+		return $tags;
 	}
 }

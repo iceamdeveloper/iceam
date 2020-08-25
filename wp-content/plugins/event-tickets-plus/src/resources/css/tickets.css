@@ -54,6 +54,10 @@
 	font-weight: var(--font-weight-regular);
 }
 
+.tribe-tickets-meta-fieldset header h3 {
+		margin: 0;
+	}
+
 .tribe-tickets-meta-required header,
 	.tribe-tickets-meta-required label {
 		position: relative;

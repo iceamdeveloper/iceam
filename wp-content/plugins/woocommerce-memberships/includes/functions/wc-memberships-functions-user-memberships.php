@@ -23,7 +23,7 @@
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 
 /**
@@ -109,13 +109,13 @@ function wc_memberships_get_user_membership_status_name( $status ) {
 
 
 /**
- * Checks if user is a member of either any or a particular membership plan, with any status.
+ * Determines if user is a member of either any or a particular membership plan, with any status.
  *
  * @since 1.0.0
  *
- * @param int $user_id optional, defaults to current user
- * @param int|string $membership_plan Membership Plan slug, post object or related post ID
- * @param bool $cache whether to use cache results (default true)
+ * @param int|\WP_User|null $user_id optional, defaults to current user
+ * @param int|string|\WC_Memberships_Membership_Plan|null $membership_plan slug, ID or object, if null (default) checks membership of any plan
+ * @param bool $cache whether to use cached results (default true)
  * @return bool
  */
 function wc_memberships_is_user_member( $user_id = null, $membership_plan = null, $cache = true ) {
@@ -124,13 +124,13 @@ function wc_memberships_is_user_member( $user_id = null, $membership_plan = null
 
 
 /**
- * Checks if user is an active member of either any or a particular membership plan.
+ * Determines if user is an active member of either any or a particular membership plan.
  *
  * @since 1.0.0
  *
- * @param int|\WP_User $user optional, defaults to current user
- * @param int|string $plan Membership Plan slug, post object or related post ID
- * @param bool $cache whether to use cache results (default true)
+ * @param int|\WP_User|null $user optional, defaults to current user
+ * @param int|string|\WC_Memberships_Membership_Plan|null $plan membership plan slug, ID or object, if null (default) checks membership of any plan
+ * @param bool $cache whether to use cached results (default true)
  * @return bool
  */
 function wc_memberships_is_user_active_member( $user = null, $plan = null, $cache = true ) {
@@ -139,13 +139,13 @@ function wc_memberships_is_user_active_member( $user = null, $plan = null, $cach
 
 
 /**
- * Checks if user is a delayed member of either any or  a particular membership plan.
+ * Determines if user is a delayed member of either any or a particular membership plan.
  *
  * @since 1.7.0
  *
- * @param int|\WP_User $user optional, defaults to current user
- * @param int|string $plan Membership Plan slug, post object or related post ID
- * @param bool $cache whether to use cache results (default true)
+ * @param int|\WP_User|null $user optional, defaults to current user
+ * @param int|string|\WC_Memberships_Membership_Plan|null $plan membership plan slug, ID or object, if null (default) checks membership of any plan
+ * @param bool $cache whether to use cached results (default true)
  * @return bool
  */
 function wc_memberships_is_user_delayed_member( $user = null, $plan = null, $cache = true ) {
@@ -154,13 +154,13 @@ function wc_memberships_is_user_delayed_member( $user = null, $plan = null, $cac
 
 
 /**
- * Checks if user is a member with either active or delayed status of either a particular or any membership plan.
+ * Determines if user is a member with either active or delayed status of either a particular or any membership plan.
  *
  * @since 1.8.0
  *
- * @param int|\WP_User $user optional, defaults to current user
- * @param int|string $plan Membership Plan slug, post object or related post ID
- * @param bool $cache whether to use cache results (default true)
+ * @param int|\WP_User|null $user optional, defaults to current user
+ * @param int|string|\WC_Memberships_Membership_Plan|null $plan membership plan slug, ID or object, if null (default) checks membership of any plan
+ * @param bool $cache whether to use cached results (default true)
  * @return bool
  */
 function wc_memberships_is_user_active_or_delayed_member( $user = null, $plan = null, $cache = true ) {
@@ -196,7 +196,7 @@ function wc_memberships_user_can( $user_id, $action, $target, $when = '' ) {
  *
  * @param array $args array of arguments
  * @param string $action either 'create' or 'renew' -- when in doubt, use 'create'
- * @throws \SkyVerge\WooCommerce\PluginFramework\v5_5_0\SV_WC_Plugin_Exception may create an exception on errors
+ * @throws \SkyVerge\WooCommerce\PluginFramework\v5_7_1\SV_WC_Plugin_Exception may create an exception on errors
  * @return \WC_Memberships_User_Membership
  */
 function wc_memberships_create_user_membership( $args = array(), $action = 'create' ) {

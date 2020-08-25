@@ -1,14 +1,17 @@
 <?php
 
+use Tribe\Tickets\Plus\Commerce\WooCommerce\Attendee;
+use Tribe\Tickets\Promoter\Triggers\Contracts\Attendee_Model;
+
 /**
  * Class Tribe__Tickets_Plus__Commerce__WooCommerce__Promoter_Observer
  *
- * @since TBD
+ * @since 4.12.0
  */
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Promoter_Observer {
 
 	/**
-	 * @since TBD
+	 * @since 4.12.0
 	 *
 	 * @var Tribe__Tickets__Promoter__Observer $observer ET Observer reference.
 	 */
@@ -27,10 +30,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Promoter_Observer {
 	/**
 	 * Hooks on which this observer notifies promoter.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 */
 	private function hook() {
-		add_action( 'event_tickets_woocommerce_tickets_generated_for_product', [ $this, 'tickets_generated' ], 10, 4 );
+		add_action( 'event_tickets_woocommerce_ticket_created', [ $this, 'ticket_created' ], 10, 4 );
+		add_action( 'wootickets_checkin', [ $this, 'checkin' ], 10, 2 );
 		add_action( 'wootickets_ticket_deleted', tribe_callback( 'tickets.promoter.observer', 'notify_event_id' ), 10, 2 );
 		add_action( 'tribe_tickets_plus_woo_reset_attendee_cache', tribe_callback( 'tickets.promoter.observer', 'notify' ) );
 
@@ -41,23 +45,60 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Promoter_Observer {
 	}
 
 	/**
-	 * Notify the post ID where the attendees were created.
+	 * Listener for "wootickets_checkin" action.
 	 *
-	 * @since 4.10.1.2
+	 * @since 4.12.3
 	 *
-	 * @param int $product_id RSVP ticket post ID
-	 * @param int $order_id ID of the WooCommerce order
-	 * @param int $quantity Quantity ordered
-	 * @param int $post_id ID of event
+	 * @param int       $attendee_id The ID of the attendee utilized.
+	 * @param bool|null $qr          Whether it's from a QR scan.
 	 */
-	public function tickets_generated( $product_id, $order_id, $quantity, $post_id ) {
-		$this->observer->notify( $post_id );
+	public function checkin( $attendee_id, $qr ) {
+		$this->trigger( 'checkin', $attendee_id );
+	}
+
+	/**
+	 * Action fired when an attendee ticket is generated.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param int $attendee_id       ID of attendee ticket.
+	 * @param int $order_id          WooCommerce order ID.
+	 * @param int $product_id        Product ID attendee is "purchasing".
+	 * @param int $order_attendee_id Attendee # for order.
+	 */
+	public function ticket_created( $attendee_id, $order_id, $product_id, $order_attendee_id ) {
+		$this->trigger( 'ticket_purchased', $attendee_id );
+	}
+
+	/**
+	 * Deliver a trigger message for this specific provider.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param string $type        The type of trigger that is being fired.
+	 * @param int    $attendee_id The ID of the attendee.
+	 */
+	private function trigger( $type, $attendee_id ) {
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $ticket */
+		$ticket   = tribe( 'tickets-plus.commerce.woo' );
+		$attendee = new Attendee( $ticket->get_attendee( $attendee_id ) );
+
+		/**
+		 * Dispatch a new trigger with an attendee.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param string                                           $type     The type of trigger that is being fired.
+		 * @param Attendee_Model                                   $attendee The attendee model object.
+		 * @param Tribe__Tickets_Plus__Commerce__WooCommerce__Main $ticket   The WooCommerce ticket object.
+		 */
+		do_action( 'tribe_tickets_promoter_trigger_attendee', $type, $attendee, $ticket );
 	}
 
 	/**
 	 * Notify the event when a ticket, product or order is updated
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 */
 	private function notify_ticket_event() {
 		// Ticket
@@ -72,7 +113,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Promoter_Observer {
 	/**
 	 * If an order is updated find the ID of the product to notify the event that the product has been updated.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 *
 	 * @param $order bool|WC_Abstract_Order|int Reference to the Woo Order.
 	 */

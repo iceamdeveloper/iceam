@@ -2,7 +2,7 @@
 /**
  * WC_PB_CP_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.14.3
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Composite Products Compatibility.
  *
- * @version  5.10.0
+ * @version  6.2.2
  */
 class WC_PB_CP_Compatibility {
 
@@ -43,6 +43,28 @@ class WC_PB_CP_Compatibility {
 		 */
 
 		add_filter( 'woocommerce_get_composited_product_price', array( __CLASS__, 'composited_bundle_price' ), 10, 3 );
+
+		// Create composite context for bundled cart items - 'filters' method implementation.
+		if ( 'filters' === WC_PB_Product_Prices::get_bundled_cart_item_discount_method() ) {
+			add_filter( 'woocommerce_bundled_cart_item', array( __CLASS__, 'bundled_cart_item_reference' ) );
+		}
+
+		add_filter( 'woocommerce_bundles_update_price_meta', array( __CLASS__, 'bundles_update_price_meta' ), 10, 2 );
+		add_filter( 'woocommerce_bundled_item_discount', array( __CLASS__, 'bundled_item_discount' ), 10, 3 );
+
+		/*
+		 * Shipping.
+		 */
+
+		// Inheritance.
+		add_filter( 'woocommerce_bundled_item_is_priced_individually', array( __CLASS__, 'bundled_item_is_priced_individually' ), 10, 2 );
+		add_filter( 'woocommerce_bundle_contains_shipped_items', array( __CLASS__, 'bundle_contains_shipped_items' ), 10, 2 );
+		add_filter( 'woocommerce_bundled_item_is_shipped_individually', array( __CLASS__, 'bundled_item_is_shipped_individually' ), 10, 2 );
+		add_filter( 'woocommerce_bundled_item_has_bundled_weight', array( __CLASS__, 'bundled_item_has_bundled_weight' ), 10, 4 );
+
+		// Value & weight aggregation in packages.
+		add_filter( 'woocommerce_bundle_container_cart_item', array( __CLASS__, 'composited_bundle_container_cart_item' ), 10, 3 );
+		add_filter( 'woocommerce_composited_package_item', array( __CLASS__, 'composited_bundle_container_package_item' ), 10, 3 );
 
 		/*
 		 * Templates.
@@ -83,10 +105,6 @@ class WC_PB_CP_Compatibility {
 
 		// Disable edit-in-cart feature if part of a composite.
 		add_filter( 'woocommerce_bundle_is_editable_in_cart', array( __CLASS__, 'composited_bundle_not_editable_in_cart' ), 10, 3 );
-
-		// Value & weight aggregation in packages.
-		add_filter( 'woocommerce_bundle_container_cart_item', array( __CLASS__, 'composited_bundle_container_cart_item' ), 10, 3 );
-		add_filter( 'woocommerce_composited_package_item', array( __CLASS__, 'composited_bundle_container_package_item' ), 10, 3 );
 
 		// Use custom callback to add bundles to orders in 'WC_CP_Order::add_composite_to_order'.
 		add_filter( 'woocommerce_add_component_to_order_callback', array( __CLASS__, 'add_composited_bundle_to_order_callback' ), 10, 6 );
@@ -221,6 +239,258 @@ class WC_PB_CP_Compatibility {
 		return $price;
 	}
 
+	/**
+	 * Create component reference to aggregate discount of component into bundled item - 'filters' method implementation.
+	 *
+	 * @see bundled_item_discount
+	 *
+	 * @param  string  $cart_item
+	 * @return void
+	 */
+	public static function bundled_cart_item_reference( $cart_item ) {
+
+		if ( isset( $cart_item[ 'data' ]->bundled_cart_item ) ) {
+
+			if ( $bundle_container_item = wc_pb_get_bundled_cart_item_container( $cart_item ) ) {
+
+				if ( $composite_container_item = wc_cp_get_composited_cart_item_container( $bundle_container_item ) ) {
+
+					$bundle           = $bundle_container_item[ 'data' ];
+					$composite        = $composite_container_item[ 'data' ];
+					$component_id     = $bundle_container_item[ 'composite_item' ];
+					$component_option = $composite->get_component_option( $component_id, $bundle->get_id() );
+
+					if ( $component_option ) {
+						$cart_item[ 'data' ]->bundled_cart_item->composited_cart_item = $component_option;
+					}
+				}
+			}
+		}
+
+		return $cart_item;
+	}
+
+	/**
+	 * Filters 'woocommerce_bundled_item_discount' to include component + bundled item discounts.
+	 *
+	 * @param  mixed            $bundled_discount
+	 * @param  WC_Bundled_Item  $bundled_item
+	 * @param  string           $context
+	 * @return mixed
+	 */
+	public static function bundled_item_discount( $bundled_discount, $bundled_item, $context ) {
+
+		if ( 'cart' !== $context ) {
+			return $bundled_discount;
+		}
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundled_item->composited_cart_item ) ) {
+			$component_option = $bundled_item->composited_cart_item;
+		} elseif ( $bundled_item->get_bundle() && isset( $bundled_item->get_bundle()->composited_cart_item ) ) {
+			$component_option = $bundled_item->get_bundle()->composited_cart_item;
+		}
+
+		if ( $component_option && ( $component_option instanceof WC_CP_Product ) ) {
+
+			$discount = $component_option->get_discount();
+
+			if ( ! $bundled_discount ) {
+				return $discount;
+			}
+
+			// If discount is allowed on the component sale price use both the component + bundled item discount. Else, use the component discount.
+			if ( $component_option->is_discount_allowed_on_sale_price() ) {
+
+				// If component discount is set use both component + bundled item discount. Else, use only the bundled item discount.
+				if ( $discount ) {
+					$bundled_discount = $discount + $bundled_discount - ( $bundled_discount * $discount ) / 100;
+				}
+
+			} else {
+
+				if ( $discount ) {
+					$bundled_discount = $discount;
+				}
+			}
+		}
+
+		return $bundled_discount;
+	}
+
+	/**
+	 * Component discounts should not trigger bundle price updates.
+	 *
+	 * @param  boolean            $is
+	 * @param  WC_Product_Bundle  $bundle
+	 * @return boolean
+	 */
+	public static function bundles_update_price_meta( $update, $bundle ) {
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundle->composited_cart_item ) ) {
+			$component_option = $bundle->composited_cart_item;
+		}
+
+		if ( $component_option ) {
+			$update = false;
+		}
+
+		return $update;
+	}
+
+	/**
+	 * If a component is not priced individually, this should force bundled items to return a zero price.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @param  boolean          $is
+	 * @param  WC_Bundled_Item  $bundled_item
+	 * @return boolean
+	 */
+	public static function bundled_item_is_priced_individually( $is_priced_individually, $bundled_item ) {
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundled_item->composited_cart_item ) ) {
+			$component_option = $bundled_item->composited_cart_item;
+		} elseif ( $bundled_item->get_bundle() && isset( $bundled_item->get_bundle()->composited_cart_item ) ) {
+			$component_option = $bundled_item->get_bundle()->composited_cart_item;
+		}
+
+		if ( $component_option ) {
+			if ( ! $component_option->is_priced_individually() ) {
+				$is_priced_individually = false;
+			}
+		}
+
+		return $is_priced_individually;
+	}
+
+	/**
+	 * If a component is not priced individually, this should force bundled items to return a zero price.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @param  boolean            $contains
+	 * @param  WC_Product_Bundle  $bundle
+	 * @return boolean
+	 */
+	public static function bundle_contains_priced_items( $contains, $bundle ) {
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundle->composited_cart_item ) ) {
+			$component_option = $bundle->composited_cart_item;
+		}
+
+		if ( $component_option ) {
+			if ( ! $component_option->is_priced_individually() ) {
+				$contains = false;
+			}
+		}
+
+		return $contains;
+	}
+
+	/**
+	 * If a component is not shipped individually, this should force bundled items to comply.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @param  boolean          $is
+	 * @param  WC_Bundled_Item  $bundled_item
+	 * @return boolean
+	 */
+	public static function bundled_item_is_shipped_individually( $is_shipped_individually, $bundled_item ) {
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundled_item->composited_cart_item ) ) {
+			$component_option = $bundled_item->composited_cart_item;
+		} elseif ( $bundled_item->get_bundle() && isset( $bundled_item->get_bundle()->composited_cart_item ) ) {
+			$component_option = $bundled_item->get_bundle()->composited_cart_item;
+		}
+
+		if ( $component_option ) {
+			if ( ! $component_option->is_shipped_individually() ) {
+				$is_shipped_individually = false;
+			}
+		}
+
+		return $is_shipped_individually;
+	}
+
+	/**
+	 * If a component is not shipped individually, this should force bundled items to comply.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @param  boolean            $has
+	 * @param  WC_Product         $bundled_product
+	 * @param  int                $bundled_item_id
+	 * @param  WC_Product_Bundle  $bundle
+	 * @return boolean
+	 */
+	public static function bundled_item_has_bundled_weight( $has, $bundled_cart_item, $bundled_item_id, $bundle ) {
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundle->composited_cart_item ) ) {
+			$component_option = $bundle->composited_cart_item;
+		}
+
+		if ( $component_option ) {
+			if ( ! $component_option->is_shipped_individually() && ! $component_option->is_weight_aggregated() ) {
+				$has = false;
+			}
+		}
+
+		return $has;
+	}
+
+	/**
+	 * If a component is not shipped individually, this should force bundled items to comply.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @param  boolean            $is
+	 * @param  WC_Product_Bundle  $bundle
+	 * @return boolean
+	 */
+	public static function bundle_contains_shipped_items( $contains, $bundle ) {
+
+		$component_option = false;
+
+		if ( is_callable( array( 'WC_CP_Products', 'get_filtered_component_option' ) ) && WC_CP_Products::get_filtered_component_option() ) {
+			$component_option = WC_CP_Products::get_filtered_component_option();
+		} elseif ( isset( $bundle->composited_cart_item ) ) {
+			$component_option = $bundle->composited_cart_item;
+		}
+
+		if ( $component_option ) {
+			if ( ! $component_option->is_shipped_individually() ) {
+				$contains = false;
+			}
+		}
+
+		return $contains;
+	}
+
 	/*
 	|--------------------------------------------------------------------------
 	| Templates.
@@ -274,7 +544,7 @@ class WC_PB_CP_Compatibility {
 			$form_classes[] = 'bundle_insufficient_stock';
 		}
 
- 		wc_get_template( 'composited-product/bundle-product.php', array(
+		wc_get_template( 'composited-product/bundle-product.php', array(
 			'product_id'         => $product_id,
 			'product'            => $product,
 			'quantity_min'       => $quantity_min,
@@ -340,7 +610,7 @@ class WC_PB_CP_Compatibility {
 			$form_classes[] = 'bundle_insufficient_stock';
 		}
 
- 		wc_get_template( 'composited-product/bundle-product.php', array(
+		wc_get_template( 'composited-product/bundle-product.php', array(
 			'product_id'         => $product_id,
 			'product'            => $product,
 			'quantity_min'       => $quantity_min,
@@ -584,7 +854,7 @@ class WC_PB_CP_Compatibility {
 	}
 
 	/**
-	 * Aggregate value and weight of bundled items in shipping packages when a bundle is composited.
+	 * Aggregate value and weight of bundled items in shipping packages when an unassembled bundle is composited.
 	 *
 	 * @param  array                 $cart_item
 	 * @param  WC_Product_Composite  $container_cart_item_key
@@ -594,14 +864,20 @@ class WC_PB_CP_Compatibility {
 
 		if ( $container_cart_item = wc_cp_get_composited_cart_item_container( $cart_item ) ) {
 
+			$component_id     = $cart_item[ 'composite_item' ];
+			$component_option = $container_cart_item[ 'data' ]->get_component_option( $component_id, $cart_item[ 'product_id' ] );
+
+			if ( ! $component_option ) {
+				return $cart_item;
+			}
+
+			$cart_item[ 'data' ]->composited_value = is_callable( array( 'WC_CP_Products', 'get_composited_cart_item_discount_method' ) ) && 'props' === WC_CP_Products::get_composited_cart_item_discount_method() ? $cart_item[ 'data' ]->get_price( 'edit' ) : $component_option->get_raw_price( $cart_item[ 'data' ], 'cart' );
+
+			// If the bundle doesn't need shipping at this point, it means it's unassembled.
 			if ( false === $cart_item[ 'data' ]->needs_shipping() ) {
-
-				$component_id     = $cart_item[ 'composite_item' ];
-				$component_option = $container_cart_item[ 'data' ]->get_component_option( $component_id, $cart_item[ 'product_id' ] );
-
-				if ( $component_option && false === $component_option->is_shipped_individually() ) {
-					$cart_item[ 'data' ]->add_meta_data( '_wc_cp_composited_value', $cart_item[ 'data' ]->get_price( 'edit' ), true );
-					$cart_item[ 'data' ]->add_meta_data( '_wc_cp_composited_weight', 0.0, true );
+				if ( false === $component_option->is_shipped_individually() ) {
+					$cart_item[ 'data' ]->composited_weight = 0.0;
+					$cart_item[ 'data' ]->set_aggregate_weight( 'yes' );
 				}
 			}
 		}
@@ -610,7 +886,7 @@ class WC_PB_CP_Compatibility {
 	}
 
 	/**
-	 * Aggregate value and weight of bundled items in shipping packages when a bundle is composited.
+	 * Aggregate value and weight of bundled items in shipping packages when a bundle is composited in an assembled composite.
 	 *
 	 * @param  array   $cart_item
 	 * @param  string  $cart_item_key
@@ -619,74 +895,67 @@ class WC_PB_CP_Compatibility {
 	 */
 	public static function composited_bundle_container_package_item( $cart_item, $cart_item_key, $container_cart_item_key ) {
 
+		// If this isn't an assembled Composite, get out.
+		if ( ! isset( $cart_item[ 'data' ]->composited_value ) ) {
+			return $cart_item;
+		}
+
 		if ( wc_pb_is_bundle_container_cart_item( $cart_item ) ) {
 
-			if ( $cart_item[ 'data' ]->meta_exists( '_wc_cp_composited_value' ) ) {
+			$composited_bundle_value  = isset( $cart_item[ 'data' ]->composited_value ) ? $cart_item[ 'data' ]->composited_value : 0.0;
+			$composited_bundle_weight = isset( $cart_item[ 'data' ]->composited_weight ) ? $cart_item[ 'data' ]->composited_weight : 0.0;
 
-				$composited_bundle_value  = $cart_item[ 'data' ]->get_meta( '_wc_cp_composited_value', true );
-				$composited_bundle_weight = $cart_item[ 'data' ]->get_meta( '_wc_cp_composited_weight', true );
+			$bundle     = unserialize( serialize( $cart_item[ 'data' ] ) );
+			$bundle_qty = $cart_item[ 'quantity' ];
 
-				$bundle     = unserialize( serialize( $cart_item[ 'data' ] ) );
-				$bundle_qty = $cart_item[ 'quantity' ];
+			// Aggregate weights and prices.
 
-				// Aggregate weights.
+			$bundled_weight = 0.0;
+			$bundled_value  = 0.0;
+			$bundle_totals  = array(
+				'line_subtotal'     => $cart_item[ 'line_subtotal' ],
+				'line_total'        => $cart_item[ 'line_total' ],
+				'line_subtotal_tax' => $cart_item[ 'line_subtotal_tax' ],
+				'line_tax'          => $cart_item[ 'line_tax' ],
+				'line_tax_data'     => $cart_item[ 'line_tax_data' ]
+			);
 
-				$bundled_weight = 0;
+			foreach ( wc_pb_get_bundled_cart_items( $cart_item, WC()->cart->cart_contents, true ) as $child_item_key ) {
 
-				// Aggregate prices.
+				$child_cart_item_data   = WC()->cart->cart_contents[ $child_item_key ];
+				$bundled_product        = $child_cart_item_data[ 'data' ];
+				$bundled_product_qty    = $child_cart_item_data[ 'quantity' ];
+				$bundled_product_value  = isset( $bundled_product->bundled_value ) ? $bundled_product->bundled_value : 0.0;
+				$bundled_product_weight = isset( $bundled_product->bundled_weight ) ? $bundled_product->bundled_weight : 0.0;
 
-				$bundled_value = 0;
+				// Aggregate price.
+				if ( $bundled_product_value ) {
 
-				$bundle_totals = array(
-					'line_subtotal'     => $cart_item[ 'line_subtotal' ],
-					'line_total'        => $cart_item[ 'line_total' ],
-					'line_subtotal_tax' => $cart_item[ 'line_subtotal_tax' ],
-					'line_tax'          => $cart_item[ 'line_tax' ],
-					'line_tax_data'     => $cart_item[ 'line_tax_data' ]
-				);
+					$bundled_value += $bundled_product_value * $bundled_product_qty;
 
-				foreach ( wc_pb_get_bundled_cart_items( $cart_item, WC()->cart->cart_contents, true ) as $child_item_key ) {
+					$bundle_totals[ 'line_subtotal' ]     += $child_cart_item_data[ 'line_subtotal' ];
+					$bundle_totals[ 'line_total' ]        += $child_cart_item_data[ 'line_total' ];
+					$bundle_totals[ 'line_subtotal_tax' ] += $child_cart_item_data[ 'line_subtotal_tax' ];
+					$bundle_totals[ 'line_tax' ]          += $child_cart_item_data[ 'line_tax' ];
 
-					$child_cart_item_data   = WC()->cart->cart_contents[ $child_item_key ];
-					$bundled_product        = $child_cart_item_data[ 'data' ];
-					$bundled_product_qty    = $child_cart_item_data[ 'quantity' ];
-					$bundled_product_value  = $bundled_product->get_meta( '_wc_pb_bundled_value', true );
-					$bundled_product_weight = $bundled_product->get_meta( '_wc_pb_bundled_weight', true );
+					$child_item_line_tax_data = $child_cart_item_data[ 'line_tax_data' ];
 
-					// Aggregate price.
-					if ( $bundled_product_value ) {
-
-						$bundled_value += $bundled_product_value * $bundled_product_qty;
-
-						$bundle_totals[ 'line_subtotal' ]     += $child_cart_item_data[ 'line_subtotal' ];
-						$bundle_totals[ 'line_total' ]        += $child_cart_item_data[ 'line_total' ];
-						$bundle_totals[ 'line_subtotal_tax' ] += $child_cart_item_data[ 'line_subtotal_tax' ];
-						$bundle_totals[ 'line_tax' ]          += $child_cart_item_data[ 'line_tax' ];
-
-						$child_item_line_tax_data = $child_cart_item_data[ 'line_tax_data' ];
-
-						$bundle_totals[ 'line_tax_data' ][ 'total' ]    = array_merge( $bundle_totals[ 'line_tax_data' ][ 'total' ], $child_item_line_tax_data[ 'total' ] );
-						$bundle_totals[ 'line_tax_data' ][ 'subtotal' ] = array_merge( $bundle_totals[ 'line_tax_data' ][ 'subtotal' ], $child_item_line_tax_data[ 'subtotal' ] );
-					}
-
-					// Aggregate weight.
-					if ( $bundled_product_weight ) {
-						$bundled_weight += $bundled_product_weight * $bundled_product_qty;
-					}
+					$bundle_totals[ 'line_tax_data' ][ 'total' ]    = array_merge( $bundle_totals[ 'line_tax_data' ][ 'total' ], $child_item_line_tax_data[ 'total' ] );
+					$bundle_totals[ 'line_tax_data' ][ 'subtotal' ] = array_merge( $bundle_totals[ 'line_tax_data' ][ 'subtotal' ], $child_item_line_tax_data[ 'subtotal' ] );
 				}
 
-				$cart_item = array_merge( $cart_item, $bundle_totals );
-
-				if ( $bundled_value > 0 ) {
-					$bundle->add_meta_data( '_wc_cp_composited_value', (double) $composited_bundle_value + $bundled_value / $bundle_qty, true );
+				// Aggregate weight.
+				if ( $bundled_product_weight ) {
+					$bundled_weight += $bundled_product_weight * $bundled_product_qty;
 				}
-
-				if ( $bundled_weight > 0 ) {
-					$bundle->add_meta_data( '_wc_cp_composited_weight', (double) $composited_bundle_weight + $bundled_weight / $bundle_qty, true );
-				}
-
-				$cart_item[ 'data' ] = $bundle;
 			}
+
+			$cart_item = array_merge( $cart_item, $bundle_totals );
+
+			$bundle->composited_value  = (double) $composited_bundle_value + $bundled_value / $bundle_qty;
+			$bundle->composited_weight = (double) $composited_bundle_weight + $bundled_weight / $bundle_qty;
+
+			$cart_item[ 'data' ] = $bundle;
 		}
 
 		return $cart_item;

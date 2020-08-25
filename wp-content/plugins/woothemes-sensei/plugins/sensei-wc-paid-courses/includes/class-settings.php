@@ -83,6 +83,13 @@ final class Settings {
 		];
 
 		if ( Sensei_WC_Memberships::is_wc_memberships_active() ) {
+			$default_auto_enrol        = false;
+			$legacy_auto_start_setting = Sensei()->settings->get( 'sensei_wc_memberships_auto_start_courses' );
+
+			if ( $legacy_auto_start_setting ) {
+				$default_auto_enrol = $legacy_auto_start_setting;
+			}
+
 			$fields['sensei_wc_memberships_restrict_course_video'] = [
 				'name'        => __( 'Restrict course video', 'sensei-wc-paid-courses' ),
 				'description' => __( 'Used when you don\'t want the course video to be viewable by non-members', 'sensei-wc-paid-courses' ),
@@ -90,11 +97,11 @@ final class Settings {
 				'default'     => false,
 				'section'     => 'sensei-wc-memberships-settings',
 			];
-			$fields['sensei_wc_memberships_auto_start_courses']    = [
-				'name'        => __( 'Auto-start courses belonging to a membership', 'sensei-wc-paid-courses' ),
-				'description' => __( 'Automatically start courses belonging to a WC Membership when activated', 'sensei-wc-paid-courses' ),
+			$fields['sensei_wc_memberships_auto_enrol_courses']    = [
+				'name'        => __( 'Auto-enroll in courses belonging to a membership', 'sensei-wc-paid-courses' ),
+				'description' => __( 'Automatically enroll learners in courses provided by their WooCommerce Membership plan. If disabled, members can enroll themselves.', 'sensei-wc-paid-courses' ),
 				'type'        => 'checkbox',
-				'default'     => false,
+				'default'     => $default_auto_enrol,
 				'section'     => 'sensei-wc-memberships-settings',
 			];
 		}

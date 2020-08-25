@@ -1,5 +1,28 @@
 *** WooCommerce Memberships Changelog ***
 
+2020.08.24 - version 1.18.0
+ * Misc - Add SkyVerge help menu for support on WooCommerce.com connected sites
+
+2020.08.18 - version 1.17.6
+ * Fix - Correctly load the Block Editor in WordPress 5.5
+ * Fix - Ensure that the comments count is not an empty array while trying to subtract membership notes from the counts object's properties
+ * Fix - When a subscription that has membership discounts is in cart for renewal, make sure it is not accidentally double discounted
+
+2020.06.09 - version 1.17.5
+ * Tweak - Improve compatibility with WooCommerce Name Your Price during WooCommerce Subscriptions switches
+ * Fix - Ensure that pagination links in the members area have a trailing slash when using pretty permalinks
+ * Fix - When duplicating a product that is forced public or excluded from member purchasing discounts, purge caches to ensure these settings are immediately enforced also for the product copy
+
+2020.05.13 - version 1.17.4
+ * Fix - If a subscription-tied user membership with a free trial is cancelled by the customer, ensure that all the rules that accounted for the free trial period are still enforced consistently
+ * Fix - Ensure that functions and methods that check if a user is a member can accept a plan slug as an argument to return results properly
+
+2020.05.04 - version 1.17.3
+ * Tweak - Improve Memberships performance while browsing shop products as a logged in user
+ * Tweak - When filtering the WooCommerce dashboard breadcrumbs for the Members Area, ensure that the breadcrumbs variable is a countable array
+ * Dev - Run the woocommerce_memberships_thank_you_message filter only when there are memberships in context
+ * Misc - Add support for WooCommerce 4.1
+
 2020.04.02 - version 1.17.2
  * Fix - Avoid PHP throwing a notice when viewing a WooCommerce Bookings bookable product that is restricted from purchase
 

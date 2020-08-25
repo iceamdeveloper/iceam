@@ -42,17 +42,22 @@ class Messages {
 		);
 		$map['week_no_results_found']       = __(
 			'No results were found for this week. Try searching another week.',
-			'the-events-calendar'
+			'tribe-events-calendar-pro'
 		);
 		// translators: the placeholder is the keyword(s), as the user entered it.
 		$map['week_no_results_found_w_keyword'] = __(
 			'There were no results found for <strong>"%s"</strong> this week. Try searching another week.',
-			'the-events-calendar'
+			'tribe-events-calendar-pro'
 		);
 		// translators: %1$s: Events (plural), %2$s: the location search string, as the user entered it.
 		$map['week_no_results_found_w_location'] = __(
 			'No results were found for %1$s in or near <strong>"%2$s"</strong> this week. Try searching another week.',
-			'the-events-calendar'
+			'tribe-events-calendar-pro'
+		);
+		// translators: the placeholder is an html link to the next week with available events.
+		$map['week_no_results_found_w_ff_link']       = __(
+			'No results were found for this week. %1$s',
+			'tribe-events-calendar-pro'
 		);
 
 		return $map;

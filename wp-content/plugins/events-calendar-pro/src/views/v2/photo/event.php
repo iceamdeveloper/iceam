@@ -19,10 +19,9 @@
 
 $classes = get_post_class( [ 'tribe-common-g-col', 'tribe-events-pro-photo__event' ], $event->ID );
 
-if ( $event->featured ) {
+if ( ! empty( $event->featured ) ) {
 	$classes[] = 'tribe-events-pro-photo__event--featured';
 }
-
 ?>
 <article <?php tribe_classes( $classes ) ?>>
 

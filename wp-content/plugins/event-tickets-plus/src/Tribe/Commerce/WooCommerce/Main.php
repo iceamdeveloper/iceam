@@ -296,12 +296,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Registers all actions/filters
 	 */
 	public function hooks() {
+		if ( ! tribe_tickets_is_woocommerce_active() ) {
+			return;
+		}
+
 		add_action( 'init', [ $this, 'register_wootickets_type' ] );
 		add_action( 'init', [ $this, 'register_resources' ] );
 		add_action( 'add_meta_boxes', [ $this, 'woocommerce_meta_box' ] );
 		add_action( 'before_delete_post', [ $this, 'handle_delete_post' ] );
 		add_action( 'woocommerce_order_status_changed', [ $this, 'delayed_ticket_generation' ], 12, 3 );
-		add_action( 'tribe_wc_delayed_ticket_generation', [ $this, 'generate_tickets' ] ) ;
+		add_action( 'tribe_wc_delayed_ticket_generation', [ $this, 'generate_tickets' ] );
 		add_action( 'woocommerce_order_status_changed', [ $this, 'reset_attendees_cache' ] );
 		add_action( 'woocommerce_email_header', [ $this, 'maybe_add_tickets_msg_to_email' ], 10, 2 );
 		add_action( 'tribe_events_tickets_metabox_edit_advanced', [ $this, 'do_metabox_advanced_options' ], 10, 2 );
@@ -310,6 +314,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			add_action( 'woocommerce_product_quick_edit_save', [ $this, 'syncronize_product_editor_changes' ] );
 			add_action( 'woocommerce_process_product_meta_simple', [ $this, 'syncronize_product_editor_changes' ] );
 		}
+
+		add_filter( 'tribe_tickets_get_modules', [ $this, 'maybe_remove_as_active_module' ] );
 
 		if (
 			function_exists( 'WC' ) // In case this gets called when WooCommerce is deactivated.
@@ -380,6 +386,27 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		if ( $user_stylesheet_url ) {
 			wp_register_style( 'tribe-events-wootickets-override-style', $user_stylesheet_url );
 		}
+	}
+
+	/**
+	 * If WooCommerce is not active, remove WooTickets as an active provider.
+	 *
+	 * Protects against running code for past WooTicket attendees and tickets after WooCommerce is deactivated.
+	 *
+	 * @see   \Tribe__Tickets__Tickets::modules()
+	 *
+	 * @since 4.12.0
+	 *
+	 * @param array $active_modules The array of active provider modules.
+	 *
+	 * @return array
+	 */
+	public function maybe_remove_as_active_module( $active_modules ) {
+		if ( ! function_exists( 'WC' ) ) {
+			unset( $active_modules[ $this->class_name ] );
+		}
+
+		return $active_modules;
 	}
 
 	/**
@@ -1088,13 +1115,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * Saves a given ticket (WooCommerce product)
+	 * Saves a ticket (WooCommerce product).
 	 *
-	 * @param int                           $post_id
-	 * @param Tribe__Tickets__Ticket_Object $ticket
-	 * @param array                         $raw_data
+	 * @param int                           $post_id  Post ID.
+	 * @param Tribe__Tickets__Ticket_Object $ticket   Ticket object.
+	 * @param array                         $raw_data Ticket data.
 	 *
-	 * @return bool
+	 * @throws WC_Data_Exception Throws exception when invalid data is found.
+	 * @return int|bool
 	 */
 	public function save_ticket( $post_id, $ticket, $raw_data = [] ) {
 		// assume we are updating until we find out otherwise
@@ -1388,7 +1416,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			delete_post_meta( $ticket->ID, '_ticket_end_date' );
 		}
 
-		tribe( 'tickets.version' )->update( $ticket->ID );
+		/** @var Tribe__Tickets__Version $version */
+		$version = tribe( 'tickets.version' );
+
+		$version->update( $ticket->ID );
 
 		/**
 		 * Generic action fired after saving a ticket (by type)
@@ -1502,38 +1533,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public function get_tickets( $post_id ) {
-		$default_provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
-
-		// If the event provider is set to something else, let's save some time, shall we?
-		if ( ! is_admin() && __CLASS__ !== $default_provider ) {
-			return [];
-		}
-
-		$ticket_ids = $this->get_tickets_ids( $post_id );
-
-		if ( ! $ticket_ids ) {
-			return [];
-		}
-
-		$tickets = [];
-
-		foreach ( $ticket_ids as $post ) {
-			$ticket = $this->get_ticket( $post_id, $post );
-
-			if ( __CLASS__ !== $ticket->provider_class ) {
-				continue;
-			}
-
-			$tickets[] = $ticket;
-		}
-
-		return $tickets;
-	}
-
-	/**
 	 * Replaces the link to the WC product with a link to the Event in the
 	 * order confirmation page.
 	 *
@@ -1570,7 +1569,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$post = get_post( $post->post_parent );
 		}
 
-		$tickets = self::get_tickets( $post->ID );
+		$tickets = $this->get_tickets( $post->ID );
 
 		foreach( $tickets as $index => $ticket ) {
 			if ( __CLASS__ !== $ticket->provider_class ) {
@@ -1704,8 +1703,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return null|Tribe__Tickets__Ticket_Object
 	 */
 	public function get_ticket( $post_id, $ticket_id ) {
-		if ( empty( $ticket_id ) ) {
-			return;
+		if (
+			empty( $ticket_id )
+			|| ! function_exists( 'wc_get_product' )
+		) {
+			return null;
 		}
 
 		$product = wc_get_product( $ticket_id );
@@ -1735,6 +1737,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->report_link      = $this->get_ticket_reports_link( null, $ticket_id );
 		$return->sku              = $product->get_sku();
 		$return->show_description = $return->show_description();
+		$return->price_suffix     = $this->get_price_suffix( $product, $this->get_price_value_for( $product, $return ), 1 );
 
 		$start_date = get_post_meta( $ticket_id, '_ticket_start_date', true );
 		$end_date   = get_post_meta( $ticket_id, '_ticket_end_date', true );
@@ -2174,7 +2177,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			$attendee = get_post( $attendee );
 		}
 
-		if ( ! $attendee instanceof WP_Post || $this->attendee_object !== $attendee->post_type ) {
+		if (
+			! $attendee instanceof WP_Post
+			|| $this->attendee_object !== $attendee->post_type
+		) {
 			return false;
 		}
 
@@ -2687,7 +2693,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Get's the WC product price html
 	 *
 	 * @param int|object $product
-	 * @param array      $attendee
+	 * @param array|boolean $attendee
 	 *
 	 * @return string
 	 */
@@ -2853,7 +2859,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 *
 	 * @since 4.8.1
 	 * @since 4.11.1 If backorders are not allowed and Stock Quantity is lower than zero, correct it to be zero.
-	 * @since TBD Adjust return value to match how Event Tickets' filter changed (now requires a value of 1+,
+	 * @since 4.12.0 Adjust return value to match how Event Tickets' filter changed (now requires a value of 1+,
 	 *               even if Unlimited).
 	 *
 	 * @param int                           $available_at_a_time Max quantity allowed to be purchased at a time (0+).
@@ -3477,5 +3483,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		echo '</div>';
+	}
+
+	/**
+	 * Get the price suffix from WooCommerce method.
+	 *
+	 * @param WC_Product $product the WooCommerce product.
+	 * @param string     $price to calculate, left blank to just use get_price().
+	 * @param integer    $qty   passed on to get_price_including_tax() or get_price_excluding_tax().
+	 *
+	 * @since 4.12.0
+	 *
+	 * @return string
+	 */
+	public function get_price_suffix( $product, $price = '', $qty = 1 ) {
+		return $product->get_price_suffix( $price, $qty );
 	}
 }

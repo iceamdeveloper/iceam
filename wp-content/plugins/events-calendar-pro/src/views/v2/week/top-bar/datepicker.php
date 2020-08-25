@@ -32,8 +32,8 @@ $datepicker_date = Dates::build_date_object( $selected_start_date_value )->forma
 		class="tribe-common-h3 tribe-common-h--alt tribe-events-c-top-bar__datepicker-button"
 		data-js="tribe-events-top-bar-datepicker-button"
 		type="button"
-		aria-label="<?php esc_attr_e( 'Click to toggle datepicker', 'the-events-calendar' ); ?>"
-		title="<?php esc_attr_e( 'Click to toggle datepicker', 'the-events-calendar' ); ?>"
+		aria-label="<?php esc_attr_e( 'Click to toggle datepicker', 'tribe-events-calendar-pro' ); ?>"
+		title="<?php esc_attr_e( 'Click to toggle datepicker', 'tribe-events-calendar-pro' ); ?>"
 	>
 		<time
 			datetime="<?php echo esc_attr( $week_start_date ); ?>"

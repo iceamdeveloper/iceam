@@ -8,886 +8,1259 @@
  * @see: http://moderntribe.github.io/products-engineering/css/
  */
 
-.tribe-rsvp {
-	padding: 20px 0;
-}
-
-.tribe-tickets-attendee {
-	padding: 10px;
-}
-
-.tribe-events-style-full .tribe-events-tickets .tribe-tickets-attendee table,
-	.tribe-events-style-full .tribe-events-tickets .tribe-tickets-attendee tr,
-	.tribe-events-style-full .tribe-events-tickets .tribe-tickets-attendee td,
-	.tribe-events-tickets .tribe-tickets-attendee table,
-	.tribe-events-tickets .tribe-tickets-attendee tr,
-	.tribe-events-tickets .tribe-tickets-attendee td {
-		border: 0;
-	}
-
-.tribe-rsvp-message-display .tribe-rsvp-messages {
-	display: block;
-}
-
-.tribe-rsvp-messages {
-	display: none;
-	padding: 10px 10px 5px;
-}
-
-.tribe-rsvp-message {
-	border-radius: 3px;
-	border-style: solid;
-	border-width: 1px;
-	font-size: 12px;
-	margin: 0 0 5px;
-	padding: 0 .6em;
-}
-
-.tribe-rsvp-message-success {
-	background-color: #ffffe0;
-	border-color: #e6db55;
-}
-
-.tribe-rsvp-message-error {
-	background-color: #ffebe8;
-	border-color: #c00;
-}
-
-.tribe-tickets-quantity {
-	width: 100%;
-}
-
-.tickets-unavailable {
-	font-style: italic;
-}
-
-.tribe-rsvp-list {
-	list-style: none;
-	padding: 0;
-	margin: 0;
-}
-
-.tribe-rsvp-list > .tribe-item {
-		min-height: 105px;
-		padding: 20px;
-		border: 1px solid #ededed;
-		border-bottom: 0;
-	}
-
-.tribe-rsvp-list > .tribe-item:last-child {
-			border-bottom: 1px solid #ededed;
-			margin-bottom: 20px;
-		}
-
-.tribe-rsvp-list > .tribe-item.tribe-disabled {
-			background-color: #efefef;
-			border-color: #ddd;
-			color: #717171;
-		}
-
-.tribe-rsvp-list > .tribe-item.tribe-disabled:last-child {
-				border-bottom-color: #ddd;
-			}
-
-.tribe-rsvp-list > .tribe-item .tribe-answer {
-			float: right;
-			display: inline-block;
-		}
-
-.tribe-rsvp-list > .tribe-item table {
-			border: 0;
-			margin: 0;
-		}
-
-.tribe-rsvp-list > .tribe-item td {
-			border: 0;
-		}
-
-.list-attendee {
-	color: #999;
-	display: inline-block;
-	letter-spacing: 1px;
-	text-transform: uppercase;
-}
-
-.tribe-submit-tickets-form {
-	margin-top: 20px;
-}
-
-.user-details {
-	margin: 0 0 1.5em;
-}
-
-.user-details p {
-		margin: 0 0 .5em;
-	}
-
-.tribe-answer {
-	line-height: 2;
-}
-
-.tribe-answer .type-label {
-		margin-bottom: 0;
-		padding-right: .5em;
-	}
-
-.tribe-answer label {
-		display: block;
-	}
-
-.tribe-answer select {
-		background: white;
-		border: 1px solid #ddd;
-		height: 30px;
-		line-height: 1;
-		margin-left: 5px;
-	}
-
-.tribe-rsvp h2 {
-		margin-bottom: 20px;
-		line-height: 1.2;
-	}
-
-.event-tickets-meta-label {
-	font-weight: 700;
-	margin: 0 1em 0 0;
-}
-
-/* TwentySixteen fix for box shadow as bottom border on <a> link */
-
-.tribe-theme-twentysixteen .entry-content a,
-	.tribe-theme-twentysixteen .entry-summary a,
-	.tribe-theme-twentysixteen .taxonomy-description a,
-	.tribe-theme-twentysixteen .logged-in-as a,
-	.tribe-theme-twentysixteen .comment-content a,
-	.tribe-theme-twentysixteen .pingback .comment-body > a,
-	.tribe-theme-twentysixteen .textwidget a,
-	.tribe-theme-twentysixteen .entry-footer a:hover,
-	.tribe-theme-twentysixteen .site-info a:hover,
-	.tribe-theme-parent-twentysixteen .entry-content a,
-	.tribe-theme-parent-twentysixteen .entry-summary a,
-	.tribe-theme-parent-twentysixteen .taxonomy-description a,
-	.tribe-theme-parent-twentysixteen .logged-in-as a,
-	.tribe-theme-parent-twentysixteen .comment-content a,
-	.tribe-theme-parent-twentysixteen .pingback .comment-body > a,
-	.tribe-theme-parent-twentysixteen .textwidget a,
-	.tribe-theme-parent-twentysixteen .entry-footer a:hover,
-	.tribe-theme-parent-twentysixteen .site-info a:hover {
-		box-shadow: none;
-	}
-
-/* = Tickets & RSVP Modules Front End Styles
-=============================================*/
-
-/* Title */
-
-.tribe-events-tickets-title.tribe--rsvp {
-	margin: 0;
-}
-
-.tribe-events-style-full.tribe-events-style-theme h2.tribe-events-tickets-title {
-		font-size: 90%;
-	}
-
-.tribe-link-view-attendee {
-	margin: 15px 0;
-}
-
-/* RSVP & Tickets Table */
-
-.tribe-events-tickets {
-	background: #f8f8f8;
-	border: 0;
-	border-radius: 3px;
-	max-width: 100%;
-	position: relative;
-}
-
-.tribe-events-tickets table,
-	.tribe-events-tickets th,
-	.tribe-events-tickets td {
-		border: 0;
-	}
-
-.tribe-events-tickets tr {
-		display: -webkit-flex;
-		display: flex;
-		-webkit-flex-flow: row wrap;
-		        flex-flow: row wrap;
-	}
-
-.tribe-events-tickets tr:not(:first-child) {
-			border-top: 2px solid #dfdfdf;
-		}
-
-.tribe-events-tickets td {
-		-webkit-flex: none;
-		        flex: none;
-		padding: 8px 10px;
-		width: 100%;
-		word-break: normal;
-	}
-
-.tribe-events-tickets td.tickets_name {
-			font-weight: bold;
-		}
-
-.tribe-events-tickets td.quantity,
-		.tribe-events-tickets td.woocommerce {
-			-webkit-order: 2;
-			        order: 2;
-		}
-
-.tribe-events-tickets td.quantity input[type="number"], .tribe-events-tickets td.woocommerce input[type="number"] {
-				background-color: #fff;
-				border-radius: 3px;
-				margin-bottom: 5px;
-				padding: 5px 10px;
-				text-align: left;
-			}
-
-.tribe-events-tickets td.tickets_submit {
-			-webkit-order: 3;
-			        order: 3;
-		}
-
-.tribe-events-tickets td.tickets_submit .tribe-button {
-				margin: 0 0 10px;
-			}
-
-.tribe-events-tickets .woocommerce.add-to-cart .tribe-button {
-				margin: 10px 0;
-			}
-
-.tribe-events-tickets .tribe-link-tickets-message {
-		background: rgba(200, 200, 200, .8);
-		bottom: 0;
-		left: 0;
-		position: absolute;
-		right: 0;
-		text-align: center;
-		top: 0;
-	}
-
-.tribe-events-tickets .tribe-link-tickets-message .no-javascript-msg {
-			left: 50%;
-			position: absolute;
-			top: 50%;
-			-webkit-transform: translate(-50%, -50%);
-			        transform: translate(-50%, -50%);
-			width: 90%;
-		}
-
-.tribe-events-tickets .tribe-tickets-remaining {
-		color: #777;
-		display: block;
-		font-size: 11px;
-	}
-
-.tribe-events-tickets .tribe-tickets-attendees-list-optout label {
-			color: #777;
-			font-size: 13px;
-		}
-
-.tribe-events-tickets .tribe-tickets-attendees-list-optout input[type="radio"] + label,
-		.tribe-events-tickets .tribe-tickets-attendees-list-optout input[type="checkbox"] + label {
-			display: inline-block;
-		}
-
-.tribe-events-tickets .tickets_name,
-	.tribe-events-tickets .tickets_name p,
-	.tribe-events-tickets .tickets_description,
-	.tribe-events-tickets .tickets_price {
-		color: #464646;
-		font-size: 15px;
-		padding: 16px 10px;
-	}
-
-.tribe-events-tickets input[type="date"],
-	.tribe-events-tickets input[type="time"],
-	.tribe-events-tickets input[type="datetime-local"],
-	.tribe-events-tickets input[type="week"],
-	.tribe-events-tickets input[type="month"],
-	.tribe-events-tickets input[type="text"],
-	.tribe-events-tickets input[type="email"],
-	.tribe-events-tickets input[type="url"],
-	.tribe-events-tickets input[type="password"],
-	.tribe-events-tickets input[type="search"],
-	.tribe-events-tickets input[type="tel"],
-	.tribe-events-tickets input[type="number"],
-	.tribe-events-tickets textarea,
-	.tribe-events-tickets select {
-		background: #fff;
-		width: 100%;
-	}
-
-.tribe-events-tickets header {
-		height: auto;
-	}
-
-/* RSVP Table (differences only) */
-
-.tribe-events-tickets-rsvp tr.tribe-event-tickets-plus-meta,
-		.tribe-events-tickets-rsvp tr.tribe-tickets-meta-row {
-			display: none;
-		}
-
-.tribe-tickets-has-rsvp.tribe-events-tickets-rsvp tr.tribe-event-tickets-plus-meta, .tribe-tickets-has-rsvp.tribe-events-tickets-rsvp tr.tribe-tickets-meta-row {
-				display: block;
-			}
-
-.tribe-events-tickets-rsvp tr.tribe-event-tickets-plus-meta > td, .tribe-events-tickets-rsvp tr.tribe-tickets-meta-row > td {
-				display: block;
-			}
-
-.tribe-events-tickets-rsvp tr.tribe-event-tickets-plus-meta tr, .tribe-events-tickets-rsvp tr.tribe-tickets-meta-row tr {
-				border: 0;
-			}
-
 /**
- * RSVP block view styles
+ * Event Tickets - RSVP Stylesheet.
  *
- * @since  0.3.0-alpha
+ * @since TBD
  */
 
-.tribe-block__rsvp {
-	font-family: Helvetica, sans-serif, arial;
-	margin-bottom: 30px;
-	margin-top: 30px;
-	max-width: 580px;
-	position: relative;
+/* -----------------------------------------------------------------------------
+ *
+ * Utilities
+ *
+ * This file is just a clearing-house.
+ * Make partials (start with an underscore) for any actual css code.
+ *
+ * ----------------------------------------------------------------------------- */
+
+/* Variables */
+
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Borders - Radius
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Borders - Width
+	 * ----------------------------------------------------------------------------- */
 }
 
-.tribe-block__rsvp__ticket {
-	border: 1px solid #e1e3e6;
-	display: -webkit-flex;
-	display: flex;
-	-webkit-flex-wrap: wrap;
-	        flex-wrap: wrap;
-	position: relative;
-	width: 100%;
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Box Shadows
+	 * ----------------------------------------------------------------------------- */
 }
 
-.tribe-block__rsvp__icon {
-	-webkit-align-items: center;
-	        align-items: center;
-	background: #ffffff;
-	border-bottom: 1px dashed #b5bcc2;
-	color: #434343;
-	display: -webkit-flex;
-	display: flex;
-	-webkit-flex: none;
-	        flex: none;
-	-webkit-flex-direction: column;
-	        flex-direction: column;
-	font-size: 14px;
-	font-weight: bold;
-	line-height: 17px;
-	padding: 20px 17px;
-	width: 100%;
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Layers of z-index
+	 * ----------------------------------------------------------------------------- */
 }
 
-.tribe-block__rsvp__icon svg {
-		margin-bottom: 7px;
-	}
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Colors - Typography
+	 * ----------------------------------------------------------------------------- */
 
-.tribe-block__rsvp__content {
-	background-color: #f5f8f9;
-	-webkit-flex: auto;
-	        flex: auto;
+	/* -----------------------------------------------------------------------------
+	 * Colors - Iconography
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Colors - UI
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Colors - Borders & Misc
+	 * ----------------------------------------------------------------------------- */
+
 }
 
-.tribe-block__rsvp__details__status {}
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Forms - Colors
+	 * ----------------------------------------------------------------------------- */
 
-.tribe-block__rsvp__details {
-	padding: 25px 20px 20px;
+	/* -----------------------------------------------------------------------------
+	 * Forms - Box Shadows
+	 * ----------------------------------------------------------------------------- */
 }
 
-.tribe-block__rsvp__title {
-	color: #000000;
-	font-size: 21px;
-	font-weight: bold;
-	line-height: 28px;
-	margin-bottom: 12px;
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Gutter - Default
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Gutter - Page
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Grid Width - Default
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Grid Width - Relative
+	 * ----------------------------------------------------------------------------- */
 }
 
-.tribe-block__rsvp__description {
-	color: #545d66;
-	font-size: 14px;
-	line-height: 18px;
-	margin-bottom: 15px;
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Opacities
+	 * ----------------------------------------------------------------------------- */
 }
 
-.tribe-block__rsvp__availability {
-	color: #545d66;
-	display: -webkit-flex;
-	display: flex;
-	-webkit-align-items: center;
-	        align-items: center;
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Spacers
+	 * ----------------------------------------------------------------------------- */
+}
+
+/* -----------------------------------------------------------------------------
+ * SVG - Arrow Right
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Arrow (light, left)
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Caret Down
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Caret Left
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Caret Right
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Caret Up
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Check
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Close
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Day
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Dropdown
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Error
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Featured
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Filters
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - List
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Location
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Map
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Month
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Photo
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Recurring
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Remove
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Reset
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Search
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Search Filter
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Week
+ * ----------------------------------------------------------------------------- */
+
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Transitions
+	 * ----------------------------------------------------------------------------- */
+}
+
+:root {
+	/* -----------------------------------------------------------------------------
+	 * Font Stacks
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Font Weights
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Font Sizing
+	 * ----------------------------------------------------------------------------- */
+
+	/* -----------------------------------------------------------------------------
+	 * Line Height
+	 * ----------------------------------------------------------------------------- */
+}
+
+/* Mixins */
+
+/* -----------------------------------------------------------------------------
+ * Body
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Desktop Body 1
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Desktop Body 2
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Desktop Body 3
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Mobile Body 1
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Mobile Body 2
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Mobile Body 3
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 1
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 2
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 3
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 4
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 5
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 6
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 7
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Heading 8
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Anchor - Default
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Anchor - Alt
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Anchor - Thin
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Anchor - Thin
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Button - Global
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Button - Solid
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Button - Link
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Button - Border
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Button - Icon Border
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Sliders & Toggles
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Sliders
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Hidden: Hide from both screenreaders and browsers
+ * @author: h5bp.com/u
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Visually Hide: Hide only visually, but have it available for screenreaders
+ * @author: h5bp.com/v
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Visually Show: Show element after has been hidden with %visually-hide
+ * ----------------------------------------------------------------------------- */
+
+/* Accordion Styles */
+
+.accordion-header {
+	background: none;
+	border: 0;
+	color: inherit;
+	cursor: pointer;
 	font-size: 12px;
-	line-height: 18px;
-}
-
-.tribe-block__rsvp__quantity {
-	font-size: 18px;
 	font-weight: bold;
-	margin-right: 6px;
-}
-
-.tribe-block__rsvp__status {
-	display: -webkit-flex;
-	display: flex;
-	-webkit-flex-wrap: nowrap;
-	        flex-wrap: nowrap;
-	padding: 0 20px 25px;
-	text-align: center;
-}
-
-.tribe-block__rsvp__status > span {
-		-webkit-flex: none;
-		        flex: none;
-		margin-right: 15px;
-		width: calc((100% - 15px)/2);
-	}
-
-.tribe-block__rsvp__status > span:last-child {
-			margin-right: 0;
-		}
-
-.tribe-block__rsvp__status-button {
-	-webkit-align-items: center;
-	        align-items: center;
-	border: 1px solid #545d66;
-	border-radius: 4px;
-	background: #ffffff;
-	color: #545d66;
-	display: -webkit-flex;
-	display: flex;
-	font-family: Helvetica, sans-serif, arial;
-	font-size: 14px;
-	font-weight: bold;
-	height: 44px;
-	-webkit-justify-content: center;
-	        justify-content: center;
-	line-height: 1;
-	padding: 0;
+	padding: 10px 20px;
+	box-sizing: border-box;
+	position: relative;
+	text-align: left;
 	width: 100%;
 }
 
-.tribe-block__rsvp__status-button svg {
-		margin-left: 9px;
-	}
-
-.tribe-block__rsvp__status-button:hover,
-	.tribe-block__rsvp__status-button:focus {
-		background: #ffffff;
-		border: 1px solid #000000;
-		color: #000000;
-	}
-
-.tribe-block__rsvp__status-button.tribe-active {
-		border: 1px solid #000000;
-		color: #000000;
-	}
-
-.tribe-block__rsvp__status-button.tribe-inactive {
-		border: 1px solid #e1e3e6;
-		color: #a2aab2;
-	}
-
-.tribe-block__rsvp__status-button.tribe-inactive:hover,
-		.tribe-block__rsvp__status-button.tribe-inactive:focus {
-			background: #ffffff;
-			border: 1px solid #545d66;
-			color: #545d66;
-		}
-
-.tribe-block__rsvp__status-button[disabled="disabled"] {
-		cursor: default;
-	}
-
-.tribe-block__rsvp__going-icon,
-.tribe-block__rsvp__not-going-icon {
-	fill: #a2aab2;
-}
-
-.tribe-block__rsvp__status-button:hover .tribe-block__rsvp__going-icon,
-	.tribe-block__rsvp__status-button:focus .tribe-block__rsvp__going-icon,
-	.tribe-active .tribe-block__rsvp__going-icon,
-	.tribe-block__rsvp__status-button:hover .tribe-block__rsvp__not-going-icon,
-	.tribe-block__rsvp__status-button:focus .tribe-block__rsvp__not-going-icon,
-	.tribe-active .tribe-block__rsvp__not-going-icon {
-		fill: #191e23;
-	}
-
-.tribe-inactive .tribe-block__rsvp__going-icon, .tribe-inactive .tribe-block__rsvp__not-going-icon {
-		fill: #e1e3e6;
-	}
-
-.tribe-inactive:hover .tribe-block__rsvp__going-icon,
-	.tribe-inactive:focus .tribe-block__rsvp__going-icon,
-	.tribe-inactive:hover .tribe-block__rsvp__not-going-icon,
-	.tribe-inactive:focus .tribe-block__rsvp__not-going-icon {
-		fill: #a2aab2;
-	}
-
-.tribe-block__rsvp__form {
-	padding: 0 20px;
-}
-
-.tribe-block__rsvp__form form {
-		border-top: 1px solid #e1e3e6;
-		display: -webkit-flex;
-		display: flex;
-		padding: 30px 0;
-	}
-
-.tribe-left {
-	-webkit-flex: none;
-	        flex: none;
-}
-
-.tribe-block__rsvp__number-input {
-	padding-right: 20px;
-}
-
-.tribe-block__rsvp__number-input-inner {
-	-webkit-align-items: center;
-	        align-items: center;
-	display: -webkit-flex;
-	display: flex;
-}
-
-.tribe-block__rsvp__number-input-inner input[type="number"] {
-		-webkit-appearance: textfield;
-		   -moz-appearance: textfield;
-		        appearance: textfield;
-		background: transparent;
-		border: none;
-		color: #000000;
-		font-family: Helvetica, sans-serif, arial;
-		font-size: 30px;
-		font-weight: bold;
-		height: 40px;
-		max-width: 48px;
-		padding: 4px 0;
-		text-align: center;
-	}
-
-.tribe-block__rsvp__number-input-inner input[type="number"]::-webkit-inner-spin-button,
-		.tribe-block__rsvp__number-input-inner input[type="number"]::-webkit-outer-spin-button {
-			-webkit-appearance: none;
-			        appearance: none;
-		}
-
-.tribe-block__rsvp__number-input-label {
-	display: block;
-	font-size: 14px;
-	font-weight: bold;
-	line-height: 18px;
-	margin-top: 9px;
-	text-align: center;
-}
-
-.tribe-block__rsvp__number-input-button {
-	background-color: transparent;
-	height: 30px;
-	padding: 0;
-	position: relative;
-	width: 20px;
-}
-
-.tribe-block__rsvp__number-input-button:before,
-	.tribe-block__rsvp__number-input-button:after {
-		background-color: #aeb4bb;
-		content: '';
-		height: 2px;
+.accordion-header::before {
+		background-color: #000;
+		border-radius: 100%;
+		box-sizing: border-box;
+		color: #fff;
+		content: '\f132';
+		font-family: 'dashicons';
+		font-size: 10px;
+		line-height: 17px;
+		font-weight: 400;
+		height: 14px;
+		left: 0;
+		padding: 0;
 		position: absolute;
-		width: 10px;
+		top: 12px;
+		width: 15px;
+		text-align: center;
+		padding-right: 1px;
 	}
 
-.tribe-block__rsvp__number-input-button:hover,
-	.tribe-block__rsvp__number-input-button:focus {
+.accordion-header::after {
+		content: '';
+		border-bottom: 1px solid #ddd;
+		position: absolute;
+		right: 0;
+		width: 80%;
+		top: 50%;
+		transform: translateY(-50%);
+	}
+
+.accordion-header.is-active::before {
+			content: '\f460';
+			line-height: 15px;
+		}
+
+.accordion-header:focus {
+		outline: 1px solid #5b9dd9;
+	}
+
+.accordion-header:hover {
 		background: none;
 	}
 
-.tribe-block__rsvp__number-input-button:hover:before,
-		.tribe-block__rsvp__number-input-button:hover:after,
-		.tribe-block__rsvp__number-input-button:focus:before,
-		.tribe-block__rsvp__number-input-button:focus:after {
-			background-color: #545d66;
-		}
-
-.tribe-block__rsvp__number-input-button--minus {
-	margin-left: -10px;
+.tribe-tickets-editor-history::after {
+	width: calc(100% - 80px);
 }
 
-.tribe-block__rsvp__number-input-button--minus:before,
-	.tribe-block__rsvp__number-input-button--minus:after {
-		right: 0;
+.tribe_attendee_meta::after {
+	width: calc(100% - 170px);
+}
+
+.tribe_advanced_meta::after {
+	width: calc(100% - 105px);
+}
+
+.accordion-label:focus {
+		outline: none;
 	}
 
-.tribe-block__rsvp__number-input-button--plus {
-	margin-right: -10px;
-}
-
-.tribe-block__rsvp__number-input-button--plus:before,
-	.tribe-block__rsvp__number-input-button--plus:after {
-		left: 0;
-	}
-
-.tribe-block__rsvp__number-input-button--plus:after {
-		-webkit-transform: rotate(90deg);
-		        transform: rotate(90deg);
-	}
-
-.tribe-right {
-	-webkit-flex: auto;
-	        flex: auto;
-}
-
-.tribe-right input[type="text"],
-		.tribe-right input[type="email"] {
-			border-color: #e1e3e6;
-			color: #000000;
-			display: block;
-			font-family: Helvetica, sans-serif, arial;
-			font-size: 16px;
-			height: 40px;
-			line-height: 18px;
-			margin-bottom: 15px;
-			padding: 10px 15px;
-			width: 100%;
-		}
-
-.tribe-right input[type="text"]::-webkit-input-placeholder, .tribe-right input[type="email"]::-webkit-input-placeholder {
-				color: #a2aab2;
-			}
-
-.tribe-right input[type="text"]:-ms-input-placeholder, .tribe-right input[type="email"]:-ms-input-placeholder {
-				color: #a2aab2;
-			}
-
-.tribe-right input[type="text"]::-ms-input-placeholder, .tribe-right input[type="email"]::-ms-input-placeholder {
-				color: #a2aab2;
-			}
-
-.tribe-right input[type="text"]::placeholder, .tribe-right input[type="email"]::placeholder {
-				color: #a2aab2;
-			}
-
-.tribe-right label {
-		cursor: pointer;
-		font-size: 14px;
-		font-weight: normal;
-	}
-
-.tribe-right label[for^="tribe-tickets-attendees-list-optout"] {
-			-webkit-align-items: flex-start;
-			        align-items: flex-start;
-			display: -webkit-flex;
-			display: flex;
-			margin: 0 0 15px;
-			padding-top: 7px;
-		}
-
-.tribe-right label[for^="tribe-tickets-attendees-list-optout"] input[type="checkbox"] {
-				-webkit-appearance: none;
-				   -moz-appearance: none;
-				        appearance: none;
-				background-color: #ffffff;
-				border: 1px solid #e1e3e6;
-				border-radius: 0;
-				cursor: pointer;
-				-webkit-flex: none;
-				        flex: none;
-				height: 16px;
-				margin: 1px 10px 0 0;
-				width: 16px;
-			}
-
-.tribe-right label[for^="tribe-tickets-attendees-list-optout"] input[type="checkbox"]:focus {
-					box-shadow: 0 0 0 1px #e1e3e6;
-					outline: 2px solid transparent;
-					outline-offset: -2px;
-				}
-
-.tribe-right label[for^="tribe-tickets-attendees-list-optout"] input[type="checkbox"]:checked:before {
-					color: #009fd4;
-					content: "\f147";
-					display: inline-block;
-					float: left;
-					font: normal 21px/1 dashicons;
-					margin: -3px 0 0 -4px;
-					speak: none;
-					vertical-align: middle;
-					width: 16px;
-				}
-
-.tribe-tickets-meta-option-label {
-	color: #000000;
-	font-size: 14px;
-	line-height: 18px;
-	font-weight: normal;
-}
-
-.tribe-block__rsvp__message__error,
-.tribe-block__rsvp__message__success {
-	color: #000000;
-	font-size: 14px;
-	line-height: 18px;
-	padding: 20px;
-}
-
-.tribe-block__rsvp__message__error {
-	background: #ffebe8;
-	border: 1px solid #cc0000;
+.accordion-content {
 	display: none;
-	margin-bottom: 20px;
 }
 
-.tribe-block__rsvp__message__success {
-	background: #ecfae5;
-	border: 1px solid #1bd800;
-	margin-top: 20px;
-}
-
-.tribe-block__rsvp__submit-button {
-	background: #009fd4;
-	color: #ffffff;
-	font-family: Helvetica, sans-serif, arial;
-	font-size: 15px;
-	font-weight: bold;
-	line-height: 18px;
-	margin: 10px 0 0;
-	padding: 10px 23px;
-}
-
-.tribe-block__rsvp__submit-button:hover,
-	.tribe-block__rsvp__submit-button:focus {
-		background: #007bb4;
+.ticket_panel .accordion-content {
+		margin: 1em 0 2em;
 	}
 
-.tribe-block__rsvp__submit-button:disabled {
-		cursor: not-allowed;
-		background: #a2aab2;
+.accordion-content.is-active {
+		display: block;
 	}
 
-.tribe-block__rsvp__form__attendee-meta {
-	margin: 0;
-}
-
-.tribe-block__rsvp__form__attendee-meta th,
-	.tribe-block__rsvp__form__attendee-meta td {
+.tribe-common-c-loader.tribe-tickets-loader__tickets-block,
+	.tribe-common-c-loader.tribe-tickets-loader__modal {
+		align-items: center;
+		background: rgba(255,255,255, 0.6);
+		display: flex;
+		height: 100%;
+		justify-content: center;
+		left: 0;
 		padding: 0;
-		border: none;
-		word-break: normal;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 100;
 	}
 
-.tribe-common-c-loader.tribe-block__rsvp__loading {
-	-webkit-align-items: center;
-	        align-items: center;
-	background: rgba( 255, 255, 255, .7 );
-	height: 100%;
-	-webkit-justify-content: center;
-	        justify-content: center;
-	left: 0;
-	margin: 0;
-	padding: 0;
-	position: absolute;
-	text-align: center;
-	top: 0;
-	width: 100%;
-	z-index: 99;
+.tribe-common-c-loader.tribe-tickets-loader__modal {
+		height: 100vh;
+		position: fixed;
+		width: 100vw;
+	}
+
+.event-tickets .tribe-common-c-loader {
+		align-items: center;
+		background: rgba(255,255,255, 0.6);
+		display: flex;
+		height: 100%;
+		justify-content: center;
+		left: 0;
+		padding: 0;
+		position: absolute;
+		top: 0;
+		width: 100%;
+		z-index: 100;
+	}
+
+.tribe-common .tribe-tickets__notice {
+		padding: 16px;
+		background-color: #F7F6F6;
+		border-radius: 4px;
+		margin: 20px 0;
+	}
+
+.tribe-common .tribe-tickets__notice > *:last-child {
+			padding-bottom: 0;
+			margin-bottom: 0;
+		}
+
+.tribe-common .tribe-tickets-notice__title {
+		margin: 0;
+		position: relative;
+	}
+
+.tribe-common .tribe-tickets-notice__title:empty {
+			display: none;
+		}
+
+/*
+		Error Notices
+	*/
+
+.tribe-common .tribe-tickets__notice--error {
+		background-color: rgba(218,57,77, 0.08);
+		display: none;
+		padding-left: 50px;
+	}
+
+.tribe-common .tribe-tickets__notice--error .tribe-tickets-notice__title {
+		position: relative;
+	}
+
+.tribe-common .tribe-tickets__notice--error .tribe-tickets-notice__title:before {
+			background-image: url( "data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='18' height='18'%3E%3Cg fill='none' fill-rule='evenodd' transform='translate(1 1)'%3E%3Ccircle cx='8' cy='8' r='7.467' stroke='%23141827' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5'/%3E%3Ccircle cx='8' cy='11.733' r='1.067' fill='%23141827' fill-rule='nonzero'/%3E%3Cpath stroke='%23141827' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M8 3.733v4.8' fill='%23141827'/%3E%3C/g%3E%3C/svg%3E" );
+			background-size: contain;
+			content: '';
+			height: 16px;
+			left: -32px;
+			position: absolute;
+			top: 2px;
+			width: 16px;
+		}
+
+/*
+		"Barred" Notices (visible side borders)
+	*/
+
+.tribe-common .tribe-tickets__notice--barred {
+		background-color: #FFFFFF;
+		border: 4px solid #E4E4E4;
+		border-bottom: 0;
+		border-radius: 0;
+		border-top: 0;
+		padding: 0 12px;
+	}
+
+.tribe-common .tribe-tickets__notice--barred-left {
+		border-right: 0;
+		padding: 0 0 0 12px;
+	}
+
+.tribe-common .tribe-tickets__notice--barred-right {
+		border-left: 0;
+		padding: 0 12px 0 0;
+	}
+
+/* -------------------------------------------------------------------------
+	 * SVG Icons
+	 * ------------------------------------------------------------------------- */
+
+.event-tickets .tribe-tickets-svgicon {
+		background-repeat: no-repeat;
+		background-size: contain;
+	}
+
+/* -----------------------------------------------------------------------------
+ *
+ * Tooltip
+ *
+ * ----------------------------------------------------------------------------- */
+
+/* Defining our tooltipster theme. */
+
+.tooltipster-base.tribe-tickets-tooltip-theme {
+	background-color: #FFFFFF;
+	border: 1px solid #D5D5D5;
+	border-radius: 4px;
+	box-shadow: 0 2px 12px 0 rgba(0,0,0, 0.14);
+	height: auto !important;
+	padding: 24px;
+	max-width: 254px;
 }
 
-.tribe-common-c-loader.tribe-block__rsvp__loading svg {
-		max-width: 70px;
-		position: absolute;
-		top: 35%;
+.tooltipster-base.tribe-tickets-tooltip-theme .tooltipster-box {
+		background-color: transparent;
+		border: 0;
+		border-radius: 0;
+		box-shadow: none;
+		margin: 0;
 	}
 
-.tribe-common-c-loader.tribe-block__rsvp__loading svg circle {
-			fill: #888;
+.tooltipster-base.tribe-tickets-tooltip-theme .tooltipster-box .tooltipster-content {
+			color: #141827;
+			overflow: inherit;
+			padding: 0;
+			word-break: break-word;
 		}
 
-@media only screen and (min-width: 768px) {
-
-.tribe-events-tickets tr {
-			display: table-row
+.tooltipster-base.tribe-tickets-tooltip-theme .tooltipster-arrow {
+		display: none;
 	}
+
+/* -----------------------------------------------------------------------------
+	 *
+	 * Button: Small
+	 *
+	 * Example:
+	 * <button class="tribe-common-c-btn tribe-common-c-btn--small">...</button>
+	 * <a href="#" class="tribe-common-c-btn tribe-common-c-btn--small">...</a>
+	 *
+	 * ----------------------------------------------------------------------------- */
+
+.tribe-common button.tribe-common-c-btn--small, .tribe-common input[type="button"].tribe-common-c-btn--small, .tribe-common input[type="submit"].tribe-common-c-btn--small, .tribe-common a.tribe-common-c-btn--small {
+			background-color: #334AFF;
+			padding: 11px 14px;
+			width: auto;
 		}
 
-@media (min-width: 768px ) {
+/* -----------------------------------------------------------------------------
+	 *
+	 * Button: Link
+	 *
+	 * Example:
+	 * <button class="tribe-common-c-btn-link">...</button>
+	 * <a href="#" class="tribe-common-c-btn-link">...</a>
+	 *
+	 * ----------------------------------------------------------------------------- */
 
-.tribe-events-tickets td {
-			width: auto
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+			color: #141827;
+			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
+			font-size: 14px;
+			line-height: 1.62;
+			font-weight: 400;
+			border: 0;
+			cursor: pointer;
+			display: inline-block;
+			height: auto;
+			padding: 0;
+			text-decoration: none;
+			width: auto;
+			background-color: transparent;
+			text-align: center;
+			text-decoration: underline;
+			transition: color 0.2s ease;
+		}
+
+.tribe-common button.tribe-common-c-btn-link:hover,
+	.tribe-common button.tribe-common-c-btn-link:focus,
+	.tribe-common input[type="button"].tribe-common-c-btn-link:hover,
+	.tribe-common input[type="button"].tribe-common-c-btn-link:focus,
+	.tribe-common input[type="submit"].tribe-common-c-btn-link:hover,
+	.tribe-common input[type="submit"].tribe-common-c-btn-link:focus,
+	.tribe-common a.tribe-common-c-btn-link:hover,
+	.tribe-common a.tribe-common-c-btn-link:focus {
+		background-color: transparent;
 	}
+
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+
+			background-color: transparent;
+			color: #334AFF;
+			padding: 11px 20px;
+			width: 100%;
+}
+
+.tribe-common button.tribe-common-c-btn-link:focus,
+			.tribe-common button.tribe-common-c-btn-link:hover,
+			.tribe-common input[type="button"].tribe-common-c-btn-link:focus,
+			.tribe-common input[type="button"].tribe-common-c-btn-link:hover,
+			.tribe-common input[type="submit"].tribe-common-c-btn-link:focus,
+			.tribe-common input[type="submit"].tribe-common-c-btn-link:hover,
+			.tribe-common a.tribe-common-c-btn-link:focus,
+			.tribe-common a.tribe-common-c-btn-link:hover {
+				color: rgba(51,74,255, 0.8);
+			}
+
+.tribe-common button.tribe-common-c-btn-link:active, .tribe-common input[type="button"].tribe-common-c-btn-link:active, .tribe-common input[type="submit"].tribe-common-c-btn-link:active, .tribe-common a.tribe-common-c-btn-link:active {
+				color: rgba(51,74,255, 0.9);
+			}
+
+.tribe-common button.tribe-common-c-btn-link:disabled, .tribe-common input[type="button"].tribe-common-c-btn-link:disabled, .tribe-common input[type="submit"].tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
+				color: rgba(51,74,255, 0.07);
+			}
+
+/**
+ * Event Tickets RSVP Stylesheet
+ *
+ * @since TBD
+ */
+
+/**
+ * Event Tickets - RSVP Structure
+ *
+ * @since TBD
+ *
+ */
+
+.event-tickets .tribe-tickets__rsvp-wrapper {
+		background-color: #FFFFFF;
+		border-radius: 4px;
+		border: 1px solid #E4E4E4;
+		max-width: 580px;
+		overflow: hidden;
+		position: relative;
+		width: 100%;
+		transition: all 0.3s ease;
+		margin-top: 28px;
+	}
+
+.event-tickets .tribe-tickets__rsvp {
+		padding-left: 21px;
+		padding-right: 21px;
+		padding-top: 56px;
+		padding-bottom: 56px;
+	}
+
+/**
+ * Event Tickets - RSVP Details
+ *
+ * @since TDB
+ */
+
+.event-tickets .tribe-tickets__rsvp-details-wrapper {
+		flex: none;
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		align-items: center;
+	}
+
+.event-tickets .tribe-tickets__rsvp-details {
+		text-align: center;
+		width: 100%;
+	}
+
+.event-tickets .tribe-tickets__rsvp-description {
+		color: #727272;
+		margin-top: 8px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-attendance {
+		display: flex;
+		flex-direction: column;
+		margin-top: 20px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-attendance-number {
+		font-size: 32px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-attendance-number.tribe-tickets__rsvp-attendance-number--no-description {
+			font-size: 42px;
 		}
+
+.event-tickets .tribe-tickets__rsvp-attendance-going {
+		color: #727272;
+	}
+
+.event-tickets .tribe-tickets__rsvp-availability {
+		color: #727272;
+		margin-top: 20px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-availability-quantity,
+	.event-tickets .tribe-tickets__rsvp-availability-days-left {
+		color: #141827;
+	}
+
+/**
+ * Event Tickets - RSVP Structure
+ *
+ * @since TBD
+ */
+
+.event-tickets .tribe-tickets__rsvp-actions-wrapper {
+		flex: none;
+		display: flex;
+		justify-content: center;
+		text-align: center;
+		align-items: center;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions {
+		border-top: 1px dashed #E4E4E4;
+		margin-top: 56px;
+		padding: 56px 0;
+		width: 100%;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions .tribe-common-c-btn {
+			max-width: 125px;
+		}
+
+/* -------------------------------------------------------------------------
+	 * RSVP Actions (Going / Can't go)
+	 * ------------------------------------------------------------------------- */
+
+.event-tickets .tribe-tickets__rsvp-actions-rsvp-going {
+		margin-top: 12px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-rsvp-not-going {
+		margin-top: 40px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-button-not-going {
+		font-size: 14px;
+	}
+
+/* -------------------------------------------------------------------------
+	 * Full RSVP
+	 * ------------------------------------------------------------------------- */
+
+.event-tickets .tribe-tickets__rsvp-actions-full {
+		padding: 80px 32px 64px 32px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-full-text {
+		color: #727272;
+		text-transform: uppercase;
+	}
+
+/* -------------------------------------------------------------------------
+	 * RSVP Success
+	 * ------------------------------------------------------------------------- */
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-check-icon {
+		background-color: #334AFF;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.6.1L3.9 6.8 1.4 4.3c-.1-.1-.3-.1-.4 0l-.8.8c-.1.1-.1.3 0 .4l3.4 3.4c.2.1.4.1.5 0l7.7-7.7c.1-.1.1-.3 0-.4L11 .1c-.1-.1-.3-.1-.4 0z' fill='%23FFFFFF'/%3E%3C/svg%3E");
+		background-repeat: no-repeat;
+		background-position: center;
+		border-radius: 100%;
+		display: inline-block;
+		height: 32px;
+		width: 32px;
+		margin: 0 4px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-text {
+		margin-left: 8px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-toggle {
+		margin-top: 20px;
+		display: flex;
+		justify-content: center;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-toggle-input {
+		flex: none;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-toggle-label {
+		text-align: left;
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-toggle-label-underline {
+		cursor: help;
+		-webkit-text-decoration: underline dotted;
+		        text-decoration: underline dotted;
+	}
+
+/**
+ * Event Tickets - RSVP Messages
+ *
+ * @since TDB
+ */
+
+.event-tickets .tribe-tickets__rsvp-message {
+		display: flex;
+		align-items: center;
+		background-color: rgba(51,74,255, 0.07);
+		border-radius: 4px;
+		padding: 20px 16px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-message--success-icon {
+		display: inline-block;
+		width: 16px;
+		height: 16px;
+		margin-right: 12px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-message--success-icon path {
+			stroke: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon {
+		display: inline-block;
+		margin-right: 12px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon circle {
+			stroke: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon circle#dot {
+			stroke: transparent;
+			fill: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon path {
+			stroke: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-message-link {
+		color: #334AFF;
+	}
+
+/**
+ * Event Tickets - RSVP form.
+ *
+ * @since TBD
+ */
+
+.event-tickets .tribe-common-c-btn:disabled {
+		background-color: #334AFF;
+		cursor: not-allowed;
+	}
+
+.event-tickets button.tribe-common-cta:disabled {
+		cursor: not-allowed;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-wrapper {
+		padding: 24px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-title {
+		border-bottom: 1px dashed #E4E4E4;
+		padding-bottom: 24px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-content {
+		margin-bottom: 8px;
+		margin-top: 40px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-buttons {
+		display: flex;
+		align-items: baseline;
+		justify-content: flex-end;
+		padding-top: 20px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-buttons > * {
+			margin-left: 20px;
+		}
+
+.event-tickets .tribe-tickets__rsvp-form-button {
+		width: auto;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-button--cancel {
+		color: #727272;
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-button--cancel:focus,
+		.event-tickets .tribe-tickets__rsvp-form-button--cancel:hover {
+			color: #141827;
+		}
+
+/**
+ * Event Tickets - RSVP Attendee Registration
+ *
+ * @since TBD
+ */
+
+.event-tickets .tribe-tickets__rsvp-ar {
+		padding-left: 21px;
+		padding-right: 21px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-sidebar-wrapper {
+		flex: none;
+		display: flex;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-sidebar {
+		border-bottom: 1px dashed #E4E4E4;
+		margin-top: 24px;
+		padding: 24px 0;
+		width: 100%;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity {
+		display: flex;
+		align-items: center;
+		margin-top: 20px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input {
+		align-items: center;
+		display: flex;
+		margin-left: 16px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input input[type="number"] {
+			-webkit-appearance: textfield;
+			   -moz-appearance: textfield;
+			        appearance: textfield;
+			background: transparent;
+			border: none;
+			height: 40px;
+			max-width: 40px;
+			padding: 4px 0;
+			text-align: center;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input input[type="number"]::-webkit-inner-spin-button,
+			.event-tickets .tribe-tickets__rsvp-ar-quantity-input input[type="number"]::-webkit-outer-spin-button {
+				-webkit-appearance: none;
+				        appearance: none;
+			}
+
+/* @todo @juanfra: check this and see if we do a minus/plus and one for the number input instead of generic. */
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input-number {
+		background-color: transparent;
+		border: 1px solid #D5D5D5;
+		border-radius: 50%;
+		height: 28px;
+		padding: 0;
+		position: relative;
+		width: 28px;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input-number:before,
+		.event-tickets .tribe-tickets__rsvp-ar-quantity-input-number:after {
+			background-color: #141827;
+			content: '';
+			height: 2px;
+			position: absolute;
+			width: 8px;
+			left: 9px;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input-number:hover,
+		.event-tickets .tribe-tickets__rsvp-ar-quantity-input-number:focus {
+			background: none;
+			border-color: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input-number--plus:after {
+			transform: rotate(90deg);
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list {
+		margin-top: 32px !important; /* @todo @juanfra: see why common is setting specificity for this. */
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item {
+		display: inline-block;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button:hover,
+		.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button:focus,
+		.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button--inactive:hover,
+		.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button--inactive:focus {
+			color: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button--inactive {
+		color: #727272;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-icon,
+	.event-tickets .tribe-tickets__rsvp-ar-guest-icon--inactive {
+		display: inline-block;
+		height: 17px;
+		margin-right: 24px;
+		width: 14px;
+
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-icon path {
+			fill: #141827;
+			stroke: #141827;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-icon--inactive path {
+			fill: #D5D5D5;
+			stroke: #D5D5D5;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-form-wrapper {
+		background-color: #F6F7F9;
+		flex: none;
+		display: flex;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-form {
+		width: 100%;
+		padding: 24px 0;
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-form .tribe-tickets__form {
+			margin-top: 20px;
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-form-title {
+		color: #727272;
+	}
 
 @media (min-width: 768px) {
 
-.tribe-events-tickets td.quantity input[type="number"], .tribe-events-tickets td.woocommerce input[type="number"] {
-					width: 4.375em
-			}
-
-.tribe-events-tickets .woocommerce.add-to-cart {
-				padding: 16px
-		}
-
-.tribe-events-tickets .woocommerce.add-to-cart .tribe-button {
-					margin: 10px
-			}
-
-.tribe-events-tickets input[type="date"],
-	.tribe-events-tickets input[type="time"],
-	.tribe-events-tickets input[type="datetime-local"],
-	.tribe-events-tickets input[type="week"],
-	.tribe-events-tickets input[type="month"],
-	.tribe-events-tickets input[type="text"],
-	.tribe-events-tickets input[type="email"],
-	.tribe-events-tickets input[type="url"],
-	.tribe-events-tickets input[type="password"],
-	.tribe-events-tickets input[type="search"],
-	.tribe-events-tickets input[type="tel"],
-	.tribe-events-tickets input[type="number"],
-	.tribe-events-tickets textarea,
-	.tribe-events-tickets select {
-			width: auto
+.tribe-common-c-loader.tribe-tickets-loader__tickets-block,
+	.tribe-common-c-loader.tribe-tickets-loader__modal {
+			padding: 0
 	}
 
-.tribe-tickets-has-rsvp.tribe-events-tickets-rsvp tr.tribe-event-tickets-plus-meta, .tribe-tickets-has-rsvp.tribe-events-tickets-rsvp tr.tribe-tickets-meta-row {
-					display: table-row
-			}
+.event-tickets .tribe-common-c-loader {
+			padding: 0
+	}
 
-.tribe-events-tickets-rsvp tr.tribe-event-tickets-plus-meta > td, .tribe-events-tickets-rsvp tr.tribe-tickets-meta-row > td {
-					display: table-cell
-			}
-				}
+.tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
+				background-color: transparent;
+				width: auto
+		}
+
+.event-tickets .tribe-tickets__rsvp {
+			padding-left: 24px;
+			padding-right: 24px;
+			padding-top: 24px;
+			padding-bottom: 24px
+	}
+
+.event-tickets .tribe-tickets__rsvp-details-wrapper {
+			width: 62.5%
+	}
+
+.event-tickets .tribe-tickets__rsvp-details {
+			text-align: left;
+			text-align: initial
+	}
+
+.event-tickets .tribe-tickets__rsvp-description {
+			margin-top: 12px
+	}
+
+.event-tickets .tribe-tickets__rsvp-attendance {
+			margin-top: 24px
+	}
+
+.event-tickets .tribe-tickets__rsvp-attendance-number {
+			font-size: 24px
+	}
+
+.event-tickets .tribe-tickets__rsvp-availability {
+			margin-top: 24px
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-wrapper {
+			border-left: 1px dashed #E4E4E4;
+			width: 37.5%
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions {
+			border-top: 0;
+			margin-top: 0
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-rsvp-not-going {
+			margin-top: 24px
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-button-not-going {
+			font-size: 12px
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-full {
+			padding: 0 32px
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going {
+			justify-content: flex-start
+	}
+
+.event-tickets .tribe-tickets__rsvp-actions-success-going-toggle {
+			justify-content: flex-start;
+			margin-top: 8px
+	}
+
+.event-tickets .tribe-tickets__rsvp-message {
+			padding: 16px
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-title {
+			border: none;
+			padding-bottom: 0
+	}
+
+.event-tickets .tribe-tickets__rsvp-form-content {
+			margin-top: 24px
+	}
+
+.event-tickets .tribe-tickets__form input[type="number"].tribe-tickets__rsvp-form-input-number {
+			max-width: 140px
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar {
+			flex-direction: row-reverse;
+			padding-left: 24px;
+			padding-right: 24px
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-sidebar-wrapper {
+			border-left: 1px dashed #E4E4E4;
+			width: 37.5%
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-sidebar {
+			border: 0;
+			margin-top: 0;
+			padding-left: 20px
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity {
+			display: block
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input {
+			margin-left: 0
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item {
+			display: block
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item:not(:first-of-type) {
+				margin-top: 32px
+		}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-title {
+			clip: auto;
+			width: auto;
+			height: auto;
+			margin: 0;
+			position: static
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-icon,
+	.event-tickets .tribe-tickets__rsvp-ar-guest-icon--inactive {
+			height: 14px;
+			margin-right: 4px;
+			width: 11px
+
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-form-wrapper {
+			width: 62.5%
+	}
+
+.event-tickets .tribe-tickets__rsvp-ar-form {
+			text-align: left;
+			text-align: initial
+	}
+		}
+
+@media (prefers-reduced-motion: reduce) {
+
+.event-tickets .tribe-tickets__rsvp-wrapper {
+			transition: none
+	}
+		}
 
 @media (min-width: 600px) {
 
-.tribe-block__rsvp__ticket {
-		-webkit-align-items: stretch;
-		        align-items: stretch;
-		-webkit-flex-wrap: nowrap;
-		        flex-wrap: nowrap
-}
-
-.tribe-block__rsvp__icon {
-		border-bottom: none;
-		border-right: 1px dashed #b5bcc2;
-		padding: 28px 17px;
-		width: 84px
-}
-
-.tribe-block__rsvp__number-input-inner input[type="number"] {
-			font-size: 36px;
-			height: 48px
-	}
-
-.tribe-block__rsvp__message__success {
-		padding: 10px 30px;
-		text-align: center
-}
-	}
+.event-tickets .tribe-tickets__rsvp-ar-quantity-input input[type="number"] {
+				height: 40px
+		}
+			}

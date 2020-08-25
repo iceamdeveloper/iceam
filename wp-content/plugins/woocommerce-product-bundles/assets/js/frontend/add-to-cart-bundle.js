@@ -165,6 +165,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 		this.$bundle_error_content    = this.$bundle_error.find( 'ul.msg' );
 		this.$bundle_quantity         = this.$bundle_button.find( 'input.qty' );
 
+		this.$nyp                     = this.$bundle_data.find( '.nyp' );
+
 		this.$addons_totals           = this.$bundle_data.find( '#product-addons-total' );
 		this.show_addons_totals       = false;
 
@@ -350,6 +352,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 			 */
 
 			this.bind_event_handlers();
+			this.viewport_resized();
 
 			/**
 			 * Init Bundled Items.
@@ -670,17 +673,45 @@ jQuery.fn.wc_get_bundle_script = function() {
 		};
 
 		/**
+		 * Handler for viewport resizing.
+		 */
+		this.viewport_resized = function() {
+
+			if ( this.is_composited() ) {
+				return;
+			}
+
+			var form_width = this.$bundle_form.width();
+
+			if ( form_width <= wc_bundle_params.responsive_breakpoint ) {
+				this.$bundle_form.addClass( 'small_width' );
+			} else {
+				this.$bundle_form.removeClass( 'small_width' );
+			}
+		}
+
+		/**
 		 * Attach bundle-level event handlers.
 		 */
 		this.bind_event_handlers = function() {
 
-			if ( bundle.has_addons() ) {
+			// Add responsive class to bundle form.
+			$( window ).resize( function() {
 
+				clearTimeout( bundle.viewport_resize_timer );
+
+				bundle.viewport_resize_timer = setTimeout( function() {
+					bundle.viewport_resized();
+				}, 50 );
+			} );
+
+			// PAO compatibility.
+			if ( bundle.has_addons() ) {
 				bundle.$bundle_data.on( 'updated_addons', bundle.updated_addons_handler );
 			}
 
+			// CP compatibility.
 			if ( bundle.is_composited() ) {
-
 				bundle.$bundle_quantity.on( 'input change', function() {
 					bundle.update_bundle();
 				} );
@@ -688,13 +719,12 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 			this.$bundle_data
 
+				// NYP compatibility.
 				.on( 'woocommerce-nyp-updated-item', function( event ) {
 
-					var nyp = $( this ).find( '.nyp' );
+					if ( bundle.$nyp.is( ':visible' ) ) {
 
-					if ( nyp.is( ':visible' ) ) {
-
-						bundle.price_data[ 'base_price' ] = nyp.data( 'price' );
+						bundle.price_data[ 'base_price' ] = bundle.$nyp.data( 'price' );
 
 						if ( bundle.is_initialized ) {
 							bundle.dirty_subtotals = true;
@@ -794,11 +824,37 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 					if ( $( this ).is( ':checked' ) ) {
 
-						bundled_item.$bundled_item_content.slideDown( 200 );
+						bundled_item.$bundled_item_content.css( {
+							height:   '',
+							display: 'block',
+							position: 'absolute',
+						} );
+
+						var height = bundled_item.$bundled_item_content.get( 0 ).getBoundingClientRect().height;
+
+						if ( typeof height === 'undefined' ) {
+							height = bundled_item.$bundled_item_content.outerHeight();
+						}
+
+						bundled_item.$bundled_item_content.css( {
+							height:   '',
+							position: '',
+							display:  'none'
+						} );
+
+						if ( height ) {
+							bundled_item.$bundled_item_content.addClass( 'bundled_item_cart_content--populated' );
+							bundled_item.$bundled_item_content.slideDown( 200 );
+						}
+
 						bundled_item.set_selected( true );
 
 						// Tabular mini-extension compat.
 						bundled_item.$self.find( '.bundled_item_qty_col .quantity' ).removeClass( 'quantity_hidden' );
+
+						if( bundled_item.is_nyp() ) {
+							bundled_item.$nyp.trigger( 'wc-nyp-update', [ { 'force': true } ] );
+						}
 
 						// Allow variations script to flip images in bundled_product_images div.
 						bundled_item.$bundled_item_cart.find( '.variations select:eq(0)' ).trigger( 'change' );
@@ -936,7 +992,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 					.on( 'updated_addons', function( event ) {
 
 						var addons_price         = bundle.get_addons_raw_price( bundled_item ),
-						    regular_addons_price = bundle.has_pct_addons( bundled_item ) ? bundle.get_addons_raw_price( bundled_item, 'regular' ) : addons_price;
+							regular_addons_price = bundle.has_pct_addons( bundled_item ) ? bundle.get_addons_raw_price( bundled_item, 'regular' ) : addons_price;
 
 						if ( bundle.price_data.addons_prices[ bundled_item.bundled_item_id ] !== addons_price || bundle.price_data.regular_addons_prices[ bundled_item.bundled_item_id ] !== regular_addons_price ) {
 							bundle.price_data.addons_prices[ bundled_item.bundled_item_id ]         = addons_price;
@@ -1015,7 +1071,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 			bundle.update_bundle_timer = setTimeout( function() {
 				bundle.update_bundle_task( triggered_by );
-			}, 10 );
+			}, 5 );
 		};
 
 		/**
@@ -1028,7 +1084,9 @@ jQuery.fn.wc_get_bundle_script = function() {
 				validation_status        = false === bundle.is_initialized ? '' : bundle.api.get_bundle_validation_status(),
 				unset_count              = 0,
 				unset_titles             = [],
-				total_items_qty          = 0;
+				total_items_qty          = 0,
+				nyp_error_count          = 0,
+				nyp_error_titles         = [];
 
 			/*
 			 * Validate bundle.
@@ -1055,6 +1113,14 @@ jQuery.fn.wc_get_bundle_script = function() {
 					}
 				}
 
+				// Check NYP validity.
+				if( bundled_item.is_nyp() && ! bundled_item.is_nyp_valid() ) {
+					nyp_error_count++;
+					if ( bundled_item.is_visible() && bundled_item.get_title( true ) ) {
+						nyp_error_titles.push( bundled_item.get_title( true ) );
+					}
+				}
+
 			} );
 
 			if ( unset_count > 0 ) {
@@ -1068,6 +1134,19 @@ jQuery.fn.wc_get_bundle_script = function() {
 				}
 
 				bundle.add_validation_message( select_options_message );
+			}
+
+			if ( nyp_error_count > 0 ) {
+
+				var nyp_amount_message = '';
+
+				if ( nyp_error_count === nyp_error_titles.length && nyp_error_count < 5 ) {
+					nyp_amount_message = wc_bundle_params.i18n_enter_valid_price_for.replace( '%s', wc_pb_format_list( nyp_error_titles ) );
+				} else {
+					nyp_amount_message = wc_bundle_params.i18n_enter_valid_price;
+				}
+
+				bundle.add_validation_message( nyp_amount_message );
 			}
 
 			if ( 0 === total_items_qty && 'no' === bundle.price_data[ 'zero_items_allowed' ] ) {
@@ -1127,7 +1206,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 				// Hide validation messages.
 				setTimeout( function() {
 					bundle.$bundle_error.slideUp( 200 );
-				}, 10 );
+				}, 1 );
 
 				bundle.$bundle_wrap.trigger( 'woocommerce-product-bundle-show' );
 
@@ -1211,7 +1290,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 			bundle.$bundle_error_content.html( messages.html() );
 			setTimeout( function() {
 				bundle.$bundle_error.slideDown( 200 );
-			}, 10 );
+			}, 1 );
 			bundle.$bundle_button.find( 'button' ).addClass( 'disabled' );
 
 			bundle.$bundle_wrap.trigger( 'woocommerce-product-bundle-hide' );
@@ -1517,7 +1596,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 
 			bundle.update_price_timer = setTimeout( function() {
 				bundle.updated_totals_task();
-			}, 10 );
+			}, 5 );
 		};
 
 		/**
@@ -1699,7 +1778,7 @@ jQuery.fn.wc_get_bundle_script = function() {
 		};
 
 		this.updated_addons_handler = function( event ) {
- 			bundle.updated_totals_task();
+			bundle.updated_totals_task();
 		};
 
 		this.has_addons = function() {
@@ -1709,8 +1788,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 		this.has_pct_addons = function( bundled_item ) {
 
 			var is_bundled_item  = typeof( bundled_item ) !== 'undefined',
-			    obj              = is_bundled_item ? bundled_item : this,
-			    has              = false;
+				obj              = is_bundled_item ? bundled_item : this,
+				has              = false;
 
 			if ( ! obj.has_addons ) {
 				return has;
@@ -1757,8 +1836,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 				if ( addon.is_custom_price ) {
 
 					var addon_raw_price = 0.0,
-					    tax_ratio_incl  = tax_ratios && typeof( tax_ratios.incl ) !== 'undefined' ? Number( tax_ratios.incl ) : false,
-					    tax_ratio_excl  = tax_ratios && typeof( tax_ratios.excl ) !== 'undefined' ? Number( tax_ratios.excl ) : false;
+						tax_ratio_incl  = tax_ratios && typeof( tax_ratios.incl ) !== 'undefined' ? Number( tax_ratios.incl ) : false,
+						tax_ratio_excl  = tax_ratios && typeof( tax_ratios.excl ) !== 'undefined' ? Number( tax_ratios.excl ) : false;
 
 					if ( 'incl' === wc_bundle_params.tax_display_shop && 'no' === wc_bundle_params.prices_include_tax ) {
 						addon_raw_price = addon.cost_raw / ( tax_ratio_incl ? tax_ratio_incl : 1 );
@@ -1902,8 +1981,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 	}
 
 	/**
-     * Bundled Item object.
-     */
+	 * Bundled Item object.
+	 */
 	function WC_PB_Bundled_Item( bundle, $bundled_item, index ) {
 
 		this.initialize = function() {
@@ -2157,6 +2236,23 @@ jQuery.fn.wc_get_bundle_script = function() {
 			return this.nyp;
 		};
 
+		this.is_nyp_valid = function() {
+
+			var status = true;
+
+			if ( $.fn.wc_nyp_get_script_object ) {
+
+				var nyp_script = this.$nyp.wc_nyp_get_script_object();
+
+				if ( nyp_script && false === nyp_script.isValid() ) {
+					status = false;
+				}
+			}
+
+			return status;
+
+		};
+
 		this.is_sold_individually = function() {
 			return this.sold_individually;
 		};
@@ -2359,8 +2455,8 @@ jQuery.fn.wc_get_bundle_script = function() {
 		} );
 
 		/**
-	 	 * Script initialization on '.bundle_data' jQuery objects.
-	 	 */
+		 * Script initialization on '.bundle_data' jQuery objects.
+		 */
 		$.fn.wc_pb_bundle_form = function() {
 
 			if ( ! $( this ).hasClass( 'bundle_data' ) ) {

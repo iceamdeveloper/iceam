@@ -1,5 +1,63 @@
 *** WooCommerce Product Bundles ***
 
+2020.08.21 - version 6.3.5
+* Fix - Fixed an edge-case issue that prevented Product Bundles with discounted, mandatory items from appearing as on sale in the catalog.
+* Tweak - Preserve runtime meta when cloning parent item in shipping packages.
+
+2020.08.20 - version 6.3.4
+* Fix - Introduced integration with WooCommerce Services. When shipping an assembled bundle, WooCommerce Services will now see a single physical item that aggregates the weight and total of its contents.
+* Fix - Bundled item discount applied twice when manually renewing the subscription of a Product Bundle with plans created using All Products for WooCommerce Subscriptions.
+* Fix - Added compatibility with the WordPress 5.5 REST API.
+
+2020.07.22 - version 6.3.3
+* Tweak - Added responsive styles. 380px form-width breakpoint is editable using the 'woocommerce_bundle_front_end_params' filter.
+* Tweak - Made various small styling tweaks in Product Bundle pages.
+* Tweak - Added styles for basic improved compatibility with the Astra and Flatsome themes.
+* Tweak - Backfill current bundled item data in bundle configurations extracted from orders.
+
+2020.07.15 - version 6.3.2
+* Fix - Prevented stock meta form saving while 'woocommerce_process_product_meta' is running. Should prevent some edge-case issues with duplicate bundled items.
+* Tweak - Consider if customer is tax exempt when formatting cart item display prices.
+* Tweak - It is now possible to calculate and display the quantity of remaining bundles based on the availability of the bundled product with the lowest stock (bundles with static quantities only). To enable, use: add_filter( 'woocommerce_bundle_display_bundled_items_stock_quantity', '__return_true' );
+* Tweak - Dropped the use of debug options - please use debug constants instead. See 'WC_Bundles::define_constants'.
+
+2020.07.07 - version 6.3.1
+* Fix - Prevent 'WC_PB_Admin_Notices' from adding messages to the Inbox when WooCommerce Admin is disabled.
+* Fix - Declared support for WooCommerce 4.3.
+
+2020.06.26 - version 6.3.0
+* Feature - Added free Product Bundles mini-extension recommendations in the WooCommerce Inbox.
+* Feature - Check if the server is able to perform loopback requests and display a warning if the test fails.
+* Feature - Check if PHP is truncating form fields on edit-product pages when updating a Product Bundle and display a warning.
+* Feature - Check if the pricing configuration of a Product Bundle is incomplete and display a warning in the edit-product page.
+* Tweak - Remove '- optional' suffix from optional bundled items. To bring it back: add_filter( 'woocommerce_bundles_optional_bundled_item_add_suffix', '__return_true' );
+* Tweak - The 'stock_status' of Bundles in the product lookup table now takes child availability into account: Bundles with an 'Insufficient stock' availability status now appear as 'outofstock' in the lookup table.
+* Tweak - Added loopback test results in Status Report.
+* Fix - Updated the datastore logic of Product Bundles to update the 'tax_status' and 'tax_class' product lookup table columns.
+
+2020.06.05 - version 6.2.5
+* Fix - Prevent infinite loops involving 'WC_Product_Bundle::sync()'.
+
+2020.05.22 - version 6.2.4
+* Fix - Declared support for WooCommerce 4.2.
+* Tweak - Moved NYP 3.0 JS integration over to Product Bundles.
+
+2020.04.22 - version 6.2.3
+* Fix - Variation attribute values not populated correctly when bundling multiple variations of the same Variable product.
+
+2020.04.17 - version 6.2.2
+* Fix - Declared support for WooCommerce 4.1.
+* Tweak - Ensure that the sw-select script is registered before checking its version.
+* Tweak - Added tweaks for NYP 3.0 compatibility.
+
+2020.04.02 - version 6.2.1
+* Tweak - Updated 'Discount' option tooltips.
+* Fix - Reverted change introduced in version 6.0.0: When 'Item Grouping > None' is selected for a composited Bundle, customers should be able to add the Composite to the cart without choosing any bundled items. To require customers to choose at least one item, use the free 'Product Bundles - Min/Max Items' add-on.
+
+2020.03.27 - version 6.2.0
+* Fix - Assembled Composites that contain Product Bundles are now represented correctly in shipping package contents.
+* Tweak - Added 'WC_PB()->plugin_initialized()' method.
+
 2020.03.23 - version 6.1.5
 * Tweak - Improved order note accuracy when editing bundles in the edit-order screen.
 * Fix - PHP warning when attempting to choose an incorrect bundle configuration in the edit-order screen under WC 3.9+.

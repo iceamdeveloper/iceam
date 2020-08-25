@@ -58,10 +58,9 @@ function members_register_default_settings_views( $manager ) {
  * @return bool
  */
 function members_is_settings_page() {
-
 	$screen = get_current_screen();
-
-	return is_object( $screen ) && 'members_page_members-settings' === $screen->id;
+	$prefix = 'members';
+	return is_object( $screen ) && ( $prefix . '_page_members-settings' === $screen->id || 'admin_page_members-settings' === $screen->id );
 }
 
 /**
@@ -85,7 +84,7 @@ function members_is_addon_active( $addon ) {
  */
 function members_get_settings_page_url() {
 
-	return add_query_arg( array( 'page' => 'members-settings' ), admin_url( 'options-general.php' ) );
+	return add_query_arg( array( 'page' => 'members-settings' ), admin_url( 'admin.php' ) );
 }
 
 /**

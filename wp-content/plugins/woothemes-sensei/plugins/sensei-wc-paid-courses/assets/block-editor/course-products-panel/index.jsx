@@ -15,48 +15,52 @@ import Panel from './panel';
 const productsMetaKey = '_course_woocommerce_product';
 
 /**
- * Function to inject the product IDs as a prop.
+ * Function to inject Panel's properties.
  */
-const withProductIds = withSelect( ( select ) => (
-	{
-		productIds: select( 'core/editor' ).getEditedPostAttribute( 'meta' )[ productsMetaKey ],
-	}
-) );
-
-/**
- * Function to inject the course ID as a prop.
- */
-const withCourseId = withSelect( ( select ) => (
-	{
-		courseId: select( 'core/editor' ).getCurrentPostId(),
-	}
-) );
+const withProperties = withSelect( ( select ) => ( {
+	productIds: select( 'core/editor' ).getEditedPostAttribute( 'meta' )[
+		productsMetaKey
+	],
+	productChanges: select( 'core/editor' ).getEditedPostAttribute(
+		'productChanges'
+	),
+	courseId: select( 'core/editor' ).getCurrentPostId(),
+} ) );
 
 /**
  * Function to inject the onChange callback as a prop. Updates the post with the
  * new product IDs when called.
  */
-const withOnChange = withDispatch( ( dispatch ) => {
+const withOnChange = withDispatch( ( dispatch, ownProps, { select } ) => {
 	const { editPost } = dispatch( 'core/editor' );
 
 	return {
-		onChange( newProducts ) {
+		onChange( newProducts, userInitiated = true ) {
 			const newProductIds = newProducts.map( ( { id } ) => id );
+			const oldProductIds = select(
+				'core/editor'
+			).getEditedPostAttribute( 'meta' )[ productsMetaKey ];
 
-			editPost(
-				{
-					meta: {
-						[ productsMetaKey ]: newProductIds,
-					}
-				}
+			const productsAdded = newProductIds.filter(
+				( n ) => ! oldProductIds.includes( n )
 			);
-		}
-	}
+			const productsRemoved = oldProductIds.filter(
+				( n ) => ! newProductIds.includes( n )
+			);
+
+			editPost( {
+				meta: {
+					[ productsMetaKey ]: newProductIds,
+				},
+				productChanges: {
+					productsAdded,
+					productsRemoved,
+					userInitiated,
+				},
+			} );
+		},
+	};
 } );
 
 // Wrap and export the Panel component.
-export default compose(
-	withProductIds,
-	withCourseId,
-	withOnChange
-)( Panel );
+export default compose( withProperties, withOnChange )( Panel );

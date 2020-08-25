@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -118,6 +118,12 @@ class WC_Memberships_Integrations {
 		if ( $this->is_user_switching_active() ) {
 			$this->user_switching = wc_memberships()->load_class( '/includes/integrations/user-switching/class-wc-memberships-integration-user-switching.php', 'WC_Memberships_Integration_User_Switching' );
 		}
+
+		// Jilt Promotions -- can't use admin_init because that's too late to be able to add connection redirect args
+		add_action( 'init', static function() {
+			require_once( wc_memberships()->get_plugin_path() . '/includes/integrations/Jilt_Promotions/Import_Export.php' );
+			new \SkyVerge\WooCommerce\Memberships\Integrations\Jilt_Promotions\Import_Export();
+		} );
 	}
 
 

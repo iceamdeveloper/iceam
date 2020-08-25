@@ -679,6 +679,21 @@ ul.plugins_list {
 #TB_ajaxContent.ub_deactive_window {
     margin: 0 auto;
 }
+.ub-setting-wrap {
+    display: inline-block;
+    width: 100%;
+}
+.ub-setting-wrap .ub-left-setting {
+    display: inline-block;
+    float: left;
+    width: 30%;
+}
+.wrap .ublocker-page-title.mg-bpttom-20 {
+    margin-bottom: 20px;
+}
+.ub-left-setting h4 {
+    margin: 0;
+}
 @media screen and (max-width: 1200px) {
     
     #blocked-list .cover_form {

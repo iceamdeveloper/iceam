@@ -18,6 +18,7 @@
 namespace Tribe\Events\Pro\Views\V2;
 
 use Tribe\Events\Pro\Views\V2\Assets as Pro_Assets;
+use Tribe\Events\Pro\Views\V2\Template\Featured_Title;
 use Tribe\Events\Pro\Views\V2\Template\Title;
 use Tribe\Events\Pro\Views\V2\Views\All_View;
 use Tribe\Events\Pro\Views\V2\Views\Map_View;
@@ -99,6 +100,7 @@ class Hooks extends \tad_DI52_ServiceProvider {
 		add_filter( 'tribe_events_views_v2_view_repository_args', [ $this, 'filter_events_views_v2_view_repository_args' ], 10, 2 );
 		add_filter( 'tribe_events_views_v2_view_template_vars', [ $this, 'filter_events_views_v2_view_template_vars' ], 10, 2 );
 		add_filter( 'tribe_events_v2_view_title', [ $this, 'filter_tribe_events_v2_view_title' ], 10, 4 );
+		add_filter( 'tribe_events_pro_filter_views_v2_wp_title_plural_events_label', [ $this, 'filter_views_v2_wp_title_plural_events_label' ], 10, 4 );
 		add_filter( 'tribe_events_views_v2_view_url', [ $this, 'filter_tribe_events_views_v2_view_url' ], 10, 3 );
 		add_filter( 'tribe_events_views_v2_messages_map', [ $this, 'filter_tribe_events_views_v2_messages_map' ] );
 		add_filter( 'tribe_events_views_v2_messages_need_events_label_keys', [ $this, 'filter_tribe_events_views_v2_messages_need_events_label_keys' ] );
@@ -138,6 +140,9 @@ class Hooks extends \tad_DI52_ServiceProvider {
 		add_filter( 'tribe_events_rewrite_rules_custom', [ $this, 'filter_events_rewrite_rules_custom' ], 20 );
 
 		add_filter( 'tribe_events_filter_bar_views_v2_should_display_filters', [ $this, 'filter_hide_filter_bar_organizer_venue' ], 10, 2 );
+
+		add_filter( 'tribe_events_views_v2_manager_view_label_domain', [ $this, 'filter_view_label_domain'], 10, 3 );
+		add_filter( 'tribe_customizer_inline_stylesheets', [ $this, 'customizer_inline_stylesheets' ], 12, 2 );
 	}
 
 	/**
@@ -414,6 +419,21 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	}
 
 	/**
+	 * Filter the plural events label for Featured V2 PRO Views.
+	 *
+	 * @since 5.1.4
+	 *
+	 * @param string  $label   The plural events label as it's been generated thus far.
+	 * @param Context $context The context used to build the title, it could be the global one, or one externally
+	 *                         set.
+	 *
+	 * @return string the original label or updated label for virtual archives.
+	 */
+	public function filter_views_v2_wp_title_plural_events_label( $label, Context $context ) {
+		return $this->container->make( Featured_Title::class )->filter_views_v2_wp_title_plural_events_label( $label, $context );
+	}
+
+	/**
 	 * Filters the View URL to add, or remove, URL query arguments managed by PRO.
 	 *
 	 * @since 4.7.9
@@ -533,18 +553,20 @@ class Hooks extends \tad_DI52_ServiceProvider {
 	 *
 	 * @since 4.7.9
 	 *
-	 * @param array $rules The geocode based rewrite rules.
+	 * @param array<string,string> $rules         The geocode based rewrite rules.
+	 * @param array<string,string> $bases         The geocode rewrite bases.
+	 * @param array<string,string> $rewrite_slugs The geocode slugs.
 	 *
-	 * @return array The filtered geocode based rewrite rules.
+	 * @return array<string,string> The filtered geocode based rewrite rules.
 	 *
 	 * @see \Tribe__Events__Pro__Geo_Loc::add_routes() for where this code is applying.
 	 */
-	public function filter_geocode_rewrite_rules( $rules ) {
-		if ( empty( $rules ) ) {
+	public function filter_geocode_rewrite_rules( $rules, $bases, $rewrite_slugs ) {
+		if ( empty( $rules ) || empty( $bases ) || empty( $rewrite_slugs ) ) {
 			return $rules;
 		}
 
-		return $this->container->make( Rewrite::class )->add_map_pagination_rules( $rules );
+		return $this->container->make( Rewrite::class )->add_map_pagination_rules( $rules, $bases, $rewrite_slugs );
 	}
 
 	/**
@@ -883,5 +905,43 @@ class Hooks extends \tad_DI52_ServiceProvider {
 		}
 
 		return $this->container->make( Rewrite::class )->filter_events_rewrite_rules_custom( $rewrite_rules );
+	}
+
+	public function filter_view_label_domain( $domain, $slug, $view_class ) {
+		if (
+			'photo' !== $slug
+			&& 'week' !== $slug
+			&& 'map' !== $slug
+		) {
+			return $domain;
+		}
+
+		return  'tribe-events-calendar-pro';
+	}
+
+	/**
+	 * Add views stylesheets to customizer styles array to check.
+	 * Remove unused legacy stylesheets.
+	 *
+	 * @param array<string> $sheets Array of sheets to search for.
+	 * @param string        $css_template String containing the inline css to add.
+	 *
+	 * @return array Modified array of sheets to search for.
+	 */
+	public function customizer_inline_stylesheets( $sheets, $css_template ) {
+		$v2_sheets = [
+			'tribe-events-pro-views-v2-skeleton',
+			'tribe-events-pro-views-v2-full'
+		];
+
+		// Unenqueue legacy sheets.
+		$keys = array_keys( $sheets, 'tribe-events-calendar-pro-style' );
+		if ( ! empty( $keys ) ) {
+			foreach ( $keys as $key ) {
+				unset( $sheets[ $key ] );
+			}
+		}
+
+		return array_merge( $sheets, $v2_sheets );
 	}
 }

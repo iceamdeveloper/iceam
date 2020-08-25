@@ -1,6 +1,6 @@
 <?php
 $provider      = $ticket->provider_class;
-$provider_obj  = call_user_func( array( $provider, 'get_instance' ) );
+$provider_obj  = Tribe__Tickets__Tickets::get_ticket_provider_instance( $provider );
 $inventory     = $ticket->inventory();
 $available     = $ticket->available();
 $capacity      = $ticket->capacity();
@@ -10,7 +10,7 @@ $stk_warning   = false;
 $mode          = $ticket->global_stock_mode();
 $event         = $ticket->get_event();
 
-// If we don't have an event we should't even continue
+// If we don't have an event we shouldn't even continue
 if ( ! $event ) {
 	return;
 }

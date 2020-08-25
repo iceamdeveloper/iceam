@@ -687,6 +687,9 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 					'woocommerce_link_all_variations',
 					'woocommerce_bulk_edit_variations',
 					'woocommerce_json_search_products_and_variations',
+					// @since 2.0.18.200512
+					'woocommerce_do_ajax_product_import',
+					'woocommerce_do_ajax_product_export',
 				)));
 		}
 
@@ -994,7 +997,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * @since 1.8.2.161216
 		 */
 		public function debug_mode() {
-			return false;
+			return apply_filters(self::$plugin_slug . '_debug_mode', false);
 		}
 	}
 }

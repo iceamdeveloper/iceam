@@ -40,26 +40,20 @@ extends Tribe__Editor__Blocks__Abstract {
 
 		// Prevent the render when the ID of the post has not being set to a correct value
 		if ( $args['post_id'] === null ) {
-			return;
+			return '';
 		}
 
 		// Fetch the default provider
-		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
-		if ( ! class_exists( $provider ) ) {
-			return;
+		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider_object( $post_id );
+		if ( empty( $provider ) ) {
+			return '';
 		}
 
-		// No need to handle RSVPs here
-		if ( 'Tribe__Tickets__RSVP' === $provider ) {
-			return;
+		// No need to handle RSVPs here.
+		if ( 'Tribe__Tickets__RSVP' === $provider->class_name ) {
+			return '';
 		}
 
-		// If Provider is not active return
-		if ( ! array_key_exists( $provider, Tribe__Tickets__Tickets::modules() ) ) {
-			return;
-		}
-
-		$provider    = call_user_func( [ $provider, 'get_instance' ] );
 		$provider_id = $this->get_provider_id( $provider );
 		$tickets     = $this->get_tickets( $post_id );
 
@@ -89,6 +83,7 @@ extends Tribe__Editor__Blocks__Abstract {
 	 * @return void
 	 */
 	public function assets() {
+		global $wp_version;
 		$plugin = Tribe__Tickets__Main::instance();
 
 		wp_register_script(
@@ -101,11 +96,17 @@ extends Tribe__Editor__Blocks__Abstract {
 
 		wp_enqueue_script( 'wp-util-not-in-footer' );
 
+		$tickets_block_dependencies = [ 'jquery', 'wp-util-not-in-footer' ];
+
+		if ( version_compare( $wp_version, '5.0', '>=' ) ) {
+			$tickets_block_dependencies[] = 'wp-i18n';
+		}
+
 		tribe_asset(
 			$plugin,
 			'tribe-tickets-gutenberg-tickets',
 			'tickets-block.js',
-			[ 'jquery', 'wp-util-not-in-footer', 'wp-i18n' ],
+			$tickets_block_dependencies,
 			null,
 			[
 				'type'         => 'js',
@@ -191,7 +192,7 @@ extends Tribe__Editor__Blocks__Abstract {
 	}
 
 	/**
-	 * Get all tickets for event/post, removing RSVPs
+	 * Get all tickets for event/post, other than RSVP type because they're presented in a separate block.
 	 *
 	 * @since 4.9
 	 *
@@ -203,13 +204,20 @@ extends Tribe__Editor__Blocks__Abstract {
 		$all_tickets = Tribe__Tickets__Tickets::get_all_event_tickets( $post_id );
 
 		if ( ! $all_tickets ) {
-			return array();
+			return [];
 		}
 
-		$tickets = array();
+		/** @var Tribe__Tickets__RSVP $rsvp */
+		$rsvp = tribe( 'tickets.rsvp' );
 
+		$tickets = [];
+
+		// We only want RSVP tickets.
 		foreach ( $all_tickets as $ticket ) {
-			if ( 'Tribe__Tickets__RSVP' === $ticket->provider_class ) {
+			if (
+				! $ticket instanceof Tribe__Tickets__Ticket_Object
+				|| $rsvp->class_name === $ticket->provider_class
+			) {
 				continue;
 			}
 
@@ -220,30 +228,29 @@ extends Tribe__Editor__Blocks__Abstract {
 	}
 
 	/**
-	 * Get provider ID
+	 * Get provider ID/slug.
 	 *
 	 * @since 4.9
+	 * @since 4.12.3 Retrieve slug from updated Ticktes Status Manager method.
 	 *
 	 * @param  Tribe__Tickets__Tickets $provider Provider class instance
 	 *
 	 * @return string
 	 */
 	public function get_provider_id( $provider ) {
+		/** @var Tribe__Tickets__Status__Manager $status */
+		$status = tribe( 'tickets.status' );
 
-		switch ( $provider->class_name ) {
-			case 'Tribe__Tickets__Commerce__PayPal__Main' :
-				return 'tpp';
-				break;
-			case 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main' :
-				return 'woo';
-				break;
-			case 'Tribe__Tickets_Plus__Commerce__EDD__Main' :
-				return 'edd';
-				break;
-			default:
-				return 'tpp';
+		$slug = $status->get_provider_slug( $provider );
+
+		if (
+			empty( $slug )
+			|| 'rsvp' === $slug
+		) {
+			$slug = 'tpp';
 		}
 
+		return $slug;
 	}
 
 	/**

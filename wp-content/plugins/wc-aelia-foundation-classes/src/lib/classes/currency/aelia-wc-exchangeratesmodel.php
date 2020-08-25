@@ -68,6 +68,11 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 	 * @return array|false
 	 */
 	protected function get_cached_exchange_rates($cache_key) {
+		// Skip the cache when the AFC debug mode is enabled
+		// @since 2.0.18.200512
+		if(WC_AeliaFoundationClasses::instance()->debug_mode()) {
+			return false;
+		}
 		return get_transient(md5(get_class($this)) . '_' . $cache_key);
 	}
 

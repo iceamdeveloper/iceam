@@ -2,7 +2,7 @@
 /**
  * WC_PB_Helpers class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.0.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Helper Functions.
  *
  * @class    WC_PB_Helpers
- * @version  6.1.5
+ * @version  6.2.4
  */
 class WC_PB_Helpers {
 
@@ -112,6 +112,32 @@ class WC_PB_Helpers {
 			$group_id = md5( $group_key . '_' . $group_id );
 			self::cache_set( $group_key . '_id', $group_id );
 		}
+	}
+
+	/**
+	 * Runtime object prop getter.
+	 *
+	 * @since  6.2.4
+	 *
+	 * @param  object  $object
+	 * @param  string  $prop
+	 * @return mixed
+	 */
+	public static function get_runtime_prop( $object, $prop ) {
+		return isset( $object->$prop ) ? $object->$prop : null;
+	}
+
+	/**
+	 * Runtime object prop checker.
+	 *
+	 * @since  6.2.4
+	 *
+	 * @param  object  $object
+	 * @param  string  $prop
+	 * @return mixed
+	 */
+	public static function has_runtime_prop( $object, $prop ) {
+		return isset( $object->$prop );
 	}
 
 	/**
@@ -345,5 +371,35 @@ class WC_PB_Helpers {
 		}
 
 		return $allowed_html;
+	}
+
+	/**
+	 * Get a new product instance, preserving runtime meta from another one.
+	 *
+	 * @since  6.3.5
+	 *
+	 * @param  WC_Product  $product
+	 * @return WC_Product
+	 */
+	public static function get_product_preserving_meta( $product ) {
+
+		$clone = wc_get_product( $product->get_id() );
+
+		$meta_data_to_set = array();
+
+		foreach ( $product->get_meta_data() as $meta ) {
+			if ( ! isset( $meta->id ) ) {
+				$meta_data_to_set[] = array(
+					'key'   => $meta->key,
+					'value' => $meta->value
+				);
+			}
+		}
+
+		foreach ( $meta_data_to_set as $meta ) {
+			$clone->add_meta_data( $meta[ 'key' ], $meta[ 'value' ], true );
+		}
+
+		return $clone;
 	}
 }

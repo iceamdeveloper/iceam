@@ -88,6 +88,8 @@ class Tribe__Tickets__REST__V1__Post_Repository
 
 	/**
 	 * {@inheritdoc}
+	 *
+	 * @since 4.12.0 Returns 401 Unauthorized if Event Tickets Plus is not loaded.
 	 */
 	public function get_attendee_data( $attendee_id, $context = 'default' ) {
 		$attendee_post = get_post( $attendee_id );
@@ -101,12 +103,13 @@ class Tribe__Tickets__REST__V1__Post_Repository
 
 		/** @var Tribe__Tickets__Data_API $data_api */
 		$data_api = tribe( 'tickets.data_api' );
+
 		/** @var Tribe__Tickets__Tickets $provider */
 		$provider = $data_api->get_ticket_provider( $attendee_id );
 
-		if ( false === $provider ) {
+		if ( empty( $provider ) ) {
 			// the attendee post does exist but it does not make sense on the server, server error
-			return new WP_Error( 'attendee-not-found', $this->messages->get_message( 'attendee-not-found' ), array( 'status' => 500 ) );
+			return new WP_Error( 'attendee-not-found', $this->messages->get_message( 'attendee-not-found' ), [ 'status' => 500 ] );
 		}
 
 		// The return value of this function will always be an array even if we only want one object.
@@ -114,7 +117,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 
 		if ( empty( $attendee ) ) {
 			// the attendee post does exist but it does not make sense on the server, server error
-			return new WP_Error( 'attendee-not-found', $this->messages->get_message( 'attendee-not-found' ), array( 'status' => 500 ) );
+			return new WP_Error( 'attendee-not-found', $this->messages->get_message( 'attendee-not-found' ), [ 'status' => 500 ] );
 		}
 
 		// See note above, this is an array with one element in it
@@ -189,7 +192,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 	 *
 	 * @param int|WP_Post $ticket_id
 	 *
-	 * @return Tribe__Tickets__Ticket_Object|bool The ticket object or `false`
+	 * @return Tribe__Tickets__Ticket_Object|bool|WP_Error The ticket object, `false`, or WP_Error.
 	 */
 	protected function get_ticket_object( $ticket_id ) {
 		if ( isset( $this->current_ticket_id ) && $ticket_id != $this->current_ticket_id ) {
@@ -210,8 +213,8 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		/** @var Tribe__Tickets__Tickets $provider */
 		$provider = tribe_tickets_get_ticket_provider( $ticket_id );
 
-		if ( ! $provider instanceof Tribe__Tickets__Tickets ) {
-			return new WP_Error( 'ticket-provider-not-found', $this->messages->get_message( 'ticket-provider-not-found' ), array( 'status' => 500 ) );
+		if ( empty( $provider ) ) {
+			return new WP_Error( 'ticket-provider-not-found', $this->messages->get_message( 'ticket-provider-not-found' ), [ 'status' => 500 ] );
 		}
 
 		$this->current_ticket_provider = $provider;
@@ -219,7 +222,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		$post = $provider->get_event_for_ticket( $ticket_id );
 
 		if ( ! $post instanceof WP_Post ) {
-			return new WP_Error( 'ticket-post-not-found', $this->messages->get_message( 'ticket-post-not-found' ), array( 'status' => 500 ) );
+			return new WP_Error( 'ticket-post-not-found', $this->messages->get_message( 'ticket-post-not-found' ), [ 'status' => 500 ] );
 		}
 
 		$this->current_ticket_post = $post;
@@ -228,7 +231,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		$ticket = $provider->get_ticket( $post->ID, $ticket_id );
 
 		if ( ! $ticket instanceof Tribe__Tickets__Ticket_Object ) {
-			return new WP_Error( 'ticket-object-not-found', $this->messages->get_message( 'ticket-object-not-found' ), array( 'status' => 500 ) );
+			return new WP_Error( 'ticket-object-not-found', $this->messages->get_message( 'ticket-object-not-found' ), [ 'status' => 500 ] );
 		}
 
 		$this->current_ticket_id     = $ticket_id;
@@ -329,15 +332,14 @@ class Tribe__Tickets__REST__V1__Post_Repository
 			return $existing;
 		}
 
-		if ( null === $provider_class ) {
-			/** @var Tribe__Tickets__Tickets $provider */
+		if ( empty( $provider_class ) ) {
 			$provider = tribe_tickets_get_ticket_provider( $ticket_id );
 
-			if ( ! $provider instanceof Tribe__Tickets__Tickets ) {
+			if ( empty( $provider ) ) {
 				return false;
 			}
 
-			$provider_class = get_class( $provider );
+			$provider_class = $provider->class_name;
 		}
 
 		$generator = new Tribe__Tickets__Global_ID();
@@ -345,10 +347,12 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		$type = $this->get_provider_slug( $provider_class );
 		$generator->type( $type );
 
-		$global_id = $generator->generate( array(
-			'type' => $type,
-			'id'   => $ticket_id,
-		) );
+		$global_id = $generator->generate(
+			[
+				'type' => $type,
+				'id'   => $ticket_id,
+			]
+		);
 
 		update_post_meta( $ticket_id, $this->global_id_key, $global_id );
 
@@ -578,7 +582,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 			'available'            => (int) $ticket->stock(), // see note above about why we use this
 		);
 
-		if ( current_user_can( 'read_private_posts' ) ) {
+		if ( current_user_can( 'edit_users' ) || current_user_can( 'tribe_manage_attendees' ) ) {
 			$details['max']     = (int) $ticket->capacity();
 			$details['sold']    = (int) $ticket->qty_sold();
 			$details['pending'] = (int) $ticket->qty_pending();
@@ -627,6 +631,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 			'currency_symbol'   => html_entity_decode( $currency->get_provider_symbol( $provider, $ticket_id ) ),
 			'currency_position' => $currency->get_provider_symbol_position( $provider, $ticket_id ),
 			'values'            => array( $price ),
+			'suffix'            => $ticket->price_suffix,
 		);
 
 		return $details;
@@ -649,6 +654,9 @@ class Tribe__Tickets__REST__V1__Post_Repository
 
 		$event = $ticket_object->get_event();
 
+		$has_manage_access          = current_user_can( 'edit_users' ) || current_user_can( 'tribe_manage_attendees' );
+		$always_show_attendees_data = $has_manage_access;
+
 		/**
 		 * Allow filtering to always show attendees data on tickets in the REST API. This bypasses checks for Attendees
 		 * shortcode or block in the associated event/post content for the ticket.
@@ -659,7 +667,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		 *                                         can see this information.
 		 * @param array $data                      Ticket REST data.
 		 */
-		$always_show_attendees_data = apply_filters( 'tribe_tickets_rest_api_always_show_attendee_data', current_user_can( 'read_private_posts' ), $data );
+		$always_show_attendees_data = apply_filters( 'tribe_tickets_rest_api_always_show_attendee_data', $always_show_attendees_data, $data );
 
 		// Check if we have an event or attendees block/shortcode.
 		if ( ! $always_show_attendees_data ) {
@@ -686,7 +694,7 @@ class Tribe__Tickets__REST__V1__Post_Repository
 
 		if (
 			$ticket_object instanceof Tribe__Tickets__Ticket_Object
-			&& current_user_can( 'read_private_posts' )
+			&& $has_manage_access
 			&& false !== $data['attendees']
 		) {
 			$is_rsvp = $ticket_object->provider_class === 'Tribe__Tickets__RSVP';
@@ -748,19 +756,14 @@ class Tribe__Tickets__REST__V1__Post_Repository
 			return false;
 		}
 
-		$can_read_private_posts = current_user_can( 'read_private_posts' );
-		$permission             = $can_read_private_posts ? 'editable' : 'readable';
-		// if the use can read private posts then it can access attendees that did optout
-		$optout = $can_read_private_posts ? 'any' : 'no';
+		$has_manage_access = current_user_can( 'edit_users' ) || current_user_can( 'tribe_manage_attendees' );
+		$permission        = $has_manage_access ? 'editable' : 'readable';
 
 		$query = tribe_attendees( 'restv1' )
 			->permission( $permission )
-			->where( 'ticket', $ticket_id )
-			->where( 'optout', $optout );
+			->where( 'ticket', $ticket_id );
 
-		if ( ! $can_read_private_posts
-		     && tribe_tickets_get_ticket_provider( $ticket_id ) instanceof Tribe__Tickets__RSVP
-		) {
+		if ( ! $has_manage_access && 'Tribe__Tickets__RSVP' === $ticket_object->provider_class ) {
 			// if we are dealing with an RSVP ticket then the attendee must be going to show
 			$query->where( 'meta_equals', Tribe__Tickets__RSVP::ATTENDEE_RSVP_KEY, 'yes' );
 		}
@@ -891,8 +894,11 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		$attendee_id = $attendee['attendee_id'];
 		/** @var Tribe__Tickets__Data_API $data_api */
 		$data_api = tribe( 'tickets.data_api' );
-		/** @var Tribe__Tickets__Tickets $provider */
 		$provider = $data_api->get_ticket_provider( $attendee_id );
+		if ( empty( $provider ) ) {
+			return [];
+		}
+
 		/** @var Tribe__Tickets__REST__V1__Main $main */
 		$main = tribe( 'tickets.rest-v1.main' );
 
@@ -903,12 +909,12 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		if ( $checked_in ) {
 			$checkin_details = get_post_meta( $attendee_id, $this->current_ticket_provider->checkin_key . '_details', true );
 			if ( isset( $checkin_details['date'], $checkin_details['source'], $checkin_details['author'] ) ) {
-				$checkin_details = array(
+				$checkin_details = [
 					'date'         => $checkin_details['date'],
 					'date_details' => $this->get_date_details( $checkin_details['date'] ),
 					'source'       => $checkin_details['source'],
 					'author'       => $checkin_details['author'],
-				);
+				];
 			} else {
 				$checkin_details = false;
 			}
@@ -917,10 +923,10 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		try {
 			$attendee_order_id = $this->get_attendee_order_id( $attendee_id, $provider );
 		} catch ( ReflectionException $e ) {
-			return array();
+			return [];
 		}
 
-		$attendee_data = array(
+		$attendee_data = [
 			'id'                => $attendee_id,
 			'post_id'           => (int) $attendee['event_id'],
 			'ticket_id'         => (int) $attendee['product_id'],
@@ -933,12 +939,12 @@ class Tribe__Tickets__REST__V1__Post_Repository
 			'modified'          => $attendee_post->post_modified,
 			'modified_utc'      => $attendee_post->post_modified_gmt,
 			'rest_url'          => $main->get_url( '/attendees/' . $attendee_id ),
-		);
+		];
 
-		$can_read_private_post = current_user_can( 'read_private_posts' );
+		$has_manage_access = current_user_can( 'edit_users' ) || current_user_can( 'tribe_manage_attendees' );
 
 		// Only show the attendee name if the attendee did not optout or the user can read private posts
-		if ( empty( $attendee['optout'] ) || $can_read_private_post ) {
+		if ( empty( $attendee['optout'] ) || $has_manage_access ) {
 			$attendee_data['title']  = Tribe__Utils__Array::get( $attendee, 'holder_name', Tribe__Utils__Array::get( $attendee, 'purchaser_name', '' ) );
 			$attendee_data['optout'] = tribe_is_truthy( $attendee['optout'] );
 		} else {
@@ -946,15 +952,18 @@ class Tribe__Tickets__REST__V1__Post_Repository
 		}
 
 		// Sensible information should not be shown to everyone
-		if ( $can_read_private_post ) {
-			$attendee_data = array_merge( $attendee_data, array(
-				'provider'        => $this->get_provider_slug( $provider ),
-				'order'           => $attendee_order_id,
-				'sku'             => $this->get_attendee_sku( $attendee_id, $attendee_order_id, $provider ),
-				'email'           => Tribe__Utils__Array::get( $attendee, 'holder_email', Tribe__Utils__Array::get( $attendee, 'purchaser_email', '' ) ),
-				'checked_in'      => $checked_in,
-				'checkin_details' => $checkin_details,
-			) );
+		if ( $has_manage_access ) {
+			$attendee_data = array_merge(
+				$attendee_data,
+				[
+					'provider'        => $this->get_provider_slug( $provider ),
+					'order'           => $attendee_order_id,
+					'sku'             => $this->get_attendee_sku( $attendee_id, $attendee_order_id, $provider ),
+					'email'           => Tribe__Utils__Array::get( $attendee, 'holder_email', Tribe__Utils__Array::get( $attendee, 'purchaser_email', '' ) ),
+					'checked_in'      => $checked_in,
+					'checkin_details' => $checkin_details,
+				]
+			);
 
 			if ( $provider instanceof Tribe__Tickets__RSVP ) {
 				$attendee_data['rsvp_going'] = tribe_is_truthy( $attendee['order_status'] );
@@ -1016,7 +1025,6 @@ class Tribe__Tickets__REST__V1__Post_Repository
 			return (int) $attendee_id;
 		}
 
-		$key = '';
 		if ( ! empty( $provider->attendee_order_key ) ) {
 			$key = $provider->attendee_order_key;
 		} else {

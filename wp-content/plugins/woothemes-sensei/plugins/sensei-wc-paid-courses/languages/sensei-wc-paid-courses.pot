@@ -1,4 +1,4 @@
-# Copyright (C) 2019 sensei-wc-paid-courses
+# Copyright (C) 2020 sensei-wc-paid-courses
 # This file is distributed under the same license as the sensei-wc-paid-courses package.
 msgid ""
 msgstr ""
@@ -14,30 +14,30 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. translators: %1$s is version of PHP that this plugin requires; %2$s is the version of PHP WordPress is running on.
-#: includes/class-sensei-wc-paid-courses-dependency-checker.php:114
+#: includes/class-sensei-wc-paid-courses-dependency-checker.php:121
 msgid "<strong>Sensei WooCommerce Paid Courses</strong> requires a minimum PHP version of %1$s, but you are running %2$s."
 msgstr ""
 
-#: includes/class-sensei-wc-paid-courses-dependency-checker.php:124
+#: includes/class-sensei-wc-paid-courses-dependency-checker.php:131
 msgid "Learn more about updating PHP"
 msgstr ""
 
 #. translators: accessibility text
-#: includes/class-sensei-wc-paid-courses-dependency-checker.php:126
+#: includes/class-sensei-wc-paid-courses-dependency-checker.php:133
 msgid "(opens in a new tab)"
 msgstr ""
 
 #. translators: %1$s is the minimum version number of Sensei that is required.
-#: includes/class-sensei-wc-paid-courses-dependency-checker.php:145
+#: includes/class-sensei-wc-paid-courses-dependency-checker.php:152
 msgid "<strong>Sensei WooCommerce Paid Courses</strong> requires that the plugin <strong>Sensei LMS</strong> (minimum version: <strong>%1$s</strong>) is installed and activated."
 msgstr ""
 
 #. translators: %1$s is the minimum version number of WooCommerce that is required.
-#: includes/class-sensei-wc-paid-courses-dependency-checker.php:165
+#: includes/class-sensei-wc-paid-courses-dependency-checker.php:172
 msgid "<strong>Sensei WooCommerce Paid Courses</strong> requires that the plugin <strong>WooCommerce</strong> (minimum version: <strong>%1$s</strong>) is installed and activated."
 msgstr ""
 
-#: includes/class-sensei-wc-paid-courses.php:154
+#: includes/class-sensei-wc-paid-courses.php:174
 msgid "Select a product"
 msgstr ""
 
@@ -49,7 +49,7 @@ msgstr ""
 msgid "Optional settings for WooCommerce functions."
 msgstr ""
 
-#: includes/class-settings.php:60
+#: includes/class-settings.php:60, includes/course-enrolment-providers/class-woocommerce-memberships.php:164
 msgid "WooCommerce Memberships"
 msgstr ""
 
@@ -65,20 +65,20 @@ msgstr ""
 msgid "Advanced: Log Sensei/WooCommerce integration events (Uses WC_Logger, logs events at `notice` level)"
 msgstr ""
 
-#: includes/class-settings.php:87
+#: includes/class-settings.php:94
 msgid "Restrict course video"
 msgstr ""
 
-#: includes/class-settings.php:88
+#: includes/class-settings.php:95
 msgid "Used when you don't want the course video to be viewable by non-members"
 msgstr ""
 
-#: includes/class-settings.php:94
-msgid "Auto-start courses belonging to a membership"
+#: includes/class-settings.php:101
+msgid "Auto-enroll in courses belonging to a membership"
 msgstr ""
 
-#: includes/class-settings.php:95
-msgid "Automatically start courses belonging to a WC Membership when activated"
+#: includes/class-settings.php:102
+msgid "Automatically enroll learners in courses provided by their WooCommerce Membership plan. If disabled, members can enroll themselves."
 msgstr ""
 
 #: includes/class-widgets.php:59
@@ -89,156 +89,242 @@ msgstr ""
 msgid "Paid Courses"
 msgstr ""
 
-#: includes/admin/class-courses.php:60
+#: includes/admin/class-courses.php:64
 msgid "Products"
 msgstr ""
 
-#: includes/admin/class-courses.php:208
+#: includes/admin/class-courses.php:225
 msgid "Variation #"
 msgstr ""
 
-#: includes/admin/class-courses.php:245, includes/admin/class-courses.php:245, includes/admin/class-courses.php:254
+#: includes/admin/class-courses.php:272, includes/admin/class-courses.php:272, includes/admin/class-courses.php:281
 msgid "Add a Product"
 msgstr ""
 
-#: includes/admin/class-courses.php:254, includes/admin/class-courses.php:262
+#: includes/admin/class-courses.php:281, includes/admin/class-courses.php:289
 msgid "No products exist yet."
 msgstr ""
 
-#: includes/admin/class-courses.php:254
+#: includes/admin/class-courses.php:281
 msgid "Please add some first"
 msgstr ""
 
-#: includes/admin/class-courses.php:308
+#: includes/admin/class-courses.php:336
 msgctxt "column name"
 msgid "Products"
 msgstr ""
 
-#: includes/admin/class-courses.php:405
-msgid "WooCommerce Product"
+#: includes/admin/class-courses.php:395
+msgid "Please note that <strong>adding a new product</strong> will automatically <strong>enroll</strong> any users in the course who have previously purchased the product. For subscription products, only active subscribers will be enrolled.<br>"
 msgstr ""
 
-#: includes/admin/class-courses.php:407
-msgid "None"
+#: includes/admin/class-courses.php:396
+msgid "Similarly, <strong>removing an existing product</strong> will automatically <strong>unenroll</strong> any users from the course who have previously purchased the product, unless they have purchased another product that is associated with the course.<br>"
+msgstr ""
+
+#: includes/admin/class-courses.php:409
+msgid "Enrollment and Updating Products"
+msgstr ""
+
+#: includes/admin/class-woocommerce-memberships-cancelled-orders-notice.php:100
+msgid "Active with Cancelled Orders"
+msgstr ""
+
+#: includes/admin/class-woocommerce-memberships-cancelled-orders-notice.php:164
+msgid "Sensei with WooCommerce Paid Courses has detected active memberships associated with cancelled orders."
+msgstr ""
+
+#: includes/admin/class-woocommerce-memberships-cancelled-orders-notice.php:173
+msgid ""
+"Prior to Sensei with WooCommerce Paid Courses 3.0, active memberships with cancelled orders\n"
+"						<strong>did not</strong> provide learners with access to the membership's associated courses.\n"
+"						As of Sensei with WooCommerce Paid Courses 3.0, active memberships (regardless of order status)\n"
+"						<strong>do</strong> provide learners with access to the membership's associated courses."
+msgstr ""
+
+#: includes/admin/class-woocommerce-memberships-cancelled-orders-notice.php:186
+msgid ""
+"Please review and manually cancel any memberships where the learner should not have access to\n"
+"					the courses associated with that membership."
+msgstr ""
+
+#: includes/admin/class-woocommerce-memberships-cancelled-orders-notice.php:195
+msgid "View Active Memberships with Cancelled Orders"
+msgstr ""
+
+#. translators: %1$s is URL to edit/view the membership; #%2$s is the membership number.
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1240
+msgid "<a href=\"%1$s\">Membership #%2$s</a> has an active status and is providing access to enrollment."
+msgstr ""
+
+#. translators: %1$s is URL to edit/view the membership; #%2$s is the membership number.
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1247
+msgid "<a href=\"%1$s\">Membership #%2$s</a> would provide access to enrollment for this course but it does not have an active status."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1255
+msgid "Learner does not have any memberships that would provide access to enrollment for this course."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1260
+msgid "Learner has signed up for this course and has an active membership."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1262
+msgid "Learner has signed up for this course but does not have an active membership."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1266
+msgid "Learner has not signed up for this course but has an active membership so they should be able to sign up from the course page."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-memberships.php:1268
+msgid "Learner has not signed up for this course and is not able to without an active membership."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-simple.php:85
+msgid "WooCommerce Simple Products"
+msgstr ""
+
+#. translators: %1$s is URL to edit/view the order; #%2$s is the order number.
+#: includes/course-enrolment-providers/class-woocommerce-simple.php:491
+msgid "<a href=\"%1$s\">Order #%2$s</a> has a paid status and is providing enrollment."
+msgstr ""
+
+#. translators: %1$s is URL to edit/view the order; #%2$s is the order number.
+#: includes/course-enrolment-providers/class-woocommerce-simple.php:498
+msgid "<a href=\"%1$s\">Order #%2$s</a> contains a product that would provide enrollment for this course but it does not have a paid status."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-simple.php:506
+msgid "Learner does not have any orders for products that would provide enrollment for this course."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-subscriptions.php:104
+msgid "WooCommerce Subscriptions"
+msgstr ""
+
+#. translators: %1$s is URL to edit/view the subscription; #%2$s is the subscription number.
+#: includes/course-enrolment-providers/class-woocommerce-subscriptions.php:548
+msgid "<a href=\"%1$s\">Subscription #%2$s</a> has an active status and is providing enrollment."
+msgstr ""
+
+#. translators: %1$s is URL to edit/view the subscription; #%2$s is the subscription number.
+#: includes/course-enrolment-providers/class-woocommerce-subscriptions.php:555
+msgid "<a href=\"%1$s\">Subscription #%2$s</a> contains a product that would provide enrollment for this course but it does not have an active status."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-subscriptions.php:563
+msgid "Learner does not have any subscriptions for products that would provide enrollment for this course."
 msgstr ""
 
 #. translators: Placeholder is a link to log in.
 #. translators: Placeholder is a link to log in.
-#: includes/frontend/class-courses.php:91, includes/woocommerce-integrations/class-sensei-wc.php:1250
+#: includes/frontend/class-courses.php:101, includes/woocommerce-integrations/class-sensei-wc.php:1267
 msgid "Or %1$s to access your purchased courses"
 msgstr ""
 
-#: includes/frontend/class-courses.php:92, includes/woocommerce-integrations/class-sensei-wc.php:1210
+#: includes/frontend/class-courses.php:102, includes/woocommerce-integrations/class-sensei-wc.php:1227
 msgid "log in"
 msgstr ""
 
-#. translators: Placeholder is a link to the Course.
-#: includes/frontend/class-lessons.php:78
-msgid "Please purchase the %1$s before starting the lesson."
-msgstr ""
-
-#: includes/frontend/class-lessons.php:91
+#: includes/frontend/class-lessons.php:87
 msgid "Free Preview"
 msgstr ""
 
-#. translators: Placeholder is a link to the course permalink.
-#: includes/frontend/class-quizzes.php:56
-msgid "Please purchase the %1$s before taking this quiz."
-msgstr ""
-
-#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:630
+#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:662
 msgid "It appears that this membership plan contains a content restriction rule for a course that is already associated with the same product. This can result in undesirable behavior."
 msgid_plural "It appears that this membership plan contains a content restriction rule for some courses that are already associated with the same product. This can result in undesirable behavior."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:642
+#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:674
 msgid "Please remove the following product(s) from the Products field on the Edit Course page for the following course:"
 msgid_plural "Please remove the following product(s) from the Products field on the Edit Course page for the following courses:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:764
+#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:796
 msgid "It appears that this course is associated with a product that is already part of a membership plan for the same course and product. This can result in undesirable behavior."
 msgid_plural "It appears that this course is associated with products that are already part of one or more membership plans for the same course and products. This can result in undesirable behavior."
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:781
+#: includes/woocommerce-integrations/class-sensei-wc-memberships.php:813
 msgid "Learn more about this issue and how to resolve it."
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc-subscriptions.php:278
+#: includes/woocommerce-integrations/class-sensei-wc-subscriptions.php:299
 msgid "No active subscription"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc-subscriptions.php:279
+#: includes/woocommerce-integrations/class-sensei-wc-subscriptions.php:300
 msgid "Sorry, you do not have an access to this content without an active subscription."
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:157
+#: includes/woocommerce-integrations/class-sensei-wc.php:163
 msgid "Paid"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:168
+#: includes/woocommerce-integrations/class-sensei-wc.php:174
 msgid "Free"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:492
+#: includes/woocommerce-integrations/class-sensei-wc.php:511
 msgctxt "Purchase thank you note on Checkout page. The course link(s) will be shown"
 msgid "You have purchased the following course:"
 msgid_plural "You have purchased the following courses:"
 msgstr[0] ""
 msgstr[1] ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:558
+#: includes/woocommerce-integrations/class-sensei-wc.php:577
 msgid "complete purchase"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:559
+#: includes/woocommerce-integrations/class-sensei-wc.php:578
 msgid "complete the purchase"
 msgstr ""
 
 #. translators: Placeholder is a link to the cart.
-#: includes/woocommerce-integrations/class-sensei-wc.php:562
+#: includes/woocommerce-integrations/class-sensei-wc.php:581
 msgid "You have already added this Course to your cart. Please %1$s to access the course."
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:1014
+#: includes/woocommerce-integrations/class-sensei-wc.php:1036
 msgid "Register for this Course"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:1016
+#: includes/woocommerce-integrations/class-sensei-wc.php:1038
 msgid "Purchase this Course"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:1225
+#: includes/woocommerce-integrations/class-sensei-wc.php:1242
 msgid "Checkout"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:1225
+#: includes/woocommerce-integrations/class-sensei-wc.php:1242
 msgid "checkout"
 msgstr ""
 
 #. translators: Placeholder is a link to the cart.
-#: includes/woocommerce-integrations/class-sensei-wc.php:1229
+#: includes/woocommerce-integrations/class-sensei-wc.php:1246
 msgid "This course is already in your cart, please proceed to %1$s, to gain access."
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:1475
+#: includes/woocommerce-integrations/class-sensei-wc.php:1497
 msgid "Course details"
 msgstr ""
 
 #. translators: Placeholder is a link to the course.
-#: includes/woocommerce-integrations/class-sensei-wc.php:1493
+#: includes/woocommerce-integrations/class-sensei-wc.php:1515
 msgid "View course: %1$s"
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:2125
+#: includes/woocommerce-integrations/class-sensei-wc.php:2153
 msgid "You are already taking all the courses associated with this product."
 msgstr ""
 
-#: includes/woocommerce-integrations/class-sensei-wc.php:2128
+#: includes/woocommerce-integrations/class-sensei-wc.php:2156
 msgid "The product you are buying contains a course you are already taking."
 msgstr ""
 
@@ -255,14 +341,18 @@ msgstr ""
 msgid "Sorry, you cannot list this resource."
 msgstr ""
 
-#: includes/rest-api/controllers/class-course-products.php:187
+#: includes/rest-api/controllers/class-course-products.php:200
 msgid "ID of course for which to get assignable products"
 msgstr ""
 
-#: includes/rest-api/controllers/class-course-products.php:212
+#: includes/rest-api/controllers/class-course-products.php:225
 msgid "The product ID."
 msgstr ""
 
-#: includes/rest-api/controllers/class-course-products.php:217
+#: includes/rest-api/controllers/class-course-products.php:230
 msgid "The product name."
+msgstr ""
+
+#: includes/rest-api/controllers/class-course-products.php:235
+msgid "The product's total sales."
 msgstr ""

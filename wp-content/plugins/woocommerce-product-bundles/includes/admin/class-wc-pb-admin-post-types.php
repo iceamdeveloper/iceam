@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin_Post_Types class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -67,7 +67,7 @@ class WC_PB_Admin_Post_Types {
 	public static function bulk_edit_price( $supported_product_types ) {
 
 		$supported_product_types[] = 'bundle';
-		
+
 		return $supported_product_types;
 	}
 }

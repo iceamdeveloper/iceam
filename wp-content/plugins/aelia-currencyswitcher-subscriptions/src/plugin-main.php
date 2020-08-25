@@ -5,7 +5,6 @@ if(!defined('ABSPATH')) exit; // Exit if accessed directly
 require_once('lib/classes/definitions/definitions.php');
 
 use Aelia\WC\Aelia_Plugin;
-use Aelia\WC\Aelia_SessionManager;
 use Aelia\WC\Messages;
 use Aelia\WC\Logger;
 
@@ -13,7 +12,7 @@ use Aelia\WC\Logger;
  * Aelia Currency Switcher Subscriptions Integration plugin.
  **/
 class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
-	public static $version = '1.4.11.200310';
+	public static $version = '1.5.5.200815';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;

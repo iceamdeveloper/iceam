@@ -9,40 +9,24 @@
  *
  * @link {INSERT_ARTCILE_LINK_HERE}
  *
- * @version 5.0.0
+ * @since 5.0.0
+ * @since 5.1.1 Moved icons out to separate templates.
  *
  * @var WP_Post $event The event post object, decorated with additional properties by the `tribe_get_event` function.
  *
  * @see tribe_get_event() for the additional properties added to the event post object.
+ *
+ * @version 5.1.1
  */
 
 ?>
 <div class="tribe-events-pro-week-mobile-events__event-datetime-wrapper tribe-common-b2">
-	<?php if ( ! empty( $event->featured ) ) : ?>
-		<em
-			class="tribe-events-pro-week-mobile-events__event-datetime-featured-icon tribe-common-svgicon tribe-common-svgicon--featured"
-			aria-label="<?php esc_attr_e( 'Featured', 'tribe-events-calendar-pro' ); ?>"
-			title="<?php esc_attr_e( 'Featured', 'tribe-events-calendar-pro' ); ?>"
-		>
-		</em>
-	<?php endif; ?>
+	<?php $this->template( 'week/mobile-events/day/event/date/featured', [ 'event' => $event ] ); ?>
 	<time
 		class="tribe-events-pro-week-mobile-events__event-datetime"
 		datetime="<?php echo esc_attr( $event->dates->start_display->format( 'c' ) ); ?>"
 	>
 		<?php echo $event->schedule_details->escaped(); // Already escaped. ?>
 	</time>
-	<?php if ( ! empty( $event->recurring ) ) : ?>
-		<a
-			href="<?php echo esc_url( $event->permalink_all ); ?>"
-			class="tribe-events-pro-week-mobile-events__event-datetime-recurring-link"
-		>
-			<em
-				class="tribe-events-pro-week-mobile-events__event-datetime-recurring-icon tribe-common-svgicon tribe-common-svgicon--recurring"
-				aria-label="<?php esc_attr_e( 'Recurring', 'tribe-events-calendar-pro' ) ?>"
-				title="<?php esc_attr_e( 'Recurring', 'tribe-events-calendar-pro' ) ?>"
-			>
-			</em>
-		</a>
-	<?php endif; ?>
+	<?php $this->template( 'week/mobile-events/day/event/date/recurring', [ 'event' => $event ] ); ?>
 </div>

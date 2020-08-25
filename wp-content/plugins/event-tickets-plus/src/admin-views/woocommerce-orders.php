@@ -194,7 +194,7 @@ $title = apply_filters( 'tribe_tickets_woocommerce_order_report_title', $title )
 							 * @deprecated 4.10.6
 							 *
 							 */
-							echo apply_filters_deprecated( 'tribe_events_orders_report_site_fees_note', '', $event, $organizer );
+							echo apply_filters_deprecated( 'tribe_events_orders_report_site_fees_note', [ '', $event, $organizer ], '4.10.6' );
 							?>
 						</div>
 						<?php

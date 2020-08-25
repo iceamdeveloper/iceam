@@ -34,7 +34,7 @@ if (!function_exists('ublk_latest_news_solwin_feed')) {
                 $file = 'https://www.solwininfotech.com/documents/assets/latest_product.xml';
                 echo '<div class="display-product">'
                 . '<div class="product-detail"><p><strong>' . __('Latest Product', 'user-blocker') . '</strong></p>';
-                $response = wp_remote_post($file);
+                $response = wp_remote_get($file);
                 if (is_wp_error($response)) {
                     $error_message = $response->get_error_message();
                     echo "<p>" . __('Something went wrong', 'user-blocker') . " : $error_message" . "</p>";
@@ -121,7 +121,7 @@ if (!function_exists('ublk_enqueueStyleScript')) {
     function ublk_enqueueStyleScript() {
         global $screen;
         $screen = get_current_screen();
-        if ((isset($_GET['page']) && ($_GET['page'] == 'all_type_blocked_user_list' || $_GET['page'] == 'permanent_blocked_user_list' || $_GET['page'] == 'datewise_blocked_user_list' || $_GET['page'] == 'blocked_user_list' || $_GET['page'] == 'block_user' || $_GET['page'] == 'block_user_date' || $_GET['page'] == 'block_user_permenant' || $_GET['page'] == 'welcome_block_user')) || $screen->id == "plugins" ) {
+        if ((isset($_GET['page']) && ($_GET['page'] == 'all_type_blocked_user_list' || $_GET['page'] == 'permanent_blocked_user_list' || $_GET['page'] == 'datewise_blocked_user_list' || $_GET['page'] == 'blocked_user_list' || $_GET['page'] == 'block_user' || $_GET['page'] == 'block_user_date' || $_GET['page'] == 'block_user_permenant' || $_GET['page'] == 'welcome_block_user' || $_GET['page'] == 'user_blocker_settings')) || $screen->id == "plugins" ) {
             wp_enqueue_script('jquery');
             wp_enqueue_script('jquery-ui-js', 'https://code.jquery.com/ui/1.11.0/jquery-ui.min.js', 'jquery');
             wp_register_script('timepicker-addon-js', plugins_url() . '/user-blocker/script/jquery-ui-timepicker-addon.js', 'jquery');
@@ -171,7 +171,7 @@ if (!function_exists('ublk_get_user_blocker_total_downloads')) {
             )
         );
         // Make request and extract plug-in object. Action is query_plugins
-        $response = wp_remote_post(
+        $response = wp_remote_get(
                 'http://api.wordpress.org/plugins/info/1.0/', array(
             'body' => array(
                 'action' => 'query_plugins',
@@ -220,7 +220,7 @@ if ($wp_version > 3.8) {
                 )
             );
             // Make request and extract plug-in object. Action is query_plugins
-            $response = wp_remote_post(
+            $response = wp_remote_get(
                     'http://api.wordpress.org/plugins/info/1.0/', array(
                 'body' => array(
                     'action' => 'query_plugins',
@@ -821,4 +821,50 @@ if(!function_exists('ublk_update_block_user_role')){
 //            }
 //        }
     }
+}
+
+function ublk_block_user_setting_page(){
+    
+    $msg = '';
+    $msg_class = '';
+    if (isset($_POST['submit_display']) && isset($_POST['_wp_ub_settings_nonce']) && wp_verify_nonce($_POST['_wp_ub_settings_nonce'], '_wp_ub_settings_action')) {
+        $msg_class = 'updated';
+        if(isset($_POST['ub_delete_data'])) {
+            update_option('ub_delete_data', '1');
+        } else {
+            update_option('ub_delete_data', '0');  
+        }
+        $msg = __('User blocker plugin setting has been updated successfully', 'user-blocker');
+    }
+    $ub_delete_data = get_option('ub_delete_data',0);
+    ?>
+    <div class="wrap">
+        <?php 
+        if ($msg != '') {
+            ?>
+            <div class="ublocker-notice <?php echo $msg_class; ?>">
+                <p><?php echo $msg; ?></p>
+            </div>
+            <?php
+        }
+        ?>
+        <h2 class="ublocker-page-title mg-bpttom-20"><?php _e('User Blocker Plugin Settings', 'user-blocker') ?></h2>
+        <div class="cover_form">
+            <form id="frmubsetting" name="frmubsetting" method="post" action="">
+                <div class="ub-setting-wrap">
+                    <div class="ub-left-setting">
+                        <h4><?php _e('Delete data on deletion of plugin', 'user-blocker') ?></h4>
+                    </div>
+                    <div class="ub-right-setting">
+                        <input id="ub_delete_data" type="checkbox" value="1" <?php checked('1',$ub_delete_data); ?> name="ub_delete_data">&nbsp;<label for="ub_delete_data"><?php esc_html_e('Delete data on deletion of plugin.', 'user-blocker'); ?></label>
+                    </div>
+                </div>
+                <?php wp_nonce_field('_wp_ub_settings_action', '_wp_ub_settings_nonce'); ?>
+                    <p class="submit">
+                        <input id="submit" class="button button-primary" type="submit" value="<?php esc_attr_e('Save Changes', 'user-blocker'); ?>" name="submit_display">
+                    </p>
+            </form>
+        </div>
+    </div>
+    <?php
 }

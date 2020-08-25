@@ -2,7 +2,7 @@
 /**
  * WC_PB_Install class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles installation and updating tasks.
  *
  * @class    WC_PB_Install
- * @version  5.9.0
+ * @version  6.3.0
  */
 class WC_PB_Install {
 
@@ -37,6 +37,18 @@ class WC_PB_Install {
 			'wc_pb_update_510_db_version'
 		)
 	);
+
+	/**
+	 * Whether install() ran in this request.
+	 * @var boolean
+	 */
+	private static $is_install_request;
+
+	/**
+	 * Term runtime cache.
+	 * @var boolean
+	 */
+	private static $bundle_term_exists;
 
 	/**
 	 * Background update class.
@@ -64,7 +76,7 @@ class WC_PB_Install {
 		// Installation and DB updates handling.
 		add_action( 'init', array( __CLASS__, 'init_background_updater' ), 5 );
 		add_action( 'init', array( __CLASS__, 'define_updating_constant' ) );
-		add_action( 'admin_init', array( __CLASS__, 'maybe_install' ) );
+		add_action( 'init', array( __CLASS__, 'maybe_install' ) );
 		add_action( 'admin_init', array( __CLASS__, 'maybe_update' ) );
 
 		// Show row meta on the plugin screen.
@@ -116,16 +128,10 @@ class WC_PB_Install {
 	 *
 	 * @since  5.5.0
 	 *
-	 * @param  boolean  $check_installing
 	 * @return boolean
 	 */
-	private static function can_install( $check_installing = true ) {
-
-		if ( $check_installing && get_transient( 'wc_pb_installing' ) ) {
-			return false;
-		}
-
-		return ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) && ! defined( 'IFRAME_REQUEST' ) && current_user_can( 'manage_woocommerce' );
+	private static function can_install() {
+		return ( ! defined( 'DOING_AJAX' ) || ! DOING_AJAX ) && ! defined( 'IFRAME_REQUEST' ) && ! self::is_installing();
 	}
 
 	/**
@@ -137,6 +143,27 @@ class WC_PB_Install {
 		if ( self::can_install() && self::must_install() ) {
 			self::install();
 		}
+	}
+
+	/**
+	 * Check version and run the installer if necessary.
+	 *
+	 * @since  6.2.4
+	 */
+	private static function is_installing() {
+		return 'yes' === get_transient( 'wc_pb_installing' );
+	}
+
+	/**
+	 * Check version and run the installer if necessary.
+	 *
+	 * @since  6.2.4
+	 */
+	private static function is_new_install() {
+		if ( is_null( self::$bundle_term_exists ) ) {
+			self::$bundle_term_exists = get_term_by( 'slug', 'bundle', 'product_type' );
+		}
+		return ! self::$bundle_term_exists;
 	}
 
 	/**
@@ -163,11 +190,10 @@ class WC_PB_Install {
 	 *
 	 * @since  5.5.0
 	 *
-	 * @param  boolean  $check_installing
 	 * @return boolean
 	 */
-	private static function can_update( $check_installing = true ) {
-		return self::can_install( $check_installing ) && version_compare( self::$current_db_version, WC_PB()->plugin_version( true ), '<' );
+	private static function can_update() {
+		return ( self::$is_install_request || self::can_install() ) && current_user_can( 'manage_woocommerce' ) && version_compare( self::$current_db_version, WC_PB()->plugin_version( true ), '<' );
 	}
 
 	/**
@@ -176,13 +202,49 @@ class WC_PB_Install {
 	 * @since  5.5.0
 	 */
 	public static function maybe_update() {
+
 		if ( ! empty( $_GET[ 'force_wc_pb_db_update' ] ) && isset( $_GET[ '_wc_pb_admin_nonce' ] ) && wp_verify_nonce( wc_clean( $_GET[ '_wc_pb_admin_nonce' ] ), 'wc_pb_force_db_update_nonce' ) ) {
+
 			if ( self::can_update() && self::must_update() ) {
 				self::force_update();
 			}
+
 		} elseif ( ! empty( $_GET[ 'trigger_wc_pb_db_update' ] ) && isset( $_GET[ '_wc_pb_admin_nonce' ] ) && wp_verify_nonce( wc_clean( $_GET[ '_wc_pb_admin_nonce' ] ), 'wc_pb_trigger_db_update_nonce' ) ) {
+
 			if ( self::can_update() && self::must_update() ) {
 				self::trigger_update();
+			}
+
+		} else {
+
+			// Queue upgrade tasks.
+			if ( self::can_update() ) {
+
+				if ( ! is_blog_installed() ) {
+					return;
+				}
+
+				if ( self::must_update() && ! self::is_new_install() ) {
+
+					if ( ! class_exists( 'WC_PB_Admin_Notices' ) ) {
+						require_once( WC_PB_ABSPATH . 'includes/admin/class-wc-pb-admin-notices.php' );
+					}
+
+					// Add 'update' notice and save early -- saving on the 'shutdown' action will fail if a chained request arrives before the 'shutdown' hook fires.
+					WC_PB_Admin_Notices::add_maintenance_notice( 'update' );
+					WC_PB_Admin_Notices::save_notices();
+
+					if ( self::auto_update_enabled() ) {
+						self::update();
+					} else {
+						delete_transient( 'wc_pb_installing' );
+						delete_option( 'wc_pb_update_init' );
+					}
+
+				// Nothing found - this is a new install :)
+				} else {
+					self::update_db_version();
+				}
 			}
 		}
 	}
@@ -203,14 +265,21 @@ class WC_PB_Install {
 	 */
 	public static function install() {
 
+		if ( ! is_blog_installed() ) {
+			return;
+		}
+
 		// Running for the first time? Set a transient now. Used in 'can_install' to prevent race conditions.
 		set_transient( 'wc_pb_installing', 'yes', 10 );
+
+		// Set a flag to indicate we're installing in the current request.
+		self::$is_install_request = true;
 
 		// Create tables.
 		self::create_tables();
 
 		// if bundle type does not exist, create it.
-		if ( false === $bundle_term_exists = get_term_by( 'slug', 'bundle', 'product_type' ) ) {
+		if ( self::is_new_install() ) {
 			wp_insert_term( 'bundle', 'product_type' );
 		}
 
@@ -223,30 +292,15 @@ class WC_PB_Install {
 			WC_PB_Admin_Notices::add_maintenance_notice( 'welcome' );
 		}
 
+		// Run a loopback test after every update. Will only run once if successful.
+		WC_PB_Admin_Notices::add_maintenance_notice( 'loopback' );
+
+		// Add feature plugin recommendations in the Inbox: These are only added once.
+		WC_PB_Admin_Notices::add_note( 'min-max' );
+		WC_PB_Admin_Notices::add_note( 'bulk-discounts' );
+
 		// Update plugin version - once set, 'maybe_install' will not call 'install' again.
 		self::update_version();
-
-		// Queue upgrade tasks.
-		if ( self::can_update( false ) ) {
-
-			if ( $bundle_term_exists && self::must_update() ) {
-
-				// Add 'update' notice and save early -- saving on the 'shutdown' action will fail if a chained request arrives before the 'shutdown' hook fires.
-				WC_PB_Admin_Notices::add_maintenance_notice( 'update' );
-				WC_PB_Admin_Notices::save_notices();
-
-				if ( self::auto_update_enabled() ) {
-					self::update();
-				} else {
-					delete_transient( 'wc_pb_installing' );
-					delete_option( 'wc_pb_update_init' );
-				}
-
-			// Nothing found - this is a new install :)
-			} else {
-				self::update_db_version();
-			}
-		}
 	}
 
 	/**
@@ -369,6 +423,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 	public static function trigger_update() {
 		self::update();
 		wp_safe_redirect( admin_url() );
+		exit;
 	}
 
 	/**
@@ -385,6 +440,7 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 		 */
 		do_action( self::$background_updater->get_cron_hook_identifier() );
 		wp_safe_redirect( admin_url() );
+		exit;
 	}
 
 	/**
@@ -501,8 +557,8 @@ CREATE TABLE {$wpdb->prefix}woocommerce_bundled_itemmeta (
 
 		if ( $file == WC_PB()->plugin_basename() ) {
 			$row_meta = array(
-				'docs'    => '<a href="https://docs.woocommerce.com/document/bundles/">' . __( 'Documentation', 'woocommerce-product-bundles' ) . '</a>',
-				'support' => '<a href="' . esc_url( WC_PB_SUPPORT_URL ) . '">' . __( 'Support', 'woocommerce-product-bundles' ) . '</a>',
+				'docs'    => '<a href="' . WC_PB()->get_resource_url( 'docs-contents' ) . '">' . __( 'Documentation', 'woocommerce-product-bundles' ) . '</a>',
+				'support' => '<a href="' . WC_PB()->get_resource_url( 'ticket-form' ) . '">' . __( 'Support', 'woocommerce-product-bundles' ) . '</a>',
 			);
 
 			return array_merge( $links, $row_meta );

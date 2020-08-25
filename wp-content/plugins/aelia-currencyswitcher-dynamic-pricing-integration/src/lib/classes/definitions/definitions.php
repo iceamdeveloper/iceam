@@ -22,7 +22,7 @@ class Definitions {
 	 * The slug used to check for updates.
 	 *
 	 * @var string
-	 * @since x.x
+	 * @since 1.0.5.190426
 	 */
 	const PLUGIN_SLUG_FOR_UPDATES = 'aelia-currencyswitcher-dynamic-pricing-integration';
 

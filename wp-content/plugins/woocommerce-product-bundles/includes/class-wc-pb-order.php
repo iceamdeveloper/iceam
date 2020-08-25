@@ -2,7 +2,7 @@
 /**
  * WC_PB_Order class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.5.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle order-related functions and filters.
  *
  * @class    WC_PB_Order
- * @version  5.11.0
+ * @version  6.2.0
  */
 class WC_PB_Order {
 
@@ -121,6 +121,7 @@ class WC_PB_Order {
 			return false;
 		}
 
+		$bundle              = wc_get_product( $order_item->get_product_id() );
 		$configuration       = $order_item->get_meta( '_stamp', true );
 		$bundled_order_items = wc_pb_get_bundled_order_items( $order_item, $order );
 
@@ -148,7 +149,8 @@ class WC_PB_Order {
 			$configuration[ $bundled_item_id ][ 'quantity' ] = $bundled_order_item_qty / $order_item->get_quantity();
 		}
 
-		return $configuration;
+		// Finally, parse the configuration to add data for any new bundled items.
+		return $bundle ? WC_PB()->cart->parse_bundle_configuration( $bundle, $configuration ) : $configuration;
 	}
 
 	/**
@@ -300,11 +302,8 @@ class WC_PB_Order {
 
 						if ( $bundled_product->needs_shipping() && $bundled_item->is_shipped_individually( $bundled_product ) ) {
 							$shipped_individually = true;
-						} elseif ( $bundled_product->needs_shipping() ) {
-							/** Hook documented in 'WC_PB_Cart::set_bundled_cart_item()'. */
-							if ( apply_filters( 'woocommerce_bundled_item_has_bundled_weight', $bundle->get_aggregate_weight(), $bundled_product, $bundled_item_id, $bundle ) ) {
-								$bundled_weight += (double) $bundled_product->get_weight( 'edit' ) * $bundled_item_quantity;
-							}
+						} elseif ( $bundled_product->needs_shipping() && $bundled_item->is_weight_aggregated( $bundled_product ) ) {
+							$bundled_weight += (double) $bundled_product->get_weight( 'edit' ) * $bundled_item_quantity;
 						}
 
 						$bundled_order_item->add_meta_data( '_bundled_item_needs_shipping', $shipped_individually ? 'yes' : 'no', true );

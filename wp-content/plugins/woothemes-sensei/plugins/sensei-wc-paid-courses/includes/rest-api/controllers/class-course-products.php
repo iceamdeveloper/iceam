@@ -118,6 +118,7 @@ class Course_Products extends WP_REST_Controller {
 			'per_page' => 'posts_per_page',
 			'search'   => 's',
 			'status'   => 'post_status',
+			'include'  => 'post__in',
 		];
 
 		/*
@@ -131,16 +132,21 @@ class Course_Products extends WP_REST_Controller {
 		}
 
 		// Load the data.
-		$products = Courses::instance()->get_assignable_products( $request['course_id'], $args );
-		$data     = [];
+		$products          = Courses::instance()->get_assignable_products( $request['course_id'], $args );
+		$products_response = [];
 
 		// Prepare for response.
 		foreach ( $products as $product ) {
-			$product_response = $this->prepare_item_for_response( $product, $request );
-			$data[]           = $this->prepare_response_for_collection( $product_response );
+			$product_response    = $this->prepare_item_for_response( $product, $request );
+			$products_response[] = $this->prepare_response_for_collection( $product_response );
 		}
 
-		return rest_ensure_response( $data );
+		$response = [
+			'user_confirmed_modal' => Courses::instance()->has_user_confirmed_modal(),
+			'products'             => $products_response,
+		];
+
+		return rest_ensure_response( $response );
 	}
 
 	/**
@@ -164,6 +170,10 @@ class Course_Products extends WP_REST_Controller {
 			$data['name'] = $this->get_product_name( $product );
 		}
 
+		if ( in_array( 'total_sales', $fields, true ) ) {
+			$data['total_sales'] = get_post_meta( $product->ID, 'total_sales', true );
+		}
+
 		return rest_ensure_response( $data );
 	}
 
@@ -181,6 +191,9 @@ class Course_Products extends WP_REST_Controller {
 		$posts_controller_params           = $this->posts_controller->get_collection_params();
 		$query_params['status']            = $posts_controller_params['status'];
 		$query_params['status']['default'] = 'any';
+
+		// Add "include" from Posts Controller.
+		$query_params['include'] = $posts_controller_params['include'];
 
 		// Add course ID to get only products that are assignable to that course.
 		$query_params['course_id'] = [
@@ -208,14 +221,19 @@ class Course_Products extends WP_REST_Controller {
 			'title'      => 'product',
 			'type'       => 'object',
 			'properties' => [
-				'id'   => [
+				'id'          => [
 					'description' => esc_html__( 'The product ID.', 'sensei-wc-paid-courses' ),
 					'type'        => 'integer',
 					'readonly'    => true,
 				],
-				'name' => [
+				'name'        => [
 					'description' => esc_html__( 'The product name.', 'sensei-wc-paid-courses' ),
 					'type'        => 'string',
+					'readonly'    => true,
+				],
+				'total_sales' => [
+					'description' => esc_html__( 'The product\'s total sales.', 'sensei-wc-paid-courses' ),
+					'type'        => 'integer',
 					'readonly'    => true,
 				],
 			],

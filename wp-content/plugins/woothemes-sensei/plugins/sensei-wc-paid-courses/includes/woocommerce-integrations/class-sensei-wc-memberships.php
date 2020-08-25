@@ -14,6 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 use Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses;
 use Sensei_WC_Paid_Courses\Courses;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
 
 // @phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy classname.
 
@@ -46,14 +47,14 @@ class Sensei_WC_Memberships {
 		// Remove default restriction functionality for wc memberships on courses.
 		add_action( 'wp', [ __CLASS__, 'disable_wc_membership_course_restrictions' ], 999 );
 
-		// Add custom restriction functionality.
-		add_filter( 'sensei_is_course_content_restricted', [ __CLASS__, 'is_course_access_restricted' ], 10, 2 );
-		add_filter( 'sensei_couse_access_permission_message', [ __CLASS__, 'add_wc_memberships_notice' ], 10, 2 );
-		add_filter( 'sensei_display_start_course_form', [ __CLASS__, 'display_start_course_form_to_members_only' ], 10, 2 );
-		add_filter( 'sensei_user_can_register_for_course', [ __CLASS__, 'display_start_course_form_to_members_only' ], 10, 2 );
+		if ( Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+			// Add custom restriction functionality.
+			add_filter( 'sensei_is_course_content_restricted', [ __CLASS__, 'is_course_access_restricted' ], 10, 2 );
+			add_filter( 'sensei_couse_access_permission_message', [ __CLASS__, 'add_wc_memberships_notice' ], 10, 2 );
+			add_filter( 'sensei_display_start_course_form', [ __CLASS__, 'display_start_course_form_to_members_only' ], 10, 2 );
+			add_filter( 'sensei_user_can_register_for_course', [ __CLASS__, 'display_start_course_form_to_members_only' ], 10, 2 );
+		}
 
-		add_action( 'wc_memberships_user_membership_status_changed', [ __CLASS__, 'start_courses_associated_with_membership' ] );
-		add_action( 'wc_memberships_user_membership_saved', [ __CLASS__, 'on_wc_memberships_user_membership_saved' ], 10, 2 );
 		add_filter( 'wc_memberships_restricted_message_html', [ __CLASS__, 'customize_membership_notice' ] );
 
 		// Load block editor assets.
@@ -92,11 +93,15 @@ class Sensei_WC_Memberships {
 	/**
 	 * Is Course Access Restricted.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param bool $access_restricted Access Restricted.
 	 * @param int  $course_id Course ID.
 	 * @return bool
 	 */
 	public static function is_course_access_restricted( $access_restricted, $course_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		if ( false === self::is_wc_memberships_active() ) {
 			return $access_restricted;
 		}
@@ -106,6 +111,8 @@ class Sensei_WC_Memberships {
 
 	/**
 	 * Is content restricted?
+	 *
+	 * @deprecated 2.0.0
 	 *
 	 * @param int $object_id The object id.
 	 * @return bool
@@ -122,10 +129,14 @@ class Sensei_WC_Memberships {
 	/**
 	 * Add Notice.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param string $content The content.
 	 * @return string
 	 */
 	public static function add_wc_memberships_notice( $content = '' ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		global $post;
 
 		if ( false === self::is_wc_memberships_active() ) {
@@ -152,12 +163,15 @@ class Sensei_WC_Memberships {
 	 * if the 'start taking this course' form should be displayed for a given course.
 	 * If a course has membership rules, restrict to active logged in members.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param bool $should_display Should Display.
 	 * @param int  $course_id The course in question.
 	 *
 	 * @return bool|int The course id or false in case a restriction applies.
 	 */
 	public static function display_start_course_form_to_members_only( $should_display, $course_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		return ! self::is_course_access_restricted( $should_display, $course_id );
 	}
@@ -267,10 +281,14 @@ class Sensei_WC_Memberships {
 	 *
 	 * Hooked into wc_memberships_user_membership_saved and wc_memberships_user_membership_created
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param mixed $membership_plan The Membership Plan.
 	 * @param array $args The args.
 	 */
 	public static function on_wc_memberships_user_membership_saved( $membership_plan, $args = [] ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		$user_membership_id = isset( $args['user_membership_id'] ) ? absint( $args['user_membership_id'] ) : null;
 
 		if ( ! $user_membership_id ) {
@@ -287,9 +305,12 @@ class Sensei_WC_Memberships {
 	 *
 	 * Hooked into wc_memberships_user_membership_status_changed
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param WC_Memberships_User_Membership $user_membership The user membership.
 	 */
 	public static function start_courses_associated_with_membership( $user_membership ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		if ( false === self::is_wc_memberships_active() ) {
 			return;
@@ -330,6 +351,8 @@ class Sensei_WC_Memberships {
 			 *
 			 * @since 1.0.0
 			 *
+			 * @deprecated 2.0.0
+			 *
 			 * @param bool                           $auto_start_courses True if we should auto-start the course.
 			 * @param WC_Memberships_User_Membership $user_membership    User membership object.
 			 * @param int                            $course_id          Course ID that will be started.
@@ -346,6 +369,8 @@ class Sensei_WC_Memberships {
 	/**
 	 * Should we auto start any Courses this Membership controls access to?
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param WC_Memberships_User_Membership $user_membership User Membership.
 	 * @return bool
 	 */
@@ -357,6 +382,8 @@ class Sensei_WC_Memberships {
 		 *
 		 * @since 1.0.0
 		 *
+		 * @deprecated 2.0.0
+		 *
 		 * @param bool                           $auto_start_courses True if we should auto start the course.
 		 * @param WC_Memberships_User_Membership $user_membership    User membership object.
 		 */
@@ -366,10 +393,14 @@ class Sensei_WC_Memberships {
 	/**
 	 * Is My Courses Page
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param int $post_id Post Id.
 	 * @return bool
 	 */
 	public static function is_my_courses_page( $post_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		return is_page() && intval( Sensei()->settings->get( 'my_course_page' ) ) === intval( $post_id );
 	}
 
@@ -414,12 +445,13 @@ class Sensei_WC_Memberships {
 				'lesson' => $post->ID,
 			]
 		)
-			|| current_time( 'timestamp' ) < wc_memberships_get_user_access_start_time(
+			|| time() < wc_memberships_get_user_access_start_time(
 				get_current_user_id(),
 				'view',
 				[
 					'lesson' => $post->ID,
-				]
+				],
+				true
 			) ) {
 
 			remove_action( 'sensei_single_lesson_content_inside_after', [ 'Sensei_Lesson', 'footer_quiz_call_to_action' ] );
@@ -430,7 +462,6 @@ class Sensei_WC_Memberships {
 			remove_action( 'sensei_complete_lesson_button', [ Sensei()->frontend, 'sensei_complete_lesson_button' ] );
 		}
 	}
-
 
 	/**
 	 * Optional: Restrict course videos unless the member has access.
@@ -458,12 +489,13 @@ class Sensei_WC_Memberships {
 				'course' => $post->ID,
 			]
 		)
-			|| current_time( 'timestamp' ) < wc_memberships_get_user_access_start_time(
+			|| time() < wc_memberships_get_user_access_start_time(
 				get_current_user_id(),
 				'view',
 				[
 					'course' => $post->ID,
-				]
+				],
+				true
 			) ) {
 
 			remove_action( 'sensei_single_course_content_inside_before', [ 'Sensei_Course', 'the_course_video' ], 40 );

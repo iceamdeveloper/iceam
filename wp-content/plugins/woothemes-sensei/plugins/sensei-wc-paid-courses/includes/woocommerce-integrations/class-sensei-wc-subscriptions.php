@@ -3,7 +3,6 @@
  * Sensei WooCommerce Integration
  *
  * @package sensei-wc-paid-courses
- * @since   1.0.0
  */
 
 use Sensei_WC_Paid_Courses\Courses;
@@ -13,6 +12,10 @@ use Sensei_WC_Paid_Courses\Courses;
 /**
  * Sensei_WC_Subscriptions class. Adds integration between Sensei and
  * WooCommerce Subscriptions.
+ *
+ * @deprecated 2.0.0 Functionality has been moved into the enrolment provider.
+ *
+ * @since 1.0.0
  */
 class Sensei_WC_Subscriptions {
 
@@ -38,10 +41,14 @@ class Sensei_WC_Subscriptions {
 	/**
 	 * Check if WooCommerce Subscriptions is active.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @return bool
 	 */
 	public static function is_wc_subscriptions_active() {
-		return Sensei_Utils::is_plugin_present_and_activated(
+		_deprecated_function( __METHOD__, '2.0.0', '\Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Subscriptions::is_active' );
+
+		return \Sensei_Utils::is_plugin_present_and_activated(
 			'WC_Subscriptions',
 			'woocommerce-subscriptions/woocommerce-subscriptions.php'
 		);
@@ -50,9 +57,13 @@ class Sensei_WC_Subscriptions {
 	/**
 	 * Load WC Subscriptions integration hooks if WC Subscriptions is active
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @return void
 	 */
 	public static function load_wc_subscriptions_integration_hooks() {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		if ( false === self::is_wc_subscriptions_active() ) {
 			return;
 		}
@@ -68,12 +79,15 @@ class Sensei_WC_Subscriptions {
 	 * Check if user bought a subscription for the course but has since
 	 * cancelled it.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param int $course_id The Course ID.
 	 * @param int $user_id   The User ID.
 	 *
 	 * @return bool
 	 */
 	public static function has_user_bought_subscription_but_cancelled( $course_id, $user_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		if ( ! self::is_wc_subscriptions_active() ) {
 
@@ -138,6 +152,8 @@ class Sensei_WC_Subscriptions {
 	/**
 	 * Responds to when a subscription product is purchased
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @since Sensei 1.2.0
 	 * @since Sensei 1.9.0 move to class Sensei_WC
 	 * @since Sensei 1.9.12 move to class Sensei_WC_Subscriptions
@@ -147,6 +163,8 @@ class Sensei_WC_Subscriptions {
 	 * @return void
 	 */
 	public static function activate_subscription( $order ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		$order_user         = get_user_by( 'id', $order->get_customer_id() );
 		$user['ID']         = $order_user->ID;
 		$user['user_login'] = $order_user->user_login;
@@ -195,6 +213,8 @@ class Sensei_WC_Subscriptions {
 	 * Determine if the user has and active subscription to give them access
 	 * to the requested resource.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @since Sensei 1.9.12
 	 *
 	 * @param boolean $user_access_permission The permission to check for.
@@ -202,6 +222,7 @@ class Sensei_WC_Subscriptions {
 	 * @return boolean $user_access_permission
 	 */
 	public static function get_subscription_permission( $user_access_permission, $user_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		global $post;
 
@@ -288,6 +309,8 @@ class Sensei_WC_Subscriptions {
 	 * Filter whether the user has started the course based on whether they have
 	 * purchased a subscription.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @since Sensei 1.9.12
 	 *
 	 * @param bool $has_user_started_course Whether the user has started the course.
@@ -297,6 +320,7 @@ class Sensei_WC_Subscriptions {
 	 * @return bool $has_user_started_course
 	 */
 	public static function get_subscription_user_started_course( $has_user_started_course, $course_id, $user_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		// avoid changing the filter value in the following cases.
 		if ( empty( $course_id ) || empty( $user_id ) || ! is_user_logged_in() || is_admin()
@@ -316,7 +340,7 @@ class Sensei_WC_Subscriptions {
 		}
 
 		$user_data_index_key = $course_id . '_' . $user_id;
-		if ( ! self::$disable_caching && isset( $sensei_wc_subscription_access_store[ $user_data_index_key  ] ) ) {
+		if ( ! self::$disable_caching && isset( $sensei_wc_subscription_access_store[ $user_data_index_key ] ) ) {
 			return $sensei_wc_subscription_access_store[ $user_data_index_key ];
 		}
 
@@ -372,6 +396,8 @@ class Sensei_WC_Subscriptions {
 	 *
 	 * Important to note that all subscriptions for the user is compared.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @since Sensei 1.9.0
 	 *
 	 * @param int $user_id    The User ID.
@@ -381,6 +407,8 @@ class Sensei_WC_Subscriptions {
 	 * @return bool
 	 */
 	public static function was_user_added_without_subscription( $user_id, $product_id, $course_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		$was_user_added_without_subscription = false;
 
 		// if user is not on the course they were not added.
@@ -455,11 +483,15 @@ class Sensei_WC_Subscriptions {
 	 * Determine whether the user has an active order for a non-subscription
 	 * product attached to the course.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param int $user_id   The User ID.
 	 * @param int $course_id The Course ID.
 	 * @return bool
 	 */
 	private static function user_has_non_subscription_product_for_course( $user_id, $course_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		$order_ids = Sensei_WC::get_learner_course_active_order_id( $user_id, $course_id, true, true );
 
 		foreach ( $order_ids as $order_id ) {
@@ -488,16 +520,16 @@ class Sensei_WC_Subscriptions {
 	/**
 	 * Get all the valid subscription types.
 	 *
+	 * @deprecated 2.0.0 Use \Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Subscriptions::get_subscription_types instead.
 	 * @since Sensei 1.9.0
+	 *
 	 * @return array
 	 */
 	public static function get_subscription_types() {
+		_deprecated_function( __METHOD__, '2.0.0', '\Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Subscriptions::get_subscription_types' );
+
 		/**
-		 * Get the subscription types for products.
-		 *
-		 * @since 1.0.0
-		 *
-		 * @param array $subscription_types Array of all product type slugs for subscription products.
+		 * Filter is documented in `includes/course-enrolment-providers/class-woocommerce-subscriptions.php `.
 		 */
 		return apply_filters( 'sensei_wc_paid_courses_subscriptions_get_subscription_types', self::$default_subscription_types );
 
@@ -507,6 +539,8 @@ class Sensei_WC_Subscriptions {
 	 * Give access if user has active subscription on the product otherwise restrict it.
 	 * also check if the user was added to the course directly after the subscription started.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @param int $user_id    The User ID.
 	 * @param int $product_id The Product ID.
 	 * @param int $course_id  The Course ID.
@@ -514,6 +548,7 @@ class Sensei_WC_Subscriptions {
 	 * @return bool
 	 */
 	private static function is_user_eligible_for_access( $user_id, $product_id, $course_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		return wcs_user_has_subscription( $user_id, $product_id, 'active' )
 		|| wcs_user_has_subscription( $user_id, $product_id, 'pending-cancel' )

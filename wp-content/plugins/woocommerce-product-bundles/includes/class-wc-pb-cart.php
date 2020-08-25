@@ -2,7 +2,7 @@
 /**
  * WC_PB_Cart class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.5.0
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle cart functions and filters.
  *
  * @class    WC_PB_Cart
- * @version  6.1.4
+ * @version  6.3.5
  */
 class WC_PB_Cart {
 
@@ -89,7 +89,7 @@ class WC_PB_Cart {
 		add_filter( 'woocommerce_add_cart_item_data', array( $this, 'add_cart_item_data' ), 10, 2 );
 
 		// Add bundled items to the cart.
-		add_action( 'woocommerce_add_to_cart', array( $this, 'bundle_add_to_cart' ), 10, 6 );
+		add_action( 'woocommerce_add_to_cart', array( $this, 'bundle_add_to_cart' ), 9.9, 6 );
 
 		// Modify cart items for bundled shipping strategy.
 		add_filter( 'woocommerce_add_cart_item', array( $this, 'add_cart_item_filter' ), 10, 2 );
@@ -733,7 +733,7 @@ class WC_PB_Cart {
 
 					$group_mode = $product->get_group_mode();
 
-					if ( ! empty( $bundled_items ) && ( false === WC_Product_Bundle::group_mode_has( $group_mode, 'parent_item' ) || WC_Product_Bundle::group_mode_has( $group_mode, 'component_multiselect' ) ) ) {
+					if ( ! empty( $bundled_items ) && false === WC_Product_Bundle::group_mode_has( $group_mode, 'parent_item' ) ) {
 
 						$items_added = $bundled_stock->get_items();
 
@@ -836,6 +836,10 @@ class WC_PB_Cart {
 			return $cart_item;
 		}
 
+		if ( isset( $cart_item[ 'subscription_renewal' ] ) ) {
+			$bundled_item->is_subscription_renewal = true;
+		}
+
 		$discount_method = WC_PB_Product_Prices::get_bundled_cart_item_discount_method();
 
 		if ( 'filters' === $discount_method ) {
@@ -880,17 +884,19 @@ class WC_PB_Cart {
 
 		if ( $cart_item[ 'data' ]->needs_shipping() ) {
 
+			/*
+			 * Due to the caching built into WC_Product_Bundle::get_bundled_item, any references set outside session load will be lost.
+			 * Here we fix those references.
+			 *
+			 * See WC_PB_CP_Compatibility::add_bundle_to_cart
+			 */
+			if ( isset( $bundle->composited_cart_item ) ) {
+				$bundled_item->composited_cart_item = $bundle->composited_cart_item;
+			}
+
 			if ( false === $bundled_item->is_shipped_individually() ) {
 
-				/**
-				 * 'woocommerce_bundled_item_has_bundled_weight' filter.
-				 *
-				 * @param  boolean            $append_weight
-				 * @param  WC_Product         $data
-				 * @param  mixed              $bundled_item_id
-				 * @param  WC_Product_Bundle  $bundle
-				 */
-				if ( apply_filters( 'woocommerce_bundled_item_has_bundled_weight', $bundle->get_aggregate_weight(), $cart_item[ 'data' ], $bundled_item_id, $bundle ) ) {
+				if ( $bundled_item->is_weight_aggregated( $cart_item[ 'data' ] ) ) {
 
 					$cart_item_weight = $cart_item[ 'data' ]->get_weight( 'edit' );
 
@@ -1097,8 +1103,9 @@ class WC_PB_Cart {
 	public function cart_item_data_to_validate( $data, $product ) {
 
 		if ( $product->is_type( 'bundle' ) ) {
-			$data[ 'pb_discount_method' ] = WC_PB_Product_Prices::get_bundled_cart_item_discount_method();
-			$data[ 'pb_bundle_type' ]     = $product->is_virtual() ? 'unassembled' : 'assembled';
+			$data[ 'pb_discount_method' ]  = WC_PB_Product_Prices::get_bundled_cart_item_discount_method();
+			$data[ 'pb_bundle_type' ]      = $product->is_virtual() ? 'unassembled' : 'assembled';
+			$data[ 'pb_aggregate_weight' ] = $product->get_aggregate_weight();
 		}
 
 		return $data;
@@ -1572,6 +1579,10 @@ class WC_PB_Cart {
 						unset( WC()->cart->cart_contents[ $cart_item_key ] );
 					}
 				}
+
+			// Is from order-again without the parent item?
+			} elseif ( isset( $cart_item[ 'bundled_item_id' ] ) && ! isset( $cart_item[ 'bundled_by' ] ) ) {
+				unset( WC()->cart->cart_contents[ $cart_item_key ] );
 			}
 		}
 	}
@@ -1678,17 +1689,17 @@ class WC_PB_Cart {
 			foreach ( $packages as $package_key => $package ) {
 
 				if ( ! empty( $package[ 'contents' ] ) ) {
-					foreach ( $package[ 'contents' ] as $cart_item_key => $cart_item_data ) {
+					foreach ( $package[ 'contents' ] as $cart_item_key => $cart_item ) {
 
-						if ( wc_pb_is_bundle_container_cart_item( $cart_item_data ) ) {
+						if ( wc_pb_is_bundle_container_cart_item( $cart_item ) ) {
 
 							// Let CP handle things here if needed.
-							if ( WC_PB()->compatibility->is_composited_cart_item( $cart_item_data ) ) {
+							if ( WC_PB()->compatibility->is_composited_cart_item( $cart_item ) && isset( $cart_item[ 'data' ]->composited_weight ) ) {
 								continue;
 							}
 
-							$bundle     = unserialize( serialize( $cart_item_data[ 'data' ] ) );
-							$bundle_qty = $cart_item_data[ 'quantity' ];
+							$bundle     = WC_PB_Helpers::get_product_preserving_meta( $cart_item[ 'data' ] );
+							$bundle_qty = $cart_item[ 'quantity' ];
 
 							/*
 							 * Container needs shipping: Aggregate the prices of any children that are physically packaged in their parent and, optionally, aggregate their weights into the parent, as well.
@@ -1700,14 +1711,14 @@ class WC_PB_Cart {
 								$bundled_value  = 0.0;
 
 								$bundle_totals = array(
-									'line_subtotal'     => $cart_item_data[ 'line_subtotal' ],
-									'line_total'        => $cart_item_data[ 'line_total' ],
-									'line_subtotal_tax' => $cart_item_data[ 'line_subtotal_tax' ],
-									'line_tax'          => $cart_item_data[ 'line_tax' ],
-									'line_tax_data'     => $cart_item_data[ 'line_tax_data' ]
+									'line_subtotal'     => $cart_item[ 'line_subtotal' ],
+									'line_total'        => $cart_item[ 'line_total' ],
+									'line_subtotal_tax' => $cart_item[ 'line_subtotal_tax' ],
+									'line_tax'          => $cart_item[ 'line_tax' ],
+									'line_tax_data'     => $cart_item[ 'line_tax_data' ]
 								);
 
-								foreach ( wc_pb_get_bundled_cart_items( $cart_item_data, WC()->cart->cart_contents, true ) as $child_item_key ) {
+								foreach ( wc_pb_get_bundled_cart_items( $cart_item, WC()->cart->cart_contents, true ) as $child_item_key ) {
 
 									$child_cart_item_data   = WC()->cart->cart_contents[ $child_item_key ];
 									$bundled_product        = $child_cart_item_data[ 'data' ];
@@ -1741,12 +1752,12 @@ class WC_PB_Cart {
 									}
 								}
 
-								if ( $bundled_value > 0 ) {
-									$bundle_price = $bundle->get_price( 'edit' );
+								if ( $bundled_value > 0 || isset( $cart_item[ 'data' ]->composited_value ) ) {
+									$bundle_price = isset( $cart_item[ 'data' ]->composited_value ) ? $cart_item[ 'data' ]->composited_value : $bundle->get_price( 'edit' );
 									$bundle->set_price( (double) $bundle_price + $bundled_value / $bundle_qty );
 								}
 
-								$packages[ $package_key ][ 'contents' ][ $cart_item_key ] = array_merge( $cart_item_data, $bundle_totals );
+								$packages[ $package_key ][ 'contents' ][ $cart_item_key ] = array_merge( $cart_item, $bundle_totals );
 
 								if ( $bundled_weight > 0 ) {
 									$bundle_weight = $bundle->get_weight( 'edit' );
@@ -1827,6 +1838,10 @@ class WC_PB_Cart {
 
 		$product = wc_get_product( $product_id );
 
+		if ( ! $product ) {
+			return $found;
+		}
+
 		if ( ! $product->is_type( 'bundle' ) ) {
 			return $found;
 		}
@@ -1871,9 +1886,9 @@ class WC_PB_Cart {
 	|--------------------------------------------------------------------------
 	*/
 
-	public function order_again( $cart_item_data, $order_item, $order ) {
+	public function order_again( $cart_item, $order_item, $order ) {
 		_deprecated_function( __METHOD__ . '()', '5.8.0', 'WC_PB_Order_Again::order_again_cart_item_data()' );
-		return WC_PB_Order_Again::order_again_cart_item_data( $cart_item_data, $order_item, $order );
+		return WC_PB_Order_Again::order_again_cart_item_data( $cart_item, $order_item, $order );
 	}
 	public function coupon_is_valid_for_product( $valid, $product, $coupon, $item ) {
 		_deprecated_function( __METHOD__ . '()', '5.8.0', 'WC_PB_Coupon::coupon_is_valid_for_product()' );
@@ -1945,7 +1960,7 @@ class WC_PB_Cart {
 	}
 	public function woo_bundles_cart_item_removed( $cart_item_key, $cart ) {
 		_deprecated_function( __METHOD__ . '()', '5.0.0', __CLASS__ . '::cart_item_removed()' );
-		return cart_item_removed( $cart_item_key, $cart );
+		return $this->cart_item_removed( $cart_item_key, $cart );
 	}
 	public function woo_bundles_cart_item_restored( $cart_item_key, $cart ) {
 		_deprecated_function( __METHOD__ . '()', '5.0.0', __CLASS__ . '::cart_item_restored()' );

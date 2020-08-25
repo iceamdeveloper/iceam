@@ -20,10 +20,15 @@ use Tribe__Utils__Array as Arr;
 
 /**
  * Class for Shortcode Tribe_Events.
+ *
+ * @todo On version 5.3 We need to stop using Pro Shortcode Abstract and move towards Common abstract.
+ *       We are not moving this into common or TEC just the Abstract usage needs to be removed completely.
+ *
  * @since   4.7.5
+ *
  * @package Tribe\Events\Pro\Views\V2\Shortcodes
  */
-class Tribe_Events extends Shortcode_Abstract {
+class Tribe_Events extends Shortcode_Abstract implements Shortcode_Interface {
 
 	/**
 	 * Prefix for the transient where we will save the base values for the
@@ -56,7 +61,7 @@ class Tribe_Events extends Shortcode_Abstract {
 		'tribe-bar'         => true,
 		'category'          => null,
 		'cat'               => null,
-		'featured'          => false,
+		'featured'          => null,
 		'main-calendar'     => false,
 	];
 
@@ -66,7 +71,7 @@ class Tribe_Events extends Shortcode_Abstract {
 	protected $validate_arguments_map = [
 		'should_manage_url' => 'tribe_is_truthy',
 		'tribe-bar'         => 'tribe_is_truthy',
-		'featured'          => 'tribe_is_truthy',
+		'featured'          => [ self::class, 'validate_null_or_truthy' ],
 		'main-calendar'     => 'tribe_is_truthy',
 	];
 
@@ -121,7 +126,7 @@ class Tribe_Events extends Shortcode_Abstract {
 		 *
 		 * @since  4.7.5
 		 *
-		 * @param  mixed  $disallowed_locations Which filters we dont allow URL management.
+		 * @param  mixed  $disallowed_locations Which filters we don't allow URL management.
 		 * @param  static $instance             Which instance of shortcode we are dealing with.
 		 */
 		$disallowed_locations = apply_filters( 'tribe_events_pro_shortcode_tribe_events_manage_url_disallowed_locations', $disallowed_locations, $this );
@@ -319,19 +324,19 @@ class Tribe_Events extends Shortcode_Abstract {
 		// Setup wether this view should manage url or not.
 		$view->get_template()->set( 'should_manage_url', $this->should_manage_url() );
 
-		$theme_compatiblity = tribe( Theme_Compatibility::class );
+		$theme_compatibility = tribe( Theme_Compatibility::class );
 
 		$html = '';
 
-		if ( $theme_compatiblity->is_compatibility_required() ) {
-			$classes = $theme_compatiblity->get_body_classes();
+		if ( $theme_compatibility->is_compatibility_required() ) {
+			$classes         = $theme_compatibility->get_body_classes();
 			$element_classes = new Element_Classes( $classes );
 			$html .= '<div ' . $element_classes->get_attribute() . '>';
 		}
 
 		$html .= $view->get_html();
 
-		if ( $theme_compatiblity->is_compatibility_required() ) {
+		if ( $theme_compatibility->is_compatibility_required() ) {
 			$html .= '</div>';
 		}
 
@@ -553,6 +558,10 @@ class Tribe_Events extends Shortcode_Abstract {
 	 * @return array<string,string> The filtered data attributes.
 	 */
 	public function filter_view_data( $data, $slug, $view ) {
+		if ( ! $view instanceof View_Interface ) {
+			return $data;
+		}
+
 		$context = $view->get_context();
 
 		if ( ! $context instanceof Context ) {

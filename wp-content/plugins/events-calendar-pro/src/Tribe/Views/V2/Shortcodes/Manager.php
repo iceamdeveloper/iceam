@@ -2,41 +2,59 @@
 /**
  * Shortcodes manager for the new views.
  *
- * @package Tribe\Events\Pro\Views\V2\Shortcodes
  * @since   4.7.5
+ *
+ * @deprecated  5.1.1
+ *
+ * @package Tribe\Events\Pro\Views\V2\Shortcodes
  */
 namespace Tribe\Events\Pro\Views\V2\Shortcodes;
 
 use Tribe\Events\Views\V2\View_Interface;
+use Tribe\Shortcode\Shortcode_Interface;
 use Tribe__Context as Context;
 use Tribe__Events__Pro__Shortcodes__Register as Legacy_Shortcodes;
 
 /**
  * Class Shortcode Manager.
+ *
  * @since   4.7.5
+ *
+ * @deprecated 5.1.1
+ *
  * @package Tribe\Events\Pro\Views\V2\Shortcodes
  */
-class Manager {
+class Manager extends \Tribe\Shortcode\Manager {
 	/**
 	 * Get the list of shortcodes available for handling.
 	 *
 	 * @since  4.7.5
 	 *
+	 * @deprecated 5.1.1
+	 *
 	 * @return array An associative array of shortcodes in the shape `[ <slug> => <class> ]`
 	 */
 	public function get_registered_shortcodes() {
-		$shortcodes = [
-			'tribe_events' => Tribe_Events::class,
-		];
+		$shortcodes = parent::get_registered_shortcodes();
+
+		// Do not add more shortcodes here. Use the filter on Common!
+		$shortcodes['tribe_events'] = Tribe_Events::class;
 
 		/**
 		 * Allow the registering of shortcodes into the our Pro plugin.
 		 *
 		 * @since  4.7.5
 		 *
+		 * @deprecated 5.1.1
+		 *
 		 * @var array An associative array of shortcodes in the shape `[ <slug> => <class> ]`
 		 */
-		$shortcodes = apply_filters( 'tribe_events_pro_shortcodes', $shortcodes );
+		$shortcodes = apply_filters_deprecated(
+			'tribe_events_pro_shortcodes',
+			[ $shortcodes ],
+			'5.1.4',
+			'tribe_shortcodes'
+		);
 
 		return $shortcodes;
 	}
@@ -45,6 +63,8 @@ class Manager {
 	 * Filters the context locations to add the ones used by Shortcodes.
 	 *
 	 * @since 4.7.9
+	 *
+	 * @todo Move this to a method inside of Shortcodes|Tribe_Events
 	 *
 	 * @param array $locations The array of context locations.
 	 *
@@ -67,76 +87,9 @@ class Manager {
 	}
 
 	/**
-	 * Verifies if a given shortcode slug is registered for handling.
-	 *
-	 * @since  4.7.5
-	 *
-	 * @param  string $slug Which slug we are checking if is registered.
-	 *
-	 * @return bool
-	 */
-	public function is_shortcode_registered( $slug ) {
-		$registered_shortcodes = $this->get_registered_shortcodes();
-		return isset( $registered_shortcodes[ $slug ] );
-	}
-
-	/**
-	 * Verifies if a given shortcode class name is registered for handling.
-	 *
-	 * @since  4.7.5
-	 *
-	 * @param  string $class_name Which class name we are checking if is registered.
-	 *
-	 * @return bool
-	 */
-	public function is_shortcode_registered_by_class( $class_name ) {
-		$registered_shortcodes = $this->get_registered_shortcodes();
-		return in_array( $class_name, $registered_shortcodes );
-	}
-
-	/**
-	 * Add new shortcodes handler to catch the correct strings.
-	 *
-	 * @since  4.7.5
-	 *
-	 * @return void
-	 */
-	public function add_shortcodes() {
-		$registered_shortcodes = $this->get_registered_shortcodes();
-
-		// Add to WordPress all of the registred Shortcodes
-		foreach ( $registered_shortcodes as $shortcode => $class_name ) {
-			add_shortcode( $shortcode, [ $this, 'handle' ] );
-		}
-	}
-
-	/**
-	 * Makes sure we are correctly handling the Shortcodes we manage.
-	 *
-	 * @since  4.7.5
-	 *
-	 * @param array  $arguments Set of arguments passed to the Shortcode at hand.
-	 * @param string $content   Contents passed to the shortcode, inside of the open and close brackets.
-	 * @param string $shortcode Which shortcode tag are we handling here.
-	 *
-	 * @return string
-	 */
-	public function handle( $arguments, $content, $shortcode ) {
-		$registered_shortcodes = $this->get_registered_shortcodes();
-
-		// Bail when we try to handle an unregistered shortcode (shouldn't happen)
-		if ( ! $this->is_shortcode_registered( $shortcode ) ) {
-			return false;
-		}
-
-		$instance = new $registered_shortcodes[ $shortcode ];
-		$instance->setup( $arguments, $content );
-
-		return $instance->get_html();
-	}
-
-	/**
 	 * Remove old shortcode methods from views v1.
+	 *
+	 * @todo Move this to a method inside of Shortcodes|Tribe_Events
 	 *
 	 * @since  4.7.5
 	 *
@@ -166,8 +119,12 @@ class Manager {
 	 *
 	 * @since 4.7.9
 	 *
-	 * @param string         $url       The View current URL.
-	 * @param View_Interface $view      This view instance.
+	 * @todo Move this to a method inside of Shortcodes|Tribe_Events
+	 *
+	 * @param string         $url   The View current URL.
+	 * @param View_Interface $view  This view instance.
+	 *
+	 * @return string  The URL for the view shortcode.
 	 */
 	public function filter_view_url( $url, View_Interface $view ) {
 		$context = $view->get_context();
@@ -194,9 +151,11 @@ class Manager {
 	 *
 	 * @since 4.7.9
 	 *
-	 * @param array                        $query_args  Arguments used to build the URL.
-	 * @param string                       $view_slug   The current view slug.
-	 * @param \Tribe\Events\Views\V2\View  $instance    The current View object.
+	 * @todo Move this to a method inside of Shortcodes|Tribe_Events
+	 *
+	 * @param array           $query     Arguments used to build the URL.
+	 * @param string          $view_slug The current view slug.
+	 * @param View_Interface  $view      The current View object.
 	 *
 	 * @return  array  Filtered the query arguments for shortcodes.
 	 */
@@ -216,5 +175,21 @@ class Manager {
 		$query['shortcode'] = $shortcode;
 
 		return $query;
+	}
+
+	/**
+	 * Deprecated Alias to `render_shortcode`.
+	 *
+	 * @since  4.7.5
+	 * @deprecated  5.1.1 Use `render_shortcode`
+	 *
+	 * @param array  $arguments Set of arguments passed to the Shortcode at hand.
+	 * @param string $content   Contents passed to the shortcode, inside of the open and close brackets.
+	 * @param string $shortcode Which shortcode tag are we handling here.
+	 *
+	 * @return string The rendered shortcode HTML.
+	 */
+	public function handle( $arguments, $content, $shortcode ) {
+		return $this->render_shortcode( $arguments, $content, $shortcode );
 	}
 }

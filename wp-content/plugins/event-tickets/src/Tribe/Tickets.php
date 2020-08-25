@@ -2,12 +2,10 @@
 
 if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 	/**
-	 * Class with the API definition and common functionality
-	 * for Tribe Tickets Pro. Providers for this functionality need to
-	 * extend this class. For a functional example of how this works
-	 * see Tribe WooTickets.
+	 * Class with the API definition and common functionality for Tribe Tickets. Providers for this functionality need
+	 * to extend this class.
 	 *
-	 * The relationship between orders, attendees and event posts is
+	 * The relationship between orders, attendees, and event posts is
 	 * maintained through post meta fields set for the attendee object.
 	 * Implementing classes are expected to provide the following class
 	 * constants detailing those meta keys:
@@ -334,7 +332,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			if ( ! empty( $post_id ) ) {
 				$args['meta_query'] = [
 					[
-						'key'     => $this->event_key,
+						'key'     => $this->get_event_key(),
 						'value'   => $post_id,
 						'compare' => '=',
 					],
@@ -360,7 +358,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 *
 		 * @param  int|WP_Post $post Only get tickets assigned to this post ID.
 		 *
-		 * @return array
+		 * @return array|false
 		 */
 		public function get_tickets_ids( $post = null ) {
 			if ( ! empty( $post ) ) {
@@ -541,10 +539,15 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 */
 		public static function load_ticket_object( $ticket_id ) {
 			foreach ( self::modules() as $provider_class => $name ) {
-				$provider = call_user_func( [ $provider_class, 'get_instance' ] );
-				$event    = $provider->get_event_for_ticket( $ticket_id );
+				$provider = static::get_ticket_provider_instance( $provider_class );
 
-				if ( ! $event ) {
+				if ( empty( $provider ) ) {
+					continue;
+				}
+
+				$event = $provider->get_event_for_ticket( $ticket_id );
+
+				if ( empty( $event ) ) {
 					continue;
 				}
 
@@ -581,7 +584,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 				return false;
 			}
 
-			$event_id = get_post_meta( $ticket_product, $this->event_key, true );
+			$event_id = get_post_meta( $ticket_product, $this->get_event_key(), true );
 
 			if ( ! $event_id && '' === ( $event_id = get_post_meta( $ticket_product, $this->attendee_event_key, true ) ) ) {
 				return false;
@@ -606,13 +609,13 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		public function delete_ticket( $post_id, $ticket_id ) {}
 
 		/**
-		 * Saves a ticket
+		 * Saves a ticket.
 		 *
 		 * @abstract
 		 *
-		 * @param int   $post_id
-		 * @param int   $ticket
-		 * @param array $raw_data
+		 * @param int                           $post_id  Post ID.
+		 * @param Tribe__Tickets__Ticket_Object $ticket   Ticket object.
+		 * @param array                         $raw_data Ticket data.
 		 *
 		 * @return int|false The updated/created ticket post ID or false if no ticket ID.
 		 */
@@ -621,15 +624,71 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		}
 
 		/**
-		 * Returns all the tickets for an event.
+		 * Whether a post has tickets from this provider, even if this provider is not the default provider.
 		 *
-		 * @abstract
+		 * @since 4.12.3
+		 *
+		 * @param int|WP_Post $post
+		 *
+		 * @return bool True if this post has any tickets from this provider.
+		 */
+		public function post_has_tickets( $post ) {
+			$post_id = Tribe__Main::post_id_helper( $post );
+
+			if ( empty( $post_id ) ) {
+				return false;
+			}
+
+			return ! empty( $this->get_tickets_ids( $post_id ) );
+		}
+
+		/**
+		 * Returns all the tickets for an event, of the active ticket providers.
+		 *
+		 * @since 4.12.0 Changed from protected abstract to public with duplicated child classes' logic consolidated here.
 		 *
 		 * @param int $post_id ID of parent "event" post.
 		 *
 		 * @return Tribe__Tickets__Ticket_Object[] List of ticket objects.
 		 */
-		protected function get_tickets( $post_id ) {}
+		public function get_tickets( $post_id ) {
+			$default_provider = static::get_event_ticket_provider( $post_id );
+
+			if ( empty( $default_provider ) ) {
+				return [];
+			}
+
+			// If the post's provider doesn't match.
+			if (
+				$this->class_name !== $default_provider
+				&& ! is_admin()
+			) {
+				return [];
+			}
+
+			$ticket_ids = $this->get_tickets_ids( $post_id );
+
+			if ( ! $ticket_ids ) {
+				return [];
+			}
+
+			$tickets = [];
+
+			foreach ( $ticket_ids as $post ) {
+				$ticket = $this->get_ticket( $post_id, $post );
+
+				if (
+					! $ticket instanceof Tribe__Tickets__Ticket_Object
+					|| $this->class_name !== $ticket->provider_class
+				) {
+					continue;
+				}
+
+				$tickets[] = $ticket;
+			}
+
+			return $tickets;
+		}
 
 		/**
 		 * Get attendees for a Post ID / Post type.
@@ -885,9 +944,11 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 * (it may contain the user selected currency, etc)
 		 *
 		 * @param object|int $product
+		 * @param array|boolean $attendee
+		 *
 		 * @return string
 		 */
-		public function get_price_html( $product ) {
+		public function get_price_html( $product, $attendee = false ) {
 			return '';
 		}
 
@@ -904,11 +965,11 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		}
 
 		/**
-		 * Returns instance of the child class (singleton)
+		 * Returns class instance. Child classes must overload this.
 		 *
 		 * @static
 		 *
-		 * @return mixed
+		 * @return static
 		 */
 		public static function get_instance() {}
 
@@ -1273,7 +1334,8 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 				/** @var Tribe__Tickets__Tickets $provider */
 				$provider = tribe_tickets_get_ticket_provider( $attendee );
 
-				if ( ! $provider ) {
+				// Could be `false`, such as ticket for a disabled commerce provider.
+				if ( empty( $provider ) ) {
 					continue;
 				}
 
@@ -2176,6 +2238,45 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			}
 		}
 
+
+		/**
+		 * Given a ticket provider, get its Attendee Optout Meta Key from its class property (or constant if legacy).
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param self|string $provider Examples: 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main', 'woo', 'rsvp', etc.
+		 *
+		 * @return string The meta key or an empty string if passed an invalid or inactive ticket provider.
+		 */
+		public static function get_attendee_optout_key( $provider ) {
+			$provider = static::get_ticket_provider_instance( $provider );
+
+			if ( empty( $provider ) ) {
+				return '';
+			}
+
+			/**
+			 * Not all classes have this static method.
+			 *
+			 * @see \Tribe__Tickets__Commerce__PayPal__Main::get_key() Does have this static method.
+			 */
+			if ( method_exists( $provider, 'get_key' ) ) {
+				$key = $provider::get_key( 'attendee_optout_key' );
+			}
+
+			if ( ! empty( $key ) ) {
+				return $key;
+			}
+
+			if ( ! empty( $provider->attendee_optout_key ) ) {
+				return $provider->attendee_optout_key;
+			}
+
+			$key = constant( "{$provider->class_name}::ATTENDEE_OPTOUT_KEY" );
+
+			return (string) $key;
+		}
+
 		/**
 		 * Returns the meta key used to link attendees with the base event.
 		 *
@@ -2264,6 +2365,8 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 * for this purpose.
 		 *
 		 * @internal
+		 *
+		 * @throws ReflectionException Possible from calling ReflectionProperty().
 		 *
 		 * @return string
 		 */
@@ -2842,6 +2945,9 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 				$ticket->end_date = date( Tribe__Date_Utils::DBDATEFORMAT, strtotime( $end_datetime ) );
 			}
 
+			// Pass the control to the child object.
+			$save_ticket = $this->save_ticket( $post_id, $ticket, $data );
+
 			/**
 			 * Fired once a ticket has been created and added to a post
 			 *
@@ -2850,9 +2956,6 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			 * @param array $data Submitted post data
 			 */
 			do_action( 'tribe_tickets_ticket_add', $post_id, $ticket, $data );
-
-			// Pass the control to the child object
-			$save_ticket = $this->save_ticket( $post_id, $ticket, $data );
 
 			$tickets_handler->toggle_manual_update_flag( false );
 
@@ -2875,39 +2978,103 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 				update_post_meta( $ticket->ID, $tickets_handler->key_end_date, $event_start );
 			}
 
-			tribe( 'tickets.version' )->update( $ticket->ID );
+			/** @var Tribe__Tickets__Version $version */
+			$version = tribe( 'tickets.version' );
+
+			$version->update( $ticket->ID );
 
 			return $save_ticket;
 		}
 
 		/**
-		 * Get the saved or default ticket provider
+		 * Get the saved or default ticket provider, if active.
+		 *
+		 * Will return False if there is a saved provider that is currently not active.
+		 * Example: If provider is WooCommerce Ticket but ETP is inactive, will return False.
+		 *
+		 * @see get_event_ticket_provider_object()
 		 *
 		 * @since 4.7
+		 * @since 4.12.3 Now returning false if the provider is not active.
 		 *
-		 * @param int $event_id - the post id of the event the ticket is attached to.
+		 * @param int $event_id The post ID of the event to which the ticket is attached.
 		 *
-		 * @return string ticket module class name
+		 * @return string|false The ticket object class name, or false if not active.
 		 */
 		public static function get_event_ticket_provider( $event_id = null ) {
+			$provider = static::get_event_ticket_provider_object( $event_id );
+
+			if ( empty( $provider ) ) {
+				return false;
+			}
+
+			return $provider->class_name;
+		}
+
+		/**
+		 * Given a post ID, get the instance of the saved or default ticket provider class.
+		 *
+		 * Will return False if there is a saved provider that is currently not active.
+		 * Example: If provider is WooCommerce Ticket but ETP is inactive, will return False.
+		 *
+		 * @see get_ticket_provider_instance()
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param int $post_id The post ID of the event to which the ticket is attached.
+		 *
+		 * @return self|false Instance of child class (if confirmed active) or False if provider is not active.
+		 */
+		public static function get_event_ticket_provider_object( $post_id = null ) {
 			/** @var Tribe__Tickets__Tickets_Handler $tickets_handler */
 			$tickets_handler = tribe( 'tickets.handler' );
 
-			// if  post ID is set, and a value has been saved, return the saved value
-			if ( ! empty( $event_id ) ) {
-				$saved = get_post_meta( $event_id, $tickets_handler->key_provider_field, true );
+			// 'Tribe__Tickets__RSVP' unless filtered.
+			$provider = self::get_default_module();
+
+			// If post ID is set and a value has been saved.
+			if ( ! empty( $post_id ) ) {
+				$saved = get_post_meta( $post_id, $tickets_handler->key_provider_field, true );
 
 				if ( ! empty( $saved ) ) {
-					return $saved;
+					$provider = $saved;
 				}
 			}
 
-			// otherwise just return the default
-			return self::get_default_module();
+			return static::get_ticket_provider_instance( $provider );
 		}
 
-		// @codingStandardsIgnoreEnd
+		/**
+		 * Given a provider string (class module name or slug), get its class instance if an active module.
+		 *
+		 * @param self|string $provider Examples: 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main', 'woo', 'rsvp', etc.
+		 *
+		 * @return self|false Instance of child class (if confirmed active) or False if provider is not active.
+		 */
+		public static function get_ticket_provider_instance( $provider ) {
+			$is_provider_active = tribe_tickets_is_provider_active( $provider );
 
+			if ( empty( $is_provider_active ) ) {
+				return false;
+			}
+
+			if ( $provider instanceof self ) {
+				return $provider;
+			}
+
+			/** @var Tribe__Tickets__Status__Manager $status */
+			$status = tribe( 'tickets.status' );
+
+			$provider = $status->get_provider_class_from_slug( $provider );
+
+			$instance = tribe_get_class_instance( $provider );
+
+			if ( ! $instance instanceof self ) {
+				return false;
+			}
+
+			return $instance;
+		}
 
 		/**
 		 * Get currency symbol
@@ -3084,18 +3251,27 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 *
 		 * @since 4.11.0
 		 *
-		 * @return void
+		 * @return array
 		 */
 		public static function set_messages() {
-			$messages = [
+			return [
 				'api_error_title'        => _x( 'API Error', 'Error message title, will be followed by the error code.', 'event-tickets' ),
 				'connection_error'       => __( 'Refresh this page or wait a few minutes before trying again. If this happens repeatedly, please contact the Site Admin.', 'event-tickets' ),
 				'capacity_error'         => __( 'The ticket for this event has sold out and has been removed from your cart.', 'event-tickets' ),
 				'validation_error_title' => __( 'Whoops!', 'event-tickets' ),
 				'validation_error'       => '<p>' . sprintf( esc_html_x( 'You have %s ticket(s) with a field that requires information.', 'The %s will change based on the error produced.', 'event-tickets' ), '<span class="tribe-tickets__notice--error__count">0</span>' ) . '</p>',
 			];
+		}
 
-			return $messages;
+		/**
+		 * Return the string representation of this provider class as the class name for backwards compatibility.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @return string The class name.
+		 */
+		public function __toString() {
+			return $this->class_name;
 		}
 
 		/************************
@@ -3164,5 +3340,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			_deprecated_function( __METHOD__, '4.6.2', 'wp_send_json_success()' );
 			wp_send_json_success( $data );
 		}
+
+		// @codingStandardsIgnoreEnd
 	}
 }

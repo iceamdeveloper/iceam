@@ -69,7 +69,10 @@ class Assets extends \tad_DI52_ServiceProvider {
 			$plugin,
 			'tribe-events-pro-views-v2-full',
 			'views-full.css',
-			[ 'tribe-events-views-v2-full' ],
+			[
+				'tribe-events-pro-views-v2-skeleton',
+				'tribe-events-views-v2-full',
+			],
 			'wp_enqueue_scripts',
 			[
 				'priority'     => 10,
@@ -370,7 +373,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 	 * @return void
 	 */
 	public function disable_v1() {
-		// Dont disable V1 on Single Event page
+		// Don't disable V1 on Single Event page
 		if ( tribe( Template_Bootstrap::class )->is_single_event() ) {
 			return;
 		}

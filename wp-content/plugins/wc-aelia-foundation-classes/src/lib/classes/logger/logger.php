@@ -3,6 +3,7 @@ namespace Aelia\WC;
 if(!defined('ABSPATH')) exit; // Exit if accessed directly
 
 use Monolog\Handler\StreamHandler;
+use Monolog\Handler\RotatingFileHandler ;
 use Monolog\Handler\LogglyHandler;
 use Monolog\Handler\ChromePHPHandler;
 use Monolog\Processor\ProcessIdProcessor;
@@ -357,7 +358,9 @@ class Logger {
 		// TODO Check that the target log file is writable. If not, raise a PHP warning
 
 		$this->log_handlers = apply_filters('wc_aelia_log_handlers', array(
-			new StreamHandler(self::get_log_file_name($this->log_id), \Monolog\Logger::NOTICE),
+			// Use a rotating file handler, to purge old log files automatically
+			// @since 2.0.19.200527
+			new RotatingFileHandler(self::get_log_file_name($this->log_id), apply_filters('wc_aelia_max_log_files', 30), \Monolog\Logger::NOTICE),
 			// TODO Implement Loggly only if plugin is configured for that purpose
 			//new LogglyHandler('15fc33d6-ac21-44c2-a88e-a2d5bf4db398'),
 		), $this->log_id, $this);

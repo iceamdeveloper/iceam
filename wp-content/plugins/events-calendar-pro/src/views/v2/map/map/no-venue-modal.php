@@ -54,10 +54,9 @@ if ( $is_premium || empty( $event ) || ( isset( $event->venues ) && $event->venu
 			<?php
 			echo esc_html(
 				sprintf(
-					/* translators: %1$s: event (singular), %2$s: Venue (singular) */
-					__( 'This %1$s doesn’t have a %2$s or address.', 'tribe-events-calendar-pro' ),
-					tribe_get_event_label_singular_lowercase(),
-					tribe_get_venue_label_singular()
+					/* translators: %1$s: event (singular) */
+					__( 'This %1$s does not have a mappable address.', 'tribe-events-calendar-pro' ),
+					tribe_get_event_label_singular_lowercase()
 				)
 			);
 			?>

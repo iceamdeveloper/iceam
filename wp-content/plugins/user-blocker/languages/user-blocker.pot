@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: User Blocker\n"
-"POT-Creation-Date: 2020-02-14 16:19+0530\n"
+"POT-Creation-Date: 2020-08-04 18:36+0530\n"
 "PO-Revision-Date: 2017-06-24 14:12+0530\n"
 "Last-Translator: \n"
 "Language-Team: Solwin Infotech <info@solwininfotech.com>\n"
@@ -190,7 +190,7 @@ msgstr ""
 
 #: includes/user_blocker_block_users.php:682
 #: includes/user_blocker_block_users.php:1710
-#: includes/user_blocker_block_users.php:2331 user_blocker.php:65
+#: includes/user_blocker_block_users.php:2331 user_blocker.php:64
 msgid "Block User Permanent"
 msgstr ""
 
@@ -733,7 +733,7 @@ msgid "Invalid user for reset blocking time."
 msgstr ""
 
 #: includes/user_blocker_blocked_users_list.php:150
-#: includes/user_blocker_blocked_users_list.php:1575 user_blocker.php:66
+#: includes/user_blocker_blocked_users_list.php:1575 user_blocker.php:65
 msgid "Blocked User list"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgstr ""
 msgid "blocking date is successfully reset."
 msgstr ""
 
-#: includes/user_blocker_blocked_users_list.php:825 user_blocker.php:67
+#: includes/user_blocker_blocked_users_list.php:825 user_blocker.php:66
 msgid "Date Wise Blocked User list"
 msgstr ""
 
@@ -1098,24 +1098,48 @@ msgstr ""
 msgid "Search"
 msgstr ""
 
-#: user_blocker.php:64
+#: includes/user_blocker_common_functions.php:837
+msgid "User blocker plugin setting has been updated successfully"
+msgstr ""
+
+#: includes/user_blocker_common_functions.php:851
+msgid "User Blocker Plugin Settings"
+msgstr ""
+
+#: includes/user_blocker_common_functions.php:856
+msgid "Delete data on deletion of plugin"
+msgstr ""
+
+#: includes/user_blocker_common_functions.php:859
+msgid "Delete data on deletion of plugin."
+msgstr ""
+
+#: includes/user_blocker_common_functions.php:864
+msgid "Save Changes"
+msgstr ""
+
+#: user_blocker.php:63
 msgid "Block User Date Wise"
 msgstr ""
 
-#: user_blocker.php:64
+#: user_blocker.php:63
 msgid "Date Wise Block User"
 msgstr ""
 
-#: user_blocker.php:65
+#: user_blocker.php:64
 msgid "Permanently Block User"
 msgstr ""
 
-#: user_blocker.php:68
+#: user_blocker.php:67
 msgid "Permanent Blocked User list"
 msgstr ""
 
-#: user_blocker.php:69
+#: user_blocker.php:68
 msgid "All Type Blocked User list"
+msgstr ""
+
+#: user_blocker.php:69
+msgid "User Blocker Settings"
 msgstr ""
 
 #: user_blocker.php:163 user_blocker.php:196 user_blocker.php:230

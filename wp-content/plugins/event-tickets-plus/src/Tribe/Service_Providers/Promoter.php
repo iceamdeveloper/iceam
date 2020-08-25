@@ -3,13 +3,13 @@
 /**
  * Class Tribe__Tickets_Plus__Service_Providers__Promoter
  *
- * @since TBD
+ * @since 4.12.0
  */
 class Tribe__Tickets_Plus__Service_Providers__Promoter extends tad_DI52_ServiceProvider {
 	/**
 	 * Binds and sets up implementations.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 */
 	public function register() {
 		$this->container->bind(
@@ -31,7 +31,7 @@ class Tribe__Tickets_Plus__Service_Providers__Promoter extends tad_DI52_ServiceP
 	/**
 	 * Register different commerce instances.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 */
 	public function hook() {
 		tribe( 'tickets-plus.commerce.edd.promoter-observer' );

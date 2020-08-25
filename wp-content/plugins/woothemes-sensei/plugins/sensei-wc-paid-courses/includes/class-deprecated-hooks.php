@@ -59,14 +59,21 @@ class Deprecated_Hooks {
 			'replacement' => 'sensei_wc_paid_courses_subscriptions_get_subscription_types',
 		],
 		'sensei_wc_memberships_auto_start_course'        => [
-			'type'        => self::TYPE_FILTER,
-			'version'     => '1.0.0',
-			'replacement' => 'sensei_wc_paid_courses_memberships_auto_start_course',
+			'type'    => self::TYPE_FILTER,
+			'version' => '1.0.0',
 		],
 		'sensei_wc_memberships_auto_start_courses'       => [
+			'type'    => self::TYPE_FILTER,
+			'version' => '1.0.0',
+		],
+		'sensei_wc_paid_courses_memberships_auto_start_course' => [
+			'type'    => self::TYPE_FILTER,
+			'version' => '2.0.0',
+		],
+		'sensei_wc_paid_courses_memberships_auto_start_courses' => [
 			'type'        => self::TYPE_FILTER,
-			'version'     => '1.0.0',
-			'replacement' => 'sensei_wc_paid_courses_memberships_auto_start_courses',
+			'version'     => '2.0.0',
+			'replacement' => 'sensei_wc_paid_courses_memberships_auto_enrol_courses',
 		],
 		'sensei_wc_single_add_to_cart_button_text'       => [
 			'type'        => self::TYPE_FILTER,

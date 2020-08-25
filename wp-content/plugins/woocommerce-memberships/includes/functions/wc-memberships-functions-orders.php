@@ -23,7 +23,7 @@
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 
 /**
@@ -324,17 +324,21 @@ function wc_memberships_get_order_thank_you_links( $order_id ) {
 
 				$message .= '</p>';
 			}
+
+			/**
+			 * Filters the thank you page / email message when a membership with members area sections is purchased.
+			 *
+			 * @since 1.8.4
+			 * @since 1.17.3 added the $memberships argument
+			 *
+			 * @param string $message the thank you message HTML
+			 * @param int $order_id the order ID from the purchase
+			 * @param array $memberships associative array of membership IDs and granting access details found for the given order
+			 */
+			return (string) apply_filters( 'woocommerce_memberships_thank_you_message', $message, $order_id, $memberships );
 		}
 	}
 
-	/**
-	 * Filters the thank you page / email message when a membership with members area sections is purchased.
-	 *
-	 * @since 1.8.4
-	 *
-	 * @param string $message the thank you message HTML
-	 * @param int $order_id the order ID from the purchase
-	 */
-	return apply_filters( 'woocommerce_memberships_thank_you_message', $message, $order_id );
+	return $message;
 }
 

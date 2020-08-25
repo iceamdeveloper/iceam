@@ -2,10 +2,11 @@
 /**
  * Plugin Name: WooCommerce Memberships
  * Plugin URI: https://www.woocommerce.com/products/woocommerce-memberships/
+ * Documentation URI: https://docs.woocommerce.com/document/woocommerce-memberships/
  * Description: Sell memberships that provide access to restricted content, products, discounts, and more!
  * Author: SkyVerge
  * Author URI: https://www.woocommerce.com/
- * Version: 1.17.2
+ * Version: 1.18.0
  * Text Domain: woocommerce-memberships
  * Domain Path: /i18n/languages/
  *
@@ -20,7 +21,7 @@
  *
  * Woo: 958589:9288e7609ad0b487b81ef6232efa5cfc
  * WC requires at least: 3.0.9
- * WC tested up to: 4.0.1
+ * WC tested up to: 4.4.1
  */
 
 defined( 'ABSPATH' ) or exit;
@@ -78,7 +79,7 @@ if ( 'yes' === get_option( 'wc_memberships_use_as_3_0_0' ) ) {
 if ( $load_as_3_0_0 ) {
 	require_once( plugin_dir_path( __FILE__ ) . 'lib/prospress/action-scheduler/action-scheduler.php' );
 } else {
-	require_once( plugin_dir_path( __FILE__ ) . 'vendor/prospress/action-scheduler/action-scheduler.php' );
+	require_once( plugin_dir_path( __FILE__ ) . 'vendor/woocommerce/action-scheduler/action-scheduler.php' );
 }
 
 unset( $load_as_3_0_0, $as_table_name );
@@ -101,7 +102,7 @@ class WC_Memberships_Loader {
 	const MINIMUM_WC_VERSION = '3.0.9';
 
 	/** SkyVerge plugin framework version used by this plugin */
-	const FRAMEWORK_VERSION = '5.5.0';
+	const FRAMEWORK_VERSION = '5.7.1';
 
 	/** the plugin name, for displaying notices */
 	const PLUGIN_NAME = 'WooCommerce Memberships';
@@ -127,8 +128,14 @@ class WC_Memberships_Loader {
 		add_action( 'admin_init',    array( $this, 'add_plugin_notices' ) );
 		add_action( 'admin_notices', array( $this, 'admin_notices' ), 15 );
 
+		add_filter( 'extra_plugin_headers', array( $this, 'add_documentation_header' ) );
+
 		// if the environment check fails, initialize the plugin
 		if ( $this->is_environment_compatible() ) {
+
+			require_once( 'vendor/skyverge/wc-jilt-promotions/load.php' );
+			require_once( 'vendor/skyverge/wordpress-plugin-admin/load.php' );
+
 			add_action( 'plugins_loaded', array( $this, 'init_plugin' ) );
 		}
 	}
@@ -385,6 +392,24 @@ class WC_Memberships_Loader {
 			<?php
 
 		endforeach;
+	}
+
+
+	/**
+	 * Adds the Documentation URI header.
+	 *
+	 * @internal
+	 *
+	 * @since 1.17.6-dev.1
+	 *
+	 * @param string[] $headers original headers
+	 * @return string[]
+	 */
+	public function add_documentation_header( $headers ) {
+
+		$headers[] = 'Documentation URI';
+
+		return $headers;
 	}
 
 

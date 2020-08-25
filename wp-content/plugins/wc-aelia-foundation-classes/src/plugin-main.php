@@ -15,7 +15,7 @@ use Aelia\WC\AFC\Messages;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.0.16.200317';
+	public static $version = '2.0.21.200813';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;

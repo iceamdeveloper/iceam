@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -36,7 +36,7 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 
 	/** plugin version number */
-	const VERSION = '1.17.2';
+	const VERSION = '1.18.0';
 
 	/** @var \WC_Memberships single instance of this plugin */
 	protected static $instance;
@@ -740,6 +740,56 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 
 	/** Helper methods ******************************************************/
+
+
+	/**
+	 * Determines whether a plugin is installed (not limited to active).
+	 *
+	 * Note: this might not be totally foolproof, in case the plugins have strange paths, but it only provides a minor utility in the context of Memberships.
+	 * Consider making this a framework method if there's more broad need instead.
+	 *
+	 * @since 1.7.5-dev.1
+	 *
+	 * @param string $plugin plugin identifier (usually the main plugin file name)
+	 * @return bool
+	 */
+	public function is_plugin_installed( $plugin ) {
+
+		// bail early if plugin is listed as active already
+		if ( $this->is_plugin_active( $plugin ) ) {
+			return true;
+		}
+
+		// ensures get_plugins() function is available
+		if ( ! function_exists( 'get_plugins' ) && is_readable( ABSPATH . 'wp-admin/includes/plugin.php' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin.php';
+		}
+
+		$is_installed      = false;
+		$installed_plugins = function_exists( 'get_plugins' ) ? get_plugins() : null;
+
+		if ( is_array( $installed_plugins ) ) {
+
+			foreach ( array_keys( $installed_plugins ) as $installed_plugin ) {
+
+				// in case we passed a plugin name including path or if the plugin is a single file plugin
+				if ( $plugin === $installed_plugin ) {
+					$is_installed = true;
+					break;
+				}
+
+				// plugins are normally listed with full path, but we are likely to specify just the file name
+				$installed_plugin = explode( '/', $installed_plugin );
+
+				if ( $plugin === end( $installed_plugin ) ) {
+					$is_installed = true;
+					break;
+				}
+			}
+		}
+
+		return $is_installed;
+	}
 
 
 	/**

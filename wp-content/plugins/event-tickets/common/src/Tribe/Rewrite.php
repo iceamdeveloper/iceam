@@ -26,6 +26,14 @@ class Tribe__Rewrite {
 	 * @var static
 	 */
 	public static $instance;
+	/**
+	 * A delimiter used to separate  a localized matcher from its base in the format `<loc_matcher><delim><base>`.
+	 *
+	 * @since 4.11.5
+	 *
+	 * @var string
+	 */
+	protected static $localized_matcher_delimiter = '~';
 
 	/**
 	 * WP_Rewrite Instance
@@ -505,16 +513,38 @@ class Tribe__Rewrite {
 					return '';
 				}
 
+				if ( isset( $localized_matcher['localized_slug'] ) ) {
+					// If available, then return the localized slug instead of inferring it as we do below.
+					return $localized_matcher['localized_slug'];
+				}
+
 				/*
 				 * We use `end` as, by default, the localized version of the slug in the current language will be at the
 				 * end of the array.
-				 * @todo here we should keep a map, that has to generated at permalink flush time, to map locales/slugs.
 				 */
 				return end( $localized_matcher['localized_slugs'] );
 			}, $localized_matchers );
 
 			// Include dynamic matchers now.
 			$replace = array_merge( $dynamic_matchers, $replace );
+
+			/*
+			 * Prune from the replacements the empty values. This will resolve conflicts (e.g. single and archive w/
+			 * same slug) as no two can be true at the same time.
+			 * Remove the `<delim><base>` prefix added to localized matchers, if any.
+			 */
+			$replace = array_filter( $replace );
+			$replace = array_combine(
+				array_map( static function ( $key ) {
+					return preg_replace(
+						'/' . preg_quote( Tribe__Rewrite::$localized_matcher_delimiter ) . '\\w*$/',
+						'',
+						$key
+					);
+				}, array_keys( $replace ) ),
+				$replace
+			);
+
 			$replaced = str_replace( array_keys( $replace ), $replace, $link_template );
 
 			// Remove trailing chars.
@@ -622,17 +652,22 @@ class Tribe__Rewrite {
 		static $cache_var_name = __METHOD__;
 
 		$bases         = (array) $this->get_bases();
+
 		$query_var_map = $this->get_matcher_to_query_var_map();
 
 		$localized_matchers = tribe_get_var( $cache_var_name, [] );
 
 		foreach ( $bases as $base => $localized_matcher ) {
-			if ( isset( $localized_matchers[ $localized_matcher ] ) ) {
+			// Use the base too to allow possible conflicts if the slugs are the same for single and archive.
+			$localized_matcher_key = $localized_matcher . static::$localized_matcher_delimiter . $base;
+
+			if ( isset( $localized_matchers[ $localized_matcher_key ] ) ) {
 				continue;
 			}
 
 			if ( isset( $query_var_map[ $base ] ) ) {
-				$localized_matchers[ $localized_matcher ] = [
+				$localized_matchers[ $localized_matcher_key ] = [
+					'base'            => $base,
 					'query_var'       => $query_var_map[ $base ],
 					'en_slug'         => $base,
 					'localized_slugs' => [ $base ],
@@ -642,7 +677,7 @@ class Tribe__Rewrite {
 				if ( ! empty( $buffer['slugs'] ) ) {
 					$slugs = explode( '|', $buffer['slugs'] );
 
-					$localized_matchers[ $localized_matcher ]['localized_slugs'] = array_map(
+					$localized_matchers[ $localized_matcher_key ]['localized_slugs'] = array_map(
 						static function ( $localized_slug ) {
 							return str_replace( '\-', '-', $localized_slug );
 						},
@@ -650,7 +685,7 @@ class Tribe__Rewrite {
 					);
 
 					// The English version is the first.
-					$localized_matchers[ $localized_matcher ]['en_slug'] = reset( $slugs );
+					$localized_matchers[ $localized_matcher_key ]['en_slug'] = reset( $slugs );
 				}
 			}
 		}
@@ -837,10 +872,16 @@ class Tribe__Rewrite {
 		$perma_query_vars     = [];
 		$url_components = parse_url($url);
 		$url_path = Arr::get( $url_components, 'path', '/' );
+		$site_path = parse_url( home_url(), PHP_URL_PATH );
+		if ( ! ( empty( $site_path ) && '/' !== $site_path ) ) {
+			// The current site is in a sub-directory: the site path should be dropped from the request path.
+			$url_path = str_replace( $site_path, '', $url_path );
+		}
 		$url_query = Arr::get( $url_components, 'query', '' );
 		parse_str( $url_query, $url_query_vars );
 		// Look for matches, removing leading `/` char.
-		$request_match = ltrim( $url_path, '/' );
+		$request_match         = ltrim( $url_path, '/' );
+		$decoded_request_match = urldecode( $request_match );
 
 		// Fetch the rewrite rules.
 		$rewrite_rules = $this->rewrite->wp_rewrite_rules();
@@ -849,7 +890,7 @@ class Tribe__Rewrite {
 		if ( ! empty( $rewrite_rules ) ) {
 			foreach ( (array) $rewrite_rules as $match => $query ) {
 				$matches_regex = preg_match( "#^$match#", $request_match, $matches )
-				                 || preg_match( "#^$match#", urldecode( $request_match ), $matches );
+				                 || preg_match( "#^$match#", $decoded_request_match, $matches );
 
 				if ( ! $matches_regex ) {
 					continue;
@@ -982,6 +1023,11 @@ class Tribe__Rewrite {
 			// If the URL did have query vars keep them if not overridden by our resolution.
 			$query_vars = array_merge( $url_query_vars, $query_vars );
 		}
+
+		// Prune the query vars to drop the empty `page` or `paged` ones.
+		$query_vars = array_filter( $query_vars, static function ( $value, $key ) {
+			return ! in_array( $key, [ 'paged', 'page' ] ) || (int) $value !== 0;
+		}, ARRAY_FILTER_USE_BOTH );
 
 		/**
 		 * Filters the array of parsed query variables after the class logic has been applied to it.

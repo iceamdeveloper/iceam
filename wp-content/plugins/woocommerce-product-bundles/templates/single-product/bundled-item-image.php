@@ -39,7 +39,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	} else {
 
 		$html  = '<figure class="bundled_product_image woocommerce-product-gallery__image--placeholder">';
-		$html .= sprintf( '<a href="%1$s" class="placeholder_image zoom" data-rel="%3$s"><img class="wp-post-image" src="%1$s" alt="%2$s"/></a>', wc_placeholder_img_src(), __( 'Bundled product placeholder image', 'woocommerce-composite-products' ), $image_rel );
+		$html .= sprintf( '<a href="%1$s" class="placeholder_image zoom" data-rel="%3$s"><img class="wp-post-image" src="%1$s" alt="%2$s"/></a>', wc_placeholder_img_src(), __( 'Bundled product placeholder image', 'woocommerce-product-bundles' ), $image_rel );
 		$html .= '</figure>';
 	}
 

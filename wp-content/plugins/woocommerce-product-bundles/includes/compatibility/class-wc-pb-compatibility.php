@@ -2,7 +2,7 @@
 /**
  * WC_PB_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.6.4
  */
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  6.0.0
+ * @version  6.3.4
  */
 class WC_PB_Compatibility {
 
@@ -31,7 +31,6 @@ class WC_PB_Compatibility {
 	 * @var array
 	 */
 	public static $addons_prefix          = '';
-	public static $nyp_prefix             = '';
 	public static $bundle_prefix          = '';
 	public static $compat_product         = '';
 	public static $compat_bundled_product = '';
@@ -84,11 +83,11 @@ class WC_PB_Compatibility {
 
 		// Define dependencies.
 		$this->required = array(
-			'cp'     => '6.0.0',
+			'cp'     => '6.2.0',
 			'pao'    => '3.0.14',
-			'minmax' => '1.3.3',
+			'minmax' => '1.4.1',
 			'topatc' => '1.0.3',
-			'bd'     => '1.2.0'
+			'bd'     => '1.3.1'
 		);
 
 		// Initialize.
@@ -234,6 +233,11 @@ class WC_PB_Compatibility {
 			$module_paths[ 'wishlists' ] = 'modules/class-wc-pb-wl-compatibility.php';
 		}
 
+		// WooCommerce Services compatibility.
+		if ( class_exists( 'WC_Connect_Loader' ) ) {
+			$module_paths[ 'wc_services' ] = 'modules/class-wc-pb-wc-services-compatibility.php';
+		}
+
 		// Shipstation integration.
 		$module_paths[ 'shipstation' ] = 'modules/class-wc-pb-shipstation-compatibility.php';
 
@@ -275,13 +279,21 @@ class WC_PB_Compatibility {
 	 */
 	public function add_compatibility_notices() {
 
+		if ( ! current_user_can( 'manage_woocommerce' ) ) {
+			return;
+		}
+
 		// CP version check.
 		if ( class_exists( 'WC_Composite_Products' ) && function_exists( 'WC_CP' ) ) {
 			$required_version = $this->required[ 'cp' ];
 			if ( version_compare( WC_PB()->plugin_version( true, WC_CP()->version ), $required_version ) < 0 ) {
-				$extension = 'Composite Products';
-				$notice    = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <strong>%1$s</strong> to version <strong>%2$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $required_version );
-				WC_PB_Admin_Notices::add_dismissible_notice( $notice, array( 'dismiss_class' => 'cp_lt_' . $required_version, 'type' => 'native' ) );
+
+				$extension      = __( 'Composite Products', 'woocommerce-product-bundles' );
+				$extension_full = __( 'WooCommerce Composite Products', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://woocommerce.com/products/composite-products/';
+				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
+
+				WC_PB_Admin_Notices::add_dismissible_notice( $notice, array( 'dismiss_class' => 'cp_lt_' . $required_version, 'type' => 'warning' ) );
 			}
 		}
 
@@ -292,32 +304,37 @@ class WC_PB_Compatibility {
 
 			if ( ! defined( 'WC_PRODUCT_ADDONS_VERSION' ) || version_compare( WC_PRODUCT_ADDONS_VERSION, $required_version ) < 0 ) {
 
-				$extension = 'Product Add-ons';
-				$notice    = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <strong>%1$s</strong> to version <strong>%2$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $required_version );
+				$extension      = __( 'Product Add-Ons', 'woocommerce-product-bundles' );
+				$extension_full = __( 'WooCommerce Product Add-Ons', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://woocommerce.com/products/product-add-ons/';
+				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
 
-				WC_PB_Admin_Notices::add_dismissible_notice( $notice, array( 'dismiss_class' => 'addons_lt_' . $required_version, 'type' => 'native' ) );
+				WC_PB_Admin_Notices::add_dismissible_notice( $notice, array( 'dismiss_class' => 'addons_lt_' . $required_version, 'type' => 'warning' ) );
 			}
 		}
 
 		// Tabular layout mini-extension check.
 		if ( class_exists( 'WC_PB_Tabular_Layout' ) ) {
 			$notice = sprintf( __( 'The <strong>Tabular Layout</strong> mini-extension has been rolled into <strong>Product Bundles</strong>. Please deactivate and remove the <strong>Product Bundles - Tabular Layout</strong> feature plugin.', 'woocommerce-product-bundles' ) );
-			WC_PB_Admin_Notices::add_notice( $notice, 'native' );
+			WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 		}
 
 		// Bundle-Sells mini-extension version check.
 		if ( class_exists( 'WC_PB_Bundle_Sells' ) ) {
 			$notice = sprintf( __( 'The <strong>Bundle-Sells</strong> mini-extension has been rolled into <strong>Product Bundles</strong>. Please deactivate and remove the <strong>Product Bundles - Bundle-Sells</strong> feature plugin.', 'woocommerce-product-bundles' ) );
-			WC_PB_Admin_Notices::add_notice( $notice, 'native' );
+			WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 		}
 
 		// Min/Max Items mini-extension version check.
 		if ( class_exists( 'WC_PB_Min_Max_Items' ) ) {
 			$required_version = $this->required[ 'minmax' ];
 			if ( version_compare( WC_PB()->plugin_version( true, WC_PB_Min_Max_Items::$version ), $required_version ) < 0 ) {
-				$extension = 'Product Bundles - Min/Max Items';
-				$notice    = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <strong>%1$s</strong> to version <strong>%2$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $required_version );
-				WC_PB_Admin_Notices::add_notice( $notice, 'native' );
+
+				$extension      = $extension_full = __( 'Product Bundles - Min/Max Items', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://wordpress.org/plugins/product-bundles-minmax-items-for-woocommerce/';
+				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
+
+				WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 			}
 		}
 
@@ -325,9 +342,11 @@ class WC_PB_Compatibility {
 		if ( class_exists( 'WC_PB_Top_Add_To_Cart' ) ) {
 			$required_version = $this->required[ 'topatc' ];
 			if ( version_compare( WC_PB()->plugin_version( true, WC_PB_Top_Add_To_Cart::$version ), $required_version ) < 0 ) {
-				$extension = 'Product Bundles - Top Add to Cart Button';
+
+				$extension = __( 'Product Bundles - Top Add to Cart Button', 'woocommerce-product-bundles' );
 				$notice    = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <strong>%1$s</strong> to version <strong>%2$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $required_version );
-				WC_PB_Admin_Notices::add_notice( $notice, 'native' );
+
+				WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 			}
 		}
 
@@ -335,9 +354,12 @@ class WC_PB_Compatibility {
 		if ( class_exists( 'WC_PB_Bulk_Discounts' ) ) {
 			$required_version = $this->required[ 'bd' ];
 			if ( version_compare( WC_PB()->plugin_version( true, WC_PB_Bulk_Discounts::$version ), $required_version ) < 0 ) {
-				$extension = 'Product Bundles - Bulk Discounts';
-				$notice    = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <strong>%1$s</strong> to version <strong>%2$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $required_version );
-				WC_PB_Admin_Notices::add_notice( $notice, 'native' );
+
+				$extension      = $extension_full = __( 'Product Bundles - Bulk Discounts', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://wordpress.org/plugins/product-bundles-bulk-discounts-for-woocommerce/';
+				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
+
+				WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 			}
 		}
 	}

@@ -3,15 +3,15 @@
  * Plugin Name: Sensei with WooCommerce Paid Courses
  * Plugin URI: https://woocommerce.com/products/sensei/
  * Description: Whether you want to teach, tutor or train, we have you covered.
- * Version: 2.4.0.1.2.4
+ * Version: 3.4.1.2.1.0
  * Author: Automattic
  * Author URI: https://automattic.com
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Requires at least: 4.9
- * Tested up to: 5.3
- * Requires PHP: 5.6
+ * Requires at least: 5.2
+ * Tested up to: 5.5
+ * Requires PHP: 7.0
  * WC requires at least: 3.0.0
- * WC tested up to: 3.8
+ * WC tested up to: 4.3
  * Text Domain: sensei-compat
  *
  * Woo: 152116:bad2a02a063555b7e2bee59924690763
@@ -32,6 +32,7 @@ if ( Sensei_Compat_Dependency_Checker::is_php_version_at_least( '5.6.0' ) ) {
 
 add_action( 'plugins_loaded', 'sensei_compat_load', 1 );
 register_activation_hook( __FILE__, 'sensei_compat_activate' );
+register_deactivation_hook( __FILE__, 'sensei_compat_deactivate' );
 
 if ( is_admin() ) {
 	require_once dirname( __FILE__ ) . '/class-sensei-compat-admin.php';
@@ -125,5 +126,27 @@ function sensei_compat_activate() {
 		$sensei_wcpc_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-wc-paid-courses/sensei-wc-paid-courses.php';
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'activate_' . plugin_basename( $sensei_wcpc_plugin_file ) );
+	}
+}
+
+
+/**
+ * Ensure that the deactivation hooks for the plugins are run.
+ *
+ * @since 2.0.0
+ * @access private
+ */
+function sensei_compat_deactivate() {
+	sensei_compat_load();
+	if ( SENSEI_COMPAT_LOADING_SENSEI ) {
+		$sensei_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-lms/sensei-lms.php';
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		do_action( 'deactivate_' . plugin_basename( $sensei_plugin_file ) );
+	}
+
+	if ( SENSEI_COMPAT_LOADING_WC_PAID_COURSES ) {
+		$sensei_wcpc_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-wc-paid-courses/sensei-wc-paid-courses.php';
+		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+		do_action( 'deactivate_' . plugin_basename( $sensei_wcpc_plugin_file ) );
 	}
 }

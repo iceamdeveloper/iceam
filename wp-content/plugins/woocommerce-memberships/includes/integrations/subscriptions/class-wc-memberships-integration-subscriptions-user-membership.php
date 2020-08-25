@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -546,6 +546,15 @@ class WC_Memberships_Integration_Subscriptions_User_Membership extends \WC_Membe
 	public function get_free_trial_end_date( $format = 'mysql' ) {
 
 		$date = get_post_meta( $this->id, $this->free_trial_end_date_meta, true );
+
+		if ( empty( $date ) ) {
+
+			$subscription = $this->get_subscription();
+
+			if ( $subscription && $subscription->has_status( 'pending-cancel' ) ) {
+				$date = $subscription->get_meta( 'trial_end_pre_cancellation' );
+			}
+		}
 
 		return ! empty( $date ) ? wc_memberships_format_date( $date, $format ) : null;
 	}

@@ -16,24 +16,45 @@
  *
  * @since 4.5.2
  *
- * @param bool
+ * @param bool $hide_attendee_list_optout Whether to hide attendees list opt-out.
+ * @param int  $post_id                   The post ID this ticket belongs to.
  */
-$hide_attendee_list_optout = apply_filters( 'tribe_tickets_plus_hide_attendees_list_optout', false );
+$hide_attendee_list_optout = apply_filters( 'tribe_tickets_plus_hide_attendees_list_optout', false, $post_id );
 
-if ( ! $hide_attendee_list_optout
-     && class_exists( 'Tribe__Tickets_Plus__Attendees_List' )
-     && ! Tribe__Tickets_Plus__Attendees_List::is_hidden_on( get_the_ID() )
-) { ?>
-	<tr class="tribe-tickets-attendees-list-optout">
+if ( $hide_attendee_list_optout ) {
+	return;
+}
+?>
+	<tr class="tribe-tickets-attendees-list-optout"
+		<?php
+		if ( $hide_attendee_list_optout ) :
+			echo 'style="display:none;"';
+		endif;
+		?>
+	>
 		<td colspan="4">
-			<input
-				type="checkbox"
-				name="tpp_optout[]"
-				id="tribe-tickets-attendees-list-optout-edd"
-				value="<?php echo esc_attr( $ticket->ID ); ?>"
-			>
-			<label for="tribe-tickets-attendees-list-optout-edd"><?php esc_html_e( "Don't list me on the public attendee list", 'event-tickets-plus' ); ?></label>
+			<?php
+			if ( $hide_attendee_list_optout ) :
+				?>
+				<input
+					name="tpp_optout[]"
+					value="<?php echo esc_attr( $ticket->ID ); ?>"
+					type="hidden"
+				>
+				<?php
+			else :
+				?>
+				<input
+					type="checkbox"
+					name="tpp_optout[]"
+					id="tribe-tickets-attendees-list-optout-tpp"
+					value="<?php echo esc_attr( $ticket->ID ); ?>"
+				>
+				<label for="tribe-tickets-attendees-list-optout-tpp">
+					<?php esc_html_e( "Don't list me on the public attendee list", 'event-tickets-plus' ); ?>
+				</label>
+				<?php
+			endif;
+			?>
 		</td>
 	</tr>
-	<?php
-}

@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -96,22 +96,6 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 		}
 
 		return $job;
-	}
-
-
-	/**
-	 * Processes a single item from the background job.
-	 *
-	 * Child classes should override this method.
-	 *
-	 * @since 1.10.0
-	 *
-	 * @param mixed $item current item in queue
-	 * @param \stdClass $job related job instance
-	 * @return \stdClass the $job, processed
-	 */
-	public function process_item( $item, $job ) {
-		return parent::process_item( $item, $job );
 	}
 
 

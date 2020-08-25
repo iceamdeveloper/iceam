@@ -47,6 +47,10 @@ final class Courses {
 		add_filter( 'manage_edit-course_columns', [ $this, 'add_column_headings' ], 10, 1 );
 		add_action( 'manage_posts_custom_column', [ $this, 'add_column_data' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
+		add_action( 'enqueue_block_editor_assets', [ $this, 'localize_block_editor_assets' ], 30 );
+
+		// Add "large catalog" data for sidebar functionality.
+		add_filter( 'sensei_wc_paid_courses_course_block_editor_l10n_data', [ $this, 'add_product_catalog_data' ] );
 	}
 
 	/**
@@ -88,9 +92,12 @@ final class Courses {
 	 * @param mixed  $product_ids The product IDs.
 	 */
 	public function save_course_woocommerce_product( $course_id, $meta_key, $product_ids ) {
-		if ( '_course_woocommerce_product' !== $meta_key ) {
+		if ( '_course_woocommerce_product' !== $meta_key || 'revision' === get_post_type( $course_id ) ) {
 			return;
 		}
+
+		// phpcs:ignore WordPress.Security.NonceVerification -- Nonce verification is done in the beginning of the request handling.
+		\Sensei_WC_Paid_Courses\Courses::instance()->update_modal_confirmation_date( $_POST );
 
 		// Ensure array.
 		if ( ! is_array( $product_ids ) ) {
@@ -160,10 +167,20 @@ final class Courses {
 			]
 		);
 
-		// Set the new array of product IDs in place of the old ones.
-		delete_post_meta( $course_id, $meta_key );
+		$current_product_ids = Sensei_WC::get_course_product_ids( $course_id, false );
+
+		// Remove only products which we are not adding.
+		foreach ( $current_product_ids as $current_product_id ) {
+			if ( ! in_array( $current_product_id, $valid_product_ids, true ) ) {
+				delete_post_meta( $course_id, $meta_key, $current_product_id );
+			}
+		}
+
+		// Add the new product IDs which is not already added.
 		foreach ( $valid_product_ids as $product_id ) {
-			add_post_meta( $course_id, $meta_key, $product_id );
+			if ( ! in_array( $product_id, $current_product_ids, true ) ) {
+				add_post_meta( $course_id, $meta_key, $product_id );
+			}
 		}
 	}
 
@@ -232,13 +249,23 @@ final class Courses {
 
 				}
 
+				$total_sales = get_post_meta( $post_item->ID, 'total_sales', true );
+				$total_sales = $total_sales ? $total_sales : 0;
+
 				$html .= '<option value="' . esc_attr( absint( $post_item->ID ) ) . '"';
 				$html .= in_array( $post_item->ID, $select_course_woocommerce_products, true ) ? ' selected' : '';
+				$html .= ' data-total-sales="' . $total_sales . '" ';
 				$html .= '>' . esc_html( $product_name ) . '</option>' . "\n";
 
 			} // End For Loop.
 
 			$html .= '</select>' . "\n";
+
+			$html .= '<input type="hidden" name="user_confirmed_modal">';
+			if ( ! \Sensei_WC_Paid_Courses\Courses::instance()->has_user_confirmed_modal() ) {
+				$html .= $this->get_modal();
+			}
+
 			if ( current_user_can( 'publish_product' ) ) {
 
 				$html .= '<p>' . "\n";
@@ -280,8 +307,9 @@ final class Courses {
 						'label' => [],
 					],
 					'option'   => [
-						'selected' => [],
-						'value'    => [],
+						'selected'         => [],
+						'value'            => [],
+						'data-total-sales' => [],
 					],
 					'select'   => [
 						'class'    => [],
@@ -319,6 +347,66 @@ final class Courses {
 			$columns += $new_columns;
 		}
 		return $columns;
+	}
+
+	/**
+	 * Helper method which returns the modal.
+	 *
+	 * @since  2.0.0
+	 *
+	 * @return string The modal.
+	 */
+	private function get_modal() {
+		$modal_title   = $this->get_modal_title();
+		$modal_content = $this->get_modal_content();
+
+		return <<<MODAL
+<div id="user-confirmation-modal" class="modal user-confirmation-modal__frame" tabindex="0">
+	<div class="user-confirmation-modal__header">
+		<h2>$modal_title</h2>
+	</div>
+	<hr>
+	<div class="user-confirmation-modal__message">
+		$modal_content
+	</div>
+	<hr>
+	<div class="user-confirmation-modal__button-container">
+		<button id="user-confirmation-modal-cancel" type="button" class="button button-secondary">Cancel</button>
+		<button id="user-confirmation-modal-confirm" type="button" class="button button-primary">Confirm</button>
+	</div>
+</div>
+MODAL;
+	}
+
+	/**
+	 * Helper method which returns the modal content.
+	 *
+	 * @since  2.0.0
+	 *
+	 * @return string The modal content.
+	 */
+	public function get_modal_content() {
+		$allowed_atributes = [
+			'p'      => [],
+			'strong' => [],
+			'br'     => [],
+		];
+
+		$addition_message = __( 'Please note that <strong>adding a new product</strong> will automatically <strong>enroll</strong> any users in the course who have previously purchased the product. For subscription products, only active subscribers will be enrolled.<br>', 'sensei-wc-paid-courses' );
+		$removal_message  = __( 'Similarly, <strong>removing an existing product</strong> will automatically <strong>unenroll</strong> any users from the course who have previously purchased the product, unless they have purchased another product that is associated with the course.<br>', 'sensei-wc-paid-courses' );
+
+		return wp_kses( '<p>' . $addition_message . '<br>' . $removal_message . '</p>', $allowed_atributes );
+	}
+
+	/**
+	 * Helper method which returns the modal title.
+	 *
+	 * @since  2.0.0
+	 *
+	 * @return string The modal title.
+	 */
+	public function get_modal_title() {
+		return esc_html__( 'Enrollment and Updating Products', 'sensei-wc-paid-courses' );
 	}
 
 	/**
@@ -376,107 +464,6 @@ final class Courses {
 	}
 
 	/**
-	 * Add the product select field to the form in the Course Select meta box on the edit lesson page.
-	 *
-	 * @since 1.0.0
-	 */
-	public function add_lesson_course_product_field() {
-		_deprecated_function( __METHOD__, '1.1.0' );
-
-		$html         = '';
-		$product_args = [
-			'post_type'        => [ 'product', 'product_variation' ],
-			'posts_per_page'   => -1,
-			'orderby'          => 'title',
-			'order'            => 'DESC',
-			'post_status'      => [ 'publish', 'private', 'draft' ],
-			'tax_query'        => [
-				[
-					'taxonomy' => 'product_type',
-					'field'    => 'slug',
-					'terms'    => [ 'variable', 'grouped' ],
-					'operator' => 'NOT IN',
-				],
-			],
-			'suppress_filters' => 0,
-		];
-
-		$products_array = get_posts( $product_args );
-		$html          .= '<label>' . esc_html__( 'WooCommerce Product', 'sensei-wc-paid-courses' ) . '</label> ';
-		$html          .= '<select id="course-woocommerce-product-options" name="course_woocommerce_product" class="chosen_select widefat" style="width: 100%">' . "\n";
-		$html          .= '<option value="-">' . esc_html__( 'None', 'sensei-wc-paid-courses' ) . '</option>';
-		$prev_parent_id = 0;
-
-		foreach ( $products_array as $products_item ) {
-
-			if ( 'product_variation' === $products_item->post_type ) {
-				$product_object = wc_get_product( $products_item->ID );
-				if ( empty( $product_object ) ) {
-					// Product variation has been orphaned. Treat it like it has also been deleted.
-					continue;
-				}
-				$parent_id    = intval( Sensei_WC_Utils::get_product_id( $product_object ) );
-				$product_name = ucwords( wc_get_formatted_variation( Sensei_WC_Utils::get_variation_data( $product_object ), true ) );
-			} else {
-				$parent_id      = false;
-				$prev_parent_id = 0;
-				$product_name   = $products_item->post_title;
-			}
-
-			// Show variations in groups.
-			if ( $parent_id && $parent_id !== $prev_parent_id ) {
-				if ( 0 !== $prev_parent_id ) {
-					$html .= '</optgroup>';
-				}
-				$html          .= '<optgroup label="' . esc_attr( get_the_title( $parent_id ) ) . '">';
-				$prev_parent_id = $parent_id;
-			} elseif ( ! $parent_id && 0 === $prev_parent_id ) {
-				$html .= '</optgroup>';
-			}
-
-			$html .= '<option value="' . esc_attr( absint( $products_item->ID ) ) . '">' . esc_html( $product_name ) . '</option>' . "\n";
-		} // End For Loop.
-		$html .= '</select>' . "\n";
-
-		echo wp_kses(
-			$html,
-			[
-				'optgroup' => [
-					'label' => [],
-				],
-				'option'   => [
-					'selected' => [],
-					'value'    => [],
-				],
-				'select'   => [
-					'class' => [],
-					'id'    => [],
-					'name'  => [],
-					'style' => [],
-				],
-			]
-		);
-	}
-
-	/**
-	 * Triggers after a course was created from the lesson page meta box. Handles the saving of the product ID field.
-	 *
-	 * @since 1.0.0
-	 *
-	 * @param int   $course_id Course ID that was just created.
-	 * @param array $data      Data that was sent when creating the course.
-	 */
-	public function lesson_course_handle_product_id( $course_id, $data ) {
-		_deprecated_function( __METHOD__, '1.1.0' );
-
-		$course_woocommerce_product_id = isset( $data['course_woocommerce_product'] ) ? absint( $data['course_woocommerce_product'] ) : '-';
-		if ( 0 === $course_woocommerce_product_id ) {
-			$course_woocommerce_product_id = '-';
-		}
-		add_post_meta( $course_id, '_course_woocommerce_product', $course_woocommerce_product_id );
-	}
-
-	/**
 	 * Enqueues admin scripts when needed on different screens.
 	 *
 	 * @since 1.0.0
@@ -485,7 +472,61 @@ final class Courses {
 		$screen = get_current_screen();
 		if ( in_array( $screen->id, [ 'lesson', 'course' ], true ) ) {
 			wp_enqueue_script( Sensei_WC_Paid_Courses::SCRIPT_ADMIN_COURSE_METADATA );
+
+			if ( 'course' === $screen->id ) {
+
+				wp_enqueue_script( 'jquery-modal' );
+				wp_enqueue_style( 'jquery-modal' );
+
+				wp_enqueue_style(
+					'sensei-wcpc-admin-course',
+					\Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses::instance()->plugin_url . '/assets/css/sensei-wcpc-admin-course.css',
+					[],
+					SENSEI_WC_PAID_COURSES_VERSION
+				);
+			}
 		}
+	}
+
+	/**
+	 * Send localization data for block editor script.
+	 *
+	 * @access private
+	 * @since 2.0.0
+	 */
+	public function localize_block_editor_assets() {
+		$screen = get_current_screen();
+		if ( 'course' === $screen->id ) {
+			Sensei_WC_Paid_Courses::instance()->localize_block_editor_asset(
+				'course',
+				/**
+				 * Filter the localization data for block editor script.
+				 *
+				 * @since 1.2.5
+				 *
+				 * @param array $data The localization data.
+				 */
+				apply_filters( 'sensei_wc_paid_courses_course_block_editor_l10n_data', [] )
+			);
+		}
+	}
+
+	/**
+	 * Add "large catalog" flag to the frontend.
+	 *
+	 * @access private
+	 * @since 2.0.0
+	 *
+	 * @param array $data The localization arry.
+	 * @return array The filtered data.
+	 */
+	public function add_product_catalog_data( $data ) {
+		global $post;
+
+		$product_ids                = \Sensei_WC_Paid_Courses\Courses::instance()->get_assignable_products( $post, [ 'fields' => 'ids' ] );
+		$data['productCatalogSize'] = count( $product_ids );
+
+		return $data;
 	}
 
 	/**

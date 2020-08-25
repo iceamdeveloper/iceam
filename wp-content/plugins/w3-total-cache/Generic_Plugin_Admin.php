@@ -42,6 +42,9 @@ class Generic_Plugin_Admin {
 				'\W3TC\Generic_WidgetServices',
 				'admin_init_w3tc_dashboard' ) );
 		add_action( 'admin_init_w3tc_dashboard', array(
+			'\W3TC\Generic_WidgetCommunity',
+			'admin_init_w3tc_dashboard' ) );
+		add_action( 'admin_init_w3tc_dashboard', array(
 				'\W3TC\Generic_WidgetBoldGrid',
 				'admin_init_w3tc_dashboard' ) );
 
@@ -200,8 +203,8 @@ class Generic_Plugin_Admin {
 		$score = apply_filters( 'w3tc_monitoring_score', $score );
 
 		header( "Content-Type: application/x-javascript; charset=UTF-8" );
-		echo 'document.getElementById("w3tc_monitoring_score").innerHTML = "' .
-			strtr( $score, '"', '.' ) . '";';
+		echo 'document.getElementById("w3tc_monitoring_score") && ( document.getElementById("w3tc_monitoring_score").innerHTML = "' .
+			strtr( $score, '"', '.' ) . '" );';
 
 		exit();
 	}
@@ -290,7 +293,6 @@ class Generic_Plugin_Admin {
 					'dimension9': '<?php echo esc_attr( $state->get_string( 'common.install_version' ) ) ?>',
 					'dimension10': '<?php echo esc_attr( Util_Environment::w3tc_edition( $this->_config ) ) ?>',
 					'dimension11': '<?php echo esc_attr( Util_Widget::list_widgets() ) ?>',
-					'userId': '<?php echo $current_user->user_email ?>',
 					'page': '<?php echo $page ?>'
 				});
 

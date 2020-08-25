@@ -1,10 +1,10 @@
 === WooCommerce Currency Switcher - Bundles Integration ===
 Tags: woocommerce, currency switcher, bundles, integration
 Requires at least: 4.0
-Tested up to: 4.5
+Tested up to: 5.5
 License: GPLv3
 WC requires at least: 3.0
-WC tested up to: 3.9.1
+WC tested up to: 4.4
 
 Implements integration between the [Aelia Currency Switcher](http://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Bundles plugin](http://www.woothemes.com/products/woocommerce-bundles/).
 
@@ -26,6 +26,20 @@ This plugin acts as a bridge between [Aelia Currency Switcher](http://aelia.co/s
 3. That's it! Now the price of the Bundles you enter will be converted automatically in the appropriate currency.
 
 == Changelog ==
+
+= 1.2.7.200813 =
+* Updated supported WordPress and WooCommerce versions.
+
+= 1.2.7.200625 =
+* Updated supported WooCommerce versions.
+
+= 1.2.7.200603 =
+* Updated supported WooCommerce versions.
+
+= 1.2.6.200428 =
+* Updated requirement checking class.
+* Updated requirements.
+* Updated supported WooCommerce versions.
 
 = 1.2.5.200205 =
 * Tweak - Added extra check to prevent double conversion of a  bundle's base price, in case the conversion function is called multiple times.

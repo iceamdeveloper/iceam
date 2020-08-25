@@ -235,6 +235,9 @@ class Sensei_Legacy_Shortcodes {
 
 		if ( is_user_logged_in() ) {
 
+			if ( ! Sensei_Utils::get_setting_as_flag( 'js_disable', 'sensei_settings_js_disable' ) ) {
+				wp_enqueue_script( Sensei()->token . '-user-dashboard' );
+			}
 			Sensei_Templates::get_template( 'user/my-courses.php' );
 
 		} else {
@@ -295,7 +298,7 @@ class Sensei_Legacy_Shortcodes {
 	}
 
 	/**
-	 * Loop through courses in the query and output the infomration needed
+	 * Loop through courses in the query and output the information needed
 	 *
 	 * @since 1.9.0
 	 *
@@ -376,7 +379,8 @@ class Sensei_Legacy_Shortcodes {
 		$author_display_name   = $user_info->display_name;
 		$category_output       = get_the_term_list( $course_id, 'course-category', '', ', ', '' );
 		$preview_lesson_count  = intval( Sensei()->course->course_lesson_preview_count( $course_id ) );
-		$is_user_taking_course = Sensei_Utils::user_started_course( $course_id, get_current_user_id() );
+		$lesson_count          = Sensei()->course->course_lesson_count( $course_id );
+		$is_user_taking_course = Sensei_Course::is_user_enrolled( $course_id, get_current_user_id() );
 		?>
 
 		<article class="<?php echo esc_attr( join( ' ', get_post_class( array( 'course', 'post' ), $course_id ) ) ); ?>">
@@ -413,13 +417,16 @@ class Sensei_Legacy_Shortcodes {
 						<?php } // End If Statement ?>
 
 						<span class="course-lesson-count">
-									<?php echo esc_html( Sensei()->course->course_lesson_count( $course_id ) ) . '&nbsp;' . esc_html__( 'Lessons', 'sensei-lms' ); ?>
-								</span>
+							<?php
+							// translators: Placeholder %d is the lesson count.
+							echo esc_html( sprintf( _n( '%d Lesson', '%d Lessons', $lesson_count, 'sensei-lms' ), $lesson_count ) );
+							?>
+						</span>
 
 						<?php if ( ! empty( $category_output ) ) { ?>
 							<span class="course-category">
 								<?php
-								// translators: Placeholder is a comma-separated list of categories.
+								// translators: Placeholder is a comma-separated list of the Course categories.
 								echo wp_kses_post( sprintf( __( 'in %s', 'sensei-lms' ), $category_output ) );
 								?>
 							</span>

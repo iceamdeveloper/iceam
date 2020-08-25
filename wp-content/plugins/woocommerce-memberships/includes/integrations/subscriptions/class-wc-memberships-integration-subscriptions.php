@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -412,9 +412,8 @@ class WC_Memberships_Integration_Subscriptions {
 
 					$user_membership->update_status( 'free_trial', $note );
 
-					// also update the free trial end date
-					// which now might account for a paused interval
-					$user_membership->set_free_trial_end_date( $this->get_subscription_event_date( $subscription, 'trial_end' ) );
+					// also update the free trial end date, which now might account for a paused interval
+					$user_membership->set_free_trial_end_date( $trial_end );
 
 				} else {
 
@@ -590,18 +589,25 @@ class WC_Memberships_Integration_Subscriptions {
 
 			$is_variation   = null;
 			$old_product_id = 0;
+			$new_product_id = 0;
 
 			// Grab the variation ID for variable product upgrades, or the product_id for grouped product upgrades.
 			// Even for grouped products there might still be a variation ID if products grouped are variable products.
 			if ( ! empty( $old_order_item['variation_id'] ) ) {
 				$is_variation   = true;
-				$old_product_id = $old_order_item['variation_id'];
+				$old_product_id = (int) $old_order_item['variation_id'];
 			} elseif ( ! empty( $old_order_item['product_id'] ) ) {
 				$is_variation   = false;
-				$old_product_id = $old_order_item['product_id'];
+				$old_product_id = (int) $old_order_item['product_id'];
 			}
 
-			if ( $old_product_id > 0 ) {
+			if ( ! empty( $new_order_item['variation_id'] ) ) {
+				$new_product_id = (int) $new_order_item['variation_id'];
+			} elseif ( ! empty( $new_order_item['product_id'] ) ) {
+				$new_product_id = (int) $new_order_item['product_id'];
+			}
+
+			if ( $old_product_id > 0 && $old_product_id !== $new_product_id ) {
 
 				// loop found memberships
 				foreach ( $user_memberships as $user_membership ) {
@@ -880,7 +886,17 @@ class WC_Memberships_Integration_Subscriptions {
 	 */
 	private function get_subscription_event( $subscription, $event, $format = 'mysql' ) {
 
-		$date = $subscription instanceof \WC_Subscription ? $subscription->get_date( $event ) : '';
+		$date = '';
+
+		if ( $subscription instanceof \WC_Subscription ) {
+
+			$date = $subscription->get_date( $event );
+
+			// fall back to previously recorded trial end date if the Subscription has entered pending cancellation
+			if ( $subscription && empty( $date ) && 'trial_end' === $event && $subscription->has_status( 'pending-cancel' ) ) {
+				$date = $subscription->get_meta( 'trial_end_pre_cancellation' );
+			}
+		}
 
 		return 'timestamp' === $format && ! empty( $date ) ? strtotime( $date ) : $date;
 	}
@@ -1042,29 +1058,6 @@ class WC_Memberships_Integration_Subscriptions {
 		}
 
 		return $is_linked;
-	}
-
-
-	/**
-	 * Checks if a Subscription associated to a Membership is renewable.
-	 *
-	 * @since 1.6.0
-	 * @deprecated since 1.13.2
-	 *
-	 * TODO remove this deprecated method by version 2.0.0 or by July 2020, whichever comes earlier {FN 2018-01-21}
-	 *
-	 * @param \WC_Subscription $subscription Subscription
-	 * @param \WC_Memberships_User_Membership $user_membership User Membership
-	 * @return bool
-	 */
-	public function is_subscription_linked_to_membership_renewable( $subscription, $user_membership ) {
-
-		_deprecated_function( 'WC_Memberships_Integration_Subscriptions::is_subscription_linked_to_membership_renewable()', '1.13.2', 'WC_Memberships_Integration_Subscriptions_User_Membership::can_be_renewed()' );
-
-		return    $user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership
-		       && $user_membership->has_subscription()
-		       && function_exists( 'wcs_can_user_resubscribe_to' )
-		       && wcs_can_user_resubscribe_to( $subscription, $user_membership->get_user_id() );
 	}
 
 

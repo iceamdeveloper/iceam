@@ -3,7 +3,7 @@
 Plugin Name: Event Tickets Plus
 Plugin URI:  http://m.tri.be/1acc
 Description: Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more! Includes advanced options like shared capacity between tickets, ticket QR codes, and integrations with your favorite ecommerce provider.
-Version: 4.11.4
+Version: 4.12.3
 Author: Modern Tribe, Inc.
 Author URI: http://m.tri.be/28
 License: GPLv2 or later
@@ -94,7 +94,7 @@ add_action( 'tribe_common_loaded', 'tribe_register_event_tickets_plus', 5 );
 // add action if Event Tickets or the Events Calendar is not active
 add_action( 'plugins_loaded', 'tribe_register_event_tickets_plus', 50 );
 // ensure we load the lang files
-add_action( 'plugins_loaded', 'event_tickets_plus_setup_textdomain' );
+add_action( 'tribe_load_text_domains', 'event_tickets_plus_setup_textdomain' );
 
 /**
  * Instantiate class and set up WordPress actions.
@@ -163,8 +163,9 @@ function event_tickets_plus_setup_textdomain() {
 }
 
 /**
- * Requires the autoloader class from the main plugin class and sets up
- * autoloading.
+ * Requires the autoloader class from the main plugin class and sets up autoloading.
+ *
+ * @since 4.12.1 Added support for namespaced classes to autoload.
  */
 function tribe_init_tickets_plus_autoloading() {
 	if ( ! class_exists( 'Tribe__Autoloader' ) ) {
@@ -172,7 +173,21 @@ function tribe_init_tickets_plus_autoloading() {
 	}
 
 	$autoloader = Tribe__Autoloader::instance();
-	$autoloader->register_prefix( 'Tribe__Tickets_Plus__', dirname( __FILE__ ) . '/src/Tribe', 'event-tickets-plus' );
+
+	// For class names with `__` string separator.
+	$autoloader->register_prefix(
+		'Tribe__Tickets_Plus__',
+		__DIR__ . '/src/Tribe',
+		'event-tickets-plus'
+	);
+
+	// For namespaced classes.
+	$autoloader->register_prefix(
+		'\\Tribe\\Tickets\\Plus\\',
+		__DIR__ . '/src/Tribe',
+		'event-tickets-plus-ns'
+	);
+
 	$autoloader->register_autoloader();
 
 	$plugin_path = trailingslashit( EVENT_TICKETS_PLUS_DIR );

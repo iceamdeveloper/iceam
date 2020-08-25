@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Sensei_Templates;
+use Sensei_WC_Paid_Courses\Background_Jobs\Scheduler;
 
 /**
  * Main Sensei WooCommerce Paid Courses class.
@@ -59,6 +60,8 @@ final class Sensei_WC_Paid_Courses {
 		$this->script_asset_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 		$this->plugin_dir          = dirname( __DIR__ );
 		$this->plugin_url          = untrailingslashit( plugins_url( '', SENSEI_WC_PAID_COURSES_PLUGIN_BASENAME ) );
+
+		register_deactivation_hook( SENSEI_WC_PAID_COURSES_PLUGIN_FILE, [ $this, 'deactivation' ] );
 	}
 
 	/**
@@ -84,6 +87,7 @@ final class Sensei_WC_Paid_Courses {
 		Courses::instance()->init();
 		Settings::instance()->init();
 		Widgets::instance()->init();
+		Course_Enrolment_Providers::instance()->init();
 
 		/**
 		 * Hook in WooCommerce functionality.
@@ -95,10 +99,12 @@ final class Sensei_WC_Paid_Courses {
 		 */
 		add_action( 'init', [ 'Sensei_WC_Memberships', 'load_wc_memberships_integration_hooks' ] );
 
-		/**
-		 * Hook in WooCommerce Subscriptions functionality.
-		 */
-		add_action( 'init', [ 'Sensei_WC_Subscriptions', 'load_wc_subscriptions_integration_hooks' ] );
+		if ( Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+			/**
+			 * Hook in WooCommerce Subscriptions functionality.
+			 */
+			add_action( 'init', [ 'Sensei_WC_Subscriptions', 'load_wc_subscriptions_integration_hooks' ] );
+		}
 
 		if ( $init_all || ! is_admin() ) {
 			add_action( 'init', [ $instance, 'frontend_init' ] );
@@ -127,7 +133,6 @@ final class Sensei_WC_Paid_Courses {
 	 */
 	public function frontend_init() {
 		Frontend\Courses::instance()->init();
-		Frontend\Quizzes::instance()->init();
 		Frontend\Lessons::instance()->init();
 		Frontend\Shortcodes::instance()->init();
 	}
@@ -143,6 +148,21 @@ final class Sensei_WC_Paid_Courses {
 	}
 
 	/**
+	 * Clean up on deactivation.
+	 *
+	 * @since 2.0.0
+	 */
+	public function deactivation() {
+		if ( class_exists( 'ActionScheduler_Versions' ) ) {
+			// Cancel all pending jobs.
+			include_once $this->plugin_dir . '/includes/background-jobs/class-scheduler.php';
+
+			$sensei_wc_paid_courses_scheduler = Scheduler::instance();
+			$sensei_wc_paid_courses_scheduler->cancel_all_jobs();
+		}
+	}
+
+	/**
 	 * Registers scripts used in admin.
 	 */
 	public function register_admin_scripts() {
@@ -152,6 +172,8 @@ final class Sensei_WC_Paid_Courses {
 			'sensei_admin_course_metadata',
 			[
 				'product_options_placeholder' => __( 'Select a product', 'sensei-wc-paid-courses' ),
+				'modal_content'               => Admin\Courses::instance()->get_modal_content(),
+				'modal_title'                 => Admin\Courses::instance()->get_modal_title(),
 			]
 		);
 	}
@@ -261,6 +283,10 @@ final class Sensei_WC_Paid_Courses {
 	 * @param bool $load_all Load all dependencies for frontend and admin.
 	 */
 	private function include_dependencies( $load_all = false ) {
+		include_once $this->plugin_dir . '/includes/background-jobs/class-scheduler.php';
+		include_once $this->plugin_dir . '/includes/background-jobs/class-job-interface.php';
+		include_once $this->plugin_dir . '/includes/background-jobs/class-woocommerce-memberships-detect-cancelled-orders.php';
+
 		include_once $this->plugin_dir . '/includes/woocommerce-integrations/class-sensei-wc.php';
 		include_once $this->plugin_dir . '/includes/woocommerce-integrations/class-sensei-wc-memberships.php';
 		include_once $this->plugin_dir . '/includes/woocommerce-integrations/class-sensei-wc-subscriptions.php';
@@ -270,11 +296,16 @@ final class Sensei_WC_Paid_Courses {
 		include_once $this->plugin_dir . '/includes/class-courses.php';
 		include_once $this->plugin_dir . '/includes/class-settings.php';
 		include_once $this->plugin_dir . '/includes/class-widgets.php';
+		include_once $this->plugin_dir . '/includes/class-course-enrolment-providers.php';
+
+		// Background jobs.
+		include_once $this->plugin_dir . '/includes/background-jobs/class-membership-plan-calculation-job.php';
 
 		// Load admin dependencies.
 		if ( $load_all || is_admin() ) {
 			include_once $this->plugin_dir . '/includes/admin/class-language-packs.php';
 			include_once $this->plugin_dir . '/includes/admin/class-courses.php';
+			include_once $this->plugin_dir . '/includes/admin/class-woocommerce-memberships-cancelled-orders-notice.php';
 		}
 
 		// Load frontend dependencies.

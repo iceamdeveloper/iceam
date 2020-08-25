@@ -245,7 +245,7 @@ if ( ! class_exists( 'Tribe__Events__Query' ) ) {
 				 */
 				add_filter( 'option_page_on_front', array( __CLASS__, 'default_page_on_front' ) );
 				// check option for including events in the main wordpress loop, if true, add events post type
-				if ( tribe_get_option( 'showEventsInMainLoop', false ) ) {
+				if ( tribe_get_option( 'showEventsInMainLoop', false ) && ! get_query_var( 'tribe_events_front_page' ) ) {
 					$query->query_vars['post_type']   = isset( $query->query_vars['post_type'] )
 						? ( array ) $query->query_vars['post_type']
 						: array( 'post' );
@@ -886,6 +886,11 @@ if ( ! class_exists( 'Tribe__Events__Query' ) ) {
 		 * @return string
 		 */
 		public static function posts_orderby( $order_sql, $query ) {
+			// If this is set then the class will bail out of any filtering.
+			if ( $query->get( 'tribe_suppress_query_filters', false ) ) {
+				return $order_sql;
+			}
+
 			global $wpdb;
 
 			if ( $query->tribe_is_event || $query->tribe_is_event_category ) {
@@ -1374,8 +1379,11 @@ if ( ! class_exists( 'Tribe__Events__Query' ) ) {
 
 					if ( class_exists( 'Tribe__Events__Pro__Recurrence__Event_Query' ) ) {
 						$recurrence_query = new Tribe__Events__Pro__Recurrence__Event_Query();
-						$recurrence_query->set_parent_event( get_post( $args['post_parent'] ) );
-						add_filter( 'posts_where', array( $recurrence_query, 'include_parent_event' ), 100 );
+						$parent_post      = get_post( $args['post_parent'] );
+						if ( $parent_post instanceof WP_Post ) {
+							$recurrence_query->set_parent_event( $parent_post );
+							add_filter( 'posts_where', array( $recurrence_query, 'include_parent_event' ), 100 );
+						}
 					}
 				}
 

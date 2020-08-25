@@ -242,6 +242,7 @@ class Settings {
 	public static function factory($settings_key = self::SETTINGS_KEY,
 																 $textdomain = '') {
 		$class = get_called_class();
+		$renderer = null;
 		$settings_manager = new $class($settings_key, $textdomain, $renderer);
 		return $settings_manager;
 	}

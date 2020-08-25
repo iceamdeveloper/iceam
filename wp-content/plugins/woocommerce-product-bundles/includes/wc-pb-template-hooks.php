@@ -2,7 +2,7 @@
 /**
  * Product Bundles template hooks
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.11.0
  */

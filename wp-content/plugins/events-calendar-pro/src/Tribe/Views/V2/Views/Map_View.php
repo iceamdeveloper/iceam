@@ -264,10 +264,10 @@ class Map_View extends View {
 	 * {@inheritDoc}
 	 */
 	protected function setup_template_vars() {
-		$template_vars = parent::setup_template_vars();
-
-		$geoloc_search = $this->context->get( 'geoloc_search', false );
-		$show_distance = ! empty( $geoloc_search );
+		$template_vars           = parent::setup_template_vars();
+		$geoloc_search           = $this->context->get( 'geoloc_search', false );
+		$show_distance           = ! empty( $geoloc_search );
+		$template_vars['events'] = $this->maybe_remove_non_venue_events( $template_vars['events'] );
 
 		if ( $show_distance ) {
 			$template_vars['events'] = $this->sort_events_by_distance( $template_vars['events'] );
@@ -305,10 +305,24 @@ class Map_View extends View {
 		foreach( $template_vars['events'] as $event ) {
 			foreach ( $event->venues as $venue ) {
 				if ( empty( $template_vars['events_by_venue'][ $venue->ID ] ) ) {
+					$geolocation = $venue->geolocation;
+					if (
+						! empty( $template_vars['map_provider']->is_premium )
+						&& (
+							! isset( $geolocation->latitude, $geolocation->longitude )
+							|| ( '' === $geolocation->latitude || '' === $geolocation->longitude )
+						)
+					) {
+						// If we're using a custom api key and the venue is missing the geolocation information,
+						// then it's not mappable.
+						continue;
+					}
+
+
 					// WP_Post instances will be suppressed by the data filter, so we convert it to an object.
-					$template_vars['events_by_venue'][ $venue->ID ] = (object) [
+					$template_vars['events_by_venue'][ $venue->ID ]            = (object) [
 						'ID' => $venue->ID,
-						'geolocation' => $venue->geolocation,
+						'geolocation' => $geolocation,
 						'post_title' => $venue->post_title,
 					];
 					$template_vars['events_by_venue'][ $venue->ID ]->event_ids = [];
@@ -391,6 +405,36 @@ class Map_View extends View {
 		}
 
 		return array_reverse( $events );
+	}
+
+	/**
+	 * Determines if we should hide events with no venue.
+	 *
+	 * @since 5.1.1
+	 *
+	 * @param array $events
+	 * @return array
+	 */
+	protected function maybe_remove_non_venue_events( $events ) {
+		/**
+		 * Filter allowing user control over showing of events with no venue.
+		 *
+		 * @since 5.1.1
+		 *
+		 * @param boolean $include_no_venue To show or not to show.
+		 * @param array $events Array of events to filter.
+		 *
+		 * @return boolean To show or not to show.
+		 */
+		$include_no_venue = apply_filters( 'tribe_events_pro_map_view_show_events_with_no_venue', false, $events );
+
+		if ( ! empty( $include_no_venue ) ) {
+			return $events;
+		}
+
+		return array_filter( $events, static function ( \WP_Post $event ) {
+			return ! empty( $event->venues->count() );
+		} );
 	}
 
 	/**

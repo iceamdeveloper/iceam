@@ -402,8 +402,9 @@ if ( ! function_exists( 'tribe_tickets_is_current_time_in_date_window' ) ) {
 	 * Checks if the post has tickets that are available in the current date range set on the ticket.
 	 *
 	 * @since 4.11.3
+	 * @since 4.12.3 Use new helper method to account for possibly inactive ticket provider.
 	 *
-	 * @param int $post_id Post (or event) to check for ticket availability.
+	 * @param int $post_id Post to check for ticket availability.
 	 *
 	 * @return bool
 	 */
@@ -418,19 +419,25 @@ if ( ! function_exists( 'tribe_tickets_is_current_time_in_date_window' ) ) {
 		$tickets               = Tribe__Tickets__Tickets::get_all_event_tickets( $post_id );
 		$default_provider      = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
 
-		/** @var Tribe__Tickets__Ticket_Object $ticket */
-		foreach ( $tickets as $ticket ) {
-			$ticket_provider = $ticket->get_provider();
+		if ( false !== $default_provider ) {
+			/** @var Tribe__Tickets__Ticket_Object $ticket */
+			foreach ( $tickets as $ticket ) {
+				$ticket_provider = $ticket->get_provider();
 
-			// Skip tickets that are for a different provider than the event provider.
-			if (
-				$default_provider !== $ticket_provider->class_name
-				&& Tribe__Tickets__RSVP::class !== $ticket_provider->class_name
-			) {
-				continue;
+				if ( ! $ticket_provider instanceof Tribe__Tickets__Tickets ) {
+					continue;
+				}
+
+				// Skip tickets that are for a different provider than the event provider.
+				if (
+					$default_provider !== $ticket_provider->class_name
+					&& Tribe__Tickets__RSVP::class !== $ticket_provider->class_name
+				) {
+					continue;
+				}
+
+				$has_tickets_available = ( $has_tickets_available || tribe_events_ticket_is_on_sale( $ticket ) );
 			}
-
-			$has_tickets_available = ( $has_tickets_available || tribe_events_ticket_is_on_sale( $ticket ) );
 		}
 
 		$ticket_availability[ $post_id ] = $has_tickets_available;
@@ -795,11 +802,11 @@ if ( ! function_exists( 'tribe_tickets_get_event_ids' ) ) {
 if ( ! function_exists( 'tribe_tickets_get_ticket_provider' ) ) {
 
 	/**
-	 * Gets the ticket provider class when passed an id
+	 * Gets the ticket provider class when passed an id.
 	 *
-	 * @param integer|string $id a rsvp order key, order id, attendee id, ticket id, or product id
+	 * @param int|string $id An RSVP order key, order id, attendee id, ticket id, or product id.
 	 *
-	 * @return bool|Tribe__Tickets__Tickets
+	 * @return Tribe__Tickets__Tickets|false Ticket provider instance or False if provider is not active.
 	 */
 	function tribe_tickets_get_ticket_provider( $id ) {
 		/** @var Tribe__Tickets__Data_API $data_api */
@@ -960,7 +967,7 @@ if ( ! function_exists( 'tribe_tickets_get_capacity' ) ) {
 		}
 
 		// Bail when it's not a post or ID is 0
-		if ( ! $post instanceof WP_Post || 0 === $post->ID ) {
+		if ( ! $post instanceof WP_Post || empty( $post->ID ) ) {
 			return null;
 		}
 
@@ -1034,6 +1041,7 @@ if ( ! function_exists( 'tribe_get_event_capacity' ) ) {
 	 * Returns the capacity for a given Post/Event.
 	 *
 	 * @since  4.11.3
+	 * @since 4.12.3 Use new helper method to account for possibly inactive ticket provider.
 	 *
 	 * @param int|WP_Post $post Post (event) we are trying to fetch capacity for.
 	 *
@@ -1067,23 +1075,21 @@ if ( ! function_exists( 'tribe_get_event_capacity' ) ) {
 		foreach ( $rsvp_tickets as $rsvp_ticket ) {
 			$cap = tribe_tickets_get_capacity( $rsvp_ticket );
 
-			if ( -1 === $cap || '' === $cap ) {
-				$rsvp_cap = -1;
+			if ( - 1 === $cap || '' === $cap ) {
+				$rsvp_cap = - 1;
 				break;
 			}
 
 			$rsvp_cap += $cap;
 		}
 
-		$provider_id = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
+		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider_object( $post_id );
 
-		// Protect against ticket that exists but is of a type that is not enabled.
-		if ( ! method_exists( $provider_id, 'get_instance' ) ) {
+		if ( empty( $provider ) ) {
 			return null;
 		}
 
-		$provider = call_user_func( [ $provider_id, 'get_instance' ] );
-		$tickets  = $provider->get_tickets_ids( $post_id );
+		$tickets = $provider->get_tickets_ids( $post_id );
 
 		// We only have RSVPs.
 		if ( empty( $tickets ) ) {
@@ -1539,7 +1545,7 @@ if ( ! function_exists( 'tribe_tickets_is_enabled_post_context' ) ) {
 		}
 
 		/**
-		 * Whether or not we are in tickets-enabled context, such as determining if we should load plugin assets.
+		 * Whether we are in tickets-enabled context, such as determining if we should load plugin assets.
 		 *
 		 * @since 4.11.1
 		 *
@@ -1550,5 +1556,232 @@ if ( ! function_exists( 'tribe_tickets_is_enabled_post_context' ) ) {
 		 * @return bool
 		 */
 		return apply_filters( 'tribe_tickets_is_enabled_post_context', false, $post_types, $context );
+	}
+}
+
+/**
+ * Determine whether new RSVP views are enabled.
+ *
+ * In order the function will check the `TRIBE_TICKETS_RSVP_NEW_VIEWS` constant,
+ * the `TRIBE_TICKETS_RSVP_NEW_VIEWS` environment variable and, finally, the `tickets_rsvp_use_new_views` option.
+ *
+ * @since 4.12.3
+ *
+ * @return boolean Whether new RSVP views are enabled.
+ */
+function tribe_tickets_rsvp_new_views_is_enabled() {
+	// Check for constant.
+	if ( defined( 'TRIBE_TICKETS_RSVP_NEW_VIEWS' ) ) {
+		return (boolean) TRIBE_TICKETS_RSVP_NEW_VIEWS;
+	}
+
+	// Check for env var.
+	$env_var = getenv( 'TRIBE_TICKETS_RSVP_NEW_VIEWS' );
+
+	if ( false !== $env_var ) {
+		return (boolean) $env_var;
+	}
+
+	// @todo Remove this in G20.07
+	return false;
+
+	// Determine if ET was installed at version 4.12.2+.
+	$should_default_to_on = ! tribe_installed_before( 'Tribe__Tickets__Main', '4.12.2' );
+
+	$enabled = (boolean) tribe_get_option( 'tickets_rsvp_use_new_views', $should_default_to_on );
+
+	/**
+	 * Allows filtering whether new RSVP views are enabled.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param boolean $enabled Whether new RSVP views are enabled.
+	 */
+	return apply_filters( 'tribe_tickets_rsvp_new_views_is_enabled', $enabled );
+}
+
+if ( ! function_exists( 'tribe_tickets_ar_field_is_required' ) ) {
+	/**
+	 * Check if the AR field is required.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param object $field The field object.
+	 *
+	 * @return bool True if is required
+	 */
+	function tribe_tickets_ar_field_is_required( $field ) {
+		return isset( $field->required ) && 'on' === $field->required;
+	}
+}
+
+if ( ! function_exists( 'tribe_tickets_ar_field_name' ) ) {
+	/**
+	 * Build the AR field name.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param int    $ticket_id  The ticket ID.
+	 * @param string $field_slug The field slug.
+	 *
+	 * @return string The AR field name.
+	 */
+	function tribe_tickets_ar_field_name( $ticket_id, $field_slug ) {
+		return 'tribe-tickets-meta[' . $ticket_id . '][{{data.attendee_id}}][' . $field_slug . ']';
+	}
+}
+
+if ( ! function_exists( 'tribe_tickets_ar_field_id' ) ) {
+	/**
+	 * Build the AR field `id`.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param int    $ticket_id   The ticket ID.
+	 * @param string $field_slug  The field slug.
+	 * @param string $option_slug The field option slug (in case they need it).
+	 *
+	 * @return string The AR field id.
+	 */
+	function tribe_tickets_ar_field_id( $ticket_id, $field_slug, $option_slug = '' ) {
+
+		$field_id = "tribe-tickets-meta_{$ticket_id}_{$field_slug}{{data.attendee_id}}";
+
+		if ( ! empty( $option_slug ) ) {
+			$field_id .= "_{$option_slug}";
+		}
+
+		return $field_id;
+	}
+}
+
+if ( ! function_exists( 'tribe_get_guest_label_singular' ) ) {
+
+	/**
+	 * Get the singular version of the Guest label. May also be used as a verb.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param string $context Allows passing additional context to this function's filter, e.g. 'verb' or 'template.php'.
+	 *
+	 * @return string
+	 */
+	function tribe_get_guest_label_singular( $context = '' ) {
+		/**
+		 * Allows customization of the singular version of the Guest label.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param string $label   The singular version of the Guest label. Defaults to "Guest".
+		 * @param string $context The context in which this string is filtered, e.g. 'verb' or 'template.php'.
+		 */
+		return apply_filters( 'tribe_get_guest_label_singular', _x( 'Guest', 'singular label for Guest', 'event-tickets' ), $context );
+	}
+}
+
+if ( ! function_exists( 'tribe_get_guest_label_singular_lowercase' ) ) {
+
+	/**
+	 * Get the lowercase singular version of the Guest label. May also be used as a verb.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param string $context Allows passing additional context to this function's filter, e.g. 'verb' or 'template.php'.
+	 *
+	 * @return string
+	 */
+	function tribe_get_guest_label_singular_lowercase( $context = '' ) {
+		/**
+		 * Allows customization of the lowercase singular version of the Guest label.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param string $label   The lowercase singular version of the Guest label. Defaults to "guest".
+		 * @param string $context The context in which this string is filtered, e.g. 'verb' or 'template.php'.
+		 */
+		return apply_filters( 'tribe_get_guest_label_singular_lowercase', _x( 'guest', 'lowercase singular label for Guest', 'event-tickets' ), $context );
+	}
+}
+
+if ( ! function_exists( 'tribe_get_guest_label_plural' ) ) {
+
+	/**
+	 * Get the plural version of the Guest label. May also be used as a verb.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param string $context Allows passing additional context to this function's filter, e.g. 'verb' or 'template.php'.
+	 *
+	 * @return string
+	 */
+	function tribe_get_guest_label_plural( $context = '' ) {
+		/**
+		 * Allows customization of the plural version of the Guest label.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param string $label   The plural version of the Guest label, defaults to "Guests".
+		 * @param string $context The context in which this string is filtered, e.g. 'verb' or 'template.php'.
+		 */
+		return apply_filters( 'tribe_get_guest_label_plural', _x( 'Guests', 'plural label for Guest', 'event-tickets' ), $context );
+	}
+}
+
+if ( ! function_exists( 'tribe_get_guest_label_plural_lowercase' ) ) {
+
+	/**
+	 * Get the lowercase plural version of the Guest label.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param string $context Allows passing additional context to this function's filter, e.g. 'verb' or 'template.php'.
+	 *
+	 * @return string
+	 */
+	function tribe_get_guest_label_plural_lowercase( $context = '' ) {
+		/**
+		 * Allows customization of the lowercase plural version of the Guest label.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param string $label   The lowercase plural version of the Guest label, defaults to "guests".
+		 * @param string $context The context in which this string is filtered, e.g. 'verb' or 'template.php'.
+		 */
+		return apply_filters( 'tribe_get_guest_label_plural_lowercase', _x( 'guests', 'lowercase plural label for Guest', 'event-tickets' ), $context );
+	}
+}
+
+if ( ! function_exists( 'tribe_tickets_is_provider_active' ) ) {
+	/**
+	 * Whether the passed ticket provider class string (or its slug) is active.
+	 *
+	 * Example: if provider is for a WooCommerce Ticket but ETP is disabled, returns False.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param Tribe__Tickets__Tickets|string $provider Examples: 'Tribe__Tickets_Plus__Commerce__WooCommerce__Main',
+	 *                                                 'woo', 'rsvp', etc.
+	 *
+	 * @return bool True if class exists and is in the list of active modules.
+	 */
+	function tribe_tickets_is_provider_active( $provider ) {
+		if ( $provider instanceof Tribe__Tickets__Tickets ) {
+			$provider = $provider->class_name;
+		}
+
+		// Protect against other type of object or other unexpected value.
+		if ( ! is_string( $provider ) ) {
+			return false;
+		}
+
+		/** @var Tribe__Tickets__Status__Manager $status */
+		$status = tribe( 'tickets.status' );
+
+		$provider = $status->get_provider_class_from_slug( $provider );
+
+		return (
+			class_exists( $provider )
+			&& array_key_exists( $provider, Tribe__Tickets__Tickets::modules() )
+		);
 	}
 }

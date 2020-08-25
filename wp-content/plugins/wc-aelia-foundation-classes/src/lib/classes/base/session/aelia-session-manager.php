@@ -44,6 +44,16 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 		}
 
 		/**
+		 * Returns the logger used by the Aelia Foundation Classes.
+		 *
+		 * @return Aelia\WC\Logger
+		 * @since 2.0.17.200504
+		 */
+		protected static function get_logger() {
+			return WC_AeliaFoundationClasses::instance()->get_logger();
+		}
+
+		/**
 		 * Safely store data into the session. Compatible with WooCommerce 2.0+ and
 		 * backwards compatible with previous versions.
 		 *
@@ -218,9 +228,16 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 					$_COOKIE[$cookie_data['name']] = $cookie_data['value'];
 				}
 			}
-			elseif(defined('WP_DEBUG') && WP_DEBUG) {
+			// Don't raise a notice when running Cron jobs, as cookies are most likely not needed during these operations
+			// @since 2.0.17.200504
+			elseif(!defined('DOING_CRON')) {
 				$file = empty($file) ? 'unknown' : '';
-				trigger_error("{$name} cookie cannot be set - headers already sent by file '{$file}' on line {$line}", E_USER_NOTICE);
+				// Use the internal logger to keep track of the fact that the cookie could not be set. This will prevent
+				// PHP notices from being displayed on the frontend and alarming users
+				// @since 2.0.17.200504
+				self::get_logger()->notice("{$name} cookie cannot be set - headers already sent by file '{$file}' on line {$line}", array(
+					'Cookie Data' => $cookie_data,
+				));
 			}
 		}
 

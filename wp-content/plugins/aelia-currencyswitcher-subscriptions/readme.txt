@@ -1,25 +1,25 @@
 === WooCommerce Currency Switcher - Subscriptions Integration ===
 Tags: woocommerce, currency switcher, subscriptions, integration
-Requires at least: 3.6
-Tested up to: 5.4
+Requires at least: 4.0
+Tested up to: 5.5
 icense: GPLv3
-License URI: http://www.gnu.org/licenses/gpl-3.0.html
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 4.0
+WC tested up to: 4.4
 
-Implements the integration between [Aelia Currency Switcher](http://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Subscriptions plugin](http://www.woothemes.com/products/woocommerce-subscriptions/).
+Implements the integration between [Aelia Currency Switcher](https://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Subscriptions plugin](http://www.woothemes.com/products/woocommerce-subscriptions/).
 
 == Description ==
-This plugin acts as a bridge between [Aelia Currency Switcher](http://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Subscriptions plugin](http://www.woothemes.com/products/woocommerce-subscriptions/), ensuring that Subscriptions prices are converted correctly into the currency being used to place an order.
+This plugin acts as a bridge between [Aelia Currency Switcher](https://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Subscriptions plugin](http://www.woothemes.com/products/woocommerce-subscriptions/), ensuring that Subscriptions prices are converted correctly into the currency being used to place an order.
 
 == Requirements ==
 
-* PHP 5.3 or newer.
+* PHP 5.4 or newer.
 * WordPress 3.6 or newer.
 * WooCommerce 3.0.x or newer.
 * Aelia Currency Switcher 4.4.7.170202 or newer
-* WooCommerce Subscriptions (by Brent Shepherd) 2.2 or newer.
-* [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.7.5.160722 or newer.
+* WooCommerce Subscriptions (by Prospress) 2.2 or newer.
+* [AFC plugin for WooCommerce](https://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.7.5.160722 or newer.
 
 == Installation ==
 
@@ -33,6 +33,35 @@ This is a free plugin, and it's provided as is, without explicit or implicit gua
 Should you need assistance, please feel free to [contact us](https://aelia.co/contact) andto avail of our paid support service (standard charges apply).
 
 == Changelog ==
+
+= 1.5.5.200815 =
+* Updated supported WordPress and WooCommerce versions.
+
+= 1.5.4.200703 =
+* Updated supported WooCommerce versions.
+
+= 1.5.3.200618 =
+* Fix - Fixed currency conversion logic during subscription renewals.
+* Fix - Fixed logic that shows the "forced checkout currency" notice, so that it doesn't appear when the cart has been emptied after the checkout.
+
+= 1.5.2.200428 =
+* Updated requirement checking class.
+* Updated requirements.
+* Updated supported WooCommerce versions.
+
+= 1.5.1.200414 =
+* Fix - Added logic to force checkout currency for subscriptions switches (upgrades/downgrades).
+* Set minimum required WooCommerce version to 3.0.
+* Removed obsolete code.
+* Updated supported WooCommerce and WordPress versions.
+
+= 1.4.13.200603 =
+* Updated supported WooCommerce versions.
+
+= 1.4.12.200428 =
+* Updated requirement checking class.
+* Updated requirements.
+* Updated supported WooCommerce versions.
 
 = 1.4.11.200310 =
 * Restored patch to force currency during the processing of manual renewals.

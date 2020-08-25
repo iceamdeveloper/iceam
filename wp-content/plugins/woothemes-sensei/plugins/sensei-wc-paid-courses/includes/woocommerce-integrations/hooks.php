@@ -32,8 +32,9 @@ add_action( 'sensei_before_main_content', [ 'Sensei_WC', 'do_single_course_wc_si
  *
  * Single Lesson Hooks
  */
-add_filter( 'sensei_can_user_view_lesson', [ 'Sensei_WC', 'alter_can_user_view_lesson' ], 20, 3 );
-
+if ( \Sensei_WC_Paid_Courses\Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+	add_filter( 'sensei_can_user_view_lesson', [ 'Sensei_WC', 'alter_can_user_view_lesson' ], 20, 3 );
+}
 
 /******************************
  *
@@ -74,10 +75,12 @@ add_action( 'woocommerce_email_after_order_table', [ 'Sensei_WC', 'email_course_
  *
  * Checkout
  */
-add_action( 'woocommerce_order_status_completed', [ 'Sensei_WC', 'complete_order' ] );
-add_action( 'woocommerce_order_status_processing', [ 'Sensei_WC', 'complete_order' ] );
+if ( \Sensei_WC_Paid_Courses\Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+	add_action( 'woocommerce_order_status_completed', [ 'Sensei_WC', 'complete_order' ] );
+	add_action( 'woocommerce_order_status_processing', [ 'Sensei_WC', 'complete_order' ] );
+	add_action( 'woocommerce_order_status_cancelled', [ 'Sensei_WC', 'cancel_order' ] );
+}
 
-add_action( 'woocommerce_order_status_cancelled', [ 'Sensei_WC', 'cancel_order' ] );
 // Disable guest checkout if a course is in the cart as we need a valid user to store data for.
 add_filter( 'pre_option_woocommerce_enable_guest_checkout', [ 'Sensei_WC', 'disable_guest_checkout' ] );
 // Mark orders with virtual products as complete rather then stay processing.

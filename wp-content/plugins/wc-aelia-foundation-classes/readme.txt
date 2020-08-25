@@ -3,11 +3,11 @@ Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
 Requires at least: 4.0
-Tested up to: 5.4
+Tested up to: 5.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 2.6
-WC tested up to: 4.0.1
+WC tested up to: 4.4
 
 Adds a set of classes that can simplify the development of other plugins for WooCommerce.
 
@@ -49,12 +49,12 @@ Most of our free and premium plugins use this library. We released it to the pub
 As indicated in the Description section, we offer this plugin **free of charge**, but we cannot afford to also provide free, direct support for it as we do for our paid products.
 Should you encounter any difficulties with this plugin, and need support, you have several options:
 
-1. **[Contact us](http://aelia.co/contact) to report the issue**, and we will look into it as soon as possible. This option is **free of charge**, and it's offered on a best effort basis. Please note that we won't be able to offer hands-on troubleshooting on issues related to a specific site, such as incompatibilities with a specific environment or 3rd party plugins.
+1. **[Contact us](https://aelia.co/contact) to report the issue**, and we will look into it as soon as possible. This option is **free of charge**, and it's offered on a best effort basis. Please note that we won't be able to offer hands-on troubleshooting on issues related to a specific site, such as incompatibilities with a specific environment or 3rd party plugins.
 2. **If you need urgent support**, you can avail of our standard paid support. As part of paid support, you will receive direct assistance from our team, who will troubleshoot your site and help you to make it work smoothly. We can also help you with installation, customisation and development of new features.
 
 = I have a question unrelated to support, where can I ask it? =
 
-Should you have any question about this product, please feel free to [contact us](http://aelia.co/contact). We will deal with each enquiry as soon as possible.
+Should you have any question about this product, please feel free to [contact us](https://aelia.co/contact). We will deal with each enquiry as soon as possible.
 
 == Installation ==
 
@@ -62,9 +62,35 @@ Should you have any question about this product, please feel free to [contact us
 2. Activate the plugin through the **Plugins** menu in WordPress.
 3. Done. No further configuration is required.
 
-For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
+For more information about installation and management of plugins, please refer to [WordPress documentation](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
 == Changelog ==
+
+= 2.0.21.200813 =
+* Updated supported WordPress and WooCommerce versions.
+
+= 2.0.21.200629 =
+* Fix - Fixed signature of method `Aelia\WC\Settings:factory()` to restore backward compatibility.
+
+= 2.0.20.200625 =
+* Tweak - Fixed admin UI to show that the log files now contain a timestamp in their name.
+* Fix - Fixed bug in the logic used to install the GeoIP database manually.
+* Updated supported WooCommerce versions.
+
+= 2.0.19.200527 =
+* Tweak - Configured default logger to use rotating log files. The new logic will create one file per day, keeping a maximum of 30 files.
+
+= 2.0.18.200512 =
+* Tweak - Added logic to skip exchange rates cache when debug mode is enabled.
+* Updated supported WooCommerce versions.
+
+= 2.0.17.200504 =
+* Tweak - Improved logging of events that prevent cookies from being set.
+
+= 2.0.16.200428 =
+* Feature - Added filter `wc_aelia_afc_required_plugin_info` to the logic used for requirement checking. This is to allow 3rd parties to interact with the checks.
+* Fix - Fixed issue caused by the absence of the special WooCommerce plugin headers in the result returned by function `get_plugins()`.
+* Updated supported WooCommerce versions.
 
 = 2.0.16.200317 =
 * Tweak - Improved error handling during automatic updates of premium plugins.

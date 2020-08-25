@@ -25,7 +25,8 @@ namespace SkyVerge\WooCommerce\Memberships\Admin;
 
 defined( 'ABSPATH' ) or exit;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\Jilt_Promotions\Admin\Emails;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 /**
  * Onboarding Setup Wizard.
@@ -57,6 +58,28 @@ class Setup_Wizard extends Framework\Admin\Setup_Wizard {
 
 		$this->default_plan_name      = __( 'VIP Membership', 'woocommerce-memberships' );
 		$this->membership_plan_id_key = 'wc_memberships_setup_wizard_membership_plan_id';
+
+		/**
+		 * Adds UTM parameters when Jilt is installed from the Memberships onboarding wizard.
+		 *
+		 * @see \SkyVerge\WooCommerce\Memberships\Admin\Setup_Wizard::save_member_emails_preferences()
+		 *
+		 * @since 1.17.5
+		 *
+		 * @param array $args UTM params
+		 */
+		add_filter( 'wc_jilt_app_connection_redirect_args', static function( $args ) {
+
+			if ( 'yes' === get_option( 'wc_memberships_onboarding_wizard_install_jilt' ) ) {
+
+				$args['utm_source']   = Emails::UTM_SOURCE;
+				$args['utm_medium']   = Emails::UTM_MEDIUM;
+				$args['utm_campaign'] = 'memberships-onboarding-wizard';
+				$args['utm_content']  = Emails::UTM_CONTENT;
+			}
+
+			return $args;
+		} );
 	}
 
 
@@ -73,8 +96,16 @@ class Setup_Wizard extends Framework\Admin\Setup_Wizard {
 
 		parent::add_admin_notices();
 
+		// bail if Jilt is already installed
+		if ( $this->get_plugin()->is_plugin_installed( 'jilt-for-woocommerce.php' ) ) {
+
+			// also remove the WC Admin Note if Jilt has been installed
+			if ( Framework\SV_WC_Plugin_Compatibility::is_enhanced_admin_available() ) {
+				\Automattic\WooCommerce\Admin\Notes\WC_Admin_Notes::delete_notes_with_name( 'wc-memberships-jilt-cross-sell-notice' );
+			}
+
 		// show a notice about advanced emails with Jilt after upgrading to 1.11.0 when the feature was launched
-		if ( 'yes' === get_option( 'wc_memberships_show_advanced_emails_notice', 'no' ) ) {
+		} elseif ( 'yes' === get_option( 'wc_memberships_show_advanced_emails_notice', 'no' ) ) {
 
 			$message = sprintf(
 				/* translators: Placeholders: %1$s - opening <strong> HTML tag, %2$s - closing </strong> HTML tag, %3$s - opening <a> HTML link tag, %4$s - closing </a> HTML link tag, %5$s - opening <a> HTML link tag, %6$s - closing </a> HTML link tag */
@@ -84,10 +115,24 @@ class Setup_Wizard extends Framework\Admin\Setup_Wizard {
 				'<a href="https://jilt.com/go/memberships-notice">', '</a>'
 			);
 
-			$this->get_plugin()->get_admin_notice_handler()->add_admin_notice( $message, 'memberships_upgrade_to_1_11_0', array(
+			$this->get_plugin()->get_admin_notice_handler()->add_admin_notice( $message, 'memberships_upgrade_to_1_11_0', [
 				'always_show_on_settings' => false,
 				'notice_class'            => 'updated',
-			) );
+			] );
+
+		// show a notice about Jilt emails when upgrading from version 1.12.0 or later (do not show if the WC Admin note can be seen instead)
+		} elseif ( 'yes' === get_option( 'wc_memberships_show_jilt_cross_sell_notice', 'no' ) && ! Framework\SV_WC_Helper::is_enhanced_admin_screen() ) {
+
+			$message = sprintf(
+				/* translators: Placeholders: %1$s - opening <a> HTML link tag, %2$s - closing </a> HTML link tag */
+				esc_html__( 'Use an email platform that automatically syncs member details. Segment newsletters by membership plan, and create automated email series for members in minutes using Jilt. %1$sSign up for free%2$s — all new accounts get a bonus credit!', 'woocommerce-memberships' ),
+				'<a href="https://jilt.com/go/memberships-update">', '</a>'
+			);
+
+			$this->get_plugin()->get_admin_notice_handler()->add_admin_notice( $message, 'memberships_upgrade_to_1_17_5', [
+				'always_show_on_settings' => false,
+				'notice_class'            => 'notice-info',
+			] );
 		}
 	}
 
@@ -1253,10 +1298,12 @@ class Setup_Wizard extends Framework\Admin\Setup_Wizard {
 
 			try {
 
-				\WC_Install::background_installer( 'jilt-for-woocommerce', array(
+				\WC_Install::background_installer( 'jilt-for-woocommerce', [
 					'name'      => __( 'Jilt for WooCommerce', 'woocommerce-memberships' ),
-					'repo-slug' => 'jilt-for-woocommerce'
-				) );
+					'repo-slug' => 'jilt-for-woocommerce',
+				] );
+
+				update_option( 'wc_memberships_onboarding_wizard_install_jilt', 'yes' );
 
 				$this->get_plugin()->log( 'Jilt for WooCommerce installed from Setup Wizard.' );
 

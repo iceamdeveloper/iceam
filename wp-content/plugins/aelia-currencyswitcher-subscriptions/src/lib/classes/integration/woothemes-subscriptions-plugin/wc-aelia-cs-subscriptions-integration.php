@@ -183,6 +183,30 @@ class Subscriptions_Integration {
 	}
 
 	/**
+	 * Indicates if the price of a product being renewed should be preserved.
+	 *
+	 * WHY
+	 * The Subscriptions plugin applies a "grandfathering" logic to renewals,
+	 * taking the price originally paid for the product. The Currency Switcher, on
+	 * the other hand, always takes the latest price of each product. Due to that, a
+	 * the price of a renewal could be higher or lower than the one originally paid. This
+	 * method allows to preserve the original logic of the Subscriptions plugin,
+	 * without overwriting the "old" product with the latest one.
+	 *
+	 * @param WC_Product $product
+	 * @return boolean
+	 * @since 1.5.0.200410
+	 */
+	protected function should_preserve_renewal_price($product) {
+		return !empty($product->aelia_product_renewal) ||
+					 // If argument "subscription_renewal" is set, we are processing a renewal. The price
+					 // of the product being handled should not be touched
+					 // @since 1.5.3.200617
+					 (!empty($_REQUEST['subscription_renewal']) && ($_REQUEST['subscription_renewal'] === 'true')) &&
+					 apply_filters('wc_aelia_cs_subscriptions_preserve_renewal_price', true, $product);
+	}
+
+	/**
 	 * Converts a subscription prices to the specific currency, taking
 	 * into account manually entered prices.
 	 *
@@ -200,7 +224,7 @@ class Subscriptions_Integration {
 																				 array $product_sale_prices_in_currency,
 																				 array $product_signup_prices_in_currency) {
 		// @since 1.3.1.170405
-		$product_id = aelia_wc_version_is('>=', '3.0') ? $product->get_id() : $product->id;
+		$product_id = $product->get_id();
 		$product_base_currency = $this->currencyprices_manager()->get_product_base_currency($product_id);
 		$shop_base_currency = $this->base_currency();
 
@@ -290,9 +314,14 @@ class Subscriptions_Integration {
 		$product->subscription_price = $product->price;
 
 		// @since 1.3.1.170405
-		if(aelia_wc_version_is('>=', '3.0')) {
-			$product->set_regular_price($product->regular_price);
-			$product->set_sale_price($product->sale_price);
+		$product->set_regular_price($product->regular_price);
+		$product->set_sale_price($product->sale_price);
+
+		// If the subscription is being renewed and the renewal price should be
+		// preserved, keep the price set by the subscription plugin, instead of the
+		// latest one
+		// @since 1.5.0.200410
+		if(!$this->should_preserve_renewal_price($product)) {
 			$product->set_price($product->price);
 		}
 
@@ -310,32 +339,62 @@ class Subscriptions_Integration {
 	 * Tags cart items containing a product being renewed or resubscribed, to make
 	 * it easier to distinguish them.
 	 *
+	 * @param WC_Cart $cart
 	 * @since 1.3.3.170413
 	 */
-	protected function tag_cart_resubscribes_and_renewals() {
-		if(!empty(WC()->cart->cart_contents)) {
-			foreach(WC()->cart->cart_contents as $cart_item) {
-				// Skip cart items that don't have a product
-				if(!is_object($cart_item['data'])) {
-					continue;
-				}
-				// Tag products being resubscribed
-				if(isset($cart_item['subscription_resubscribe'])) {
-					$cart_item['data']->aelia_product_resubscribe = true;
-				}
+	protected function tag_cart_resubscribes_and_renewals($cart = null) {
+		if(empty($cart)) {
+			$cart = WC()->cart;
+		}
 
-				// Tag products being renewed
-				if(isset($cart_item['subscription_renewal'])) {
-					$cart_item['data']->aelia_product_renewal = true;
-				}
-
-				// Tag products being switched
-				// @since 1.3.6.170531
-				if(isset($cart_item['subscription_switch'])) {
-					$cart_item['data']->aelia_product_switch = true;
-				}
+		if(!empty($cart->cart_contents)) {
+			foreach($cart->cart_contents as $cart_item) {
+				// Tag the cart items with renewals, upgrades or downgrades
+				$this->tag_cart_item($cart_item);
 			}
 		}
+	}
+
+	/**
+	 * Tags a cart item when it contains a product being renewed or resubscribed, to make
+	 * it easier to distinguish them.
+	 *
+	 * @param array $cart_item
+	 * @since 1.5.0.200410
+	 */
+	protected function tag_cart_item(&$cart_item) {
+		// Skip cart items that don't have a product
+		if(!is_object($cart_item['data'])) {
+			return;
+		}
+		// Tag products being resubscribed
+		if(isset($cart_item['subscription_resubscribe'])) {
+			$cart_item['data']->aelia_product_resubscribe = true;
+		}
+
+		// Tag products being renewed
+		if(isset($cart_item['subscription_renewal'])) {
+			$cart_item['data']->aelia_product_renewal = true;
+
+			// Attach the currency of the original subscription to the renewal item. This will be
+			// used to force the checkout in that currency
+			// @since 1.5.0.200410
+			$subscription = wcs_get_subscription($cart_item['subscription_renewal']['subscription_id']);
+			$cart_item['data']->checkout_currency = $this->get_order_currency($subscription);
+		}
+
+		// Tag products being switched
+		// @since 1.3.6.170531
+		if(isset($cart_item['subscription_switch'])) {
+			$cart_item['data']->aelia_product_switch = true;
+
+			// Attach the currency of the original subscription to the "switch" item. This will be
+			// used to force the checkout in that currency
+			// @since 1.5.0.200410
+			$subscription = wcs_get_subscription($cart_item['subscription_switch']['subscription_id']);
+			$cart_item['data']->checkout_currency = $this->get_order_currency($subscription);
+		}
+		return $cart_item;
 	}
 
 	/**
@@ -486,8 +545,17 @@ class Subscriptions_Integration {
 		// Fix checkout currency during renewals
 		// @link https://aelia.freshdesk.com/a/tickets/85291
 		// @link https://github.com/woocommerce/woocommerce-subscriptions/issues/1040
-		add_filter('woocommerce_order_again_cart_item_data', array($this, 'woocommerce_order_again_cart_item_data'), 10, 3);
-		add_filter('woocommerce_checkout_init', array($this, 'maybe_override_currency'), 50);
+		//add_filter('woocommerce_order_again_cart_item_data', array($this, 'woocommerce_order_again_cart_item_data'), 10, 3);
+		add_filter('wp_loaded', array($this, 'maybe_override_currency'), 50);
+
+		// Tag renewals, upgraded and downgrades when cart items are loaded from a session
+		// @link https://aelia.freshdesk.com/a/tickets/86723
+		add_filter('woocommerce_get_cart_item_from_session', array($this, 'woocommerce_get_cart_item_from_session'), 5, 3);
+
+		//add_filter('woocommerce_add_cart_item', array($this, 'woocommerce_add_cart_item'), 5, 1);
+		// Add filter to prevent the conversion of product prices during renewals
+		// @since 1.5.3.200617
+		add_filter('wc_aelia_cs_product_requires_conversion', array($this, 'wc_aelia_cs_product_requires_conversion'), 5, 2);
 
 		// Handle manual creation of subscription
 		// @since 1.3.8.171004
@@ -539,7 +607,8 @@ class Subscriptions_Integration {
 		);
 
 		// Determine the conversion method to use
-		$method_key = get_value(get_class($product), $method_keys, '');
+		$method_key = isset($method_keys[get_class($product)]) ? $method_keys[get_class($product)] : '';
+
 		$convert_method = 'convert_' . $method_key . '_product_prices';
 
 		if(!method_exists($this, $convert_method)) {
@@ -558,7 +627,7 @@ class Subscriptions_Integration {
 	 */
 	public function convert_subscription_product_prices(WC_Product_Subscription $product, $currency) {
 		// @since 1.3.1.170405
-		$product_id = aelia_wc_version_is('>=', '3.0') ? $product->get_id() : $product->id;
+		$product_id = $product->get_id();
 		$product = $this->convert_to_currency($product,
 																					$currency,
 																					$this->get_subscription_regular_prices($product_id),
@@ -632,11 +701,6 @@ class Subscriptions_Integration {
 		$product->price = $product->subscription_price;
 		$product->subscription_sign_up_fee = $product->min_subscription_sign_up_fee;
 
-		// @deprecated 1.4.4.190630
-		// if(aelia_wc_version_is('>=', '3.0')) {
-		// 	$product->set_price($product->price);
-		// }
-
 		if(!isset($product->max_variation_period)) {
 			$product->max_variation_period = '';
 		}
@@ -658,7 +722,7 @@ class Subscriptions_Integration {
 	 */
 	public function convert_subscription_variation_product_prices(WC_Product_Subscription_Variation $product, $currency) {
 		// @since 1.3.1.170405
-		$variation_id = aelia_wc_version_is('>=', '3.0') ? $product->get_id() : $product->variation_id;
+		$variation_id = $product->get_id();
 		$product = $this->convert_to_currency($product,
 																					$currency,
 																					$this->currencyprices_manager()->get_variation_regular_prices($variation_id),
@@ -824,10 +888,17 @@ class Subscriptions_Integration {
 	 * @param int post_id The ID of the Post (subscription) being saved.
 	 */
 	public function woocommerce_process_product_meta_subscription($post_id) {
-		$subscription_signup_prices = $this->currencyprices_manager()->sanitise_currency_prices(get_value(self::FIELD_SIGNUP_FEE_CURRENCY_PRICES, $_POST));
+		$currency_prices = isset($_POST[self::FIELD_SIGNUP_FEE_CURRENCY_PRICES]) ? $_POST[self::FIELD_SIGNUP_FEE_CURRENCY_PRICES] : false;
+		$subscription_signup_prices = $this->currencyprices_manager()->sanitise_currency_prices($currency_prices);
 
-		// D.Zanella - This code saves the subscription prices in the various currencies
-		update_post_meta($post_id, self::FIELD_SIGNUP_FEE_CURRENCY_PRICES, json_encode($subscription_signup_prices));
+		// Update the post meta
+		// @since WC 3.0
+		// @since 1.5.0.200410
+		$product = wc_get_product($post_id);
+		if($product instanceof \WC_Product) {
+			$product->update_meta_data(self::FIELD_SIGNUP_FEE_CURRENCY_PRICES, json_encode($subscription_signup_prices));
+			$product->save_meta_data();
+		}
 
 		// Copy the currency prices from the fields dedicated to the variation inside the standard product fields
 		$_POST[WC_Aelia_CurrencyPrices_Manager::FIELD_REGULAR_CURRENCY_PRICES] = $_POST[self::FIELD_REGULAR_CURRENCY_PRICES];
@@ -865,14 +936,20 @@ class Subscriptions_Integration {
 		// "all_" prefix has been added to easily distinguish these variables from
 		// the ones containing the data of a single variation, whose names would
 		// be otherwise very similar
-		$all_variations_ids = get_value('variable_post_id', $_POST, array());
-		$all_variations_signup_currency_prices = get_value(self::FIELD_VARIATION_SIGNUP_FEE_CURRENCY_PRICES, $_POST);
+		$all_variations_ids = isset($_POST['variable_post_id']) ? $_POST['variable_post_id'] : array();
+		$all_variations_signup_currency_prices = isset($_POST[self::FIELD_VARIATION_SIGNUP_FEE_CURRENCY_PRICES]) ? $_POST[self::FIELD_VARIATION_SIGNUP_FEE_CURRENCY_PRICES] : false;
 
 		// D.Zanella - This code saves the subscription prices for all variations in
 		// the various currencies
 		foreach($all_variations_ids as $variation_idx => $variation_id) {
-			$variations_signup_currency_prices = $currencyprices_manager->sanitise_currency_prices(get_value($variation_idx, $all_variations_signup_currency_prices, null));
-			update_post_meta($variation_id, self::FIELD_VARIATION_SIGNUP_FEE_CURRENCY_PRICES, json_encode($variations_signup_currency_prices));
+			$variation = wc_get_product($variation_id);
+			if($variation instanceof \WC_Product) {
+				$currency_prices = isset($all_variations_signup_currency_prices[$variation_idx]) ? $all_variations_signup_currency_prices[$variation_idx] : null;
+				$variations_signup_currency_prices = $currencyprices_manager->sanitise_currency_prices($currency_prices);
+
+				$variation->update_meta_data(self::FIELD_VARIATION_SIGNUP_FEE_CURRENCY_PRICES, json_encode($variations_signup_currency_prices));
+				$variation->save_meta_data();
+			}
 		}
 
 		// Copy the currency prices from the fields dedicated to the variation inside the standard product fields
@@ -956,7 +1033,7 @@ class Subscriptions_Integration {
 	 * @since 1.3.12.180308
 	 */
 	protected function get_order_currency(\WC_Order $order) {
-		return aelia_wc_version_is('>=', '3.0') ? $order->get_currency() : $order->get_order_currency();
+		return $order->get_currency();
 	}
 
 	/**
@@ -968,13 +1045,14 @@ class Subscriptions_Integration {
 	 * @param WC_Subscription subscription The original subscription being renewed.
 	 * @since 1.2.13.151208
 	 * @link https://github.com/Prospress/woocommerce-subscriptions/issues/1040
+	 * @deprecated 1.5.2.200428
 	 */
-	public function woocommerce_order_again_cart_item_data($cart_item_data, $line_item, $subscription) {
-		// Keep track of the original currency, it will be needed at checkout
-		$cart_item_data['renewal_data_key'] = key($cart_item_data);
-		$cart_item_data['checkout_currency'] = $this->get_order_currency($subscription);
-		return $cart_item_data;
-	}
+	// public function woocommerce_order_again_cart_item_data($cart_item_data, $line_item, $subscription) {
+	// 	$cart_item_data['renewal_data_key'] = key($cart_item_data);
+	// 	// Keep track of the original currency, the checkout will be forced to that currency
+	// 	$cart_item_data['data']->checkout_currency = $this->get_order_currency($subscription);
+	// 	return $cart_item_data;
+	// }
 
 	/**
 	 * If necessary, replaces the currency active at checkout with the one from
@@ -985,9 +1063,89 @@ class Subscriptions_Integration {
 	 */
 	public function maybe_override_currency() {
 		$this->checkout_currency = $this->get_checkout_currency();
-		// If a checkout currency was stored, use it
-		if(!empty($this->checkout_currency)) {
-			add_filter('woocommerce_currency', array($this, 'override_currency'), 10);
+
+		// Force the checkout currency and display a notice when the currency was forced
+		// during the checkout and the cart is not empty
+		// @since 1.5.3.200618
+		if(!empty($this->checkout_currency) && (isset(WC()->cart) && !WC()->cart->is_empty())) {
+			add_filter('wc_aelia_cs_selected_currency', array($this, 'override_currency'), 10);
+
+			// Inform the customer when the checkout currency has been forced, due to the
+			// presence of a renewal, upgrade or downgrade
+			$this->show_checkout_currency_notice($this->checkout_currency);
+		}
+	}
+
+	/**
+	 * Tags a cart item containin a subscription renewal, upgrade and downgrade, to
+	 * keep track of the currency in which that product must be purchased.
+	 *
+	 * @param array $cart_item
+	 * @param array $values
+	 * @param string $key
+	 * @return array
+	 * @since 1.5.0.200410
+	 */
+	public function woocommerce_get_cart_item_from_session($cart_item, $values, $key) {
+		return $this->tag_cart_item($cart_item);
+	}
+
+	// /**
+	//  * Converts product prices when they are added to the cart. This is required
+	//  * for compatibility with some 3rd party plugins, which will need this
+	//  * information to perform their duty.
+	//  *
+	//  * @param array cart_item The cart item, which contains, amongst other things,
+	//  * the product added to cart.
+	//  * @return array The processed cart item, with the product prices converted in
+	//  * the selected currency.
+	//  */
+	// public function woocommerce_add_cart_item($cart_item) {
+	// 	// $cart_item['data'] contains the product added to the cart.
+	// 	$this->tag_cart_item($cart_item);
+
+	// 	return $cart_item;
+	// }
+
+	/**
+	 * Disables the conversion of product prices during the processing of renewals.
+	 *
+	 * @param bool $requires_conversion
+	 * @param WC_Product $product
+	 * @return bool
+	 * @since 1.5.3.200617
+	 */
+	public function wc_aelia_cs_product_requires_conversion($requires_conversion, $product) {
+		return $requires_conversion && !$this->should_preserve_renewal_price($product);
+	}
+
+	/**
+	 * Informs the customer when the checkout currency has been forced, due to the
+	 * presence of a renewal, upgrade or downgrade.
+	 *
+	 * @param string $checkout_currency
+	 * @since 1.5.0.200410
+	 */
+	protected function show_checkout_currency_notice($checkout_currency) {
+		// Allow 3rd parties to decide not to display the notice that informs the customer
+		// when the checkout currency has been forced
+		if(!apply_filters('wc_aelia_cs_subscriptions_show_checkout_currency_notice', true, $checkout_currency)) {
+			return;
+		}
+
+		$currency_name = WC_Aelia_Currencies_Manager::get_currency_name($checkout_currency);
+
+		// Build the notice to inform the user that the currency has been forced to a specific one, due to
+		// the presencoe of a renewal, upgrade or downgrade in the cart
+		$forced_currency_notice = '<strong>' . __('Important', Definitions::TEXT_DOMAIN) . ': </strong>' .
+															__('Subscription renewals, upgraded and downgrades must be purchased in the currency used for the original subscription.', Definitions::TEXT_DOMAIN) .
+															' ' .
+															sprintf(__('The active currency has been set to %s automatically.', Definitions::TEXT_DOMAIN), $currency_name);
+
+		// Add the notice to the list, if not present already
+		if(!wc_has_notice($forced_currency_notice)) {
+			wc_add_notice($forced_currency_notice);
+			add_filter('wc_aelia_cs_subscriptions_show_checkout_currency_notice', '__return_false');
 		}
 	}
 
@@ -1004,14 +1162,36 @@ class Subscriptions_Integration {
 	 */
 	protected function get_checkout_currency() {
 		$currency = null;
-		foreach(WC()->cart->get_cart() as $item) {
-			// If any of the items in the cart is a subscription renewal, it should
-			// have a currency attached to it. That is the currency to use at checkout
-			if(!empty($item) && !empty($item['checkout_currency'])) {
-				$currency = $item['checkout_currency'];
-				break;
+
+		if(!empty(WC()->cart)) {
+			foreach(WC()->cart->get_cart() as $item) {
+				// If any of the items in the cart is a subscription renewal, it should
+				// have a currency attached to it. That is the currency to use at checkout
+				// if(!empty($item) && !empty($item['checkout_currency'])) {
+				// 	$currency = $item['checkout_currency'];
+				// 	break;
+				// }
+
+				if(!empty($item['data']->checkout_currency)) {
+					$currency = $item['data']->checkout_currency;
+					break;
+				}
 			}
 		}
+
+		if(empty($currency)) {
+			// When the customer goes to a product page to upgrade or downgrade the subscription,
+			// take the currency from the original subscription
+			// @since 1.5.1.200414
+			if(!empty($_GET['switch-subscription']) && !empty($_GET['item'])) {
+				$subscription = wcs_get_subscription($_GET['switch-subscription']);
+
+				if(is_object($subscription) && ($subscription instanceof \WC_Subscription)) {
+					$currency = $subscription->get_currency();
+				}
+			}
+		}
+
 		return $currency;
 	}
 

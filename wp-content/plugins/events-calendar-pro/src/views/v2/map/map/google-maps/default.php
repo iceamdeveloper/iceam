@@ -21,10 +21,11 @@ $event = reset( $events );
 $url = '';
 // Verifies if that event has a venue.
 if ( isset( $event->venues ) && $event->venues->count() ) {
-	$url = add_query_arg(
+	$venue = $event->venues->first();
+	$url   = add_query_arg(
 		[
 			'key' => $map_provider->api_key,
-			'q'   => urlencode( $event->venues->first()->geolocation->address ),
+			'q'   => urlencode( $venue->geolocation->address ),
 		],
 		$map_provider->iframe_url
 	);

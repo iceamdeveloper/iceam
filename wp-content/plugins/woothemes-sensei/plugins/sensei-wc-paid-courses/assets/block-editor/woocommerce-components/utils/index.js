@@ -3,21 +3,33 @@
  */
 import { addQueryArgs } from '@wordpress/url';
 import apiFetch from '@wordpress/api-fetch';
-import { flatten, uniqBy } from 'lodash';
+import { uniqBy, get } from 'lodash';
 
-export const isLargeCatalog = window.wc_product_block_data ? window.wc_product_block_data.isLargeCatalog : false;
+const MAX_PRODUCTS = 100;
+
+// Get the product catalog size.
+const productCatalogSize = get(
+	window,
+	'sensei_wc_paid_courses_block_editor_course.productCatalogSize',
+	false
+);
+
+// If we don't know the catalog size, assume it is large.
+export const isLargeCatalog = productCatalogSize
+	? productCatalogSize > MAX_PRODUCTS
+	: true;
 
 const getProductsRequests = ( { selected = [], search, courseId } ) => {
 	const requests = [
 		addQueryArgs( '/sensei-wcpc-internal/v1/course-products', {
 			course_id: courseId,
-			per_page: isLargeCatalog ? 100 : -1,
+			per_page: MAX_PRODUCTS,
 			catalog_visibility: 'visible',
 			search,
 		} ),
 	];
 
-	// If we have a large catalog, we might not get all selected products in the first page.
+	// Ensure we have all of the selected products as well.
 	if ( isLargeCatalog && selected.length ) {
 		requests.push(
 			addQueryArgs( '/sensei-wcpc-internal/v1/course-products', {
@@ -34,12 +46,29 @@ const getProductsRequests = ( { selected = [], search, courseId } ) => {
 /**
  * Get a promise that resolves to a list of products from the API.
  *
- * @param {object} - A query object with the list of selected products and search term.
+ * @param {Object} requestArgs            The request arguments.
+ * @param {Array}  requestArgs.selected   A list of the selected products.
+ * @param {string} requestArgs.search     The search string.
+ * @param {number} requestArgs.courseId   The course id.
  */
 export const getProducts = ( { selected = [], search, courseId } ) => {
 	const requests = getProductsRequests( { selected, search, courseId } );
 
-	return Promise.all( requests.map( ( path ) => apiFetch( { path } ) ) ).then( ( data ) => {
-		return uniqBy( flatten( data ), 'id' );
-	} );
+	return Promise.all( requests.map( ( path ) => apiFetch( { path } ) ) ).then(
+		( data ) => {
+			let products = [];
+			const userConfirmedModal =
+				data.length > 0 ? data[ 0 ].user_confirmed_modal : false;
+
+			data.forEach(
+				( response ) =>
+					( products = response.products.concat( products ) )
+			);
+
+			return {
+				userConfirmedModal,
+				products: uniqBy( products, 'id' ),
+			};
+		}
+	);
 };

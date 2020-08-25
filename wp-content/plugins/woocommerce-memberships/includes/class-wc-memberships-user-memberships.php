@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -73,7 +73,7 @@ class WC_Memberships_User_Memberships {
 		add_filter( 'comments_clauses',   array( $this, 'exclude_membership_notes_from_queries' ) );
 		add_action( 'comment_feed_join',  array( $this, 'exclude_membership_notes_from_feed_join' ) );
 		add_action( 'comment_feed_where', array( $this, 'exclude_membership_notes_from_feed_where' ) );
-		add_filter( 'wp_count_comments',  array( $this, 'exclude_membership_notes_from_comments_count' ), 999, 2 );
+		add_filter( 'wp_count_comments',  [ $this, 'exclude_membership_notes_from_comments_count' ], 999, 2 );
 
 		// expiration events handling
 		add_action( 'wc_memberships_user_membership_expiry',           array( $this, 'trigger_expiration_events' ), 10, 1 );
@@ -169,7 +169,7 @@ class WC_Memberships_User_Memberships {
 
 		// this shouldn't happen, yet ensure $user_membership isn't null
 		if ( ! $user_membership instanceof \WC_Memberships_User_Membership ) {
-			/* translators: Placeholder: %s - membership plan ID */
+			/* translators: Placeholder: %d - membership plan ID */
 			throw new Framework\SV_WC_Plugin_Exception( sprintf( __( 'Cannot create User Membership #%d.', 'woocommerce-memberships' ), $user_membership_id ) );
 		}
 
@@ -508,12 +508,12 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Checks if user is a member of one particular or any membership plan.
+	 * Determines if a user is a member of one particular plan or any membership plan.
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int|\WP_User $user_id optional, defaults to current user
-	 * @param int|string|\WC_Memberships_Membership_Plan $membership_plan optional: membership plan ID, object or slug - leave empty to check if the user is a member of any plan
+	 * @param int|\WP_User|null $user_id optional: defaults to current user
+	 * @param int|string|\WC_Memberships_Membership_Plan|null $membership_plan optional: membership plan ID, object or slug - leave empty to check if the user is a member of any plan
 	 * @param bool|string $check_if_active optional additional check to see if the member has currently active access (pass param as true or 'active') or delayed access (use 'delayed')
 	 * @param bool $cache whether to use cached results (default true)
 	 * @return bool
@@ -531,19 +531,21 @@ class WC_Memberships_User_Memberships {
 		// sanity check (invalid user or not logged in)
 		if ( ! is_numeric( $user_id ) || 0 === $user_id ) {
 			return $is_member;
-		} else {
-			$user_id = (int) $user_id;
 		}
 
-		$plan_id = null;
+		$user_id = (int) $user_id;
 
-		if ( is_numeric( $membership_plan ) ) {
-			$plan_id = $membership_plan;
+		if ( null === $membership_plan ) {
+			$plan_id = 0; // this is used to cache if a user is a member of any plan
+		} elseif ( is_numeric( $membership_plan ) ) {
+			$plan_id = (int) $membership_plan;
 		} elseif ( $membership_plan instanceof \WC_Memberships_Membership_Plan ) {
 			$plan_id = $membership_plan->get_id();
+		} elseif ( is_string( $membership_plan ) && '' !== $membership_plan && ( $membership_plan = wc_memberships_get_membership_plan( $membership_plan ) ?: null ) ) {
+			$plan_id = $membership_plan->get_id();
+		} else {
+			return $is_member;
 		}
-
-		$member_status_cache_key = null;
 
 		// set status check cache key
 		if ( true === $check_if_active ) {
@@ -551,21 +553,22 @@ class WC_Memberships_User_Memberships {
 		} elseif ( ! $check_if_active ) {
 			$member_status_cache_key = 'is_member';
 		} elseif ( is_string( $check_if_active ) ) {
-			$member_status_cache_key = "is_{$check_if_active}";
+			$member_status_cache_key = "is_{$check_if_active}"; // allow custom cache keys, e.g. "is_delayed"
+		} else {
+			$member_status_cache_key = null;
 		}
 
 		// use memoization to fetch a value faster, if user member status is cached
 		if (    false !== $cache
 		     && $member_status_cache_key
-		     && is_numeric( $plan_id )
 		     && isset( $this->is_user_member[ $user_id ][ $plan_id ][ $member_status_cache_key ] ) ) {
 
 			$is_member = $this->is_user_member[ $user_id ][ $plan_id ][ $member_status_cache_key ];
 
 		} else {
 
-			// note 'true' is for legacy purposes here (check for active)
-			$must_be_active_member = in_array( $check_if_active, array( 'active', 'delayed', true ), true );
+			// note: 'true' is for legacy purposes here (check for active)
+			$must_be_active_member = in_array( $check_if_active, [ 'active', 'delayed', true ], true );
 
 			if ( null === $membership_plan ) {
 
@@ -584,14 +587,13 @@ class WC_Memberships_User_Memberships {
 
 							if ( true === $must_be_active_member ) {
 
+								// return true if we are checking for currently active
 								if ( $is_member = ( $user_membership->is_active() && $user_membership->is_in_active_period() ) ) {
-
-									// return true if we are checking for currently active
 									break;
+								}
 
-								} elseif ( 'delayed' === $check_if_active && ( $is_member = $user_membership->is_delayed() ) ) {
-
-									// return true if we are checking if start is delayed
+								// return true if we are checking if start is delayed
+								if ( 'delayed' === $check_if_active && ( $is_member = $user_membership->is_delayed() ) ) {
 									break;
 								}
 
@@ -604,13 +606,13 @@ class WC_Memberships_User_Memberships {
 					}
 				}
 
-			} else {
+			} elseif ( $user_membership = $this->get_user_membership( $user_id, $membership_plan ) ) {
 
-				// check if the user is a member of a specific plan
-				$user_membership = $this->get_user_membership( $user_id, $membership_plan );
-				$is_member       = (bool) $user_membership;
+				if ( ! $must_be_active_member ) {
 
-				if ( $user_membership && $must_be_active_member ) {
+					$is_member = true;
+
+				} else {
 
 					$is_member = $user_membership->is_active() && $user_membership->is_in_active_period();
 
@@ -622,7 +624,7 @@ class WC_Memberships_User_Memberships {
 				}
 			}
 
-			$this->is_user_member[ $user_id ][ $plan_id ][ $member_status_cache_key ] = $is_member;
+			$this->is_user_member[ $user_id ][ $plan_id ][ (string) $member_status_cache_key ] = $is_member;
 		}
 
 		return $is_member;
@@ -630,12 +632,12 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Checks if user is a member with active access of one particular or any membership plan
+	 * Determines if a user is a member with active access of one particular or any membership plan
 	 *
 	 * @since 1.0.0
 	 *
-	 * @param int|\WP_User $user_id optional, defaults to current user
-	 * @param int|string $membership_plan optional: membership plan ID or slug - leave empty to check if the user is a member of any plan
+	 * @param int|\WP_User|null $user_id optional: defaults to current user
+	 * @param int|string|\WC_Memberships_Membership_Plan|null $membership_plan optional: membership plan ID, object or slug - leave empty to check if the user is an active member of any plan
 	 * @param bool $cache whether to use cache results (default true)
 	 * @return bool
 	 */
@@ -645,14 +647,14 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Checks if user is an active member of one particular or any membership plan but is delayed.
+	 * Determines if a user is an active member of one particular or any membership plan but is delayed.
 	 *
 	 * This is when a member has not gained access yet because the start date of the plan is in the future.
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param int|\WP_User $user_id optional, defaults to current user
-	 * @param int|string $membership_plan optional: membership plan ID or slug - leave empty to check if the user is a member of any plan
+	 * @param int|\WP_User|null $user_id optional: defaults to current user
+	 * @param int|string|\WC_Memberships_Membership_Plan|null $membership_plan optional: membership plan ID, object or slug - leave empty to check if the user is a delayed member of any plan
 	 * @param bool $cache whether to use cache results (default true)
 	 * @return bool
 	 */
@@ -662,7 +664,7 @@ class WC_Memberships_User_Memberships {
 
 
 	/**
-	 * Checks if user is either a member with active or delayed access of one particular or any membership plan.
+	 * Determines if a user is either a member with active or delayed access of one particular or any membership plan.
 	 *
 	 * Note: this isn't the equivalent of doing `! wc_memberships_is_user_active_member()`
 	 * @see \WC_Memberships_User_Memberships::is_user_active_member()
@@ -670,8 +672,8 @@ class WC_Memberships_User_Memberships {
 	 *
 	 * @since 1.7.0
 	 *
-	 * @param int|\WP_User $user_id optional, defaults to current user
-	 * @param int|string $membership_plan optional: membership plan ID or slug - leave empty to check if the user is a member of any plan
+	 * @param int|\WP_User|null $user_id optional: defaults to current user
+	 * @param int|string|\WC_Memberships_Membership_Plan|null $membership_plan optional: membership plan ID, object or slug - leave empty to check if the user is an active or delayed member of any plan
 	 * @param bool $cache whether to use cache results (default true)
 	 * @return bool
 	 */
@@ -1612,11 +1614,14 @@ class WC_Memberships_User_Memberships {
 
 		if ( 0 === $post_id ) {
 
-			$notes = $this->get_user_membership_notes_count();
+			if ( ! empty( $counts ) && isset( $counts->all, $counts->approved ) ) {
 
-			if ( $notes > 0 ) {
-				$counts->all      = max( 0, (int) $counts->all - $notes );
-				$counts->approved = max( 0, (int) $counts->approved - $notes );
+				$notes = $this->get_user_membership_notes_count();
+
+				if ( $notes > 0 ) {
+					$counts->all      = max( 0, (int) $counts->all - $notes );
+					$counts->approved = max( 0, (int) $counts->approved - $notes );
+				}
 			}
 
 		} elseif ( is_numeric( $post_id ) && $post_id > 0 && 'wc_user_membership' === get_post_type( $post_id ) ) {

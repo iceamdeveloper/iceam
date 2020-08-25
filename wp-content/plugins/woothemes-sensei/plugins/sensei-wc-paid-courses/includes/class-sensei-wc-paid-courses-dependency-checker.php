@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Sensei_WC_Paid_Courses_Dependency_Checker {
 	const MINIMUM_PHP_VERSION         = '5.6';
-	const MINIMUM_SENSEI_VERSION      = '2.0.0';
+	const MINIMUM_SENSEI_VERSION      = '3.0.0';
 	const MINIMUM_WOOCOMMERCE_VERSION = '3.0.0';
 
 	/**
@@ -47,7 +47,9 @@ class Sensei_WC_Paid_Courses_Dependency_Checker {
 		$are_met = true;
 		if ( ! self::check_sensei() ) {
 			add_action( 'admin_notices', array( __CLASS__, 'add_sensei_notice' ) );
-			$are_met = false;
+
+			// Don't block loading until we take out the legacy code.
+			$are_met = self::check_sensei( '2.0.0' );
 		}
 		if ( ! self::check_woocommerce() ) {
 			add_action( 'admin_notices', array( __CLASS__, 'add_woocommerce_notice' ) );
@@ -75,14 +77,19 @@ class Sensei_WC_Paid_Courses_Dependency_Checker {
 	/**
 	 * Checks for our Sensei dependency.
 	 *
+	 * @param string $minimum_version Check for a specific minimum version. If not set, it will use the constant.
 	 * @return bool
 	 */
-	private static function check_sensei() {
+	private static function check_sensei( $minimum_version = null ) {
 		if ( ! class_exists( 'Sensei_Main' ) ) {
 			return false;
 		}
 
-		return version_compare( self::MINIMUM_SENSEI_VERSION, get_option( 'sensei-version' ), '<=' );
+		if ( ! $minimum_version ) {
+			$minimum_version = self::MINIMUM_SENSEI_VERSION;
+		}
+
+		return version_compare( $minimum_version, get_option( 'sensei-version' ), '<=' );
 	}
 
 	/**

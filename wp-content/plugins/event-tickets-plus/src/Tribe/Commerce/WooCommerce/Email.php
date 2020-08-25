@@ -6,47 +6,76 @@ if ( class_exists( 'Tribe__Tickets_Plus__Commerce__WooCommerce__Email' ) || ! cl
 
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 
+	/**
+	 * The email format type.
+	 *
+	 * The parent class declares the property dynamically so there's no docblock to inherit.
+	 *
+	 * @var string html, plain
+	 */
 	public $email_type;
+
+	/**
+	 * {@inheritdoc}
+	 */
 	public $enabled;
 
 	public function __construct() {
-		$this->id             = 'wootickets';
-		$this->title          = esc_html( tribe_get_ticket_label_plural( 'woo_email_title' ) );
-		$this->description    = esc_html( sprintf(
-			__( 'Email the user will receive after a completed order with the %s they purchased.', 'event-tickets-plus' ),
-			tribe_get_ticket_label_plural_lowercase( 'woo_email_description' )
-		) );
-		$this->subject        = esc_html( sprintf(
-			__( 'Your %s from {site_title}', 'event-tickets-plus' ),
-			tribe_get_ticket_label_plural_lowercase( 'woo_email_subject' )
-		) );
+		$this->id = 'wootickets';
+
+		$this->title = esc_html( tribe_get_ticket_label_plural( 'woo_email_title' ) );
+
+		$this->description = esc_html(
+			sprintf(
+			// Translators: dynamic 'tickets' text.
+				__( 'Email the user will receive after a completed order with the %s they purchased.', 'event-tickets-plus' ),
+				tribe_get_ticket_label_plural_lowercase( 'woo_email_description' )
+			)
+		);
+
+		$this->subject = esc_html(
+			sprintf(
+			// Translators: dynamic 'tickets' text.
+				__( 'Your %s from {site_title}', 'event-tickets-plus' ),
+				tribe_get_ticket_label_plural_lowercase( 'woo_email_subject' )
+			)
+		);
+
 		$this->customer_email = true;
 
 		// Triggers for this email
 		add_action( 'wootickets-send-tickets-email', [ $this, 'trigger' ] );
 
-		// Call parent constuctor
+		// Call parent constructor.
 		parent::__construct();
 
-		/**
-		 * Allows for filtering whether the Woo tickets email is enabled.
-		 *
-		 * @deprecated 4.7.3
-		 *
-		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
-		 */
-		$this->enabled = apply_filters( 'wootickets-tickets-email-enabled', 'yes' );
-
-		/**
-		 * Allows for filtering whether the Woo tickets email is enabled.
-		 *
-		 * @since 4.7.3
-		 *
-		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
-		 */
-		$this->enabled = apply_filters( 'tribe_tickets_plus_email_enabled', 'yes' );
-
 		$this->email_type = 'html';
+
+		$this->enabled = 'yes';
+
+		/**
+		 * Allows for filtering whether the Woo tickets email is enabled.
+		 *
+		 * @deprecated 4.7.1
+		 *
+		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
+		 */
+		$this->enabled = apply_filters_deprecated(
+			'wootickets-tickets-email-enabled',
+			[ $this->enabled ],
+			'4.7.1',
+			'tribe_tickets_plus_email_enabled',
+			'The filter "wootickets-tickets-email-enabled" has been renamed to "tribe_tickets_plus_email_enabled" to match plugin namespacing.'
+		);
+
+		/**
+		 * Allows for filtering whether the Woo tickets email is enabled.
+		 *
+		 * @since 4.7.1
+		 *
+		 * @param string $is_enabled Defaults to 'yes'; whether the Woo tickets email is enabled.
+		 */
+		$this->enabled = apply_filters( 'tribe_tickets_plus_email_enabled', $this->enabled );
 	}
 
 	/**

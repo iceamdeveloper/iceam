@@ -1294,13 +1294,19 @@ abstract class Tribe__Events__Aggregator__Record__Abstract {
 			return 0;
 		}
 
+		$activity_type = 'event';
+
+		if ( ! empty( $this->meta['content_type'] ) ) {
+			$activity_type = $this->meta['content_type'];
+		}
+
 		switch ( $type ) {
 			case 'total':
-				return $this->meta['activity']->count( 'event', 'created' ) + $this->meta['activity']->count( 'event', 'updated' );
+				return $this->meta['activity']->count( $activity_type, 'created' ) + $this->meta['activity']->count( $activity_type, 'updated' );
 				break;
 
 			default:
-				return $this->meta['activity']->count( 'event', $type );
+				return $this->meta['activity']->count( $activity_type, $type );
 				break;
 		}
 	}
@@ -2533,23 +2539,25 @@ abstract class Tribe__Events__Aggregator__Record__Abstract {
 	 * @return bool Whether the image was attached to the event or not.
 	 */
 	public function import_event_image( $event, $activity ) {
+		// If this is not a valid event no need for additional work.
+		if ( empty( $event['ID'] ) || ! tribe_is_event( $event['ID'] ) ) {
+			return false;
+		}
+
 		/**
 		 * Whether the event image should be imported and attached or not.
 		 *
 		 * @since 4.6.9
 		 *
-		 * @param bool                                        $import_event_image Defaults to `true`
-		 * @param array                                       $event              The event post ID
-		 * @param string                                      $image_url          The URL to the image that should be imported
-		 * @param Tribe__Events__Aggregator__Record__Activity $activity           The importer activity so far
+		 * @param bool                                        $import_event_image Defaults to `true`.
+		 * @param array                                       $event              The event post ID.
+		 * @param Tribe__Events__Aggregator__Record__Activity $activity           The importer activity so far.
+		 *
+		 * @return bool Either to import or not the image of the event.
 		 */
 		$import_event_image = apply_filters( 'tribe_aggregator_import_event_image', true, $event, $activity );
 
 		if ( ! $import_event_image ) {
-			return false;
-		}
-
-		if ( empty( $event['ID'] ) || ! tribe_is_event( $event['ID'] ) ) {
 			return false;
 		}
 

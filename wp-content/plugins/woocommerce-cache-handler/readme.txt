@@ -2,44 +2,50 @@
 Tags: woocommerce, multi-currency, multiple currency, caching
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Requires at least: 4.0
-Tested up to: 5.4
+Tested up to: 5.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 4.0.1
+WC tested up to: 4.4
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
 == Description ==
 
-*** Write extended description here ***
+The Cache Handler plugin can work around the limitations of rigid caching systems. Its purpose is to ensure that the correct content is served to the visitors, depending on their country, province, currency and tax status.
 
 = Requirements =
-
-*** Describe requirements here ***
-
 * WordPress 4.0 or newer.
 * PHP 5.3 or newer.
 * WooCommerce 3.0 or newer
 * [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or later.
 
-== Frequently Asked Questions ==
-
-*** Write the FAQ here ***
-
 == Installation ==
 
-*** Write installation instructions here ***
-
-For more information about installation and management of plugins, please refer to [WordPress documentation](http://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
-
-== Screenshots ==
-
-*** Add screenshots here (if any) ***
-
-1. **Settings > Options**. Miscellaneous options.
+1. Download the Cache Handler plugin from our site.
+2. Upload and activate the plugin.
+3. Go to WooCommerce > Settings > Cache Handler to configure the plugin. You will be presented with three options:
+  * **Disabled**. The Cache Handler will be disabled and won't do anything.
+	* **Enable Redirect**. The Cache Handler will use the same redirect mechanism adopted by WooCommerce to redirect users to the correct content. Visitor's will be redirected to pages that have a unique page identifier appended to the URL (e.g. http://example.org?ph=23985623985). The identifier will be unique for the combination of country, province, currency and tax status, and it will ensure that visitors will see the correct content.
+	* **Enable Ajax Loader**. The Cache Handler will use Ajax to load prices dynamically on each page. This method will trigger an Ajax request that will update "on the fly" all the prices found on a page. Its main drawback is that it cannot handle prices introduced by other plugins (e.g. pricing tables, product addons, etc). If you use that type of plugins, you should use the Enable Redirect method instead.
+4. Choose the option that works best for your site, and save the settings.
+5. Clear all the caching systems you are using (plugins, Nginx, Varnish, CloudFlare, etc). This is important, as it will allow the Cache Handler to add its scripts to your pages, and ensure that the correct content is served.
 
 == Changelog ==
+
+= 1.0.14.200813 =
+* Updated supported WordPress and WooCommerce versions.
+
+= 1.0.14.200629 =
+* Updated supported WooCommerce versions.
+
+= 1.0.14.200603 =
+* Updated supported WooCommerce versions.
+
+= 1.0.13.200428 =
+* Updated requirement checking class.
+* Updated requirements.
+* Updated supported WooCommerce versions.
 
 = 1.0.12.200323 =
 * Updated supported WooCommerce versions.

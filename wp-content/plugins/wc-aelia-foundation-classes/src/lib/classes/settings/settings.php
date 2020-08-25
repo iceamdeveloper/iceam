@@ -102,21 +102,6 @@ class Settings extends \Aelia\WC\Settings {
 	}
 
 	/**
-	 * Factory method.
-	 *
-	 * @param string settings_key The key used to store and retrieve the plugin settings.
-	 * @param string textdomain The text domain used for localisation.
-	 * @param string renderer The renderer to use to generate the settings page.
-	 * @return WC_Aelia_Settings.
-	 */
-	public static function factory($settings_key = self::SETTINGS_KEY,
-																 $textdomain = '') {
-		$class = get_called_class();
-		$settings_manager = new $class($settings_key, $textdomain, $renderer);
-		return $settings_manager;
-	}
-
-	/**
 	 * Returns the settings for the "General" section.
 	 *
 	 * @param array settings An array of settings. The method will merge its data
@@ -184,11 +169,13 @@ class Settings extends \Aelia\WC\Settings {
 				'name' => __('Debug mode', self::$text_domain),
 				'type' => 'checkbox',
 				'desc' => __('Enable debug mode.', self::$text_domain) . ' ' .
-									__('When debug mode is enabled, the plugin will log additional ' .
+									__('When the debug mode is enabled, the plugin will log additional ' .
 										 'information about the operations it performs. The log file ' .
 										 'will be located at', self::$text_domain) .
 									' <code class="log_file_path">' .
-									\Aelia\WC\Logger::get_log_file_name(\Aelia\WC\WC_AeliaFoundationClasses::$plugin_slug) .
+									// Show the new name of log files, to indicate that they contain a timestamp
+									// @since 2.0.20.200625
+									str_replace('.log', '-[TIMESTAMP].log', \Aelia\WC\Logger::get_log_file_name(\Aelia\WC\WC_AeliaFoundationClasses::$plugin_slug)) .
 									'</code>',
 				'class' => 'afc_debug_mode',
 				'default' => 'no',

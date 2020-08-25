@@ -8,9 +8,4 @@ import { Icon } from '@wordpress/components';
  */
 import SenseiIconSvg from './sensei-icon-svg';
 
-export default ( props ) => (
-	<Icon
-		{ ...props }
-		icon={ <SenseiIconSvg /> }
-	/>
-);
+export default ( props ) => <Icon { ...props } icon={ <SenseiIconSvg /> } />;

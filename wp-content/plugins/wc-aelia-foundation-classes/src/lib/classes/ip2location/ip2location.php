@@ -50,7 +50,7 @@ class IP2Location extends Base_Class {
 
 		$link_url = $path . '?' . http_build_query($args);
 		$plugin_action = '<a href="' . $link_url . '" ' .
-										 'class="plugin_action button">';
+										 'class="button">';
 		// It's assumed that the label was already passed through the translation functions
 		$plugin_action .= $button_label;
 		$plugin_action .= '</a>';
@@ -87,7 +87,7 @@ class IP2Location extends Base_Class {
 					__('Could not download and install the GeoIP database.', WC_AeliaFoundationClasses::$text_domain) .
 					'&nbsp;' .
 					sprintf(__('Please %s.', WC_AeliaFoundationClasses::$text_domain),
-									IP2Location::get_geoip_install_html(__('try to install the database again',
+									self::get_geoip_install_html(__('try to install the database again',
 																									 WC_AeliaFoundationClasses::$text_domain))) .
 					'&nbsp;' .
 					sprintf(__('If the error persists, please download the the database ' .

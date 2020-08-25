@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -60,6 +60,7 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 			'1.11.1',
 			'1.13.2',
 			'1.16.2',
+			'1.17.5',
 		];
 	}
 
@@ -527,6 +528,9 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 	/**
 	 * Updates to 1.11.1
 	 *
+	 * @see \SkyVerge\WooCommerce\Memberships\Admin\Setup_Wizard::add_admin_notices()
+	 * @see \WC_Memberships_Upgrade::upgrade_to_1_17_5()
+	 *
 	 * @since 1.11.1
 	 */
 	protected function upgrade_to_1_11_1() {
@@ -581,6 +585,50 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 			$this->get_plugin()->log( 'Action Scheduler 3.0.0 will be used after Memberships 1.16.0 update' );
 		} else {
 			update_option( 'wc_memberships_use_as_3_0_0', 'no' );
+		}
+	}
+
+
+	/**
+	 * Updates to 1.17.5
+	 *
+	 * @see \SkyVerge\WooCommerce\Memberships\Admin\Setup_Wizard::add_admin_notices()
+	 * @see \WC_Memberships_Upgrade::upgrade_to_1_11_1()
+	 *
+	 * @since 1.17.5
+	 *
+	 * @param string $installed_version version upgrading from
+	 */
+	protected function upgrade_to_1_17_5( $installed_version ) {
+
+		// only show the new notice if upgrading from version 1.12 or above
+		if ( ! empty( $installed_version ) && version_compare( $installed_version, '1.12.0', '>=' ) ) {
+
+			// remove the old flag about Jilt advanced emails introduced in 1.11.1
+			delete_option( 'wc_memberships_show_advanced_emails_notice' );
+
+			// bail if Jilt is installed already
+			if ( $this->get_plugin()->is_plugin_installed( 'jilt-for-woocommerce.php' ) ) {
+				return;
+			}
+
+			// add a flag to display an updated notice about Jilt emails upon upgrade
+			update_option( 'wc_memberships_show_jilt_cross_sell_notice', 'yes' );
+
+			// also add an informational WooCommerce admin note, if notes are available and Jilt is not installed already
+			if ( Framework\SV_WC_Plugin_Compatibility::is_enhanced_admin_available() ) {
+
+				$note = new \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note();
+				$note->set_type( \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_INFORMATIONAL );
+				$note->set_icon( 'info' );
+				$note->set_source( 'woocommerce-memberships' );
+				$note->set_name( 'wc-memberships-jilt-cross-sell-notice' );
+				$note->set_title( __( 'Jilt for WooCommerce', 'woocommerce-memberships' ) );
+				$note->set_content( __( 'Use an email platform that automatically syncs member details. Segment newsletters by membership plan, and create automated email series for members in minutes using Jilt. All new accounts get a bonus credit!', 'woocommerce-memberships' ) );
+				$note->add_action( 'dismiss', __( 'Not now', 'woocommerce-memberships' ), false, \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_ACTIONED );
+				$note->add_action( 'sign-up', __( 'Sign up for free', 'woocommerce-memberships' ), 'https://jilt.com/go/memberships-update', \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_ACTIONED, true );
+				$note->save();
+			}
 		}
 	}
 

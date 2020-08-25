@@ -94,6 +94,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	 *
 	 * @since 4.11.0
 	 * @since 4.11.2 Do not add 'provider' to checkout URL if no tickets in the Cart.
+	 * @since 4.12.0    Stop adding the 'provider' parameter to the checkout URL, was causing conflicts with payment gateways.
 	 *
 	 * @param string $checkout_url Checkout URL.
 	 *
@@ -110,10 +111,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 
 		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo */
 		$woo = tribe( 'tickets-plus.commerce.woo' );
-
-		if ( $this->get_tickets_in_cart( [], $woo->attendee_object ) ) {
-			$checkout_url = add_query_arg( 'provider', $woo->attendee_object, $checkout_url );
-		}
 
 		return $checkout_url;
 	}
@@ -183,11 +180,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo */
 		$woo = tribe( 'tickets-plus.commerce.woo' );
 
-		$ticket_provider = $woo->attendee_object;
-		$checkout_url    = $attendee_reg->get_url();
-		$checkout_url    = add_query_arg( 'provider', $ticket_provider, $checkout_url );
+		$ticket_provider  = $woo->attendee_object;
+		$attendee_reg_url = $attendee_reg->get_url();
+		$attendee_reg_url = add_query_arg( 'provider', $ticket_provider, $attendee_reg_url );
 
-		return $checkout_url;
+		return $attendee_reg_url;
 	}
 
 	/**
@@ -528,16 +525,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	 * Get WooCommerce Checkout URL.
 	 *
 	 * @since 4.11.0
+	 * @since 4.12.0    Stop adding the 'provider' parameter to the checkout URL, was causing conflicts with payment gateways.
 	 *
 	 * @return string WooCommerce Checkout URL.
 	 */
 	public function get_checkout_url() {
 		$checkout_url = wc_get_checkout_url();
-
-		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $ticket_provider */
-		$ticket_provider = tribe( 'tickets-plus.commerce.woo' );
-
-		$checkout_url = add_query_arg( 'provider', $ticket_provider::ATTENDEE_OBJECT, $checkout_url );
 
 		/**
 		 * Allow filtering of the WooCommerce Checkout URL.

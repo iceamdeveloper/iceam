@@ -105,6 +105,7 @@ $display_tab_fields = Tribe__Main::array_insert_before_key(
 				. __( 'The settings below control the display of your calendar. If things don\'t look right, try switching between the three style sheet options or pick a page template from your theme.', 'the-events-calendar' )
 				. '</p> <p>'
 				. sprintf(
+					/* translators: %s: URL to knowledgebase. Please also use &#37; for % to avoid PHP warnings. */
 					__( 'There are going to be situations where no out-of-the-box template is 100&#37; perfect. Check out our <a href="%s">our themer\'s guide</a> for instructions on custom modifications.', 'the-events-calendar' ),
 					Tribe__Main::$tec_url . 'knowledgebase/themers-guide/?utm_medium=plugin-tec&utm_source=generaltab&utm_campaign=in-app'
 				)
@@ -204,7 +205,7 @@ $display_tab_fields = Tribe__Main::array_insert_before_key(
 			'label'           => __( 'Events template', 'the-events-calendar' ),
 			'tooltip'         => __( 'Choose a page template to control the appearance of your calendar and event content.', 'the-events-calendar' ),
 			'validation_type' => 'options',
-			'size'            => 'large',
+			'size'            => 'small',
 			'default'         => 'default',
 			'options'         => $template_options,
 		],
@@ -243,7 +244,7 @@ $display_tab_fields = Tribe__Main::array_insert_before_key(
 			'type'            => 'dropdown',
 			'label'           => __( 'Default view', 'the-events-calendar' ),
 			'validation_type' => 'not_empty',
-			'size'            => 'large',
+			'size'            => 'small',
 			'default'         => 'month',
 			'options'         => $enabled_views_options,
 		),

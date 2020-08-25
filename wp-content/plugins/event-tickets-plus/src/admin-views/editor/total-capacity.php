@@ -1,6 +1,10 @@
 <?php
 $post_id = get_the_ID();
-$total_tickets  = tribe( 'tickets.handler' )->get_total_event_capacity( $post_id );
+
+/** @var Tribe__Tickets__Tickets_Handler $handler */
+$handler = tribe( 'tickets.handler' );
+
+$total_tickets = tribe_get_event_capacity( $post_id );
 
 // only show if there are tickets
 if ( empty( $total_tickets ) ) {
@@ -13,13 +17,13 @@ if ( empty( $total_tickets ) ) {
 		<?php
 		switch ( $total_tickets ) {
 			case -1:
-				?><i><?php echo esc_html( tribe( 'tickets.handler' )->unlimited_term ); ?></i><?php
+				printf( '<i>%s</i>', esc_html( $handler->unlimited_term ) );
 				break;
 			case 0:
-				?><i><?php esc_html_e( 'No tickets created yet', 'event-tickets-plus' ); ?></i><?php
+				printf( '<i>%s</i>', esc_html__( 'No tickets created yet', 'event-tickets-plus' ) );
 				break;
 			default:
-				echo absint( $total_tickets );
+				echo esc_html( number_format_i18n( $total_tickets ) );
 				break;
 		}
 		?>

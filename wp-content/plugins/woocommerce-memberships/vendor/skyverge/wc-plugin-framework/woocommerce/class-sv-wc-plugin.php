@@ -18,15 +18,15 @@
  *
  * @package   SkyVerge/WooCommerce/Plugin/Classes
  * @author    SkyVerge
- * @copyright Copyright (c) 2013-2019, SkyVerge, Inc.
+ * @copyright Copyright (c) 2013-2020, SkyVerge, Inc.
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-namespace SkyVerge\WooCommerce\PluginFramework\v5_5_0;
+namespace SkyVerge\WooCommerce\PluginFramework\v5_7_1;
 
 defined( 'ABSPATH' ) or exit;
 
-if ( ! class_exists( '\\SkyVerge\\WooCommerce\\PluginFramework\\v5_5_0\\SV_WC_Plugin' ) ) :
+if ( ! class_exists( '\\SkyVerge\\WooCommerce\\PluginFramework\\v5_7_1\\SV_WC_Plugin' ) ) :
 
 
 /**
@@ -37,13 +37,13 @@ if ( ! class_exists( '\\SkyVerge\\WooCommerce\\PluginFramework\\v5_5_0\\SV_WC_Pl
  * plugin.  This class handles all the "non-feature" support tasks such
  * as verifying dependencies are met, loading the text domain, etc.
  *
- * @version 5.5.0
+ * @version 5.7.1
  */
 abstract class SV_WC_Plugin {
 
 
 	/** Plugin Framework Version */
-	const VERSION = '5.5.0';
+	const VERSION = '5.7.1';
 
 	/** @var object single instance of plugin */
 	protected static $instance;
@@ -392,8 +392,7 @@ abstract class SV_WC_Plugin {
 	/**
 	 * Initializes the plugin admin.
 	 *
-	 * Plugins can override this to set up any handlers after the WordPress
-	 * admin is ready.
+	 * Plugins can override this to set up any handlers after the WordPress admin is ready.
 	 *
 	 * @since 5.2.0
 	 */
@@ -419,9 +418,15 @@ abstract class SV_WC_Plugin {
 		require_once(  $framework_path . '/Addresses/Address.php' );
 		require_once(  $framework_path . '/Addresses/Customer_Address.php' );
 
+		// Settings API
+		require_once( $framework_path . '/Settings_API/Abstract_Settings.php' );
+		require_once( $framework_path . '/Settings_API/Setting.php' );
+		require_once( $framework_path . '/Settings_API/Control.php' );
+
 		// common utility methods
 		require_once( $framework_path . '/class-sv-wc-helper.php' );
 		require_once( $framework_path . '/Country_Helper.php' );
+		require_once( $framework_path . '/admin/Notes_Helper.php' );
 
 		// backwards compatibility for older WC versions
 		require_once( $framework_path . '/class-sv-wc-plugin-compatibility.php' );
@@ -446,7 +451,11 @@ abstract class SV_WC_Plugin {
 		require_once( $framework_path . '/api/abstract-sv-wc-api-json-request.php' );
 		require_once( $framework_path . '/api/abstract-sv-wc-api-json-response.php' );
 
+		// REST API Controllers
+		require_once( $framework_path . '/rest-api/Controllers/Settings.php' );
+
 		// Handlers
+		require_once( $framework_path . '/Handlers/Script_Handler.php' );
 		require_once( $framework_path . '/class-sv-wc-plugin-dependencies.php' );
 		require_once( $framework_path . '/class-sv-wc-hook-deprecator.php' );
 		require_once( $framework_path . '/class-sv-wp-admin-message-handler.php' );
@@ -760,6 +769,48 @@ abstract class SV_WC_Plugin {
 	}
 
 
+	/**
+	 * Determines if TLS v1.2 is required for API requests.
+	 *
+	 * Subclasses should override this to return true if TLS v1.2 is required.
+	 *
+	 * @since 5.5.2
+	 *
+	 * @return bool
+	 */
+	public function require_tls_1_2() {
+
+		return false;
+	}
+
+
+	/**
+	 * Determines if TLS 1.2 is available.
+	 *
+	 * @since 5.5.2
+	 *
+	 * @return bool
+	 */
+	public function is_tls_1_2_available() {
+
+		// assume availability to avoid notices for unknown SSL types
+		$is_available = true;
+
+		// check the cURL version if installed
+		if ( is_callable( 'curl_version' ) ) {
+
+			$versions = curl_version();
+
+			// cURL 7.34.0 is considered the minimum version that supports TLS 1.2
+			if ( version_compare( $versions['version'], '7.34.0', '<' ) ) {
+				$is_available = false;
+			}
+		}
+
+		return $is_available;
+	}
+
+
 	/** Getter methods ******************************************************/
 
 
@@ -887,6 +938,21 @@ abstract class SV_WC_Plugin {
 	public function get_admin_notice_handler() {
 
 		return $this->admin_notice_handler;
+	}
+
+
+	/**
+	 * Gets the settings API handler instance.
+	 *
+	 * Plugins can use this to init the settings API handler.
+	 *
+	 * @since 5.7.0
+	 *
+	 * @return void|Settings_API\Abstract_Settings
+	 */
+	public function get_settings_handler() {
+
+		return;
 	}
 
 

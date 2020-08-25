@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -266,7 +266,7 @@ class WC_Memberships_Integration_Subscriptions_User_Memberships {
 
 			$subscription_tied_membership = new \WC_Memberships_Integration_Subscriptions_User_Membership( $user_membership->post );
 
-			// Maybe set the free trial end date meta if subscription is on trial.
+			// maybe set the free trial end date meta if subscription is on free trial
 			if ( $subscription_tied_membership->has_status( 'free_trial' ) ) {
 
 				$subscription_trial_end_date = wc_memberships()->get_integrations_instance()->get_subscriptions_instance()->get_subscription_event_date( $subscription_tied_membership->get_subscription(), 'trial_end' );

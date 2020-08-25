@@ -3,13 +3,13 @@
  * Plugin Name: Sensei WooCommerce Paid Courses
  * Plugin URI: https://senseilms.com/
  * Description: Whether you want to teach, tutor or train, we have you covered.
- * Version: 1.2.4
+ * Version: 2.1.0
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Requires at least: 4.9
- * Tested up to: 5.3
- * Requires PHP: 5.6
- * WC requires at least: 3.0.0
- * WC tested up to: 3.8
+ * Requires at least: 5.2
+ * Tested up to: 5.5
+ * Requires PHP: 7.0
+ * WC requires at least: 3.0
+ * WC tested up to: 4.3
  * Author: Automattic
  * Author URI: https://senseilms.com/
  * Text Domain: sensei-wc-paid-courses
@@ -22,7 +22,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'SENSEI_WC_PAID_COURSES_VERSION', '1.2.4' );
+define( 'SENSEI_WC_PAID_COURSES_VERSION', '2.1.0' );
 define( 'SENSEI_WC_PAID_COURSES_PLUGIN_FILE', __FILE__ );
 define( 'SENSEI_WC_PAID_COURSES_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 

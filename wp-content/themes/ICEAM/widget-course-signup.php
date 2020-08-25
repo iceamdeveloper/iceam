@@ -40,7 +40,7 @@
 		$title = apply_filters( 'widget_title', $instance['title'] );
 		
         $wc_post_id = get_post_meta( $post->ID, '_course_woocommerce_product', true );
-        $product = $woothemes_sensei->sensei_get_woocommerce_product_object( $wc_post_id );
+        $product = Sensei_WC::get_product_object( $wc_post_id );
 		
 		$resubscribe_link = wcs_get_users_resubscribe_link_for_product( $wc_post_id );
 		$can_resubscribe = (wcs_user_has_subscription( $user_ID, $wc_post_id, 'on-hold' ) == true || wcs_user_has_subscription( $user_ID, $wc_post_id, 'expired' ) == true ? true : false);

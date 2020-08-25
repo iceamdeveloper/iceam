@@ -1,5 +1,80 @@
 *** Sensei with WooCommerce Paid Courses Changelog ***
 
+2020.08.11 - version 3.4.1.2.1.0
+* Sensei LMS: Version bump to 3.4.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.4.1/changelog.txt
+
+2020.08.06 - version 3.4.0.2.1.0
+* New: Remove / Restore Enrollments
+	* Restore enrolment when new membership is purchased or existing membership is updated - #513
+	* Restore simple product enrollments - #514
+	* Restore subscription enrollments - #515
+* Fix: Issue with course products sidebar icon in Wordpress 5.5 - #519
+* Sensei LMS: Version bump to 3.4.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.4.0/changelog.txt
+
+2020.07.30 - version 3.3.1.2.0.1
+* Sensei LMS: Version bump to 3.3.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.3.1/changelog.txt
+
+2020.07.23 - version 3.3.0.2.0.1
+* Sensei LMS: Version bump to 3.3.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.3.0/changelog.txt
+
+2020.06.30 - version 3.2.0.2.0.1
+* Sensei LMS: Version bump to 3.2.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.2.0/changelog.txt
+
+2020.06.05 - version 3.1.1.2.0.1
+* Sensei LMS: Version bump to 3.1.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.1.1/changelog.txt
+
+2020.06.04 - version 3.1.0.2.0.1
+* Sensei LMS: Version bump to 3.1.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.1.0/changelog.txt
+
+2020.04.29 - version 3.0.1.2.0.1
+* Fix: Skip enrollment checking completely for guests - #489
+* Sensei LMS: Version bump to 3.0.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.0.1/changelog.txt
+
+2020.04.27 - version 3.0.0.2.0.0
+* New: Fix membership rule with empty field - #452
+* New: Recalculate membership plan when granting access for existing purchases - #446
+* New: Recalculate membership when plan is updated - #411
+* New: Refactor membership recalculation to use new scheduler - #448
+* New: Add a scheduler for background jobs - #445
+* New: Add memberships enrolment provider - #393
+* New: Add support for directly deleted orders in simple provider - #343
+* New: Add a user confirmation modal on course's product update - #345
+* New: Add simple/variable product course enrolment provider - #324
+* New: Add subscriptions course enrolment provider - #325
+* New: Allow membership courses to be signed up for - #435
+* New: Block legacy manual enrolment migration for learners with active memberships - #414
+* New: Block manual enrolment for simple product purchasers - #375
+* New: Block manual enrolment for subscription product purchasers - #392
+* New: Deprecate Sensei_WC::is_my_courses_page - #425
+* New: Deprecate `Courses::activate_purchased_single_course` - #427
+* New: Deprecate alter_can_user_view_lesson - #420
+* New: Deprecate legacy membership handling methods - #431
+* New: Deprecate legacy subscription behavior - #338
+* New: Detect and notify admins when active memberships with cancelled orders are found - #444
+* New: Fire actions when products attached to a course are changed - #341
+* New: Fix issue with single action scheduling in Action Scheduler and stop all on deactivation - #457
+* New: Introduce enrollment provider handler and deprecate some legacy methods - #330
+* New: Recalculate enrolments on course membership update - #453
+* New: Recalculate enrolments when toggling products in a course - #401
+* New: Deprecate some membership-related functions - #350
+* New: Add notice to upgrade Sensei LMS when using a version older than 3.0 with WCPC 2.0 - #337
+* New: Add debug information to providers - #465
+* New: Enable ability to block users with memberships that have ended from being manually enrolled - #477
+* Tweak: Load jquery-modal from Sensei core - #424
+* Tweak: Remove purchase notice message override on lesson and quiz pages - #415
+* Tweak: Replace use of current_time function - #328
+* Tweak: Use callback method for filter in membership frontend sign-up - #458
+* Tweak: Recalculate course enrolments for all learners - #474
+* Tweak: Switch flag to not provide manual enrolment to anyone with inactive memberships - #481
+* Fix: Fix large catalog functionality in course products sidebar - #340
+* Fix: Remove check for placed orders when getting purchasable products - #417
+* Fix: Only add woocommerce CSS class to the single course page - #297
+* Fix: Fix PHP warning when running cron jobs - #466
+* Fix: Allow graceful deactivation without Action Scheduler - #468
+* Fix: Fix display of products in product selector - #471
+* Fix: Ensure deactivation hooks are executed in plugins - #40
+* Sensei LMS: Version bump to 3.0.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.0.0/changelog.txt
+
 2020.01.23 - version 2.4.0.1.2.4
 * Sensei LMS: Version bump to 2.4.0 https://raw.githubusercontent.com/Automattic/sensei/version/2.4.0/changelog.txt
 

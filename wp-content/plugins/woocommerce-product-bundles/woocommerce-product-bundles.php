@@ -3,9 +3,9 @@
 * Plugin Name: WooCommerce Product Bundles
 * Plugin URI: https://woocommerce.com/products/product-bundles/
 * Description: Offer product bundles, bulk discount packages and assembled products.
-* Version: 6.1.5
+* Version: 6.3.5
 * Author: SomewhereWarm
-* Author URI: https://somewherewarm.gr/
+* Author URI: https://somewherewarm.com/
 *
 * Woo: 18716:fbca839929aaddc78797a5b511c14da9
 *
@@ -15,10 +15,10 @@
 * Requires PHP: 5.6
 *
 * Requires at least: 4.4
-* Tested up to: 5.3
+* Tested up to: 5.5
 *
 * WC requires at least: 3.1
-* WC tested up to: 4.0
+* WC tested up to: 4.4
 *
 * Copyright: © 2017-2020 SomewhereWarm SMPC.
 * License: GNU General Public License v3.0
@@ -34,11 +34,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Main plugin class.
  *
  * @class    WC_Bundles
- * @version  6.1.5
+ * @version  6.3.5
  */
 class WC_Bundles {
 
-	public $version  = '6.1.5';
+	public $version  = '6.3.5';
 	public $required = '3.1.0';
 
 	/**
@@ -130,6 +130,30 @@ class WC_Bundles {
 	}
 
 	/**
+	 * Indicates whether the plugin has been fully initialized.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @return boolean
+	 */
+	public function plugin_initialized() {
+		return class_exists( 'WC_PB_Helpers' );
+	}
+
+	/**
+	 * Define constants if not present.
+	 *
+	 * @since  6.2.0
+	 *
+	 * @return boolean
+	 */
+	protected function maybe_define_constant( $name, $value ) {
+		if ( ! defined( $name ) ) {
+			define( $name, $value );
+		}
+	}
+
+	/**
 	 * Plugin version getter.
 	 *
 	 * @since  5.8.0
@@ -155,6 +179,9 @@ class WC_Bundles {
 	 */
 	public function initialize_plugin() {
 
+		$this->define_constants();
+		$this->maybe_create_store();
+
 		// WC version sanity check.
 		if ( ! function_exists( 'WC' ) || version_compare( WC()->version, $this->required ) < 0 ) {
 			$notice = sprintf( __( 'WooCommerce Product Bundles requires at least WooCommerce <strong>%s</strong>.', 'woocommerce-product-bundles' ), $this->required );
@@ -165,13 +192,12 @@ class WC_Bundles {
 
 		// PHP version check.
 		if ( ! function_exists( 'phpversion' ) || version_compare( phpversion(), '5.6.20', '<' ) ) {
-			$notice = sprintf( __( 'WooCommerce Product Bundles requires at least PHP <strong>%1$s</strong>. Learn <a href="%2$s">how to update PHP</a>.', 'woocommerce-product-bundles' ), '5.6.20', 'https://docs.woocommerce.com/document/how-to-update-your-php-version/' );
+			$notice = sprintf( __( 'WooCommerce Product Bundles requires at least PHP <strong>%1$s</strong>. Learn <a href="%2$s">how to update PHP</a>.', 'woocommerce-product-bundles' ), '5.6.20', $this->get_resource_url( 'update-php' ) );
 			require_once( 'includes/admin/class-wc-pb-admin-notices.php' );
 			WC_PB_Admin_Notices::add_notice( $notice, 'error' );
 			return false;
 		}
 
-		$this->define_constants();
 		$this->includes();
 
 		WC_PB_Compatibility::instance();
@@ -195,53 +221,55 @@ class WC_Bundles {
 	 */
 	public function define_constants() {
 
-		wc_maybe_define_constant( 'WC_PB_VERSION', $this->version );
-		wc_maybe_define_constant( 'WC_PB_SUPPORT_URL', 'https://woocommerce.com/my-account/marketplace-ticket-form/' );
-		wc_maybe_define_constant( 'WC_PB_ABSPATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
+		$this->maybe_define_constant( 'WC_PB_VERSION', $this->version );
+		$this->maybe_define_constant( 'WC_PB_SUPPORT_URL', 'https://woocommerce.com/my-account/marketplace-ticket-form/' );
+		$this->maybe_define_constant( 'WC_PB_ABSPATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
-		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_stock_sync', null ) || 'yes' === get_option( 'woocommerce_product_bundles_debug_stock_cache', null ) || defined( 'WC_PB_DEBUG_STOCK_CACHE' ) ) {
+		/*
+		 * Available debug constants:
+		 *
+		 * 'WC_PB_DEBUG_STOCK_CACHE' - Used to disable bundled item stock caching.
+		 *
+		 * 'WC_PB_DEBUG_STOCK_SYNC' - Used to disable bundled item stock syncing in the background.
+		 *
+		 * 'WC_PB_DEBUG_STOCK_PARENT_SYNC' - Used to disable stock status and visibility syncing for bundle containers.
+		 *
+		 * 'WC_PB_DEBUG_TRANSIENTS' - Used to disable transients caching.
+		 *
+		 * 'WC_PB_DEBUG_OBJECT_CACHE' - Used to disable object caching.
+		 *
+		 * 'WC_PB_DEBUG_RUNTIME_CACHE' - Used to disable runtime object caching.
+		 */
+
+		if ( defined( 'WC_PB_DEBUG_STOCK_CACHE' ) ) {
 			/**
 			 * 'WC_PB_DEBUG_STOCK_SYNC' constant.
 			 *
 			 * Used to disable bundled product stock meta syncing for bundled items.
 			 */
-			wc_maybe_define_constant( 'WC_PB_DEBUG_STOCK_SYNC', true );
+			$this->maybe_define_constant( 'WC_PB_DEBUG_STOCK_SYNC', true );
 		}
 
-		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_stock_parent_sync', null ) || defined( 'WC_PB_DEBUG_STOCK_SYNC' ) ) {
+		if ( defined( 'WC_PB_DEBUG_STOCK_SYNC' ) ) {
 			/**
 			 * 'WC_PB_DEBUG_STOCK_PARENT_SYNC' constant.
 			 *
 			 * Used to disable stock status and visibility syncing for bundles.
 			 */
-			wc_maybe_define_constant( 'WC_PB_DEBUG_STOCK_PARENT_SYNC', true );
+			$this->maybe_define_constant( 'WC_PB_DEBUG_STOCK_PARENT_SYNC', true );
 		}
+	}
 
-		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_transients', null ) ) {
-			/**
-			 * 'WC_PB_DEBUG_TRANSIENTS' constant.
-			 *
-			 * Used to disable transients caching at plugin level.
-			 */
-			wc_maybe_define_constant( 'WC_PB_DEBUG_TRANSIENTS', true );
-		}
-
-		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_object_cache', null ) ) {
-			/**
-			 * 'WC_PB_DEBUG_OBJECT_CACHE' constant.
-			 *
-			 * Used to disable object caching at plugin level.
-			 */
-			wc_maybe_define_constant( 'WC_PB_DEBUG_OBJECT_CACHE', true );
-		}
-
-		if ( 'yes' === get_option( 'woocommerce_product_bundles_debug_runtime_cache', null ) ) {
-			/**
-			 * 'WC_PB_DEBUG_RUNTIME_CACHE' constant.
-			 *
-			 * Used to disable runtime object caching at plugin level.
-			 */
-			wc_maybe_define_constant( 'WC_PB_DEBUG_RUNTIME_CACHE', true );
+	/**
+	 * A simple dumb datastore for sharing information accross our plugins.
+	 *
+	 * @since  6.3.0
+	 *
+	 * @return void
+	 */
+	private function maybe_create_store() {
+		if ( ! isset( $GLOBALS[ 'sw_store' ] ) ) {
+			$GLOBALS[ 'sw_store' ] = array();
 		}
 	}
 
@@ -305,6 +333,9 @@ class WC_Bundles {
 		// REST API hooks.
 		require_once( 'includes/class-wc-pb-rest-api.php' );
 
+		// Notices handling.
+		require_once( 'includes/class-wc-pb-notices.php' );
+
 		// Admin includes.
 		if ( is_admin() ) {
 			$this->admin_includes();
@@ -333,6 +364,41 @@ class WC_Bundles {
 	 */
 	public function load_translation() {
 		load_plugin_textdomain( 'woocommerce-product-bundles', false, dirname( plugin_basename( __FILE__ ) ) . '/languages/' );
+	}
+
+	/**
+	 * Returns URL to a doc or support resource.
+	 *
+	 * @since  6.3.0
+	 *
+	 * @param  string  $handle
+	 * @return string
+	 */
+	public function get_resource_url( $handle ) {
+
+		$resource = false;
+
+		if ( 'pricing-options' === $handle ) {
+			$resource = 'https://docs.woocommerce.com/document/bundles/bundles-configuration/#pricing';
+		} elseif ( 'shipping-options' === $handle ) {
+			$resource = 'https://docs.woocommerce.com/document/bundles/bundles-configuration/#shipping';
+		} elseif ( 'update-php' === $handle ) {
+			$resource = 'https://docs.woocommerce.com/document/how-to-update-your-php-version/';
+		} elseif ( 'docs-contents' === $handle ) {
+			$resource = 'https://docs.woocommerce.com/document/bundles/';
+		} elseif ( 'max-input-vars' === $handle ) {
+			$resource = 'https://docs.woocommerce.com/document/bundles/bundles-faq/#faq_bundled_items_dont_save';
+		} elseif ( 'updating' === $handle ) {
+			$resource = 'https://docs.woocommerce.com/document/how-to-update-woocommerce/';
+		} elseif ( 'min-max' === $handle ) {
+			$resource = 'https://wordpress.org/plugins/product-bundles-minmax-items-for-woocommerce/';
+		} elseif ( 'bulk-discounts' === $handle ) {
+			$resource = 'https://wordpress.org/plugins/product-bundles-bulk-discounts-for-woocommerce/';
+		} elseif ( 'ticket-form' === $handle ) {
+			$resource = WC_PB_SUPPORT_URL;
+		}
+
+		return $resource;
 	}
 
 	/*

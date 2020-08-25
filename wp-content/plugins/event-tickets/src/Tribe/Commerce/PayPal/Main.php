@@ -195,6 +195,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 			unset( parent::$active_modules['Tribe__Tickets__Commerce__PayPal__Main'] );
 		}
 
+		/** @var Tribe__Tickets__Commerce__PayPal__Tickets_View tickets_view */
 		$this->tickets_view = tribe( 'tickets.commerce.paypal.view' );
 
 		$this->register_resources();
@@ -1167,13 +1168,13 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 	}
 
 	/**
-	 * Saves a ticket
+	 * Saves a Tribe Commerce ticket.
 	 *
 	 * @since 4.7
 	 *
-	 * @param int                           $post_id
-	 * @param Tribe__Tickets__Ticket_Object $ticket
-	 * @param array                         $raw_data
+	 * @param int                           $post_id  Post ID.
+	 * @param Tribe__Tickets__Ticket_Object $ticket   Ticket object.
+	 * @param array                         $raw_data Ticket data.
 	 *
 	 * @return int|false The updated/created ticket post ID or false if no ticket ID.
 	 */
@@ -1197,7 +1198,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 			$ticket->ID = wp_insert_post( $args );
 
 			// Relate event <---> ticket
-			add_post_meta( $ticket->ID, $this->event_key, $post_id );
+			add_post_meta( $ticket->ID, $this->get_event_key(), $post_id );
 
 		} else {
 			$args = array(
@@ -1478,7 +1479,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 	public function front_end_tickets_form( $content ) {
 
 		$post    = $GLOBALS['post'];
-		$tickets = self::get_tickets( $post->ID );
+		$tickets = $this->get_tickets( $post->ID );
 
 		foreach( $tickets as $index => $ticket ) {
 			if ( __CLASS__ !== $ticket->provider_class ) {
@@ -1961,7 +1962,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 	 * @since 4.7
 	 *
 	 * @param int|object $product
-	 * @param array $attendee
+	 * @param array|boolean $attendee
 	 *
 	 * @return string
 	 */
@@ -2163,7 +2164,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 			'attendee_order_key'   => $instance->order_key,
 			'attendee_optout_key'  => $instance->attendee_optout_key,
 			'attendee_tpp_key'     => $instance->attendee_tpp_key,
-			'event_key'            => $instance->event_key,
+			'event_key'            => $instance->get_event_key(),
 			'checkin_key'          => $instance->checkin_key,
 			'order_key'            => $instance->order_key,
 		];
@@ -2437,7 +2438,7 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 			return $tickets;
 		}
 
-		$event_key  = $this->event_key;
+		$event_key  = $this->get_event_key();
 		$optout_key = $this->attendee_optout_key;
 
 		foreach ( $contents as $ticket_id => $item ) {
@@ -2615,40 +2616,6 @@ class Tribe__Tickets__Commerce__PayPal__Main extends Tribe__Tickets__Tickets {
 		}
 
 		return $cart::get_transient_name( $invoice );
-	}
-
-	/**
-	 * {@inheritDoc}
-	 *
-	 * @since 4.7
-	 */
-	public function get_tickets( $post_id ) {
-		$default_provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
-
-		// If the event provider is set to something else, let's save some time, shall we?
-		if ( ! is_admin() && __CLASS__ !== $default_provider ) {
-			return [];
-		}
-
-		$ticket_ids = $this->get_tickets_ids( $post_id );
-
-		if ( ! $ticket_ids ) {
-			return [];
-		}
-
-		$tickets = [];
-
-		foreach ( $ticket_ids as $post ) {
-			$ticket = $this->get_ticket( $post_id, $post );
-
-			if ( __CLASS__ !== $ticket->provider_class ) {
-				continue;
-			}
-
-			$tickets[] = $ticket;
-		}
-
-		return $tickets;
 	}
 
 	/**

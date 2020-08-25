@@ -4,6 +4,9 @@
  */
 
 // Don't load directly
+
+use Tribe\DB_Lock;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	die( '-1' );
 }
@@ -32,7 +35,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		const VENUE_POST_TYPE     = 'tribe_venue';
 		const ORGANIZER_POST_TYPE = 'tribe_organizer';
 
-		const VERSION             = '5.0.3.1';
+		const VERSION             = '5.1.6';
 
 		/**
 		 * Min Pro Addon
@@ -479,14 +482,10 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 *
 		 */
 		public function bootstrap() {
-
-			Tribe__Main::instance( $this )->load_text_domain( 'the-events-calendar', $this->plugin_dir . 'lang/' );
-
 			$this->bind_implementations();
 			$this->loadLibraries();
 			$this->addHooks();
 			$this->register_active_plugin();
-
 		}
 
 		/**
@@ -509,6 +508,17 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		}
 
 		/**
+		 * Load The Events Calendar text domain.
+		 *
+		 * @since 5.1.0
+		 *
+		 * @return bool
+		 */
+		public function load_text_domain() {
+			return Tribe__Main::instance( $this )->load_text_domain( 'the-events-calendar', $this->plugin_dir . 'lang/' );
+		}
+
+		/**
 		 * Registers the implementations in the container.
 		 *
 		 * Classes that should be built at `plugins_loaded` time are also instantiated.
@@ -519,6 +529,9 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 */
 		public function bind_implementations(  ) {
 			tribe_singleton( 'tec.main', $this );
+
+			// i18n.
+			tribe_singleton( 'tec.i18n', new Tribe\Events\I18n( $this ) );
 
 			// Utils
 			tribe_singleton( 'tec.cost-utils', 'Tribe__Events__Cost_Utils' );
@@ -549,6 +562,9 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 
 			// Ignored Events
 			tribe_singleton( 'tec.ignored-events', 'Tribe__Events__Ignored_Events', array( 'hook' ) );
+
+			// Capabilities.
+			tribe_singleton( Tribe__Events__Capabilities::class, Tribe__Events__Capabilities::class, [ 'hook' ] );
 
 			// Assets loader
 			tribe_singleton( 'tec.assets', 'Tribe__Events__Assets', array( 'register', 'hook' ) );
@@ -618,10 +634,16 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 				tribe_singleton( 'tec.customizer.widget', new Tribe__Events__Customizer__Widget() );
 			}
 
+			// First boot.
+			tribe_register_provider( Tribe\Events\Service_Providers\First_Boot::class );
+
 			/**
 			 * Allows other plugins and services to override/change the bound implementations.
 			 */
 			do_action( 'tribe_events_bound_implementations' );
+
+			// Database locks.
+			tribe_singleton( 'db-lock', DB_Lock::class );
 		}
 
 		/**
@@ -707,6 +729,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			 * because of the way $wp_locale works
 			 */
 			add_action( 'init', array( $this, 'setup_l10n_strings' ), 5 );
+			add_action( 'tribe_load_text_domains', [ $this, 'load_text_domain' ], 5 );
 
 			// Since TEC is active, change the base page for the Event Settings page
 			Tribe__Settings::$parent_page = 'edit.php';
@@ -902,6 +925,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			tribe( 'tec.admin.notice.timezones' );
 			tribe( 'tec.admin.notice.marketing' );
 			tribe( 'tec.privacy' );
+			tribe( Tribe__Events__Capabilities::class );
 		}
 
 		/**
@@ -1353,7 +1377,7 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 
 				sprintf( __( '%s: A complete look at the features you can expect to see right out of the box as well as how to use them.', 'the-events-calendar' ), '<strong><a href="https://m.tri.be/18jc" target="_blank">' . esc_html__( 'Features overview', 'the-events-calendar' ) . '</a></strong>' ),
 
-				sprintf( __( '%s: Our most comprehensive outline for customizing the calendar to suit your needs, including custom layouts and styles.', 'the-events-calendar' ), '<strong><a href="https://m.tri.be/18jg" target="_blank">' . esc_html__( 'Themer’s Guide', 'the-events-calendar' ) . '</a></strong>' ),
+				sprintf( __( '%s: Our most comprehensive outline for customizing the calendar to suit your needs, including custom layouts and styles.', 'the-events-calendar' ), '<strong><a href="https://m.tri.be/18jg" target="_blank">' . esc_html__( "Themer's Guide", 'the-events-calendar' ) . '</a></strong>' ),
 
 				sprintf( __( '%s: An overview of the default templates and styles that are included in the plugin, as well as how to change them.', 'the-events-calendar' ), '<strong><a href="https://m.tri.be/18jd" target="_blank">' . esc_html__( 'Using stylesheets and page templates', 'the-events-calendar' ) . '</a></strong>' ),
 
@@ -2509,30 +2533,21 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 *
 		 * WARNING: This function is slow because it deals with files, so don't overuse it!
 		 *
+		 * @since 5.1.1 Deprecated and moved code to the `Tribe\Events\I18n` class.
+		 *
 		 * @param  array  $strings          An array of strings (required)
 		 * @param  array  $languages        Which l10n to fetch the string (required)
 		 * @param  array  $domains          Possible Domains to re-load
 		 * @param  string $default_language The default language to avoid re-doing that
 		 *
 		 * @return array                    A multi level array with the possible translations for the given strings
+		 *
+		 * @deprecated Since 5.1.1, use `tribe( 'tec.i18n' )->get_i18n_strings()` instead.
 		 */
 		public function get_i18n_strings( $strings, $languages, $domains = array(), $default_language = 'en_US' ) {
-			$domains = wp_parse_args( $domains, array(
-				'default' => true, // Default doesn't need file path
-				'the-events-calendar' => $this->plugin_dir . 'lang/',
-			) );
+			_deprecated_function( __METHOD__, '5.1.5', "tribe( 'tec.i18n' )->get_i18n_strings()" );
 
-			return $this->get_i18n_strings_for_domains( $strings, $languages, $domains );
-		}
-
-		/**
-		 * DO NOT USE THIS INTERNAL USE
-		 * A way to quickly filter the locale based on a Local Class Variable
-		 *
-		 * @return string The Locale set on _locale
-		 */
-		public function _set_locale() {
-			return empty( $this->_locale ) ? 'en_US' : $this->_locale;
+			return tribe( 'tec.i18n' )->get_i18n_strings( $strings, $languages, $domains, $default_language );
 		}
 
 		/**
@@ -3094,72 +3109,20 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 		 * WARNING: This function is slow because it deals with files, so don't overuse it!
 		 * Differently from the `get_i18n_strings` method this will not use any domain that's not specified.
 		 *
-		 * @todo Include support for the `load_theme_textdomain` + `load_muplugin_textdomain`
+		 * @since 5.1.1 Deprecated and moved to the `Tribe\Events\I18n` class.
 		 *
-		 * @param  array  $strings          An array of strings (required)
-		 * @param  array  $languages        Which l10n to fetch the string (required)
-		 * @param  array  $domains          Possible Domains to re-load
+		 * @param array $strings   An array of strings (required).
+		 * @param array $languages Which l10n to fetch the string (required).
+		 * @param array $domains   Possible Domains to re-load.
 		 *
-		 * @return array                    A multi level array with the possible translations for the given strings
+		 * @return array                    A multi level array with the possible translations for the given strings.
+		 *
+		 * @deprecated Since 5.1.1, use `tribe( 'tec.i18n' )->get_i18n_strings_for_domains()` instead.
 		 */
 		public function get_i18n_strings_for_domains( $strings, $languages, $domains = array( 'default' ) ) {
-			foreach ( $languages as $language ) {
-				$this->_locale = $language;
-				foreach ( (array) $domains as $domain => $file ) {
-					// Configure the language
-					add_filter( 'locale', array( $this, '_set_locale' ) );
+			_deprecated_function( __METHOD__, '5.1.5', "tribe( 'tec.i18n' )->get_i18n_strings_for_domains()" );
 
-					// Reload it with the correct language
-					unload_textdomain( $domain );
-
-					if ( 'default' === $domain ) {
-						load_default_textdomain();
-					} else {
-						Tribe__Main::instance()->load_text_domain( $domain, $file );
-					}
-
-					// Loop on the strings the build the possible translations
-					foreach ( $strings as $key => $value ) {
-						$value = is_array( $value ) ? reset( $value ) : $value;
-						if ( ! is_string( $value ) ) {
-							continue;
-						}
-
-						// Make sure we have an Array
-						$strings[ $key ] = (array) $strings[ $key ];
-
-						// Grab the possible strings for Default and Any other domain
-						if ( 'default' === $domain ) {
-							$strings[ $key ][] = __( $value );
-							$strings[ $key ][] = __( strtolower( $value ) );
-							$strings[ $key ][] = __( ucfirst( $value ) );
-						} else {
-							$strings[ $key ][] = __( $value, $domain );
-							$strings[ $key ][] = __( strtolower( $value ), $domain );
-							$strings[ $key ][] = __( ucfirst( $value ), $domain );
-						}
-					}
-
-					// Set back to the default language
-					remove_filter( 'locale', array( $this, '_set_locale' ) );
-
-					// Reload it with the correct language
-					unload_textdomain( $domain );
-
-					if ( 'default' === $domain ) {
-						load_default_textdomain();
-					} else {
-						Tribe__Main::instance()->load_text_domain( $domain, $file );
-					}
-				}
-			}
-
-			// Prevent Empty Strings and Duplicates
-			foreach ( $strings as $key => $value ) {
-				$strings[ $key ] = array_filter( array_unique( array_map( 'sanitize_title_with_dashes', (array) $value ) ) );
-			}
-
-			return $strings;
+			return tribe( 'tec.i18n' )->get_i18n_strings_for_domains( $strings, $languages, $domains );
 		}
 
 		/**
@@ -3188,6 +3151,11 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 
 				$avoid_recursion = false;
 
+				return;
+			}
+
+			// When not an instance of Post we bail to avoid revision problems.
+			if ( ! $post instanceof WP_Post ) {
 				return;
 			}
 
@@ -3965,24 +3933,27 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			$start_date = get_post_meta( $post->ID, '_EventStartDate', true );
 			$this->_where_start_date = $start_date;
 
-			$args       = array(
-				'post__not_in'   => array( $post->ID ),
-				'meta_key'       => '_EventStartDate',
-				'orderby'        => array( '_EventStartDate' => $order, 'ID' => $order ),
+			$args = [
+				'post__not_in'   => [ $post->ID ],
+				'orderby'        => [
+					'start_date_clause' => $order,
+					'ID'                => $order,
+				],
 				'posts_per_page' => 1,
-				'meta_query'     => array(
-					array(
+				'meta_query'     => [
+					'start_date_clause'         => [
 						'key'     => '_EventStartDate',
 						'value'   => $start_date,
 						'compare' => $direction,
-					),
-					array(
+						'type'    => 'DATETIME',
+					],
+					'hide_from_upcoming_clause' => [
 						'key'     => '_EventHideFromUpcoming',
 						'compare' => 'NOT EXISTS',
-					),
-					'relation'    => 'AND',
-				),
-			);
+					],
+					'relation'                  => 'AND',
+				],
+			];
 
 			/**
 			 * Allows the query arguments used when retrieving the next/previous event link
@@ -5943,5 +5914,4 @@ if ( ! class_exists( 'Tribe__Events__Main' ) ) {
 			$this->get_autoloader_instance()->register_prefixes( $prefixes );
 		}
 	}
-
 } // end if !class_exists Tribe__Events__Main

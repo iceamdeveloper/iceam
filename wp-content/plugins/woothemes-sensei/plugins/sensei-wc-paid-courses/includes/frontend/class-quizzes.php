@@ -18,6 +18,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class for admin functionality related to quizzes.
  *
+ * @deprecated 2.0.0
+ *
  * @class Sensei_WC_Paid_Courses\Frontend\Quizzes
  */
 final class Quizzes {
@@ -37,13 +39,16 @@ final class Quizzes {
 	 * Initializes the class and adds all filters and actions related to the frontend.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 2.0.0
 	 */
 	public function init() {
-		add_filter( 'sensei_quiz_course_signup_notice_message', [ $this, 'course_signup_notice_message' ], 10, 3 );
+		_deprecated_function( __METHOD__, '2.0.0' );
 	}
 
 	/**
 	 * Filter the course sign up notice message on the quiz page.
+	 *
+	 * @deprecated 2.0.0
 	 *
 	 * @param string $message     Message to show for the course sign up notice.
 	 * @param int    $course_id   Post ID for the course.
@@ -51,10 +56,8 @@ final class Quizzes {
 	 * @return string
 	 */
 	public function course_signup_notice_message( $message, $course_id, $course_link ) {
-		if ( Sensei_WC::is_course_purchasable( $course_id ) ) {
-			// translators: Placeholder is a link to the course permalink.
-			$message = sprintf( __( 'Please purchase the %1$s before taking this quiz.', 'sensei-wc-paid-courses' ), $course_link );
-		}
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		return $message;
 	}
 

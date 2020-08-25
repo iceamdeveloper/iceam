@@ -75,6 +75,17 @@ class Tribe__Events__Pro__Assets {
 
 		tribe_asset(
 			$pro,
+			'tribe_events-premium-admin',
+			'events-admin.css',
+			[],
+			'admin_enqueue_scripts',
+			[
+				'priority' => 10,
+			]
+		);
+
+		tribe_asset(
+			$pro,
 			'tribe-events-pro',
 			'tribe-events-pro.js',
 			[ 'jquery', 'tribe-events-calendar-script' ],

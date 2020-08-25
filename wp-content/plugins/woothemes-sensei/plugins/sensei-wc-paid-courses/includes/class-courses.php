@@ -24,12 +24,24 @@ use WP_Query;
  * @class Sensei_WC_Paid_Courses\Courses
  */
 final class Courses {
+	const META_COURSE_PRODUCT = '_course_woocommerce_product';
+
 	/**
 	 * Instance of class.
 	 *
 	 * @var self
 	 */
 	private static $instance;
+
+	/**
+	 * Deferred product toggled recalculation trigger.
+
+	 * Product IDs are tracked in two arrays per course (course ID is the key),
+	 * one for `removed` and one for `added`.
+	 *
+	 * @var array
+	 */
+	private $deferred_products_toggled = [];
 
 	/**
 	 * Courses constructor. Prevents other instances from being created outside of `Course::instance()`.
@@ -44,24 +56,37 @@ final class Courses {
 	public function init() {
 		add_filter( 'sensei_course_meta_fields', [ $this, 'add_course_product_meta_field' ] );
 
-		// Remove course from active courses if an order is cancelled or refunded.
-		add_action( 'woocommerce_order_status_processing_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
-		add_action( 'woocommerce_order_status_completed_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
-		add_action( 'woocommerce_order_status_on-hold_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
-		add_action( 'woocommerce_order_status_processing_to_refunded', [ $this, 'remove_active_course' ], 10, 1 );
-		add_action( 'woocommerce_order_status_completed_to_refunded', [ $this, 'remove_active_course' ], 10, 1 );
-		add_action( 'woocommerce_order_status_on-hold_to_refunded', [ $this, 'remove_active_course' ], 10, 1 );
+		if ( \Sensei_WC_Paid_Courses\Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+			// Remove course from active courses if an order is cancelled or refunded.
+			add_action( 'woocommerce_order_status_processing_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
+			add_action( 'woocommerce_order_status_completed_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
+			add_action( 'woocommerce_order_status_on-hold_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
+			add_action( 'woocommerce_order_status_processing_to_refunded', [ $this, 'remove_active_course' ], 10, 1 );
+			add_action( 'woocommerce_order_status_completed_to_refunded', [ $this, 'remove_active_course' ], 10, 1 );
+			add_action( 'woocommerce_order_status_on-hold_to_refunded', [ $this, 'remove_active_course' ], 10, 1 );
 
-		// Check for purchased but unactivated courses on My Courses page.
-		add_action( 'wp', [ $this, 'activate_purchased_courses_my_courses_page' ] );
+			// Check for purchased but unactivated courses on My Courses page.
+			add_action( 'wp', [ $this, 'activate_purchased_courses_my_courses_page' ] );
 
-		// Check for purchased but unactivated courses on Learner Profile page.
-		add_action( 'sensei_before_my_courses', [ $this, 'activate_purchased_courses' ] );
+			// Check for purchased but unactivated courses on Learner Profile page.
+			add_action( 'sensei_before_my_courses', [ $this, 'activate_purchased_courses' ] );
 
-		// Check for purchased but unactivated course on an individual course page.
-		add_action( 'sensei_single_course_content_inside_before', [ $this, 'activate_purchased_single_course' ] );
+			// Check for purchased but unactivated course on an individual course page.
+			add_action( 'sensei_single_course_content_inside_before', [ $this, 'activate_purchased_single_course' ] );
+		}
 
 		add_action( 'rest_api_init', [ $this, 'setup_rest_api_meta' ] );
+
+		// Temporary workaround to a WP core issue. https://core.trac.wordpress.org/ticket/49339#ticket.
+		add_filter( 'get_post_metadata', [ $this, 'fix_product_metadata_type' ], 10, 4 );
+
+		// Fire hooks after add or remove products from courses.
+		add_action( 'added_post_meta', [ $this, 'maybe_fire_course_product_added_hook' ], 10, 4 );
+		add_action( 'deleted_post_meta', [ $this, 'maybe_fire_course_product_removed_hook' ], 10, 4 );
+
+		// Defer list of products being added or removed from a course.
+		add_action( 'sensei_wc_paid_courses_course_product_toggled', [ $this, 'defer_products_toggled' ], 10, 3 );
+		add_action( 'shutdown', [ $this, 'recalculate_deferred_products_toggled' ] );
 	}
 
 	/**
@@ -177,7 +202,7 @@ final class Courses {
 	 *
 	 * @param int|array $product_id Post ID for the product or array of post IDs.
 	 *
-	 * @return array
+	 * @return \WP_Post[]
 	 */
 	public static function get_product_courses( $product_id = [] ) {
 		$courses = [];
@@ -193,7 +218,7 @@ final class Courses {
 		$parent_ids = [];
 
 		foreach ( $product_ids as $id ) {
-			$product = wc_get_product( $id );
+			$product = \wc_get_product( $id );
 
 			if ( ! ( $product instanceof \WC_Product ) ) {
 				continue;
@@ -256,7 +281,7 @@ final class Courses {
 		return [
 			'post_type'        => 'course',
 			'posts_per_page'   => -1,
-			'meta_key'         => '_course_woocommerce_product',
+			'meta_key'         => self::META_COURSE_PRODUCT,
 			'meta_value'       => is_array( $product_id ) ? $product_id : [ $product_id ],
 			'meta_compare'     => 'IN',
 			'post_status'      => 'publish',
@@ -271,10 +296,13 @@ final class Courses {
 	 * Remove all active courses when an order is refunded or cancelled.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 2.0.0
 	 *
 	 * @param  integer $order_id ID of order.
 	 */
 	public function remove_active_course( $order_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		$order   = wc_get_order( $order_id );
 		$user_id = get_post_meta( $order_id, '_customer_user', true );
 
@@ -351,14 +379,16 @@ final class Courses {
 
 	} // End remove_active_course()
 
-
 	/**
 	 * Assign user to unassigned purchased course when visiting the My Courses page.
 	 *
 	 * @since 1.2.0
+	 * @deprecated 2.0.0
 	 */
 	public function activate_purchased_courses_my_courses_page() {
 		global $wp_query;
+
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		if ( is_admin() || ! Sensei_WC::is_my_courses_page( $wp_query ) || ! is_user_logged_in() ) {
 			return;
@@ -371,10 +401,14 @@ final class Courses {
 	 * Activate all purchased courses for user.
 	 *
 	 * @since  1.0.0
+	 * @deprecated 2.0.0
+	 *
 	 * @param  integer $user_id User ID.
 	 * @return void
 	 */
 	public function activate_purchased_courses( $user_id = 0 ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		if ( ! $user_id ) {
 			return;
 		}
@@ -392,12 +426,38 @@ final class Courses {
 	} // End activate_purchased_courses()
 
 	/**
+	 * Get all of the products associated with a course.
+	 *
+	 * @param int $course_id Course post ID.
+	 *
+	 * @return \WC_Product[]
+	 */
+	public static function get_course_products( $course_id ) {
+		$course_product_ids = \get_post_meta( $course_id, '_course_woocommerce_product', false );
+		$course_products    = [];
+
+		// Only pass along products that exist.
+		foreach ( $course_product_ids as $product_id ) {
+			$product = \wc_get_product( $product_id );
+			if ( $product instanceof \WC_Product ) {
+				$course_products[] = $product;
+			}
+		}
+
+		return $course_products;
+	}
+
+	/**
 	 * Activate single course if already purchased.
+	 *
+	 * @deprecated 2.0.0
 	 *
 	 * @return void
 	 */
 	public function activate_purchased_single_course() {
 		global $post, $current_user;
+
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		if ( ! is_user_logged_in() ) {
 			return;
@@ -492,7 +552,7 @@ final class Courses {
 
 		register_post_meta(
 			'course',
-			'_course_woocommerce_product',
+			self::META_COURSE_PRODUCT,
 			[
 				'type'              => 'integer',
 				'description'       => 'An array of Product IDs attached to this course.',
@@ -512,8 +572,8 @@ final class Courses {
 		add_filter(
 			'rest_prepare_course',
 			function( $response ) {
-				if ( isset( $response->data['meta'] ) && isset( $response->data['meta']['_course_woocommerce_product'] ) ) {
-					$response->data['meta']['_course_woocommerce_product'] = array_filter( $response->data['meta']['_course_woocommerce_product'] );
+				if ( isset( $response->data['meta'] ) && isset( $response->data['meta'][ self::META_COURSE_PRODUCT ] ) ) {
+					$response->data['meta'][ self::META_COURSE_PRODUCT ] = array_filter( $response->data['meta'][ self::META_COURSE_PRODUCT ] );
 				}
 
 				return $response;
@@ -521,8 +581,8 @@ final class Courses {
 		);
 
 		add_action( 'rest_insert_course', [ $this, 'sanitize_course_woocommerce_product' ], 10, 2 );
+		add_action( 'rest_insert_course', [ $this, 'store_user_confirmation' ], 11, 2 );
 	}
-
 
 	/**
 	 * Filter out non-product posts and products that have been trashed from REST API change requests.
@@ -536,14 +596,14 @@ final class Courses {
 	public function sanitize_course_woocommerce_product( $course, $request ) {
 		$body = $request->get_json_params();
 
-		if ( isset( $body['meta'] ) && isset( $body['meta']['_course_woocommerce_product'] ) ) {
-			$products = $body['meta']['_course_woocommerce_product'];
+		if ( isset( $body['meta'] ) && isset( $body['meta'][ self::META_COURSE_PRODUCT ] ) ) {
+			$products = $body['meta'][ self::META_COURSE_PRODUCT ];
 
 			if ( ! is_array( $products ) ) {
 				$products = [ $products ];
 			}
 
-			$body['meta']['_course_woocommerce_product'] = [];
+			$body['meta'][ self::META_COURSE_PRODUCT ] = [];
 			foreach ( $products as $key => $product_id ) {
 				if (
 					empty( $product_id )
@@ -553,11 +613,258 @@ final class Courses {
 					continue;
 				}
 
-				$body['meta']['_course_woocommerce_product'][] = intval( $product_id );
+				$body['meta'][ self::META_COURSE_PRODUCT ][] = intval( $product_id );
 			}
 		}
 
 		$request->set_body( wp_json_encode( $body ) );
+	}
+
+	/**
+	 * Store the user confirmation in case 'Confirm' was clicked in the course modal.
+	 *
+	 * @access private
+	 * @since  2.0.0
+	 *
+	 * @param \WP_Post         $course  Course post object.
+	 * @param \WP_REST_Request $request REST request object.
+	 */
+	public function store_user_confirmation( $course, $request ) {
+		$body = $request->get_json_params();
+		$this->update_modal_confirmation_date( $body );
+	}
+
+	/**
+	 * Stores the time which the user clicked 'Confirm' on the modal displayed in course products.
+	 *
+	 * @param array $request_args The request arguments.
+	 *
+	 * @since  2.0.0
+	 */
+	public function update_modal_confirmation_date( $request_args ) {
+
+		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- This is intentional. The method handles input from form and JSON.
+		if ( ! isset( $request_args['user_confirmed_modal'] ) || true != $request_args['user_confirmed_modal'] ) {
+			return;
+		}
+
+		$user_id = wp_get_current_user()->ID;
+
+		if ( $user_id ) {
+			update_user_meta( $user_id, 'sensei_wcpc_modal_confirmation_date', time() );
+		}
+	}
+
+	/**
+	 * Checks if the user has clicked 'Confirm' on the modal recently (1 week).
+	 *
+	 * @since  2.0.0
+	 *
+	 * @return boolean True if the user confirmed.
+	 */
+	public function has_user_confirmed_modal() {
+
+		$user_id = wp_get_current_user()->ID;
+
+		if ( $user_id ) {
+			$confirmation_date = get_user_meta( $user_id, 'sensei_wcpc_modal_confirmation_date', true );
+
+			return $confirmation_date && time() < $confirmation_date + 7 * 24 * 60 * 60;
+		}
+
+		return false;
+	}
+
+	/**
+	 * A temporary workaround to fix an issue on WP core.
+	 * More details: https://core.trac.wordpress.org/ticket/49339#ticket.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param null|array|string $value     The value get_metadata() should return - a single metadata value,
+	 *                                     or an array of values.
+	 * @param int               $object_id Object ID.
+	 * @param string            $meta_key  Meta key.
+	 * @param bool              $single    Whether to return only the first value of the specified $meta_key.
+	 */
+	public function fix_product_metadata_type( $value, $object_id, $meta_key, $single ) {
+		if ( self::META_COURSE_PRODUCT !== $meta_key ) {
+			return null;
+		}
+
+		// The hook is fixed to get meta from posts.
+		$meta_type = 'post';
+
+		// Temporarily remove the filter.
+		remove_filter( 'get_post_metadata', [ $this, 'fix_product_metadata_type' ] );
+
+		$value = get_metadata( $meta_type, $object_id, $meta_key, $single );
+
+		// Re-add the filter.
+		add_filter( 'get_post_metadata', [ $this, 'fix_product_metadata_type' ], 10, 4 );
+
+		return is_array( $value ) ? array_map( 'intval', $value ) : $value;
+	}
+
+	/**
+	 * Fire the course product hooks if a new product is being added to a course.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @access private
+	 *
+	 * @param array  $meta_ids   An array of deleted metadata entry IDs.
+	 * @param int    $post_id    Post ID.
+	 * @param string $meta_key   Meta key.
+	 * @param mixed  $meta_value Meta value.
+	 */
+	public function maybe_fire_course_product_added_hook( $meta_ids, $post_id, $meta_key, $meta_value ) {
+		$this->maybe_fire_course_product_toggled_hook( $meta_value, $post_id, $meta_key, 'added' );
+	}
+
+	/**
+	 * Fire the course product hooks if a product is being removed from a course.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @access private
+	 *
+	 * @param array  $meta_ids   An array of deleted metadata entry IDs.
+	 * @param int    $post_id    Post ID.
+	 * @param string $meta_key   Meta key.
+	 * @param mixed  $meta_value Meta value.
+	 */
+	public function maybe_fire_course_product_removed_hook( $meta_ids, $post_id, $meta_key, $meta_value ) {
+		$this->maybe_fire_course_product_toggled_hook( $meta_value, $post_id, $meta_key, 'removed' );
+	}
+
+	/**
+	 * Fire the course product hooks if a product is being added or removed from a course.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @access private
+	 *
+	 * @param int    $meta_value Meta value.
+	 * @param int    $post_id    Post ID.
+	 * @param string $meta_key   Meta key.
+	 * @param string $action     Action executed (added|removed).
+	 */
+	private function maybe_fire_course_product_toggled_hook( $meta_value, $post_id, $meta_key, $action ) {
+		if ( self::META_COURSE_PRODUCT !== $meta_key ) {
+			return;
+		}
+
+		$course_id  = $post_id;
+		$product_id = intval( $meta_value );
+
+		/**
+		 * Fires after add or remove a product from a course.
+		 *
+		 * The dynamic portion of the hook, `$action`, refers to the action executed (added or removed).
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param int $course_id  Course ID.
+		 * @param int $product_id Product ID removed from the course.
+		 */
+		do_action( "sensei_wc_paid_courses_course_product_${action}", $course_id, $product_id );
+
+		/**
+		 * Fires after add or remove a product from a course.
+		 *
+		 * @since 2.0.0
+		 *
+		 * @param int    $course_id  Course ID.
+		 * @param int    $product_id Product ID removed from the course.
+		 * @param string $action     Action executed (added|removed).
+		 */
+		do_action( 'sensei_wc_paid_courses_course_product_toggled', $course_id, $product_id, $action );
+	}
+
+	/**
+	 * Defer recalculation for products toggled.
+	 *
+	 * Hooked into `sensei_wc_paid_courses_course_product_toggled`.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param int       $course_id   ID of the course which had the products toggled.
+	 * @param int|int[] $product_ids Product ID or Product IDs added or removed from course.
+	 * @param string    $action      Action executed (added|removed).
+	 */
+	public function defer_products_toggled( $course_id, $product_ids, $action ) {
+		if ( 'publish' !== get_post_status( $course_id ) ) {
+			return;
+		}
+
+		// Standardize product ids as array.
+		$product_ids = is_array( $product_ids ) ? $product_ids : [ $product_ids ];
+
+		if ( ! isset( $this->deferred_products_toggled[ $course_id ] ) ) {
+			$this->deferred_products_toggled[ $course_id ] = [
+				'added'   => [],
+				'removed' => [],
+			];
+		}
+
+		foreach ( $product_ids as $product_id ) {
+			$this->update_deferred_product_toggled( $course_id, $product_id, $action );
+		}
+	}
+
+	/**
+	 * Update deferred product toggled.
+	 *
+	 * If the product is in the opposite action (added / removed), just remove from this array.
+	 * Otherwise, add to the respective action array.
+	 *
+	 * @since 2.0.0
+	 *
+	 * @param int    $course_id  ID of the course which had the product toggled.
+	 * @param int    $product_id Product ID added or removed from course.
+	 * @param string $action     Action executed (added|removed).
+	 */
+	private function update_deferred_product_toggled( $course_id, $product_id, $action ) {
+		$opposite_action     = 'added' === $action ? 'removed' : 'added';
+		$current_product_ids = $this->deferred_products_toggled[ $course_id ][ $action ];
+
+		// Get products from opposite action.
+		$opposite_product_ids     = $this->deferred_products_toggled[ $course_id ][ $opposite_action ];
+		$index_in_opposite_action = array_search( $product_id, $opposite_product_ids, true );
+
+		// If the product is in the opposite action array, just remove from this one.
+		if ( false !== $index_in_opposite_action ) {
+			unset( $this->deferred_products_toggled[ $course_id ][ $opposite_action ][ $index_in_opposite_action ] );
+			return;
+		}
+
+		// Add to the respective action array.
+		if ( ! in_array( $product_id, $current_product_ids, true ) ) {
+			$this->deferred_products_toggled[ $course_id ][ $action ][] = $product_id;
+		}
+	}
+
+	/**
+	 * Call recalculation enrolments for the deferred products toggled.
+	 *
+	 * Hooked into `shutdown`
+	 *
+	 * @since 2.0.0
+	 *
+	 * @access private
+	 */
+	public function recalculate_deferred_products_toggled() {
+		foreach ( $this->deferred_products_toggled as $course_id => $deferred_product_toggled ) {
+			$nothing_toggled = empty( $deferred_product_toggled['added'] ) && empty( $deferred_product_toggled['removed'] );
+
+			if ( $nothing_toggled || 'publish' !== get_post_status( $course_id ) ) {
+				continue;
+			}
+
+			$course_enrolment = \Sensei_Course_Enrolment::get_course_instance( $course_id );
+			$course_enrolment->recalculate_enrolment();
+		}
 	}
 
 	/**

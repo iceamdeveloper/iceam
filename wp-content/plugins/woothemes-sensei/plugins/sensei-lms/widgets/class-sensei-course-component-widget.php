@@ -282,6 +282,7 @@ class Sensei_Course_Component_Widget extends WP_Widget {
 				$user_info           = get_userdata( absint( $course->post_author ) );
 				$author_link         = get_author_posts_url( absint( $course->post_author ) );
 				$author_display_name = $user_info->display_name;
+				$lesson_count        = Sensei()->course->course_lesson_count( $post_id );
 				?>
 
 				<li class="fix">
@@ -311,7 +312,10 @@ class Sensei_Course_Component_Widget extends WP_Widget {
 					<?php } // End If Statement ?>
 
 					<span class="course-lesson-count">
-						<?php echo esc_html( Sensei()->course->course_lesson_count( $post_id ) ) . '&nbsp;' . esc_html__( 'Lessons', 'sensei-lms' ); ?>
+						<?php
+						// translators: Placeholder %d is the lesson count.
+						echo esc_html( sprintf( _n( '%d Lesson', '%d Lessons', $lesson_count, 'sensei-lms' ), $lesson_count ) );
+						?>
 					</span>
 
 					<br />
@@ -358,7 +362,7 @@ class Sensei_Course_Component_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Get all new course IDS
+	 * Get all new courses.
 	 *
 	 * @since 1.9.2
 	 *
@@ -371,75 +375,53 @@ class Sensei_Course_Component_Widget extends WP_Widget {
 	}
 
 	/**
-	 * Get all active course IDS for the current user
+	 * Get all active courses for the current user
 	 *
 	 * @since 1.9.2
 	 *
-	 * @return array $courses
+	 * @return WP_Post[]
 	 */
 	public function get_active_courses() {
-
-		$courses               = array();
-		$activity_args         = array(
-			'user_id' => get_current_user_id(),
-			'type'    => 'sensei_course_status',
-			'status'  => 'in-progress',
-		);
-		$user_courses_activity = Sensei_Utils::sensei_check_for_activity( $activity_args, true );
-
-		if ( ! is_array( $user_courses_activity ) ) {
-			$user_courses_activity_arr   = array();
-			$user_courses_activity_arr[] = $user_courses_activity;
-			$user_courses_activity       = $user_courses_activity_arr;
-
+		$user_id = get_current_user_id();
+		if ( empty( $user_id ) ) {
+			return [];
 		}
 
-		foreach ( $user_courses_activity as $activity ) {
-			$courses[] = get_post( $activity->comment_post_ID );
-		}
+		$query_args = [
+			'posts_per_page' => $this->instance['limit'],
+		];
 
-		return $courses;
+		$learner_manager = Sensei_Learner::instance();
+		$courses_query   = $learner_manager->get_enrolled_active_courses_query( $user_id, $query_args );
 
+		return $courses_query->posts;
 	}
 
 	/**
-	 * Get all active course IDS for the current user
+	 * Get all courses for the current user.
 	 *
 	 * @since 1.9.2
 	 *
 	 * @return array $courses
 	 */
 	public function get_completed_courses() {
-
-		$courses       = array();
-		$activity_args = array(
-			'user_id' => get_current_user_id(),
-			'type'    => 'sensei_course_status',
-			'status'  => 'complete',
-		);
-
-		$user_courses_activity = Sensei_Utils::sensei_check_for_activity( $activity_args, true );
-
-		if ( ! is_array( $user_courses_activity ) ) {
-			$user_courses_activity_arr   = array();
-			$user_courses_activity_arr[] = $user_courses_activity;
-			$user_courses_activity       = $user_courses_activity_arr;
-
+		$user_id = get_current_user_id();
+		if ( empty( $user_id ) ) {
+			return [];
 		}
 
-		foreach ( $user_courses_activity as $activity ) {
+		$query_args = [
+			'posts_per_page' => $this->instance['limit'],
+		];
 
-			if ( isset( $activity->comment_post_ID ) ) {
+		$learner_manager = Sensei_Learner::instance();
+		$courses_query   = $learner_manager->get_enrolled_completed_courses_query( $user_id, $query_args );
 
-				$courses[] = get_post( $activity->comment_post_ID );
-
-			}
-		}
-		return $courses;
+		return $courses_query->posts;
 	}
 
 	/**
-	 * Get all active course IDS for the current user
+	 * Get the featured courses.
 	 *
 	 * @since 1.9.2
 	 *

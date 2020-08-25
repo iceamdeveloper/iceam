@@ -25,14 +25,14 @@ const CourseSidebarFallback = () => {
 			</PluginSidebarMoreMenuItem>
 			<PluginSidebar
 				name={ pluginHandle }
-				title={ __( "Sensei LMS", "sensei-wc-paid-courses" ) }
+				title={ __( 'Sensei LMS', 'sensei-wc-paid-courses' ) }
 				icon={ <Icon /> }
 			>
 				<Slot name="SenseiCourseSidebar" />
 			</PluginSidebar>
 		</Fragment>
 	);
-}
+};
 
 setTimeout( () => {
 	// Only register our sidebar if Sensei LMS hasn't already registered it.

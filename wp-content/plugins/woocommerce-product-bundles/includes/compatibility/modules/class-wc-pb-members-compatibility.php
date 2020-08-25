@@ -2,7 +2,7 @@
 /**
  * WC_PB_Members_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    6.0.0
  */
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Memberships Integration: Discounts inheritance.
  *
- * @version  6.1.3
+ * @version  6.2.5
  */
 class WC_PB_Members_Compatibility {
 
@@ -48,19 +48,19 @@ class WC_PB_Members_Compatibility {
 		// See 'WC_Memberships_Member_Discounts'.
 		if ( ! ( is_admin() && ! is_ajax() ) ) {
 
-	 		if ( 'filters' === WC_PB_Product_Prices::get_bundled_cart_item_discount_method() ) {
+			if ( 'filters' === WC_PB_Product_Prices::get_bundled_cart_item_discount_method() ) {
 
-	 			// Bundle membership discounts are inherited by bundled items and applied here.
-				add_filter( 'woocommerce_bundled_item_discount', array( __CLASS__, 'inherit_member_discount' ), 10, 2 );
+				// Bundle membership discounts are inherited by bundled items and applied here.
+				add_filter( 'woocommerce_bundled_item_discount', array( __CLASS__, 'inherit_member_discount' ), 10, 3 );
 
-		 		// Enable/disable discount filtering.
-		 		add_action( 'wc_memberships_discounts_enable_price_adjustments', array( __CLASS__, 'enable_member_discount_inheritance' ) );
-		 		add_action( 'wc_memberships_discounts_disable_price_adjustments', array( __CLASS__, 'disable_member_discount_inheritance' ) );
-	 		}
-	 	}
+				// Enable/disable discount filtering.
+				add_action( 'wc_memberships_discounts_enable_price_adjustments', array( __CLASS__, 'enable_member_discount_inheritance' ) );
+				add_action( 'wc_memberships_discounts_disable_price_adjustments', array( __CLASS__, 'disable_member_discount_inheritance' ) );
+			}
+		}
 
- 		// Prevent Memberships from applying member discounts to bundled products -- membership discounts are inherited.
- 		add_filter( 'wc_memberships_exclude_product_from_member_discounts', array( __CLASS__, 'exclude_bundled_product_from_member_discounts' ), 10, 2 );
+		// Prevent Memberships from applying member discounts to bundled products -- membership discounts are inherited.
+		add_filter( 'wc_memberships_exclude_product_from_member_discounts', array( __CLASS__, 'exclude_bundled_product_from_member_discounts' ), 10, 2 );
 	}
 
 	/**
@@ -84,7 +84,11 @@ class WC_PB_Members_Compatibility {
 	 * @param  WC_Bundled_Item  $bundled_item
 	 * @return mixed
 	 */
-	public static function inherit_member_discount( $discount, $bundled_item ) {
+	public static function inherit_member_discount( $discount, $bundled_item, $context ) {
+
+		if ( 'sync' === $context ) {
+			return $discount;
+		}
 
 		if ( ! self::member_is_logged_in() ) {
 			return $discount;

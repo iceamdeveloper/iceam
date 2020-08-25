@@ -19,8 +19,8 @@
 	<a
 		href="<?php echo esc_url( $prev_url ); ?>"
 		class="tribe-common-c-btn-icon tribe-common-c-btn-icon--caret-left tribe-events-c-top-bar__nav-link tribe-events-c-top-bar__nav-link--prev"
-		aria-label="<?php esc_attr_e( 'Previous week', 'the-events-calendar' ); ?>"
-		title="<?php esc_attr_e( 'Previous week', 'the-events-calendar' ); ?>"
+		aria-label="<?php esc_attr_e( 'Previous week', 'tribe-events-calendar-pro' ); ?>"
+		title="<?php esc_attr_e( 'Previous week', 'tribe-events-calendar-pro' ); ?>"
 		data-js="tribe-events-view-link"
 	>
 	</a>

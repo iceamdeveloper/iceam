@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -91,8 +91,19 @@ class WC_Memberships_Integration_Subscriptions_Free_Trial {
 
 		$user_membership = wc_memberships_get_user_membership( $user_membership_id );
 
-		if ( $user_membership && ! $user_membership->has_status( 'free_trial' ) ) {
-			unset( $statuses['wcm-free_trial'] );
+		if ( $user_membership ) {
+
+			$unset = ! $user_membership->has_status( 'free_trial' );
+
+			if ( $unset && $user_membership instanceof \WC_Memberships_Integration_Subscriptions_User_Membership ) {
+
+				$subscription = $user_membership->get_subscription();
+				$unset        = ! $subscription || ! ( $subscription->has_status( 'pending-cancel' ) && $user_membership->is_in_free_trial_period() );
+			}
+
+			if ( $unset ) {
+				unset( $statuses['wcm-free_trial'] );
+			}
 		}
 
 		return $statuses;
@@ -133,6 +144,11 @@ class WC_Memberships_Integration_Subscriptions_Free_Trial {
 
 			$integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
 			$memberships = $integration ? $integration->get_memberships_from_subscription( $subscription ) : array();
+
+			// if the end date has been deleted, look for its historical record if the subscription is now pending cancellation
+			if ( empty( $date ) && 'woocommerce_subscription_date_deleted' === current_action() ) {
+				$date = $subscription->has_status( 'pending-cancel' ) ? $subscription->get_meta( 'trial_end_pre_cancellation' ) : $date;
+			}
 
 			if ( ! empty( $memberships ) ) {
 
@@ -187,56 +203,6 @@ class WC_Memberships_Integration_Subscriptions_Free_Trial {
 				}
 			}
 		}
-	}
-
-
-	/**
-	 * Adds the free trial status to the list of statuses that have access.
-	 *
-	 * TODO: remove this deprecated method by version 2.0.0 or by May 2020 {FN 2019-05-06}
-	 *
-	 * @deprecated since 1.13.1
-	 * @internal
-	 *
-	 * @since 1.7.0
-	 *
-	 * @param string[] $statuses array of statuses
-	 * @return string[]
-	 */
-	public function mark_free_trial_for_active_access( $statuses ) {
-
-		_deprecated_function( __METHOD__, '1.13.1' );
-
-		if ( ! in_array( 'free_trial', $statuses ) ) {
-			$statuses[] = 'free_trial';
-		}
-
-		return $statuses;
-	}
-
-
-	/**
-	 * Adds free trial status to valid statuses for membership cancellation.
-	 *
-	 * TODO: remove this deprecated method by version 2.0.0 or by May 2020 {FN 2019-05-06}
-	 *
-	 * @deprecated since 1.13.1
-	 * @internal
-	 *
-	 * @since 1.6.0
-	 *
-	 * @param string[] $statuses array of statuses
-	 * @return string[]
-	 */
-	public function enable_cancel_for_free_trial( $statuses ) {
-
-		_deprecated_function( __METHOD__, '1.13.1' );
-
-		if ( ! in_array( 'free_trial', $statuses ) ) {
-			$statuses[] = 'free_trial';
-		}
-
-		return $statuses;
 	}
 
 

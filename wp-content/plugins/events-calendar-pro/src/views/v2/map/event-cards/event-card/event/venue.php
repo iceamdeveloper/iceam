@@ -21,7 +21,7 @@ if ( ! $event->venues->count() ) {
 	return;
 }
 
-$separator            = esc_html_x( ', ', 'Address separator', 'events-calendar-pro' );
+$separator            = esc_html_x( ', ', 'Address separator', 'tribe-events-calendar-pro' );
 $venue                = $event->venues[0];
 $append_after_address = array_filter( array_map( 'trim', [ $venue->city, $venue->state_province, $venue->state, $venue->province ] ) );
 

@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -523,6 +523,7 @@ class WC_Memberships_Members_Area {
 
 		// sanity check to see if we're at the right endpoint:
 		if (    isset( $wp->query_vars[ $this->endpoint ] )
+		     && is_array( $crumbs )
 		     && is_account_page()
 		     && ( count( $crumbs ) > 0 ) ) {
 
@@ -834,7 +835,7 @@ class WC_Memberships_Members_Area {
 		}
 
 		// handle optional pagination
-		$paged   = isset( $args['paged'] ) ? max( 1, (int) $args['paged'] ) : 1;
+		$paged = isset( $args['paged'] ) ? max( 1, (int) $args['paged'] ) : 1;
 
 		// get any sorting args
 		$sorting = $this->get_members_area_sorting_args();
@@ -901,27 +902,6 @@ class WC_Memberships_Members_Area {
 				wc_get_template( "myaccount/{$section}.php", $args );
 			}
 		}
-	}
-
-
-	/**
-	 * Adds the members area query var to WooCommerce query vars.
-	 *
-	 * TODO remove this deprecated method by version 2.0.0 or by May 2020, whichever comes earlier {FN 2019-01-28}
-	 *
-	 * @internal
-	 *
-	 * @since 1.10.1
-	 * @deprecated since 1.13.0
-	 *
-	 * @param string[] $query_vars array of query vars
-	 * @return string[]
-	 */
-	public function add_query_var( $query_vars ) {
-
-		_deprecated_function( '\WC_Memberships_Members_Area::add_query_var()', '1.13.0' );
-
-		return $query_vars;
 	}
 
 

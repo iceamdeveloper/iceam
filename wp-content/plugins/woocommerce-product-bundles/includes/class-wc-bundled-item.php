@@ -2,7 +2,7 @@
 /**
  * WC_Bundled_Item class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.2.0
  */
@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The bunded item class is a product container that initializes and holds pricing, availability and variation/attribute-related data for a bundled product.
  *
  * @class    WC_Bundled_Item
- * @version  6.1.1
+ * @version  6.3.4
  */
 class WC_Bundled_Item {
 
@@ -194,6 +194,12 @@ class WC_Bundled_Item {
 	 * @var array
 	 */
 	private $product_variations;
+
+	/**
+	 * See 'has_filtered_variations'
+	 * @var boolean
+	 */
+	private $block_child_filtering = false;
 
 	/**
 	 * __construct method.
@@ -516,11 +522,11 @@ class WC_Bundled_Item {
 		$this->data->update_meta( 'max_stock', $this->max_stock );
 
 		// Save changes if the bundle exists in the DB.
-		if ( ! defined( 'WC_PB_DEBUG_STOCK_SYNC' ) && $this->get_bundle_id() ) {
+		if ( ! defined( 'WC_PB_DEBUG_STOCK_SYNC' ) && $this->get_bundle_id() && ! doing_action( 'woocommerce_process_product_meta' ) ) {
 
 			$bundle = $this->get_bundle();
 
-			if ( $bundle && $bundle->is_type( 'bundle' ) && $bundle->get_type() === $bundle->get_data_store_type() ) {
+			if ( $bundle && $bundle->is_type( 'bundle' ) && $bundle->get_type() === $bundle->get_data_store_type() && ! $bundle->has_bundled_data_item_changes() ) {
 				$this->data->save();
 			}
 		}
@@ -540,7 +546,7 @@ class WC_Bundled_Item {
 		$bundled_product_id = $this->get_product_id();
 		$bundled_product    = $this->product;
 
-		$discount = $this->get_discount();
+		$discount = $this->get_discount( 'sync' );
 
 		/*------------------------------*/
 		/*  Simple Subs                 */
@@ -550,7 +556,7 @@ class WC_Bundled_Item {
 
 			// Recurring price.
 			$regular_recurring_fee = $this->get_raw_regular_price();
-			$recurring_fee         = $this->get_raw_price();
+			$recurring_fee         = $this->get_raw_price( false, 'sync' );
 
 			$this->min_regular_recurring_price = $this->max_regular_recurring_price = $regular_recurring_fee;
 			$this->min_recurring_price         = $this->max_recurring_price         = $recurring_fee;
@@ -585,12 +591,12 @@ class WC_Bundled_Item {
 
 			} else {
 
-				$this->min_price         = $this->max_price         = $this->get_raw_price();
+				$this->min_price         = $this->max_price         = $this->get_raw_price( false, 'sync' );
 				$this->min_regular_price = $this->max_regular_price = $this->get_raw_regular_price();
 			}
 
 			$this->min_regular_price = $this->max_regular_price = $this->get_raw_regular_price();
-			$this->min_price         = $this->max_price         = $this->get_raw_price();
+			$this->min_price         = $this->max_price         = $this->get_raw_price( false, 'sync' );
 
 		/*----------------------------------*/
 		/*	Variable Products               */
@@ -635,7 +641,7 @@ class WC_Bundled_Item {
 
 				if ( 'variable-subscription' === $bundled_product->get_type() ) {
 
-					$this->min_recurring_price         = $this->max_recurring_price         = $this->get_raw_price( $min_variation );
+					$this->min_recurring_price         = $this->max_recurring_price         = $this->get_raw_price( $min_variation, 'sync' );
 					$this->min_regular_recurring_price = $this->max_regular_recurring_price = $this->get_raw_regular_price( $min_variation );
 
 					$min_signup_fee = WC_Subscriptions_Product::get_sign_up_fee( $min_variation );
@@ -648,8 +654,8 @@ class WC_Bundled_Item {
 
 				} else {
 
-					$this->min_price             = $this->get_raw_price( $min_variation );
-					$this->max_price             = $this->get_raw_price( $max_variation );
+					$this->min_price             = $this->get_raw_price( $min_variation, 'sync' );
+					$this->max_price             = $this->get_raw_price( $max_variation, 'sync' );
 					$min_variation_regular_price = $this->get_raw_regular_price( $min_variation );
 					$max_variation_regular_price = $this->get_raw_regular_price( $max_variation );
 
@@ -1036,6 +1042,23 @@ class WC_Bundled_Item {
 	}
 
 	/**
+	 * True if the weight of the composited product is added to the weight of the container.
+	 *
+	 * @return boolean
+	 */
+	public function is_weight_aggregated( $product = false ) {
+
+		$is_weight_aggregated = false;
+
+		if ( ( $bundle = $this->get_bundle() ) && false === $this->is_shipped_individually() ) {
+			$is_weight_aggregated = apply_filters( 'woocommerce_bundled_item_has_bundled_weight', $bundle->get_aggregate_weight(), $product ? $product : $this->get_product(), $this->get_id(), $bundle );
+		}
+
+		return $is_weight_aggregated;
+	}
+
+
+	/**
 	 * Bundled item sale status.
 	 *
 	 * @param  string  $context
@@ -1281,7 +1304,9 @@ class WC_Bundled_Item {
 				$this->product_attributes = array();
 			}
 
+			$this->block_child_filtering = true;
 			$this->product_attributes[ 'all' ] = $this->product->get_variation_attributes();
+			$this->block_child_filtering = false;
 
 			if ( $return_configurable ) {
 
@@ -1453,7 +1478,7 @@ class WC_Bundled_Item {
 	 * @return boolean
 	 */
 	public function has_filtered_variations() {
-		return is_array( $this->allowed_variations );
+		return is_array( $this->allowed_variations ) && $this->block_child_filtering === false;
 	}
 
 	/**
@@ -1758,6 +1783,17 @@ class WC_Bundled_Item {
 	}
 
 	/**
+	 * Optional item suffix.
+	 *
+	 * @since  6.3.0
+	 *
+	 * @return string
+	 */
+	public function get_optional_suffix() {
+		return $this->is_optional() && apply_filters( 'woocommerce_bundles_optional_bundled_item_add_suffix', false, $this ) && $this->get_bundle() && $this->get_bundle()->contains( 'mandatory' ) ? apply_filters( 'woocommerce_bundles_optional_bundled_item_suffix', __( 'optional', 'woocommerce-product-bundles' ) ) : '';
+	}
+
+	/**
 	 * Item min/max quantity.
 	 *
 	 * @return int
@@ -1859,13 +1895,25 @@ class WC_Bundled_Item {
 	 * @return double
 	 */
 	public function get_discount( $context = '' ) {
-		/**
-		 * 'woocommerce_bundled_item_discount' filter.
-		 *
-		 * @param  mixed            $discount
-		 * @param  WC_Bundled_Item  $this
-		 */
-		return $this->is_priced_individually() ? apply_filters( 'woocommerce_bundled_item_discount', $this->discount, $this, $context ) : '';
+
+		$discount = '';
+
+		if ( $this->is_priced_individually() ) {
+
+			if ( isset( $this->is_subscription_renewal ) ) {
+				return $discount;
+			}
+
+			/**
+			 * 'woocommerce_bundled_item_discount' filter.
+			 *
+			 * @param  mixed            $discount
+			 * @param  WC_Bundled_Item  $this
+			 */
+			$discount = apply_filters( 'woocommerce_bundled_item_discount', $this->discount, $this, $context );
+		}
+
+		return $discount;
 	}
 
 	/**

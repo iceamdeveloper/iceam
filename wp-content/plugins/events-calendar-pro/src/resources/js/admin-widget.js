@@ -171,18 +171,21 @@
 			// For AJAX we reset the data
 			args.data = { results: [] };
 
-			// Allows HTML from Select2 AJAX calls
-			args.escapeMarkup = function ( m ) {
+			// Allows HTML from Select2 AJAX calls.
+			args.escapeMarkup = function( m ) {
 				return m;
 			};
 
-			args.ajax = { // instead of writing the function to execute the request we use Select2's convenient helper
+			// instead of writing the function to execute the request we use Select2's convenient helper.
+			args.ajax = {
 				dataType: 'json',
 				type: 'POST',
 				url: window.ajaxurl,
-				results: function ( data ) { // parse the results into the format expected by Select2.
+				processResults: function( data ) {
+					// parse the results into the format expected by Select2.
+					$select.data( 'lastOptions', data.data );
 					return data.data;
-				}
+				},
 			};
 
 			// By default only send the source
@@ -191,7 +194,7 @@
 					action: 'tribe_widget_dropdown_' + source,
 					disabled: $select.data( 'disabled' ),
 					search: search,
-					page: page
+					page: page,
 				};
 			};
 		}
@@ -201,7 +204,7 @@
 		} ).select2( args );
 	};
 
-	tribeWidget.conditional = function ( conditional, $widget ) {
+	tribeWidget.conditional = function( conditional, $widget ) {
 
 		var $this = $( conditional ),
 			field = $this.data( 'tribeConditionalField' ),
@@ -231,7 +234,7 @@
 				$conditional.hide().prev( '.select2-container' ).show();
 			}
 		} );
-	}
+	};
 
 	tribeWidget.setup = function ( e, $widget ) {
 		// If it's not set we try to figure it out from the Event
@@ -301,57 +304,84 @@
 			// On the Widget Actions, try to re-configure
 			'widget-added widget-updated': tribeWidget.setup,
 		} )
-		.on( 'change', '.calendar-widget-add-filter', function ( e ) {
-
-			var $select = $( this ),
-				$widget = $select.parents( '.widget[id*="tribe-"]' ),
-				$filters = $widget.find( '.calendar-widget-filters-container' ),
-				$list = $widget.find( '.calendar-widget-filter-list' ),
-				$field = $widget.find( '.calendar-widget-added-filters' ),
-				values = $field.val() ? $.parseJSON( $field.val() ) : {},
-				term = e.added,
-				disabled = $select.data( 'disabled' ) ? $select.data( 'disabled' ) : [];
+		.on( 'change', '.calendar-widget-add-filter', function( e ) {
+			var $select = $( this );
+			var $widget = $select.parents( '.widget[id*="tribe-"]' );
+			var $filters = $widget.find( '.calendar-widget-filters-container' );
+			var $list = $widget.find( '.calendar-widget-filter-list' );
+			var $field = $widget.find( '.calendar-widget-added-filters' );
+			var values = $field.val() ? $.parseJSON( $field.val() ) : {};
+			var term = $select.val();
+			var disabled = $select.data( 'disabled' ) ? $select.data( 'disabled' ) : [];
+			var options = $select.data( 'lastOptions' );
 
 			if ( 'undefined' === typeof term ) {
 				return;
 			}
 
-			// If we don't have the given Taxonomy
-			if ( !values[term.taxonomy.name] ) {
-				values[term.taxonomy.name] = [];
+			var term_obj;
+
+			if ( null === values ) {
+				values = {};
 			}
 
-			// Bail if we already have the term added
-			if ( -1 !== $.inArray( term.id, values[term.taxonomy.name] ) ) {
-				// Remove the Selected Option
-				$select.select2( 'val', '', false );
+			options.results.forEach( function( group ) {
+				if ( ! group.tax ) {
+					return;
+				}
+				// If we don't have the given Taxonomy.
+				if ( ! values[ group.tax.name ] ) {
+					values[ group.tax.name ] = [];
+				}
+
+				group.children.forEach( function( option ) {
+					if ( ! option ) {
+						return;
+					}
+
+					if ( option.id != term ) {
+						return;
+					}
+					term_obj = option;
+					values[ group.tax.name ].push( option.id );
+				} );
+			} );
+
+			if ( ! term_obj ) {
+				return;
+			}
+
+			// Bail if we already have the term added.
+			if ( -1 !== $.inArray( term.id, values[ term_obj.taxonomy.name ] ) ) {
+				// Remove the Selected Option.
+				$select.val( '' );
 				return;
 			}
 
 			$filters.show();
 
-			values[term.taxonomy.name].push( term.id );
+			values[ term_obj.taxonomy.name ].push( term.id );
 
 			$field.val( JSON.stringify( values ) );
 
 			var $link = $( '<a/>' ).attr( {
-					'data-tax': term.taxonomy.name,
-					'data-term': term.id,
-					'class': 'calendar-widget-remove-filter',
-					'href': '#',
-				} ).text( '(remove)' ),
-				$remove = $( '<span/>' ).append( $link ),
-				$li = $( '<li/>' ).append( 'p' ).html( term.taxonomy.labels.name + ': ' + term.text ).append( $remove );
+				'data-tax': term_obj.taxonomy.name,
+				'data-term': term_obj.id,
+				'class': 'calendar-widget-remove-filter',
+				'href': '#',
+			} ).text( '(remove)' );
+			var $remove = $( '<span/>' ).append( $link );
+			var $li = $( '<li/>' ).append( 'p' ).html( term_obj.taxonomy.labels.name + ': ' + term_obj.text ).append( $remove );
 
 			$list.append( $li );
 
 			tribeWidget.calendar_toggle( $widget );
 
-			disabled.push( term.id );
+			disabled.push( term_obj.id );
 			$select.data( 'disabled', disabled );
 
 			// After all that remove the Opt
-			$select.select2( 'val', '', false );
+			$select.val( '' );
 		} )
 		.on( 'click', '.calendar-widget-remove-filter', function ( e ) {
 			e.preventDefault();
@@ -366,8 +396,8 @@
 				taxonomy = $link.data( 'tax' ),
 				disabled = $select.data( 'disabled' ) ? $select.data( 'disabled' ) : [];
 
-			if ( values[taxonomy] ) {
-				values[taxonomy] = _.without( values[taxonomy], termId.toString() );
+			if ( values[ taxonomy ] ) {
+				values[ taxonomy ] = _.without( values[ taxonomy ], termId.toString() );
 			}
 
 			// Updates the HTML field
@@ -382,17 +412,14 @@
 			$widget.find( 'input[name^="widget-tribe-"]' ).trigger( 'change' );
 
 			tribeWidget.calendar_toggle( $widget );
-
 		} )
 		.on( 'click', '.so-close', function( e ) {
 			// Close select2 when we close a panel dialog
-				$( '.calendar-widget-add-filter' ).select2( 'close' );
-			}
-		);
+			$( '.calendar-widget-add-filter' ).select2( 'close' );
+		} );
 
 	// Open the Widget
 	$body.on( 'click.widgets-toggle', tribeWidget.setup );
-
 
 	// Pass the pagebuilder panel as the "widget" so we can set up filters correctly
 	$( document ).on(

@@ -1,14 +1,17 @@
 <?php
 
+use Tribe\Tickets\Plus\Commerce\EDD\Attendee;
+use Tribe\Tickets\Promoter\Triggers\Contracts\Attendee_Model;
+
 /**
  * Class Tribe__Tickets_Plus__Commerce__EDD__Promoter_Observer
  *
- * @since TBD
+ * @since 4.12.0
  */
 class Tribe__Tickets_Plus__Commerce__EDD__Promoter_Observer {
 
 	/**
-	 * @since TBD
+	 * @since 4.12.0
 	 *
 	 * @var Tribe__Tickets__Promoter__Observer $observer ET Observer reference.
 	 */
@@ -27,11 +30,12 @@ class Tribe__Tickets_Plus__Commerce__EDD__Promoter_Observer {
 	/**
 	 * Hooks on which this observer notifies promoter
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 */
 	private function hook() {
-		add_action( 'event_ticket_edd_attendee_created', [ $this->observer, 'notify_event_id' ], 10, 2 );
+		add_action( 'event_tickets_edd_ticket_created', [ $this, 'ticket_created' ], 10, 4 );
 		add_action( 'eddtickets_ticket_deleted', [ $this->observer, 'notify_event_id' ], 10, 2 );
+		add_action( 'eddtickets_checkin', [ $this, 'checkin' ], 10, 2 );
 
 		// Only act if observer has notify_ticket_event method
 		if ( method_exists( $this->observer, 'notify_ticket_event' ) ) {
@@ -40,9 +44,60 @@ class Tribe__Tickets_Plus__Commerce__EDD__Promoter_Observer {
 	}
 
 	/**
+	 * Listener when the "eddtickets_checkin" action is fired.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param int       $attendee_id The ID of the attendee utilized.
+	 * @param bool|null $qr          Whether it's from a QR scan.
+	 */
+	public function checkin( $attendee_id, $qr ) {
+		$this->trigger( 'checkin', $attendee_id );
+	}
+
+	/**
+	 * Action fired when an attendee ticket is generated.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param int $attendee_id       ID of attendee ticket.
+	 * @param int $order             EDD order ID.
+	 * @param int $product_id        Product ID attendee is "purchasing".
+	 * @param int $order_attendee_id Attendee # for order.
+	 */
+	public function ticket_created( $attendee_id, $order, $product_id, $order_attendee_id ) {
+		$this->trigger( 'ticket_purchased', $attendee_id );
+	}
+
+	/**
+	 * Trigger an action using the EDD provider.
+	 *
+	 * @since 4.12.3
+	 *
+	 * @param string $type        The type of trigger that is being fired.
+	 * @param int    $attendee_id The ID of the attendee.
+	 */
+	private function trigger( $type, $attendee_id ) {
+		/** @var Tribe__Tickets_Plus__Commerce__EDD__Main $ticket */
+		$ticket   = tribe( 'tickets-plus.commerce.edd' );
+		$attendee = new Attendee( $ticket->get_attendee( $attendee_id ) );
+
+		/**
+		 * Dispatch a new trigger with an attendee.
+		 *
+		 * @since 4.12.3
+		 *
+		 * @param string                                   $type     The type of trigger that is being fired.
+		 * @param Attendee_Model                           $attendee The attendee model object.
+		 * @param Tribe__Tickets_Plus__Commerce__EDD__Main $ticket   The EDD ticket object.
+		 */
+		do_action( 'tribe_tickets_promoter_trigger_attendee', $type, $attendee, $ticket );
+	}
+
+	/**
 	 * H0ok into different actions specifically for EDD.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 */
 	private function notify_ticket_event() {
 		// Downloads
@@ -57,10 +112,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Promoter_Observer {
 	/**
 	 * Callback if an EDD customer has been updated.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 *
-	 * @param $updated bool If the updated was successful or not.
-	 * @param $customer_id int Customer ID updated with the Order.
+	 * @param bool $updated     If the updated was successful or not.
+	 * @param int  $customer_id Customer ID updated with the Order.
 	 */
 	public function customer_updated( $updated, $customer_id ) {
 		if ( ! $updated || ! class_exists( 'EDD_Customer' ) ) {
@@ -83,7 +138,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Promoter_Observer {
 	/**
 	 * If an EDD payment is updated notify to orders that are part of this payment.
 	 *
-	 * @since TBD
+	 * @since 4.12.0
 	 *
 	 * @param $payment_id int ID of the payment.
 	 */

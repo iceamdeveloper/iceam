@@ -72,8 +72,6 @@ class Sensei_Frontend {
 		add_action( 'sensei_complete_lesson_button', array( $this, 'sensei_complete_lesson_button' ) );
 		add_action( 'sensei_reset_lesson_button', array( $this, 'sensei_reset_lesson_button' ) );
 		add_action( 'sensei_course_archive_meta', array( $this, 'sensei_course_archive_meta' ) );
-		add_action( 'sensei_lesson_tag_main_content', array( $this, 'sensei_lesson_archive_main_content' ), 10 );
-		add_action( 'sensei_no_permissions_main_content', array( $this, 'sensei_no_permissions_main_content' ), 10 );
 		add_action( 'sensei_lesson_meta', array( $this, 'sensei_lesson_meta' ), 10 );
 		add_action( 'sensei_single_course_content_inside_before', array( $this, 'sensei_course_start' ), 10 );
 		add_filter( 'wp_login_failed', array( $this, 'sensei_login_fail_redirect' ), 10 );
@@ -137,19 +135,15 @@ class Sensei_Frontend {
 
 		if ( ! $disable_js ) {
 
-			$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-
-			// My Courses tabs script.
-			wp_register_script( Sensei()->token . '-user-dashboard', esc_url( Sensei()->plugin_url . 'assets/js/user-dashboard' . $suffix . '.js' ), array( 'jquery-ui-tabs' ), Sensei()->version, true );
-			wp_enqueue_script( Sensei()->token . '-user-dashboard' );
-
 			// Course Archive javascript.
 			if ( is_post_type_archive( 'course' ) ) {
 
-				wp_register_script( 'sensei-course-archive-js', esc_url( Sensei()->plugin_url . 'assets/js/frontend/course-archive' . $suffix . '.js' ), array( 'jquery' ), '1', true );
+				Sensei()->assets->register( 'sensei-course-archive-js', 'js/frontend/course-archive.js', [ 'jquery' ], true );
 				wp_enqueue_script( 'sensei-course-archive-js' );
 
 			}
+
+			Sensei()->assets->register( Sensei()->token . '-user-dashboard', 'js/user-dashboard.js', [ 'jquery-ui-tabs' ], true );
 
 			// Allow additional scripts to be loaded.
 			do_action( 'sensei_additional_scripts' );
@@ -170,8 +164,7 @@ class Sensei_Frontend {
 
 		if ( ! $disable_styles ) {
 
-			wp_register_style( Sensei()->token . '-frontend', Sensei()->plugin_url . 'assets/css/frontend/sensei.css', '', Sensei()->version, 'screen' );
-			wp_enqueue_style( Sensei()->token . '-frontend' );
+			Sensei()->assets->enqueue( Sensei()->token . '-frontend', 'css/frontend.css', [], 'screen' );
 
 			// Allow additional stylesheets to be loaded.
 			do_action( 'sensei_additional_styles' );
@@ -184,7 +177,7 @@ class Sensei_Frontend {
 	/**
 	 * Get template part.
 	 *
-	 * @deprecated since 1.9.0
+	 * @deprecated since 1.9.0 use Sensei_Templates::get_part
 	 * @access public
 	 * @param mixed  $slug Template slug.
 	 * @param string $name Optional. Template name. Default ''.
@@ -192,45 +185,12 @@ class Sensei_Frontend {
 	 */
 	function sensei_get_template_part( $slug, $name = '' ) {
 
+		// To be removed in 5.0.0.
+		_deprecated_function( __METHOD__, '1.9.0', 'Sensei_Templates::get_part' );
+
 		Sensei_Templates::get_part( $slug, $name );
 
 	} // End sensei_get_template_part()
-
-	/**
-	 * Get template.
-	 *
-	 * @deprecated since 1.9.0
-	 * @access public
-	 * @param mixed  $template_name Template name.
-	 * @param array  $args Optional. Arguments. Default array().
-	 * @param string $template_path Template path. Optional. Default ''.
-	 * @param string $default_path Default path to templates. Optional. Default ''.
-	 * @return void
-	 */
-	function sensei_get_template( $template_name, $args = array(), $template_path = '', $default_path = '' ) {
-
-		_deprecated_function( 'sensei_get_template', '1.9.0', 'Sensei_Templates::get_template' );
-		Sensei_Templates::get_template( $template_name, $args, $template_path, $default_path );
-
-	} // End sensei_get_template()
-
-
-	/**
-	 * Check if the template file exists.
-	 *
-	 * @access public
-	 * @param mixed  $template_name Template name.
-	 * @param string $template_path Template path. Optional. Default ''.
-	 * @param string $default_path Default path to templates. Optional. Default ''.
-	 * @return void
-	 */
-	function sensei_locate_template( $template_name, $template_path = '', $default_path = '' ) {
-
-		_deprecated_function( 'sensei_locate_template', '1.9.0', 'Sensei_Templates::locate_template' );
-		Sensei_Templates::locate_template( $template_name, $template_path, $default_path );
-
-	} // End sensei_locate_template()
-
 
 	/**
 	 * Output the start of the content wrapper.
@@ -501,22 +461,9 @@ class Sensei_Frontend {
 	} // End sensei_search_results_classes()
 
 	/**
-	 * Outputs the single page title.
-	 *
-	 * @since  1.1.0
-	 * @return void
-	 * @deprecated
-	 */
-	function the_single_title() {
-
-		_deprecated_function( 'Sensei_Frontend::the_single_title', '1.9.0' );
-
-	} // End sensei_single_title()
-
-	/**
 	 * Outputs the course image.
 	 *
-	 * @deprecated since 1.9.0
+	 * @deprecated since 1.9.0 use Sensei()->course->course_image
 	 * @param int    $course_id Course ID.
 	 * @param string $width Optional. Image width. Default '100'.
 	 * @param string $height Optional. Image height. Default '100'.
@@ -526,6 +473,8 @@ class Sensei_Frontend {
 	 */
 	function sensei_course_image( $course_id, $width = '100', $height = '100', $return = false ) {
 
+		// To be removed in 5.0.0.
+		_deprecated_function( __METHOD__, '1.9.0', 'Sensei()->course->course_image' );
 		if ( ! $return ) {
 
 			echo wp_kses_post( Sensei()->course->course_image( $course_id, $width, $height ) );
@@ -541,7 +490,7 @@ class Sensei_Frontend {
 	 * Outputs the lesson image.
 	 *
 	 * @since  1.2.0
-	 * @deprecated since 1.9.0
+	 * @deprecated since 1.9.0 use Sensei()->lesson->lesson_image
 	 * @param int        $lesson_id Lesson ID.
 	 * @param string     $width Optional. Image width. Default '100'.
 	 * @param string     $height Optional. Image height. Default '100'.
@@ -551,6 +500,9 @@ class Sensei_Frontend {
 	 * @return string Lesson image or empty string if the image was echoed.
 	 */
 	function sensei_lesson_image( $lesson_id, $width = '100', $height = '100', $return = false, $widget = false ) {
+
+		// To be removed in 5.0.0.
+		_deprecated_function( __METHOD__, '1.9.0', 'Sensei()->lesson->lesson_image' );
 
 		if ( ! $return ) {
 
@@ -585,44 +537,6 @@ class Sensei_Frontend {
 
 		}
 	}
-
-	/**
-	 * Outputs the headers on the course archive page.
-	 *
-	 * @access public
-	 * @since  1.2.0
-	 * @deprecated since 1.9.0 use Sensei_Course::archive_header
-	 * @return void
-	 */
-	function sensei_course_archive_header() {
-
-		trigger_error( 'This function sensei_course_archive_header has been depricated. Please use: Sensei_Course::course_archive_header ' );
-		Sensei_Course::archive_header( '', '<header class="archive-header"><h1>', '</h1></header>' );
-
-	} // sensei_course_archive_header()
-
-	/**
-	 * Outputs the headers on the lesson archive page.
-	 *
-	 * @deprecated since 1.9.0
-	 * @access public
-	 * @since  1.2.1
-	 * @return void
-	 */
-	public function sensei_lesson_archive_header() {
-		_deprecated_function( 'Sensei_Frontend::sensei_lesson_archive_header', '1.9.0', 'Sensei_Lesson::the_archive_header' );
-		Sensei()->lesson->the_archive_header();
-	} // sensei_course_archive_header()
-
-	/**
-	 * Generates the "My Messages"archive header.
-	 *
-	 * @deprecated since 1.9.0
-	 */
-	public function sensei_message_archive_header() {
-		_deprecated_function( 'Sensei_Frontend::sensei_message_archive_header', 'Please use: Sense' );
-		Sensei_Messages::the_archive_header();
-	} // sensei_message_archive_header()
 
 	/**
 	 * Output for course archive page individual course title.
@@ -704,18 +618,6 @@ class Sensei_Frontend {
 
 		echo wp_kses_post( $html );
 	} // End sensei_breadcrumb()
-
-
-	/**
-	 * Outputs the course signup link.
-	 *
-	 * @deprecated since 1.9.0 use Sensei_Lesson::course_signup_link instead
-	 */
-	public function sensei_lesson_course_signup_link() {
-
-		_deprecated_function( 'sensei_lesson_course_signup_link', '1.9.0', 'Sensei_Lesson::course_signup_link' );
-		Sensei_Lesson::course_signup_link();
-	}
 
 	/**
 	 * Outputs the lesson tags.
@@ -981,18 +883,6 @@ class Sensei_Frontend {
 	} // End sensei_get_user_quiz_answers()
 
 	/**
-	 * Checks if a user has completed a lesson.
-	 *
-	 * @param int $post_id Optional. Lesson ID. Default 0.
-	 * @param int $user_id Optional. User ID. Default 0.
-	 * @return bool true if the user has completed the lesson, false otherwise.
-	 */
-	public function sensei_has_user_completed_lesson( $post_id = 0, $user_id = 0 ) {
-		_deprecated_function( __FUNCTION__, '1.7', 'Sensei_Utils::user_completed_lesson()' );
-		return Sensei_Utils::user_completed_lesson( $post_id, $user_id );
-	} // End sensei_has_user_completed_lesson()
-
-	/**
 	 * Outputs all notices.
 	 */
 	public function sensei_frontend_messages() {
@@ -1034,7 +924,7 @@ class Sensei_Frontend {
 		// make sure user is taking course.
 		$course_id = Sensei()->lesson->get_course_id( $lesson_id );
 
-		if ( ! Sensei_Utils::user_started_course( $course_id, get_current_user_id() ) ) {
+		if ( ! Sensei_Course::is_user_enrolled( $course_id ) ) {
 			return;
 		}
 
@@ -1096,9 +986,12 @@ class Sensei_Frontend {
 	/**
 	 * Outputs the quiz buttons and messages.
 	 *
-	 * @deprecated since 1.9.0
+	 * @deprecated since 1.9.0 use Sensei_Lesson::footer_quiz_call_to_action()
 	 */
 	public function sensei_lesson_quiz_meta() {
+
+		// To be removed in 5.0.0.
+		_deprecated_function( __METHOD__, '1.9.0', 'Sensei_Lesson::footer_quiz_call_to_action' );
 
 		Sensei_Lesson::footer_quiz_call_to_action();
 
@@ -1109,6 +1002,7 @@ class Sensei_Frontend {
 		$post_id           = get_the_ID();
 		$category_output   = get_the_term_list( $post_id, 'course-category', '', ', ', '' );
 		$free_lesson_count = intval( Sensei()->course->course_lesson_preview_count( $post_id ) );
+		$lesson_count      = Sensei()->course->course_lesson_count( $post_id );
 		?>
 		<section class="entry">
 			<p class="sensei-course-meta">
@@ -1124,17 +1018,22 @@ class Sensei_Frontend {
 
 				if ( isset( Sensei()->settings->settings['course_author'] ) && ( Sensei()->settings->settings['course_author'] ) ) {
 					?>
-			   <span class="course-author"><?php esc_html_e( 'by', 'sensei-lms' ); ?><?php the_author_link(); ?></span>
+					<span class="course-author"><?php esc_html_e( 'by', 'sensei-lms' ); ?><?php the_author_link(); ?></span>
 					<?php
 				} // End If Statement
 				?>
-			   <span class="course-lesson-count"><?php echo esc_html( Sensei()->course->course_lesson_count( $post_id ) ) . '&nbsp;' . esc_html__( 'Lessons', 'sensei-lms' ); ?></span>
+				<span class="course-lesson-count">
+					<?php
+					// translators: Placeholder %d is the lesson count.
+					echo esc_html( sprintf( _n( '%d Lesson', '%d Lessons', $lesson_count, 'sensei-lms' ), $lesson_count ) );
+					?>
+				</span>
 			<?php
 			if ( ! empty( $category_output ) ) {
 				?>
 				<span class="course-category">
 					<?php
-					// translators: Placeholder is a comma-separated list of course categories.
+					// translators: Placeholder is a comma-separated list of the Course categories.
 					echo sprintf( esc_html__( 'in %s', 'sensei-lms' ), wp_kses_post( $category_output ) );
 					?>
 				</span>
@@ -1163,34 +1062,6 @@ class Sensei_Frontend {
 		<?php
 	} // End sensei_course_archive_meta()
 
-	/**
-	 * @deprecated since 1.9.0
-	 */
-	public function sensei_single_main_content() {
-		_deprecated_function( 'Woothemes_Sensei_Frontend::sensei_single_main_content', '1.9.0' );
-	} // End sensei_single_main_content()
-
-	/**
-	 * @deprecated since 1.9.0
-	 */
-	public function sensei_lesson_archive_main_content() {
-		_deprecated_function( 'Sensei_Frontend::sensei_lesson_archive_main_content', '1.9.0', 'Please include loop-lesson.php directly' );
-	} // End sensei_lesson_archive_main_content()
-
-	/**
-	 * @deprecated since 1.9.0
-	 */
-	public function sensei_message_archive_main_content() {
-		_deprecated_function( 'Sensei_Frontend::sensei_message_archive_main_content', 'This method is no longer needed' );
-	} // End sensei_lesson_archive_main_content()
-
-	/**
-	 * @deprecated since 1.9.0
-	 */
-	public function sensei_no_permissions_main_content() {
-		_deprecated_function( 'Sensei_Frontend::sensei_no_permissions_main_content', 'This method is no longer needed' );
-	} // End sensei_no_permissions_main_content()
-
 	public function sensei_course_category_main_content() {
 		global $post;
 		if ( have_posts() ) {
@@ -1198,7 +1069,7 @@ class Sensei_Frontend {
 
 			<section id="main-course" class="course-container">
 
-				<?php do_action( 'sensei_course_archive_header' ); ?>
+				<?php sensei_do_deprecated_action( 'sensei_course_archive_header', '3.0.0', 'sensei_course_content_inside_before' ); ?>
 
 				<?php
 				while ( have_posts() ) {
@@ -1206,10 +1077,6 @@ class Sensei_Frontend {
 					?>
 
 					<article class="<?php echo esc_attr( join( ' ', get_post_class( array( 'course', 'post' ), get_the_ID() ) ) ); ?>">
-
-						<?php sensei_do_deprecated_action( 'sensei_course_image', '1.9.0', 'sensei_single_course_content_inside_before', get_the_ID() ); ?>
-
-						<?php sensei_do_deprecated_action( 'sensei_course_archive_course_title', '1.9.0', 'sensei_course_content_inside_before', $post ); ?>
 
 						<?php do_action( 'sensei_course_archive_meta' ); ?>
 
@@ -1320,7 +1187,7 @@ class Sensei_Frontend {
 					<?php
 					echo '&nbsp;' . wp_kses_post(
 						sprintf(
-							// translators: Placeholder is a link to view the course.
+							// translators: Placeholder is a link to the Course permalink.
 							__( 'Part of: %s', 'sensei-lms' ),
 							'<a href="' . esc_url( get_permalink( $lesson_course_id ) ) . '" title="' . esc_attr__( 'View course', 'sensei-lms' ) . '"><em>' . esc_html( get_the_title( $lesson_course_id ) ) . '</em></a>'
 						)
@@ -1356,7 +1223,7 @@ class Sensei_Frontend {
 	}
 
 	public function sensei_lesson_preview_title( $title = '', $id = 0 ) {
-		global $post, $current_user;
+		global $post;
 
 		// Limit to lessons and check if lesson ID matches filtered post ID.
 		// @see https://github.com/woothemes/sensei/issues/574.
@@ -1369,7 +1236,7 @@ class Sensei_Frontend {
 				$course_id = get_post_meta( $post->ID, '_lesson_course', true );
 
 				// Check if the user is taking the course.
-				if ( is_singular( 'lesson' ) && Sensei_Utils::is_preview_lesson( $post->ID ) && ! Sensei_Utils::user_started_course( $course_id, $current_user->ID ) && $post->ID == $id ) {
+				if ( is_singular( 'lesson' ) && Sensei_Utils::is_preview_lesson( $post->ID ) && ! Sensei_Course::is_user_enrolled( $course_id ) && $post->ID == $id ) {
 					$title .= ' ' . $this->sensei_lesson_preview_title_tag( $course_id );
 				}
 			}
@@ -1380,18 +1247,37 @@ class Sensei_Frontend {
 	public function sensei_course_start() {
 		global $post, $current_user;
 
-		// Check if the user is taking the course.
-		$is_user_taking_course = Sensei_Utils::user_started_course( $post->ID, $current_user->ID );
 		// Handle user starting the course.
-		if ( isset( $_POST['course_start'] )
+		if (
+			isset( $_POST['course_start'] )
 			&& wp_verify_nonce( $_POST['woothemes_sensei_start_course_noonce'], 'woothemes_sensei_start_course_noonce' )
-			&& ! $is_user_taking_course ) {
+			&& Sensei_Course::can_current_user_manually_enrol( $post->ID )
+		) {
 
-			// Start the course.
-			$activity_logged                   = Sensei_Utils::user_start_course( $current_user->ID, $post->ID );
+			/**
+			 * Lets providers give their own course sign-up handler.
+			 *
+			 * @since 3.0.0
+			 *
+			 * @param callable $handler {
+			 *     Frontend enrolment handler. Returns `true` if successful; `false` if not.
+			 *
+			 *     @type int $user_id   User ID.
+			 *     @type int $course_id Course post ID.
+			 * }
+			 * @param int      $user_id          User ID.
+			 * @param int      $course_id        Course post ID.
+			 */
+			$learner_enrollment_handler = apply_filters( 'sensei_frontend_learner_enrolment_handler', [ $this, 'manually_enrol_learner' ], $current_user->ID, $post->ID );
+
+			$student_enrolled = false;
+			if ( is_callable( $learner_enrollment_handler ) ) {
+				$student_enrolled = call_user_func( $learner_enrollment_handler, $current_user->ID, $post->ID );
+			}
+
 			$this->data                        = new stdClass();
 			$this->data->is_user_taking_course = false;
-			if ( $activity_logged ) {
+			if ( $student_enrolled ) {
 				$this->data->is_user_taking_course = true;
 
 				// Refresh page to avoid re-posting.
@@ -1417,20 +1303,22 @@ class Sensei_Frontend {
 	} // End sensei_course_start()
 
 	/**
-	 * @deprecated since 1.9.0
+	 * Handle the frontend manual enrollment of a learner.
+	 *
+	 * @since 3.0.0
+	 * @access private
+	 *
+	 * @param int $user_id   User ID.
+	 * @param int $course_id Course post ID.
+	 *
+	 * @return bool True if successful.
 	 */
-	public function sensei_course_meta() {
-		_deprecated_function( 'Sensei_Frontend::sensei_course_meta', '1.9.0', 'Sensei_Course::the_course_meta()' );
-		Sensei()->course->the_course_meta( get_post() );
-	} // End sensei_course_meta()
+	public function manually_enrol_learner( $user_id, $course_id ) {
+		$enrolment_manager = Sensei_Course_Enrolment_Manager::instance();
+		$manual_enrolment  = $enrolment_manager->get_manual_enrolment_provider();
 
-	/**
-	 * @deprecated since 1.9.0
-	 */
-	public function sensei_course_meta_video() {
-		_deprecated_function( 'Sensei_Frontend::sensei_course_meta_video', '1.9.0', 'Sensei_Course::the_course_video()' );
-		Sensei_Course::the_course_video();
-	} // End sensei_course_meta_video()
+		return $manual_enrolment && $manual_enrolment->enrol_learner( $user_id, $course_id );
+	}
 
 	/**
 	 * This function shows the WooCommerce cart notice if the user has

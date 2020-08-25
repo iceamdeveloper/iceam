@@ -8,7 +8,7 @@ $shared_ticket_list      = $tickets_handler->get_event_shared_tickets( $post_id 
 $independent_ticket_list = $tickets_handler->get_event_independent_tickets( $post_id );
 $unlimited_ticket_list   = $tickets_handler->get_event_unlimited_tickets( $post_id );
 $rsvp_ticket_list        = $tickets_handler->get_event_rsvp_tickets( $post_id );
-$total_capacity          = $tickets_handler->get_total_event_capacity( $post_id );
+$total_capacity          = tribe_get_event_capacity( $post_id );
 $total_shared_tickets    = tribe_tickets_get_capacity( $post_id );
 ?>
 <table id="tribe_expanded_capacity_table" summary="capacity table" class="eventtable ticket_list tribe-tickets-editor-capacity-table eventForm tribe-tickets-editor-table striped fixed">

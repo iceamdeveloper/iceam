@@ -206,11 +206,30 @@ if ( class_exists( 'Tribe__Events__Pro__Main' ) ) {
 					if ( empty( $parseUrl['scheme'] ) ) {
 						$meta = "http://$meta";
 					}
-					$meta = sprintf( '<a href="%s" target="%s">%s</a>',
+
+					/**
+					 * Filter the target attribute for the event website link
+					 *
+					 * @since 5.1.0
+					 *
+					 * @param string the target attribute string. Defaults to "_self".
+					 */
+					$target = apply_filters( 'tribe_get_event_website_link_target', '_self' );
+
+					/**
+					 * Filter the website link label
+					 *
+					 * @since 3.0
+					 *
+					 * @param string the link label/text.
+					 */
+					$label  = apply_filters( 'tribe_get_event_website_link_label', $url_label );
+
+					$meta   = sprintf( '<a href="%s" target="%s">%s</a>',
 						esc_url( $meta ),
-						apply_filters( 'tribe_get_event_website_link_target', '_self' ),
-						apply_filters( 'tribe_get_event_website_link_label', $url_label )
-						);
+						esc_attr( $target ),
+						esc_html( $label )
+					);
 				}
 
 				// Display $meta if not empty - making a special exception for (string) '0'

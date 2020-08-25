@@ -8,29 +8,35 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Global Sensei functions
  */
 
+/**
+ * Determine if the current page is a Sensei LMS page.
+ *
+ * @since 1.5.0
+ *
+ * @return bool True if current page is a Sensei LMS page.
+ */
 function is_sensei() {
 	global $post;
 
 	$is_sensei = false;
 
-	$post_types = array( 'lesson', 'course', 'quiz', 'question' );
+	$post_types = array( 'lesson', 'course', 'quiz', 'question', 'sensei_message' );
 	$taxonomies = array( 'course-category', 'quiz-type', 'question-type', 'lesson-tag', 'module' );
 
-	if ( is_post_type_archive( $post_types ) || is_singular( $post_types ) || is_tax( $taxonomies ) ) {
-
+	if ( is_post_type_archive( $post_types )
+		|| is_singular( $post_types )
+		|| is_tax( $taxonomies )
+	) {
 		$is_sensei = true;
-
-	}
-
-	if ( is_object( $post ) && ! is_wp_error( $post ) ) {
-
+	} elseif ( is_object( $post ) && ! is_wp_error( $post ) ) {
 		$course_page_id     = intval( Sensei()->settings->settings['course_page'] );
 		$my_courses_page_id = intval( Sensei()->settings->settings['my_course_page'] );
-
-		if ( in_array( $post->ID, array( $course_page_id, $my_courses_page_id ) ) ) {
-
+		if ( in_array( $post->ID, array( $course_page_id, $my_courses_page_id ) )
+			|| Sensei_Utils::is_learner_profile_page()
+			|| Sensei_Utils::is_course_results_page()
+			|| Sensei_Utils::is_teacher_archive_page()
+		) {
 			$is_sensei = true;
-
 		}
 	}
 
@@ -38,27 +44,55 @@ function is_sensei() {
 }
 
 /**
- * Determine if the current user is and admin that
- * can acess all of Sensei without restrictions
+ * Determine if a user is an admin that can access all of Sensei without restrictions.
  *
  * @since 1.4.0
+ * @since 3.0.0 Added `$user_id` argument. Preserves backward compatibility.
+ *
+ * @param int $user_id User ID. Defaults to current user.
+ *
  * @return boolean
  */
-function sensei_all_access() {
+function sensei_all_access( $user_id = null ) {
+	if ( null === $user_id ) {
+		$user_id = get_current_user_id();
+	}
 
-	$access = current_user_can( 'manage_sensei' ) || current_user_can( 'manage_sensei_grades' );
+	if ( empty( $user_id ) ) {
+		return false;
+	}
+
+	$access = user_can( $user_id, 'manage_sensei' ) || user_can( $user_id, 'manage_sensei_grades' );
+
+	if ( has_filter( 'sensei_all_access' ) ) {
+		// For backwards compatibility with filter, we temporarily need to change the current user.
+		$previous_current_user_id = get_current_user_id();
+		wp_set_current_user( $user_id );
+
+		/**
+		 * Filter sensei_all_access function result which determines if the current user
+		 * can access all of Sensei without restrictions.
+		 *
+		 * @since 1.4.0
+		 * @deprecated 3.0.0
+		 *
+		 * @param bool $access True if user has all access.
+		 */
+		$access = apply_filters_deprecated( 'sensei_all_access', [ $access ], '3.0.0', 'sensei_user_all_access' );
+
+		wp_set_current_user( $previous_current_user_id );
+	}
 
 	/**
-	 * Filter sensei_all_access function result
-	 * which determinse if the current user
-	 * can access all of Sensei without restrictions
+	 * Filter if a particular user has access to all of Sensei without restrictions.
 	 *
-	 * @since 1.4.0
-	 * @param bool $access
+	 * @since 3.0.0
+	 *
+	 * @param bool $access  True if user has all access.
+	 * @param int  $user_id User ID to check.
 	 */
-	return apply_filters( 'sensei_all_access', $access );
-
-} // End sensei_all_access()
+	return apply_filters( 'sensei_user_all_access', $access, $user_id );
+}
 
 if ( ! function_exists( 'sensei_light_or_dark' ) ) {
 
@@ -182,6 +216,7 @@ function sensei_do_deprecated_action( $hook_tag, $version, $alternative = '', $a
 
 	if ( has_action( $hook_tag ) ) {
 
+		// translators: Placeholders are the hook tag and the version which it was deprecated, respectively.
 		$error_message = sprintf( __( "SENSEI: The hook '%1\$s', has been deprecated since '%2\$s'.", 'sensei-lms' ), $hook_tag, $version );
 
 		if ( ! empty( $alternative ) ) {

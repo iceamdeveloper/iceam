@@ -10,6 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Subscriptions;
 use Sensei_WC_Paid_Courses\Courses;
 
 // @phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedClassFound -- Legacy classname.
@@ -69,6 +71,8 @@ class Sensei_WC {
 	 *
 	 * If multiple exist we will return the latest order unless `$get_all` is `true`.
 	 *
+	 * @deprecated 2.0.0 Only used for legacy enrolment handling.
+	 *
 	 * @param int  $user_id               User ID.
 	 * @param int  $course_id             Course ID.
 	 * @param bool $check_parent_products Check Parent Products.
@@ -77,6 +81,8 @@ class Sensei_WC {
 	 * @return int|bool|array The latest order ID or `false` if there aren't any. If `$get_all` is `true`, returns an array.
 	 */
 	public static function get_learner_course_active_order_id( $user_id, $course_id, $check_parent_products = false, $get_all = false ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		$course_product_ids = self::get_course_product_ids( $course_id );
 		$orders_query       = new WP_Query(
 			[
@@ -290,17 +296,24 @@ class Sensei_WC {
 	 *
 	 * @since Sensei 1.9.0
 	 *
+	 * @deprecated 2.0.0 Only used for legacy enrolment handling.
+	 *
 	 * @param bool $can_user_view_lesson Whether the user can view this lesson.
 	 * @param int  $lesson_id            The lesson ID.
 	 * @param int  $user_id              The user ID.
 	 * @return bool
 	 */
 	public static function alter_can_user_view_lesson( $can_user_view_lesson, $lesson_id, $user_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		// do not override access to admins.
 		$course_id = Sensei()->lesson->get_course_id( $lesson_id );
 
-		if ( sensei_all_access() || Sensei_Utils::is_preview_lesson( $lesson_id )
-			|| Sensei_Utils::user_started_course( $course_id, $user_id ) ) {
+		if (
+			sensei_all_access()
+			|| Sensei_Utils::is_preview_lesson( $lesson_id )
+			|| Course_Enrolment_Providers::is_user_enrolled( $course_id, $user_id )
+		) {
 			return $can_user_view_lesson;
 		}
 
@@ -360,10 +373,14 @@ class Sensei_WC {
 	/**
 	 * Detect whether this page is the My Courses page.
 	 *
+	 * @deprecated 2.0.0
 	 * @param WP_Query $query The current query.
 	 * @return bool
 	 */
 	public static function is_my_courses_page( $query ) {
+
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		if ( ! $query->is_page() ) {
 			return false;
 		}
@@ -405,9 +422,11 @@ class Sensei_WC {
 	/**
 	 * Get the ID for the current user.
 	 *
+	 * @deprecated 2.0.0
 	 * @return int|bool The user ID or false for the anonymous user.
 	 */
 	private static function current_user_id() {
+
 		$current_user = wp_get_current_user();
 
 		if ( ! ( $current_user instanceof WP_User ) || intval( $current_user->ID ) === 0 ) {
@@ -575,10 +594,10 @@ class Sensei_WC {
 	 * @return bool
 	 */
 	public static function is_course_in_cart( $course_id ) {
-		$course_product_ids    = self::get_course_product_ids( $course_id );
-		$user_course_status_id = Sensei_Utils::user_started_course( $course_id, get_current_user_id() );
+		$course_product_ids = self::get_course_product_ids( $course_id );
+		$is_user_enrolled   = Course_Enrolment_Providers::is_user_enrolled( $course_id, get_current_user_id() );
 
-		if ( ! empty( $course_product_ids ) && ! $user_course_status_id ) {
+		if ( ! empty( $course_product_ids ) && ! $is_user_enrolled ) {
 			foreach ( $course_product_ids as $course_product_id ) {
 
 				if ( self::is_product_in_cart( $course_product_id ) ) {
@@ -795,7 +814,6 @@ class Sensei_WC {
 
 	} // get_paid_products_on_sale_query_args
 
-
 	/**
 	 * Return the WordPress query args for
 	 * products not on sale but that is not a free
@@ -886,9 +904,13 @@ class Sensei_WC {
 	/**
 	 * Detect whether WC Subscriptions is active.
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @return bool
 	 */
 	public static function is_wc_subscriptions_active() {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		return Sensei_WC_Subscriptions::is_wc_subscriptions_active();
 	}
 
@@ -1023,12 +1045,12 @@ class Sensei_WC {
 	 * Get the purchasable products for a particular course.
 	 *
 	 * A product is considered to be purchasable if:
-	 * The user has not already purchased it.
 	 * The product is not already in the cart.
 	 * The product is considered purchasable by WooCommerce.
 	 * The product is in stock.
 	 *
 	 * @since 1.1.0
+	 *
 	 * @param int $course_id The course ID.
 	 * @return array An array of products that can be purchased by the user.
 	 */
@@ -1047,11 +1069,6 @@ class Sensei_WC {
 		}
 
 		foreach ( $product_ids as $product_id ) {
-			// User has already purchased this product.
-			if ( self::has_customer_bought_product( get_current_user_id(), $product_id ) ) {
-				continue;
-			}
-
 			$product = self::get_product_object( $product_id );
 
 			if ( ! ( $product instanceof \WC_Product ) ) {
@@ -1304,7 +1321,7 @@ class Sensei_WC {
 				if ( Sensei_WC_Utils::has_user_bought_product( $product_id, $item ) ) {
 
 					// Check if user has an active subscription for product.
-					if ( Sensei_WC_Subscriptions::is_wc_subscriptions_active() ) {
+					if ( function_exists( 'wcs_user_has_subscription' ) && function_exists( 'wcs_get_subscription' ) ) {
 						$user_bought_subscription_but_cancelled = wcs_user_has_subscription( $user_id, $product_id, 'cancelled' );
 						if ( $user_bought_subscription_but_cancelled ) {
 							// assume the user was refunded, so technically it is ok to display a buy product.
@@ -1359,6 +1376,7 @@ class Sensei_WC {
 	 * Return the product ids for the given course.
 	 *
 	 * @since 1.1.0
+	 * @todo Deprecate this in favor of simple \Sensei_WC_Paid_Courses\Courses::get_course_products.
 	 *
 	 * @param int  $course_id The ID of the course.
 	 * @param bool $include_memberships Optional. Whether to include course memberships. Default true.
@@ -1420,7 +1438,7 @@ class Sensei_WC {
 	 * @return array
 	 */
 	public static function add_woocommerce_body_class( $classes ) {
-		if ( ! in_array( 'woocommerce', $classes, true ) ) {
+		if ( ! in_array( 'woocommerce', $classes, true ) && is_singular( 'course' ) ) {
 			$classes[] = 'woocommerce';
 		}
 
@@ -1430,6 +1448,8 @@ class Sensei_WC {
 	/**
 	 * Responds to when a subscription product is purchased
 	 *
+	 * @deprecated 2.0.0
+	 *
 	 * @since Sensei 1.2.0
 	 * @since Sensei 1.9.0 move to class Sensei_WC
 	 *
@@ -1438,6 +1458,8 @@ class Sensei_WC {
 	 * @return void
 	 */
 	public static function activate_subscription( $order ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		Sensei_WC_Subscriptions::activate_subscription( $order );
 	}
 
@@ -1508,12 +1530,14 @@ class Sensei_WC {
 	 * Completes an order with WCPC and give access to paid courses.
 	 *
 	 * @since  Sensei 1.0.3
+	 * @deprecated 2.0.0 Only used for legacy enrolment handling.
 	 * @access public
 	 *
 	 * @param int $order_id WC order ID.
 	 * @return void
 	 */
 	public static function complete_order( $order_id = 0 ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		$order_user = [];
 
@@ -1607,11 +1631,13 @@ class Sensei_WC {
 	 *
 	 * @since Sensei 1.2.0
 	 * @since Sensei 1.9.0 Move function to the Sensei_WC class
+	 * @deprecated 2.0.0 Only used for legacy enrolment handling.
 	 *
 	 * @param integer|WC_Order $order_id The order ID.
 	 * @return void
 	 */
 	public static function cancel_order( $order_id ) {
+		_deprecated_function( __METHOD__, '2.0.0', 'Method no longer needed when used with Sensei 3' );
 
 		// Get order object.
 		if ( is_object( $order_id ) ) {
@@ -1710,6 +1736,7 @@ class Sensei_WC {
 	 *
 	 * @since  1.0.0
 	 * @since Sensei 1.9.0 move to class Sensei_WC
+	 * @deprecated 2.0.0
 	 *
 	 * @param  int           $course_id  The course ID (default: 0).
 	 * @param  array|Object  $order_user Specific user's data (default: array()).
@@ -1718,6 +1745,7 @@ class Sensei_WC {
 	 * @return bool|int
 	 */
 	public static function course_update( $course_id = 0, $order_user = [], $order = null ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
 
 		global $current_user;
 		$has_valid_user_object = isset( $current_user->ID ) || isset( $order_user['ID'] );
@@ -1775,7 +1803,7 @@ class Sensei_WC {
 			$has_payment_method = false;
 			$payment_method     = '';
 		}
-		$is_user_taking_course = Sensei_Utils::user_started_course( intval( $course_id ), intval( $user_id ) );
+		$is_user_taking_course = Course_Enrolment_Providers::is_user_enrolled( intval( $course_id ), intval( $user_id ) );
 		Sensei_WC_Utils::log( 'Sensei_WC::course_update: user_taking_course: ' . ( $is_user_taking_course ? 'yes' : 'no' ) );
 
 		if ( false !== $is_user_taking_course ) {
@@ -1844,7 +1872,7 @@ class Sensei_WC {
 
 			$activity_logged = Sensei_Utils::user_start_course( intval( $user_id ), intval( $course_id ) );
 			Sensei_WC_Utils::log( 'Sensei_WC::course_update: activity_logged: ' . $activity_logged );
-			$is_user_taking_course = ( false !== $activity_logged );
+			$is_user_taking_course = Course_Enrolment_Providers::is_user_enrolled( $user_id, $course_id );
 		}
 
 		Sensei_WC_Utils::log( 'Sensei_WC::course_update: user taking course after update: ' . ( $is_user_taking_course ? 'yes' : 'NO' ) );
@@ -2103,7 +2131,7 @@ class Sensei_WC {
 		$user_id = get_current_user_id();
 		$product = self::get_product_object( absint( $product_id ) );
 
-		if ( ! ( $product instanceof \WC_Product ) ) {
+		if ( ! ( $product instanceof \WC_Product ) || ! $user_id ) {
 			return;
 		}
 
@@ -2112,7 +2140,7 @@ class Sensei_WC {
 		$courses_started      = 0;
 
 		foreach ( $courses as $course ) {
-			if ( Sensei_Utils::user_started_course( $course->ID, $user_id ) ) {
+			if ( Course_Enrolment_Providers::is_user_enrolled( $course->ID, $user_id ) ) {
 				$courses_started++;
 			}
 		}

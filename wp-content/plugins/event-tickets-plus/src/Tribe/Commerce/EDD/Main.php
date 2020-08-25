@@ -214,6 +214,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * Registers all actions/filters
 	 */
 	public function hooks() {
+		if ( ! tribe_tickets_is_edd_active() ) {
+			return;
+		}
 
 		add_action( 'init', array( $this, 'register_eddtickets_type' ), 1 );
 		add_action( 'add_meta_boxes', array( $this, 'edd_meta_box' ) );
@@ -234,16 +237,18 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		add_filter( 'edd_item_quantities_enabled', '__return_true' );
 		add_filter( 'edd_download_quantity_disabled', [ $this, 'maybe_disable_download_quantity' ], 10, 2 );
 		add_action( 'edd_checkout_cart_item_title_after', [ $this, 'cart_item_title_after' ], 10, 2 );
-		add_filter( 'edd_download_files', array( $this, 'ticket_downloads' ), 10, 2 );
-		add_filter( 'edd_download_file_url_args', array( $this, 'print_ticket_url' ), 10 );
+		add_filter( 'edd_download_files', [ $this, 'ticket_downloads' ], 10, 2 );
+		add_filter( 'edd_download_file_url_args', [ $this, 'print_ticket_url' ], 10 );
 
-		add_filter( 'edd_add_to_cart_item', array( $this, 'set_attendee_optout_choice' ), 10 );
-		add_filter( 'tribe_tickets_settings_post_types', array( $this, 'exclude_product_post_type' ) );
-		add_action( 'tribe_events_tickets_metabox_edit_advanced', array( $this, 'do_metabox_advanced_options' ), 10, 2 );
-		add_filter( 'tribe_tickets_get_default_module', array( $this, 'override_default_module' ), 10, 2 );
+		add_filter( 'edd_add_to_cart_item', [ $this, 'set_attendee_optout_choice' ], 10 );
+		add_filter( 'tribe_tickets_settings_post_types', [ $this, 'exclude_product_post_type' ] );
+		add_action( 'tribe_events_tickets_metabox_edit_advanced', [ $this, 'do_metabox_advanced_options' ], 10, 2 );
+		add_filter( 'tribe_tickets_get_default_module', [ $this, 'override_default_module' ], 10, 2 );
 
-		add_action( 'eddtickets_checkin', array( $this, 'purge_attendees_transient' ) );
-		add_action( 'eddtickets_uncheckin', array( $this, 'purge_attendees_transient' ) );
+		add_filter( 'tribe_tickets_get_modules', [ $this, 'maybe_remove_as_active_module' ] );
+
+		add_action( 'eddtickets_checkin', [ $this, 'purge_attendees_transient' ] );
+		add_action( 'eddtickets_uncheckin', [ $this, 'purge_attendees_transient' ] );
 
 		add_filter( 'tribe_attendee_registration_form_classes', [ $this, 'tribe_attendee_registration_form_class' ] );
 		add_filter( 'tribe_attendee_registration_cart_provider', [ $this, 'tribe_attendee_registration_cart_provider' ], 10, 2 );
@@ -252,6 +257,27 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		add_filter( 'tribe_tickets_cart_urls', [ $this, 'add_cart_url' ] );
 		add_filter( 'tribe_tickets_checkout_urls', [ $this, 'add_checkout_url' ] );
+	}
+
+	/**
+	 * If Easy Digital Downloads is not active, remove EDD Tickets as an active provider.
+	 *
+	 * Protects against running code for past EDD Tickets attendees and tickets after EDD is deactivated.
+	 *
+	 * @see   \Tribe__Tickets__Tickets::modules()
+	 *
+	 * @since 4.12.0
+	 *
+	 * @param array $active_modules The array of active provider modules.
+	 *
+	 * @return array
+	 */
+	public function maybe_remove_as_active_module( $active_modules ) {
+		if ( ! function_exists( 'EDD' ) ) {
+			unset( $active_modules[ $this->class_name ] );
+		}
+
+		return $active_modules;
 	}
 
 	/**
@@ -604,9 +630,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	/**
 	 * Saves a given ticket (EDDCommerce product)
 	 *
-	 * @param int                           $post_id
-	 * @param Tribe__Tickets__Ticket_Object $ticket
-	 * @param array                         $raw_data
+	 * @param int                           $post_id  Post ID.
+	 * @param Tribe__Tickets__Ticket_Object $ticket   Ticket object.
+	 * @param array                         $raw_data Ticket data.
 	 *
 	 * @return bool
 	 */
@@ -932,38 +958,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	}
 
 	/**
-	 * {@inheritDoc}
-	 */
-	public function get_tickets( $post_id ) {
-		$default_provider = Tribe__Tickets__Tickets::get_event_ticket_provider( $post_id );
-
-		// If the event provider is set to something else, let's save some time, shall we?
-		if ( ! is_admin() && __CLASS__ !== $default_provider ) {
-			return [];
-		}
-
-		$ticket_ids = $this->get_tickets_ids( $post_id );
-
-		if ( ! $ticket_ids ) {
-			return array();
-		}
-
-		$tickets = array();
-
-		foreach ( $ticket_ids as $post ) {
-			$ticket = $this->get_ticket( $post_id, $post );
-
-			if ( __CLASS__ !== $ticket->provider_class ) {
-				continue;
-			}
-
-			$tickets[] = $ticket;
-		}
-
-		return $tickets;
-	}
-
-	/**
 	 * Replaces the link to the product with a link to the Event in the
 	 * order confirmation page.
 	 *
@@ -1001,7 +995,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$post = get_post( $post->post_parent );
 		}
 
-		$tickets = self::get_tickets( $post->ID );
+		$tickets = $this->get_tickets( $post->ID );
 
 		foreach( $tickets as $index => $ticket ) {
 			if ( __CLASS__ !== $ticket->provider_class ) {
@@ -2185,7 +2179,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 *
 	 * @return bool `true` if at least one attendee was generated, `false` otherwise
 	 */
-	public function generate_attendees_for_order_entry( $order_id, array $item = array() ) {
+	public function generate_attendees_for_order_entry( $order_id, array $item = [] ) {
 		$product_id = isset( $item['id'] ) ? $item['id'] : false;
 		$optout     = 0;
 

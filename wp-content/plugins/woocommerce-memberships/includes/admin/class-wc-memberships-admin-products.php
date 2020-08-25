@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_5_0 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -214,6 +214,10 @@ class WC_Memberships_Admin_Products {
 		if ( in_array( $old_product_id, wc_memberships()->get_member_discounts_instance()->get_products_excluded_from_member_discounts(), false ) ) {
 			wc_memberships()->get_member_discounts_instance()->set_product_excluded_from_member_discounts( $new_product );
 		}
+
+		// prune public content caches
+		wc_memberships()->get_restrictions_instance()->delete_public_content_cache();
+		wc_memberships()->get_member_discounts_instance()->delete_excluded_member_discounts_products_cache();
 	}
 
 

@@ -2,7 +2,7 @@
 /**
  * WC_PB_NYP_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.gr>
+ * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.1.4
  */
@@ -15,15 +15,30 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * NYP Compatibility.
  *
- * @version  6.1.5
+ * @version  6.2.2
  */
 class WC_PB_NYP_Compatibility {
 
+	/**
+	 * NYP field name suffix.
+	 *
+	 * @var array
+	 */
+	protected static $nyp_suffix = '';
+
+	/**
+	 * Initialize!
+	 */
 	public static function init() {
 
 		// Support for NYP.
 		add_action( 'woocommerce_bundled_product_add_to_cart', array( __CLASS__, 'nyp_price_input_support' ), 9, 2 );
-		add_filter( 'nyp_field_prefix', array( __CLASS__, 'nyp_cart_prefix' ), 10, 2 );
+
+		if( version_compare( WC_Name_Your_Price()->version, '3.0', '>=' ) ) {
+			add_filter( 'wc_nyp_field_suffix', array( __CLASS__, 'nyp_cart_suffix' ), 10, 2 );
+		} else {
+			add_filter( 'nyp_field_prefix', array( __CLASS__, 'nyp_cart_suffix' ), 10, 2 );
+		}
 
 		// Validate add to cart NYP.
 		add_filter( 'woocommerce_bundled_item_add_to_cart_validation', array( __CLASS__, 'validate_bundled_item_nyp' ), 10, 5 );
@@ -59,17 +74,17 @@ class WC_PB_NYP_Compatibility {
 
 		if ( 'simple' === $item->product->get_type() ) {
 
-			WC_PB_Compatibility::$nyp_prefix = $item->get_id();
+			self::$nyp_suffix = $item->get_id();
 
 			if( $item->is_optional() || ! $item->get_quantity( 'min' ) ) {
 				add_filter( 'wc_nyp_data_attributes', array( __CLASS__, 'nyp_data_attributes' ) );
 			}
 
-			WC_Name_Your_Price()->display->display_price_input( $product_id, self::nyp_cart_prefix( false, $product_id ) );
+			WC_Name_Your_Price()->display->display_price_input( $product_id, self::nyp_cart_suffix( false, $product_id ) );
 
 			remove_filter( 'wc_nyp_data_attributes', array( __CLASS__, 'nyp_data_attributes' ) );
 
-			WC_PB_Compatibility::$nyp_prefix = '';
+			self::$nyp_suffix = '';
 		}
 	}
 
@@ -87,23 +102,23 @@ class WC_PB_NYP_Compatibility {
 	}
 
 	/**
-	 * Sets a unique prefix for unique NYP products. The prefix is set and re-set globally before validating and adding to cart.
+	 * Sets a unique suffix for unique NYP products. The suffix is set and re-set globally before validating and adding to cart.
 	 *
-	 * @param  string  $prefix
+	 * @param  string  $suffix
 	 * @param  int     $product_id
 	 * @return string
 	 */
-	public static function nyp_cart_prefix( $prefix, $product_id ) {
+	public static function nyp_cart_suffix( $suffix, $product_id ) {
 
-		if ( ! empty( WC_PB_Compatibility::$nyp_prefix ) ) {
-			$prefix = '-' . WC_PB_Compatibility::$nyp_prefix;
+		if ( ! empty( self::$nyp_suffix ) ) {
+			$suffix = '-' . self::$nyp_suffix;
 		}
 
 		if ( ! empty( WC_PB_Compatibility::$bundle_prefix ) ) {
-			$prefix = '-' . WC_PB_Compatibility::$nyp_prefix . '-' . WC_PB_Compatibility::$bundle_prefix;
+			$sufffix = '-' . self::$nyp_suffix . '-' . WC_PB_Compatibility::$bundle_prefix;
 		}
 
-		return $prefix;
+		return $suffix;
 	}
 
 	/**
@@ -117,15 +132,15 @@ class WC_PB_NYP_Compatibility {
 
 		$nyp_data = array();
 
-		// Set nyp prefix.
-		WC_PB_Compatibility::$nyp_prefix = $bundled_item_id;
+		// Set nyp suffix.
+		self::$nyp_suffix = $bundled_item_id;
 
 		$bundled_product_id = $bundled_item_stamp[ 'product_id' ];
 
 		$nyp_data = WC_Name_Your_Price()->cart->add_cart_item_data( $nyp_data, $bundled_product_id, '' );
 
-		// Reset nyp prefix.
-		WC_PB_Compatibility::$nyp_prefix = '';
+		// Reset nyp suffix.
+		self::$nyp_suffix = '';
 
 		if ( ! empty( $nyp_data[ 'nyp' ] ) ) {
 			$bundled_item_stamp[ 'nyp' ] = $nyp_data[ 'nyp' ];
@@ -156,13 +171,13 @@ class WC_PB_NYP_Compatibility {
 
 		if ( $bundled_item->is_priced_individually() ) {
 
-			WC_PB_Compatibility::$nyp_prefix = $bundled_item_id;
+			self::$nyp_suffix = $bundled_item_id;
 
 			if ( ! WC_Name_Your_Price()->cart->validate_add_cart_item( true, $product_id, $quantity ) ) {
 				$add = false;
 			}
 
-			WC_PB_Compatibility::$nyp_prefix = '';
+			self::$nyp_suffix = '';
 		}
 
 		return $add;
@@ -180,8 +195,8 @@ class WC_PB_NYP_Compatibility {
 	 */
 	public static function after_bundled_add_to_cart( $product_id, $quantity, $variation_id, $variations, $bundled_item_cart_data ) {
 
-		// Reset nyp prefix.
-		WC_PB_Compatibility::$nyp_prefix = '';
+		// Reset nyp suffix.
+		self::$nyp_suffix = '';
 
 		add_filter( 'woocommerce_add_cart_item_data', array( WC_Name_Your_Price()->cart, 'add_cart_item_data' ), 5, 3 );
 	}
@@ -198,8 +213,8 @@ class WC_PB_NYP_Compatibility {
 	 */
 	public static function before_bundled_add_to_cart( $product_id, $quantity, $variation_id, $variations, $bundled_item_cart_data ) {
 
-		// Set nyp prefix.
-		WC_PB_Compatibility::$nyp_prefix = $bundled_item_cart_data[ 'bundled_item_id' ];
+		// Set nyp suffix.
+		self::$nyp_suffix = $bundled_item_cart_data[ 'bundled_item_id' ];
 
 		remove_filter( 'woocommerce_add_cart_item_data', array( WC_Name_Your_Price()->cart, 'add_cart_item_data' ), 5, 3 );
 	}
@@ -220,6 +235,19 @@ class WC_PB_NYP_Compatibility {
 
 		return $bundled_item_cart_data;
 	}
-}
 
+	/**
+	 * Sets a unique prefix for unique NYP products. The prefix is set and re-set globally before validating and adding to cart.
+	 *
+	 * @param  string  $prefix
+	 * @param  int     $product_id
+	 * @return string
+	 * @deprecated 6.2.2
+	 */
+	public static function nyp_cart_prefix( $prefix, $product_id ) {
+		wc_deprecated_function( __METHOD__, '6.2.2', 'Method has been renamed nyp_cart_suffix' );
+		return self::nyp_cart_suffix( $prefix, $product_id );
+	}
+
+}
 WC_PB_NYP_Compatibility::init();

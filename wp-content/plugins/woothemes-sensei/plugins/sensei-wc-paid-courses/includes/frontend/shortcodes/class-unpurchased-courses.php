@@ -11,8 +11,8 @@ namespace Sensei_WC_Paid_Courses\Frontend\Shortcodes;
 use Sensei;
 use Sensei_Shortcode_Interface;
 use Sensei_Templates;
-use Sensei_Utils;
 use Sensei_WC;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
 use WP_Query;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -113,7 +113,7 @@ class Unpurchased_Courses implements Sensei_Shortcode_Interface {
 			}
 
 			// Only include courses that the user is not already enrolled in.
-			if ( ! Sensei_Utils::user_started_course( $course->ID, get_current_user_id() ) ) {
+			if ( ! Course_Enrolment_Providers::is_user_enrolled( $course->ID, get_current_user_id() ) ) {
 				$paid_courses_not_taken[] = $course->ID;
 			}
 		}

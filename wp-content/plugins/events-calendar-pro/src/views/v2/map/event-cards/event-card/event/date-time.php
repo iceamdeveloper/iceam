@@ -7,15 +7,17 @@
  *
  * See more documentation about our views templating system.
  *
- * @link {INSERT_ARTCILE_LINK_HERE}
+ * @since 5.0.1
+ * @since 5.1.1 Moved icons out to separate templates.
  *
- * @version 5.0.1
+ * @link {INSERT_ARTCILE_LINK_HERE}
  *
  * @var WP_Post $event The event post object with properties added by the `tribe_get_event` function.
  * @var obj     $date_formats Object containing the date formats.
  *
  * @see tribe_get_event() For the format of the event object.
  *
+ * @version 5.1.1
  */
 
 use Tribe__Date_Utils as Dates;
@@ -37,17 +39,7 @@ if ( $event->multiday ) {
 }
 ?>
 <div class="tribe-events-pro-map__event-datetime-wrapper tribe-common-b2 tribe-common-b3--min-medium">
-	<?php if ( ! empty( $event->featured ) ) : ?>
-		<em
-			class="tribe-events-pro-map__event-datetime-featured-icon tribe-common-svgicon tribe-common-svgicon--featured"
-			aria-label="<?php esc_attr_e( 'Featured', 'tribe-events-calendar-pro' ); ?>"
-			title="<?php esc_attr_e( 'Featured', 'tribe-events-calendar-pro' ); ?>"
-		>
-		</em>
-		<span class="tribe-events-pro-map__event-datetime-featured-text tribe-common-a11y-visual-hide">
-			<?php esc_attr_e( 'Featured', 'tribe-events-calendar-pro' ); ?>
-		</span>
-	<?php endif; ?>
+	<?php $this->template( 'map/event-cards/event-card/event/date-time/featured' ); ?>
 	<time
 		class="tribe-events-pro-map__event-start-datetime"
 		datetime="<?php echo esc_attr( $start_attr ); ?>"
@@ -67,12 +59,5 @@ if ( $event->multiday ) {
 			<?php echo esc_html( $end ); ?>
 		</time>
 	<?php endif; ?>
-	<?php if ( ! empty( $event->recurring ) ) : ?>
-		<em
-			class="tribe-events-pro-map__event-datetime-recurring-icon tribe-common-svgicon tribe-common-svgicon--recurring"
-			aria-label="<?php esc_attr_e( 'Recurring', 'tribe-events-calendar-pro' ) ?>"
-			title="<?php esc_attr_e( 'Recurring', 'tribe-events-calendar-pro' ) ?>"
-		>
-		</em>
-	<?php endif; ?>
+	<?php $this->template( 'map/event-cards/event-card/event/date-time/recurring', [ 'event' => $event ] ); ?>
 </div>

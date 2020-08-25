@@ -44,14 +44,15 @@ abstract class Tribe__Tickets_Plus__Tickets extends Tribe__Tickets__Tickets {
 
 	/**
 	 * Hooks into tribe_tickets_ajax_refresh_tables
-	 * to add the capacty table and total capacity line to the refreshed tables
+	 * to add the capacity table and total capacity line to the refreshed tables.
 	 *
 	 * @deprecated 4.6.2
-	 * @since 4.6
+	 * @since      4.6
 	 *
-	 * @param array $return data to be returned to ajax function
-	 * @param int $event_id - the post id of the event/post the ticket is attached to.
-	 * @return array $return data to return to ajax function
+	 * @param array $return  Data to be returned to ajax function.
+	 * @param int   $post_id The post id of the event/post the ticket is attached to.
+	 *
+	 * @return array Data to return to ajax function.
 	 */
 	public function refresh_tables( $return, $post_id ) {
 		_deprecated_function( __METHOD__, '4.6.2', '' );

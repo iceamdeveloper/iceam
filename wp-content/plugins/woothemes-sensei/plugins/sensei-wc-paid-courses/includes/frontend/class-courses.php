@@ -9,9 +9,10 @@
 namespace Sensei_WC_Paid_Courses\Frontend;
 
 use Sensei_WC;
-use Sensei_WC_Utils;
 use Sensei_WC_Subscriptions;
 use Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Memberships;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -50,8 +51,10 @@ final class Courses {
 		add_action( 'sensei_my_courses_before', [ $this, 'remove_action_output_course_price' ] );
 		add_action( 'sensei_my_courses_after', [ $this, 'add_action_output_course_price' ] );
 
-		// Filter out subscription courses from course query if user has cancelled their subscription.
-		add_filter( 'sensei_setup_course_query_should_filter_course_by_status', [ $this, 'should_filter_subscription_course' ], 10, 3 );
+		if ( Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+			// Filter out subscription courses from course query if user has cancelled their subscription.
+			add_filter( 'sensei_setup_course_query_should_filter_course_by_status', [ $this, 'should_filter_subscription_course' ], 10, 3 );
+		}
 
 		// Frontend styling.
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ] );
@@ -79,6 +82,13 @@ final class Courses {
 		$course_id = $post->ID;
 
 		if ( ! Sensei_WC::is_course_purchasable( $course_id, true ) ) {
+			return;
+		}
+
+		if (
+			class_exists( 'Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Memberships' )
+			&& WooCommerce_Memberships::does_user_have_membership( get_current_user_id(), $course_id )
+		) {
 			return;
 		}
 
@@ -181,6 +191,7 @@ final class Courses {
 	 * based on whether the subscription is still valid.
 	 *
 	 * @since 1.0.0
+	 * @deprecated 2.0.0
 	 *
 	 * @param bool       $should_filter Whether the course should be filtered out.
 	 * @param WP_Comment $course_status The current course status record.
@@ -188,6 +199,8 @@ final class Courses {
 	 * @return bool
 	 */
 	public function should_filter_subscription_course( $should_filter, $course_status, $user_id ) {
+		_deprecated_function( __METHOD__, '2.0.0' );
+
 		// Determine whether the user has cancelled their subscription.
 		$cancelled = Sensei_WC_Subscriptions::has_user_bought_subscription_but_cancelled(
 			$course_status->comment_post_ID,
