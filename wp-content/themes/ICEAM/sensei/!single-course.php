@@ -26,8 +26,9 @@ get_sensei_header();
     global $current_user;
     global $woocommerce;
     $user_ID = get_current_user_id();
-    $wc_post_id = get_post_meta( $post->ID, '_course_woocommerce_product', true );
-    $need_to_resubscribe = (wcs_user_has_subscription( $user_ID, $wc_post_id, 'on-hold' ) == true || wcs_user_has_subscription( $user_ID, $wc_post_id, 'expired' ) == true ? true : false);
+	$wc_post_id = get_post_meta( $post->ID, '_course_woocommerce_product', true );
+    // $need_to_resubscribe = (wcs_user_has_subscription( $user_ID, $wc_post_id, 'active' ) == false ? true : false);
+    $need_to_resubscribe = false;
     
 	/**
 	 * Hook inside the single course post above the content
