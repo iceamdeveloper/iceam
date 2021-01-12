@@ -811,13 +811,19 @@ article.callout, div.callout {
     margin-bottom: 5px;
 }
 
+
+.single-tribe_venue div#tribe-events {
+    padding-top: 0;
+    margin-top: -20px;
+}
+
 .tribe-events-venue .tribe-events-map-wrap {
     background: #fff;
 }
 
 .tribe-events-venue #promo-announcement{
     background-color: #f36557;
-    margin: -50px -10px 50px;
+    margin: 0px -10px 50px;
     color: #fff;
 }
 
