@@ -21,7 +21,10 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
+use SkyVerge\WooCommerce\Memberships\Profile_Fields;
+use SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field;
+use SkyVerge\WooCommerce\Memberships\Profile_Fields\Exceptions\Invalid_Field;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -189,6 +192,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 				'memberships_merged'  => 0,
 				'users_created'       => 0,
 				'rows_skipped'        => 0,
+				'profile_fields'      => [],
 				'html'                => '',
 			),
 		) );
@@ -353,6 +357,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		$current_position = $file_position;
 		$file_size        = max( 0, (int) $job->file_size );
 		$headers          = fgetcsv( $file_handle, 0, $this->get_csv_delimiter( $job ), $this->get_csv_delimiter( 'import' ) );
+		$headers          = is_array( $headers ) ? array_map( 'trim', $headers ) : $headers;
 		$headers_columns  = $headers ? count( $headers ) : 0;
 
 		// cannot parse headers
@@ -543,6 +548,9 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 				$import_data['membership_expiration'] = null;
 			}
 
+			// add the profile fields' data
+			$import_data = array_merge( $this->get_profile_fields_import_data( $row ), $import_data );
+
 			/**
 			 * Filter CSV User Membership import data before processing an import.
 			 *
@@ -615,6 +623,29 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		}
 
 		return $user_membership;
+	}
+
+
+	/**
+	 * Gets the member profile fields' values from row data.
+	 *
+	 * @since 1.19.0
+	 *
+	 * @param array $row_data CSV row data
+	 * @return array
+	 */
+	private function get_profile_fields_import_data( $row_data ) {
+
+		$profile_fields_import_data = $row_data;
+
+		foreach ( $row_data as $key => $value ) {
+
+			if ( ! Profile_Fields::is_profile_field_slug( $key ) ) {
+				unset( $profile_fields_import_data[ $key ] );
+			}
+		}
+
+		return $profile_fields_import_data;
 	}
 
 
@@ -698,6 +729,9 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 
 					// update meta upon create or update action
 					$user_membership = $this->update_user_membership_meta( $user_membership, $action, $import_data, $job );
+
+					// update member profile fields upon create or update action
+					$user_membership = $this->update_member_profile_fields( $user_membership, $import_data, $job );
 
 					/**
 					 * Fires upon creating or updating a User Membership from import data.
@@ -819,6 +853,41 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		$membership_plan = null;
 
 		unset( $membership_plan );
+
+		return $user_membership;
+	}
+
+
+	/**
+	 * Updates the member profile fields.
+	 *
+	 * @since 1.19.0
+	 *
+	 * @param \WC_Memberships_User_Membership $user_membership
+	 * @param array $data import data
+	 * @param \stdClass $job job object being processed
+	 * @return \WC_Memberships_User_Membership
+	 */
+	private function update_member_profile_fields( \WC_Memberships_User_Membership $user_membership, $data, $job ) {
+
+		foreach ( $data as $key => $value ) {
+
+			if ( Profile_Fields::is_profile_field_slug( $key ) ) {
+
+				try {
+
+					$user_membership->set_profile_field( $key, $value );
+
+				} catch ( \Exception $exception ) {
+
+					$code = $exception->getCode();
+
+					$job->results->profile_fields[ $code ] = ( isset( $job->results->profile_fields[ $code ] ) ? $job->results->profile_fields[ $code ] + 1 : 1 );
+				}
+			}
+		}
+
+		$this->update_job( $job );
 
 		return $user_membership;
 	}
@@ -1029,12 +1098,29 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 
 		$user_data = [
 			'user_login' => wp_slash( $username ),
-			'user_pass'  => wp_generate_password(),
 			'user_email' => wp_slash( $email ),
 			'first_name' => ! empty( $import_data['member_first_name'] ) ? $import_data['member_first_name'] : '',
 			'last_name'  => ! empty( $import_data['member_last_name'] )  ? $import_data['member_last_name']  : '',
 			'role'       => 'customer',
 		];
+
+		/**
+		 * Filters how to handle imported user password generation.
+		 *
+		 * If true, WooCommerce will generate the password and display the password in the welcome email.
+		 * If false, WordPress will generate the password quietly and WooCommerce won't display it in the welcome email.
+		 *
+		 * @since 1.19.2
+		 *
+		 * @param bool $notify_new_users_password whether the password will be displayed in WooCommerce emails
+		 * @param array $import_data the user import data
+		 * @param \stdClass $job member import job
+		 */
+		if ( ! empty( $job->notify_new_users ) && (bool) apply_filters( 'wc_memberships_csv_import_woocommerce_generate_password', 'yes' === get_option( 'woocommerce_registration_generate_password' ), $import_data, $job ) ) {
+			$user_data['user_pass'] = ''; /** handled in {@see wc_create_new_customer()} */
+		} else {
+			$user_data['user_pass'] = wp_generate_password();
+		}
 
 		// we need to unhook our automatic handling to avoid race conditions or duplicated free memberships creation
 		remove_action( 'user_register', [ wc_memberships()->get_plans_instance(), 'grant_access_to_free_membership' ], 10 );
@@ -1110,6 +1196,27 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 				if ( $skipped_rows > 0 ) {
 					/* translators: Placeholder: %s - skipped User Memberships to import from file */
 					$message .= '<li>' . sprintf( _n( '%s row skipped.', '%s rows skipped.', $skipped_rows, 'woocommerce-memberships' ), $skipped_rows ) . '</li>';
+				}
+
+				foreach ( $results->profile_fields as $error_code => $error_count ) {
+
+					if ( $error_count > 0 ) {
+
+						switch ( $error_code ) {
+
+							case Invalid_Field::ERROR_REQUIRED_VALUE:
+								$message .= '<li>' . __( 'Some required profile fields had empty values and were not imported.', 'woocommerce-memberships' ) . '</li>';
+							break;
+
+							case Invalid_Field::ERROR_INVALID_PLAN:
+								$message .= '<li>' . __( 'Some profile fields could not be populated for users based on their assigned membership plans.', 'woocommerce-memberships' ) . '</li>';
+							break;
+
+							case Invalid_Field::ERROR_INVALID_VALUE:
+								$message .= '<li>' . __( 'Some profile fields had invalid values and were not imported.', 'woocommerce-memberships' ) . '</li>';
+							break;
+						}
+					}
 				}
 
 				$message .= '</ul>';

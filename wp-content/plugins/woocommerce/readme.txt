@@ -1,10 +1,10 @@
 === WooCommerce ===
-Contributors: automattic, mikejolley, jameskoster, claudiosanches, kloon, rodrigosprimo, peterfabian1000, vedjain, jamosova, obliviousharmony, konamiman
+Contributors: automattic, mikejolley, jameskoster, claudiosanches, rodrigosprimo, peterfabian1000, vedjain, jamosova, obliviousharmony, konamiman, sadowski, wpmuguru, royho
 Tags: e-commerce, store, sales, sell, woo, shop, cart, checkout, downloadable, downloads, payments, paypal, storefront, stripe, woo commerce
-Requires at least: 5.2
-Tested up to: 5.5
+Requires at least: 5.3
+Tested up to: 5.6
 Requires PHP: 7.0
-Stable tag: 4.4.1
+Stable tag: 4.9.0
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,7 +12,7 @@ WooCommerce is the world’s most popular open-source eCommerce solution.
 
 == Description ==
 
-WooCommerce is the world’s most popular open-source eCommerce solution. 
+WooCommerce is [the world’s most popular](https://trends.builtwith.com/shop) open-source eCommerce solution. 
 
 Our core platform is free, flexible, and amplified by a global community. The freedom of open-source means you retain full ownership of your store’s content and data forever.
 
@@ -158,20 +158,9 @@ If you encounter issues with the shop/category pages after an update, flush the 
 
 WooCommerce comes with some sample data you can use to see how products look; import sample_products.xml via the [WordPress importer](https://wordpress.org/plugins/wordpress-importer/). You can also use the core [CSV importer](https://docs.woocommerce.com/document/product-csv-importer-exporter/?utm_source=wp%20org%20repo%20listing&utm_content=3.6) or our [CSV Import Suite extension](https://woocommerce.com/products/product-csv-import-suite/?utm_source=wp%20org%20repo%20listing&utm_content=3.6) to import sample_products.csv
 
-== Contributors & Developers ==
-“WooCommerce” has been translated into 55 locales. Thank you to [the translators](https://translate.wordpress.org/projects/wp-plugins/woocommerce/contributors) for their contributions. [Translate “WooCommerce” into your language](https://translate.wordpress.org/projects/wp-plugins/woocommerce?utm_source=wp%20org%20repo%20listing&utm_content=3.6).
-
-INTERESTED IN DEVELOPMENT?
-[Browse the code](https://plugins.trac.wordpress.org/browser/woocommerce/), check out the [SVN repository](https://plugins.svn.wordpress.org/woocommerce/), or subscribe to the [development log](https://plugins.trac.wordpress.org/log/woocommerce/) by [RSS](https://plugins.trac.wordpress.org/log/woocommerce/?limit=100&mode=stop_on_copy&format=rss).
-
 == Changelog ==
 
-= 4.4.1 - 2020-08-19 =
-
-**WooCommerce**
-* Fix - Add protection to run adjust methods only if product query. #27396
-* Dev - Stripped the internals of the DI Container to address plugin dependency conflicts it caused. #27395
-* Fix - Add more protection for field locale property incase it's not defined. #27405
+= 4.9.0 - 2021-01-xx =
 
 [See changelog for all versions](https://raw.githubusercontent.com/woocommerce/woocommerce/master/changelog.txt).
 

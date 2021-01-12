@@ -1,6 +1,6 @@
 <?php
-class Tribe__Tickets__Editor__Blocks__Rsvp
-extends Tribe__Editor__Blocks__Abstract {
+
+class Tribe__Tickets__Editor__Blocks__Rsvp extends Tribe__Editor__Blocks__Abstract {
 
 	/**
 	 * Init class
@@ -11,10 +11,10 @@ extends Tribe__Editor__Blocks__Abstract {
 	 */
 	public function hook() {
 		// Add AJAX calls
-		add_action( 'wp_ajax_rsvp-form', array( $this, 'rsvp_form' ) );
-		add_action( 'wp_ajax_nopriv_rsvp-form', array( $this, 'rsvp_form' ) );
-		add_action( 'wp_ajax_rsvp-process', array( $this, 'rsvp_process' ) );
-		add_action( 'wp_ajax_nopriv_rsvp-process', array( $this, 'rsvp_process' ) );
+		add_action( 'wp_ajax_rsvp-form', [ $this, 'rsvp_form' ] );
+		add_action( 'wp_ajax_nopriv_rsvp-form', [ $this, 'rsvp_form' ] );
+		add_action( 'wp_ajax_rsvp-process', [ $this, 'rsvp_process' ] );
+		add_action( 'wp_ajax_nopriv_rsvp-process', [ $this, 'rsvp_process' ] );
 
 	}
 
@@ -45,11 +45,11 @@ extends Tribe__Editor__Blocks__Abstract {
 	 *
 	 * @since 4.9
 	 *
-	 * @param  array $attributes
+	 * @param array $attributes Block attributes.
 	 *
 	 * @return string
 	 */
-	public function render( $attributes = array() ) {
+	public function render( $attributes = [] ) {
 		/** @var Tribe__Tickets__Editor__Template $template */
 		$template = tribe( 'tickets.editor.template' );
 
@@ -112,7 +112,7 @@ extends Tribe__Editor__Blocks__Abstract {
 	 * @return array
 	 */
 	public function get_active_tickets( $tickets ) {
-		$active_tickets = array();
+		$active_tickets = [];
 
 		foreach ( $tickets as $ticket ) {
 			// continue if it's not in date range
@@ -159,7 +159,6 @@ extends Tribe__Editor__Blocks__Abstract {
 	 * @return int
 	 */
 	public function get_threshold( $post_id = 0 ) {
-
 		/** @var Tribe__Settings_Manager $settings_manager */
 		$settings_manager = tribe( 'settings.manager' );
 		$threshold        = $settings_manager::get_option( 'ticket-display-tickets-left-threshold', 0 );
@@ -167,10 +166,10 @@ extends Tribe__Editor__Blocks__Abstract {
 		/**
 		 * Overwrites the threshold to display "# tickets left".
 		 *
-		 * @param int   $threshold Stock threshold to trigger display of "# tickets left"
-		 * @param int   $post_id  Event ID.
-		 *
 		 * @since 4.11.1
+		 *
+		 * @param int $threshold Stock threshold to trigger display of "# tickets left" text.
+		 * @param int $post_id   Event ID.
 		 */
 		$threshold = absint( apply_filters( 'tribe_display_rsvp_block_tickets_left_threshold', $threshold, $post_id ) );
 
@@ -183,24 +182,25 @@ extends Tribe__Editor__Blocks__Abstract {
 	 * @since 4.12.3
 	 *
 	 * @param bool $is_unlimited
+	 *
+	 * @return bool
 	 */
 	public function show_unlimited( $is_unlimited ) {
 		/**
 		 * Allows hiding of "unlimited" to be toggled on/off conditionally.
 		 *
-		 * @param int   $show_unlimited allow showing of "unlimited".
-		 *
 		 * @since 4.11.1
+		 *
+		 * @param int $show_unlimited allow showing of "unlimited".
+		 *
 		 */
-		return apply_filters( 'tribe_rsvp_block_show_unlimited_availability', false, $is_unlimited );
+		return (bool) apply_filters( 'tribe_rsvp_block_show_unlimited_availability', false, $is_unlimited );
 	}
 
 	/**
 	 * Register block assets
 	 *
 	 * @since 4.9
-	 *
-	 * @param  array $attributes
 	 *
 	 * @return void
 	 */
@@ -233,6 +233,18 @@ extends Tribe__Editor__Blocks__Abstract {
 
 		tribe_asset(
 			$plugin,
+			'tribe-tickets-rsvp-ari',
+			'v2/rsvp-ari.js',
+			[ 'jquery', 'wp-util' ],
+			null,
+			[
+				'groups'       => 'tribe-tickets-rsvp',
+				'conditionals' => [ $this, 'should_enqueue_ari' ],
+			]
+		);
+
+		tribe_asset(
+			$plugin,
 			'tribe-tickets-rsvp-manager',
 			'v2/rsvp-manager.js',
 			[
@@ -240,6 +252,7 @@ extends Tribe__Editor__Blocks__Abstract {
 				'tribe-common',
 				'tribe-tickets-rsvp-block',
 				'tribe-tickets-rsvp-tooltip',
+				'tribe-tickets-rsvp-ari',
 			],
 			null,
 			[
@@ -278,15 +291,6 @@ extends Tribe__Editor__Blocks__Abstract {
 			]
 		);
 
-		// @todo: Remove this once we solve the common breakpoints vs container based.
-		tribe_asset(
-			$plugin,
-			'tribe-common-responsive',
-			'common-responsive.css',
-			[ 'tribe-common-skeleton-style' ],
-			null
-		);
-
 		tribe_asset(
 			$plugin,
 			'tribe-tickets-rsvp-style',
@@ -297,11 +301,22 @@ extends Tribe__Editor__Blocks__Abstract {
 
 		tribe_asset(
 			$plugin,
-			'tribe-tickets-form-style',
-			'forms.css',
-			[ 'tribe-tickets-rsvp-style' ],
+			'tribe-tickets-rsvp-style-override',
+			Tribe__Templates::locate_stylesheet( 'tribe-events/tickets/rsvp.css' ),
+			[],
 			null
 		);
+	}
+
+	/**
+	 * Determine whether we should enqueue the ARI assets.
+	 *
+	 * @since 5.0.0
+	 *
+	 * @return bool Whether we should enqueue the ARI assets.
+	 */
+	public function should_enqueue_ari() {
+		return class_exists( 'Tribe__Tickets_Plus__Main' );
 	}
 
 	/**
@@ -312,8 +327,10 @@ extends Tribe__Editor__Blocks__Abstract {
 	 * @return void
 	 */
 	public function rsvp_form() {
-
-		$response  = array( 'html' => '', 'view' => 'rsvp-form' );
+		$response  = [
+			'html' => '',
+			'view' => 'rsvp-form',
+		];
 		$ticket_id = absint( tribe_get_request_var( 'ticket_id', 0 ) );
 		$going     = tribe_get_request_var( 'going', 'yes' );
 
@@ -330,19 +347,20 @@ extends Tribe__Editor__Blocks__Abstract {
 			wp_send_json_error( $response );
 		}
 
-		$args = array(
-			'ticket_id' => $ticket_id,
+		$args = [
 			'post_id'   => $ticket->get_event_id(),
 			'ticket'    => $ticket,
 			'going'     => $going,
-		);
+		];
 
-		$html = tribe( 'tickets.editor.template' )->template( 'blocks/rsvp/form/form', $args, false );
+		/** @var Tribe__Tickets__Editor__Template $template */
+		$template = tribe( 'tickets.editor.template' );
 
-		$response['html']    = $html;
+		$html = $template->template( 'blocks/rsvp/form/form', $args, false );
+
+		$response['html'] = $html;
 
 		wp_send_json_success( $response );
-
 	}
 
 	/**
@@ -353,8 +371,11 @@ extends Tribe__Editor__Blocks__Abstract {
 	 * @return void
 	 */
 	public function rsvp_process() {
+		$response = [
+			'html' => '',
+			'view' => 'rsvp-process',
+		];
 
-		$response  = array( 'html' => '', 'view' => 'rsvp-process' );
 		$ticket_id = absint( tribe_get_request_var( 'ticket_id', 0 ) );
 
 		if ( 0 === $ticket_id ) {
@@ -381,7 +402,13 @@ extends Tribe__Editor__Blocks__Abstract {
 			wp_send_json_error( $response );
 		}
 
-		$products = (array) tribe_get_request_var( 'product_id' );
+		$products = [];
+
+		if ( isset( $_POST['tribe_tickets'] ) ) {
+			$products = wp_list_pluck( $_POST['tribe_tickets'], 'ticket_id' );
+		} elseif ( isset( $_POST['product_id'] ) ) {
+			$products = (array) $_POST['product_id'];
+		}
 
 		// Iterate over each product
 		foreach ( $products as $product_id ) {
@@ -405,7 +432,7 @@ extends Tribe__Editor__Blocks__Abstract {
 		 */
 		do_action( 'event_tickets_rsvp_tickets_generated', $order_id, $post_id, $attendee_order_status );
 
-		$send_mail_stati = array( 'yes' );
+		$send_mail_stati = [ 'yes' ];
 
 		/**
 		 * Filters whether a confirmation email should be sent or not for RSVP tickets.
@@ -443,22 +470,23 @@ extends Tribe__Editor__Blocks__Abstract {
 			}
 		}
 
-		$args = array(
-			'ticket_id' => $ticket_id,
-			'ticket'    => $ticket,
-		);
+		$args = [
+			'ticket' => $ticket,
+		];
 
 		$remaining = $ticket->remaining();
 
+		/** @var Tribe__Tickets__Editor__Template $template */
+		$template = tribe( 'tickets.editor.template' );
+
 		if ( ! $remaining ) {
-			$response['status_html'] = tribe( 'tickets.editor.template' )->template( 'blocks/rsvp/status', $args, false );
+			$response['status_html'] = $template->template( 'blocks/rsvp/status', $args, false );
 		}
 
 		$response['remaining']      = $ticket->remaining();
-		$response['remaining_html'] = tribe( 'tickets.editor.template' )->template( 'blocks/rsvp/details/availability', $args, false );
-		$response['html']           = tribe( 'tickets.editor.template' )->template( 'blocks/rsvp/messages/success', $args, false );
+		$response['remaining_html'] = $template->template( 'blocks/rsvp/details/availability', $args, false );
+		$response['html']           = $template->template( 'blocks/rsvp/messages/success', $args, false );
 
 		wp_send_json_success( $response );
-
 	}
 }

@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Hooks for DB lifecycle management of products, bundles, bundled items and their meta.
  *
  * @class    WC_PB_DB_Sync
- * @version  5.8.0
+ * @version  6.4.0
  */
 class WC_PB_DB_Sync {
 
@@ -58,20 +58,23 @@ class WC_PB_DB_Sync {
 
 		if ( ! defined( 'WC_PB_DEBUG_STOCK_SYNC' ) ) {
 
-			// Delete bundled item stock meta when stock changes.
+			// Schedule bundled item stock meta update when stock changes.
 			add_action( 'woocommerce_product_set_stock', array( __CLASS__, 'product_stock_changed' ), 100 );
 			add_action( 'woocommerce_variation_set_stock', array( __CLASS__, 'product_stock_changed' ), 100 );
 
-			// Delete bundled item stock meta when stock status changes.
+			// Schedule bundled item stock meta update when stock status changes.
 			add_action( 'woocommerce_product_set_stock_status', array( __CLASS__, 'product_stock_status_changed' ), 100, 3 );
 			add_action( 'woocommerce_variation_set_stock_status', array( __CLASS__, 'product_stock_status_changed' ), 100, 3 );
+
+			// Schedule bundled item stock meta update when the backorder prop changes.
+			add_action( 'woocommerce_product_object_updated_props', array( __CLASS__, 'backorder_prop_changed' ), 100, 2 );
 
 			// Set stock update pre-syncing flag.
 			add_action( 'woocommerce_init', array( __CLASS__, 'set_bundled_product_stock_pre_sync' ), 10 );
 
 			if ( ! defined( 'WC_PB_DEBUG_STOCK_PARENT_SYNC' ) ) {
 
-				include_once( 'class-wc-pb-db-sync-task-runner.php' );
+				include_once( WC_PB_ABSPATH . 'includes/class-wc-pb-db-sync-task-runner.php' );
 
 				// Spawn task runner.
 				add_action( 'init', array( __CLASS__, 'initialize_sync_task_runner' ), 5 );
@@ -184,7 +187,7 @@ class WC_PB_DB_Sync {
 	}
 
 	/**
-	 * Delete bundled item stock meta cache when an associated product stock changes.
+	 * Delete bundled item stock meta cache when a linked product stock changes.
 	 *
 	 * @param  mixed   $product_id
 	 * @param  string  $stock_status
@@ -201,7 +204,20 @@ class WC_PB_DB_Sync {
 	}
 
 	/**
-	 * Delete bundled item stock meta cache when an associated product stock changes.
+	 * Delete bundled item stock meta cache when the 'backorders' prop of a linked product changes.
+	 *
+	 * @param  WC_Product  $product
+	 * @param  array       $changes
+	 * @return void
+	 */
+	public static function backorder_prop_changed( $product, $changes ) {
+		if ( in_array( 'backorders', $changes ) ) {
+			self::bundled_product_stock_changed( $product );
+		}
+	}
+
+	/**
+	 * Delete bundled item stock meta cache when a linked product stock changes.
 	 *
 	 * @param  WC_Product  $product
 	 * @return void
@@ -328,10 +344,17 @@ class WC_PB_DB_Sync {
 				// The product is in stock and stock is being managed: Compare with the min item quantity.
 				foreach ( $bundled_item_ids as $bundled_item_index => $bundled_item_id ) {
 
-					if ( '' === $stock_quantity || $stock_quantity >= max( 1, absint( $bundled_item_min_qty[ $bundled_item_index ] ) ) ) {
+					$item_qty = max( 1, absint( $bundled_item_min_qty[ $bundled_item_index ] ) );
+					$item_stock_qty = $stock_quantity;
+
+					if ( '' !== $item_stock_qty ) {
+						$item_stock_qty = intval( floor( $item_stock_qty / $item_qty ) * $item_qty );
+					}
+
+					if ( '' === $stock_quantity || $stock_quantity >= $item_qty ) {
 
 						$stock_status = 'in_stock';
-						$max_stock    = $backorders_allowed ? '' : $stock_quantity;
+						$max_stock    = $backorders_allowed ? '' : $item_stock_qty;
 
 					} elseif ( $backorders_allowed ) {
 
@@ -341,7 +364,7 @@ class WC_PB_DB_Sync {
 					} else {
 
 						$stock_status = 'out_of_stock';
-						$max_stock    = '' !== $stock_quantity ? $stock_quantity : 0;
+						$max_stock    = '' !== $item_stock_qty ? $item_stock_qty : 0;
 					}
 
 					$data = array(
@@ -455,7 +478,7 @@ class WC_PB_DB_Sync {
 			WC_PB_Core_Compatibility::log( 'Scheduling sync...', 'info', 'wc_pb_db_sync_tasks' );
 
 			$data_store = WC_Data_Store::load( 'product-bundle' );
-			$ids        = $data_store->get_bundled_items_stock_status_ids( 'unsynced' );
+			$ids        = $data_store->get_bundled_items_stock_sync_status_ids( 'unsynced' );
 
 			if ( ! empty( $ids ) ) {
 

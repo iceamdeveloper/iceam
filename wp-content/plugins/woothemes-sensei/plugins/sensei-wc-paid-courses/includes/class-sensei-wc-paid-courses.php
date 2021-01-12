@@ -45,11 +45,11 @@ final class Sensei_WC_Paid_Courses {
 	public $plugin_url;
 
 	/**
-	 * Asset suffix.
+	 * Script and stylesheet loading.
 	 *
-	 * @var string
+	 * @var Sensei_Assets
 	 */
-	protected $script_asset_suffix;
+	public $assets;
 
 	/**
 	 * Initialize the singleton instance.
@@ -57,9 +57,8 @@ final class Sensei_WC_Paid_Courses {
 	 * @since 1.0.0
 	 */
 	private function __construct() {
-		$this->script_asset_suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$this->plugin_dir          = dirname( __DIR__ );
-		$this->plugin_url          = untrailingslashit( plugins_url( '', SENSEI_WC_PAID_COURSES_PLUGIN_BASENAME ) );
+		$this->plugin_dir = dirname( __DIR__ );
+		$this->plugin_url = untrailingslashit( plugins_url( '', SENSEI_WC_PAID_COURSES_PLUGIN_BASENAME ) );
 
 		register_deactivation_hook( SENSEI_WC_PAID_COURSES_PLUGIN_FILE, [ $this, 'deactivation' ] );
 	}
@@ -76,6 +75,10 @@ final class Sensei_WC_Paid_Courses {
 
 		add_action( 'init', [ $instance, 'load_plugin_textdomain' ], 0 );
 
+		if ( class_exists( 'Sensei_Assets' ) ) {
+			$instance->assets = new \Sensei_Assets( $instance->plugin_url, $instance->plugin_dir, SENSEI_WC_PAID_COURSES_VERSION );
+		}
+
 		$skip_plugin_deps_check = defined( 'SENSEI_WC_PAID_COURSES_SKIP_DEPS_CHECK' ) && SENSEI_WC_PAID_COURSES_SKIP_DEPS_CHECK;
 		if ( ! $skip_plugin_deps_check && ! \Sensei_WC_Paid_Courses_Dependency_Checker::are_plugin_dependencies_met() ) {
 			return;
@@ -88,6 +91,7 @@ final class Sensei_WC_Paid_Courses {
 		Settings::instance()->init();
 		Widgets::instance()->init();
 		Course_Enrolment_Providers::instance()->init();
+		Blocks\Block_Purchase_Course::init();
 
 		/**
 		 * Hook in WooCommerce functionality.
@@ -166,7 +170,7 @@ final class Sensei_WC_Paid_Courses {
 	 * Registers scripts used in admin.
 	 */
 	public function register_admin_scripts() {
-		wp_register_script( self::SCRIPT_ADMIN_COURSE_METADATA, $this->plugin_url . '/assets/js/admin-course-metadata' . $this->script_asset_suffix . '.js', [ 'jquery' ], SENSEI_WC_PAID_COURSES_VERSION, true );
+		wp_register_script( self::SCRIPT_ADMIN_COURSE_METADATA, $this->plugin_url . '/assets/dist/js/admin-course-metadata.js', [ 'jquery' ], SENSEI_WC_PAID_COURSES_VERSION, true );
 		wp_localize_script(
 			self::SCRIPT_ADMIN_COURSE_METADATA,
 			'sensei_admin_course_metadata',
@@ -191,15 +195,19 @@ final class Sensei_WC_Paid_Courses {
 		}
 
 		$handle = $this->block_editor_asset_handle( $script );
-		$src    = $this->plugin_url . "/assets/block-editor/build/$script.js";
+		$src    = $this->plugin_url . "/assets/dist/block-editor/$script.js";
 
 		// Load script dependencies.
-		$deps_json_path = $this->plugin_dir . "/assets/block-editor/build/$script.deps.json";
+		$asset_config = $this->plugin_dir . "/assets/dist/block-editor/$script.asset.php";
 
-		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_get_contents_file_get_contents -- Safe local file.
-		$deps = file_exists( $deps_json_path ) ? json_decode( file_get_contents( $deps_json_path ) ) : [];
+		$default_config = [
+			'dependencies' => [],
+			'version'      => SENSEI_WC_PAID_COURSES_VERSION,
+		];
 
-		wp_enqueue_script( $handle, $src, $deps, SENSEI_WC_PAID_COURSES_VERSION, true );
+		$config = file_exists( $asset_config ) ? include $asset_config : $default_config;
+
+		wp_enqueue_script( $handle, $src, $config['dependencies'], $config['version'], false );
 	}
 
 	/**
@@ -297,6 +305,9 @@ final class Sensei_WC_Paid_Courses {
 		include_once $this->plugin_dir . '/includes/class-settings.php';
 		include_once $this->plugin_dir . '/includes/class-widgets.php';
 		include_once $this->plugin_dir . '/includes/class-course-enrolment-providers.php';
+
+		// Blocks.
+		include_once $this->plugin_dir . '/includes/blocks/class-block-purchase-course.php';
 
 		// Background jobs.
 		include_once $this->plugin_dir . '/includes/background-jobs/class-membership-plan-calculation-job.php';

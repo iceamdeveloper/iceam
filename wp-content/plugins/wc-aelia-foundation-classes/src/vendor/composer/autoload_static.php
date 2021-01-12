@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite3f140459463edb2bbafc55c86e48339
+class ComposerStaticInitc20805e2d53b2dec41c805220b48c5fd
 {
     public static $files = array (
         '89ff252b349d4d088742a09c25f5dd74' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php',
@@ -82,6 +82,7 @@ class ComposerStaticInite3f140459463edb2bbafc55c86e48339
         'Aelia\\WC\\Aelia_Integration' => __DIR__ . '/../..' . '/lib/classes/base/integration/aelia-integration.php',
         'Aelia\\WC\\Aelia_Plugin' => __DIR__ . '/../..' . '/lib/classes/base/plugin/aelia-plugin.php',
         'Aelia\\WC\\Aelia_SessionManager' => __DIR__ . '/../..' . '/lib/classes/base/session/aelia-session-manager.php',
+        'Aelia\\WC\\Aelia_Upgrade_Handler' => __DIR__ . '/../..' . '/lib/classes/install/aelia-upgrade-handler.php',
         'Aelia\\WC\\Base_Class' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/aelia-base-class.php',
         'Aelia\\WC\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
         'Aelia\\WC\\ExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
@@ -100,11 +101,13 @@ class ComposerStaticInite3f140459463edb2bbafc55c86e48339
         'Aelia\\WC\\Semaphore' => __DIR__ . '/../..' . '/lib/classes/base/semaphore/semaphore.php',
         'Aelia\\WC\\Settings' => __DIR__ . '/../..' . '/lib/classes/base/settings/settings.php',
         'Aelia\\WC\\Settings_Renderer' => __DIR__ . '/../..' . '/lib/classes/base/settings/settings-renderer.php',
+        'Aelia\\WC\\Traits\\Singleton' => __DIR__ . '/../..' . '/lib/traits/singleton.php',
         'Aelia\\WC\\Updater' => __DIR__ . '/../..' . '/lib/classes/updater/updater.php',
         'Aelia\\WC\\WC_AeliaFoundationClasses_Install' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-install.php',
         'Aelia_WC_AFC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-requirementscheck.php',
         'Aelia_WC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-requirementscheck.php',
         'Composer\\CaBundle\\CaBundle' => __DIR__ . '/..' . '/composer/ca-bundle/src/CaBundle.php',
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
         'GeoIp2\\Database\\Reader' => __DIR__ . '/..' . '/geoip2/geoip2/src/Database/Reader.php',
         'GeoIp2\\Exception\\AddressNotFoundException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AddressNotFoundException.php',
         'GeoIp2\\Exception\\AuthenticationException' => __DIR__ . '/..' . '/geoip2/geoip2/src/Exception/AuthenticationException.php',
@@ -134,6 +137,7 @@ class ComposerStaticInite3f140459463edb2bbafc55c86e48339
         'GeoIp2\\Record\\RepresentedCountry' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/RepresentedCountry.php',
         'GeoIp2\\Record\\Subdivision' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Subdivision.php',
         'GeoIp2\\Record\\Traits' => __DIR__ . '/..' . '/geoip2/geoip2/src/Record/Traits.php',
+        'GeoIp2\\Util' => __DIR__ . '/..' . '/geoip2/geoip2/src/Util.php',
         'GeoIp2\\WebService\\Client' => __DIR__ . '/..' . '/geoip2/geoip2/src/WebService/Client.php',
         'Httpful\\Bootstrap' => __DIR__ . '/..' . '/nategood/httpful/src/Httpful/Bootstrap.php',
         'Httpful\\Exception\\ConnectionErrorException' => __DIR__ . '/..' . '/nategood/httpful/src/Httpful/Exception/ConnectionErrorException.php',
@@ -280,10 +284,10 @@ class ComposerStaticInite3f140459463edb2bbafc55c86e48339
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInite3f140459463edb2bbafc55c86e48339::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInite3f140459463edb2bbafc55c86e48339::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInite3f140459463edb2bbafc55c86e48339::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInite3f140459463edb2bbafc55c86e48339::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitc20805e2d53b2dec41c805220b48c5fd::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitc20805e2d53b2dec41c805220b48c5fd::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitc20805e2d53b2dec41c805220b48c5fd::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitc20805e2d53b2dec41c805220b48c5fd::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin AJAX meta-box handlers.
  *
  * @class    WC_PB_Admin_Ajax
- * @version  6.3.0
+ * @version  6.4.0
  */
 class WC_PB_Admin_Ajax {
 
@@ -39,7 +39,7 @@ class WC_PB_Admin_Ajax {
 		add_action( 'wp_ajax_woocommerce_dismiss_bundle_notice', array( __CLASS__ , 'dismiss_notice' ) );
 
 		// Ajax handler for performing loopback tests.
-		add_action( 'wp_ajax_woocommerce_bundles_loopback_test', array( __CLASS__, 'ajax_loopback_test' ) );
+		add_action( 'wp_ajax_woocommerce_bundles_health-check-loopback_test', array( __CLASS__, 'ajax_loopback_test' ) );
 
 		/*
 		 * Edit-Product screens.
@@ -245,7 +245,7 @@ class WC_PB_Admin_Ajax {
 				}
 
 				ob_start();
-				include( 'meta-boxes/views/html-bundled-product.php' );
+				include( WC_PB_ABSPATH . 'includes/admin/meta-boxes/views/html-bundled-product.php' );
 				$response[ 'markup' ] = ob_get_clean();
 
 			} else {
@@ -333,7 +333,7 @@ class WC_PB_Admin_Ajax {
 		add_filter( 'woocommerce_bundled_item_is_priced_individually', '__return_false' );
 
 		ob_start();
-		include( 'meta-boxes/views/html-bundle-edit-form.php' );
+		include( WC_PB_ABSPATH . 'includes/admin/meta-boxes/views/html-bundle-edit-form.php' );
 		$html = ob_get_clean();
 
 		$response = array(

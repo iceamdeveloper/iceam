@@ -33,10 +33,22 @@ class Sensei_Compat_Admin {
 		if ( empty( $value ) ) {
 			return $value;
 		}
-		$translations_available = self::get_sensei_language_pack_updates();
+
+		$cache_key_parts   = array_values( get_available_languages() );
+		$cache_key_parts[] = Sensei()->version;
+
+		$language_pack_transient_key = 'sensei_language_packs_' . md5( implode( ',', $cache_key_parts ) );
+
+		$translations_available = get_site_transient( $language_pack_transient_key );
+		if ( ! $translations_available ) {
+			$translations_available = self::get_sensei_language_pack_updates();
+			set_site_transient( $language_pack_transient_key, $translations_available, DAY_IN_SECONDS );
+		}
+
 		foreach ( $translations_available as $locale => $package ) {
 			$value->translations[] = $package;
 		}
+
 		return $value;
 	}
 
@@ -161,7 +173,7 @@ class Sensei_Compat_Admin {
 		}
 
 		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
-		$plugin_slug = sanitize_title( $_GET['plugin_details'] );
+		$plugin_slug = sanitize_title( wp_unslash( $_GET['plugin_details'] ) );
 		$plugin_name = $plugins_handled[ $plugin_slug ];
 
 		$details_link = self_admin_url(

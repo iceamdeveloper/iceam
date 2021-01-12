@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin notices handling.
  *
  * @class    WC_PB_Admin_Notices
- * @version  6.3.1
+ * @version  6.5.0
  */
 class WC_PB_Admin_Notices {
 
@@ -406,7 +406,10 @@ class WC_PB_Admin_Notices {
 	}
 
 	/**
-	 * Add 'loopback' notice.
+	 * Add 'loopback' test.
+	 *
+	 * In PB, the ability to do loopback requests is nice to have, but the plugin will do fine even without them, in most cases.
+	 * For this reason, we have decided to remove the notice and only let the test run to have a result in the Status Report.
 	 *
 	 * @since  6.3.0
 	 */
@@ -429,75 +432,35 @@ class WC_PB_Admin_Notices {
 			return;
 		}
 
-		$last_tested   = self::get_notice_option( 'loopback', 'last_tested', 0 );
-		$last_result   = self::get_notice_option( 'loopback', 'last_result', 'pass' );
-		$auto_run_test = gmdate( 'U' ) - $last_tested > DAY_IN_SECONDS;
-		$show_notice   = 'fail' === $last_result;
-
 		if ( ! function_exists( 'wc_enqueue_js' ) ) {
+			return;
+		}
+
+		$last_tested   = self::get_notice_option( 'loopback', 'last_tested', 0 );
+		$auto_run_test = gmdate( 'U' ) - $last_tested > DAY_IN_SECONDS;
+
+		if ( ! $auto_run_test ) {
 			return;
 		}
 
 		wc_enqueue_js( "
 			jQuery( function( $ ) {
 
-				var auto_run_test  = " . ( $auto_run_test ? 'true' : 'false' ) . ",
-					notice         = jQuery( '.wc_pb_notice.loopback' ),
-					notice_exists  = notice.length > 0;
-
 				var do_loopback_test = function() {
 
-					if ( notice_exists && ! auto_run_test ) {
-						notice.find( 'a.wc-pb-run-again' ).addClass( 'disabled' );
-						notice.find( 'span.spinner' ).addClass( 'is-active' );
-					}
-
 					var data = {
-						action: 'woocommerce_bundles_loopback_test',
+						action: 'woocommerce_bundles_health-check-loopback_test',
 						security: '" . wp_create_nonce( 'wc_pb_loopback_notice_nonce' ) . "'
 					};
 
 					jQuery.post( '" . WC()->ajax_url() . "', data, function( response ) {
-
-						if ( ! notice_exists || auto_run_test ) {
-							return;
-						}
-
-						if ( 'success' === response.result ) {
-							notice.html( '" . '<p>' . __( 'Loopback test passed!', 'woocommerce-product-bundles' ) . '</p>' . "' ).removeClass( 'notice-warning' ).addClass( 'notice-success' );
-						} else {
-							notice.html( '" . '<p>' . __( 'Loopback test failed!', 'woocommerce-product-bundles' ) . '</p>' . "' ).removeClass( 'notice-warning' ).addClass( 'notice-error' );
-						}
+						return true;
 					} );
 				};
 
-				if ( auto_run_test ) {
-					do_loopback_test();
-				}
-
-				if ( notice_exists ) {
-
-					notice.find( 'a.wc-pb-run-again' ).on( 'click', function() {
-
-						auto_run_test = false;
-
-						do_loopback_test();
-
-						return false;
-					} );
-				}
+				do_loopback_test();
 			} );
 		" );
-
-		if ( $show_notice ) {
-
-			$notice       = __( 'Product Bundles ran a quick check-up on your site, and found that loopback requests might be failing to complete. Loopback requests are used by WooCommerce to run scheduled events, such as database upgrades. To keep your site in top shape, please ask the host or administrator of your server to look into this for you.', 'woocommerce-product-bundles' );
-			$rerun_prompt = '<p><a href="#trigger_loopback_test" class="button wc-pb-run-again">' . __( 'Repeat test', 'woocommerce-product-bundles' ) . '</a><span class="spinner" style="float:none;vertical-align:top"></span></p>';
-
-			$notice .= $rerun_prompt;
-
-			self::add_dismissible_notice( $notice, array( 'type' => 'warning', 'unique_context' => 'loopback', 'dismiss_class' => 'loopback' ) );
-		}
 	}
 
 	/**
@@ -670,37 +633,6 @@ class WC_PB_Admin_Notices {
 	 * @return array
 	 */
 	public static function get_note_args( $name ) {
-
-		if ( 'min-max' === $name ) {
-
-			ob_start();
-
-			?>
-			<p><?php _e( 'Want to sell cases of wine, combos of T-shirts, or cupcakes by the dozen?', 'woocommerce-product-bundles' ); ?></p>
-			<p><?php _e( 'Use the free <strong>Min/Max Items</strong> add-on to create personalized bundles with a fixed or flexible container size.', 'woocommerce-product-bundles' ); ?></p>
-			<?php
-
-			$content = ob_get_clean();
-
-			$args = array(
-				'name'         => 'wc-pb-min-max',
-				'title'        => __( 'Picking \'n mixing with Product Bundles', 'woocommerce-product-bundles' ),
-				'content'      => $content,
-				'type'         => Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_INFORMATIONAL,
-				'source'       => 'woocommerce-product-bundles',
-				'icon'         => 'plugins',
-				'check_plugin' => true,
-				'actions'      => array(
-					array(
-						'name'  => 'learn-more-min-max',
-						'label' => __( 'Learn more', 'woocommerce-product-bundles' ),
-						'url'   => WC_PB()->get_resource_url( 'min-max' )
-					)
-				)
-			);
-
-			return $args;
-		}
 
 		if ( 'bulk-discounts' === $name ) {
 

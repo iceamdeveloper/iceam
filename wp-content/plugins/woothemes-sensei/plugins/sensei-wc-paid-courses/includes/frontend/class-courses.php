@@ -65,7 +65,7 @@ final class Courses {
 	 * @since 1.1.0
 	 */
 	public function enqueue_styles() {
-		wp_enqueue_style( 'sensei-wcpc-courses', \Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses::instance()->plugin_url . '/assets/css/sensei-wcpc-courses.css', [], SENSEI_WC_PAID_COURSES_VERSION );
+		wp_enqueue_style( 'sensei-wcpc-courses', \Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses::instance()->plugin_url . '/assets/dist/css/sensei-wcpc-courses.css', [], SENSEI_WC_PAID_COURSES_VERSION );
 	}
 
 	/**

@@ -2,9 +2,6 @@
 namespace Aelia\WC;
 if(!defined('ABSPATH')) exit; // Exit if accessed directly
 
-//define('SCRIPT_DEBUG', 1);
-//error_reporting(E_ALL);
-
 require_once('lib/classes/base/plugin/aelia-plugin.php');
 require_once('lib/classes/definitions/definitions.php');
 
@@ -15,7 +12,7 @@ use Aelia\WC\AFC\Messages;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.0.21.200813';
+	public static $version = '2.1.2.210108';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -153,12 +150,8 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 * descendant classes.
 	 */
 	public function load_frontend_scripts() {
-		// Enqueue the required Frontend stylesheets
-		//wp_enqueue_style(static::$plugin_slug . '-frontend');
-
 		// JavaScript
 		wp_enqueue_script(static::$plugin_slug . '-frontend');
-		//$this->localize_frontend_scripts();
 	}
 
 	/**

@@ -15,4 +15,5 @@ return array(
     'Aelia\\WC\\Cache_Handler\\Settings' => $baseDir . '/lib/classes/settings/settings.php',
     'Aelia_WC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-requirementscheck.php',
     'Cache_Handler_RequirementsChecks' => $baseDir . '/lib/classes/install/plugin-requirementscheck.php',
+    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

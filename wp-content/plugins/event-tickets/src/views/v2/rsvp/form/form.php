@@ -8,22 +8,24 @@
  *
  * See more documentation about our Blocks Editor templating system.
  *
- * @link {INSERT_ARTICLE_LINK_HERE}
+ * @link https://m.tri.be/1amp Help article for RSVP & Ticket template files.
  *
  * @since 4.12.3
+ * @since 5.0.0 Updated the input name used for submitting.
  *
- * @version 4.12.3
+ * @version 5.0.0
  */
 
 $going = $this->get( 'going' );
 ?>
 
 <form
-	name="tribe-rsvp-form"
-	data-product-id="<?php echo esc_attr( $rsvp->ID ); ?>"
+	name="tribe-tickets-rsvp-form"
+	data-rsvp-id="<?php echo esc_attr( $rsvp->ID ); ?>"
 >
-	<input type="hidden" name="product_id[]" value="<?php echo esc_attr( absint( $rsvp->ID ) ); ?>">
-	<input type="hidden" name="attendee[order_status]" value="<?php echo esc_attr( $going ); ?>">
+	<input type="hidden" name="tribe_tickets[<?php echo esc_attr( absint( $rsvp->ID ) ); ?>][ticket_id]" value="<?php echo esc_attr( absint( $rsvp->ID ) ); ?>">
+	<input type="hidden" name="tribe_tickets[<?php echo esc_attr( absint( $rsvp->ID ) ); ?>][attendees][0][order_status]" value="<?php echo esc_attr( $going ); ?>">
+	<input type="hidden" name="tribe_tickets[<?php echo esc_attr( absint( $rsvp->ID ) ); ?>][attendees][0][optout]" value="1">
 
 	<div class="tribe-tickets__rsvp-form-wrapper">
 

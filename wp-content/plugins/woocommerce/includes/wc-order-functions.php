@@ -4,7 +4,7 @@
  *
  * Functions for order specific things.
  *
- * @package WooCommerce/Functions
+ * @package WooCommerce\Functions
  * @version 3.4.0
  */
 
@@ -71,7 +71,7 @@ function wc_get_orders( $args ) {
  *
  * @since  2.2
  *
- * @param  mixed $the_order Post object or post ID of the order.
+ * @param mixed $the_order       Post object or post ID of the order.
  *
  * @return bool|WC_Order|WC_Order_Refund
  */
@@ -456,11 +456,12 @@ function wc_delete_shop_order_transients( $order = 0 ) {
 		delete_transient( $transient );
 	}
 
-	// Clear money spent for user associated with order.
+	// Clear customer's order related caches.
 	if ( is_a( $order, 'WC_Order' ) ) {
 		$order_id = $order->get_id();
 		delete_user_meta( $order->get_customer_id(), '_money_spent' );
 		delete_user_meta( $order->get_customer_id(), '_order_count' );
+		delete_user_meta( $order->get_customer_id(), '_last_order' );
 	} else {
 		$order_id = 0;
 	}
@@ -778,6 +779,7 @@ function wc_order_fully_refunded( $order_id ) {
 	}
 
 	// Create the refund object.
+	wc_switch_to_site_locale();
 	wc_create_refund(
 		array(
 			'amount'     => $max_refund,
@@ -786,6 +788,7 @@ function wc_order_fully_refunded( $order_id ) {
 			'line_items' => array(),
 		)
 	);
+	wc_restore_locale();
 
 	$order->add_order_note( __( 'Order status set to refunded. To return funds to the customer you will need to issue a refund through your payment gateway.', 'woocommerce' ) );
 }
@@ -861,6 +864,9 @@ function wc_update_coupon_usage_counts( $order_id ) {
 	} elseif ( ! $order->has_status( 'cancelled' ) && ! $has_recorded ) {
 		$action = 'increase';
 		$order->get_data_store()->set_recorded_coupon_usage_counts( $order, true );
+	} elseif ( $order->has_status( 'cancelled' ) ) {
+		$order->get_data_store()->release_held_coupons( $order, true );
+		return;
 	} else {
 		return;
 	}

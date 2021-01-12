@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -56,11 +56,11 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 			'1.9.2',
 			'1.10.0',
 			'1.10.5',
-			'1.11.0',
 			'1.11.1',
 			'1.13.2',
 			'1.16.2',
-			'1.17.5',
+			'1.19.0',
+			'1.20.0',
 		];
 	}
 
@@ -137,6 +137,12 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 		// show a notice about restricted content to admin users as they get started
 		update_option( 'wc_memberships_admin_restricted_content_notice', 'yes' );
 
+		// default option to the my account members area endpoint
+		update_option( 'woocommerce_myaccount_members_area_endpoint', 'members-area' );
+
+		// default option to the my account profile fields area endpoint
+		update_option( 'woocommerce_myaccount_profile_fields_area_endpoint', 'my-profile' );
+
 		// load settings and install default values
 		include_once( WC()->plugin_path() . '/includes/admin/settings/class-wc-settings-page.php' );
 
@@ -205,18 +211,38 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 	 */
 	private static function create_files() {
 
+		self::create_access_protected_uploads_dir( 'memberships_csv_exports' );
+		self::create_access_protected_uploads_dir( 'memberships_profile_fields' );
+	}
+
+
+	/**
+	 * Creates a directory with access protection files in WordPress uploads.
+	 *
+	 * Adds files to loosely protect a directory from access:
+	 * - empty "index.html"
+	 * - .htaccess with "deny from all"
+	 *
+	 * Helper method, do not open to public.
+	 *
+	 * @since 1.19.0
+	 *
+	 * @param string $dir
+	 */
+	public static function create_access_protected_uploads_dir( $dir ) {
+
 		// install files and folders for exported files and prevent hotlinking
-		$upload_dir  = wp_upload_dir();
-		$exports_dir = trailingslashit( $upload_dir['basedir'] ) . 'memberships_csv_exports';
+		$upload_dir = wp_upload_dir();
+		$directory  = trailingslashit( $upload_dir['basedir'] ) . $dir;
 
 		$files = [
 			[
-				'base'    => $exports_dir,
+				'base'    => $directory,
 				'file'    => 'index.html',
 				'content' => '',
 			],
 			[
-				'base'    => $exports_dir,
+				'base'    => $directory,
 				'file'    => '.htaccess',
 				'content' => 'deny from all',
 			],
@@ -526,21 +552,6 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 
 
 	/**
-	 * Updates to 1.11.1
-	 *
-	 * @see \SkyVerge\WooCommerce\Memberships\Admin\Setup_Wizard::add_admin_notices()
-	 * @see \WC_Memberships_Upgrade::upgrade_to_1_17_5()
-	 *
-	 * @since 1.11.1
-	 */
-	protected function upgrade_to_1_11_1() {
-
-		// add a flag to display a notice about Jilt advanced emails on upgrade
-		update_option( 'wc_memberships_show_advanced_emails_notice', 'yes' );
-	}
-
-
-	/**
 	 * Updates to version 1.13.2
 	 *
 	 * - Creates .htaccess and index.php files in the exports directory.
@@ -575,6 +586,8 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 	 *
 	 * Logs whether the installation was found running Action Scheduler when 1.16.0 was deployed bundling AS 3.0.0-beta.
 	 *
+	 * TODO remove this upgrade script when requiring WooCommerce 4.0+ and delete the option "wc_memberships_use_as_3_0_0" {FN 2020-11-17}
+	 *
 	 * @since 1.16.2
 	 *
 	 * @param null|string $upgrading_from version installed
@@ -590,46 +603,28 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 
 
 	/**
-	 * Updates to 1.17.5
+	 * Updates to version 1.19.0
 	 *
-	 * @see \SkyVerge\WooCommerce\Memberships\Admin\Setup_Wizard::add_admin_notices()
-	 * @see \WC_Memberships_Upgrade::upgrade_to_1_11_1()
-	 *
-	 * @since 1.17.5
-	 *
-	 * @param string $installed_version version upgrading from
+	 * @since 1.19.0
 	 */
-	protected function upgrade_to_1_17_5( $installed_version ) {
+	protected function upgrade_to_1_19_0() {
 
-		// only show the new notice if upgrading from version 1.12 or above
-		if ( ! empty( $installed_version ) && version_compare( $installed_version, '1.12.0', '>=' ) ) {
+		self::create_access_protected_uploads_dir( 'memberships_profile_fields' );
 
-			// remove the old flag about Jilt advanced emails introduced in 1.11.1
-			delete_option( 'wc_memberships_show_advanced_emails_notice' );
+		update_option( 'woocommerce_myaccount_profile_fields_area_endpoint', 'my-profile' );
+	}
 
-			// bail if Jilt is installed already
-			if ( $this->get_plugin()->is_plugin_installed( 'jilt-for-woocommerce.php' ) ) {
-				return;
-			}
 
-			// add a flag to display an updated notice about Jilt emails upon upgrade
-			update_option( 'wc_memberships_show_jilt_cross_sell_notice', 'yes' );
+	/**
+	 * Updates to version 1.20.0
+	 *
+	 * @since 1.20.0
+	 */
+	protected function upgrade_to_1_20_0() {
 
-			// also add an informational WooCommerce admin note, if notes are available and Jilt is not installed already
-			if ( Framework\SV_WC_Plugin_Compatibility::is_enhanced_admin_available() ) {
-
-				$note = new \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note();
-				$note->set_type( \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_INFORMATIONAL );
-				$note->set_icon( 'info' );
-				$note->set_source( 'woocommerce-memberships' );
-				$note->set_name( 'wc-memberships-jilt-cross-sell-notice' );
-				$note->set_title( __( 'Jilt for WooCommerce', 'woocommerce-memberships' ) );
-				$note->set_content( __( 'Use an email platform that automatically syncs member details. Segment newsletters by membership plan, and create automated email series for members in minutes using Jilt. All new accounts get a bonus credit!', 'woocommerce-memberships' ) );
-				$note->add_action( 'dismiss', __( 'Not now', 'woocommerce-memberships' ), false, \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_ACTIONED );
-				$note->add_action( 'sign-up', __( 'Sign up for free', 'woocommerce-memberships' ), 'https://jilt.com/go/memberships-update', \Automattic\WooCommerce\Admin\Notes\WC_Admin_Note::E_WC_ADMIN_NOTE_ACTIONED, true );
-				$note->save();
-			}
-		}
+		// Jilt Promotions flags
+		delete_option( 'wc_memberships_show_advanced_emails_notice' );
+		delete_option( 'wc_memberships_show_jilt_cross_sell_notice' );
 	}
 
 

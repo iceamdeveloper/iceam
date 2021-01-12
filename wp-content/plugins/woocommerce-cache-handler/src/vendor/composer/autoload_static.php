@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit490151108f57239ca837c061c6e3f4a3
+class ComposerStaticInit77f637cb971e7453538fbb74b9e5c1b9
 {
     public static $classMap = array (
         'Aelia\\WC\\Cache_Handler\\Ajax_Loader_Cache_Handler' => __DIR__ . '/../..' . '/lib/classes/cache_handlers/ajax_loader_cache_handler.php',
@@ -16,12 +16,13 @@ class ComposerStaticInit490151108f57239ca837c061c6e3f4a3
         'Aelia\\WC\\Cache_Handler\\Settings' => __DIR__ . '/../..' . '/lib/classes/settings/settings.php',
         'Aelia_WC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-requirementscheck.php',
         'Cache_Handler_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/plugin-requirementscheck.php',
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit490151108f57239ca837c061c6e3f4a3::$classMap;
+            $loader->classMap = ComposerStaticInit77f637cb971e7453538fbb74b9e5c1b9::$classMap;
 
         }, null, ClassLoader::class);
     }

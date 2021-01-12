@@ -1,10 +1,10 @@
 === WooCommerce Currency Switcher - Dynamic Pricing Integration ===
 Tags: woocommerce, currency switcher, dynamic-pricing, integration, dynamic pricing
 Requires at least: 3.6
-Tested up to: 5.5
+Tested up to: 5.5.3
 License: GPLv3
 WC requires at least: 2.6
-WC tested up to: 4.4
+WC tested up to: 4.8
 
 Implements the integration between [Aelia Currency Switcher](https://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Dynamic Pricing plugin](https://www.woothemes.com/products/woocommerce-dynamic-pricing/).
 
@@ -26,6 +26,23 @@ This plugin is a temporary workaround for the lack of multi-currency support in 
 3. That's it! Now the price of the Dynamic Pricing you enter will be converted automatically in the appropriate currency.
 
 == Changelog ==
+
+= 1.0.12.201207 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.11.201103 =
+* Updated supported WooCommerce versions.
+
+= 1.0.10.200904 =
+* Updated supported WooCommerce versions.
+
+= 1.0.9.201005 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.8.200904 =
+* Updated supported WooCommerce versions.
 
 = 1.0.7.200813 =
 * Updated supported WordPress and WooCommerce versions.

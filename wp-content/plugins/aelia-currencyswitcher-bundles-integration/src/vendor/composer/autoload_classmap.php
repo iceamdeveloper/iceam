@@ -10,4 +10,5 @@ return array(
     'Aelia\\WC\\CurrencySwitcher\\Bundles\\Definitions' => $baseDir . '/lib/classes/definitions/definitions.php',
     'Aelia_WC_CS_Bundles_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-cs-bundles-requirementscheck.php',
     'Aelia_WC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-requirementscheck.php',
+    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

@@ -890,7 +890,7 @@ article.callout, div.callout {
     visibility: hidden !important;
 }
 
-.course.post .course-meta form.cart {
+.single-course .course-meta form.cart {
     display: none;
 }
 

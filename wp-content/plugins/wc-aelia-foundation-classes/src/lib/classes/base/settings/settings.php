@@ -134,9 +134,8 @@ class Settings {
 		if(empty($key)) {
 			return $this->_current_settings;
 		}
-		else {
-			return get_value($key, $this->_current_settings, $default);
-		}
+
+		return $this->_current_settings[$key] ?? $default;
 	}
 
 	/**

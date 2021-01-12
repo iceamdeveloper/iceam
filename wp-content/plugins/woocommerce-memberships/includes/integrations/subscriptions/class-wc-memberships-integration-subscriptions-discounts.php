@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -60,7 +60,7 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 		add_filter( 'wc_memberships_price_adjustments_filter_priority', array( $this, 'adjust_price_filters_priority' ) );
 
 		// if using cart discounts, ensure renewals don't get double discounted
-		add_filter( 'wc_memberships_is_user_eligible_for_member_discounts', [ $this, 'disable_cart_discounts_for_renewals' ] );
+		add_filter( 'wc_memberships_exclude_product_from_member_discounts', [ $this, 'disable_cart_discounts_for_renewals' ], 999, 2 );
 	}
 
 
@@ -280,21 +280,33 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 
 
 	/**
-	 * Ensures that the cart does not contain a renewal to avoid double-discounting.
+	 * Avoids double-discounting when adding a product to cart intended for subscription's renewal.
+	 *
+	 * @internal
 	 *
 	 * @since 1.17.6
 	 *
-	 * @param bool $user_is_eligible whether the user should be eligible for cart discounts
+	 * @param bool $exclude_from_discounts whether the product should be excluded from discounts
+	 * @param null|int|\WC_Product $product the product object or ID (null value is for a legacy version of this callback)
 	 * @return bool
 	 */
-	public function disable_cart_discounts_for_renewals( $user_is_eligible ) {
+	public function disable_cart_discounts_for_renewals( $exclude_from_discounts, $product = null ) {
 
-		if ( $user_is_eligible && function_exists( 'wcs_cart_contains_renewal' ) ) {
+		if ( ! $exclude_from_discounts && isset( WC()->cart ) && \WC_Subscriptions_Product::is_subscription( $product ) && is_user_logged_in() ) {
 
-			$user_is_eligible = ! wcs_cart_contains_renewal();
+			$product_id = $product instanceof \WC_Product ? $product->get_id() : $product;
+
+			foreach ( WC()->cart->get_cart_contents() as $item ) {
+
+				if ( $product_id && isset( $item['subscription_renewal'] ) && (int) $product_id === (int) $item['product_id'] ) {
+
+					$exclude_from_discounts = true;
+					break;
+				}
+			}
 		}
 
-		return $user_is_eligible;
+		return $exclude_from_discounts;
 	}
 
 

@@ -230,7 +230,7 @@ class WooThemes_Sensei_Certificates {
 		}
 
 		if ( $should_enqueue ) {
-			wp_enqueue_style( 'sensei-certificates-frontend', $this->plugin_url . 'assets/css/frontend.css', array(), SENSEI_CERTIFICATES_VERSION, 'screen' );
+			wp_enqueue_style( 'sensei-certificates-frontend', $this->plugin_url . 'assets/dist/css/frontend.css', array(), SENSEI_CERTIFICATES_VERSION, 'screen' );
 		}
 	}
 
@@ -746,7 +746,7 @@ class WooThemes_Sensei_Certificates {
 
 			// Get Course Data
 			$course_id       = get_post_meta( $certificate_id, 'course_id', true );
-			$course_title    = get_the_title( $course_id );
+			$course_title    = get_post_field('post_title', $course_id);
 			$course_end      = Sensei_Utils::sensei_check_for_activity(
 				array(
 					'post_id' => intval( $course_id ),

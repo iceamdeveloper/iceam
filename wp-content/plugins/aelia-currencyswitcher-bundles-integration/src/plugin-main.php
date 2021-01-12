@@ -12,7 +12,7 @@ use Aelia\WC\Messages;
  * Aelia Currency Switcher Bundles Integration plugin.
  **/
 class WC_Aelia_CS_Bundles_Plugin extends Aelia_Plugin {
-	public static $version = '1.2.7.200813';
+	public static $version = '1.2.12.201207';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;

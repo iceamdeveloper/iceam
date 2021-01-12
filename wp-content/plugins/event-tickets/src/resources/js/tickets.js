@@ -295,6 +295,9 @@ var ticketHeaderImage = window.ticketHeaderImage || {};
 
 			// At the end always swap panels (deafults to base/list)
 			obj.swapPanel( swapTo );
+
+			// Trigger dependency.
+			$( '.tribe-dependency' ).trigger( 'verify.dependency' );
 		};
 
 		obj.setupPanels = function() {
@@ -612,7 +615,7 @@ var ticketHeaderImage = window.ticketHeaderImage || {};
 			var $orders = $base_panel.find( '.tribe-ticket-field-order' );
 			var params = {
 				action: 'tribe-ticket-add',
-				data: $edit_panel.find( 'input,textarea' ).serialize().replace( /\'/g, '%27' ).replace( /\:/g, '%3A' ),
+				data: $edit_panel.find( 'input,textarea,select' ).serialize().replace( /\'/g, '%27' ).replace( /\:/g, '%3A' ),
 				post_id: $post_id.val(),
 				nonce: TribeTickets.add_ticket_nonce,
 				menu_order: $orders.length,

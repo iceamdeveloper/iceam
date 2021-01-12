@@ -337,6 +337,29 @@ class Sensei_WC {
 	}
 
 	/**
+	 * Require login for paid courses.
+	 *
+	 * @since 2.1.1
+	 *
+	 * @hooked into sensei_is_login_required.
+	 *
+	 * @param boolean  $login_required Current filter vaue.
+	 * @param int|null $course_id      Course ID.
+	 *
+	 * @return boolean Whether login is required to access course.
+	 */
+	public static function require_login_for_paid_courses( $login_required, $course_id ) {
+		if (
+			empty( $course_id )
+			|| ! Course_Enrolment_Providers::instance()->handles_enrolment( $course_id )
+		) {
+			return $login_required;
+		}
+
+		return true;
+	}
+
+	/**
 	 * Assign user to unassigned purchased courses.
 	 *
 	 * Note: this method seems to be dead code and not hooked to anything, best remove it.
@@ -443,10 +466,12 @@ class Sensei_WC {
 	 *
 	 * @since  Sensei 1.4.5
 	 * @access public
+	 * @deprecated 2.3.0
 	 *
 	 * @return void
 	 */
 	public static function course_link_from_order() {
+		_deprecated_function( __METHOD__, '2.3.0' );
 
 		if ( ! is_order_received_page() ) {
 			return;
@@ -454,9 +479,54 @@ class Sensei_WC {
 
 		$order_id = get_query_var( 'order-received' );
 		$order    = wc_get_order( $order_id );
+
+		$courses = self::get_order_courses( $order );
+
+		if ( ! empty( $courses ) ) {
+			self::generate_order_notice( $courses );
+		}
+	}
+
+	/**
+	 * Display courses section in order details.
+	 *
+	 * @param WC_Order $order The order.
+	 */
+	public static function order_details_display_courses( $order ) {
+		$courses = self::get_order_courses( $order );
+
+		if ( empty( $courses ) ) {
+			return;
+		}
+
+		$course_links = [];
+
+		foreach ( $courses as $course ) {
+			$title           = $course->post_title;
+			$permalink       = get_permalink( $course->ID );
+			$course_links[] .= '<li><a href="' . esc_url( $permalink ) . '" >' . $title . '</a></li>';
+		}
+
+		echo wp_kses_post(
+			'<section class="woocommerce-order-sensei-courses"><h2>' . esc_html__( 'Courses', 'sensei-wc-paid-courses' ) . '</h2>
+			<ul>' . join( '', $course_links ) . '</ul></section>'
+		);
+
+	}
+
+	/**
+	 * Get courses provided by the products in an order.
+	 *
+	 * @param WC_Order $order The order.
+	 *
+	 * @return array|void
+	 */
+	private static function get_order_courses( WC_Order $order ) {
+
 		if ( false === $order ) {
 			return;
 		}
+
 		$status = Sensei_WC_Utils::get_order_status( $order );
 
 		// exit early if not wc-completed or wc-processing.
@@ -476,20 +546,24 @@ class Sensei_WC {
 			}
 		}
 
+		$courses = [];
+
 		if ( ! empty( $product_ids ) ) {
-			self::generate_order_notice( $product_ids );
+
+			$courses = Courses::get_product_courses( $product_ids );
 		}
 
+		return $courses;
 	}
 
 	/**
 	 * Helper method to generate the order's information notice.
 	 *
-	 * @param array $product_ids An array of product ids.
+	 * @deprecated 2.3.0
+	 * @param array $courses Courses in the order.
 	 */
-	private static function generate_order_notice( array $product_ids ) {
-
-		$courses = Courses::get_product_courses( $product_ids );
+	private static function generate_order_notice( array $courses ) {
+		_deprecated_function( __METHOD__, '2.3.0' );
 
 		$course_links = [];
 
@@ -652,6 +726,62 @@ class Sensei_WC {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Add Courses menu item to My Account page.
+	 *
+	 * @access private
+	 * @since  2.3.0
+	 *
+	 * @param array $items My Account menu items.
+	 *
+	 * @return array
+	 */
+	public static function add_my_account_courses_menu( $items ) {
+
+		if ( empty( Sensei()->settings->get( 'my_course_page' ) ) ) {
+			return $items;
+		}
+
+		/**
+		 * Position of Courses item in the My Account menu.
+		 *
+		 * @since 2.3.0
+		 * @hook sensei_wc_paid_courses_my_account_menu_courses_position
+		 *
+		 * @param {int} $position Menu position.
+		 */
+		$position = apply_filters( 'sensei_wc_paid_courses_my_account_menu_courses_position', 2 );
+
+		$courses_item = [ 'courses' => __( 'Courses', 'sensei-wc-paid-courses' ) ];
+
+		return array_slice( $items, 0, $position ) + $courses_item + array_slice( $items, $position );
+	}
+
+	/**
+	 * Point the Courses item in My Account menu to the My Courses page.
+	 *
+	 * @hooked woocommerce_get_endpoint_url
+	 * @since  2.3.0
+	 *
+	 * @param string $url       Endpoint URL.
+	 * @param string $endpoint  Endpoint slug.
+	 * @param string $value     Query param value.
+	 * @param string $permalink Permalink.
+	 *
+	 * @return string
+	 */
+	public static function my_account_courses_menu_link( $url, $endpoint, $value, $permalink ) {
+
+		if ( 'courses' === $endpoint && wc_get_page_permalink( 'myaccount' ) === $permalink ) {
+			$my_courses_page = Sensei()->settings->get( 'my_course_page' );
+			if ( ! empty( $my_courses_page ) ) {
+				return get_permalink( intval( $my_courses_page ) );
+			}
+		}
+
+		return $url;
 	}
 
 	/**
@@ -2128,11 +2258,39 @@ class Sensei_WC {
 			return;
 		}
 
+		switch ( self::get_enrollment_status_for_product_courses( $product_id ) ) {
+			// Not taking courses.
+			case 0:
+				return;
+
+			// The user is not taking all the courses associated with this product, so allow the purchase.
+			case 1:
+				wc_add_notice( __( 'The product you are buying contains a course you are already taking.', 'sensei-wc-paid-courses' ), 'notice' );
+				break;
+
+			// Taking all courses.
+			case 2:
+				throw new Exception( __( 'You are already taking all the courses associated with this product.', 'sensei-wc-paid-courses' ) );
+		};
+	}
+
+	/**
+	 * Check if learner is already taking courses with a product.
+	 *
+	 * @since 2.2.0
+	 *
+	 * @param int $product_id Product ID.
+	 *
+	 * @return int 0 if user is not taking any course with the product.
+	 *             1 if user is taking courses with the product.
+	 *             2 if user is taking all courses with the product.
+	 */
+	public static function get_enrollment_status_for_product_courses( $product_id ) {
 		$user_id = get_current_user_id();
 		$product = self::get_product_object( absint( $product_id ) );
 
 		if ( ! ( $product instanceof \WC_Product ) || ! $user_id ) {
-			return;
+			return 0;
 		}
 
 		$courses              = Courses::get_product_courses( $product_id );
@@ -2146,15 +2304,10 @@ class Sensei_WC {
 		}
 
 		if ( 0 === $courses_started ) {
-			return;
+			return 0;
 		}
 
-		if ( $courses_started === $product_course_count ) {
-			throw new Exception( __( 'You are already taking all the courses associated with this product.', 'sensei-wc-paid-courses' ) );
-		} else {
-			// The user is not taking all the courses associated with this product, so allow the purchase.
-			wc_add_notice( __( 'The product you are buying contains a course you are already taking.', 'sensei-wc-paid-courses' ), 'notice' );
-		}
+		return $courses_started === $product_course_count ? 2 : 1;
 	}
 
 	/**
@@ -2332,4 +2485,5 @@ class Sensei_WC {
 
 		return $purchased_course_data;
 	}
+
 }//end class

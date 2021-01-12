@@ -157,7 +157,7 @@ final class Language_Packs {
 	 */
 	private function get_version_package_data() {
 		$transient_key = self::REMOTE_PACKAGE_TRANSIENT . SENSEI_WC_PAID_COURSES_VERSION;
-		$data          = get_transient( $transient_key );
+		$data          = get_site_transient( $transient_key );
 
 		if ( false !== $data && is_array( $data ) ) {
 			return $data;
@@ -184,7 +184,7 @@ final class Language_Packs {
 			$data['packages'][ $locale ]['package'] = sprintf( self::BASE_PACKAGE_URL . '/%1$s/%2$s.zip', SENSEI_WC_PAID_COURSES_VERSION, $locale );
 		}
 
-		set_transient( $transient_key, $data, $cache_exp );
+		set_site_transient( $transient_key, $data, $cache_exp );
 
 		return $data;
 	}

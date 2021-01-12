@@ -2,12 +2,10 @@
 Contributors: daigo75, aelia
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Tags: woocommerce, utility, framework, aelia
-Requires at least: 4.0
-Tested up to: 5.5
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
-WC requires at least: 2.6
-WC tested up to: 4.4
+Requires at least: 5.0
+Tested up to: 5.6
 
 Adds a set of classes that can simplify the development of other plugins for WooCommerce.
 
@@ -31,9 +29,9 @@ The Aelia Foundation Classes add several classes that can simplify the developme
 This product includes GeoLite2 data created by MaxMind, available from [https://www.maxmind.com](https://www.maxmind.com). By using this software, you agree to use the GeoLite2 exclusively according to the terms set in the GeoLite2 End User License Agreement, which is available here: https://www.maxmind.com/en/geolite2/eula. If you do not wish to accept the terms, you must stop using the software immediately.
 
 ##Requirements
-* WordPress 4.0 or later.
-* PHP 5.4 or later.
-* WooCommerce 2.6 or later
+* WordPress 4.0 or newer.
+* PHP 7.0 or newer.
+* WooCommerce 2.6 or newer.
 
 ## Notes
 * This plugin is provided as-is, and it's not automatically covered by free support. See FAQ for more details.
@@ -64,7 +62,41 @@ Should you have any question about this product, please feel free to [contact us
 
 For more information about installation and management of plugins, please refer to [WordPress documentation](https://codex.wordpress.org/Managing_Plugins#Installing_Plugins).
 
+== Upgrade Notice ==
+
+= 2.1.1.201208 =
+This is a major update, which introduces several important changes. **The required PHP version is now 7.0 or newer**. Please make sure that your server is configured correctly, before installing this update.
+
 == Changelog ==
+
+= 2.1.2.210108 =
+* Tweak - Downgraded 3rd party dependencies, to ensure compatibility with PHP 7.0.
+* Updated supported WooCommerce versions.
+
+= 2.1.1.201208 =
+* Feature - Extended Settings API. Added support for `settings_key` and `value` field attributes in `Settings_Renderer` base class.
+
+= 2.1.0.201112 =
+* Refactoring - Added new methods to `Settings_Renderer` base class, to make the settings API more flexible and easier to extend.
+* Added new `Singleton` trait, to simplify the implementation of `Some_Class::instance()` methods.
+* Updated supported WooCommerce versions.
+
+= 2.0.24.201103 =
+* Corrected version.
+
+= 2.0.23.201029 =
+* Fix - Fixed logging for "headers already sent by" cookie warning. The bug prevented the correct tracking of the file that sent the headers prematurely.
+* Updated supported WooCommerce versions.
+
+= 2.0.22.201005 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 2.0.21.200904 =
+* Updated supported WordPress and WooCommerce versions.
+
+= 2.0.22.200820 =
+* Feature - Added new filter `wc_aelia_is_frontend`, to allow 3rd parties to determine dynamically if context should be considered "frontend".
 
 = 2.0.21.200813 =
 * Updated supported WordPress and WooCommerce versions.

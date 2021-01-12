@@ -110,6 +110,35 @@ class Sensei_Import_Course_Model extends Sensei_Import_Model {
 		$this->set_course_terms( Sensei_Data_Port_Course_Schema::COLUMN_MODULES, 'module', $teacher );
 		$this->set_course_terms( Sensei_Data_Port_Course_Schema::COLUMN_CATEGORIES, 'course-category' );
 
+		// We need to set the post content after modules have been created in order to map module ids properly.
+		$value = $this->get_value( Sensei_Data_Port_Course_Schema::COLUMN_DESCRIPTION );
+		if ( null !== $value ) {
+			$migrator = new Sensei_Import_Block_Migrator( $this->get_post_id(), $this->task, $this );
+
+			wp_update_post(
+				[
+					'ID'           => $post_id,
+					'post_content' => $migrator->migrate( $value ),
+				]
+			);
+		}
+
+		$course_lessons = $this->get_value( Sensei_Data_Port_Course_Schema::COLUMN_LESSONS );
+		if ( null !== $course_lessons ) {
+			/**
+			 * Associations task object for this job.
+			 *
+			 * @var Sensei_Import_Associations $associations_task
+			 */
+			$associations_task = $this->task->get_job()->get_associations_task();
+			$associations_task->add_course_lessons(
+				$this->get_post_id(),
+				$course_lessons,
+				$this->line_number,
+				$this->get_value( $this->schema->get_column_title() )
+			);
+		}
+
 		return true;
 	}
 
@@ -130,11 +159,6 @@ class Sensei_Import_Course_Model extends Sensei_Import_Model {
 
 		if ( $this->is_new() ) {
 			$args['post_status'] = 'draft';
-		}
-
-		$value = $this->get_value( Sensei_Data_Port_Course_Schema::COLUMN_DESCRIPTION );
-		if ( null !== $value ) {
-			$args['post_content'] = $value;
 		}
 
 		$value = $this->get_value( Sensei_Data_Port_Course_Schema::COLUMN_TITLE );
@@ -224,7 +248,7 @@ class Sensei_Import_Course_Model extends Sensei_Import_Model {
 		if ( ! empty( $failed_terms ) ) {
 			$this->add_line_warning(
 				sprintf(
-				// translators: Placeholder is comma separated list of terms that failed to save.
+					// translators: Placeholder is comma separated list of terms that failed to save.
 					__( 'The following terms failed to save: %s', 'sensei-lms' ),
 					implode( ', ', $failed_terms )
 				),

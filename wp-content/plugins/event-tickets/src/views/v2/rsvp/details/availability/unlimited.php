@@ -8,7 +8,7 @@
  *
  * See more documentation about our Blocks Editor templating system.
  *
- * @link  {INSERT_ARTICLE_LINK_HERE}
+ * @link  https://m.tri.be/1amp Help article for RSVP & Ticket template files.
  *
  * @since 4.12.3
  *
@@ -26,5 +26,5 @@ $handler = tribe( 'tickets.handler' );
 
 ?>
 <span class="tribe-tickets__rsvp-availability-unlimited">
-	<?php echo esc_html( $handler->unlimited_term ); ?>
+	<?php echo esc_html( $handler->unlimited_term . ( false !== $days_to_rsvp ? ',' : '' ) ); ?>
 </span>

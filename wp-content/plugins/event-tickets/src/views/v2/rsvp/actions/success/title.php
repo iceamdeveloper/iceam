@@ -8,16 +8,17 @@
  *
  * See more documentation about our Blocks Editor templating system.
  *
- * @link {INSERT_ARTICLE_LINK_HERE}
+ * @link https://m.tri.be/1amp Help article for RSVP & Ticket template files.
  *
  * @since 4.12.3
- * @version 4.12.3
+ * @version 5.0.0
  */
 
+$success_text = ! empty( $is_going ) ? __( 'You are going', 'event-tickets' ) : __( "Can't go", 'event-tickets' );
 ?>
 <div class="tribe-tickets__rsvp-actions-success-going">
 	<em class="tribe-tickets__rsvp-actions-success-going-check-icon"></em>
 	<span class="tribe-tickets__rsvp-actions-success-going-text tribe-common-h4 tribe-common-h6--min-medium">
-		<?php esc_html_e( 'You are going', 'event-tickets' ); ?>
+		<?php echo esc_html( $success_text ); ?>
 	</span>
 </div>

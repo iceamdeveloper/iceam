@@ -43,10 +43,13 @@ class Field_Type_From_To extends \BP_XProfile_Field_Type {
 	public function edit_field_html( array $raw_properties = array() ) {
 		global $field;
 
-		$data = empty( $field->data ) ? array(
+		// does the value field exists.
+		$data_exists = isset( $field->data ) && ! empty( $field->data->id );
+
+		$data = $data_exists ? maybe_unserialize( $field->data->value ) : array(
 			'from' => self::get_from_value( $field->id ),
 			'to'   => self::get_to_value( $field->id ),
-		) : maybe_unserialize( $field->data->value );
+		);
 
 		// make sure data is always array. In case some one changed the field type, do not throw error.
 		if ( ! is_array( $data ) ) {
@@ -61,11 +64,10 @@ class Field_Type_From_To extends \BP_XProfile_Field_Type {
 		}
 
 		$field_name = bp_get_the_profile_field_input_name();
-		$value      = bp_get_the_profile_field_edit_value();
+		$value      = (array) bp_get_the_profile_field_edit_value();
 
-		$is_array = is_array( $value );
-		$from     = $is_array && isset( $value['from'] ) ? $value['from'] : $data['from'];
-		$to       = $is_array && isset( $value['to'] ) ? $value['to'] : $data['to'];
+		$from = isset( $value['from'] ) ? $value['from'] : $data['from'];
+		$to   = isset( $value['to'] ) ? $value['to'] : $data['to'];
 
 		$type = self::get_value_type( $field->id );
 
@@ -208,6 +210,17 @@ class Field_Type_From_To extends \BP_XProfile_Field_Type {
 						</label>
 
 					</p>
+                    <h4> Misc Settings</h4>
+                    <?php $separator = self::get_separator_token( $current_field->id, '-' ); ?>
+                    <p>
+                        <label for="bpxcftr_fromto_separator_token"> <?php _e( 'Value separator', 'bp-xprofile-custom-field-types' );?></label>
+                        <select name="bpxcftr_fromto_separator_token">
+                            <option value="-" <?php selected( $separator, '-', true);?>><?php _e( 'Hyphen(v1 - v2)', 'bp-xprofile-custom-field-types');?></option>
+                            <option value=":" <?php selected( $separator, ':', true );?>><?php _e( 'Colon(v1 : v2)', 'bp-xprofile-custom-field-types');?></option>
+                            <option value="to" <?php selected( $separator, 'to', true );?>><?php _e( 'to( v1 to v2)', 'bp-xprofile-custom-field-types');?></option>
+
+                        </select>
+                    </p>
 
 				</div><!-- constraints -->
 
@@ -238,7 +251,24 @@ class Field_Type_From_To extends \BP_XProfile_Field_Type {
 			return join( '', $field_value );
 		}
 
-		return sprintf( '<span class="bpxcftr-fromto-from-value">%s</span>-<span class="bpxcftr-fromto-to-value">%s</span>', $field_value[0], $field_value[1] );
+		$separator_tokens = array(
+			'-'  => '-',
+			':'  => ':',
+			'to' => _x( 'to', 'From/To field value separator', 'bp-xprofile-custom-field-types' ),
+		);
+
+		if ( $field_id ) {
+			$separator = self::get_separator_token( $field_id );
+		}
+
+		if ( $separator && isset( $separator_tokens[ $separator ] ) ) {
+			$separator = $separator_tokens[ $separator ];
+		} else {
+			$separator = '-';
+		}
+
+
+		return sprintf( '<span class="bpxcftr-fromto-from-value">%1$s</span>%3$s<span class="bpxcftr-fromto-to-value">%2$s</span>', $field_value[0], $field_value[1], $separator );
 	}
 
 	/**
@@ -271,6 +301,11 @@ class Field_Type_From_To extends \BP_XProfile_Field_Type {
 		if ( empty( $type ) || 'string' === $type ) {
 			return true;// allow numbers?
 		}
+		// allow deleting value.
+		if ( '' === $values['from'] && '' === $values['to'] ) {
+			return true;
+		}
+
 
 		if ( 'integer' === $type && ( filter_var( $values['from'], FILTER_VALIDATE_INT ) === false || filter_var( $values['to'], FILTER_VALIDATE_INT ) === false ) ) {
 			return false;
@@ -313,5 +348,23 @@ class Field_Type_From_To extends \BP_XProfile_Field_Type {
 	 */
 	private static function get_to_value( $field_id ) {
 		return bp_xprofile_get_meta( $field_id, 'field', 'to_value', true );
+	}
+
+	/**
+	 * Get the Separator token value
+	 *
+	 * @param int    $field_id field id.
+	 * @param string $default defaut value.
+	 *
+	 * @return int
+	 */
+	private static function get_separator_token( $field_id, $default = '-' ) {
+
+		$token = bp_xprofile_get_meta( $field_id, 'field', 'separator_token', true );
+		if ( empty( $token ) ) {
+			$token = $default;
+		}
+
+		return apply_filters( 'bpxcftr_field_fromto_value_separator_token', $token, $field_id );
 	}
 }

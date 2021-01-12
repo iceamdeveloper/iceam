@@ -169,3 +169,26 @@
 .aelia-premium-plugin-updater .license_key_replace_actions_wrapper {
 	display: inline-block;
 }
+
+/**
+ * Styles for upgrade notices, displayed when a new version of the plugin is available.
+ *
+ * @since 2.1.1.201208
+ */
+.update-message .aelia_plugin_upgrade_notice {
+	border-top: 1px solid #ffb900;
+	padding: 9px 0 9px 12px;
+}
+
+.update-message .aelia_plugin_upgrade_notice:before {
+	display: none;
+}
+
+.update-message .aelia_plugin_upgrade_notice .title {
+	display: block;
+	font-weight: bold;
+}
+
+.update-message .aelia-dummy {
+	display: none;
+}

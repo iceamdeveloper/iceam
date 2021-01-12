@@ -48,12 +48,12 @@ const uploadFile = (
  * A component which displays a list of upload levels. Each level has each own description, upload button and a
  * placeholder for messages.
  *
- * @param {Object}   input                        UploadLevels input.
- * @param {number}   input.jobId                  The job id.
- * @param {Object}   input.state                  The import state.
- * @param {Function} input.uploadFileForLevel     Callback for action to upload file.
- * @param {Function} input.throwEarlyUploadError  Callback for throwing an early upload error.
- * @param {Function} input.deleteLevelFile        The import state.
+ * @param {Object}   input                       UploadLevels input.
+ * @param {number}   input.jobId                 The job id.
+ * @param {Object}   input.state                 The import state.
+ * @param {Function} input.uploadFileForLevel    Callback for action to upload file.
+ * @param {Function} input.throwEarlyUploadError Callback for throwing an early upload error.
+ * @param {Function} input.deleteLevelFile       The import state.
  */
 export const UploadLevels = ( {
 	jobId,
@@ -100,7 +100,10 @@ export const UploadLevels = ( {
 
 				/* eslint-disable jsx-a11y/label-has-for */
 				return (
-					<li key={ level.key } className="sensei-upload-file-line">
+					<li
+						key={ level.key }
+						className="sensei-upload-file-line sensei-data-port-step__line"
+					>
 						<label
 							className="sensei-upload-file-line__description"
 							htmlFor={ `sensei-upload-file-line-${ level.key }` }
@@ -130,7 +133,6 @@ export const UploadLevels = ( {
 								? __( 'Uploading…', 'sensei-lms' )
 								: __( 'Upload', 'sensei-lms' ) }
 						</FormFileUpload>
-
 						{ ( message || deleteButton ) && (
 							<div className="sensei-upload-file-line__info">
 								{ message }

@@ -231,7 +231,7 @@ if(!class_exists('Aelia\WC\Aelia_SessionManager')) {
 			// Don't raise a notice when running Cron jobs, as cookies are most likely not needed during these operations
 			// @since 2.0.17.200504
 			elseif(!defined('DOING_CRON')) {
-				$file = empty($file) ? 'unknown' : '';
+				$file = empty($file) ? 'unknown' : $file;
 				// Use the internal logger to keep track of the fact that the cookie could not be set. This will prevent
 				// PHP notices from being displayed on the frontend and alarming users
 				// @since 2.0.17.200504

@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  6.3.4
+ * @version  6.4.0
  */
 class WC_PB_Compatibility {
 
@@ -85,7 +85,6 @@ class WC_PB_Compatibility {
 		$this->required = array(
 			'cp'     => '6.2.0',
 			'pao'    => '3.0.14',
-			'minmax' => '1.4.1',
 			'topatc' => '1.0.3',
 			'bd'     => '1.3.1'
 		);
@@ -121,7 +120,7 @@ class WC_PB_Compatibility {
 	 * @return void
 	 */
 	public static function core_includes() {
-		require_once( 'core/class-wc-pb-core-compatibility.php' );
+		require_once( WC_PB_ABSPATH . 'includes/compatibility/core/class-wc-pb-core-compatibility.php' );
 	}
 
 	/**
@@ -142,6 +141,11 @@ class WC_PB_Compatibility {
 		if ( class_exists( 'WC_PB_Bundle_Sells' ) ) {
 			remove_action( 'plugins_loaded', array( 'WC_PB_Bundle_Sells', 'load_plugin' ), 10 );
 		}
+
+		// Bundle-Sells mini-extension was merged into PB.
+		if ( class_exists( 'WC_PB_Min_Max_Items' ) ) {
+			remove_action( 'plugins_loaded', array( 'WC_PB_Min_Max_Items', 'load_plugin' ), 10 );
+		}
 	}
 
 	/**
@@ -155,97 +159,124 @@ class WC_PB_Compatibility {
 
 		// Addons support.
 		if ( class_exists( 'WC_Product_Addons' ) && defined( 'WC_PRODUCT_ADDONS_VERSION' ) && version_compare( WC_PRODUCT_ADDONS_VERSION, $this->required[ 'pao' ] ) >= 0 ) {
-			$module_paths[ 'product_addons' ] = 'modules/class-wc-pb-addons-compatibility.php';
+			$module_paths[ 'product_addons' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-addons-compatibility.php';
 		}
 
 		// NYP support.
 		if ( function_exists( 'WC_Name_Your_Price' ) ) {
-			$module_paths[ 'name_your_price' ] = 'modules/class-wc-pb-nyp-compatibility.php';
+			$module_paths[ 'name_your_price' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-nyp-compatibility.php';
 		}
 
 		// Points and Rewards support.
 		if ( class_exists( 'WC_Points_Rewards_Product' ) ) {
-			$module_paths[ 'points_rewards_products' ] = 'modules/class-wc-pb-pnr-compatibility.php';
+			$module_paths[ 'points_rewards_products' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-pnr-compatibility.php';
 		}
 
 		// Pre-orders support.
 		if ( class_exists( 'WC_Pre_Orders' ) ) {
-			$module_paths[ 'pre_orders' ] = 'modules/class-wc-pb-po-compatibility.php';
+			$module_paths[ 'pre_orders' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-po-compatibility.php';
 		}
 
 		// Composite Products support.
 		if ( class_exists( 'WC_Composite_Products' ) && function_exists( 'WC_CP' ) && version_compare( WC_PB()->plugin_version( true, WC_CP()->version ), $this->required[ 'cp' ] ) >= 0 ) {
-			$module_paths[ 'composite_products' ] = 'modules/class-wc-pb-cp-compatibility.php';
+			$module_paths[ 'composite_products' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-cp-compatibility.php';
 		}
 
 		// One Page Checkout support.
 		if ( function_exists( 'is_wcopc_checkout' ) ) {
-			$module_paths[ 'one_page_checkout' ] = 'modules/class-wc-pb-opc-compatibility.php';
+			$module_paths[ 'one_page_checkout' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-opc-compatibility.php';
 		}
 
 		// Cost of Goods support.
 		if ( class_exists( 'WC_COG' ) ) {
-			$module_paths[ 'cost_of_goods' ] = 'modules/class-wc-pb-cog-compatibility.php';
+			$module_paths[ 'cost_of_goods' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-cog-compatibility.php';
 		}
 
 		// QuickView support.
 		if ( class_exists( 'WC_Quick_View' ) ) {
-			$module_paths[ 'quickview' ] = 'modules/class-wc-pb-qv-compatibility.php';
+			$module_paths[ 'quickview' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-qv-compatibility.php';
 		}
 
 		// PIP support.
 		if ( class_exists( 'WC_PIP' ) ) {
-			$module_paths[ 'pip' ] = 'modules/class-wc-pb-pip-compatibility.php';
+			$module_paths[ 'pip' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-pip-compatibility.php';
 		}
 
 		// Subscriptions fixes.
 		if ( class_exists( 'WC_Subscriptions' ) ) {
-			$module_paths[ 'subscriptions' ] = 'modules/class-wc-pb-subscriptions-compatibility.php';
+			$module_paths[ 'subscriptions' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-subscriptions-compatibility.php';
 		}
 
 		// Subscriptions fixes.
 		if ( class_exists( 'WC_Memberships' ) ) {
-			$module_paths[ 'memberships' ] = 'modules/class-wc-pb-members-compatibility.php';
+			$module_paths[ 'memberships' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-members-compatibility.php';
 		}
 
 		// Min Max Quantities integration.
 		if ( class_exists( 'WC_Min_Max_Quantities' ) ) {
-			$module_paths[ 'min_max_quantities' ] = 'modules/class-wc-pb-min-max-compatibility.php';
+			$module_paths[ 'min_max_quantities' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-min-max-compatibility.php';
 		}
 
 		// WP Import/Export support -- based on a hack that does not when exporting using WP-CLI.
 		if ( ! defined( 'WP_CLI' )  ) {
-			$module_paths[ 'wp_import_export' ] = 'modules/class-wc-pb-wp-ie-compatibility.php';
+			$module_paths[ 'wp_import_export' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-wp-ie-compatibility.php';
 		}
 
 		// WooCommerce Give Products support.
 		if ( class_exists( 'WC_Give_Products' ) ) {
-			$module_paths[ 'give_products' ] = 'modules/class-wc-pb-give-products-compatibility.php';
+			$module_paths[ 'give_products' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-give-products-compatibility.php';
 		}
 
 		// Shipwire integration.
 		if ( class_exists( 'WC_Shipwire' ) ) {
-			$module_paths[ 'shipwire' ] = 'modules/class-wc-pb-shipwire-compatibility.php';
+			$module_paths[ 'shipwire' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-shipwire-compatibility.php';
 		}
 
 		// Wishlists compatibility.
 		if ( class_exists( 'WC_Wishlists_Plugin' ) ) {
-			$module_paths[ 'wishlists' ] = 'modules/class-wc-pb-wl-compatibility.php';
+			$module_paths[ 'wishlists' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-wl-compatibility.php';
 		}
 
 		// WooCommerce Services compatibility.
 		if ( class_exists( 'WC_Connect_Loader' ) ) {
-			$module_paths[ 'wc_services' ] = 'modules/class-wc-pb-wc-services-compatibility.php';
+			$module_paths[ 'wc_services' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-wc-services-compatibility.php';
 		}
 
 		// Shipstation integration.
-		$module_paths[ 'shipstation' ] = 'modules/class-wc-pb-shipstation-compatibility.php';
+		$module_paths[ 'shipstation' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-shipstation-compatibility.php';
 
 		// Storefront compatibility.
-		$module_paths[ 'storefront' ] = 'modules/class-wc-pb-sf-compatibility.php';
+		if ( function_exists( 'wc_is_active_theme' ) && wc_is_active_theme( 'storefront' ) ) {
+			$module_paths[ 'storefront' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-sf-compatibility.php';
+		}
+
+		// Flatsome compatibility.
+		if ( function_exists( 'wc_is_active_theme' ) && wc_is_active_theme( 'flatsome' ) ) {
+			$module_paths[ 'flatsome' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-fs-compatibility.php';
+		}
+
+		// Divi compatibility.
+		if ( function_exists( 'wc_is_active_theme' ) && wc_is_active_theme( 'Divi' ) ) {
+			$module_paths[ 'divi' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-et-compatibility.php';
+		}
+
+		// Elementor Pro compatibility.
+		if ( class_exists('\ElementorPro\Plugin') ) {
+			$module_paths[ 'elementor' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-elementor-compatibility.php';
+		}
+
+		// PayPal Express Checkout compatibility.
+		if ( class_exists( 'WC_Gateway_PPEC_Plugin' ) ) {
+			$module_paths[ 'ppec' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-ppec-compatibility.php';
+		}
+
+		// Stripe compatibility.
+		if ( class_exists( 'WC_Gateway_Stripe' ) ) {
+			$module_paths[ 'stripe' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-stripe-compatibility.php';
+		}
 
 		// ThemeAlien Variation Swatches for WooCommerce compatibility.
-		$module_paths[ 'taws_variation_swatches' ] = 'modules/class-wc-pb-taws-variation-swatches-compatibility.php';
+		$module_paths[ 'taws_variation_swatches' ] = WC_PB_ABSPATH . 'includes/compatibility/modules/class-wc-pb-taws-variation-swatches-compatibility.php';
 
 		/**
 		 * 'woocommerce_bundles_compatibility_modules' filter.
@@ -319,23 +350,16 @@ class WC_PB_Compatibility {
 			WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 		}
 
-		// Bundle-Sells mini-extension version check.
+		// Bundle-Sells mini-extension check.
 		if ( class_exists( 'WC_PB_Bundle_Sells' ) ) {
 			$notice = sprintf( __( 'The <strong>Bundle-Sells</strong> mini-extension has been rolled into <strong>Product Bundles</strong>. Please deactivate and remove the <strong>Product Bundles - Bundle-Sells</strong> feature plugin.', 'woocommerce-product-bundles' ) );
 			WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 		}
 
-		// Min/Max Items mini-extension version check.
+		// Min/Max Items mini-extension check.
 		if ( class_exists( 'WC_PB_Min_Max_Items' ) ) {
-			$required_version = $this->required[ 'minmax' ];
-			if ( version_compare( WC_PB()->plugin_version( true, WC_PB_Min_Max_Items::$version ), $required_version ) < 0 ) {
-
-				$extension      = $extension_full = __( 'Product Bundles - Min/Max Items', 'woocommerce-product-bundles' );
-				$extension_url  = 'https://wordpress.org/plugins/product-bundles-minmax-items-for-woocommerce/';
-				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
-
-				WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
-			}
+			$notice = sprintf( __( 'The <strong>Min/Max Items</strong> mini-extension has been rolled into <strong>Product Bundles</strong>. Please deactivate and remove the <strong>Product Bundles - Min/Max Items</strong> feature plugin. If you have localized Min/Max Items in your language, please be aware that all localizable strings have been moved into the Product Bundles text domain.', 'woocommerce-product-bundles' ) );
+			WC_PB_Admin_Notices::add_notice( $notice, 'warning' );
 		}
 
 		// Top Add-to-Cart mini-extension version check.

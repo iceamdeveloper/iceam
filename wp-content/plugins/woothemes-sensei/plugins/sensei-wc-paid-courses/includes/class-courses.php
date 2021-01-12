@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Sensei_WC;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Memberships;
 use Sensei_WC_Utils;
 use Sensei_Utils;
 use WC_Order;
@@ -83,6 +84,9 @@ final class Courses {
 		// Fire hooks after add or remove products from courses.
 		add_action( 'added_post_meta', [ $this, 'maybe_fire_course_product_added_hook' ], 10, 4 );
 		add_action( 'deleted_post_meta', [ $this, 'maybe_fire_course_product_removed_hook' ], 10, 4 );
+
+		// Remove course/product association when product is trashed.
+		add_action( 'wp_trash_post', [ $this, 'remove_product_on_trash' ] );
 
 		// Defer list of products being added or removed from a course.
 		add_action( 'sensei_wc_paid_courses_course_product_toggled', [ $this, 'defer_products_toggled' ], 10, 3 );
@@ -582,6 +586,24 @@ final class Courses {
 
 		add_action( 'rest_insert_course', [ $this, 'sanitize_course_woocommerce_product' ], 10, 2 );
 		add_action( 'rest_insert_course', [ $this, 'store_user_confirmation' ], 11, 2 );
+
+		if ( \Sensei_WC_Memberships::is_wc_memberships_active() ) {
+			register_rest_field(
+				'course',
+				'course_membership_products',
+				[
+					'get_callback' => function( $course_data ) {
+						return \Sensei_WC_Memberships::get_course_membership_product_ids( $course_data['id'] );
+					},
+					'schema'       => [
+						'description' => __( 'The products which are linked to the course memberships.', 'sensei-wc-paid-courses' ),
+						'type'        => 'array',
+						'context'     => [ 'view', 'edit', 'embed' ],
+						'readonly'    => true,
+					],
+				]
+			);
+		}
 	}
 
 	/**
@@ -736,6 +758,22 @@ final class Courses {
 	 */
 	public function maybe_fire_course_product_removed_hook( $meta_ids, $post_id, $meta_key, $meta_value ) {
 		$this->maybe_fire_course_product_toggled_hook( $meta_value, $post_id, $meta_key, 'removed' );
+	}
+
+	/**
+	 * Remove product from course when trashing the product.
+	 *
+	 * @param int $post_id Post that is being sent to the trash.
+	 */
+	public function remove_product_on_trash( $post_id ) {
+		if ( 'product' !== get_post_type( $post_id ) ) {
+			return;
+		}
+
+		$course_ids = wp_list_pluck( self::get_direct_attached_product_courses( $post_id ), 'ID' );
+		foreach ( $course_ids as $course_id ) {
+			delete_post_meta( $course_id, self::META_COURSE_PRODUCT, $post_id );
+		}
 	}
 
 	/**

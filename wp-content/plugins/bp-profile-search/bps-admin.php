@@ -212,8 +212,8 @@ function bps_persistent ($post)
 <?php
 }
 
-add_action ('save_post', 'bps_update_meta', 10, 2);
-function bps_update_meta ($form, $post)
+add_action ('save_post', 'bps_update_meta', 10, 3);
+function bps_update_meta ($form, $post, $update)
 {
 	if ($post->post_type != 'bps_form' || $post->post_status != 'publish')  return false;
 	if (empty ($_POST['options']) && empty ($_POST['bps_options']))  return false;

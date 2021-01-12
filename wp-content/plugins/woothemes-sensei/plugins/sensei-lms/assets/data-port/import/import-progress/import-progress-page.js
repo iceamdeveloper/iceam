@@ -5,14 +5,13 @@ import { __ } from '@wordpress/i18n';
 /**
  * This component displays the import progress page of the importer.
  *
- * @param {Object} input        ImportProgressPage input.
- * @param {Object} input.state  The import state.
+ * @param {Object} input       ImportProgressPage input.
+ * @param {Object} input.state The import state.
  */
 export const ImportProgressPage = ( { state } ) => {
-	const { status, percentage } = state;
-	const isActive = status !== 'completed';
+	const { percentage } = state;
 
-	useProgressPolling( isActive );
+	useProgressPolling();
 
 	return (
 		<section className="sensei-data-port-step sensei-import-progress-page">
@@ -31,7 +30,7 @@ export const ImportProgressPage = ( { state } ) => {
 			>
 				<p>
 					<progress
-						className="sensei-import-progress-page__progress"
+						className="sensei-data-port__progressbar sensei-import-progress-page__progress"
 						max="100"
 						value={ percentage }
 					/>

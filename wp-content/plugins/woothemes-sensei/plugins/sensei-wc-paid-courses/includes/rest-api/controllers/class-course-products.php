@@ -159,20 +159,9 @@ class Course_Products extends WP_REST_Controller {
 	 * @return WP_REST_Response
 	 */
 	public function prepare_item_for_response( $product, $request ) {
-		$data   = [];
 		$fields = $this->get_fields_for_response( $request );
 
-		if ( in_array( 'id', $fields, true ) ) {
-			$data['id'] = $product->ID;
-		}
-
-		if ( in_array( 'name', $fields, true ) ) {
-			$data['name'] = $this->get_product_name( $product );
-		}
-
-		if ( in_array( 'total_sales', $fields, true ) ) {
-			$data['total_sales'] = get_post_meta( $product->ID, 'total_sales', true );
-		}
+		$data = $this->get_product_attributes( $product, $fields );
 
 		return rest_ensure_response( $data );
 	}
@@ -231,6 +220,16 @@ class Course_Products extends WP_REST_Controller {
 					'type'        => 'string',
 					'readonly'    => true,
 				],
+				'description' => [
+					'description' => esc_html__( 'The product description.', 'sensei-wc-paid-courses' ),
+					'type'        => 'string',
+					'readonly'    => true,
+				],
+				'price_html'  => [
+					'description' => esc_html__( 'The product price in HTML.', 'sensei-wc-paid-courses' ),
+					'type'        => 'string',
+					'readonly'    => true,
+				],
 				'total_sales' => [
 					'description' => esc_html__( 'The product\'s total sales.', 'sensei-wc-paid-courses' ),
 					'type'        => 'integer',
@@ -243,29 +242,49 @@ class Course_Products extends WP_REST_Controller {
 	}
 
 	/**
-	 * Get the display name for the product. Generally, this will be the post
-	 * title, but for variations it will also show the variable attributes.
-	 *
-	 * @since 1.1.0
-	 * @access private
+	 * Get the response attributes for a product.
 	 *
 	 * @param mixed $product The product. This can be a WP_Post, WC_Product, or ID.
-	 * @return string
+	 * @param array $fields  The fields to return.
+	 *
+	 * @return array
 	 */
-	private function get_product_name( $product ) {
+	private function get_product_attributes( $product, $fields ) : array {
+		$product_attributes = [];
+
+		if ( in_array( 'id', $fields, true ) ) {
+			$product_attributes['id'] = $product->ID;
+		}
+
 		$product = wc_get_product( $product );
 
 		if ( ! ( $product instanceof \WC_Product ) ) {
-			return '';
+			return $product_attributes;
 		}
 
-		if ( in_array( $product->get_type(), [ 'variation', 'subscription_variation' ], true ) ) {
-			$parent_name = $product->get_parent_data()['title'];
-			$attributes  = $product->get_attribute_summary();
-			return "$parent_name - $attributes";
+		if ( in_array( 'name', $fields, true ) ) {
+			if ( in_array( $product->get_type(), [ 'variation', 'subscription_variation' ], true ) ) {
+				$parent_name                = $product->get_parent_data()['title'];
+				$attributes                 = $product->get_attribute_summary();
+				$product_attributes['name'] = "$parent_name - $attributes";
+			} else {
+				$product_attributes['name'] = $product->get_title();
+			}
 		}
 
-		return $product->get_title();
+		if ( in_array( 'description', $fields, true ) ) {
+			$product_attributes['description'] = wp_kses_post( $product->get_short_description() );
+		}
+
+		if ( in_array( 'price_html', $fields, true ) ) {
+			$product_attributes['price_html'] = wp_kses_post( $product->get_price_html() );
+		}
+
+		if ( in_array( 'total_sales', $fields, true ) ) {
+			$product_attributes['total_sales'] = get_post_meta( $product->get_id(), 'total_sales', true );
+		}
+
+		return $product_attributes;
 	}
 }
 

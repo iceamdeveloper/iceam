@@ -5,10 +5,9 @@
  * @package automattic/jetpack-autoloader
  */
 
-namespace Automattic\Jetpack\Autoloader\jp8fc159bc7852bd778b94a3d5b8347fa5;
+namespace Automattic\Jetpack\Autoloader\jp324ab71ddd6ce9d2b4235222158cda48;
 
  // phpcs:ignore
 
-require_once trailingslashit( dirname( __FILE__ ) ) . 'jetpack-autoloader/autoload_functions.php';
-
-set_up_autoloader();
+require_once __DIR__ . '/jetpack-autoloader/class-autoloader.php';
+Autoloader::init();

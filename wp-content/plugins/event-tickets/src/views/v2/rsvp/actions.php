@@ -8,7 +8,7 @@
  *
  * See more documentation about our Blocks Editor templating system.
  *
- * @link {INSERT_ARTICLE_LINK_HERE}
+ * @link https://m.tri.be/1amp Help article for RSVP & Ticket template files.
  *
  * @var Tribe__Tickets__Ticket_Object $rsvp The rsvp ticket object.
  * @var string|null $step The step the views are on.
@@ -21,7 +21,7 @@
 <div class="tribe-tickets__rsvp-actions-wrapper tribe-common-g-col">
 	<div class="tribe-tickets__rsvp-actions">
 
-		<?php if ( 'success' === $step ) : ?>
+		<?php if ( in_array( $step, [ 'success', 'opt-in' ], true ) ) : ?>
 
 			<?php $this->template( 'v2/rsvp/actions/success', [ 'rsvp' => $rsvp ] ); ?>
 

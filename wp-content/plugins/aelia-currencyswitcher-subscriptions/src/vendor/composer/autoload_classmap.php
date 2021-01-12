@@ -10,4 +10,5 @@ return array(
     'Aelia\\WC\\CurrencySwitcher\\Subscriptions\\Subscriptions_Integration' => $baseDir . '/lib/classes/integration/woothemes-subscriptions-plugin/wc-aelia-cs-subscriptions-integration.php',
     'Aelia_WC_CS_Subscriptions_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-cs-subscriptions-requirementscheck.php',
     'Aelia_WC_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-requirementscheck.php',
+    'Composer\\InstalledVersions' => $vendorDir . '/composer/InstalledVersions.php',
 );

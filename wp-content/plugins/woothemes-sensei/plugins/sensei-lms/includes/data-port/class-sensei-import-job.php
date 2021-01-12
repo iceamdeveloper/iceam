@@ -13,10 +13,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * This class represents a data import job.
  */
 class Sensei_Import_Job extends Sensei_Data_Port_Job {
-	const MAPPED_ID_STATE_KEY = '_map';
-	const RESULT_ERROR        = -1;
-	const RESULT_WARNING      = 0;
-	const RESULT_SUCCESS      = 1;
+	const MAPPED_ID_STATE_KEY   = '_map';
+	const SAMPLE_DATA_STATE_KEY = '_sample';
+	const RESULT_ERROR          = -1;
+	const RESULT_WARNING        = 0;
+	const RESULT_SUCCESS        = 1;
 
 	/**
 	 * The array of the import tasks.
@@ -46,13 +47,23 @@ class Sensei_Import_Job extends Sensei_Data_Port_Job {
 	 */
 	public function get_tasks() {
 		if ( ! isset( $this->tasks ) ) {
-			$this->tasks              = [];
-			$this->tasks['questions'] = $this->initialize_task( Sensei_Import_Questions::class );
-			$this->tasks['courses']   = $this->initialize_task( Sensei_Import_Courses::class );
-			$this->tasks['lessons']   = $this->initialize_task( Sensei_Import_Lessons::class );
+			$this->tasks                 = [];
+			$this->tasks['questions']    = $this->initialize_task( Sensei_Import_Questions::class );
+			$this->tasks['lessons']      = $this->initialize_task( Sensei_Import_Lessons::class );
+			$this->tasks['courses']      = $this->initialize_task( Sensei_Import_Courses::class );
+			$this->tasks['associations'] = $this->initialize_task( Sensei_Import_Associations::class );
 		}
 
 		return $this->tasks;
+	}
+
+	/**
+	 * Fetch the associations task object.
+	 *
+	 * @return Sensei_Import_Associations
+	 */
+	public function get_associations_task() {
+		return $this->get_tasks()['associations'];
 	}
 
 	/**
@@ -102,8 +113,9 @@ class Sensei_Import_Job extends Sensei_Data_Port_Job {
 	public function add_log_entry( $message, $level = self::LOG_LEVEL_INFO, $data = [] ) {
 		if ( isset( $data['code'], $data['type'] ) ) {
 			$event_data = [
-				'type'  => $data['type'],
-				'error' => $data['code'],
+				'type'          => $data['type'],
+				'error'         => $data['code'],
+				'sample_course' => $this->is_sample_data() ? 1 : 0,
 			];
 
 			if ( self::LOG_LEVEL_ERROR === $level ) {
@@ -184,6 +196,13 @@ class Sensei_Import_Job extends Sensei_Data_Port_Job {
 			$this->delete_file( $file_key );
 		}
 
+		if ( ! file_exists( $tmp_file ) ) {
+			return new WP_Error(
+				'sensei_data_port_file_save_failed',
+				__( 'Error saving file.', 'sensei-lms' )
+			);
+		}
+
 		$check_file = $this->check_file( $file_key, $tmp_file, $file_name );
 
 		if ( is_wp_error( $check_file ) ) {
@@ -191,6 +210,24 @@ class Sensei_Import_Job extends Sensei_Data_Port_Job {
 		}
 
 		return parent::save_file( $file_key, $tmp_file, $file_name );
+	}
+
+	/**
+	 * Sets whether this is the sample data being imported.
+	 *
+	 * @param bool $is_sample_data True if this is the sample data being imported.
+	 */
+	public function set_is_sample_data( $is_sample_data ) {
+		$this->set_state( self::SAMPLE_DATA_STATE_KEY, (bool) $is_sample_data );
+	}
+
+	/**
+	 * Whether the data being imported is the sample data.
+	 *
+	 * @return bool
+	 */
+	public function is_sample_data() {
+		return true === $this->get_state( self::SAMPLE_DATA_STATE_KEY );
 	}
 
 	/**
@@ -293,6 +330,23 @@ class Sensei_Import_Job extends Sensei_Data_Port_Job {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Check if a post has already been imported during this job.
+	 *
+	 * @param string $post_type Post type for the imported object.
+	 * @param string $post_id   ID of the post in the database.
+	 *
+	 * @return bool
+	 */
+	public function was_imported( $post_type, $post_id ) {
+		$map = $this->get_state( self::MAPPED_ID_STATE_KEY );
+		if ( ! isset( $map[ $post_type ] ) ) {
+			return false;
+		}
+
+		return in_array( intval( $post_id ), $map[ $post_type ], true );
 	}
 
 	/**

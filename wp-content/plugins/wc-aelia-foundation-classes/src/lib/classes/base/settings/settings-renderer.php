@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use \InvalidArgumentException;
 
@@ -110,7 +110,6 @@ class Settings_Renderer {
 		}
 
 		$tab['sections'][] = $id;
-		//var_dump($tab, $this->_settings_tabs);
 
 		add_settings_section($id, $title, $callback, $page);
 	}
@@ -149,24 +148,179 @@ class Settings_Renderer {
 	}
 
 	/**
+	 * Given an array of items with a "priority" attribute, sorts such items in an ascending order,
+	 * depending on the value of such attribute.
+	 *
+	 * @param array $items An array of items. Each item should be an array itself, with a "priority" element.
+	 * @param string $priority_attr The name of the attribute containing the priority.
+	 * @param integer $default_priority The default priority to assign to an item, if none was specified.
+	 * @return array
+	 * @since 2.1.0.201112
+	 */
+	protected static function sort_items_by_priority($items, $priority_attr = 'priority', $default_priority = 100) {
+		uasort($items, function($elem1, $elem2) use ($priority_attr, $default_priority) {
+			$elem1_priority = $elem1[$priority_attr] ?? $default_priority;
+			$elem2_priority = $elem2[$priority_attr] ?? $default_priority;
+
+			return $elem1_priority <=> $elem2_priority;
+		});
+		return $items;
+	}
+
+	/**
+	 * Returns the tabs to be used to render the Settings page.
+	 *
+	 * @return array
+	 * @since 2.1.0.201112
+	 */
+	protected function get_settings_tabs() {
+		// To be implemented by descendant class
+		return array();
+	}
+
+	/**
 	 * Sets the tabs to be used to render the Settings page.
 	 */
 	protected function add_settings_tabs() {
+		// Add the tabs to the settings page, after sorting them by priority
+		// @since 2.1.0.201112
+		foreach(self::sort_items_by_priority(apply_filters('wc_aelia_' . $this->_settings_key . '_settings_tabs', $this->get_settings_tabs())) as $tab) {
+			$this->add_settings_tab($this->_settings_key,	$tab['id'], $tab['label']);
+		}
+	}
+
+	/**
+	 * Returns the sections to be used to render the Settings page.
+	 *
+	 * @return array
+	 * @since 2.1.0.201112
+	 */
+	protected function get_settings_sections() {
 		// To be implemented by descendant class
+		return array();
+	}
+
+	/**
+	 * Empty callback function, to be used when a callback is not used for
+	 * a section.
+	 *
+	 * @since 2.1.0.201112
+	 */
+	public function void_callback() {
+		// Deliberately left empty
 	}
 
 	/**
 	 * Configures the plugin settings sections.
 	 */
 	protected function add_settings_sections() {
+		foreach(apply_filters('wc_aelia_' . $this->_settings_key . '_settings_sections', $this->get_settings_sections()) as $tab_id => $tab_sections) {
+			// Sort the sections by priority
+			// @since 2.1.0.201112
+			foreach(self::sort_items_by_priority($tab_sections) as $section) {
+				$this->add_settings_section(
+					$section['id'],
+					$section['label'],
+					isset($section['callback']) ? $section['callback'] : array($this, 'void_callback'),
+					$this->_settings_key,
+					$tab_id
+				);
+			}
+		}
+	}
+
+	/**
+	 * Returns the setting fields to be used to render the Settings page.
+	 *
+	 * @return array
+	 * @since 2.1.0.201112
+	 */
+	protected function get_settings_fields() {
 		// To be implemented by descendant class
+		return array();
 	}
 
 	/**
 	 * Configures the plugin settings fields.
 	 */
 	protected function add_settings_fields() {
-		// To be implemented by descendant class
+		foreach(apply_filters('wc_aelia_' . $this->_settings_key . '_settings_fields', $this->get_settings_fields()) as $section_id => $section_fields) {
+			foreach(self::sort_items_by_priority($section_fields) as $field) {
+				$field = array_merge(array(
+					'label' => 'text',
+					'description' => 'text',
+					'css_class' => '',
+					'attributes' => array(),
+					'type' => 'text',
+				), $field);
+
+				// If a field name has been specified, pass it with the rest of the attributes. If not,
+				// the field ID will be used to generate a field name automatically
+				// @since 2.1.0.201112
+				if(!empty($field['name'])) {
+					$field['attributes']['name'] = $field['name'];
+				}
+
+				// If a settingss key has been specified, pass it with the rest of the attributes. If not,
+				// the default settings key from the settings controller will be used automatically
+				// @since 2.1.1.201208
+				if(!empty($field['settings_key'])) {
+					$field['attributes']['settings_key'] = $field['settings_key'];
+				}
+
+				// If a field value has been specified, pass it with the rest of the attributes. If not,
+				// the settings controller will try to fetch the value from the settings loaded from the database
+				// @since 2.1.1.201208
+				if(!empty($field['value'])) {
+					$field['attributes']['value'] = $field['value'];
+				}
+
+				switch($field['type']) {
+					case 'checkbox':
+						$this->render_checkbox_field(
+							$section_id,
+							$field['id'],
+							$field['label'],
+							$field['description'],
+							$field['css_class'],
+							$field['attributes']
+						);
+						break;
+					case 'dropdown':
+						$this->render_dropdown_field(
+							$section_id,
+							$field['id'],
+							$field['label'],
+							$field['options'],
+							$field['description'],
+							$field['css_class'],
+							$field['attributes']
+						);
+						break;
+					case 'custom':
+						$this->render_custom_field(
+							$section_id,
+							$field['id'],
+							$field['label'],
+							$field['attributes'],
+							$field['render_callback']
+						);
+						break;
+					case 'text':
+					default:
+							$this->render_text_field(
+								$section_id,
+								$field['id'],
+								$field['label'],
+								$field['description'],
+								$field['css_class'],
+								$field['attributes'],
+								$field['type']
+							);
+						break;
+				}
+			}
+		}
 	}
 
 	/**
@@ -258,7 +412,6 @@ class Settings_Renderer {
 		}
 
 		foreach($settings_tabs as $tab_id => $tab_info) {
-			$tab_label = get_value('label', $tab_info);
 			$sections = get_value('sections', $tab_info, array());
 
 			echo "<div id=\"tab-{$tab_id}\" class=\"aelia settings-tab\">";
@@ -274,7 +427,7 @@ class Settings_Renderer {
 				}
 
 				$section_id = get_value('id', $section);
-				if(isset($wp_settings_fields[$page]) && get_value($section_id, $wp_settings_fields[$page], false) == true) {
+				if(isset($wp_settings_fields[$page]) && get_value($section_id, $wp_settings_fields[$page], false)) {
 					echo '<table class="form-table">';
 					do_settings_fields($page, $section['id']);
 					echo '</table>';
@@ -312,7 +465,7 @@ class Settings_Renderer {
 		settings_errors();
 		echo '<form id="' . $this->_settings_key . '_form" method="post" action="options.php" class="wc-aelia-plugin-settings">';
 		settings_fields($this->_settings_key);
-		//do_settings_sections($this->_settings_key);
+
 		$this->render_settings_sections($this->_settings_key);
 		echo '<div class="buttons">';
 		$this->render_buttons();
@@ -392,11 +545,11 @@ class Settings_Renderer {
 		if(empty($field_id)) {
 			throw new InvalidArgumentException(__('Field ID must be specified.', $this->_textdomain));
 		}
-		$field_name = get_value('name', $field_args, $field_id);
+		$field_name = $field_args['name'] ?? $field_args['attributes']['name'] ?? $field_id;
 
 		// If a Settings Key has been passed, modify field ID and Name to make them
 		// part of the Settings Key array
-		$settings_key = get_value('settings_key', $field_args, null);
+		$settings_key = $field_args['settings_key'] ?? null;
 		$field_id = $this->group_field($field_id, $settings_key);
 		$field_name = $this->group_field($field_name, $settings_key);
 	}
@@ -602,7 +755,7 @@ class Settings_Renderer {
 		// Retrieve the HTML attributes
 		$attributes = get_value('attributes', $args, array());
 
-		if(get_value('checked', $attributes, false) == true) {
+		if(get_value('checked', $attributes, false)) {
 			$attributes['checked'] = 'checked';
 		}
 		else {
@@ -636,7 +789,6 @@ class Settings_Renderer {
 	public function options_page_load() {
 		if(get_value('settings-updated', $_GET)) {
       //plugin settings have been saved. Display a message, or do anything you like.
-			//var_dump('Settings saved.');
 		}
 	}
 
@@ -661,7 +813,12 @@ class Settings_Renderer {
 	 * @param string type The field type.
 	 */
 	protected function render_text_field($section, $field_id, $label, $description = '', $css_class = '', $attributes = array(), $type = 'text') {
-		$value = $this->current_settings($field_id, $this->default_settings($field_id, ''));
+		// Fetch the value from the attributes passed with the field definition, if present. If absent, fetch
+		// the value from current settings. This allows 3rd parties to inject custom fields whose value has
+		// to be determined using some specific logic
+		// @since 2.1.1.201208
+		$value = $attributes['value'] ?? $this->current_settings($field_id, $this->default_settings($field_id, ''));
+
 		add_settings_field(
 			$field_id,
 	    $label,
@@ -669,7 +826,7 @@ class Settings_Renderer {
 	    $this->_settings_key,
 	    $section,
 	    array(
-				'settings_key' => $this->_settings_key,
+				'settings_key' => $attributes['settings_key'] ?? $this->_settings_key,
 				'id' => $field_id,
 				'label_for' => $field_id,
 				'value' => $value,
@@ -696,7 +853,12 @@ class Settings_Renderer {
 	 * @param array attributes Additional HTML attributes.
 	 */
 	protected function render_checkbox_field($section, $field_id, $label, $description = '', $css_class = '', $attributes = array()) {
-		$value = $this->current_settings($field_id, $this->default_settings($field_id, ''));
+		// Fetch the value from the attributes passed with the field definition, if present. If absent, fetch
+		// the value from current settings. This allows 3rd parties to inject custom fields whose value has
+		// to be determined using some specific logic
+		// @since 2.1.1.201208
+		$value = $attributes['value'] ?? $this->current_settings($field_id, $this->default_settings($field_id, ''));
+
 		add_settings_field(
 			$field_id,
 	    $label,
@@ -704,7 +866,7 @@ class Settings_Renderer {
 	    $this->_settings_key,
 	    $section,
 	    array(
-				'settings_key' => $this->_settings_key,
+				'settings_key' => $attributes['settings_key'] ?? $this->_settings_key,
 				'id' => $field_id,
 				'label_for' => $field_id,
 				// Input field attributes
@@ -730,7 +892,11 @@ class Settings_Renderer {
 	 * @param array attributes Additional HTML attributes (e.g. "multiple").
 	 */
 	protected function render_dropdown_field($section, $field_id, $label, $options, $description = '', $css_class = '', $attributes = array()) {
-		$value = $this->current_settings($field_id, $this->default_settings($field_id, ''));
+		// Fetch the value from the attributes passed with the field definition, if present. If absent, fetch
+		// the value from current settings. This allows 3rd parties to inject custom fields whose value has
+		// to be determined using some specific logic
+		// @since 2.1.1.201208
+		$value = $attributes['value'] ?? $this->current_settings($field_id, $this->default_settings($field_id, ''));
 
 		add_settings_field(
 			$field_id,
@@ -739,7 +905,7 @@ class Settings_Renderer {
 	    $this->_settings_key,
 	    $section,
 	    array(
-				'settings_key' => $this->_settings_key,
+				'settings_key' => $attributes['settings_key'] ?? $this->_settings_key,
 				'id' => $field_id,
 				'label_for' => $field_id,
 				'options' => $options,
@@ -750,6 +916,33 @@ class Settings_Renderer {
 					'description' => $description,
 				), $attributes),
 			)
+		);
+	}
+
+	/**
+	 * Handlesa custom field, which will be rendered using a dedicated callback function.
+	 *
+	 * @param string $section
+	 * @param string $field_id
+	 * @param string $field_label
+	 * @param array $attributes
+	 * @param callable $render_callback
+	 * @since 2.1.0.201112
+	 */
+	protected function render_custom_field($section, $field_id, $field_label, array $attributes, $render_callback) {
+		if(!is_callable($render_callback)) {
+			// Invalid callback, report issue
+			return;
+		}
+
+		// Add "Exchange Rates" table
+		add_settings_field(
+			$field_id,
+			$field_label,
+			$render_callback,
+			$this->_settings_key,
+			$section,
+			$attributes
 		);
 	}
 }

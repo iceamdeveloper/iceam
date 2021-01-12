@@ -44,6 +44,7 @@ final class Courses {
 		add_filter( 'sensei_course_meta_default_save', [ $this, 'disable_default_save_for_course_woocommerce_product' ], 10, 3 );
 		add_action( 'sensei_course_meta_before_save', [ $this, 'save_course_woocommerce_product' ], 10, 3 );
 		add_filter( 'update_post_metadata', [ $this, 'save_course_woocommerce_product_fallback' ], 10, 4 );
+		add_filter( 'sensei_duplicate_post_ignore_meta', [ $this, 'duplicate_course_ignore_course_product_meta' ], 10, 3 );
 		add_filter( 'manage_edit-course_columns', [ $this, 'add_column_headings' ], 10, 1 );
 		add_action( 'manage_posts_custom_column', [ $this, 'add_column_data' ], 10, 2 );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
@@ -141,6 +142,27 @@ final class Courses {
 		// Save the meta correctly, and prevent the default functionality.
 		$this->save_course_woocommerce_product( $object_id, $meta_key, $meta_value );
 		return false;
+	}
+
+	/**
+	 * Skip duplicating course product meta field when duplicating a course.
+	 *
+	 * @hooked sensei_duplicate_post_ignore_meta
+	 * @since 2.3.0
+	 *
+	 * @param array    $meta_keys The meta keys to be ignored.
+	 * @param \WP_Post $new_post  The new duplicate post.
+	 * @param \WP_Post $post      The original post that's being duplicated.
+	 *
+	 * @return array The meta keys to be ignored.
+	 */
+	public function duplicate_course_ignore_course_product_meta( $meta_keys, $new_post, $post ) {
+
+		if ( 'course' === $post->post_type ) {
+			$meta_keys[] = \Sensei_WC_Paid_Courses\Courses::META_COURSE_PRODUCT;
+		}
+
+		return $meta_keys;
 	}
 
 	/**
@@ -480,7 +502,7 @@ MODAL;
 
 				wp_enqueue_style(
 					'sensei-wcpc-admin-course',
-					\Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses::instance()->plugin_url . '/assets/css/sensei-wcpc-admin-course.css',
+					\Sensei_WC_Paid_Courses\Sensei_WC_Paid_Courses::instance()->plugin_url . '/assets/dist/css/sensei-wcpc-admin-course.css',
 					[],
 					SENSEI_WC_PAID_COURSES_VERSION
 				);

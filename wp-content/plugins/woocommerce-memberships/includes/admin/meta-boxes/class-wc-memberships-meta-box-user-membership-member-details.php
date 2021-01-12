@@ -21,7 +21,7 @@
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -95,19 +95,23 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends \WC_Members
 		echo get_avatar( $user->ID, 256 );
 
 		?>
-		<h2 class="member-name"><?php echo esc_html( $user->display_name ); ?> <a class="edit-member" href="<?php echo esc_url( get_edit_user_link( $user->ID ) ); ?>">(<?php echo strtolower( esc_html__( 'Edit User', 'woocommerce-memberships' ) ); ?>)</a></h2>
-
+		<h2 class="member-name">
+			<a class="edit-member" href="<?php echo esc_url( get_edit_user_link( $user->ID ) ); ?>">
+				<span class="dashicons dashicons-edit"></span><?php echo esc_html( $user->display_name ); ?>
+			</a>
+		</h2>
 		<p>
 			<a href="mailto:<?php echo esc_attr( $user->user_email ); ?>" class="member-email"><?php echo esc_html( $user->user_email ); ?></a>
 			<br><br>
 			<?php if ( $member_since = wc_memberships()->get_user_memberships_instance()->get_user_member_since_local_date( $user->ID, 'timestamp' ) ) : ?>
 
-				<span class="member-since"><?php
-
-					/* translators: Placeholder: %s - date */
-					printf( __( 'Member since %s', 'woocommerce-memberships' ),
+				<span class="member-since">
+					<?php printf(
+						/* translators: Placeholder: %s - date */
+						esc_html__( 'Member since %s', 'woocommerce-memberships' ),
 						date_i18n( wc_date_format(), $member_since )
-					); ?></span>
+					); ?>
+				</span>
 
 			<?php endif; ?>
 		</p>
@@ -142,6 +146,22 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends \WC_Members
 		</address>
 		<br>
 		<?php
+
+		$last_active = get_user_meta( $user->ID, 'wc_last_active', true );
+
+		if ( is_numeric( $last_active ) ) :
+
+			?>
+			<span class="last-login">
+				<?php printf(
+					/* translators: Placeholder: %s last login since */
+					esc_html__( 'Last login: %s ago', 'woocommerce-memberships' ),
+					human_time_diff( (int) $last_active )
+				); ?>
+			</span>
+			<?php
+
+		endif;
 
 		/**
 		 * Fires at the end of the member detail meta box.

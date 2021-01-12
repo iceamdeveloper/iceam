@@ -286,6 +286,8 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		protected function set_hooks() {
 			add_action('init', array($this, 'wordpress_loaded'));
 			add_action('admin_init', array($this, 'run_updates'));
+			// @since 2.1.1.201208
+			add_action('current_screen', array($this, 'conditional_includes'));
 
 			// Called after all plugins have loaded
 			add_action('plugins_loaded', array($this, 'plugins_loaded'));
@@ -310,6 +312,30 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 
 			// Automatic updates
 			add_filter('wc_aelia_afc_register_plugins_to_update', array($this, 'wc_aelia_afc_register_plugins_to_update'), 10, 1);
+		}
+
+		/**
+		 * Include admin files conditionally.
+		 *
+		 * @ since 2.1.1.201208
+		 */
+		public function conditional_includes() {
+			$screen = get_current_screen();
+
+			if(empty($screen)) {
+				return;
+			}
+
+			switch($screen->id) {
+				case 'plugins':
+					if(!empty($this->main_plugin_file)) {
+						// Load the upgrade handler, which will display information such as important upgrade notices
+						Aelia_Upgrade_Handler::instance($this);
+					}
+					break;
+				default:
+					// Do nothing
+			}
 		}
 
 		/**
@@ -675,7 +701,9 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		public static function is_frontend() {
 			$ajax_action = isset($_REQUEST['action']) ? strtolower($_REQUEST['action']) : '';
 
-			return !is_admin() || (
+			// Allow 3rd parties to determine dynamically if current context should be considered "frontend"
+			// @since 2.0.22.200820
+			return apply_filters('wc_aelia_is_frontend', !is_admin() || (
 				self::doing_ajax() &&
 				!in_array($ajax_action, array(
 					// The following actions are called in the backend. If they are used, then
@@ -690,7 +718,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 					// @since 2.0.18.200512
 					'woocommerce_do_ajax_product_import',
 					'woocommerce_do_ajax_product_export',
-				)));
+				))), static::$plugin_slug);
 		}
 
 		/**

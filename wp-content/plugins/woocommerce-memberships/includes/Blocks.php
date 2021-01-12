@@ -23,9 +23,9 @@
 
 namespace SkyVerge\WooCommerce\Memberships;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
 
-defined('ABSPATH') or exit;
+defined( 'ABSPATH' ) or exit;
 
 /**
  * Blocks handler for the Gutenberg editor.

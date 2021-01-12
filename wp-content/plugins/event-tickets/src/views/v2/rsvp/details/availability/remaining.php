@@ -8,7 +8,7 @@
  *
  * See more documentation about our Blocks Editor templating system.
  *
- * @link  {INSERT_ARTICLE_LINK_HERE}
+ * @link  https://m.tri.be/1amp Help article for RSVP & Ticket template files.
  *
  * @var Tribe__Tickets__Ticket_Object $rsvp The rsvp ticket object.
  * @var int $threshold The threshold.
@@ -28,12 +28,12 @@ echo wp_kses_post(
 	sprintf(
 		// Translators: 1: opening span. 2: the number of remaining tickets to RSVP. 3: Closing span.
 		_x(
-			'%1$s %2$s %3$s remaining, ',
+			'%1$s %2$s %3$s remaining',
 			'Remaining RSVP quantity',
 			'event-tickets'
 		),
 		'<span class="tribe-tickets__rsvp-availability-quantity tribe-common-b2--bold">',
 		$remaining_tickets,
 		'</span>'
-	)
+	) . ( false !== $days_to_rsvp ? ',' : '' )
 );

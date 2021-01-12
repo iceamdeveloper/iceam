@@ -23,7 +23,7 @@
 
 namespace SkyVerge\WooCommerce\Memberships;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_7_1 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -117,6 +117,31 @@ class REST_API extends Framework\REST_API {
 				$user_memberships_api->register_routes();
 			}
 		}
+	}
+
+
+	/**
+	 * Determines if the current request is for a WC REST API endpoint.
+	 *
+	 * @since 1.19.0-dev.1
+	 *
+	 * @return bool
+	 */
+	public function is_rest_api_request() {
+
+		if ( function_exists( 'WC' ) && is_callable( [ WC(), 'is_rest_api_request' ] ) ) {
+			return (bool) WC()->is_rest_api_request();
+		}
+
+		if ( empty( $_SERVER['REQUEST_URI'] ) || ! function_exists( 'rest_get_url_prefix' ) ) {
+			return false;
+		}
+
+		$rest_prefix         = trailingslashit( rest_get_url_prefix() );
+		$is_rest_api_request = false !== strpos( $_SERVER['REQUEST_URI'], $rest_prefix );
+
+		/* applies WooCommerce core filter */
+		return (bool) apply_filters( 'woocommerce_is_rest_api_request', $is_rest_api_request );
 	}
 
 

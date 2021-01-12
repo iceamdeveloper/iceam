@@ -186,7 +186,7 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 	 * @since  4.5
 	 * @since  4.11.3 Now also displays for posts having only RSVPs. Also changed from <form> to <button>.
 	 *
-	 * @param bool $echo Whether or not we should print
+	 * @param bool $echo Whether or not we should print.
 	 *
 	 * @return string
 	 */
@@ -202,10 +202,10 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 			return '';
 		}
 
-		// get an array for ticket and rsvp counts
+		// Get an array for ticket and rsvp counts.
 		$types = Tribe__Tickets__Tickets::get_ticket_counts( $event_id );
 
-		// if no rsvp or tickets return
+		// If no rsvp or tickets return.
 		if ( ! $types ) {
 			return '';
 		}
@@ -213,7 +213,7 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 		$html  = [];
 		$parts = [];
 
-		// If we have tickets or RSVP, but everything is Sold Out then display the Sold Out message
+		// If we have tickets or RSVP, but everything is Sold Out then display the Sold Out message.
 		foreach ( $types as $type => $data ) {
 			if ( ! $data['count'] ) {
 				continue;
@@ -222,14 +222,14 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 			if ( ! $data['available'] ) {
 				$parts[ $type . '-stock' ] = '<span class="tribe-out-of-stock">' . esc_html_x( 'Sold out', 'list view stock sold out', 'event-tickets' ) . '</span>';
 
-				// Only re-apply if we don't have a stock yet
+				// Only re-apply if we don't have a stock yet.
 				if ( empty( $html['stock'] ) ) {
 					$html['stock'] = $parts[ $type . '-stock' ];
 				}
 			} else {
 				$stock = $data['stock'];
 				if ( $data['unlimited'] || ! $data['stock'] ) {
-					// if unlimited tickets, tickets with no stock and rsvp, or no tickets and rsvp unlimited - hide the remaining count
+					// if unlimited tickets, tickets with no stock and rsvp, or no tickets and rsvp unlimited - hide the remaining count.
 					$stock = false;
 				}
 
@@ -262,8 +262,10 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 						}
 
 						if ( 'rsvp' === $type ) {
+							// Translators: %s number of RSVP spots left.
 							$text = _n( '%s spot left', '%s spots left', $stock, 'event-tickets' );
 						} else {
+							// Translators: %s number of tickets left.
 							$text = _n( '%s ticket left', '%s tickets left', $stock, 'event-tickets' );
 						}
 
@@ -276,6 +278,7 @@ if ( ! function_exists( 'tribe_tickets_buy_button' ) ) {
 				$parts[ $type . '-stock' ] = $html['stock'] = $stock_html;
 
 				if ( 'rsvp' === $type ) {
+					// Translators: %s RSVP singular or plural.
 					$button_label  = sprintf( _x( '%s Now!', 'list view rsvp now ticket button', 'event-tickets' ), tribe_get_rsvp_label_singular( 'list_view_rsvp_now_button' ) );
 					$button_anchor = '#rsvp-now';
 				} else {
@@ -634,14 +637,14 @@ if ( ! function_exists( 'tribe_tickets_get_template_part' ) ) {
 	 * Includes a template part, similar to the WP get template part, but looks
 	 * in the correct directories for Tribe Tickets templates
 	 *
-	 * @param string      $slug The Base template name
-	 * @param null|string $name (optional) if set will try to include `{$slug}-{$name}.php` file
-	 * @param array       $data (optional) array of vars to inject into the template part
-	 * @param boolean     $echo (optional) Allows the user to print or return the template
-	 *
-	 * @return string|void It will depend if it's echoing or not
 	 * @uses Tribe__Tickets__Templates::get_template_hierarchy
 	 *
+	 * @param string      $slug The Base template name.
+	 * @param null|string $name (optional) if set will try to include `{$slug}-{$name}.php` file.
+	 * @param array       $data (optional) array of vars to inject into the template part.
+	 * @param bool        $echo (optional) Allows the user to print or return the template.
+	 *
+	 * @return string|void Whether it's echoing or not.
 	 */
 	function tribe_tickets_get_template_part( $slug, $name = null, array $data = null, $echo = true ) {
 
@@ -770,10 +773,11 @@ if ( ! function_exists( 'tribe_tickets_get_template_part' ) ) {
 if ( ! function_exists( 'tribe_tickets_post_type_enabled' ) ) {
 
 	/**
-	 * Returns whether or not the provided post type allows tickets to be attached
+	 * Returns whether the provided post type allows tickets to be attached
 	 *
 	 * @param string $post_type
-	 * @return boolean
+	 *
+	 * @return bool
 	 */
 	function tribe_tickets_post_type_enabled( $post_type ) {
 		$post_types = Tribe__Tickets__Main::instance()->post_types();
@@ -1085,7 +1089,13 @@ if ( ! function_exists( 'tribe_get_event_capacity' ) ) {
 
 		$provider = Tribe__Tickets__Tickets::get_event_ticket_provider_object( $post_id );
 
-		if ( empty( $provider ) ) {
+		$has_provider = ! empty( $provider );
+
+		if ( ( ! $has_provider && $rsvp_tickets ) || $provider instanceof Tribe__Tickets__RSVP ) {
+			// If we have no provider but have RSVP tickets, or the provider is RSVP, return the RSVP capacity.
+			return (int) $rsvp_cap;
+		} elseif ( ! $has_provider ) {
+			// If we have no provider, return null for no capacity set.
 			return null;
 		}
 
@@ -1200,7 +1210,7 @@ if ( ! function_exists( 'tribe_tickets_ticket_in_wc_membership_for_user' ) ) {
 	 * @param int $ticket_id
 	 * @param int $user_id
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	function tribe_tickets_ticket_in_wc_membership_for_user( $ticket_id, $user_id = 0 ) {
 
@@ -1486,7 +1496,7 @@ if ( ! function_exists( 'tribe_tickets_is_event_page' ) ) {
 	 *
 	 * @param int|WP_Post|null $post The post (or its ID) we're testing. Default is global post.
 	 *
-	 * @return boolean
+	 * @return bool
 	 */
 	function tribe_tickets_is_event_page( $post = null ) {
 		// Tribe__Events__Main must exist.
@@ -1567,92 +1577,34 @@ if ( ! function_exists( 'tribe_tickets_is_enabled_post_context' ) ) {
  *
  * @since 4.12.3
  *
- * @return boolean Whether new RSVP views are enabled.
+ * @return bool Whether new RSVP views are enabled.
  */
 function tribe_tickets_rsvp_new_views_is_enabled() {
 	// Check for constant.
 	if ( defined( 'TRIBE_TICKETS_RSVP_NEW_VIEWS' ) ) {
-		return (boolean) TRIBE_TICKETS_RSVP_NEW_VIEWS;
+		return (bool) TRIBE_TICKETS_RSVP_NEW_VIEWS;
 	}
 
 	// Check for env var.
 	$env_var = getenv( 'TRIBE_TICKETS_RSVP_NEW_VIEWS' );
 
 	if ( false !== $env_var ) {
-		return (boolean) $env_var;
+		return (bool) $env_var;
 	}
 
-	// @todo Remove this in G20.07
-	return false;
+	// Determine if ET was installed at version 5.0+.
+	$should_default_to_on = ! tribe_installed_before( 'Tribe__Tickets__Main', '5.0' );
 
-	// Determine if ET was installed at version 4.12.2+.
-	$should_default_to_on = ! tribe_installed_before( 'Tribe__Tickets__Main', '4.12.2' );
-
-	$enabled = (boolean) tribe_get_option( 'tickets_rsvp_use_new_views', $should_default_to_on );
+	$enabled = (bool) tribe_get_option( 'tickets_rsvp_use_new_views', $should_default_to_on );
 
 	/**
 	 * Allows filtering whether new RSVP views are enabled.
 	 *
 	 * @since 4.12.3
 	 *
-	 * @param boolean $enabled Whether new RSVP views are enabled.
+	 * @param bool $enabled Whether new RSVP views are enabled.
 	 */
 	return apply_filters( 'tribe_tickets_rsvp_new_views_is_enabled', $enabled );
-}
-
-if ( ! function_exists( 'tribe_tickets_ar_field_is_required' ) ) {
-	/**
-	 * Check if the AR field is required.
-	 *
-	 * @since 4.12.3
-	 *
-	 * @param object $field The field object.
-	 *
-	 * @return bool True if is required
-	 */
-	function tribe_tickets_ar_field_is_required( $field ) {
-		return isset( $field->required ) && 'on' === $field->required;
-	}
-}
-
-if ( ! function_exists( 'tribe_tickets_ar_field_name' ) ) {
-	/**
-	 * Build the AR field name.
-	 *
-	 * @since 4.12.3
-	 *
-	 * @param int    $ticket_id  The ticket ID.
-	 * @param string $field_slug The field slug.
-	 *
-	 * @return string The AR field name.
-	 */
-	function tribe_tickets_ar_field_name( $ticket_id, $field_slug ) {
-		return 'tribe-tickets-meta[' . $ticket_id . '][{{data.attendee_id}}][' . $field_slug . ']';
-	}
-}
-
-if ( ! function_exists( 'tribe_tickets_ar_field_id' ) ) {
-	/**
-	 * Build the AR field `id`.
-	 *
-	 * @since 4.12.3
-	 *
-	 * @param int    $ticket_id   The ticket ID.
-	 * @param string $field_slug  The field slug.
-	 * @param string $option_slug The field option slug (in case they need it).
-	 *
-	 * @return string The AR field id.
-	 */
-	function tribe_tickets_ar_field_id( $ticket_id, $field_slug, $option_slug = '' ) {
-
-		$field_id = "tribe-tickets-meta_{$ticket_id}_{$field_slug}{{data.attendee_id}}";
-
-		if ( ! empty( $option_slug ) ) {
-			$field_id .= "_{$option_slug}";
-		}
-
-		return $field_id;
-	}
 }
 
 if ( ! function_exists( 'tribe_get_guest_label_singular' ) ) {
@@ -1783,5 +1735,48 @@ if ( ! function_exists( 'tribe_tickets_is_provider_active' ) ) {
 			class_exists( $provider )
 			&& array_key_exists( $provider, Tribe__Tickets__Tickets::modules() )
 		);
+	}
+}
+
+if ( ! function_exists( 'tribe_tickets_new_views_is_enabled' ) ) {
+	/**
+	 * Determine whether the new Tickets views are enabled.
+	 *
+	 * In order: the function will check the constant, the environment variable, the settings UI option, and then
+	 * allow filtering.
+	 *
+	 * @since 5.0.3
+	 *
+	 * @return bool Whether the tickets block views is enabled.
+	 */
+	function tribe_tickets_new_views_is_enabled() {
+		// Check for constant.
+		if ( defined( 'TRIBE_TICKETS_NEW_VIEWS' ) ) {
+			return (bool) TRIBE_TICKETS_NEW_VIEWS;
+		}
+
+		// Check for env var.
+		$env_var = getenv( 'TRIBE_TICKETS_NEW_VIEWS' );
+
+		if ( false !== $env_var ) {
+			return (bool) $env_var;
+		}
+
+		// If ETP was installed on or after version 5.1, default to enabled.
+		$should_default_to_on = class_exists( 'Tribe__Tickets_Plus__Main' ) && ! tribe_installed_before( 'Tribe__Tickets_Plus__Main', '5.1' );
+
+		// Check for settings UI option.
+		$enabled = (bool) tribe_get_option( 'tickets_use_new_views', $should_default_to_on );
+
+		/**
+		 * Allows filtering whether the tickets block views is enabled.
+		 *
+		 * @since 5.0.3
+		 *
+		 * @param bool $enabled Whether the tickets block views are enabled.
+		 *
+		 * @var bool   $enabled Whether the tickets block views are enabled.
+		 */
+		return (bool) apply_filters( 'tribe_tickets_new_views_is_enabled', $enabled );
 	}
 }

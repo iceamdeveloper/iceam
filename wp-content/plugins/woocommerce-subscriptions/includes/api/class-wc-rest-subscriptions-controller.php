@@ -215,6 +215,8 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 				$subscription->payment_complete( $request['transaction_id'] );
 			}
 
+			do_action( 'wcs_api_subscription_created', $subscription->get_id() );
+
 			return $subscription->get_id();
 		} catch ( WC_Data_Exception $e ) {
 			return new WP_Error( $e->getErrorCode(), $e->getMessage(), $e->getErrorData() );
@@ -266,6 +268,8 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 			if ( $subscription->needs_payment() && true === $request['set_paid'] ) {
 				$subscription->payment_complete();
 			}
+
+			do_action( 'wcs_api_subscription_updated', $subscription->get_id() );
 
 			return $subscription->get_id();
 		} catch ( WC_Data_Exception $e ) {
@@ -439,6 +443,9 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 							}
 						}
 						break;
+					case 'transition_status':
+						$subscription->update_status( $value );
+						break;
 					case 'start_date':
 					case 'trial_end_date':
 					case 'next_payment_date':
@@ -486,6 +493,12 @@ class WC_REST_Subscriptions_Controller extends WC_REST_Orders_V1_Controller {
 		$schema = parent::get_item_schema();
 
 		$subscriptions_schema = array(
+			'transition_status'         => array(
+				'description' => __( 'The status to transition the subscription to. Unlike the "status" param, this will calculate and update the subscription dates.', 'woocommerce-subscriptions' ),
+				'type'        => 'string',
+				'enum'        => $this->get_order_statuses(),
+				'context'     => array( 'edit' ),
+			),
 			'billing_interval'          => array(
 				'description' => __( 'The number of billing periods between subscription renewals.', 'woocommerce-subscriptions' ),
 				'type'        => 'integer',

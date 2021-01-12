@@ -38,10 +38,9 @@ if ( \Sensei_WC_Paid_Courses\Course_Enrolment_Providers::use_legacy_enrolment_me
 
 /******************************
  *
- * Order and checkout hooks.
+ * Login required to access content.
  */
-// add a notice on the checkout page to tell users about the course they've purchase.
-add_action( 'template_redirect', [ 'Sensei_WC', 'course_link_from_order' ] );
+add_filter( 'sensei_is_login_required', [ 'Sensei_WC', 'require_login_for_paid_courses' ], 10, 2 );
 
 /******************************
  *
@@ -88,7 +87,20 @@ add_filter( 'woocommerce_payment_complete_order_status', [ 'Sensei_WC', 'virtual
 
 /************************************
  *
+ * Order details
+ */
+add_action( 'woocommerce_after_order_details', [ 'Sensei_WC', 'order_details_display_courses' ] );
+
+/************************************
+ *
  * Add To Cart
  */
 // fail to add to cart if user already taking course.
 add_action( 'woocommerce_add_to_cart', [ 'Sensei_WC', 'do_not_add_course_to_cart_if_user_taking_course' ], 10, 6 );
+
+/************************************
+ *
+ * My Account
+ */
+add_filter( 'woocommerce_account_menu_items', [ 'Sensei_WC', 'add_my_account_courses_menu' ], 10, 1 );
+add_filter( 'woocommerce_get_endpoint_url', [ 'Sensei_WC', 'my_account_courses_menu_link' ], 10, 4 );

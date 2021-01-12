@@ -61,7 +61,11 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 */
 	public function maybe_set_attendee_meta_cookie( $ticket_meta = null, $provider = null ) {
 		if ( null === $ticket_meta ) {
-			if ( ! isset( $_POST[ self::META_DATA_KEY ] ) ) {
+			if ( isset( $_POST['tribe_tickets'] ) ) {
+				$ticket_meta = $_POST['tribe_tickets'];
+			} elseif ( isset( $_POST[ self::META_DATA_KEY ] ) ) {
+				$ticket_meta = $_POST[ self::META_DATA_KEY ];
+			} else {
 				return false;
 			}
 
@@ -74,8 +78,6 @@ class Tribe__Tickets_Plus__Meta__Storage {
 			if ( ! empty( $_POST['process-tickets'] ) ) {
 				return false;
 			}
-
-			$ticket_meta = $_POST[ self::META_DATA_KEY ];
 		}
 
 		// Bad meta.
@@ -115,6 +117,26 @@ class Tribe__Tickets_Plus__Meta__Storage {
 
 		// Generate a new hash key.
 		$hash_key = uniqid();
+
+		$has_new_meta = false;
+
+		$first_meta = current( $ticket_meta );
+
+		if ( ! empty( $first_meta['attendees'] ) ) {
+			$new_meta = [];
+
+			foreach ( $ticket_meta as $ticket_id => $ticket_data ) {
+				$attendee_meta = [];
+
+				foreach ( $ticket_data['attendees'] as $attendee_key => $attendee ) {
+					$attendee_meta[ $attendee_key ] = $attendee['meta'];
+				}
+
+				$new_meta[ $ticket_id ] = $attendee_meta;
+			}
+
+			$ticket_meta = $new_meta;
+		}
 
 		$ticket_meta = Tribe__Utils__Array::escape_multidimensional_array( $ticket_meta );
 
@@ -303,7 +325,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	/**
 	 * Store temporary data as a transient.
 	 *
-	 * @param array $temporary_data Temporary data to store.
+	 * @param mixed $temporary_data Temporary data to store.
 	 *
 	 * @return string
 	 */
@@ -390,7 +412,7 @@ class Tribe__Tickets_Plus__Meta__Storage {
 	 *
 	 * @since 4.11.0
 	 *
-	 * @param array       $data     Meta data to save.
+	 * @param mixed       $data     Metadata to save. Will be cast to array if not already.
 	 * @param null|int    $id       Post ID (or null if using current post).
 	 *                              Note: This is only for context, it does not affect what is saved.
 	 * @param null|string $hash_key The hash key.
@@ -408,6 +430,13 @@ class Tribe__Tickets_Plus__Meta__Storage {
 		if ( empty( $transient_name ) ) {
 			return false;
 		}
+
+		/**
+		 * Consistency with expected value type.
+		 *
+		 * @see get_meta_data() Notice that it bails if not returned an array value, as expected.
+		 */
+		$data = (array) $data;
 
 		$this->data_cache = $data;
 

@@ -265,7 +265,7 @@ class WC_Subscription extends WC_Order {
 			$needs_payment = true;
 
 		// Now make sure the parent order doesn't need payment
-		} elseif ( ( $parent_order = $this->get_parent() ) && ( $parent_order->needs_payment() || $parent_order->has_status( 'on-hold' ) ) ) {
+		} elseif ( ( $parent_order = $this->get_parent() ) && ( $parent_order->needs_payment() || $parent_order->has_status( array( 'on-hold', 'cancelled' ) ) ) ) {
 
 			$needs_payment = true;
 
@@ -350,9 +350,17 @@ class WC_Subscription extends WC_Order {
 					$can_be_updated = false;
 				}
 				break;
-			case 'pending-cancel':
-				if ( $this->payment_method_supports( 'subscription_cancellation' ) && ( $this->has_status( 'active' ) || $this->has_status( 'on-hold' ) && ! $this->needs_payment() ) ) {
-					$can_be_updated = true;
+			case 'pending-cancel' :
+				// Only active subscriptions can be given the "pending cancellation" status, becuase it is used to account for a prepaid term
+				if ( $this->payment_method_supports( 'subscription_cancellation' ) ) {
+					if ( $this->has_status( 'active' ) ) {
+						$can_be_updated = true;
+					} elseif ( ! $this->needs_payment() && $this->has_status( array( 'cancelled', 'on-hold' ) ) ) {
+						// Payment completed and subscription is cancelled
+						$can_be_updated = true;
+					} else {
+						$can_be_updated = false;
+					}
 				} else {
 					$can_be_updated = false;
 				}
@@ -1468,12 +1476,12 @@ class WC_Subscription extends WC_Order {
 				$from_timestamp = $start_time;
 			}
 
-			$next_payment_timestamp = wcs_add_time( $this->get_billing_interval(), $this->get_billing_period(), $from_timestamp );
+			$next_payment_timestamp = wcs_add_time( $this->get_billing_interval(), $this->get_billing_period(), $from_timestamp, 'offset_site_time' );
 
 			// Make sure the next payment is more than 2 hours in the future, this ensures changes to the site's timezone because of daylight savings will never cause a 2nd renewal payment to be processed on the same day
 			$i = 1;
 			while ( $next_payment_timestamp < ( current_time( 'timestamp', true ) + 2 * HOUR_IN_SECONDS ) && $i < 3000 ) {
-				$next_payment_timestamp = wcs_add_time( $this->get_billing_interval(), $this->get_billing_period(), $next_payment_timestamp );
+				$next_payment_timestamp = wcs_add_time( $this->get_billing_interval(), $this->get_billing_period(), $next_payment_timestamp, 'offset_site_time' );
 				$i += 1;
 			}
 		}

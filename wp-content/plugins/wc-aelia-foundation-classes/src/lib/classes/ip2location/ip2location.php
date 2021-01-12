@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use GeoIp2\Database\Reader;
 
@@ -13,16 +13,13 @@ class IP2Location extends Base_Class {
 	// @var Reder The instance of the MaxMind database reader.
 	protected $_db_reader;
 
-	// @var string URL to the geolocation database
-	//const GEOLITE_DB = 'https://geolite.maxmind.com/download/geoip/database/GeoLite2-City.mmdb.gz';
-
 	// New temporary URL to serve the GeoIP database, to deal with the changes introduced by MaxMind
 	// @since 2.0.10.191231
 	// @link https://blog.maxmind.com/2019/12/18/significant-changes-to-accessing-and-using-geolite2-databases/
 	const GEOLITE_DB = 'https://geoip.aelia.co/Geolite2-City.mmdb.gz';
 
-	//protected static $geoip_db_file = 'geolite-db/GeoLite2-Country.mmdb';
 	public static $geoip_db_file = 'GeoLite2-City.mmdb';
+
 	// @var array An array of error messages.
 	protected $errors = array();
 
@@ -143,7 +140,7 @@ class IP2Location extends Base_Class {
 			$target_handle = @fopen(self::geoip_db_file(), 'w');
 
 			if($gzhandle && $target_handle) {
-				while(($string = gzread($gzhandle, 4096)) != false) {
+				while($string = gzread($gzhandle, 4096)) {
 					fwrite($target_handle, $string, strlen($string));
 				}
 				gzclose($gzhandle);
@@ -249,8 +246,6 @@ class IP2Location extends Base_Class {
 	 * @return string|bool A Country Code on success, or False on failure.
 	 */
 	public function get_country_code($ip_address){
-		//$ip_address = @gethostbyname($host);
-
 		// Log the attempt to resolve the IP address to a country code
 		// @since 2.0.3.190129
 		$this->logger->debug(__('Attempting to detect country from IP address.', WC_AeliaFoundationClasses::$text_domain), array(
@@ -391,10 +386,10 @@ class IP2Location extends Base_Class {
 		// Log the attempt to resolve the IP address
 		// @since 2.0.3.190129
 		$this->logger->debug(__('Attempting to fetch IP address of visitor.', WC_AeliaFoundationClasses::$text_domain), array(
-			'$_SERVER[HTTP_CLIENT_IP]' => @$_SERVER['HTTP_CLIENT_IP'],
-			'$_SERVER[HTTP_X_FORWARDED_FOR]' => @$_SERVER['HTTP_X_FORWARDED_FOR'],
-			'$_SERVER[HTTP_X_REAL_IP]' => @$_SERVER['HTTP_X_REAL_IP'],
-			'$_SERVER[REMOTE_ADDR]' => @$_SERVER['REMOTE_ADDR'],
+			'$_SERVER[HTTP_CLIENT_IP]' => isset($_SERVER['HTTP_CLIENT_IP']) ? $_SERVER['HTTP_CLIENT_IP'] : '',
+			'$_SERVER[HTTP_X_FORWARDED_FOR]' => isset($_SERVER['HTTP_X_FORWARDED_FOR']) ? $_SERVER['HTTP_X_FORWARDED_FOR'] : '',
+			'$_SERVER[HTTP_X_REAL_IP]' =>isset($_SERVER['HTTP_X_REAL_IP']) ? $_SERVER['HTTP_X_REAL_IP'] : '',
+			'$_SERVER[REMOTE_ADDR]' => isset($_SERVER['REMOTE_ADDR']) ? $_SERVER['REMOTE_ADDR'] : '',
 		));
 
 		// Parse the proxy headers that might contain the real IP address

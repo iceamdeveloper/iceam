@@ -11,7 +11,7 @@
 /**
  * Event Tickets - RSVP Stylesheet.
  *
- * @since TBD
+ * @since 5.0.0
  */
 
 /* -----------------------------------------------------------------------------
@@ -63,7 +63,6 @@
 	/* -----------------------------------------------------------------------------
 	 * Colors - Borders & Misc
 	 * ----------------------------------------------------------------------------- */
-
 }
 
 :root {
@@ -159,6 +158,14 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - Link
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Guest
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - List
  * ----------------------------------------------------------------------------- */
 
@@ -167,7 +174,19 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - Mail
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - Map
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Map pin
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Messages
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
@@ -175,7 +194,23 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * SVG - No Map
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Paper Plane
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Phone
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * SVG - Photo
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * SVG - Plus
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
@@ -211,7 +246,7 @@
 :root {
 	/* -----------------------------------------------------------------------------
 	 * Font Stacks
-	 * ----------------------------------------------------------------------------- */
+	 * ----------------------------------------------------------------------------- */ /* stylelint-disable-line value-keyword-case */
 
 	/* -----------------------------------------------------------------------------
 	 * Font Weights
@@ -322,6 +357,10 @@
 
 /* -----------------------------------------------------------------------------
  * Button - Border
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
+ * Button - Border Small
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
@@ -474,7 +513,7 @@
 
 .tribe-common .tribe-tickets__notice {
 		padding: 16px;
-		background-color: #F7F6F6;
+		background-color: #f7f6f6;
 		border-radius: 4px;
 		margin: 20px 0;
 	}
@@ -523,8 +562,8 @@
 	*/
 
 .tribe-common .tribe-tickets__notice--barred {
-		background-color: #FFFFFF;
-		border: 4px solid #E4E4E4;
+		background-color: #fff;
+		border: 4px solid #e4e4e4;
 		border-bottom: 0;
 		border-radius: 0;
 		border-top: 0;
@@ -559,8 +598,8 @@
 /* Defining our tooltipster theme. */
 
 .tooltipster-base.tribe-tickets-tooltip-theme {
-	background-color: #FFFFFF;
-	border: 1px solid #D5D5D5;
+	background-color: #fff;
+	border: 1px solid #d5d5d5;
 	border-radius: 4px;
 	box-shadow: 0 2px 12px 0 rgba(0,0,0, 0.14);
 	height: auto !important;
@@ -598,7 +637,7 @@
 	 * ----------------------------------------------------------------------------- */
 
 .tribe-common button.tribe-common-c-btn--small, .tribe-common input[type="button"].tribe-common-c-btn--small, .tribe-common input[type="submit"].tribe-common-c-btn--small, .tribe-common a.tribe-common-c-btn--small {
-			background-color: #334AFF;
+			background-color: #334aff;
 			padding: 11px 14px;
 			width: auto;
 		}
@@ -646,7 +685,7 @@
 .tribe-common button.tribe-common-c-btn-link, .tribe-common input[type="button"].tribe-common-c-btn-link, .tribe-common input[type="submit"].tribe-common-c-btn-link, .tribe-common a.tribe-common-c-btn-link {
 
 			background-color: transparent;
-			color: #334AFF;
+			color: #334aff;
 			padding: 11px 20px;
 			width: 100%;
 }
@@ -673,20 +712,20 @@
 /**
  * Event Tickets RSVP Stylesheet
  *
- * @since TBD
+ * @since 5.0.0
  */
 
 /**
  * Event Tickets - RSVP Structure
  *
- * @since TBD
+ * @since 5.0.0
  *
  */
 
 .event-tickets .tribe-tickets__rsvp-wrapper {
-		background-color: #FFFFFF;
+		background-color: #fff;
 		border-radius: 4px;
-		border: 1px solid #E4E4E4;
+		border: 1px solid #e4e4e4;
 		max-width: 580px;
 		overflow: hidden;
 		position: relative;
@@ -705,7 +744,7 @@
 /**
  * Event Tickets - RSVP Details
  *
- * @since TDB
+ * @since 5.0.3
  */
 
 .event-tickets .tribe-tickets__rsvp-details-wrapper {
@@ -722,7 +761,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-description {
-		color: #727272;
+		color: #5d5d5d;
 		margin-top: 8px;
 	}
 
@@ -741,11 +780,11 @@
 		}
 
 .event-tickets .tribe-tickets__rsvp-attendance-going {
-		color: #727272;
+		color: #5d5d5d;
 	}
 
 .event-tickets .tribe-tickets__rsvp-availability {
-		color: #727272;
+		color: #5d5d5d;
 		margin-top: 20px;
 	}
 
@@ -757,7 +796,7 @@
 /**
  * Event Tickets - RSVP Structure
  *
- * @since TBD
+ * @since 5.0.0
  */
 
 .event-tickets .tribe-tickets__rsvp-actions-wrapper {
@@ -769,7 +808,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions {
-		border-top: 1px dashed #E4E4E4;
+		border-top: 1px dashed #e4e4e4;
 		margin-top: 56px;
 		padding: 56px 0;
 		width: 100%;
@@ -804,7 +843,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions-full-text {
-		color: #727272;
+		color: #5d5d5d;
 		text-transform: uppercase;
 	}
 
@@ -819,8 +858,8 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions-success-going-check-icon {
-		background-color: #334AFF;
-		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.6.1L3.9 6.8 1.4 4.3c-.1-.1-.3-.1-.4 0l-.8.8c-.1.1-.1.3 0 .4l3.4 3.4c.2.1.4.1.5 0l7.7-7.7c.1-.1.1-.3 0-.4L11 .1c-.1-.1-.3-.1-.4 0z' fill='%23FFFFFF'/%3E%3C/svg%3E");
+		background-color: #334aff;
+		background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12' height='9' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M10.6.1L3.9 6.8 1.4 4.3c-.1-.1-.3-.1-.4 0l-.8.8c-.1.1-.1.3 0 .4l3.4 3.4c.2.1.4.1.5 0l7.7-7.7c.1-.1.1-.3 0-.4L11 .1c-.1-.1-.3-.1-.4 0z' fill='%23fff'/%3E%3C/svg%3E");
 		background-repeat: no-repeat;
 		background-position: center;
 		border-radius: 100%;
@@ -832,6 +871,7 @@
 
 .event-tickets .tribe-tickets__rsvp-actions-success-going-text {
 		margin-left: 8px;
+		text-transform: capitalize;
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions-success-going-toggle {
@@ -857,7 +897,7 @@
 /**
  * Event Tickets - RSVP Messages
  *
- * @since TDB
+ * @since 5.0.3
  */
 
 .event-tickets .tribe-tickets__rsvp-message {
@@ -867,6 +907,11 @@
 		border-radius: 4px;
 		padding: 20px 16px;
 	}
+
+.event-tickets .tribe-tickets__rsvp-message--error,
+		.event-tickets .tribe-tickets__rsvp-message--error.tribe-tickets__rsvp-message {
+			background-color: rgba(218,57,77, 0.08);
+		}
 
 .event-tickets .tribe-tickets__rsvp-message--success-icon {
 		display: inline-block;
@@ -879,36 +924,37 @@
 			stroke: #141827;
 		}
 
-.event-tickets .tribe-tickets__rsvp-message--must-login-icon {
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon,
+	.event-tickets .tribe-tickets__rsvp-message--error-icon {
 		display: inline-block;
 		margin-right: 12px;
 	}
 
-.event-tickets .tribe-tickets__rsvp-message--must-login-icon circle {
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon circle, .event-tickets .tribe-tickets__rsvp-message--error-icon circle {
 			stroke: #141827;
 		}
 
-.event-tickets .tribe-tickets__rsvp-message--must-login-icon circle#dot {
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon circle#dot, .event-tickets .tribe-tickets__rsvp-message--error-icon circle#dot {
 			stroke: transparent;
 			fill: #141827;
 		}
 
-.event-tickets .tribe-tickets__rsvp-message--must-login-icon path {
+.event-tickets .tribe-tickets__rsvp-message--must-login-icon path, .event-tickets .tribe-tickets__rsvp-message--error-icon path {
 			stroke: #141827;
 		}
 
 .event-tickets .tribe-tickets__rsvp-message-link {
-		color: #334AFF;
+		color: #334aff;
 	}
 
 /**
  * Event Tickets - RSVP form.
  *
- * @since TBD
+ * @since 5.0.0
  */
 
 .event-tickets .tribe-common-c-btn:disabled {
-		background-color: #334AFF;
+		background-color: #334aff;
 		cursor: not-allowed;
 	}
 
@@ -921,7 +967,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-form-title {
-		border-bottom: 1px dashed #E4E4E4;
+		border-bottom: 1px dashed #e4e4e4;
 		padding-bottom: 24px;
 	}
 
@@ -946,7 +992,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-form-button--cancel {
-		color: #727272;
+		color: #5d5d5d;
 	}
 
 .event-tickets .tribe-tickets__rsvp-form-button--cancel:focus,
@@ -954,10 +1000,15 @@
 			color: #141827;
 		}
 
+.event-tickets .tribe-tickets__rsvp-form-button--submit {
+		padding-left: 28px;
+		padding-right: 28px;
+	}
+
 /**
  * Event Tickets - RSVP Attendee Registration
  *
- * @since TBD
+ * @since 5.0.0
  */
 
 .event-tickets .tribe-tickets__rsvp-ar {
@@ -971,7 +1022,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-ar-sidebar {
-		border-bottom: 1px dashed #E4E4E4;
+		border-bottom: 1px dashed #e4e4e4;
 		margin-top: 24px;
 		padding: 24px 0;
 		width: 100%;
@@ -1011,8 +1062,9 @@
 
 .event-tickets .tribe-tickets__rsvp-ar-quantity-input-number {
 		background-color: transparent;
-		border: 1px solid #D5D5D5;
+		border: 1px solid #d5d5d5;
 		border-radius: 50%;
+		flex: none;
 		height: 28px;
 		padding: 0;
 		position: relative;
@@ -1024,9 +1076,10 @@
 			background-color: #141827;
 			content: '';
 			height: 2px;
+			left: 9px;
+			top: 12px; /* Fix for IE11 */
 			position: absolute;
 			width: 8px;
-			left: 9px;
 		}
 
 .event-tickets .tribe-tickets__rsvp-ar-quantity-input-number:hover,
@@ -1055,11 +1108,15 @@
 		}
 
 .event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button--inactive {
-		color: #727272;
+		color: #5d5d5d;
 	}
 
-.event-tickets .tribe-tickets__rsvp-ar-guest-icon,
-	.event-tickets .tribe-tickets__rsvp-ar-guest-icon--inactive {
+.event-tickets .tribe-tickets__rsvp-ar-guest-list-item-button--inactive .tribe-tickets__rsvp-ar-guest-icon path {
+				fill: #d5d5d5;
+				stroke: #d5d5d5;
+			}
+
+.event-tickets .tribe-tickets__rsvp-ar-guest-icon {
 		display: inline-block;
 		height: 17px;
 		margin-right: 24px;
@@ -1070,11 +1127,6 @@
 .event-tickets .tribe-tickets__rsvp-ar-guest-icon path {
 			fill: #141827;
 			stroke: #141827;
-		}
-
-.event-tickets .tribe-tickets__rsvp-ar-guest-icon--inactive path {
-			fill: #D5D5D5;
-			stroke: #D5D5D5;
 		}
 
 .event-tickets .tribe-tickets__rsvp-ar-form-wrapper {
@@ -1093,7 +1145,7 @@
 		}
 
 .event-tickets .tribe-tickets__rsvp-ar-form-title {
-		color: #727272;
+		color: #5d5d5d;
 	}
 
 @media (min-width: 768px) {
@@ -1145,13 +1197,14 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions-wrapper {
-			border-left: 1px dashed #E4E4E4;
+			border-left: 1px dashed #e4e4e4;
 			width: 37.5%
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions {
 			border-top: 0;
-			margin-top: 0
+			margin-top: 0;
+			padding: 0
 	}
 
 .event-tickets .tribe-tickets__rsvp-actions-rsvp-not-going {
@@ -1199,7 +1252,7 @@
 	}
 
 .event-tickets .tribe-tickets__rsvp-ar-sidebar-wrapper {
-			border-left: 1px dashed #E4E4E4;
+			border-left: 1px dashed #e4e4e4;
 			width: 37.5%
 	}
 
@@ -1227,14 +1280,13 @@
 
 .event-tickets .tribe-tickets__rsvp-ar-guest-list-item-title {
 			clip: auto;
-			width: auto;
 			height: auto;
 			margin: 0;
-			position: static
+			position: static;
+			width: auto
 	}
 
-.event-tickets .tribe-tickets__rsvp-ar-guest-icon,
-	.event-tickets .tribe-tickets__rsvp-ar-guest-icon--inactive {
+.event-tickets .tribe-tickets__rsvp-ar-guest-icon {
 			height: 14px;
 			margin-right: 4px;
 			width: 11px

@@ -19,9 +19,9 @@ class Sensei_Data_Port_Utilities {
 	/**
 	 * Create a user. If the user exists, the method simply returns the user.
 	 *
-	 * @param string $username  The username.
-	 * @param string $email     User's email.
-	 * @param string $role      The user's role.
+	 * @param string $username The username.
+	 * @param string $email    User's email.
+	 * @param string $role     The user's role.
 	 *
 	 * @return WP_User|WP_Error  WP_User on success, WP_Error on failure.
 	 */
@@ -140,9 +140,9 @@ class Sensei_Data_Port_Utilities {
 		 * Increase this value in case big attachments are imported and the request to get them
 		 * times out.
 		 *
-		 * @since 3.3.0
+		 * @param float $timeout Time in seconds until a request times out. Default 10.
 		 *
-		 * @param float  $timeout  Time in seconds until a request times out. Default 10.
+		 * @since 3.3.0
 		 */
 		$timeout  = apply_filters( 'sensei_import_attachment_request_timeout', 10 );
 		$response = wp_safe_remote_get( $external_url, [ 'timeout' => $timeout ] );
@@ -150,7 +150,7 @@ class Sensei_Data_Port_Utilities {
 		if ( is_wp_error( $response ) || 200 !== wp_remote_retrieve_response_code( $response ) ) {
 			return new WP_Error(
 				'sensei_data_port_attachment_failure',
-				__( 'No attachment with the specified file name was found.', 'sensei-lms' )
+				__( 'Error encountered while retrieving the attachment from the provided URL.', 'sensei-lms' )
 			);
 		}
 
@@ -402,7 +402,7 @@ class Sensei_Data_Port_Utilities {
 
 		if ( $remove_quotes ) {
 			$list = array_map(
-				function ( $value ) {
+				function( $value ) {
 					return trim( $value, self::CHARS_WHITESPACE_AND_QUOTES );
 				},
 				$list
@@ -423,5 +423,116 @@ class Sensei_Data_Port_Utilities {
 	 */
 	public static function replace_curly_quotes( $string ) {
 		return str_replace( [ '“', '”' ], '"', $string );
+	}
+
+	/**
+	 * Serialize a list of terms into comma-separated list.
+	 * Adds quotes if name contains commas.
+	 *
+	 * @param WP_Term[] $terms
+	 *
+	 * @return string
+	 */
+	public static function serialize_term_list( $terms ) {
+		$names = array_map( 'Sensei_Data_Port_Utilities::serialize_term', $terms );
+		return implode( ',', $names );
+	}
+
+	/**
+	 * Return term name and hierarchy representation, in the format of 'Parent > Child'.
+	 *
+	 * @param WP_Term $term
+	 *
+	 * @return string
+	 */
+	public static function serialize_term( WP_Term $term ) {
+
+		$name = self::escape_list_item( $term->name );
+		if ( ! empty( $term->parent ) ) {
+			$parent_term = get_term( $term->parent, $term->taxonomy );
+			$parent_str  = self::serialize_term( $parent_term );
+			return $parent_str . ' > ' . $name;
+		}
+		return $name;
+	}
+
+	/**
+	 * Serialize a list into comma-separated list.
+	 * Wrap values in quotes if they contain a comma.
+	 *
+	 * @deprecated 3.5.2
+	 *
+	 * @param string[] $values
+	 *
+	 * @return string
+	 */
+	public static function serialize_list( $values = [] ) {
+		_deprecated_function( __METHOD__, '3.5.2' );
+
+		return ! empty( $values )
+			? implode( ',', array_map( 'Sensei_Data_Port_Utilities::escape_list_item', $values ) )
+			: '';
+	}
+
+	/**
+	 * Wrap value in quotes if it contains a comma.
+	 * Escape quotes if wrapped.
+	 *
+	 * @param string $value
+	 *
+	 * @return string
+	 */
+	public static function escape_list_item( $value ) {
+		if ( false !== strpos( $value, ',' ) ) {
+			$value = '"' . str_replace( '"', '\"', $value ) . '"';
+		}
+		return $value;
+	}
+
+	/**
+	 * Serialize ID field.
+	 *
+	 * @param int|int[] $ids ID or IDs array to format.
+	 *
+	 * @return string Serialized ID field.
+	 */
+	public static function serialize_id_field( $ids ) {
+		if ( empty( $ids ) ) {
+			return '';
+		}
+
+		return 'id:' . implode( ',id:', (array) $ids );
+	}
+
+	/**
+	 * Helper method which gets a module by name and checks if the module can be applied to a course's lesson.
+	 *
+	 * @param string $module_name  The module name.
+	 * @param int    $course_id    Course ID.
+	 *
+	 * @return WP_Error|WP_Term  WP_Error when the module can't be applied to the lesson, WP_Term otherwise.
+	 */
+	public static function get_module_for_course( $module_name, $course_id ) {
+		$module = get_term_by( 'name', $module_name, 'module' );
+
+		if ( ! $module ) {
+			return new WP_Error(
+				'sensei_data_port_module_not_found',
+				// translators: Placeholder is the term which errored.
+				sprintf( __( 'Module does not exist: %s.', 'sensei-lms' ), $module_name )
+			);
+		}
+
+		$course_modules = wp_list_pluck( wp_get_post_terms( $course_id, 'module' ), 'term_id' );
+
+		if ( ! in_array( $module->term_id, $course_modules, true ) ) {
+			return new WP_Error(
+				'sensei_data_port_module_not_part_of_course',
+				// translators: First placeholder is the term which errored, second is the course id.
+				sprintf( __( 'Module %1$s is not part of course %2$s.', 'sensei-lms' ), $module_name, $course_id )
+			);
+		}
+
+		return $module;
 	}
 }
