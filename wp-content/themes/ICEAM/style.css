@@ -1319,6 +1319,14 @@ body.sensei.single-course .course-lessons article.lesson{
     padding: 10px;
 }
 
+/* erase course progress elements from ongoing seminar page */
+body.postid-13953 .meter, 
+body.postid-13953 .course-completion-rate,
+body.postid-13953 section.course-enrolment,
+body.postid-13956 .lesson_button_form {
+    display: none;
+}
+
 
 /* COURSE RESULTS */
 

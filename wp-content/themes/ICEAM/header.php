@@ -20,7 +20,7 @@
 <meta property="og:type" content="website" />
 <meta property="og:url" content="http://iceam.org/" />
 <meta property="og:title" content="Home" />
-<meta property="og:image" content="http://iceam.org/wp-content/uploads/2015/05/our-mission.jpg" />
+<meta property="og:image" content="http://iceam.org/wp-content/uploads/2019/09/BambergICEAM-1.jpg" />
 
 <link rel="pingback" href="<?php echo esc_url( get_bloginfo( 'pingback_url' ) ); ?>" />
 

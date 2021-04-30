@@ -142,6 +142,38 @@ add_filter( 'bbp_get_replies_per_page', 'filter_bbp_get_replies_per_page', 100, 
 
 
 
+/***********************************************************************
+ *
+ *	ADD FB PIXEL TO NY PAGE
+ *
+ **********************************************************************/
+
+function my_facebook_pixel_code(){ 
+	if( get_the_ID() == 9052 ):
+	?>
+		<!-- Facebook Pixel Code -->
+		<script>
+		!function(f,b,e,v,n,t,s)
+		{if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+		n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+		if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+		n.queue=[];t=b.createElement(e);t.async=!0;
+		t.src=v;s=b.getElementsByTagName(e)[0];
+		s.parentNode.insertBefore(t,s)}(window, document,'script',
+		'https://connect.facebook.net/en_US/fbevents.js');
+		fbq('init', '340693964031226');
+		fbq('track', 'PageView');
+		</script>
+		<noscript><img height=&quot;1&quot; width=&quot;1&quot; style=&quot;display:none&quot;
+		src="https://www.facebook.com/tr?id=340693964031226&ev=PageView&noscript=1";
+		/></noscript>
+		<!-- End Facebook Pixel Code -->
+		
+	<?php 
+	endif;
+}
+add_action( 'wp_head', 'my_facebook_pixel_code' );
+
 
 
 /***********************************************************************
@@ -856,7 +888,7 @@ function bp_custom_registration_role($user_id) {
 add_action('woocommerce_before_cart','show_cart_registration_prompt',10, 1);
 function show_cart_registration_prompt($woocommerce_before_cart){
     if(!get_current_user_id()){
-        echo('<div class="woocommerce-message"><a href="/register" class="btn btn-primary" style="margin-left: 10px; float: right; display: inline-block;">Sign Up Now!</a> Some automatic discounts are not displayed until logged in. Not <a href="/register">registered</a> yet? </div>');
+        echo('<div class="woocommerce-message">Some automatic discounts are not displayed until logged in. <a href="/my-courses">Sign in</a></div>');
     }
 }
 
@@ -1108,6 +1140,14 @@ function change_existing_currency_symbol( $currency_symbol, $currency ) {
      }
      return $currency_symbol;
 }
+
+
+add_action('wcs_subscription_details_table_before_dates', 'add_custom_text_sensei_account');
+
+function add_custom_text_sensei_account(){
+	echo '<p><strong>Note:</strong> Subscriptions will <strong>never</strong> auto-renew. In other words, there is no need to cancel your subscriptions since you will not be charged unless you manually renew.</p>';
+}
+
 
 
 /***********************************************************************
