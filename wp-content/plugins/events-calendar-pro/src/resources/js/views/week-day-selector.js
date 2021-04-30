@@ -114,7 +114,7 @@ tribe.events.views.weekDaySelector = {};
 
 				obj.closeDay( $header, $content );
 			} );
-	}
+	};
 
 	/**
 	 * Handle click event on day button
@@ -211,7 +211,7 @@ tribe.events.views.weekDaySelector = {};
 	 * @return {void}
 	 */
 	obj.init = function( event, index, $container, data ) {
-		if ( 'week' !== data.slug ) {
+		if ( 'week' !== data.slug && 'widget-week' !== data.slug ) {
 			return;
 		}
 
@@ -231,5 +231,5 @@ tribe.events.views.weekDaySelector = {};
 	};
 
 	// Configure on document ready
-	$document.ready( obj.ready );
+	$( obj.ready );
 } )( jQuery, tribe.events.views.weekDaySelector );

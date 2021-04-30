@@ -7,7 +7,7 @@
  *
  * See more documentation about our views templating system.
  *
- * @link http://m.tri.be/1aiy
+ * @link https://evnt.is/1aiy
  *
  * @version  5.1.6
  *
@@ -67,7 +67,7 @@ if ( empty( $disable_event_search ) ) {
 		<?php $this->template( 'components/filter-bar' ); ?>
 
 		<?php if ( ! empty( $events ) ) : ?>
-			<div class="tribe-events-pro-map tribe-common-g-row">
+			<div class="tribe-common-g-row tribe-events-pro-map">
 				<?php $this->template( 'map/map' ); ?>
 				<?php $this->template( 'map/event-cards' ); ?>
 			</div>

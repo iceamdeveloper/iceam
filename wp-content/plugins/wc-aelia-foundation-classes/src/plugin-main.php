@@ -12,7 +12,7 @@ use Aelia\WC\AFC\Messages;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.1.2.210108';
+	public static $version = '2.1.6.210406';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -160,7 +160,6 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 * @since 1.6.0.150724
 	 */
 	protected function set_cron_schedules() {
-		//wp_schedule_event(strtotime('first tuesday of next month'), 'monthly', 'woocommerce_geoip_updater' );
 		if(!wp_get_schedule('aelia_afc_geoip_updater')) {
 			wp_schedule_event(time(), 'weekly', 'aelia_afc_geoip_updater');
 		}

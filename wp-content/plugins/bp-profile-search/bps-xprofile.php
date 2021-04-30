@@ -7,7 +7,7 @@ function bps_xprofile_setup ($fields)
 
 	if (!bp_is_active ('xprofile'))  return $fields;
 
-	$args = array ('hide_empty_fields' => false, 'member_type' => bp_get_member_types (), 'user_id' => false);
+	$args = array ('hide_empty_fields' => false, 'member_type' => false, 'user_id' => false);
 	if (bp_has_profile ($args))
 	{
 		while (bp_profile_groups ())
@@ -142,6 +142,7 @@ function bps_xprofile_search ($f)
 
 	case 'set_match_any':
 	case 'set_match_all':
+	case 'set_match_single':
 		$values = (array)$value;
 		$parts = array ();
 		foreach ($values as $value)

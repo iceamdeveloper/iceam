@@ -110,7 +110,7 @@ class Sensei_Grading_User_Quiz {
 			<div class="buttons">
 				<input type="submit" value="<?php esc_attr_e( 'Save', 'sensei-lms' ); ?>" class="grade-button button-primary" title="Saves grades as currently marked on this page" />
 				<input type="button" value="<?php esc_attr_e( 'Auto grade', 'sensei-lms' ); ?>" class="autograde-button button-secondary" title="Where possible, automatically grades questions that have not yet been graded" />
-				<input type="reset" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-secondary" title="Resets all questions to ungraded and total grade to 0" />
+				<input type="button" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-link button-link-delete" title="Resets all questions to ungraded and total grade to 0" />
 			</div>
 			<div class="clear"></div><br/>
 			<?php
@@ -142,6 +142,7 @@ class Sensei_Grading_User_Quiz {
 				$right_answer        = get_post_meta( $question_id, '_question_right_answer', true );
 				$user_answer_content = Sensei()->quiz->get_user_question_answer( $lesson_id, $question_id, $user_id );
 				$type_name           = __( 'Multiple Choice', 'sensei-lms' );
+				$grade_type          = 'manual-grade';
 
 				switch ( $type ) {
 					case 'boolean':
@@ -311,8 +312,8 @@ class Sensei_Grading_User_Quiz {
 							</span>
 						</div>
 						<div class="answer-notes">
-							<h5><?php esc_html_e( 'Grading Notes', 'sensei-lms' ); ?></h5>
-							<textarea class="correct-answer" name="questions_feedback[<?php echo esc_attr( $question_id ); ?>]" placeholder="<?php esc_attr_e( 'Add notes here...', 'sensei-lms' ); ?>"><?php echo esc_html( $question_answer_notes ); ?></textarea>
+							<h5><?php esc_html_e( 'Answer Feedback', 'sensei-lms' ); ?></h5>
+							<textarea class="correct-answer" name="questions_feedback[<?php echo esc_attr( $question_id ); ?>]" placeholder="<?php esc_attr_e( 'Add feedback here...', 'sensei-lms' ); ?>"><?php echo esc_html( $question_answer_notes ); ?></textarea>
 						</div>
 					</div>
 				</div>
@@ -339,7 +340,7 @@ class Sensei_Grading_User_Quiz {
 			<div class="buttons">
 				<input type="submit" value="<?php esc_attr_e( 'Save', 'sensei-lms' ); ?>" class="grade-button button-primary" title="Saves grades as currently marked on this page" />
 				<input type="button" value="<?php esc_attr_e( 'Auto grade', 'sensei-lms' ); ?>" class="autograde-button button-secondary" title="Where possible, automatically grades questions that have not yet been graded" />
-				<input type="reset" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-secondary" title="Resets all questions to ungraded and total grade to 0" />
+				<input type="button" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-link button-link-delete" title="Resets all questions to ungraded and total grade to 0" />
 			</div>
 			<div class="clear"></div>
 			<script type="text/javascript">

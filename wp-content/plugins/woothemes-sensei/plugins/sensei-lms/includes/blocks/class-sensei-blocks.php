@@ -14,27 +14,69 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Sensei_Blocks {
 	/**
-	 * Course outline block.
+	 * Course blocks.
 	 *
 	 * @var Sensei_Course_Blocks
 	 */
 	public $course;
 
 	/**
-	 * Sensei_Blocks constructor .
+	 * Course blocks.
 	 *
-	 * @param Sensei_Main $sensei
+	 * @var Sensei_Lesson_Blocks
 	 */
-	public function __construct( $sensei ) {
+	private $lesson;
+
+	/**
+	 * Quiz blocks.
+	 *
+	 * @var Sensei_Quiz_Blocks
+	 */
+	public $quiz;
+
+	/**
+	 * Page blocks.
+	 *
+	 * @var Sensei_Page_Blocks
+	 */
+	public $page;
+
+	/**
+	 * Sensei_Blocks constructor.
+	 *
+	 * @param Sensei_Main $sensei Sensei instance.
+	 */
+	public function __construct( Sensei_Main $sensei ) {
 		// Skip if Gutenberg is not available.
 		if ( ! function_exists( 'register_block_type' ) ) {
 			return;
 		}
 
+		// Register generic blocks assets.
+		add_action( 'init', [ $this, 'register_generic_assets' ] );
+
 		add_filter( 'block_categories', [ $this, 'sensei_block_categories' ], 10, 2 );
 
 		// Init blocks.
-		$this->course = new Sensei_Course_Blocks( $sensei );
+		$this->course = new Sensei_Course_Blocks();
+		$this->lesson = new Sensei_Lesson_Blocks();
+		$this->quiz   = new Sensei_Quiz_Blocks();
+		$this->page   = new Sensei_Page_Blocks();
+	}
+
+	/**
+	 * Register generic assets.
+	 *
+	 * @access private
+	 */
+	public function register_generic_assets() {
+		Sensei()->assets->register( 'sensei-shared-blocks', 'blocks/shared.js', [], true );
+		Sensei()->assets->register( 'sensei-shared-blocks-style', 'blocks/shared-style.css' );
+		Sensei()->assets->register( 'sensei-shared-blocks-editor-style', 'blocks/shared-style-editor.css' );
+
+		Sensei()->assets->register( 'sensei-editor-components-style', 'blocks/editor-components/editor-components-style.css' );
+
+		Sensei()->assets->register( 'sensei-blocks-frontend', 'blocks/frontend.js', [], true );
 	}
 
 	/**
@@ -48,18 +90,18 @@ class Sensei_Blocks {
 	 * @return array Filtered categories.
 	 */
 	public function sensei_block_categories( $categories, $post ) {
-		if ( 'course' !== $post->post_type ) {
+		if ( ! in_array( $post->post_type, [ 'course', 'lesson', 'question', 'page' ], true ) ) {
 			return $categories;
 		}
 
 		return array_merge(
-			$categories,
 			[
 				[
 					'slug'  => 'sensei-lms',
 					'title' => __( 'Sensei LMS', 'sensei-lms' ),
 				],
-			]
+			],
+			$categories
 		);
 	}
 
@@ -75,6 +117,10 @@ class Sensei_Blocks {
 	 *                               `register_block_type_from_metadata` if it's defined.
 	 */
 	public static function register_sensei_block( $block_name, $block_args, $file_or_folder = null ) {
+		if ( WP_Block_Type_Registry::get_instance()->is_registered( $block_name ) ) {
+			return;
+		}
+
 		/**
 		 * Filter the args of the Sensei blocks.
 		 *
@@ -102,5 +148,23 @@ class Sensei_Blocks {
 		} else {
 			register_block_type_from_metadata( $file_or_folder, $block_args );
 		}
+	}
+
+	/**
+	 * Check if the current post has any Sensei blocks.
+	 *
+	 * @param int|WP_Post|null $post
+	 *
+	 * @return bool
+	 */
+	public function has_sensei_blocks( $post = null ) {
+		if ( ! is_string( $post ) ) {
+			$wp_post = get_post( $post );
+			if ( $wp_post instanceof WP_Post ) {
+				$post = $wp_post->post_content;
+			}
+		}
+
+		return false !== strpos( (string) $post, '<!-- wp:sensei-lms/' );
 	}
 }

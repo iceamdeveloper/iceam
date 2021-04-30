@@ -1,9 +1,20 @@
+/**
+ * External dependencies
+ */
 import { Card, H, Link } from '@woocommerce/components';
+
+/**
+ * WordPress dependencies
+ */
 import { __ } from '@wordpress/i18n';
 import { Button } from '@wordpress/components';
 import { useState } from '@wordpress/element';
+
+/**
+ * Internal dependencies
+ */
 import { UsageModal } from './usage-modal';
-import { useQueryStringRouter } from '../query-string-router';
+import { useQueryStringRouter } from '../../shared/query-string-router';
 import { useSetupWizardStep } from '../data/use-setup-wizard-step';
 
 /**

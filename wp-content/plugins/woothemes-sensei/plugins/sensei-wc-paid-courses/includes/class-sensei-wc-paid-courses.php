@@ -225,6 +225,7 @@ final class Sensei_WC_Paid_Courses {
 
 		$handle = $this->block_editor_asset_handle( $script );
 		wp_localize_script( $handle, str_replace( '-', '_', $handle ), $data );
+		wp_set_script_translations( $handle, 'sensei-wc-paid-courses' );
 	}
 
 	/**

@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_6 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -180,7 +180,7 @@ class WC_Memberships_Meta_Box_View_Purchasing_Discount_Rules extends \WC_Members
 												<th scope="row" class="check-column"></th>
 
 												<td class="purchasing-discount-applies-to product-variation-column">
-													<p class="form-field"><?php esc_html_e( $variation->get_formatted_name() ); ?></p>
+													<p class="form-field"><?php echo $variation->get_formatted_name(); ?></p>
 												</td>
 
 												<td class="purchasing-discount-membership-plan membership-plan-column">
@@ -191,7 +191,8 @@ class WC_Memberships_Meta_Box_View_Purchasing_Discount_Rules extends \WC_Members
 															disabled
 															name="_variation_purchasing_discount_rules[<?php echo esc_attr( $object_id ); ?>][membership_plan_id]"
 															id="_variation_purchasing_discount_rules_<?php echo esc_attr( $object_id ); ?>_membership_plan_id"
-															class="wc-enhanced-select membership-plan wide">
+															class="wc-enhanced-select membership-plan wide"
+															style="width:90%;">
 															<?php foreach ( $this->meta_box->get_membership_plan_options() as $id => $label ) : ?>
 																<option value="<?php echo esc_attr( $id ); ?>" <?php selected( $id, $variation_rule->get_membership_plan_id() ); ?>><?php echo esc_html( $label ); ?></option>
 															<?php endforeach; ?>

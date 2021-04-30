@@ -113,7 +113,8 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 		$ticket_id     = null;
 		$fieldset_form = true;
 
-		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
+		/** @var Tribe__Tickets_Plus__Meta $meta_object */
+		$meta_object = tribe( 'tickets-plus.meta' );
 
 		$active_meta = [];
 
@@ -123,9 +124,22 @@ class Tribe__Tickets_Plus__Meta__Fieldset {
 			}
 		}
 
+		/** @var \Tribe__Tickets_Plus__Admin__Views $template */
+		$template = tribe( 'tickets-plus.admin.views' );
+
+		$args = [
+			'templates'     => $templates,
+			'meta'          => $meta,
+			'ticket_id'     => $ticket_id,
+			'fieldset_form' => $fieldset_form,
+			'meta_object'   => $meta_object,
+			'active_meta'   => $active_meta,
+		];
+
+		$template->add_template_globals( $args );
 		?>
 		<div id="tribetickets" class="event-tickets-plus-fieldset-table tribe-tickets-plus-fieldset-page">
-			<?php include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/meta.php'; ?>
+			<?php $template->template( 'meta', $args ); ?>
 		</div>
 		<?php
 	}

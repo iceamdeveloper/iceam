@@ -127,7 +127,7 @@ foreach ($F->fields as $f)
 	if (!empty ($f->error_message))
 	{
 ?>
-			<span class="bps-error"><?php echo $f->error_message; ?></span><br>
+			<span class="bps-error dashicons dashicons-warning"></span><span class="bps-error"><?php echo $f->error_message; ?></span><br>
 <?php
 	}
 
@@ -158,13 +158,13 @@ foreach ($F->fields as $f)
 ?>
 			<select style="min-width: 5em;" id="<?php echo $id; ?>" name="<?php echo $name.'[min]'; ?>">
 			<?php foreach ($f->options as $key => $label) { ?>
-				<option <?php if ($key == $value['min']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
+				<option <?php if (strval ($key) == $value['min']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
 			<?php } ?>
 			</select>
 			<span> - </span>
 			<select style="min-width: 5em;" name="<?php echo $name.'[max]'; ?>">
 			<?php foreach ($f->options as $key => $label) { ?>
-				<option <?php if ($key == $value['max']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
+				<option <?php if (strval ($key) == $value['max']) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
 			<?php } ?>
 			</select><br>
 <?php
@@ -201,11 +201,9 @@ foreach ($F->fields as $f)
 				<option value="miles" <?php selected ($value['units'], "miles"); ?>><?php echo $miles; ?></option>
 			</select>
 			<span><?php echo $of; ?></span>
-			<input type="search" style="width: 90%;" id="<?php echo $id; ?>" name="<?php echo $name.'[location]'; ?>"
-				value="<?php echo $value['location']; ?>" placeholder="<?php echo $placeholder; ?>">
-			<button type="button" id="<?php echo $id; ?>_icon" title="<?php echo $icon_title; ?>">
-				<span class="dashicons dashicons-location"></span>
-			</button><br>
+			<input type="search" id="<?php echo $id; ?>" name="<?php echo $name.'[location]'; ?>" value="<?php echo $value['location']; ?>"
+				placeholder="<?php echo $placeholder; ?>"><span id="<?php echo $id; ?>_icon" title="<?php echo $icon_title; ?>"
+				style="vertical-align: text-bottom; cursor: pointer;" class="dashicons dashicons-location"></span><br>
 			<input type="hidden" id="<?php echo $id; ?>_lat" name="<?php echo $name.'[lat]'; ?>" value="<?php echo $value['lat']; ?>">
 			<input type="hidden" id="<?php echo $id; ?>_lng" name="<?php echo $name.'[lng]'; ?>" value="<?php echo $value['lng']; ?>">
 
@@ -223,7 +221,7 @@ foreach ($F->fields as $f)
 ?>
 			<select id="<?php echo $id; ?>" name="<?php echo $name; ?>">
 			<?php foreach ($f->options as $key => $label) { ?>
-				<option <?php if ($key == $value) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
+				<option <?php if (strval ($key) == $value) echo 'selected="selected"'; ?> value="<?php echo $key; ?>"><?php echo $label; ?> </option>
 			<?php } ?>
 			</select><br>
 <?php
@@ -242,10 +240,10 @@ foreach ($F->fields as $f)
 		wp_enqueue_script ('bps-template');
 ?>
 			<?php foreach ($f->options as $key => $label) { ?>
-				<label><input type="radio" <?php if ($key == $value) echo 'checked="checked"'; ?>
+				<label><input type="radio" <?php if (strval ($key) == $value) echo 'checked="checked"'; ?>
 					name="<?php echo $name; ?>" value="<?php echo $key; ?>"> <?php echo $label; ?></label><br>
 			<?php } ?>
-			<a href="javascript:bps_clear_radio('<?php echo $id; ?>_wrap')"><?php echo __('Clear', 'buddypress'); ?></a><br>
+			<a href="javascript:bps_clear_radio('<?php echo $id; ?>_wrap')"><?php echo $F->strings['clear']; ?></a><br>
 <?php
 	break;
 	case 'checkbox':
@@ -277,7 +275,7 @@ foreach ($F->fields as $f)
 }
 ?>
 		<div>
-			<button type="submit"><?php echo __('Search', 'buddypress'); ?></button>
+			<button type="submit"><?php echo $F->strings['search']; ?></button>
 		</div>
 	</form>
 

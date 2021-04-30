@@ -62,41 +62,6 @@ function bps_template_info ($template)
 	return $located;
 }
 
-function bps_check_enqueued_scripts ($form, $located)
-{
-	$done = array ('distance' => false, 'radio' => false);
-	list ($fields, ) = bps_get_form_fields ($form);
-
-	foreach ($fields as $f)
-	{
-		switch ($f->display)
-		{
-		case 'distance':
-
-			if ($done['distance'])  break;
-			$done['distance'] = true;
-
-			if (!wp_script_is ($f->script_handle, 'enqueued'))
-				wp_enqueue_script ($f->script_handle);
-
-			if (!wp_script_is ('bps-template', 'enqueued'))
-				wp_enqueue_script ('bps-template', plugins_url ('bp-profile-search/bps-template.js'), array (), BPS_VERSION);
-
-			break;
-
-		case 'radio':
-
-			if ($done['radio'])  break;
-			$done['radio'] = true;
-
-			if (!wp_script_is ('bps-template', 'enqueued'))
-				wp_enqueue_script ('bps-template', plugins_url ('bp-profile-search/bps-template.js'), array (), BPS_VERSION);
-
-			break;
-		}
-	}
-}
-
 function bps_call_template ($template, $args = array ())
 {
 	$located = bp_locate_template ($template. '.php');
@@ -153,7 +118,6 @@ function bps_call_form_template ($form, $location)
 	}
 
 	include $located;
-	bps_check_enqueued_scripts ($form, $located);
 
 	echo "\n<!-- BP Profile Search end $template -->\n";
 	array_pop ($GLOBALS['bps_template_args']);
@@ -209,7 +173,7 @@ function bps_escaped_form_data ($version = '')
 
 function bps_escaped_filters_data ($version = '')
 {
-	if ($version == '')	return bps_escaped_filters_data47 ();
+	if ($version == '5.4')	return bps_escaped_filters_data54 ();
 
 	return false;
 }
@@ -232,4 +196,112 @@ function bps_unique_id ($id)
 	$unique = $k[$id]? $id. '_'. $k[$id]: $id;
 	
 	return apply_filters ('bps_unique_id', $unique, $id);
+}
+
+function bps_escaped_form_data49 ()
+{
+	list ($form, $location) = bps_template_args ();
+
+	$meta = bps_meta ($form);
+	list ($fields, $errors) = bps_get_form_fields ($form);
+
+	$F = new stdClass;
+	$F->id = $form;
+	$F->title = bps_wpml ($form, '-', 'title', get_the_title ($form));
+	$F->location = $location;
+	$F->unique_id = bps_unique_id ('form_'. $form);
+	$F->errors = $errors;
+
+	$dirs = bps_directories ();
+	$F->action = $dirs[bps_wpml_id ($meta['action'])]->path;
+	$F->method = $meta['method'];
+
+	$platform = bps_platform ();
+	$F->strings['clear'] = esc_html (($platform == 'buddypress')? __('Clear', 'buddypress'): __('Clear', 'buddyboss'));
+	$F->strings['search'] = esc_html (($platform == 'buddypress')? __('Search', 'buddypress'): __('Search', 'buddyboss'));
+
+	$F->fields = $fields;
+	$F->fields[] = bps_set_hidden_field (BPS_FORM, $form);
+	$F->fields[] = bps_set_hidden_field ('bps_form_page', bps_current_page ());
+
+	do_action ('bps_before_search_form', $F);
+
+	foreach ($F->fields as $f)
+	{
+		$f->unique_id = bps_unique_id ($f->html_name);
+
+		if (!is_array ($f->value))
+			$f->value = esc_attr (stripslashes ($f->value));
+		else foreach ($f->value as $k => $value)
+			$f->value[$k] = esc_attr (stripslashes ($value));
+		if ($f->display == 'hidden')  continue;
+
+		$f->label = esc_html ($f->label);
+		$f->description = esc_html ($f->description);
+		$f->error_message = esc_html ($f->error_message);
+
+		$options = array ();
+		foreach ($f->options as $key => $label)
+			$options[esc_attr ($key)] = esc_html ($label);
+		$f->options = $options;
+	}
+
+	return $F;
+}
+
+function bps_escaped_filters_data54 ()
+{
+	$F = new stdClass;
+
+	$action = parse_url ($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+	$action = add_query_arg (BPS_FORM, 'clear', $action);
+	$F->links[esc_url ($action)] = esc_html ((bps_platform () == 'buddypress')? __('Clear', 'buddypress'): __('Clear', 'buddyboss'));
+	
+	$form_page = bps_get_request ('filters')['bps_form_page'];
+	if ($form_page != bps_current_page ())
+		$F->links[esc_url ($form_page)] = esc_html (__('New Search', 'bp-profile-search'));
+
+	$F->fields = bps_get_filters_fields ();
+
+	do_action ('bps_before_filters', $F);
+
+	foreach ($F->fields as $f)
+	{
+		$f->label = esc_html ($f->label);
+		$f->mode = esc_html ($f->mode);
+		if (!is_array ($f->value))
+			$f->value = esc_html (stripslashes ($f->value));
+		else foreach ($f->value as $k => $value)
+			$f->value[$k] = esc_html (stripslashes ($value));
+	}
+
+	return $F;
+}
+
+function bps_escaped_details_data ()
+{
+	$F = new stdClass;
+	$F->fields = array ();
+
+	$details = bps_get_details ();
+	foreach ($details as $code)
+	{
+		$f = bps_parsed_field ($code);
+		if (!isset ($f->get_value) || !is_callable ($f->get_value))  continue;
+
+		$f->d_label = (isset ($f->filter) && isset ($f->label))? $f->label: $f->name;
+		call_user_func ($f->get_value, $f);
+
+		$f->d_label = esc_html ($f->d_label);
+		if (!is_array ($f->d_value))
+			$f->d_value = esc_html (stripslashes ($f->d_value));
+		else foreach ($f->d_value as $k => $value)
+			$f->d_value[$k] = esc_html (stripslashes ($value));
+
+		do_action ('bps_field_before_details', $f);
+		$F->fields[] = $f;
+	}
+
+	do_action ('bps_before_details', $F);
+	return $F;
 }

@@ -3,12 +3,7 @@
 class woocommerce_category_pricing_rules_admin {
 
 	public function __construct() {
-		add_action( 'init', array(&$this, 'on_init') );
 		add_action( 'admin_enqueue_scripts', array(&$this, 'admin_enqueue_scripts'), 100 );
-	}
-
-	public function on_init() {
-		wp_enqueue_script( 'jquery-ui-sortable' );
 	}
 
 	public function admin_enqueue_scripts( $hook ) {

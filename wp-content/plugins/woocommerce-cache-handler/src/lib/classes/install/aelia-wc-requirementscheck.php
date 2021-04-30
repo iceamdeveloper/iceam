@@ -48,7 +48,7 @@ if(!class_exists('Aelia_WC_RequirementsChecks')) {
 		 *
 		 * @var string
 		 */
-		protected $required_php_version = '5.6';
+		protected $required_php_version = '7.0';
 
 		// @var array An array of PHP extensions required by the plugin
 		protected $required_extensions = array(

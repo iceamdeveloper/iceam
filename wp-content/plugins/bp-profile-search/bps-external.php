@@ -316,6 +316,7 @@ function bps_usermeta_search ($f)
 
 	case 'set_match_any':
 	case 'set_match_all':
+	case 'set_match_single':
 		$values = (array)$value;
 		$parts = array ();
 		foreach ($values as $value)

@@ -1,10 +1,22 @@
+/**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
+ * WordPress dependencies
+ */
+import { useDispatch, useSelect } from '@wordpress/data';
 import { InspectorControls } from '@wordpress/block-editor';
 import { PanelBody } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
-import classnames from 'classnames';
-import { StatusControl, Status, StatusLabels } from '../status-control';
-import { COURSE_STATUS_STORE } from '../status-store';
-import { useDispatch, useSelect } from '@wordpress/data';
+
+/**
+ * Internal dependencies
+ */
+import { Status } from '../status-preview';
+import { StatusControl, StatusLabels } from '../status-preview/status-control';
+import { COURSE_STATUS_STORE } from '../status-preview/status-store';
 
 /**
  * Module status preview with setting control.

@@ -104,6 +104,9 @@ class Sensei_PostTypes {
 		// REST API functionality.
 		add_action( 'rest_api_init', [ $this, 'setup_rest_api' ] );
 
+		// Add protections on feeds for certain CPTs.
+		add_action( 'wp', [ $this, 'protect_feeds' ] );
+
 		// Add 'Edit Quiz' link to admin bar
 		add_action( 'admin_bar_menu', array( $this, 'quiz_admin_bar_menu' ), 81 );
 
@@ -142,6 +145,42 @@ class Sensei_PostTypes {
 		// Ensure registered meta will show up in the REST API for courses and lessons.
 		add_post_type_support( 'course', 'custom-fields' );
 		add_post_type_support( 'lesson', 'custom-fields' );
+
+		// Hide post content for students who aren't enrolled.
+		add_filter( 'post_password_required', [ $this, 'lesson_is_protected' ], 10, 2 );
+	}
+
+	/**
+	 * Add protection to Sensei post type feeds.
+	 *
+	 * @access private
+	 */
+	public function protect_feeds() {
+		if ( is_feed() && is_post_type_archive( [ 'lesson', 'question', 'quiz', 'sensei_message' ] ) ) {
+			wp_die( esc_html__( 'Error: Feed does not exist', 'sensei-lms' ), '', [ 'response' => 404 ] );
+		}
+	}
+
+	/**
+	 * Helper function to hide lesson post content by artificially making this a password protected post in certain contexts.
+	 *
+	 * @access private
+	 *
+	 * @param bool    $is_password_protected Filtered value for if this is a password protected post.
+	 * @param WP_Post $post                  Post object.
+	 *
+	 * @return bool
+	 */
+	public function lesson_is_protected( $is_password_protected, $post ) {
+		if (
+			$post instanceof WP_Post
+			&& 'lesson' === $post->post_type
+			&& ! sensei_can_user_view_lesson( $post->ID, get_current_user_id() )
+		) {
+			return true;
+		}
+
+		return $is_password_protected;
 	}
 
 	/**
@@ -152,6 +191,8 @@ class Sensei_PostTypes {
 	 * @return void
 	 */
 	public function setup_course_post_type() {
+		// If Sensei LMS was first activated pre-3.7.0 and permalinks had a front value, `with_front` will be enabled.
+		$with_front = Sensei()->get_legacy_flag( Sensei_Main::LEGACY_FLAG_WITH_FRONT ) ? true : false;
 
 		$args = array(
 			'labels'                => $this->create_post_type_labels( $this->labels['course']['singular'], $this->labels['course']['plural'], $this->labels['course']['menu'] ),
@@ -163,7 +204,7 @@ class Sensei_PostTypes {
 			'query_var'             => true,
 			'rewrite'               => array(
 				'slug'       => esc_attr( apply_filters( 'sensei_course_slug', _x( 'course', 'post type single url base', 'sensei-lms' ) ) ),
-				'with_front' => true,
+				'with_front' => $with_front,
 				'feeds'      => true,
 				'pages'      => true,
 			),
@@ -172,7 +213,7 @@ class Sensei_PostTypes {
 			'has_archive'           => $this->get_course_post_type_archive_slug(),
 			'hierarchical'          => false,
 			'menu_position'         => 51,
-			'supports'              => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions' ),
+			'supports'              => array( 'title', 'editor', 'excerpt', 'thumbnail', 'revisions', 'custom-fields' ),
 			'show_in_rest'          => true,
 			'rest_base'             => 'courses',
 			'rest_controller_class' => 'WP_REST_Posts_Controller',
@@ -257,6 +298,9 @@ class Sensei_PostTypes {
 			array_push( $supports_array, 'comments' );
 		} // End If Statement
 
+		// If Sensei LMS was first activated pre-3.7.0 and permalinks had a front value, `with_front` will be enabled.
+		$with_front = Sensei()->get_legacy_flag( Sensei_Main::LEGACY_FLAG_WITH_FRONT ) ? true : false;
+
 		$args = array(
 			'labels'                => $this->create_post_type_labels( $this->labels['lesson']['singular'], $this->labels['lesson']['plural'], $this->labels['lesson']['menu'] ),
 			'public'                => true,
@@ -266,7 +310,7 @@ class Sensei_PostTypes {
 			'query_var'             => true,
 			'rewrite'               => array(
 				'slug'       => esc_attr( apply_filters( 'sensei_lesson_slug', _x( 'lesson', 'post type single slug', 'sensei-lms' ) ) ),
-				'with_front' => true,
+				'with_front' => $with_front,
 				'feeds'      => true,
 				'pages'      => true,
 			),
@@ -278,7 +322,7 @@ class Sensei_PostTypes {
 			'supports'              => $supports_array,
 			'show_in_rest'          => true,
 			'rest_base'             => 'lessons',
-			'rest_controller_class' => 'WP_REST_Posts_Controller',
+			'rest_controller_class' => 'Sensei_REST_API_Lessons_Controller',
 		);
 
 		/**
@@ -299,6 +343,8 @@ class Sensei_PostTypes {
 	 * @return void
 	 */
 	public function setup_quiz_post_type() {
+		// If Sensei LMS was first activated pre-3.7.0 and permalinks had a front value, `with_front` will be enabled.
+		$with_front = Sensei()->get_legacy_flag( Sensei_Main::LEGACY_FLAG_WITH_FRONT ) ? true : false;
 
 		$args = array(
 			'labels'              => $this->create_post_type_labels(
@@ -315,7 +361,7 @@ class Sensei_PostTypes {
 			'exclude_from_search' => true,
 			'rewrite'             => array(
 				'slug'       => esc_attr( apply_filters( 'sensei_quiz_slug', _x( 'quiz', 'post type single slug', 'sensei-lms' ) ) ),
-				'with_front' => true,
+				'with_front' => $with_front,
 				'feeds'      => true,
 				'pages'      => true,
 			),
@@ -348,29 +394,38 @@ class Sensei_PostTypes {
 	 * @return void
 	 */
 	public function setup_question_post_type() {
+		// If Sensei LMS was first activated pre-3.7.0 and permalinks had a front value, `with_front` will be enabled.
+		$with_front = Sensei()->get_legacy_flag( Sensei_Main::LEGACY_FLAG_WITH_FRONT ) ? true : false;
 
 		$args = array(
-			'labels'              => $this->create_post_type_labels( $this->labels['question']['singular'], $this->labels['question']['plural'], $this->labels['question']['menu'] ),
-			'public'              => false,
-			'publicly_queryable'  => true,
-			'show_ui'             => true,
-			'show_in_menu'        => true,
-			'show_in_nav_menus'   => false,
-			'query_var'           => true,
-			'exclude_from_search' => true,
-			'rewrite'             => array(
+			'labels'                => $this->create_post_type_labels( $this->labels['question']['singular'], $this->labels['question']['plural'], $this->labels['question']['menu'] ),
+			'public'                => false,
+			'publicly_queryable'    => true,
+			'show_ui'               => true,
+			'show_in_menu'          => true,
+			'show_in_nav_menus'     => false,
+			'query_var'             => true,
+			'exclude_from_search'   => true,
+			'rewrite'               => array(
 				'slug'       => esc_attr( apply_filters( 'sensei_question_slug', _x( 'question', 'post type single slug', 'sensei-lms' ) ) ),
-				'with_front' => true,
+				'with_front' => $with_front,
 				'feeds'      => true,
 				'pages'      => true,
 			),
-			'map_meta_cap'        => true,
-			'capability_type'     => 'question',
-			'has_archive'         => true,
-			'hierarchical'        => false,
-			'menu_position'       => 51,
-			'supports'            => array( 'title', 'revisions' ),
+			'map_meta_cap'          => true,
+			'capability_type'       => 'question',
+			'has_archive'           => true,
+			'hierarchical'          => false,
+			'menu_position'         => 51,
+			'supports'              => array( 'title', 'revisions' ),
+			'show_in_rest'          => true,
+			'rest_base'             => 'questions',
+			'rest_controller_class' => 'Sensei_REST_API_Questions_Controller',
 		);
+
+		if ( Sensei()->quiz->is_block_based_editor_enabled() ) {
+			$args['supports'][] = 'editor';
+		}
 
 		/**
 		 * Filter the arguments passed in when registering the Sensei Question post type.
@@ -593,6 +648,7 @@ class Sensei_PostTypes {
 			'query_var'         => false,
 			'show_in_nav_menus' => false,
 			'show_admin_column' => true,
+			'show_in_rest'      => true,
 			'rewrite'           => array( 'slug' => esc_attr( apply_filters( 'sensei_question_type_slug', _x( 'question-type', 'taxonomy archive slug', 'sensei-lms' ) ) ) ),
 		);
 
@@ -631,6 +687,7 @@ class Sensei_PostTypes {
 			'query_var'         => false,
 			'show_in_nav_menus' => false,
 			'show_admin_column' => true,
+			'show_in_rest'      => true,
 			'capabilities'      => array(
 				'manage_terms' => 'manage_categories',
 				'edit_terms'   => 'edit_questions',

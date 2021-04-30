@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_6 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -494,7 +494,7 @@ class WC_Memberships_Member_Discounts {
 	 * @param int $product_id the ID of the related product to check discounts for
 	 * @return \WC_Memberships_Membership_Plan_Rule[] array of membership plan purchasing discount rules
 	 */
-	private function get_user_product_purchasing_discount_rules( $user_id, $product_id ) {
+	public function get_user_product_purchasing_discount_rules( $user_id, $product_id ) {
 
 		if ( ! is_numeric( $user_id ) || ! is_numeric( $product_id ) ) {
 			return [];

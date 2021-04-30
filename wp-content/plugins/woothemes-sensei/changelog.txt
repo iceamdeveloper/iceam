@@ -1,5 +1,34 @@
 *** Sensei with WooCommerce Paid Courses Changelog ***
 
+2021.04.14 - version 3.10.0.2.3.3
+* Sensei LMS: Version bump to 3.10.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.10.0/changelog.txt
+
+2021.03.31 - version 3.9.1.2.3.3
+* Sensei LMS: Version bump to 3.9.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.9.1/changelog.txt
+
+2021.03.25 - version 3.9.0.2.3.3
+* Fix: Return array instead of null to fix warning - #594
+* Sensei LMS: Version bump to 3.9.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.9.0/changelog.txt
+
+2021.02.17 - version 3.8.1.2.3.2
+* Fix: Fix untranslatable string for Complete purchase - #590
+* Sensei LMS: Version bump to 3.8.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.8.1/changelog.txt
+
+2021.02.09 - version 3.8.0.2.3.1
+* Tweak: Use Sensei_Notices for Purchase Course block - #577
+* Fix: Add JS strings and references to POT file - #582
+* Fix: Set script text domain for block assets - #586
+* Sensei LMS: Version bump to 3.8.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.8.0/changelog.txt
+
+2021.01.21 - version 3.7.0.2.3.0
+* New: Add link to My Courses on My Account page - #560
+* New: Add Courses section to order details - #561
+* New: Remove plugin data when plugin is uninstalled - #570
+* Tweak: Don't show purchase confirmation on Order Received page - #565
+* Tweak: Filter out course product meta when duplicating course - #562
+* Fix: Remove product from course when product is sent to trash - #567
+* Sensei LMS: Version bump to 3.7.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.7.0/changelog.txt
+
 2021.01.06 - version 3.6.1.2.2.0
 * Sensei LMS: Version bump to 3.6.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.6.1/changelog.txt
 

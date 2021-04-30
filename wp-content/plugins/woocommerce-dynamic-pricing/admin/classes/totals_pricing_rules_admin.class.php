@@ -3,12 +3,8 @@
 class woocommerce_totals_pricing_rules_admin {
 
 	public function __construct() {
-		add_action( 'init', array(&$this, 'on_init') );
 	}
 
-	public function on_init() {
-		wp_enqueue_script( 'jquery-ui-sortable' );
-	}
 
 	public function advanced_metabox() {
 		?>

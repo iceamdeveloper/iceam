@@ -17,7 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -258,7 +258,7 @@ function wc_memberships_profile_field_form_field( \SkyVerge\WooCommerce\Membersh
 
 		// show a empty placeholder to force the user to select a value
 		if ( empty( $field_args['default'] ) || ( $value && ! isset( $field_args['options'][ $value ] ) ) ) {
-			$field_args['options'] = array_merge( [ '' => '' ], $field_args['options'] );
+			$field_args['options'] = [ '' => '' ] + $field_args['options'];
 		}
 
 		$field = woocommerce_form_field( $field_key, array_merge( $field_args, [ 'return' => true ] ), $value );

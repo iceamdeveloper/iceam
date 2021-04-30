@@ -18,7 +18,8 @@ class Sensei_Block_Contact_Teacher {
 	 * Sensei_Block_Contact_Teacher constructor.
 	 */
 	public function __construct() {
-		add_action( 'init', [ $this, 'register_block' ] );
+		$this->register_block();
+		$this->add_notices();
 	}
 
 	/**
@@ -33,6 +34,18 @@ class Sensei_Block_Contact_Teacher {
 				'render_callback' => [ $this, 'render_contact_teacher_block' ],
 			]
 		);
+	}
+
+	/**
+	 * Check if a notice should be displayed.
+	 *
+	 * @access private
+	 */
+	public function add_notices() {
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Arguments used for comparison.
+		if ( isset( $_GET['send'] ) && 'complete' === $_GET['send'] ) {
+			Sensei()->notices->add_notice( __( 'Your private message has been sent.', 'sensei-lms' ), 'tick', 'sensei-contact-teacher-confirm' );
+		}
 	}
 
 	/**
@@ -58,25 +71,12 @@ class Sensei_Block_Contact_Teacher {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Arguments used for comparison.
 		$contact_form_open = isset( $_GET['contact'] );
 
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Arguments used for comparison.
-		$message_sent = ( isset( $_GET['send'] ) && 'complete' === $_GET['send'] );
-		$notice       = $message_sent ? $this->confirmation_notice() : '';
-
 		$contact_form = $this->teacher_contact_form( $post );
 
 		return '<div id="private_message" class="sensei-block-wrapper sensei-collapsible">
 				' . ( $this->add_button_attributes( $content, $contact_form_link ) ) . '
-				' . $notice . '
 				<div class="sensei-collapsible__content ' . ( $contact_form_open ? '' : 'collapsed' ) . '">' . $contact_form . '</div>
 			</div>';
-	}
-
-	/**
-	 * Render a notice confirming the message was sent.
-	 */
-	private function confirmation_notice() {
-		$confirmation_message = __( 'Your private message has been sent.', 'sensei-lms' );
-		return '<div class="sensei-message tick">' . esc_html( $confirmation_message ) . '</div>';
 	}
 
 	/**

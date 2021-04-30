@@ -1,5 +1,12 @@
+/**
+ * External dependencies
+ */
 import { Stepper } from '@woocommerce/components';
-import { useQueryStringRouter } from '../query-string-router';
+
+/**
+ * Internal dependencies
+ */
+import { useQueryStringRouter } from '../../shared/query-string-router';
 
 /**
  * Go to route when clicking steps that can be active (completed or next).

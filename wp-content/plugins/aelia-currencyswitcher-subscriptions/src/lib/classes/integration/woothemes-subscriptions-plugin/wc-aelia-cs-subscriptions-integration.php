@@ -380,7 +380,13 @@ class Subscriptions_Integration {
 			// used to force the checkout in that currency
 			// @since 1.5.0.200410
 			$subscription = wcs_get_subscription($cart_item['subscription_renewal']['subscription_id']);
-			$cart_item['data']->checkout_currency = $this->get_order_currency($subscription);
+			// Check that the subscription is a valid object, before trying to fetch the currency from it. In
+			// some cases (don't know the specific conditions), the Subscriptions plugin can return "false",
+			// which would throw a fatal error
+			// @since 1.5.10.201120
+			if($subscription instanceof \WC_Order) {
+				$cart_item['data']->checkout_currency = $this->get_order_currency($subscription);
+			}
 		}
 
 		// Tag products being switched
@@ -392,7 +398,13 @@ class Subscriptions_Integration {
 			// used to force the checkout in that currency
 			// @since 1.5.0.200410
 			$subscription = wcs_get_subscription($cart_item['subscription_switch']['subscription_id']);
-			$cart_item['data']->checkout_currency = $this->get_order_currency($subscription);
+			// Check that the subscription is a valid object, before trying to fetch the currency from it. In
+			// some cases (don't know the specific conditions), the Subscriptions plugin can return "false",
+			// which would throw a fatal error
+			// @since 1.5.10.201120
+			if($subscription instanceof \WC_Order) {
+				$cart_item['data']->checkout_currency = $this->get_order_currency($subscription);
+			}
 		}
 		return $cart_item;
 	}

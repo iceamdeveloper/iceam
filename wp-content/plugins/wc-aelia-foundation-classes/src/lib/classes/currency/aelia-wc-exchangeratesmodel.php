@@ -110,6 +110,15 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 	public function get_exchange_rates($base_currency, array $currencies) {
 		$result = array();
 
+		// Allow 3rd parties to alter the base currency before fetching the rates. This can be useful when the remote
+		// provider doesn't support the base currency (e.g. BTC, ETH), but it can return rates based on a different
+		// currency, such as USD
+		// @since 2.1.4.210208
+		$base_currency = apply_filters('wc_aelia_exchange_rates_base_currency', $base_currency, $currencies, $this);
+		// Allow 3rd parties to alter the list of currencies for which an exchange rate should be fetched
+		// @since x.x
+		$currencies = apply_filters('wc_aelia_exchange_rates_currencies', $currencies, $this);
+
 		if(empty($base_currency)) {
 			throw new InvalidArgumentException(__('Base Currency is required, empty value received.',
 																						Definitions::TEXT_DOMAIN));
@@ -131,7 +140,7 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 
 				if(!empty($exchange_rate) && ($exchange_rate > 0)) {
 					// Allow 3rd parties to change the amount of decimals used for conversion
-					// @since
+					// @since 2.1.3.210128
 					$exchange_rates_decimals = apply_filters('wc_aelia_afc_exchange_rates_decimals',
 																									 self::EXCHANGE_RATE_DECIMALS,
 																									 $currency,
@@ -147,6 +156,9 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 
 			$result[$currency] = $exchange_rate;
 		}
-		return $result;
+
+		// Allow 3rd parties to alter the exchange rates before they are returned
+		// @since 2.0.11.210128
+		return apply_filters('wc_aelia_exchange_rates', $result, $base_currency, $this);
 	}
 }

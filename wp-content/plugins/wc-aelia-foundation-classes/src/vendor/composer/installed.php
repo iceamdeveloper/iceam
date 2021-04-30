@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '4130a87bed052de8f5b2ef2edb1ea36c61fdee28',
+    'reference' => '6faa2c720098dd26d281c672aba93830fe9370f2',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,16 +18,16 @@
       'aliases' => 
       array (
       ),
-      'reference' => '4130a87bed052de8f5b2ef2edb1ea36c61fdee28',
+      'reference' => '6faa2c720098dd26d281c672aba93830fe9370f2',
     ),
     'composer/ca-bundle' => 
     array (
-      'pretty_version' => '1.2.8',
-      'version' => '1.2.8.0',
+      'pretty_version' => '1.2.9',
+      'version' => '1.2.9.0',
       'aliases' => 
       array (
       ),
-      'reference' => '8a7ecad675253e4654ea05505233285377405215',
+      'reference' => '78a0e288fdcebf92aa2318a8d3656168da6ac1a5',
     ),
     'geoip2/geoip2' => 
     array (

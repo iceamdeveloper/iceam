@@ -3,6 +3,7 @@
 function bps_get_request ($type, $form=0)		// published interface, 20190324
 {
 	if ($type == 'form')  return bps_get_request2 ($type, $form);
+	if ($type == 'filters')  return bps_get_request2 ($type);
 
 	$current = bps_current_page ();
 	$hidden_filters = bps_get_hidden_filters ();
@@ -45,17 +46,17 @@ function bps_current_page ()
 }
 
 add_filter ('bp_ajax_querystring', 'bps_filter_members', 99, 2);
-function bps_filter_members ($qs, $object)
+function bps_filter_members ($querystring, $object)
 {
-	if ($object != 'members')  return $qs;
+	if ($object != 'members')  return $querystring;
 
 	$request = bps_get_request ('search');
-	if (empty ($request))  return $qs;
+	if (empty ($request))  return $querystring;
 
 	$results = bps_search ($request);
 	if ($results['validated'])
 	{
-		$args = wp_parse_args ($qs);
+		$args = wp_parse_args ($querystring);
 		$users = $results['users'];
 
 		if (isset ($args['include']) && $args['include'] !== '')
@@ -67,10 +68,10 @@ function bps_filter_members ($qs, $object)
 
 		$users = apply_filters ('bps_search_results', $users);
 		$args['include'] = implode (',', $users);
-		$qs = build_query ($args);
+		$querystring = build_query ($args);
 	}
 
-	return $qs;
+	return $querystring;
 }
 
 function bps_search ($request, $users=null)		// published interface, 20190324

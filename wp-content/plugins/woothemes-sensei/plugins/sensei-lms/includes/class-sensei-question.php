@@ -28,7 +28,7 @@ class Sensei_Question {
 		$this->meta_fields    = array( 'question_right_answer', 'question_wrong_answers' );
 		if ( is_admin() ) {
 			// Custom Write Panel Columns
-			add_filter( 'manage_edit-question_columns', array( $this, 'add_column_headings' ), 10, 1 );
+			add_filter( 'manage_edit-question_columns', array( $this, 'add_column_headings' ), 20, 1 );
 			add_action( 'manage_posts_custom_column', array( $this, 'add_column_data' ), 10, 2 );
 			add_action( 'add_meta_boxes', array( $this, 'question_edit_panel_metabox' ), 10, 2 );
 
@@ -52,19 +52,28 @@ class Sensei_Question {
 			'file-upload'     => __( 'File Upload', 'sensei-lms' ),
 		);
 
+		/**
+		 * Filter the question types.
+		 *
+		 * @hook sensei_question_types
+		 *
+		 * @param {string[]} $types Question types.
+		 * @return {string[]} Associative array of question types.
+		 */
 		return apply_filters( 'sensei_question_types', $types );
 	}
 
 	/**
-	 * Add column headings to the "lesson" post list screen.
+	 * Add column headings to the "question" post list screen,
+	 * while moving the existing ones to the end.
 	 *
-	 * @access public
+	 * @access private
 	 * @since  1.3.0
-	 * @param  array $defaults
-	 * @return array $new_columns
+	 * @param  array $defaults  Array of column header labels keyed by column ID.
+	 * @return array            Updated array of column header labels keyed by column ID.
 	 */
 	public function add_column_headings( $defaults ) {
-		$new_columns                      = array();
+		$new_columns                      = [];
 		$new_columns['cb']                = '<input type="checkbox" />';
 		$new_columns['title']             = _x( 'Question', 'column name', 'sensei-lms' );
 		$new_columns['question-type']     = _x( 'Type', 'column name', 'sensei-lms' );
@@ -73,8 +82,20 @@ class Sensei_Question {
 			$new_columns['date'] = $defaults['date'];
 		}
 
+		// Unset renamed existing columns.
+		unset( $defaults['taxonomy-question-type'] );
+		unset( $defaults['taxonomy-question-category'] );
+
+		// Add all remaining columns at the end.
+		foreach ( $defaults as $column_key => $column_value ) {
+			if ( ! isset( $new_columns[ $column_key ] ) ) {
+				$new_columns[ $column_key ] = $column_value;
+			}
+		}
+
 		return $new_columns;
-	} // End add_column_headings()
+	}
+
 
 	/**
 	 * Add data for our newly-added custom columns.
@@ -132,14 +153,22 @@ class Sensei_Question {
 					}
 				}
 			}
-			add_meta_box( 'question-edit-panel', $metabox_title, array( $this, 'question_edit_panel' ), 'question', 'normal', 'high' );
+
 			add_meta_box( 'question-lessons-panel', __( 'Quizzes', 'sensei-lms' ), array( $this, 'question_lessons_panel' ), 'question', 'side', 'default' );
-			add_meta_box( 'multiple-question-lessons-panel', __( 'Quizzes', 'sensei-lms' ), array( $this, 'question_lessons_panel' ), 'multiple_question', 'side', 'default' );
+
+			if ( ! Sensei()->quiz->is_block_based_editor_enabled() ) {
+				add_meta_box( 'multiple-question-lessons-panel', __( 'Quizzes', 'sensei-lms' ), array( $this, 'question_lessons_panel' ), 'multiple_question', 'side', 'default' );
+				add_meta_box( 'question-edit-panel', $metabox_title, array( $this, 'question_edit_panel' ), 'question', 'normal', 'high' );
+			}
 		}
 	}
 
 	public function question_edit_panel() {
 		global  $post, $pagenow;
+
+		if ( Sensei()->quiz->is_block_based_editor_enabled() ) {
+			return;
+		}
 
 		add_action( 'admin_enqueue_scripts', array( Sensei()->lesson, 'enqueue_scripts' ) );
 		add_action( 'admin_enqueue_scripts', array( Sensei()->lesson, 'enqueue_styles' ) );
@@ -467,11 +496,15 @@ class Sensei_Question {
 		/**
 		 * Filter the grade for the given question.
 		 *
-		 * @since 1.9.6 introduced
+		 * @since 1.9.6
+		 * @hook sensei_get_question_grade
+		 *
+		 * @param {int} $question_grade Question grade.
+		 * @param {int} $question_id    Question ID.
+		 * @return {int} Question grade.
 		 */
 		return apply_filters( 'sensei_get_question_grade', $question_grade, $question_id );
-
-	} // end get_question_grade
+	}
 
 
 	/**
@@ -516,18 +549,18 @@ class Sensei_Question {
 	 * @return string
 	 */
 	public static function get_the_question_title( $question_id ) {
-
 		/**
-		 * Filter the sensei question title
+		 * Filter the question title.
 		 *
 		 * @since 1.3.0
-		 * @param $question_title
+		 * @hook sensei_question_title
+		 *
+		 * @param {string} $title Question title.
+		 * @return {string} Question title.
 		 */
 		$title = apply_filters( 'sensei_question_title', get_the_title( $question_id ) );
 
-		/**
-		 * hook document in class-woothemes-sensei-message.php the_title()
-		 */
+		/** This filter is documented in includes/class-sensei-messages.php */
 		$title = apply_filters( 'sensei_single_title', $title, 'question' );
 
 		$question_grade = Sensei()->question->get_question_grade( $question_id );
@@ -554,7 +587,6 @@ class Sensei_Question {
 		 * Already documented within WordPress Core
 		 */
 		return apply_filters( 'the_content', wp_kses_post( $question->post_content ) );
-
 	}
 
 	/**
@@ -591,6 +623,15 @@ class Sensei_Question {
 					$question_media_description = $attachment->post_content;
 					switch ( $question_media_type ) {
 						case 'image':
+							/**
+							 * Filter the size of the question image.
+							 *
+							 * @hook sensei_question_image_size
+							 *
+							 * @param {string} $size        Image size.
+							 * @param {int}    $question_id Question ID.
+							 * @return {string} Image size.
+							 */
 							$image_size          = apply_filters( 'sensei_question_image_size', 'medium', $question_id );
 							$attachment_src      = wp_get_attachment_image_src( $question_media, $image_size );
 							$question_media_link = '<a class="' . esc_attr( $question_media_type ) . '" title="' . esc_attr( $question_media_title ) . '" href="' . esc_url( $question_media_url ) . '" target="_blank"><img src="' . esc_url( $attachment_src[0] ) . '" width="' . esc_attr( $attachment_src[1] ) . '" height="' . esc_attr( $attachment_src[2] ) . '" /></a>';
@@ -722,12 +763,14 @@ class Sensei_Question {
 		 * Allow dynamic overriding of whether to show question answers or not
 		 *
 		 * @since 1.9.7
+		 * @hook sensei_question_show_answers
 		 *
-		 * @param boolean $show_answers
-		 * @param integer $question_id
-		 * @param integer $quiz_id
-		 * @param integer $lesson_id
-		 * @param integer $user_id
+		 * @param {bool} $show_answers Whether to show the answer to the question.
+		 * @param {int}  $question_id  Question ID.
+		 * @param {int}  $quiz_id      Quiz ID.
+		 * @param {int}  $lesson_id    Lesson ID.
+		 * @param {int}  $user_id      User ID.
+		 * @return {bool} Whether to show the answer to the question.
 		 */
 		$show_answers = apply_filters( 'sensei_question_show_answers', $show_answers, $question_id, $quiz_id, $lesson_id, get_current_user_id() );
 
@@ -741,14 +784,16 @@ class Sensei_Question {
 				<div class="sensei-message info info-special answer-feedback">
 
 					<?php
-
 						/**
-						 * Filter the answer feedback
-						 * Since 1.9.0
+						 * Filter the answer feedback.
 						 *
-						 * @param string $answer_notes
-						 * @param string $question_id
-						 * @param string $lesson_id
+						 * @since 1.9.0
+						 * @hook sensei_question_answer_notes
+						 *
+						 * @param {bool|string} $answer_notes Answer notes.
+						 * @param {int}         $question_id  Question ID.
+						 * @param {int}         $lesson_id    Lesson ID.
+						 * @return {string} Answer notes.
 						 */
 						echo wp_kses_post( apply_filters( 'sensei_question_answer_notes', $answer_notes, $question_id, $lesson_id ) );
 
@@ -798,7 +843,7 @@ class Sensei_Question {
 			$show_answers = true;
 		}
 
-		// This filter is documented in self::answer_feedback_notes()
+		/** This filter is documented in self::answer_feedback_notes */
 		$show_answers = apply_filters( 'sensei_question_show_answers', $show_answers, $question_item->ID, $quiz_id, $lesson_id, get_current_user_id() );
 
 		if ( $show_answers ) {
@@ -843,28 +888,30 @@ class Sensei_Question {
 		}
 
 		/**
-		 * Filter what the final answer message CSS classes will be
+		 * Filter the answer message CSS classes.
 		 *
-		 * @param string $answer_message_class The Answer message css classes, space separated.
-		 * @param int    $lesson_id The Lesson ID.
-		 * @param int    $question_id The question ID.
-		 * @param int    $user_id The user ID.
-		 * @param bool   $user_correct Is this a correct answer?.
+		 * @hook sensei_question_answer_message_css_class
 		 *
-		 * @return string A space separated string of css class names.
+		 * @param {string} $answer_message_class Space-separated CSS classes to apply to answer message.
+		 * @param {int}    $lesson_id            Lesson ID.
+		 * @param {int}    $question_id          Question ID.
+		 * @param {int}    $user_id              User ID.
+		 * @param {bool}   $user_correct         Whether this is the correct answer.
+		 * @return {string} Space-separated CSS classes to apply to answer message.
 		 */
 		$final_css_classes = apply_filters( 'sensei_question_answer_message_css_class', $answer_message_class, $lesson_id, $question_id, get_current_user_id(), $user_correct );
 
 		/**
-		 * Filter what the final answer text will look like.
+		 * Filter the answer message.
 		 *
-		 * @param string $answer_message The Answer message.
-		 * @param int    $lesson_id The Lesson ID.
-		 * @param int    $question_id The question ID.
-		 * @param int    $user_id The user ID.
-		 * @param bool   $user_correct Is this a correct answer?.
+		 * @hook sensei_question_answer_message_text
 		 *
-		 * @return string
+		 * @param {string} $answer_message Answer message.
+		 * @param {int}    $lesson_id      Lesson ID.
+		 * @param {int}    $question_id    Question ID.
+		 * @param {int}    $user_id        User ID.
+		 * @param {bool}   $user_correct   Whether this is the correct answer.
+		 * @return {string} Answer message.
 		 */
 		$final_message = apply_filters( 'sensei_question_answer_message_text', $answer_message, $lesson_id, $question_id, get_current_user_id(), $user_correct );
 		?>
@@ -921,16 +968,16 @@ class Sensei_Question {
 		$data['lesson_complete']        = $user_lesson_complete;
 
 		/**
-		 * Filter the question template data. This filter fires  in
-		 * the get_template_data function
-		 *
-		 * @hooked self::boolean_load_question_data
+		 * Filter the question template data. This filter fires in
+		 * the get_template_data function.
 		 *
 		 * @since 1.9.0
+		 * @hook sensei_get_question_template_data
 		 *
-		 * @param array $data
-		 * @param string $question_id
-		 * @param string $quiz_id
+		 * @param {array} $data        Question data.
+		 * @param {int}   $question_id Question ID.
+		 * @param {int}   $quiz_id     Quiz ID.
+		 * @return {array} Question data.
 		 */
 		return apply_filters( 'sensei_get_question_template_data', $data, $question_id, $quiz_id );
 
@@ -1234,18 +1281,19 @@ class Sensei_Question {
 		}
 
 		/**
-		 * Filters the correct answer response.
+		 * Filter the correct answer response.
 		 *
 		 * Can be used for text filters.
 		 *
 		 * @since 1.9.7
+		 * @hook sensei_questions_get_correct_answer
 		 *
-		 * @param string $right_answer Correct answer.
-		 * @param int    $question_id  Question ID
+		 * @param {string} $right_answer Correct answer.
+		 * @param {int}    $question_id  Question ID.
+		 * @return {string} Correct answer.
 		 */
 		return apply_filters( 'sensei_questions_get_correct_answer', $right_answer, $question_id );
-
-	} // get_correct_answer
+	}
 
 	/**
 	 * Get answers by ID keys.
@@ -1320,6 +1368,67 @@ class Sensei_Question {
 		}
 
 		sensei_log_event( 'question_add', $event_properties );
+	}
+
+	/**
+	 * Check if a question can change to a new author. For normal questions, this is only possible if it
+	 * doesn't belong to any other quiz that has a different author.
+	 *
+	 * @param int $question_id   The question post ID.
+	 * @param int $new_author_id The new author ID.
+	 *
+	 * @return bool
+	 */
+	private function can_question_change_author( int $question_id, int $new_author_id ) {
+		$question = get_post( $question_id );
+
+		if ( ! $question || ! in_array( $question->post_type, [ 'question', 'multiple_question' ], true ) ) {
+			return false;
+		}
+
+		if ( 'multiple_question' === $question->post_type ) {
+			// These stick to the quiz. However, we don't attempt to change the questions in the category.
+			return true;
+		}
+
+		$can_question_change_author = true;
+		$quiz_ids                   = array_filter( get_post_meta( $question->ID, '_quiz_id' ) );
+		foreach ( $quiz_ids as $quiz_id ) {
+			$quiz = get_post( $quiz_id );
+			if (
+				$quiz
+				&& 'quiz' === $quiz->post_type
+				&& $new_author_id !== (int) $quiz->post_author
+			) {
+				$can_question_change_author = false;
+				break;
+			}
+		}
+
+		return $can_question_change_author;
+	}
+
+	/**
+	 * Update the question author if possible.
+	 *
+	 * @param int $question_id   Question post ID.
+	 * @param int $new_author_id New author.
+	 *
+	 * @return bool Whether the question author could be changed.
+	 */
+	public function maybe_update_question_author( int $question_id, int $new_author_id ) {
+		if ( ! $question_id || ! $this->can_question_change_author( $question_id, $new_author_id ) ) {
+			return false;
+		}
+
+		wp_update_post(
+			[
+				'ID'          => $question_id,
+				'post_author' => $new_author_id,
+			]
+		);
+
+		return true;
 	}
 
 } // End Class

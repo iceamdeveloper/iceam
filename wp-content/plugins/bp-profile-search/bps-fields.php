@@ -53,7 +53,11 @@ class bps_Fields
 
 		'text/e'		=> array ('' => array ('selectbox', 'radio'), 'one_of' => array ('checkbox', 'multiselectbox')),
 		'decimal/e'		=> array ('' => array ('selectbox', 'radio'), 'range' => 'range'),
-		'set/e'			=> array ('match_any' => array ('checkbox', 'multiselectbox'), 'match_all'	=> array ('checkbox', 'multiselectbox')),
+		'set/e'			=> array ('match_any' => array ('checkbox', 'multiselectbox'),
+						          'match_all' => array ('checkbox', 'multiselectbox'), 'match_single' => 'selectbox'),
+
+		'gmw_bpsgeo_location'	// for GEO my WP (https://wordpress.org/plugins/geo-my-wp/)
+						=> array ('gmw_proximity' => 'proximity'),
 	);
 
 	// to generate the Search Mode selector in the admin page
@@ -70,9 +74,11 @@ class bps_Fields
 			'one_of'		=> __('is one of', 'bp-profile-search'),
 			'match_any'		=> __('match any', 'bp-profile-search'),
 			'match_all'		=> __('match all', 'bp-profile-search'),
+			'match_single'	=> __('match single', 'bp-profile-search'),
+			'gmw_proximity' => __('proximity', 'bp-profile-search'),
 		);
-		
-		$labels = apply_filters ('bps_filter_selector', $labels);
+
+//		$labels = apply_filters ('bps_filter_selector', $labels);
 		$filters = array ();
 		foreach ($f->filters as $filter)
 			$filters[$filter] = $labels[$filter];
@@ -90,12 +96,14 @@ class bps_Fields
 			'range'			=> '',
 			'age_range'		=> '',
 			'distance'		=> __('is within', 'bp-profile-search'),
-			'one_of'		=>  '',
+			'one_of'		=> '',
 			'match_any'		=> __('match any', 'bp-profile-search'),
 			'match_all'		=> __('match all', 'bp-profile-search'),
+			'match_single'	=> '',
+			'gmw_proximity' => __('is within', 'bp-profile-search'),
 		);
 
-		$labels = apply_filters ('bps_filter_labels', $labels);
+//		$labels = apply_filters ('bps_filter_labels', $labels);
 		return $labels[$filter];
 	}
 
@@ -122,13 +130,15 @@ class bps_Fields
 		case 'contains':
 		case 'like':
 		case 'distance':
+//		case 'gmw_proximity':
 		case 'match_any':
 		case 'match_all':
+		case 'match_single':
 			$show_details = true;
 			break;
 		}
 
-		$show_details = apply_filters ('bps_show_details', $show_details, $f);
+//		$show_details = apply_filters ('bps_show_details', $show_details, $f);
 		return $show_details;
 	}
 
@@ -139,7 +149,8 @@ class bps_Fields
 		$format = isset ($f->format)? $f->format: 'none';
 		$enum = (isset ($f->options) && is_array ($f->options))? count ($f->options): 0;
 		$selector = $format. ($enum? '/e': '');
-		$display = apply_filters ('bps_field_config', self::$display, $f);
+//		$display = apply_filters ('bps_field_config', self::$display, $f);
+		$display = self::$display;
 		if (!isset ($display[$selector]))  return false;
 
 		$f->filters = array_keys ($display[$selector]);
@@ -165,6 +176,7 @@ class bps_Fields
 		case 'contains':
 		case '':
 		case 'like':
+		case 'match_single':
 			$value = '';
 			break;
 
@@ -177,6 +189,10 @@ class bps_Fields
 			$value = array ('distance' => '', 'units' => '', 'location' => '', 'lat' => '', 'lng' => '');
 			break;
 
+		case 'gmw_proximity':
+			$value = array ('distance' => '', 'units' => '', 'address' => '', 'lat' => '', 'lng' => '');
+			break;
+
 		case 'one_of':
 		case 'match_any':
 		case 'match_all':
@@ -184,7 +200,7 @@ class bps_Fields
 			break;
 		}
 
-		$value = apply_filters ('bps_get_empty_value', $value, $filter);
+//		$value = apply_filters ('bps_get_empty_value', $value, $filter);
 		return $value;
 	}
 
@@ -197,6 +213,7 @@ class bps_Fields
 		case 'contains':
 		case '':
 		case 'like':
+		case 'match_single':
 			if ($value === '')  $empty = true;
 			break;
 
@@ -206,7 +223,11 @@ class bps_Fields
 			break;
 
 		case 'distance':
-			if ($value['distance'] === '' && $value['location'] === '')  $empty = true;
+			if ($value['location'] === '')  $empty = true;
+			break;
+
+		case 'gmw_proximity':
+			if ($value['address'] === '')  $empty = true;
 			break;
 
 		case 'one_of':
@@ -215,8 +236,40 @@ class bps_Fields
 			break;
 		}
 
-		$empty = apply_filters ('bps_is_empty_value', $empty, $value, $filter);
+//		$empty = apply_filters ('bps_is_empty_value', $empty, $value, $filter);
 		return $empty;
+	}
+
+	public static function remove_empty_values ($value, $filter)
+	{
+		switch ($filter)
+		{
+		case 'contains':
+		case '':
+		case 'like':
+		case 'match_single':
+			if ($value === '')  return false;
+			return $value;
+
+		case 'range':
+		case 'age_range':
+			if ($value['min'] === '')  unset ($value['min']);
+			if ($value['max'] === '')  unset ($value['max']);
+			return $value;
+
+		case 'distance':
+			if ($value['location'] === '')  return false;
+			return $value;
+
+		case 'gmw_proximity':
+			if ($value['address'] === '')  return false;
+			return $value;
+
+		case 'one_of':
+		case 'match_any':
+		case 'match_all':
+			return $value;
+		}
 	}
 
 	public static function get_display ($f, $filter)
@@ -224,7 +277,8 @@ class bps_Fields
 		$format = isset ($f->format)? $f->format: 'none';
 		$enum = (isset ($f->options) && is_array ($f->options))? count ($f->options): 0;
 		$selector = $format. ($enum? '/e': '');
-		$display = apply_filters ('bps_field_config', self::$display, $f);
+//		$display = apply_filters ('bps_field_config', self::$display, $f);
+		$display = self::$display;
 		$display = isset ($display[$selector][$filter])? $display[$selector][$filter]: false;
 
 		if (is_array ($display))
@@ -238,7 +292,8 @@ class bps_Fields
 		$format = isset ($f->format)? $f->format: 'none';
 		$enum = (isset ($f->options) && is_array ($f->options))? count ($f->options): 0;
 		$selector = $format. ($enum? '/e': '');
-		$display = apply_filters ('bps_field_config', self::$display, $f);
+//		$display = apply_filters ('bps_field_config', self::$display, $f);
+		$display = self::$display;
 		if (!isset ($display[$selector][$filter]))  return false;
 
 		$display = $display[$selector][$filter];

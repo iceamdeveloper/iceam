@@ -760,12 +760,12 @@ class Sensei_WC_Memberships {
 	 * @param array $data The localization data.
 	 * @return array
 	 */
-	public static function notify_double_attached_product_on_course_block_editor( $data ) {
+	public static function notify_double_attached_product_on_course_block_editor( $data ) : array {
 		global $post;
 
 		$screen = get_current_screen();
 		if ( 'course' !== $screen->id ) {
-			return;
+			return [];
 		}
 
 		// Find any products that are also directly attached to courses.
@@ -773,7 +773,7 @@ class Sensei_WC_Memberships {
 
 		// Return if there are no double-attached courses.
 		if ( empty( $double_attached_product_ids ) ) {
-			return;
+			return [];
 		}
 
 		// Add notice text.

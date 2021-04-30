@@ -7,7 +7,7 @@
  *
  * See more documentation about our views templating system.
  *
- * @link http://m.tri.be/1aiy
+ * @link https://evnt.is/1aiy
  *
  * @version 5.2.0
  *
@@ -21,7 +21,7 @@ if ( empty( $event->cost ) || empty( $display['cost'] ) ) {
 	return;
 }
 ?>
-<div class="tribe-events-widget-events-list__event-cost tribe-common-b2">
+<div class="tribe-common-b2 tribe-events-widget-events-list__event-cost">
 	<span class="tribe-events-widget-events-list__event-cost-price">
 		<?php echo esc_html( $event->cost ); ?>
 	</span>

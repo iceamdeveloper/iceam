@@ -97,16 +97,18 @@ function sensei_start_course_form( $course_id ) {
 	$prerequisite_complete = Sensei_Course::is_prerequisite_complete( $course_id );
 
 	if ( $prerequisite_complete ) {
+		wp_enqueue_script( 'sensei-stop-double-submission' );
+
 		?><form method="POST" action="<?php echo esc_url( get_permalink( $course_id ) ); ?>">
 
 				<input type="hidden" name="<?php echo esc_attr( 'woothemes_sensei_start_course_noonce' ); ?>" id="<?php echo esc_attr( 'woothemes_sensei_start_course_noonce' ); ?>" value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_start_course_noonce' ) ); ?>" />
 
-				<span><input name="course_start" type="submit" class="course-start" value="<?php esc_html_e( 'Take This Course', 'sensei-lms' ); ?>"/></span>
+				<span><input name="course_start" type="submit" class="course-start sensei-stop-double-submission" value="<?php esc_html_e( 'Take This Course', 'sensei-lms' ); ?>"/></span>
 
 			</form>
 			<?php
-	} // End If Statement
-} // End sensei_start_course_form()
+	}
+}
 
 
 /**
@@ -772,17 +774,8 @@ function sensei_quiz_has_questions() {
 		return false;
 	}
 
-	if ( $sensei_question_loop['current'] + 1 < $sensei_question_loop['total'] ) {
-
-		return true;
-
-	} else {
-
-		return false;
-
-	}
-
-}//end sensei_quiz_has_questions()
+	return $sensei_question_loop['current'] + 1 < $sensei_question_loop['total'];
+}
 
 /**
  * This funciton must only be run inside the quiz question loop.

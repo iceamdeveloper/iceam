@@ -17,14 +17,14 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Exceptions\Invalid_Field;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_6 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -539,6 +539,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			$import_data['member_last_name']      = ! empty( $row['member_last_name'] )  ? $row['member_last_name']  : null;
 			$import_data['membership_status']     = ! empty( $row['membership_status'] ) ? $row['membership_status'] : null;
 			$import_data['member_since']          = ! empty( $row['member_since'] )      ? $row['member_since']      : null;
+			$import_data['member_role']           = ! empty( $row['member_role'] )       ? $row['member_role']       : null;
 
 			// we don't check for empty here, because an empty string membership expiration means the membership is unlimited
 			if ( isset( $row['membership_expiration'] ) && ( is_string( $row['membership_expiration'] ) || is_numeric( $row['membership_expiration'] ) ) ) {
@@ -733,6 +734,23 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 					// update member profile fields upon create or update action
 					$user_membership = $this->update_member_profile_fields( $user_membership, $import_data, $job );
 
+					// update user role
+					if ( ! empty( $import_data['member_role'] ) ) {
+
+						$user = get_user_by( 'id', $user_membership->get_user_id() );
+
+						if ( $user ) {
+
+							// the merchant wants to set the user to a specific role, the behavior below to remove the last role they had is for backwards compatibility from a free add on that was merged into the core plugin
+							wc_memberships()->get_user_memberships_instance()->update_member_user_role(
+								$user->ID,
+								is_array( $user->roles ) ? array_shift( $user->roles ) : '',
+								$import_data['member_role'],
+								true
+							);
+						}
+					}
+
 					/**
 					 * Fires upon creating or updating a User Membership from import data.
 					 *
@@ -875,6 +893,16 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			if ( Profile_Fields::is_profile_field_slug( $key ) ) {
 
 				try {
+
+					// in case of multi-value profile fields, ensure the value to set is of array type
+					if ( is_string( $value ) ) {
+
+						$definition = Profile_Fields::get_profile_field_definition( $key );
+
+						if ( $definition && $definition->is_multiple() ) {
+							$value = array_map( 'trim', explode( ',', $value ) );
+						}
+					}
 
 					$user_membership->set_profile_field( $key, $value );
 

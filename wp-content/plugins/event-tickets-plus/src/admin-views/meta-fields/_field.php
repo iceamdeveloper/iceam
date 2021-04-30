@@ -1,12 +1,52 @@
-<div id="field-<?php echo esc_attr( $field_id ); ?>" class="tribe-tickets-attendee-info-active-field meta-postbox closed">
+<?php
+/**
+ * Admin AR Fields: Wrapper
+ *
+ * @since 4.1
+ * @since 5.2.2 Use admin views to render this template.
+ *
+ * @version 5.2.2
+ *
+ * @var Tribe__Tickets_Plus__Admin__Views                 $this      [Global] Template object.
+ * @var string                                            $type      [Global] The field type.
+ * @var string                                            $type_name [Global] The field type name.
+ * @var Tribe__Tickets_Plus__Meta__Field__Abstract_Field  $field     [Global] The field object.
+ * @var int                                               $field_id  [Global] The ticket to add/edit.
+ * @var string                                            $label     [Global] The field label.
+ * @var string                                            $required  [Global] If the field is required (`on`) or not.
+ * @var string                                            $slug      [Global] Tribe field slug.
+ * @var array                                             $extra     [Global] Array containing the field extra (checkboxes or select options).
+ * @var bool                                              $open      [Global] True if the field should be open.
+ */
+
+$classes = [
+	'tribe-tickets-attendee-info-active-field',
+	'tribe-tickets__admin-attendee-info-field',
+	'tribe-tickets__admin-attendee-info-field--active',
+	'meta-postbox',
+	'closed' => empty( $open ),
+];
+
+?>
+<div
+	id="field-<?php echo esc_attr( $field_id ); ?>"
+	<?php tribe_classes( $classes ); ?>
+>
 	<?php if ( version_compare( $GLOBALS['wp_version'], '5.5', '>=' ) ) : ?>
 		<div class="postbox-header">
-			<h2 class="hndle ui-sortable-handle">
-				<span><span class="tribe-tickets-attendee-info-field-type"><?php echo esc_html( $type_name ); ?>:</span> <?php echo esc_html( $label ); ?></span>
+			<h2 class="hndle ui-sortable-handle tribe-tickets__admin-attendee-info-field-title">
+				<span>
+					<span class="tribe-tickets-attendee-info-field-type tribe-tickets__admin-attendee-info-field-title-type">
+						<?php echo esc_html( $type_name ); ?>
+					</span>
+					<span class="tribe-tickets__admin-attendee-info-field-title-label">
+						<?php echo esc_html( $label ); ?>
+					</span>
+				</span>
 			</h2>
 			<div class="handle-actions hide-if-no-js">
 				<?php
-				/* 
+				/*
 				 * We need to build support for this later.
 				<button type="button" class="handle-order-higher" aria-disabled="false" aria-describedby="tribe-tickets-attendee-info-<?php echo esc_attr( $field_id ); ?>-handle-order-higher-description">
 					<span class="screen-reader-text"><?php esc_html_e( 'Move up', 'event-tickets-plus' ); ?></span>
@@ -41,7 +81,7 @@
 			<input type="text" class="ticket_field" name="tribe-tickets-input[<?php echo esc_attr( $field_id ); ?>][label]" value="<?php echo esc_attr( $label ); ?>">
 		</div>
 
-		##FIELD_EXTRA_DATA##
+		<?php $this->template( 'meta-fields/' . $type ); ?>
 
 		<div class="tribe-tickets-input tribe-tickets-input-checkbox tribe-tickets-required">
 			<label class="prompt"><input type="checkbox" <?php checked( $required, 'on' ); ?> class="ticket_field" name="tribe-tickets-input[<?php echo esc_attr( $field_id );?>][required]" value="on">

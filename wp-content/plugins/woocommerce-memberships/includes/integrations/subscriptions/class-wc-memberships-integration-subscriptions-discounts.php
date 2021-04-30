@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2020, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_2 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_10_6 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -51,7 +51,7 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 	public function __construct() {
 
 		// process member discounts for Subscriptions after standard discounts
-		add_action( 'init', array( $this, 'init' ), 20 );
+		add_action( 'wp_loaded', [ $this, 'init' ], 20 );
 
 		// create an option in settings to enable sign up fees discounts
 		add_filter( 'wc_memberships_products_settings', array( $this, 'enable_discounts_to_sign_up_fees' ) );
@@ -140,11 +140,11 @@ class WC_Memberships_Integration_Subscriptions_Discounts {
 
 				do_action( 'wc_memberships_discounts_disable_price_adjustments' );
 
-				$price_before_discount = $product->get_price();
+				$price_before_discount = wc_get_price_to_display( $product );
 
 				do_action( 'wc_memberships_discounts_enable_price_adjustments' );
 
-				$price_after_discount = $product->get_price();
+				$price_after_discount = wc_get_price_to_display( $product );
 
 				if ( $price_before_discount !== $price_after_discount ) {
 

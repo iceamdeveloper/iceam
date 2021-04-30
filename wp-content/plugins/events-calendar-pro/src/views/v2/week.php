@@ -7,7 +7,7 @@
  *
  * See more documentation about our views templating system.
  *
- * @link http://m.tri.be/1aiy
+ * @link https://evnt.is/1aiy
  *
  * @version  5.1.6
  *
@@ -30,6 +30,7 @@ if ( empty( $disable_event_search ) ) {
 }
 
 $grid_classes = [ 'tribe-events-pro-week-grid', 'tribe-common-a11y-hidden' ];
+
 if ( $hide_weekends ) {
 	$grid_classes[] = 'tribe-events-pro-week-grid--hide-weekends';
 }
@@ -84,7 +85,6 @@ if ( $hide_weekends ) {
 			<?php $this->template( 'week/grid-header' ); ?>
 
 			<?php $this->template( 'week/grid-body' ); ?>
-
 		</div>
 
 		<?php $this->template( 'components/ical-link' ); ?>

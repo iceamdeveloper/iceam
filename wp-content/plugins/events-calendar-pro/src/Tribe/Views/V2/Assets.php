@@ -62,6 +62,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 				'priority'     => 10,
 				'conditionals' => [ $this, 'should_enqueue_frontend' ],
 				'groups'       => [ static::$group_key ],
+				'print'        => true,
 			]
 		);
 
@@ -81,34 +82,8 @@ class Assets extends \tad_DI52_ServiceProvider {
 					[ $this, 'should_enqueue_frontend' ],
 					[ tribe( TEC_Assets::class ), 'should_enqueue_full_styles' ],
 				],
+				'print'        => true,
 				'groups'       => [ static::$group_key ],
-			]
-		);
-
-		tribe_asset(
-			$plugin,
-			'tribe-events-pro-widgets-v2-events-list-skeleton',
-			'widget-events-list-skeleton.css',
-			[
-				'tribe-events-widgets-v2-events-list-skeleton',
-			],
-			null,
-			[
-				'priority' => 15,
-			]
-		);
-
-		tribe_asset(
-			$plugin,
-			'tribe-events-pro-widgets-v2-events-list-full',
-			'widget-events-list-full.css',
-			[
-				'tribe-events-widgets-v2-events-list-full',
-				'tribe-events-pro-widgets-v2-events-list-skeleton',
-			],
-			null,
-			[
-				'priority' => 15,
 			]
 		);
 
@@ -222,7 +197,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 
 		tribe_asset(
 			$plugin,
-			'swiper',
+			'tribe-swiper',
 			'vendor/swiper/dist/js/swiper.js',
 			[],
 			null,
@@ -234,7 +209,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 			'tribe-events-pro-views-v2-map-provider-google-maps',
 			'views/map-provider-google-maps.js',
 			[
-				'swiper',
+				'tribe-swiper',
 				'tribe-events-pro-views-v2-map-no-venue-modal',
 			],
 			'wp_enqueue_scripts',
@@ -345,6 +320,7 @@ class Assets extends \tad_DI52_ServiceProvider {
 					'priority'     => 10,
 					'conditionals' => [ $this, 'should_enqueue_frontend' ],
 					'groups'       => [ static::$group_key ],
+					'print'        => true,
 				]
 			);
 		}
@@ -358,7 +334,9 @@ class Assets extends \tad_DI52_ServiceProvider {
 				$widget_overrides_stylesheet,
 				[],
 				null,
-				[]
+				[
+					'print' => true,
+				]
 			);
 		}
 	}

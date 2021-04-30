@@ -57,7 +57,7 @@ tribe_events_pro_admin.recurrence = {
 					$el.find( 'option:selected' ).attr( 'selected', false );
 				}
 
-				if ( ! $.isArray( value ) ) {
+				if ( ! Array.isArray( value ) ) {
 					value = [ value ];
 				}
 
@@ -310,7 +310,7 @@ tribe_events_pro_admin.recurrence = {
 		}
 
 		$interval
-			.select2()
+			.select2TEC()
 			.select2( 'destroy' )
 			.removeClass( 'select2-offscreen' )
 			.data( 'options', autocomplete_options );

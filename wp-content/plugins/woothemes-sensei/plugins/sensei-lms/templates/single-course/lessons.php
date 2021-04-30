@@ -58,16 +58,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 				?>
 
-				<!-- <section class="entry">
+				<section class="entry">
 
 					<?php
 					/**
 					 * Display the lesson excerpt
 					 */
-					// the_excerpt();
+					the_excerpt();
 					?>
 
-				</section> -->
+				</section>
 
 				<?php
 

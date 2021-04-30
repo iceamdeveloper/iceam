@@ -9,10 +9,11 @@
 
 namespace Tribe\Events\Pro\Views\V2\Widgets;
 
-use Tribe\Events\Views\V2\Assets as TEC_Assets;
 use Tribe\Events\Views\V2\View_Interface;
+use Tribe\Events\Views\V2\Widgets\Widget_Abstract;
 use Tribe__Main as Main;
 use Tribe__Utils__Array as Arr;
+use Tribe\Events\Pro\Views\V2\Widgets\Taxonomy_Filter;
 
 /**
  * Class for the Advanced List Widget.
@@ -23,7 +24,12 @@ use Tribe__Utils__Array as Arr;
  */
 class Widget_Advanced_List {
 
-	use Taxonomy_Filter;
+	/**
+	 * {@inheritDoc}
+	 *
+	 * @var string
+	 */
+	protected static $widget_css_group = 'advanced-list-widget';
 
 	/**
 	 * Default arguments to be merged into final arguments of the widget.
@@ -48,13 +54,24 @@ class Widget_Advanced_List {
 	];
 
 	/**
+	 * Get local widget css group slug.
+	 *
+	 * @since 5.5.0
+	 *
+	 * @return string
+	 */
+	public static function get_css_group() {
+		return static::$widget_css_group;
+	}
+
+	/**
 	 * Renders the event cost in the event.
 	 *
 	 * @since 5.2.0
 	 *
 	 * @param \Tribe__Template $template Current instance of the `Tribe__Template` that's being rendered.
 	 */
-	public function action_render_event_cost( $template ) {
+	public function render_event_cost( $template ) {
 		$template->template( 'widgets/widget-events-list/event/cost', $template->get_values() );
 	}
 
@@ -65,7 +82,7 @@ class Widget_Advanced_List {
 	 *
 	 * @param \Tribe__Template $template Current instance of the `Tribe__Template` that's being rendered.
 	 */
-	public function action_render_event_venue( $template ) {
+	public function render_event_venue( $template ) {
 		$template->template( 'widgets/widget-events-list/event/venue', $template->get_values() );
 	}
 
@@ -76,7 +93,7 @@ class Widget_Advanced_List {
 	 *
 	 * @param \Tribe__Template $template Current instance of the `Tribe__Template` that's being rendered.
 	 */
-	public function action_render_event_organizers( $template ) {
+	public function render_event_organizers( $template ) {
 		$template->template( 'widgets/widget-events-list/event/organizers', $template->get_values() );
 	}
 
@@ -89,30 +106,10 @@ class Widget_Advanced_List {
 	 *
 	 * @return string
 	 */
-	public function action_render_event_recurring_icon( $template ) {
+	public function render_event_recurring_icon( $template ) {
 		return $template->template( 'widgets/widget-events-list/event/date/recurring', $template->get_values() );
 	}
 
-	/**
-	 * Enqueue assets for PRO version of events list widget.
-	 *
-	 * @since 5.2.0
-	 *
-	 * @param boolean         $should_enqueue Whether assets are enqueued or not.
-	 * @param \Tribe__Context $context        Context we are using to build the view.
-	 * @param View_Interface  $view           Which view we are using the template on.
-	 */
-	public function action_enqueue_assets( $should_enqueue, $context, $view ) {
-		if ( ! $should_enqueue ) {
-			return;
-		}
-
-		tribe_asset_enqueue( 'tribe-events-pro-widgets-v2-events-list-skeleton' );
-
-		if ( tribe( TEC_Assets::class )->should_enqueue_full_styles() ) {
-			tribe_asset_enqueue( 'tribe-events-pro-widgets-v2-events-list-full' );
-		}
-	}
 
 	/**
 	 * Filter the default arguments for the list widget.
@@ -184,7 +181,7 @@ class Widget_Advanced_List {
 		];
 
 		// Add the taxonomy filter controls.
-		$adv_admin_fields = array_merge( $adv_admin_fields, Taxonomy_Filter::get_taxonomy_admin_section() );
+		$adv_admin_fields = array_merge( $adv_admin_fields, tribe( 'pro.views.v2.widgets.taxonomy' )->get_taxonomy_admin_section() );
 
 		return Main::array_insert_after_key( 'limit', $admin_fields, $adv_admin_fields );
 	}
@@ -210,7 +207,7 @@ class Widget_Advanced_List {
 		$updated_instance['cost']      = ! empty( $new_instance['cost'] );
 		$updated_instance['organizer'] = ! empty( $new_instance['organizer'] );
 		$updated_instance['operand']   = ! empty( $new_instance['operand'] ) ? $new_instance['operand'] : false;
-		$updated_instance['filters']   = ! empty( $new_instance['filters'] ) ? $this->format_taxonomy_filters( $new_instance['filters'] ) : false;
+		$updated_instance['filters']   = ! empty( $new_instance['filters'] ) ? tribe( 'pro.views.v2.widgets.taxonomy' )->format_taxonomy_filters( $new_instance['filters'] ) : false;
 
 		return $updated_instance;
 	}
@@ -221,13 +218,17 @@ class Widget_Advanced_List {
 	 * @since 5.2.0
 	 *
 	 * @param array<string,mixed> $alterations The alterations to make to the context.
-	 * @param array<string,mixed> $arguments   Current set of arguments.
+ 	 * @param array<string,mixed> $arguments   Current set of arguments.
+	 * @param Widget_Abstract     $widget         The widget instance we are dealing with.
 	 *
 	 * @return array<string,mixed> $alterations The alterations to make to the context.
 	 */
-	public function filter_args_to_context( $alterations, $arguments ) {
-		$alterations['event_display'] = 'list';
-		$alterations['view']          = 'list';
+	public function filter_args_to_context( $alterations, $arguments, $widget ) {
+		/* @var Taxonomy_Filter $taxonomy_filters */
+		$taxonomy_filters = tribe( 'pro.views.v2.widgets.taxonomy' );
+
+		$alterations['event_display']     = 'list';
+		$alterations['view']              = 'list';
 
 		$alterations['widget_list_display'] = [
 			'cost'      => tribe_is_truthy( $arguments['cost'] ),
@@ -243,7 +244,8 @@ class Widget_Advanced_List {
 
 		// Handle tax filters.
 		if ( ! empty( $arguments['filters'] ) ) {
-			$alterations = array_merge( $alterations, $this->set_taxonomy_args( $arguments['filters'] ) );
+			$alterations            = array_merge( $alterations, $taxonomy_filters->set_taxonomy_args( $arguments['filters'], $arguments['operand'] ) );
+			$alterations['operand'] = $arguments['operand'];
 		}
 
 		return $alterations;

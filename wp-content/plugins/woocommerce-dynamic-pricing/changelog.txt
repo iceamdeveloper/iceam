@@ -1,4 +1,14 @@
 *** Dynamic Pricing Changelog ***
+2021.04.30 - version 3.1.25
+    * Fix:  Update sorting functions for PHP 8.
+    * Fix:  Update the way the jquery-sortable-ui is included.
+
+2021.02.12 - version 3.1.24
+    * Update: WP and WC Version
+
+2020.12.15 - version 3.1.23
+    * Update: WP and WC Version
+
 2020.10.15 - version 3.1.22
     * Update: WP and WC Version
 

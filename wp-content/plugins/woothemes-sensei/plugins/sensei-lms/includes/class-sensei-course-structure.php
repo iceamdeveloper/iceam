@@ -271,7 +271,16 @@ class Sensei_Course_Structure {
 	 */
 	private function save_module( array $item ) {
 		if ( $item['id'] ) {
-			$module_id = $this->update_module( $item );
+			$term = get_term( $item['id'], 'module' );
+			$slug = $this->get_module_slug( $item['title'] );
+
+			// Slug has changed.
+			if ( $term->slug !== $slug ) {
+				$existing_module_id = $this->get_existing_module( $item['title'] );
+				$module_id          = $existing_module_id ? $existing_module_id : $this->create_module( $item );
+			} else {
+				$module_id = $this->update_module( $item );
+			}
 		} else {
 			$module_id = $this->create_module( $item );
 		}
@@ -309,13 +318,7 @@ class Sensei_Course_Structure {
 	 * @return int|null Term ID if found.
 	 */
 	private function get_existing_module( string $module_name ) {
-		$slug = sanitize_title( $module_name );
-
-		$teacher_user_id = get_post( $this->course_id )->post_author;
-		if ( ! user_can( $teacher_user_id, 'manage_options' ) ) {
-			$slug = intval( $teacher_user_id ) . '-' . $slug;
-		}
-
+		$slug            = $this->get_module_slug( $module_name );
 		$existing_module = get_term_by( 'slug', $slug, 'module' );
 
 		if ( $existing_module ) {
@@ -335,12 +338,8 @@ class Sensei_Course_Structure {
 	private function create_module( array $item ) {
 		$args = [
 			'description' => $item['description'],
+			'slug'        => $this->get_module_slug( $item['title'] ),
 		];
-
-		$teacher_user_id = get_post( $this->course_id )->post_author;
-		if ( ! user_can( $teacher_user_id, 'manage_options' ) ) {
-			$args['slug'] = intval( $teacher_user_id ) . '-' . sanitize_title( $item['title'] );
-		}
 
 		$create_result = wp_insert_term( $item['title'], 'module', $args );
 		if ( is_wp_error( $create_result ) ) {
@@ -381,6 +380,21 @@ class Sensei_Course_Structure {
 		}
 
 		return $term->term_id;
+	}
+
+	/**
+	 * Get module slug.
+	 *
+	 * @param string $title Module title.
+	 *
+	 * @return string Slug.
+	 */
+	private function get_module_slug( $title ) {
+		$teacher_user_id = get_post( $this->course_id )->post_author;
+
+		return user_can( $teacher_user_id, 'manage_options' )
+			? sanitize_title( $title )
+			: intval( $teacher_user_id ) . '-' . sanitize_title( $title );
 	}
 
 	/**
@@ -445,7 +459,8 @@ class Sensei_Course_Structure {
 			'post_type'   => 'lesson',
 			'post_status' => 'draft',
 			'meta_input'  => [
-				'_lesson_course' => $this->course_id,
+				'_lesson_course'  => $this->course_id,
+				'_needs_template' => true,
 			],
 		];
 
@@ -478,7 +493,9 @@ class Sensei_Course_Structure {
 			],
 		];
 
-		wp_insert_post( $post_args );
+		$quiz_id = wp_insert_post( $post_args );
+		update_post_meta( $lesson_id, '_lesson_quiz', $quiz_id );
+
 	}
 
 	/**
@@ -758,37 +775,39 @@ class Sensei_Course_Structure {
 	 * @return array Sorted structure.
 	 */
 	public static function sort_structure( $structure, $order, $type ) {
-		usort(
-			$structure,
-			function( $a, $b ) use ( $order, $type ) {
-				// One of the types is not being sorted.
-				if ( $type !== $a['type'] || $type !== $b['type'] ) {
-					// If types are equal, keep in the current positions.
-					if ( $a['type'] === $b['type'] ) {
+		if ( ! empty( $order )
+		&& [ 0 ] !== $order ) {
+			usort(
+				$structure,
+				function( $a, $b ) use ( $order, $type ) {
+					// One of the types is not being sorted.
+					if ( $type !== $a['type'] || $type !== $b['type'] ) {
+						// If types are equal, keep in the current positions.
+						if ( $a['type'] === $b['type'] ) {
+							return 0;
+						}
+
+						// Always keep the modules before the lessons.
+						return 'module' === $a['type'] ? - 1 : 1;
+					}
+
+					$a_position = array_search( $a['id'], $order, true );
+					$b_position = array_search( $b['id'], $order, true );
+
+					// If both weren't sorted, keep the current positions.
+					if ( false === $a_position && false === $b_position ) {
 						return 0;
 					}
 
-					// Always keep the modules before the lessons.
-					return 'module' === $a['type'] ? - 1 : 1;
+					// Keep not sorted items in the end.
+					if ( false === $a_position ) {
+						return 1;
+					}
+
+					return false === $b_position || $a_position < $b_position ? -1 : 1;
 				}
-
-				$a_position = array_search( $a['id'], $order, true );
-				$b_position = array_search( $b['id'], $order, true );
-
-				// If both weren't sorted, keep the current positions.
-				if ( false === $a_position && false === $b_position ) {
-					return 0;
-				}
-
-				// Keep not sorted items in the end.
-				if ( false === $a_position ) {
-					return 1;
-				}
-
-				return false === $b_position || $a_position < $b_position ? -1 : 1;
-			}
-		);
-
+			);
+		}
 		return $structure;
 	}
 }

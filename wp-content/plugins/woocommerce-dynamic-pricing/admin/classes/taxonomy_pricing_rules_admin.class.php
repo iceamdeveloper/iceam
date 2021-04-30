@@ -16,7 +16,6 @@ class woocommerce_taxonomy_pricing_rules_admin {
 
 	public function on_init() {
 	    $this->the_taxonomy = get_taxonomy($this->taxonomy);
-		wp_enqueue_script( 'jquery-ui-sortable' );
 	}
 
 	public function admin_enqueue_scripts( $hook ) {

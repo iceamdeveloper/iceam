@@ -4,7 +4,7 @@
  * BP Profile Search - member details template 'bps-details'
  *
  * This template works just like any other BuddyPress template.
- * To override this template, copy it to the 'buddypress/members' directory in your theme’s root, then edit the new copy
+ * To override this template, copy it to the 'buddypress/members' directory in your theme's root, then edit the new copy
  * according to your needs. If you edit the original file, your changes will be overwritten during the next BP Profile Search update.
  *
  */

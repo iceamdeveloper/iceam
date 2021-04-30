@@ -1,6 +1,6 @@
 <?php
 /**
- * Provides methods for Widgets that behave include taxonomy filters.
+ * Utility class that provides methods for Widgets that include taxonomy filters.
  *
  * @since   5.2.0
  *
@@ -9,18 +9,44 @@
 
 namespace Tribe\Events\Pro\Views\V2\Widgets;
 
-use Tribe__Context as Context;
+use Tribe\Events\Views\V2\Views\Widgets\Widget_View;
+use Tribe\Events\Views\V2\Widgets\Widget_Abstract;
+use Tribe__Events__Main as TEC;
 
 /**
- * Trait Taxonomy_Filter
+ * Class Taxonomy_Filter
  *
  * @since   5.2.0
  *
  * @package Tribe\Events\Pro\Views\V2\Widgets
- *
- * @property Context $context The current View context.
  */
-trait Taxonomy_Filter {
+class Taxonomy_Filter {
+	/**
+	 * Match any operand.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @var string
+	 */
+	const OPERAND_OR = 'OR';
+
+	/**
+	 * Match all operand.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @var string
+	 */
+	const OPERAND_AND = 'AND';
+
+	/**
+	 * Default operand for taxonomy filters.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @var string
+	 */
+	const DEFAULT_OPERAND = self::OPERAND_OR;
 
 	/**
 	 * Get the admin structure for a widget taxonomy filter.
@@ -29,7 +55,7 @@ trait Taxonomy_Filter {
 	 *
 	 * @return array<string,mixed> The additional structure
 	 */
-	public static function get_taxonomy_admin_section() {
+	public function get_taxonomy_admin_section() {
 		return [
 			'taxonomy_section' => [
 				'type'     => 'section',
@@ -38,22 +64,22 @@ trait Taxonomy_Filter {
 				'children' => [
 					'filters' => [
 						'type' => 'taxonomy-filters',
-						'name' => 'filters',
 					],
 					'operand' => [
 						'type'     => 'fieldset',
 						'classes'  => 'tribe-common-form-control-checkbox-radio-group',
 						'label'    => _x( 'Operand:', 'The label for the taxonomy and/or option in the List Widget.', 'tribe-events-calendar-pro' ),
+						'selected'  => static::DEFAULT_OPERAND,
 						'children' => [
 							[
 								'type'         => 'radio',
-								'label'        => 'Match all',
-								'button_value' => 'AND',
+								'label'        => 'Match any',
+								'button_value' => static::OPERAND_OR,
 							],
 							[
 								'type'         => 'radio',
-								'label'        => 'Match any',
-								'button_value' => 'OR',
+								'label'        => 'Match all',
+								'button_value' => static::OPERAND_AND,
 							],
 						],
 					],
@@ -72,22 +98,72 @@ trait Taxonomy_Filter {
 	 * Decodes and sets the taxonomy args in a format that WP can use.
 	 *
 	 * @since 5.2.0
+	 * @since 5.3.0    Add $operand to handle Matching all.
 	 *
 	 * @param string|array<string,mixed> $filters The current 'filter' arguments.
+	 * @param string                     $operand The current Operand that we will use to determine how to build the classes.
 	 *
 	 * @return array<string,mixed> $filters The clean and ready filters argument.
 	 */
-	public function set_taxonomy_args( $filters ) {
+	public function set_taxonomy_args( $filters, $operand = self::DEFAULT_OPERAND ) {
 		$filters = maybe_unserialize( $filters );
 
 		if ( is_string( $filters ) ) {
 			$filters = json_decode( $filters, true );
 		}
 
+		if ( empty( $filters ) ) {
+			return [];
+		}
+
 		// Remove empty elements from each sub-array, then from the top-level one.
-		$filters = array_filter( array_map( 'array_filter', (array) $filters ) );
+		$filters = array_filter( array_map(
+			static function ( $filter ) {
+				// Empty values will still be a string.
+				return array_filter( (array) $filter );
+			},
+			(array) $filters )
+		);
+
+		if ( static::OPERAND_OR === strtoupper( $operand ) ) {
+			return $filters;
+		}
 
 		return $filters;
+	}
+
+	/**
+	 * Undocumented function
+	 *
+	 * @since TBD
+	 *
+	 * @param array  $args    The arguments for the shortcode
+	 * @param array  $filters The taxonomy filters.
+	 * @param string $operand The taxonomy operand.
+	 *
+	 * @return array $args The modified args with taxonomy arguments added.
+	 */
+	public function set_shortcode_taxonomy_params( $args, $filters, $operand = self::DEFAULT_OPERAND ) {
+		// If no filters, bail.
+		if ( empty( $filters ) ) {
+			return $args;
+		}
+
+		$filters = $this->set_taxonomy_args( $filters, $operand );
+
+		// If no filters, bail.
+		if ( empty( $filters ) ) {
+			return $args;
+		}
+
+		foreach( $filters as $tax => $ids ) {
+			$args[ $tax ] = implode( ', ', $ids );
+		}
+
+		// Note of warning - widget settings typically use "operand" and shortcodes use "tax-operand"!
+		$args['tax-operand'] = $operand;
+
+		return $args;
 	}
 
 	/**
@@ -118,59 +194,38 @@ trait Taxonomy_Filter {
 	/**
 	 * Parse and format the data for select2 fields.
 	 *
-	 * @since 5.2.0
+	 * @since 5.3.0
 	 *
-	 * @param array<string,mixed> $field      The data for the field we're rendering.
-	 * @param \WP_Widget          $widget_obj The widget object.
+	 * @param Widget_Abstract     $widget_obj The widget object.
 	 *
-	 * @return array<string,mixed> The modified field data.
+	 * @return string  Which terms are disabled for this widget.
 	 */
-	public function format_tax_data( $field, $widget_obj ) {
-		$field['widget_obj'] = $widget_obj;
-		$field['disabled']   = null;
+	public function get_disabled_terms_on_widget( $widget_obj ) {
 		$disabled            = [];
 
 		if ( ! ( isset( $widget_obj->number, $widget_obj->option_name ) && is_numeric( $widget_obj->number ) ) ) {
 			// Trust no one.
-			return $field;
+			return '';
 		}
 
 		// Hunt down the widget options.
 		$widgets_options = get_option( $widget_obj->option_name );
 
 		if ( ! isset( $widgets_options[ $widget_obj->number ]['filters'] ) ) {
-			return $field;
+			return '';
 		}
 
-		$tax_filters     = json_decode( $widgets_options[ $widget_obj->number ]['filters'], true );
+		$tax_filters = json_decode( $widgets_options[ $widget_obj->number ]['filters'], true );
 
-		if ( empty( $tax_filters ) ) {
-			return $field;
+		// Avoids warnings around array_values.
+		if ( ! is_array( $tax_filters ) ) {
+			return '';
 		}
 
 		// Populate the disables terms IDs.
 		$disabled = array_filter( array_merge( $disabled, ...array_values( $tax_filters ) ) );
 
-		// Convert to string for select2.
-		$disabled = '[' . implode( ',', $disabled ) . ']';
-
-		$field['disabled'] = $disabled;
-
-		return $field;
-	}
-
-	/**
-	 * Adds the taxonomy multiselect
-	 *
-	 * @since 5.2.0
-	 *
-	 * @param array<string,mixed> $field      The data for the field we're rendering.
-	 * @param \WP_Widget           $widget_obj The widget object.
-	 * @param \Tribe__Container    $container  The DI container.
-	 */
-	public function add_taxonomy_input( $field, $widget_obj, $container ) {
-		$data = $this->format_tax_data( $field, $widget_obj );
-		$container->make( Admin_Template::class )->template( 'widget/components/taxonomy', $data );
+		return wp_json_encode( $disabled );
 	}
 
 	/**
@@ -180,7 +235,7 @@ trait Taxonomy_Filter {
 	 *
 	 * @param array<string,mixed> $data The data for the field we're rendering.
 	 * @param string              $field_name The slug for the field.
-	 * @param obj                 $widget_obj The widget object.
+	 * @param Widget_Abstract     $widget_obj The widget object.
 	 *
 	 * @return array<string,mixed> The modified field data.
 	 */
@@ -206,13 +261,17 @@ trait Taxonomy_Filter {
 	 * @return array<string,string> $list_items The array of taxonomy items.
 	 */
 	public function format_tax_value_for_list( $value ) {
+		if ( ! is_array( $value ) ) {
+			$value = json_decode( $value, true );
+		}
+
+		// Moved this after json_decode - because a json_encoded null is a string "null" and empty() won't catch that.
 		if ( empty( $value ) ) {
 			return [];
 		}
 
-		$value = json_decode( $value, true );
-
 		$list_items = [];
+
 		foreach ( $value as $tax_name => $terms ) {
 			if ( empty( $terms ) ) {
 				continue;
@@ -244,5 +303,46 @@ trait Taxonomy_Filter {
 		}
 
 		return $list_items;
+	}
+
+	/**
+	 * Add args before hading them off to the repository.
+	 *
+	 * @since 5.1.1
+	 * @since 5.3.0 Include $widget_view param.
+	 *
+	 * @param array<string,mixed> $args        The arguments to be set on the View repository instance.
+	 * @param \Tribe__Context     $context     The context to use to setup the args.
+	 * @param Widget_View         $widget_view Widget View being filtered.
+	 *
+	 * @return array<string,mixed> $args The arguments, ready to be set on the View repository instance.
+	 */
+	public function add_taxonomy_filters_repository_args( $args, $context, $widget_view ) {
+		/**
+		 * @todo remove dependency on Context, this variable should come from $args instead of context.
+		 */
+		$operand = $context->get( 'operand', static::DEFAULT_OPERAND );
+		if ( ! empty( $context->get( 'post_tag' ) ) ) {
+			$args['post_tag'] = $context->get( 'post_tag' );
+		}
+
+		$operation = static::OPERAND_AND === $operand ? 'term_and' : 'term_in';
+		foreach( [ 'post_tag', TEC::TAXONOMY ] as $taxonomy ) {
+			if ( empty( $args[ $taxonomy ] ) ) {
+				continue;
+			}
+			$widget_view->get_repository()->by( $operation, $taxonomy, $args[ $taxonomy ] );
+
+			unset( $args[ $taxonomy ] );
+		}
+
+		// Makes sure tax query exists.
+		if ( empty( $args['tax_query'] ) ) {
+			$args['tax_query'] = [];
+		}
+
+		$args['tax_query']['relation'] = $operand;
+
+		return $args;
 	}
 }

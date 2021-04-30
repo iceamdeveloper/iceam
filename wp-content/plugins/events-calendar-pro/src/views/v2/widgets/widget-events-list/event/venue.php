@@ -7,7 +7,7 @@
  *
  * See more documentation about our views templating system.
  *
- * @link http://m.tri.be/1aiy
+ * @link https://evnt.is/1aiy
  *
  * @version 5.2.0
  *
@@ -35,12 +35,12 @@ if (
 
 $venue = $event->venues[0];
 ?>
-<div class="tribe-events-widget-events-list__event-venue tribe-common-b2">
+<div class="tribe-common-b2 tribe-events-widget-events-list__event-venue">
 
 	<?php if ( ! empty( $display['venue'] ) ) : ?>
 		<a
 			href="<?php echo esc_url( $venue->permalink ); ?>"
-			class="tribe-events-widget-events-list__event-venue-name tribe-common-b2--bold tribe-common-anchor-thin"
+			class="tribe-common-b2--bold tribe-common-anchor-thin tribe-events-widget-events-list__event-venue-name"
 		>
 			<?php echo wp_kses_post( $venue->post_title ); ?>
 		</a>
@@ -71,7 +71,7 @@ $venue = $event->venues[0];
 				|| ( ! empty( $venue->zip ) && ! empty( $display['zip'] ) )
 			) :
 			?>
-				<div class="tribe-events-widget-events-list__event-venue-address-">
+				<div class="tribe-events-widget-events-list__event-venue-address-larger-areas">
 					<?php if ( ! empty( $venue->city ) && ! empty( $display['city'] ) ) : ?>
 						<span class="tribe-events-widget-events-list__event-venue-address-city">
 							<?php echo esc_html( $venue->city ); ?>

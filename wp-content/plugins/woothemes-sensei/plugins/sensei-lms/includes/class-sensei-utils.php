@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Sensei_Utils {
+	const WC_INFORMATION_TRANSIENT = 'sensei_woocommerce_plugin_information';
+
 	/**
 	 * Get the placeholder thumbnail image.
 	 *
@@ -75,7 +77,6 @@ class Sensei_Utils {
 		if ( ! $comment_id ) {
 			// Add the comment
 			$comment_id = wp_insert_comment( $data );
-
 		} elseif ( isset( $args['action'] ) && 'update' == $args['action'] ) {
 			// Update the comment if an update was requested
 			$data['comment_ID'] = $comment_id;
@@ -420,7 +421,20 @@ class Sensei_Utils {
 		 */
 		$file_upload_args = apply_filters( 'sensei_file_upload_args', array( 'test_form' => false ) );
 
-		$file['name'] = md5( uniqid() ) . '_' . $file['name'];
+		/**
+		 * Customize the prefix prepended onto files uploaded in Sensei.
+		 *
+		 * @since 3.9.0
+		 * @hook sensei_file_upload_file_prefix
+		 *
+		 * @param {string} $prefix Prefix to prepend to uploaded files.
+		 * @param {array}  $file   Arguments with uploaded file information.
+		 *
+		 * @return {string}
+		 */
+		$file_prefix = apply_filters( 'sensei_file_upload_file_prefix', substr( md5( uniqid() ), 0, 7 ) . '_', $file );
+
+		$file['name'] = $file_prefix . $file['name'];
 		$file_return  = wp_handle_upload( $file, $file_upload_args );
 
 		if ( isset( $file_return['error'] ) || isset( $file_return['upload_error_handler'] ) ) {
@@ -1303,10 +1317,11 @@ class Sensei_Utils {
 
 				// Output HTML
 				if ( isset( $nav_links['next'] ) ) {
-					$message .= ' ' . '<a class="next-lesson" href="' . esc_url( $nav_links['next']['url'] )
-								. '" rel="next"><span class="meta-nav"></span>' . __( 'Next Lesson', 'sensei-lms' )
-								. '</a>';
-
+					if ( ! $is_lesson || ! has_block( 'sensei-lms/lesson-actions', $lesson_id ) ) {
+						$message .= ' <a class="next-lesson" href="' . esc_url( $nav_links['next']['url'] )
+									. '" rel="next"><span class="meta-nav"></span>' . __( 'Next Lesson', 'sensei-lms' )
+									. '</a>';
+					}
 				}
 			} else {  // Lesson/Quiz not complete
 
@@ -2363,6 +2378,35 @@ class Sensei_Utils {
 	}
 
 	/**
+	 * Get the course id of the current post.
+	 *
+	 * @return int|null The course id or null if it was not found.
+	 */
+	public static function get_current_course() {
+		global $post;
+
+		$post_type = get_post_type( $post );
+		$course_id = null;
+
+		switch ( $post_type ) {
+			case 'course':
+				$course_id = $post->ID;
+				break;
+
+			case 'lesson':
+				$course_id = Sensei()->lesson->get_course_id( $post->ID );
+				break;
+
+			case 'quiz':
+				$lesson_id = (int) get_post_meta( $post->ID, '_quiz_lesson', true );
+				$course_id = $lesson_id ? Sensei()->lesson->get_course_id( $lesson_id ) : null;
+				break;
+		}
+
+		return $course_id ? $course_id : null;
+	}
+
+	/**
 	 * Restore the global WP_Query
 	 *
 	 * @since 1.9.0
@@ -2490,6 +2534,96 @@ class Sensei_Utils {
 		return true;
 	}
 
+	/**
+	 * Get WooCommerce plugin information.
+	 *
+	 * @return array WooCommerce information.
+	 */
+	public static function get_woocommerce_plugin_information() {
+		$wc_information = get_transient( self::WC_INFORMATION_TRANSIENT );
+
+		if ( false !== $wc_information ) {
+			return $wc_information;
+		}
+
+		if ( ! function_exists( 'plugins_api' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/plugin-install.php';
+		}
+
+		$wc_slug            = 'woocommerce';
+		$plugin_information = plugins_api(
+			'plugin_information',
+			[
+				'slug'   => $wc_slug,
+				'fields' => [
+					'short_description' => true,
+					'description'       => false,
+					'sections'          => false,
+					'tested'            => false,
+					'requires'          => false,
+					'requires_php'      => false,
+					'rating'            => false,
+					'ratings'           => false,
+					'downloaded'        => false,
+					'downloadlink'      => false,
+					'last_updated'      => false,
+					'added'             => false,
+					'tags'              => false,
+					'compatibility'     => false,
+					'homepage'          => false,
+					'versions'          => false,
+					'donate_link'       => false,
+					'reviews'           => false,
+					'banners'           => false,
+					'icons'             => false,
+					'active_installs'   => false,
+					'group'             => false,
+					'contributors'      => false,
+				],
+			]
+		);
+
+		$wc_information = (object) [
+			'product_slug' => $wc_slug,
+			'title'        => $plugin_information->name,
+			'excerpt'      => $plugin_information->short_description,
+			'plugin_file'  => 'woocommerce/woocommerce.php',
+			'link'         => 'https://wordpress.org/plugins/' . $wc_slug,
+			'unselectable' => true,
+			'version'      => $plugin_information->version,
+		];
+
+		set_transient( self::WC_INFORMATION_TRANSIENT, $wc_information, DAY_IN_SECONDS );
+
+		return $wc_information;
+	}
+
+	/**
+	 * Get data used for WooCommerce.com purchase redirect.
+	 *
+	 * @return array The data.
+	 */
+	public static function get_woocommerce_connect_data() {
+		$wc_params                = [];
+		$is_woocommerce_installed = self::is_woocommerce_active( '3.7.0' ) && class_exists( 'WC_Admin_Addons' );
+
+		if ( $is_woocommerce_installed ) {
+			$wc_params = WC_Admin_Addons::get_in_app_purchase_url_params();
+
+		} else {
+			$wc_info = self::get_woocommerce_plugin_information();
+
+			$wc_params = [
+				'wccom-site'          => site_url(),
+				'wccom-woo-version'   => $wc_info->version,
+				'wccom-connect-nonce' => wp_create_nonce( 'connect' ),
+			];
+		}
+
+		$wc_params['wccom-back'] = rawurlencode( 'admin.php' );
+
+		return $wc_params;
+	}
 
 	/**
 	 * Hard - Resets a Learner's Course Progress

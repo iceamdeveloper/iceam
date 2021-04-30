@@ -143,6 +143,7 @@ class Sensei_Frontend {
 
 			}
 
+			Sensei()->assets->register( 'sensei-stop-double-submission', 'js/stop-double-submission.js', [], true );
 			Sensei()->assets->register( Sensei()->token . '-user-dashboard', 'js/user-dashboard.js', [ 'jquery-ui-tabs' ], true );
 
 			// Allow additional scripts to be loaded.
@@ -851,12 +852,14 @@ class Sensei_Frontend {
 	/**
 	 * Gets the quiz answers for the current user.
 	 *
-	 * @deprecated use Sensei_Quiz::get_user_answers
+	 * @deprecated 3.10.0 use Sensei_Quiz::get_user_answers
 	 * @param int $lesson_id Lesson ID.
 	 * @return array Quiz answers for the current user.
 	 */
 	public function sensei_get_user_quiz_answers( $lesson_id = 0 ) {
 		global $current_user;
+
+		_deprecated_function( __METHOD__, '3.10.0', 'Sensei_Quiz::get_user_answers' );
 
 		$user_answers = array();
 
@@ -929,6 +932,9 @@ class Sensei_Frontend {
 		}
 
 		if ( false === Sensei()->lesson->lesson_has_quiz_with_questions_and_pass_required( $lesson_id ) ) {
+
+			wp_enqueue_script( 'sensei-stop-double-submission' );
+
 			?>
 			<form class="lesson_button_form" method="POST" action="<?php echo esc_url( get_permalink() ); ?>">
 				<input type="hidden"
@@ -941,7 +947,7 @@ class Sensei_Frontend {
 
 				<input type="submit"
 					   name="quiz_complete"
-					   class="quiz-submit complete"
+					   class="quiz-submit complete sensei-stop-double-submission"
 					   value="<?php esc_attr_e( 'Complete Lesson', 'sensei-lms' ); ?>"/>
 
 			</form>
@@ -955,8 +961,6 @@ class Sensei_Frontend {
 	public function sensei_reset_lesson_button() {
 		global  $post;
 
-		$quiz_id = 0;
-
 		// Lesson quizzes.
 		$quiz_id       = Sensei()->lesson->lesson_quizzes( $post->ID );
 		$reset_allowed = true;
@@ -965,6 +969,8 @@ class Sensei_Frontend {
 			$reset_allowed = get_post_meta( $quiz_id, '_enable_quiz_reset', true );
 		}
 		if ( ! $quiz_id || ! empty( $reset_allowed ) ) {
+			wp_enqueue_script( 'sensei-stop-double-submission' );
+
 			?>
 		<form method="POST" action="<?php echo esc_url( get_permalink() ); ?>">
 
@@ -976,12 +982,12 @@ class Sensei_Frontend {
 
 			<input type="hidden" name="quiz_action" value="lesson-reset" />
 
-			<input type="submit" name="quiz_complete" class="quiz-submit reset" value="<?php esc_attr_e( 'Reset Lesson', 'sensei-lms' ); ?>"/>
+			<input type="submit" name="quiz_complete" class="quiz-submit reset sensei-stop-double-submission" value="<?php esc_attr_e( 'Reset Lesson', 'sensei-lms' ); ?>"/>
 
 		</form>
 			<?php
-		} // End If Statement
-	} // End sensei_reset_lesson_button()
+		}
+	}
 
 	/**
 	 * Outputs the quiz buttons and messages.

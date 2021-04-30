@@ -64,7 +64,7 @@ class Sensei_Course {
 			add_action( 'save_post', array( $this, 'meta_box_save' ) );
 
 			// Custom Write Panel Columns
-			add_filter( 'manage_course_posts_columns', array( $this, 'add_column_headings' ), 10, 1 );
+			add_filter( 'manage_course_posts_columns', array( $this, 'add_column_headings' ), 20, 1 );
 			add_action( 'manage_course_posts_custom_column', array( $this, 'add_column_data' ), 10, 2 );
 
 			// Enqueue scripts.
@@ -225,6 +225,7 @@ class Sensei_Course {
 		 * @param {int}    $user_id                 User ID if user is logged in.
 		 * @param {string} $context                 Context that we're checking for course content
 		 *                                        access (`lesson`, `quiz`, or `module`).
+		 * @return {bool} Whether the visitor can view course content.
 		 */
 		return apply_filters( 'sensei_can_access_course_content', $can_view_course_content, $course_id, $user_id, $context );
 	}
@@ -680,15 +681,16 @@ class Sensei_Course {
 	} // End course_manage_meta_box_content()
 
 	/**
-	 * Add column headings to the "lesson" post list screen.
+	 * Add column headings to the "course" post list screen,
+	 * while moving the existing ones to the end.
 	 *
-	 * @access public
+	 * @access private
 	 * @since  1.0.0
-	 * @param  array $defaults
-	 * @return array $new_columns
+	 * @param  array $defaults  Array of column header labels keyed by column ID.
+	 * @return array            Updated array of column header labels keyed by column ID.
 	 */
 	public function add_column_headings( $defaults ) {
-		$new_columns                        = array();
+		$new_columns                        = [];
 		$new_columns['cb']                  = '<input type="checkbox" />';
 		$new_columns['title']               = _x( 'Course Title', 'column name', 'sensei-lms' );
 		$new_columns['course-prerequisite'] = _x( 'Pre-requisite Course', 'column name', 'sensei-lms' );
@@ -697,8 +699,27 @@ class Sensei_Course {
 			$new_columns['date'] = $defaults['date'];
 		}
 
+		// Make sure other sensei columns stay directly behind the new columns.
+		$other_sensei_columns = [
+			'taxonomy-module',
+			'teacher',
+			'module_order',
+		];
+		foreach ( $other_sensei_columns as $column_key ) {
+			if ( isset( $defaults[ $column_key ] ) ) {
+				$new_columns[ $column_key ] = $defaults[ $column_key ];
+			}
+		}
+
+		// Add all remaining columns at the end.
+		foreach ( $defaults as $column_key => $column_value ) {
+			if ( ! isset( $new_columns[ $column_key ] ) ) {
+				$new_columns[ $column_key ] = $column_value;
+			}
+		}
+
 		return $new_columns;
-	} // End add_column_headings()
+	}
 
 	/**
 	 * Add data for our newly-added custom columns.
@@ -1537,8 +1558,9 @@ class Sensei_Course {
 
 					if ( 0 < absint( count( $course_lessons ) )
 						&& Sensei()->settings->settings['course_completion'] == 'complete' ) {
+						wp_enqueue_script( 'sensei-stop-double-submission' );
 
-						$active_html .= '<span><input name="course_complete" type="submit" class="course-complete" value="'
+						$active_html .= '<span><input name="course_complete" type="submit" class="course-complete sensei-stop-double-submission" value="'
 							. esc_attr__( 'Mark as Complete', 'sensei-lms' ) . '"/> </span>';
 
 					} // End If Statement
@@ -2317,9 +2339,11 @@ class Sensei_Course {
 			if ( 0 < absint( count( Sensei()->course->course_lessons( $course->ID ) ) )
 				&& Sensei()->settings->settings['course_completion'] == 'complete'
 				&& ! Sensei_Utils::user_completed_course( $course, get_current_user_id() ) ) {
-				?>
 
-					<span><input name="course_complete" type="submit" class="course-complete" value="<?php esc_attr_e( 'Mark as Complete', 'sensei-lms' ); ?>" /></span>
+				wp_enqueue_script( 'sensei-stop-double-submission' );
+
+				?>
+					<span><input name="course_complete" type="submit" class="course-complete sensei-stop-double-submission" value="<?php esc_attr_e( 'Mark as Complete', 'sensei-lms' ); ?>" /></span>
 
 				<?php
 			} // End If Statement
@@ -2501,14 +2525,16 @@ class Sensei_Course {
 		$extra_classes[] = 'loop-item-number-' . $sensei_course_loop['counter'];
 
 		/**
-		 * Filter the course loop class the fires in the  in get_course_loop_content_class function
-		 * which is called from the course loop content-course.php
+		 * Filter the course loop class the fires in the in get_course_loop_content_class function
+		 * which is called from the course loop content-course.php.
 		 *
 		 * @since 1.9.0
 		 * @hook sensei_course_loop_content_class
 		 *
 		 * @param {array} $extra_classes
 		 * @param {WP_Post} $loop_current_course
+		 *
+		 * @return {array} Additional CSS classes.
 		 */
 		return apply_filters( 'sensei_course_loop_content_class', $extra_classes, get_post() );
 
@@ -3423,34 +3449,45 @@ class Sensei_Course {
 	 * @since 1.9.10
 	 */
 	public static function prerequisite_complete_message() {
-		if ( ! self::is_prerequisite_complete( get_the_ID(), get_current_user_id() ) ) {
-			$course_prerequisite_id   = absint( get_post_meta( get_the_ID(), '_course_prerequisite', true ) );
-			$course_title             = get_the_title( $course_prerequisite_id );
-			$prerequisite_course_link = '<a href="' . esc_url( get_permalink( $course_prerequisite_id ) )
-				. '" title="'
-				. sprintf(
-					// translators: Placeholder $1$s is the course title.
-					esc_attr__( 'You must first complete: %1$s', 'sensei-lms' ),
-					$course_title
-				)
-				 . '">' . $course_title . '</a>';
-
-			$complete_prerequisite_message = sprintf(
-				// translators: Placeholder $1$s is the course title.
-				esc_html__( 'You must first complete %1$s before viewing this course', 'sensei-lms' ),
-				$prerequisite_course_link
-			);
-
-			/**
-			 * Filter sensei_course_complete_prerequisite_message.
-			 *
-			 * @since 1.9.10
-			 * @param string $complete_prerequisite_message the message to filter
-			 */
-			$filtered_message = apply_filters( 'sensei_course_complete_prerequisite_message', $complete_prerequisite_message );
-
-			Sensei()->notices->add_notice( $filtered_message, 'info' );
+		if ( ! self::is_prerequisite_complete( get_the_ID() ) ) {
+			$message = self::get_course_prerequisite_message( get_the_ID() );
+			Sensei()->notices->add_notice( $message, 'info' );
 		}
+	}
+
+	/**
+	 * Generate the HTML of the course prerequisite notice.
+	 *
+	 * @param int $course_id The course id.
+	 *
+	 * @return string The HTML.
+	 */
+	public static function get_course_prerequisite_message( int $course_id ) : string {
+		$course_prerequisite_id   = absint( get_post_meta( $course_id, '_course_prerequisite', true ) );
+		$course_title             = get_the_title( $course_prerequisite_id );
+		$prerequisite_course_link = '<a href="' . esc_url( get_permalink( $course_prerequisite_id ) )
+			. '" title="'
+			. sprintf(
+				// translators: Placeholder $1$s is the course title.
+				esc_attr__( 'You must first complete: %1$s', 'sensei-lms' ),
+				$course_title
+			)
+			. '">' . $course_title . '</a>';
+
+		$complete_prerequisite_message = sprintf(
+			// translators: Placeholder $1$s is the course title.
+			esc_html__( 'You must first complete %1$s before taking this course.', 'sensei-lms' ),
+			$prerequisite_course_link
+		);
+
+		/**
+		 * Filter sensei_course_complete_prerequisite_message.
+		 *
+		 * @param string $complete_prerequisite_message the message to filter
+		 *
+		 * @since 1.9.10
+		 */
+		return apply_filters( 'sensei_course_complete_prerequisite_message', $complete_prerequisite_message );
 	}
 
 	/**
@@ -3469,7 +3506,7 @@ class Sensei_Course {
 			'module_count'  => count( wp_get_post_terms( $course->ID, 'module' ) ),
 			'lesson_count'  => $this->course_lesson_count( $course->ID ),
 			'product_count' => $product_count,
-			'sample_course' => 'getting-started-with-sensei-lms' === $course->post_name ? 1 : 0,
+			'sample_course' => Sensei_Data_Port_Manager::SAMPLE_COURSE_SLUG === $course->post_name ? 1 : 0,
 		];
 		sensei_log_event( 'course_publish', $event_properties );
 	}
@@ -3558,15 +3595,16 @@ class Sensei_Course {
 		$product_count = empty( $product_ids ) ? 0 : count( array_filter( $product_ids, 'is_numeric' ) );
 
 		$event_properties = [
-			'course_id'                 => $course_id,
-			'has_outline_block'         => has_block( 'sensei-lms/course-outline', $content ) ? 1 : 0,
-			'has_progress_block'        => has_block( 'sensei-lms/course-progress', $content ) ? 1 : 0,
-			'has_take_course_block'     => has_block( 'sensei-lms/button-take-course', $content ) ? 1 : 0,
-			'has_contact_teacher_block' => has_block( 'sensei-lms/button-contact-teacher', $content ) ? 1 : 0,
-			'module_count'              => count( wp_get_post_terms( $course_id, 'module' ) ),
-			'lesson_count'              => $this->course_lesson_count( $course_id ),
-			'product_count'             => $product_count,
-			'sample_course'             => 'getting-started-with-sensei-lms' === $post->post_name ? 1 : 0,
+			'course_id'                     => $course_id,
+			'has_outline_block'             => has_block( 'sensei-lms/course-outline', $content ) ? 1 : 0,
+			'has_progress_block'            => has_block( 'sensei-lms/course-progress', $content ) ? 1 : 0,
+			'has_take_course_block'         => has_block( 'sensei-lms/button-take-course', $content ) ? 1 : 0,
+			'has_contact_teacher_block'     => has_block( 'sensei-lms/button-contact-teacher', $content ) ? 1 : 0,
+			'has_conditional_content_block' => has_block( 'sensei-lms/conditional-content', $content ) ? 1 : 0,
+			'module_count'                  => count( wp_get_post_terms( $course_id, 'module' ) ),
+			'lesson_count'                  => $this->course_lesson_count( $course_id ),
+			'product_count'                 => $product_count,
+			'sample_course'                 => Sensei_Data_Port_Manager::SAMPLE_COURSE_SLUG === $post->post_name ? 1 : 0,
 		];
 
 		sensei_log_event( 'course_update', $event_properties );
@@ -3596,7 +3634,7 @@ class Sensei_Course {
 		if (
 			$post
 			&& is_singular( 'course' )
-			&& ! $this->is_legacy_course( $post )
+			&& $this->has_sensei_blocks( $post )
 		) {
 			$this->remove_legacy_course_actions();
 		}
@@ -3662,7 +3700,18 @@ class Sensei_Course {
 	 *
 	 * @return bool
 	 */
-	public function is_legacy_course( $course ) {
+	public function is_legacy_course( $course = null ) {
+		return ! $this->has_sensei_blocks( $course );
+	}
+
+	/**
+	 * Check if a course contains Sensei blocks.
+	 *
+	 * @param int|WP_Post $course Course ID or course object.
+	 *
+	 * @return bool
+	 */
+	public function has_sensei_blocks( $course = null ) {
 		$course = get_post( $course );
 
 		$course_blocks = [
@@ -3674,13 +3723,13 @@ class Sensei_Course {
 
 		foreach ( $course_blocks as $block ) {
 			if ( has_block( $block, $course ) ) {
-				return false;
+				return true;
 			}
 		}
 
-		return true;
+		return false;
 	}
-}//end class
+}
 
 /**
  * Class WooThemes_Sensei_Course

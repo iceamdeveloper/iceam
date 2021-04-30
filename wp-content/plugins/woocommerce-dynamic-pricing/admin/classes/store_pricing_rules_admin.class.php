@@ -14,15 +14,14 @@ class woocommerce_store_pricing_rules_admin {
 
 		$this->category_admin                   = new woocommerce_category_pricing_rules_admin();
 		$this->membership_admin                 = new woocommerce_membership_pricing_rules_admin();
-		//$this->woocommerce_memberships_admin    = new woocommerce_woocommerce_memberships_pricing_rules_admin();
 		$this->group_admin                      = new woocommerce_group_pricing_rules_admin();
 		$this->totals_admin                     = new woocommerce_totals_pricing_rules_admin();
 		$this->taxonomy_admins['product_brand'] = new woocommerce_taxonomy_pricing_rules_admin( 'product_brand' );
 
 		if ( is_admin() ) {
-			add_action( 'admin_enqueue_scripts', array( &$this, 'enqueue' ) );
-			add_action( 'admin_init', array( &$this, 'register_settings' ) );
-			add_action( 'admin_menu', array( &$this, 'on_admin_menu' ), 99 );
+			add_action( 'admin_enqueue_scripts', array( $this, 'enqueue' ) );
+			add_action( 'admin_init', array( $this, 'register_settings' ) );
+			add_action( 'admin_menu', array( $this, 'on_admin_menu' ), 99 );
 			add_filter( 'woocommerce_screen_ids', array( $this, 'get_woocommerce_screen_ids' ) );
 
 			add_filter( 'plugins_loaded', array( $this, 'on_plugins_loaded' ) );
@@ -53,6 +52,8 @@ class woocommerce_store_pricing_rules_admin {
 				wp_enqueue_style( 'woocommerce-pricing-admin', WC_Dynamic_Pricing::plugin_url() . '/assets/admin/admin.css' );
 				wp_enqueue_script( 'woocommerce-pricing-admin', WC_Dynamic_Pricing::plugin_url() . '/assets/admin/admin.js', array(
 					'jquery',
+					'jquery-ui-core',
+					'jquery-ui-sortable',
 					'jquery-ui-datepicker'
 				) );
 			} else {

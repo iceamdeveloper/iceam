@@ -88,10 +88,10 @@ function bps_set_directory_data ($attr, $content)
 	{
 		if (in_array ($key, array ('template', 'show', 'order_by')))  continue;
 
-		$k = bps_match_key ($key, $fields);
-		if ($k === false)  continue;
+		$code = bps_match_key ($key, $fields);
+		if ($code === false)  continue;
 
-		$f = $fields[$k];
+		$f = $fields[$code];
 		$filter = ($key == $f->code)? '': substr ($key, strlen ($f->code) + 1);
 		if (!bps_Fields::is_filter ($f, $filter))  continue;
 
@@ -138,8 +138,6 @@ function bps_set_directory_data ($attr, $content)
 
 	$cookie = apply_filters ('bps_cookie_name', 'bps_directory');
 	setcookie ($cookie, http_build_query ($bps_directory_data), 0, COOKIEPATH);
-
-	return '';
 }
 
 function bps_get_directory_data ()
@@ -186,7 +184,7 @@ function bps_before_directory ()
 
 	$request = bps_get_request ('filters');
 	if (!empty ($request))
-		bps_call_template ('members/bps-filters', array ($request, true));
+		bps_call_template ('members/bps-filters');
 }
 
 function bps_set_sort_options ($options)

@@ -2,8 +2,8 @@
 Contributors: dontdream
 Tags: buddypress, directory, members, users, search, filter
 Requires at least: 4.9
-Tested up to: 5.6
-Stable tag: 5.3.5
+Tested up to: 5.7
+Stable tag: 5.4.1
 
 Member search and member directories for BuddyPress.
 
@@ -115,6 +115,12 @@ See the standard installation procedure, in [Managing Plugins](https://wordpress
 
 == Changelog ==
 
+= 5.4.1 =
+* Added: new *match single* search mode, for *multiselectbox* and *checkbox* profile fields
+= 5.4 =
+* Breaking change: custom form templates must enqueue the scripts they need
+* Breaking change: new filters template
+* See [BP Profile Search 5.4](https://dontdream.it/bp-profile-search-5-4/) for details
 = 5.3.5 =
 * Fixed: member-type specific fields are no longer incorrectly hidden
 = 5.3.4 =
@@ -159,14 +165,14 @@ See the standard installation procedure, in [Managing Plugins](https://wordpress
 * Minor adjustment to the bps-form-default template
 * See [BP Profile Search 5.0.4](https://dontdream.it/bp-profile-search-5-0-4/) for details
 = 5.0.3 =
-* Fixed compatibility with *GEO my WordPress*
+* Fixed compatibility with *GEO my WP*
 * Fixed bug in the [bps_directory] shortcode with values containing ampersand (&)
 = 5.0.2 =
 * Added display of profile fields in the [bps_directory] shortcode
 * Added display of selected profile fields in search results
 * Added option to sort search results by selected profile fields
 * Fixed a potential privacy problem involving unauthorized searches
-* Improved compatibility with *GEO my WordPress*
+* Improved compatibility with *GEO my WP*
 * See [BP Profile Search 5.0.2](https://dontdream.it/bp-profile-search-5-0-2/) for details
 = 5.0.1 =
 * Fixed critical bug in the [bps_directory] shortcode - wrong links to user profiles
@@ -276,56 +282,56 @@ See the standard installation procedure, in [Managing Plugins](https://wordpress
 * Fixed bug with member-type specific fields
 = 4.4.1 =
 * Fixed bug in wildcard searching
-= 4.4 =
+= 4.4 10/04/2015 =
 * Updated to use WP language packs
-= 4.3.1 =
+= 4.3.1 09/03/2015 =
 * Fixed rendering of hidden fields in form templates
-= 4.3 =
+= 4.3 08/25/2015 =
 * Updated templates to better support custom field types
 * Updated [documentation](https://dontdream.it/bp-profile-search/custom-profile-field-types/) for custom field types authors
-= 4.2.4 =
+= 4.2.4 08/18/2015 =
 * Updated for WordPress 4.3
-= 4.2.3 =
+= 4.2.3 08/04/2015 =
 * Restricted capability to create forms to admin only
 * Added the filters *bps_form_order* and *bps_form_caps*
 * Changed the name of a few functions
-= 4.2.2 =
+= 4.2.2 06/06/2015 =
 * Updated templates to work in member-type directories
-= 4.2.1 =
+= 4.2.1 05/15/2015 =
 * Fixed bug when searching in a *multiselectbox* profile field type
-= 4.2 =
+= 4.2 04/18/2015 =
 * Added ability to use form templates
-= 4.1.1 =
+= 4.1.1 03/21/2015 =
 * Fixed bug with field labels containing quotes
-= 4.1 =
+= 4.1 03/04/2015 =
 * Added ability to create custom Members directory pages
 * Added ability to use them as custom search results pages
-= 4.0.3 =
+= 4.0.3 09/07/2014 =
 * Fixed PHP fatal error when BP component *Extended Profiles* was not active
 * Replaced deprecated like_escape()
-= 4.0.2 =
+= 4.0.2 06/16/2014 =
 * Fixed PHP warning when using the *SAME* search mode
-= 4.0.1 =
+= 4.0.1 06/08/2014 =
 * Fixed bug with field options not respecting sort order
 * Fixed bug with search strings containing ampersand (&)
-= 4.0 =
+= 4.0 06/02/2014 =
 * Added support for multiple forms
 * Added ability to export/import forms
 * Added selection of the form *method* attribute
 * Updated Italian and Russian translations
-= 3.6.6 =
+= 3.6.6 05/15/2014 =
 * Added French translation
-= 3.6.5 =
+= 3.6.5 05/09/2014 =
 * Fixed bug when searching in a *number* profile field type
-= 3.6.4 =
+= 3.6.4 04/30/2014 =
 * Added support for custom profile field types, see [documentation](https://dontdream.it/bp-profile-search/custom-profile-field-types/)
-= 3.6.3 =
+= 3.6.3 04/21/2014 =
 * Reduced the number of database queries
-= 3.6.2 =
+= 3.6.2 04/14/2014 =
 * Updated for the *number* profile field type (BP 2.0)
-= 3.6.1 =
+= 3.6.1 04/09/2014 =
 * Fixed PHP warnings after upgrade
-= 3.6 =
+= 3.6 04/03/2014 =
 * Redesigned settings page, added Help section
 * Added customization of field label and description
 * Added *Value Range Search* for multiple numeric fields
@@ -333,18 +339,18 @@ See the standard installation procedure, in [Managing Plugins](https://wordpress
 * Added reordering of form fields
 * Updated Italian translation
 * Updated Russian translation
-= 3.5.6 =
+= 3.5.6 03/02/2014 =
 * Replaced deprecated $wpdb->escape() with esc_sql()
 * Added *Clear* link to reset the search filters
-= 3.5.5 =
+= 3.5.5 02/18/2014 =
 * Fixed the CSS for widget forms and shortcode generated forms
-= 3.5.4 =
+= 3.5.4 02/16/2014 =
 * Added Serbo-Croatian translation
-= 3.5.3 =
+= 3.5.3 01/07/2014 =
 * Added Spanish, Russian and Italian translations
-= 3.5.2 =
+= 3.5.2 09/14/2013 =
 * Fixed a pagination bug introduced in 3.5.1
-= 3.5.1 =
+= 3.5.1 09/10/2013 =
 * Fixed a few conflicts with other plugins and themes
 = 3.5 09/04/2013 =
 * Added the *Add to Directory* option

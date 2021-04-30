@@ -7,16 +7,19 @@
  *
  * See more documentation about our views templating system.
  *
- * @link http://m.tri.be/1aiy
+ * @link https://evnt.is/1aiy
  *
  * @version 5.0.0
  *
  * @var string $multiday_toggle_controls A space-separated list of entries for the `aria-controls` attribute.
  * @var int    $more_events              The number of events not showing in the stack due to the toggle.
  */
+if ( 0 >= $more_events ) {
+	return;
+}
 
 $more_text = sprintf(
-	_n( '+1 more', '+ %s more', $more_events, 'tribe-events-calendar-pro' ),
+	_n( '+1 more', '+%s more', $more_events, 'tribe-events-calendar-pro' ),
 	number_format_i18n( $more_events )
 );
 ?>

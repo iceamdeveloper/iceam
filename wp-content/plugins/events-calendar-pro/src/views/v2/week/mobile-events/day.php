@@ -7,7 +7,7 @@
  *
  * See more documentation about our views templating system.
  *
- * @link http://m.tri.be/1aiy
+ * @link https://evnt.is/1aiy
  *
  *
  * @version 5.0.0
@@ -71,5 +71,5 @@ if (
 	 	}
 	 }
 	?>
-
+	<?php $this->template( 'week/mobile-events/day/more-events', ['more_events' => $day['more_events'], 'more_url' => $day['day_url']] ); ?>
 </div>

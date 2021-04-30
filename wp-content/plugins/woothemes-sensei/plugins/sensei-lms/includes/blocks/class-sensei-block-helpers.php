@@ -14,17 +14,16 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Sensei_Block_Helpers {
 
-
 	/**
 	 * Build CSS classes (for named colors) and inline styles from block attributes.
 	 *
-	 * @param array $block_attributes  The block attributes.
-	 * @param array $colors            An array with the color attribute as keys and the style property as values.
-	 * @param array $size_styles       An array with the sizing attribute as keys and the style property as values.
+	 * @param array $block_attributes The block attributes.
+	 * @param array $colors           An array with the color attribute as keys and the style property as values.
+	 * @param array $size_styles      An array with the sizing attribute as keys and the style property as values.
 	 *
 	 * @return array Colors CSS classes and inline styles.
 	 */
-	public static function build_styles( array $block_attributes, array $colors = [], array $size_styles = [] ) : array {
+	public static function build_styles( array $block_attributes, array $colors = [], array $size_styles = [] ): array {
 		$attributes = [
 			'css_classes'   => [],
 			'inline_styles' => [],
@@ -39,6 +38,11 @@ class Sensei_Block_Helpers {
 			$colors
 		);
 
+		$has_style_classes = [
+			'color'            => 'has-text-color',
+			'background-color' => 'has-background',
+		];
+
 		foreach ( $colors as $color => $style ) {
 
 			if ( ! $style ) {
@@ -48,8 +52,8 @@ class Sensei_Block_Helpers {
 			$custom_color  = $block_attributes[ 'custom' . ucfirst( $color ) ] ?? null;
 			$default_color = $block_attributes[ 'default' . ucfirst( $color ) ] ?? null;
 
-			if ( $custom_color || $named_color ) {
-				$attributes['css_classes'][] = sprintf( 'has-%s', $style );
+			if ( isset( $has_style_classes[ $style ] ) && ( $custom_color || $named_color || $default_color ) ) {
+				$attributes['css_classes'][] = $has_style_classes[ $style ];
 			}
 
 			$named_class = 'border-color' === $style ? 'border-color-%s' : 'has-%s-%s';
@@ -74,12 +78,12 @@ class Sensei_Block_Helpers {
 	/**
 	 * Render class and style HTML attributes.
 	 *
-	 * @param string|string[] $class_names An array of classes or a single class.
-	 * @param array           $css         {
-	 *     An array of classes and inline styles.
+	 * @param string|string[] $class_names   An array of classes or a single class.
+	 * @param array           $css           {
+	 *                                       An array of classes and inline styles.
 	 *
-	 *     @type string[] $css_classes   An array of classes.
-	 *     @type string[] $inline_styles An array of inline css.
+	 * @type string[]         $css_classes   An array of classes.
+	 * @type string[]         $inline_styles An array of inline css.
 	 * }
 	 *
 	 * @return string
@@ -122,5 +126,41 @@ class Sensei_Block_Helpers {
 		return $class_name;
 	}
 
+	/**
+	 * Generate CSS for the given variables. Skips variables with an empty value.
+	 *
+	 * @param array  $variables CSS variable key - value pairs.
+	 * @param string $separator Separator string between variables.
+	 *
+	 * @return array CSS styles and classlist.
+	 */
+	public static function css_variables( $variables, $separator = "\n" ) {
+		$style   = '';
+		$classes = '';
+		foreach ( $variables as $variable => $value ) {
+			if ( ! isset( $value ) || '' === $value ) {
+				continue;
+			}
+			$style   .= '--sensei-' . $variable . ': ' . $value . ';' . $separator;
+			$classes .= ' has-sensei-' . $variable . ' ';
+		}
+
+		return [ $style, $classes ];
+	}
+
+	/**
+	 * Add unit postfix to a value. Returns null if value is empty.
+	 *
+	 * @param string $value Value.
+	 * @param string $unit  Unit.
+	 *
+	 * @return string|null Postfixed value or null if empty.
+	 */
+	public static function css_unit( $value, $unit = 'px' ) {
+		if ( ! isset( $value ) || '' === $value ) {
+			return null;
+		}
+		return '' . $value . $unit;
+	}
 
 }

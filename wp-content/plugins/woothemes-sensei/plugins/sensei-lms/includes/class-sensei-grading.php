@@ -176,10 +176,19 @@ class Sensei_Grading {
 		// Load Grading data
 		if ( ! empty( $_GET['course_id'] ) ) {
 			$course_id = intval( $_GET['course_id'] );
+
+			if ( ! current_user_can( get_post_type_object( 'course' )->cap->edit_post, $course_id ) ) {
+				return;
+			}
 		}
 		if ( ! empty( $_GET['lesson_id'] ) ) {
 			$lesson_id = intval( $_GET['lesson_id'] );
+
+			if ( ! current_user_can( get_post_type_object( 'lesson' )->cap->edit_post, $lesson_id ) ) {
+				return;
+			}
 		}
+
 		if ( ! empty( $_GET['user_id'] ) ) {
 			$user_id = intval( $_GET['user_id'] );
 		}
@@ -223,7 +232,12 @@ class Sensei_Grading {
 			$user_id = intval( $_GET['user'] );
 		}
 		if ( isset( $_GET['quiz_id'] ) ) {
-			$quiz_id = intval( $_GET['quiz_id'] );
+			$quiz_id   = intval( $_GET['quiz_id'] );
+			$lesson_id = get_post_meta( $quiz_id, '_quiz_lesson', true );
+
+			if ( ! current_user_can( get_post_type_object( 'lesson' )->cap->edit_post, $lesson_id ) ) {
+				return;
+			}
 		}
 
 		$sensei_grading_user_profile = new Sensei_Grading_User_Quiz( $user_id, $quiz_id );
@@ -633,14 +647,9 @@ class Sensei_Grading {
 			++$count;
 			$question_id = $question->ID;
 
-			if ( isset( $_POST[ 'question_' . $question_id ] ) ) {
+			if ( isset( $_POST[ 'question_' . $question_id . '_grade' ] ) ) {
 
-				$question_grade = 0;
-				if ( $_POST[ 'question_' . $question_id ] == 'right' ) {
-
-					$question_grade = $_POST[ 'question_' . $question_id . '_grade' ];
-
-				}
+				$question_grade = absint( wp_unslash( $_POST[ 'question_' . $question_id . '_grade' ] ) ) ?? 0;
 
 				// add data to the array that will, after the loop, be stored on the lesson status
 				$all_question_grades[ $question_id ] = $question_grade;

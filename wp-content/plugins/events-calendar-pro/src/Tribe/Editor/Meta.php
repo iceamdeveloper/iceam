@@ -48,7 +48,16 @@ class Tribe__Events__Pro__Editor__Meta extends Tribe__Editor__Meta {
 					break;
 				case 'checkbox':
 					$args = $this->text();
-					register_meta( 'post', '_' . $field['name'], $this->text_array() );
+					global $wp_version;
+
+					/**
+					 * Removing the line below fixes a problem that was plaguing users on version
+					 *
+					 * @link https://theeventscalendar.atlassian.net/browse/ECP-746
+					 */
+					if ( version_compare( $wp_version, '4.7.0', '<' ) ) {
+						register_meta( 'post', '_' . $field['name'], $this->text_array() );
+					}
 					break;
 				default:
 					$args = $this->text();
@@ -212,7 +221,7 @@ class Tribe__Events__Pro__Editor__Meta extends Tribe__Editor__Meta {
 			return $show_meta;
 		}
 
-		// when it doesnt have blocks we return default
+		// when it doesn't have blocks we return default
 		if ( ! has_blocks( absint( $post_id ) ) ) {
 			return $show_meta;
 		}

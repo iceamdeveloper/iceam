@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Sensei_Course_Blocks
  */
-class Sensei_Course_Blocks {
+class Sensei_Course_Blocks extends Sensei_Blocks_Initializer {
 	/**
 	 * Course outline block.
 	 *
@@ -42,21 +42,46 @@ class Sensei_Course_Blocks {
 	public $take_course;
 
 	/**
-	 * Sensei_Blocks constructor .
-	 *
-	 * @param Sensei_Main $sensei
+	 * Sensei_Course_Blocks constructor.
 	 */
-	public function __construct( $sensei ) {
-
-		add_action( 'enqueue_block_assets', [ $this, 'enqueue_block_assets' ] );
-		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
+	public function __construct() {
+		parent::__construct( [ 'course' ] );
 		add_filter( 'sensei_use_sensei_template', [ 'Sensei_Course_Blocks', 'skip_single_course_template' ] );
 
-		// Init blocks.
+	}
+
+	/**
+	 * Initialize blocks that are used in course pages.
+	 */
+	public function initialize_blocks() {
 		$this->outline         = new Sensei_Course_Outline_Block();
 		$this->progress        = new Sensei_Course_Progress_Block();
 		$this->contact_teacher = new Sensei_Block_Contact_Teacher();
 		$this->take_course     = new Sensei_Block_Take_Course();
+		new Sensei_Conditional_Content_Block();
+		new Sensei_Block_View_Results();
+
+		$post_type_object = get_post_type_object( 'course' );
+
+		$block_template = [
+			[ 'sensei-lms/button-take-course' ],
+			[ 'sensei-lms/button-contact-teacher' ],
+			[ 'sensei-lms/course-progress' ],
+			[ 'sensei-lms/course-outline' ],
+		];
+
+		/**
+		 * Customize the course block template.
+		 *
+		 * @hook  sensei_course_block_template
+		 * @since 3.9.0
+		 *
+		 * @param {string[][]} $template          Array of blocks to use as the default initial state for a course.
+		 * @param {string[][]} $original_template Original block template.
+		 *
+		 * @return {string[][]} Array of blocks to use as the default initial state for a course.
+		 */
+		$post_type_object->template = apply_filters( 'sensei_course_block_template', $block_template, $post_type_object->template ?? [] );
 	}
 
 	/**
@@ -65,14 +90,15 @@ class Sensei_Course_Blocks {
 	 * @access private
 	 */
 	public function enqueue_block_assets() {
-		if ( 'course' !== get_post_type() ) {
-			return;
-		}
 
-		Sensei()->assets->enqueue( 'sensei-single-course', 'blocks/single-course.css' );
+		Sensei()->assets->enqueue(
+			'sensei-single-course-blocks-style',
+			'blocks/single-course-style.css',
+			[ 'sensei-shared-blocks-style' ]
+		);
 
 		if ( ! is_admin() ) {
-			Sensei()->assets->enqueue( 'sensei-single-course-frontend', 'blocks/course-outline/frontend.js' );
+			Sensei()->assets->enqueue_script( 'sensei-blocks-frontend' );
 		}
 	}
 
@@ -82,16 +108,28 @@ class Sensei_Course_Blocks {
 	 * @access private
 	 */
 	public function enqueue_block_editor_assets() {
-		if ( 'course' !== get_post_type() ) {
-			return;
+
+		Sensei()->assets->enqueue(
+			'sensei-single-course-blocks',
+			'blocks/single-course.js',
+			[ 'sensei-shared-blocks' ],
+			true
+		);
+		Sensei()->assets->enqueue(
+			'sensei-single-course-blocks-editor-style',
+			'blocks/single-course-style-editor.css',
+			[ 'sensei-shared-blocks-editor-style', 'sensei-editor-components-style' ]
+		);
+
+		global $post;
+		if ( null !== $post ) {
+			Sensei()->assets->preload_data( [ sprintf( '/sensei-internal/v1/course-structure/%d?context=edit', $post->ID ) ] );
 		}
 
-		Sensei()->assets->enqueue( 'sensei-blocks', 'blocks/index.js', [], true );
-		Sensei()->assets->enqueue( 'sensei-single-course-editor', 'blocks/single-course.editor.css' );
 	}
 
 	/**
-	 * Disable single course template if there is an outline block present.
+	 * Disable single course template if the course is block based.
 	 *
 	 * @access private
 	 *
@@ -100,7 +138,7 @@ class Sensei_Course_Blocks {
 	 * @return bool
 	 */
 	public static function skip_single_course_template( $enabled ) {
-		return is_single() && 'course' === get_post_type() && ! Sensei()->course->is_legacy_course( get_post() )
+		return is_single() && 'course' === get_post_type() && Sensei()->course->has_sensei_blocks( get_post() )
 			? false
 			: $enabled;
 	}

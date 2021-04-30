@@ -1,11 +1,18 @@
+/**
+ * External dependencies
+ */
+/**
+ * WordPress dependencies
+ */
 import { createBlock } from '@wordpress/blocks';
+import { select } from '@wordpress/data';
 import { invert } from 'lodash';
 
 /**
  * Course structure data.
  *
  * @global
- * @typedef {[CourseLessonData,CourseModuleData]} CourseStructure
+ * @typedef {Array.<(CourseLessonData|CourseModuleData)>} CourseStructure
  */
 /**
  * @typedef CourseModuleData
@@ -67,8 +74,8 @@ export const syncStructureToBlocks = ( structure, blocks ) => {
 /**
  * Find the block for a given lesson/module item.
  *
- * @param {Object[]}                            blocks Block.
- * @param {[CourseLessonData,CourseModuleData]} item   Structure item.
+ * @param {Object[]}                                    blocks Block.
+ * @param {Array.<(CourseLessonData|CourseModuleData)>} item   Structure item.
  * @return {Object} The block, if found.
  */
 const findBlock = ( blocks, { id, type, title } ) => {
@@ -141,4 +148,25 @@ export const getFirstBlockByName = ( blockName, blocks ) => {
 	}
 
 	return false;
+};
+
+/**
+ * Get the course outline inner blocks of a specific type.
+ *
+ * @param {string} outlineClientId The outline block client id.
+ * @param {string} blockType       The block type to return.
+ *
+ * @return {Array} An array of blocks.
+ */
+export const getCourseInnerBlocks = ( outlineClientId, blockType ) => {
+	let allChildren = select( 'core/block-editor' ).getBlocks(
+		outlineClientId
+	);
+
+	allChildren = allChildren.reduce(
+		( m, block ) => [ ...m, ...block.innerBlocks ],
+		allChildren
+	);
+
+	return allChildren.filter( ( { name } ) => blockType === name );
 };

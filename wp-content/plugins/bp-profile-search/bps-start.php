@@ -11,8 +11,6 @@ include 'bps-help.php';
 include 'bps-request.php';
 include 'bps-search.php';
 include 'bps-template.php';
-include 'bps-templates47.php';
-include 'bps-templates48.php';
 include 'bps-widget.php';
 include 'bps-xprofile.php';
 
@@ -72,8 +70,17 @@ function bps_meta ($form)
 	$default['template_options'][$default['template']] = array ();
 
 	$meta = get_post_meta ($form);
-	$options[$form] = isset ($meta['bps_options'])? unserialize ($meta['bps_options'][0]): $default;
+	$meta = isset ($meta['bps_options'])? maybe_unserialize ($meta['bps_options'][0]): $default;
 
+	if (!is_admin ())  foreach ($meta['field_code'] as $k => $code)
+	{
+		$label = $meta['field_label'][$k];
+		$desc = $meta['field_desc'][$k];
+		$meta['field_label'][$k] = bps_wpml ($form, $code, 'label', $label);
+		$meta['field_desc'][$k] = bps_wpml ($form, $code, 'comment', $desc);
+	}
+
+	$options[$form] = $meta;
 	return $options[$form];
 }
 

@@ -1,9 +1,21 @@
-import { __ } from '@wordpress/i18n';
+/**
+ * External dependencies
+ */
 import { merge, find } from 'lodash';
+import classnames from 'classnames';
 
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+import { getBlockDefaultClassName } from '@wordpress/blocks';
+
+/**
+ * Internal dependencies
+ */
 import './color-hooks';
-import { EditButtonBlock } from './edit-button';
-import { SaveButtonBlock } from './save-button';
+import ButtonEdit from './button-edit';
+import ButtonSave from './button-save';
 import { button as icon } from '../../icons/wordpress-icons';
 import { withDefaultBlockStyle } from '../../shared/blocks/settings';
 
@@ -30,12 +42,16 @@ export const BlockStyles = {
  *
  * Settings are merged into block settings, the rest of the options are passed on to the save and edit components.
  *
- * @param {Object} opts
- * @param {Object} opts.settings Block settings.
+ * @param {Object}   opts
+ * @param {Object}   opts.settings    Block settings.
+ * @param {Function} opts.EditWrapper Custom edit wrapper component.
  */
-export const createButtonBlockType = ( { settings, ...options } ) => {
+export const createButtonBlockType = ( {
+	settings,
+	EditWrapper,
+	...options
+} ) => {
 	options = {
-		tagName: 'a',
 		alignmentOptions: {
 			controls: [ 'left', 'center', 'right', 'full' ],
 			default: 'left',
@@ -50,13 +66,13 @@ export const createButtonBlockType = ( { settings, ...options } ) => {
 	const defaultStyle = find( styles, 'isDefault' )?.name;
 
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return -- We don't wanna recreate the component every edit render.
-	const EditButtonBlockWithBlockStyle = withDefaultBlockStyle( defaultStyle )(
-		EditButtonBlock
+	const ButtonEditWithBlockStyle = withDefaultBlockStyle( defaultStyle )(
+		ButtonEdit
 	);
 
 	// eslint-disable-next-line @wordpress/no-unused-vars-before-return -- We don't wanna recreate the component every edit render.
-	const SaveButtonBlockWithBlockStyle = withDefaultBlockStyle( defaultStyle )(
-		SaveButtonBlock
+	const ButtonSaveWithBlockStyle = withDefaultBlockStyle( defaultStyle )(
+		ButtonSave
 	);
 
 	return merge(
@@ -68,7 +84,7 @@ export const createButtonBlockType = ( { settings, ...options } ) => {
 				text: {
 					type: 'string',
 					source: 'html',
-					selector: options.tagName,
+					selector: 'a,button',
 				},
 				align: {
 					type: 'string',
@@ -82,6 +98,14 @@ export const createButtonBlockType = ( { settings, ...options } ) => {
 				isPreview: {
 					type: 'boolean',
 					default: false,
+				},
+				inContainer: {
+					type: 'boolean',
+					default: false,
+				},
+				buttonClassName: {
+					type: 'array',
+					default: [],
 				},
 			},
 			supports: {
@@ -97,20 +121,40 @@ export const createButtonBlockType = ( { settings, ...options } ) => {
 			icon,
 			styles,
 			edit( props ) {
-				return (
-					<EditButtonBlockWithBlockStyle
-						{ ...props }
-						{ ...options }
-					/>
+				const content = (
+					<ButtonEditWithBlockStyle { ...props } { ...options } />
 				);
+
+				if ( EditWrapper ) {
+					return <EditWrapper { ...props }>{ content }</EditWrapper>;
+				}
+
+				return content;
 			},
 			save( props ) {
 				return (
-					<SaveButtonBlockWithBlockStyle
+					<ButtonSaveWithBlockStyle
 						{ ...props }
 						{ ...options }
+						blockName={ settings.name }
 					/>
 				);
+			},
+			getEditWrapperProps( { inContainer, align } ) {
+				if ( inContainer ) {
+					return {
+						className: classnames(
+							'sensei-buttons-container__button-block',
+							getBlockDefaultClassName( settings.name ) +
+								'__wrapper',
+							{
+								[ `sensei-buttons-container__button-align-${ align }` ]: align,
+							}
+						),
+					};
+				}
+
+				return {};
 			},
 			example: {
 				attributes: {

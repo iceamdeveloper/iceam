@@ -42,6 +42,9 @@ function bps_set_request ()
 
 function bps_get_request2 ($type, $form=0)		// published interface, 20190324
 {
+	static $saved_request = array ();
+	if (isset ($saved_request["$type-$form"]))  return $saved_request["$type-$form"];
+
 	$request = _bps_clean_request ();
 
 	if (!empty ($request))  switch ($type)
@@ -51,6 +54,11 @@ function bps_get_request2 ($type, $form=0)		// published interface, 20190324
 		break;
 
 	case 'filters':
+		$current = bps_current_page ();
+		$showing_errors = isset ($_REQUEST['bps_errors']);
+		if ($request['bps_directory'] != $current || $showing_errors)  $request = array ();
+		break;
+
 	case 'search':
 		$current = bps_current_page ();
 		if (empty ($request['bps_directory']) || $request['bps_directory'] != $current)  $request = array ();
@@ -66,14 +74,12 @@ function bps_get_request2 ($type, $form=0)		// published interface, 20190324
 		echo "-->\n";
 	}
 
+	$saved_request["$type-$form"] = $request;
 	return $request;
 }
 
 function _bps_clean_request ()
 {
-	static $clean;
-	if (isset ($clean))  return $clean;
-
 	$request = $_REQUEST;
 	if (empty ($request[BPS_FORM]))
 	{
@@ -109,19 +115,36 @@ function bps_clean ($request)		// $request[BPS_FORM] is set and != 'clear'
 {
 	$clean = array ();
 
-	$form = $clean[BPS_FORM] = $request[BPS_FORM];
+	$form = $request[BPS_FORM];
 	$meta = bps_meta ($form);
+
+	$hidden_filters = bps_get_hidden_filters ();
+	foreach ($hidden_filters as $key => $value)  unset ($request[$key]);
 
 	foreach ($meta['field_code'] as $k => $code)
 	{
 		$filter = $meta['field_mode'][$k];
-		$key = bps_key ($code, $filter);
+		$key = bps_key ($code, $filter, '_');
 		if (!isset ($request[$key]))  continue;
-		if (bps_Fields::is_empty_value ($request[$key], $filter))  continue;
 
-		$clean[$key] = $request[$key];
+		$value = $request[$key];
+		if (bps_Fields::is_empty_value ($value, $filter))  continue;
+
+		$key = bps_key ($code, $filter);
+		$clean[$key] = $value;
+
+		$label = $meta['field_label'][$k];
+		if ($label)
+		{
+			$key = bps_key ($code, 'label');
+			$clean[$key] = $label;
+		}
 	}
 
+	if (empty ($clean))  return $clean;
+
+	$clean[BPS_FORM] = $form;
+	$clean['bps_form_page'] = $request['bps_form_page'];
 	$clean['bps_directory'] = $request['bps_directory'];
 	return $clean;
 }
@@ -160,21 +183,17 @@ function bps_get_form_fields ($form)
 			break;
 		}
 
-		$label = $meta['field_label'][$k];
-		$f->label = $label? bps_wpml ($form, $code, 'label', $label): $f->name;
-
-		if ($label)		// to be removed
-			$form_fields[$form][] = bps_set_hidden_field ($code. '_label', $f->label);
+		$f->label = $meta['field_label'][$k]?: $f->name;
 
 		$description = $meta['field_desc'][$k];
 		if ($description == '-')
 			$f->description = '';
 		else if ($description)
-			$f->description = bps_wpml ($form, $code, 'comment', $description);
+			$f->description = $description;
 
 		$f->form_id = $form;
 		$f->value = bps_Fields::get_empty_value ($filter);
-		$f->html_name = bps_key ($code, $filter);
+		$f->html_name = bps_key ($code, $filter, '_');
 		$f->mode = bps_Fields::get_filter_label ($filter);
 		$f->required = (strpos ($f->label, '*') === 0);
 		$f->error_message = '';
@@ -183,12 +202,9 @@ function bps_get_form_fields ($form)
 
 		if (!empty ($request))
 		{
-			$key = $f->html_name;
+			$key = bps_key ($code, $filter);
 			if (isset ($request[$key]))
-			{
-				$f->filter = $filter;
 				$f->value = $request[$key];
-			}
 
 			$f->error_message = _bps_validate_field ($f);
 			if ($f->error_message)  $errors[$form] += 1;
@@ -247,8 +263,6 @@ function _bps_validate_field ($f)
 			$error_message = __('this field is required, please enter a distance and select a location', 'bp-profile-search');
 		else if ($value['distance'] === '' && $value['location'] !== '')
 			$error_message = __('please enter a distance', 'bp-profile-search');
-		else if ($value['distance'] !== '' && $value['location'] === '')
-			$error_message = __('please select a location', 'bp-profile-search');
 		break;
 
 	case 'radio':
@@ -269,10 +283,79 @@ function _bps_validate_field ($f)
 	return $error_message;
 }
 
-function bps_key ($code, $filter)
+function bps_get_filters_fields ()
 {
-	$key = ($filter == '')? $code: $code. '_'. $filter;
+	static $filter_fields;
+	if (isset ($filter_fields))  return $filter_fields;
+
+	$filter_fields = array ();
+	$request = bps_get_request ('filters');
+	if (empty ($request))  return $filter_fields;
+
+	list (, $fields) = bps_get_fields ();
+
+	foreach ($request as $key => $value)
+	{
+		if (in_array ($key, [BPS_FORM, 'bps_form_page', 'bps_directory']))  continue;
+
+		list ($code, $filter) = bps_reverse_key ($key);
+		if (empty ($fields[$code]) || $filter == 'label')  continue;
+
+		$f = clone $fields[$code];
+
+		$key = bps_key ($code, 'label');
+		$f->label = isset ($request[$key])? $request[$key]: $f->name;
+		$f->filter = $filter;
+		$f->mode = bps_Fields::get_filter_label ($filter);
+		$f->value = $value;
+
+		if (!empty ($f->options))
+		{
+			if (is_array ($f->value))
+			{
+				$values = array ();
+				foreach ($f->value as $k => $key)
+					$values[$k] = ($key === '')? '': $f->options[stripslashes ($key)];	// provisional
+				$f->value = $values;
+			}
+			else
+			{
+				$key = $f->value;
+				$f->value = $f->options[stripslashes ($key)];
+			}
+		}
+
+		do_action ('bps_field_before_filters', $f);
+		$filter_fields[] = $f;
+	}
+
+	return $filter_fields;
+}
+
+function bps_key ($code, $filter, $join='_')
+{
+	$key = ($filter == '')? $code: $code. $join. $filter;
 	return $key;
+}
+
+function bps_reverse_key ($key)
+{
+	list (, $fields) = bps_get_fields ();
+	foreach ($fields as $code => $f)
+	{
+		if ($key == $code)
+			return array ($code, '');
+		if (strpos ($key, $code. '_') === 0)
+			return array ($code, substr ($key, strlen ($code) + 1));
+	}
+	return array (false, false);
+}
+
+function bps_reverse_key0 ($key)
+{
+	$reverse = explode ('.', $key);
+	if (empty ($reverse[1]))  $reverse[1] = '';
+	return $reverse;
 }
 
 function bps_debug ()

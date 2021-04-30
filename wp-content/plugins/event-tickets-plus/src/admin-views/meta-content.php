@@ -6,6 +6,7 @@
  *
  * @var Tribe__Tickets_Plus__Main $etp_main
  */
+
 $etp_main = tribe( 'tickets-plus.main' );
 
 $meta_object = $etp_main->meta(); ?>
@@ -27,4 +28,5 @@ $meta_object = $etp_main->meta(); ?>
 	</a>.
 </p>
 
-<?php include $etp_main->plugin_path . 'src/admin-views/meta.php';
+<?php
+$this->template( 'meta' );

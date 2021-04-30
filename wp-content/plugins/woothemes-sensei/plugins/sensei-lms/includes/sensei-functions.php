@@ -35,6 +35,7 @@ function is_sensei() {
 			|| Sensei_Utils::is_learner_profile_page()
 			|| Sensei_Utils::is_course_results_page()
 			|| Sensei_Utils::is_teacher_archive_page()
+			|| Sensei()->blocks->has_sensei_blocks()
 		) {
 			$is_sensei = true;
 		}
@@ -44,7 +45,8 @@ function is_sensei() {
 }
 
 /**
- * Determine if a user is an admin that can access all of Sensei without restrictions.
+ * Determine if a user is an admin that can access all of Sensei without restrictions or if he is a teacher accessing
+ * his own course.
  *
  * @since 1.4.0
  * @since 3.0.0 Added `$user_id` argument. Preserves backward compatibility.
@@ -62,7 +64,18 @@ function sensei_all_access( $user_id = null ) {
 		return false;
 	}
 
-	$access = user_can( $user_id, 'manage_sensei' ) || user_can( $user_id, 'manage_sensei_grades' );
+	$access = false;
+
+	if ( user_can( $user_id, 'manage_sensei' ) ) {
+		$access = true;
+	} else {
+		$course_id = Sensei_Utils::get_current_course();
+
+		if ( $course_id ) {
+			$teacher = (int) get_post( $course_id )->post_author;
+			$access  = $user_id === $teacher;
+		}
+	}
 
 	if ( has_filter( 'sensei_all_access' ) ) {
 		// For backwards compatibility with filter, we temporarily need to change the current user.
@@ -285,29 +298,7 @@ function sensei_user_login_url() {
  * @return bool
  */
 function sensei_is_login_required() {
-	global $post;
-
-	$post_type = get_post_type( $post );
-	$course_id = null;
-
-	switch ( $post_type ) {
-		case 'course':
-			$course_id = $post->ID;
-			break;
-
-		case 'lesson':
-			$course_id = Sensei()->lesson->get_course_id( $post->ID );
-			break;
-
-		case 'quiz':
-			$lesson_id = intval( get_post_meta( $post->ID, '_quiz_lesson', true ) );
-			$course_id = $lesson_id ? Sensei()->lesson->get_course_id( $lesson_id ) : null;
-			break;
-	}
-
-	if ( ! $course_id ) {
-		$course_id = null;
-	}
+	$course_id = Sensei_Utils::get_current_course();
 
 	$login_required = isset( Sensei()->settings->settings['access_permission'] ) && ( true == Sensei()->settings->settings['access_permission'] );
 
@@ -321,6 +312,8 @@ function sensei_is_login_required() {
 	 *
 	 * @param {bool}     $must_be_logged_to_view_lesson True if user need to be logged to see the lesson.
 	 * @param {int|null} $course_id                     Course post ID.
+	 *
+	 * @return {bool} Whether the user needs to be logged in to view content.
 	 */
 	return apply_filters( 'sensei_is_login_required', $login_required, $course_id );
 }
@@ -388,4 +381,24 @@ function sensei_log_event( $event_name, $properties = [] ) {
 	}
 
 	Sensei_Usage_Tracking::get_instance()->send_event( $event_name, $properties );
+}
+
+/**
+ * Track a Sensei event with Jetpack, when Jetpack is available.
+ *
+ * @since 3.7.0
+ *
+ * @param string $event_name The name of the event, without the `sensei_` prefix.
+ * @param array  $properties The event properties to be sent.
+ */
+function sensei_log_jetpack_event( $event_name, $properties = [] ) {
+	if ( ! class_exists( 'Automattic\Jetpack\Tracking' ) || ! Sensei()->usage_tracking->is_tracking_enabled() ) {
+		return;
+	}
+
+	$jetpack_connection = Jetpack::connection();
+	if ( $jetpack_connection->is_user_connected() ) {
+		$tracking = new Automattic\Jetpack\Tracking( 'sensei', $jetpack_connection );
+		$tracking->record_user_event( $event_name, $properties );
+	}
 }

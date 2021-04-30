@@ -17,7 +17,6 @@ class Tribe__Tickets_Plus__Assets {
 			[ 'jquery-cookie', 'vendor/jquery.cookie/jquery.cookie.js', [ 'jquery' ] ],
 			[ 'event-tickets-plus-attendees-list-js', 'attendees-list.js', [ 'event-tickets-attendees-list-js' ] ],
 			[ 'event-tickets-plus-meta-js', 'meta.js', [ 'jquery-cookie', 'jquery-deparam' ] ],
-			[ 'tribe-tickets-plus-attendee-meta', 'v2/tickets-meta.js', [ 'jquery', 'tribe-common' ] ],
 		];
 
 		$plugin = tribe( 'tickets-plus.main' );
@@ -39,7 +38,38 @@ class Tribe__Tickets_Plus__Assets {
 			]
 		);
 
+		// Tickets meta validation library.
+		tribe_asset(
+			$plugin,
+			'tribe-tickets-plus-attendee-meta',
+			'v2/tickets-meta.js',
+			[
+				'jquery',
+				'tribe-common',
+			],
+			null,
+			[
+				'groups' => [
+					'tribe-tickets-block-assets',
+					'tribe-tickets-modal',
+					'tribe-tickets-rsvp',
+					'tribe-tickets-registration-page',
+					'tribe-tickets-admin',
+					'tribe-tickets-forms',
+				],
+			]
+		);
+
 		if ( function_exists( 'tribe_tickets_new_views_is_enabled' ) && tribe_tickets_new_views_is_enabled() ) {
+
+			/**
+			 * Whether or not we should display the modal if no AR tickets in cart.
+			 *
+			 * @since 5.2.1
+			 *
+			 * @param boolean $show_modal (true) Whether or not to show the modal for this particular case.
+			 */
+			$show_modal_if_no_ar_in_cart = (bool) apply_filters( 'tribe_tickets_modal_show_if_no_ticket_with_ar_in_cart', true );
 
 			// Tickets modal scripts.
 			tribe_asset(
@@ -55,6 +85,12 @@ class Tribe__Tickets_Plus__Assets {
 					'groups' => [
 						'tribe-tickets-block-assets',
 						'tribe-tickets-modal',
+					],
+					'localize' => (object) [
+						'name' => 'TribeTicketsModal',
+						'data' => [
+							'ShowIfNoTicketWithArInCart' => $show_modal_if_no_ar_in_cart,
+						],
 					],
 				]
 			);
@@ -188,7 +224,7 @@ class Tribe__Tickets_Plus__Assets {
 			[ 'event-tickets-plus-meta-admin-css', 'meta.css', [] ],
 			[ 'event-tickets-plus-meta-report-js', 'meta-report.js', [] ],
 			[ 'event-tickets-plus-attendees-list-js', 'attendees-list.js', [ 'event-tickets-attendees-list-js' ] ],
-			[ 'event-tickets-plus-meta-admin-js', 'meta-admin.js', [ 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable' ] ],
+			[ 'event-tickets-plus-meta-admin-js', 'meta-admin.js', [ 'tribe-common', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'event-tickets-admin-js' ] ],
 			[ 'event-tickets-plus-admin-css', 'admin.css', [ 'event-tickets-admin-css' ] ],
 			[ 'event-tickets-plus-admin-tables-js', 'tickets-tables.js', [ 'underscore', 'jquery', 'tribe-common' ] ],
 			[ 'event-tickets-plus-admin-qr', 'qr.js', [ 'jquery' ] ],

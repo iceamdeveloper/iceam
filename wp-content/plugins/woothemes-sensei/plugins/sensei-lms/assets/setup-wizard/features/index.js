@@ -1,11 +1,21 @@
-import { useState, useEffect, useCallback } from '@wordpress/element';
+/**
+ * External dependencies
+ */
 import { Card, H } from '@woocommerce/components';
-import { __ } from '@wordpress/i18n';
 import { uniq } from 'lodash';
 
+/**
+ * WordPress dependencies
+ */
+import { useState, useEffect, useCallback } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
+
+/**
+ * Internal dependencies
+ */
 import { INSTALLED_STATUS } from './feature-status';
 import { logEvent } from '../log-event';
-import { useQueryStringRouter } from '../query-string-router';
+import { useQueryStringRouter } from '../../shared/query-string-router';
 import { useSetupWizardStep } from '../data/use-setup-wizard-step';
 import {
 	getWccomProductId,

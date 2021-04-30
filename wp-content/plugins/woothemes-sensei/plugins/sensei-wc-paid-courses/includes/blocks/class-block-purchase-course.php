@@ -112,6 +112,7 @@ class Block_Purchase_Course {
 
 			if ( ! is_admin() ) {
 				Sensei_WC_Paid_Courses::instance()->assets->enqueue( 'sensei-wcpc-block-purchase-course-frontend', 'blocks/purchase-course/frontend.js', [], true );
+				wp_set_script_translations( 'sensei-wcpc-block-purchase-course-frontend', 'sensei-wc-paid-courses' );
 			}
 		}
 	}
@@ -173,7 +174,8 @@ class Block_Purchase_Course {
 		}
 
 		if ( ! \Sensei_Course::is_prerequisite_complete( $this->course_id ) ) {
-			return $this->get_prerequisite_notice();
+			Sensei()->notices->add_notice( Sensei()->course::get_course_prerequisite_message( $this->course_id ), 'info', 'sensei-take-course-prerequisite' );
+			return '';
 		}
 
 		if ( Sensei_WC::is_course_in_cart( $this->course_id ) ) {
@@ -181,7 +183,13 @@ class Block_Purchase_Course {
 		}
 
 		if ( empty( $this->products[0] ) ) {
-			return $this->get_unavailable_product_notice();
+			Sensei()->notices->add_notice(
+				__( 'There are no products available to purchase.', 'sensei-wc-paid-courses' ),
+				'info',
+				'sensei-take-course-no-products'
+			);
+
+			return '';
 		}
 
 		return $this->render_form();
@@ -346,7 +354,7 @@ class Block_Purchase_Course {
 			$this->button
 		);
 
-		$button = $this->add_login_notice( $button );
+		$this->add_login_notice();
 
 		return $button;
 	}
@@ -357,54 +365,17 @@ class Block_Purchase_Course {
 	 * @return string
 	 */
 	private function course_in_cart() {
-		$checkout_url = wc_get_checkout_url();
-
 		$cart_link = '<a class="cart-complete" href="' . esc_url( wc_get_cart_url() ) . '">'
 			. esc_html__( 'added to cart', 'sensei-wc-paid-courses' )
 			. '</a>';
 
-		$complete_purchase_notice = '
-			<div class="sensei-message clean">'
-				// translators: Placeholder is a link to the cart.
-				. wp_kses_post( sprintf( __( 'Course %1s. Please complete the purchase to access the course.', 'sensei-wc-paid-courses' ), $cart_link ) ) . '
-			</div>';
+		// translators: Placeholder is a link to the cart.
+		Sensei()->notices->add_notice( sprintf( __( 'Course %1s. Please complete the purchase to access the course.', 'sensei-wc-paid-courses' ), $cart_link ), 'info', 'sensei-take-course-complete-purchase' );
 
-		// phpcs:ignore WordPress.Security.NonceVerification
-		$product_id            = isset( $_GET['add-to-cart'] ) ? absint( $_GET['add-to-cart'] ) : null;
-		$taking_courses_notice = $this->taking_courses_with_product_notice( $product_id );
-
-		return $complete_purchase_notice
-			. $taking_courses_notice
-			. '<form action="' . esc_url( $checkout_url ) . '">'
-			. $this->render_button( 'Complete purchase' )
+		$checkout_url = wc_get_checkout_url();
+		return '<form action="' . esc_url( $checkout_url ) . '">'
+			. $this->render_button( esc_html__( 'Complete purchase', 'sensei-wc-paid-courses' ) )
 			. '</form>';
-	}
-
-	/**
-	 * Notice informing if learner is already taking courses with the product.
-	 *
-	 * @param int $product_id Product ID.
-	 *
-	 * @return string Notice informing if learner is already taking courses.
-	 */
-	private function taking_courses_with_product_notice( $product_id ) {
-		if ( null === $product_id ) {
-			return '';
-		}
-
-		// Case 2 (already taking all courses) won't happen because we don't render the purchase block if the user is enrolled in the course.
-		switch ( \Sensei_WC::get_enrollment_status_for_product_courses( $product_id ) ) {
-			case 0:
-				return '';
-			case 1:
-				return '
-					<div class="sensei-message alert">
-						' . __( 'The product you are buying contains a course you are already taking.', 'sensei-wc-paid-courses' ) . '
-					</div>
-				';
-		}
-
-		return '';
 	}
 
 	/**
@@ -435,46 +406,22 @@ class Block_Purchase_Course {
 	}
 
 	/**
-	 * Append a log in notice to the button.
-	 *
-	 * @param string $content Button HTML.
-	 *
-	 * @return string|string[]|null
+	 * Add a log in notice to the button.
 	 */
-	private function add_login_notice( $content ) {
+	private function add_login_notice() {
 
 		if ( ! is_user_logged_in() ) {
-			$notice_content = sprintf(
-			// translators: Placeholder is a link to log in.
-				__( 'Or %1$s to access your purchased courses.', 'sensei-wc-paid-courses' ),
-				'<a href="' . sensei_user_login_url() . '">' . __( 'log in', 'sensei-wc-paid-courses' ) . '</a>'
+			$login_link = '<a href="' . sensei_user_login_url() . '">' . __( 'log in', 'sensei-wc-paid-courses' ) . '</a>';
+
+			Sensei()->notices->add_notice(
+				sprintf(
+					// translators: Placeholder is a link to log in.
+					__( 'Please %1$s to access your purchased courses.', 'sensei-wc-paid-courses' ),
+					$login_link
+				),
+				'info',
+				'sensei-take-course-login'
 			);
-			$notice = '<div class="wp-block-sensei-button__notice">' . $notice_content . '</div>';
-
-			$content = preg_replace( '/(<\/button>)/', '$1 ' . $notice, $content );
-
 		}
-
-		return $content;
-	}
-
-	/**
-	 * Render notice for course prerequisite.
-	 *
-	 * @return string
-	 */
-	private function get_prerequisite_notice() {
-		$notice = Sensei()->blocks->course->take_course->get_course_prerequisite_message( $this->course_id );
-		return '<div class="sensei-message clean">' . $notice . '</div>';
-	}
-
-	/**
-	 * Get unavailable product notice.
-	 *
-	 * @return string
-	 */
-	private function get_unavailable_product_notice() {
-		$notice = '<div class="sensei-message clean">' . esc_html__( 'There are no products available to purchase.', 'sensei-wc-paid-courses' ) . '</div>';
-		return $notice;
 	}
 }

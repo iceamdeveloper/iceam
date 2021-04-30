@@ -1,11 +1,11 @@
 <?php
 /*
 Plugin Name: Event Tickets Plus
-Plugin URI:  http://m.tri.be/1acc
+Plugin URI:  https://evnt.is/1acc
 Description: Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more! Includes advanced options like shared capacity between tickets, ticket QR codes, and integrations with your favorite ecommerce provider.
-Version: 5.1.1
-Author: Modern Tribe, Inc.
-Author URI: http://m.tri.be/28
+Version: 5.2.3
+Author: The Events Calendar
+Author URI: https://evnt.is/28
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: event-tickets-plus
@@ -13,7 +13,7 @@ Domain Path: /lang/
  */
 
 /*
- Copyright 2010-2012 by Modern Tribe Inc and the contributors
+ Copyright 2010-2021 by The Events Calendar and the contributors
 
  This program is free software; you can redistribute it and/or
  modify it under the terms of the GNU General Public License

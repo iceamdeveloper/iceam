@@ -113,6 +113,7 @@ class Sensei_Autoloader {
 			'Sensei_Learner_Management'                  => 'admin/class-sensei-learner-management.php',
 			'Sensei_Extensions'                          => 'admin/class-sensei-extensions.php',
 			'Sensei_Exit_Survey'                         => 'admin/class-sensei-exit-survey.php',
+			'Sensei_WCPC_Prompt'                         => 'admin/class-sensei-wcpc-prompt.php',
 			'Sensei_Learners_Admin_Bulk_Actions_Controller' => 'admin/class-sensei-learners-admin-bulk-actions-controller.php',
 			'Sensei_Learners_Admin_Bulk_Actions_View'    => 'admin/class-sensei-learners-admin-bulk-actions-view.php',
 			'Sensei_Learners_Main'                       => 'admin/class-sensei-learners-main.php',
@@ -120,6 +121,20 @@ class Sensei_Autoloader {
 			'Sensei_Setup_Wizard'                        => 'admin/class-sensei-setup-wizard.php',
 			'Sensei_Setup_Wizard_Pages'                  => 'admin/class-sensei-setup-wizard-pages.php',
 			'Sensei_Plugins_Installation'                => 'admin/class-sensei-plugins-installation.php',
+			'Sensei_Status'                              => 'admin/class-sensei-status.php',
+
+			/**
+			 * Admin Tools
+			 */
+			'Sensei_Tools'                               => 'admin/class-sensei-tools.php',
+			'Sensei_Tool_Interface'                      => 'admin/tools/class-sensei-tool-interface.php',
+			'Sensei_Tool_Interactive_Interface'          => 'admin/tools/class-sensei-tool-interactive-interface.php',
+			'Sensei_Tool_Recalculate_Course_Enrolment'   => 'admin/tools/class-sensei-tool-recalculate-course-enrolment.php',
+			'Sensei_Tool_Recalculate_Enrolment'          => 'admin/tools/class-sensei-tool-recalculate-enrolment.php',
+			'Sensei_Tool_Ensure_Roles'                   => 'admin/tools/class-sensei-tool-ensure-roles.php',
+			'Sensei_Tool_Remove_Deleted_User_Data'       => 'admin/tools/class-sensei-tool-remove-deleted-user-data.php',
+			'Sensei_Tool_Module_Slugs_Mismatch'          => 'admin/tools/class-sensei-tool-module-slugs-mismatch.php',
+			'Sensei_Tool_Enrolment_Debug'                => 'admin/tools/class-sensei-tool-enrolment-debug.php',
 
 			/**
 			 * Shortcodes
@@ -142,6 +157,12 @@ class Sensei_Autoloader {
 			 */
 			'Sensei_Renderer_Interface'                  => 'renderers/interface-sensei-renderer.php',
 			'Sensei_Renderer_Single_Post'                => 'renderers/class-sensei-renderer-single-post.php',
+
+			/**
+			 * Update tasks.
+			 */
+			'Sensei_Update_Fix_Question_Author'          => 'update-tasks/class-sensei-update-fix-question-author.php',
+			'Sensei_Update_Remove_Abandoned_Multiple_Question' => 'update-tasks/class-sensei-update-remove-abandoned-multiple-question.php',
 
 			/**
 			 * Unsupported theme handlers.

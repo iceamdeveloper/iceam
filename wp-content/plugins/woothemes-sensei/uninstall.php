@@ -13,6 +13,7 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 }
 
 require_once __DIR__ . '/plugins/sensei-lms/uninstall.php';
+require_once __DIR__ . '/plugins/sensei-wc-paid-courses/uninstall.php';
 
 /**
  * Runs when the compatibility plugin is uninstalled.

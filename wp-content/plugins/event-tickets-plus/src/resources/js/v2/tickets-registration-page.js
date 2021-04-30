@@ -1,10 +1,10 @@
-/* global tribe */
+/* global tribe, jQuery */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
  * @since 5.1.0
  *
- * @type {PlainObject}
+ * @type {Object}
  */
 tribe.tickets = tribe.tickets || {};
 
@@ -13,7 +13,7 @@ tribe.tickets = tribe.tickets || {};
  *
  * @since 5.1.0
  *
- * @type {PlainObject}
+ * @type {Object}
  */
 tribe.tickets.registration = {};
 
@@ -22,8 +22,8 @@ tribe.tickets.registration = {};
  *
  * @since 5.1.0
  *
- * @param  {PlainObject} $ jQuery
- * @param  {PlainObject} obj obj
+ * @param  {Object} $ jQuery
+ * @param  {Object} obj obj
  *
  * @return {void}
  */
@@ -236,6 +236,7 @@ tribe.tickets.registration = {};
 
 		$.each( meta, function( metaIndex, ticket ) {
 			const $currentContainers = $containers.filter( '[data-ticket-id="' + ticket.ticket_id + '"]' );
+			const $tempTextarea = $( '<textarea />' );
 
 			if ( ! $currentContainers.length ) {
 				return;
@@ -249,16 +250,27 @@ tribe.tickets.registration = {};
 
 				const $ticketContainers = $currentContainers.find( obj.selectors.metaItem );
 				$.each( datum, function( index, value ) {
+					// Set value of temporary textarea.
+					$tempTextarea.html( value );
+
+					const formattedValue = $tempTextarea.text();
 					const $field = $ticketContainers.eq( current ).find( '[name*="' + index + '"]' );
+
 					if ( ! $field.is( ':radio' ) && ! $field.is( ':checkbox' ) ) {
-						$field.val( value );
+						$field.val( formattedValue );
 					} else {
 						$field.each( function() {
 							const $item = $( this );
-							if ( value === $item.val() ) {
+
+							if ( formattedValue === $item.val() ) {
 								$item.prop( 'checked', true );
 							}
 						} );
+					}
+
+					// Populate for the birthday selects.
+					if ( $field.hasClass( 'tribe-tickets__form-field--birth-value' ) ) {
+						tribe.tickets.meta.populateFieldBirthday();
 					}
 				} );
 
@@ -456,6 +468,6 @@ tribe.tickets.registration = {};
 	};
 
 	// Configure on document ready.
-	$document.ready( obj.ready );
+	$( obj.ready );
 } )( jQuery, tribe.tickets.registration );
 /* eslint-enable max-len */

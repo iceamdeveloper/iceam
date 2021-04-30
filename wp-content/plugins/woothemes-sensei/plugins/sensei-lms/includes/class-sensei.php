@@ -12,6 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class Sensei_Main {
 	const COMMENT_COUNT_TRANSIENT_PREFIX = 'sensei_comment_counts_';
+	const LEGACY_FLAG_OPTION             = 'sensei-legacy-flags';
+	const LEGACY_FLAG_WITH_FRONT         = 'with_front';
 
 	/**
 	 * @var string
@@ -374,9 +376,6 @@ class Sensei_Main {
 		// Setup post types.
 		$this->post_types = new Sensei_PostTypes();
 
-		// Load the updates class.
-		$this->updates = new Sensei_Updates( $this );
-
 		// Load Course Results Class.
 		$this->course_results = new Sensei_Course_Results();
 
@@ -426,6 +425,8 @@ class Sensei_Main {
 		// Setup Wizard.
 		$this->setup_wizard = Sensei_Setup_Wizard::instance();
 
+		Sensei_Scheduler::init();
+
 		// Differentiate between administration and frontend logic.
 		if ( is_admin() ) {
 			// Load Admin Class
@@ -436,24 +437,20 @@ class Sensei_Main {
 
 			new Sensei_Import();
 			new Sensei_Export();
-
 			new Sensei_Exit_Survey();
-
-			if ( $this->feature_flags->is_enabled( 'rest_api_testharness' ) ) {
-				$this->test_harness = new Sensei_Admin_Rest_Api_Testharness( $this->main_plugin_file_name );
-			}
+			new Sensei_WCPC_Prompt();
 		} else {
 
 			// Load Frontend Class
 			$this->frontend = new Sensei_Frontend();
 
-			// Load notice Class
-			$this->notices = new Sensei_Notices();
-
 			// Load built in themes support integration
 			$this->theme_integration_loader = new Sensei_Theme_Integration_Loader();
 
 		}
+
+		// Load notice Class
+		$this->notices = new Sensei_Notices();
 
 		// Load Grading Functionality
 		$this->grading = new Sensei_Grading( $this->main_plugin_file_name );
@@ -642,38 +639,54 @@ class Sensei_Main {
 		$is_upgrade      = $current_version && version_compare( $this->version, $current_version, '>' );
 
 		// Make sure the current version is up-to-date.
-		if (
-			! $current_version
-			|| $is_upgrade
-		) {
+		if ( ! $current_version || $is_upgrade ) {
 			$this->register_plugin_version();
 		}
 
-		// Only proceed if we knew the previous version and this was a new install or an upgrade.
-		if ( $current_version && ! $is_new_install && ! $is_upgrade ) {
-			return;
+		$this->updates = new Sensei_Updates( $current_version, $is_new_install, $is_upgrade );
+		$this->updates->run_updates();
+	}
+
+	/**
+	 * Sets a legacy flag to a boolean value.
+	 *
+	 * @since 3.7.0
+	 *
+	 * @param string $flag  Short name for the flag to set.
+	 * @param bool   $value Boolean value to set.
+	 */
+	public function set_legacy_flag( $flag, $value ) {
+		$legacy_flags          = $this->get_legacy_flags();
+		$legacy_flags[ $flag ] = (bool) $value;
+
+		update_option( self::LEGACY_FLAG_OPTION, wp_json_encode( $legacy_flags ) );
+	}
+
+	/**
+	 * Get a legacy flag value.
+	 *
+	 * @param string $flag    Short name for the flag to set.
+	 * @param bool   $default Boolean value to set. Defaults to false.
+	 *
+	 * @return bool
+	 */
+	public function get_legacy_flag( $flag, $default = false ) {
+		$legacy_flags = $this->get_legacy_flags();
+
+		if ( isset( $legacy_flags[ $flag ] ) ) {
+			return (bool) $legacy_flags[ $flag ];
 		}
 
-		// Mark site as having enrolment data from legacy instances.
-		if (
-			// If the version is known and the previous version was pre-3.0.0.
-			(
-				$is_upgrade
-				&& version_compare( '3.0.0', $current_version, '>' )
-			)
+		return (bool) $default;
+	}
 
-			// If there wasn't a current version set and this isn't a new install, double check to make sure there wasn't any enrolment.
-			|| (
-				! $current_version
-				&& ! $is_new_install
-				&& $this->course_progress_exists()
-			)
-		) {
-			update_option( 'sensei_enrolment_legacy', time() );
-		}
-
-		// Flush rewrite cache.
-		$this->initiate_rewrite_rules_flush();
+	/**
+	 * Get the legacy flags that have been set.
+	 *
+	 * @return array
+	 */
+	public function get_legacy_flags() {
+		return json_decode( get_option( self::LEGACY_FLAG_OPTION, '{}' ), true );
 	}
 
 	/**
@@ -688,23 +701,6 @@ class Sensei_Main {
 		$course_sample_id = (int) $wpdb->get_var( "SELECT `ID` FROM {$wpdb->posts} WHERE `post_type`='course' LIMIT 1" );
 
 		return ! empty( $course_sample_id );
-	}
-
-	/**
-	 * Helper function to check to see if any course progress exists in the database.
-	 *
-	 * @return bool
-	 */
-	private function course_progress_exists() {
-		$activity_args = [
-			'type'   => 'sensei_course_status',
-			'number' => 1,
-			'status' => 'any',
-		];
-
-		$activity_sample = Sensei_Utils::sensei_check_for_activity( $activity_args, true );
-
-		return ! empty( $activity_sample );
 	}
 
 	/**
@@ -1513,12 +1509,63 @@ class Sensei_Main {
 		$this->teacher->create_role();
 
 		// Setup all the role capabilities needed.
-		$this->updates->add_sensei_caps();
-		$this->updates->add_editor_caps();
-		$this->updates->assign_role_caps();
+		$this->add_sensei_admin_caps();
+		$this->add_editor_caps();
+		$this->assign_role_caps();
 
 		// Flush rules.
 		add_action( 'activated_plugin', array( __CLASS__, 'activation_flush_rules' ), 10 );
+	}
+
+	/**
+	 * Assign role caps for the various post types.
+	 */
+	public function assign_role_caps() {
+		foreach ( $this->post_types->role_caps as $role_cap_set ) {
+			foreach ( $role_cap_set as $role_key => $capabilities_array ) {
+				// Get the role.
+				$role = get_role( $role_key );
+				foreach ( $capabilities_array as $cap_name ) {
+					// If the role exists, add required capabilities for the plugin.
+					if ( ! empty( $role ) ) {
+						if ( ! $role->has_cap( $cap_name ) ) {
+							$role->add_cap( $cap_name );
+						}
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Adds Sensei capabilities to the editor role.
+	 *
+	 * @return bool
+	 */
+	public function add_editor_caps() {
+		$role = get_role( 'editor' );
+
+		if ( ! is_null( $role ) ) {
+			$role->add_cap( 'manage_sensei_grades' );
+		}
+
+		return true;
+	}
+
+	/**
+	 * Adds Sensei capabilities to admin.
+	 *
+	 * @return bool
+	 */
+	public function add_sensei_admin_caps() {
+		$role = get_role( 'administrator' );
+
+		if ( ! is_null( $role ) ) {
+			$role->add_cap( 'manage_sensei' );
+			$role->add_cap( 'manage_sensei_grades' );
+		}
+
+		return true;
 	}
 
 	/**

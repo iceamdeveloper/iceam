@@ -376,15 +376,15 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 	 *
 	 * @since 4.1
 	 *
+	 * @since 5.2.2 Use admin view to return the field.
+	 *
+	 * @param bool $open True if the field should be open.
+	 *
 	 * @return string
 	 */
-	public function render_admin_field() {
-		// @todo Future: Replace this with an admin view call instead.
-
+	public function render_admin_field( $open = false ) {
 		$tickets_plus = Tribe__Tickets_Plus__Main::instance();
-
-		$name    = $tickets_plus->plugin_path . 'src/admin-views/meta-fields/' . sanitize_file_name( $this->type ) . '.php';
-		$wrapper = $tickets_plus->plugin_path . 'src/admin-views/meta-fields/_field.php';
+		$name         = $tickets_plus->plugin_path . 'src/admin-views/meta-fields/' . sanitize_file_name( $this->type ) . '.php';
 
 		if ( ! file_exists( $name ) ) {
 			return '';
@@ -397,27 +397,26 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 
 		// Alias $this to $field for usage in templates.
 		$field = $this;
+		$label = ! empty( $this->label ) ? $this->label : '';
 
-		$field_id    = wp_rand();
-		$type        = $this->type;
-		$label       = ! empty( $this->label ) ? $this->label : '';
-		$required    = ! empty( $this->required ) ? $this->required : '';
-		$slug        = ! empty( $this->slug ) ? $this->slug : sanitize_title( $label );
-		$extra       = $this->extra;
-		$classes     = $this->classes;
-		$attributes  = $this->attributes;
-		$placeholder = $this->placeholder;
-		$type_name   = tribe( Field_Types_Collection::class )->get_name_by_id( $this->type );
+		/** @var \Tribe__Tickets_Plus__Admin__Views $view */
+		$template = tribe( 'tickets-plus.admin.views' );
 
-		ob_start();
-		include $wrapper;
-		$field = ob_get_clean();
+		$args = [
+			'type'      => $this->type,
+			'type_name' => tribe( Field_Types_Collection::class )->get_name_by_id( $this->type ),
+			'field'     => $field,
+			'field_id'  => wp_rand(),
+			'label'     => $label,
+			'required'  => ! empty( $this->required ) ? $this->required : '',
+			'slug'      => ! empty( $this->slug ) ? $this->slug : sanitize_title( $label ),
+			'extra'     => $this->extra,
+			'open'      => $open,
+		];
 
-		ob_start();
-		include $name;
-		$response = str_replace( '##FIELD_EXTRA_DATA##', ob_get_clean(), $field );
+		$template->add_template_globals( $args );
 
-		return $response;
+		return $template->template( 'meta-fields/_field', $args, false );
 	}
 
 	/**
@@ -472,5 +471,18 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 	 */
 	public function get_placeholder() {
 		return $this->placeholder;
+	}
+
+	/**
+	 * Get the formatted value.
+	 *
+	 * @since 5.2.0
+	 *
+	 * @param string|mixed $value The current value.
+	 *
+	 * @return string|mixed The formatted value.
+	 */
+	public function get_formatted_value( $value ) {
+		return $value;
 	}
 }

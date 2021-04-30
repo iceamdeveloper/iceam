@@ -5,7 +5,7 @@ Tags: woocommerce, utility, framework, aelia
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires at least: 5.0
-Tested up to: 5.6
+Tested up to: 5.7
 
 Adds a set of classes that can simplify the development of other plugins for WooCommerce.
 
@@ -68,6 +68,20 @@ For more information about installation and management of plugins, please refer 
 This is a major update, which introduces several important changes. **The required PHP version is now 7.0 or newer**. Please make sure that your server is configured correctly, before installing this update.
 
 == Changelog ==
+
+= 2.1.6.210406 =
+* Updated supported WooCommerce versions.
+
+= 2.1.5.210311 =
+* Updated supported WordPress and WooCommerce versions.
+
+= 2.1.4.210208 =
+* Feature - Added filter `wc_aelia_exchange_rates_base_currency`, to allow 3rd parties to alter the base currency used to fetch exchange rates.
+* Feature - Added filter `wc_aelia_exchange_rates_currencies`, to allow 3rd parties to alter the list of currencies for which an exchange rate should be fetched.
+
+= 2.1.3.210128 =
+* Feature - Added filter `wc_aelia_exchange_rates`, to allow 3rd parties to alter the exchange rates before they are returned.
+* Updated supported WooCommerce versions.
 
 = 2.1.2.210108 =
 * Tweak - Downgraded 3rd party dependencies, to ensure compatibility with PHP 7.0.

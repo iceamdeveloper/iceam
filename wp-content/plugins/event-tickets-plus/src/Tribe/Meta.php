@@ -231,8 +231,8 @@ class Tribe__Tickets_Plus__Meta {
 	 *
 	 * @since 4.6
 	 *
-	 * @param int $unused_post_id ID of parent "event" post
-	 * @param int $ticket_id ID of ticket post
+	 * @param int $unused_post_id ID of parent "event" post.
+	 * @param int $ticket_id ID of ticket post.
 	 */
 	public function accordion_content( $unused_post_id, $ticket_id = null ) {
 		$is_admin = tribe_is_truthy( tribe_get_request_var( 'is_admin', is_admin() ) );
@@ -241,14 +241,21 @@ class Tribe__Tickets_Plus__Meta {
 			return;
 		}
 
-		$enable_meta = $this->ticket_has_meta( $ticket_id );
-		$active_meta = $this->get_meta_fields_by_ticket( $ticket_id );
-		$templates   = $this->meta_fieldset()->get_fieldsets();
+		$args = [
+			'ticket_id'     => $ticket_id,
+			'enable_meta'   => $this->ticket_has_meta( $ticket_id ),
+			'active_meta'   => $this->get_meta_fields_by_ticket( $ticket_id ),
+			'templates'     => $this->meta_fieldset()->get_fieldsets(),
+			'fieldset_form' => false,
+			'meta_object'   => $this,
+		];
 
 		/** @var Tribe__Tickets_Plus__Admin__Views $plus_admin_views */
-		$plus_admin_views = tribe( 'tickets-plus.admin.views' );
+		$template = tribe( 'tickets-plus.admin.views' );
 
-		$plus_admin_views->template( 'attendee-meta', get_defined_vars() );
+		$template->add_template_globals( $args );
+
+		$template->template( 'attendee-meta', $args );
 	}
 
 	/**
@@ -266,19 +273,33 @@ class Tribe__Tickets_Plus__Meta {
 			return;
 		}
 
-		$enable_meta = $this->ticket_has_meta( $ticket_id );
-		$active_meta = $this->get_meta_fields_by_ticket( $ticket_id );
-		$templates   = $this->meta_fieldset()->get_fieldsets();
+		/** @var Tribe__Tickets_Plus__Meta $meta_object */
+		$meta_object = tribe( 'tickets-plus.meta' );
 
-		tribe( 'tickets-plus.admin.views' )->template( 'meta-content', get_defined_vars() );
+		$template_args = [
+			'ticket_id'   => $ticket_id,
+			'enable_meta' => $this->ticket_has_meta( $ticket_id ),
+			'active_meta' => $this->get_meta_fields_by_ticket( $ticket_id ),
+			'templates'   => $this->meta_fieldset()->get_fieldsets(),
+			'meta_object' => $meta_object,
+		];
+
+		/** @var \Tribe__Tickets_Plus__Admin__Views $template */
+		$template = tribe( 'tickets-plus.admin.views' );
+
+		// Add the rendering attributes into global context.
+		$template->add_template_globals( $template_args );
+
+		$template->template( 'meta-content' );
 	}
 
 	/**
 	 * Gets just the meta fields for insertion via ajax
 	 *
-	 * @param int $unused_post_id ID of parent "event" post
-	 * @param int $ticket_id ID of ticket post
-	 * @return string The cutom field(s) html
+	 * @param int $unused_post_id Post ID of ticket parent.
+	 * @param int $ticket_id      Ticket post ID.
+	 *
+	 * @return string The custom field(s) HTML.
 	 */
 	public function ajax_attendee_meta( $unused_post_id, $ticket_id ) {
 		$output      = '';
@@ -287,7 +308,7 @@ class Tribe__Tickets_Plus__Meta {
 
 		foreach ( $active_meta as $meta ) {
 			$field = $meta_object->generate_field( $ticket_id, $meta->type, (array) $meta );
-			// outputs HTML input field - no escaping
+			// Outputs HTML input field - no escaping.
 			$output .= $field->render_admin_field();
 		}
 
@@ -402,7 +423,7 @@ class Tribe__Tickets_Plus__Meta {
 		$field = $this->generate_field( null, $_POST['type'] );
 
 		if ( $field ) {
-			$data = $field->render_admin_field();
+			$data = $field->render_admin_field( true );
 		}
 
 		if ( empty( $data ) ) {
