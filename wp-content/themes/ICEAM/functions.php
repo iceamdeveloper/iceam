@@ -1152,6 +1152,19 @@ function add_custom_text_sensei_account(){
 
 /***********************************************************************
  *
+ *	ALLOW USERS TO RESUBSCRIBE TO COURSES THEY'RE ALREADY ENROLLED IN
+ *  I HAVE NO CLUE WHY THIS ISN'T DEFAULT BEHAVIOR
+ *
+ **********************************************************************/
+
+add_action( 'init', 'remove_sensei_add_to_cart_hook', 11 );
+
+function remove_sensei_add_to_cart_hook(){
+  remove_action( 'woocommerce_add_to_cart', array( 'Sensei_WC', 'do_not_add_course_to_cart_if_user_taking_course' ), 10, 6 );
+}
+
+/***********************************************************************
+ *
  *	THE END
  *
  **********************************************************************/
