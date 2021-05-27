@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit08f7745890766eae00b7d3350211bcd5
+class ComposerStaticInita8c0f569e5803d5c6c57bc8c93e033c4
 {
     public static $classMap = array (
         'Aelia\\WC\\CurrencySwitcher\\DynamicPricing\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
@@ -17,7 +17,7 @@ class ComposerStaticInit08f7745890766eae00b7d3350211bcd5
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInit08f7745890766eae00b7d3350211bcd5::$classMap;
+            $loader->classMap = ComposerStaticInita8c0f569e5803d5c6c57bc8c93e033c4::$classMap;
 
         }, null, ClassLoader::class);
     }

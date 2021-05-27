@@ -50,7 +50,7 @@ class Sensei_WC {
 	 */
 	public static function is_woocommerce_active() {
 		return self::is_woocommerce_present();
-	} // end is_woocommerce_active
+	}
 
 	/**
 	 * Checks if the WooCommerce plugin is installed and activation.
@@ -64,7 +64,7 @@ class Sensei_WC {
 	 */
 	public static function is_woocommerce_present() {
 		return Sensei_Utils::is_plugin_present_and_activated( 'Woocommerce', 'woocommerce/woocommerce.php' );
-	}//end is_woocommerce_present()
+	}
 
 	/**
 	 * Find the order active number (completed or processing ) for a given user on a course. It will return the latest order.
@@ -176,7 +176,7 @@ class Sensei_WC {
 
 		return $filter_links;
 
-	}//end add_course_archive_wc_filter_links()
+	}
 
 	/**
 	 * Apply the free filter the the course query getting all course with no products or products with zero price.
@@ -207,7 +207,7 @@ class Sensei_WC {
 
 		return $query;
 
-	}//end course_archive_wc_filter_free()
+	}
 
 	/**
 	 * Apply the paid filter to the course query on the courses page
@@ -659,7 +659,7 @@ class Sensei_WC {
 			<?php
 		}
 
-	} // End sensei_woocommerce_in_cart_message()
+	}
 
 	/**
 	 * Checks the cart to see if a course is in the cart.
@@ -682,7 +682,7 @@ class Sensei_WC {
 
 		return false;
 
-	}//end is_course_in_cart()
+	}
 
 	/**
 	 * Check the cart to see if the product is in the cart.
@@ -857,7 +857,7 @@ class Sensei_WC {
 			array_values( $free_product_variation_parent_ids )
 		);
 
-	}//end get_free_product_ids()
+	}
 
 	/**
 	 * The meta query for courses that are free.
@@ -887,7 +887,7 @@ class Sensei_WC {
 			],
 		];
 
-	}//end get_free_courses_meta_query_args()
+	}
 
 	/**
 	 * The metat query for courses that are free
@@ -911,7 +911,7 @@ class Sensei_WC {
 			],
 		];
 
-	}//end get_paid_courses_meta_query_args()
+	}
 
 	/**
 	 * The WordPress Query args
@@ -1796,7 +1796,7 @@ class Sensei_WC {
 
 			foreach ( $order->get_items() as $item ) {
 
-				$item_id = Sensei_WC_Utils::get_item_id_from_item( $item ); // End If Statement.
+				$item_id = Sensei_WC_Utils::get_item_id_from_item( $item );
 
 				if ( self::has_customer_bought_product( $user_id, $item_id ) ) {
 
@@ -2058,7 +2058,7 @@ class Sensei_WC {
 
 		return $guest_checkout;
 
-	}//end disable_guest_checkout()
+	}
 
 	/**
 	 * Change order status with virtual products to completed
@@ -2486,4 +2486,4 @@ class Sensei_WC {
 		return $purchased_course_data;
 	}
 
-}//end class
+}

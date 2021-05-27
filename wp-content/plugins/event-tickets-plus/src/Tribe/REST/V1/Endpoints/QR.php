@@ -180,7 +180,15 @@ implements Tribe__REST__Endpoints__READ_Endpoint_Interface, Tribe__Documentation
 			return $response;
 		}
 
-		$api_check = $this->has_api( $qr_arr );
+		/**
+		 * Allow filtering the API key validation status.
+		 *
+		 * @since TBD
+		 *
+		 * @param bool  $is_valid Whether the provided API key is valid or not.
+		 * @param array $qr_arr The request data for Check in.
+		 */
+		$api_check = apply_filters( 'event_tickets_plus_requested_api_is_valid', $this->has_api( $qr_arr ), $qr_arr );
 
 		// Check all the data we need is there
 		if ( empty( $api_check ) || empty( $qr_arr['ticket_id'] ) ) {
@@ -313,6 +321,7 @@ implements Tribe__REST__Endpoints__READ_Endpoint_Interface, Tribe__Documentation
 		$qr_arr = [
 			'api_key'       => $request['api_key'],
 			'ticket_id'     => $request['ticket_id'],
+			'event_id'      => $request['event_id'],
 			'security_code' => $request['security_code'],
 		];
 

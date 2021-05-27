@@ -186,7 +186,7 @@ final class Courses {
 		}
 
 		return $courses;
-	} // End _back_compat_get_product_courses()
+	}
 
 	/**
 	 * Get all the courses attached to a product or set of products.
@@ -369,9 +369,9 @@ final class Courses {
 								$course_ids_from_other_orders[] = $course->ID;
 							}
 						}
-					} // End For Loop
-				} // End If Statement
-			} // End For Loop
+					}
+				}
+			}
 		}
 
 		foreach ( $course_ids_from_order as $order_course_id ) {
@@ -381,7 +381,7 @@ final class Courses {
 			}
 		}
 
-	} // End remove_active_course()
+	}
 
 	/**
 	 * Assign user to unassigned purchased course when visiting the My Courses page.
@@ -427,7 +427,7 @@ final class Courses {
 				Sensei_Utils::user_start_course( $user_id, $course_id );
 			}
 		}
-	} // End activate_purchased_courses()
+	}
 
 	/**
 	 * Get all of the products associated with a course.
@@ -542,7 +542,7 @@ final class Courses {
 				}
 			}
 		}
-	} // End activate_purchased_single_course()
+	}
 
 	/**
 	 * Set up meta in REST API.

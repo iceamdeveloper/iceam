@@ -9,7 +9,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2021-04-14T16:03:43+00:00\n"
+"POT-Creation-Date: 2021-05-10T20:30:15+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.4.0\n"
 "X-Domain: sensei-wc-paid-courses\n"
@@ -197,6 +197,7 @@ msgstr ""
 #: includes/blocks/class-block-purchase-course.php:414
 #: includes/frontend/class-courses.php:102
 #: includes/woocommerce-integrations/class-sensei-wc.php:1357
+#. translators: Placeholder is a link to log in.
 msgid "log in"
 msgstr ""
 
@@ -338,6 +339,10 @@ msgstr ""
 msgid ""
 "Learner has not signed up for this course and is not able to without an "
 "active membership."
+msgstr ""
+
+#: includes/course-enrolment-providers/class-woocommerce-simple.php:85
+msgid "WooCommerce Simple Products"
 msgstr ""
 
 #: includes/course-enrolment-providers/class-woocommerce-simple.php:491

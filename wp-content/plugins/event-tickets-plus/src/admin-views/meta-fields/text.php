@@ -5,6 +5,7 @@
 
 $multiline = isset( $extra['multiline'] ) ? $extra['multiline'] : '';
 ?>
+
 <div class="tribe-tickets-input tribe-tickets-input-checkbox tribe-tickets-required">
 	<label class="prompt">
 		<input

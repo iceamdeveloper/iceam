@@ -118,8 +118,7 @@ class Tribe__Tickets_Plus__QR__Settings {
 			wp_send_json_error( __( 'Permission Error', 'event-tickets-plus' ) );
 		}
 
-		$random  = $this->generate_random_int();
-		$api_key = $this->generate_qr_api_hash( $random );
+		$api_key = $this->generate_new_api_key();
 
 		if ( empty( $api_key ) ) {
 			wp_send_json_error( __( 'The QR API key was not generated, please try again.', 'event-tickets-plus' ) );
@@ -157,22 +156,36 @@ class Tribe__Tickets_Plus__QR__Settings {
 	}
 
 	/**
-	 * Generate a hash key for QR API
+	 * Generate a hash key for QR API.
 	 *
 	 * @since 4.7.5
 	 *
-	 * @return int $random a random number
+	 * @param int $random The random number.
+	 *
+	 * @return string The QR API key.
 	 */
 	protected function generate_qr_api_hash( $random ) {
 		$api_key = substr( md5( $random ), 0, 8 );
 
 		/**
-		 * Filters the generated hash key for QR API
+		 * Filters the generated hash key for QR API.
 		 *
 		 * @since 4.7.5
 		 *
-		 * @param string $api_key a API key string
+		 * @param string $api_key a API key string.
 		 */
 		return apply_filters( 'tribe_tickets_plus_qr_api_hash', $api_key );
+	}
+
+	/**
+	 * Generate a random API key.
+	 *
+	 * @since TBD
+	 *
+	 * @return string The QR API key.
+	 */
+	public function generate_new_api_key() {
+		$random  = $this->generate_random_int();
+		return $this->generate_qr_api_hash( $random );
 	}
 }

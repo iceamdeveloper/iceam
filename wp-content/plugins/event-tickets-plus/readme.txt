@@ -4,7 +4,7 @@ Contributors: theeventscalendar, brianjessee, camwynsp, paulkim, sc0ttkclark, ag
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
 Requires at least: 4.9.14
 Tested up to: 5.7.1
-Stable tag: 5.2.3
+Stable tag: 5.2.4
 Requires PHP: 5.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -134,6 +134,17 @@ Our Premium Plugins:
 * <a href="https://evnt.is/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [5.2.4] 2021-05-12 =
+
+* Feature - Placeholder support added for Text, Email, Telephone and URL Attendee Registration Fields. [ETP-711]
+* Fix - The Attendee Registration modal cart, now makes the right calculation when removing items. [ETP-715]
+* Fix - Show total attendance count for `tribe_attendee_list` shortcode title. [ETP-129]
+* Tweak - Add Attendee Registration Fields to the Tickets editor UI for the classic editor. [ETP-594]
+* Tweak - Add new filter to allow filtering of the QR Code check-in API key. [ETP-720]
+* Tweak - Added filters: `tribe_tickets_modal_show_if_no_ticket_with_ar_in_cart`, `tribe_tickets_plus_manual_attendees_view_send_ticket_email_for_new_attendees`, `event_tickets_plus_placeholder_enabled_ar_fields`, `event_tickets_plus_requested_api_is_valid`
+* Tweak - Changed views: `meta/email`, `meta/telephone`, `meta/text`, `meta/url`, `v2/attendee-registration/mini-cart`
+* Language - 3 new strings added, 17 updated, 0 fuzzied, and 0 obsoleted
 
 = [5.2.3] 2021-04-22 =
 

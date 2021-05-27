@@ -1495,6 +1495,15 @@ class Subscriptions_Integration {
 	public function woocommerce_scheduled_subscription_payment($subscription_id) {
 		// Fetch the currency from the original subscription
 		$subscription = wcs_get_subscription($subscription_id);
+
+		// If the subscription ID is not valid, stop here
+		// @since x.x
+		if(!$subscription instanceof \WC_Subscription) {
+			$this->subscription_renewal_currency = null;
+			$this->log(sprintf(__('Invalid subscription ID passed with event "woocommerce_scheduled_subscription_payment". Subscription ID: %s',
+				 										WC_Aelia_CS_Subscriptions::$text_domain), $subscription_id), false);
+			return;
+		}
 		// Store the active currency to be used during a renewal
 		$this->subscription_renewal_currency = $subscription->get_currency();
 

@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC\CurrencySwitcher\Subscriptions;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 require_once('lib/classes/definitions/definitions.php');
 
@@ -12,7 +12,7 @@ use Aelia\WC\Logger;
  * Aelia Currency Switcher Subscriptions Integration plugin.
  **/
 class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
-	public static $version = '1.5.11.210128';
+	public static $version = '1.5.13.210513';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -30,12 +30,9 @@ class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
 		// Load Composer autoloader
 		require_once(__DIR__ . '/vendor/autoload.php');
 
-		$settings_key = self::$plugin_slug;
-
 		$messages_controller = new Messages(self::$text_domain);
 
-		$plugin_instance = new self(null, $messages_controller);
-		return $plugin_instance;
+		return new self(null, $messages_controller);
 	}
 
 	/**

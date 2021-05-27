@@ -6,7 +6,7 @@
     'aliases' => 
     array (
     ),
-    'reference' => '6faa2c720098dd26d281c672aba93830fe9370f2',
+    'reference' => 'f837c8278e5f29d2df685bd496666f5a0001ca64',
     'name' => '__root__',
   ),
   'versions' => 
@@ -18,7 +18,7 @@
       'aliases' => 
       array (
       ),
-      'reference' => '6faa2c720098dd26d281c672aba93830fe9370f2',
+      'reference' => 'f837c8278e5f29d2df685bd496666f5a0001ca64',
     ),
     'composer/ca-bundle' => 
     array (
@@ -76,12 +76,12 @@
     ),
     'psr/log' => 
     array (
-      'pretty_version' => '1.1.3',
-      'version' => '1.1.3.0',
+      'pretty_version' => '1.1.4',
+      'version' => '1.1.4.0',
       'aliases' => 
       array (
       ),
-      'reference' => '0f73288fd15629204f9d42b7055f72dacbe811fc',
+      'reference' => 'd49695b909c3b7628b6289db5479a1c204601f11',
     ),
     'psr/log-implementation' => 
     array (

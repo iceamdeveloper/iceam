@@ -398,6 +398,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 		// Alias $this to $field for usage in templates.
 		$field = $this;
 		$label = ! empty( $this->label ) ? $this->label : '';
+		$placeholder = ! empty( $this->get_placeholder() ) ? $this->get_placeholder() : '';
 
 		/** @var \Tribe__Tickets_Plus__Admin__Views $view */
 		$template = tribe( 'tickets-plus.admin.views' );
@@ -412,6 +413,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 			'slug'      => ! empty( $this->slug ) ? $this->slug : sanitize_title( $label ),
 			'extra'     => $this->extra,
 			'open'      => $open,
+			'placeholder' => $placeholder,
 		];
 
 		$template->add_template_globals( $args );
@@ -484,5 +486,33 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 	 */
 	public function get_formatted_value( $value ) {
 		return $value;
+	}
+
+	/**
+	 * Check if the field has placeholder enabled.
+	 *
+	 * @since TBD
+	 *
+	 * @return bool
+	 */
+	public function has_placeholder() {
+		$placeholder_types = [
+			'text',
+			'telephone',
+			'url',
+			'email',
+		];
+
+		/**
+		 * Allow to filter the supported Placeholders AR fields.
+		 *
+		 * @param array                                            $placeholder_types List of types that support Placeholder.
+		 * @param Tribe__Tickets_Plus__Meta__Field__Abstract_Field $field             The field object.
+		 *
+		 * @since TBD
+		 */
+		$placeholder_types = (array) apply_filters( 'event_tickets_plus_placeholder_enabled_ar_fields', $placeholder_types, $this );
+
+		return in_array( $this->type, $placeholder_types, true );
 	}
 }

@@ -136,6 +136,11 @@ tribe.tickets.modal = {};
 		$cartItems.each(
 			function() {
 				const $cartItem = $( this );
+
+				if ( ! $cartItem.is( ':visible' ) ) {
+					return;
+				}
+
 				const ticketID = $cartItem.closest( tribe.tickets.block.selectors.item ).data( 'ticket-id' );
 				const $ticketContainer = $( obj.selectors.metaForm ).find( obj.selectors.metaContainer + '[data-ticket-id="' + ticketID + '"]' );
 
@@ -552,9 +557,7 @@ tribe.tickets.modal = {};
 				ticket.qty = 0;
 				$cartItem.find( obj.selectors.itemQuantityInput ).val( ticket.qty );
 				ticket.price = tribe.tickets.block.getPrice( $cartItem );
-
 				obj.updateItemTotal( ticket.qty, ticket.price, $cartItem );
-				tribe.tickets.block.updateFormTotals( $cart );
 
 				$( obj.selectors.metaContainer + '[data-ticket-id="' + ticket.id + '"]' )
 					.removeClass( obj.selectors.metaContainerHasTickets.className() )
@@ -568,6 +571,13 @@ tribe.tickets.modal = {};
 				window.setTimeout(
 					function() {
 						const $items = $cart.find( tribe.tickets.block.selectors.item ).filter( ':visible' );
+
+						// Update the form totals.
+						tribe.tickets.block.updateFormTotals( $cart );
+
+						// Maybe show non meta notice.
+						obj.maybeShowNonMetaNotice( $cart );
+
 						if ( 0 >= $items.length ) {
 							// Get the object ID
 							const id = $( tribe.tickets.block.selectors.blockSubmit ).attr( 'data-content' );
@@ -825,6 +835,10 @@ tribe.tickets.modal = {};
 				$cartItems.each(
 					function() {
 						const $blockCartItem = $( this );
+
+						if ( ! $blockCartItem.is( ':visible' ) ) {
+							return;
+						}
 
 						const qtyInCart = tribe.tickets.block.getQty( $blockCartItem );
 						const hasArFields = $blockCartItem.data( 'ticket-ar-fields' );

@@ -69,6 +69,12 @@ This is a major update, which introduces several important changes. **The requir
 
 == Changelog ==
 
+= 2.1.8.210518 =
+* Tweak - Added `addons` path to the paths handled by the base plugin class.
+
+= 2.1.7.210513 =
+* Updated supported WooCommerce versions.
+
 = 2.1.6.210406 =
 * Updated supported WooCommerce versions.
 

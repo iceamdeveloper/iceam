@@ -1,15 +1,15 @@
-<?php if(!defined('ABSPATH')) exit; // Exit if accessed directly
+<?php if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 /*
 Plugin Name: WooCommerce Currency Switcher - Subscriptions Integration
 Plugin URI: https://aelia.co/
 Description: Subscriptions integration for Aelia Currency Switcher for WooCommerce
 Author: Aelia
 Author URI: https://aelia.co
-Version: 1.5.11.210128
+Version: 1.5.13.210513
 Text Domain: wc-aelia-cs-subscriptions
 Domain Path: /languages
 WC requires at least: 3.0
-WC tested up to: 5.0
+WC tested up to: 5.3
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-cs-subscriptions-requirementscheck.php');

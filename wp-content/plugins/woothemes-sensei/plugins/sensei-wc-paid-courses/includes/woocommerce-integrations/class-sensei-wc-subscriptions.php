@@ -197,15 +197,15 @@ class Sensei_WC_Subscriptions {
 
 				$courses = Courses::_back_compat_get_product_courses( $item_id );
 
-			} // End If Statement
+			}
 
 			// Loop and add the user to the course.
 			foreach ( $courses as $course_item ) {
 
 				Sensei_Utils::user_start_course( intval( $user['ID'] ), $course_item->ID );
 
-			} // End For Loop
-		} // End For Loop
+			}
+		}
 
 	}
 
@@ -303,7 +303,7 @@ class Sensei_WC_Subscriptions {
 
 		return $user_access_permission;
 
-	} // end get_subscription_permission
+	}
 
 	/**
 	 * Filter whether the user has started the course based on whether they have

@@ -178,7 +178,7 @@ class Tribe__Tickets_Plus__Attendees_List extends Attendees_List {
 			return;
 		}
 
-		$attendees_total = count( $attendees_list );
+		$attendees_total = $this->get_attendance_counts( $event->ID );
 
 		if ( empty( $attendees_total ) ) {
 			return;

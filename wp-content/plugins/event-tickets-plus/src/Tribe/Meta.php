@@ -60,19 +60,21 @@ class Tribe__Tickets_Plus__Meta {
 		add_filter( 'tribe_tickets_has_meta_enabled', [ $this, 'filter_ticket_has_meta_enabled' ], 9, 2 );
 		add_filter( 'tribe_tickets_data_ticket_ids_have_meta_fields', [ $this, 'filter_data_ticket_ids_have_meta_fields' ], 10, 2 );
 
-		add_action( 'event_tickets_after_save_ticket', array( $this, 'save_meta' ), 10, 3 );
+		add_action( 'event_tickets_after_save_ticket', [ $this, 'save_meta' ], 10, 3 );
 
-		add_action( 'event_tickets_ticket_list_after_ticket_name', array( $this, 'maybe_render_custom_meta_icon' ) );
-		add_action( 'tribe_events_tickets_metabox_edit_accordion_content', array( $this, 'accordion_content' ), 10, 2 );
+		add_action( 'event_tickets_ticket_list_after_ticket_name', [ $this, 'maybe_render_custom_meta_icon' ] );
+		add_action( 'event_tickets_ticket_list_after_ticket_name', [ $this, 'maybe_render_attendee_registration_fields_list' ] );
+
+		add_action( 'tribe_events_tickets_metabox_edit_accordion_content', [ $this, 'accordion_content' ], 10, 2 );
 
 		/* Ajax filters and actions */
-		add_filter( 'tribe_events_tickets_metabox_edit_attendee', array( $this, 'ajax_attendee_meta' ), 10, 2 );
-		add_action( 'wp_ajax_tribe-tickets-info-render-field', array( $this, 'ajax_render_fields' ) );
-		add_action( 'wp_ajax_tribe-tickets-load-saved-fields', array( $this, 'ajax_render_saved_fields' ) );
-		add_action( 'woocommerce_remove_cart_item', array( $this, 'clear_storage_on_remove_cart_item' ), 10, 2 );
+		add_filter( 'tribe_events_tickets_metabox_edit_attendee', [ $this, 'ajax_attendee_meta' ], 10, 2 );
+		add_action( 'wp_ajax_tribe-tickets-info-render-field', [ $this, 'ajax_render_fields' ] );
+		add_action( 'wp_ajax_tribe-tickets-load-saved-fields', [ $this, 'ajax_render_saved_fields' ] );
+		add_action( 'woocommerce_remove_cart_item', [ $this, 'clear_storage_on_remove_cart_item' ], 10, 2 );
 
-		// Check if the attendee registration cart has required meta
-		add_filter( 'tribe_tickets_attendee_registration_has_required_meta', array( $this, 'filter_cart_has_required_meta' ), 20, 2 );
+		// Check if the attendee registration cart has required meta.
+		add_filter( 'tribe_tickets_attendee_registration_has_required_meta', [ $this, 'filter_cart_has_required_meta' ], 20, 2 );
 
 		// Commerce hooks.
 		add_filter( 'tribe_tickets_commerce_cart_get_data', [ $this, 'get_cart_data' ], 10, 3 );
@@ -639,6 +641,54 @@ class Tribe__Tickets_Plus__Meta {
 		<?php
 	}
 
+	/**
+	 * If the given ticket has attendee meta, render a list of the fields.
+	 *
+	 * @since TBD
+	 *
+	 * @param Tribe__Tickets__Ticket_Object $ticket The ticket object.
+	 */
+	public function maybe_render_attendee_registration_fields_list( $ticket ) {
+		if ( ! is_admin() ) {
+			return;
+		}
+		/** @var \Tribe\Tickets\Plus\Attendee_Registration\IAC $iac */
+		$iac            = tribe( 'tickets-plus.attendee-registration.iac' );
+		$iac_for_ticket = $iac->get_iac_setting_for_ticket( $ticket->ID );
+		$iac_enabled    = $iac_for_ticket === $iac::ALLOWED_KEY || $iac_for_ticket === $iac::REQUIRED_KEY;
+		$meta           = $this->get_meta_fields_by_ticket( $ticket->ID );
+
+		if ( empty( $meta ) && empty( $iac_enabled ) ) {
+			return;
+		}
+
+		$fields = [];
+
+		if ( ! empty( $iac_enabled ) ) {
+			$fields[] = __( 'Name', 'event-tickets-plus' );
+			$fields[] = __( 'Email', 'event-tickets-plus' );
+		}
+
+		foreach ( $meta as $field ) {
+			if ( empty( $field->type ) ) {
+				continue;
+			}
+
+			if ( empty( $field->label ) ) {
+				$fields[] = '(' . $field->get_name() . ')';
+				continue;
+			}
+
+			$fields[] = $field->label;
+		}
+
+		?>
+
+		<div class="tribe-tickets__tickets-editor-ticket-name-attendee-registration-fields">
+			<?php echo esc_html( implode( ', ', $fields ) ); ?>
+		</div>
+		<?php
+	}
 	/**
 	 * Injects fieldsets into JSON data during ticket add ajax output
 	 *

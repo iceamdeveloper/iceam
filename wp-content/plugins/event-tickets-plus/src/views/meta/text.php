@@ -12,8 +12,9 @@
  * @since 4.10.7 Added var documentation for `$this`.
  * @since 4.12.1    Updated PHP comment.
  * @since 5.1.0 Updated template link.
+ * @since TBD Added placeholder attribute support.
  *
- * @version 5.1.0
+ * @version TBD
  *
  * @var Tribe__Tickets_Plus__Meta__Field__Text $this
  */
@@ -28,6 +29,7 @@ $option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attend
 		<textarea
 			id="<?php echo esc_attr( $option_id ); ?>"
 			class="ticket-meta"
+			placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>"
 			name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][<?php echo esc_attr( $this->slug ); ?>]"
 			<?php echo $required ? 'required' : ''; ?>
 			<?php disabled( $this->is_restricted( $attendee_id ) ); ?>
@@ -39,6 +41,7 @@ $option_id = "tribe-tickets-meta_{$this->slug}" . ( $attendee_id ? '_' . $attend
 			type="text"
 			id="<?php echo esc_attr( $option_id ); ?>"
 			class="ticket-meta"
+			placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>"
 			name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][<?php echo esc_attr( $this->slug ); ?>]"
 			value="<?php echo esc_attr( $value ); ?>"
 			<?php echo $required ? 'required' : ''; ?>

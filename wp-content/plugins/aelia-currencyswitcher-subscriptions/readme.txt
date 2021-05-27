@@ -1,7 +1,7 @@
 === WooCommerce Currency Switcher - Subscriptions Integration ===
 Tags: woocommerce, currency switcher, subscriptions, integration
 Requires at least: 4.0
-Tested up to: 5.6
+Tested up to: 5.7
 icense: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -31,6 +31,14 @@ This is a free plugin, and it's provided as is, without explicit or implicit gua
 Should you need assistance, please feel free to [contact us](https://aelia.co/contact) andto avail of our paid support service (standard charges apply).
 
 == Changelog ==
+
+= 1.5.13.210513 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.5.12.210225 =
+* Updated supported WooCommerce versions.
+* Tweak - Added handling of edge condition where action `woocommerce_scheduled_subscription_payment` is triggered by the Subscriptions plugin with an invalid subscription ID.
 
 = 1.5.11.210128 =
 * Updated supported WooCommerce versions.

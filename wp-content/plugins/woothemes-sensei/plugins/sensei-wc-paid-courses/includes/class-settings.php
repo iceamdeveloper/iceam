@@ -60,7 +60,7 @@ final class Settings {
 				'name'        => __( 'WooCommerce Memberships', 'sensei-wc-paid-courses' ),
 				'description' => __( 'Optional settings for WooCommerce Memberships functions.', 'sensei-wc-paid-courses' ),
 			];
-		} // End If Statement
+		}
 
 		return $tabs;
 	}

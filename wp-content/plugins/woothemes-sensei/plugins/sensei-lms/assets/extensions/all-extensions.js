@@ -1,69 +1,112 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
-import { __ } from '@wordpress/i18n';
+import { useSelect } from '@wordpress/data';
 
 /**
  * Internal dependencies
  */
 import Card from './card';
+import { Grid, Col } from './grid';
+import { EXTENSIONS_STORE } from './store';
 
-const AllExtensions = () => (
-	<>
-		<section className="sensei-extensions__section sensei-extensions__grid__col --col-12">
-			<h2 className="sensei-extensions__section__title">
-				{ __( 'Featured', 'sensei-lms' ) }
-			</h2>
-			<ul className="sensei-extensions__section__content sensei-extensions__featured-list">
-				<li className="sensei-extensions__featured-list__item">
-					<Card hasUpdate />
-				</li>
-				<li className="sensei-extensions__featured-list__item">
-					<Card />
-				</li>
-				<li className="sensei-extensions__featured-list__item">
-					<Card />
-				</li>
-			</ul>
-		</section>
+/**
+ * Renders the sections based on the skeleton structure. It can also render subsections recursively.
+ *
+ * @param {Array}  layout     Layout skeleton.
+ * @param {Object} extensions Extensions by slug to be rendered.
+ */
+const renderSections = ( layout, extensions ) =>
+	layout.map( ( section ) => (
+		<Col
+			key={ section.key }
+			as="section"
+			className={ classnames( 'sensei-extensions__section', {
+				'sensei-extensions__section--with-inner-sections':
+					section.innerSections,
+			} ) }
+			cols={ section.columns }
+		>
+			{ section.title && (
+				<h2 className="sensei-extensions__section__title">
+					{ section.title }
+				</h2>
+			) }
 
-		<section className="sensei-extensions__section sensei-extensions__grid__col --col-8">
-			<h2 className="sensei-extensions__section__title">
-				{ __( 'Course creation', 'sensei-lms' ) }
-			</h2>
-			<ul className="sensei-extensions__section__content sensei-extensions__large-list">
-				<li className="sensei-extensions__large-list__item">
-					<Card />
-				</li>
-				<li className="sensei-extensions__large-list__item">
-					<Card />
-				</li>
-				<li className="sensei-extensions__large-list__item">
-					<Card />
-				</li>
-				<li className="sensei-extensions__large-list__item">
-					<Card />
-				</li>
-			</ul>
-		</section>
+			{ section.description && (
+				<p className="sensei-extensions__section__description">
+					{ section.description }
+				</p>
+			) }
 
-		<section className="sensei-extensions__section sensei-extensions__grid__col --col-4">
-			<h2 className="sensei-extensions__section__title">
-				{ __( 'Learner engagement', 'sensei-lms' ) }
-			</h2>
-			<ul className="sensei-extensions__section__content sensei-extensions__small-list">
-				<li className="sensei-extensions__small-list__item">
-					<Card />
-				</li>
-				<li className="sensei-extensions__small-list__item">
-					<Card />
-				</li>
-				<li className="sensei-extensions__small-list__item">
-					<Card />
-				</li>
-			</ul>
-		</section>
-	</>
-);
+			{ section.innerSections ? (
+				<Grid>
+					{ renderSections( section.innerSections, extensions ) }
+				</Grid>
+			) : (
+				<ul
+					className={ classnames(
+						'sensei-extensions__section__content',
+						`sensei-extensions__${ section.type }`
+					) }
+				>
+					{ section.items.map(
+						( {
+							key,
+							extensionSlug,
+							itemProps = {},
+							wrapperProps = {},
+							cardProps = {},
+						} ) =>
+							( ! extensionSlug ||
+								extensions[ extensionSlug ] ) && (
+								<li
+									{ ...itemProps }
+									key={ key }
+									className={ classnames(
+										'sensei-extensions__list-item',
+										itemProps?.className
+									) }
+								>
+									<div
+										{ ...wrapperProps }
+										className={ classnames(
+											'sensei-extensions__card-wrapper',
+											wrapperProps?.className
+										) }
+									>
+										<Card
+											{ ...( extensionSlug
+												? extensions[ extensionSlug ]
+												: {} ) }
+											{ ...cardProps }
+										/>
+									</div>
+								</li>
+							)
+					) }
+				</ul>
+			) }
+		</Col>
+	) );
+
+/**
+ * All extensions component.
+ *
+ * @param {Object} props        Component props.
+ * @param {Array}  props.layout Layout to render the extensions page.
+ */
+const AllExtensions = ( { layout } ) => {
+	const { extensions } = useSelect( ( select ) => ( {
+		extensions: select( EXTENSIONS_STORE ).getEntities( 'extensions' ),
+	} ) );
+
+	return renderSections( layout, extensions );
+};
 
 export default AllExtensions;

@@ -354,6 +354,9 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		protected function set_paths() {
 			$this->paths['plugin'] = WP_PLUGIN_DIR . '/' . $this->plugin_dir()  . '/src';
 			$this->paths['languages'] = WP_PLUGIN_DIR . '/' . $this->plugin_dir()  . '/languages';
+			// @since 2.1.8.210518
+			$this->paths['addons'] = WP_PLUGIN_DIR . '/' . $this->plugin_dir()  . '/addons';
+
 			$this->paths['languages_rel'] = $this->plugin_dir()  . '/languages';
 			$this->paths['lib'] = $this->path('plugin') . '/lib';
 			$this->paths['views'] = $this->path('plugin') . '/views';
@@ -376,6 +379,8 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 */
 		protected function set_urls() {
 			$this->urls['plugin'] = plugins_url() . '/' . $this->plugin_dir() . '/src';
+			// @since 2.1.8.210518
+			$this->urls['addons'] = plugins_url() . '/' . $this->plugin_dir() . '/addons';
 
 			$this->urls['design'] = $this->url('plugin') . '/design';
 			$this->urls['css'] = $this->url('design') . '/css';

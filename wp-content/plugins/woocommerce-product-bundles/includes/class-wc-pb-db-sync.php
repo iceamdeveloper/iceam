@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Hooks for DB lifecycle management of products, bundles, bundled items and their meta.
  *
  * @class    WC_PB_DB_Sync
- * @version  6.7.8
+ * @version  6.8.1
  */
 class WC_PB_DB_Sync {
 
@@ -526,9 +526,11 @@ class WC_PB_DB_Sync {
 			'delete_ids' => array()
 		) );
 
-		self::$sync_task_runner->save();
-
-		WC_PB_Core_Compatibility::log( sprintf( 'Queued %s IDs.', sizeof( $ids ) ), 'info', 'wc_pb_db_sync_tasks' );
+		if ( self::$sync_task_runner->maybe_save() ) {
+			WC_PB_Core_Compatibility::log( sprintf( 'Queued %s IDs.', sizeof( $ids ) ), 'info', 'wc_pb_db_sync_tasks' );
+		} else {
+			WC_PB_Core_Compatibility::log( 'Aborting! Queue full.', 'info', 'wc_pb_db_sync_tasks' );
+		}
 
 		// Log dispatch time.
 		update_option( 'wc_pb_db_sync_task_runner_last_run', gmdate( 'U' ) );

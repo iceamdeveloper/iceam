@@ -4,8 +4,9 @@
  *
  * @since 4.1
  * @since 5.2.2 Use admin views to render this template.
+ * @since TBD Added placeholder template.
  *
- * @version 5.2.2
+ * @version TBD
  *
  * @var Tribe__Tickets_Plus__Admin__Views                 $this      [Global] Template object.
  * @var string                                            $type      [Global] The field type.
@@ -13,6 +14,7 @@
  * @var Tribe__Tickets_Plus__Meta__Field__Abstract_Field  $field     [Global] The field object.
  * @var int                                               $field_id  [Global] The ticket to add/edit.
  * @var string                                            $label     [Global] The field label.
+ * @var string                                            $placeholder [Global] The field placeholder.
  * @var string                                            $required  [Global] If the field is required (`on`) or not.
  * @var string                                            $slug      [Global] Tribe field slug.
  * @var array                                             $extra     [Global] Array containing the field extra (checkboxes or select options).
@@ -81,6 +83,7 @@ $classes = [
 			<input type="text" class="ticket_field" name="tribe-tickets-input[<?php echo esc_attr( $field_id ); ?>][label]" value="<?php echo esc_attr( $label ); ?>">
 		</div>
 
+		<?php $this->template( 'meta-fields/_placeholder' ); ?>
 		<?php $this->template( 'meta-fields/' . $type ); ?>
 
 		<div class="tribe-tickets-input tribe-tickets-input-checkbox tribe-tickets-required">

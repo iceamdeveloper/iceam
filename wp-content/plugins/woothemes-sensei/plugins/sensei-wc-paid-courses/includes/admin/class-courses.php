@@ -279,7 +279,7 @@ final class Courses {
 				$html .= ' data-total-sales="' . $total_sales . '" ';
 				$html .= '>' . esc_html( $product_name ) . '</option>' . "\n";
 
-			} // End For Loop.
+			}
 
 			$html .= '</select>' . "\n";
 
@@ -294,7 +294,7 @@ final class Courses {
 				$html .= '<a href="' . esc_url( admin_url( 'post-new.php?post_type=product' ) ) . '" title="' . esc_attr( __( 'Add a Product', 'sensei-wc-paid-courses' ) ) . '">' . esc_html__( 'Add a Product', 'sensei-wc-paid-courses' ) . '</a>' . "\n";
 				$html .= '</p>' . "\n";
 
-			} // End If Statement.
+			}
 		} else {
 
 			if ( current_user_can( 'publish_product' ) ) {
@@ -311,8 +311,8 @@ final class Courses {
 				$html .= esc_html( __( 'No products exist yet.', 'sensei-wc-paid-courses' ) ) . "\n";
 				$html .= '</p>' . "\n";
 
-			} // End If Statement.
-		} // End If Statement.
+			}
+		}
 
 		echo wp_kses(
 			$html,
@@ -342,7 +342,7 @@ final class Courses {
 				]
 			)
 		);
-	} // End course_woocommerce_product_meta_box_content()
+	}
 
 	/**
 	 * Add column headings to the course listing in WP admin.

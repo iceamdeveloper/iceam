@@ -13,8 +13,9 @@ import ExtensionActions from '../extension-actions';
  *
  * @param {Object} props            Component props.
  * @param {Array}  props.extensions Extensions with update.
+ * @param {Array}  props.actions    Actions that can be taken.
  */
-const Multiple = ( { extensions } ) => (
+const Multiple = ( { extensions, actions } ) => (
 	<>
 		<ul className="sensei-extensions__update-notification__list">
 			{ extensions.map( ( extension ) => (
@@ -23,22 +24,25 @@ const Multiple = ( { extensions } ) => (
 					className="sensei-extensions__update-notification__list__item"
 				>
 					{ extension.title }{ ' ' }
-					<a
-						href={ extension.link }
-						className="sensei-extensions__update-notification__version-link"
-						target="_blank"
-						rel="noreferrer external"
-					>
-						{ sprintf(
-							// translators: placeholder is the version number.
-							__( 'version %s', 'sensei-lms' ),
-							extension.version
-						) }
-					</a>
+					{ extension.changelog_url && (
+						<a
+							href={ extension.changelog_url }
+							className="sensei-extensions__update-notification__version-link"
+							target="_blank"
+							rel="noreferrer external"
+						>
+							{ sprintf(
+								// translators: placeholder is the version number.
+								__( 'version %s', 'sensei-lms' ),
+								extension.version
+							) }
+						</a>
+					) }
 				</li>
 			) ) }
 		</ul>
-		<ExtensionActions buttonLabel={ __( 'Update all', 'sensei-lms' ) } />
+
+		<ExtensionActions actions={ actions } />
 	</>
 );
 

@@ -168,7 +168,7 @@ if(!function_exists('default_currency_decimals')) {
 			'SLL' => 2, // Sierra Leone Leone
 			'SOS' => 2, // Somali Shilling
 			'SRD' => 2, // Surinam Dollar
-			'STD' => 2, // São Tome and Principe Dobra
+			'STD' => 2, // SÃ£o Tome and Principe Dobra
 			'SVC' => 2, // El Salvador Colon
 			'SYP' => 2, // Syrian Pound
 			'SZL' => 2, // Swaziland Lilangeni
@@ -320,4 +320,23 @@ if(!function_exists('aelia_date_to_string')) {
 	}
 }
 
+if(!function_exists('aelia_apply_deprecated_filters')) {
+	/**
+	 * Runs a deprecated filter with notice only if used.
+	 *
+	 * @param string $tag The name of the filter hook.
+	 * @param array  $args Array of additional function arguments to be passed to do_action().
+	 * @param string $version The version of WooCommerce that deprecated the hook.
+	 * @param string $replacement The hook that should have been used.
+	 * @param string $message A message regarding the change.
+	 * @since 2.1.7.210513
+	 */
+	function aelia_apply_deprecated_filters($tag, $args, $version, $replacement = null, $message = null) {
+		if(!has_filter($tag)) {
+			return (is_array($args) && !empty($args)) ? $args[0] : null;
+		}
 
+		wc_deprecated_hook($tag, $version, $replacement, $message);
+		return apply_filters_ref_array($tag, $args);
+	}
+}

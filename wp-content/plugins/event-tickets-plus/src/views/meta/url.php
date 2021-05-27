@@ -10,8 +10,9 @@
  *
  * @since   4.12.1
  * @since 5.1.0 Updated template link.
+ * @since TBD Added placeholder attribute support.
  *
- * @version 5.1.0
+ * @version TBD
  *
  * @var Tribe__Tickets_Plus__Meta__Field__URL $this
  */
@@ -30,6 +31,7 @@ $classes = [
 			type="url"
 			id="<?php echo esc_attr( $option_id ); ?>"
 			class="ticket-meta"
+			placeholder="<?php echo esc_attr( $field['placeholder'] ); ?>"
 			name="tribe-tickets-meta[<?php echo esc_attr( $attendee_id ); ?>][<?php echo esc_attr( $this->slug ); ?>]"
 			value="<?php echo esc_attr( $value ); ?>"
 			<?php echo $required ? 'required' : ''; ?>
