@@ -901,7 +901,7 @@ function show_cart_registration_prompt($woocommerce_before_cart){
  *
  **********************************************************************/
 
-add_action( 'loop_end', 'add_disclaimer_to_single_lessons' );
+add_action( 'get_footer', 'add_disclaimer_to_single_lessons' );
 function add_disclaimer_to_single_lessons() {
 	$signature = get_user_meta(get_current_user_id(), 'wpcf-disclaimer-signature', true);
 	
