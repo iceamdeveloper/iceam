@@ -98,7 +98,12 @@ add_action( 'wp_footer', 'woocommerce_prettyphoto' );
  * Products per page
  * Change default number of products per page
  */
-add_filter( 'loop_shop_per_page', create_function( '$cols', 'return 12;' ) );
+
+function get_cols_number ($cols) {
+	return 12;
+} 
+
+add_filter( 'loop_shop_per_page', 'get_cols_number' );
 
 /**
  * Reviews
