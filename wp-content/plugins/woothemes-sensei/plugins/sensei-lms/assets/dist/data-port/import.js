@@ -5,7 +5,7 @@
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>o
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(444);
+/* harmony import */var n=r(69307),s=r(70444);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -14,7 +14,7 @@ const o=(0,n.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0
 /* harmony default export */}
 //# sourceMappingURL=close-small.js.map
 /***/,
-/***/42:
+/***/60042:
 /***/(e,t)=>{var r;
 /*!
   Copyright (c) 2018 Jed Watson.
@@ -23,7 +23,7 @@ const o=(0,n.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0
 */
 /* global define */!function(){"use strict";var n={}.hasOwnProperty;function s(){for(var e=[],t=0;t<arguments.length;t++){var r=arguments[t];if(r){var o=typeof r;if("string"===o||"number"===o)e.push(r);else if(Array.isArray(r)){if(r.length){var a=s.apply(null,r);a&&e.push(a)}}else if("object"===o)if(r.toString===Object.prototype.toString)for(var i in r)n.call(r,i)&&r[i]&&e.push(i);else e.push(r.toString())}}return e.join(" ")}e.exports?(s.default=s,e.exports=s):void 0===(r=function(){return s}.apply(t,[]))||(e.exports=r)}()}
 /***/,
-/***/3743:
+/***/33743:
 /***/e=>{"use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -39,7 +39,7 @@ const o=(0,n.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0
  * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
  */var r=function(){};r.thatReturns=t,r.thatReturnsFalse=t(!1),r.thatReturnsTrue=t(!0),r.thatReturnsNull=t(null),r.thatReturnsThis=function(){return this},r.thatReturnsArgument=function(e){return e},e.exports=r}
 /***/,
-/***/7081:
+/***/87081:
 /***/e=>{"use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
@@ -60,7 +60,7 @@ const o=(0,n.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0
  */e.exports=function(e,t,r,n,s,o,a,i){if(!e){var l;if(void 0===t)l=new Error("Minified exception occurred; use the non-minified dev environment for the full error message and additional helpful warnings.");else{var c=[r,n,s,o,a,i],u=0;(l=new Error(t.replace(/%s/g,(function(){return c[u++]})))).name="Invariant Violation"}// we don't care about invariant's own frame
 throw l.framesToPop=1,l}}}
 /***/,
-/***/5350:
+/***/82264:
 /***/(e,t,r)=>{"use strict";
 /**
  * Copyright (c) 2014-present, Facebook, Inc.
@@ -68,7 +68,7 @@ throw l.framesToPop=1,l}}}
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
  *
- */var n=r(3743);
+ */var n=r(33743);
 /**
  * Similar to invariant but only logs a warning if the condition is not met.
  * This can be used to log issues in development environments in critical
@@ -76,8 +76,8 @@ throw l.framesToPop=1,l}}}
  * same logic and follow the same code paths.
  */e.exports=n}
 /***/,
-/***/9219:
-/***/(e,t,r)=>{"use strict";var n="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},s=i(r(9196)),o=i(r(349)),a=i(r(8470));
+/***/19219:
+/***/(e,t,r)=>{"use strict";var n="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},s=i(r(99196)),o=i(r(40349)),a=i(r(58470));
 /**
                                                                                                                                                                                                                                                                                * External Dependencies
                                                                                                                                                                                                                                                                                */
@@ -96,7 +96,7 @@ v.push(t[p.value])}else v.push(p.value);return r&&(u=function(e,t){var r,n,s=t[e
 throw new Error("Missing closing component token `"+s.value+"`")}(i,e),d=c(e.slice(i+1,u),t),a=s.default.cloneElement(r,{},d),v.push(a),u<e.length-1&&(f=c(e.slice(u+1),t),v=v.concat(f))),1===v.length?v[0]:(v.forEach((function(e,t){e&&(g["interpolation-child-"+t]=e)})),(0,o.default)(g))}t.Z=function(e){var t=e.mixedString,r=e.components,s=e.throwErrors;if(l=t,!r)return t;if("object"!==(void 0===r?"undefined":n(r))){if(s)throw new Error("Interpolation Error: unable to process `"+t+"` because components is not an object");return t}var o=(0,a.default)(t);try{return c(o,r)}catch(e){if(s)throw new Error("Interpolation Error: unable to process `"+t+"` because of error `"+e.message+"`");return t}}}
 //# sourceMappingURL=index.js.map
 /***/,
-/***/8470:
+/***/58470:
 /***/e=>{"use strict";function t(e){
 // {{/example}}
 return e.match(/^\{\{\//)?{type:"componentClose",value:e.replace(/\W/g,"")}:
@@ -107,14 +107,14 @@ e.match(/^\{\{/)?{type:"componentOpen",value:e.replace(/\W/g,"")}:{type:"string"
 return e.split(/(\{\{\/?\s*\w+\s*\/?\}\})/g).map(t)}}
 //# sourceMappingURL=tokenize.js.map
 /***/,
-/***/349:
+/***/40349:
 /***/(e,t,r)=>{"use strict";
 /**
  * Copyright (c) 2015-present, Facebook, Inc.
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
- */var n=r(9196),s="function"==typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,o=r(3743),a=r(7081),i=r(5350),l="function"==typeof Symbol&&Symbol.iterator;function c(e,t){
+ */var n=r(99196),s="function"==typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,o=r(33743),a=r(87081),i=r(82264),l="function"==typeof Symbol&&Symbol.iterator;function c(e,t){
 // Do some typechecking here since we call this blindly. We want to ensure
 // that we don't block potential future ES APIs.
 return e&&"object"==typeof e&&null!=e.key?(r=e.key,n={"=":"=0",":":"=2"},"$"+(""+r).replace(/[=:]/g,(function(e){return n[e]}))):t.toString(36);
@@ -134,7 +134,7 @@ function(e){var t=e&&(l&&e[l]||e["@@iterator"]);if("function"==typeof t)return t
 // traverseAllChildren used to do for objects as children
 l+(!p.key||t&&t.key===p.key?"":m(p.key)+"/")+r,p=n.cloneElement(s,{key:a},void 0!==s.props?s.props.children:void 0)),i.push(p))}function b(e,t,r,n,s){var o="";null!=r&&(o=m(r)+"/");var a=y.getPooled(t,o,n,s);!function(e,t,r){null==e||u(e,"",t,r)}(e,E,a),y.release(a)}y.prototype.destructor=function(){this.result=null,this.keyPrefix=null,this.func=null,this.context=null,this.count=0},d=function(e,t,r,n){var s=this;if(s.instancePool.length){var o=s.instancePool.pop();return s.call(o,e,t,r,n),o}return new s(e,t,r,n)},(f=y).instancePool=[],f.getPooled=d||v,f.poolSize||(f.poolSize=10),f.release=h;e.exports=function(e){if("object"!=typeof e||!e||Array.isArray(e))return i(!1,"React.addons.createFragment only accepts a single object. Got: %s",e),e;if(n.isValidElement(e))return i(!1,"React.addons.createFragment does not accept a ReactElement without a wrapper object."),e;a(1!==e.nodeType,"React.addons.createFragment(...): Encountered an invalid child; DOM elements are not valid children of React components.");var t=[];for(var r in e)b(e[r],t,r,o.thatReturnsArgument);return t}}
 /***/,
-/***/631:
+/***/90631:
 /***/(e,t,r)=>{"use strict";r.r(t),
 /* harmony export */r.d(t,{
 /* harmony export */fetchFromAPI:()=>/* binding */m
@@ -159,7 +159,7 @@ l+(!p.key||t&&t.key===p.key?"":m(p.key)+"/")+r,p=n.cloneElement(s,{key:a},void 0
 /* harmony export */,resetState:()=>/* binding */I
 /* harmony export */,restartImporter:()=>/* binding */A
 /* harmony export */});
-/* harmony import */var n=r(5463),s=r(832),o=r(468),a=r(7769),i=regeneratorRuntime.mark(v),l=regeneratorRuntime.mark(y),c=regeneratorRuntime.mark(_),u=regeneratorRuntime.mark(k),p=regeneratorRuntime.mark(A),m=function(e){return{type:n/* .FETCH_FROM_API */.nx,request:e}},d=function(e){return{type:n/* .WAIT */.wF,timeout:e}},f=(0,s/* .composeFetchAction */.GI)(n/* .START_LOAD_CURRENT_JOB_STATE */.jn,regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,m({path:(0,a/* .buildJobEndpointUrl */.D)(n/* .API_SPECIAL_ACTIVE_JOB_ID */.BL)});case 2:return t=e.sent,e.abrupt("return",(0,o/* .normalizeImportData */.wh)(t));case 4:case"end":return e.stop()}}),e)})),n/* .SUCCESS_LOAD_CURRENT_JOB_STATE */.H1,n/* .ERROR_LOAD_CURRENT_JOB_STATE */.sw);
+/* harmony import */var n=r(25463),s=r(20832),o=r(70468),a=r(97769),i=regeneratorRuntime.mark(v),l=regeneratorRuntime.mark(y),c=regeneratorRuntime.mark(_),u=regeneratorRuntime.mark(k),p=regeneratorRuntime.mark(A),m=function(e){return{type:n/* .FETCH_FROM_API */.nx,request:e}},d=function(e){return{type:n/* .WAIT */.wF,timeout:e}},f=(0,s/* .composeFetchAction */.GI)(n/* .START_LOAD_CURRENT_JOB_STATE */.jn,regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,m({path:(0,a/* .buildJobEndpointUrl */.D)(n/* .API_SPECIAL_ACTIVE_JOB_ID */.BL)});case 2:return t=e.sent,e.abrupt("return",(0,o/* .normalizeImportData */.wh)(t));case 4:case"end":return e.stop()}}),e)})),n/* .SUCCESS_LOAD_CURRENT_JOB_STATE */.H1,n/* .ERROR_LOAD_CURRENT_JOB_STATE */.sw);
 /* harmony import */
 /**
  * Update job state in the background.
@@ -280,7 +280,7 @@ function k(e,t){var r;return regeneratorRuntime.wrap((function(n){for(;;)switch(
  */
 function A(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,I();case 2:return e.next=4,f();case 4:case"end":return e.stop()}}),p)}
 /***/},
-/***/5463:
+/***/25463:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Lt:()=>/* binding */n
@@ -309,12 +309,12 @@ function A(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.
  */
 var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="START_LOAD_CURRENT_JOB_STATE",l="SUCCESS_LOAD_CURRENT_JOB_STATE",c="ERROR_LOAD_CURRENT_JOB_STATE",u="SET_JOB_STATE",p="START_IMPORT",m="SUCCESS_START_IMPORT",d="ERROR_START_IMPORT",f="START_UPLOAD_IMPORT_DATA_FILE",v="SUCCESS_UPLOAD_IMPORT_DATA_FILE",g="ERROR_UPLOAD_IMPORT_DATA_FILE",h="START_DELETE_IMPORT_DATA_FILE",y="SUCCESS_DELETE_IMPORT_DATA_FILE",E="ERROR_DELETE_IMPORT_DATA_FILE",b="SET_IMPORT_LOG",w="ERROR_FETCH_IMPORT_LOG",_="RESET_STATE"}
 /***/,
-/***/2588:
+/***/42588:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>l
 /* harmony export */});
-/* harmony import */var n,s=r(4649),o=r(6989),a=r.n(o),i=r(5463);
+/* harmony import */var n,s=r(64649),o=r(86989),a=r.n(o),i=r(25463);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -324,30 +324,30 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
  */
 /* harmony default export */const l=(n={},(0,s/* ["default"] */.Z)(n,i/* .FETCH_FROM_API */.nx,(function(e){var t=e.request;return a()(t)})),(0,s/* ["default"] */.Z)(n,i/* .WAIT */.wF,(function(e){var t=e.timeout;return new Promise((function(e){return setTimeout(e,t)}))})),n);
 /***/},
-/***/1842:
+/***/51842:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>c
 /* harmony export */});
-/* harmony import */var n=r(9818),s=r(9790),o=r(631),a=r(330),i=r(2588),l=r(3802);
+/* harmony import */var n=r(9818),s=r(19790),o=r(90631),a=r(50330),i=r(42588),l=r(43802);
 /* harmony import */
 /* harmony default export */const c=function(){(0,n.registerStore)("sensei/import",{reducer:s/* ["default"] */.Z,actions:o,selectors:a,controls:i/* ["default"] */.Z,resolvers:l})};
 /***/},
-/***/468:
+/***/70468:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */wh:()=>/* binding */c
 /* harmony export */});
 /* unused harmony exports normalizeUploadsState, parseCompletedSteps */
-/* harmony import */var n=r(189),s=r(3782),o=r(6886),a=["id","files","status","results"],i=function(e){var t={};return Object.entries(e).forEach((function(e){var r=(0,o/* ["default"] */.Z)(e,2),n=r[0],s=r[1];s.name&&(t[n]={filename:s.name,isUploaded:!0})})),t},l=function(e){return"pending"===e.status?["upload"]:"completed"===e.status?["upload","progress"]:[]},c=function(e){var t=e.id,r=e.files,o=e.status,c=e.results,u=(0,s/* ["default"] */.Z)(e,a);return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},u),{},{jobId:t,progress:o,upload:i(r||[]),completedSteps:l(o||{}),done:{results:c}})};
+/* harmony import */var n=r(50189),s=r(53782),o=r(66886),a=["id","files","status","results"],i=function(e){var t={};return Object.entries(e).forEach((function(e){var r=(0,o/* ["default"] */.Z)(e,2),n=r[0],s=r[1];s.name&&(t[n]={filename:s.name,isUploaded:!0})})),t},l=function(e){return"pending"===e.status?["upload"]:"completed"===e.status?["upload","progress"]:[]},c=function(e){var t=e.id,r=e.files,o=e.status,c=e.results,u=(0,s/* ["default"] */.Z)(e,a);return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},u),{},{jobId:t,progress:o,upload:i(r||[]),completedSteps:l(o||{}),done:{results:c}})};
 /* harmony import */}
 /***/,
-/***/9790:
+/***/19790:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>c
 /* harmony export */});
-/* harmony import */var n=r(4649),s=r(189),o=r(2819),a=r(5463),i={jobId:null,isFetching:!0,fetchError:!1,completedSteps:[],upload:{isSubmitting:!1,errorMsg:null,courses:{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null},lessons:{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null},questions:{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null}},progress:{status:"",percentage:0},done:{results:null,logs:null}},l=function(e,t,r){return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{upload:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload),{},(0,n/* ["default"] */.Z)({},t,r))})};
+/* harmony import */var n=r(64649),s=r(50189),o=r(92819),a=r(25463),i={jobId:null,isFetching:!0,fetchError:!1,completedSteps:[],upload:{isSubmitting:!1,errorMsg:null,courses:{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null},lessons:{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null},questions:{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null}},progress:{status:"",percentage:0},done:{results:null,logs:null}},l=function(e,t,r){return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{upload:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload),{},(0,n/* ["default"] */.Z)({},t,r))})};
 /* harmony import */
 /**
  * Data importer reducer.
@@ -359,15 +359,15 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
  */
 /* harmony default export */const c=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:i,t=arguments.length>1?arguments[1]:void 0;switch(t.type){case a/* .START_LOAD_CURRENT_JOB_STATE */.jn:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{isFetching:!0,fetchError:!1});case a/* .SUCCESS_LOAD_CURRENT_JOB_STATE */.H1:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},(0,o.merge)({},e,t.data)),{},{isFetching:!1});case a/* .SET_JOB_STATE */.gL:return(0,s/* ["default"] */.Z)({},(0,o.merge)({},e,t.data));case a/* .ERROR_LOAD_CURRENT_JOB_STATE */.sw:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{isFetching:!1,fetchError:t.error});case a/* .START_IMPORT */.FG:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{upload:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload),{},{errorMsg:null,isSubmitting:!0})});case a/* .ERROR_START_IMPORT */.UX:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{upload:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload),{},{errorMsg:t.error.message,isSubmitting:!1})});case a/* .SUCCESS_START_IMPORT */.XM:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{completedSteps:t.data.completedSteps,upload:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload),{},{isSubmitting:!1}),progress:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.progress),t.data.progress)});case a/* .START_UPLOAD_IMPORT_DATA_FILE */.fo:return l(e,t.level,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload[t.level]),{},{isUploaded:!1,isUploading:!0,isDeleting:!1,hasError:!1,errorMsg:null,filename:null}));case a/* .SUCCESS_UPLOAD_IMPORT_DATA_FILE */.i7:return l((0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{jobId:t.data.jobId}),t.level,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload[t.level]),t.data.upload[t.level]),{},{isUploading:!1,isDeleting:!1,hasError:!1,errorMsg:null}));case a/* .ERROR_UPLOAD_IMPORT_DATA_FILE */.wO:return l(e,t.level,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload[t.level]),{},{isUploaded:!1,isUploading:!1,isDeleting:!1,hasError:!0,errorMsg:t.error.message,filename:null}));case a/* .START_DELETE_IMPORT_DATA_FILE */.AI:return l(e,t.level,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload[t.level]),{},{isDeleting:!0}));case a/* .SUCCESS_DELETE_IMPORT_DATA_FILE */.Wi:return l(e,t.level,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},t.data.upload[t.level]),{},{isUploaded:!1,isDeleting:!1,hasError:!1,errorMsg:null,filename:null}));case a/* .ERROR_DELETE_IMPORT_DATA_FILE */.sW:return l(e,t.level,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.upload[t.level]),{},{isUploaded:!1,isDeleting:!1,hasError:!0,errorMsg:t.error.message}));case a/* .SET_IMPORT_LOG */.ao:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{done:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.done),{},{logs:t.data})});case a/* .ERROR_FETCH_IMPORT_LOG */.$L:return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{done:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.done),{},{logs:{fetchError:t.error}})});case a/* .RESET_STATE */.so:return(0,s/* ["default"] */.Z)({},i);default:return e}};
 /***/},
-/***/3802:
+/***/43802:
 /***/(e,t,r)=>{"use strict";r.r(t),
 /* harmony export */r.d(t,{
 /* harmony export */getLogsBySeverity:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(5463),s=r(832),o=r(631),a=r(7769),i=(0,s/* .composeFetchAction */.GI)(null,regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:if(t){e.next=2;break}return e.abrupt("return");case 2:return e.next=4,(0,o.fetchFromAPI)({path:(0,a/* .buildJobEndpointUrl */.D)(t,["logs"])});case 4:return e.abrupt("return",e.sent);case 5:case"end":return e.stop()}}),e)})),n/* .SET_IMPORT_LOG */.ao,n/* .ERROR_FETCH_IMPORT_LOG */.$L);
+/* harmony import */var n=r(25463),s=r(20832),o=r(90631),a=r(97769),i=(0,s/* .composeFetchAction */.GI)(null,regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:if(t){e.next=2;break}return e.abrupt("return");case 2:return e.next=4,(0,o.fetchFromAPI)({path:(0,a/* .buildJobEndpointUrl */.D)(t,["logs"])});case 4:return e.abrupt("return",e.sent);case 5:case"end":return e.stop()}}),e)})),n/* .SET_IMPORT_LOG */.ao,n/* .ERROR_FETCH_IMPORT_LOG */.$L);
 /* harmony import */}
 /***/,
-/***/330:
+/***/50330:
 /***/(e,t,r)=>{"use strict";r.r(t),
 /* harmony export */r.d(t,{
 /* harmony export */isFetching:()=>/* binding */l
@@ -382,40 +382,40 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
 /* harmony export */,getLogsBySeverity:()=>/* binding */h
 /* harmony export */,getLogsFetchError:()=>/* binding */y
 /* harmony export */});
-/* harmony import */var n=r(189),s=r(2819),o=r(7854),a=r(5345),i=["course","lesson","question"],l=function(e){return e.isFetching},c=function(e){return e.jobId},u=function(e){return e.fetchError},p=function(e,t){return e[t]},m=function(e){var t=e.completedSteps,r=o/* .steps.map */.S.map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{isComplete:t.includes(e.key),isNext:!1})}));return(r.find((function(e){return!e.isComplete}))||r[0]).isNext=!0,r},d=function(e,t){return e.completedSteps.includes(t)},f=function(e){var t=a/* .levels.map */.g.map((function(t){var r=t.key;return e.upload[r]})),r=t.some((function(e){return e.isUploaded})),n=t.some((function(e){return e.isUploading||e.isDeleting}));return r&&!n},v=function(e){var t=e.upload;return a/* .levels.filter */.g.filter((function(e){var r=e.key;return t[r].isUploaded})).map((function(e){return e.key}))},g=function(e){var t=e.done;return i.map((function(e){return{key:e,count:(0,s.get)(t,["results",e,"success"],0)+(0,s.get)(t,["results",e,"warning"],0)}})).filter((function(e){return e.count>0}))},h=function(e){var t=e.done,r=e.upload,o=(0,s.get)(t,"logs.items",[]).map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{filename:(0,s.get)(r,e.type+"s.filename","")})}));return(0,s.groupBy)(o,"severity")},y=function(e){var t=e.done;return(0,s.get)(t,"logs.fetchError",!1)};
+/* harmony import */var n=r(50189),s=r(92819),o=r(47854),a=r(35345),i=["course","lesson","question"],l=function(e){return e.isFetching},c=function(e){return e.jobId},u=function(e){return e.fetchError},p=function(e,t){return e[t]},m=function(e){var t=e.completedSteps,r=o/* .steps.map */.S.map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{isComplete:t.includes(e.key),isNext:!1})}));return(r.find((function(e){return!e.isComplete}))||r[0]).isNext=!0,r},d=function(e,t){return e.completedSteps.includes(t)},f=function(e){var t=a/* .levels.map */.g.map((function(t){var r=t.key;return e.upload[r]})),r=t.some((function(e){return e.isUploaded})),n=t.some((function(e){return e.isUploading||e.isDeleting}));return r&&!n},v=function(e){var t=e.upload;return a/* .levels.filter */.g.filter((function(e){var r=e.key;return t[r].isUploaded})).map((function(e){return e.key}))},g=function(e){var t=e.done;return i.map((function(e){return{key:e,count:(0,s.get)(t,["results",e,"success"],0)+(0,s.get)(t,["results",e,"warning"],0)}})).filter((function(e){return e.count>0}))},h=function(e){var t=e.done,r=e.upload,o=(0,s.get)(t,"logs.items",[]).map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{filename:(0,s.get)(r,e.type+"s.filename","")})}));return(0,s.groupBy)(o,"severity")},y=function(e){var t=e.done;return(0,s.get)(t,"logs.fetchError",!1)};
 /* harmony import */}
 /***/,
-/***/1051:
+/***/21051:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */w:()=>/* binding */c
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(5736),o=r(5609),a=r(4849),i=r(9801),l=r(3011),__=s.__,c=function(e){var t=e.restartImporter,r=e.successResults,s=void 0===r?[]:r,c=e.logs,u=void 0===c?{}:c,p=e.isFetching,m=void 0!==p&&p,d=e.fetchError,f=void 0!==d&&d,v=e.retry,g=(0,n.createElement)(n.Fragment,null,u.error&&u.error.length>0&&(0,n.createElement)("section",{className:"sensei-data-port-step"},(0,n.createElement)(l/* .Section */.$,{className:"sensei-data-port-step__body"},(0,n.createElement)("h2",null,__("Failed","sensei-lms")),(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("The following content was not imported. Please make the necessary corrections to the import file and try again.","sensei-lms")),(0,n.createElement)(a/* .ImportLog */._,{items:u.error,type:"error"}))),u.notice&&u.notice.length>0&&(0,n.createElement)("section",{className:"sensei-data-port-step"},(0,n.createElement)(l/* .Section */.$,{className:"sensei-data-port-step__body"},(0,n.createElement)("h2",null,__("Partial","sensei-lms")),(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("The following content was partially imported. The import process encountered some issues that you can resolve manually by clicking the link and making the necessary adjustments.","sensei-lms")),(0,n.createElement)(a/* .ImportLog */._,{items:u.notice,type:"warning"}))));return m?g=(0,n.createElement)("div",{className:"sensei-import-done__log-fetching"},(0,n.createElement)(o.Spinner,null)," ",__("Fetching log details…","sensei-lms")):f&&(g=(0,n.createElement)(o.Notice,{status:"error",isDismissible:!1},__("Failed to load import log.","sensei-lms")," ",f.message,(0,n.createElement)(o.Button,{onClick:v,isLink:!0,isSmall:!0},__("Retry","sensei-lms")))),(0,n.createElement)(n.Fragment,null,(0,n.createElement)("section",{className:"sensei-data-port-step"},(0,n.createElement)(l/* .Section */.$,{className:"sensei-data-port-step__body"},(0,n.createElement)("h2",null,__("Completed","sensei-lms")),s.length>0?(0,n.createElement)(n.Fragment,null,(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("The following content was imported:","sensei-lms")),(0,n.createElement)(i/* ["default"] */.Z,{successResults:s})):(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("No content was imported.","sensei-lms")),(0,n.createElement)("div",{className:"sensei-data-port-step__footer"},(0,n.createElement)(o.Button,{isPrimary:!0,onClick:t},__("Import More Content","sensei-lms"))))),g)};
+/* harmony import */var n=r(69307),s=r(65736),o=r(55609),a=r(74849),i=r(79801),l=r(43011),__=s.__,c=function(e){var t=e.restartImporter,r=e.successResults,s=void 0===r?[]:r,c=e.logs,u=void 0===c?{}:c,p=e.isFetching,m=void 0!==p&&p,d=e.fetchError,f=void 0!==d&&d,v=e.retry,g=(0,n.createElement)(n.Fragment,null,u.error&&u.error.length>0&&(0,n.createElement)("section",{className:"sensei-data-port-step"},(0,n.createElement)(l/* .Section */.$,{className:"sensei-data-port-step__body"},(0,n.createElement)("h2",null,__("Failed","sensei-lms")),(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("The following content was not imported. Please make the necessary corrections to the import file and try again.","sensei-lms")),(0,n.createElement)(a/* .ImportLog */._,{items:u.error,type:"error"}))),u.notice&&u.notice.length>0&&(0,n.createElement)("section",{className:"sensei-data-port-step"},(0,n.createElement)(l/* .Section */.$,{className:"sensei-data-port-step__body"},(0,n.createElement)("h2",null,__("Partial","sensei-lms")),(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("The following content was partially imported. The import process encountered some issues that you can resolve manually by clicking the link and making the necessary adjustments.","sensei-lms")),(0,n.createElement)(a/* .ImportLog */._,{items:u.notice,type:"warning"}))));return m?g=(0,n.createElement)("div",{className:"sensei-import-done__log-fetching"},(0,n.createElement)(o.Spinner,null)," ",__("Fetching log details…","sensei-lms")):f&&(g=(0,n.createElement)(o.Notice,{status:"error",isDismissible:!1},__("Failed to load import log.","sensei-lms")," ",f.message,(0,n.createElement)(o.Button,{onClick:v,isLink:!0,isSmall:!0},__("Retry","sensei-lms")))),(0,n.createElement)(n.Fragment,null,(0,n.createElement)("section",{className:"sensei-data-port-step"},(0,n.createElement)(l/* .Section */.$,{className:"sensei-data-port-step__body"},(0,n.createElement)("h2",null,__("Completed","sensei-lms")),s.length>0?(0,n.createElement)(n.Fragment,null,(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("The following content was imported:","sensei-lms")),(0,n.createElement)(i/* ["default"] */.Z,{successResults:s})):(0,n.createElement)("p",{className:"sensei-import-done__section-description"},__("No content was imported.","sensei-lms")),(0,n.createElement)("div",{className:"sensei-data-port-step__footer"},(0,n.createElement)(o.Button,{isPrimary:!0,onClick:t},__("Import More Content","sensei-lms"))))),g)};
 /* harmony import */}
 /***/,
-/***/4849:
+/***/74849:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */_:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(2819),o=r(5736),a=r(761),__=o.__,i=function(e){var t=e.items,r=e.type;return(0,n.createElement)("div",{className:"sensei-import-done__log-data"},(0,n.createElement)("table",{className:"sensei-data-table"},(0,n.createElement)("thead",null,(0,n.createElement)("tr",null,"error"===r&&(0,n.createElement)("th",null,__("File","sensei-lms")),(0,n.createElement)("th",null,__("Title","sensei-lms")),(0,n.createElement)("th",null,__("Line #","sensei-lms")),(0,n.createElement)("th",null,a/* .logTypeLabels */.g[r]))),(0,n.createElement)("tbody",null,t.map((function(e){return(0,n.createElement)("tr",{key:(0,s.kebabCase)(Object.entries(e).join(""))},"error"===r&&(0,n.createElement)("td",null,e.filename),(0,n.createElement)("td",null,(t=e.post.title,(o=e.post.edit_link)?(0,n.createElement)("a",{href:o,target:"_blank",rel:"noreferrer"},t):t)),(0,n.createElement)("td",null,e.line),(0,n.createElement)("td",null,e.message));var t,o})))))};
+/* harmony import */var n=r(69307),s=r(92819),o=r(65736),a=r(70761),__=o.__,i=function(e){var t=e.items,r=e.type;return(0,n.createElement)("div",{className:"sensei-import-done__log-data"},(0,n.createElement)("table",{className:"sensei-data-table"},(0,n.createElement)("thead",null,(0,n.createElement)("tr",null,"error"===r&&(0,n.createElement)("th",null,__("File","sensei-lms")),(0,n.createElement)("th",null,__("Title","sensei-lms")),(0,n.createElement)("th",null,__("Line #","sensei-lms")),(0,n.createElement)("th",null,a/* .logTypeLabels */.g[r]))),(0,n.createElement)("tbody",null,t.map((function(e){return(0,n.createElement)("tr",{key:(0,s.kebabCase)(Object.entries(e).join(""))},"error"===r&&(0,n.createElement)("td",null,e.filename),(0,n.createElement)("td",null,(t=e.post.title,(o=e.post.edit_link)?(0,n.createElement)("a",{href:o,target:"_blank",rel:"noreferrer"},t):t)),(0,n.createElement)("td",null,e.line),(0,n.createElement)("td",null,e.message));var t,o})))))};
 /* harmony import */}
 /***/,
-/***/9801:
+/***/79801:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>o
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(5736),_n=s._n;
+/* harmony import */var n=r(69307),s=r(65736),_n=s._n;
 /* harmony import */
 /* harmony default export */const o=function(e){var t=e.successResults;return(0,n.createElement)("ul",{className:"sensei-import-bullet-list"},t.map((function(e){var t=e.key,r=e.count;return(0,n.createElement)("li",{key:t},r," ",function(e){var t=e.key,r=e.count;return{course:_n("course","courses",r,"sensei-lms"),lesson:_n("lesson","lessons",r,"sensei-lms"),question:_n("question","questions",r,"sensei-lms")}[t]}({key:t,count:r}))})))};
 /***/},
-/***/8740:
+/***/98740:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>a
 /* harmony export */});
-/* harmony import */var n=r(9818),s=r(4333),o=r(1051);
+/* harmony import */var n=r(9818),s=r(94333),o=r(21051);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -425,28 +425,28 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
  */
 /* harmony default export */const a=(0,s.compose)((0,n.withSelect)((function(e){var t=e("sensei/import"),r=t.getJobId();return{successResults:t.getSuccessResults(),logs:t.getLogsBySeverity(r),isFetching:t.isResolving("getLogsBySeverity",[r]),fetchError:t.getLogsFetchError()}})),(0,n.withDispatch)((function(e){var t=e("sensei/import"),r=t.restartImporter,n=t.invalidateResolutionForStoreSelector;return{restartImporter:r,retry:function(){return n("getLogsBySeverity")}}})))(o/* .DonePage */.w);
 /***/},
-/***/7769:
+/***/97769:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */D:()=>/* binding */o
 /* harmony export */});
-/* harmony import */var n=r(228),s=r(5463),o=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,r=[].concat((0,n/* ["default"] */.Z)(e?[e]:[]),(0,n/* ["default"] */.Z)(t||[])).join("/");return s/* .API_BASE_PATH */.Lt+r};
+/* harmony import */var n=r(90228),s=r(25463),o=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,r=[].concat((0,n/* ["default"] */.Z)(e?[e]:[]),(0,n/* ["default"] */.Z)(t||[])).join("/");return s/* .API_BASE_PATH */.Lt+r};
 /* harmony import */}
 /***/,
-/***/5879:
+/***/45879:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */A:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(5736),o=r(5292),a=r(3011),__=s.__,i=function(e){var t=e.state.percentage;return(0,o/* ["default"] */.Z)(),(0,n.createElement)("section",{className:"sensei-data-port-step sensei-import-progress-page"},(0,n.createElement)("header",{className:"sensei-data-port-step__header"},(0,n.createElement)(a.H,null,__("Importing","sensei-lms")),(0,n.createElement)("p",null,__("Your content is now being imported…","sensei-lms"))),(0,n.createElement)(a/* .Section */.$,{className:"sensei-data-port-step__body",component:"section"},(0,n.createElement)("p",null,(0,n.createElement)("progress",{className:"sensei-data-port__progressbar sensei-import-progress-page__progress",max:"100",value:t}))))};
+/* harmony import */var n=r(69307),s=r(65736),o=r(55292),a=r(43011),__=s.__,i=function(e){var t=e.state.percentage;return(0,o/* ["default"] */.Z)(),(0,n.createElement)("section",{className:"sensei-data-port-step sensei-import-progress-page"},(0,n.createElement)("header",{className:"sensei-data-port-step__header"},(0,n.createElement)(a.H,null,__("Importing","sensei-lms")),(0,n.createElement)("p",null,__("Your content is now being imported…","sensei-lms"))),(0,n.createElement)(a/* .Section */.$,{className:"sensei-data-port-step__body",component:"section"},(0,n.createElement)("p",null,(0,n.createElement)("progress",{className:"sensei-data-port__progressbar sensei-import-progress-page__progress",max:"100",value:t}))))};
 /* harmony import */}
 /***/,
-/***/9357:
+/***/79357:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>a
 /* harmony export */});
-/* harmony import */var n=r(9818),s=r(4333),o=r(5879);
+/* harmony import */var n=r(9818),s=r(94333),o=r(45879);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -456,37 +456,37 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
  */
 /* harmony default export */const a=(0,s.compose)((0,n.withSelect)((function(e){return{state:e("sensei/import").getStepData("progress")}})))(o/* .ImportProgressPage */.A);
 /***/},
-/***/5292:
+/***/55292:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>o
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(9818);
+/* harmony import */var n=r(69307),s=r(9818);
 /* harmony import */
 /* harmony default export */const o=function(){var e=(0,s.useDispatch)("sensei/import").pollJobProgress,t=(0,s.useSelect)((function(e){return e("sensei/import").getJobId()}));(0,n.useEffect)((function(){e(t)}),[e,t])};
 /***/},
-/***/5345:
+/***/35345:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */g:()=>/* binding */s
 /* harmony export */});
-/* harmony import */var n=r(5736),__=n.__,s=[{key:"courses",description:__("Courses CSV File","sensei-lms")},{key:"lessons",description:__("Lessons CSV File","sensei-lms")},{key:"questions",description:__("Questions CSV File","sensei-lms")}];
+/* harmony import */var n=r(65736),__=n.__,s=[{key:"courses",description:__("Courses CSV File","sensei-lms")},{key:"lessons",description:__("Lessons CSV File","sensei-lms")},{key:"questions",description:__("Questions CSV File","sensei-lms")}];
 /* harmony import */}
 /***/,
-/***/7854:
+/***/47854:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */S:()=>/* binding */l
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(5736),o=r(1138),a=r(9357),i=r(8740),__=s.__,l=[{key:"upload",container:(0,n.createElement)(o/* ["default"] */.Z,null),label:__("Upload CSV Files","sensei-lms")},{key:"progress",container:(0,n.createElement)(a/* ["default"] */.Z,null),label:__("Import","sensei-lms")},{key:"complete",container:(0,n.createElement)(i/* ["default"] */.Z,null),label:__("Done","sensei-lms")}];
+/* harmony import */var n=r(69307),s=r(65736),o=r(71793),a=r(79357),i=r(98740),__=s.__,l=[{key:"upload",container:(0,n.createElement)(o/* ["default"] */.Z,null),label:__("Upload CSV Files","sensei-lms")},{key:"progress",container:(0,n.createElement)(a/* ["default"] */.Z,null),label:__("Import","sensei-lms")},{key:"complete",container:(0,n.createElement)(i/* ["default"] */.Z,null),label:__("Done","sensei-lms")}];
 /* harmony import */}
 /***/,
-/***/1567:
+/***/31567:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>a
 /* harmony export */});
-/* harmony import */var n=r(9818),s=r(4333),o=r(6565);
+/* harmony import */var n=r(9818),s=r(94333),o=r(56565);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -496,23 +496,23 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
  */
 /* harmony default export */const a=(0,s.compose)((0,n.withSelect)((function(e){var t=e("sensei/import");return{jobId:t.getJobId(),state:t.getStepData("upload")}})),(0,n.withDispatch)((function(e){var t=e("sensei/import");return{deleteLevelFile:t.deleteLevelFile,uploadFileForLevel:t.uploadFileForLevel,throwEarlyUploadError:t.throwEarlyUploadError}})))(o/* .UploadLevels */.B);
 /***/},
-/***/6565:
+/***/56565:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */B:()=>/* binding */c
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(5609),o=r(8598),a=r(5736),i=r(9822),l=r(5345),__=a.__,c=function(e){var t=e.jobId,r=e.state,a=e.uploadFileForLevel,c=e.throwEarlyUploadError,u=e.deleteLevelFile;return(0,n.createElement)("ol",null,l/* .levels.map */.g.map((function(e){var l,p=r[e.key],m=function(e){return e.hasError?(0,n.createElement)(i/* .Notice */.q,{message:e.errorMsg,isError:!0}):e.isUploaded?(0,n.createElement)(i/* .Notice */.q,{message:e.filename}):void 0}(p);
+/* harmony import */var n=r(69307),s=r(55609),o=r(8598),a=r(65736),i=r(29822),l=r(35345),__=a.__,c=function(e){var t=e.jobId,r=e.state,a=e.uploadFileForLevel,c=e.throwEarlyUploadError,u=e.deleteLevelFile;return(0,n.createElement)("ol",null,l/* .levels.map */.g.map((function(e){var l,p=r[e.key],m=function(e){return e.hasError?(0,n.createElement)(i/* .Notice */.q,{message:e.errorMsg,isError:!0}):e.isUploaded?(0,n.createElement)(i/* .Notice */.q,{message:e.filename}):void 0}(p);
 /* eslint-disable jsx-a11y/label-has-for */
 return p.isDeleting?l=(0,n.createElement)("div",{className:"sensei-upload-file-line__delete-button-wrapper"},(0,n.createElement)(s.Spinner,null)):p.isUploaded&&(l=(0,n.createElement)("div",{className:"sensei-upload-file-line__delete-button-wrapper"},(0,n.createElement)(s.Button,{icon:o/* ["default"] */.Z,label:__("Delete File","sensei-lms"),onClick:function(){return u(t,e.key)},disabled:p.isDeleting}))),(0,n.createElement)("li",{key:e.key,className:"sensei-upload-file-line sensei-data-port-step__line"},(0,n.createElement)("label",{className:"sensei-upload-file-line__description",htmlFor:"sensei-upload-file-line-".concat(e.key)},e.description),(0,n.createElement)(s.FormFileUpload,{key:p.isUploading,isSecondary:!0,id:"sensei-upload-file-line-".concat(e.key),accept:[".csv",".txt"],disabled:p.isUploading||p.isDeleting,onChange:function(r){return function(e,t,r,n,s){if(!(t.length<1)){var o=t[0];if(["csv","txt"].includes(o.name.split(".").pop())){var a=new FormData;a.append("file",o),n(e,r,a)}else s(r,__("Only CSV files are supported.","sensei-lms"))}}(t,r.target.files,e.key,a,c)}},p.isUploading?__("Uploading…","sensei-lms"):__("Upload","sensei-lms")),(m||l)&&(0,n.createElement)("div",{className:"sensei-upload-file-line__info"},m,l));
 /* eslint-enable */})))};
 /* harmony import */}
 /***/,
-/***/1138:
+/***/71793:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>a
 /* harmony export */});
-/* harmony import */var n=r(9818),s=r(4333),o=r(1247);
+/* harmony import */var n=r(9818),s=r(94333),o=r(71247);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -523,37 +523,37 @@ return p.isDeleting?l=(0,n.createElement)("div",{className:"sensei-upload-file-l
 /* harmony default export */const a=(0,s.compose)((0,n.withSelect)((function(e){var t=e("sensei/import");return{state:t.getStepData("upload"),isReady:t.isReadyToStart()}})),(0,n.withDispatch)((function(e,t,r){var n=r.select,s=e("sensei/import").submitStartImport;return{submitStartImport:function(){s(n("sensei/import").getJobId());// Log continue to import from uploaded files.
 var e=n("sensei/import").getUploadedLevelKeys().join(",");window.sensei_log_event("import_continue_click",{type:e})}}})))(o/* .UploadPage */.b);
 /***/},
-/***/1247:
+/***/71247:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */b:()=>/* binding */u
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(5736),o=r(5609),a=r(1567),i=r(9822),l=r(2866),c=r(3011),__=s.__,u=function(e){var t=e.state,r=e.isReady,s=e.submitStartImport,u=t.isSubmitting,p=t.errorMsg;return(0,n.createElement)("section",{className:"sensei-data-port-step sensei-upload-page"},(0,n.createElement)("header",{className:"sensei-data-port-step__header"},(0,n.createElement)(c.H,null,__("Import content from a CSV file","sensei-lms")),(0,n.createElement)("p",null,(0,l/* .formatString */.U)(__("This tool enables you to import courses, lessons, and questions from a CSV file. Please review the {{link}}documentation{{/link}} to learn more about the expected file structure.","sensei-lms"),{link:// eslint-disable-next-line jsx-a11y/anchor-has-content
+/* harmony import */var n=r(69307),s=r(65736),o=r(55609),a=r(31567),i=r(29822),l=r(22866),c=r(43011),__=s.__,u=function(e){var t=e.state,r=e.isReady,s=e.submitStartImport,u=t.isSubmitting,p=t.errorMsg;return(0,n.createElement)("section",{className:"sensei-data-port-step sensei-upload-page"},(0,n.createElement)("header",{className:"sensei-data-port-step__header"},(0,n.createElement)(c.H,null,__("Import content from a CSV file","sensei-lms")),(0,n.createElement)("p",null,(0,l/* .formatString */.U)(__("This tool enables you to import courses, lessons, and questions from a CSV file. Please review the {{link}}documentation{{/link}} to learn more about the expected file structure.","sensei-lms"),{link:// eslint-disable-next-line jsx-a11y/anchor-has-content
 (0,n.createElement)("a",{className:"link__color-secondary",href:"https://senseilms.com/documentation/import/",target:"_blank",type:"external",rel:"noopener noreferrer"})}))),(0,n.createElement)(c/* .Section */.$,{className:"sensei-data-port-step__body",component:"section"},(0,n.createElement)("p",null,__("Choose one or more CSV files to upload from your computer.","sensei-lms")),(0,n.createElement)(a/* ["default"] */.Z,null),(0,n.createElement)("div",{className:"sensei-data-port-step__footer"},null!==p&&(0,n.createElement)(i/* .Notice */.q,{message:p,isError:!0}),(0,n.createElement)(o.Button,{isPrimary:!0,className:"continue-button",disabled:!r||u,onClick:s},__("Continue","sensei-lms")))))};
 /* harmony import */}
 /***/,
-/***/9822:
+/***/29822:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */q:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(42),o=r.n(s),a=r(5609),i=function(e){var t=e.message,r=e.isError,s=o()({"sensei-data-port-notice__message":!0,error:r});return(0,n.createElement)("div",{className:"sensei-data-port-notice"},r&&(0,n.createElement)(a.Dashicon,{className:"sensei-data-port-notice__icon error",icon:"warning"}),(0,n.createElement)("span",{className:s},t))};
+/* harmony import */var n=r(69307),s=r(60042),o=r.n(s),a=r(55609),i=function(e){var t=e.message,r=e.isError,s=o()({"sensei-data-port-notice__message":!0,error:r});return(0,n.createElement)("div",{className:"sensei-data-port-notice"},r&&(0,n.createElement)(a.Dashicon,{className:"sensei-data-port-notice__icon error",icon:"warning"}),(0,n.createElement)("span",{className:s},t))};
 /* harmony import */}
 /***/,
-/***/7214:
+/***/17214:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */K:()=>/* binding */a
 /* harmony export */});
-/* harmony import */var n=r(9307),s=r(42),o=r.n(s),a=function(e){var t=e.steps;return(0,n.createElement)("ol",{className:"sensei-data-port-steps"},t.map((function(e){var t=o()({active:e.isNext,done:e.isComplete});return(0,n.createElement)("li",{key:e.key,className:t},e.label)})))};
+/* harmony import */var n=r(69307),s=r(60042),o=r.n(s),a=function(e){var t=e.steps;return(0,n.createElement)("ol",{className:"sensei-data-port-steps"},t.map((function(e){var t=o()({active:e.isNext,done:e.isComplete});return(0,n.createElement)("li",{key:e.key,className:t},e.label)})))};
 /* harmony import */}
 /***/,
-/***/9373:
+/***/49373:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */I:()=>/* binding */s
 /* harmony export */});
-/* harmony import */var n=r(9307);
+/* harmony import */var n=r(69307);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -565,13 +565,13 @@ var e=n("sensei/import").getUploadedLevelKeys().join(",");window.sensei_log_even
  */
 function s(){(0,n.useLayoutEffect)((function(){return document.body.classList.add("sensei-color"),function(){return document.body.classList.remove("sensei-color")}}))}
 /***/},
-/***/3011:
+/***/43011:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */H:()=>/* binding */i
 /* harmony export */,$:()=>/* binding */l
 /* harmony export */});
-/* harmony import */var n=r(3782),s=r(9307),o=["component","children"],a=(0,s.createContext)(2);
+/* harmony import */var n=r(53782),s=r(69307),o=["component","children"],a=(0,s.createContext)(2);
 /* harmony import */
 /**
  * These components are used to frame out the page content for accessible heading hierarchy. Instead of defining fixed heading levels
@@ -591,13 +591,13 @@ function i(e){return(0,s.createElement)(a.Consumer,null,(function(t){var r="h"+M
  * @return {Object} -
  */function l(e){var t=e.component,r=e.children,i=(0,n/* ["default"] */.Z)(e,o),l=t||"div";return(0,s.createElement)(a.Consumer,null,(function(e){return(0,s.createElement)(a.Provider,{value:e+1},!1===t?r:(0,s.createElement)(l,i,r))}))}
 /***/},
-/***/6400:
+/***/16400:
 /***/(e,t,r)=>{"use strict";
 /* unused harmony export preloadedDataUsedOnceMiddleware */
-/* harmony import */var n,s=r(6483),o=r(6989);
+/* harmony import */var n,s=r(96483),o=r(86989);
 /* harmony import */r.n(o)().use((n={},function(e,t){return"string"!=typeof e.path||"GET"!==e.method&&e.method||(n[e.path]?e.path=(0,s.addQueryArgs)(e.path,{__skip_preload:1}):n[e.path]=!0),t(e)}))}
 /***/,
-/***/832:
+/***/20832:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */GI:()=>/* binding */n
@@ -607,52 +607,52 @@ function i(e){return(0,s.createElement)(a.Consumer,null,(function(t){var r="h"+M
 /* harmony import */var n=function(e,t,r,n){
 return regeneratorRuntime.mark((function s(){var o,a=arguments;return regeneratorRuntime.wrap((function(s){for(;;)switch(s.prev=s.next){case 0:if(!e){s.next=3;break}return s.next=3,{type:e};case 3:return s.prev=3,s.delegateYield(t.apply(void 0,a),"t0",5);case 5:return o=s.t0,s.next=8,{type:r,data:o};case 8:s.next=14;break;case 10:return s.prev=10,s.t1=s.catch(3),s.next=14,{type:n,error:s.t1};case 14:case"end":return s.stop()}}),s,null,[[3,10]])}))}}
 /***/,
-/***/2866:
+/***/22866:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */U:()=>/* binding */i
 /* harmony export */});
 /* unused harmony export formattingComponents */
-/* harmony import */var n=r(189),s=r(9307),o=r(9219),a={em:(0,s.createElement)("em",null),strong:(0,s.createElement)("strong",null),code:(0,s.createElement)("code",null),small:(0,s.createElement)("small",null),sub:(0,s.createElement)("sub",null),sup:(0,s.createElement)("sup",null),br:(0,s.createElement)("br",null),p:(0,s.createElement)("p",null),del:(0,s.createElement)("del",null)},i=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return(0,o/* ["default"] */.Z)({mixedString:e,components:(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},a),t)})};
+/* harmony import */var n=r(50189),s=r(69307),o=r(19219),a={em:(0,s.createElement)("em",null),strong:(0,s.createElement)("strong",null),code:(0,s.createElement)("code",null),small:(0,s.createElement)("small",null),sub:(0,s.createElement)("sub",null),sup:(0,s.createElement)("sup",null),br:(0,s.createElement)("br",null),p:(0,s.createElement)("p",null),del:(0,s.createElement)("del",null)},i=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return(0,o/* ["default"] */.Z)({mixedString:e,components:(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},a),t)})};
 /* harmony import */}
 /***/,
-/***/761:
+/***/70761:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */g:()=>/* binding */s
 /* harmony export */});
 /* unused harmony export postTypeLabels */
-/* harmony import */var n=r(5736),__=n.__,s=(__("Courses","sensei-lms"),__("Lessons","sensei-lms"),__("Questions","sensei-lms"),{error:__("Error","sensei-lms"),warning:__("Warning","sensei-lms")});
+/* harmony import */var n=r(65736),__=n.__,s=(__("Courses","sensei-lms"),__("Lessons","sensei-lms"),__("Questions","sensei-lms"),{error:__("Error","sensei-lms"),warning:__("Warning","sensei-lms")});
 /* harmony import */}
 /***/,
-/***/9196:
+/***/99196:
 /***/e=>{"use strict";e.exports=window.React}
 /***/,
-/***/2819:
+/***/92819:
 /***/e=>{"use strict";e.exports=window.lodash}
 /***/,
-/***/6989:
+/***/86989:
 /***/e=>{"use strict";e.exports=window.wp.apiFetch}
 /***/,
-/***/5609:
+/***/55609:
 /***/e=>{"use strict";e.exports=window.wp.components}
 /***/,
-/***/4333:
+/***/94333:
 /***/e=>{"use strict";e.exports=window.wp.compose}
 /***/,
 /***/9818:
 /***/e=>{"use strict";e.exports=window.wp.data}
 /***/,
-/***/9307:
+/***/69307:
 /***/e=>{"use strict";e.exports=window.wp.element}
 /***/,
-/***/5736:
+/***/65736:
 /***/e=>{"use strict";e.exports=window.wp.i18n}
 /***/,
-/***/444:
+/***/70444:
 /***/e=>{"use strict";e.exports=window.wp.primitives}
 /***/,
-/***/6483:
+/***/96483:
 /***/e=>{"use strict";e.exports=window.wp.url}
 /***/,
 /***/1793:
@@ -661,86 +661,86 @@ return regeneratorRuntime.mark((function s(){var o,a=arguments;return regenerato
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/6470:
+/***/66470:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(e){if(Array.isArray(e))return e}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/8138:
+/***/58138:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>/* binding */s
 /* harmony export */});
 /* harmony import */var n=r(1793);function s(e){if(Array.isArray(e))return(0,n/* ["default"] */.Z)(e)}
 /***/},
-/***/4649:
+/***/64649:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(e,t,r){return t in e?Object.defineProperty(e,t,{value:r,enumerable:!0,configurable:!0,writable:!0}):e[t]=r,e}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/5181:
+/***/55181:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(e){if("undefined"!=typeof Symbol&&null!=e[Symbol.iterator]||null!=e["@@iterator"])return Array.from(e)}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/2446:
+/***/22446:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(e,t){var r=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=r){var n,s,o=[],_n=!0,a=!1;try{for(r=r.call(e);!(_n=(n=r.next()).done)&&(o.push(n.value),!t||o.length!==t);_n=!0);}catch(e){a=!0,s=e}finally{try{_n||null==r.return||r.return()}finally{if(a)throw s}}return o}}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/3764:
+/***/53764:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/3314:
+/***/83314:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/189:
+/***/50189:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>/* binding */o
 /* harmony export */});
-/* harmony import */var n=r(4649);function s(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.push.apply(r,n)}return r}function o(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?s(Object(r),!0).forEach((function(t){(0,n/* ["default"] */.Z)(e,t,r[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):s(Object(r)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))}))}return e}
+/* harmony import */var n=r(64649);function s(e,t){var r=Object.keys(e);if(Object.getOwnPropertySymbols){var n=Object.getOwnPropertySymbols(e);t&&(n=n.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),r.push.apply(r,n)}return r}function o(e){for(var t=1;t<arguments.length;t++){var r=null!=arguments[t]?arguments[t]:{};t%2?s(Object(r),!0).forEach((function(t){(0,n/* ["default"] */.Z)(e,t,r[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(r)):s(Object(r)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(r,t))}))}return e}
 /***/},
-/***/3782:
+/***/53782:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>/* binding */s
 /* harmony export */});
-/* harmony import */var n=r(808);function s(e,t){if(null==e)return{};var r,s,o=(0,n/* ["default"] */.Z)(e,t);if(Object.getOwnPropertySymbols){var a=Object.getOwnPropertySymbols(e);for(s=0;s<a.length;s++)r=a[s],t.indexOf(r)>=0||Object.prototype.propertyIsEnumerable.call(e,r)&&(o[r]=e[r])}return o}
+/* harmony import */var n=r(30808);function s(e,t){if(null==e)return{};var r,s,o=(0,n/* ["default"] */.Z)(e,t);if(Object.getOwnPropertySymbols){var a=Object.getOwnPropertySymbols(e);for(s=0;s<a.length;s++)r=a[s],t.indexOf(r)>=0||Object.prototype.propertyIsEnumerable.call(e,r)&&(o[r]=e[r])}return o}
 /***/},
-/***/808:
+/***/30808:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(e,t){if(null==e)return{};var r,n,s={},o=Object.keys(e);for(n=0;n<o.length;n++)r=o[n],t.indexOf(r)>=0||(s[r]=e[r]);return s}
 /***/r.d(t,{
 /* harmony export */Z:()=>/* binding */n
 /* harmony export */})},
-/***/6886:
+/***/66886:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(6470),s=r(2446),o=r(4013),a=r(3764);
+/* harmony import */var n=r(66470),s=r(22446),o=r(64013),a=r(53764);
 /* harmony import */function i(e,t){return(0,n/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e,t)||(0,o/* ["default"] */.Z)(e,t)||(0,a/* ["default"] */.Z)()}
 /***/},
-/***/228:
+/***/90228:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(8138),s=r(5181),o=r(4013),a=r(3314);
+/* harmony import */var n=r(58138),s=r(55181),o=r(64013),a=r(83314);
 /* harmony import */function i(e){return(0,n/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e)||(0,o/* ["default"] */.Z)(e)||(0,a/* ["default"] */.Z)()}
 /***/},
-/***/4013:
+/***/64013:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>/* binding */s
@@ -801,7 +801,7 @@ return regeneratorRuntime.mark((function s(){var o,a=arguments;return regenerato
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (()=>{"use strict";
-/* harmony import */var e=r(9307),t=r(5736),n=r(9818),s=r(9373),o=r(7214),a=r(1842),i=r(5609),__=(r(6400),t.__);
+/* harmony import */var e=r(69307),t=r(65736),n=r(9818),s=r(49373),o=r(17214),a=r(51842),i=r(55609),__=(r(16400),t.__);
 /* harmony import */
 /**
  * Internal dependencies

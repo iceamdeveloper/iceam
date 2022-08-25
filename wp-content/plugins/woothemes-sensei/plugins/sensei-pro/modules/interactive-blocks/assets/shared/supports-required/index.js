@@ -10,7 +10,11 @@ import { createHigherOrderComponent } from '@wordpress/compose';
 import { addFilter } from '@wordpress/hooks';
 import { getBlockSupport } from '@wordpress/blocks';
 import { BlockControls } from '@wordpress/block-editor';
-import { Tooltip } from '@wordpress/components';
+import {
+	ToolbarItem,
+	ToolbarButton,
+	ToolbarGroup,
+} from '@wordpress/components';
 import { useCallback } from '@wordpress/element';
 import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
@@ -81,24 +85,31 @@ export const withRequiredSupport = createHigherOrderComponent(
 				<>
 					{ supportsRequired && isLessonPost && (
 						<BlockControls>
-							<Tooltip text={ __( 'Required', 'sensei-pro' ) }>
-								<button
-									isPressed={ attributes.required }
-									onClick={ handleToggleRequired }
-									showTooltip
-									className="sensei-supports-required__required-button"
-								>
-									<div
-										className={ classnames( {
-											'sensei-supports-required__required-icon': true,
-											'sensei-supports-required__required-icon--is-pressed':
-												attributes.required,
-										} ) }
-									>
-										<IconRequired />
-									</div>
-								</button>
-							</Tooltip>
+							<ToolbarGroup>
+								<ToolbarItem>
+									{ () => (
+										<ToolbarButton
+											label={ __(
+												'Required',
+												'sensei-pro'
+											) }
+											isPressed={ attributes.required }
+											onClick={ handleToggleRequired }
+											showTooltip
+										>
+											<div
+												className={ classnames( {
+													'sensei-supports-required__required-icon': true,
+													'sensei-supports-required__required-icon--is-pressed':
+														attributes.required,
+												} ) }
+											>
+												<IconRequired />
+											</div>
+										</ToolbarButton>
+									) }
+								</ToolbarItem>
+							</ToolbarGroup>
 						</BlockControls>
 					) }
 					<BlockEdit { ...props } />

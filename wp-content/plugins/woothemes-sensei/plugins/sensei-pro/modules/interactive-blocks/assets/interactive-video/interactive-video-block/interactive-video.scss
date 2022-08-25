@@ -1,0 +1,9 @@
+.wp-block-sensei-pro-interactive-video {
+	// Hide caption field from the editor.
+	.wp-block-embed,
+	.wp-block-video {
+		.block-editor-rich-text__editable {
+			display: none;
+		}
+	}
+}

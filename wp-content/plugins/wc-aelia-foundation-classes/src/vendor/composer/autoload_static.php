@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1
+class ComposerStaticInit29eff0c5e550117c14cd774c4402133e
 {
     public static $files = array (
         '49a1299791c25c6fd83542c6fedacddd' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/load-v4p11.php',
@@ -107,6 +107,11 @@ class ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1
         'Aelia\\WC\\Message' => __DIR__ . '/../..' . '/lib/classes/base/messages/message.php',
         'Aelia\\WC\\Messages' => __DIR__ . '/../..' . '/lib/classes/base/messages/messages.php',
         'Aelia\\WC\\Model' => __DIR__ . '/../..' . '/lib/classes/base/model/model.php',
+        'Aelia\\WC\\Object_Data_Tracking\\Object_Data_Maps\\IObject_Data_Map' => __DIR__ . '/../..' . '/lib/classes/base/object-data-tracking/object-data-maps/object-data-map.php',
+        'Aelia\\WC\\Object_Data_Tracking\\Object_Data_Maps\\Object_Data_Map' => __DIR__ . '/../..' . '/lib/classes/base/object-data-tracking/object-data-maps/object-data-map.php',
+        'Aelia\\WC\\Object_Data_Tracking\\Object_Data_Maps\\Object_Data_Map_Legacy' => __DIR__ . '/../..' . '/lib/classes/base/object-data-tracking/object-data-maps/object-data-map-legacy.php',
+        'Aelia\\WC\\Object_Data_Tracking\\Object_Data_Maps\\Object_Data_Map_WeakMap' => __DIR__ . '/../..' . '/lib/classes/base/object-data-tracking/object-data-maps/object-data-map-weakmap.php',
+        'Aelia\\WC\\Object_Data_Tracking\\Object_Data_Tracker' => __DIR__ . '/../..' . '/lib/classes/base/object-data-tracking/object-data-tracker.php',
         'Aelia\\WC\\Order' => __DIR__ . '/../..' . '/lib/classes/base/orders/order.php',
         'Aelia\\WC\\Premium_Plugin_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/premium-plugin-updater.php',
         'Aelia\\WC\\Semaphore' => __DIR__ . '/../..' . '/lib/classes/base/semaphore/semaphore.php',
@@ -297,10 +302,10 @@ class ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit29eff0c5e550117c14cd774c4402133e::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit29eff0c5e550117c14cd774c4402133e::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit29eff0c5e550117c14cd774c4402133e::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit29eff0c5e550117c14cd774c4402133e::$classMap;
 
         }, null, ClassLoader::class);
     }

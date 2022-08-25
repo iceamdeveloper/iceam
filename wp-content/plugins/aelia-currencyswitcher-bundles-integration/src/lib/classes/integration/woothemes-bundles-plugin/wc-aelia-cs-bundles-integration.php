@@ -1,11 +1,10 @@
 <?php
 namespace Aelia\WC\CurrencySwitcher\Bundles;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use \WC_Aelia_CurrencySwitcher;
 use \WC_Aelia_CurrencyPrices_Manager;
 use \WC_Bundles;
-use \WC_Bundles_Product;
 use \WC_Product;
 use \WC_Product_Bundle;
 
@@ -134,10 +133,6 @@ class Bundles_Integration {
 		add_filter('woocommerce_add_cart_item', array( $this, 'woocommerce_add_cart_item'), 50, 2);
 		add_filter('woocommerce_get_cart_item_from_session', array( $this, 'woocommerce_get_cart_item_from_session'), 50, 1);
 
-		// Admin UI
-		// TODO Implement Admin UI for Bundles 4.x
-		add_action('woocommerce_product_options_general_product_data', array($this, 'woocommerce_product_options_general_product_data'), 20);
-
 		add_action('woocommerce_init', array($this, 'woocommerce_init'), 10);
 	}
 
@@ -230,10 +225,6 @@ class Bundles_Integration {
 	 * @since 1.2.2.170415
 	 */
 	protected function get_bundle_regular_price($product, $context = 'view') {
-		if($this->bundles_version_is('<', '5.2')) {
-			return $product->get_bundle_regular_price('min');
-		}
-
 		return $product->get_min_raw_regular_price($context);
 	}
 
@@ -245,17 +236,11 @@ class Bundles_Integration {
 	 * @param WC_Product product The product to check.
 	 * @return bool
 	 */
-	protected function bundle_is_on_sale(WC_Product $product) {
-		if(aelia_wc_version_is('>=', '3.0')) {
-			// WC 3.0.1 and later return dates as a WC_DateTime object, and they must
-			// be converted to a string format for easier comparison
-			$sale_price_dates_from = $this->date_to_string($product->get_date_on_sale_from());
-			$sale_price_dates_to = $this->date_to_string($product->get_date_on_sale_to());
-		}
-		else {
-			$sale_price_dates_from = $product->base_sale_price_dates_from;
-			$sale_price_dates_to = $product->base_sale_price_dates_to;
-		}
+	protected function bundle_is_on_sale(WC_Product_Bundle $product) {
+		// WC 3.0.1 and later return dates as a WC_DateTime object, and they must
+		// be converted to a string format for easier comparison
+		$sale_price_dates_from = $this->date_to_string($product->get_date_on_sale_from());
+		$sale_price_dates_to = $this->date_to_string($product->get_date_on_sale_to());
 
 		$today = date('Ymd');
 		$is_on_sale = false;
@@ -324,50 +309,37 @@ class Bundles_Integration {
 		}
 
 		// Take the regular price in the active currency
-		$product->base_regular_price = isset($bundle_base_regular_prices_in_currency[$currency]) ? $bundle_base_regular_prices_in_currency[$currency] : '';
-		if(($currency != $product_base_currency) && !is_numeric($product->base_regular_price)) {
-			$product->base_regular_price = $prices_manager->convert_product_price_from_base($product_base_regular_price, $currency, $product_base_currency, $product, 'regular_price');
+		$product_regular_price = isset($bundle_base_regular_prices_in_currency[$currency]) ? $bundle_base_regular_prices_in_currency[$currency] : '';
+		if(($currency != $product_base_currency) && !is_numeric($product_regular_price)) {
+			$product_regular_price = $prices_manager->convert_product_price_from_base($product_base_regular_price, $currency, $product_base_currency, $product, 'regular_price');
 		}
 
 		// Take the sale price in the active currency
-		$product->base_sale_price = isset($bundle_base_sale_prices_in_currency[$currency]) ? $bundle_base_sale_prices_in_currency[$currency] : '';
-		if(($currency != $product_base_currency) && !is_numeric($product->base_sale_price)) {
-			$product->base_sale_price = $prices_manager->convert_product_price_from_base($product_base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
+		$product_sale_price = isset($bundle_base_sale_prices_in_currency[$currency]) ? $bundle_base_sale_prices_in_currency[$currency] : '';
+		if(($currency != $product_base_currency) && !is_numeric($product_sale_price)) {
+			$product_sale_price = $prices_manager->convert_product_price_from_base($product_base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
 		}
 
-		// Bundles 5.1 uses the standard price properties, instead of the base ones.
-		// The logic to determine their value remains the same, so we can simply
-		// copy them from the "base price" properties.
-		// @since 1.2.0.161222
-		// @since Bundles 5.1
-		$product->regular_price = $product->base_regular_price;
-		$product->sale_price = $product->base_sale_price;
-
-		if(is_numeric($product->base_sale_price) &&
+		if(is_numeric($product_sale_price) &&
 			 $this->bundle_is_on_sale($product)) {
-			$product->base_price = $product->base_sale_price;
+			$product_price = $product_sale_price;
 		}
 		else {
-			$product->base_price = $product->base_regular_price;
-		}
-		$product->price = $product->base_price;
-
-		if(aelia_wc_version_is('>=', '3.0')) {
-			// Set prices against the product, so that other actors can fetch them as well
-			// @since 1.2.1.170414
-			$product->set_regular_price($product->regular_price);
-			$product->set_sale_price($product->sale_price);
-			$product->set_price($product->price);
+			$product_price = $product_regular_price;
 		}
 
-		//// Debug
-		// var_dump(
-		// 	$bundle_base_regular_prices_in_currency,
-		// 	"BASE CURRENCY $product_base_currency",
-		// 	"BASE REGULAR PRICE {$product->base_regular_price}",
-		// 	"BASE SALE PRICE {$product->base_sale_price}",
-		// 	"BASE PRICE {$product->base_price}"
-		// );die();
+		// New logic to replace dynamic properties
+		// @note Dynamic property
+		// @since 1.3.0.220730
+		aelia_set_object_aux_data($product, 'regular_price', $product_regular_price);
+		aelia_set_object_aux_data($product, 'sale_price', $product_sale_price);
+		aelia_set_object_aux_data($product, 'price', $product_price);
+
+		// Set prices against the product, so that other actors can fetch them as well
+		// @since 1.2.1.170414
+		$product->set_regular_price($product_regular_price);
+		$product->set_sale_price($product_sale_price);
+		$product->set_price($product_price);
 
 		return $product;
 	}
@@ -382,9 +354,16 @@ class Bundles_Integration {
 	 * @since 1.2.5.200205
 	 */
 	protected function product_requires_conversion($product, $currency) {
+		// Fetch the currency from the product
+		// @note Dynamic property
+		// @since 1.3.0.220730
+		$product_currency = aelia_get_object_aux_data($product, 'currency');
+
 		// If the product is already in the target currency, it doesn't require
 		// conversion
-		return empty($product->currency) || ($product->currency != $currency);
+		// Filter "wc_aelia_cs_product_requires_conversion" will allow 3rd parties
+		// to skip the conversion in specific cases
+		return apply_filters('wc_aelia_cs_product_requires_conversion', empty($product_currency) || ($product_currency != $currency), $product, $currency);
 	}
 
 	/**
@@ -438,19 +417,6 @@ class Bundles_Integration {
 	}
 
 	/**
-	 * Loads (includes) a View file.
-	 *
-	 * @param string view_file_name The name of the view file to include.
-	 */
-	private function load_view($view_file_name) {
-		$file_to_load = $this->admin_views_path() . '/' . $view_file_name;
-
-		if(!empty($file_to_load) && is_readable($file_to_load)) {
-			include($file_to_load);
-		}
-	}
-
-	/**
 	 * Event handler fired when a bundle is being saved. It processes and
 	 * saves the Currency Prices associated with the bundle.
 	 *
@@ -466,16 +432,6 @@ class Bundles_Integration {
 	}
 
 	/**
-	 * Alters the view used to allow entering prices manually, in each currency.
-	 *
-	 * @param string file_to_load The view/template file that should be loaded.
-	 * @return string
-	 */
-	public function woocommerce_product_options_general_product_data() {
-		//$this->load_view('simplebundle_currencyprices_view.php');
-	}
-
-	/**
 	 * Sets the prices of a bundled item.
 	 *
 	 * @param array $cart_item
@@ -483,20 +439,20 @@ class Bundles_Integration {
 	 * @since 1.2.4.190703
 	 */
 	protected function set_bundled_item_prices($cart_item) {
-		if($this->is_bundled_cart_item($cart_item)) {
-			if($bundle_container_item = $this->get_bundled_cart_item_container($cart_item)) {
-				$bundle = $bundle_container_item['data'];
-				$bundled_item_id = $cart_item['bundled_item_id'];
+		if($this->is_bundled_cart_item($cart_item) && ($bundle_container_item = $this->get_bundled_cart_item_container($cart_item))) {
+			$bundle = $bundle_container_item['data'];
+			$bundled_item_id = $cart_item['bundled_item_id'];
 
-				// If the cart item is as bundled product, and the bundle is NOT priced
-				// on a per-product basis, then the cart item's price has to be set to
-				// zero (the parant bundle's price is what matters, in this case)
-				if($bundle->has_bundled_item($bundled_item_id) &&
-					 !$this->is_bundle_priced_individually($bundle)) {
-					$cart_item['data']->regular_price = 0;
-					$cart_item['data']->price = 0;
-					$cart_item['data']->sale_price = '';
-				}
+			// If the cart item is as bundled product, and the bundle is NOT priced
+			// on a per-product basis, then the cart item's price has to be set to
+			// zero (the parant bundle's price is what matters, in this case)
+			if($bundle->has_bundled_item($bundled_item_id) &&
+					!$this->is_bundle_priced_individually($bundle)) {
+				// @note Dynamic property
+				// @since 1.3.0.220730
+				aelia_set_object_aux_data($cart_item['data'], 'regular_price', 0);
+				aelia_set_object_aux_data($cart_item['data'], 'price', 0);
+				aelia_set_object_aux_data($cart_item['data'], 'sale_price', '');
 			}
 		}
 		return $cart_item;

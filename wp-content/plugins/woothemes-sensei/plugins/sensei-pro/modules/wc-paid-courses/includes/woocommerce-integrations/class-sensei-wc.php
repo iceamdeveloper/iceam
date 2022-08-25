@@ -2209,7 +2209,7 @@ class Sensei_WC {
 			return false;
 		}
 
-		if ( empty( $course_id ) || Course_Expiration::instance()->is_access_expired( get_current_user_id(), $course_id ) ) {
+		if ( empty( $course_id ) || Course_Expiration::instance()->is_access_expired_or_not_started( get_current_user_id(), $course_id ) ) {
 			return false;
 		}
 
@@ -2282,7 +2282,7 @@ class Sensei_WC {
 		foreach ( $courses as $course ) {
 			if ( Course_Enrolment_Providers::is_user_enrolled( $course->ID, $user_id ) ) {
 				$courses_started++;
-			} elseif ( Course_Expiration::instance()->is_access_expired( $user_id, $course->ID ) ) {
+			} elseif ( Course_Expiration::instance()->is_access_expired_or_not_started( $user_id, $course->ID ) ) {
 				$has_expired_courses = true;
 			}
 		}

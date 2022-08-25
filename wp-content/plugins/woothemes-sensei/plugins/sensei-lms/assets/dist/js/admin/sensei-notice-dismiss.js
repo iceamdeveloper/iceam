@@ -1,7 +1,7 @@
 /******/(()=>{// webpackBootstrap
 /******/"use strict";
 /******/var e,t={
-/***/7701:
+/***/47701:
 /***/e=>{e.exports=window.wp.domReady;
 /***/
 /******/}},s={};
@@ -51,7 +51,7 @@
 /******/o.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t)
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-e=o(7701),
+e=o(47701),
 /**
  * WordPress dependencies
  */

@@ -1,11 +1,11 @@
 
 === Sensei LMS - Online Courses, Quizzes, & Learning ===
-Contributors: automattic, alexsanford1, burtrw, donnapep, gikaragia, jakeom, merkushin, m1r0, renathoc, yscik
+Contributors: automattic, aaronfc, alexsanford1, burtrw, donnapep, fjorgemota, gabrielcaires, gikaragia, guzluis, imranh920, jakeom, lavagolem, luchad0res, merkushin, m1r0, nurguly, onubrooks, renathoc, yscik
 Tags: lms, eLearning, teach, online courses, woocommerce
-Requires at least: 5.7
-Tested up to: 5.9.3
-Requires PHP: 7.0
-Stable tag: 4.4.3
+Requires at least: 5.8
+Tested up to: 6.0
+Requires PHP: 7.2
+Stable tag: 4.6.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,7 +55,7 @@ Do more and sell courses with Sensei Pro, which includes:
 
 **Priority Support:** Our team of expert and friendly engineers are standing by and ready to help!
 
-[Learn more about Sensei Pro](https://senseilms.com/pricing/).
+[Learn more about Sensei Pro](https://senseilms.com/sensei-pro/).
 
 ### Free Extensions ###
 
@@ -101,7 +101,7 @@ Sensei is developed in public on Github. We welcome anyone to report a bug, subm
 [Visit Sensei LMS on Github](https://github.com/Automattic/sensei/).
 
 = Does Sensei work with membership plugins? =
-Sensei LMS can be used in conjunction with [Sensei Pro](https://senseilms.com/pricing/) and [WooCommerce Memberships](https://woocommerce.com/products/woocommerce-memberships/) to enable you to sell courses as part of a membership plan. See [Selling Courses as a Membership](https://senseilms.com/documentation/selling-courses-as-a-membership/) for more details.
+Sensei LMS can be used in conjunction with [Sensei Pro](https://senseilms.com/sensei-pro/) and [WooCommerce Memberships](https://woocommerce.com/products/woocommerce-memberships/) to enable you to sell courses as part of a membership plan. See [Selling Courses as a Membership](https://senseilms.com/documentation/selling-courses-as-a-membership/) for more details.
 
 = How can I keep up to date with new releases and announcements for Sensei LMS? =
 
@@ -115,41 +115,39 @@ Please visit the [Sensei Blog](https://senseilms.com/blog/) or sign up for our [
 
 == Changelog ==
 
-2022.05.31 - version 4.4.3
-* Fix: The "import" docs link. [#5201](https://github.com/Automattic/sensei/pull/5201)
-* Fix: Module order not preserved after teacher update. [#5198](https://github.com/Automattic/sensei/pull/5198)
-* Tweak: Redirect the quiz if the lesson is password protected. [#5195](https://github.com/Automattic/sensei/pull/5195)
-* Tweak: Disable the lesson archive. [#5192](https://github.com/Automattic/sensei/pull/5192)
-* Tweak: Update Course Video Progression to support customization via hooks. [#5100](https://github.com/Automattic/sensei/pull/5100), [#5175](https://github.com/Automattic/sensei/pull/5175)
+2022-08-24 - version 4.6.3
+* New: Course List block (beta)
+    * Add the Course List block [#5419](https://github.com/Automattic/sensei/pull/5419)
+    * Add the Course Categories block [#5455](https://github.com/Automattic/sensei/pull/5455)
+    * Add new patterns for Course List [#5433](https://github.com/Automattic/sensei/pull/5433)
+    * Add Course Actions block [#5430](https://github.com/Automattic/sensei/pull/5430)
+    * Make Continue button take user to the lesson they were working on [#5496](https://github.com/Automattic/sensei/pull/5496)
+    * Make the Course List block with inner blocks globally available [#5473](https://github.com/Automattic/sensei/pull/5473)
+    * Add notice to show invalid usage when blocks are used out of course context [#5489](https://github.com/Automattic/sensei/pull/5489)
+* Add: Support for passing a custom footer to the Modal component [#5503](https://github.com/Automattic/sensei/pull/5503)
+* Fix: Template selection logic when learning mode is active [#5514](https://github.com/Automattic/sensei/pull/5514)
+* Fix: Course Outline - Show private lessons only for those who can view them. [#5468](https://github.com/Automattic/sensei/pull/5468)
+* Tweak: Combine PHP and JS strings in POT generation command [#5486](https://github.com/Automattic/sensei/pull/5486)
+* Tweak: Remove 'new' badge for learning mode [#5474](https://github.com/Automattic/sensei/pull/5474)
+* Tweak: Modify title for course theme lesson actions block to avoid confusion [#5470](https://github.com/Automattic/sensei/pull/5470)
 
-2022.05.23 - version 4.4.2
-* Fix: Modules page not found error in learning mode [#5144](https://github.com/Automattic/sensei/pull/5144) 👏 @jeremyfelt
-* Fix: Teacher name getting appended and duplicated in module title in course edit [#5114](https://github.com/Automattic/sensei/pull/5114)
-* Fix: Lessons not getting assigned to modules if the course is assigned to a teacher [#5151](https://github.com/Automattic/sensei/pull/5151)
-* Fix: Add student to course form not visible if Sensei Pro or Content Drip is enabled [#5164](https://github.com/Automattic/sensei/pull/5164)
-* Fix: Deprecated warnings on the students report screen [#5153](https://github.com/Automattic/sensei/pull/5153)
+2022-08-17 - version 4.6.2
+* Fix: Learning Mode - Do not filter templates for query slugs if it is indexing. [#5460](https://github.com/Automattic/sensei/pull/5460)
+* Fix: Do not save -1 values on quiz meta [#5461](https://github.com/Automattic/sensei/pull/5461)
+* Fix: Revert "Change className prop to not use classnames" [#5464](https://github.com/Automattic/sensei/pull/5464)
+* Fix: Fix timeupdate event on the youtube adapter [#5452](https://github.com/Automattic/sensei/pull/5452)
+* Fix: Fix interactive video when no video is set [#5442](https://github.com/Automattic/sensei/pull/5442)
+* Add: Add className prop to Sensei modal [#5462](https://github.com/Automattic/sensei/pull/5462)
+* Add: Change confirm dialog styles [#5454](https://github.com/Automattic/sensei/pull/5454)
+* Add: Fix set current time to keep the same behavior for all players [#5416](https://github.com/Automattic/sensei/pull/5416)
 
-2022.05.16 - version 4.4.1
-* New: Add a "Date Started" reports filter for students on a course [#5076](https://github.com/Automattic/sensei/pull/5076)
-* New: Show a notice if future PHP requirements aren't met in preparation for increasing the minimum requirements to PHP 7.2 [#5088](https://github.com/Automattic/sensei/pull/5088)
-* New: Add lesson notices filters [#5087](https://github.com/Automattic/sensei/pull/5087)
-* Tweak: Apply data filters to column total values for reports [#5091](https://github.com/Automattic/sensei/pull/5091)
-* Tweak: Calculate total average progress for courses reports [#5077](https://github.com/Automattic/sensei/pull/5077)
-* Tweak: Display average total for Days to Completion in Courses report header [#5097](https://github.com/Automattic/sensei/pull/5097)
-* Tweak: Display the student FullName on the reports [#5096](https://github.com/Automattic/sensei/pull/5096)
-* Tweak: Hide the export button when there is no data [#5095](https://github.com/Automattic/sensei/pull/5095)
-* Tweak: Improve performance by fetching last activity date with the main query [#5101](https://github.com/Automattic/sensei/pull/5101)
-* Tweak: On the reports screen, show no lessons instead of all when the course has no lessons [#5090](https://github.com/Automattic/sensei/pull/5090)
-* Tweak: Only show enrolled students in reports [#5105](https://github.com/Automattic/sensei/pull/5105)
-* Tweak: Refactor students page fetching data through Gutenberg and avoiding subqueries [#5104](https://github.com/Automattic/sensei/pull/5104)
-* Tweak: Use AbortController to cancel fetch requests for unmounted components [#5065](https://github.com/Automattic/sensei/pull/5065)
-* Fix: Ensure the content filter for course content is re-added in Learning Mode [#5086](https://github.com/Automattic/sensei/pull/5086)
-* Fix: Exporting "students taking course" not affected by filters [#5120](https://github.com/Automattic/sensei/pull/5120)
-* Fix: Hide export button when no results on "Students taking course" screen [#5121](https://github.com/Automattic/sensei/pull/5121)
-* Fix: Incorrect menu item selected in the Module editor [#5117](https://github.com/Automattic/sensei/pull/5117)
-* Fix: Lesson compatibility issue with Divi [#5082](https://github.com/Automattic/sensei/pull/5082)
-* Fix: Reports date filters not accounting for the user timezone [#5113](https://github.com/Automattic/sensei/pull/5113)
-* Fix: Reports exporting does not take search into account [#5079](https://github.com/Automattic/sensei/pull/5079)
-* Fix: Student name appearing twice on student report title [#5111](https://github.com/Automattic/sensei/pull/5111)
 
-[See changelog for all versions](https://github.com/Automattic/sensei/releases).
+2022-08-09 - version 4.6.1
+* Fix: Fix lesson quick edit and bulk edit for quiz settings [#4404](https://github.com/Automattic/sensei/pull/4404)
+* Fix: Use standard approach of displaying filters for list tables [#5174](https://github.com/Automattic/sensei/pull/5174)
+* Fix: Improve test coverage for Sensei_Lesson [#5389](https://github.com/Automattic/sensei/pull/5389)
+* Fix: Fix player API on the editor side when editing embeds with no changes [#5392](https://github.com/Automattic/sensei/pull/5392)
+* Fix: Fix multiple emails are send when completing a course in the backend [#5393](https://github.com/Automattic/sensei/pull/5393)
+* Add: Add current time to player and hook to get the video duration [#5410](https://github.com/Automattic/sensei/pull/5410)
+* Fix: Fix html entities bug for question answers. [#5414](https://github.com/Automattic/sensei/pull/5414)
+* Fix: Fix loading issue where the player wasn't detected correctly on the editor [#5421](https://github.com/Automattic/sensei/pull/5421)

@@ -101,6 +101,9 @@ export const withVideoRequiredSupport = createHigherOrderComponent(
 			// turnded on.
 			const senseiCourseVideoRequired = useSelect( ( select ) => {
 				const currentPost = select( 'core/editor' ).getCurrentPost();
+				if ( 'lesson' !== currentPost.type ) {
+					return false;
+				}
 				const currentPostCourse = select( 'core' ).getEntityRecord(
 					'postType',
 					'course',

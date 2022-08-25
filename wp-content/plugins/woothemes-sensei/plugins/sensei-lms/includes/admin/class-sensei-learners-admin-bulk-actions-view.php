@@ -83,7 +83,35 @@ class Sensei_Learners_Admin_Bulk_Actions_View extends Sensei_List_Table {
 		parent::__construct( $this->page_slug );
 
 		add_action( 'sensei_before_list_table', array( $this, 'data_table_header' ) );
+		remove_action( 'sensei_before_list_table', array( $this, 'table_search_form' ), 5 );
+
 		add_filter( 'sensei_list_table_search_button_text', array( $this, 'search_button' ) );
+	}
+
+	/**
+	 * Extra controls to be displayed between bulk actions and pagination.
+	 *
+	 * @param string $which The location of the extra table nav markup: 'top' or 'bottom'.
+	 */
+	public function extra_tablenav( $which ) {
+		if ( 'top' === $which ) {
+			echo '<div class="alignleft actions">';
+		}
+		parent::extra_tablenav( $which );
+
+		if ( 'top' === $which ) {
+			echo '</div>';
+		}
+	}
+
+	/**
+	 * Output search form for table.
+	 */
+	public function table_search_form() {
+		if ( empty( $_REQUEST['s'] ) && ! $this->has_items() ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+			return;
+		}
+		$this->search_box( apply_filters( 'sensei_list_table_search_button_text', __( 'Search Users', 'sensei-lms' ) ), 'search_id' );
 	}
 
 	/**
@@ -322,7 +350,11 @@ class Sensei_Learners_Admin_Bulk_Actions_View extends Sensei_List_Table {
 			<option value="0"><?php echo esc_html( $select_label ); ?></option>
 			<?php
 			foreach ( $courses as $course ) {
-				echo '<option value="' . esc_attr( $course->ID ) . '"' . selected( $course->ID, $selected_course, false ) . '>' . esc_html( $course->post_title ) . '</option>';
+				$option_label = empty( $course->post_title )
+					? __( '(no title)', 'sensei-lms' ) . ' ID: ' . $course->ID
+					: $course->post_title;
+
+				echo '<option value="' . esc_attr( $course->ID ) . '"' . selected( $course->ID, $selected_course, false ) . '>' . esc_html( $option_label ) . '</option>';
 			}
 			?>
 		</select>
@@ -380,20 +412,19 @@ class Sensei_Learners_Admin_Bulk_Actions_View extends Sensei_List_Table {
 							<button type="button" class="button components-button button-primary sensei-student-bulk-actions__button" disabled><?php echo esc_html__( 'Select Courses', 'sensei-lms' ); ?></button>
 						</div>
 					</div>
-					<form action="" method="get">
-						<div class="alignleft actions">
-							<?php
-							foreach ( $this->query_args as $name => $value ) {
-								if ( 'filter_by_course_id' === $name || 'filter_type' === $name ) {
-									continue;
-								}
-								echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
+					<div class="alignleft actions">
+						<?php
+						$exclude_query_args = [ 'filter_by_course_id', 'filter_type', 'page', 'post_type' ];
+						foreach ( $this->query_args as $name => $value ) {
+							if ( in_array( $name, $exclude_query_args, true ) ) {
+								continue;
 							}
-							$this->courses_select( $courses, $selected_course, 'courses-select-filter', 'filter_by_course_id', __( 'Filter By Course', 'sensei-lms' ) );
-							?>
-							<button type="submit" id="filt" class="button action"><?php echo esc_html__( 'Filter', 'sensei-lms' ); ?></button>
-						</div>
-					</form>
+							echo '<input type="hidden" name="' . esc_attr( $name ) . '" value="' . esc_attr( $value ) . '">';
+						}
+						$this->courses_select( $courses, $selected_course, 'courses-select-filter', 'filter_by_course_id', __( 'Filter By Course', 'sensei-lms' ) );
+						?>
+						<button type="submit" id="filt" class="button action"><?php echo esc_html__( 'Filter', 'sensei-lms' ); ?></button>
+					</div>
 				</div>
 			</div>
 		</div>

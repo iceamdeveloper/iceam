@@ -53,7 +53,7 @@ class Shortcode {
 			'month_events_per_day' => '20',
 			'hide-export'          => 'yes',
 			'tribe-bar'            => 'yes',
-			'filter-bar'           => 'no',
+			'filter-bar'           => 'yes',
 		];
 		$attributes_string = \Tribe\Shortcode\Utils::get_attributes_string( $args );
 

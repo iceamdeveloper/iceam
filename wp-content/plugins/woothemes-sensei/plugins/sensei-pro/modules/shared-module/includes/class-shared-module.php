@@ -104,6 +104,7 @@ class Shared_Module {
 		include_once $this->module_dir . '/includes/background-jobs/class-completable-job.php';
 		include_once $this->module_dir . '/includes/background-jobs/class-scheduler.php';
 		include_once $this->module_dir . '/includes/class-language-packs.php';
+		include_once $this->module_dir . '/includes/class-course-helper.php';
 	}
 
 	/**

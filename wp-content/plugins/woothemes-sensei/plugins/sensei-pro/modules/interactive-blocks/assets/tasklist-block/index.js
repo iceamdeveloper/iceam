@@ -17,7 +17,7 @@ import { TaskSave } from './task-save';
 import { ReactComponent as taskBlockIcon } from '../icons/task-block.svg';
 import { ReactComponent as taskListBlockIcon } from '../icons/tasklist-block.svg';
 
-meta = {
+const updatedMeta = {
 	...meta,
 	supports: {
 		...meta.supports,
@@ -45,11 +45,11 @@ meta = {
  * Task list block definition.
  */
 const TaskListBlock = {
-	...meta,
+	...updatedMeta,
 	supports: {
-		...meta.supports,
+		...updatedMeta.supports,
 		sensei: {
-			...meta.supports.sensei,
+			...updatedMeta.supports.sensei,
 			required: true,
 		},
 	},
@@ -77,12 +77,12 @@ const TaskListBlock = {
  * Task block definition.
  */
 const TaskBlock = {
-	...meta,
+	...updatedMeta,
 	name: TASK_BLOCK_NAME,
 	title: __( 'Task', 'sensei-pro' ),
 	icon: taskBlockIcon,
 	description: __( 'An individual item in a tasklist.', 'sensei-pro' ),
-	parent: [ meta.name ],
+	parent: [ updatedMeta.name ],
 	attributes: {
 		text: {
 			default: '',

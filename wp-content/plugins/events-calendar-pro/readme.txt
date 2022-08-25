@@ -4,8 +4,8 @@ Contributors: theeventscalendar, borkweb, bordoni, brianjessee, aguseo, camwynsp
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, the events calendar, widget, pro
 Donate link: https://evnt.is/29
 Requires at least: 5.6
-Stable tag: 5.14.2.1
-Tested up to: 6.0
+Stable tag: 5.14.5
+Tested up to: 6.0.1
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -207,6 +207,30 @@ Our Premium Plugins:
 * <a href="https://evnt.is/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [5.14.5] 2022-08-09 =
+
+* Feature - Add Elementor styling support to the `Events View` widget. [ECP-1106]
+* Fix - Add integrations to ensure the Brizy Page Builder plays well with the [tribe_events] shortcode. [ECP-1094]
+* Fix - Correct issue with Week and Day views on datepicker change. [ECP-1136]
+* Fix - Ensure the taxonomy dropdown works in Beaver Builder FE editor. [ECP-1129]
+* Tweak - Update the calendar print design. [TEC-4425]
+* Tweak - Added new function load_brizy_builder_integration to selectively load integrations for Brizy Page Builder. [ECP-1094]
+* Language - 31 new strings added, 313 updated, 0 fuzzied, and 318 obsoleted.
+
+= [5.14.4] 2022-07-20 =
+
+* Feature - Enabled Filter Bar on the admin Events manager. [FBAR-270]
+* Tweak - Add Tag filtering to the TEC `Events List` and `Events View` Elementor widgets. [ECP-1140]
+* Fix - Correct errors when filtering shortcodes or widgets by taxonomy. [ECP-1186]
+* Fix - Ensure custom fields are displayed correctly on the Elementor `Event Widget` for events created using the Block Editor. [ECP-1191]
+* Fix - Ensure the recurring event tooltip displays correctly on the Elementor `Event Widget` for events created using the classic editor. [ECP-1196]
+
+= [5.14.3] 2022-07-06 =
+
+* Fix - Ensure the `Next` arrow in `Photo` view navigates to the correct page when the `Main Events Page` is set as the homepage. [TEC-4247]
+* Fix - Correct admin url used to determine when assets are loaded for Event Settings. [ECP-1175]
+* Tweak - Remove the `Advanced Post Manager` plugin admin notice. [ECP-1163]
 
 = [5.14.2.1] 2022-06-09 =
 

@@ -24,8 +24,8 @@ function sensei_pro_has_conflicts(): bool {
 				[
 					'plugin_slug' => 'woothemes-sensei',
 					'message'     => __(
-						"Please deactivate the <strong>Sensei Pro (WC Paid Courses)</strong> plugin and try activating <strong>Sensei Pro</strong> again. 
-						All the features in <strong>Sensei Pro (WC Paid Courses)</strong> are included in <strong>Sensei Pro</strong>. 
+						"Please deactivate the <strong>Sensei Pro (WC Paid Courses)</strong> plugin and try activating <strong>Sensei Pro</strong> again.
+						All the features in <strong>Sensei Pro (WC Paid Courses)</strong> are included in <strong>Sensei Pro</strong>.
 						You don't need both plugins.",
 						'sensei-pro'
 					),
@@ -35,7 +35,7 @@ function sensei_pro_has_conflicts(): bool {
 					'deactivate'   => 'sensei-interactive-blocks',
 					'message_type' => 'notice',
 					'message'      => __(
-						"<strong>Sensei Blocks</strong> plugin has been disabled. All the features in <strong>Sensei Blocks</strong> 
+						"<strong>Sensei Blocks</strong> plugin has been disabled. All the features in <strong>Sensei Blocks</strong>
 						are included in <strong>Sensei Pro</strong>. You don't need both plugins.",
 						'sensei-pro'
 					),

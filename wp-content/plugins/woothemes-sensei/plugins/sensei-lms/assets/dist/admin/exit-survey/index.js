@@ -1,20 +1,20 @@
 /******/(()=>{// webpackBootstrap
 /******/"use strict";
 /******/var e,t,n,r,a,i,o,s,l={
-/***/7253:
+/***/27253:
 /***/(e,t,n)=>{
 /* harmony export */n.d(t,{
 /* harmony export */o:()=>/* binding */a
 /* harmony export */});
-/* harmony import */var r=n(9307),a=function(e){var t=e.id,n=e.label,a=e.detailsLabel,i="sensei-exit-reason__".concat(t),o="".concat(i,"-details");return(0,r.createElement)("div",{className:"sensei-exit-survey__item"},(0,r.createElement)("input",{id:i,type:"radio",name:"reason",value:t,className:"sensei-exit-survey__radio"}),(0,r.createElement)("label",{htmlFor:i}," ",n),a&&(0,r.createElement)("div",{className:"sensei-exit-survey__details"},(0,r.createElement)("input",{id:o,name:"details-".concat(t),defaultValue:"",type:"text",placeholder:a})))};
+/* harmony import */var r=n(69307),a=function(e){var t=e.id,n=e.label,a=e.detailsLabel,i="sensei-exit-reason__".concat(t),o="".concat(i,"-details");return(0,r.createElement)("div",{className:"sensei-exit-survey__item"},(0,r.createElement)("input",{id:i,type:"radio",name:"reason",value:t,className:"sensei-exit-survey__radio"}),(0,r.createElement)("label",{htmlFor:i}," ",n),a&&(0,r.createElement)("div",{className:"sensei-exit-survey__details"},(0,r.createElement)("input",{id:o,name:"details-".concat(t),defaultValue:"",type:"text",placeholder:a})))};
 /* harmony import */}
 /***/,
-/***/9246:
+/***/39246:
 /***/(e,t,n)=>{
 /* harmony export */n.d(t,{
 /* harmony export */C:()=>/* binding */u
 /* harmony export */});
-/* harmony import */var r=n(5773),a=n(6886),i=n(9307),o=n(5736),s=n(7253),l=n(3306),__=o.__,u=function(e){var t=e.submit,n=e.skip,o=(0,i.useRef)(null),u=(0,i.useState)(null),c=(0,a/* ["default"] */.Z)(u,2)[1],d=(0,i.useCallback)((function(e){e.preventDefault();var n=new window.FormData(o.current),r=n.get("reason");t({reason:r,details:r&&n.get("details-".concat(r))})}),[t]),m=!1;if(o.current){var f,p=new window.FormData(o.current),v="details-".concat(p.get("reason")),y=(null===(f=o.current)||void 0===f?void 0:f.elements[v])||!1;m=!(!p.get("reason")||y&&""===p.get(v).trim())}return(0,i.createElement)("form",{onChange:function(){var e=new window.FormData(o.current);c(e.values())},className:"sensei-modal sensei-exit-survey",ref:o,onSubmit:d},(0,i.createElement)("div",{className:"sensei-exit-survey__content"},(0,i.createElement)("h2",null,__("Quick Feedback","sensei-lms")),(0,i.createElement)("p",null,__("If you have a moment, please let us know why you are deactivating so that we can work to improve our product.","sensei-lms")),l/* .reasons.map */.l.map((function(e){return(0,i.createElement)(s/* .ExitSurveyFormItem */.o,(0,r/* ["default"] */.Z)({key:e.id},e))}))),(0,i.createElement)("div",{className:"sensei-exit-survey__buttons"},(0,i.createElement)("button",{className:"button button-primary",type:"submit",disabled:!m},__("Submit Feedback","sensei-lms")),(0,i.createElement)("button",{className:"button button-secondary",onClick:n,type:"button"},__("Skip Feedback","sensei-lms"))))};
+/* harmony import */var r=n(25773),a=n(66886),i=n(69307),o=n(65736),s=n(27253),l=n(3306),__=o.__,u=function(e){var t=e.submit,n=e.skip,o=(0,i.useRef)(null),u=(0,i.useState)(null),c=(0,a/* ["default"] */.Z)(u,2)[1],d=(0,i.useCallback)((function(e){e.preventDefault();var n=new window.FormData(o.current),r=n.get("reason");t({reason:r,details:r&&n.get("details-".concat(r))})}),[t]),m=!1;if(o.current){var f,p=new window.FormData(o.current),v="details-".concat(p.get("reason")),y=(null===(f=o.current)||void 0===f?void 0:f.elements[v])||!1;m=!(!p.get("reason")||y&&""===p.get(v).trim())}return(0,i.createElement)("form",{onChange:function(){var e=new window.FormData(o.current);c(e.values())},className:"sensei-modal sensei-exit-survey",ref:o,onSubmit:d},(0,i.createElement)("div",{className:"sensei-exit-survey__content"},(0,i.createElement)("h2",null,__("Quick Feedback","sensei-lms")),(0,i.createElement)("p",null,__("If you have a moment, please let us know why you are deactivating so that we can work to improve our product.","sensei-lms")),l/* .reasons.map */.l.map((function(e){return(0,i.createElement)(s/* .ExitSurveyFormItem */.o,(0,r/* ["default"] */.Z)({key:e.id},e))}))),(0,i.createElement)("div",{className:"sensei-exit-survey__buttons"},(0,i.createElement)("button",{className:"button button-primary",type:"submit",disabled:!m},__("Submit Feedback","sensei-lms")),(0,i.createElement)("button",{className:"button button-secondary",onClick:n,type:"button"},__("Skip Feedback","sensei-lms"))))};
 /* harmony import */}
 /***/,
 /***/3306:
@@ -22,13 +22,13 @@
 /* harmony export */n.d(t,{
 /* harmony export */l:()=>/* binding */a
 /* harmony export */});
-/* harmony import */var r=n(5736),__=r.__,a=[{id:"no-longer-need",label:__("I no longer need the plugin","sensei-lms")},{id:"not-working",label:__("The plugin isn't working","sensei-lms"),detailsLabel:__("What isn't working properly?","sensei-lms")},{id:"different-functionality",label:__("I'm looking for different functionality","sensei-lms"),detailsLabel:__("What functionality is missing?","sensei-lms")},{id:"found-better-plugin",label:__("I found a better plugin","sensei-lms"),detailsLabel:__("What's the name of the plugin?","sensei-lms")},{id:"temporary",label:__("It's a temporary deactivation","sensei-lms")},{id:"other",label:"Other",detailsLabel:__("Why are you deactivating?","sensei-lms")}];
+/* harmony import */var r=n(65736),__=r.__,a=[{id:"no-longer-need",label:__("I no longer need the plugin","sensei-lms")},{id:"not-working",label:__("The plugin isn't working","sensei-lms"),detailsLabel:__("What isn't working properly?","sensei-lms")},{id:"different-functionality",label:__("I'm looking for different functionality","sensei-lms"),detailsLabel:__("What functionality is missing?","sensei-lms")},{id:"found-better-plugin",label:__("I found a better plugin","sensei-lms"),detailsLabel:__("What's the name of the plugin?","sensei-lms")},{id:"temporary",label:__("It's a temporary deactivation","sensei-lms")},{id:"other",label:"Other",detailsLabel:__("Why are you deactivating?","sensei-lms")}];
 /* harmony import */}
 /***/,
-/***/9307:
+/***/69307:
 /***/e=>{e.exports=window.wp.element;
 /***/},
-/***/5736:
+/***/65736:
 /***/e=>{e.exports=window.wp.i18n;
 /***/},
 /***/1793:
@@ -37,63 +37,63 @@
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/6470:
+/***/66470:
 /***/(e,t,n)=>{function r(e){if(Array.isArray(e))return e}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/7791:
+/***/27791:
 /***/(e,t,n)=>{function r(e,t,n,r,a,i,o){try{var s=e[i](o),l=s.value}catch(e){return void n(e)}s.done?t(l):Promise.resolve(l).then(r,a)}function a(e){return function(){var t=this,n=arguments;return new Promise((function(a,i){var o=e.apply(t,n);function s(e){r(o,a,i,s,l,"next",e)}function l(e){r(o,a,i,s,l,"throw",e)}s(void 0)}))}}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */a
 /* harmony export */})},
-/***/2951:
+/***/22951:
 /***/(e,t,n)=>{function r(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/1976:
+/***/91976:
 /***/(e,t,n)=>{function r(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}function a(e,t,n){return t&&r(e.prototype,t),n&&r(e,n),Object.defineProperty(e,"prototype",{writable:!1}),e}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */a
 /* harmony export */})},
-/***/4649:
+/***/64649:
 /***/(e,t,n)=>{function r(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/5773:
+/***/25773:
 /***/(e,t,n)=>{function r(){return r=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},r.apply(this,arguments)}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/2446:
+/***/22446:
 /***/(e,t,n)=>{function r(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,a,i=[],_n=!0,o=!1;try{for(n=n.call(e);!(_n=(r=n.next()).done)&&(i.push(r.value),!t||i.length!==t);_n=!0);}catch(e){o=!0,a=e}finally{try{_n||null==n.return||n.return()}finally{if(o)throw a}}return i}}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/3764:
+/***/53764:
 /***/(e,t,n)=>{function r(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
 /***/
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/6886:
+/***/66886:
 /***/(e,t,n)=>{
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */s
 /* harmony export */});
-/* harmony import */var r=n(6470),a=n(2446),i=n(4013),o=n(3764);
+/* harmony import */var r=n(66470),a=n(22446),i=n(64013),o=n(53764);
 /* harmony import */function s(e,t){return(0,r/* ["default"] */.Z)(e)||(0,a/* ["default"] */.Z)(e,t)||(0,i/* ["default"] */.Z)(e,t)||(0,o/* ["default"] */.Z)()}
 /***/},
-/***/4013:
+/***/64013:
 /***/(e,t,n)=>{
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */a
@@ -147,7 +147,7 @@
 /******/c.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t)
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-n=c(7791),r=c(1976),a=c(2951),i=c(4649),o=c(9307),s=c(9246),
+n=c(27791),r=c(91976),a=c(22951),i=c(64649),o=c(69307),s=c(39246),
 /**
  * WordPress dependencies
  */

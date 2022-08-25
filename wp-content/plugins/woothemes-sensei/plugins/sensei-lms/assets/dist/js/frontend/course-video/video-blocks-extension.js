@@ -1,13 +1,13 @@
 /******/(()=>{// webpackBootstrap
 /******/"use strict";
 /******/var e,n,o,t,i={
-/***/4430:
+/***/24430:
 /***/(e,n,o)=>{
 /* harmony export */o.d(n,{
 /* harmony export */K:()=>/* binding */c
 /* harmony export */});
-/* harmony import */var t=o(2694),i=window.sensei.courseVideoSettings,r=i.courseVideoRequired,d=i.courseVideoAutoComplete,s=i.courseVideoAutoPause,u={},c=function(e){var n=e.pauseVideo,o=void 0===n?function(){}:n,i=e.registerVideoEndHandler,s=void 0===i?function(){}:i,c=e.url,f=void 0===c?"":c,m=e.blockElement,E=m.hasAttribute("data-sensei-is-required"),b=m.hasAttribute("data-sensei-is-not-required");// Block level setting overwrites the course level setting.
-(E||r&&!b)&&(
+/* harmony import */var t=o(92694),i=window.sensei.courseVideoSettings,r=i.courseVideoRequired,d=i.courseVideoAutoComplete,s=i.courseVideoAutoPause,u={},c=function(e){var n=e.pauseVideo,o=void 0===n?function(){}:n,i=e.registerVideoEndHandler,s=void 0===i?function(){}:i,c=e.url,f=void 0===c?"":c,m=e.blockElement,E=m.hasAttribute("data-sensei-is-required"),g=m.hasAttribute("data-sensei-is-not-required");// Block level setting overwrites the course level setting.
+(E||r&&!g)&&(
 /**
      * Called when a required video for the current lesson is registered.
      *
@@ -21,7 +21,7 @@
      */
 (0,t.doAction)("sensei.videoProgression.registerVideo",{url:f,blockElement:m}),u[f]={pauseVideo:o,completed:!1},l()),s((function(){
 // Block level setting overwrites the course level setting.
-(E||r&&!b)&&(
+(E||r&&!g)&&(
 /**
        * Called when a required video for the current lesson is finished playing.
        *
@@ -51,12 +51,12 @@ s&&void 0!==document.hidden&&
 // eslint-disable-next-line @wordpress/no-global-event-listener
 document.addEventListener("visibilitychange",(function(){if(document.hidden)for(var e in u){var n=u[e].pauseVideo;"function"==typeof n&&n()}}),!1)
 /***/},
-/***/9446:
+/***/59446:
 /***/(e,n,o)=>{
 /* harmony export */o.d(n,{
 /* harmony export */t:()=>/* binding */r
 /* harmony export */});
-/* harmony import */var t=o(4430),i=function(e){var n=function(){};e.addEventListener("ended",(function(){n()})),(0,t/* .registerVideo */.K)({registerVideoEndHandler:function(e){n=e},pauseVideo:e.pause.bind(e),url:e.src.split("?")[0],blockElement:e.closest("figure")})},r=function(){document.querySelectorAll(".sensei-course-video-container video").forEach(i)};
+/* harmony import */var t=o(24430),i=function(e){var n=function(){};e.addEventListener("ended",(function(){n()})),(0,t/* .registerVideo */.K)({registerVideoEndHandler:function(e){n=e},pauseVideo:e.pause.bind(e),url:e.src.split("?")[0],blockElement:e.closest("figure")})},r=function(){document.querySelectorAll(".sensei-course-video-container video").forEach(i)};
 /**
  * Internal dependencies
  */
@@ -66,13 +66,13 @@ document.addEventListener("visibilitychange",(function(){if(document.hidden)for(
  * @param {HTMLElement} video The video element of the Video block.
  */}
 /***/,
-/***/1878:
+/***/21878:
 /***/(e,n,o)=>{
 /* harmony export */o.d(n,{
 /* harmony export */G:()=>/* binding */r
 /* harmony export */});
-/* harmony import */var t=o(4430),i=function(e){var n,o,i=(n=e.src,(o=n.split("?")[0].split("/"))[o.length-1]),r=function(){};// eslint-disable-next-line @wordpress/no-global-event-listener
-window.addEventListener("message",(function(n){n.source===e.contentWindow&&"ended"===n.data.event&&n.data.id===i&&r()}),!1),(0,t/* .registerVideo */.K)({registerVideoEndHandler:function(e){r=e},pauseVideo:function(){e.contentWindow.postMessage({event:"videopress_action_pause"},"*")},url:e.src.split("?")[0],blockElement:e.closest("figure")})},r=function(){document.querySelectorAll(".sensei-course-video-container.videopress-extension iframe").forEach(i)};
+/* harmony import */var t=o(24430),i=function(e){var n,o,i=(n=e.src,(o=n.split("?")[0].split("/"))[o.length-1]),r=function(){};// eslint-disable-next-line @wordpress/no-global-event-listener
+window.addEventListener("message",(function(n){n.source===e.contentWindow&&"videopress_ended"===n.data.event&&n.data.id===i&&r()}),!1),(0,t/* .registerVideo */.K)({registerVideoEndHandler:function(e){r=e},pauseVideo:function(){e.contentWindow.postMessage({event:"videopress_action_pause"},"*")},url:e.src.split("?")[0],blockElement:e.closest("figure")})},r=function(){document.querySelectorAll(".sensei-course-video-container.videopress-extension iframe").forEach(i)};
 /**
  * Internal dependencies
  */
@@ -83,12 +83,12 @@ window.addEventListener("message",(function(n){n.source===e.contentWindow&&"ende
  * @return {string} The id of the video.
  */}
 /***/,
-/***/8519:
+/***/68519:
 /***/(e,n,o)=>{
 /* harmony export */o.d(n,{
 /* harmony export */V:()=>/* binding */r
 /* harmony export */});
-/* harmony import */var t=o(4430),i=function(e){var n=function(){},o=new Vimeo.Player(e);o.on("ended",(function(){n()})),o.getVideoUrl().then((function(i){(0,t/* .registerVideo */.K)({registerVideoEndHandler:function(e){n=e},pauseVideo:o.pause.bind(o),url:i,blockElement:e.closest("figure")})}))},r=function(){document.querySelectorAll(".sensei-course-video-container.vimeo-extension iframe").forEach(i)};
+/* harmony import */var t=o(24430),i=function(e){var n=function(){},o=new Vimeo.Player(e);o.on("ended",(function(){n()})),o.getVideoUrl().then((function(i){(0,t/* .registerVideo */.K)({registerVideoEndHandler:function(e){n=e},pauseVideo:o.pause.bind(o),url:i,blockElement:e.closest("figure")})}))},r=function(){document.querySelectorAll(".sensei-course-video-container.vimeo-extension iframe").forEach(i)};
 /**
  * Internal dependencies
  */
@@ -98,12 +98,14 @@ window.addEventListener("message",(function(n){n.source===e.contentWindow&&"ende
  * @param {HTMLElement} iframe The iframe element of the Vimeo video block.
  */}
 /***/,
-/***/9039:
+/***/39039:
 /***/(e,n,o)=>{
 /* harmony export */o.d(n,{
 /* harmony export */$:()=>/* binding */u
 /* harmony export */});
-/* harmony import */var t=o(4430),i=function(e){var n=function(){},o=new YT.Player(e,{events:{onStateChange:function(e){e.data===YT.PlayerState.ENDED&&n()},onReady:function(){(0,t/* .registerVideo */.K)({pauseVideo:o.pauseVideo.bind(o),registerVideoEndHandler:function(e){n=e},url:o.getVideoUrl(),blockElement:e.closest("figure")})}}})},r=!1,d=!1,s=function(){r&&d&&document.querySelectorAll(".sensei-course-video-container.youtube-extension iframe").forEach(i)},u=function(){r=!0,s()},c=void 0!==window.onYouTubeIframeAPIReady?window.onYouTubeIframeAPIReady:function(){};
+/* harmony import */var t=o(24430),i=function(e){var n=function(){},o=YT.get(e.id)||new YT.Player(e),i=function(){(0,t/* .registerVideo */.K)({pauseVideo:o.pauseVideo.bind(o),registerVideoEndHandler:function(e){n=e},url:o.getVideoUrl(),blockElement:e.closest("figure")})};o.getDuration?
+// Just in case it's called after the player is ready.
+i():o.addEventListener("onReady",i),o.addEventListener("onStateChange",(function(e){e.data===YT.PlayerState.ENDED&&n()}))},r=!1,d=!1,s=function(){r&&d&&document.querySelectorAll(".sensei-course-video-container.youtube-extension iframe").forEach(i)},u=function(){r=!0,s()};
 /**
  * Internal dependencies
  */
@@ -111,9 +113,9 @@ window.addEventListener("message",(function(n){n.source===e.contentWindow&&"ende
  * Initializes the YouTube video block player.
  *
  * @param {HTMLElement} iframe The iframe element of the YouTube video block.
- */window.onYouTubeIframeAPIReady=function(){d=!0,s(),c()}}
+ */window.senseiYouTubeIframeAPIReady.then((function(){d=!0,s()}))}
 /***/,
-/***/2694:
+/***/92694:
 /***/e=>{e.exports=window.wp.hooks;
 /***/
 /******/}},r={};
@@ -163,7 +165,7 @@ window.addEventListener("message",(function(n){n.source===e.contentWindow&&"ende
 /******/d.o=(e,n)=>Object.prototype.hasOwnProperty.call(e,n)
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-e=d(9039),n=d(9446),o=d(8519),t=d(1878),
+e=d(39039),n=d(59446),o=d(68519),t=d(21878),
 /**
  * Internal dependencies
  */

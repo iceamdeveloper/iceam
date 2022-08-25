@@ -1,11 +1,11 @@
 /******/(()=>{// webpackBootstrap
 /******/var e={
-/***/6539:
-/***/(e,t,n)=>{var r=n(7400).Symbol;
+/***/96539:
+/***/(e,t,n)=>{var r=n(77400).Symbol;
 /** Built-in value references. */e.exports=r}
 /***/,
-/***/9736:
-/***/(e,t,n)=>{var r=n(6539),o=n(4840),i=n(1258),s=r?r.toStringTag:void 0;
+/***/99736:
+/***/(e,t,n)=>{var r=n(96539),o=n(34840),i=n(21258),s=r?r.toStringTag:void 0;
 /** `Object#toString` result references. */e.exports=
 /**
  * The base implementation of `getTag` without fallbacks for buggy environments.
@@ -16,8 +16,8 @@
  */
 function(e){return null==e?void 0===e?"[object Undefined]":"[object Null]":s&&s in Object(e)?o(e):i(e)}}
 /***/,
-/***/4833:
-/***/(e,t,n)=>{var r=n(6127),o=/^\s+/;
+/***/74833:
+/***/(e,t,n)=>{var r=n(56127),o=/^\s+/;
 /** Used to match leading whitespace. */e.exports=
 /**
  * The base implementation of `_.trim`.
@@ -28,13 +28,13 @@ function(e){return null==e?void 0===e?"[object Undefined]":"[object Null]":s&&s 
  */
 function(e){return e?e.slice(0,r(e)+1).replace(o,""):e}}
 /***/,
-/***/9120:
+/***/39120:
 /***/e=>{
 /** Detect free variable `global` from Node.js. */
 var t="object"==typeof window&&window&&window.Object===Object&&window;e.exports=t}
 /***/,
-/***/4840:
-/***/(e,t,n)=>{var r=n(6539),o=Object.prototype,i=o.hasOwnProperty,s=o.toString,c=r?r.toStringTag:void 0;
+/***/34840:
+/***/(e,t,n)=>{var r=n(96539),o=Object.prototype,i=o.hasOwnProperty,s=o.toString,c=r?r.toStringTag:void 0;
 /** Used for built-in method references. */e.exports=
 /**
  * A specialized version of `baseGetTag` which ignores `Symbol.toStringTag` values.
@@ -45,7 +45,7 @@ var t="object"==typeof window&&window&&window.Object===Object&&window;e.exports=
  */
 function(e){var t=i.call(e,c),n=e[c];try{e[c]=void 0;var r=!0}catch(e){}var o=s.call(e);return r&&(t?e[c]=n:delete e[c]),o}}
 /***/,
-/***/1258:
+/***/21258:
 /***/e=>{
 /** Used for built-in method references. */
 var t=Object.prototype.toString;
@@ -63,11 +63,11 @@ var t=Object.prototype.toString;
  */
 function(e){return t.call(e)}}
 /***/,
-/***/7400:
-/***/(e,t,n)=>{var r=n(9120),o="object"==typeof self&&self&&self.Object===Object&&self,i=r||o||Function("return this")();
+/***/77400:
+/***/(e,t,n)=>{var r=n(39120),o="object"==typeof self&&self&&self.Object===Object&&self,i=r||o||Function("return this")();
 /** Detect free variable `self`. */e.exports=i}
 /***/,
-/***/6127:
+/***/56127:
 /***/e=>{
 /** Used to match a single whitespace character. */
 var t=/\s/;
@@ -80,8 +80,8 @@ var t=/\s/;
  * @returns {number} Returns the index of the last non-whitespace character.
  */e.exports=function(e){for(var n=e.length;n--&&t.test(e.charAt(n)););return n}}
 /***/,
-/***/6726:
-/***/(e,t,n)=>{var r=n(1611),o=n(2846),i=n(1936),s=Math.max,c=Math.min;
+/***/66726:
+/***/(e,t,n)=>{var r=n(11611),o=n(82846),i=n(91936),s=Math.max,c=Math.min;
 /** Error message constants. */e.exports=
 /**
  * Creates a debounced function that delays invoking `func` until after `wait`
@@ -155,7 +155,7 @@ return f=void 0,y&&a?w(e):(a=u=void 0,l)}function S(){var e=o(),n=g(e);if(a=argu
 // Handle invocations in a tight loop.
 return clearTimeout(f),f=setTimeout(O,t),w(p)}return void 0===f&&(f=setTimeout(O,t)),l}return t=i(t)||0,r(n)&&(m=!!n.leading,d=(b="maxWait"in n)?s(i(n.maxWait)||0,t):d,y="trailing"in n?!!n.trailing:y),S.cancel=function(){void 0!==f&&clearTimeout(f),v=0,a=p=u=f=void 0},S.flush=function(){return void 0===f?l:j(o())},S}}
 /***/,
-/***/1611:
+/***/11611:
 /***/e=>{e.exports=
 /**
  * Checks if `value` is the
@@ -184,7 +184,7 @@ return clearTimeout(f),f=setTimeout(O,t),w(p)}return void 0===f&&(f=setTimeout(O
  */
 function(e){var t=typeof e;return null!=e&&("object"==t||"function"==t)}}
 /***/,
-/***/2360:
+/***/92360:
 /***/e=>{e.exports=
 /**
  * Checks if `value` is object-like. A value is object-like if it's not `null`
@@ -212,8 +212,8 @@ function(e){var t=typeof e;return null!=e&&("object"==t||"function"==t)}}
  */
 function(e){return null!=e&&"object"==typeof e}}
 /***/,
-/***/5193:
-/***/(e,t,n)=>{var r=n(9736),o=n(2360);
+/***/55193:
+/***/(e,t,n)=>{var r=n(99736),o=n(92360);
 /** `Object#toString` result references. */e.exports=
 /**
  * Checks if `value` is classified as a `Symbol` primitive or object.
@@ -234,8 +234,8 @@ function(e){return null!=e&&"object"==typeof e}}
  */
 function(e){return"symbol"==typeof e||o(e)&&"[object Symbol]"==r(e)}}
 /***/,
-/***/2846:
-/***/(e,t,n)=>{var r=n(7400);
+/***/82846:
+/***/(e,t,n)=>{var r=n(77400);
 /**
  * Gets the timestamp of the number of milliseconds that have elapsed since
  * the Unix epoch (1 January 1970 00:00:00 UTC).
@@ -253,8 +253,8 @@ function(e){return"symbol"==typeof e||o(e)&&"[object Symbol]"==r(e)}}
  * // => Logs the number of milliseconds it took for the deferred invocation.
  */e.exports=function(){return r.Date.now()}}
 /***/,
-/***/1936:
-/***/(e,t,n)=>{var r=n(4833),o=n(1611),i=n(5193),s=/^[-+]0x[0-9a-f]+$/i,c=/^0b[01]+$/i,a=/^0o[0-7]+$/i,u=parseInt;
+/***/91936:
+/***/(e,t,n)=>{var r=n(74833),o=n(11611),i=n(55193),s=/^[-+]0x[0-9a-f]+$/i,c=/^0b[01]+$/i,a=/^0o[0-7]+$/i,u=parseInt;
 /** Used as references for various `Number` constants. */e.exports=
 /**
  * Converts `value` to a number.
@@ -283,7 +283,7 @@ function(e){if("number"==typeof e)return e;if(i(e))return NaN;if(o(e)){var t="fu
 /***/,
 /***/5308:
 /***/(e,t,n)=>{"use strict";
-/* harmony import */var r=n(6726),o=n.n(r);
+/* harmony import */var r=n(66726),o=n.n(r);
 /* harmony import */ // eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener("DOMContentLoaded",(function(){var e=document.querySelector("#wpadminbar");function t(){var t=e.getBoundingClientRect(),n=t.top,r=t.height,o=Math.max(0,r+n);document.documentElement.style.setProperty("--sensei-wpadminbar-offset",o+"px")}e&&(t(),// eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener("scroll",t,{capture:!1,passive:!0}),
@@ -296,12 +296,12 @@ window.addEventListener("scroll",t,{capture:!1,passive:!0}),
 // eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener("resize",o()(t,500)))}))}
 /***/,
-/***/3857:
+/***/68825:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */n.d(t,{
 /* harmony export */F:()=>/* binding */s
 /* harmony export */});
-/* harmony import */var r=n(7701),o=n.n(r),i=n(5736),__=i.__,s=function(){o()((function(){var e=document.querySelectorAll('[data-id="complete-lesson-form"]'),t=document.querySelectorAll('[data-id="complete-lesson-button"]'),n=document.querySelectorAll(".sensei-course-theme-course-progress-bar-inner"),r=document.querySelector(".sensei-course-theme__main-content"),o=function(e,n){e.preventDefault(),t.forEach((function(e){e.setAttribute("disabled","disabled"),e.classList.add("is-busy")})),setTimeout((function(){n.submit()}),1e3)},i=function(e){var t=e.target;o(e,t),n.forEach((function(e){var t=e.dataset,n=(+t.completed+1)/+t.count*100;// Percentage with one more completed.
+/* harmony import */var r=n(47701),o=n.n(r),i=n(65736),__=i.__,s=function(){o()((function(){var e=document.querySelectorAll('[data-id="complete-lesson-form"]'),t=document.querySelectorAll('[data-id="complete-lesson-button"]'),n=document.querySelectorAll(".sensei-course-theme-course-progress-bar-inner"),r=document.querySelector(".sensei-course-theme__main-content"),o=function(e,n){e.preventDefault(),t.forEach((function(e){e.setAttribute("disabled","disabled"),e.classList.add("is-busy")})),setTimeout((function(){n.submit()}),1e3)},i=function(e){var t=e.target;o(e,t),n.forEach((function(e){var t=e.dataset,n=(+t.completed+1)/+t.count*100;// Percentage with one more completed.
 e.style.width="".concat(n,"%")})),r.insertAdjacentHTML("beforebegin",'<div class="sensei-course-theme-lesson-completion-notice">\n\t\t\t\t\t'.concat(window.sensei.checkCircleIcon,'\n\t\t\t\t\t<p role="alert" class="sensei-course-theme-lesson-completion-notice__text">\n\t\t\t\t\t\t').concat(__("Lesson complete","sensei-lms"),"\n\t\t\t\t\t</p>\n\t\t\t\t</div>"))};e.forEach((function(e){e.addEventListener("submit",i)}))}))};
 /* harmony import */}
 /***/,
@@ -310,7 +310,7 @@ e.style.width="".concat(n,"%")})),r.insertAdjacentHTML("beforebegin",'<div class
 /* harmony export */n.d(t,{
 /* harmony export */R:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var r=n(4649),o=n(189);
+/* harmony import */var r=n(64649),o=n(50189);
 /* harmony import */
 /**
  * @module ContactTeacher
@@ -342,15 +342,15 @@ e.preventDefault();var i=e.target,s=i.querySelector("button.sensei-contact-teach
 var r="sensei-course-theme--focus-mode",o="sensei-course-theme__sidebar--hidden",i=function(){var e=window.sessionStorage.getItem(r);if(e)try{var t=JSON.parse(e);"boolean"==typeof t&&s(t,!0)}catch(e){}},s=function(e,t){var n=document.body.classList,i=document.querySelector(".sensei-course-theme__sidebar"),s=n.contains(r),c=void 0===e?!s:e;c?t&&i.classList.add(o):i.classList.remove(o),n.toggle(r,c),window.sessionStorage.setItem(r,JSON.stringify(c))};// eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener("DOMContentLoaded",(function(){i(),setTimeout((function(){document.body.classList.add("".concat(r,"--animated"))}),500),document.querySelector(".sensei-course-theme__sidebar").addEventListener("transitionend",(function(e){"left"===e.propertyName&&document.body.classList.contains(r)&&document.querySelector(".sensei-course-theme__sidebar").classList.add(o)}))}))}
 /***/,
-/***/1971:
+/***/91971:
 /***/(e,t,n)=>{"use strict";
-/* harmony import */var r=n(6886),o=0,i="scroll",s=function(e){var t=e<0?["up","down"]:["down","up"],n=(0,r/* ["default"] */.Z)(t,2),o=n[0],s=n[1];document.body.classList.remove("".concat(i,"-").concat(s)),document.body.classList.add("".concat(i,"-").concat(o))};// eslint-disable-next-line @wordpress/no-global-event-listener
+/* harmony import */var r=n(66886),o=0,i="scroll",s=function(e){var t=e<0?["up","down"]:["down","up"],n=(0,r/* ["default"] */.Z)(t,2),o=n[0],s=n[1];document.body.classList.remove("".concat(i,"-").concat(s)),document.body.classList.add("".concat(i,"-").concat(o))};// eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener("scroll",(function(){var e=document.documentElement,t=e.scrollTop,n=e.scrollHeight,r=e.clientHeight,c=t-o;o=Math.max(0,t),s(c);var a=n-t-r<100;document.body.classList.toggle("".concat(i,"-bottom"),a)}),{capture:!1,passive:!0})}
 /***/,
-/***/7701:
+/***/47701:
 /***/e=>{"use strict";e.exports=window.wp.domReady}
 /***/,
-/***/5736:
+/***/65736:
 /***/e=>{"use strict";e.exports=window.wp.i18n}
 /***/,
 /***/1793:
@@ -359,46 +359,46 @@ window.addEventListener("scroll",(function(){var e=document.documentElement,t=e.
 /***/n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/6470:
+/***/66470:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */function r(e){if(Array.isArray(e))return e}
 /***/n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/4649:
+/***/64649:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */function r(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}
 /***/n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/2446:
+/***/22446:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */function r(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,o,i=[],_n=!0,s=!1;try{for(n=n.call(e);!(_n=(r=n.next()).done)&&(i.push(r.value),!t||i.length!==t);_n=!0);}catch(e){s=!0,o=e}finally{try{_n||null==n.return||n.return()}finally{if(s)throw o}}return i}}
 /***/n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/3764:
+/***/53764:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */function r(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
 /***/n.d(t,{
 /* harmony export */Z:()=>/* binding */r
 /* harmony export */})},
-/***/189:
+/***/50189:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var r=n(4649);function o(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}function i(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?o(Object(n),!0).forEach((function(t){(0,r/* ["default"] */.Z)(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):o(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}
+/* harmony import */var r=n(64649);function o(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}function i(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?o(Object(n),!0).forEach((function(t){(0,r/* ["default"] */.Z)(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):o(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}
 /***/},
-/***/6886:
+/***/66886:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */c
 /* harmony export */});
-/* harmony import */var r=n(6470),o=n(2446),i=n(4013),s=n(3764);
+/* harmony import */var r=n(66470),o=n(22446),i=n(64013),s=n(53764);
 /* harmony import */function c(e,t){return(0,r/* ["default"] */.Z)(e)||(0,o/* ["default"] */.Z)(e,t)||(0,i/* ["default"] */.Z)(e,t)||(0,s/* ["default"] */.Z)()}
 /***/},
-/***/4013:
+/***/64013:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */n.d(t,{
 /* harmony export */Z:()=>/* binding */o
@@ -453,8 +453,8 @@ window.addEventListener("scroll",(function(){var e=document.documentElement,t=e.
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (()=>{"use strict";
-/* harmony import */n(1971),n(5308)
-/* harmony import */;var e=n(3814),t=n(1487),r=n(3857);
+/* harmony import */n(91971),n(5308)
+/* harmony import */;var e=n(3814),t=n(1487),r=n(68825);
 /**
  * Internal dependencies
  */

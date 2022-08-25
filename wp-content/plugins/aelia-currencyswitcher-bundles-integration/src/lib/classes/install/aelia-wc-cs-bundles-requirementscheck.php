@@ -16,7 +16,7 @@ class Aelia_WC_CS_Bundles_RequirementsChecks extends Aelia_WC_RequirementsChecks
 	protected $required_plugins = array(
 		'WooCommerce' => '3.0',
 		'Aelia Foundation Classes for WooCommerce' => array(
-			'version' => '1.8.4.170307',
+			'version' => '2.3.0.220730',
 			'extra_info' => 'You can get the plugin <a href="http://bit.ly/WC_AFC_S3">from our site</a>, free of charge.',
 			'autoload' => true,
 			'url' => 'http://bit.ly/WC_AFC_S3',
@@ -26,7 +26,7 @@ class Aelia_WC_CS_Bundles_RequirementsChecks extends Aelia_WC_RequirementsChecks
 			'extra_info' => 'You can buy the plugin <a href="https://aelia.co/shop/currency-switcher-woocommerce/">from our shop</a>.',
 		),
 		'WooCommerce Product Bundles' => array(
-			'version' => '5.10',
+			'version' => '5.2',
 		),
 	);
 

@@ -198,7 +198,9 @@ class Subscriptions_Integration {
 	 * @since 1.5.0.200410
 	 */
 	protected function should_preserve_renewal_price($product) {
-		return !empty($product->aelia_product_renewal) ||
+		// @note Dynamic property
+		// @since x.x
+		return !empty(aelia_get_object_aux_data($product, 'aelia_product_renewal')) ||
 					 // If argument "subscription_renewal" is set, we are processing a renewal. The price
 					 // of the product being handled should not be touched
 					 // @since 1.5.3.200617
@@ -271,44 +273,54 @@ class Subscriptions_Integration {
 
 		// If the regular price is not valid, take it from the base currency
 		// @since 1.4.0.181107
-		$product->regular_price = isset($product_regular_prices_in_currency[$currency]) ? $product_regular_prices_in_currency[$currency] : null;
-		if(($currency != $product_base_currency) && !is_numeric($product->regular_price)) {
-			$product->regular_price = $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'regular_price');
+		$product_regular_price = isset($product_regular_prices_in_currency[$currency]) ? $product_regular_prices_in_currency[$currency] : null;
+		if(($currency != $product_base_currency) && !is_numeric($product_regular_price)) {
+			$product_regular_price = $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_price, $currency, $product_base_currency, $product, 'regular_price');
 		}
 
 		// If the sale price is not valid, take it from the base currency
 		// @since 1.4.0.181107
-		$product->sale_price = isset($product_sale_prices_in_currency[$currency]) ? $product_sale_prices_in_currency[$currency] : null;
-		if(($currency != $product_base_currency) && !is_numeric($product->sale_price)) {
-			$product->sale_price = $this->currencyprices_manager()->convert_product_price_from_base($base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
+		$product_sale_price = isset($product_sale_prices_in_currency[$currency]) ? $product_sale_prices_in_currency[$currency] : null;
+		if(($currency != $product_base_currency) && !is_numeric($product_sale_price)) {
+			$product_sale_price = $this->currencyprices_manager()->convert_product_price_from_base($base_sale_price, $currency, $product_base_currency, $product, 'sale_price');
 		}
 
 		// If the sign up fee is not valid, take it from the base currency
 		// @since 1.4.0.181107
-		$product->subscription_sign_up_fee = isset($product_signup_prices_in_currency[$currency]) ? $product_signup_prices_in_currency[$currency] : null;
-		if(($currency != $product_base_currency) && !is_numeric($product->subscription_sign_up_fee)) {
-			$product->subscription_sign_up_fee = $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_sign_up_fee, $currency, $product_base_currency, $product, 'signup_fee');
+		$product_subscription_sign_up_fee = isset($product_signup_prices_in_currency[$currency]) ? $product_signup_prices_in_currency[$currency] : null;
+		if(($currency != $product_base_currency) && !is_numeric($product_subscription_sign_up_fee)) {
+			$product_subscription_sign_up_fee = $this->currencyprices_manager()->convert_product_price_from_base($base_subscription_sign_up_fee, $currency, $product_base_currency, $product, 'signup_fee');
 		}
 
-		if(is_numeric($product->sale_price) &&
-			 $this->product_is_on_sale($product, $product->sale_price, $product->regular_price)) {
-			$product->price = $product->sale_price;
+		if(is_numeric($product_sale_price) &&
+			 $this->product_is_on_sale($product, $product_sale_price, $product_regular_price)) {
+			$product_price = $product_sale_price;
 		}
 		else {
-			$product->price = $product->regular_price;
+			$product_price = $product_regular_price;
 		}
-		$product->subscription_price = $product->price;
+		$product_subscription_price = $product_price;
+
+		// New logic to replace dynamic properties
+		// @note Dynamic property
+		// @since 1.7.0.220730
+		aelia_set_object_aux_data($product, 'regular_price', $product_regular_price);
+		aelia_set_object_aux_data($product, 'sale_price', $product_sale_price);
+		aelia_set_object_aux_data($product, 'price', $product_price);
+
+		aelia_set_object_aux_data($product, 'subscription_price', $product_subscription_price);
+		aelia_set_object_aux_data($product, 'subscription_sign_up_fee', $product_subscription_sign_up_fee);
 
 		// @since 1.3.1.170405
-		$product->set_regular_price($product->regular_price);
-		$product->set_sale_price($product->sale_price);
+		$product->set_regular_price($product_regular_price);
+		$product->set_sale_price($product_sale_price);
 
 		// If the subscription is being renewed and the renewal price should be
 		// preserved, keep the price set by the subscription plugin, instead of the
 		// latest one
 		// @since 1.5.0.200410
 		if(!$this->should_preserve_renewal_price($product)) {
-			$product->set_price($product->price);
+			$product->set_price($product_price);
 		}
 
 		return $product;
@@ -366,7 +378,9 @@ class Subscriptions_Integration {
 
 		// Tag products being resubscribed
 		if(isset($cart_item['subscription_resubscribe'])) {
-			$cart_item['data']->aelia_product_resubscribe = true;
+			// @note Dynamic property
+			// @since x.x
+			aelia_set_object_aux_data($cart_item['data'], 'aelia_product_resubscribe', true);
 
 			// Fetch the currency of the original subscription. This will be used to force the
 			// checkout in that currency during the resubscription
@@ -376,7 +390,10 @@ class Subscriptions_Integration {
 
 		// Tag products being renewed
 		if(isset($cart_item['subscription_renewal'])) {
-			$cart_item['data']->aelia_product_renewal = true;
+			// @note Dynamic property
+			// @since x.x
+			aelia_set_object_aux_data($cart_item['data'], 'aelia_product_renewal', true);
+
 
 			// Fetch the currency of the original subscription. This will be used to force the
 			// checkout in that currency during the renewal
@@ -387,7 +404,10 @@ class Subscriptions_Integration {
 		// Tag products being switched
 		// @since 1.3.6.170531
 		if(isset($cart_item['subscription_switch'])) {
-			$cart_item['data']->aelia_product_switch = true;
+			// @note Dynamic property
+			// @since x.x
+			aelia_set_object_aux_data($cart_item['data'], 'aelia_product_switch', true);
+
 
 			// Fetch the currency of the original subscription. This will be used to force the
 			// checkout in that currency during the switch
@@ -426,9 +446,11 @@ class Subscriptions_Integration {
 		 */
 		$this->tag_cart_resubscribes_and_renewals();
 
-		return !empty($product->aelia_product_renewal) ||
-					 !empty($product->aelia_product_resubscribe) ||
-					 !empty($product->aelia_product_switch);
+		// @note Dynamic property
+		// @since x.x
+		return !empty(aelia_get_object_aux_data($product, 'aelia_product_renewal')) ||
+					 !empty(aelia_get_object_aux_data($product, 'aelia_product_resubscribe')) ||
+					 !empty(aelia_get_object_aux_data($product, 'aelia_product_switch'));
 	}
 
 	/**
@@ -455,7 +477,9 @@ class Subscriptions_Integration {
 		 */
 		$this->tag_cart_resubscribes_and_renewals();
 
-		return !empty($product->aelia_product_switch);
+		// @note Dynamic property
+		// @since x.x
+		return !empty(aelia_get_object_aux_data($product, 'aelia_product_switch'));
 	}
 
 	public function __construct() {
@@ -668,10 +692,12 @@ class Subscriptions_Integration {
 				continue;
 			}
 
-			$variation_regular_prices[] = $variation->regular_price;
-			$variation_sale_prices[] = $variation->sale_price;
-			$variation_signup_prices[] = $variation->subscription_sign_up_fee;
-			$variation_prices[] = $variation->price;
+			// @note Dynamic property
+			// @since 1.7.0.220730
+			$variation_regular_prices[] = aelia_get_object_aux_data($variation, 'regular_price');
+			$variation_sale_prices[] = aelia_get_object_aux_data($variation, 'sale_price');
+			$variation_signup_prices[] = aelia_get_object_aux_data($variation, 'subscription_sign_up_fee');
+			$variation_prices[] = aelia_get_object_aux_data($variation, 'price');
 		}
 
 		// Filter out all the non-numeric prices for the variations. The remaining prices will be used to determine
@@ -682,27 +708,46 @@ class Subscriptions_Integration {
 		$variation_prices = is_array($variation_prices) ? array_filter($variation_prices, array($this, 'keep_numeric')) : array() ;
 		$variation_signup_prices = is_array($variation_signup_prices) ? array_filter($variation_signup_prices, array($this, 'keep_numeric')) : array() ;
 
-		$product->min_variation_regular_price = $currencyprices_manager->get_min_value($variation_regular_prices);
-		$product->max_variation_regular_price = $currencyprices_manager->get_max_value($variation_regular_prices);
+		// Only set the properties if they actually exists on the object. This is to ensure compatibility
+		// with PHP 8.2, which deprecates dynamic properties. If these properties don't exist, then they
+		// aren't going to be used anyway.
+		// @since 4.14.0.220730
+		aelia_maybe_set_object_prop($product, 'min_variation_regular_price', $currencyprices_manager->get_min_value($variation_regular_prices));
+		aelia_maybe_set_object_prop($product, 'max_variation_regular_price', $currencyprices_manager->get_max_value($variation_regular_prices));
 
-		$product->min_variation_sale_price = $currencyprices_manager->get_min_value($variation_sale_prices);
-		$product->max_variation_sale_price = $currencyprices_manager->get_max_value($variation_sale_prices);
+		aelia_maybe_set_object_prop($product, 'min_variation_sale_price', $currencyprices_manager->get_min_value($variation_sale_prices));
+		aelia_maybe_set_object_prop($product, 'max_variation_sale_price', $currencyprices_manager->get_max_value($variation_sale_prices));
 
-		$product->min_variation_price = $currencyprices_manager->get_min_value($variation_prices);
-		$product->max_variation_price = $currencyprices_manager->get_max_value($variation_prices);
+		aelia_maybe_set_object_prop($product, 'min_variation_price', $currencyprices_manager->get_min_value($variation_prices));
+		aelia_maybe_set_object_prop($product, 'max_variation_price', $currencyprices_manager->get_max_value($variation_prices));
 
-		$product->min_subscription_sign_up_fee = $currencyprices_manager->get_min_value($variation_signup_prices);
-		$product->max_subscription_sign_up_fee = $currencyprices_manager->get_max_value($variation_signup_prices);
+		aelia_maybe_set_object_prop($product, 'min_subscription_sign_up_fee', $currencyprices_manager->get_min_value($variation_signup_prices));
+		aelia_maybe_set_object_prop($product, 'max_subscription_sign_up_fee', $currencyprices_manager->get_max_value($variation_signup_prices));
 
-		$product->subscription_price = $product->min_variation_price;
-		$product->price = $product->subscription_price;
-		$product->subscription_sign_up_fee = $product->min_subscription_sign_up_fee;
+		// Keep track of the product prices, using the new logic to handle auxiliary data
+		// @note Dynamic property
+		// @since 4.14.0.220730
+		$product_subscription_price = $currencyprices_manager->get_min_value($variation_prices);
+		$product_subscription_sign_up_fee = $currencyprices_manager->get_min_value($variation_signup_prices);
+
+		aelia_set_object_aux_data($product, 'subscription_price', $product_subscription_price);
+		// The product price always has the same value as the subscription price, as it represents the same information, i.e.
+		// the price that the customer will pay on a regular basis
+		aelia_set_object_aux_data($product, 'price', $product_subscription_price);
+		aelia_set_object_aux_data($product, 'subscription_sign_up_fee', $product_subscription_sign_up_fee);
 
 		if(!isset($product->max_variation_period)) {
-			$product->max_variation_period = '';
+			// Only set the property if it actually exists on the object. This is to ensure compatibility
+			// with PHP 8.2, which deprecates dynamic propertis
+			// @since 1.7.0.220730
+			aelia_maybe_set_object_prop($product, 'max_variation_period', '');
 		}
+
 		if(!isset($product->max_variation_period_interval)) {
-			$product->max_variation_period_interval = '';
+			// Only set the property if it actually exists on the object. This is to ensure compatibility
+			// with PHP 8.2, which deprecates dynamic propertis
+			// @since 1.7.0.220730
+			aelia_maybe_set_object_prop($product, 'max_variation_period_interval', '');
 		}
 
 		return $product;
@@ -737,9 +782,16 @@ class Subscriptions_Integration {
 	 * @since 1.3.1.170405
 	 */
 	protected function product_requires_conversion($product, $currency) {
+		// Fetch the currency from the product
+		// @note Dynamic property
+		// @since 1.7.0.220730
+		$product_currency = aelia_get_object_aux_data($product, 'currency');
+
 		// If the product is already in the target currency, it doesn't require
-		// conversion
-		return empty($product->currency) || ($product->currency != $currency);
+		// conversion.
+		// Filter "wc_aelia_cs_product_requires_conversion" will allow 3rd parties
+		// to skip the conversion in specific cases
+		return apply_filters('wc_aelia_cs_product_requires_conversion', empty($product_currency) || ($product_currency != $currency), $product, $currency);
 	}
 
 	/**
@@ -786,11 +838,11 @@ class Subscriptions_Integration {
 			}
 		}
 
-		// Check that the subscription price exist and that nobody else changed
-		// it against the product, before returning it
-		// @since 1.4.5.190307
-		if(property_exists($product, 'subscription_price')) {
-			$subscription_price = $product->subscription_price;
+		// Only use the price calculated by the Currency Switcher if it's not null
+		// @since 1.7.0.220730
+		$aelia_subscription_price = aelia_get_object_aux_data($product, 'subscription_price');
+		if($aelia_subscription_price != null) {
+			$subscription_price = $aelia_subscription_price;
 		}
 
 		return $subscription_price;
@@ -827,8 +879,12 @@ class Subscriptions_Integration {
 			// we cant' take the sign up fee from the product and convert it, as we would overwrite the
 			// pro-rates sign up fee.
 			// @since 1.4.6.190807
-			if(property_exists($product, 'subscription_sign_up_fee') && is_numeric($product->subscription_sign_up_fee)) {
-				$subscription_sign_up_fee = (float)$product->subscription_sign_up_fee;
+
+			// Only use the price calculated by the Currency Switcher if it's not null
+			// @since 1.7.0.220730
+			$aelia_subscription_sign_up_fee = aelia_get_object_aux_data($product, 'subscription_sign_up_fee');
+			if(($aelia_subscription_sign_up_fee != null) && is_numeric($aelia_subscription_sign_up_fee)) {
+				$subscription_sign_up_fee = (float)$aelia_subscription_sign_up_fee;
 			}
 		}
 
@@ -846,7 +902,7 @@ class Subscriptions_Integration {
 	 * @since 1.4.9.191219
 	 */
 	public function wc_aelia_cs_product_should_have_property($should_have_property, $product, $property_name) {
-		if($product->is_type( 'variable-subscription' ) && in_array($property_name, array('regular_price', 'sale_price'))) {
+		if($product->is_type('variable-subscription') && in_array($property_name, array('regular_price', 'sale_price'))) {
 			$should_have_property = false;
 		}
 		return $should_have_property;

@@ -68,10 +68,17 @@ For more information about installation and management of plugins, please refer 
 
 == Upgrade Notice ==
 
-= 2.1.1 =
-This is a major update, which introduces several important changes. **The required PHP version is now 7.0 or newer**. Please make sure that your server is configured correctly, before installing this update.
+= 2.3.0 =
+This update improves compatibility with PHP 8.2. [We recommend to read the release notes and the upgrade guidelines](https://aelia.co/php-8-performance-improvements-compatibility/) before installing this update.
 
 == Changelog ==
+
+= 2.3.0.220730 =
+* Improved compatibility with PHP 8.2. Introduced new logic to track auxiliary object data, without relying on dynamic properties.
+* Updated supported WooCommerce versions.
+
+= 2.2.9.220704 =
+* Updated supported WooCommerce versions.
 
 = 2.2.8.220607 =
 * Updated supported WooCommerce versions.

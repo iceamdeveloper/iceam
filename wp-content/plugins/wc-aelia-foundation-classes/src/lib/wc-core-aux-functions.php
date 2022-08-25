@@ -383,3 +383,66 @@ if(!function_exists('aelia_set_object_read')) {
 		return $original_value;
 	}
 }
+
+if(!function_exists('aelia_set_object_aux_data')) {
+	/**
+	 * Adds or replace the value of a piece of data in the data map.
+	 *
+	 * @param object $object
+	 * @param string $name
+	 * @param mixed $value
+	 * @return void
+	 * @since 2.3.0.220730
+	 */
+	function aelia_set_object_aux_data(object $object, string $name, $value): void {
+		\Aelia\WC\Object_Data_Tracking\Object_Data_Tracker::set_value($object, $name, $value);
+	}
+}
+
+if(!function_exists('aelia_get_object_aux_data')) {
+	/**
+	 * Returns the value of a piece of data from the data map linked to an object. If
+	 * the data is not found, null is returned.
+	 *
+	 * @param object $object
+	 * @param string $name
+	 * @return mixed
+	 * @since 2.3.0.220730
+	 */
+	function aelia_get_object_aux_data(object $object, $name) {
+		return \Aelia\WC\Object_Data_Tracking\Object_Data_Tracker::get_value($object, $name);
+	}
+}
+
+if(!function_exists('aelia_delete_object_aux_data')) {
+	/**
+	 * Adds or replace the value of a piece of data in the data map.
+	 *
+	 * @param object $object
+	 * @param string $name
+	 * @return void
+	 * @since 2.3.0.220730
+	 */
+	function aelia_delete_object_aux_data(object $object, string $name): void {
+		\Aelia\WC\Object_Data_Tracking\Object_Data_Tracker::delete_value($object, $name);
+	}
+}
+
+if(!function_exists('aelia_maybe_set_object_prop')) {
+	/**
+	 * Sets an object property, if that property exists against the object.
+	 * This function will be useful to set object properties that may be removed in
+	 * the future.
+	 *
+	 * @param object $object
+	 * @param string $name
+	 * @param mixed $value
+	 * @return void
+	 * @since 2.3.0.220730
+	 */
+	function aelia_maybe_set_object_prop(object $object, string $name, $value): void {
+		if(property_exists($object, $name)) {
+			$object->{$name} = $value;
+		}
+	}
+}

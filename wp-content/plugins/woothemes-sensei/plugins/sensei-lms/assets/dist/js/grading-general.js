@@ -1,7 +1,7 @@
 /******/(()=>{// webpackBootstrap
 /******/"use strict";
 /******/var e,__,r={
-/***/5736:
+/***/65736:
 /***/e=>{e.exports=window.wp.i18n;
 /***/
 /******/}},a={};
@@ -51,7 +51,7 @@
 /******/n.o=(e,r)=>Object.prototype.hasOwnProperty.call(e,r)
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
-e=n(5736),__=e.__,jQuery(document).ready((function(e){
+e=n(65736),__=e.__,jQuery(document).ready((function(e){
 /***************************************************************************************************
    * 	1 - Helper Functions.
    ***************************************************************************************************/

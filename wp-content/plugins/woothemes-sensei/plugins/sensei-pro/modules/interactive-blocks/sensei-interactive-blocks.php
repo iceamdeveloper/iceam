@@ -7,7 +7,7 @@
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
  * Requires at least: 5.7
  * Tested up to: 5.9
- * Requires PHP: 7.0
+ * Requires PHP: 7.2
  * Author: Automattic
  * Author URI: https://senseilms.com/
  * Text Domain: sensei-pro
@@ -26,7 +26,7 @@ if ( sensei_interactive_blocks_has_conflicts() ) {
 }
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
-define( 'SENSEI_PRO_VERSION', '1.3.0' ); // Note: this is the current sensei-pro version this plugin was built from, needed so the correct language packs are loaded (in shared module).
+define( 'SENSEI_PRO_VERSION', '1.6.0' ); // Note: this is the current sensei-pro version this plugin was built from, needed so the correct language packs are loaded (in shared module).
 define( 'SENSEI_IB_VERSION', '1.0.0' );
 define( 'SENSEI_IB_PLUGIN_FILE', __FILE__ );
 define( 'SENSEI_IB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );

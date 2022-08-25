@@ -32,6 +32,13 @@ Should you need assistance, please feel free to [contact us](https://aelia.co/co
 
 == Changelog ==
 
+= 1.7.0.220730 =
+* Improved compatibility with PHP 8.2. Introduced new logic to track auxiliary object data, without relying on dynamic properties.
+* Updated supported WooCommerce versions.
+
+= 1.6.5.220704 =
+* Updated supported WooCommerce versions.
+
 = 1.6.4.220607 =
 * Updated supported WooCommerce versions.
 

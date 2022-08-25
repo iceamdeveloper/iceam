@@ -1,28 +1,18 @@
 /**
  * External dependencies
  */
-import { Provider, useDispatch, useSelector } from 'react-redux';
-import { isEmpty } from 'lodash';
-
 /**
  * WordPress dependencies
  */
-import {
-	createElement,
-	isValidElement,
-	render,
-	useCallback,
-	useEffect,
-	useRef,
-} from '@wordpress/element';
-import { applyFilters } from '@wordpress/hooks';
+import { createElement, isValidElement, render } from '@wordpress/element';
+import { isEmpty } from 'lodash';
+import { Provider } from 'react-redux';
 
 /**
  * Internal dependencies
  */
 import { blocksStore } from './data';
-import { actions, selectors } from './data/attributes';
-import { getPersistedState } from './data/persistState';
+import { useBlocksStore } from './data/use-blocks-store';
 
 /**
  * @typedef {module:block-frontend/parse~FrontendBlock} FrontendBlock
@@ -89,78 +79,16 @@ export function RawElement( { block } ) {
 }
 
 /**
- * The last saved state in local storage.
- */
-const persistedState = getPersistedState();
-
-/**
  * Render the block's react component.
  *
  * @param {Object}        props
  * @param {FrontendBlock} props.block
  */
 export function BlockComponent( { block, ...rest } ) {
-	const {
-		blockType,
-		blockProps,
-		clientId,
-		attributes: defaultAttributes,
-	} = block;
+	const { blockType, blockId } = block;
 	const { run: Component } = blockType;
-	const blockId = blockProps[ 'data-sensei-block-id' ] || clientId;
-	const persistedAttributes = useRef(
-		selectors.getBlockAttributes( persistedState, blockId )
-	);
 
-	const dispatch = useDispatch();
-
-	// Set the attributes for the block in initial mount.
-	useEffect( () => {
-		dispatch(
-			actions.setAttributes( blockId, {
-				// Set the blockId
-				blockId,
-
-				// Set block type name.
-				blockType: block.blockType,
-
-				// Populate the attributes with the default attributes that comes with the block.
-				...defaultAttributes,
-
-				/**
-				 * Allows to modify blocks' persistedAttributes before they are
-				 * added to the store as initial state for blocks.
-				 *
-				 * @since 1.2.0
-				 *
-				 * @name sensei.blockFrontend.persistedAttributes Hook that allows you to
-				 * 												  filter persistedAttributes object.
-				 *
-				 * @param {Object}        persistedAttributes The attribures that were stored in local storage
-				 *                                            that are going to be used as initial state for the block.
-				 * @param {string}        blockId             The block id.
-				 * @param {FrontendBlock} block               The frontend block object.
-				 */
-				...applyFilters(
-					'sensei.blockFrontend.persistedAttributes',
-					persistedAttributes.current,
-					blockId,
-					block
-				),
-			} )
-		);
-	}, [] );
-
-	const attributes = useSelector( ( state ) =>
-		selectors.getBlockAttributes( state, blockId )
-	);
-
-	const setAttributes = useCallback(
-		( attr ) => {
-			dispatch( actions.setAttributes( blockId, attr ) );
-		},
-		[ blockId ]
-	);
+	const { attributes, setAttributes } = useBlocksStore( block );
 
 	// Do not render the component if there are no attributes yet.
 	if ( isEmpty( attributes ) ) {

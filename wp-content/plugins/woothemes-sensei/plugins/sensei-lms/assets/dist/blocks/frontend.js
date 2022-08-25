@@ -1,7 +1,7 @@
 /******/(()=>{// webpackBootstrap
 /******/"use strict";
 /******/var e={
-/***/503:
+/***/80503:
 /***/(e,t,n)=>{
 /* harmony import */var o=n(7705),i=document.activeElement,a=function(e){null==e||e.preventDefault();var t=(0,o/* .querySelectorAncestor */.Z)(e.target,"[data-sensei-modal]");if(t){// Put element's copy at the end of the body element.
 var n=t.cloneNode(!0);n.setAttribute("data-sensei-modal-clone",""),document.body.appendChild(n),["overlay","close"].forEach((function(e){n.querySelectorAll("[data-sensei-modal-".concat(e,"]")).forEach((function(e){e.addEventListener("click",l)}))})),// Open the modal.
@@ -13,7 +13,7 @@ window.requestAnimationFrame((function(){return window.requestAnimationFrame((fu
  * Internal dependencies
  */
 /**
- * @modulw sensei-modal
+ * @module sensei-modal
  * @description Adds a basic suport for modals via "data-sensei-modal-*" attribures on HTML elements.
  *
  * @usage
@@ -110,7 +110,7 @@ var o=function e(t){var n=arguments.length>1&&void 0!==arguments[1]?arguments[1]
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (()=>{
-/* harmony import */n(503);
+/* harmony import */n(80503);
 /**
  * Internal dependencies
  */

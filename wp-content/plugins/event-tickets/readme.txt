@@ -3,8 +3,8 @@
 Contributors: theeventscalendar, brianjessee, camwynsp, aguseo, bordoni, borkweb, GeoffBel, jentheo, leahkoerper, lucatume, neillmcshea, vicskf, zbtirrell, juanfra, moraleida.me
 Tags: tickets, registration, event registration, RSVP, ticket sales, attendee management
 Requires at least: 5.6
-Tested up to: 6.0
-Stable tag: 5.4.1
+Tested up to: 6.0.1
+Stable tag: 5.4.4
 Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -187,6 +187,50 @@ We've got a [LoopedIn](https://evnt.is/ideas) page where we're actively watching
 Check out our extensive [knowledgebase](https://evnt.is/18wm) for articles on using, tweaking, and troubleshooting our plugins.
 
 == Changelog ==
+
+= [5.4.4] 2022-08-15 =
+
+* Fix - Tickets/RSVP blocks appear in wrong place on non-events when block editor is disabled in The Events Calendar. [ET-1544]
+* Fix - Fixed searching attendees by purchaser name and email for Tickets Commerce attendees. [ET-1543]
+* Fix - Fixed concurrent RSVP booking not showing error messages for out of stock tickets. [ET-1506]
+* Fix - Fixed showing proper ticket unavailable message for past events. [ET-1146]
+* Fix - Fixed Shared Capacity calculation with capped tickets. [ETP-801]
+* Fix - Fixed logic that was causing fatal errors when using Elementor. [ET-1561]
+* Enhancement - Sorting support added on Tickets Commerce Order Report page columns. [ET-1527]
+* Enhancement - Sorting support added on Attendee Report page for Ticket, Security Code, and Check In columns. [ET-1526]
+* Enhancement - Added section about Tickets Commerce on the Tickets Home page. [ET-1539]
+* Enhancement - Tickets Commerce Stripe gateway now shows additional purchaser info metadata in Stripe dashboard. [ET-1542]
+* Enhancement - Update REST API Endpoints to have access via API KEY and remove the restriction to be using Event Tickets Plus to access the `attendees` endpoint. [ET-1559]
+* Enhancement - Allow filtering of Events Archive REST API using `ticketed` parameter to filter Ticketed and Non-ticketed events. [TEC-4439]
+* Language - 6 new strings added, 162 updated, 0 fuzzied, and 9 obsoleted
+
+= [5.4.3.1] 2022-07-21 =
+
+* Fix - Update Freemius to avoid PHP 8 fatals. [TEC-4330]
+
+= [5.4.3] 2022-07-20 =
+
+* Tweak - update TCMN to match TEC 5.16.3 [TEC-4433]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted.
+
+= [5.4.2.1] 2022-07-12 =
+
+* Fix - Fixes compatibility with Elementor-based themes. [ET-1554]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted.
+
+= [5.4.2] 2022-07-05 =
+
+* Enhancement - Unify CSS class names for many admin elements. [ET-1536]
+* Enhancement - Add a `Currency Position` setting for Tickets Commerce. [ET-1534]
+* Tweak - Added helpful heading labels for Tickets Commerce Payments settings tab fields. [ET-1529]
+* Fix - Fixed changing of Shared Capacity stock when a single ticket stock is updated. [ETP-800]
+* Fix - Cannot edit events with Elementor on The Events Calendar with Event Tickets activated. [ET-1538]
+* Fix - Remove duplicate `Total Event Capacity` wording when ET+ is activated. [ET-1535]
+* Fix - When using Event Tickets as a standalone plugin, the SelectWoo asset was not being properly loaded. [ET-1531]
+* Fix - Some CSS issues within the tickets block in the block editor. [ET-1530]
+* Fix - The wrong `Ticket #` was being sent in attendee emails for Ticket Commerce tickets. [ET-1537]
+* Fix - Allow price block to override the string that is dynamically created from ticket values. [ET-1524]
+* Language - 9 new strings added, 177 updated, 0 fuzzied, and 1 obsoleted.
 
 = [5.4.1] 2022-06-08 =
 

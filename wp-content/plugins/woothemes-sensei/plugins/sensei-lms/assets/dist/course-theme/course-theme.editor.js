@@ -1,7 +1,7 @@
 /******/(()=>{// webpackBootstrap
 /******/"use strict";
 /******/var e={
-/***/6483:
+/***/96483:
 /***/e=>{e.exports=window.wp.url;
 /***/
 /******/}},t={};
@@ -52,7 +52,7 @@
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
 (()=>{
-/* harmony import */var e=n(6483);
+/* harmony import */var e=n(96483);
 /* harmony import */
 /**
  * Reload the page when opening or closing a course theme template, to ensure the active theme styles are not loaded.

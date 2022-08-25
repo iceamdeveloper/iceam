@@ -16,10 +16,6 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  */
 class Sensei_Pro_Dependency_Checker {
-	// These are kept for backwards compatibility only.
-	const MINIMUM_PHP_VERSION    = '7.2';
-	const MINIMUM_SENSEI_VERSION = '4.0.0';
-
 	/**
 	 * Minimum PHP version.
 	 *
@@ -108,7 +104,7 @@ class Sensei_Pro_Dependency_Checker {
 			return false;
 		}
 
-		if ( version_compare( $instance->minimum_sensei_version, get_option( 'sensei-version' ), '>' ) ) {
+		if ( version_compare( $instance->minimum_sensei_version, Sensei()->version, '>' ) ) {
 			if ( is_admin() ) {
 				add_filter( 'sensei_admin_notices', [ $instance, 'add_sensei_version_notice' ] );
 			}
@@ -204,7 +200,7 @@ class Sensei_Pro_Dependency_Checker {
 			'style'      => 'error',
 			'heading'    => 'Sensei Pro',
 			// translators: %1$s is the minimum version number of Sensei that is required, %2$s is the detected version.
-			'message'    => sprintf( __( 'An unsupported version of <strong>Sensei LMS</strong> was detected. Some features will not work properly or at all. Minimum required version: <strong>%1$s</strong>, version detected: <strong>%2$s</strong>.', 'sensei-pro' ), $this->minimum_sensei_version, get_option( 'sensei-version' ) ),
+			'message'    => sprintf( __( '<strong>Sensei Pro</strong> requires that the plugin <strong>Sensei LMS, version %1$s</strong> is installed and activated. Version detected: <strong>%2$s</strong>.', 'sensei-pro' ), $this->minimum_sensei_version, Sensei()->version ),
 			'conditions' => [
 				[
 					'type'    => 'screens',

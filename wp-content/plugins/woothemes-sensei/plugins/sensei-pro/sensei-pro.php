@@ -3,16 +3,16 @@
  * Plugin Name: Sensei Pro
  * Plugin URI: https://senseilms.com/
  * Description: Whether you want to teach, tutor or train, we have you covered.
- * Version: 1.3.0
+ * Version: 1.6.0
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Requires at least: 5.7
- * Tested up to: 5.9.3
- * Requires PHP: 7.0
+ * Requires at least: 5.8
+ * Tested up to: 6.0
+ * Requires PHP: 7.2
  * WC requires at least: 4.0
  * WC tested up to: 6.1.1
- * Sensei requires at least: 4.4.3
+ * Sensei requires at least: 4.6.0
  * Author: Automattic
- * Author URI: https://senseilms.com/
+ * Author URI: https://automattic.com/
  * Text Domain: sensei-pro
  * Domain Path: /lang
  *
@@ -32,7 +32,7 @@ if ( ! realpath( dirname( __FILE__ ) . '/../../woothemes-sensei.php' ) ) {
 	}
 }
 
-define( 'SENSEI_PRO_VERSION', '1.3.0' );
+define( 'SENSEI_PRO_VERSION', '1.6.0' );
 define( 'SENSEI_PRO_PLUGIN_FILE', __FILE__ );
 define( 'SENSEI_PRO_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'SENSEI_PRO_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
@@ -43,6 +43,10 @@ require_once dirname( __FILE__ ) . '/includes/class-sensei-pro-dependency-checke
 if ( ! Sensei_Pro_Dependency_Checker::are_system_dependencies_met() ) {
 	return;
 }
+
+// Sensei Pro Installer.
+require_once dirname( __FILE__ ) . '/modules/installer/installer.php';
+Sensei_Pro_Installer\Installer::instance()->init();
 
 // Sensei Pro Setup.
 require_once dirname( __FILE__ ) . '/includes/class-setup-context.php';

@@ -87,7 +87,9 @@ final class Sensei_Pro {
 			'advanced-quiz',
 			'course-expiration',
 			'interactive-blocks',
+			'student-groups',
 			'premium-patterns',
+			'block-visibility',
 		];
 	}
 

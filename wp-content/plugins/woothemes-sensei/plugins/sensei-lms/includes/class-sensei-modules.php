@@ -1407,7 +1407,9 @@ class Sensei_Core_Modules {
 	 * @return array          Modified columns.
 	 */
 	public function add_lesson_columns( $columns = array() ) {
-		$columns['module'] = __( 'Module', 'sensei-lms' );
+		// The lesson module column id should not be equal to "module".
+		// @see https://core.trac.wordpress.org/ticket/56185.
+		$columns['modules'] = __( 'Module', 'sensei-lms' );
 
 		return $columns;
 	}
@@ -1422,7 +1424,7 @@ class Sensei_Core_Modules {
 	 * @param  integer $lesson_id The lesson ID.
 	 */
 	public function add_lesson_column_content( $column = '', $lesson_id = 0 ) {
-		if ( 'module' === $column ) {
+		if ( 'modules' === $column ) {
 			$modules = wp_get_post_terms( $lesson_id, $this->taxonomy );
 			$module  = $modules && is_array( $modules ) ? $modules[0] : null;
 
@@ -2193,7 +2195,14 @@ class Sensei_Core_Modules {
 			return $term_owner;
 
 		}
+		$term = get_term_by( 'slug', $slug, 'module' );
 
+		if ( $term ) {
+			$author_meta = get_term_meta( $term->term_id, 'module_author', true );
+			if ( $author_meta ) {
+				return get_user_by( 'id', $author_meta );
+			}
+		}
 		// look for the author in the slug
 		$slug_parts = explode( '-', $slug );
 
@@ -2627,4 +2636,23 @@ class Sensei_Core_Modules {
 		wp_reset_query();
 	}
 
+	/**
+	 * Set teacher meta for module.
+	 *
+	 * @since 4.6.0
+	 *
+	 * @param int $module_id  Term ID.
+	 * @param int $teacher_id ID of module teacher.
+	 */
+	public static function update_module_teacher_meta( $module_id, $teacher_id ) {
+		if ( user_can( $teacher_id, 'manage_options' ) ) {
+			delete_term_meta( $module_id, 'module_author' );
+		} else {
+			update_term_meta(
+				$module_id,
+				'module_author',
+				$teacher_id
+			);
+		}
+	}
 }
