@@ -97,6 +97,8 @@ class Modal {
 		$context = [
 			'is_modal' => $et_template->get( 'is_modal', false ),
 			'ticket'   => $et_template->get( 'ticket' ),
+			'privacy' => $et_template->get( 'privacy' ),
+			'post_id' => $et_template->get( 'post_id' ),
 		];
 
 		$template->template( 'v2/modal/item/opt-out', $context );

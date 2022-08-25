@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use \Exception;
 use \WP_Error;
@@ -206,6 +206,10 @@ class Premium_Plugin_Updater extends Updater {
 			// Ajax
 			add_filter('wc_aelia_afc_ajax_callbacks', array($this, 'wc_aelia_afc_ajax_callbacks'), 10, 1);
 			add_action('wc_aelia_afc_load_admin_scripts', array($this, 'wc_aelia_afc_load_admin_scripts'), 10);
+
+			// Add messages related to the Premium Plugin Updater
+			// @since 2.1.0.200724
+			add_filter('wc_aelia_afc_admin_script_params', array($this, 'wc_aelia_afc_admin_script_params'), 10);
 		}
 	}
 
@@ -346,6 +350,10 @@ class Premium_Plugin_Updater extends Updater {
 
 		return wp_parse_args(array(
 			Definitions::ARG_AJAX_ACTION => $action,
+			// The slug used to check the updates for a plugin might differ from the
+			// actual plugin slug (it happened in the past, due to design mistake that
+			// haven't been corrected yet). Due to that, we must take the correct slug
+			// before we send a request
 			Definitions::ARG_PRODUCT_SLUG => self::get_plugin_slug_for_update_check($plugin),
 			Definitions::ARG_INSTALLED_VERSION => $plugin_class::$version,
 			Definitions::ARG_SITE_URL => self::get_installation_instance_id(),
@@ -370,15 +378,10 @@ class Premium_Plugin_Updater extends Updater {
 
 		);
 
-		// Debug
-		//var_dump($args);
-
 		$target_url = esc_url_raw($this->get_api_call_url($args));
 		// Add the target URL to the arguments, for debugging purposes
 		$args['request_url'] = $target_url;
 
-		// Debug
-		//var_dump("PLUGIN UPDATE URL", $target_url);
 		$response = wp_remote_get($target_url);
 
 		if(is_wp_error($response) || (wp_remote_retrieve_response_code($response) != 200)) {
@@ -392,8 +395,6 @@ class Premium_Plugin_Updater extends Updater {
 		}
 
 		$response = wp_remote_retrieve_body($response);
-		// Debug
-		//var_dump("Update API raw response body: ", $response);
 		$response = unserialize($response);
 
 		if(!is_object($response)) {
@@ -409,122 +410,6 @@ class Premium_Plugin_Updater extends Updater {
 		$response->new_version_available = !empty($response->new_version) && version_compare($response->new_version, $args['version'], '>');
 		return $response;
 	}
-
-	// TODO Remove method get_api_error_messages(). Take note of the error messages it handled,
-	// they will be useful to cover the same scenarios in this client
-	// @var string The message key to use for a generic "unexpected error" message
-	//const MSG_KEY_UNEXPECTED_ERROR = '_unexpected_error';
-	//protected function get_api_error_messages() {
-	//	if(empty($this->api_error_messages)) {
-	//		// Common messages
-	//		$buy_licence_msg = sprintf(__('To reactivate a licence, or buy a licence key, ' .
-	//																	'please go to your <a href="%s" target="_blank">account ' .
-	//																	'dashboard</a>.', Definitions::TEXT_DOMAIN),
-	//															 $this->url('customer_account'));
-	//		$reactivate_subscription_msg = sprintf(__('You can reactivate the subscription from ' .
-	//																							'your <a href="%s" target="_blank">account ' .
-	//																							'dashboard</a>.', Definitions::TEXT_DOMAIN),
-	//																					 $this->url('customer_account'));
-	//		$buy_subscription = sprintf(__('You can buy a new subscription from your ' .
-	//																	 '<a href="%s" target="_blank">account dashboard</a>. ' .
-	//																	 'You will receive a new licence key by email after ' .
-	//																	 'completing the order.',
-	//																	 Definitions::TEXT_DOMAIN),
-	//																$this->url('customer_account'));
-	//
-	//		$this->api_error_messages = array(
-	//			'no_key' => sprintf(__('Could not find a licence key for "{product_name}". This could have ' .
-	//														 'happened because you did not enter a licence key for the ' .
-	//														 'product, or because the key was deactivated in your account. ' .
-	//														 'To enter a licence key, please go to the <a href="%s">Product ' .
-	//														 'Licences page</a>.', Definitions::TEXT_DOMAIN),
-	//													$this->url('product_licences')) .
-	//									// Append the "To reactivate or buy licence" message
-	//									' ' . $buy_licence_msg,
-	//			'no_subscription' => sprintf(__('Could not find a subscription for "{product_name}". You can ' .
-	//																			'buy or renew a subscription from your ' .
-	//																			'<a href="%s" target="_blank">account ' .
-	//																			'dashboard</a>.', Definitions::TEXT_DOMAIN),
-	//																	 $this->url('customer_account')),
-	//			'exp_license' => sprintf(__('The licence for "{product_name}" has expired. You can still use ' .
-	//																	'the product, as there are no restrictions from that ' .
-	//																	'perspective. If you wish to receive further updates, ' .
-	//																	'you will have to place a renewal order.', Definitions::TEXT_DOMAIN)) .
-	//											 // Append the "To reactivate or buy licence" message
-	//											 ' ' . $buy_licence_msg,
-	//			'hold_subscription' => sprintf(__('The subscription for "{product_name}" is on hold.',
-	//																				Definitions::TEXT_DOMAIN)) .
-	//														 // Append the "reactivate subscription" message
-	//														 ' ' . $reactivate_subscription_msg,
-	//			'cancelled_subscription' => sprintf(__('The subscription for "{product_name}" has been cancelled. ' .
-	//																						 'You can renew the subscription from your ' .
-	//																						 '<a href="%s" target="_blank">account ' .
-	//																						 'dashboard</a>. You will receive a new licence ' .
-	//																						 'key by email after completing the order.',
-	//																						 Definitions::TEXT_DOMAIN),
-	//																					$this->url('customer_account')),
-	//			'exp_subscription' => sprintf(__('The subscription for "{product_name}" has expired.',
-	//																			 Definitions::TEXT_DOMAIN)) .
-	//														// Append the "reactivate subscription" message
-	//														' ' . $reactivate_subscription_msg,
-	//			'suspended_subscription' => sprintf(__('The subscription for "{product_name}" has been suspended.',
-	//																						 Definitions::TEXT_DOMAIN)) .
-	//																	// Append the "reactivate subscription" message
-	//																	' ' . $reactivate_subscription_msg,
-	//			'pending_subscription' => sprintf(__('The subscription for "{product_name}" is still pending. You can ' .
-	//																					 'check the status of the subscription from your ' .
-	//																					 '<a href="%s" target="_blank">account ' .
-	//																					 'dashboard</a>. You will receive a new licence ' .
-	//																					 'key by email after completing the order.',
-	//																					 Definitions::TEXT_DOMAIN),
-	//																				$this->url('customer_account')),
-	//			'trash_subscription' => sprintf(__('The subscription for "{product_name}" has been queued ' .
-	//																				 'for deletion and permanent deactivation.',
-	//																				 Definitions::TEXT_DOMAIN)) .
-	//															// Append the "buy new subscription" message
-	//															' ' . $buy_subscription,
-	//			'no_subscription' => sprintf(__('Could not find a subscription for "{product_name}".',
-	//																			 Definitions::TEXT_DOMAIN)) .
-	//													 // Append the "buy new subscription" message
-	//													 ' ' . $buy_subscription,
-	//			'no_activation' => sprintf(__('The licence key for "{product_name}" was not activated. To enter ' .
-	//																		'a licence key, please go to the <a href="%s">Product ' .
-	//																		'Licences page</a>.', Definitions::TEXT_DOMAIN),
-	//																 $this->url('product_licences')) .
-	//												 // Append the "To reactivate or buy licence" message
-	//												 ' ' . $buy_licence_msg,
-	//			'download_revoked' => sprintf(__('The permission to download updates for "{product_name}" was revoked. ' .
-	//																			 'The most common cause of this issue is that the licence ' .
-	//																			 'key is expired.', Definitions::TEXT_DOMAIN),
-	//																 $this->url('product_licences')) .
-	//														// Append the "To reactivate or buy licence" message
-	//														' ' . $buy_licence_msg,
-	//			'switched_subscription' => sprintf(__('The subscription for "{product_name}" was changed. ' .
-	//																						'You should have received a new licence key ' .
-	//																						'by email, which <a href="%s">you will need ' .
-	//																						'to activate</a> to receive updates for this ' .
-	//																						'product. If you did not receive a new licence ' .
-	//																						'key by email, you can retrieve it from your ' .
-	//																						'<a href="%s" target="_blank">account ' .
-	//																						'dashboard</a>.',
-	//																						Definitions::TEXT_DOMAIN),
-	//																				 $this->url('product_licences'),
-	//																				 $this->url('customer_account')),
-	//			self::MSG_KEY_UNEXPECTED_ERROR => sprintf(__('Unexpected error message returned ' .
-	//																									 'by updates server ' .
-	//																									 'for product "{product_name}. ' .
-	//																									 'Please <a href="%s" target="_blank">contact our ' .
-	//																									 'support team</a> and send them with the ' .
-	//																									 'information you can find below.', Definitions::TEXT_DOMAIN),
-	//																								$this->url('support')) .																			 '<pre>' .
-	//																				sprintf(__('Request URL: "{request_url}."', Definitions::TEXT_DOMAIN)) .
-	//																				' ' .
-	//																				sprintf(__('Response (JSON): "{response}."', Definitions::TEXT_DOMAIN)) .
-	//																				'</pre>',
-	//		);
-	//	}
-	//	return $this->api_error_messages;
-	//}
 
 	/**
 	 * Validates the arguments before they are used for a request.
@@ -596,9 +481,6 @@ class Premium_Plugin_Updater extends Updater {
 		// @since 1.9.14.180126
 		$this->slugs_for_update_checks_to_plugin_slugs[$plugin_slug_for_update_check] = $plugin_slug;
 
-		// Debug
-		//var_dump("REQUEST", $request_args);
-
 		// If the request arguments are not valid, we can skip the request
 		if(!$this->validate_update_check_api_request_args($request_args)) {
 			return;
@@ -619,9 +501,6 @@ class Premium_Plugin_Updater extends Updater {
 													'Plugin Slug' => $plugin_slug,
 													'Plugin file' => $plugin->get_plugin_file(),
 												 ));
-
-		// Debug
-		//var_dump("REQUEST", $plugin_slug_for_update_check, $plugin->main_plugin_file, $this->get_api_call_url($request_args));
 
 		// Add a filter to log the result of the plugin update checker operation
 		add_filter('puc_request_info_result-' . $plugin_slug_for_update_check,
@@ -708,11 +587,10 @@ class Premium_Plugin_Updater extends Updater {
 		}
 		unset($this->update_checks_errors[$plugin_slug_for_current_update_check]);
 
-		// Debug
-		//var_dump("PUC RESULT", $plugin_slug_for_current_update_check, $plugin_slug, $plugin_info);
-
 		// If the API server returned a valid response, store the license data
 		if(!empty($plugin_info) && is_object($plugin_info)) {
+			// When the "check status" call completes successfully, update the license
+			// data. This will allow to keep the status and license expiration up to date
 			$this->save_license_data($plugin_slug, array(
 				'license_key' => $plugin_info->license_key,
 				'license_status' => $plugin_info->license_status,
@@ -745,9 +623,6 @@ class Premium_Plugin_Updater extends Updater {
 
 		// Store the error messages related to plugin updates (if any)
 		set_site_transient(self::get_update_checks_errors_transient_id(), $this->update_checks_errors, HOUR_IN_SECONDS);
-
-		// Debug
-		//var_dump($this->update_checks_errors);die();
 
 		$this->logger->debug(__('Plugin Update Checker request completed, logging result.', Definitions::TEXT_DOMAIN),
 												 array(
@@ -798,7 +673,16 @@ class Premium_Plugin_Updater extends Updater {
 		$request_url = $this->get_api_call_url($request_args);
 
 		// Debug
-		//var_dump($request_url);die();
+		// Pass the XDEBUG cookie to the licensing server, if set, to allow
+		// debugging of API calls
+		// if(isset($_COOKIE['XDEBUG_SESSION'])) {
+		// 	$options['cookies'] = array(
+		// 		new \WP_Http_Cookie(array(
+		// 			'name' => 'XDEBUG_SESSION',
+		// 			'value' => $_COOKIE['XDEBUG_SESSION']
+		// 		)),
+		// 	);
+		// }
 
 		$api_response = wp_remote_get(
 			$request_url,
@@ -849,7 +733,7 @@ class Premium_Plugin_Updater extends Updater {
 	 * @param array|WP_Error $result
 	 * @return true|WP_Error
 	 */
-	protected function validate_api_response($api_response) {
+	protected function validate_api_response($api_response) { // NOSONAR
 		$result = Definitions::RES_OK;
 		if(is_wp_error($api_response)) {
 			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_HTTP_ERROR,
@@ -867,9 +751,11 @@ class Premium_Plugin_Updater extends Updater {
 		// @since 2.0.16.200317
 		if($api_response['response']['code'] == 401) {
 			return new WP_Error(Definitions::ERR_REMOTE_REQUEST_UNAUTHORIZED,
-													__('The remote licensing server returned a "not authorised" response.', self::$text_domain) .
+													__('The remote server replied that the licence is currently not linked to this site.', self::$text_domain) .
 													' ' .
-													__('Please check that the license code is valid and that the license is active.', self::$text_domain));
+													__('If you wish to activate the licence on this site, please click on the "Activate" button.', self::$text_domain)) .
+													' ' .
+													__("If the activation returns an error, please log on to your account to verify that you haven't exceeded your activation limit.", self::$text_domain);
 		}
 
 		// Check if the remote server replied with an error
@@ -922,18 +808,7 @@ class Premium_Plugin_Updater extends Updater {
 													__('Could not validate an empty license key', self::$text_domain));
 		}
 
-		// The slug used to check the updates for a plugin might differ from the
-		// actual plugin slug (it happened in the past, due to design mistake that
-		// haven't been corrected yet). Due to that, we must take the correct slug
-		// before we send a request
-		$plugin_slug_for_update_check = self::get_plugin_slug_for_update_check($plugin);
-
-		$license_validation_result = $this->remote_api_request(Definitions::REQ_REMOTE_CHECK_PRODUCT_VERSION, $request_args, $response);
-
-		// Debug
-		//var_dump($license_validation_result, $response);die();
-
-		return $license_validation_result;
+		return $this->remote_api_request(Definitions::REQ_REMOTE_CHECK_PRODUCT_VERSION, $request_args, $response);
 	}
 
 	public function after_plugin_row($file, $plugin_data) {
@@ -977,7 +852,7 @@ class Premium_Plugin_Updater extends Updater {
 
 		if(empty($update_message)) {
 			$this->update_checks_errors = $this->get_update_checks_errors();
-			//var_dump("ERRORS", $this->update_checks_errors, $plugin_slug);
+
 			if(!empty($this->update_checks_errors[$plugin_slug])) {
 				$error = $this->update_checks_errors[$plugin_slug];
 				$update_message = implode(' ', array(
@@ -999,8 +874,6 @@ class Premium_Plugin_Updater extends Updater {
 		<tr class="aelia-premium-plugin plugin-update-tr">
 			<td colspan="3" class="plugin-update colspanchange">
 				<div class="update-message"><?php
-					//$license_validation_result = $this->validate_license($plugin_slug);
-					//var_dump("LICENSE VALID", $license_validation_result);
 					echo $update_message;
 				?></div>
 			</td>
@@ -1039,7 +912,7 @@ class Premium_Plugin_Updater extends Updater {
 				'id' => static::$id,
 				'name' => __('Aelia Premium plugins', self::$text_domain),
 				'type' => 'title',
-				'desc' => implode(' ', array(
+				'desc' => wp_kses_post(implode(' ', array(
 					'<div class="' . static::$id . ' section_description">',
 					__('Here you can manage the licences for your Aelia products.', self::$text_domain),
 					__('By activating a licence, you will get access to the updates for the products you purchased.', self::$text_domain),
@@ -1053,10 +926,25 @@ class Premium_Plugin_Updater extends Updater {
 					'<br />',
 					sprintf(__('For more information please refer to our documentation: <a href="%s" target="_blank">Aelia - How to manage the licenses for your premium plugins</a>.', self::$text_domain),
 									self::URL_LICENSES_HOW_TO),
+					// Show a note about Freemius licences
+					// @since 2.1.18.211006
 					'<br />',
-					sprintf(__('Should you need assistance with the licences, please feel free to <a href="%1$s" target="_blank">contact the Aelia Support Team</a>.', self::$text_domain), Definitions::URL_SUPPORT),
+					'<div class="migrate_licence_to_freemius_note">',
+					'<h4 class="help_title">',
+					__('Important', self::$text_domain) . ' - ' . __('Are you trying to activate a licence key that starts with <code>sk_</code>?', self::$text_domain),
+					'</h4>',
+					sprintf(__('If you have a licence key that starts with <code>sk_</code>, it was generated by <a href="%1$s" target="_blank">the new licensing system we are introduced in October 2021</a>.', self::$text_domain),
+									'https://aelia.co/new-website-live/'),
+					'<br />',
+					sprintf(__('Please read the following article to learn how to install the latest version of the product and activate your new licence: <a href="%1$s" target="_blank">How to activate a new Freemius licence on an existing website</a>.', self::$text_domain),
+									'https://aelia.freshdesk.com/a/solutions/articles/3000110609'),
 					'</div>',
-				)),
+					'<br />',
+					'<p>',
+					sprintf(__('Should you need assistance with the licences, please feel free to <a href="%1$s" target="_blank">contact the Aelia Support Team</a>.', self::$text_domain), Definitions::URL_SUPPORT),
+					'</p>',
+					'</div>',
+				))),
 			),
 		);
 
@@ -1078,22 +966,6 @@ class Premium_Plugin_Updater extends Updater {
 			'type' => 'sectionend',
 		);
 		return $fields;
-	}
-
-
-	/**
-	 * Updates the plugin settings.
-	 *
-	 * @since 1.8.3.170110
-	 */
-	// TODO Remove method. It's designed to be invoked when action "woocommerce_update_options_" is
-	// triggered, but the license manager now uses Ajax instead
-	public function save_licenses() {
-		foreach(array_keys($this->get_product_licenses()) as $plugin_slug) {
-			add_filter('woocommerce_admin_settings_sanitize_option_' . $plugin_slug . '-license',
-								 array($this, 'sanitize_plugin_license_data'), 10, 3);
-		}
-		parent::save_licenses();
 	}
 
 	/**
@@ -1149,9 +1021,6 @@ class Premium_Plugin_Updater extends Updater {
 	 * @since 1.9.4.170410
 	 */
 	public function woocommerce_admin_field_premium_license($field) {
-		// Debug
-		//var_dump($field);
-
 		$license_key = trim($field['data']['license_key']);
 		$plugin_slug = trim($field['data']['plugin_slug']);
 
@@ -1172,6 +1041,10 @@ class Premium_Plugin_Updater extends Updater {
 		else {
 			$license_expiration = __('N/A', self::$text_domain);
 		}
+
+		// Load a list of messages to display (e.g. errors, warnings)
+		// @since 2.0.20.200605
+		$messages = $this->get_messages_for_license($field);
 
 		$plugin_name = $this->get_plugin_name($plugin_slug);
 		$plugin_version = $this->get_plugin_version($plugin_slug);
@@ -1240,26 +1113,48 @@ class Premium_Plugin_Updater extends Updater {
 					?></span>
 				</span>
 			</div>
+			<?php if(!empty($messages)): ?>
+				<div class="warnings"><?php
+					foreach($messages as $message_id => $message_text) {
+						?>
+						<div class="warning <?= $message_id ?>"><?php
+							echo wp_kses_post($message_text);
+						?></div>
+						<?php
+					}
+				?></div>
+				</div>
+			<?php endif; ?>
 		</div>
 		<?php
 	}
 
 	/**
-	 * Sanitises the license data handled by this updater before it's saved.
+	 * Returns a list of messages (errors, warnings) to be displayed for a section
+	 * of licensing data.
 	 *
-	 * @param string value The license data to be saved.
-	 * @param array option An array describing the field being saved.
-	 * @param string raw_value The license data to be saved (raw).
-	 * @return mixed The sanitised value.
-	 * @since 1.9.4.170410
+	 * @param array $license_field
+	 * @return array
+	 * @since 2.0.20.200605
 	 */
-	public function sanitize_plugin_license_data($value, $option, $raw_value) {
-		// TODO Implement method
-		var_dump(
-			"SANITIZING",
-			$value, $option, $raw_value
-		);
-		die();
+	protected function get_messages_for_license($license_field) {
+		$messages = array();
+
+		if(!empty($license_field['data']['activated_on_site_url']) && ($license_field['data']['activated_on_site_url'] !== self::get_site_url())) {
+			// Invite admins to reactivate a licence after the site's domain/URL changed
+			$messages['domain_changed'] = implode(' ' , array(
+					'<strong class="label">' . __('Important', self::$text_domain) . ':</strong>',
+					'<br />',
+					__('The domain or address of this site seems to have changed.', self::$text_domain),
+					__('A licence activated for this product, when the site had a different URL, could have to be reactivated.', self::$text_domain),
+					__('This will not affect the Aelia plugins, which will keep working normally, but it could prevent your site from receiving automatic updates.', self::$text_domain),
+					'<br />',
+					sprintf(__('If you see any message indicating that this might be the case, please feel free to ' .
+										 '<a href="%1$s" target="_blank">contact our support service</a>. We will be happy to assist you.', self::$text_domain), Definitions::URL_SUPPORT),
+				));
+		}
+
+		return $messages;
 	}
 
 	/**
@@ -1293,6 +1188,23 @@ class Premium_Plugin_Updater extends Updater {
 												null,
 												true);
 		}
+	}
+
+	/**
+	 * Adds custom admin parameters.
+	 *
+	 * @param array $params
+	 * @return array
+	 * @since 2.1.0.200724
+	 */
+	public function wc_aelia_afc_admin_script_params($params) {
+		$params['premium_updater'] = array(
+			'messages' => array(
+				'expiration_forever' => __('Forever', self::$text_domain),
+				'expiration_not_available' => __('N/A', self::$text_domain),
+			),
+		);
+		return $params;
 	}
 
 	/**
@@ -1371,6 +1283,10 @@ class Premium_Plugin_Updater extends Updater {
 					'license_key' => $license_key,
 					'license_status' => $action_response['response']['license']['site_status'],
 					'date_expiration' => $action_response['response']['license']['date_expiration'],
+					// Save the URL used for the activation. That will allow to track changes in the
+					// domain and inform the admins
+					// @since 2.0.20.200605
+					'activated_on_site_url' => self::get_site_url(),
 				);
 				$this->save_license_data($plugin_slug, $license_data);
 			}
@@ -1407,11 +1323,14 @@ class Premium_Plugin_Updater extends Updater {
 		);
 
 		if(isset($action_response['response']['result']) && ($action_response['response']['result'] === Definitions::RES_OK)) {
-			$license_data = array(
+			// Update the license data that has changed, while preserving any extra data, such
+			// as the URL of the original activation
+			// @since 2.0.20.200605
+			$license_data = array_merge($this->get_license_data($plugin_slug, true), array(
 				'license_key' => $license_key,
 				'license_status' => $action_response['response']['license']['site_status'],
 				'date_expiration' => $action_response['response']['license']['date_expiration'],
-			);
+			));
 			$this->save_license_data($plugin_slug, $license_data);
 			// Delete any cached error messages
 			// @since 1.9.13.180104

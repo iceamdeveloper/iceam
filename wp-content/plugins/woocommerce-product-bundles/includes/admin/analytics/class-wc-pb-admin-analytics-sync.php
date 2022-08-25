@@ -2,7 +2,6 @@
 /**
  * WC_PB_Admin_Analytics_Sync class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    6.9.0
  */
@@ -19,7 +18,7 @@ use Automattic\WooCommerce\Admin\API\Reports\Products\DataStore as ProductsDataS
  * Admin Reports Class for syncing the lookup table.
  *
  * @class    WC_PB_Admin_Analytics_Sync
- * @version  6.9.0
+ * @version  6.12.0
  */
 class WC_PB_Admin_Analytics_Sync {
 
@@ -136,6 +135,8 @@ class WC_PB_Admin_Analytics_Sync {
 		}
 
 		WC_PB_Admin_Notices::add_maintenance_notice( 'update_order_item_stats' );
+
+		return __( 'Tool ran.', 'woocommerce-product-bundles' );
 	}
 
 	/**
@@ -244,14 +245,16 @@ class WC_PB_Admin_Analytics_Sync {
 				continue;
 			}
 
-			$item_stats = $order_item_stats[ $container_order_item_id ];
-			$bundle_id  = $item_stats[ 'product_id' ];
+			$item_stats           = $order_item_stats[ $container_order_item_id ];
+			$bundle_id            = $item_stats[ 'product_id' ];
+			$bundle_order_item_id = $item_stats[ 'order_item_id' ];
 
 			// Write container item stats.
 			$wpdb->replace(
 				$pb_table_name,
 				array(
 					'order_item_id'         => $item_stats[ 'order_item_id' ],
+					'parent_order_item_id'  => 0,
 					'order_id'              => $item_stats[ 'order_id' ],
 					'bundle_id'             => $bundle_id,
 					'product_id'            => $item_stats[ 'product_id' ],
@@ -266,6 +269,7 @@ class WC_PB_Admin_Analytics_Sync {
 				),
 				array(
 					'%d', // order_item_id.
+					'%d', // parent_order_item_id.
 					'%d', // order_id.
 					'%d', // bundle_id.
 					'%d', // product_id.
@@ -293,6 +297,7 @@ class WC_PB_Admin_Analytics_Sync {
 					$pb_table_name,
 					array(
 						'order_item_id'         => $item_stats[ 'order_item_id' ],
+						'parent_order_item_id'  => $bundle_order_item_id,
 						'order_id'              => $item_stats[ 'order_id' ],
 						'bundle_id'             => $bundle_id,
 						'product_id'            => $item_stats[ 'product_id' ],
@@ -307,6 +312,7 @@ class WC_PB_Admin_Analytics_Sync {
 					),
 					array(
 						'%d', // order_item_id.
+						'%d', // parent_order_item_id.
 						'%d', // order_id.
 						'%d', // bundle_id.
 						'%d', // product_id.

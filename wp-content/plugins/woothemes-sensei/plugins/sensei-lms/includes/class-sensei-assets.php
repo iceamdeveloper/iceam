@@ -43,16 +43,25 @@ class Sensei_Assets {
 	protected $version;
 
 	/**
+	 * Plugin text domain.
+	 *
+	 * @var string
+	 */
+	protected $text_domain;
+
+	/**
 	 * Sensei_Assets constructor.
 	 *
 	 * @param string $plugin_url  The URL for the plugin.
 	 * @param string $plugin_path Plugin location.
 	 * @param string $version     Plugin version.
+	 * @param string $text_domain Plugin text domain.
 	 */
-	public function __construct( $plugin_url, $plugin_path, $version ) {
+	public function __construct( $plugin_url, $plugin_path, $version, $text_domain = 'sensei-lms' ) {
 		$this->plugin_url  = $plugin_url;
 		$this->plugin_path = $plugin_path;
 		$this->version     = $version;
+		$this->text_domain = $text_domain;
 	}
 
 	/**
@@ -76,7 +85,7 @@ class Sensei_Assets {
 	 * @param string|null $handle       Unique name of the asset.
 	 * @param string      $filename     The filename.
 	 * @param array       $dependencies Dependencies.
-	 * @param null        $args
+	 * @param null        $args         Asset arguments.
 	 */
 	public function register( $handle, $filename, $dependencies = [], $args = null ) {
 		$config = $this->asset_config( $filename, $dependencies, $args );
@@ -113,7 +122,7 @@ class Sensei_Assets {
 		call_user_func( $action . '_' . $config['type'], $handle, $config['url'], $config['dependencies'], $config['version'], $config['args'] );
 
 		if ( 'script' === $config['type'] && in_array( 'wp-i18n', $config['dependencies'], true ) ) {
-			wp_set_script_translations( $handle, 'sensei-lms' );
+			wp_set_script_translations( $handle, $this->text_domain );
 		}
 	}
 
@@ -183,7 +192,7 @@ class Sensei_Assets {
 	 *
 	 * @return string Public url for the file.
 	 */
-	private function asset_url( $filename ) {
+	public function asset_url( $filename ) {
 		return rtrim( $this->plugin_url, '/' ) . '/assets/dist/' . $filename;
 	}
 
@@ -258,4 +267,62 @@ class Sensei_Assets {
 		add_filter( 'sensei_disable_styles', '__return_true' );
 	}
 
+	/**
+	 * Gets the href to the file at assets/icons/<name>.svg
+	 * inside a generated sprite.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param string $name The name of the icon file at "assets/icons/<name>.svg".
+	 *
+	 * @return string The icon href.
+	 */
+	private function get_icon_href( string $name ) : string {
+		$sprite_file = $this->plugin_url . 'assets/dist/icons/sensei-sprite.svg?v=' . $this->version;
+
+		/**
+		 * Filters the icon href for the svg.
+		 *
+		 * @since 4.4.0
+		 * @hook sensei_icon_href
+		 *
+		 * @param {string} $icon_href   The icon href.
+		 * @param {string} $sprite_file The sprite file URL.
+		 * @param {string} $name        The icon name.
+		 *
+		 * @return {string} The icon href.
+		 */
+		$icon_href = apply_filters( 'sensei_icon_href', "{$sprite_file}#sensei-sprite-{$name}", $sprite_file, $name );
+
+		return $icon_href;
+	}
+
+	/**
+	 * Gets SVG HTML from a generated sprite.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param string $name        The name of the icon file at "assets/images/<name>.svg".
+	 * @param string $class_names Classnames to add to the SVG element.
+	 *
+	 * @return string The SVG HTML.
+	 */
+	public function get_icon( string $name, string $class_names = '' ) : string {
+		$href = $this->get_icon_href( $name );
+
+		return '<svg class="' . esc_attr( $class_names ) . '"><use xlink:href="' . esc_url( $href ) . '"></use></svg>';
+	}
+
+	/**
+	 * Gets image from assets.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @param string $name    The name of the image file at "assets/images/<name>".
+	 *
+	 * @return string Image path.
+	 */
+	public function get_image( string $name ) : string {
+		return $this->plugin_url . 'assets/dist/images/' . $name;
+	}
 }

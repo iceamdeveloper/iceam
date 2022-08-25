@@ -186,6 +186,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	public $email = '_tribe_tickets_email';
 
 	/**
+	 * Meta key that holds if the order was restocked already or not.
+	 *
+	 * @since 5.2.5
+	 *
+	 * @var string
+	 */
+	public $restocked_refunded_order = '_tribe_tickets_restocked_refunded_order';
+
+	/**
 	 * Order count cache key.
 	 *
 	 * @since 4.11.0.2
@@ -305,10 +314,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Binds implementations that are specific to WooCommerce
 	 *
 	 * @see \Tribe__Tickets_Plus__Commerce__Woocommerce__Cart
+	 * @see \Tribe\Tickets\Plus\Commerce\WooCommerce\Regenerate_Order_Attendees
 	 */
 	public function bind_implementations() {
 		tribe_singleton( 'tickets-plus.commerce.woo.cart', 'Tribe__Tickets_Plus__Commerce__WooCommerce__Cart', [ 'hook' ] );
 		tribe( 'tickets-plus.commerce.woo.cart' );
+
+		tribe_singleton( 'tickets-plus.commerce.woo.regenerate-order-attendees', \Tribe\Tickets\Plus\Commerce\WooCommerce\Regenerate_Order_Attendees::class, [ 'hook' ] );
+		tribe( 'tickets-plus.commerce.woo.regenerate-order-attendees' );
 	}
 
 	/**
@@ -323,6 +336,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_action( 'init', [ $this, 'register_resources' ] );
 		add_action( 'add_meta_boxes', [ $this, 'woocommerce_meta_box' ] );
 		add_action( 'before_delete_post', [ $this, 'handle_delete_post' ] );
+		add_action( 'woocommerce_checkout_update_order_meta', [ $this, 'delayed_ticket_generation' ], 8, 1 );
 		add_action( 'woocommerce_order_status_changed', [ $this, 'delayed_ticket_generation' ], 12, 3 );
 		add_action( 'tribe_wc_delayed_ticket_generation', [ $this, 'generate_tickets' ] );
 		add_action( 'woocommerce_order_status_changed', [ $this, 'reset_attendees_cache' ] );
@@ -358,6 +372,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_action( 'woocommerce_order_actions', [ $this, 'add_resend_tickets_action' ] ); // WC 3.2.x
 		add_action( 'woocommerce_order_action_resend_tickets_email', [ $this, 'send_tickets_email' ] ); // WC 3.2.x
 
+		add_filter( 'woocommerce_order_actions', [ $this, 'add_restock_action_for_refunded_order' ] );
+		add_action( 'woocommerce_order_action_event_tickets_plus_restock_refunded_tickets', [ $this, 'handle_restock_action_for_refunded_order' ] );
+
 		add_filter( 'event_tickets_attendees_woo_checkin_stati', tribe_callback( 'tickets-plus.commerce.woo.checkin-stati', 'filter_attendee_ticket_checkin_stati' ), 10 );
 		add_action( 'wootickets_checkin', [ $this, 'purge_attendees_transient' ] );
 		add_action( 'wootickets_uncheckin', [ $this, 'purge_attendees_transient' ] );
@@ -387,6 +404,85 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		// Temporary workaround for empty orders. Remove this after WooCommerce 5.1 is released which contains a fix for this.
 		add_filter( 'woocommerce_order_query', [ $this, 'temporarily_filter_order_query' ] );
+
+		// Stock actions.
+		add_action( 'event_tickets_attendee_ticket_deleted', [ $this, 'update_order_note_for_deleted_attendee' ], 10, 2 );
+		add_action( 'tribe_tickets_ticket_moved', [ $this, 'create_order_for_moved_ticket' ], 10, 6 );
+	}
+
+	/**
+	 * Create a duplicate order with the attendee data to show order report.
+	 *
+	 * @since 5.3.3
+	 *
+	 * @param int $attendee_id              the ticket which has been moved.
+	 * @param int $src_ticket_type_id       the ticket type it belonged to originally.
+	 * @param int $tgt_ticket_type_id       the ticket type it now belongs to.
+	 * @param int $src_event_id             the event/post which the ticket originally belonged to.
+	 * @param int $tgt_event_id             the event/post which the ticket now belongs to.
+	 * @param int $instigator_id            the user who initiated the change.
+	 */
+	public function create_order_for_moved_ticket( $attendee_id, $src_ticket_type_id, $tgt_ticket_type_id, $src_event_id, $tgt_event_id, $instigator_id ) {
+
+		$from_product = wc_get_product( $src_ticket_type_id );
+		$to_product   = wc_get_product( $tgt_ticket_type_id );
+
+		if ( ! $from_product || ! $to_product ) {
+			return;
+		}
+
+		$attendee = $this->get_attendee( $attendee_id );
+		$order    = wc_get_order( Tribe__Utils__Array::get( $attendee, 'order_id' ) );
+
+		if ( ! $order ) {
+			return;
+		}
+
+		$new_order = wc_create_order( [
+			'parent'        => $order->get_id(),
+			'customer_id'   => $order->get_customer_id(),
+			'customer_note' => $order->get_customer_note(),
+			'created_via'   => 'admin',
+			'status'        => $order->get_status(),
+ 		] );
+
+		$new_order->add_product( $to_product );
+		$new_order->set_address( $order->get_address() );
+		$new_order->set_total( 0 );
+
+		$new_order->add_meta_data( $this->order_has_tickets, true );
+		$new_order->add_meta_data( Tribe__Tickets_Plus__Meta::META_KEY, $order->get_meta( Tribe__Tickets_Plus__Meta::META_KEY ) );
+		$new_order->add_order_note(
+				sprintf(
+				// Translators: %1$s: The Attendee Name. %2$s: Parent order edit URL. %3$s: Parent order ID.
+					__( '<b> Attendee Moved : </b> <br> <i>%s</i> was moved into this order from <a href="%s">Order %s</a>', 'event-tickets-plus' ),
+					$attendee['holder_name'],
+					$order->get_edit_order_url(),
+					$order->get_id()
+				)
+		);
+
+		$new_order->save();
+
+		$order->add_order_note(
+				sprintf(
+				// Translators: %1$s: The Attendee Name. %2$s: Copied order edit URL. %3$s: Copied order ID.
+					__( '<b> Attendee Moved : </b> <br> <i>%s</i> is moved from this order to <a href="%s">Order %s</a>',  'event-tickets-plus' ),
+					$attendee['holder_name'],
+					$new_order->get_edit_order_url(),
+					$new_order->get_id()
+				)
+		);
+
+		$order->save();
+
+		$this->reset_attendees_cache( $order->get_id() );
+		$this->reset_attendees_cache( $new_order->get_id() );
+
+		/** @var Tribe__Tickets__Tickets_Handler $handler */
+		$handler = tribe( 'tickets.handler' );
+		$handler->sync_shared_capacity( $src_event_id, tribe_tickets_get_capacity( $src_event_id ) );
+		$handler->sync_shared_capacity( $tgt_event_id, tribe_tickets_get_capacity( $tgt_event_id ) );
 	}
 
 	public function register_resources() {
@@ -778,7 +874,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		// Get the items purchased in this order
-		$order       = new WC_Order( $order_id );
+		$order       = wc_get_order( $order_id );
+
+		// Bail if order is empty.
+		if ( empty( $order ) ) {
+			return;
+		}
+
 		$order_items = $order->get_items();
 
 		// Bail if the order is empty
@@ -899,7 +1001,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$created_attendees = false;
 
 		// Get the items purchased in this order
-		$order       = new WC_Order( $order_id );
+		$order       = wc_get_order( $order_id );
+
+		// Bail if order is empty.
+		if ( empty( $order ) ) {
+			return;
+		}
+
 		$order_items = $order->get_items();
 
 		// Bail if the order is empty
@@ -1198,6 +1306,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			];
 
 			$ticket->ID = wp_update_post( $args );
+
+			$product    = wc_get_product( $ticket->ID );
 		}
 
 		if ( ! $ticket->ID ) {
@@ -1241,13 +1351,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$can_update_ticket_price = apply_filters( 'tribe_tickets_can_update_ticket_price', true, $ticket );
 
 		if ( $can_update_ticket_price ) {
-			update_post_meta( $ticket->ID, '_regular_price', $ticket->price );
+			$product->set_regular_price( $ticket->price );
 
 			// Do not update _price if the ticket is on sale: the user should edit this in the WC product editor
 			if ( ! wc_get_product( $ticket->ID )->is_on_sale() || 'create' === $save_type ) {
-				update_post_meta( $ticket->ID, '_price', $ticket->price );
+				$product->set_price( $ticket->price );
 			}
 		}
+
+		// Save the changes to product.
+		$product->save();
 
 		// Fetches all Ticket Form Datas
 		$data = Arr::get( $raw_data, 'tribe-ticket', [] );
@@ -1478,8 +1591,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * @return bool
 	 */
 	public function delete_ticket( $post_id, $ticket_id ) {
-		// Run anything we might need on parent method.
-		parent::delete_ticket( $post_id, $ticket_id );
 
 		// Ensure we know the event and product IDs (the event ID may not have been passed in)
 		if ( empty( $post_id ) ) {
@@ -1515,7 +1626,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		// Re-stock the product inventory (on the basis that a "seat" has just been freed)
 		$this->increment_product_inventory( $product_id );
 
-		$this->clear_attendees_cache( $post_id );
+		// Run anything we might need on parent method.
+		parent::delete_ticket( $post_id, $ticket_id );
 
 		$has_shared_tickets = 0 !== count( $tickets_handler->get_event_shared_tickets( $post_id ) );
 
@@ -1748,11 +1860,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->ID            = $ticket_id;
 		$return->name          = $product->get_title();
 		$return->menu_order    = $product->get_menu_order();
-		$return->price         = $this->get_price_value_for( $product, $return );
-		$return->regular_price = $product->get_regular_price( 'edit' );
+		$return->price         = $this->get_formatted_price( $this->get_price_value_for( $product ) );
+		$return->regular_price = $this->get_formatted_price( $product->get_regular_price( 'edit' ) );
 		$return->on_sale       = (bool) $product->is_on_sale( 'edit' );
 		if ( $return->on_sale ) {
-			$return->price = $product->get_sale_price( 'edit' );
+			$return->price = $this->get_formatted_price( $product->get_sale_price( 'edit' ) );
 		}
 		$return->capacity         = tribe_tickets_get_capacity( $ticket_id );
 		$return->provider_class   = get_class( $this );
@@ -1825,7 +1937,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 * @param int    $ticket_id
 		 */
 		$ticket = apply_filters( 'tribe_tickets_plus_woo_get_ticket', $return, $post_id, $ticket_id );
-
 		return $ticket;
 	}
 
@@ -2000,8 +2111,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			WHERE
 				`wc_itemmeta`.`meta_key` = '_product_id'
 				AND `wc_itemmeta`.`meta_value` = %d
-				$order_state_sql
-		";
+		" . $order_state_sql;
 
 		return $wpdb->get_results( $wpdb->prepare( $query, $ticket_id ) );
 	}
@@ -2368,7 +2478,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		// The order does not exist so return some default values.
-		if ( ! $order || ! $order_id ) {
+		if ( empty( $order ) || ! $order_id ) {
 			return [
 				'order_id'           => null,
 				'order_id_display'   => null,
@@ -2586,8 +2696,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 *
 		 * @param int Post ID
 		 * @param string the provider class name
+		 * @param int $ticket_id The ticket ID.
 		 */
-		do_action( 'tribe_events_tickets_metabox_edit_ajax_advanced', $post_id, $provider );
+		do_action( 'tribe_events_tickets_metabox_edit_ajax_advanced', $post_id, $provider, $ticket_id );
 
 		echo '</div>';
 	}
@@ -3078,6 +3189,41 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
+	 * Maybe format price display for ticket edit form.
+	 *
+	 * @since 5.2.7
+	 *
+	 * @param string $price Price.
+	 *
+	 * @return string Formatted price.
+	 */
+	public function get_formatted_price( $price ) {
+
+		if ( ! $this->should_show_regular_price() ) {
+			return $price;
+		}
+
+		$args = [
+			'decimal_separator'  => wc_get_price_decimal_separator(),
+			'thousand_separator' => wc_get_price_thousand_separator(),
+			'decimals'           => wc_get_price_decimals(),
+		];
+
+		$formatted_price = number_format( $price, $args['decimals'], $args['decimal_separator'], $args['thousand_separator'] );
+
+		/**
+		 * Filter the formatted price for ticket edit form.
+		 *
+		 * @since 5.2.7
+		 *
+		 * @param string $formatted_price Formatted price.
+		 * @param string $price Original price data.
+		 * @param array $args Arguments containing the formatting options for numbers of decimals, decimals and thousands separators.
+		 */
+		return apply_filters( 'tribe_tickets_plus_ticket_edit_form_formatted_price', $formatted_price, $price, $args );
+	}
+
+	/**
 	 * @return bool
 	 */
 	protected function should_show_regular_price() {
@@ -3086,6 +3232,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		return doing_action( 'wp_ajax_tribe-ticket-edit-' . __CLASS__ )
 			|| doing_action( 'wp_ajax_tribe-ticket-add-' . __CLASS__ )
 			|| doing_action( 'wp_ajax_tribe-ticket-delete-' . __CLASS__ )
+			|| 'tribe-ticket-edit' === tribe_get_request_var( 'action', '' )
+			|| tribe_get_request_var( 'is_admin', false )
 			|| ( is_admin()
 				&& ! empty( $screen )
 				&& $screen->base === 'post'
@@ -3312,11 +3460,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	public function reset_attendees_cache( $order_id ) {
 
 		// Get the items purchased in this order
-		$order       = new WC_Order( $order_id );
+		$order       = wc_get_order( $order_id );
 		$order_items = $order->get_items();
 
-		// Bail if the order is empty
-		if ( empty( $order_items ) ) {
+		// Bail if the order is empty.
+		if ( empty( $order ) ) {
 			return;
 		}
 
@@ -3603,10 +3751,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		if ( ! empty( $cart_has_meta ) ) {
 			/** @var Tribe__Tickets__Attendee_Registration__Main $attendee_registration */
 			$attendee_registration = tribe( 'tickets.attendee_registration' );
+			$provider_slug = tribe_tickets_get_provider_query_slug();
 
 			echo sprintf(
 				'<a class="tribe-checkout-backlink" href="%1$s">%2$s</a>',
-				esc_url( add_query_arg( 'provider', $this->attendee_object, $attendee_registration->get_url() ) ),
+				esc_url( add_query_arg( $provider_slug, $this->attendee_object, $attendee_registration->get_url() ) ),
 				esc_html__( 'Edit attendee info', 'event-tickets-plus' )
 			);
 		}
@@ -3647,5 +3796,170 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		return $orders;
+	}
+
+	/**
+	 * Add order note in WooCommerce order when an attendee is delete.
+	 *
+	 * @since 5.2.5
+	 *
+	 * @param int $post_id Post or Event ID.
+	 * @param int $attendee_id Attendee ID for deleted attendee.
+	 */
+	public function update_order_note_for_deleted_attendee( $post_id, $attendee_id ) {
+		if ( empty( $post_id ) || empty( $attendee_id ) ){
+			return;
+		}
+
+		$attendee = $this->get_attendee( $attendee_id );
+
+		$order = wc_get_order( $attendee['order_id'] );
+
+		// Bail if the order is empty.
+		if ( empty( $order ) ) {
+			return;
+		}
+
+		// Translators: %1$s: Attendee post object ID, %2$s: Generated Ticket Serial.
+		$order->add_order_note( sprintf( __( 'Attendee (%1$s) with Ticket #%2$s was deleted by admin.', 'event-tickets-plus' ), $attendee[ 'attendee_id' ], $attendee[ 'ticket_id' ] ) );
+	}
+
+	/**
+	 * Check if given attendee should reduce stock or not.
+	 *
+	 * @since 5.2.5
+	 *
+	 * @param array $attendee Attendee data.
+	 *
+	 * @return bool
+	 */
+	public function attendee_decreases_inventory( array $attendee ) {
+
+		$order_id = Tribe__Utils__Array::get( $attendee, 'order_id' );
+
+		$order = wc_get_order( $order_id );
+
+		// Bail if the order is empty, return true to decrease attendees.
+		if ( empty( $order ) ) {
+			return true;
+		}
+
+		// For cancelled orders inventory is restocked, so we should not decrease inventory for this case.
+		if ( 'cancelled' === $order->get_status() ) {
+			return false;
+		}
+
+		// For refunded orders inventory is not restocked automatically, we should only decrease if the order was not restocked.
+		if ( 'refunded' === $order->get_status() && tribe_is_truthy( $order->get_meta( $this->restocked_refunded_order ) ) ) {
+			// Don't count the attendee if the refunded order was restocked.
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Adds an action to restock the ticket items for any refunded orders.
+	 *
+	 * @since 5.2.5
+	 *
+	 * @param array $actions List of actions.
+	 *
+	 * @return array
+	 */
+	public function add_restock_action_for_refunded_order( $actions ) {
+		$order_id = get_the_ID();
+
+		if ( empty( $order_id ) ) {
+			return $actions;
+		}
+
+		$order = wc_get_order( $order_id );
+
+		// Bail if the order is empty. Return $actions.
+		if ( empty( $order ) ) {
+			return $actions;
+		}
+
+		$has_tickets = tribe_is_truthy( $order->get_meta( $this->order_has_tickets ) );
+
+		if ( ! $has_tickets ) {
+			return $actions;
+		}
+
+		$restocked_already = tribe_is_truthy( $order->get_meta( $this->restocked_refunded_order ) );
+
+		if ( $restocked_already ) {
+			return $actions;
+		}
+
+		if ( 'refunded' != $order->get_status() ) {
+			return $actions;
+		}
+
+		$actions['event_tickets_plus_restock_refunded_tickets'] = esc_html__( 'Restock Tickets from this order', 'event-tickets-plus' );
+
+		return $actions;
+	}
+
+	/**
+	 * Handle restock action for refund orders.
+	 *
+	 * @since 5.2.5
+	 *
+	 * @param WC_Order $order
+	 */
+	public function handle_restock_action_for_refunded_order( $order ) {
+
+		if ( 'refunded' != $order->get_status() ) {
+			return;
+		}
+
+		$restocked_already = tribe_is_truthy( $order->get_meta( $this->restocked_refunded_order ) );
+
+		if ( $restocked_already ) {
+			return;
+		}
+
+		// Increase the stock for both regular product and shared cap products.
+		wc_increase_stock_levels( $order->get_id() );
+
+		// Set meta to skip the item count while counting attendee stock.
+		$order->add_meta_data( $this->restocked_refunded_order, true , true );
+
+		// Update Order notes to keep a log for this restock action for admin.
+		$order->add_order_note( __( 'Tickets from this order are re-stocked', 'event-tickets-plus' ) );
+
+		// Save the order meta.
+		$order->save();
+	}
+
+	/**
+	 * Handles if email sending is allowed.
+	 *
+	 * @since 5.3.1
+	 *
+	 * @param WP_Post|null $ticket                The ticket post object if available, otherwise null.
+	 * @param array|null   $attendee              The attendee information if available, otherwise null.
+	 *
+	 * @return boolean
+	 */
+	public function allow_resending_email( $ticket = null, $attendee = null ) {
+		// Check for cancelled or refunded orders.
+		$allow_email_resend = ! ( 'cancelled' === $attendee['order_status'] || 'refunded' === $attendee['order_status'] );
+
+		/**
+		 *
+		 * Shared filter between Woo, EDD, and the default logic.
+		 * This filter allows the admin to control the re-send email option when an attendee's email is updated per a payment type (EDD, Woo, etc).
+		 * True means allow email resend, false means disallow email resend.
+		 *
+		 * @since 5.3.1
+		 *
+		 * @param bool         						  Whether to allow email resending.
+		 * @param WP_Post|null $ticket                The ticket post object if available, otherwise null.
+		 * @param array|null   $attendee              The attendee information if available, otherwise null.
+		 */
+		return (bool) apply_filters( 'tribe_tickets_manual_attendee_allow_email_resend', $allow_email_resend, $ticket, $attendee );
 	}
 }

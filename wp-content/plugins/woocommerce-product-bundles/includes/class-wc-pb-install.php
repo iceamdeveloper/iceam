@@ -2,7 +2,6 @@
 /**
  * WC_PB_Install class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles installation and updating tasks.
  *
  * @class    WC_PB_Install
- * @version  6.4.0
+ * @version  6.12.0
  */
 class WC_PB_Install {
 
@@ -280,6 +279,7 @@ class WC_PB_Install {
 		self::$is_install_request = true;
 
 		// Create tables.
+		self::maybe_prepare_db_for_upgrade();
 		self::create_tables();
 
 		// if bundle type does not exist, create it.
@@ -357,6 +357,7 @@ class WC_PB_Install {
 		) $collate;
 		CREATE TABLE {$wpdb->prefix}wc_order_bundle_lookup (
 			order_item_id BIGINT UNSIGNED NOT NULL,
+			parent_order_item_id BIGINT UNSIGNED NOT NULL,
 			order_id BIGINT UNSIGNED NOT NULL,
 			bundle_id BIGINT UNSIGNED NOT NULL,
 			product_id BIGINT UNSIGNED NOT NULL,
@@ -370,7 +371,8 @@ class WC_PB_Install {
 			tax_amount double DEFAULT 0 NOT NULL,
 			PRIMARY KEY  (order_item_id),
 			KEY order_id (order_id),
-			KEY bundle_id (product_id),
+			KEY parent_order_item_id (parent_order_item_id),
+			KEY bundle_id (bundle_id),
 			KEY product_id (product_id),
 			KEY customer_id (customer_id),
 			KEY date_created (date_created)
@@ -447,6 +449,21 @@ class WC_PB_Install {
 		self::update();
 		wp_safe_redirect( admin_url() );
 		exit;
+	}
+
+	/**
+	 * Maybe prepare DB for upcoming upgrade.
+	 *
+	 * @since 6.11.1
+	 * @return void
+	 */
+	protected static function maybe_prepare_db_for_upgrade() {
+
+		// Fix db index for 6.10.0 till 6.11.0.
+		if ( version_compare( self::$current_version, '6.10.0' ) > -1 && version_compare( '6.11.0', self::$current_version ) > -1 ) {
+			global $wpdb;
+			$wpdb->query( "ALTER TABLE `{$wpdb->prefix}wc_order_bundle_lookup` DROP KEY `bundle_id`" );
+		}
 	}
 
 	/**

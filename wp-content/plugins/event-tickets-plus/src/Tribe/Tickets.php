@@ -63,4 +63,33 @@ abstract class Tribe__Tickets_Plus__Tickets extends Tribe__Tickets__Tickets {
 
 		return $return;
 	}
+
+	/**
+	 * Compares tickets to ticket ids and returns tickets that match.
+	 *
+	 * @since  5.3.2
+	 *
+	 * @param  Tribe__Tickets__Ticket_Object[] $tickets    Ticket object to compare.
+	 * @param  int[]                           $ticket_ids Ticket ID to compare.
+	 *
+	 * @return Tribe__Tickets__Ticket_Object[] Array of matching tickets.
+	 */
+	public static function filter_tickets_by_ids( $tickets, $ticket_ids ) {
+		// If either array is empty, then no matches.
+		if ( empty( $tickets ) || empty( $ticket_ids ) ) {
+			return [];
+		}
+
+		// Ensure all ticket IDs are integers.
+		$ticket_ids = array_map( 'intval', $ticket_ids );
+
+		// Find and return matching ticket IDs.
+		$filtered_tickets = [];
+		array_walk( $tickets, function ( $ticket ) use ( $ticket_ids, &$filtered_tickets ) {
+			if ( in_array( intval( $ticket->ID ), $ticket_ids ) ) {
+				$filtered_tickets[] = $ticket;
+			}
+		} );
+		return $filtered_tickets;
+	}
 }

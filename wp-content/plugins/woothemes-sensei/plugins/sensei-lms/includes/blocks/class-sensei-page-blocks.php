@@ -26,6 +26,8 @@ class Sensei_Page_Blocks extends Sensei_Blocks_Initializer {
 	public function initialize_blocks() {
 		new Sensei_Learner_Courses_Block();
 		new Sensei_Learner_Messages_Button_Block();
+		new Sensei_Course_Completed_Actions_Block();
+		new Sensei_Course_Results_Block();
 	}
 
 	/**
@@ -36,7 +38,6 @@ class Sensei_Page_Blocks extends Sensei_Blocks_Initializer {
 	public function enqueue_block_assets() {
 
 		Sensei()->assets->disable_frontend_styles();
-		Sensei()->assets->enqueue( 'sensei-single-page-blocks', 'blocks/single-page.js', [], true );
 		Sensei()->assets->enqueue(
 			'sensei-single-page-blocks-style',
 			'blocks/single-page-style.css'
@@ -49,6 +50,7 @@ class Sensei_Page_Blocks extends Sensei_Blocks_Initializer {
 	 * @access private
 	 */
 	public function enqueue_block_editor_assets() {
+		Sensei()->assets->enqueue( 'sensei-single-page-blocks', 'blocks/single-page.js', [], true );
 		Sensei()->assets->enqueue(
 			'sensei-single-page-blocks-editor-style',
 			'blocks/single-page-style-editor.css'

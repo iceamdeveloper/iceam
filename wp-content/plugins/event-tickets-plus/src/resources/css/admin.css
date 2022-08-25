@@ -5,7 +5,7 @@
  * src/resources/postcss/ file. For more information, check out our engineering
  * docs on how we handle CSS in our engineering docs.
  *
- * @see: http://moderntribe.github.io/products-engineering/css/
+ * @see: https://the-events-calendar.github.io/products-engineering/docs/code-standards/css/
  */
 
 /* Capacity Table */
@@ -13,14 +13,14 @@
 		box-shadow: none;
 	}
 #tribe_show_attendees {
-	margin-left: .4em;
+	margin-left: 0.4em;
 }
 .tribe-warning-toggle {
 	border: none;
 	box-shadow: none;
 	float: right;
 	margin: 0 10px 0 0;
-	transition: all .5s ease;
+	transition: all 0.5s ease;
 }
 .tribe-warning-toggle label {
 		line-height: 33px;
@@ -31,7 +31,6 @@
 .tribe-warning-toggle label .event-warnings .dashicons, .tribe-warning-toggle label .event-warnings-close .dashicons {
 				font-size: 18px;
 				line-height: 33px;
-
 			}
 .tribe-warning-toggle #tribe-tickets-warning {
 		display: none;
@@ -39,7 +38,7 @@
 .recurring-warning {
 	color: red;
 	padding: 10px;
-	transition: all .5s ease;
+	transition: all 0.5s ease;
 }
 .recurring-warning .dashicons {
 		font-size: 40px;
@@ -51,14 +50,23 @@
 		min-height: 38px;
 		padding: 0 0 0 50px;
 	}
-.tribe_attendee-collection_meta::after {
+.tribe_attendee-collection_meta:after {
 	width: calc(100% - 160px);
 }
 .tribe-tickets__tickets-editor-ticket-name-attendee-registration-fields {
 	color: #999;
 	display: block;
-	font-style: italic;
+	font-size: var(--tec-font-size-1);
+	line-height: var(--tec-spacer-4);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
 }
+.tribe-tickets__tickets-editor-ticket-name-attendee-registration-fields:before {
+		color: #ccc;
+		font-size: var(--tec-spacer-3);
+		height: var(--tec-spacer-3);
+		line-height: var(--tec-spacer-3);
+		margin-top: calc(var(--tec-spacer-0)/2);
+		width: var(--tec-spacer-3);
+	}

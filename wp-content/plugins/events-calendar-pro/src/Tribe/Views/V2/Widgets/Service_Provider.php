@@ -47,7 +47,7 @@ class Service_Provider extends \tad_DI52_ServiceProvider {
 	protected function register_compatibility() {
 		$compatibility = new Compatibility();
 		$this->container->singleton( Compatibility::class, $compatibility );
-		$this->container->singleton( 'events-pro.views.v2.widgets.compatibility', $compatibility );
+		$this->container->singleton( 'pro.views.v2.widgets.compatibility', $compatibility );
 	}
 
 	/**
@@ -75,6 +75,7 @@ class Service_Provider extends \tad_DI52_ServiceProvider {
 	protected function register_assets() {
 		$assets = new Assets( $this->container );
 		$assets->register();
+		$assets->register_admin_assets();
 
 		$this->container->singleton( Assets::class, $assets );
 	}

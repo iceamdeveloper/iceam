@@ -10,8 +10,9 @@
  * @since 5.0.0
  * @since 5.1.0 Added support for div HTML attributes.
  * @since 5.2.0 Fixed handling of showing current value of field.
+ * @since 5.2.9 Added support for description.
  *
- * @version 5.2.0
+ * @version 5.2.9
  *
  * @var string $field_name The meta field name.
  * @var string $field_d The meta field id.
@@ -22,6 +23,8 @@
  * @var array $attributes Array containing the HTML attributes for the field.
  * @var Tribe__Tickets__Ticket_Object $ticket The ticket object.
  * @var Tribe__Tickets_Plus__Meta__Field__Birth $field.
+ * @var string $value The current field value.
+ * @var string $description A user-defined description for meta field.
  *
  * @see     Tribe__Tickets_Plus__Meta__Field__Birth
  */
@@ -126,5 +129,10 @@ $selected_year  = $formatted_value['year'];
 			<?php tribe_required( $required ); ?>
 			autocomplete="off"
 		/>
+		<?php if ( ! empty( $description ) ) : ?>
+			<div class="tribe-common-b3 tribe-tickets__form-field-description">
+				<?php echo wp_kses_post( $description ); ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>

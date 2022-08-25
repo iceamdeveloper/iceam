@@ -8,26 +8,26 @@ jQuery(document).ready(function () {
 
     // deactivation popup code
     var ublk_plugin_admin = jQuery('.documentation_ublk_plugin').closest('div').find('.deactivate').find('a');
-    ublk_plugin_admin.click(function (event) {
+    ublk_plugin_admin.on( 'click', function (event) {
         event.preventDefault();
         jQuery('#deactivation_thickbox_ublk').trigger('click');
         jQuery('#TB_window').removeClass('thickbox-loading');
         change_thickbox_size_ublk();
     });
     checkOtherDeactivate();
-    jQuery('.sol_deactivation_reasons').click(function () {
+    jQuery('.sol_deactivation_reasons').on( 'click', function () {
         checkOtherDeactivate();
     });
-    jQuery('#sbtDeactivationFormCloseublk').click(function (event) {
+    jQuery('#sbtDeactivationFormCloseublk').on( 'click', function (event) {
         event.preventDefault();
         jQuery("#TB_closeWindowButton").trigger('click');
     });
 
-    jQuery('.ublk-deactivation').on('click', function() {
+    jQuery('.ublk-deactivation').on( 'click', function() {
         window.location.href = ublk_plugin_admin.attr('href');
     });
 
-    jQuery('#txtUsername').keypress(function (event) {
+    jQuery('#txtUsername').on( 'keypress', function (event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') {
             jQuery('#filter_action').trigger('click');
@@ -54,17 +54,24 @@ jQuery(document).ready(function () {
             jQuery("#frmdate").datepicker("option", "maxDate", selectedDate);
         }
     });
-    jQuery('#display_status').change(function () {
+    jQuery('#display_status').on( 'change', function () {
         if (jQuery(this).val() == 'roles') {
             jQuery('.role_records').show();
+            jQuery('.export_display').val('roles');
             jQuery('.users_records, .filter_div').hide();
+            jQuery(".frmExport .actions").css("top", "-15px");
+            jQuery(".frmExport").css({ "left":"225px", "bottom":"-36px"});
+
         }
         else {
             jQuery('.role_records').hide();
+            jQuery('.export_display').val('users');
             jQuery('.users_records, .filter_div').show();
+            jQuery(".frmExport .actions").css("top", "0px");
+            jQuery(".frmExport").css({ "left":"395px", "bottom":"-76px"});
         }
     });
-    jQuery('#chkapply').click(function () {
+    jQuery('#chkapply').on( 'click', function () {
         var txtSunFrom = jQuery('#txtSunFrom').val();
         var txtSunTo = jQuery('#txtSunTo').val();
         var txtMonFrom = jQuery('#txtMonFrom').val();
@@ -116,7 +123,7 @@ jQuery(document).ready(function () {
         jQuery('#txtSatFrom').val(from);
         jQuery('#txtSatTo').val(to);
     });
-    jQuery('#chkreset').click(function () {
+    jQuery('#chkreset').on( 'click', function () {
         jQuery('#txtSunFrom').val('');
         jQuery('#txtSunTo').val('');
         jQuery('#txtMonFrom').val('');
@@ -132,7 +139,7 @@ jQuery(document).ready(function () {
         jQuery('#txtSatFrom').val('');
         jQuery('#txtSatTo').val('');
     });
-    jQuery('.view_block_data').click(function (event) {
+    jQuery('.view_block_data').on( 'click', function (event) {
         event.preventDefault();
         jQuery(this).closest('tr').next('tr').slideToggle();
     });
@@ -144,9 +151,21 @@ jQuery(document).ready(function () {
         jQuery('#srole').val('');
     });
     //Datepicker
-    jQuery('.view_block_data_all').click(function (event) {
+    jQuery('.view_block_data_all').on( 'click', function (event) {
         event.preventDefault();
         jQuery(this).closest('tr').next('tr').slideToggle();
+    });
+
+    //Pagination
+    jQuery('#display_status').on( 'change', function() {
+        if(this.value == "roles" || parseInt(jQuery(".total-pages").html()) == 0){
+            jQuery(".tablenav-pages").css("display", "none");
+            jQuery("div#screen-options-link-wrap").css("display", "none");
+        }
+        else if (parseInt(jQuery(".total-pages").html()) > 0){
+            jQuery(".tablenav-pages").css("display", "block");
+            jQuery("div#screen-options-link-wrap").css("display", "block");
+        }
     });
 });
 
@@ -190,7 +209,7 @@ function searchUser() {
 
 jQuery(window).on('load',function () {
     jQuery('#subscribe_thickbox').trigger('click');
-    jQuery("#TB_closeWindowButton").click(function () {
+    jQuery("#TB_closeWindowButton").on( 'click', function () {
         jQuery.post(ajaxurl,
                 {
                     'action': 'close_tab'

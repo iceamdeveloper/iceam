@@ -7,7 +7,7 @@
  * @author      Automattic
  * @package     Sensei
  * @category    Templates
- * @version     3.6.0
+ * @version     4.0.0
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -25,6 +25,7 @@ get_sensei_header();
  *
  * @hooked Sensei_Quiz::the_title               - 20
  * @hooked Sensei_Quiz::the_user_status_message - 40
+ * @hooked Sensei_Notices::maybe_print_notices  - 50
  */
 do_action( 'sensei_single_quiz_content_inside_before', get_the_ID() );
 
@@ -34,7 +35,7 @@ do_action( 'sensei_single_quiz_content_inside_before', get_the_ID() );
 
 	<?php if ( sensei_quiz_has_questions() ) : ?>
 
-		<form method="POST" action="<?php echo esc_url_raw( get_permalink() ); ?>" enctype="multipart/form-data">
+		<form method="POST" enctype="multipart/form-data" id="sensei-quiz-form">
 
 			<?php
 
@@ -57,7 +58,10 @@ do_action( 'sensei_single_quiz_content_inside_before', get_the_ID() );
 					sensei_setup_the_question();
 					?>
 
-					<li class="<?php sensei_the_question_class(); ?>">
+					<li
+						class="<?php sensei_the_question_class(); ?>"
+						value="<?php echo esc_attr( sensei_get_the_question_number() ); ?>"
+					>
 
 						<?php
 
@@ -84,7 +88,7 @@ do_action( 'sensei_single_quiz_content_inside_before', get_the_ID() );
 						/**
 						 * Action inside before the question content on single-quiz page
 						 *
-						 * @hooked Sensei_Question::answer_feedback_notes
+						 * @hooked Sensei_Question::the_answer_feedback
 						 *
 						 * @param string $the_question_id
 						 */

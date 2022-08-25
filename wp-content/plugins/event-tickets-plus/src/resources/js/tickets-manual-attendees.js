@@ -1,4 +1,3 @@
-/* global tribe */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
@@ -118,7 +117,7 @@ tribe.tickets.manualAttendees = {};
 	obj.bindAddAttendeeTicketSelectChange = function( $container, requestData ) {
 		const $ticketSelect = $container.find( obj.selectors.formAddAttendeeTicketSelect );
 
-		$ticketSelect.on( 'change', function( e ) {
+		$ticketSelect.on( 'change', function() {
 			const data = {
 				action: 'tribe_tickets_admin_manager',
 				request: requestData.request,
@@ -141,7 +140,7 @@ tribe.tickets.manualAttendees = {};
 	 * @param  {jqXHR}       jqXHR    Request object.
 	 * @param  {PlainObject} settings Settings that this request was made with.
 	 */
-	obj.bindModalEvents = function( event, jqXHR, settings ) {
+	obj.bindModalEvents = function( event, jqXHR, settings ) { /* eslint-disable-line no-unused-vars,max-len */
 		const $container = event.data.container;
 		const data = event.data.requestData;
 
@@ -159,7 +158,7 @@ tribe.tickets.manualAttendees = {};
 	 * @param  {jqXHR}       jqXHR    Request object.
 	 * @param  {PlainObject} settings Settings that this request was made with.
 	 */
-	obj.handleFormSuccess = function( event, jqXHR, settings ) {
+	obj.handleFormSuccess = function( event, jqXHR, settings ) { /* eslint-disable-line no-unused-vars,max-len */
 		const data = event.data.requestData;
 
 		if ( 'submit' === data.step ) {
@@ -187,7 +186,9 @@ tribe.tickets.manualAttendees = {};
 		const eventId = $form.data( 'event-id' ) || null;
 		const ticketId = $form.data( 'ticket-id' ) || null;
 		const provider = $form.data( 'provider' ) || null;
-		const request = attendeeId ? 'tribe_tickets_manual_attendees_edit' : 'tribe_tickets_manual_attendees_add';
+		const request = attendeeId
+			? 'tribe_tickets_manual_attendees_edit'
+			: 'tribe_tickets_manual_attendees_add';
 
 		const data = {
 			action: 'tribe_tickets_admin_manager',
@@ -341,7 +342,9 @@ tribe.tickets.manualAttendees = {};
 		const eventId = $trigger.data( 'event-id' ) || null;
 		const ticketId = $trigger.data( 'ticket-id' ) || null;
 		const provider = $trigger.data( 'provider' ) || null;
-		const request = attendeeId ? 'tribe_tickets_manual_attendees_edit' : 'tribe_tickets_manual_attendees_add';
+		const request = attendeeId
+			? 'tribe_tickets_manual_attendees_edit'
+			: 'tribe_tickets_manual_attendees_add';
 
 		if ( title ) {
 			const $modalTitle = $modal.find( obj.selectors.modalTitle );

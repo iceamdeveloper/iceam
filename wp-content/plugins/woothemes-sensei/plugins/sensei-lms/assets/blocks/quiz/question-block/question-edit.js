@@ -1,21 +1,28 @@
 /**
+ * External dependencies
+ */
+import classnames from 'classnames';
+
+/**
  * WordPress dependencies
  */
 import { BlockControls, InnerBlocks } from '@wordpress/block-editor';
 import { select, useDispatch } from '@wordpress/data';
-import { useCallback } from '@wordpress/element';
+import { useCallback, useMemo, useState } from '@wordpress/element';
 import { compose } from '@wordpress/compose';
 import { __, _n, sprintf } from '@wordpress/i18n';
-/**
- * External dependencies
- */
-import cn from 'classnames';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
-
 import { withBlockValidation } from '../../../shared/blocks/block-validation';
+import {
+	answerFeedbackCorrectBlock,
+	answerFeedbackIncorrectBlock,
+} from '../answer-feedback-block';
+import questionDescriptionBlock from '../question-description-block';
+import questionAnswersBlock from '../question-answers-block';
 import { useQuestionNumber } from '../question-number';
 import SingleLineInput from '../../../shared/blocks/single-line-input';
 import { withBlockMeta } from '../../../shared/blocks/block-metadata';
@@ -25,6 +32,7 @@ import {
 	QuestionValidationNotice,
 	SharedQuestionNotice,
 } from './question-block-helpers';
+import { QuestionContext } from './question-context';
 import { QuestionGradeToolbar } from './question-grade-toolbar';
 import {
 	validateQuestionBlock,
@@ -34,6 +42,27 @@ import QuestionView from './question-view';
 import QuestionSettings from './question-settings';
 import { QuestionTypeToolbar } from './question-type-toolbar';
 import SingleQuestion from './single-question';
+
+let questionOptions = Object.entries( types ).map(
+	( [ value, settings ] ) => ( {
+		...settings,
+		label: settings.title,
+		value,
+	} )
+);
+
+/**
+ * Filters the available question type options.
+ *
+ * @since 4.1.0
+ *
+ * @param {Array} options The available question type options.
+ * @return {Array} The filtered question type options.
+ */
+questionOptions = applyFilters(
+	'senseiQuestionTypeToolbarOptions',
+	questionOptions
+);
 
 /**
  * Format the question grade as `X points`.
@@ -52,6 +81,7 @@ const formatGradeLabel = ( grade ) =>
  * @param {Object}   props.attributes       Block attributes.
  * @param {Object}   props.attributes.title Question title.
  * @param {Function} props.setAttributes    Set block attributes.
+ * @param {Object}   props.meta             Block metadata.
  */
 const QuestionEdit = ( props ) => {
 	const {
@@ -79,6 +109,8 @@ const QuestionEdit = ( props ) => {
 	const questionNumber = useQuestionNumber( clientId );
 	const AnswerBlock = type && types[ type ];
 
+	const canHaveFeedback = AnswerBlock?.feedback;
+
 	const hasSelected = useHasSelected( props );
 	const isSingle = context && ! ( 'sensei-lms/quizId' in context );
 	const showContent = title || hasSelected || isSingle;
@@ -98,6 +130,44 @@ const QuestionEdit = ( props ) => {
 		</div>
 	);
 
+	const [ showAnswerFeedback, toggleAnswerFeedback ] = useState( false );
+
+	const questionContext = useMemo(
+		() => ( {
+			answer,
+			setAttributes,
+			AnswerBlock,
+			hasSelected,
+			canHaveFeedback,
+			answerFeedback: {
+				showAnswerFeedback,
+				toggleAnswerFeedback,
+			},
+		} ),
+		[
+			AnswerBlock,
+			answer,
+			hasSelected,
+			setAttributes,
+			showAnswerFeedback,
+			canHaveFeedback,
+		]
+	);
+
+	const template = useMemo(
+		() => [
+			[ questionDescriptionBlock.name, {} ],
+			[ questionAnswersBlock.name, {} ],
+			...( canHaveFeedback
+				? [
+						[ answerFeedbackCorrectBlock.name, {} ],
+						[ answerFeedbackIncorrectBlock.name, {} ],
+				  ]
+				: [] ),
+		],
+		[ canHaveFeedback ]
+	);
+
 	if ( ! editable ) {
 		return (
 			<QuestionView
@@ -109,9 +179,10 @@ const QuestionEdit = ( props ) => {
 
 	return (
 		<div
-			className={ cn( 'sensei-lms-question-block', {
+			className={ classnames( 'sensei-lms-question-block', {
 				'is-draft': ! title,
 				'is-invalid': isInvalid,
+				'show-answer-feedback': showAnswerFeedback,
 			} ) }
 		>
 			{ questionIndex }
@@ -127,37 +198,20 @@ const QuestionEdit = ( props ) => {
 					onRemove={ () => removeBlock( clientId ) }
 				/>
 			</h2>
+			{ AnswerBlock.subtitle && (
+				<AnswerBlock.subtitle isQuestionSelected={ hasSelected } />
+			) }
 			{ showContent && questionGrade }
 			{ hasSelected && shared && <SharedQuestionNotice /> }
 			{ showContent && (
-				<>
+				<QuestionContext.Provider value={ questionContext }>
 					<InnerBlocks
-						template={ [
-							[
-								'core/paragraph',
-								{
-									placeholder: __(
-										'Question Description',
-										'sensei-lms'
-									),
-								},
-							],
-						] }
+						template={ template }
 						templateInsertUpdatesSelection={ false }
-						templateLock={ false }
+						templateLock={ 'all' }
+						renderAppender={ null }
 					/>
-					{ AnswerBlock?.edit && (
-						<AnswerBlock.edit
-							attributes={ answer }
-							setAttributes={ ( next ) =>
-								setAttributes( {
-									answer: { ...answer, ...next },
-								} )
-							}
-							hasSelected={ hasSelected }
-						/>
-					) }
-				</>
+				</QuestionContext.Provider>
 			) }
 			<QuestionValidationNotice
 				{ ...props }
@@ -170,6 +224,7 @@ const QuestionEdit = ( props ) => {
 						onSelect={ ( nextValue ) =>
 							setAttributes( { type: nextValue } )
 						}
+						options={ questionOptions }
 					/>
 					<QuestionGradeToolbar
 						value={ options.grade }

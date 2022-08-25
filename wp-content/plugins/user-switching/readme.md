@@ -1,8 +1,8 @@
 # User Switching
 
-Stable tag: 1.5.7  
+Stable tag: 1.5.8  
 Requires at least: 3.7  
-Tested up to: 5.7  
+Tested up to: 6.0  
 Requires PHP: 5.3  
 License: GPL v2 or later  
 Tags: users, profiles, user switching, fast user switching, multisite, buddypress, bbpress, become, user management, developer  
@@ -84,6 +84,10 @@ User Switching is considered **Ethical Open Source** because it meets all of the
 2. The *Switch To* link on a user's profile<br>![The Switch To link on a user's profile](.wordpress-org/screenshot-2.png)
 
 ## Frequently Asked Questions
+
+### Does this plugin work with PHP 8?
+
+Yes.
 
 ### What does "Switch off" mean?
 
@@ -256,6 +260,10 @@ In addition, User Switching respects the following filters from WordPress core w
 
 ## Changelog ##
 
+### 1.5.8 ###
+
+* Avoid a fatal if the `interim-login` query parameter is present on a page other than wp-login.php.
+
 ### 1.5.7 ###
 
 * Fix some issues that could lead to PHP errors given a malformed cookie.
@@ -340,87 +348,97 @@ In addition, User Switching respects the following filters from WordPress core w
 * Docblock improvements.
 * Coding standards improvements.
 
-### 0.6 ###
+### 1.0.9 ###
 
-- More intuitive redirecting after switching.
-- Avoid a BuddyPress bug preventing Switch To buttons from appearing.
-- Added a template function: `current_user_switched()` which lets you know if the current user switched into their account.
-- Added some hooks: `switch_to_user`, `switch_back_user` and `switch_off_user`, fired when appropriate.
+- Remove the bundled languages in favour of language packs from translate.wordpress.org.
 
 
-### 0.5.2 ###
+### 1.0.8 ###
 
-- Farsi (Persian) translation by Amin Ab.
-- Display switch back links in Network Admin and login screen.
-- Avoid a BuddyPress bug preventing Switch To buttons from appearing.
-
-
-### 0.5.1 ###
-
-- Toolbar tweaks for WordPress 3.3.
+- Chinese (Taiwan) and Czech translations.
+- Updated Dutch, Spanish, Hebrew, and German translations.
+- Add an ID attribute to the links that User Switching outputs on the WordPress login screen, BuddyPress screens, and bbPress screens.
+- Avoid a deprecated argument notice when the `user-actions` admin toolbar node has been removed.
 
 
-### 0.5.1.1 ###
+### 1.0.7 ###
 
-- Chinese Simplified translation by Sparanoid.
-
-
-### 0.5.1.2 ###
-
-- German translation by Ralph Stenzel.
-
-
-### 0.5 ###
-
-- New "Switch off" function: Log out and log instantly back in again when needed (see the FAQ).
+- Azerbaijani, Danish, and Bosnian translations.
+- Add back the 'User Switching' heading on the user profile screen.
+- Correct the value passed to the `$old_user_id` parameter of the `switch_back_user` hook when a user has been switched off. This should be boolean `false` rather than `0`.
+- Docblocks for actions and filters.
+- More code standards tweaks.
 
 
-### 0.4.1 ###
+### 1.0.6 ###
 
-- Support for upcoming changes to the admin bar in WordPress 3.3.
-
-
-### 0.4 ###
-
-- Add some extended support for BuddyPress.
-- Add some extended support for Multisite.
-- Fix a permissions problem for users with no privileges.
-- Fix a PHP warning when used as a mu-plugin (thanks Scribu).
+- Correct the values passed to the `switch_back_user` action when a user switches back.
+- More code standards tweaks.
 
 
-### 0.3.2 ###
+### 1.0.5 ###
 
-- Fix the 'Switch back to' menu item in the WordPress admin bar (WordPress 3.1+).
-- Fix a formatting issue on the user profile page.
-
-
-### 0.3.1 ###
-
-- Prevent admins switching to multisite super admin accounts.
+- Norwegian translation by Per Søderlind.
+- Code standards tweaks.
 
 
-### 0.3 ###
+### 1.0.4 ###
 
-- Adds an admin bar menu item (WordPress 3.1+) for switching back to the user you switched from.
-
-
-### 0.2.2 ###
-
-- Respect the current 'Remember me' setting when switching users.
-- Redirect to home page instead of admin screen if the user you're switching to has no privileges.
+- Support for the new `logout_redirect` and `removable_query_args` filters in WordPress 4.2.
 
 
-### 0.2.1 ###
+### 1.0.3 ###
 
-- Edge case bugfix to prevent 'Switch back to...' message appearing when it shouldn't.
-
-
-### 0.2 ###
-
-- Functionality for switching back to user you switched from.
+- Croation translation by Ante Sepic.
+- Avoid PHP notices caused by other plugins which erroneously use boolean `true` as a capability.
 
 
-### 0.1 ###
+### 1.0.2 ###
 
-- Initial release.
+- Turkish translation by Abdullah Pazarbasi.
+- Romanian translation by ArianServ.
+- Dutch translation by Thom.
+- Greek translation by evigiannakou.
+- Bulgarian translation by Petya Raykovska.
+- Finnish translation by Sami Keijonen.
+- Italian translation by Alessandro Curci and Alessandro Tesoro.
+- Updated Arabic, Spanish, German, and Polish translations.
+
+
+### 1.0.1 ###
+
+- Shorten the names of User Switching's cookies to avoid problems with Suhosin's over-zealous default rules.
+- Add backwards compatibility for the deprecated `OLDUSER_COOKIE` constant.
+
+
+### 1.0 ###
+
+- Security hardening for sites that use HTTPS in the admin area and HTTP on the front end.
+- Add an extra auth check before the nonce verification.
+- Pretty icon next to the switch back links.
+
+
+### 0.9 ###
+
+- Minor fixes for the `login_redirect` filter.
+- Increase the specificity of the `switch_to_old_user` and `switch_off` nonces.
+
+
+### 0.8.9 ###
+
+- French translation by Fx Bénard.
+- Hebrew translation by Rami Y.
+- Indonesian translation by Eko Ikhyar.
+- Portuguese translation by Raphael Mendonça.
+
+
+### 0.8.8 ###
+
+- Spanish Translation by Marcelo Pedra.
+- User Switching is now a network-only plugin when used on Multisite.
+
+
+### 0.8.7 ###
+
+- Respect the `secure_logged_in_cookie` and `login_redirect` filters.
 

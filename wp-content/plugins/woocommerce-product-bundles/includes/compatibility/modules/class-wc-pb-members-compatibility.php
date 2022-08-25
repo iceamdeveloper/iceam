@@ -2,7 +2,6 @@
 /**
  * WC_PB_Members_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    6.0.0
  */
@@ -15,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Memberships Integration: Discounts inheritance.
  *
- * @version  6.9.0
+ * @version  6.13.3
  */
 class WC_PB_Members_Compatibility {
 
@@ -45,8 +44,10 @@ class WC_PB_Members_Compatibility {
 	 */
 	public static function init() {
 
+		$is_ajax = WC_PB_Core_Compatibility::is_wc_version_gte( '6.1' ) ? wp_doing_ajax() : is_ajax();
+
 		// See 'WC_Memberships_Member_Discounts'.
-		if ( ! ( is_admin() && ! is_ajax() ) ) {
+		if ( ! ( is_admin() && ! $is_ajax ) ) {
 
 			if ( 'filters' === WC_PB_Product_Prices::get_bundled_cart_item_discount_method() ) {
 
@@ -102,6 +103,11 @@ class WC_PB_Members_Compatibility {
 			return $discount;
 		}
 
+		// Don't recalculate discounts, avoid infinite loops.
+		if ( self::$calculating_inherited_discounts ) {
+			return $discount;
+		}
+
 		// Flag to prevent 'exclude_bundled_product_from_member_discounts' from kicking in.
 		self::$calculating_inherited_discounts = true;
 
@@ -110,11 +116,13 @@ class WC_PB_Members_Compatibility {
 
 		// If the bundle is excluded from member discounts, don't apply any discounts.
 		if ( wc_memberships()->get_member_discounts_instance()->is_product_excluded_from_member_discounts( $bundle ) ) {
+			self::$calculating_inherited_discounts = false;
 			return $discount;
 		}
 
 		// If the product itself is excluded from member discounts, don't apply any discounts.
 		if ( wc_memberships()->get_member_discounts_instance()->is_product_excluded_from_member_discounts( $bundled_product ) ) {
+			self::$calculating_inherited_discounts = false;
 			return $discount;
 		}
 
@@ -163,6 +171,7 @@ class WC_PB_Members_Compatibility {
 		$discount_rules = apply_filters( 'woocommerce_bundled_item_member_discount_rules', $discount_rules, $parent_discount_rules, $child_discount_rules, $bundled_item );
 
 		if ( empty( $discount_rules ) ) {
+			self::$calculating_inherited_discounts = false;
 			return $discount;
 		}
 
@@ -220,12 +229,25 @@ class WC_PB_Members_Compatibility {
 	 */
 	public static function exclude_bundled_product_from_member_discounts( $exclude, $product ) {
 
-		if ( WC_PB_Product_Prices::is_bundled_pricing_context( $product, 'catalog' ) && ! self::$calculating_inherited_discounts ) {
-			$exclude = true;
+		if ( is_numeric( $product ) ) {
+			$product = WC_PB_Helpers::cache_get( 'mb_compat_product_' . $product );
+
+			if ( is_null( $product ) ) {
+				$product = wc_get_product( $product );
+				if ( is_a( $product, 'WC_Product' ) ) {
+					WC_PB_Helpers::cache_set( 'mb_compat_product_' . $product->get_id(), $product );
+				}
+			}
 		}
 
-		if ( WC_PB_Product_Prices::is_bundled_pricing_context( $product, 'cart' ) ) {
-			$exclude = true;
+		if ( $product && is_a( $product, 'WC_Product' ) ) {
+			if ( WC_PB_Product_Prices::is_bundled_pricing_context( $product, 'catalog' ) && ! self::$calculating_inherited_discounts ) {
+				$exclude = true;
+			}
+
+			if ( WC_PB_Product_Prices::is_bundled_pricing_context( $product, 'cart' ) ) {
+				$exclude = true;
+			}
 		}
 
 		return $exclude;

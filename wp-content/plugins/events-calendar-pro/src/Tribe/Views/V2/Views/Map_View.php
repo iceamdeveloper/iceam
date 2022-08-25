@@ -377,12 +377,16 @@ class Map_View extends View {
 
 		// Assign the distance in Kms.
 		$geo_loc->assign_distance_to_posts( $events, $lat_from, $lng_from );
+
+		// Sort by distances _before_ we add the unit string.
+		$events =  wp_list_sort( $events, 'distance', $direction );
+
 		// Convert the distance to the current unit.
 		array_walk( $events, static function ( \WP_Post $event ) {
 			$event->distance = tribe_get_distance_with_unit( $event->distance );
 		} );
 
-		return wp_list_sort( $events, 'distance', $direction );
+		return $events;
 	}
 
 	/**
@@ -467,9 +471,9 @@ class Map_View extends View {
 	 * @since 5.3.0
 	 *
 	 * @param array<string,mixed> $template_vars The View template variables.
-	 * @param View_Interface      $view          The current View instance.
+	 * @param View_Interface      $unused_view   The current View instance.
 	 */
-	public function filter_map_view_pin( array $template_vars, View_Interface $view ) {
+	public function filter_map_view_pin( array $template_vars, View_Interface $unused_view ) {
 
 		if ( tribe_is_using_basic_gmaps_api() ) {
 			return $template_vars;
@@ -479,7 +483,7 @@ class Map_View extends View {
 			return $template_vars;
 		}
 
-		$map_pin = \Tribe__Customizer::instance()->get_option( [ 'global_elements', 'map_pin' ], false );
+		$map_pin = tribe( 'customizer' )->get_option( [ 'global_elements', 'map_pin' ], false );
 		if ( empty( $map_pin ) ) {
 			return $template_vars;
 		}

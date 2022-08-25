@@ -5,7 +5,7 @@
  * src/resources/postcss/ file. For more information, check out our engineering
  * docs on how we handle CSS in our engineering docs.
  *
- * @see: http://moderntribe.github.io/products-engineering/css/
+ * @see: https://the-events-calendar.github.io/products-engineering/docs/code-standards/css/
  */
 
 /**
@@ -23,7 +23,7 @@
  */
 
 /* = Pro Tickets Admin/Skeleton Styles
-=============================================*/
+============================================= */
 
 .tribe-events-tickets .tickets_price {
 	color: #000;
@@ -44,13 +44,12 @@
 .tribe-events-tickets {
 	border-bottom: 0;
 	margin: 0;
-	width: 100%;
 	position: relative;
-
+	width: 100%;
 }
 
 .tribe-events-tickets .tribe-link-tickets-message {
-		background: rgba(200, 200, 200, .8);
+		background: rgba(200, 200, 200, 0.8);
 		bottom: 0;
 		left: 0;
 		position: absolute;
@@ -88,7 +87,7 @@
 }
 
 /* = WooTickets Mobile Styles (max-width: 600px)
-=============================================*/
+============================================= */
 
 #tribe-events-report .wrap {
 	padding: 10px;
@@ -180,18 +179,17 @@
 }
 
 #tribe-events-report .tribe-scrollable-table {
+	background: linear-gradient(to right, #fff, rgba(255, 255, 255, 0)), linear-gradient(to left, #fff, rgba(255, 255, 255, 0)), linear-gradient(to right, #f5f5f5, rgba(195, 195, 197, 0)), linear-gradient(to left, #f5f5f5, rgba(195, 195, 197, 0));
 	background-attachment: local, local, scroll, scroll;
-	background-color:      white;
-	background-image:      -webkit-linear-gradient(to right, #fff, rgba(255, 255, 255, 0)), -webkit-linear-gradient(to left, #fff, rgba(255, 255, 255, 0)), -webkit-linear-gradient(to right, #f5f5f5, rgba(195, 195, 197, 0)), -webkit-linear-gradient(to left, #f5f5f5, rgba(195, 195, 197, 0));
-	background:            linear-gradient(to right, #fff, rgba(255, 255, 255, 0)), linear-gradient(to left, #fff, rgba(255, 255, 255, 0)), linear-gradient(to right, #f5f5f5, rgba(195, 195, 197, 0)), linear-gradient(to left, #f5f5f5, rgba(195, 195, 197, 0));
-	background-image:      -moz-linear-gradient(to right, #fff, rgba(255, 255, 255, 0)), -moz-linear-gradient(to left, #fff, rgba(255, 255, 255, 0)), -moz-linear-gradient(to right, #f5f5f5, rgba(195, 195, 197, 0)), -moz-linear-gradient(to left, #f5f5f5, rgba(195, 195, 197, 0));
-	background-image:      -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #fff), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, #fff), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #f5f5f5), color-stop(100%, rgba(195, 195, 197, 0))), -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, #f5f5f5), color-stop(100%, rgba(195, 195, 197, 0)));
-	background-position:   0 0, 100% 0, 0 0, 100% 0;
-	background-repeat:     no-repeat;
-	background-size:       4em 100%, 4em 100%, 1em 100%, 1em 100%;
-	margin-bottom:         1.6em;
-	overflow-x:            auto;
-	width:                 100%;
+	background-color: white; /* stylelint-disable-line value-no-vendor-prefix,function-linear-gradient-no-nonstandard-direction */ /* stylelint-disable-line value-no-vendor-prefix,function-linear-gradient-no-nonstandard-direction */
+	background-image: -moz-linear-gradient(to right, #fff, rgba(255, 255, 255, 0)), -moz-linear-gradient(to left, #fff, rgba(255, 255, 255, 0)), -moz-linear-gradient(to right, #f5f5f5, rgba(195, 195, 197, 0)), -moz-linear-gradient(to left, #f5f5f5, rgba(195, 195, 197, 0)); /* stylelint-disable-line value-no-vendor-prefix,function-linear-gradient-no-nonstandard-direction */
+	background-image: -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #fff), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, #fff), color-stop(100%, rgba(255, 255, 255, 0))), -webkit-gradient(linear, 0% 50%, 100% 50%, color-stop(0%, #f5f5f5), color-stop(100%, rgba(195, 195, 197, 0))), -webkit-gradient(linear, 100% 50%, 0% 50%, color-stop(0%, #f5f5f5), color-stop(100%, rgba(195, 195, 197, 0)));
+	background-position: 0 0, 100% 0, 0 0, 100% 0;
+	background-repeat: no-repeat;
+	background-size: 4em 100%, 4em 100%, 1em 100%, 1em 100%;
+	margin-bottom: 1.6em;
+	overflow-x: auto;
+	width: 100%;
 }
 
 #tribe-events-report .wp-list-table {
@@ -207,13 +205,45 @@
 	display: none;
 }
 
-.orders #the-list .cancelled, .orders #the-list .refunded {
+.orders #the-list .cancelled,
+		.orders #the-list .refunded {
 			font-style: italic;
 		}
 
+/* = Attendee meta styles for Enhanced Woo Templates.
+============================================= */
+
+.woocommerce table a.event-title {
+			font-size: 1.25em;
+			font-style: italic;
+		}
+
+.woocommerce table div.tribe-event-details {
+			font-size: 0.75em;
+			margin: 0 0 0.75em;
+		}
+
+.woocommerce table div.tribe-attendee-meta-heading {
+			margin: 0;
+		}
+
+.woocommerce table .tribe-attendee-meta {
+			border-collapse: collapse;
+			border-width: 0;
+			margin: 0.5em 0;
+		}
+
+.woocommerce table .tribe-attendee-meta td {
+				border: 0 none;
+				font-size: 0.75em;
+				padding: 0 0 0.25em;
+				vertical-align: top;
+				width: auto;
+			}
+
 @media (max-width: 600px) {
 	/* = WooTickets
-	=============================================*/
+	============================================= */
 
 	td.tickets_name {
 		font-size: 18px;

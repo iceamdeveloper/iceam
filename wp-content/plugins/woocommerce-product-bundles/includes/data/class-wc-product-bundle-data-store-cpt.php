@@ -2,7 +2,6 @@
 /**
  * WC_Product_Bundle_Data_Store_CPT class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.2.0
  */
@@ -17,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bundle data stored as Custom Post Type. For use with the WC 2.7+ CRUD API.
  *
  * @class    WC_Product_Bundle_Data_Store_CPT
- * @version  6.7.8
+ * @version  6.12.0
  */
 class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 
@@ -28,6 +27,7 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 	protected $extended_internal_meta_keys = array(
 		'_wcpb_min_qty_limit',
 		'_wcpb_max_qty_limit',
+		'_wc_pb_virtual_bundle',
 		'_wc_pb_layout_style',
 		'_wc_pb_group_mode',
 		'_wc_pb_bundle_stock_quantity',
@@ -51,6 +51,7 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 	protected $props_to_meta_keys = array(
 		'min_bundle_size'                 => '_wcpb_min_qty_limit',
 		'max_bundle_size'                 => '_wcpb_max_qty_limit',
+		'virtual_bundle'                  => '_wc_pb_virtual_bundle',
 		'layout'                          => '_wc_pb_layout_style',
 		'group_mode'                      => '_wc_pb_group_mode',
 		'bundle_stock_quantity'           => '_wc_pb_bundle_stock_quantity',
@@ -136,7 +137,7 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 			$meta_value = $product->$property_get_fn( 'edit' );
 
 			// Sanitize it for storage.
-			if ( in_array( $property, array( 'editable_in_cart', 'aggregate_weight' ) ) ) {
+			if ( in_array( $property, array( 'editable_in_cart', 'aggregate_weight', 'virtual_bundle' ) ) ) {
 				$meta_value = wc_bool_to_string( $meta_value );
 			}
 
@@ -176,10 +177,8 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 		}
 
 		// Update WC 3.6+ lookup table.
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ) {
-			if ( array_intersect( $this->updated_props, array( 'sku', 'total_sales', 'average_rating', 'stock_quantity', 'stock_status', 'manage_stock', 'downloadable', 'virtual', 'tax_status', 'tax_class' ) ) ) {
-				$this->update_lookup_table( $product->get_id(), 'wc_product_meta_lookup' );
-			}
+		if ( array_intersect( $this->updated_props, array( 'sku', 'total_sales', 'average_rating', 'stock_quantity', 'stock_status', 'manage_stock', 'downloadable', 'virtual', 'tax_status', 'tax_class' ) ) ) {
+			$this->update_lookup_table( $product->get_id(), 'wc_product_meta_lookup' );
 		}
 
 		// Trigger action so 3rd parties can deal with updated props.
@@ -207,9 +206,7 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 			if ( update_post_meta( $id, '_wc_pb_bundled_items_stock_status', $bundled_items_stock_status ) ) {
 
 				// Update WC 3.6+ lookup table.
-				if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ) {
-					$this->update_lookup_table( $product->get_id(), 'wc_product_meta_lookup' );
-				}
+				$this->update_lookup_table( $product->get_id(), 'wc_product_meta_lookup' );
 
 				if ( 'instock' === $product->get_stock_status() ) {
 
@@ -232,8 +229,26 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 		}
 
 		if ( in_array( 'bundle_stock_quantity', $props_to_save ) ) {
-			if ( update_post_meta( $id, '_wc_pb_bundle_stock_quantity', $product->get_bundle_stock_quantity( 'edit' ) ) ) {
+
+			$from_quantity = get_post_meta( $id, '_wc_pb_bundle_stock_quantity', true );
+			$to_quantity   = $product->get_bundle_stock_quantity( 'edit' );
+
+			if ( update_post_meta( $id, '_wc_pb_bundle_stock_quantity', $to_quantity ) ) {
+
 				$updated_props[] = 'bundle_stock_quantity';
+
+				/**
+				 * Trigger 'woocommerce_bundle_stock_quantity_changed' action.
+				 *
+				 * @since 6.10.0
+				 *
+				 * @see WC_PB_DB_Sync::bundle_stock_quantity_changed
+				 *
+				 * @param  int                $to_quantity
+				 * @param  int                $from_quantity
+				 * @param  WC_Product_Bundle  $product
+				 */
+				do_action( 'woocommerce_bundle_stock_quantity_changed', $to_quantity, $from_quantity, $product );
 			}
 		}
 
@@ -358,9 +373,7 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 			}
 
 			// Update WC 3.6+ lookup table.
-			if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ) {
-				$this->update_lookup_table( $product->get_id(), 'wc_product_meta_lookup' );
-			}
+			$this->update_lookup_table( $product->get_id(), 'wc_product_meta_lookup' );
 
 			do_action( 'woocommerce_product_object_updated_props', $product, $updated_props );
 		}

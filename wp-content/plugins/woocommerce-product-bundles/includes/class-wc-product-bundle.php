@@ -2,7 +2,6 @@
 /**
  * WC_Product_Bundle class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    1.0.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundle Class.
  *
  * @class    WC_Product_Bundle
- * @version  6.8.1
+ * @version  6.15.4
  */
 class WC_Product_Bundle extends WC_Product {
 
@@ -39,6 +38,7 @@ class WC_Product_Bundle extends WC_Product {
 	 * @var array
 	 */
 	private $extended_data = array(
+		'virtual_bundle'                  => false,
 		'min_bundle_size'                 => '',
 		'max_bundle_size'                 => '',
 		'layout'                          => 'default',
@@ -405,7 +405,7 @@ class WC_Product_Bundle extends WC_Product {
 					$min_raw_price         += $min_quantity * (double) $bundled_item->min_price;
 					$min_raw_regular_price += $min_quantity * (double) $bundled_item->min_regular_price;
 
-					if ( ! $max_quantity ) {
+					if ( '' === $max_quantity ) {
 						$max_raw_price = $max_raw_regular_price = INF;
 					}
 
@@ -527,8 +527,10 @@ class WC_Product_Bundle extends WC_Product {
 
 		$bundle_stock_quantity = '';
 
-		if ( 'outofstock' === parent::get_stock_status( 'edit' ) || 'outofstock' === $bundled_items_stock_status ) {
+		if ( in_array( $this->get_bundle_stock_status( 'edit' ), array( 'outofstock', 'insufficientstock' ) ) ) {
+
 			$bundle_stock_quantity = 0;
+
 		} else {
 
 			// Find parent quantity.
@@ -546,14 +548,14 @@ class WC_Product_Bundle extends WC_Product {
 
 				$bundled_item_min_qty = $bundled_data_item->get_meta( 'quantity_min' );
 
-				if ( 'yes' === $bundled_data_item->get_meta( 'optional' ) || 0 === $bundled_item_min_qty ) {
+				if ( 'yes' === $bundled_data_item->get_meta( 'optional' ) || 0 === $bundled_item_min_qty || is_null( $bundled_item_min_qty ) ) {
 					continue;
 				}
 
 				$bundled_item_stock_quantity = $bundled_data_item->get_meta( 'max_stock' );
 
 				// Infinite qty? Move on.
-				if ( '' === $bundled_item_stock_quantity ) {
+				if ( '' === $bundled_item_stock_quantity || is_null( $bundled_item_stock_quantity ) ) {
 					continue;
 				}
 
@@ -709,7 +711,7 @@ class WC_Product_Bundle extends WC_Product {
 					$data[ 'quantities_available' ][ $bundled_item->get_id() ]            = $bundled_item->get_stock_quantity();
 					$data[ 'is_in_stock' ][ $bundled_item->get_id() ]                     = $bundled_item->is_in_stock() ? 'yes' : 'no';
 					$data[ 'backorders_allowed' ][ $bundled_item->get_id() ]              = $bundled_item->is_on_backorder() || $bundled_item->get_product()->backorders_allowed() ? 'yes' : 'no';
-					$data[ 'backorders_require_notification' ][ $bundled_item->get_id() ] = $bundled_item->is_on_backorder() || $bundled_item->get_product()->backorders_require_notification() ? 'yes' : 'no';
+					$data[ 'backorders_require_notification' ][ $bundled_item->get_id() ] = $bundled_item->get_product()->backorders_require_notification() ? 'yes' : 'no';
 				}
 
 				$data[ 'is_nyp' ][ $bundled_item->get_id() ] = $bundled_item->is_nyp() ? 'yes' : 'no';
@@ -1050,49 +1052,135 @@ class WC_Product_Bundle extends WC_Product {
 	 */
 	public function apply_subs_price_html( $price ) {
 
-		$bundled_items = $this->get_bundled_items();
+		$subs_details = $this->calculate_subs_price_data( array( 'bundled_items', 'price', 'regular_price', 'is_range', 'price_html' ) );
 
-		if ( ! empty( $bundled_items ) ) {
+		if ( ! empty( $subs_details ) ) {
 
-			$subs_details            = array();
-			$subs_details_html       = array();
-			$non_optional_subs_exist = false;
-			$from_string             = wc_get_price_html_from_text();
-			$has_payment_up_front    = $this->get_bundle_regular_price( 'min' ) > 0;
-			$is_range                = false !== strpos( $price, $from_string );
+			$subs_details_html    = array();
+			$from_string          = wc_get_price_html_from_text();
+			$has_payment_up_front = $this->get_bundle_regular_price( 'min' ) > 0;
+			$is_range             = false !== strpos( $price, $from_string );
 
-			foreach ( $bundled_items as $bundled_item_id => $bundled_item ) {
+			foreach ( $subs_details as $sub_details ) {
 
-				if ( $bundled_item->is_subscription() && $bundled_item->is_priced_individually() ) {
+				if ( $sub_details[ 'is_range' ] ) {
+					$is_range = true;
+				}
 
-					$bundled_product    = $bundled_item->product;
-					$bundled_product_id = $bundled_item->get_product_id();
+				if ( $sub_details[ 'regular_price' ] > 0 ) {
 
-					if ( $bundled_item->is_variable_subscription() ) {
-						$product = $bundled_item->min_price_product;
-					} else {
-						$product = $bundled_product;
+					$sub_price_html = wc_price( $sub_details[ 'price' ] );
+
+					if ( $sub_details[ 'price' ] !== $sub_details[ 'regular_price' ] ) {
+
+						$sub_regular_price_html = wc_price( $sub_details[ 'regular_price' ] );
+						$sub_price_html         = wc_format_sale_price( $sub_regular_price_html, $sub_price_html );
 					}
 
-					$sub_string = str_replace( '_synced', '', WC_Subscriptions_Cart::get_recurring_cart_key( array( 'data' => $product ), ' ' ) );
+					$sub_price_details_html = sprintf( $sub_details[ 'price_html' ], $sub_price_html );
+					$subs_details_html[]    = '<span class="bundled_sub_price_html">' . $sub_price_details_html . '</span>';
+				}
+			}
+
+			$subs_price_html       = '';
+			$subs_details_html_len = count( $subs_details_html );
+
+			foreach ( $subs_details_html as $i => $sub_details_html ) {
+				if ( $i === $subs_details_html_len - 1 || ( $i === 0 && ! $has_payment_up_front ) ) {
+					if ( $i > 0 || $has_payment_up_front ) {
+						$subs_price_html = sprintf( _x( '%1$s, and</br>%2$s', 'subscription price html', 'woocommerce-product-bundles' ), $subs_price_html, $sub_details_html );
+					} else {
+						$subs_price_html = $sub_details_html;
+					}
+				} else {
+					$subs_price_html = sprintf( _x( '%1$s,</br>%2$s', 'subscription price html', 'woocommerce-product-bundles' ), $subs_price_html, $sub_details_html );
+				}
+			}
+
+			if ( $subs_price_html ) {
+
+				if ( $has_payment_up_front ) {
+					/* translators: %1$s: Product one-time price, %2$s: Product recurring price */
+					$price = sprintf( _x( '%1$s<span class="bundled_subscriptions_price_html"> one time%2$s</span>', 'subscription price html', 'woocommerce-product-bundles' ), $price, $subs_price_html );
+				} else {
+					$price = '<span class="bundled_subscriptions_price_html">' . $subs_price_html . '</span>';
+				}
+
+				if ( $is_range && false === strpos( $price, $from_string ) ) {
+					/* translators: %1$s: "From" string, %2$s: Product price */
+					$price = sprintf( _x( '%1$s%2$s', 'Price range: from', 'woocommerce-product-bundles' ), $from_string, $price );
+				}
+			}
+		}
+
+		return $price;
+	}
+
+	/**
+	 * Calculate subscriptions price data for each bundled item.
+	 *
+	 * Refer to `WC_Product_Bundle::apply_subs_price_html` for the structure of the $args array.
+	 *
+	 * @param  array $args
+	 * @return array $subs_details
+	 */
+	public function calculate_subs_price_data( $args ) {
+
+		$subs_details = array();
+
+		if ( empty( $args ) ) {
+			return $subs_details;
+		}
+
+		$bundled_items = $this->get_bundled_items();
+
+		if ( empty( $bundled_items ) ) {
+			return $subs_details;
+		}
+
+		foreach ( $bundled_items as $bundled_item_id => $bundled_item ) {
+
+			if ( $bundled_item->is_subscription() && $bundled_item->is_priced_individually() && $bundled_item->is_purchasable() ) {
+
+				$bundled_product = $bundled_item->product;
+
+				if ( $bundled_item->is_variable_subscription() ) {
+					$product = $bundled_item->min_price_product;
+				} else {
+					$product = $bundled_product;
+				}
+
+				$sub_string = str_replace( '_synced', '', WC_Subscriptions_Cart::get_recurring_cart_key( array( 'data' => $product ), ' ' ) );
+
+				if ( in_array( 'bundled_items', $args, true ) ) {
 
 					if ( ! isset( $subs_details[ $sub_string ][ 'bundled_items' ] ) ) {
 						$subs_details[ $sub_string ][ 'bundled_items' ] = array();
 					}
 
+					$subs_details[ $sub_string ][ 'bundled_items' ][] = $bundled_item_id;
+				}
+
+				if ( in_array( 'price', $args, true ) ) {
 					if ( ! isset( $subs_details[ $sub_string ][ 'price' ] ) ) {
-						$subs_details[ $sub_string ][ 'price' ]         = 0;
+						$subs_details[ $sub_string ][ 'price' ] = 0;
+					}
+					$subs_details[ $sub_string ][ 'price' ] += $bundled_item->get_quantity( 'min', array( 'context' => 'price', 'check_optional' => true ) ) * WC_PB_Product_Prices::get_product_price( $product, array( 'price' => $bundled_item->min_recurring_price, 'calc' => 'display' ) );
+				}
+
+				if ( in_array( 'regular_price', $args, true ) ) {
+					if ( ! isset( $subs_details[ $sub_string ][ 'regular_price' ] ) ) {
 						$subs_details[ $sub_string ][ 'regular_price' ] = 0;
-						$subs_details[ $sub_string ][ 'is_range' ]      = false;
+					}
+					$subs_details[ $sub_string ][ 'regular_price' ] += $bundled_item->get_quantity( 'min', array( 'context' => 'price', 'check_optional' => true ) ) * WC_PB_Product_Prices::get_product_price( $product, array( 'price' => $bundled_item->min_regular_recurring_price, 'calc' => 'display' ) );
+				}
+
+				if ( in_array( 'is_range', $args, true ) ) {
+					if ( ! isset( $subs_details[ $sub_string ][ 'is_range' ] ) ) {
+						$subs_details[ $sub_string ][ 'is_range' ] = false;
 					}
 
-					$subs_details[ $sub_string ][ 'bundled_items' ][] = $bundled_item_id;
-
-					$subs_details[ $sub_string ][ 'price' ]         += $bundled_item->get_quantity( 'min', array( 'context' => 'price', 'check_optional' => true ) ) * WC_PB_Product_Prices::get_product_price( $product, array( 'price' => $bundled_item->min_recurring_price, 'calc' => 'display' ) );
-					$subs_details[ $sub_string ][ 'regular_price' ] += $bundled_item->get_quantity( 'min', array( 'context' => 'price', 'check_optional' => true ) ) * WC_PB_Product_Prices::get_product_price( $product, array( 'price' => $bundled_item->min_regular_recurring_price, 'calc' => 'display' ) );
-
 					if ( $bundled_item->is_variable_subscription() ) {
-
 						$bundled_item->add_price_filters();
 
 						if ( $bundled_item->has_variable_subscription_price() ) {
@@ -1101,69 +1189,15 @@ class WC_Product_Bundle extends WC_Product {
 
 						$bundled_item->remove_price_filters();
 					}
-
-					if ( ! isset( $subs_details[ $sub_string ][ 'price_html' ] ) ) {
-						$subs_details[ $sub_string ][ 'price_html' ] = WC_PB_Product_Prices::get_recurring_price_html_component( $product );
-					}
-				}
-			}
-
-			if ( ! empty( $subs_details ) ) {
-
-				foreach ( $subs_details as $sub_details ) {
-
-					if ( $sub_details[ 'is_range' ] ) {
-						$is_range = true;
-					}
-
-					if ( $sub_details[ 'regular_price' ] > 0 ) {
-
-						$sub_price_html = wc_price( $sub_details[ 'price' ] );
-
-						if ( $sub_details[ 'price' ] !== $sub_details[ 'regular_price' ] ) {
-
-							$sub_regular_price_html = wc_price( $sub_details[ 'regular_price' ] );
-							$sub_price_html         = wc_format_sale_price( $sub_regular_price_html, $sub_price_html );
-						}
-
-						$sub_price_details_html = sprintf( $sub_details[ 'price_html' ], $sub_price_html );
-						$subs_details_html[]    = '<span class="bundled_sub_price_html">' . $sub_price_details_html . '</span>';
-					}
 				}
 
-				$subs_price_html       = '';
-				$subs_details_html_len = count( $subs_details_html );
-
-				foreach ( $subs_details_html as $i => $sub_details_html ) {
-					if ( $i === $subs_details_html_len - 1 || ( $i === 0 && ! $has_payment_up_front ) ) {
-						if ( $i > 0 || $has_payment_up_front ) {
-							$subs_price_html = sprintf( _x( '%1$s, and</br>%2$s', 'subscription price html', 'woocommerce-product-bundles' ), $subs_price_html, $sub_details_html );
-						} else {
-							$subs_price_html = $sub_details_html;
-						}
-					} else {
-						$subs_price_html = sprintf( _x( '%1$s,</br>%2$s', 'subscription price html', 'woocommerce-product-bundles' ), $subs_price_html, $sub_details_html );
-					}
-				}
-
-				if ( $subs_price_html ) {
-
-					if ( $has_payment_up_front ) {
-						/* translators: %1$s: Product one-time price, %2$s: Product recurring price */
-						$price = sprintf( _x( '%1$s<span class="bundled_subscriptions_price_html"> one time%2$s</span>', 'subscription price html', 'woocommerce-product-bundles' ), $price, $subs_price_html );
-					} else {
-						$price = '<span class="bundled_subscriptions_price_html">' . $subs_price_html . '</span>';
-					}
-
-					if ( $is_range && false === strpos( $price, $from_string ) ) {
-						/* translators: %1$s: "From" string, %2$s: Product price */
-						$price = sprintf( _x( '%1$s%2$s', 'Price range: from', 'woocommerce-product-bundles' ), $from_string, $price );
-					}
+				if ( in_array( 'price_html', $args, true ) && ! isset( $subs_details[ $sub_string ][ 'price_html' ] ) ) {
+					$subs_details[ $sub_string ][ 'price_html' ] = WC_PB_Product_Prices::get_recurring_price_html_component( $product );
 				}
 			}
 		}
 
-		return $price;
+		return $subs_details;
 	}
 
 	/**
@@ -1319,10 +1353,10 @@ class WC_Product_Bundle extends WC_Product {
 		$availability = parent::get_availability();
 
 		// If a child does not have enough stock, let people know.
-		if ( parent::is_in_stock() && 'outofstock' === $this->get_bundled_items_stock_status() ) {
+		if ( 'insufficientstock' === $this->get_bundle_stock_status() ) {
 
 			$availability[ 'availability' ] = __( 'Insufficient stock', 'woocommerce-product-bundles' );
-			$availability[ 'class' ]        = 'out-of-stock';
+			$availability[ 'class' ]        = 'out-of-stock insufficient-stock';
 
 		// If a child is on backorder, the parent should appear to be on backorder, too.
 		} elseif ( parent::is_in_stock() && $this->contains( 'on_backorder' ) ) {
@@ -1330,16 +1364,53 @@ class WC_Product_Bundle extends WC_Product {
 			$availability[ 'availability' ] = __( 'Available on backorder', 'woocommerce' );
 			$availability[ 'class' ]        = 'available-on-backorder';
 
-		// Add remaining quantity data if the quantities of the children are static, and at least one child exists that manages stock and displays quantity in the availability string.
-		} elseif ( ! $this->contains( 'configurable_quantities' ) && 'no_amount' !== ( $stock_format = get_option( 'woocommerce_stock_format' ) ) && apply_filters( 'woocommerce_bundle_display_bundled_items_stock_quantity', $this->managing_stock(), $this ) ) {
+		// Override remaining quantity data if parent is in stock and at least one child exists that manages stock and displays quantity in the availability string.
+		} elseif ( parent::is_in_stock() ) {
+
+			$display_bundle_stock_quantity = true;
 
 			$bundle_stock_quantity = $this->get_bundle_stock_quantity();
+			$stock_format          = get_option( 'woocommerce_stock_format' );
 
-			// Only override if not managing stock, or if the container level quantity is higher.
-			if ( '' !== $bundle_stock_quantity && ( ! $this->managing_stock() || $this->get_stock_quantity() > $bundle_stock_quantity ) ) {
-				add_filter( 'woocommerce_product_get_stock_quantity', array( $this, 'filter_stock_quantity' ), 1000 );
-				$availability[ 'availability' ] = wc_format_stock_for_display( $this );
-				remove_filter( 'woocommerce_product_get_stock_quantity', array( $this, 'filter_stock_quantity' ), 1000 );
+			if (
+				'' !== $bundle_stock_quantity
+				&& 'no_amount' !== $stock_format
+				&& ( 'low_amount' !== $stock_format || $bundle_stock_quantity <= get_option( 'woocommerce_notify_low_stock_amount' ) )
+				&& ( ! $this->managing_stock() || $this->get_stock_quantity() > $bundle_stock_quantity )
+			) {
+
+				/*
+				 * Do not show remaining stock at bundle level if:
+				 * - a bundled item manages stock;
+				 * - min !== max qty; and
+				 * - purchasing the max possible qty affects the remaining bundle stock
+				 */
+				$has_undefined_bundle_stock_quantity = false;
+
+				foreach ( $this->get_bundled_items() as $bundled_item ) {
+					if (
+						( $min_qty = $bundled_item->get_quantity( 'min', array( 'check_optional' => true ) ) ) !== ( $max_qty = $bundled_item->get_quantity( 'max' ) )
+						&& '' !== ( $max_stock = $bundled_item->get_max_stock() )
+						&& ( $max_qty === '' || ( $max_stock - $max_qty < $max_qty * $bundle_stock_quantity ) )
+					) {
+						$has_undefined_bundle_stock_quantity = true;
+					}
+				}
+
+				$display_bundle_stock_quantity = ! $has_undefined_bundle_stock_quantity;
+
+				if ( apply_filters( 'woocommerce_bundle_display_bundled_items_stock_quantity', $display_bundle_stock_quantity, $this ) ) {
+
+					add_filter( 'woocommerce_product_get_stock_quantity', array( $this, 'filter_stock_quantity' ), 1000 );
+					$availability[ 'availability' ] = wc_format_stock_for_display( $this );
+					remove_filter( 'woocommerce_product_get_stock_quantity', array( $this, 'filter_stock_quantity' ), 1000 );
+
+				} elseif ( ! $this->managing_stock() || $this->get_stock_quantity() > $bundle_stock_quantity ) {
+
+					add_filter( 'pre_option_woocommerce_stock_format', array( $this, 'filter_stock_format' ), 1000 );
+					$availability[ 'availability' ] = wc_format_stock_for_display( $this );
+					remove_filter( 'pre_option_woocommerce_stock_format', array( $this, 'filter_stock_format' ), 1000 );
+				}
 			}
 		}
 
@@ -1444,6 +1515,18 @@ class WC_Product_Bundle extends WC_Product {
 	*/
 
 	/**
+	 * Forces all bundled products to be treated as virtual, along with the bundle itself.
+	 *
+	 * @since 6.11.0
+	 *
+	 * @param  string  $context
+	 * @return boolean
+	 */
+	public function get_virtual_bundle( $context = 'view' ) {
+		return $this->get_prop( 'virtual_bundle', $context );
+	}
+
+	/**
 	 * Min bundle size.
 	 *
 	 * @since  6.6.0
@@ -1506,6 +1589,30 @@ class WC_Product_Bundle extends WC_Product {
 	 */
 	public function get_bundled_items_stock_sync_status( $context = 'edit' ) {
 		return $this->get_prop( 'bundled_items_stock_sync_status', 'edit' );
+	}
+
+	/**
+	 * Bundle stock status, taking bundled item stock limitations into account.
+	 *
+	 * @since  6.9.0
+	 *
+	 * @param  string  $context
+	 * @return int|''
+	 */
+	public function get_bundle_stock_status( $context = 'view' ) {
+
+		$parent_stock_status        = $this->get_stock_status( $context );
+		$bundled_items_stock_status = $this->get_bundled_items_stock_status( $context );
+
+		$value = 'instock';
+
+		if ( 'outofstock' === $parent_stock_status ) {
+			$value = 'outofstock';
+		} elseif ( 'outofstock' === $bundled_items_stock_status ) {
+			$value = 'insufficientstock';
+		}
+
+		return $value;
 	}
 
 	/**
@@ -1889,7 +1996,7 @@ class WC_Product_Bundle extends WC_Product {
 
 			$bundled_item = WC_PB_Helpers::cache_get( $cache_key, $cache_group );
 
-			if ( $this->has_bundled_data_item_changes() || defined( 'WC_PB_DEBUG_RUNTIME_CACHE' ) || null === $bundled_item ) {
+			if ( $this->has_bundled_data_item_changes() || null === $bundled_item ) {
 
 				$bundled_item = new WC_Bundled_Item( $bundled_data_item, $this );
 
@@ -1908,6 +2015,21 @@ class WC_Product_Bundle extends WC_Product {
 	| Functions for setting product data. These do not update anything in the
 	| database itself and only change what is stored in the class object.
 	*/
+
+	/**
+	 * Set 'virtual_bundle' prop. Forced all bundled products to be treated as virtual.
+	 *
+	 * @since 6.11.0
+	 *
+	 * @param  string|boolean  $virtual
+	 */
+	public function set_virtual_bundle( $virtual ) {
+		$virtual = wc_string_to_bool( $virtual );
+		$this->set_prop( 'virtual_bundle', $virtual );
+		if ( $virtual ) {
+			$this->set_prop( 'virtual', true );
+		}
+	}
 
 	/**
 	 * Set min bundle size.
@@ -2215,6 +2337,17 @@ class WC_Product_Bundle extends WC_Product {
 	*/
 
 	/**
+	 * Just a different way to check the 'virtual_bundle' prop value.
+	 *
+	 * @since  6.11.0
+	 *
+	 * @return boolean
+	 */
+	public function is_virtual_bundle() {
+		return $this->get_virtual_bundle();
+	}
+
+	/**
 	 * Equivalent of 'get_changes', but boolean and for bundled data items only.
 	 *
 	 * @since  6.3.2
@@ -2292,13 +2425,16 @@ class WC_Product_Bundle extends WC_Product {
 				$shipped_items_exist = false;
 
 				// Any items shipped individually?
-				$bundled_data_items = $this->get_bundled_data_items();
+				if ( false === $this->get_virtual_bundle() ) {
 
-				if ( ! empty( $bundled_data_items ) ) {
-					foreach ( $bundled_data_items as $bundled_data_item ) {
-						if ( 'yes' === $bundled_data_item->get_meta( 'shipped_individually' ) ) {
-							$shipped_items_exist = true;
-							break;
+					$bundled_data_items = $this->get_bundled_data_items();
+
+					if ( ! empty( $bundled_data_items ) ) {
+						foreach ( $bundled_data_items as $bundled_data_item ) {
+							if ( 'yes' === $bundled_data_item->get_meta( 'shipped_individually' ) ) {
+								$shipped_items_exist = true;
+								break;
+							}
 						}
 					}
 				}
@@ -2318,7 +2454,7 @@ class WC_Product_Bundle extends WC_Product {
 
 				$assembled_items_exist = false;
 
-				if ( false === $this->get_virtual( 'edit' ) ) {
+				if ( false === $this->get_virtual() ) {
 
 					// Any items assembled?
 					$bundled_data_items = $this->get_bundled_data_items();
@@ -2396,7 +2532,7 @@ class WC_Product_Bundle extends WC_Product {
 		} elseif ( 'publish' !== $this->get_status() && ! current_user_can( 'edit_post', $this->get_id() ) ) {
 			$purchasable = false;
 		// Check if the product contains anything.
-		} elseif ( 0 === sizeof( $this->get_bundled_data_items() ) ) {
+		} elseif ( 0 === count( $this->get_bundled_data_items() ) ) {
 			$purchasable = false;
 		// Check if all non-optional contents are purchasable.
 		} elseif ( $this->contains( 'non_purchasable' ) ) {
@@ -2551,7 +2687,7 @@ class WC_Product_Bundle extends WC_Product {
 	}
 
 	/**
-	 * Returns whether or not the bundle has any attributes set. Takes into account the attributes of all bundled products.
+	 * Returns whether or not the bundle has any attributes set.
 	 *
 	 * @return boolean
 	 */
@@ -2573,21 +2709,7 @@ class WC_Product_Bundle extends WC_Product {
 
 				foreach ( $bundled_items as $bundled_item ) {
 
-					/**
-					 * 'woocommerce_bundle_show_bundled_product_attributes' filter.
-					 *
-					 * @param  boolean            $show_attributes
-					 * @param  WC_Product_Bundle  $this
-					 */
-					$show_bundled_product_attributes = apply_filters( 'woocommerce_bundle_show_bundled_product_attributes', $bundled_item->is_visible(), $this, $bundled_item );
-
-					if ( ! $show_bundled_product_attributes ) {
-						continue;
-					}
-
-					$bundled_product = $bundled_item->product;
-
-					if ( $bundled_product->has_attributes() ) {
+					if ( $bundled_item->has_attributes() ) {
 						$has_attributes = true;
 						break;
 					}
@@ -2648,6 +2770,10 @@ class WC_Product_Bundle extends WC_Product {
 
 		if ( false === $this->validate_group_mode() ) {
 			$this->set_group_mode( 'parent' );
+		}
+
+		if ( $this->get_virtual_bundle( 'edit' ) ) {
+			$this->set_virtual( true );
 		}
 
 		if ( $this->get_min_bundle_size( 'edit' ) > 0 && $this->get_max_bundle_size( 'edit' ) > 0 && $this->get_min_bundle_size( 'edit' ) > $this->get_max_bundle_size( 'edit' ) ) {
@@ -2757,6 +2883,10 @@ class WC_Product_Bundle extends WC_Product {
 
 	public function filter_stock_quantity( $qty ) {
 		return $this->get_bundle_stock_quantity();
+	}
+
+	public function filter_stock_format( $qty ) {
+		return 'no_amount';
 	}
 
 	/*

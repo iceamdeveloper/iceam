@@ -8,8 +8,9 @@
  * @link    https://evnt.is/1amp See more documentation about our views templating system.
  *
  * @since   5.1.0
+ * @since   5.3.2 Add remove button to the ticket attendee.
  *
- * @version 5.1.0
+ * @version 5.3.2
  *
  * @var \Tribe\Tickets\Plus\Attendee_Registration\View $this                   [Global] The AR View instance.
  * @var array                                          $events                 [Global] Multidimensional array of post IDs with their ticket data.
@@ -41,10 +42,13 @@ $classes = [
 	<?php tribe_classes( $classes ); ?>
 	data-ticket-id="<?php echo esc_attr( $ticket->ID ); ?>"
 >
-	<h4 class="tribe-common-b1 tribe-common-b1--bold tribe-tickets__attendee-tickets-item-title">
-		<?php /* Translators: 1 the attendee number. */ ?>
-		<?php echo sprintf( esc_html_x( 'Attendee %1$s', 'Tickets modal attendee fields', 'event-tickets-plus' ), '{{data.attendee_id}}' ); ?>
-	</h4>
+	<div class="tribe-tickets__attendee-tickets-item-header">
+		<h4 class="tribe-common-b1 tribe-common-b1--bold tribe-tickets__attendee-tickets-item-title">
+			<?php /* Translators: 1 the attendee number. */ ?>
+			<?php echo sprintf( esc_html_x( 'Attendee %1$s', 'Tickets modal attendee fields', 'event-tickets-plus' ), '{{data.attendee_id}}' ); ?>
+		</h4>
+		<?php $this->template( 'v2/attendee-registration/content/attendees/remove-button' ); ?>
+	</div>
 
 	<?php $field_render( $ticket, $post_id ); ?>
 </div>

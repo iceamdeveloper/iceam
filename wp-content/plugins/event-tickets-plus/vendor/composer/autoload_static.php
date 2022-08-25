@@ -4,11 +4,46 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit0e53ac4455f29f85ee966add482d6db3
+class ComposerStaticInit8d42c3e16c35a29c0e8cdb6225fc3359
 {
+    public static $prefixLengthsPsr4 = array (
+        'T' => 
+        array (
+            'TEC\\Tickets_Plus\\' => 17,
+        ),
+    );
+
+    public static $prefixDirsPsr4 = array (
+        'TEC\\Tickets_Plus\\' => 
+        array (
+            0 => __DIR__ . '/../..' . '/src/Tickets_Plus',
+        ),
+    );
+
+    public static $classMap = array (
+        'TEC\\Tickets_Plus\\Admin\\Tabs\\Attendee_Registration' => __DIR__ . '/../..' . '/src/Tickets_Plus/Admin/Tabs/Attendee_Registration.php',
+        'TEC\\Tickets_Plus\\Admin\\Tabs\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Admin/Tabs/Provider.php',
+        'TEC\\Tickets_Plus\\Assets' => __DIR__ . '/../..' . '/src/Tickets_Plus/Assets.php',
+        'TEC\\Tickets_Plus\\Commerce\\Assets' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Assets.php',
+        'TEC\\Tickets_Plus\\Commerce\\Attendee' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Attendee.php',
+        'TEC\\Tickets_Plus\\Commerce\\Attendee_Registration\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Attendee_Registration/Hooks.php',
+        'TEC\\Tickets_Plus\\Commerce\\Attendee_Registration\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Attendee_Registration/Provider.php',
+        'TEC\\Tickets_Plus\\Commerce\\Gateways\\Stripe\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Gateways/Stripe/Hooks.php',
+        'TEC\\Tickets_Plus\\Commerce\\Gateways\\Stripe\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Gateways/Stripe/Provider.php',
+        'TEC\\Tickets_Plus\\Commerce\\Gateways\\Stripe\\Settings' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Gateways/Stripe/Settings.php',
+        'TEC\\Tickets_Plus\\Commerce\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Hooks.php',
+        'TEC\\Tickets_Plus\\Commerce\\Order' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Order.php',
+        'TEC\\Tickets_Plus\\Commerce\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Provider.php',
+        'TEC\\Tickets_Plus\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Hooks.php',
+        'TEC\\Tickets_Plus\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Provider.php',
+    );
+
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8d42c3e16c35a29c0e8cdb6225fc3359::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8d42c3e16c35a29c0e8cdb6225fc3359::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8d42c3e16c35a29c0e8cdb6225fc3359::$classMap;
 
         }, null, ClassLoader::class);
     }

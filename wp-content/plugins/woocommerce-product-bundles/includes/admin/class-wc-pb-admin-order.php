@@ -2,7 +2,6 @@
 /**
  * WC_PB_Admin_Order class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.8.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundles edit-order functions and filters.
  *
  * @class    WC_PB_Admin_Order
- * @version  6.1.5
+ * @version  6.14.1
  */
 class WC_PB_Admin_Order {
 
@@ -69,7 +68,7 @@ class WC_PB_Admin_Order {
 				$is_configurable = true;
 			} elseif ( $bundled_item->get_quantity( 'min' ) !== $bundled_item->get_quantity( 'max' ) ) {
 				$is_configurable = true;
-			} elseif ( ( $configurable_attributes = $bundled_item->get_product_variation_attributes( true ) ) && sizeof( $configurable_attributes ) > 0 ) {
+			} elseif ( ( $configurable_attributes = $bundled_item->get_product_variation_attributes( true ) ) && count( $configurable_attributes ) > 0 ) {
 				$is_configurable = true;
 			}
 
@@ -130,73 +129,51 @@ class WC_PB_Admin_Order {
 						'configuration' => apply_filters( 'woocommerce_auto_added_bundle_configuration', WC_PB()->cart->get_posted_bundle_configuration( $product ), $product, $item, $order )
 					) );
 
-					if ( $added_to_order ) {
+					if ( ! is_wp_error( $added_to_order ) ) {
 
-						if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ) {
+						$new_container_item = $order->get_item( $added_to_order );
 
-							$new_container_item = $order->get_item( $added_to_order );
+						$bundled_order_items = wc_pb_get_bundled_order_items( $new_container_item, $order );
+						$product_ids         = array();
+						$order_notes         = array();
 
-							if ( $item_reduced_stock = $item->get_meta( '_reduced_stock', true ) ) {
-								$new_container_item->add_meta_data( '_reduced_stock', $item_reduced_stock, true );
-								$new_container_item->save();
+						foreach ( $bundled_order_items as $order_item_id => $order_item ) {
+
+							$bundled_item_id = $order_item->get_meta( '_bundled_item_id', true );
+							$product_id      = $order_item->get_product_id();
+
+							if ( $variation_id = $order_item->get_variation_id() ) {
+								$product_id = $variation_id;
 							}
 
-							$bundled_order_items = wc_pb_get_bundled_order_items( $new_container_item, $order );
-							$product_ids = array();
-							$order_notes         = array();
+							$product_ids[ $bundled_item_id ] = $product_id;
+						}
 
-							foreach ( $bundled_order_items as $order_item_id => $order_item ) {
+						$duplicate_product_ids              = array_diff_assoc( $product_ids, array_unique( $product_ids ) );
+						$duplicate_product_bundled_item_ids = array_keys( array_intersect( $product_ids, $duplicate_product_ids ) );
 
-								$bundled_item_id = $order_item->get_meta( '_bundled_item_id', true );
-								$product_id      = $order_item->get_product_id();
+						foreach ( $bundled_order_items as $order_item_id => $order_item ) {
 
-								if ( $variation_id = $order_item->get_variation_id() ) {
-									$product_id = $variation_id;
-								}
+							$bundled_item_id     = $order_item->get_meta( '_bundled_item_id', true );
+							$bundled_product     = $order_item->get_product();
+							$bundled_product_sku = $bundled_product->get_sku();
 
-								$product_ids[ $bundled_item_id ] = $product_id;
+							if ( ! $bundled_product_sku ) {
+								$bundled_product_sku = '#' . $bundled_product->get_id();
 							}
 
-							$duplicate_product_ids              = array_diff_assoc( $product_ids, array_unique( $product_ids ) );
-							$duplicate_product_bundled_item_ids = array_keys( array_intersect( $product_ids, $duplicate_product_ids ) );
-
-							foreach ( $bundled_order_items as $order_item_id => $order_item ) {
-
-								$bundled_item_id     = $order_item->get_meta( '_bundled_item_id', true );
-								$bundled_product     = $order_item->get_product();
-								$bundled_product_sku = $bundled_product->get_sku();
-
-								if ( ! $bundled_product_sku ) {
-									$bundled_product_sku = '#' . $bundled_product->get_id();
-								}
-
-								if ( in_array( $bundled_item_id, $duplicate_product_bundled_item_ids ) ) {
-									$stock_id = sprintf( _x( '%1$s:%2$s', 'bundled items stock change note sku with id format', 'woocommerce-product-bundles' ), $bundled_product_sku, $item_id );
-								} else {
-									$stock_id = $bundled_product_sku;
-								}
-
-								/* translators: %1$s: Product title, %2$s: Product identifier */
-								$order_note = sprintf( _x( '%1$s (%2$s)', 'bundled items stock change note format', 'woocommerce-product-bundles' ), $order_item->get_name(), $stock_id );
-
-								if ( $bundled_product->managing_stock() ) {
-
-									$qty           = $order_item->get_quantity();
-									$old_stock     = $bundled_product->get_stock_quantity();
-									$new_stock     = wc_update_product_stock( $bundled_product, $qty, 'decrease' );
-									$stock_from_to = $old_stock . '&rarr;' . $new_stock;
-									$order_note    = sprintf( _x( '%1$s (%2$s) &ndash; %3$s', 'bundled items stock change note format', 'woocommerce-product-bundles' ), $order_item->get_name(), $stock_id, $stock_from_to );
-
-									$order_item->add_meta_data( '_reduced_stock', $qty, true );
-									$order_item->save();
-								}
-
-								$order_notes[] = $order_note;
+							if ( in_array( $bundled_item_id, $duplicate_product_bundled_item_ids ) ) {
+								$stock_id = sprintf( _x( '%1$s:%2$s', 'bundled items stock change note sku with id format', 'woocommerce-product-bundles' ), $bundled_product_sku, $item_id );
+							} else {
+								$stock_id = $bundled_product_sku;
 							}
 
-							if ( ! empty( $order_notes ) ) {
-								$order->add_order_note( sprintf( __( 'Added bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $order_notes ) ), false, true );
-							}
+							/* translators: %1$s: Product title, %2$s: Product identifier */
+							$order_notes[] =  sprintf( _x( '%1$s (%2$s)', 'bundled items stock change note format', 'woocommerce-product-bundles' ), $order_item->get_name(), $stock_id );
+						}
+
+						if ( ! empty( $order_notes ) ) {
+							$order->add_order_note( sprintf( __( 'Added bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $order_notes ) ), false, true );
 						}
 
 						$order->remove_item( $item_id );

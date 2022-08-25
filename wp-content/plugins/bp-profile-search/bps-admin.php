@@ -63,7 +63,7 @@ function bps_field_selector ($k)
 ?>
 	<div id="field_div<?php echo $k; ?>" class="sortable">
 		<span class="bps_col1" title="<?php _e('drag and drop to reorder fields', 'bp-profile-search'); ?>">&nbsp;&#x21C5;</span>
-		<?php _bps_field_select ($groups, "bps_options[field_name][$k]", "field_name$k", $code, true); ?>
+		<?php _bps_field_select ($groups, "bps_options[field_name][$k]", "field_name$k", false, true); ?>
 		<a class="remove_field delete" href="javascript:void(0)"><?php _e('Remove', 'bp-profile-search'); ?></a>
 		<span class="spinner"></span>
 	</div>
@@ -278,4 +278,49 @@ function bps_get_option ($name, $default)
 {
 	$settings = get_option ('bps_settings');
 	return isset ($settings->{$name})? $settings->{$name}: $default;
+}
+
+add_filter ('debug_information', 'bps_site_info', 20);
+function bps_site_info ($debug_info)
+{
+	if (bps_platform () == 'buddypress')
+		$platform = 'BuddyPress';
+	else if (bps_platform () == 'buddyboss')
+		$platform = 'BuddyBoss Platform';
+
+	$theme = wp_get_theme ();
+
+	$debug_info['bp-profile-search'] = array (
+		'label'  => 'BP Profile Search',
+		'fields' => array (
+			'version' => array (
+				'label' => 'Version',
+				'value' => BPS_VERSION,
+			),
+			'platform' => array (
+				'label' => 'Platform',
+				'value' => $platform. ' '. bp_get_version (),
+			),
+			'theme' => array (
+				'label' => 'Theme',
+				'value' => $theme->get ('Name'). ' '. $theme->get ('Version'),
+			),
+			'index' => array (
+				'label' => 'Members index template',
+				'value' => str_replace (WP_CONTENT_DIR, '', bp_locate_template ('members/index.php')),
+			),
+			'loop' => array (
+				'label' => 'Members loop template',
+				'value' => str_replace (WP_CONTENT_DIR, '', bp_locate_template ('members/members-loop.php')),
+			),
+		)
+	);
+
+	foreach (bps_templates() as $k => $template)
+	{
+		$debug_info['bp-profile-search']['fields']['template'. $k]['label'] = $k? '': 'Form template(s)';
+		$debug_info['bp-profile-search']['fields']['template'. $k]['value'] = str_replace (WP_CONTENT_DIR, '', bp_locate_template ($template. '.php'));
+	}
+
+	return $debug_info;
 }

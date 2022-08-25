@@ -2,8 +2,8 @@
 Contributors: buddydev, sbrajesh, raviousprime
 Tags: buddypress, xprofile, fields, buddypress-profile-field-types
 Requires at least: 5.0
-Tested up to: 5.7
-Stable tag: 1.1.9
+Tested up to: 6.0
+Stable tag: 1.2.4
 License: GLPv2 or later
 
 Buddypress Xprofile Custom Field Types adds extra custom profile fields to BuddyPress. Field types are: Birthdate, Email, Url etc.
@@ -85,7 +85,7 @@ Yes, but you will need to follow our [migration guide](https://buddydev.com/plug
 Yes, 100%. For better performance, we have changed the way field settings were stored in admin. The user data will be preserved and they won't notice the difference.
 
 = What is the supported BuddyPress Version? =
-2.9+, Tested with 7.0-RC1.
+5.0+, Tested with 10.2.0
 
 = Where do I get support? =
 Please use [BuddyDev support](https://buddydev.com/support/forums/) forums.
@@ -100,6 +100,21 @@ We will love to work with you. Please let us know if you need any of our [servic
 3. profile view screenshot-3.png
 
 == Changelog ==
+= 1.2.4 =
+ * Added filter 'bpxcftr_enable_tag_removal_on_view_profile' to allow enabling/disabling the tag removal from profile view.
+
+= 1.2.3 =
+ * Added Support for Country field when used with BP Profile Search plugin.
+ * Fixed the selected country not working for country field editing. Props Michal Lan.
+
+= 1.2.2 =
+ * Added the filter 'bpxcftr_countries_list' to allow customizing countries list via code.
+
+= 1.2.1 =
+ * Fixed file size notice.
+
+= 1.2.0 =
+ * Added Tags Field Type(allows adding custom tags by user). Development sponsored by a kind gentleman.
 
 = 1.1.9 =
  * Added support for BuddyBoss Profile search.

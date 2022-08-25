@@ -1,3 +1,8 @@
+/**
+ * WordPress dependencies
+ */
+import { __ } from '@wordpress/i18n';
+
 jQuery( document ).ready( function ( $ ) {
 	/***************************************************************************************************
 	 * 	1 - Helper Functions.
@@ -56,11 +61,32 @@ jQuery( document ).ready( function ( $ ) {
 
 		if ( total_questions == total_graded_questions ) {
 			jQuery( '#all_questions_graded' ).val( 'yes' );
-			jQuery( '.grade-button' ).val( 'Grade' );
+			jQuery( '.grade-button' ).val( __( 'Grade', 'sensei-lms' ) );
 		} else {
 			jQuery( '#all_questions_graded' ).val( 'no' );
-			jQuery( '.grade-button' ).val( 'Save' );
+			jQuery( '.grade-button' ).val( __( 'Save', 'sensei-lms' ) );
 		}
+	};
+
+	jQuery.fn.updateFeedback = function () {
+		jQuery( '.question_box' ).each( function () {
+			var question_id = jQuery( this ).find( '.question_id' ).val();
+			var question_grade = parseInt(
+				jQuery( this )
+					.find( '#question_' + question_id + '_grade' )
+					.val()
+			);
+
+			var correctFeedback = jQuery( this ).find(
+				'.answer-feedback-correct'
+			);
+			var incorrectFeedback = jQuery( this ).find(
+				'.answer-feedback-incorrect'
+			);
+
+			correctFeedback.toggle( 0 < question_grade );
+			incorrectFeedback.toggle( ! question_grade );
+		} );
 	};
 
 	/**
@@ -94,8 +120,8 @@ jQuery( document ).ready( function ( $ ) {
 					correct_answer = $this.find( '.correct-answer' ).html();
 				}
 
-				user_answer = $.trim( user_answer );
-				correct_answer = $.trim( correct_answer );
+				user_answer = user_answer.trim();
+				correct_answer = correct_answer.trim();
 
 				// Auto-grading
 				if ( $this.hasClass( 'auto-grade' ) ) {
@@ -175,12 +201,14 @@ jQuery( document ).ready( function ( $ ) {
 		} );
 
 		$.fn.calculateTotalGrade();
+		$.fn.updateFeedback();
 	};
 
+	// Calculate total grade on page load to make sure everything is set up correctly
+	jQuery.fn.autoGrade();
+
 	/**
-	 * Resets all graded questions
-	 * @param obj scope Scope of questions to reset
-	 * @return void
+	 * Resets all graded questions.
 	 */
 	jQuery.fn.resetGrades = function () {
 		jQuery( '.question_box' )
@@ -195,6 +223,7 @@ jQuery( document ).ready( function ( $ ) {
 			.removeClass( 'ungraded' );
 		jQuery( '.question-grade' ).val( '0' );
 		jQuery.fn.calculateTotalGrade();
+		jQuery.fn.updateFeedback();
 	};
 
 	jQuery.fn.getQueryVariable = function ( variable ) {
@@ -316,6 +345,7 @@ jQuery( document ).ready( function ( $ ) {
 				.val( 0 );
 		}
 		jQuery.fn.calculateTotalGrade();
+		jQuery.fn.updateFeedback();
 	} );
 
 	/**
@@ -365,6 +395,7 @@ jQuery( document ).ready( function ( $ ) {
 			).attr( 'checked', false );
 		}
 		jQuery.fn.calculateTotalGrade();
+		jQuery.fn.updateFeedback();
 	} );
 
 	/**
@@ -401,6 +432,10 @@ jQuery( document ).ready( function ( $ ) {
 			jQuery.fn.autoGrade();
 		}
 	);
+
+	if ( jQuery( '.sensei-grading-main' ).length ) {
+		jQuery.fn.updateFeedback();
+	}
 
 	/***************************************************************************************************
 	 * 	4 - Load Select2 Dropdowns.

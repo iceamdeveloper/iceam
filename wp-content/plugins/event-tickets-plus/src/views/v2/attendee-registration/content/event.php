@@ -49,7 +49,7 @@ $classes = [
 	'tribe-tickets__attendee-tickets-form',
 	'tribe-validation',
 	$provider_class,
-]
+];
 
 ?>
 <div

@@ -26,6 +26,14 @@
 	background: transparent;
 }
 
+.settings-page.ui-widget-content a {
+	color: #135e96;
+}
+
+.settings-page .chosen-single a {
+	color: #444;
+}
+
 .settings-page .ui-tabs-panel.ui-widget-content {
 	background: white;
 	border: 1px solid #aaa;
@@ -105,9 +113,6 @@
 .aelia-premium-plugin-updater.license .plugin_name .title {
 	font-size: 110%;
 	font-weight: bold;
-}
-
-.aelia-premium-plugin-updater.license .license_key {
 }
 
 .aelia-premium-plugin-updater.license .license_key_wrapper,
@@ -191,4 +196,41 @@
 
 .update-message .aelia-dummy {
 	display: none;
+}
+.aelia-premium-plugin-updater.license .warnings {
+	border: 2px solid crimson;
+	padding: 4px 6px;
+}
+
+#tab-license .aelia.settings-section {
+	padding-bottom: 10px;
+}
+
+#section-freemius_account_section a {
+	font-weight: bold;
+}
+
+.aelia .fs-secure-notice {
+	position: static;
+}
+
+/*** Note about the migration of licences to Freemius ***/
+/* @since 2.1.18.211005 */
+#aelia-premium-plugin-updater-description .migrate_licence_to_freemius_note {
+	background-color: white;
+	padding: 0 10px;
+	border: 2px dashed maroon;
+}
+
+#aelia-premium-plugin-updater-description .migrate_licence_to_freemius_note p {
+	margin-bottom: 10px;
+}
+
+/*
+// Fix for Freemius contact form
+// @since 2.1.20.211024
+// @link https://bitbucket.org/businessdad/wc-aelia-foundation-classes/issues/2/settings-page-the-freemius-contact-form
+*/
+.freemius_contact_form .fs-full-size-wrapper {
+	margin: 0;
 }

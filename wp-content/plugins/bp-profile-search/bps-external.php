@@ -8,7 +8,7 @@ function bps_groups_setup ($fields)
 	if (!bp_is_active ('groups'))  return $fields;
 
 	$options = array ();
-	$args = array ('user_id' => 0, 'show_hidden' => true, 'type' => 'alphabetical');
+	$args = array ('user_id' => 0, 'show_hidden' => true, 'type' => 'alphabetical', 'per_page' => false);
 	if (bp_has_groups ($args))  while (bp_groups ())
 	{
 		bp_the_group ();

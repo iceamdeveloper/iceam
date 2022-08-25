@@ -2,7 +2,6 @@
 /**
  * WC_PB_Admin_Analytics class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    6.9.0
  */
@@ -15,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product Bundles WooCommerce Analytics.
  *
- * @version  6.9.0
+ * @version  6.15.3
  */
 class WC_PB_Admin_Analytics {
 
@@ -111,13 +110,14 @@ class WC_PB_Admin_Analytics {
 	 * Register analytics JS.
 	 */
 	public static function register_script() {
-		if ( ! class_exists( 'Automattic\WooCommerce\Admin\Loader' ) || ! Automattic\WooCommerce\Admin\Loader::is_admin_or_embed_page() ) {
+
+		if ( ! WC_PB_Core_Compatibility::is_admin_or_embed_page() ) {
 			return;
 		}
 
 		$suffix            = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
-		$script_path       = '/assets/js/admin/analytics' . $suffix . '.js';
-		$script_asset_path = WC_PB_ABSPATH . 'assets/js/admin/analytics.asset.php';
+		$script_path       = '/assets/dist/admin/analytics' . $suffix . '.js';
+		$script_asset_path = WC_PB_ABSPATH . 'assets/dist/admin/analytics.asset.php';
 		$script_asset      = file_exists( $script_asset_path )
 			? require( $script_asset_path )
 			: array(

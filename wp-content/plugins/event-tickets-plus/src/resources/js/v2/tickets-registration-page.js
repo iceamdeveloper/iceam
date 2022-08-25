@@ -1,4 +1,3 @@
-/* global tribe, jQuery */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
@@ -38,6 +37,7 @@ tribe.tickets.registration = {};
 		item: '.tribe-tickets__tickets-item',
 		itemPrice: '.tribe-amount',
 		itemQuantity: '.tribe-ticket-quantity',
+		itemTotal: '.tribe-tickets__tickets-item-total .tribe-amount',
 		footerQuantity: '.tribe-tickets__tickets-footer-quantity-number',
 		footerAmount: '.tribe-tickets__tickets-footer-total .tribe-amount',
 		checkoutButton: '.tribe-tickets__registration-submit',
@@ -120,6 +120,7 @@ tribe.tickets.registration = {};
 			data: {
 				provider: obj.providerId,
 			},
+			cache: false,
 			dataType: 'json',
 			url: tribe.tickets.utils.getRestEndpoint(),
 			success: function( data ) {
@@ -159,7 +160,8 @@ tribe.tickets.registration = {};
 
 		$.each( tickets, function( index, ticket ) {
 			const ticketTemplate = window.wp.template( 'tribe-registration--' + ticket.ticket_id );
-			const $ticketContainer = $tribeRegistration.find( obj.selectors.metaContainer + '[data-ticket-id="' + ticket.ticket_id + '"]' );
+			const $ticketContainer = $tribeRegistration
+				.find( obj.selectors.metaContainer + '[data-ticket-id="' + ticket.ticket_id + '"]' );
 			const counter = 1;
 
 			if ( ! $ticketContainer.length ) {
@@ -235,7 +237,8 @@ tribe.tickets.registration = {};
 		}
 
 		$.each( meta, function( metaIndex, ticket ) {
-			const $currentContainers = $containers.filter( '[data-ticket-id="' + ticket.ticket_id + '"]' );
+			const $currentContainers = $containers
+				.filter( '[data-ticket-id="' + ticket.ticket_id + '"]' );
 			const $tempTextarea = $( '<textarea />' );
 
 			if ( ! $currentContainers.length ) {
@@ -337,10 +340,11 @@ tribe.tickets.registration = {};
 
 		$quantities.each( function() {
 			const $qty = $( this );
-			const $price = $qty.closest( obj.selectors.item ).find( obj.selectors.itemPrice ).first( 0 );
+			const $ticketItem = $qty.closest( obj.selectors.item );
 			let quantity = parseInt( $qty.text(), 10 );
 			quantity = isNaN( quantity ) ? 0 : quantity;
-			const cost = tribe.tickets.utils.cleanNumber( $price.text(), provider ) * quantity;
+			const priceVal = tribe.tickets.utils.getPrice( $ticketItem, provider );
+			const cost = parseFloat( priceVal ) * quantity;
 			footerAmount += cost;
 		} );
 
@@ -368,11 +372,11 @@ tribe.tickets.registration = {};
 			const $item = $form.find( '[data-ticket-id="' + value.ticket_id + '"]' );
 
 			if ( $item ) {
-				const pricePer = $item.find( '.tribe-tickets__tickets-sale-price .tribe-amount' ).text();
-				$item.find( '.tribe-ticket-quantity' ).html( value.quantity );
-				let price = value.quantity * tribe.tickets.utils.cleanNumber( pricePer, provider );
-				price = tribe.tickets.utils.numberFormat( price, provider );
-				$item.find( '.tribe-tickets__tickets-item-total .tribe-amount' ).html( price );
+				$item.find( obj.selectors.itemQuantity ).html( value.quantity );
+				const price = tribe.tickets.utils.getPrice( $item, provider );
+				const totalPrice = value.quantity * price;
+				const formattedTotal = tribe.tickets.utils.numberFormat( totalPrice, provider );
+				$item.find( obj.selectors.itemTotal ).html( formattedTotal );
 			}
 		} );
 

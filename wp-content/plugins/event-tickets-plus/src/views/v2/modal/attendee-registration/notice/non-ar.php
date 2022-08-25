@@ -10,32 +10,13 @@
  * @link https://evnt.is/1amp
  *
  * @since 5.1.0
+ * @since   5.2.5 Added plural/singular support for the notice string content.
  *
- * @version 5.1.0
+ * @version 5.2.5
  *
- * @var int $non_meta_count The number of tickets in cart, without meta fields.
+ * @var int $non_meta_count The number of tickets, without meta fields.
  */
 
-$notice_classes = [
-	'tribe-tickets__notice--non-ar',
-	'tribe-common-a11y-hidden' => empty( $non_meta_count ),
-];
+$this->template( 'v2/modal/attendee-registration/notice/non-ar/singular' );
 
-/** @var Tribe__Tickets__Editor__Template $et_template */
-$et_template = tribe( 'tickets.editor.template' );
-
-$et_template->template(
-	'components/notice',
-	[
-		'notice_classes' => $notice_classes,
-		'content'        => sprintf(
-			// Translators: %s: The HTML wrapped number of tickets.
-			esc_html_x(
-				'There are %s other tickets in your cart that do not require attendee information.',
-				'Note that there are more tickets in the cart, %s is the html-wrapped number.',
-				'event-tickets-plus'
-			),
-			'<span id="tribe-tickets__non-ar-count">' . absint( $non_meta_count ) . '</span>'
-		),
-	]
-);
+$this->template( 'v2/modal/attendee-registration/notice/non-ar/plural' );

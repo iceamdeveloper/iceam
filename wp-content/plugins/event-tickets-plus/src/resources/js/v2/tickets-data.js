@@ -1,4 +1,3 @@
-/* global tribe, JSON, jQuery */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
@@ -229,7 +228,8 @@ tribe.tickets.data = {};
 					}
 
 					sessionStorage.setItem(
-						'tribe_tickets_cart-' + postId, // @todo: review this and how to get it from the container data.
+						// @todo: review this and how to get it from the container data.
+						'tribe_tickets_cart-' + postId,
 						JSON.stringify( data.tickets )
 					);
 
@@ -273,7 +273,9 @@ tribe.tickets.data = {};
 				const $ticketsBlock = $document.find( tribe.tickets.block.selectors.container );
 				// Iterate over the tickets block and storeLocal.
 				$ticketsBlock.each( function( index, block ) {
-					const blockPostId = $( block ).find( tribe.tickets.block.selectors.form ).data( 'post-id' );
+					const blockPostId = $( block )
+						.find( tribe.tickets.block.selectors.form )
+						.data( 'post-id' );
 					obj.data.storeLocal( blockPostId );
 				} );
 

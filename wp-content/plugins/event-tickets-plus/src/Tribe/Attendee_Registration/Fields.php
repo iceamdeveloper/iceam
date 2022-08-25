@@ -2,6 +2,8 @@
 
 namespace Tribe\Tickets\Plus\Attendee_Registration;
 
+use TEC\Tickets\Commerce\Attendee;
+use TEC\Tickets\Commerce\Module;
 use Tribe__Utils__Array as Arr;
 
 /**
@@ -60,11 +62,26 @@ class Fields {
 		// Enforce attendee ID for templating and support JS placeholder.
 		$attendee_id = tribe_tickets_plus_meta_field_get_attendee_id( $attendee_id );
 
+		$saved_meta = $storage->get_meta_data_for( $post_id );
+
+		/**
+		 * Tickets Commerce code for Attendee meta on the Modal edit.
+		 *
+		 * @since 5.3.0
+		 *
+		 * @todo Figure out a way to properly handle Attendee Meta modal that doesn't
+		 *       involve Meta Storage class or any extra cookies, that should be external.
+		 */
+		if ( Attendee::POSTTYPE === get_post_type( $attendee_id ) ) {
+			$saved_meta = tec_tc_get_attendee( $attendee_id )->attendee_meta;
+			$values = tribe( Module::class )->process_attendee_meta( $ticket->ID, $saved_meta );
+		}
+
 		$template_args = [
 			'post_id'     => $post_id,
 			'ticket'      => $ticket,
 			'attendee_id' => $attendee_id,
-			'saved_meta'  => $storage->get_meta_data_for( $post_id ),
+			'saved_meta'  => $saved_meta,
 		];
 
 		// Add the rendering attributes into global context.
@@ -84,6 +101,7 @@ class Fields {
 				'classes'     => $field->get_css_classes(),
 				'attributes'  => $field->get_attributes(),
 				'placeholder' => $field->get_placeholder(),
+				'description' => $field->get_description(),
 			];
 
 			$return .= $template->template( 'v2/components/meta/' . $field->type, $context, $echo );

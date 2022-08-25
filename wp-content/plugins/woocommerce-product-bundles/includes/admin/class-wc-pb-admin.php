@@ -2,7 +2,6 @@
 /**
  * WC_PB_Admin class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    1.0.0
  */
@@ -18,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Loads admin scripts, includes admin classes and adds admin hooks.
  *
  * @class    WC_PB_Admin
- * @version  6.3.0
+ * @version  6.12.8
  */
 class WC_PB_Admin {
 
@@ -27,7 +26,7 @@ class WC_PB_Admin {
 	 *
 	 * @var string
 	 */
-	private static $bundled_selectsw_version = '1.1.3';
+	private static $bundled_selectsw_version = '1.1.7';
 
 	/**
 	 * Setup Admin class.
@@ -75,10 +74,8 @@ class WC_PB_Admin {
 	public static function includes() {
 
 		// Product Import/Export.
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.1' ) ) {
-			require_once( WC_PB_ABSPATH . 'includes/admin/export/class-wc-pb-product-export.php' );
-			require_once( WC_PB_ABSPATH . 'includes/admin/import/class-wc-pb-product-import.php' );
-		}
+		require_once( WC_PB_ABSPATH . 'includes/admin/export/class-wc-pb-product-export.php' );
+		require_once( WC_PB_ABSPATH . 'includes/admin/import/class-wc-pb-product-import.php' );
 
 		// Product Metaboxes.
 		require_once( WC_PB_ABSPATH . 'includes/admin/meta-boxes/class-wc-pb-meta-box-product-data.php' );
@@ -90,9 +87,7 @@ class WC_PB_Admin {
 		require_once( WC_PB_ABSPATH . 'includes/admin/class-wc-pb-admin-ajax.php' );
 
 		// Admin edit-order screen.
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.2' ) ) {
-			require_once( WC_PB_ABSPATH . 'includes/admin/class-wc-pb-admin-order.php' );
-		}
+		require_once( WC_PB_ABSPATH . 'includes/admin/class-wc-pb-admin-order.php' );
 	}
 
 	/**
@@ -280,8 +275,7 @@ class WC_PB_Admin {
 			$params = array(
 				'add_bundled_product_nonce' => wp_create_nonce( 'wc_bundles_add_bundled_product' ),
 				'group_modes_with_parent'   => $group_modes_with_parent,
-				'is_first_bundle'           => isset( $_GET[ 'wc_pb_first_bundle' ] ) ? 'yes' : 'no',
-				'is_wc_version_gte_3_2'     => WC_PB_Core_Compatibility::is_wc_version_gte( '3.2' ) ? 'yes' : 'no'
+				'is_first_bundle'           => isset( $_GET[ 'wc_pb_first_bundle' ] ) ? 'yes' : 'no'
 			);
 
 			wp_localize_script( 'wc-pb-admin-product-panel', 'wc_bundles_admin_params', $params );
@@ -312,8 +306,6 @@ class WC_PB_Admin {
 
 			$params = array(
 				'edit_bundle_nonce'     => wp_create_nonce( 'wc_bundles_edit_bundle' ),
-				'is_wc_version_gte_3_4' => WC_PB_Core_Compatibility::is_wc_version_gte( '3.4' ) ? 'yes' : 'no',
-				'is_wc_version_gte_3_6' => WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ? 'yes' : 'no',
 				'i18n_configure'        => __( 'Configure', 'woocommerce-product-bundles' ),
 				'i18n_edit'             => __( 'Edit', 'woocommerce-product-bundles' ),
 				'i18n_form_error'       => __( 'Failed to initialize form. If this issue persists, please reload the page and try again.', 'woocommerce-product-bundles' ),

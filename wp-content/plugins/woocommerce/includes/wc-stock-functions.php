@@ -19,7 +19,7 @@ defined( 'ABSPATH' ) || exit;
  *
  * @param  int|WC_Product $product        Product ID or product instance.
  * @param  int|null       $stock_quantity Stock quantity.
- * @param  string         $operation      Type of opertion, allows 'set', 'increase' and 'decrease'.
+ * @param  string         $operation      Type of operation, allows 'set', 'increase' and 'decrease'.
  * @param  bool           $updating       If true, the product object won't be saved here as it will be updated later.
  * @return bool|int|null
  */
@@ -403,7 +403,7 @@ function wc_get_low_stock_amount( WC_Product $product ) {
 	$low_stock_amount = $product->get_low_stock_amount();
 
 	if ( '' === $low_stock_amount && $product->is_type( 'variation' ) ) {
-		$product = wc_get_product( $product->get_parent_id() );
+		$product          = wc_get_product( $product->get_parent_id() );
 		$low_stock_amount = $product->get_low_stock_amount();
 	}
 
@@ -411,5 +411,5 @@ function wc_get_low_stock_amount( WC_Product $product ) {
 		$low_stock_amount = get_option( 'woocommerce_notify_low_stock_amount', 2 );
 	}
 
-	return $low_stock_amount;
+	return (int) $low_stock_amount;
 }

@@ -85,7 +85,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	 */
 	public function trigger( $order_id ) {
 		if ( $order_id ) {
-			$this->object = new WC_Order( $order_id );
+			$this->object = wc_get_order( $order_id );
+		}
+
+		// Bail if order is empty.
+		if ( empty( $this->object ) ) {
+			return;
 		}
 
 		if ( ! $this->is_enabled() ) {

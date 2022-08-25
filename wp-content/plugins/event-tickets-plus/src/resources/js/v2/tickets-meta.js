@@ -1,4 +1,3 @@
-/* global tribe, jQuery */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
@@ -80,7 +79,7 @@ tribe.tickets.meta = {};
 	 * @returns {array} If the form validates.
 	 */
 	obj.validateForm = function( $form ) {
-		const $attendeeTickets = $form.find( obj.selectors.formAttendeeTicketsItem );
+		const $attendeeTickets = $form.find( obj.selectors.formAttendeeTicketsItem ); /* eslint-disable-line es5/no-es6-methods,max-len */
 		let formValid = true;
 		let invalidTickets = 0;
 
@@ -113,7 +112,7 @@ tribe.tickets.meta = {};
 	 * @returns {boolean} True if all fields validate, false otherwise.
 	 */
 	obj.validateAttendeeTicket = function( $container ) {
-		const $fields = $container.find( obj.selectors.formFieldInput );
+		const $fields = $container.find( obj.selectors.formFieldInput ); /* eslint-disable-line es5/no-es6-methods,max-len */
 		let isValid = true;
 
 		$document.trigger( 'beforeValidateAttendeeTicket.tribeTicketsMeta', [ $container ] );
@@ -152,8 +151,8 @@ tribe.tickets.meta = {};
 	 * @return {boolean} If the input group is valid.
 	 */
 	obj.validateCheckboxRadioGroup = function( $group ) {
-		const checked  = $group.find( 'input:checked' ).length;
-		const required = $group.find( 'input:required' ).length;
+		const checked  = $group.find( 'input:checked' ).length; /* eslint-disable-line es5/no-es6-methods,max-len */
+		const required = $group.find( 'input:required' ).length; /* eslint-disable-line es5/no-es6-methods,max-len */
 
 		// the group is valid if there are no required.
 		// or if it is required and there's at least one checked.
@@ -186,9 +185,9 @@ tribe.tickets.meta = {};
 	 */
 	obj.validateFieldBirthday = function( $input ) {
 		const wrapper = $input.closest( obj.selectors.formFieldInputBirthday.container );
-		const day = wrapper.find( obj.selectors.formFieldInputBirthday.day );
-		const month = wrapper.find( obj.selectors.formFieldInputBirthday.month );
-		const year = wrapper.find( obj.selectors.formFieldInputBirthday.year );
+		const day = wrapper.find( obj.selectors.formFieldInputBirthday.day ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const month = wrapper.find( obj.selectors.formFieldInputBirthday.month ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const year = wrapper.find( obj.selectors.formFieldInputBirthday.year ); /* eslint-disable-line es5/no-es6-methods,max-len */
 		let isValidField = true;
 
 		if ( ! day.prop( 'required' ) && ! month.prop( 'required' ) && ! year.prop( 'required' ) ) {
@@ -240,6 +239,14 @@ tribe.tickets.meta = {};
 			isValidField = obj.validateFieldBirthday( $input );
 		}
 
+		// Do not allow empty spaces as valid for required fields.
+		if (
+			$input.prop( 'required' ) &&
+			( $input.is( ':text' ) || $input.is( 'textarea' ) || 'tel' === $input.attr( 'type' ) )
+		) {
+			isValidField = !! $input.val().trim();
+		}
+
 		if ( ! isValidField ) {
 			$input.addClass( obj.selectors.formFieldInputError.className() );
 		} else {
@@ -282,10 +289,10 @@ tribe.tickets.meta = {};
 		$( obj.selectors.formFieldInputBirthday.container ).each( function( index, value ) {
 			const wrapper = $( value );
 
-			const day = wrapper.find( obj.selectors.formFieldInputBirthday.day );
-			const month = wrapper.find( obj.selectors.formFieldInputBirthday.month );
-			const year = wrapper.find( obj.selectors.formFieldInputBirthday.year );
-			const realValue = wrapper.find( obj.selectors.formFieldInputBirthday.value );
+			const day = wrapper.find( obj.selectors.formFieldInputBirthday.day ); /* eslint-disable-line es5/no-es6-methods,max-len */
+			const month = wrapper.find( obj.selectors.formFieldInputBirthday.month ); /* eslint-disable-line es5/no-es6-methods,max-len */
+			const year = wrapper.find( obj.selectors.formFieldInputBirthday.year ); /* eslint-disable-line es5/no-es6-methods,max-len */
+			const realValue = wrapper.find( obj.selectors.formFieldInputBirthday.value ); /* eslint-disable-line es5/no-es6-methods,max-len */
 
 			const savedValues = realValue.val().split( '-' );
 
@@ -309,10 +316,10 @@ tribe.tickets.meta = {};
 	 */
 	obj.updateFieldBirthdayValue = function( e ) {
 		const wrapper = $( e.target ).closest( obj.selectors.formFieldInputBirthday.container );
-		const day = wrapper.find( obj.selectors.formFieldInputBirthday.day );
-		const month = wrapper.find( obj.selectors.formFieldInputBirthday.month );
-		const year = wrapper.find( obj.selectors.formFieldInputBirthday.year );
-		const realValue = wrapper.find( obj.selectors.formFieldInputBirthday.value );
+		const day = wrapper.find( obj.selectors.formFieldInputBirthday.day ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const month = wrapper.find( obj.selectors.formFieldInputBirthday.month ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const year = wrapper.find( obj.selectors.formFieldInputBirthday.year ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const realValue = wrapper.find( obj.selectors.formFieldInputBirthday.value ); /* eslint-disable-line es5/no-es6-methods,max-len */
 
 		// Data is stored in format: yyyy-mm-dd
 		realValue.val( year.val() + '-' + month.val() + '-' + day.val() );
@@ -337,8 +344,8 @@ tribe.tickets.meta = {};
 			return;
 		}
 
-		const $checked = $group.find( obj.selectors.formFieldInputCheckbox.checkbox + ':checked' );
-		const $groupCheckboxes = $group.find( obj.selectors.formFieldInputCheckbox.checkbox );
+		const $checked = $group.find( obj.selectors.formFieldInputCheckbox.checkbox + ':checked' ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const $groupCheckboxes = $group.find( obj.selectors.formFieldInputCheckbox.checkbox ); /* eslint-disable-line es5/no-es6-methods,max-len */
 
 		// If they un-check all, set them all as required.
 		if ( 0 === $checked.length ) {

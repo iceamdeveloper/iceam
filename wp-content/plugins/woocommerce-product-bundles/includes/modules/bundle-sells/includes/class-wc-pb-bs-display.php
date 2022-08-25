@@ -2,7 +2,6 @@
 /**
  * WC_PB_BS_Display class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.8.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Display-related functions and filters.
  *
  * @class    WC_PB_BS_Display
- * @version  6.7.6
+ * @version  6.12.0
  */
 class WC_PB_BS_Display {
 
@@ -44,7 +43,7 @@ class WC_PB_BS_Display {
 	 * @return void
 	 */
 	public static function apply_bundled_item_template_overrides() {
-		add_filter( 'woocommerce_locate_template', array( __CLASS__, 'get_bundled_item_template_location' ), 10, 3 );
+		add_filter( 'wc_get_template', array( __CLASS__, 'get_bundled_item_template_location' ), 10, 4 );
 	}
 
 	/**
@@ -53,7 +52,7 @@ class WC_PB_BS_Display {
 	 * @return void
 	 */
 	public static function reset_bundled_item_template_overrides() {
-		remove_filter( 'woocommerce_locate_template', array( __CLASS__, 'get_bundled_item_template_location' ), 10, 3 );
+		remove_filter( 'wc_get_template', array( __CLASS__, 'get_bundled_item_template_location' ), 10, 4 );
 	}
 
 	/*
@@ -163,10 +162,11 @@ class WC_PB_BS_Display {
 	 *
 	 * @param  string  $template
 	 * @param  string  $template_name
+	 * @param  string  $template_args
 	 * @param  string  $template_path
 	 * @return string
 	 */
-	public static function get_bundled_item_template_location( $template, $template_name, $template_path ) {
+	public static function get_bundled_item_template_location( $template, $template_name, $template_args, $template_path ) {
 
 		if ( false === strpos( $template_path, WC_PB()->plugin_path() . '/includes/modules/bundle-sells' ) ) {
 
@@ -212,9 +212,9 @@ class WC_PB_BS_Display {
 				$parent_item_name      = $parent_item[ 'data' ]->get_title();
 
 				if ( $parent_item_permalink ) {
-					$parent_item_name = wp_kses_post( apply_filters( 'woocommerce_cart_item_name', sprintf( '<a href="%s">%s</a>', esc_url( $parent_item_permalink ), $parent_item_name ), $parent_item, $parent_item_key ) );
+					$parent_item_name = wp_kses_post( apply_filters( 'woocommerce_bundle_sell_parent_name', sprintf( '<a href="%s">%s</a>', esc_url( $parent_item_permalink ), $parent_item_name ), $parent_item, $parent_item_key ) );
 				} else {
-					$parent_item_name = wp_kses_post( apply_filters( 'woocommerce_cart_item_name', $parent_item_name, $parent_item, $parent_item_key ) );
+					$parent_item_name = wp_kses_post( apply_filters( 'woocommerce_bundle_sell_parent_name', $parent_item_name, $parent_item, $parent_item_key ) );
 				}
 
 				/**

@@ -1,1 +1,59 @@
-!function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=97)}({58:function(e,t){e.exports=window.wp.domReady},97:function(e,t,n){"use strict";n.r(t);var r=n(58);n.n(r)()((function(){document.querySelectorAll(".sensei-notice").forEach((function(e){e.addEventListener("click",(function(t){if(e.dataset.dismissNonce&&e.dataset.dismissAction&&t.target.classList.contains("notice-dismiss")){var n=new FormData;n.append("action",e.dataset.dismissAction),n.append("nonce",e.dataset.dismissNonce),fetch(ajaxurl,{method:"POST",body:n})}}))}))}))}});
+/******/(()=>{// webpackBootstrap
+/******/"use strict";
+/******/var e,t={
+/***/7701:
+/***/e=>{e.exports=window.wp.domReady;
+/***/
+/******/}},s={};
+/************************************************************************/
+/******/ // The module cache
+/******/
+/******/
+/******/ // The require function
+/******/function o(e){
+/******/ // Check if module is in cache
+/******/var i=s[e];
+/******/if(void 0!==i)
+/******/return i.exports;
+/******/
+/******/ // Create a new module (and put it into the cache)
+/******/var n=s[e]={
+/******/ // no module.id needed
+/******/ // no module.loaded needed
+/******/exports:{}
+/******/};
+/******/
+/******/ // Execute the module function
+/******/
+/******/
+/******/ // Return the exports of the module
+/******/return t[e](n,n.exports,o),n.exports;
+/******/}
+/******/
+/************************************************************************/
+/******/ /* webpack/runtime/compat get default export */
+/******/
+/******/ // getDefaultExport function for compatibility with non-harmony modules
+/******/o.n=e=>{
+/******/var t=e&&e.__esModule?
+/******/()=>e.default
+/******/:()=>e
+/******/;
+/******/return o.d(t,{a:t}),t;
+/******/},
+/******/ // define getter functions for harmony exports
+/******/o.d=(e,t)=>{
+/******/for(var s in t)
+/******/o.o(t,s)&&!o.o(e,s)&&
+/******/Object.defineProperty(e,s,{enumerable:!0,get:t[s]})
+/******/;
+/******/},
+/******/o.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t)
+/******/,
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+e=o(7701),
+/**
+ * WordPress dependencies
+ */
+o.n(e)()((function(){document.querySelectorAll(".sensei-notice").forEach((function(e){e.addEventListener("click",(function(t){if(e.dataset.dismissNonce&&e.dataset.dismissAction&&t.target.classList.contains("notice-dismiss")){var s=new FormData;e.dataset.dismissNotice&&s.append("notice",e.dataset.dismissNotice),s.append("action",e.dataset.dismissAction),s.append("nonce",e.dataset.dismissNonce),fetch(ajaxurl,{method:"POST",body:s})}}))}))}))})
+/******/();

@@ -11,14 +11,18 @@
  * @link https://evnt.is/1amp
  *
  * @since 5.1.0
+ * @since 5.2.9 Updated HTML to display the opt in AR button.
  *
- * @version 5.1.0
+ * @version 5.2.9
  *
- * @var bool $is_modal True if it's in modal context.
+ * @var null|bool                          $is_modal                    [Global] Whether the modal is enabled.
+ * @var Tribe__Tickets__Ticket_Object      $ticket                      The ticket object.
+ * @var Tribe__Tickets__Privacy            $privacy                     [Global] Tribe Tickets Privacy object.
+ * @var int                                $post_id                     [Global] The current Post ID to which tickets are attached.
  */
 
-// Bail if it's not in modal context.
-if ( empty( $is_modal ) ) {
+// Bail if we are not in the "modal" context.
+if ( empty( $is_modal ) ){
 	return;
 }
 
@@ -27,9 +31,10 @@ if ( empty( $is_modal ) ) {
  *
  * @since 4.9
  *
- * @param bool
+ * @param bool $hide_attendee_list_optout Whether to hide attendees list opt-out.
+ * @param int  $post_id                   The post ID this ticket belongs to.
  */
-$hide_attendee_list_optout = apply_filters( 'tribe_tickets_plus_hide_attendees_list_optout', false );
+$hide_attendee_list_optout = apply_filters( 'tribe_tickets_plus_hide_attendees_list_optout', false, $post_id );
 
 if ( $hide_attendee_list_optout ) {
 	// Force opt-out.
@@ -42,12 +47,21 @@ if ( $hide_attendee_list_optout ) {
 	<?php
 	return;
 }
-?>
+$modal_field_id = 'tribe-tickets-attendees-list-optout-' . $ticket->ID . '--modal';
 
-<input
-	id="tribe-tickets-attendees-list-optout-modal-<?php echo esc_attr( $ticket->ID ); ?>"
-	class="tribe-tickets__tickets-item-quantity"
-	name="attendee[optout]"
-	value="1"
-	type="hidden"
-/>
+?>
+<div class="tribe-common-form-control-checkbox tribe-tickets-attendees-list-optout--wrapper">
+	<label
+		class="tribe-common-form-control-checkbox__label"
+		for="<?php echo esc_attr( $modal_field_id ); ?>"
+	>
+		<input
+			class="tribe-common-form-control-checkbox__input tribe-tickets__tickets-item-optout"
+			id="<?php echo esc_attr( $modal_field_id ); ?>"
+			name="attendee[optout]"
+			type="checkbox"
+			<?php checked( true ); ?>
+		/>
+		<?php echo wp_kses_post( $privacy->get_opt_out_text() ); ?>
+	</label>
+</div>

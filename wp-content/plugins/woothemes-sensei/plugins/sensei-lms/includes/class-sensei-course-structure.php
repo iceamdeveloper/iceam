@@ -61,7 +61,8 @@ class Sensei_Course_Structure {
 	 * @see Sensei_Course_Structure::prepare_lesson()
 	 * @see Sensei_Course_Structure::prepare_module()
 	 *
-	 * @param string $context Context that structure is being retrieved for. Possible values: edit, view.
+	 * @param string  $context  Context that structure is being retrieved for. Possible values: edit, view.
+	 * @param boolean $no_cache Avoid query cache.
 	 *
 	 * @return array {
 	 *     An array which has course structure information.
@@ -70,7 +71,11 @@ class Sensei_Course_Structure {
 	 *                 and prepare_module().
 	 * }
 	 */
-	public function get( $context = 'view' ) {
+	public function get( $context = 'view', $no_cache = false ) {
+		if ( $no_cache ) {
+			add_filter( 'posts_where', [ $this, 'filter_no_cache_where' ] );
+		}
+
 		$context = in_array( $context, [ 'view', 'edit' ], true ) ? $context : 'view';
 
 		$structure = [];
@@ -78,11 +83,10 @@ class Sensei_Course_Structure {
 		$published_lessons_only = 'view' === $context;
 		$post_status            = $published_lessons_only ? self::PUBLISHED_POST_STATUSES : 'any';
 		$no_module_lessons      = wp_list_pluck( Sensei()->modules->get_none_module_lessons( $this->course_id, $post_status ), 'ID' );
+		$modules                = $this->get_modules();
 
-		$modules = $this->get_modules();
 		foreach ( $modules as $module_term ) {
 			$module = $this->prepare_module( $module_term, $post_status );
-
 			if ( ! empty( $module['lessons'] ) || 'edit' === $context ) {
 				$structure[] = $module;
 			}
@@ -97,7 +101,26 @@ class Sensei_Course_Structure {
 			$structure[] = $this->prepare_lesson( $lesson );
 		}
 
+		if ( $no_cache ) {
+			remove_filter( 'posts_where', [ $this, 'filter_no_cache_where' ] );
+		}
+
 		return $structure;
+	}
+
+	/**
+	 * Filter where adding an extra condition to avoid cache.
+	 *
+	 * @access private
+	 *
+	 * @param string $where Current where.
+	 *
+	 * @return string Where with extra condition to avoid cache.
+	 */
+	public function filter_no_cache_where( $where ) {
+		$time = time();
+
+		return $where . ' AND ' . $time . ' = ' . $time;
 	}
 
 	/**
@@ -114,17 +137,23 @@ class Sensei_Course_Structure {
 	 *     @type string $type        The type of the array which is 'module'.
 	 *     @type int    $id          The module term id.
 	 *     @type string $title       The module name.
+	 *     @type string $teacher     Name of the teacher of this module, gets populated only in admin panel for admins and if the teacher is not admin.
+	 *     @type string $lastTitle   Used in the block editor for unchanged title state reference.
 	 *     @type string $description The module description.
 	 *     @type array  $lessons     An array of the module lessons. See Sensei_Course_Structure::prepare_lesson().
 	 * }
 	 */
 	private function prepare_module( WP_Term $module_term, $lesson_post_status ) : array {
 		$lessons = $this->get_module_lessons( $module_term->term_id, $lesson_post_status );
-		$module  = [
+		$author  = Sensei_Core_Modules::get_term_author( $module_term->slug );
+
+		$module = [
 			'type'        => 'module',
 			'id'          => $module_term->term_id,
 			'title'       => $module_term->name,
 			'description' => $module_term->description,
+			'teacher'     => user_can( $author, 'manage_options' ) ? '' : $author->display_name,
+			'lastTitle'   => $module_term->name,
 			'lessons'     => [],
 		];
 
@@ -402,7 +431,7 @@ class Sensei_Course_Structure {
 	 *
 	 * @param array $module_order Module order to save.
 	 */
-	private function save_module_order( array $module_order ) {
+	public function save_module_order( array $module_order ) {
 		$current_module_order_raw = get_post_meta( $this->course_id, '_module_order', true );
 		$current_module_order     = $current_module_order_raw ? array_map( 'intval', $current_module_order_raw ) : [];
 
@@ -672,6 +701,14 @@ class Sensei_Course_Structure {
 		if ( 'module' === $raw_item['type'] ) {
 			if ( $item['id'] ) {
 				$term = get_term( $item['id'], 'module' );
+				// Because term may get deleted in some cases during the process of changing the course teacher
+				// which takes place before saving structure.
+				if ( ! $term && $raw_item['lastTitle'] ) {
+					// During the teacher changing process of courses, modules are created or fetched using the
+					// existing title, not the one that is sent in the course structure save process.
+					$term       = $this->get_existing_module( $raw_item['lastTitle'] );
+					$item['id'] = $term;
+				}
 				if ( ! $term || is_wp_error( $term ) ) {
 					return new WP_Error(
 						'sensei_course_structure_missing_module',
@@ -804,10 +841,27 @@ class Sensei_Course_Structure {
 						return 1;
 					}
 
-					return false === $b_position || $a_position < $b_position ? -1 : 1;
+					return false === $b_position || $a_position < $b_position ? - 1 : 1;
 				}
 			);
 		}
+
 		return $structure;
+	}
+
+	/**
+	 * Get first incomplete lesson ID or `false` if there is none.
+	 *
+	 * @return int|false
+	 */
+	public function get_first_incomplete_lesson_id() {
+		list( $lesson_ids, ) = $this->flatten_structure( $this->get() );
+		foreach ( $lesson_ids as $lesson_id ) {
+			if ( ! Sensei_Utils::user_completed_lesson( $lesson_id ) ) {
+				return $lesson_id;
+			}
+		}
+
+		return false;
 	}
 }

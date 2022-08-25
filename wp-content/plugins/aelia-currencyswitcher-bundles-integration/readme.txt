@@ -1,19 +1,19 @@
 === WooCommerce Currency Switcher - Bundles Integration ===
 Tags: woocommerce, currency switcher, bundles, integration
 Requires at least: 4.0
-Tested up to: 5.7
+Tested up to: 6.0.9
 License: GPLv3
 WC requires at least: 3.0
-WC tested up to: 5.3
+WC tested up to: 6.6
 
 Implements integration between the [Aelia Currency Switcher](http://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Bundles plugin](http://www.woothemes.com/products/woocommerce-bundles/).
 
 == Description ==
 This plugin acts as a bridge between [Aelia Currency Switcher](http://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Bundles plugin](http://www.woothemes.com/products/woocommerce-bundles/), ensuring that Bundles prices are converted correctly into the currency being used to place an order.
 
-= Requirements =
+== Requirements ==
 
-* PHP 5.3+
+* PHP 7.1+
 * WordPress 3.6+
 * WooCommerce 3.0.x or newer.
 * Aelia Currency Switcher 3.8.14.151214 or or newer.
@@ -26,6 +26,46 @@ This plugin acts as a bridge between [Aelia Currency Switcher](http://aelia.co/s
 3. That's it! Now the price of the Bundles you enter will be converted automatically in the appropriate currency.
 
 == Changelog ==
+
+= 1.2.26.220607 =
+* Updated supported WooCommerce versions.
+
+= 1.2.25.220502 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.2.24.220330 =
+* Updated supported WooCommerce versions.
+
+= 1.2.23.220224 =
+* Updated supported WooCommerce versions.
+
+= 1.2.22.220124 =
+* Updated supported WooCommerce versions.
+
+= 1.2.21.220104 =
+* Updated supported WooCommerce versions.
+
+= 1.2.20.211208 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.2.19.211102 =
+* Updated supported WooCommerce versions.
+
+= 1.2.18.211005 =
+* Updated supported WooCommerce versions.
+
+= 1.2.17.210906 =
+* Updated supported WooCommerce versions.
+
+= 1.2.16.210816 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.2.15.210622 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
 
 = 1.2.14.210513 =
 * Updated supported WooCommerce versions.

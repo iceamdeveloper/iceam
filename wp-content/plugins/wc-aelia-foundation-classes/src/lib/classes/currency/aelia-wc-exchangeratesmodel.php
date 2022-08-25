@@ -1,10 +1,10 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
+use Aelia\WC\Exceptions\NotImplementedException;
 use \Exception;
 use \InvalidArgumentException;
-
 interface IExchangeRatesModel {
 	public function get_exchange_rates($base_currency, array $currencies);
 	public function get_errors();
@@ -95,8 +95,7 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 	 * @throws An Exception. This method must be implemented by descendant classes.
 	 */
 	protected function get_rate($base_currency, $currency) {
-		throw new Exception(__('Not implemented. Descendant classes must implement this method.'),
-												Definitions::TEXT_DOMAIN);
+		throw new NotImplementedException(__('Not implemented. Descendant classes must implement this method.'), Definitions::TEXT_DOMAIN);
 	}
 
 	/**
@@ -116,7 +115,7 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 		// @since 2.1.4.210208
 		$base_currency = apply_filters('wc_aelia_exchange_rates_base_currency', $base_currency, $currencies, $this);
 		// Allow 3rd parties to alter the list of currencies for which an exchange rate should be fetched
-		// @since x.x
+		// @since 2.1.4.210208
 		$currencies = apply_filters('wc_aelia_exchange_rates_currencies', $currencies, $this);
 
 		if(empty($base_currency)) {
@@ -136,7 +135,7 @@ abstract class ExchangeRatesModel implements IExchangeRatesModel {
 			else {
 				// Note: if exchange rate cannot be found, null is stored instead
 				// TODO Find a way to notify Admins of such occurrence
-				$exchange_rate = $this->get_rate($base_currency, $currency);
+				$exchange_rate = $this->get_rate($base_currency, $currency); // NOSONAR This method will return an output after being implemented by descendant classes
 
 				if(!empty($exchange_rate) && ($exchange_rate > 0)) {
 					// Allow 3rd parties to change the amount of decimals used for conversion

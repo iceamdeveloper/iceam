@@ -53,11 +53,21 @@ abstract class Sensei_Blocks_Initializer {
 		if ( is_admin() ) {
 			$screen = get_current_screen();
 
+			if ( empty( $screen ) ) {
+				return;
+			}
+
+			$is_editor = $screen->is_block_editor || in_array( $screen->id, [ 'widgets', 'site-editor', 'appearance_page_gutenberg-edit-site' ], true );
+
 			// Init blocks.
-			if ( null === $screen || ! $screen->is_block_editor || ! $this->is_post_type_included( $screen->post_type ) ) {
+			if ( ! $is_editor || ! $this->is_post_type_included( $screen->post_type ) ) {
 				return;
 			}
 		} elseif ( ! $this->is_post_type_included( get_post_type() ) ) {
+			return;
+		}
+
+		if ( ! $this->should_initialize_blocks() ) {
 			return;
 		}
 
@@ -68,6 +78,15 @@ abstract class Sensei_Blocks_Initializer {
 		}
 
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_block_editor_assets' ] );
+	}
+
+	/**
+	 * Check if it should initialize the blocks.
+	 *
+	 * @since 3.13.4
+	 */
+	protected function should_initialize_blocks() {
+		return true;
 	}
 
 	/**

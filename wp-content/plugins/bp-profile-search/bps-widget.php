@@ -11,7 +11,7 @@ class bps_widget extends WP_Widget
 	function __construct ()
 	{
 		$widget_ops = array ('description' => __('A Profile Search form.', 'bp-profile-search'));
-		parent::__construct ('bps_widget', __('Profile Search', 'bp-profile-search'), $widget_ops);
+		parent::__construct (false, __('Profile Search', 'bp-profile-search'), $widget_ops);
 	}
 
 	function widget ($args, $instance)

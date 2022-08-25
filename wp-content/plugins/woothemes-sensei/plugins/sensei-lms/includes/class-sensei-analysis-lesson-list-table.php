@@ -12,9 +12,17 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.2.0
  */
 class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
+
 	public $lesson_id;
 	public $course_id;
-	public $page_slug = 'sensei_analysis';
+	public $page_slug;
+
+	/**
+	 * The post type under which is the page registered.
+	 *
+	 * @var string
+	 */
+	private $post_type = 'course';
 
 	/**
 	 * Constructor
@@ -24,6 +32,7 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 	public function __construct( $lesson_id = 0 ) {
 		$this->lesson_id = intval( $lesson_id );
 		$this->course_id = intval( get_post_meta( $this->lesson_id, '_lesson_course', true ) );
+		$this->page_slug = Sensei_Analysis::PAGE_SLUG;
 
 		// Load Parent token into constructor
 		parent::__construct( 'analysis_lesson' );
@@ -43,7 +52,7 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 	 */
 	function get_columns() {
 		$columns = array(
-			'title'     => __( 'Learner', 'sensei-lms' ),
+			'title'     => __( 'Student', 'sensei-lms' ),
 			'started'   => __( 'Date Started', 'sensei-lms' ),
 			'completed' => __( 'Date Completed', 'sensei-lms' ),
 			'status'    => __( 'Status', 'sensei-lms' ),
@@ -165,6 +174,8 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 		$this->search = $search;
 
 		$args = array(
+			'number'  => '',
+			'offset'  => 0,
 			'orderby' => $orderby,
 			'order'   => $order,
 		);
@@ -200,6 +211,7 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 		$user_start_date = get_comment_meta( $item->comment_ID, 'start', true );
 		$user_end_date   = $item->comment_date;
 
+		$grade = null;
 		if ( 'complete' == $item->comment_approved ) {
 			$status = __( 'Completed', 'sensei-lms' );
 			$grade  = __( 'No Grade', 'sensei-lms' );
@@ -228,8 +240,9 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 					'page'      => $this->page_slug,
 					'user_id'   => $item->user_id,
 					'course_id' => $this->course_id,
+					'post_type' => $this->post_type,
 				),
-				admin_url( 'admin.php' )
+				admin_url( 'edit.php' )
 			);
 
 			$user_name = '<strong><a class="row-title" href="' . esc_url( $url ) . '">' . esc_html( $user_name ) . '</a></strong>';
@@ -329,7 +342,7 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 	 * @return void
 	 */
 	public function no_items() {
-		esc_html_e( 'No learners found.', 'sensei-lms' );
+		esc_html_e( 'No students found.', 'sensei-lms' );
 	}
 
 	/**
@@ -339,7 +352,7 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 	 * @return void
 	 */
 	public function data_table_header() {
-		echo '<strong>' . esc_html__( 'Learners taking this Lesson', 'sensei-lms' ) . '</strong>';
+		echo '<strong>' . esc_html__( 'Students taking this Lesson', 'sensei-lms' ) . '</strong>';
 	}
 
 	/**
@@ -356,8 +369,9 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 				'page'                   => $this->page_slug,
 				'lesson_id'              => $this->lesson_id,
 				'sensei_report_download' => $report,
+				'post_type'              => $this->post_type,
 			),
-			admin_url( 'admin.php' )
+			admin_url( 'edit.php' )
 		);
 		echo '<a class="button button-primary" href="' . esc_url( wp_nonce_url( $url, 'sensei_csv_download', '_sdl_nonce' ) ) . '">' . esc_html__( 'Export all rows (CSV)', 'sensei-lms' ) . '</a>';
 	}
@@ -370,7 +384,7 @@ class Sensei_Analysis_Lesson_List_Table extends Sensei_List_Table {
 	 */
 	public function search_button( $text = '' ) {
 
-		$text = __( 'Search Learners', 'sensei-lms' );
+		$text = __( 'Search Students', 'sensei-lms' );
 
 		return $text;
 

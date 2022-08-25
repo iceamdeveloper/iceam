@@ -46,11 +46,14 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 			.on( 'change', '.quantity input, .quantity select', this.event.quantity_changed )
 			.on( 'keyup input', '.quantity input', this.event.quantity_changed );
 
-		this.$ticket_form.find( '.quantity input:not([type="hidden"]), .quantity select' ).each( function() {
-			my.set_quantity( $( this ) );
-		} );
+		this.$ticket_form
+			.find( '.quantity input:not([type="hidden"]), .quantity select' ) /* eslint-disable-line es5/no-es6-methods,max-len */
+			.each( function() {
+				my.set_quantity( $( this ) );
+			} );
 
-		$( '.tribe-event-tickets-plus-meta-fields' ).on( 'keydown', '.tribe-tickets-meta-number input', this.event.limit_number_field_typing );
+		$( '.tribe-event-tickets-plus-meta-fields' )
+			.on( 'keydown', '.tribe-tickets-meta-number input', this.event.limit_number_field_typing );
 
 		// Block editor FE event handlers
 		this.$rsvp_block = $( '.tribe-block__rsvp' );
@@ -63,7 +66,8 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	};
 
 	my.render_fields = function( ticket_id, num ) {
-		var $row = $( '.tribe-event-tickets-plus-meta' ).filter( '[data-ticket-id="' + ticket_id + '"]' );
+		var $row = $( '.tribe-event-tickets-plus-meta' )
+			.filter( '[data-ticket-id="' + ticket_id + '"]' );
 		var $template = $row.find( '.tribe-event-tickets-plus-meta-fields-tpl' );
 		var $fields = $row.find( '.tribe-event-tickets-plus-meta-fields' );
 		var template_html = $template.html();
@@ -78,7 +82,9 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		if ( current_count > num ) {
 			diff = current_count - num;
 
-			$fields.find( '.tribe-event-tickets-plus-meta-attendee:nth-last-child(-n+' + diff + ')' ).remove();
+			$fields
+				.find( '.tribe-event-tickets-plus-meta-attendee:nth-last-child(-n+' + diff + ')' )
+				.remove();
 			return;
 		}
 
@@ -87,14 +93,23 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		var i = 0;
 		for ( ; i < diff; i++ ) {
 			var tweaked_template_html = template_html;
-			tweaked_template_html = template_html.replace( /tribe-tickets-meta\[\]/g, 'tribe-tickets-meta[' + ticket_id + '][' + ( current_count + i ) + ']' );
-			tweaked_template_html = tweaked_template_html.replace( /tribe-tickets-meta_([a-z0-9\-]+)_/g, 'tribe-tickets-meta_$1_' + ( current_count + i ) + '_' );
+			tweaked_template_html = template_html.replace(
+				/tribe-tickets-meta\[\]/g,
+				'tribe-tickets-meta[' + ticket_id + '][' + ( current_count + i ) + ']'
+			);
+			tweaked_template_html = tweaked_template_html.replace(
+				/tribe-tickets-meta_([a-z0-9-]+)_/g,
+				'tribe-tickets-meta_$1_' + ( current_count + i ) + '_'
+			);
 			$fields.append( tweaked_template_html );
 		}
 	};
 
 	my.set_quantity = function( $field ) {
-		var going = $field.closest( 'form' ).find( '.tribe-tickets-order_status-row select' ).val() === 'yes';
+		var going = $field
+			.closest( 'form' )
+			.find( '.tribe-tickets-order_status-row select' )
+			.val() === 'yes';
 
 		if ( going ) {
 			var quantity = parseInt( $field.val(), 10 );
@@ -115,7 +130,9 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	};
 
 	my.has_meta_fields = function( ticket_id ) {
-		var template_html = $( document.getElementById( 'tribe-event-tickets-plus-meta-fields-tpl-' + ticket_id ) ).html();
+		var template_html = $(
+			document.getElementById( 'tribe-event-tickets-plus-meta-fields-tpl-' + ticket_id )
+		).html();
 		return !! $( template_html ).find( '.tribe-tickets-meta' ).length;
 	};
 
@@ -163,7 +180,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 * Event handler for RSVP when status has changed
 	 */
 	my.event.status_changed = function() {
-		var $quantity = my.$ticket_form.find( '.quantity' );
+		var $quantity = my.$ticket_form.find( '.quantity' ); /* eslint-disable-line es5/no-es6-methods,max-len */
 		var going = $( this ).val() === 'yes';
 		var ticket_id = parseInt( $quantity.data( 'product-id' ), 10 );
 		var quantity = going ? parseInt( $quantity.find( '.tribe-tickets-quantity' ).val(), 10 ) : 0;
@@ -176,7 +193,7 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 */
 	my.event.block_quantity_changed = function() {
 		var going = my.$rsvp_block
-			.find( '.tribe-block__rsvp__status .tribe-active' )
+			.find( '.tribe-block__rsvp__status .tribe-active' ) /* eslint-disable-line es5/no-es6-methods,max-len */
 			.hasClass( 'tribe-block__rsvp__status-button--going' );
 
 		my.block_set_quantity( $( this ), going );
@@ -204,7 +221,10 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 			return;
 		}
 		// Ensure that it is a number and stop the keypress
-		if ( ( e.shiftKey || ( e.keyCode < 48 || e.keyCode > 57 ) ) && ( e.keyCode < 96 || e.keyCode > 105 ) ) {
+		if (
+			( e.shiftKey || ( e.keyCode < 48 || e.keyCode > 57 ) ) &&
+			( e.keyCode < 96 || e.keyCode > 105 )
+		) {
 			e.preventDefault();
 		}
 	};
@@ -220,10 +240,10 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		$( my.selectors.horizontal_datepicker.container ).each( function( index, value ) {
 			const wrapper = $( value );
 
-			const day = wrapper.find( my.selectors.horizontal_datepicker.day );
-			const month = wrapper.find( my.selectors.horizontal_datepicker.month );
-			const year = wrapper.find( my.selectors.horizontal_datepicker.year );
-			const realValue = wrapper.find( my.selectors.horizontal_datepicker.value );
+			const day = wrapper.find( my.selectors.horizontal_datepicker.day ); /* eslint-disable-line es5/no-es6-methods,max-len */
+			const month = wrapper.find( my.selectors.horizontal_datepicker.month ); /* eslint-disable-line es5/no-es6-methods,max-len */
+			const year = wrapper.find( my.selectors.horizontal_datepicker.year ); /* eslint-disable-line es5/no-es6-methods,max-len */
+			const realValue = wrapper.find( my.selectors.horizontal_datepicker.value ); /* eslint-disable-line es5/no-es6-methods,max-len */
 
 			const savedValues = realValue.val().split( '-' );
 
@@ -246,10 +266,10 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 */
 	my.horizontal_datepicker.populateHiddenValue = function( e ) {
 		const wrapper = $( e.target ).closest( my.selectors.horizontal_datepicker.container );
-		const day = wrapper.find( my.selectors.horizontal_datepicker.day );
-		const month = wrapper.find( my.selectors.horizontal_datepicker.month );
-		const year = wrapper.find( my.selectors.horizontal_datepicker.year );
-		const realValue = wrapper.find( my.selectors.horizontal_datepicker.value );
+		const day = wrapper.find( my.selectors.horizontal_datepicker.day ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const month = wrapper.find( my.selectors.horizontal_datepicker.month ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const year = wrapper.find( my.selectors.horizontal_datepicker.year ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		const realValue = wrapper.find( my.selectors.horizontal_datepicker.value ); /* eslint-disable-line es5/no-es6-methods,max-len */
 
 		// Data is stored in format: yyyy-mm-dd
 		realValue.val( year.val() + '-' + month.val() + '-' + day.val() );
@@ -263,21 +283,31 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 		let isValueEmpty = hiddenValue.val() === '' || hiddenValue.val() === 'null-null-null';
 		let isRequired = ! isValueEmpty;
 
-		wrapper.find( my.selectors.horizontal_datepicker.day ).prop( 'required', isRequired );
-		wrapper.find( my.selectors.horizontal_datepicker.month ).prop( 'required', isRequired );
-		wrapper.find( my.selectors.horizontal_datepicker.year ).prop( 'required', isRequired );
+		wrapper.find( my.selectors.horizontal_datepicker.day ).prop( 'required', isRequired ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		wrapper.find( my.selectors.horizontal_datepicker.month ).prop( 'required', isRequired ); /* eslint-disable-line es5/no-es6-methods,max-len */
+		wrapper.find( my.selectors.horizontal_datepicker.year ).prop( 'required', isRequired ); /* eslint-disable-line es5/no-es6-methods,max-len */
 
 		if ( isRequired ) {
-			wrapper.find( my.selectors.horizontal_datepicker.day ).addClass( 'tribe-tickets-meta-required' );
-			wrapper.find( my.selectors.horizontal_datepicker.month ).addClass( 'tribe-tickets-meta-required' );
-			wrapper.find( my.selectors.horizontal_datepicker.year ).addClass( 'tribe-tickets-meta-required' );
+			wrapper
+				.find( my.selectors.horizontal_datepicker.day ) /* eslint-disable-line es5/no-es6-methods,max-len */
+				.addClass( 'tribe-tickets-meta-required' );
+			wrapper
+				.find( my.selectors.horizontal_datepicker.month ) /* eslint-disable-line es5/no-es6-methods,max-len */
+				.addClass( 'tribe-tickets-meta-required' );
+			wrapper
+				.find( my.selectors.horizontal_datepicker.year ) /* eslint-disable-line es5/no-es6-methods,max-len */
+				.addClass( 'tribe-tickets-meta-required' );
 		} else {
-			wrapper.find( my.selectors.horizontal_datepicker.day ).removeClass( 'tribe-tickets-meta-required' );
-			wrapper.find( my.selectors.horizontal_datepicker.month ).removeClass( 'tribe-tickets-meta-required' );
-			wrapper.find( my.selectors.horizontal_datepicker.year ).removeClass( 'tribe-tickets-meta-required' );
+			wrapper
+				.find( my.selectors.horizontal_datepicker.day ) /* eslint-disable-line es5/no-es6-methods,max-len */
+				.removeClass( 'tribe-tickets-meta-required' );
+			wrapper
+				.find( my.selectors.horizontal_datepicker.month ) /* eslint-disable-line es5/no-es6-methods,max-len */
+				.removeClass( 'tribe-tickets-meta-required' );
+			wrapper
+				.find( my.selectors.horizontal_datepicker.year ) /* eslint-disable-line es5/no-es6-methods,max-len */
+				.removeClass( 'tribe-tickets-meta-required' );
 		}
-
-
 	};
 
 	/**
@@ -304,9 +334,21 @@ tribe_event_tickets_plus.meta.event = tribe_event_tickets_plus.meta.event || {};
 	 * @since 5.0.0
 	 */
 	my.addListeners = function() {
-		$( document ).on( 'change', my.selectors.horizontal_datepicker.select, this.horizontal_datepicker.populateHiddenValue );
-		$( document ).on( 'change', my.selectors.field.number, this.horizontal_datepicker.ensurePositiveNumber );
-		$( document ).on( 'change', my.selectors.horizontal_datepicker.value, this.horizontal_datepicker.makeDayMonthYearRequired );
+		$( document ).on(
+			'change',
+			my.selectors.horizontal_datepicker.select,
+			this.horizontal_datepicker.populateHiddenValue
+		);
+		$( document ).on(
+			'change',
+			my.selectors.field.number,
+			this.horizontal_datepicker.ensurePositiveNumber
+		);
+		$( document ).on(
+			'change',
+			my.selectors.horizontal_datepicker.value,
+			this.horizontal_datepicker.makeDayMonthYearRequired
+		);
 
 		/**
 		 * Fires after the meta fields that were loaded through AJAX have been populated with data.

@@ -16,8 +16,10 @@ class Sensei_Compat_Admin {
 	public static function init() {
 		add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 4 );
 		add_filter( 'install_plugins_search', array( __CLASS__, 'load_plugin_information' ) );
+		add_filter( 'sensei_admin_notices', [ __CLASS__, 'wccom_connect_notice' ] );
 		if ( SENSEI_COMPAT_LOADING_SENSEI ) {
 			add_filter( 'site_transient_update_plugins', array( __CLASS__, 'add_sensei_translations' ) );
+			add_action( 'set_site_transient_update_plugins', array( __CLASS__, 'clear_sensei_translations' ) );
 		}
 	}
 
@@ -26,7 +28,7 @@ class Sensei_Compat_Admin {
 	 *
 	 * @access private
 	 *
-	 * @param \stdClass $value Current value of `update_plugins` transient.
+	 * @param  \stdClass $value Current value of `update_plugins` transient.
 	 * @return \stdClass
 	 */
 	public static function add_sensei_translations( $value ) {
@@ -34,10 +36,7 @@ class Sensei_Compat_Admin {
 			return $value;
 		}
 
-		$cache_key_parts   = array_values( get_available_languages() );
-		$cache_key_parts[] = Sensei()->version;
-
-		$language_pack_transient_key = 'sensei_language_packs_' . md5( implode( ',', $cache_key_parts ) );
+		$language_pack_transient_key = self::get_translation_update_cache_key();
 
 		$translations_available = get_site_transient( $language_pack_transient_key );
 		if ( ! $translations_available ) {
@@ -50,6 +49,27 @@ class Sensei_Compat_Admin {
 		}
 
 		return $value;
+	}
+
+	/**
+	 * Clear's Sensei language pack update cache.
+	 *
+	 * @access private
+	 */
+	public static function clear_sensei_translations() {
+		delete_site_transient( self::get_translation_update_cache_key() );
+	}
+
+	/**
+	 * Gets the cache key for the current Sensei translation update cache.
+	 *
+	 * @return string
+	 */
+	private static function get_translation_update_cache_key() {
+		$cache_key_parts   = array_values( get_available_languages() );
+		$cache_key_parts[] = Sensei()->version;
+
+		return 'sensei_language_packs_' . md5( implode( ',', $cache_key_parts ) );
 	}
 
 	/**
@@ -146,9 +166,9 @@ class Sensei_Compat_Admin {
 
 		unset( $plugin_meta[0] );
 
-		if ( SENSEI_COMPAT_LOADING_WC_PAID_COURSES && defined( 'SENSEI_WC_PAID_COURSES_VERSION' ) ) {
-			// translators: placeholder is current version of WooCommerce Paid Courses.
-			array_unshift( $plugin_meta, esc_html( sprintf( __( 'WooCommerce Paid Courses Version: %s', 'sensei-compat' ), SENSEI_WC_PAID_COURSES_VERSION ) ) );
+		if ( SENSEI_COMPAT_LOADING_SENSEI_PRO && defined( 'SENSEI_PRO_VERSION' ) ) {
+			// translators: placeholder is current version of Sensei Pro.
+			array_unshift( $plugin_meta, esc_html( sprintf( __( 'Sensei Pro Version: %s', 'sensei-compat' ), SENSEI_PRO_VERSION ) ) );
 		}
 
 		if ( SENSEI_COMPAT_LOADING_SENSEI && function_exists( 'Sensei' ) ) {
@@ -167,12 +187,12 @@ class Sensei_Compat_Admin {
 			'sensei-lms'  => 'Sensei LMS',
 			'woocommerce' => 'WooCommerce',
 		];
-		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		if ( empty( $_GET['plugin_details'] ) || ! isset( $plugins_handled[ $_GET['plugin_details'] ] ) ) {
 			return;
 		}
 
-		// phpcs:ignore WordPress.Security.NonceVerification.NoNonceVerification
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$plugin_slug = sanitize_title( wp_unslash( $_GET['plugin_details'] ) );
 		$plugin_name = $plugins_handled[ $plugin_slug ];
 
@@ -196,5 +216,76 @@ class Sensei_Compat_Admin {
 			} );
 		</script>
 		<?php
+	}
+
+	/**
+	 * Check if WooCommerce.com connection has been made.
+	 *
+	 * @return bool
+	 */
+	private static function is_wccom_connected() {
+		if ( ! class_exists( 'WC_Helper_Options' ) ) {
+			return false;
+		}
+
+		$auth = WC_Helper_Options::get( 'auth' );
+
+		return ! empty( $auth['access_token'] );
+	}
+
+	/**
+	 * Displays a notice for users that needs to connect the WCCOM.
+	 *
+	 * @access private
+	 *
+	 * @param array $notices Notices list.
+	 *
+	 * @return array Notices including the WCCOM connect notice.
+	 */
+	public static function wccom_connect_notice( $notices ) {
+		if ( self::is_wccom_connected() ) {
+			return $notices;
+		}
+
+		$connect_url = add_query_arg(
+			[
+				'page'              => 'wc-addons',
+				'section'           => 'helper',
+				'wc-helper-connect' => 1,
+				'wc-helper-nonce'   => wp_create_nonce( 'connect' ),
+			],
+			admin_url( 'admin.php' )
+		);
+
+		$notices['wccom-connect-notice'] = [
+			'type'       => 'user',
+			'icon'       => 'sensei',
+			'heading'    => __( 'Sensei Updates', 'sensei-compat' ),
+			'message'    => __( 'Get notified about new features and updates by connecting your WooCommerce.com account.', 'sensei-compat' ),
+			'actions'    => [
+				[
+					'label' => __( 'Connect account', 'sensei-compat' ),
+					'url'   => $connect_url,
+				],
+			],
+			'conditions' => [
+				[
+					'type'    => 'screens',
+					'screens' => [ 'sensei*', 'plugins', 'plugins-network' ],
+				],
+				[
+					'type'    => 'plugins',
+					'plugins' => [
+						'woocommerce/woocommerce.php' => true,
+					],
+				],
+				[
+					'type'         => 'user_cap',
+					'capabilities' => [ 'activate_plugins' ],
+				],
+			],
+		];
+
+		return $notices;
 	}
 }

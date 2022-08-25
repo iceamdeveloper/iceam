@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 require_once('lib/classes/base/plugin/aelia-plugin.php');
 require_once('lib/classes/definitions/definitions.php');
@@ -8,11 +8,14 @@ require_once('lib/classes/definitions/definitions.php');
 use Aelia\WC\AFC\Settings;
 use Aelia\WC\AFC\Messages;
 
+use Aelia\WC\Integrations\Freemius\Freemius_Plugin_Integration;
+
+
 /**
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.1.8.210518';
+	public static $version = '2.2.8.220607';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -51,6 +54,12 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		require_once('lib/wc-core-aux-functions.php');
 
 		parent::__construct($settings_controller, $messages_controller);
+
+		
+		// Initialise the Freemius Integration that will be used to manage the plugin licences
+		// @since 2.1.8.210518
+		Freemius_Plugin_Integration::init();
+		
 	}
 
 	/**
@@ -65,6 +74,10 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 
 		// Admin init
 		add_action('admin_init', array($this, 'admin_init'), 5);
+
+		// Initialize the updaters on "init"
+		// @since 2.1.8.210518
+		add_action('init', array($this, 'initialize_updaters'), 5);
 
 		add_action('wp_login', array($this, 'wp_login'), 10, 2);
 	}
@@ -172,10 +185,6 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 */
 	public function admin_init() {
 		$this->show_admin_messages();
-
-		// Initialize the updaters when in the Admin section
-		// @since 1.8.3.170110
-		$this->initialize_updaters();
 	}
 
 	/**
@@ -184,8 +193,6 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	 * @since 1.9.10.171201
 	 */
 	public function show_admin_messages() {
-		
-		
 	}
 
 	/**
@@ -199,6 +206,12 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		// @since 2.0.2.181203
 		if(defined('DISABLE_AFC_UPDATERS') && DISABLE_AFC_UPDATERS) {
 			return false;
+		}
+
+		// Always initialise the updaters when the WP CLI tool is used
+		// @since 2.1.8.210518
+		if(defined('WP_CLI') && WP_CLI){
+			return true;
 		}
 
 		// If current user cannot manage the plugins, don't load the updaters

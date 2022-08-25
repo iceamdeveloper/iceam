@@ -2,7 +2,6 @@
 /**
  * REST API Reports bundles datastore
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    6.9.0
  */
@@ -18,7 +17,7 @@ use Automattic\WooCommerce\Admin\API\Reports\SqlQuery;
 /**
  * WC_PB_REST_Reports_Bundles_Data_Store class.
  *
- * @version 6.9.0
+ * @version 6.12.2
  */
 class WC_PB_Analytics_Stock_Data_Store extends WC_PB_Analytics_Data_Store {
 
@@ -270,12 +269,14 @@ class WC_PB_Analytics_Stock_Data_Store extends WC_PB_Analytics_Data_Store {
 		$included_products = $this->get_included_products( $query_args );
 		if ( $included_products ) {
 			$this->add_from_sql_params( $query_args, 'outer', 'default_results.bundle_id' );
+			$this->add_sql_clause( 'where', "AND _products.post_status <> 'trash'" );
 
 			// Hint: We can "play" with the bundle id, as long as we are at the subquery level only.
 			$this->subquery->add_sql_clause( 'where', "AND {$bundled_items_table}.bundle_id IN ({$included_products})" );
 
 		} else {
 			$this->add_from_sql_params( $query_args, 'inner', "{$bundled_items_table}.product_id" );
+			$this->subquery->add_sql_clause( 'where', "AND _products.post_status <> 'trash'" );
 		}
 	}
 
@@ -290,30 +291,41 @@ class WC_PB_Analytics_Stock_Data_Store extends WC_PB_Analytics_Data_Store {
 	protected function add_from_sql_params( $query_args, $arg_name, $id_cell ) {
 		global $wpdb;
 
-		$table_name = self::get_db_table_name();
-		$type       = 'join';
+		$table_name      = self::get_db_table_name();
+		$type            = 'join';
+		$products_joined = false;
 
 		// Order by product name requires extra JOIN.
 		switch ( $query_args[ 'orderby' ] ) {
 			case 'bundle_name':
-				$join = " JOIN {$wpdb->posts} AS _bundles ON {$table_name}.bundle_id = _bundles.ID";
+				$join            = " JOIN {$wpdb->posts} AS _bundles ON {$table_name}.bundle_id = _bundles.ID";
 				break;
 			case 'product_name':
-				$join = " JOIN {$wpdb->posts} AS _products ON {$id_cell} = _products.ID";
+				$products_joined = true;
+				$join            = " JOIN {$wpdb->posts} AS _products ON {$id_cell} = _products.ID";
 				break;
 			case 'units_required':
-				$join = " LEFT JOIN {$wpdb->bundled_itemmeta} AS _meta ON {$table_name}.bundled_item_id = _meta.bundled_item_id AND _meta.meta_key = 'quantity_min'";
+				$join            = " LEFT JOIN {$wpdb->bundled_itemmeta} AS _meta ON {$table_name}.bundled_item_id = _meta.bundled_item_id AND _meta.meta_key = 'quantity_min'";
 				break;
 			default:
-				$join = '';
+				$join            = '';
 				break;
 		}
 
 		if ( $join ) {
 			if ( 'inner' === $arg_name ) {
+
 				$this->subquery->add_sql_clause( $type, $join );
+				if ( ! $products_joined ) {
+					$this->subquery->add_sql_clause( $type, "JOIN {$wpdb->posts} AS _products ON {$id_cell} = _products.ID" );
+				}
+
 			} else {
+
 				$this->add_sql_clause( $type, $join );
+				if ( ! $products_joined ) {
+					$this->add_sql_clause( $type, "JOIN {$wpdb->posts} AS _products ON {$id_cell} = _products.ID" );
+				}
 			}
 		}
 	}

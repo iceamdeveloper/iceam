@@ -1,11 +1,11 @@
 === BP Profile Search ===
 Contributors: dontdream
 Tags: buddypress, directory, members, users, search, filter
-Requires at least: 4.9
-Tested up to: 5.7
-Stable tag: 5.4.2
+Requires at least: 5.7
+Tested up to: 6.0
+Stable tag: 5.4.6
 
-Member search and member directories for BuddyPress.
+Member search and member directories for BuddyPress and the BuddyBoss Platform.
 
 == Description ==
 
@@ -115,6 +115,14 @@ See the standard installation procedure, in [Managing Plugins](https://wordpress
 
 == Changelog ==
 
+= 5.4.6 =
+* Added: debug information under *Tools -> Site Health*
+= 5.4.5 =
+* Fixed: limit on number of displayed groups
+= 5.4.4 =
+* Fixed: bug on search fields marked *required*
+= 5.4.3 =
+* Fixed: widget preview in WordPress 5.8
 = 5.4.2 =
 * Added: ability to change the position of the *active filters* section
 = 5.4.1 =

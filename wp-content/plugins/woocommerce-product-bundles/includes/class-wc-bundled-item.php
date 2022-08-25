@@ -2,7 +2,6 @@
 /**
  * WC_Bundled_Item class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.2.0
  */
@@ -18,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The bunded item class is a product container that initializes and holds pricing, availability and variation/attribute-related data for a bundled product.
  *
  * @class    WC_Bundled_Item
- * @version  6.9.0
+ * @version  6.14.1
  */
 class WC_Bundled_Item {
 
@@ -30,7 +29,7 @@ class WC_Bundled_Item {
 
 	/**
 	 * A reference to the bundled item data object - @see WC_Bundled_Item_Data.
-	 * @var WP_Bundled_Item_Data
+	 * @var WC_Bundled_Item_Data
 	 */
 	public $data = null;
 
@@ -487,12 +486,14 @@ class WC_Bundled_Item {
 					continue;
 				}
 
+				$stock_managed_by_id = $variation->get_stock_managed_by_id();
+
 				// Already counted this stock?
-				if ( in_array( $variation_id, $manage_stock_ids ) ) {
+				if ( in_array( $stock_managed_by_id, $manage_stock_ids ) ) {
 					continue;
 				}
 
-				$manage_stock_ids[] = $variation->get_stock_managed_by_id();
+				$manage_stock_ids[] = $stock_managed_by_id;
 
 				if ( false === $variation->is_in_stock() ) {
 
@@ -615,7 +616,7 @@ class WC_Bundled_Item {
 
 			// Name your price support.
 			if ( $this->is_priced_individually() && WC_PB()->compatibility->is_nyp( $bundled_product ) ) {
-				$max_nyp_price = WC_Name_Your_Price_Helpers::get_maximum_price( $bundled_product );
+				$max_nyp_price           = WC_Name_Your_Price_Helpers::get_maximum_price( $bundled_product );
 				$this->max_regular_price = $this->max_price = $max_nyp_price ? $max_nyp_price : INF;
 				$this->is_nyp            = true;
 			}
@@ -1057,8 +1058,10 @@ class WC_Bundled_Item {
 
 		$is_shipped_individually = 'yes' === $this->shipped_individually;
 
-		if ( ( $bundle = $this->get_bundle() ) && $bundle->is_virtual() ) {
-			$is_shipped_individually = true;
+		if ( $bundle = $this->get_bundle() ) {
+			if ( $bundle->is_virtual() ) {
+				$is_shipped_individually = false === $bundle->is_virtual_bundle();
+			}
 		}
 
 		/**
@@ -1080,7 +1083,7 @@ class WC_Bundled_Item {
 		$is_weight_aggregated = false;
 
 		if ( ( $bundle = $this->get_bundle() ) && false === $this->is_shipped_individually() ) {
-			$is_weight_aggregated = apply_filters( 'woocommerce_bundled_item_has_bundled_weight', $bundle->get_aggregate_weight(), $product ? $product : $this->get_product(), $this->get_id(), $bundle );
+			$is_weight_aggregated = apply_filters( 'woocommerce_bundled_item_has_bundled_weight', $bundle->get_aggregate_weight() && ! $bundle->is_virtual_bundle(), $product ? $product : $this->get_product(), $this->get_id(), $bundle );
 		}
 
 		return $is_weight_aggregated;
@@ -1230,7 +1233,7 @@ class WC_Bundled_Item {
 		if ( $this->is_nyp() ) {
 			$requires_input = true;
 		} elseif ( 'variable' === $this->product->get_type() || 'variable-subscription' === $this->product->get_type() ) {
-			$requires_input = sizeof( $this->get_product_variation_attributes( true ) ) > 0;
+			$requires_input = count( $this->get_product_variation_attributes( true ) ) > 0;
 		} elseif ( false === $this->disable_addons() && WC_PB()->compatibility->has_addons( $this->get_product(), true ) ) {
 			$requires_input = true;
 		}
@@ -1264,6 +1267,46 @@ class WC_Bundled_Item {
 	 */
 	public function is_subscription() {
 		return in_array( $this->product->get_type(), array( 'subscription', 'variable-subscription' ) );
+	}
+
+	/**
+	 * Check if the item has a limited subscription.
+	 *
+	 * @since  6.13.1
+	 *
+	 * @return boolean
+	 */
+	public function is_limited_subscription() {
+
+		if ( ! $this->is_subscription() ) {
+			return false;
+		}
+
+		$bundled_product = $this->get_product();
+		return ( 'active' === wcs_get_product_limitation( $bundled_product ) );
+	}
+
+	/**
+	 * Check if the user has purchased a subscription item.
+	 *
+	 * @since  6.13.1
+	 *
+	 * @return boolean
+	 */
+	public function user_has_subscription() {
+
+		if ( ! $this->is_subscription() ) {
+			return false;
+		}
+
+		if ( is_user_logged_in() ) {
+			$user_id         = get_current_user_id();
+			$bundled_product = $this->get_product();
+			if ( wcs_user_has_subscription( $user_id, $bundled_product->get_id(), 'active' ) ) {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/**
@@ -1549,7 +1592,7 @@ class WC_Bundled_Item {
 			$use_ajax = false;
 		} elseif ( $this->has_filtered_variations() && apply_filters( 'woocommerce_bundled_item_filtered_variations_disable_ajax', true, $this ) ) {
 			$use_ajax = false;
-		} elseif ( sizeof( $this->get_children() ) <= apply_filters( 'woocommerce_ajax_variation_threshold', 30, $this->product ) ) {
+		} elseif ( count( $this->get_children() ) <= apply_filters( 'woocommerce_ajax_variation_threshold', 30, $this->product ) ) {
 			$use_ajax = false;
 		}
 
@@ -2356,41 +2399,128 @@ class WC_Bundled_Item {
 	}
 
 	/**
-	 * Builds a list of product attributes for a bundled item.
+	 * Whether this bundled item has attributes to display.
 	 *
-	 * @since  5.10.1
+	 * @since  6.15.2
 	 *
 	 * @return array
 	 */
-	public function get_bundled_item_display_attribute_args() {
+	public function has_attributes() {
 
-		$product            = $this->get_product();
-		$product_attributes = array();
-		$display_dimensions = $this->is_shipped_individually() && $product && apply_filters( 'wc_product_enable_dimensions_display', $product->has_weight() || $product->has_dimensions() );
+		if ( isset( $this->has_attributes ) ) {
+			return $this->has_attributes;
+		}
+
+		$product = $this->get_product();
+
+		if ( ! $product ) {
+			return false;
+		}
+
+		/**
+		 * 'woocommerce_bundle_show_bundled_product_attributes' filter.
+		 *
+		 * @param  boolean            $show_attributes
+		 * @param  WC_Product_Bundle  $bundle
+		 * @param  WC_Bundled_Item    $bundled_item
+		 */
+		if ( apply_filters( 'woocommerce_bundle_show_bundled_product_attributes', $this->is_visible(), $this->get_bundle(), $this ) ) {
+			$this->has_attributes = $product->has_attributes() || $this->has_weight() || $this->has_dimensions();
+		}
+
+		return $this->has_attributes;
+	}
+
+	/**
+	 * Whether this bundled item has weight to display.
+	 *
+	 * @since  6.15.2
+	 *
+	 * @return array
+	 */
+	public function has_weight() {
+
+		if ( isset( $this->has_weight ) ) {
+			return $this->has_weight;
+		}
+
+		$product = $this->get_product();
+
+		if ( ! $product ) {
+			return false;
+		}
 
 		/**
 		 * 'woocommerce_bundle_show_bundled_product_physical_props' filter.
-		 * Whether to display the bundled item's physical props.
 		 *
 		 * @since  5.8.0
 		 *
-		 * @param  boolean             $display_dimensions
-		 * @param  WC_Product_Bundles  $product
-		 * @param  WC_Bundled_Item     $bundled_item
+		 * @param  boolean          $show_physical_props
+		 * @param  WC_Product       $product
+		 * @param  WC_Bundled_Item  $bundled_item
 		 */
-		$display_dimensions = apply_filters( 'woocommerce_bundle_show_bundled_product_physical_props', $display_dimensions, $product, $this );
+		if ( apply_filters( 'woocommerce_bundle_show_bundled_product_physical_props', $this->is_visible(), $product, $this ) ) {
+			$this->has_weight = ( $this->is_shipped_individually() || $this->is_weight_aggregated() ) && apply_filters( 'wc_product_enable_dimensions_display', $product->has_weight() );
+		}
 
-		// Display weight and dimensions before attribute list.
-		$display_dimensions = apply_filters( 'wc_product_enable_dimensions_display', $product->has_weight() || $product->has_dimensions() );
+		return $this->has_weight;
+	}
 
-		if ( $display_dimensions && $product->has_weight() ) {
+	/**
+	 * Whether this bundled item has dimensions to display.
+	 *
+	 * @since  6.15.2
+	 *
+	 * @return array
+	 */
+	public function has_dimensions() {
+
+		if ( isset( $this->has_dimensions ) ) {
+			return $this->has_dimensions;
+		}
+
+		$product = $this->get_product();
+
+		if ( ! $product ) {
+			return false;
+		}
+
+		/**
+		 * 'woocommerce_bundle_show_bundled_product_physical_props' filter.
+		 *
+		 * @since  5.8.0
+		 *
+		 * @param  boolean          $show_physical_props
+		 * @param  WC_Product       $product
+		 * @param  WC_Bundled_Item  $bundled_item
+		 */
+		if ( apply_filters( 'woocommerce_bundle_show_bundled_product_physical_props', $this->is_visible(), $product, $this ) ) {
+			$this->has_dimensions = $this->is_shipped_individually() && apply_filters( 'wc_product_enable_dimensions_display', $product->has_dimensions() );
+		}
+
+		return $this->has_dimensions;
+	}
+
+	/**
+	 * Builds a list of product attributes for display.
+	 *
+	 * @since  6.15.2
+	 *
+	 * @return array
+	 */
+	public function get_attribute_template_args() {
+
+		$product_attributes = array();
+		$product            = $this->get_product();
+
+		if ( $this->has_weight() ) {
 			$product_attributes[ 'weight' ] = array(
 				'label' => __( 'Weight', 'woocommerce' ),
 				'value' => wc_format_weight( $product->get_weight() ),
 			);
 		}
 
-		if ( $display_dimensions && $product->has_dimensions() ) {
+		if ( $this->has_dimensions() ) {
 			$product_attributes[ 'dimensions' ] = array(
 				'label' => __( 'Dimensions', 'woocommerce' ),
 				'value' => wc_format_dimensions( $product->get_dimensions( false ) ),
@@ -2479,7 +2609,7 @@ class WC_Bundled_Item {
 			'product'            => $product,
 			'attributes'         => $attributes,
 			'product_attributes' => $product_attributes,
-			'display_dimensions' => $display_dimensions
+			'display_dimensions' => $this->has_weight() || $this->has_dimensions()
 		);
 	}
 
@@ -2513,7 +2643,7 @@ class WC_Bundled_Item {
 	 * @return string
 	 */
 	public function get_bundled_item_thumbnail_size() {
-		return apply_filters( 'bundled_product_large_thumbnail_size', WC_PB_Core_Compatibility::is_wc_version_gte( '3.3' ) ? 'woocommerce_thumbnail' : 'shop_catalog', $this );
+		return apply_filters( 'bundled_product_large_thumbnail_size', 'woocommerce_thumbnail', $this );
 	}
 
 	/*
@@ -2522,6 +2652,10 @@ class WC_Bundled_Item {
 	|--------------------------------------------------------------------------
 	*/
 
+	public function get_bundled_item_display_attribute_args() {
+		_deprecated_function( __METHOD__ . '()', '6.15.0', __CLASS__ . '::sync_prices()' );
+		$this->get_attribute_template_args();
+	}
 	public function init() {
 		_deprecated_function( __METHOD__ . '()', '5.0.0', __CLASS__ . '::sync_prices()' );
 		$this->sync_prices();

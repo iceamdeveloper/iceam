@@ -1,7 +1,50 @@
 *** WooCommerce Memberships Changelog ***
 
+2022.03.28 - version 1.23.0
+ * Feature - Introduce a configurable membership directory block with search, filtering, and pagination of members.
+
+2022.02.14 - version 1.22.11
+ * Fix - When a user doesn't belong to any membership plan, don't show them any profile fields in the My Account area
+
+2022.02.08 - version 1.22.10
+ * Fix - Remove deprecated usages of `is_ajax()` in favor of `wp_doing_ajax()`
+ * Misc - Require WooCommerce v3.9.4 or later
+
+2021.11.22 - version 1.22.9
+ * Fix - Show profile fields for product variations when the parent product has associated profile fields
+
+2021.11.15 - version 1.22.8
+ * Fix - Hide rules belonging to trashed membership plans from all meta boxes
+
+2021.10.07 - version 1.22.7
+ * Dev - Adds a filter to help third party code handle product discounts when a product is on sale
+
+2021.10.01 - version 1.22.6
+ * Fix - When using the `wcm_product_discount` shortcode, ensure that the percentage discount amount is not miscalculated while a member is logged in
+
+2021.09.09 - version 1.22.5
+ * Tweak - Pass the full product instance to `wc_memberships_exclude_product_from_member_discounts` filter instead of product ID when checking cart item member discounts
+ * Fix - Update usage of deprecated `block_categories` filter to address notices since WP 5.8
+
+2021.08.10 - version 1.22.4
+ * Tweak - Strip HTML tags in product names dropdown in plan access settings
+ * Fix - Admins updating an order that triggers Sensei auto-enrollment to courses shouldn't be redirected to the posts edit screen
+ * Dev - Add filter hook to toggle duplicating a product's memberships data when cloning products
+
+2021.07.05 - version 1.22.3
+ * Fix - Address an issue with plans with fixed dates and some timezone configurations
+ * Misc - Drop the `woo-includes` folder and move plugin classes from `includes` to `src` folder
+
+2021.06.23 - version 1.22.2
+ * Fix - Display the correct cart item subtotal when a customer adds more than a discounted subscription product to cart
+ * Fix - Address a potential issue in the shipping handler
+
+2021.06.07 - version 1.22.1
+ * Fix - Add sanity checks before calling Sensei or LearnDash methods to avoid errors if old versions are installed
+ * Fix - Address a potential uncaught error in Sensei and LearnDash integrations when fetching dependent courses
+
 2021.05.04 - version 1.22.0
- * Feature - Auto-enroll users to Sensei and LearnDash courses upon membership purchase
+ * Feature - Auto-enroll users to Sensei (3.11+) and LearnDash (3.4+) courses upon membership purchase
  * Dev - Add meta data handling support to membership plan rule objects
 
 2021.04.12 - version 1.21.8

@@ -19,8 +19,6 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	const ENROL_RESTORE_ENROLMENT                 = 'enrol_restore_enrolment';
 	const REMOVE_ENROLMENT                        = 'remove_enrolment';
 	const REMOVE_PROGRESS                         = 'remove_progress';
-	const COMPLETE_COURSE                         = 'complete_course';
-	const RECALCULATE_COURSE_COMPLETION           = 'recalculate_course_completion';
 
 	/**
 	 * The available bulk actions.
@@ -37,6 +35,13 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	private $page_slug;
 
 	/**
+	 * Post type that the Student Management menu is associated with.
+	 *
+	 * @var string $menu_post_type
+	 */
+	private $menu_post_type;
+
+	/**
 	 * The page view.
 	 *
 	 * @var string
@@ -49,6 +54,13 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	 * @var Sensei_Learner_Management
 	 */
 	private $learner_management;
+
+	/**
+	 * The Sensei_Learner object with utility functions.
+	 *
+	 * @var Sensei_Learner
+	 */
+	private $learner;
 
 	/**
 	 * The name of the page
@@ -99,7 +111,7 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 		_deprecated_function( __METHOD__, '3.0.0' );
 
 		if ( current_user_can( 'manage_sensei_grades' ) ) {
-			add_submenu_page( 'sensei', __( 'Learner Admin', 'sensei-lms' ), __( 'Learner Admin', 'sensei-lms' ), 'manage_sensei_grades', 'sensei_learner_admin', array( $this, 'learner_admin_page' ) );
+			add_submenu_page( 'sensei', __( 'Student Admin', 'sensei-lms' ), __( 'Student Admin', 'sensei-lms' ), 'manage_sensei_grades', 'sensei_learner_admin', array( $this, 'learner_admin_page' ) );
 		}
 	}
 
@@ -107,19 +119,20 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	 * Sensei_Learners_Admin_Main constructor.
 	 *
 	 * @param Sensei_Learner_Management $management The learner managemnt object.
+	 * @param Sensei_Learner            $learner    The learner object with utility functions.
 	 */
-	public function __construct( $management ) {
-		$this->name               = __( 'Bulk Learner Actions', 'sensei-lms' );
-		$this->page_slug          = $management->page_slug;
-		$this->view               = 'sensei_learner_admin';
+	public function __construct( $management, $learner ) {
 		$this->learner_management = $management;
+		$this->learner            = $learner;
+		$this->name               = __( 'Bulk Student Actions', 'sensei-lms' );
+		$this->page_slug          = $management->page_slug;
+		$this->menu_post_type     = 'course';
+		$this->view               = 'sensei_learner_admin';
 
 		$this->known_bulk_actions = [
-			self::ENROL_RESTORE_ENROLMENT       => __( 'Enroll / Restore Enrollment', 'sensei-lms' ),
-			self::REMOVE_ENROLMENT              => __( 'Remove Enrollment', 'sensei-lms' ),
-			self::REMOVE_PROGRESS               => __( 'Reset or Remove Progress', 'sensei-lms' ),
-			self::COMPLETE_COURSE               => __( 'Recalculate Course(s) Completion (notify on complete)', 'sensei-lms' ),
-			self::RECALCULATE_COURSE_COMPLETION => __( 'Recalculate Course(s) Completion (do not notify on complete)', 'sensei-lms' ),
+			self::ENROL_RESTORE_ENROLMENT => __( 'Add to Course', 'sensei-lms' ),
+			self::REMOVE_ENROLMENT        => __( 'Remove from Course', 'sensei-lms' ),
+			self::REMOVE_PROGRESS         => __( 'Reset or Remove Progress', 'sensei-lms' ),
 		];
 
 		if ( is_admin() ) {
@@ -137,11 +150,12 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	public function redirect_to_learner_admin_index( $result ) {
 		$url = add_query_arg(
 			array(
-				'page'    => $this->get_page_slug(),
-				'view'    => $this->get_view(),
-				'message' => $result,
+				'post_type' => $this->menu_post_type,
+				'page'      => $this->get_page_slug(),
+				'view'      => $this->get_view(),
+				'message'   => $result,
 			),
-			admin_url( 'admin.php' )
+			admin_url( 'edit.php' )
 		);
 		wp_safe_redirect( $url );
 		exit;
@@ -155,10 +169,11 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	public function get_url() {
 		return add_query_arg(
 			[
-				'page' => $this->get_page_slug(),
-				'view' => $this->get_view(),
+				'post_type' => $this->menu_post_type,
+				'page'      => $this->get_page_slug(),
+				'view'      => $this->get_view(),
 			],
-			admin_url( 'admin.php' )
+			admin_url( 'edit.php' )
 		);
 	}
 
@@ -171,11 +186,12 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	public function get_learner_management_course_url( $course_id ) {
 		return add_query_arg(
 			[
+				'post_type' => $this->menu_post_type,
 				'page'      => 'sensei_learners',
 				'course_id' => absint( $course_id ),
 				'view'      => 'learners',
 			],
-			admin_url( 'admin.php' )
+			admin_url( 'edit.php' )
 		);
 	}
 
@@ -275,16 +291,6 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 					Sensei_Utils::reset_course_for_user( $course_id, $user_id );
 				}
 				break;
-			case self::COMPLETE_COURSE:
-				if ( Sensei_Utils::has_started_course( $course_id, $user_id ) && ! Sensei_Utils::user_completed_course( $course_id, $user_id ) ) {
-					Sensei_Utils::user_complete_course( $course_id, $user_id );
-				}
-				break;
-			case self::RECALCULATE_COURSE_COMPLETION:
-				if ( Sensei_Utils::has_started_course( $course_id, $user_id ) && ! Sensei_Utils::user_completed_course( $course_id, $user_id ) ) {
-					Sensei_Utils::user_complete_course( $course_id, $user_id, false );
-				}
-				break;
 		}
 	}
 
@@ -316,10 +322,15 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 
 	/**
 	 * Display the learner bulk action page.
+	 *
+	 * @deprecated 4.4.0
 	 */
 	public function learner_admin_page() {
+
+		_deprecated_function( __METHOD__, '4.4.0', 'Sensei_Learner_Management::output_main_page' );
+
 		// Load Learners data.
-		$sensei_learners_main_view = new Sensei_Learners_Admin_Bulk_Actions_View( $this, $this->learner_management );
+		$sensei_learners_main_view = new Sensei_Learners_Admin_Bulk_Actions_View( $this, $this->learner_management, $this->learner );
 		$sensei_learners_main_view->prepare_items();
 
 		// Wrappers.
@@ -351,7 +362,7 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 	 */
 	public function is_current_page() {
 		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Arguments used for comparison.
-		return isset( $_GET['page'], $_GET['view'] ) && ( $_GET['page'] === $this->page_slug ) && ( $_GET['view'] === $this->view );
+		return empty( $_GET['course_id'] ) && isset( $_GET['page'] ) && $_GET['page'] === $this->page_slug;
 	}
 
 	/**
@@ -402,7 +413,7 @@ class Sensei_Learners_Admin_Bulk_Actions_Controller {
 				break;
 			case 'action-success':
 				$msg_class = 'notice notice-success';
-				$msg       = __( 'Bulk learner action succeeded', 'sensei-lms' );
+				$msg       = __( 'Bulk student action succeeded', 'sensei-lms' );
 				break;
 		}
 

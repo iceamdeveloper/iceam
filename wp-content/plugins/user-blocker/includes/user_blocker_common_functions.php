@@ -287,7 +287,7 @@ if (!function_exists('ublk_display_support_section')) {
                     <div class="pro-content">
                         <strong class="ual_advertisement_legend"><?php _e('Blog Designer Pro', 'user-blocker'); ?></strong>
                         <ul class="advertisementContent">
-                            <li><?php _e("50 Beautiful Blog Templates", 'user-blocker') ?></li>
+                            <li><?php _e("50+ Beautiful Blog Templates", 'user-blocker') ?></li>
                             <li><?php _e("10+ Unique Timeline Templates", 'user-blocker') ?></li>
                             <li><?php _e("200+ Blog Layout Variations", 'user-blocker') ?></li>
                             <li><?php _e("Single Post Design options", 'user-blocker') ?></li>
@@ -296,7 +296,7 @@ if (!function_exists('ublk_display_support_section')) {
                             <li><?php _e("800+ Google Font Support", 'user-blocker') ?></li>
                             <li><?php _e("600+ Font Awesome Icons Support", 'user-blocker') ?></li>
                         </ul>
-                        <p class="pricing_change"><?php _e('Now only at', 'user-blocker'); ?> <ins>$39</ins></p>
+                        <p class="pricing_change"><?php _e('Now only at', 'user-blocker'); ?> <ins>$59</ins></p>
                     </div>
                     <div class="pre-book-pro">
                         <a href="https://codecanyon.net/item/blog-designer-pro-for-wordpress/17069678?ref=solwin" target="_blank">
@@ -506,12 +506,10 @@ if (!function_exists('ublk_settings_link')) {
 if (!function_exists('ublk_session_start')) {
 
     function ublk_session_start() {
-        if (session_id() == '') {
+        if(session_status()!=PHP_SESSION_ACTIVE) {
             session_start(['read_and_close' => true]);
-            // session_start();
         }
     }
-
 }
 
 /**
@@ -705,26 +703,92 @@ if (!function_exists('ublk_pagination')) {
 if (!function_exists('ublk_blocked_pagination')) {
 
     function ublk_blocked_pagination($total_pages, $total_items, $paged, $prev_page, $next_page, $srole, $txtUsername, $orderby, $order, $tab) {
-        ?>
-        <div class="tablenav-pages" <?php
-        if ((int) $total_pages <= 1) {
-            echo 'style="display: none;"';
-        }
-        ?>>
-            <span class="displaying-num"><?php echo $total_items; ?> <?php _e('items', 'user-blocker'); ?></span>
-            <span class="pagination-links">
-                <a class="first-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=1&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the first page', 'user-blocker'); ?>">&laquo;</a>
-                <a class="prev-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=' . $prev_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the previous page', 'user-blocker'); ?>">&lsaquo;</a>
-                <span class="paging-input">
-                    <input class="current-page" type="text" size="1" value="<?php echo $paged; ?>" name="paged" title="Current page">
-        <?php _e('of', 'user-blocker'); ?>
-                    <span class="total-pages"><?php echo $total_pages; ?></span>
-                </span>
-                <a class="next-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=' . $next_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the next page', 'user-blocker'); ?>">&rsaquo;</a>
-                <a class="last-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=' . $total_pages . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the last page', 'user-blocker'); ?>">&raquo;</a>
-            </span>
-            <input style="display: none;" id="sbtPages" class="button" type="submit" value="sbtPages" name="filter_action">
-        </div><?php
+        if(isset($_GET['page']) && ($_GET['page'] == 'blocked_user_list' )){ ?>
+                <div class="tablenav-pages" <?php
+                    if ((int) $total_pages <= 1) {
+                        echo 'style="display: none;"';
+                    }
+                    ?>>
+                        <span class="displaying-num"><?php echo $total_items; ?> <?php _e('items', 'user-blocker'); ?></span>
+                        <span class="pagination-links">
+                            <a class="first-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=1&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the first page', 'user-blocker'); ?>">&laquo;</a>
+                            <a class="prev-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=' . $prev_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the previous page', 'user-blocker'); ?>">&lsaquo;</a>
+                            <span class="paging-input">
+                                <input class="current-page" type="text" size="1" value="<?php echo $paged; ?>" name="paged" title="Current page">
+                    <?php _e('of', 'user-blocker'); ?>
+                                <span class="total-pages"><?php echo $total_pages; ?></span>
+                            </span>
+                            <a class="next-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=' . $next_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the next page', 'user-blocker'); ?>">&rsaquo;</a>
+                            <a class="last-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=blocked_user_list&paged=' . $total_pages . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the last page', 'user-blocker'); ?>">&raquo;</a>
+                        </span>
+                        <input style="display: none;" id="sbtPages" class="button" type="submit" value="sbtPages" name="filter_action">
+                </div>
+        <?php }
+        elseif(isset($_GET['page']) && ($_GET['page'] == 'datewise_blocked_user_list' )){ ?>
+                <div class="tablenav-pages" <?php
+                    if ((int) $total_pages <= 1) {
+                        echo 'style="display: none;"';
+                    }
+                    ?>>
+                        <span class="displaying-num"><?php echo $total_items; ?> <?php _e('items', 'user-blocker'); ?></span>
+                        <span class="pagination-links">
+                            <a class="first-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=datewise_blocked_user_list&paged=1&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the first page', 'user-blocker'); ?>">&laquo;</a>
+                            <a class="prev-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=datewise_blocked_user_list&paged=' . $prev_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the previous page', 'user-blocker'); ?>">&lsaquo;</a>
+                            <span class="paging-input">
+                                <input class="current-page" type="text" size="1" value="<?php echo $paged; ?>" name="paged" title="Current page">
+                    <?php _e('of', 'user-blocker'); ?>
+                                <span class="total-pages"><?php echo $total_pages; ?></span>
+                            </span>
+                            <a class="next-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=datewise_blocked_user_list&paged=' . $next_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the next page', 'user-blocker'); ?>">&rsaquo;</a>
+                            <a class="last-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=datewise_blocked_user_list&paged=' . $total_pages . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the last page', 'user-blocker'); ?>">&raquo;</a>
+                        </span>
+                        <input style="display: none;" id="sbtPages" class="button" type="submit" value="sbtPages" name="filter_action">
+                </div>
+        <?php }
+        elseif(isset($_GET['page']) && ($_GET['page'] == 'permanent_blocked_user_list' )){ ?>
+                <div class="tablenav-pages" <?php
+                    if ((int) $total_pages <= 1) {
+                        echo 'style="display: none;"';
+                    }
+                    ?>>
+                        <span class="displaying-num"><?php echo $total_items; ?> <?php _e('items', 'user-blocker'); ?></span>
+                        <span class="pagination-links">
+                            <a class="first-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=permanent_blocked_user_list&paged=1&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the first page', 'user-blocker'); ?>">&laquo;</a>
+                            <a class="prev-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=permanent_blocked_user_list&paged=' . $prev_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the previous page', 'user-blocker'); ?>">&lsaquo;</a>
+                            <span class="paging-input">
+                                <input class="current-page" type="text" size="1" value="<?php echo $paged; ?>" name="paged" title="Current page">
+                    <?php _e('of', 'user-blocker'); ?>
+                                <span class="total-pages"><?php echo $total_pages; ?></span>
+                            </span>
+                            <a class="next-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=permanent_blocked_user_list&paged=' . $next_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the next page', 'user-blocker'); ?>">&rsaquo;</a>
+                            <a class="last-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=permanent_blocked_user_list&paged=' . $total_pages . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the last page', 'user-blocker'); ?>">&raquo;</a>
+                        </span>
+                        <input style="display: none;" id="sbtPages" class="button" type="submit" value="sbtPages" name="filter_action">
+                </div>
+
+        <?php }
+        else { ?>
+            <div class="tablenav-pages" <?php
+                    if ((int) $total_pages <= 1) {
+                        echo 'style="display: none;"';
+                    }
+                    ?>>
+                        <span class="displaying-num"><?php echo $total_items; ?> <?php _e('items', 'user-blocker'); ?></span>
+                        <span class="pagination-links">
+                            <a class="first-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=all_type_blocked_user_list&paged=1&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the first page', 'user-blocker'); ?>">&laquo;</a>
+                            <a class="prev-page <?php if ($paged == '1') echo 'disabled'; ?>" href="<?php echo '?page=all_type_blocked_user_list&paged=' . $prev_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the previous page', 'user-blocker'); ?>">&lsaquo;</a>
+                            <span class="paging-input">
+                                <input class="current-page" type="text" size="1" value="<?php echo $paged; ?>" name="paged" title="Current page">
+                    <?php _e('of', 'user-blocker'); ?>
+                                <span class="total-pages"><?php echo $total_pages; ?></span>
+                            </span>
+                            <a class="next-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=all_type_blocked_user_list&paged=' . $next_page . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the next page', 'user-blocker'); ?>">&rsaquo;</a>
+                            <a class="last-page <?php if ($paged == $total_pages) echo 'disabled'; ?>" href="<?php echo '?page=all_type_blocked_user_list&paged=' . $total_pages . '&role=' . $srole . '&txtUsername=' . $txtUsername; ?>&orderby=<?php echo $orderby; ?>&order=<?php echo $order; ?>" title="<?php _e('Go to the last page', 'user-blocker'); ?>">&raquo;</a>
+                        </span>
+                        <input style="display: none;" id="sbtPages" class="button" type="submit" value="sbtPages" name="filter_action">
+                </div>
+        <?php }
+        
     }
 
 }

@@ -4,7 +4,7 @@
 import { InnerBlocks } from '@wordpress/block-editor';
 import { compose } from '@wordpress/compose';
 import { useDispatch, useSelect } from '@wordpress/data';
-import { createContext, useEffect } from '@wordpress/element';
+import { createContext, useCallback, useEffect } from '@wordpress/element';
 
 /**
  * Internal dependencies
@@ -12,10 +12,10 @@ import { createContext, useEffect } from '@wordpress/element';
 import OutlinePlaceholder from './outline-placeholder';
 import OutlineSettings from './outline-settings';
 import { withDefaultBlockStyle } from '../../../shared/blocks/settings';
-import ToggleLegacyCourseMetaboxesWrapper from '../../toggle-legacy-course-metaboxes-wrapper';
 import { useCourseLessonsStatusSync } from '../status-preview/use-course-lessons-status-sync';
 import { COURSE_STORE } from '../course-outline-store';
 import { useBlocksCreator } from '../use-block-creator';
+import OutlineAppender from './outline-appender';
 
 const ALLOWED_BLOCKS = [
 	'sensei-lms/course-outline-module',
@@ -57,7 +57,12 @@ const OutlineEdit = ( props ) => {
 
 	useCourseLessonsStatusSync( clientId, attributes.isPreview );
 
-	const content = isEmpty ? (
+	const AppenderComponent = useCallback(
+		() => <OutlineAppender clientId={ clientId } />,
+		[ clientId ]
+	);
+
+	return isEmpty ? (
 		<OutlinePlaceholder
 			addBlock={ ( type ) => setBlocks( [ { type } ], true ) }
 		/>
@@ -72,15 +77,12 @@ const OutlineEdit = ( props ) => {
 			<OutlineSettings { ...props } />
 
 			<section className={ className }>
-				<InnerBlocks allowedBlocks={ ALLOWED_BLOCKS } />
+				<InnerBlocks
+					allowedBlocks={ ALLOWED_BLOCKS }
+					renderAppender={ AppenderComponent }
+				/>
 			</section>
 		</OutlineAttributesContext.Provider>
-	);
-
-	return (
-		<ToggleLegacyCourseMetaboxesWrapper { ...props }>
-			{ content }
-		</ToggleLegacyCourseMetaboxesWrapper>
 	);
 };
 

@@ -2,7 +2,6 @@
 /**
  * WC_PB_BS_Cart class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.8.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Cart-related functions and filters.
  *
  * @class    WC_PB_BS_Cart
- * @version  6.6.4
+ * @version  6.12.0
  */
 class WC_PB_BS_Cart {
 
@@ -230,17 +229,25 @@ class WC_PB_BS_Cart {
 		// Identify items to search for bundle-sells and items to apply bundle sells to.
 		foreach ( $cart->cart_contents as $cart_item_key => $cart_item ) {
 
-			if ( wc_pb_maybe_is_bundled_cart_item( $cart_item ) || wc_pb_is_bundle_container_cart_item( $cart_item ) ) {
-				continue;
-			}
-
-			if ( function_exists( 'wc_cp_maybe_is_composited_cart_item' ) && function_exists( 'wc_cp_is_composite_container_cart_item' ) && ( wc_cp_maybe_is_composited_cart_item( $cart_item ) || wc_cp_is_composite_container_cart_item( $cart_item ) ) ) {
+			// Bundle containers cannot grant discounts.
+			if ( wc_pb_is_bundle_container_cart_item( $cart_item ) ) {
 				continue;
 			}
 
 			$search_cart_item_keys[] = $cart_item_key;
 
+			// Only Simple products and Simple Subscriptions can receive discounts.
 			if ( ! $cart_item[ 'data' ]->is_type( array( 'simple', 'subscription' ) ) ) {
+				continue;
+			}
+
+			// Bundles and bundled items cannot receive discounts.
+			if ( wc_pb_maybe_is_bundled_cart_item( $cart_item ) || wc_pb_is_bundle_container_cart_item( $cart_item ) ) {
+				continue;
+			}
+
+			// Composites and composited items cannot receive discounts.
+			if ( function_exists( 'wc_cp_maybe_is_composited_cart_item' ) && function_exists( 'wc_cp_is_composite_container_cart_item' ) && ( wc_cp_maybe_is_composited_cart_item( $cart_item ) || wc_cp_is_composite_container_cart_item( $cart_item ) ) ) {
 				continue;
 			}
 

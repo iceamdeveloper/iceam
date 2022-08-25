@@ -36,6 +36,15 @@ class Week_View extends By_Day_View {
 	protected $slug = 'week';
 
 	/**
+	 * Cached dates for the prev/next links.
+	 *
+	 * @since 5.14.2
+	 *
+	 * @var array
+	 */
+	protected $cached_event_dates = [];
+
+	/**
 	 * Visibility for this view.
 	 *
 	 * @since 4.7.5
@@ -137,6 +146,17 @@ class Week_View extends By_Day_View {
 		$template_vars['has_multiday_events']       = $this->get_has_multiday_events( $list_ready_stack );
 		$template_vars['events']                    = $events;
 
+		// Handle indexing on prev/next links.
+		$next_week_num       = Dates::build_date_object( $this->context->get( 'event_date' ) )->modify( '+1 week' )->format( 'W' );
+		$prev_week_num       = Dates::build_date_object( $this->context->get( 'event_date' ) )->modify( '-1 week' )->format( 'W' );
+		$next_event_date     = $this->get_next_event_date();
+		$previous_event_date = $this->get_previous_event_date();
+
+		$index_next_rel = $next_event_date && $next_week_num === $next_event_date;
+		$index_prev_rel = $previous_event_date && $prev_week_num === $previous_event_date;
+		$template_vars['next_rel'] = $index_next_rel ? 'next' : 'noindex';
+		$template_vars['prev_rel'] = $index_prev_rel ? 'prev' : 'noindex';
+
 		$template_vars['multiday_min_toggle'] = $stack_toggle_threshold;
 
 		// If any of the days in the stack has more events than the threshold, then show the toggle.
@@ -229,7 +249,6 @@ class Week_View extends By_Day_View {
 		 * The start time has, but, to take the timezone settings into account.
 		 */
 		$use_site_timezone = Timezones::is_mode( 'site' );
-		$site_timezone     = Timezones::build_timezone_object();
 		$time_format       = get_option( 'time_format', Dates::TIMEFORMAT );
 		$event_times       = [];
 		$all_day           = [];
@@ -253,7 +272,8 @@ class Week_View extends By_Day_View {
 			}
 
 			/** @var \Tribe\Utils\Date_I18n_Immutable $start */
-			$start = $use_site_timezone ? $event->dates->start->setTimezone( $site_timezone ) : $event->dates->start;
+
+			$start = $use_site_timezone ? $event->dates->start_site : $event->dates->start;
 			$time  = $start->setTime( (int) $start->format( 'G' ), 0, 0 )->format_i18n( $time_format );
 
 			// ISO 8601 format, e.g. `2019-01-01T00:00:00+00:00`.
@@ -583,8 +603,9 @@ class Week_View extends By_Day_View {
 	 * @return string The full vertical position CSS class for the event, if required, else an empty string.
 	 */
 	protected function get_event_vertical_position_class( \WP_Post $event ) {
-		$start_hour    = (int) $event->dates->start->format( 'H' );
-		$start_minutes = (int) $event->dates->start->format( 'i' );
+		$start         = Timezones::is_mode( 'site' ) ? $event->dates->start_site : $event->dates->start;
+		$start_hour    = (int) $start->format( 'H' );
+		$start_minutes = (int) $start->format( 'i' );
 
 		if ( 0 === $start_hour && $start_minutes <= 15 ) {
 			// Starts between `00:00` and `00:15`.
@@ -648,9 +669,16 @@ class Week_View extends By_Day_View {
 		 * Two events overlap if the start of the first is before the end of the second and if the start of the second
 		 * is before the end of the first.
 		 */
-		$ends_after_prev_starts  = $prev->dates->start < $event->dates->end;
-		$starts_before_prev_ends = $event->dates->start < $prev->dates->end;
-		$overlap                 = $ends_after_prev_starts && $starts_before_prev_ends;
+
+		if ( ! Timezones::is_mode( 'site' ) ) {
+			$ends_after_prev_starts  = $prev->dates->start < $event->dates->end;
+			$starts_before_prev_ends = $event->dates->start < $prev->dates->end;
+		} else {
+			$ends_after_prev_starts  = $prev->dates->start_site < $event->dates->end_site;
+			$starts_before_prev_ends = $event->dates->start_site < $prev->dates->end_site;
+		}
+
+		$overlap = $ends_after_prev_starts && $starts_before_prev_ends;
 
 		if ( ! $overlap ) {
 			return '';
@@ -663,6 +691,53 @@ class Week_View extends By_Day_View {
 			: 2;
 
 		return $class_base . $sequence;
+	}
+
+	/**
+	 * Get the date of the event immediately previous to the current view date.
+	 *
+	 * @since 5.14.2
+	 *
+	 * @param DateTime $current_date A DateTime object signifying the current date for the view.
+	 *
+	 * @return DateTime|false Either the previous event chronologically, the previous month, or false if no next event found.
+	 */
+	public function get_previous_event_date() {
+		$args = $this->filter_repository_args( parent::setup_repository_args( $this->context ) );
+		$date         = $this->context->get( 'event_date', 'today' );
+		$current_date = Dates::build_date_object( $date );
+
+		// Use cache to reduce the performance impact.
+		$cache_key = __METHOD__ . '_' . substr( md5( wp_json_encode( [ $current_date, $args ] ) ), 10 );
+
+		if ( isset( $this->cached_event_dates[ $cache_key ] ) ) {
+			return $this->cached_event_dates[ $cache_key ];
+		}
+
+		list( $week_start ) = $this->calculate_grid_start_end( $current_date );
+
+		// Find the first event that starts before the start of this month.
+		$prev_event = tribe_events()
+			->by_args( $args )
+			->where( 'ends_before', tribe_beginning_of_day( $week_start->format( 'Y-m-d' ) ) )
+			->order( 'DESC' )
+			->first();
+
+		if ( ! $prev_event instanceof \WP_Post ) {
+			return false;
+		}
+
+		// Show the closest week on which that event appears (but not the current week).
+		$prev_date  = min(
+			Dates::build_date_object( $prev_event->dates->start ),
+			$current_date->modify( '-1 week' )
+		);
+
+		$prev_date = $prev_date->format( 'W' );
+
+		$this->cached_event_dates[ $cache_key ] = $prev_date;
+
+		return $prev_date;
 	}
 
 	/**
@@ -702,6 +777,54 @@ class Week_View extends By_Day_View {
 		$this->cached_urls[ $cache_key ] = $url;
 
 		return $url;
+	}
+
+	/**
+	 * Get the date of the event immediately after to the current view date.
+	 *
+	 * @since 5.14.2
+	 *
+	 * @param DateTime|false $current_date A DateTime object signifying the current date for the view.
+	 *
+	 * @return DateTime|false Either the next event chronologically, the next month, or false if no next event found.
+	 */
+	public function get_next_event_date() {
+		$args = $this->filter_repository_args( parent::setup_repository_args( $this->context ) );
+		$date         = $this->context->get( 'event_date', 'today' );
+		$current_date = Dates::build_date_object( $date );
+		list( $week_start ) = $this->calculate_grid_start_end( $current_date );
+
+		// Use cache to reduce the performance impact.
+		$cache_key = __METHOD__ . '_' . substr( md5( wp_json_encode( [ $current_date, $args ] ) ), 10 );
+
+		if ( isset( $this->cached_event_dates[ $cache_key ] ) ) {
+			return $this->cached_event_dates[ $cache_key ];
+		}
+
+		list( $week_start, $week_end ) = $this->calculate_grid_start_end( $current_date );
+
+		// The first event that ends after the end of the month; it could still begin in this month.
+		$next_event = tribe_events()
+			->by_args( $this->filter_repository_args( $args ) )
+			->where( 'starts_after', tribe_end_of_day( $week_end->format( 'Y-m-d' ) ) )
+			->order( 'ASC' )
+			->first();
+
+		if ( ! $next_event instanceof \WP_Post ) {
+			return false;
+		}
+
+		// At a minimum pick the next week or the week the next event starts.
+		$next_date = max(
+			Dates::build_date_object( $next_event->dates->start ),
+			$current_date->modify( '+1 week' )
+		);
+
+		$next_date = $next_date->format( 'W' );
+
+		$this->cached_event_dates[ $cache_key ] = $next_date;
+
+		return $next_date;
 	}
 
 	/**

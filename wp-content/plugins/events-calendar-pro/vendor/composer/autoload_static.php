@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit37aadb9233d9b756168540d295c9498a
+class ComposerStaticInitc39ac78a7f38444afa3c7a3369ddcf3d
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -21,6 +21,17 @@ class ComposerStaticInit37aadb9233d9b756168540d295c9498a
     );
 
     public static $classMap = array (
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Assets' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Assets.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Events_Table' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Events_Table.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Hooks' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Hooks.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Modal\\Split_Abstract' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Modal/Split_Abstract.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Modal\\Split_Single' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Modal/Split_Single.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Modal\\Split_Upcoming' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Modal/Split_Upcoming.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Page' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Page.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Provider' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Provider.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Settings' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Settings.php',
+        'Tribe\\Events\\Pro\\Admin\\Manager\\Shortcode' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Shortcode.php',
+        'Tribe\\Events\\Pro\\Event_Status\\Event_Status_Provider' => __DIR__ . '/../..' . '/src/Tribe/Event_Status/Event_Status_Provider.php',
         'Tribe\\Events\\Pro\\Integrations\\Elementor\\Controls\\Groups\\Event_Query' => __DIR__ . '/../..' . '/src/Tribe/Integrations/Elementor/Controls/Groups/Event_Query.php',
         'Tribe\\Events\\Pro\\Integrations\\Elementor\\Controls\\Traits\\TEC_Control' => __DIR__ . '/../..' . '/src/Tribe/Integrations/Elementor/Controls/Traits/TEC_Control.php',
         'Tribe\\Events\\Pro\\Integrations\\Elementor\\Controls_Manager' => __DIR__ . '/../..' . '/src/Tribe/Integrations/Elementor/Controls_Manager.php',
@@ -43,6 +54,10 @@ class ComposerStaticInit37aadb9233d9b756168540d295c9498a
         'Tribe\\Events\\Pro\\Service_Providers\\Customizer' => __DIR__ . '/../..' . '/src/Tribe/Service_Providers/Customizer.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Assets' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Assets.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Customizer' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Customizer.php',
+        'Tribe\\Events\\Pro\\Views\\V2\\Customizer\\Hooks' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Customizer/Hooks.php',
+        'Tribe\\Events\\Pro\\Views\\V2\\Customizer\\Section\\Events_Bar' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Customizer/Section/Events_Bar.php',
+        'Tribe\\Events\\Pro\\Views\\V2\\Customizer\\Section\\Global_Elements' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Customizer/Section/Global_Elements.php',
+        'Tribe\\Events\\Pro\\Views\\V2\\Customizer\\Service_Provider' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Customizer/Service_Provider.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Geo_Loc\\Base_Handler' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Geo_Loc/Base_Handler.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Geo_Loc\\Geocoding_Handler' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Geo_Loc/Geocoding_Handler.php',
         'Tribe\\Events\\Pro\\Views\\V2\\Geo_Loc\\Handler_Interface' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Geo_Loc/Handler_Interface.php',
@@ -101,9 +116,9 @@ class ComposerStaticInit37aadb9233d9b756168540d295c9498a
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit37aadb9233d9b756168540d295c9498a::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit37aadb9233d9b756168540d295c9498a::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit37aadb9233d9b756168540d295c9498a::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitc39ac78a7f38444afa3c7a3369ddcf3d::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitc39ac78a7f38444afa3c7a3369ddcf3d::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInitc39ac78a7f38444afa3c7a3369ddcf3d::$classMap;
 
         }, null, ClassLoader::class);
     }

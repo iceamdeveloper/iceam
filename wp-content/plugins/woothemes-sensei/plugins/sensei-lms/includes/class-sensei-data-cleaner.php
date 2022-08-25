@@ -57,7 +57,7 @@ class Sensei_Data_Cleaner {
 		'sensei_installed',
 		'sensei_course_enrolment_site_salt',
 		'sensei_course_order',
-		'skip_install_sensei_pages', // @deprecated since 3.1.0.
+		'skip_install_sensei_pages', // deprecated 3.1.0.
 		'sensei_suggest_setup_wizard',
 		'sensei-data-port-jobs',
 		'sensei_setup_wizard_data',
@@ -68,15 +68,16 @@ class Sensei_Data_Cleaner {
 		'sensei-version',
 		'woothemes-sensei-version',
 		'sensei_enrolment_legacy',
-		'sensei_usage_tracking_opt_in_hide', // @deprecated since 3.1.0.
+		'sensei_usage_tracking_opt_in_hide', // deprecated 3.1.0.
 		'sensei-upgrades',
 		'woothemes-sensei-upgrades',
 		'woothemes-sensei-settings',
 		'sensei-settings',
-		'sensei_show_email_signup_form', // @deprecated 3.1.0
+		'sensei_show_email_signup_form', // deprecated 3.1.0.
 		'sensei_courses_page_id',
 		'woothemes-sensei_courses_page_id',
 		'woothemes-sensei_user_dashboard_page_id',
+		'woothemes-sensei_course_completed_page_id',
 		'sensei-legacy-flags',
 		'sensei-scheduler-calculation-version',
 		'widget_sensei_course_component',
@@ -85,6 +86,7 @@ class Sensei_Data_Cleaner {
 		'widget_sensei_category_courses',
 		'sensei_dismiss_wcpc_prompt',
 		'sensei-cancelled-wccom-connect-dismissed',
+		'sensei_course_theme_query_var_flushed',
 	);
 
 	/**
@@ -248,6 +250,9 @@ class Sensei_Data_Cleaner {
 		'sensei_payment_complete',
 		'sensei_products_processed',
 		'_sensei_attachment_source_key',
+		'sensei_course_video_autocomplete',
+		'sensei_course_video_autopause',
+		'sensei_course_video_required',
 	);
 
 	/**
@@ -357,6 +362,12 @@ class Sensei_Data_Cleaner {
 		$my_courses_page_id = $settings->get( 'my_course_page' );
 		if ( $my_courses_page_id ) {
 			wp_trash_post( $my_courses_page_id );
+		}
+
+		// Trash the Course Completed page.
+		$course_completed_page_id = $settings->get( 'course_completed_page' );
+		if ( $course_completed_page_id ) {
+			wp_trash_post( $course_completed_page_id );
 		}
 	}
 

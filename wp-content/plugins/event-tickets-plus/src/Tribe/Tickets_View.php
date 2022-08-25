@@ -247,7 +247,7 @@ class Tribe__Tickets_Plus__Tickets_View {
 				}
 			}
 
-			$values = (array) get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
+			$values = (array) get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::get_attendee_meta_fields_key( null, $attendee_id ), true );
 
 			/**
 			 * Allow filtering the attendee meta to be saved to the attendee.
@@ -265,7 +265,7 @@ class Tribe__Tickets_Plus__Tickets_View {
 			// Only write to database if arrays do not match, regardless of the order of keys
 			if ( $data_to_save != $values ) {
 				// Updates the meta information associated with individual attendees
-				update_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, $data_to_save );
+				update_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::get_attendee_meta_fields_key( null, $attendee_id ), $data_to_save );
 
 				/**
 				 * An Action fired when an Attendees Meta Data is Updated.
@@ -353,6 +353,14 @@ class Tribe__Tickets_Plus__Tickets_View {
 		$iac = tribe( 'tickets-plus.attendee-registration.iac' );
 
 		$ticket = get_post( $attendee['product_id'] );
+		$enable_resending_email = true;
+
+		if (
+			'cancelled' === $attendee['order_status']
+			|| 'refunded' === $attendee['order_status']
+		) {
+			$enable_resending_email = false;
+		}
 
 		/**
 		 * This filter allows the admin to control the re-send email option when an attendee's email is updated.
@@ -363,7 +371,7 @@ class Tribe__Tickets_Plus__Tickets_View {
 		 * @param WP_Post|null $ticket                The ticket post object if available, otherwise null.
 		 * @param array|null   $attendee              The attendee information if available, otherwise null.
 		 */
-		$allow_resending_email = (bool) apply_filters( 'tribe_tickets_my_tickets_allow_email_resend_on_attendee_email_update', true, $ticket, $attendee );
+		$allow_resending_email = (bool) apply_filters( 'tribe_tickets_my_tickets_allow_email_resend_on_attendee_email_update', $enable_resending_email, $ticket, $attendee );
 
 		$args = [
 			'attendee'                    => $attendee,

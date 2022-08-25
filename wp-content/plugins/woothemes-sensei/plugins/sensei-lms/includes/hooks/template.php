@@ -125,26 +125,33 @@ add_action( 'sensei_single_quiz_content_inside_before', array( 'Sensei_Quiz', 's
 // Hook in the quiz user message.
 add_action( 'sensei_single_quiz_content_inside_before', array( 'Sensei_Quiz', 'the_user_status_message' ), 40 );
 
+// @since 3.15.0
+// Add the quiz hidden fields.
+add_action( 'sensei_single_quiz_questions_before', array( 'Sensei_Quiz', 'output_quiz_hidden_fields' ), 10 );
+
+// @since 3.15.0
+// Add the quiz progress bar.
+add_action( 'sensei_single_quiz_questions_before', array( 'Sensei_Quiz', 'the_quiz_progress_bar' ), 20 );
+
 // @since 1.9.0
 // hook in the question title, description and quesiton media
 add_action( 'sensei_quiz_question_inside_before', array( 'Sensei_Question', 'the_question_title' ), 10 );
 add_action( 'sensei_quiz_question_inside_before', array( 'Sensei_Question', 'the_question_description' ), 20 );
 add_action( 'sensei_quiz_question_inside_before', array( 'Sensei_Question', 'the_question_media' ), 30 );
-add_action( 'sensei_quiz_question_inside_before', array( 'Sensei_Question', 'the_question_hidden_fields' ), 40 );
-
-// @since 1.9.0
-// hook in incorrect / correct message below questions if the quiz has been graded
-add_action( 'sensei_quiz_question_inside_after', array( 'Sensei_Question', 'the_answer_result_indication' ) );
 
 // @since 1.9.0
 // add answer grading feedback at the bottom of the question
-add_action( 'sensei_quiz_question_inside_after', array( 'Sensei_Question', 'answer_feedback_notes' ) );
+add_action( 'sensei_quiz_question_inside_after', array( 'Sensei_Question', 'the_answer_feedback' ) );
 
 // @since 1.9.0
 // add extra question data for different quesiton types when get_question_template_data_is_called.
 add_filter( 'sensei_get_question_template_data', array( 'Sensei_Question', 'multiple_choice_load_question_data' ), 10, 3 );
 add_filter( 'sensei_get_question_template_data', array( 'Sensei_Question', 'gap_fill_load_question_data' ), 10, 3 );
 add_filter( 'sensei_get_question_template_data', array( 'Sensei_Question', 'file_upload_load_question_data' ), 10, 3 );
+
+// @since 3.15.0
+// Add the quiz pagination.
+add_action( 'sensei_single_quiz_questions_after', array( 'Sensei_Quiz', 'the_quiz_pagination' ), 9, 0 );
 
 // @since 1.9.0
 // deprecate the quiz button action
@@ -315,3 +322,4 @@ add_action( 'sensei_course_results_content_inside_before', array( $sensei->notic
 add_action( 'sensei_single_course_content_inside_before', array( $sensei->notices, 'maybe_print_notices' ), 40 );
 add_action( 'sensei_single_lesson_content_inside_before', array( $sensei->notices, 'maybe_print_notices' ), 40 );
 add_action( 'sensei_taxonomy_module_content_inside_before', array( $sensei->notices, 'maybe_print_notices' ), 40 );
+add_action( 'sensei_single_quiz_content_inside_before', array( $sensei->notices, 'maybe_print_notices' ), 50 );

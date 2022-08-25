@@ -67,6 +67,7 @@ class Sensei_Frontend {
 		add_action( 'sensei_lesson_archive_lesson_title', array( $this, 'sensei_lesson_archive_lesson_title' ), 10 );
 		add_action( 'wp', array( $this, 'sensei_complete_lesson' ), 10 );
 		add_action( 'wp_head', array( $this, 'sensei_complete_course' ), 10 );
+		add_action( 'sensei_course_status_updated', array( $this, 'redirect_to_course_completed_page' ), 1000, 3 );
 		add_action( 'sensei_frontend_messages', array( $this, 'sensei_frontend_messages' ) );
 		add_action( 'sensei_lesson_video', array( $this, 'sensei_lesson_video' ), 10, 1 );
 		add_action( 'sensei_complete_lesson_button', array( $this, 'sensei_complete_lesson_button' ) );
@@ -142,7 +143,7 @@ class Sensei_Frontend {
 				wp_enqueue_script( 'sensei-course-archive-js' );
 
 			}
-
+			Sensei()->assets->register( 'sensei-quiz-progress', 'blocks/progress-bar.js' );
 			Sensei()->assets->register( 'sensei-stop-double-submission', 'js/stop-double-submission.js', [], true );
 			Sensei()->assets->register( Sensei()->token . '-user-dashboard', 'js/user-dashboard.js', [ 'jquery-ui-tabs' ], true );
 
@@ -160,37 +161,16 @@ class Sensei_Frontend {
 	 * @return void
 	 */
 	public function enqueue_styles() {
+		Sensei()->assets->enqueue( 'pages-frontend', 'css/pages-frontend.css' );
 
 		$disable_styles = Sensei_Utils::get_setting_as_flag( 'styles_disable', 'sensei_disable_styles' );
 
 		if ( ! $disable_styles ) {
-
 			Sensei()->assets->enqueue( Sensei()->token . '-frontend', 'css/frontend.css', [], 'screen' );
 
 			// Allow additional stylesheets to be loaded.
 			do_action( 'sensei_additional_styles' );
-
 		}
-
-	}
-
-
-	/**
-	 * Get template part.
-	 *
-	 * @deprecated since 1.9.0 use Sensei_Templates::get_part
-	 * @access public
-	 * @param mixed  $slug Template slug.
-	 * @param string $name Optional. Template name. Default ''.
-	 * @return void
-	 */
-	function sensei_get_template_part( $slug, $name = '' ) {
-
-		// To be removed in 5.0.0.
-		_deprecated_function( __METHOD__, '1.9.0', 'Sensei_Templates::get_part' );
-
-		Sensei_Templates::get_part( $slug, $name );
-
 	}
 
 	/**
@@ -292,6 +272,10 @@ class Sensei_Frontend {
 			}
 
 			Sensei_Templates::get_template( 'globals/pagination-quiz.php' );
+
+		} elseif ( Sensei_Utils::is_course_results_page() ) {
+			// Pagination content for legacy course results page here.
+			return;
 
 		} else {
 
@@ -459,60 +443,6 @@ class Sensei_Frontend {
 			$classes[] = 'post';
 		}
 		return $classes;
-	}
-
-	/**
-	 * Outputs the course image.
-	 *
-	 * @deprecated since 1.9.0 use Sensei()->course->course_image
-	 * @param int    $course_id Course ID.
-	 * @param string $width Optional. Image width. Default '100'.
-	 * @param string $height Optional. Image height. Default '100'.
-	 * @param bool   $return true if the image should be returned, false if the image should be
-	 *                       echoed.
-	 * @return string|null Course image or null if the image was echoed.
-	 */
-	function sensei_course_image( $course_id, $width = '100', $height = '100', $return = false ) {
-
-		// To be removed in 5.0.0.
-		_deprecated_function( __METHOD__, '1.9.0', 'Sensei()->course->course_image' );
-		if ( ! $return ) {
-
-			echo wp_kses_post( Sensei()->course->course_image( $course_id, $width, $height ) );
-			return '';
-
-		}
-
-		return Sensei()->course->course_image( $course_id, $width, $height );
-
-	}
-
-	/**
-	 * Outputs the lesson image.
-	 *
-	 * @since  1.2.0
-	 * @deprecated since 1.9.0 use Sensei()->lesson->lesson_image
-	 * @param int        $lesson_id Lesson ID.
-	 * @param string     $width Optional. Image width. Default '100'.
-	 * @param string     $height Optional. Image height. Default '100'.
-	 * @param bool       $return true if the image should be returned, false if the image should be
-	 *                           echoed.
-	 * @param bool|false $widget Widget.
-	 * @return string Lesson image or empty string if the image was echoed.
-	 */
-	function sensei_lesson_image( $lesson_id, $width = '100', $height = '100', $return = false, $widget = false ) {
-
-		// To be removed in 5.0.0.
-		_deprecated_function( __METHOD__, '1.9.0', 'Sensei()->lesson->lesson_image' );
-
-		if ( ! $return ) {
-
-			echo wp_kses_post( Sensei()->lesson->lesson_image( $lesson_id, $width, $height, $widget ) );
-			return '';
-		}
-
-		return Sensei()->lesson->lesson_image( $lesson_id, $width, $height, $widget );
-
 	}
 
 	/**
@@ -774,6 +704,29 @@ class Sensei_Frontend {
 	}
 
 	/**
+	 * Redirect to the course completed page, if applicable.
+	 *
+	 * @since 3.13.0
+	 * @access private
+	 *
+	 * @param string $status    Course status.
+	 * @param int    $user_id   The user ID (unused).
+	 * @param int    $course_id The course ID.
+	 */
+	public function redirect_to_course_completed_page( $status, $user_id, $course_id ) {
+		if ( 'complete' !== $status || ! $course_id ) {
+			return;
+		}
+
+		$url = Sensei_Course::get_course_completed_page_url( $course_id );
+
+		if ( $url ) {
+			wp_safe_redirect( esc_url_raw( $url ) );
+			exit;
+		}
+	}
+
+	/**
 	 * Marks a course as complete.
 	 */
 	public function sensei_complete_course() {
@@ -819,27 +772,6 @@ class Sensei_Frontend {
 							. '</div></header>';
 					}
 
-					break;
-
-				/**
-				 * Handle the Delete Course button. This is deprecated and will
-				 * be removed.
-				 *
-				 * @deprecated 2.0.0
-				 */
-				case __( 'Delete Course', 'sensei-lms' ):
-					_doing_it_wrong(
-						'Sensei_Frontend::sensei_complete_course',
-						'Handling for "Delete Course" button will be removed in version 4.0.',
-						'2.0.0'
-					);
-					Sensei_Utils::sensei_remove_user_from_course( $sanitized_course_id, $current_user->ID );
-
-					// Success message.
-					$this->messages = '<header class="archive-header"><div class="sensei-message tick">'
-						// translators: Placeholder is the Course title.
-						. sprintf( __( '%1$s deleted.', 'sensei-lms' ), get_the_title( $sanitized_course_id ) )
-						. '</div></header>';
 					break;
 
 				default:
@@ -934,21 +866,22 @@ class Sensei_Frontend {
 		if ( false === Sensei()->lesson->lesson_has_quiz_with_questions_and_pass_required( $lesson_id ) ) {
 
 			wp_enqueue_script( 'sensei-stop-double-submission' );
-
 			?>
-			<form class="lesson_button_form" method="POST" action="<?php echo esc_url( get_permalink() ); ?>">
+			<form class="lesson_button_form" data-id="complete-lesson-form" method="POST" action="<?php echo esc_url( get_permalink() ); ?>">
 				<input type="hidden"
-					   name="woothemes_sensei_complete_lesson_noonce"
-					   id="woothemes_sensei_complete_lesson_noonce"
-					   value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_complete_lesson_noonce' ) ); ?>"
+					name="woothemes_sensei_complete_lesson_noonce"
+					id="woothemes_sensei_complete_lesson_noonce"
+					value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_complete_lesson_noonce' ) ); ?>"
 				/>
 
 				<input type="hidden" name="quiz_action" value="lesson-complete" />
 
 				<input type="submit"
-					   name="quiz_complete"
-					   class="quiz-submit complete sensei-stop-double-submission"
-					   value="<?php esc_attr_e( 'Complete Lesson', 'sensei-lms' ); ?>"/>
+					name="quiz_complete"
+					class="quiz-submit complete sensei-stop-double-submission"
+					data-id="complete-lesson-button"
+					value="<?php esc_attr_e( 'Complete Lesson', 'sensei-lms' ); ?>"
+				/>
 
 			</form>
 			<?php
@@ -987,20 +920,6 @@ class Sensei_Frontend {
 		</form>
 			<?php
 		}
-	}
-
-	/**
-	 * Outputs the quiz buttons and messages.
-	 *
-	 * @deprecated since 1.9.0 use Sensei_Lesson::footer_quiz_call_to_action()
-	 */
-	public function sensei_lesson_quiz_meta() {
-
-		// To be removed in 5.0.0.
-		_deprecated_function( __METHOD__, '1.9.0', 'Sensei_Lesson::footer_quiz_call_to_action' );
-
-		Sensei_Lesson::footer_quiz_call_to_action();
-
 	}
 
 	public function sensei_course_archive_meta() {
@@ -1127,15 +1046,12 @@ class Sensei_Frontend {
 			<?php
 			if ( get_option( 'users_can_register' ) ) {
 
-				// get current url.
-				$action_url = get_permalink();
-
 				?>
 
 				<div class="col-2">
 					<h2><?php esc_html_e( 'Register', 'sensei-lms' ); ?></h2>
 
-					<form method="post" class="register"  action="<?php echo esc_url( $action_url ); ?>" >
+					<form method="post" class="register">
 
 						<?php do_action( 'sensei_register_form_start' ); ?>
 
@@ -1321,35 +1237,21 @@ class Sensei_Frontend {
 	 * @return bool True if successful.
 	 */
 	public function manually_enrol_learner( $user_id, $course_id ) {
-		$enrolment_manager = Sensei_Course_Enrolment_Manager::instance();
-		$manual_enrolment  = $enrolment_manager->get_manual_enrolment_provider();
+		$course_enrolment = Sensei_Course_Enrolment::get_course_instance( $course_id );
 
-		return $manual_enrolment && $manual_enrolment->enrol_learner( $user_id, $course_id );
-	}
-
-	/**
-	 * This function shows the WooCommerce cart notice if the user has
-	 * added the current course to cart. It does not show if the user is already taking
-	 * the course.
-	 *
-	 * @since 1.0.2
-	 * @deprecated 2.0.0 Replaced with WCPC plugin's Sensei_WC::course_in_cart_message method.
-	 *
-	 * @return void
-	 */
-	public function sensei_woocommerce_in_cart_message() {
-		_deprecated_function( __METHOD__, '2.0.0', 'Sensei_WC::course_in_cart_message' );
-
-		if ( ! method_exists( 'Sensei_WC', 'course_in_cart_message' ) ) {
-			return;
+		// If user is removed, just restore it.
+		if ( $course_enrolment->is_learner_removed( $user_id ) ) {
+			$course_enrolment->restore_learner( $user_id );
 		}
 
-		Sensei_WC::course_in_cart_message();
-	}
+		$enrolment_manager         = Sensei_Course_Enrolment_Manager::instance();
+		$manual_enrolment_provider = $enrolment_manager->get_manual_enrolment_provider();
 
-	// Deprecated.
-	public function sensei_lesson_comment_count( $count ) {
-		return $count;
+		if ( ! ( $manual_enrolment_provider instanceof Sensei_Course_Manual_Enrolment_Provider ) ) {
+			return false;
+		}
+
+		return $manual_enrolment_provider->enrol_learner( $user_id, $course_id );
 	}
 
 	/**
@@ -1371,58 +1273,6 @@ class Sensei_Frontend {
 		}
 
 		return $content;
-	}
-
-	/**
-	 * Remove active course when an order is refunded or cancelled.
-	 *
-	 * @deprecated 2.0.0 Moved to WCPC plugin. Use \Sensei_WC_Paid_Courses\Courses::remove_active_course
-	 *
-	 * @param  integer $order_id ID of order.
-	 * @return void
-	 */
-	public function remove_active_course( $order_id ) {
-		_deprecated_function( __METHOD__, '2.0.0', '\Sensei_WC_Paid_Courses\Courses::remove_active_course' );
-
-		if ( ! method_exists( 'Sensei_WC_Paid_Courses\Courses', 'remove_active_course' ) ) {
-			return;
-		}
-
-		\Sensei_WC_Paid_Courses\Courses::remove_active_course( $order_id );
-	}
-
-	/**
-	 * Activate all purchased courses for user.
-	 *
-	 * @deprecated 2.0.0 Use `\Sensei_WC_Paid_Courses\Courses::activate_purchased_courses()` if it exists.
-	 * @since  1.4.8
-	 * @param  integer $user_id User ID.
-	 * @return void
-	 */
-	public function activate_purchased_courses( $user_id = 0 ) {
-		_deprecated_function( __METHOD__, '2.0.0', '\Sensei_WC_Paid_Courses\Courses::activate_purchased_courses' );
-
-		if ( ! method_exists( '\Sensei_WC_Paid_Courses\Courses', 'activate_purchased_courses' ) ) {
-			return;
-		}
-
-		\Sensei_WC_Paid_Courses\Courses::instance()->activate_purchased_courses( $user_id );
-	}
-
-	/**
-	 * Activate single course if already purchases.
-	 *
-	 * @deprecated 2.0.0 Use `\Sensei_WC_Paid_Courses\Courses::activate_purchased_single_course()` if it exists.
-	 * @return void
-	 */
-	public function activate_purchased_single_course() {
-		_deprecated_function( __METHOD__, '2.0.0', '\Sensei_WC_Paid_Courses\Courses::activate_purchased_single_course' );
-
-		if ( ! method_exists( '\Sensei_WC_Paid_Courses\Courses', 'activate_purchased_single_course' ) ) {
-			return;
-		}
-
-		\Sensei_WC_Paid_Courses\Courses::instance()->activate_purchased_single_course();
 	}
 
 	/**
@@ -1535,16 +1385,29 @@ class Sensei_Frontend {
 					wp_redirect( esc_url_raw( add_query_arg( 'login', 'failed', $referrer ) ) );
 					exit;
 				} else { // on login success.
+					$redirect_to = isset( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : remove_query_arg( 'login', $referrer );
 
 					/**
-					* Change the redirect url programatically.
-					*
-					* @since 1.6.1
-					*
-					* @param string $referrer the page where the current url wheresensei login form was posted from.
-					*/
+					 * Change the redirect url programatically.
+					 *
+					 * @since 1.6.1
+					 * @deprecated 3.15.0 Use `sensei_login_success_redirect_url` instead.
+					 *
+					 * @param string $referrer the page where the current url wheresensei login form was posted from.
+					 */
+					$success_redirect_url = apply_filters_deprecated( 'sesei_login_success_redirect_url', [ $redirect_to ], 'sensei_login_success_redirect_url', 'Use `sensei_login_success_redirect_url` instead' );
 
-					$success_redirect_url = apply_filters( 'sesei_login_success_redirect_url', remove_query_arg( 'login', $referrer ) );
+					/**
+					 * Change the redirect url programatically.
+					 *
+					 * @hook sensei_login_success_redirect_url
+					 * @since 3.15.0
+					 *
+					 * @param {string} $referrer The page where the current url wheresensei login form was posted from.
+					 *
+					 * @return {string} The redirect URL if login is successful.
+					 */
+					$success_redirect_url = apply_filters( 'sensei_login_success_redirect_url', $success_redirect_url );
 
 					wp_redirect( esc_url_raw( $success_redirect_url ) );
 					exit;
@@ -1646,13 +1509,7 @@ class Sensei_Frontend {
 			Sensei()->notices->add_notice( sprintf( __( '<strong>ERROR</strong>: Couldn&#8217;t register you&hellip; please contact the <a href="mailto:%s">webmaster</a> !', 'sensei-lms' ), get_option( 'admin_email' ) ), 'alert' );
 		}
 
-		// Notify the Admin and not the user. See https://github.com/Automattic/sensei/issues/1761.
-		global $wp_version;
-		if ( version_compare( $wp_version, '4.3.1', '>=' ) ) {
-			wp_new_user_notification( $user_id, null, 'admin' );
-		} else {
-			wp_new_user_notification( $user_id, $new_user_password );
-		}
+		wp_new_user_notification( $user_id, null, 'admin' );
 
 		// phpcs:ignore WordPress.WP.GlobalVariablesOverride.Prohibited -- Log in recently registered user.
 		$current_user = get_user_by( 'id', $user_id );
@@ -1666,7 +1523,9 @@ class Sensei_Frontend {
 			$redirect = esc_url( home_url( $wp->request ) );
 		}
 
-		wp_redirect( apply_filters( 'sensei_registration_redirect', $redirect ) );
+		$redirect_to = isset( $_REQUEST['redirect_to'] ) ? esc_url_raw( wp_unslash( $_REQUEST['redirect_to'] ) ) : $redirect;
+
+		wp_redirect( apply_filters( 'sensei_registration_redirect', $redirect_to ) );
 		exit;
 
 	}

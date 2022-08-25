@@ -3,17 +3,18 @@
  *
  * @since 5.1.0
  */
-@import "utilities/_all.pcss";
+
+@import 'utilities/_all.pcss';
 
 .event-tickets,
 .entry .entry-content .event-tickets {
 
 	.tribe-tickets__iac-email-disclaimer {
-		padding: var(--spacer-2) 0 var(--spacer-6) 0;
-		color: var(--color-text-primary-light);
+		color: var(--tec-color-text-primary-light);
+		padding: var(--tec-spacer-2) 0 var(--tec-spacer-6) 0;
 
-		@media(--viewport-medium) {
-			padding: calc(var(--spacer-4) / 2) 0 var(--spacer-6) 0;
+		@media (--viewport-medium) {
+			padding: calc(var(--tec-spacer-4) / 2) 0 var(--tec-spacer-6) 0;
 		}
 	}
 }

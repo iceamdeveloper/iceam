@@ -30,6 +30,7 @@ class Tribe_Tickets_Rsvp extends Shortcode_Abstract {
 	 */
 	protected $default_arguments = [
 		'post_id' => null,
+		'ticket_id' => null,
 	];
 
 	/**
@@ -68,9 +69,17 @@ class Tribe_Tickets_Rsvp extends Shortcode_Abstract {
 			return '';
 		}
 
-		$post_id = $this->get_argument( 'post_id' );
+		$post_id   = $this->get_argument( 'post_id' );
+		$ticket_id = $this->get_argument( 'ticket_id' );
 
-		return $this->get_rsvp_block( $post_id );
+		if ( empty( $post_id ) || empty( $ticket_id ) ) {
+			return $this->get_rsvp_block( $post_id );
+		}
+		
+		// When post id and ticket id are present, send array of ticket ids to include.
+		$include_tickets = array_map( 'intval', explode( ',', $ticket_id ) );
+		
+		return $this->get_rsvp_block( $post_id, $include_tickets );
 	}
 
 	/**
@@ -80,9 +89,9 @@ class Tribe_Tickets_Rsvp extends Shortcode_Abstract {
 	 *
 	 * @return string HTML.
 	 */
-	public function get_rsvp_block( $post ) {
+	public function get_rsvp_block( $post, $include_tickets = [] ) {
 		$tickets_view = Tickets_View::instance();
 
-		return $tickets_view->get_rsvp_block( $post, false );
+		return $tickets_view->get_rsvp_block( $post, false, $include_tickets );
 	}
 }

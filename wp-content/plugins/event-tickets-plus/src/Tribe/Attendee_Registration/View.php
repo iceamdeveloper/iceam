@@ -21,7 +21,7 @@ class View extends Tribe__Tickets_Plus__Template {
 	 * @return string The Attendee Registration page content.
 	 */
 	public function get_page_content() {
-		$q_provider       = tribe_get_request_var( 'provider', false );
+		$q_provider       = tribe_get_request_var( tribe_tickets_get_provider_query_slug() );
 		$tickets_in_cart  = Tribe__Tickets__Tickets::get_tickets_in_cart_for_provider( $q_provider );
 		$events           = [];
 		$providers        = [];
@@ -140,7 +140,7 @@ class View extends Tribe__Tickets_Plus__Template {
 		];
 
 		if ( tribe_tickets_new_views_is_enabled() ) {
-			$provider     = tribe_get_request_var( 'provider' );
+			$provider     = tribe_get_request_var( 'provider', tribe_get_request_var( 'tickets_provider' ) );
 			$provider_obj = null;
 
 			if ( empty( $provider ) ) {

@@ -43,7 +43,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	 * @param string $from_status WooCommerce Status (from)
 	 */
 	public function save_attendee_meta_to_order( $order_id, $from_status = null ) {
-		$order       = new WC_Order( $order_id );
+		$order       = wc_get_order( $order_id );
+
+		// Bail if order is empty.
+		if ( empty( $order ) ) {
+			return;
+		}
+
 		$order_items = $order->get_items();
 
 		// Bail if the order is empty

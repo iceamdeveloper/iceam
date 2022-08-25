@@ -39,7 +39,6 @@ final class Sensei_Extensions {
 	 */
 	public function init() {
 		add_action( 'admin_enqueue_scripts', array( $this, 'enqueue_admin_assets' ) );
-		add_action( 'admin_menu', array( $this, 'add_admin_menu_item' ), 60 );
 	}
 
 	/**
@@ -51,7 +50,7 @@ final class Sensei_Extensions {
 	public function enqueue_admin_assets() {
 		$screen = get_current_screen();
 
-		if ( in_array( $screen->id, [ 'sensei-lms_page_sensei-extensions' ], true ) ) {
+		if ( in_array( $screen->id, [ 'course_page_sensei-extensions' ], true ) ) {
 			Sensei()->assets->enqueue( 'sensei-extensions', 'extensions/index.js', [], true );
 			Sensei()->assets->enqueue( 'sensei-extensions-style', 'extensions/extensions.css', [ 'sensei-wp-components' ] );
 			Sensei()->assets->preload_data( [ '/sensei-internal/v1/sensei-extensions?type=plugin' ] );
@@ -113,7 +112,7 @@ final class Sensei_Extensions {
 	 * @return array
 	 */
 	public function get_extensions( $type = null, $category = null, $additional_query_args = [] ) {
-		$extension_request_key = md5( $type . '|' . $category . '|' . determine_locale() . '|' . wp_json_encode( $additional_query_args ) );
+		$extension_request_key = md5( $type . '|' . $category . '|' . determine_locale() . '|' . wp_json_encode( $additional_query_args ) . '|' . self::SENSEILMS_PRODUCTS_API_BASE_URL );
 		$extensions            = get_transient( 'sensei_extensions_' . $extension_request_key );
 
 		if ( false === $extensions ) {
@@ -138,6 +137,10 @@ final class Sensei_Extensions {
 
 				set_transient( 'sensei_extensions_' . $extension_request_key, $extensions, DAY_IN_SECONDS );
 			}
+		}
+
+		if ( empty( $extensions ) ) {
+			return [];
 		}
 
 		if ( 'plugin' === $type ) {
@@ -203,8 +206,17 @@ final class Sensei_Extensions {
 	 * @return array
 	 */
 	public function get_layout() {
-		$transient_key    = implode( '_', [ 'sensei_extensions_layout', determine_locale() ] );
+		$transient_key = implode(
+			'_',
+			[
+				'sensei_extensions_layout',
+				determine_locale(),
+				md5( self::SENSEILMS_PRODUCTS_API_BASE_URL ),
+			]
+		);
+
 		$extension_layout = get_transient( $transient_key );
+
 		if ( false === $extension_layout ) {
 			$raw_layout = wp_safe_remote_get(
 				add_query_arg(
@@ -221,68 +233,6 @@ final class Sensei_Extensions {
 		}
 
 		return $extension_layout;
-	}
-
-	/**
-	 * Get resources (such as categories and product types) for the extensions screen.
-	 *
-	 * @since  2.0.0
-	 *
-	 * @return array of objects.
-	 */
-	private function get_resources() {
-		$extension_resources = get_transient( 'sensei_extensions_resources' );
-		if ( false === $extension_resources ) {
-			$raw_resources = wp_safe_remote_get(
-				add_query_arg(
-					array(
-						'version' => Sensei()->version,
-						'lang'    => determine_locale(),
-					),
-					self::SENSEILMS_PRODUCTS_API_BASE_URL . '/resources'
-				)
-			);
-			if ( ! is_wp_error( $raw_resources ) ) {
-				$extension_resources = json_decode( wp_remote_retrieve_body( $raw_resources ) );
-				if ( $extension_resources ) {
-					set_transient( 'sensei_extensions_resources', $extension_resources, DAY_IN_SECONDS );
-				}
-			}
-		}
-
-		return $extension_resources;
-	}
-
-	/**
-	 * Get messages for the extensions page.
-	 *
-	 * @since  2.0.0
-	 *
-	 * @return array
-	 */
-	private function get_messages() {
-		$transient_key      = implode( '_', [ 'sensei_extensions_messages', Sensei()->version, determine_locale() ] );
-		$extension_messages = get_transient( $transient_key );
-		if ( false === $extension_messages ) {
-			$raw_messages = wp_safe_remote_get(
-				add_query_arg(
-					array(
-						'version' => Sensei()->version,
-						'lang'    => determine_locale(),
-					),
-					self::SENSEILMS_PRODUCTS_API_BASE_URL . '/messages'
-				)
-			);
-
-			if ( ! is_wp_error( $raw_messages ) ) {
-				$extension_messages = json_decode( wp_remote_retrieve_body( $raw_messages ) );
-				if ( $extension_messages ) {
-					set_transient( $transient_key, $extension_messages, DAY_IN_SECONDS );
-				}
-			}
-		}
-
-		return $extension_messages;
 	}
 
 	/**
@@ -329,6 +279,7 @@ final class Sensei_Extensions {
 	 * Adds the menu item for the Extensions page.
 	 *
 	 * @since  2.0.0
+	 *
 	 * @access private
 	 */
 	public function add_admin_menu_item() {
@@ -340,7 +291,7 @@ final class Sensei_Extensions {
 		}
 
 		add_submenu_page(
-			'sensei',
+			'edit.php?post_type=course',
 			__( 'Sensei LMS Extensions', 'sensei-lms' ),
 			__( 'Extensions', 'sensei-lms' ) . $updates_html,
 			'install_plugins',

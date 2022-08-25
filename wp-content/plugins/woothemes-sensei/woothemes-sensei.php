@@ -1,18 +1,19 @@
 <?php
 /**
- * Plugin Name: Sensei with WooCommerce Paid Courses
- * Plugin URI: https://woocommerce.com/products/sensei/
+ * Plugin Name: Sensei Pro (WC Paid Courses)
+ * Plugin URI: https://senseilms.com
  * Description: Whether you want to teach, tutor or train, we have you covered.
- * Version: 3.11.0.2.3.3
+ * Version: 4.4.3.1.3.0
  * Author: Automattic
  * Author URI: https://automattic.com
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Requires at least: 5.4
- * Tested up to: 5.6
+ * Requires at least: 5.7
+ * Tested up to: 5.9.3
  * Requires PHP: 7.0
- * WC requires at least: 3.0
- * WC tested up to: 5.0
+ * WC requires at least: 4.0
+ * WC tested up to: 6.1.1
  * Text Domain: sensei-compat
+ * Domain Path: /languages
  *
  * Woo: 152116:bad2a02a063555b7e2bee59924690763
  *
@@ -22,15 +23,20 @@
 define( 'SENSEI_COMPAT_PLUGIN', true );
 define( 'SENSEI_COMPAT_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-require_once dirname( __FILE__ ) . '/class-sensei-compat-dependency-checker.php';
+require_once dirname( __FILE__ ) . '/sensei-compat-conflicts-checker.php';
+if ( woothemes_sensei_has_conflicts() ) {
+	return;
+}
 
-if ( Sensei_Compat_Dependency_Checker::is_php_version_at_least( '5.6.0' ) ) {
+require_once dirname( __FILE__ ) . '/class-sensei-compat-dependency-checker.php';
+if ( Sensei_Compat_Dependency_Checker::is_php_version_at_least( '7.2.0' ) ) {
 	add_action( 'admin_notices', array( 'Sensei_Compat_Dependency_Checker', 'show_php_notice' ) );
 	add_action( 'admin_init', array( 'Sensei_Compat_Dependency_Checker', 'deactivate_self' ) );
 	return;
 }
 
 add_action( 'plugins_loaded', 'sensei_compat_load', 1 );
+add_action( 'init', 'sensei_compat_load_i18n', 10 );
 register_activation_hook( __FILE__, 'sensei_compat_activate' );
 register_deactivation_hook( __FILE__, 'sensei_compat_deactivate' );
 
@@ -40,7 +46,17 @@ if ( is_admin() ) {
 }
 
 /**
- * Load Sensei with WooCommerce Paid Courses.
+ * Load the plugin text domain. Sensei LMS handles its own text domain. Sensei Pro is
+ * usually registered from the plugin header.
+ *
+ * @access private
+ */
+function sensei_compat_load_i18n() {
+	load_plugin_textdomain( 'sensei-pro' );
+}
+
+/**
+ * Load Sensei Pro (WC Paid Courses).
  *
  * @since 1.0.0
  * @access private
@@ -56,7 +72,7 @@ function sensei_compat_load() {
 		add_action( 'admin_notices', array( 'Sensei_Compat_Dependency_Checker', 'show_legacy_sensei_notice' ) );
 		add_action( 'admin_init', array( 'Sensei_Compat_Dependency_Checker', 'deactivate_self' ) );
 		define( 'SENSEI_COMPAT_LOADING_SENSEI', false );
-		define( 'SENSEI_COMPAT_LOADING_WC_PAID_COURSES', false );
+		define( 'SENSEI_COMPAT_LOADING_SENSEI_PRO', false );
 		return;
 	}
 
@@ -64,6 +80,8 @@ function sensei_compat_load() {
 		define( 'SENSEI_COMPAT_LOADING_SENSEI', true );
 
 		add_filter( 'load_textdomain_mofile', 'sensei_compat_load_sensei_static_translations', 10, 2 );
+		add_filter( 'load_script_textdomain_relative_path', 'sensei_filter_script_textdomain_relative_path' );
+		add_filter( 'loco_compile_script_reference', 'woothemes_sensei_fix_correct_path_check_for_loco_translate', 999, 3 );
 
 		require_once dirname( __FILE__ ) . '/plugins/sensei-lms/sensei-lms.php';
 
@@ -75,15 +93,33 @@ function sensei_compat_load() {
 		define( 'SENSEI_COMPAT_LOADING_SENSEI', false );
 	}
 
-	if ( Sensei_Compat_Dependency_Checker::is_woocommerce_active() ) {
-		define( 'SENSEI_COMPAT_LOADING_WC_PAID_COURSES', true );
-		require_once dirname( __FILE__ ) . '/plugins/sensei-wc-paid-courses/sensei-wc-paid-courses.php';
-	} else {
-		define( 'SENSEI_COMPAT_LOADING_WC_PAID_COURSES', false );
-		if ( ! Sensei_Compat_Dependency_Checker::is_woothemes_updater_active() ) {
-			add_action( 'admin_notices', array( 'Sensei_Compat_Dependency_Checker', 'show_woocommerce_notice' ) );
-		}
+	define( 'SENSEI_COMPAT_LOADING_SENSEI_PRO', true );
+	require_once dirname( __FILE__ ) . '/plugins/sensei-pro/sensei-pro.php';
+}
+
+/**
+ * We are tweaking the relative path for translations (see `sensei_filter_script_textdomain_relative_path`).
+ * so that we can still use existing translations (despite files being packaged in a different way).
+ *
+ * Unfortunately Loco Translate checks for the JS file to exist before JSON translations are generated.
+ * Here we are checking for the correct path ourselves thanks to a hook provided by Loco Translate.
+ * More details here: https://wordpress.org/support/topic/request-disable-file-existence-check-to-generate-json-files
+ * If we don't do this, translations for JS won't be generated when using Loco Translate.
+ *
+ * @param boolean $bool     Whether the JS file exists or not.
+ * @param string  $relative Path for the JS file.
+ * @param string  $domain   Translation domain.
+ * @return bool
+ */
+function woothemes_sensei_fix_correct_path_check_for_loco_translate( $bool, $relative, $domain ) {
+	if ( 'sensei-pro' === $domain ) {
+		return file_exists( __DIR__ . '/plugins/sensei-pro/' . $relative );
 	}
+	if ( 'sensei-lms' === $domain ) {
+		return file_exists( __DIR__ . '/plugins/sensei-lms/' . $relative );
+	}
+
+	return $bool;
 }
 
 /**
@@ -109,6 +145,25 @@ function sensei_compat_load_sensei_static_translations( $mofile, $domain ) {
 }
 
 /**
+ * Filters the relative path to fix textdomain JSON filename hash.
+ *
+ * @since  2.4.0
+ * @access private
+ *
+ * @param string $relative Relative path to the script file.
+ *
+ * @return string Filtered relative.
+ */
+function sensei_filter_script_textdomain_relative_path( $relative ) {
+	$sensei_prefix     = 'plugins/sensei-lms/';
+	$sensei_pro_prefix = 'plugins/sensei-pro/';
+
+	$relative = preg_replace( '/^' . preg_quote( $sensei_prefix, '/' ) . '|^' . preg_quote( $sensei_pro_prefix, '/' ) . '/', '', $relative );
+
+	return $relative;
+}
+
+/**
  * Ensure that the activation hooks for the plugins are run.
  *
  * @since 1.0.0
@@ -116,16 +171,16 @@ function sensei_compat_load_sensei_static_translations( $mofile, $domain ) {
  */
 function sensei_compat_activate() {
 	sensei_compat_load();
-	if ( SENSEI_COMPAT_LOADING_SENSEI ) {
+	if ( defined( 'SENSEI_COMPAT_LOADING_SENSEI' ) && SENSEI_COMPAT_LOADING_SENSEI ) {
 		$sensei_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-lms/sensei-lms.php';
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'activate_' . plugin_basename( $sensei_plugin_file ) );
 	}
 
-	if ( SENSEI_COMPAT_LOADING_WC_PAID_COURSES ) {
-		$sensei_wcpc_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-wc-paid-courses/sensei-wc-paid-courses.php';
+	if ( defined( 'SENSEI_COMPAT_LOADING_SENSEI_PRO' ) && SENSEI_COMPAT_LOADING_SENSEI_PRO ) {
+		$sensei_pro_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-pro/sensei-pro.php';
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		do_action( 'activate_' . plugin_basename( $sensei_wcpc_plugin_file ) );
+		do_action( 'activate_' . plugin_basename( $sensei_pro_plugin_file ) );
 	}
 }
 
@@ -138,15 +193,15 @@ function sensei_compat_activate() {
  */
 function sensei_compat_deactivate() {
 	sensei_compat_load();
-	if ( SENSEI_COMPAT_LOADING_SENSEI ) {
+	if ( defined( 'SENSEI_COMPAT_LOADING_SENSEI' ) && SENSEI_COMPAT_LOADING_SENSEI ) {
 		$sensei_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-lms/sensei-lms.php';
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 		do_action( 'deactivate_' . plugin_basename( $sensei_plugin_file ) );
 	}
 
-	if ( SENSEI_COMPAT_LOADING_WC_PAID_COURSES ) {
-		$sensei_wcpc_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-wc-paid-courses/sensei-wc-paid-courses.php';
+	if ( defined( 'SENSEI_COMPAT_LOADING_SENSEI' ) && SENSEI_COMPAT_LOADING_SENSEI_PRO ) {
+		$sensei_pro_plugin_file = dirname( __FILE__ ) . '/plugins/sensei-pro/sensei-pro.php';
 		// phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
-		do_action( 'deactivate_' . plugin_basename( $sensei_wcpc_plugin_file ) );
+		do_action( 'deactivate_' . plugin_basename( $sensei_pro_plugin_file ) );
 	}
 }

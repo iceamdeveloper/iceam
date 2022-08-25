@@ -69,7 +69,7 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 		obj.maybeHideSavedFieldsSelect();
 		obj.maybeShowIacMockedFields();
 		obj.$event_tickets.trigger( 'event-tickets-plus-ticket-meta-initialized.tribe', {
-			ticket_id: obj.$event_tickets.find( '#ticket_id' ).val(),
+			ticket_id: obj.$event_tickets.find( '#ticket_id' ).val(), /* eslint-disable-line es5/no-es6-methods,max-len */
 		} );
 	};
 
@@ -277,11 +277,17 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 
 			obj.maybeHideSavedFieldsSelect();
 
-			obj.$event_tickets.trigger( 'event-tickets-plus-fieldset-loaded.tribe', { fieldset_id: savedFieldsetId } );
+			obj.$event_tickets.trigger(
+				'event-tickets-plus-fieldset-loaded.tribe',
+				{ fieldset_id: savedFieldsetId }
+			);
 		} );
 
 		fieldJqxhr.fail( function() {
-			obj.$event_tickets.trigger( 'event-tickets-plus-fieldset-load-failure.tribe', { fieldset_id: savedFieldsetId } );
+			obj.$event_tickets.trigger(
+				'event-tickets-plus-fieldset-load-failure.tribe',
+				{ fieldset_id: savedFieldsetId }
+			);
 		} );
 	};
 

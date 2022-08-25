@@ -5,7 +5,7 @@
  * src/resources/postcss/ file. For more information, check out our engineering
  * docs on how we handle CSS in our engineering docs.
  *
- * @see: http://moderntribe.github.io/products-engineering/css/
+ * @see: https://the-events-calendar.github.io/products-engineering/docs/code-standards/css/
  */
 
 /* -----------------------------------------------------------------------------
@@ -17,87 +17,7 @@
  *
  * ----------------------------------------------------------------------------- */
 
-/* Variables */
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Borders - Radius
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Borders - Width
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Layers of z-index
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Colors - Typography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Iconography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - UI
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Borders & Misc
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Forms - Colors
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Forms - Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Page
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Relative
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Opacities
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Spacers
-	 * ----------------------------------------------------------------------------- */
-}
+/* Variables - needed everywhere. */
 
 /* -----------------------------------------------------------------------------
  * SVG - Arrow Right
@@ -183,6 +103,8 @@
  * SVG - Messages
  * ----------------------------------------------------------------------------- */
 
+/* stylelint-disable-line block-no-empty */
+
 /* -----------------------------------------------------------------------------
  * SVG - Month
  * ----------------------------------------------------------------------------- */
@@ -190,6 +112,8 @@
 /* -----------------------------------------------------------------------------
  * SVG - No Map
  * ----------------------------------------------------------------------------- */
+
+/* stylelint-disable-line block-no-empty */
 
 /* -----------------------------------------------------------------------------
  * SVG - Paper Plane
@@ -231,29 +155,11 @@
  * SVG - Week
  * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Transitions
-	 * ----------------------------------------------------------------------------- */
-}
+/* -----------------------------------------------------------------------------
+ * SVG - Cal Export
+ * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Font Stacks
-	 * ----------------------------------------------------------------------------- */ /* stylelint-disable-line value-keyword-case */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Weights
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Sizing
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Line Height
-	 * ----------------------------------------------------------------------------- */
-}
+/* stylelint-disable-line block-no-empty */
 
 /* Mixins */
 
@@ -338,6 +244,13 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * Anchor - Event Title
+ *
+ * This mixin intentionally only affects the text and border _colors_
+ * to make sure they all follow the Customizer overrides.
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * Button - Global
  * ----------------------------------------------------------------------------- */
 
@@ -415,18 +328,18 @@
 .tribe-event-tickets-plus-meta-attendee > header {
 		color: #aaa;
 		display: block;
-		font-size: .8em;
+		font-size: 0.8em;
 		letter-spacing: 1px;
 		text-transform: uppercase;
 	}
 
-.tribe-event-tickets-plus-meta-attendee > header::after {
-			content: ' ' counter( section );
+.tribe-event-tickets-plus-meta-attendee > header:after {
+			content: ' ' counter(section);
 		}
 
 .tribe-tickets-meta-field-header {
 	display: block;
-	font-weight: 400;
+	font-weight: var(--tec-font-weight-regular);
 }
 
 .tribe-tickets-meta-fieldset header h3 {
@@ -445,17 +358,17 @@
 		margin: 0;
 	}
 
-.tribe-tickets-meta-required header:first-child::after,
-	.tribe-tickets-meta-required label:first-child::after {
+.tribe-tickets-meta-required header:first-child:after,
+	.tribe-tickets-meta-required label:first-child:after {
 		color: red;
 		content: '*';
-		margin-left: .5em;
+		margin-left: 0.5em;
 		position: absolute;
-		right: -.75em;
+		right: -0.75em;
 		top: 0;
 	}
 
-.tribe-tickets-meta-required .tribe-options label:first-child::after {
+.tribe-tickets-meta-required .tribe-options label:first-child:after {
 			content: '';
 		}
 
@@ -494,6 +407,16 @@
 		display: block;
 	}
 
+.tribe-attendees-list-item > span {
+		display: block;
+		margin-bottom: 5px;
+		margin-right: 5px;
+	}
+
+.tribe-attendees-list-item > span.tribe-attendees-list-hidden {
+			display: none;
+		}
+
 #tribe-events-content a.tribe-attendees-list-showall,
 a.tribe-attendees-list-showall {
 	box-shadow: none;
@@ -508,11 +431,11 @@ a.tribe-attendees-list-showall {
 			display: inline-block;
 		}
 
-.tribe-attendees-list-container a.tribe-attendees-list-showall.avatar:hover::before {
+.tribe-attendees-list-container a.tribe-attendees-list-showall.avatar:hover:before {
 				background-color: #ddd;
 			}
 
-.tribe-attendees-list-container a.tribe-attendees-list-showall.avatar::before {
+.tribe-attendees-list-container a.tribe-attendees-list-showall.avatar:before {
 				background-color: #eee;
 				bottom: 0;
 				content: '';
@@ -523,7 +446,7 @@ a.tribe-attendees-list-showall {
 				top: 0;
 			}
 
-.tribe-attendees-list-container a.tribe-attendees-list-showall.avatar::after {
+.tribe-attendees-list-container a.tribe-attendees-list-showall.avatar:after {
 				color: #444;
 				content: '\f132';
 				display: block;
@@ -538,22 +461,12 @@ a.tribe-attendees-list-showall {
 				top: 52%;
 			}
 
-.tribe-attendees-list-container.tribe-attendees-list-showjs a.tribe-attendees-list-showall.avatar::after {
+.tribe-attendees-list-container.tribe-attendees-list-showjs a.tribe-attendees-list-showall.avatar:after {
 			content: '\f460';
 		}
 
 .tribe-attendees-list-container.tribe-attendees-list-showjs .tribe-attendees-list-item > span.tribe-attendees-list-hidden {
 			display: block;
-		}
-
-.tribe-attendees-list-item > span {
-		display: block;
-		margin-bottom: 5px;
-		margin-right: 5px;
-	}
-
-.tribe-attendees-list-item > span.tribe-attendees-list-hidden {
-			display: none;
 		}
 
 .tribe-tickets-attendees-list-optout label {
@@ -567,8 +480,8 @@ a.tribe-attendees-list-showall {
 
 .tribe-orders-list {
 	list-style: none;
-	padding: 0;
 	margin: 0;
+	padding: 0;
 }
 
 .tribe-orders-list > .tribe-item {
@@ -577,12 +490,12 @@ a.tribe-attendees-list-showall {
 
 .tribe-orders-list .tribe-tickets-list {
 		list-style: none;
-		padding: 0;
 		margin: 0;
+		padding: 0;
 	}
 
 .tribe-orders-list .tribe-tickets-list > .tribe-item {
-			background-color: #fff;
+			background-color: var(--tec-color-background);
 			border: 1px solid #ededed;
 			border-bottom: 0;
 			padding: 20px;
@@ -608,8 +521,8 @@ a.tribe-attendees-list-showall {
 			}
 
 .tribe-orders-list .tribe-tickets-list > .tribe-item .tribe-answer {
-				float: right;
 				display: block;
+				float: right;
 			}
 
 .tribe-orders-list .tribe-tickets-list > .tribe-item table {
@@ -624,9 +537,9 @@ a.tribe-attendees-list-showall {
 /* Attendee Meta on orders-tickets.php */
 
 .attendee-meta.toggle {
-	font-size: 90%;
 	cursor: pointer;
 	display: block;
+	font-size: 90%;
 	margin-bottom: 10px;
 }
 
@@ -663,51 +576,51 @@ a.tribe-attendees-list-showall {
 	}
 
 .tribe_horizontal_datepicker__container .tribe_horizontal_datepicker {
-		width: 100%;
+		margin-bottom: var(--tec-spacer-1);
+		margin-top: var(--tec-spacer-1);
 		min-width: 80px;
-		margin-top: 8px;
-		margin-bottom: 8px;
+		width: 100%;
 	}
 
 .tribe_horizontal_datepicker__container .tribe_horizontal_datepicker:not(:last-child) {
-			margin-right: 8px;
+			margin-right: var(--tec-spacer-1);
 		}
 
 .tribe_horizontal_datepicker__container .tribe_horizontal_datepicker select {
-			border: 1px solid #7d7d7d;
-			border-radius: 4px;
-			width: 100%;
-		}
+			color: var(--tec-color-text-primary);
+			font-family: var(--tec-font-family-sans-serif);
+			font-size: var(--tec-font-size-1);
+			font-weight: var(--tec-font-weight-regular);
+			line-height: var(--tec-line-height-0);
 
-.tribe_horizontal_datepicker__container .tribe_horizontal_datepicker select:focus {
-				border-color: rgba(20,24,39, 0.8);
-			}
-
-.tribe_horizontal_datepicker__container .tribe_horizontal_datepicker select.ticket-meta__has-error {
-				border-color: #da394d ! important;
-			}
-
-.tribe_horizontal_datepicker__container .tribe_horizontal_datepicker select {
-			color: #141827;
-			font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-			font-size: 12px;
-			font-weight: 400;
-			line-height: 1.38;
 			-webkit-appearance: none;
+
 			   -moz-appearance: none;
+
 			        appearance: none;
-			background-color: #fff;
+			background-color: var(--tec-color-background);
 			background-image: url('../images/select.png');
 			background-position: right center;
 			background-repeat: no-repeat;
 			background-size: 33px 33px;
+			border: 1px solid var(--tec-form-color-border-secondary);
+			border-radius: var(--tec-border-radius-default);
 			height: auto;
 			padding: 10px;
-}
+			width: 100%;
+		}
+
+.tribe_horizontal_datepicker__container .tribe_horizontal_datepicker select:focus {
+				border-color: var(--tec-color-accent-secondary-hover);
+			}
+
+.tribe_horizontal_datepicker__container .tribe_horizontal_datepicker select.ticket-meta__has-error {
+				border-color: var(--tec-color-icon-error) !important;
+			}
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta label {
 		display: block;
-		font-weight: 400;
+		font-weight: var(--tec-font-weight-regular);
 	}
 
 .tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="text"],
@@ -716,7 +629,7 @@ a.tribe-attendees-list-showall {
 	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta input[type="password"],
 	.tribe-events-tickets-rsvp .tribe-event-tickets-plus-meta textarea {
 		background: white;
-		margin-top: .5em;
+		margin-top: 0.5em;
 		width: 100%;
 	}
 
@@ -726,11 +639,11 @@ a.tribe-attendees-list-showall {
 	}
 
 input[type=checkbox].tribe_show_attendees {
-	margin-left: .4em;
+	margin-left: 0.4em;
 }
 
 /* = EDD CSS
-=============================================*/
+============================================= */
 
 .edd.quantity {
 	font-size: 15px;
@@ -746,7 +659,7 @@ input[type=checkbox].tribe_show_attendees {
 
 .tribe-checkout-backlinks a.tribe-checkout-backlink {
 	box-shadow: unset;
-	margin-bottom: .75em;
+	margin-bottom: 0.75em;
 	text-decoration: none;
 }
 
@@ -760,8 +673,8 @@ input[type=checkbox].tribe_show_attendees {
 @media (min-width: 600px) {
 		.tribe_horizontal_datepicker__container .tribe_horizontal_datepicker {
 			display: inline-block;
-			width: calc(33.33333% - 8px);
 			max-width: 280px;
+			width: calc(33.33333% - var(--tec-spacer-1));
 		}
 }
 

@@ -3,7 +3,7 @@
 Plugin Name: Event Tickets Plus
 Plugin URI:  https://evnt.is/1acc
 Description: Event Tickets Plus lets you sell tickets to events, collect custom attendee information, and more! Includes advanced options like shared capacity between tickets, ticket QR codes, and integrations with your favorite ecommerce provider.
-Version: 5.2.4
+Version: 5.5.1
 Author: The Events Calendar
 Author URI: https://evnt.is/28
 License: GPLv2 or later
@@ -11,7 +11,6 @@ License URI: https://www.gnu.org/licenses/gpl-2.0.html
 Text Domain: event-tickets-plus
 Domain Path: /lang/
  */
-
 /*
  Copyright 2010-2021 by The Events Calendar and the contributors
 
@@ -37,6 +36,9 @@ define( 'EVENT_TICKETS_PLUS_FILE', __FILE__ );
 
 // Load the required php min version functions
 require_once dirname( EVENT_TICKETS_PLUS_FILE ) . '/src/functions/php-min-version.php';
+
+// Load the Composer autoload file.
+require_once dirname( EVENT_TICKETS_PLUS_FILE ) . '/vendor/autoload.php';
 
 /**
  * Verifies if we need to warn the user about min PHP version and bail to avoid fatals

@@ -2,7 +2,6 @@
 /**
  * WC_PB_CP_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.14.3
  */
@@ -15,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Composite Products Compatibility.
  *
- * @version  6.5.0
+ * @version  6.15.1
  */
 class WC_PB_CP_Compatibility {
 
@@ -77,6 +76,16 @@ class WC_PB_CP_Compatibility {
 		 * Cart and Orders.
 		 */
 
+		// Extend PB group modes to support group modes of composited bundles.
+		add_filter( 'woocommerce_bundles_group_mode_options_data', array( __CLASS__, 'composited_group_mode_options_data' ) );
+		add_filter( 'woocommerce_bundle_container_cart_item', array( __CLASS__, 'composited_bundle_group_mode' ), 0, 3 );
+
+		// Inherit component discounts - 'props' method implementation.
+		if ( 'props' === WC_PB_Product_Prices::get_bundled_cart_item_discount_method() ) {
+			add_action( 'woocommerce_bundles_before_set_bundled_cart_item', array( __CLASS__, 'bundled_cart_item_before_price_modification' ) );
+			add_action( 'woocommerce_bundles_after_set_bundled_cart_item', array( __CLASS__, 'bundled_cart_item_after_price_modification' ) );
+		}
+
 		// Validate bundle type component selections.
 		add_action( 'woocommerce_composite_component_validation_add_to_cart', array( __CLASS__, 'validate_component_configuration' ), 10, 8 );
 		add_action( 'woocommerce_composite_component_validation_add_to_order', array( __CLASS__, 'validate_component_configuration' ), 10, 8 );
@@ -106,12 +115,29 @@ class WC_PB_CP_Compatibility {
 
 		// Use custom callback to add bundles to orders in 'WC_CP_Order::add_composite_to_order'.
 		add_filter( 'woocommerce_add_component_to_order_callback', array( __CLASS__, 'add_composited_bundle_to_order_callback' ), 10, 6 );
+		add_action( 'woocommerce_bundle_cart_stamp_changed', array( __CLASS__, 'sync_bundle_cart_stamp' ) );
 
 		/*
 		 * REST API.
 		 */
 
 		add_filter( 'woocommerce_parsed_rest_composite_order_item_configuration', array( __CLASS__, 'parse_composited_rest_bundle_configuration' ), 10, 3 );
+
+		/*
+		 * Store API.
+		 */
+
+		add_filter( 'rest_request_after_callbacks', array( __CLASS__, 'filter_store_api_cart_item_data' ), 20, 3 );
+
+		/*
+		 * Analytics.
+		 */
+
+		if ( version_compare( WC_PB()->plugin_version( true, WC_CP()->version ), '8.3.0' ) >= 0 ) {
+			add_filter( 'woocommerce_analytics_clauses_from_composites_stats_total', array( __CLASS__, 'setup_analytics_base_table' ) );
+			add_filter( 'woocommerce_analytics_clauses_from_composites_stats_interval', array( __CLASS__, 'setup_analytics_base_table' ) );
+			add_filter( 'woocommerce_analytics_clauses_from_composites_subquery', array( __CLASS__, 'setup_analytics_base_table' ) );
+		}
 	}
 
 	/*
@@ -570,6 +596,109 @@ class WC_PB_CP_Compatibility {
 	*/
 
 	/**
+	 * Modify group mode of composited bundles.
+	 *
+	 * @since  6.14.0
+	 *
+	 * @param  array  $cart_item
+	 * @return array
+	 */
+	public static function composited_bundle_group_mode( $cart_item ) {
+
+		if ( $cart_item[ 'data' ]->is_type( 'bundle' ) && wc_cp_is_composited_cart_item( $cart_item ) ) {
+
+			if ( 'none' === $cart_item[ 'data' ]->get_group_mode() ) {
+				$cart_item[ 'data' ]->set_group_mode( 'none_composited' );
+			} elseif ( 'noindent' === $cart_item[ 'data' ]->get_group_mode() ) {
+				$cart_item[ 'data' ]->set_group_mode( 'flat_composited' );
+			} else {
+				$cart_item[ 'data' ]->set_group_mode( 'composited' );
+			}
+		}
+
+		return $cart_item;
+	}
+
+	/**
+	 * Add hidden Group Modes for composited bundles.
+	 *
+	 * @param  array  $group_mode_data
+	 * @return array
+	 */
+	public static function composited_group_mode_options_data( $group_mode_data ) {
+
+		$group_mode_data[ 'none_composited' ] = array(
+			'title'      => __( 'Composited None', 'woocommerce-composite-products' ),
+			'features'   => array( 'parent_item', 'child_item_indent', 'aggregated_subtotals', 'component_multiselect' ),
+			'is_visible' => false
+		);
+
+		$group_mode_data[ 'flat_composited' ] = array(
+			'title'      => __( 'Composited Flat', 'woocommerce-composite-products' ),
+			'features'   => array( 'parent_item', 'child_item_indent', 'child_item_meta', 'parent_cart_widget_item_meta' ),
+			'is_visible' => false
+		);
+
+		$group_mode_data[ 'composited' ] = array(
+			'title'      => __( 'Composited Grouped', 'woocommerce-composite-products' ),
+			'features'   => array( 'parent_item', 'child_item_indent', 'aggregated_subtotals', 'parent_cart_widget_item_meta' ),
+			'is_visible' => false
+		);
+
+		return $group_mode_data;
+	}
+
+	/**
+	 * Add filters to modify bundled product prices when parent product is composited and has a discount.
+	 *
+	 * @param  array   $cart_item
+	 * @return void
+	 */
+	public static function bundled_cart_item_before_price_modification( $cart_item ) {
+
+		if ( $bundle_container_item = wc_pb_get_bundled_cart_item_container( $cart_item ) ) {
+			if ( $composite_container_item = wc_cp_get_composited_cart_item_container( $bundle_container_item ) ) {
+
+				$bundle           = $bundle_container_item[ 'data' ];
+				$composite        = $composite_container_item[ 'data' ];
+				$component_id     = $bundle_container_item[ 'composite_item' ];
+				$component_option = $composite->get_component_option( $component_id, $bundle->get_id() );
+
+				if ( $component_option ) {
+					$component_option->add_filters();
+				}
+			}
+		}
+
+		return $cart_item;
+	}
+
+	/**
+	 * Remove filters that modify bundled product prices when the parent product is composited and has a discount.
+	 *
+	 * @param  string  $cart_item
+	 * @return void
+	 */
+	public static function bundled_cart_item_after_price_modification( $cart_item ) {
+
+		if ( $bundle_container_item = wc_pb_get_bundled_cart_item_container( $cart_item ) ) {
+			if ( $composite_container_item = wc_cp_get_composited_cart_item_container( $bundle_container_item ) ) {
+
+				$bundle           = $bundle_container_item[ 'data' ];
+				$composite        = $composite_container_item[ 'data' ];
+				$component_id     = $bundle_container_item[ 'composite_item' ];
+				$component_option = $composite->get_component_option( $component_id, $bundle->get_id() );
+
+				if ( $component_option ) {
+					$component_option->remove_filters();
+				}
+			}
+		}
+
+		return $cart_item;
+	}
+
+	/**
 	 * Hook into 'woocommerce_composite_component_add_to_cart_validation' to validate composited bundles.
 	 *
 	 * @param  WC_CP_Component  $component
@@ -759,11 +888,17 @@ class WC_PB_CP_Compatibility {
 		return $content;
 	}
 
+	/**
+	 * Append bundled item data to composited bundle metadata.
+	 *
+	 * @param  string  $title
+	 * @param  array   $cart_item
+	 * @param  string  $cart_item_key
+	 * @return string
+	 */
 	public static function composited_bundle_cart_item_data_value( $title, $cart_item, $cart_item_key ) {
 
-		if ( wc_pb_is_bundle_container_cart_item( $cart_item ) && wc_cp_is_composited_cart_item( $cart_item ) ) {
-
-			$hide_title = WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'component_multiselect' );
+		if ( wc_pb_is_bundle_container_cart_item( $cart_item ) && $cart_item[ 'data' ]->is_type( 'bundle' ) ) {
 
 			/**
 			 * 'woocommerce_composited_bundle_container_cart_item_hide_title' filter.
@@ -772,9 +907,7 @@ class WC_PB_CP_Compatibility {
 			 * @param  array    $cart_item
 			 * @param  string   $cart_item_key
 			 */
-			$hide_title = apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_title', $hide_title, $cart_item, $cart_item_key );
-
-			if ( $hide_title ) {
+			if ( apply_filters( 'woocommerce_composited_bundle_container_cart_item_hide_title', WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'component_multiselect' ), $cart_item, $cart_item_key ) ) {
 
 				$bundled_cart_items = wc_pb_get_bundled_cart_items( $cart_item );
 
@@ -784,14 +917,15 @@ class WC_PB_CP_Compatibility {
 
 				} else {
 
-					$title       = '';
-					$bundle_meta = WC_PB()->display->get_bundle_container_cart_item_data( $cart_item );
-
-					foreach ( $bundle_meta as $meta ) {
-						$title .= $meta[ 'value' ] . '<br/>';
-					}
-
+					$bundle_meta = WC_PB()->display->get_bundle_container_cart_item_data( $cart_item, array( 'aggregated' => false ) );
+					$title       = implode( ', ', wp_list_pluck( $bundle_meta, 'value' ) );
 				}
+
+			} elseif ( WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'parent_cart_widget_item_meta' ) ) {
+
+				$bundle_meta = WC_PB()->display->get_bundle_container_cart_item_data( $cart_item, array( 'aggregated' => false ) );
+
+				$title .= ' &ndash; ' . implode( ', ', wp_list_pluck( $bundle_meta, 'value' ) );
 			}
 		}
 
@@ -982,7 +1116,7 @@ class WC_PB_CP_Compatibility {
 	 */
 	public static function composited_bundle_checkout_item_quantity( $quantity, $cart_item, $cart_item_key = false ) {
 
-		if ( wc_pb_is_bundle_container_cart_item( $cart_item ) && wc_cp_is_composited_cart_item( $cart_item ) ) {
+		if ( wc_pb_is_bundle_container_cart_item( $cart_item ) ) {
 
 			$hide_qty = WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'component_multiselect' );
 
@@ -1138,6 +1272,47 @@ class WC_PB_CP_Compatibility {
 	}
 
 	/**
+	 * Sync composited bundle cart stamp.
+	 *
+	 * @since  6.12.0
+	 *
+	 * @param  string  $bundle_cart_key
+	 */
+	public static function sync_bundle_cart_stamp( $bundle_cart_key ) {
+
+		$parent_item = isset( WC()->cart->cart_contents[ $bundle_cart_key ] ) ? WC()->cart->cart_contents[ $bundle_cart_key ] : false;
+		if ( ! $parent_item ) {
+			return;
+		}
+
+		if ( wc_cp_maybe_is_composited_cart_item( $parent_item ) && wc_pb_is_bundle_container_cart_item( $parent_item ) ) {
+
+			$component_id = absint( $parent_item[ 'composite_item' ] );
+			if ( ! $component_id || ! isset( WC()->cart->cart_contents[ $bundle_cart_key ][ 'composite_data' ][ $component_id ] ) ) {
+				return;
+			}
+
+			$new_stamp = $parent_item[ 'stamp' ];
+			if ( ! $new_stamp ) {
+				return;
+			}
+
+			WC()->cart->cart_contents[ $bundle_cart_key ][ 'composite_data' ][ $component_id ][ 'stamp' ] = $new_stamp;
+
+			// Sync composite's stamp.
+			$composite_cart_key = wc_cp_get_composited_cart_item_container( $parent_item, false, true );
+			if ( ! $composite_cart_key ) {
+				return;
+			}
+
+			WC()->cart->cart_contents[ $composite_cart_key ][ 'composite_data' ][ $component_id ][ 'stamp' ] = $new_stamp;
+			foreach ( wc_cp_get_composited_cart_items( WC()->cart->cart_contents[ $composite_cart_key ], false, true ) as $child_key ) {
+				WC()->cart->cart_contents[ $composite_cart_key ][ 'composite_data' ][ $component_id ][ 'stamp' ] = $new_stamp;
+			}
+		}
+	}
+
+	/**
 	 * Custom callback for adding bundles to orders in 'WC_CP_Order::add_composite_to_order'.
 	 *
 	 * @since  5.8.0
@@ -1206,6 +1381,154 @@ class WC_PB_CP_Compatibility {
 		}
 
 		return $configuration;
+	}
+
+	/*
+	|--------------------------------------------------------------------------
+	| Store API.
+	|--------------------------------------------------------------------------
+	*/
+
+	/**
+	 * Filter store API responses.
+	 *
+	 * @since  6.15.1
+	 *
+	 * @param  $response  WP_REST_Response
+	 * @param  $server    WP_REST_Server
+	 * @param  $request   WP_REST_Request
+	 * @return WP_REST_Response
+	 */
+	public static function filter_store_api_cart_item_data( $response, $server, $request ) {
+
+		if ( is_wp_error( $response ) ) {
+			return $response;
+		}
+
+		if ( strpos( $request->get_route(), 'wc/store' ) === false ) {
+			return $response;
+		}
+
+		$data = $response->get_data();
+
+		if ( empty( $data[ 'items' ] ) ) {
+			return $response;
+		}
+
+		$cart = WC()->cart->get_cart();
+
+		foreach ( $data[ 'items' ] as &$item_data ) {
+
+			$cart_item_key = $item_data[ 'key' ];
+			$cart_item     = isset( $cart[ $cart_item_key ] ) ? $cart[ $cart_item_key ] : null;
+
+			if ( is_null( $cart_item ) ) {
+				continue;
+			}
+
+			// Is this a composited bundle?
+			if ( isset( $item_data[ 'extensions' ]->composites[ 'composited_item_data' ] ) && isset( $item_data[ 'extensions' ]->bundles[ 'bundle_data' ] ) ) {
+
+				// If the subtotal is zero at this point, no aggregation happened.
+				if ( empty( $item_data[ 'totals' ]->line_subtotal ) ) {
+					$item_data[ 'extensions' ]->composites[ 'composited_item_data' ][ 'is_subtotal_hidden' ] = true;
+				}
+
+				// If the price is zero at this point, no aggregation happened.
+				if ( empty( $item_data[ 'prices' ]->raw_prices[ 'price' ] ) ) {
+					$item_data[ 'extensions' ]->composites[ 'composited_item_data' ][ 'is_price_hidden' ] = true;
+				}
+
+				if ( ! $cart_item[ 'data' ]->is_type( 'bundle' ) ) {
+					continue;
+				}
+
+				if ( WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'component_multiselect' ) ) {
+					$item_data[ 'extensions' ]->bundles[ 'bundle_data' ][ 'is_title_hidden' ] = true;
+					$item_data[ 'quantity_limits' ]->editable = false;
+				}
+
+				foreach ( $data[ 'items' ] as &$bundled_item_data ) {
+
+					if ( ! isset( $bundled_item_data[ 'extensions' ]->bundles[ 'bundled_by' ] ) ) {
+						continue;
+					}
+
+					if ( $cart_item[ 'key' ] === $bundled_item_data[ 'extensions' ]->bundles[ 'bundled_by' ] ) {
+
+						$bundled_item_data[ 'extensions' ]->bundles[ 'bundled_item_data' ][ 'is_composited' ] = true;
+
+						if ( WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'component_multiselect' ) ) {
+							$bundled_item_data[ 'extensions' ]->bundles[ 'bundled_item_data' ][ 'is_ungrouped' ] = true;
+						}
+
+						// Do not display bundled item prices if aggregated at parent level since we can't nest deeper.
+						if ( WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'aggregated_prices' ) ) {
+							$bundled_item_data[ 'extensions' ]->bundles[ 'bundled_item_data' ][ 'is_price_hidden' ] = true;
+						}
+
+						// Do not display bundled item subtotals if aggregated at parent level since we can't nest deeper.
+						if ( WC_Product_Bundle::group_mode_has( $cart_item[ 'data' ]->get_group_mode(), 'aggregated_subtotals' ) ) {
+							$bundled_item_data[ 'extensions' ]->bundles[ 'bundled_item_data' ][ 'is_subtotal_hidden' ] = true;
+						}
+
+						// This basically controls the "arrow" that makes subtotals look indented. If the parent composite aggregates its components, then all bundled item subtotals should appear indented as well.
+						$bundled_item_data[ 'extensions' ]->bundles[ 'bundled_item_data' ][ 'is_subtotal_aggregated' ] = $item_data[ 'extensions' ]->composites[ 'composited_item_data' ][ 'is_subtotal_aggregated' ];
+					}
+				}
+			}
+		}
+
+		$response->set_data( $data );
+
+		return $response;
+	}
+
+	/*
+	|--------------------------------------------------------------------------
+	| Analytics.
+	|--------------------------------------------------------------------------
+	*/
+
+	/**
+	 * Modify CP analytics table by adding in all bundled items that sold in Composites.
+	 *
+	 * @since  6.12.0
+	 *
+	 * @param  array $clauses
+	 * @return array
+	 */
+	public static function setup_analytics_base_table( $clauses ) {
+		global $wpdb;
+
+		if ( ! class_exists( 'WC_CP_Analytics_Revenue_Data_Store' ) ) {
+			return $clauses;
+		}
+
+		$table_name = WC_CP_Analytics_Revenue_Data_Store::get_db_table_name();
+		$clause_pb  = "SELECT
+			`pb`.`order_item_id` as `order_item_id`,
+			`cp`.`parent_order_item_id` as `parent_order_item_id`,
+			`pb`.`order_id` as `order_id`,
+			`cp`.`composite_id` as `composite_id`,
+			`pb`.`product_id` as `product_id`,
+			`pb`.`variation_id` as `variation_id`,
+			`pb`.`customer_id` as `customer_id`,
+			`pb`.`date_created` as `date_created`,
+			`pb`.`product_qty` as `product_qty`,
+			`pb`.`product_net_revenue` as `product_net_revenue`,
+			`pb`.`product_gross_revenue` as `product_gross_revenue`,
+			`pb`.`coupon_amount` as `coupon_amount`,
+			`pb`.`tax_amount` as `tax_amount`
+			FROM `{$wpdb->prefix}wc_order_composite_lookup` as `cp`
+			INNER JOIN `{$wpdb->prefix}wc_order_bundle_lookup` as `pb` ON `cp`.`order_item_id` = `pb`.`parent_order_item_id`";
+
+		// Replace `from` statement with a union.
+		$clauses = array(
+			"( SELECT `order_item_id`,`parent_order_item_id`, `order_id`, `composite_id`,`product_id`,`variation_id`,`customer_id`,`date_created`,`product_qty`,`product_net_revenue`,`product_gross_revenue`,`coupon_amount`,`tax_amount` FROM " .$table_name . " UNION " . $clause_pb . " ) AS `$table_name`"
+		);
+
+		return $clauses;
 	}
 }
 

@@ -139,7 +139,7 @@ class Sensei_Main {
 	public $teacher;
 
 	/**
-	 * @var Sensei_Learners
+	 * @var Sensei_Learner_Management
 	 */
 	public $learners;
 
@@ -159,11 +159,6 @@ class Sensei_Main {
 	 * @var Sensei_Analysis
 	 */
 	public $analysis;
-
-	/**
-	 * @var Sensei_REST_API_V1
-	 */
-	public $rest_api;
 
 	/**
 	 * Internal REST API.
@@ -281,16 +276,7 @@ class Sensei_Main {
 		add_action( 'init', array( $this, 'load_localisation' ), 0 );
 
 		$this->initialize_global_objects();
-	}
-
-	/**
-	 * Load the email signup modal form.
-	 *
-	 * @deprecated 3.1.0 The modal was removed.
-	 * @access     private
-	 */
-	public function load_email_signup_modal() {
-		_deprecated_function( __METHOD__, '3.1.0' );
+		$this->initialize_cli();
 	}
 
 	/**
@@ -307,8 +293,8 @@ class Sensei_Main {
 
 		if ( is_null( self::$_instance ) ) {
 
-			// Sensei requires a reference to the main Sensei plugin file
-			$sensei_main_plugin_file = dirname( dirname( __FILE__ ) ) . '/sensei-lms.php';
+			// Sensei requires a reference to the main Sensei plugin file.
+			$sensei_main_plugin_file = SENSEI_LMS_PLUGIN_FILE;
 
 			self::$_instance = new self( $sensei_main_plugin_file, $args );
 
@@ -414,13 +400,17 @@ class Sensei_Main {
 		// data will be sent.
 		$this->usage_tracking->schedule_tracking_task();
 
-		$this->blocks = new Sensei_Blocks( $this );
+		$this->blocks = new Sensei_Blocks();
 
 		Sensei_Learner::instance()->init();
 		Sensei_Course_Enrolment_Manager::instance()->init();
 		$this->enrolment_scheduler = Sensei_Enrolment_Job_Scheduler::instance();
 		$this->enrolment_scheduler->init();
 		Sensei_Data_Port_Manager::instance()->init();
+		Sensei_Course_Theme_Option::instance()->init();
+		Sensei_Course_Theme::instance()->init();
+		Sensei_Course_Theme_Editor::instance()->init();
+		new Sensei_Customizer();
 
 		// Setup Wizard.
 		$this->setup_wizard = Sensei_Setup_Wizard::instance();
@@ -430,7 +420,7 @@ class Sensei_Main {
 		// Differentiate between administration and frontend logic.
 		if ( is_admin() ) {
 			// Load Admin Class
-			$this->admin = new Sensei_Admin( $this->main_plugin_file_name );
+			$this->admin = new Sensei_Admin();
 
 			// Load Analysis Reports
 			$this->analysis = new Sensei_Analysis( $this->main_plugin_file_name );
@@ -438,8 +428,7 @@ class Sensei_Main {
 			new Sensei_Import();
 			new Sensei_Export();
 			new Sensei_Exit_Survey();
-			new Sensei_WCPC_Prompt();
-			new Sensei_WCCOM_Connect_Notice();
+			new Sensei_Admin_Notices();
 		} else {
 
 			// Load Frontend Class
@@ -449,6 +438,7 @@ class Sensei_Main {
 			$this->theme_integration_loader = new Sensei_Theme_Integration_Loader();
 
 		}
+		Sensei_Course_Video_Settings::instance()->init( $this );
 
 		// Load notice Class
 		$this->notices = new Sensei_Notices();
@@ -465,9 +455,20 @@ class Sensei_Main {
 		// Load WPML compatibility class
 		$this->Sensei_WPML = new Sensei_WPML();
 
-		$this->rest_api = new Sensei_REST_API_V1();
-
 		$this->rest_api_internal = new Sensei_REST_API_Internal();
+	}
+
+	/**
+	 * Load the WP-CLI commands.
+	 *
+	 * @since 4.3.0
+	 */
+	private function initialize_cli() {
+		if ( defined( 'WP_CLI' ) && WP_CLI ) {
+			require_once $this->resolve_path( 'includes/class-sensei-cli.php' );
+
+			new Sensei_CLI();
+		}
 	}
 
 	/**
@@ -576,10 +577,9 @@ class Sensei_Main {
 	 * @return  void
 	 */
 	public function load_plugin_textdomain() {
-		global $wp_version;
 		$domain = 'sensei-lms';
 
-		if ( version_compare( $wp_version, '4.7', '>=' ) && is_admin() ) {
+		if ( is_admin() ) {
 			$wp_user_locale = get_user_locale();
 		} else {
 			$wp_user_locale = get_locale();
@@ -787,202 +787,6 @@ class Sensei_Main {
 		$page = apply_filters( 'sensei_get_' . esc_attr( $page ) . '_page_id', get_option( 'sensei_' . esc_attr( $page ) . '_page_id' ) );
 		return ( $page ) ? $page : -1;
 	}
-
-	/**
-	 * check_user_permissions function.
-	 *
-	 * @access public
-	 * @param string $page (default: '')
-	 * @deprecated 2.0.0
-	 *
-	 * @return bool
-	 */
-	public function check_user_permissions( $page = '' ) {
-		_deprecated_function( __METHOD__, '2.0.0', null );
-
-		global $current_user, $post;
-
-		$user_allowed = false;
-
-		switch ( $page ) {
-			case 'course-single':
-				// check for prerequisite course or lesson,
-				$course_prerequisite_id = (int) get_post_meta( $post->ID, '_course_prerequisite', true );
-
-				if ( method_exists( 'Sensei_WC', 'course_update' ) ) {
-					Sensei_WC::course_update( $post->ID );
-				}
-
-				// Count completed lessons
-				if ( 0 < absint( $course_prerequisite_id ) ) {
-
-					$prerequisite_complete = Sensei_Utils::user_completed_course( $course_prerequisite_id, $current_user->ID );
-
-				} else {
-					$prerequisite_complete = true;
-				}
-
-				// Handles restrictions on the course
-				if ( ( ! $prerequisite_complete && 0 < absint( $course_prerequisite_id ) ) ) {
-
-					$user_allowed = false;
-					$course_link  = '<a href="' . esc_url( get_permalink( $course_prerequisite_id ) ) . '">' . __( 'course', 'sensei-lms' ) . '</a>';
-
-					// translators: The placeholder %s is a link to the course.
-					$this->notices->add_notice( sprintf( __( 'Please complete the previous %1$s before taking this course.', 'sensei-lms' ), $course_link ), 'info' );
-
-				} elseif ( class_exists( 'Sensei_WC' ) && Sensei_WC::is_woocommerce_active() && Sensei_WC::is_course_purchasable( $post->ID ) && ! Sensei_Course::is_user_enrolled( $post->ID, $current_user->ID ) ) {
-
-					// translators: The placeholders are the opening and closing tags for a link to log in.
-					$message = sprintf( __( 'Or %1$s login %2$s to access your purchased courses', 'sensei-lms' ), '<a href="' . sensei_user_login_url() . '">', '</a>' );
-					$this->notices->add_notice( $message, 'info' );
-
-				} elseif ( ! Sensei_Course::is_user_enrolled( $post->ID, $current_user->ID ) ) {
-
-					// users who haven't started the course are allowed to view it
-					$user_allowed = true;
-
-				} else {
-
-					$user_allowed = true;
-
-				}
-				break;
-			case 'lesson-single':
-				// Check for WC purchase
-				$lesson_course_id = get_post_meta( $post->ID, '_lesson_course', true );
-
-				if ( method_exists( 'Sensei_WC', 'course_update' ) ) {
-					Sensei_WC::course_update( $lesson_course_id );
-				}
-				$is_preview = Sensei_Utils::is_preview_lesson( $post->ID );
-
-				if ( $this->access_settings() && Sensei_Utils::user_started_course( $lesson_course_id, $current_user->ID ) ) {
-					$user_allowed = true;
-				} elseif ( $this->access_settings() && false == $is_preview ) {
-
-					$user_allowed = true;
-
-				} else {
-					$this->permissions_message['title'] = get_the_title( $post->ID ) . ': ' . __( 'Restricted Access', 'sensei-lms' );
-					$course_link                        = '<a href="' . esc_url( get_permalink( $lesson_course_id ) ) . '">' . __( 'course', 'sensei-lms' ) . '</a>';
-					$wc_post_id                         = get_post_meta( $lesson_course_id, '_course_woocommerce_product', true );
-					if ( class_exists( 'Sensei_WC' ) && Sensei_WC::is_woocommerce_active() && ( 0 < $wc_post_id ) ) {
-						if ( $is_preview ) {
-							// translators: The placeholder %1$s is a link to the Course.
-							$this->permissions_message['message'] = sprintf( __( 'This is a preview lesson. Please purchase the %1$s to access all lessons.', 'sensei-lms' ), $course_link );
-						} else {
-							// translators: The placeholder %1$s is a link to the Course.
-							$this->permissions_message['message'] = sprintf( __( 'Please purchase the %1$s before starting this Lesson.', 'sensei-lms' ), $course_link );
-						}
-					} else {
-						if ( $is_preview ) {
-							// translators: The placeholder %1$s is a link to the Course.
-							$this->permissions_message['message'] = sprintf( __( 'This is a preview lesson. Please sign up for the %1$s to access all lessons.', 'sensei-lms' ), $course_link );
-						} else {
-							// translators: The placeholder %1$s is a link to the Course.
-							$this->permissions_message['message'] = sprintf( __( 'Please sign up for the %1$s before starting the lesson.', 'sensei-lms' ), $course_link );
-						}
-					}
-				}
-				break;
-			case 'quiz-single':
-				$lesson_id        = get_post_meta( $post->ID, '_quiz_lesson', true );
-				$lesson_course_id = get_post_meta( $lesson_id, '_lesson_course', true );
-
-				if ( method_exists( 'Sensei_WC', 'course_update' ) ) {
-					Sensei_WC::course_update( $lesson_course_id );
-				}
-				if ( ( $this->access_settings() && Sensei_Utils::user_started_course( $lesson_course_id, $current_user->ID ) ) || sensei_all_access() ) {
-
-					// Check for prerequisite lesson for this quiz
-					$lesson_prerequisite_id            = (int) get_post_meta( $lesson_id, '_lesson_prerequisite', true );
-					$user_lesson_prerequisite_complete = Sensei_Utils::user_completed_lesson( $lesson_prerequisite_id, $current_user->ID );
-
-					// Handle restrictions
-					if ( sensei_all_access() ) {
-
-						$user_allowed = true;
-
-					} else {
-
-						if ( 0 < absint( $lesson_prerequisite_id ) && ( ! $user_lesson_prerequisite_complete ) ) {
-
-							$this->permissions_message['title'] = get_the_title( $post->ID ) . ': ' . __( 'Restricted Access', 'sensei-lms' );
-							$lesson_link                        = '<a href="' . esc_url( get_permalink( $lesson_prerequisite_id ) ) . '">' . __( 'lesson', 'sensei-lms' ) . '</a>';
-							// translators: The placeholder %1$s is a link to the Lesson.
-							$this->permissions_message['message'] = sprintf( __( 'Please complete the previous %1$s before taking this Quiz.', 'sensei-lms' ), $lesson_link );
-
-						} else {
-
-							$user_allowed = true;
-
-						}
-					}
-				} elseif ( $this->access_settings() ) {
-					// Check if the user has started the course
-					if ( is_user_logged_in() && ! Sensei_Utils::user_started_course( $lesson_course_id, $current_user->ID ) && ( isset( $this->settings->settings['access_permission'] ) && ( true == $this->settings->settings['access_permission'] ) ) ) {
-
-						$user_allowed                       = false;
-						$this->permissions_message['title'] = get_the_title( $post->ID ) . ': ' . __( 'Restricted Access', 'sensei-lms' );
-						$course_link                        = '<a href="' . esc_url( get_permalink( $lesson_course_id ) ) . '">' . __( 'course', 'sensei-lms' ) . '</a>';
-						$wc_post_id                         = get_post_meta( $lesson_course_id, '_course_woocommerce_product', true );
-						if ( class_exists( 'Sensei_WC' ) && Sensei_WC::is_woocommerce_active() && ( 0 < $wc_post_id ) ) {
-							// translators: The placeholder %1$s is a link to the Course.
-							$this->permissions_message['message'] = sprintf( __( 'Please purchase the %1$s before starting this Quiz.', 'sensei-lms' ), $course_link );
-						} else {
-							// translators: The placeholder %1$s is a link to the Course.
-							$this->permissions_message['message'] = sprintf( __( 'Please sign up for the %1$s before starting this Quiz.', 'sensei-lms' ), $course_link );
-						}
-					} else {
-						$user_allowed = true;
-					}
-				} else {
-					$this->permissions_message['title'] = get_the_title( $post->ID ) . ': ' . __( 'Restricted Access', 'sensei-lms' );
-					$course_link                        = '<a href="' . esc_url( get_permalink( get_post_meta( get_post_meta( $post->ID, '_quiz_lesson', true ), '_lesson_course', true ) ) ) . '">' . __( 'course', 'sensei-lms' ) . '</a>';
-					// translators: The placeholder %1$s is a link to the Course.
-					$this->permissions_message['message'] = sprintf( __( 'Please sign up for the %1$s before taking this Quiz.', 'sensei-lms' ), $course_link );
-				}
-				break;
-			default:
-				$user_allowed = true;
-				break;
-
-		}
-
-		/**
-		 * filter the permissions message shown on sensei post types.
-		 *
-		 * @since 1.8.7
-		 *
-		 * @param array $permissions_message{
-		 *
-		 *   @type string $title
-		 *   @type string $message
-		 *
-		 * }
-		 * @param string $post_id
-		 */
-		$this->permissions_message = apply_filters( 'sensei_permissions_message', $this->permissions_message, $post->ID );
-
-		// add the permissions message to the stack
-		if ( sensei_all_access() || Sensei_Utils::is_preview_lesson( $post->ID ) ) {
-			$user_allowed = true;
-		}
-
-		/**
-		 * Filter the permissions check final result. Which determines if the user has
-		 * access to the given page.
-		 *
-		 * @since 1.0
-		 *
-		 * @param boolean $user_allowed
-		 * @param integer $user_id
-		 */
-		return apply_filters( 'sensei_access_permissions', $user_allowed, $current_user->ID );
-
-	}
-
 
 	/**
 	 * Check if visitors have access permission. If the "access_permission" setting is active, do a log in check.
@@ -1267,12 +1071,31 @@ class Sensei_Main {
 	public function body_class( $classes ) {
 		if ( is_sensei() ) {
 			$classes[] = 'sensei';
-
 			$post_type = get_post_type();
+
 			if ( ! empty( $post_type ) ) {
 				$classes[] = $post_type;
+
+				if ( 'lesson' === $post_type ) {
+					$course_id = Sensei()->lesson->get_course_id( get_the_ID() );
+					$classes[] = 'course-id-' . $course_id;
+				}
+
+				if ( 'quiz' === $post_type ) {
+					$lesson_id = Sensei()->quiz->get_lesson_id( get_the_ID() );
+					$classes[] = 'lesson-id-' . $lesson_id;
+
+					$course_id = Sensei()->lesson->get_course_id( $lesson_id );
+					$classes[] = 'course-id-' . $course_id;
+				}
+			}
+
+			// Add class to Course Completed page.
+			if ( get_the_ID() === intval( Sensei()->settings->settings['course_completed_page'] ) ) {
+				$classes[] = 'course-completed';
 			}
 		}
+
 		return $classes;
 	}
 

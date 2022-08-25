@@ -1,6 +1,584 @@
-!function(e){var t={};function n(o){if(t[o])return t[o].exports;var r=t[o]={i:o,l:!1,exports:{}};return e[o].call(r.exports,r,r.exports,n),r.l=!0,r.exports}n.m=e,n.c=t,n.d=function(e,t,o){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:o})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var o=Object.create(null);if(n.r(o),Object.defineProperty(o,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var r in e)n.d(o,r,function(t){return e[t]}.bind(null,r));return o},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=150)}({0:function(e,t){e.exports=window.wp.element},1:function(e,t){e.exports=window.wp.i18n},10:function(e,t){e.exports=function(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e},e.exports.default=e.exports,e.exports.__esModule=!0},11:function(e,t,n){var o=n(35),r=n(36),s=n(21),l=n(37);e.exports=function(e){return o(e)||r(e)||s(e)||l()},e.exports.default=e.exports,e.exports.__esModule=!0},12:function(e,t,n){var o=n(32);e.exports=function(e,t){if(null==e)return{};var n,r,s=o(e,t);if(Object.getOwnPropertySymbols){var l=Object.getOwnPropertySymbols(e);for(r=0;r<l.length;r++)n=l[r],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(s[n]=e[n])}return s},e.exports.default=e.exports,e.exports.__esModule=!0},13:function(e,t){e.exports=window.wp.blocks},15:function(e,t,n){"use strict";n.d(t,"a",(function(){return B})),n.d(t,"b",(function(){return M}));var o=n(10),r=n.n(o),s=n(5),l=n.n(s),c=n(3),i=n.n(c),a=n(12),u=n.n(a),b=n(0),m=n(8),d=n(7),p=n.n(d),f=n(1),v=n(13),O=n(19),j=n(16),g=function(e){return(e="string"==typeof e?e:e.name)&&e.startsWith("sensei-lms/button")},_=function(e){var t;return i()(i()({},e),{},{className:null==e||null===(t=e.className)||void 0===t?void 0:t.replace(/\s*has-[\w-]*(color|background)/g,""),style:Object(m.omitBy)(null==e?void 0:e.style,(function(e,t){return t.match(/(color|background|background-color)/)}))})};Object(O.addFilter)("blocks.getSaveContent.extraProps","sensei/button/removeColorSaveProps",(function(e,t){return g(t)?_(e):e})),Object(O.addFilter)("blocks.registerBlockType","sensei/button/removeColorEditProps",(function(e){if(!g(e))return e;var t=e.getEditWrapperProps;return t&&(e.getEditWrapperProps=function(e){var n=t(e);return _(n)}),e})),Object(O.addFilter)("blocks.registerBlockType","sensei/button/addColorSettings",(function(e){var t,n;return g(e)?(null===(t=e.supports)||void 0===t||!t.color||null!==(n=e.attributes)&&void 0!==n&&n.backgroundColor||(e.edit=Object(j.a)({backgroundColor:{style:"background-color",label:Object(f.__)("Background color","sensei-lms")},textColor:{style:"color",label:Object(f.__)("Text color","sensei-lms")}})(e.edit),e.attributes=i()(i()({},e.attributes),{},{backgroundColor:{type:"string"},customBackgroundColor:{type:"string"},textColor:{type:"string"},customTextColor:{type:"string"}})),e):e})),Object(O.addFilter)("editor.BlockListBlock","sensei/button/removeWrapperProps",(function(e){return function(t){var n=t.name,o=t.wrapperProps;return g(n)&&o&&(o=_(o)),Object(b.createElement)(e,l()({},t,{wrapperProps:o}))}}),1);var h=n(4),x=n(6);function y(e){var t,n,o=E(e),s=function(e){var t,n,o,s,l,c,i,a,u,b,m,d=e.attributes,f=e.colors,v=d.backgroundColor,O=d.customBackgroundColor,j=d.textColor,g=d.customTextColor,_=d.gradient,h=d.style,y=void 0===h?{}:h,w=Object(x.getColorClassName)("background-color",v);y.color||(y.color={}),O&&(y.color.background=O),g&&(y.color.text=g);var E=function(e){if(e)return"has-".concat(e,"-gradient-background")}(_),k=Object(x.getColorClassName)("color",j),C=p()(k,E,(l={},r()(l,w,!(null!=y&&null!==(t=y.color)&&void 0!==t&&t.gradient||!w)),r()(l,"has-text-color",j||(null==y||null===(n=y.color)||void 0===n?void 0:n.text)),r()(l,"has-background",v||(null==y||null===(o=y.color)||void 0===o?void 0:o.background)||_||(null==y||null===(s=y.color)||void 0===s?void 0:s.gradient)),l)),P=null!=y&&null!==(c=y.color)&&void 0!==c&&c.background||null!=y&&null!==(i=y.color)&&void 0!==i&&i.text||null!=y&&null!==(a=y.color)&&void 0!==a&&a.gradient?{background:null!=y&&null!==(u=y.color)&&void 0!==u&&u.gradient?y.color.gradient:void 0,backgroundColor:null!=y&&null!==(b=y.color)&&void 0!==b&&b.background?y.color.background:void 0,color:null!=y&&null!==(m=y.color)&&void 0!==m&&m.text?y.color.text:void 0}:{};if(f){if(v){var N=Object(x.getColorObjectByAttributeValues)(f,v);P.backgroundColor=N.color}if(j){var L=Object(x.getColorObjectByAttributeValues)(f,j);P.color=L.color}}return{className:C||void 0,style:P}}(e),l={className:{"no-border-radius":0===(n=e.attributes.borderRadius)},style:{borderRadius:n?n+"px":void 0}};return{className:p()({"wp-block-button__link":!o},l.className,s.className,null==e||null===(t=e.attributes)||void 0===t?void 0:t.buttonClassName),style:i()(i()({},l.style),s.style)}}function w(e){var t=e.className,n=e.attributes.align;return{className:p()(t,"wp-block-sensei-button","wp-block-button","has-text-align-".concat(n||"left"))}}var E=function(e){var t;return/\bis-style-link\b/.test(null==e||null===(t=e.attributes)||void 0===t?void 0:t.className)},k=n(2),C=function(e){var t=e.borderRadius,n=e.setAttributes;return Object(b.createElement)(k.PanelBody,{title:Object(f.__)("Border settings","sensei-lms"),initialOpen:!1},Object(b.createElement)(k.RangeControl,{label:Object(f.__)("Border radius","sensei-lms"),value:t,min:0,max:50,allowReset:!0,onChange:function(e){return n({borderRadius:e})}}))},P=function(e){var t,n=e.attributes,o=e.setAttributes,r=n.borderRadius,s=n.align;return Object(b.createElement)(b.Fragment,null,Object(b.createElement)(x.BlockControls,null,Object(b.createElement)(x.BlockAlignmentToolbar,l()({label:Object(f.__)("Change button alignment","sensei-lms"),value:s||(null===(t=e.alignmentOptions)||void 0===t?void 0:t.default),onChange:function(e){e&&o({align:e})}},e.alignmentOptions))),Object(b.createElement)(x.InspectorControls,null,Object(b.createElement)(C,{borderRadius:r,setAttributes:o})))},N=function(e){var t=e.placeholder,n=e.attributes,o=e.setAttributes,r=n.text,s=Object(h.useSelect)((function(e){return e("core/block-editor").getSettings()}),[]).colors,c=void 0!==e.text,a=y(i()(i()({},e),{},{colors:s}));return Object(b.createElement)("div",w(e),c?Object(b.createElement)("div",a,e.text):Object(b.createElement)(x.RichText,l()({placeholder:t||Object(f.__)("Add text…","sensei-lms"),value:r,onChange:function(e){return o({text:e})}},a,{tagName:"a",identifier:"text",withoutInteractiveFormatting:!0})),Object(b.createElement)(P,e))},L=function(e){var t=e.attributes,n=e.className,o=e.tagName,s=e.blockName,c=t.text,i=t.inContainer,a=t.align,u=o;o||(u=E({attributes:t})?"a":"button");var m=Object(b.createElement)("div",w({className:n,attributes:t}),Object(b.createElement)(x.RichText.Content,l()({},y({attributes:t}),{tagName:u,value:c})));return i?Object(b.createElement)("div",{className:p()(n,"sensei-buttons-container__button-block",Object(v.getBlockDefaultClassName)(s)+"__wrapper",r()({},"sensei-buttons-container__button-align-".concat(a),a))},m):m},S=n(17),B={Fill:{name:"default",label:Object(f.__)("Fill","sensei-lms")},Outline:{name:"outline",label:Object(f.__)("Outline","sensei-lms")},Link:{name:"link",label:Object(f.__)("Link","sensei-lms")}},M=function(e){var t,n=e.settings,o=e.EditWrapper,s=u()(e,["settings","EditWrapper"]);s=i()({alignmentOptions:{controls:["left","center","right","full"],default:"left"}},s);var c=n.styles?n.styles:[i()(i()({},B.Fill),{},{isDefault:!0}),B.Outline],a=null===(t=Object(m.find)(c,"isDefault"))||void 0===t?void 0:t.name,d=Object(j.b)(a)(N),f=Object(j.b)(a)(L);return Object(m.merge)({name:"sensei-lms/button",title:"Sensei Button",category:"sensei-lms",attributes:{text:{type:"string",source:"html",selector:"a,button"},align:{type:"string"},borderRadius:{type:"number"},style:{type:"object"},isPreview:{type:"boolean",default:!1},inContainer:{type:"boolean",default:!1},buttonClassName:{type:"array",default:[]}},supports:{color:{gradients:!0},__experimentalColor:{gradients:!0},align:!1,html:!1},icon:S.b,styles:c,edit:function(e){var t=Object(b.createElement)(d,l()({},e,s));return o?Object(b.createElement)(o,e,t):t},save:function(e){return Object(b.createElement)(f,l()({},e,s,{blockName:n.name}))},getEditWrapperProps:function(e){var t=e.inContainer,o=e.align;return t?{className:p()("sensei-buttons-container__button-block",Object(v.getBlockDefaultClassName)(n.name)+"__wrapper",r()({},"sensei-buttons-container__button-align-".concat(o),o))}:{}},example:{attributes:{align:"center",isPreview:!0}}},n)}},150:function(e,t,n){"use strict";n.r(t);var o,r=n(4),s=n(38),l=n(3),c=n.n(l),i=n(1),a=n(83),u=n(9),b=n.n(u),m=n(0),d=n(7),p=n.n(d),f=n(6),v=n(10),O=n.n(v),j=["sensei-lms/button-view-quiz","sensei-lms/button-complete-lesson","sensei-lms/button-next-lesson","sensei-lms/button-reset-lesson"],g={"sensei-lms/button-complete-lesson":{inContainer:!0},"sensei-lms/button-next-lesson":{inContainer:!0},"sensei-lms/button-reset-lesson":{inContainer:!0},"sensei-lms/button-view-quiz":{inContainer:!0}},_=j.map((function(e){return[e,c()({},g[e])]})),h="completed",x="in-progress",y=(o={},O()(o,h,["sensei-lms/button-next-lesson","sensei-lms/button-reset-lesson"]),O()(o,x,["sensei-lms/button-view-quiz","sensei-lms/button-complete-lesson"]),o),w=function(e){var t=Object(m.useState)(e),n=b()(t,2),o=n[0],s=n[1],l=Object(r.useSelect)((function(e){return e("core/block-editor").getSelectedBlock()}));return Object(m.useEffect)((function(){if(j.includes(null==l?void 0:l.name)){var e=Object.keys(y).find((function(e){return y[e].includes(l.name)}));e!==o&&s(e)}}),[l,o]),[o,s]},E=n(11),k=n.n(E),C=n(13),P=function(e){var t=e.parentClientId,n=e.setAttributes,o=e.toggledBlocks,s=e.blocks,l=Object(r.useSelect)((function(e){return e("core/block-editor").getBlock(t)}),[]),i=Object(r.useDispatch)("core/block-editor").replaceInnerBlocks,a=Object(m.useState)({}),u=b()(a,2),d=u[0],p=u[1];return s.map((function(e){return{active:!1!==o[e.blockName],onToggle:(r=e.blockName,function(e){var s=l.innerBlocks.find((function(e){return e.name===r})),a=null;e&&!s?a=[].concat(k()(l.innerBlocks),[Object(C.createBlock)(r,c()(c()({},g[r]),d[r]))]).sort((function(e,t){return j.indexOf(e.name)-j.indexOf(t.name)})):!e&&s&&(a=l.innerBlocks.filter((function(e){return e.name!==r})),p((function(e){return c()(c()({},e),{},O()({},r,s.attributes))}))),a&&i(t,a,!1),n({toggledBlocks:c()(c()({},o),{},O()({},r,e))})}),label:e.label};var r}))},N=function(){var e=Object(m.useState)((function(){var e=document.getElementById("question_counter");return e?parseInt(e.value,10)>0:null})),t=b()(e,2),n=t[0],o=t[1];Object(m.useEffect)((function(){var e=function(e){o(e.detail.questions>0)};return window.addEventListener("sensei-quiz-editor-question-count-updated",e),function(){window.removeEventListener("sensei-quiz-editor-question-count-updated",e)}}),[]);var s=(Object(r.useSelect)((function(e){return e("core/editor").getEditedPostAttribute("meta")}))||{})._quiz_has_questions;return null!==n?n:s},L=function(e){var t=document.getElementById("pass_required"),n=Object(m.useState)((function(){return!t||!t.checked})),o=b()(n,2),r=o[0],s=o[1];return Object(m.useEffect)((function(){if(t){var e=function(){s(!t.checked)};return t.addEventListener("change",e),function(){t.removeEventListener("change",e)}}}),[t]),!e||r},S=n(2),B=n(47),M=function(e){var t=e.toggleBlocks,n=e.previewState,o=e.onPreviewChange;return Object(m.createElement)(m.Fragment,null,Object(m.createElement)(f.BlockControls,null,Object(m.createElement)(S.ToolbarGroup,null,Object(m.createElement)(B.a,{options:[{label:Object(i.__)("In Progress","sensei-lms"),value:x},{label:Object(i.__)("Completed","sensei-lms"),value:h}],optionsLabel:Object(i.__)("Preview lesson state","sensei-lms"),value:n,onChange:o}))),Object(m.createElement)(f.InspectorControls,null,Object(m.createElement)(S.PanelBody,{title:Object(i.__)("Additional Actions","sensei-lms")},t.map((function(e){return Object(m.createElement)(S.ToggleControl,{key:e.label,checked:e.active,onChange:e.onToggle,label:e.label})})))))},z=function(e){var t=e.className,n=e.clientId,o=e.setAttributes,r=e.attributes.toggledBlocks,s=w(x),l=b()(s,2),c=l[0],a=l[1],u=P({parentClientId:n,setAttributes:o,toggledBlocks:r,blocks:[{blockName:"sensei-lms/button-reset-lesson",label:Object(i.__)("Reset Lesson","sensei-lms")}]}),d=N(),v=d?"has-quiz":"no-quiz",O=L(d)?"allowed":"not-allowed",g=_.filter((function(e){return!1!==r[e[0]]}));return Object(m.createElement)(m.Fragment,null,Object(m.createElement)(M,{previewState:c,onPreviewChange:a,toggleBlocks:u}),Object(m.createElement)("div",{className:p()(t,"wp-block-sensei-lms-lesson-actions__preview-".concat(c),"wp-block-sensei-lms-lesson-actions__".concat(v),"wp-block-sensei-lms-lesson-actions__complete_lessons-".concat(O))},Object(m.createElement)("div",{className:"sensei-buttons-container"},Object(m.createElement)(f.InnerBlocks,{allowedBlocks:j,template:g,templateLock:"all",templateInsertUpdatesSelection:!1}))))},R=function(e){var t=e.className;return Object(m.createElement)("div",{className:t},Object(m.createElement)("div",{className:"sensei-buttons-container"},Object(m.createElement)(f.InnerBlocks.Content,null)))},A=Object(m.createElement)(S.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(m.createElement)(S.Path,{d:"M17 3H7c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm.5 6c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5V5c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v4zm-8-1.2h5V6.2h-5v1.6zM17 13H7c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zm.5 6c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5v-4c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v4zm-8-1.2h5v-1.5h-5v1.5z"})),V=c()(c()({title:Object(i.__)("Lesson Actions","sensei-lms"),description:Object(i.__)("Enable a learner to perform specific actions for a lesson.","sensei-lms"),keywords:[Object(i.__)("Lesson","sensei-lms"),Object(i.__)("Actions","sensei-lms"),Object(i.__)("Buttons","sensei-lms"),Object(i.__)("Complete","sensei-lms"),Object(i.__)("Next","sensei-lms"),Object(i.__)("Reset","sensei-lms")],example:{innerBlocks:[{name:"sensei-lms/button-complete-lesson"},{name:"sensei-lms/button-next-lesson"},{name:"sensei-lms/button-reset-lesson"}]}},a),{},{icon:A,edit:z,save:R}),I=n(15),T=Object(I.b)({settings:{name:"sensei-lms/button-complete-lesson",parent:["sensei-lms/lesson-actions"],title:Object(i.__)("Complete Lesson","sensei-lms"),description:Object(i.__)("Enable a learner to mark the lesson as complete. This block is only displayed if the lesson has no quiz or the quiz is optional.","sensei-lms"),keywords:[Object(i.__)("Complete","sensei-lms"),Object(i.__)("Finish","sensei-lms"),Object(i.__)("Lesson","sensei-lms"),Object(i.__)("Button","sensei-lms")],attributes:{text:{default:Object(i.__)("Complete Lesson","sensei-lms")},buttonClassName:{default:["sensei-stop-double-submission"]}},styles:[c()(c()({},I.a.Fill),{},{isDefault:!0}),I.a.Outline,I.a.Link]}}),q=Object(I.b)({settings:{name:"sensei-lms/button-next-lesson",title:Object(i.__)("Next Lesson","sensei-lms"),parent:["sensei-lms/lesson-actions"],description:Object(i.__)("Enable a learner to move to the next lesson. This block is only displayed if the current lesson has been completed.","sensei-lms"),keywords:[Object(i.__)("Next","sensei-lms"),Object(i.__)("Continue","sensei-lms"),Object(i.__)("Lesson","sensei-lms"),Object(i.__)("Button","sensei-lms")],attributes:{text:{default:Object(i.__)("Next Lesson","sensei-lms")}},styles:[c()(c()({},I.a.Fill),{},{isDefault:!0}),I.a.Outline,I.a.Link]}}),F=Object(I.b)({settings:{name:"sensei-lms/button-reset-lesson",title:Object(i.__)("Reset Lesson","sensei-lms"),parent:["sensei-lms/lesson-actions"],description:Object(i.__)("Enable a learner to reset their progress. This block is only displayed if the lesson is completed and has no quiz, or the quiz is completed and retakes are enabled.","sensei-lms"),keywords:[Object(i.__)("Reset","sensei-lms"),Object(i.__)("Restart","sensei-lms"),Object(i.__)("Revert","sensei-lms"),Object(i.__)("Progress","sensei-lms"),Object(i.__)("Lesson","sensei-lms"),Object(i.__)("Button","sensei-lms")],attributes:{text:{default:Object(i.__)("Reset Lesson","sensei-lms")},buttonClassName:{default:["sensei-stop-double-submission"]}},styles:[I.a.Fill,c()(c()({},I.a.Outline),{},{isDefault:!0}),I.a.Link]}}),H=Object(I.b)({settings:{name:"sensei-lms/button-view-quiz",title:Object(i.__)("View Quiz","sensei-lms"),parent:["sensei-lms/lesson-actions"],description:Object(i.__)("Enable a learner to view the quiz.","sensei-lms"),keywords:[Object(i.__)("Quiz","sensei-lms"),Object(i.__)("Lesson","sensei-lms"),Object(i.__)("Button","sensei-lms")],attributes:{text:{default:Object(i.__)("View Quiz","sensei-lms")}},styles:[c()(c()({},I.a.Fill),{},{isDefault:!0}),I.a.Outline,I.a.Link]}}),D=n(23),G=n(84),W=n(46),Z=function(e){var t=e.attributes.isPreview,n=void 0!==t&&t,o=e.children;return Object(m.useEffect)((function(){if(!n&&window.sensei_toggle_legacy_lesson_metaboxes)return window.sensei_toggle_legacy_lesson_metaboxes(),window.sensei_toggle_legacy_lesson_metaboxes}),[n]),o},Q=n(19),J=Object(Q.applyFilters)("sensei-lms.Lesson.difficulties",[{label:Object(i.__)("None","sensei-lms"),value:""},{label:Object(i.__)("Easy","sensei-lms"),value:"easy"},{label:Object(i.__)("Standard","sensei-lms"),value:"std"},{label:Object(i.__)("Hard","sensei-lms"),value:"hard"}]),U=function(e){var t,n=e.className,o=e.attributes,r=o.difficulty,s=o.length,l=e.setAttributes;return Object(m.createElement)(Z,e,Object(m.createElement)(f.InspectorControls,null,Object(m.createElement)(S.PanelBody,{title:Object(i.__)("Properties","sensei-lms")},Object(m.createElement)(W.a,{id:"sensei-lesson-length",label:Object(i.__)("Length","sensei-lms"),min:0,step:1,value:s,onChange:function(e){return l({length:e})},suffix:Object(i._n)("minute","minutes",s,"sensei-lms")}),Object(m.createElement)(S.SelectControl,{label:Object(i.__)("Difficulty","sensei-lms"),options:J.map((function(e){return{label:e.label,value:e.value}})),value:r,onChange:function(e){return l({difficulty:e})}}))),Object(m.createElement)("div",{className:n},Object(m.createElement)("span",{className:p()("wp-block-sensei-lms-lesson-properties__length",{disabled:!s})},Object(i.__)("Length","sensei-lms")+": "+s+" "+Object(i._n)("minute","minutes",s,"sensei-lms")),Object(m.createElement)("span",{className:p()("wp-block-sensei-lms-lesson-properties__separator",{disabled:!s||!r})},"|"),Object(m.createElement)("span",{className:p()("wp-block-sensei-lms-lesson-properties__difficulty",{disabled:!r})},Object(i.__)("Difficulty","sensei-lms")+": "+(null===(t=J.find((function(e){return r===e.value})))||void 0===t?void 0:t.label))))},K=c()(c()({title:Object(i.__)("Lesson Properties","sensei-lms"),description:Object(i.__)("Add lesson properties such as length and difficulty.","sensei-lms"),keywords:[Object(i.__)("Metadata","sensei-lms"),Object(i.__)("Length","sensei-lms"),Object(i.__)("Complexity","sensei-lms"),Object(i.__)("Difficulty","sensei-lms"),Object(i.__)("Lesson Information","sensei-lms"),Object(i.__)("Lesson Properties","sensei-lms")],icon:D.d},G),{},{example:{attributes:{difficulty:"easy",length:10}},edit:U,save:function(){return null}});Object(s.a)([V,K,T,q,F,H]);var Y=Object(r.subscribe)((function(){var e;!0===(null===(e=Object(r.select)("core/editor").getEditedPostAttribute("meta"))||void 0===e?void 0:e._needs_template)&&(setTimeout(Object(r.dispatch)("core/block-editor").synchronizeTemplate,1),Object(r.dispatch)("core/editor").editPost({meta:{_needs_template:!1}}),Y())}))},16:function(e,t,n){"use strict";n.d(t,"a",(function(){return g})),n.d(t,"b",(function(){return h})),n.d(t,"c",(function(){return x}));var o=n(11),r=n.n(o),s=n(9),l=n.n(s),c=n(5),i=n.n(c),a=n(3),u=n.n(a),b=n(0),m=n(8),d=n(6),p=n(1),f=n(4),v=function(e){if(!e||null===e.match("#"))return e;var t=0,n=0,o=0,r=4===e.length?"#".concat(e[1]+e[1]+e[2]+e[2]+e[3]+e[3]):e;return 7===r.length&&(t=parseInt(r.substr(1,2),16)||0,n=parseInt(r.substr(3,2),16)||0,o=parseInt(r.substr(5,2),16)||0),"rgb(".concat(t,", ").concat(n,", ").concat(o,")")},O=window.getComputedStyle,j=Object(m.memoize)((function(){var e=document.createElement("div");e.className="editor-styles-wrapper sensei-probe-element";var t=document.createElement("div");t.className="wp-block-button";var n=document.createElement("div");n.className="wp-block-button__link",n.textContent="Probe",e.style.position="fixed",e.style.top="-100vh",t.appendChild(n),e.appendChild(t),document.body.appendChild(e);var o={primaryColor:O(n).backgroundColor,primaryContrastColor:O(n).color};return document.body.removeChild(e),o})),g=function(e){return function(t){var n=Object(m.mapValues)(e,(function(e){return e.style}));return Object(d.withColors)(n)((function(n){return Object(b.createElement)(b.Fragment,null,Object(b.createElement)(t,n),Object(b.createElement)(_,{colorSettings:e,props:n}))}))}},_=function(e){var t=e.colorSettings,n=e.props,o=Object.keys(t);return Object(b.createElement)(d.InspectorControls,null,Object(b.createElement)(d.PanelColorSettings,{title:Object(p.__)("Color settings","sensei-lms"),initialOpen:!1,colorSettings:o.map((function(e){return{value:n[e].color,label:t[e].label,onChange:function(o){n["set".concat(Object(m.upperFirst)(e))](o),t[e].onChange&&t[e].onChange(u()(u()({},n),{},{colorValue:o}))}}}))},n.backgroundColor&&n.textColor&&Object(b.createElement)(d.ContrastChecker,{textColor:n.textColor.color,backgroundColor:n.backgroundColor.color,isLargeText:!1})))},h=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"default";return function(t){return function(n){var o=n.className,r={};o&&o.includes("is-style-")||(o=r.className=[o,"is-style-".concat(e)].join(" "));var s=o.match(/is-style-(\w+)/);return s&&(r.blockStyle=s[1]),Object(b.createElement)(t,i()({},n,r))}}},x=function(e){return function(t){return function(n){var o=n.setAttributes,s=n.attributes,c=function(){var e=Object(f.useSelect)((function(e){return e("core/editor").getEditorSettings().colors}),[]),t=Object(b.useState)({}),n=l()(t,2),o=n[0],r=n[1];return Object(b.useEffect)((function(){var t=j(),n={},o=Object(m.mapValues)(Object(m.keyBy)(e,(function(e){return v(e.color)})),"slug");Object.entries(t).forEach((function(e){var t=l()(e,2),r=t[0],s=t[1],c=o[v(s)];c&&(n[r]={slug:c,color:s})})),r(n)}),[e]),o}(),a=Object(b.useState)({}),p=l()(a,2),O=p[0],g=p[1],_=Object.keys(e).map((function(e){return s[e]}));return Object(b.useEffect)((function(){var t={};Object.entries(e).forEach((function(e){var n=l()(e,2),r=n[0],i=n[1],a=i.style,b=i.probeKey,m=c[b]||{},p=m.slug;if(p&&(t[r]=u()(u()({},m),{},{className:Object(d.getColorClassName)(a,p)})),s[r]!==p){var f={};f[r]=p,"border-color"===a&&(f["".concat(r,"Value")]=m.color),o(f)}})),g(t)}),[c,o].concat(r()(_))),Object(b.createElement)(t,i()({},n,O))}}}},17:function(e,t,n){"use strict";n.d(t,"d",(function(){return s})),n.d(t,"e",(function(){return l})),n.d(t,"c",(function(){return c})),n.d(t,"b",(function(){return i})),n.d(t,"a",(function(){return a}));var o=n(0),r=n(2),s=Object(o.createElement)(r.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(o.createElement)(r.Path,{d:"M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"})),l=Object(o.createElement)(r.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(o.createElement)(r.Path,{d:"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"})),c=Object(o.createElement)(r.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(o.createElement)(r.Path,{d:"M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"})),i=Object(o.createElement)(r.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(o.createElement)(r.Path,{d:"M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13h8v-1.5H8V13z"})),a=Object(o.createElement)(r.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(o.createElement)(r.Path,{d:"M13 7h-2v6h2V7zM13 15h-2v2h2v-2z"}),Object(o.createElement)(r.Path,{d:"M12 4.75a7.25 7.25 0 100 14.5 7.25 7.25 0 000-14.5zM3.25 12a8.75 8.75 0 1117.5 0 8.75 8.75 0 01-17.5 0z"}))},19:function(e,t){e.exports=window.wp.hooks},2:function(e,t){e.exports=window.wp.components},20:function(e,t){e.exports=function(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,o=new Array(t);n<t;n++)o[n]=e[n];return o},e.exports.default=e.exports,e.exports.__esModule=!0},21:function(e,t,n){var o=n(20);e.exports=function(e,t){if(e){if("string"==typeof e)return o(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?o(e,t):void 0}},e.exports.default=e.exports,e.exports.__esModule=!0},23:function(e,t,n){"use strict";n.d(t,"a",(function(){return c})),n.d(t,"b",(function(){return i})),n.d(t,"c",(function(){return a})),n.d(t,"d",(function(){return u})),n.d(t,"e",(function(){return b})),n.d(t,"f",(function(){return m})),n.d(t,"g",(function(){return d}));var o=n(5),r=n.n(o),s=n(0),l=n(2),c=function(e){return Object(s.createElement)(l.SVG,r()({},e,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"}),Object(s.createElement)(l.Path,{d:"M20 16V4H4v12h16z"}),Object(s.createElement)(l.Path,{d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12zM6 20h2.222L11 16H8.778L6 20zM18 20h-2.222L13 16h2.222L18 20z"}))},i=function(){return Object(s.createElement)(l.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Rect,{stroke:"currentColor",fill:"transparent",x:"-0.75",y:"-0.75",width:"10",height:"14.5",transform:"matrix(4.37114e-08 -1 -1 -4.37114e-08 18.5 14)",strokeWidth:"1.5"}),Object(s.createElement)(l.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M8 12L16 12L16 8L8 8L8 12Z"}),Object(s.createElement)(l.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M7.2215 19.8616L10.7791 14.8707L9.55762 14L6.00005 18.9909L7.2215 19.8616Z"}),Object(s.createElement)(l.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M16.5578 19.8616L13.0002 14.8707L14.2217 14L17.7792 18.9909L16.5578 19.8616Z"}))},a=function(){return Object(s.createElement)(l.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Path,{d:"m4 4v12h4.7773l-2.7773 4h2.2227l2.7773-4h2l2.7773 4h2.2227l-2.7773-4h4.7773v-12zm1.5 1.5h13v9h-13zm3.5 2.5v1.5h6v-1.5zm0 3v1.5h6v-1.5z",clipRule:"evenodd",fillRule:"evenodd"}))},u=function(){return Object(s.createElement)(l.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(s.createElement)(l.Path,{d:"M16.181 17.381a7.61 7.61 0 01-2.13.133L15.778 20H18l-1.819-2.619zm-5.479-.953a7.712 7.712 0 01-2.12-1.928H5.5v-9h2.759A7.793 7.793 0 019.523 4H4v12h4.778L6 20h2.222l2.48-3.572z"}),Object(s.createElement)(l.Path,{d:"M15.541 8.944h-1.5v3.997h1.5V8.944zM15.541 7.944h-1.5V6.55h1.5v1.395z"}),Object(s.createElement)(l.Path,{d:"M20.79 9.768c0 3.425-2.714 6.269-6.145 6.269-3.43 0-6.145-2.844-6.145-6.269 0-3.424 2.714-6.268 6.145-6.268 3.43 0 6.145 2.844 6.145 6.268zm-6.145 4.769c2.565 0 4.645-2.135 4.645-4.769C19.29 7.135 17.21 5 14.645 5 12.08 5 10 7.135 10 9.768c0 2.634 2.08 4.769 4.645 4.769z"}))},b=function(){return Object(s.createElement)(l.SVG,{width:"24",height:"24",viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Path,{fillRule:"evenodd",clipRule:"evenodd",d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12z"}),Object(s.createElement)(l.Path,{fillRule:"evenodd",clipRule:"evenodd",d:"M9 12h6V8H9v4zM6 20h2.222L11 16H8.778L6 20zM18 20h-2.222L13 16h2.222L18 20z"}))},m=function(){return Object(s.createElement)(l.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Rect,{x:"2.75",y:"7.75",width:"18.5",height:"6.5",rx:"3.25",stroke:"currentColor",strokeWidth:"1.5",fillOpacity:"0"}),Object(s.createElement)(l.Path,{d:"M6 7.75 H 16.7 L 10.2 14.25 H 6 C 4.2 14.25 2.75 12.8 2.75 11 C 2.75 9.2 4.2 7.75 6 7.75Z",strokeWidth:"1.5"}))},d=function(e){return Object(s.createElement)(l.SVG,r()({},e,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 256.000000 256.000000",preserveAspectRatio:"xMidYMid meet"}),Object(s.createElement)(l.G,{transform:"translate(0.000000,256.000000) scale(0.100000,-0.100000)",stroke:"none"},Object(s.createElement)(l.Path,{d:"M1174 2541 c-28 -3 -58 -12 -67 -19 -9 -8 -25 -11 -37 -7 -11 3 -20 2 -20 -4 0 -5 -11 -8 -25 -5 -14 2 -25 0 -25 -6 0 -5 -13 -10 -30 -10 -16 0 -30 -4 -30 -9 0 -4 -23 -11 -52 -14 -28 -4 -54 -11 -58 -16 -3 -6 -25 -13 -48 -17 -23 -3 -39 -10 -37 -15 3 -4 -10 -11 -30 -15 -19 -3 -33 -9 -31 -13 2 -3 -15 -15 -37 -26 -23 -11 -48 -26 -55 -32 -7 -7 -19 -13 -27 -13 -7 0 -15 -7 -19 -15 -3 -8 -12 -15 -21 -15 -8 0 -15 -4 -15 -9 0 -5 -8 -12 -17 -15 -47 -15 -189 -157 -290 -291 -5 -5 -32 -59 -61 -120 -29 -60 -58 -118 -63 -127 -5 -10 -9 -25 -9 -33 0 -10 -5 -13 -11 -9 -9 5 -10 -1 -5 -20 4 -15 2 -26 -4 -26 -5 0 -9 -10 -9 -22 1 -23 -13 -104 -31 -186 -13 -54 -13 -254 -1 -301 6 -20 15 -71 22 -114 7 -43 15 -80 20 -82 4 -3 5 -15 1 -27 -3 -14 -2 -19 6 -14 7 4 12 2 12 -4 0 -6 14 -38 30 -72 17 -33 30 -64 30 -70 0 -5 7 -16 15 -24 8 -9 15 -24 15 -35 0 -10 4 -19 8 -19 5 0 14 -10 19 -23 23 -47 145 -179 177 -191 10 -3 16 -12 13 -21 -4 -8 -1 -12 6 -10 7 3 34 -16 60 -40 27 -25 53 -45 59 -45 6 0 19 -9 29 -21 9 -11 29 -21 43 -23 14 -1 29 -5 32 -9 3 -3 12 -3 20 0 8 3 14 -1 14 -11 0 -9 -8 -16 -17 -16 -14 0 -9 -8 16 -30 18 -17 38 -30 43 -30 6 0 8 -6 5 -13 -4 -10 2 -13 20 -9 18 3 24 1 19 -6 -4 -7 3 -14 19 -18 14 -3 25 -10 25 -14 0 -4 18 -10 40 -14 22 -3 40 -11 40 -17 0 -6 7 -9 15 -5 9 3 21 -4 31 -19 9 -14 25 -25 35 -25 10 0 20 -4 23 -9 4 -5 25 -12 49 -16 23 -4 47 -11 53 -16 12 -10 246 -5 263 5 5 4 12 2 16 -4 8 -13 41 -13 82 2 27 10 38 10 53 0 27 -17 71 -15 109 4 28 14 56 21 99 26 6 1 12 5 12 10 0 4 11 8 25 8 14 0 25 4 25 10 0 5 15 12 33 15 19 4 40 15 47 25 10 14 22 17 51 13 26 -4 39 -2 39 6 0 6 5 11 11 11 6 0 27 13 46 30 18 16 44 30 58 30 13 0 26 6 28 13 4 9 8 8 16 -3 7 -10 11 -11 11 -2 0 6 6 12 13 12 18 0 49 24 134 104 40 38 73 75 73 83 0 7 4 13 8 13 5 0 17 16 28 35 10 19 22 35 25 35 4 0 10 11 13 25 4 14 11 23 16 20 6 -3 10 1 10 9 0 21 42 116 51 116 4 0 10 13 14 30 4 16 11 30 16 30 5 0 9 9 9 20 0 11 5 20 11 20 6 0 8 9 4 20 -3 11 -2 20 3 20 5 0 18 40 30 90 18 71 22 120 22 240 0 82 -4 169 -10 192 -5 24 -17 97 -26 163 -9 66 -19 122 -23 125 -3 3 -15 30 -25 60 -11 30 -26 66 -33 80 -7 14 -13 31 -13 38 0 6 -4 12 -10 12 -5 0 -12 11 -16 25 -3 14 -10 25 -14 25 -4 0 -10 8 -14 18 -6 20 -25 50 -43 70 -7 7 -13 18 -13 23 0 5 -5 15 -10 22 -41 48 -50 62 -50 74 0 7 -5 13 -11 13 -6 0 -9 7 -6 14 4 10 1 13 -8 10 -8 -4 -20 6 -28 23 -13 25 -170 181 -209 208 -31 22 -54 35 -73 44 -11 5 -30 18 -42 30 -12 11 -33 23 -47 27 -14 3 -26 10 -26 15 0 5 -8 9 -17 9 -10 0 -31 7 -47 15 -15 8 -35 15 -42 15 -8 0 -14 4 -14 10 0 5 -10 10 -22 10 -13 0 -63 6 -113 13 -111 18 -313 27 -381 18z m381 -201 c-4 -6 6 -10 22 -10 45 0 103 -12 98 -20 -3 -4 14 -10 37 -13 22 -3 44 -10 47 -15 3 -5 20 -13 37 -16 17 -4 40 -15 50 -25 11 -9 22 -18 26 -19 24 -8 44 -17 54 -26 6 -6 22 -18 35 -26 38 -24 169 -161 169 -176 0 -8 5 -14 11 -14 6 0 9 -7 6 -14 -4 -10 -1 -13 9 -9 10 4 12 0 7 -13 -4 -12 -3 -15 5 -10 7 4 12 1 12 -7 0 -8 7 -20 16 -28 9 -7 14 -22 11 -35 -3 -15 0 -21 9 -17 8 3 16 -5 20 -21 3 -14 10 -26 14 -26 5 0 12 -20 16 -45 3 -25 10 -45 15 -45 5 0 9 -7 9 -16 0 -9 6 -28 14 -42 24 -48 46 -102 46 -117 0 -7 6 -15 13 -17 16 -6 18 -455 1 -466 -6 -4 -14 -42 -17 -86 -3 -43 -10 -83 -16 -89 -6 -6 -11 -19 -11 -30 0 -10 -4 -16 -9 -13 -5 3 -11 -17 -15 -44 -4 -28 -10 -50 -15 -50 -5 0 -11 -14 -15 -31 -4 -23 -10 -30 -21 -25 -9 3 -13 2 -10 -4 10 -16 -5 -52 -20 -46 -8 3 -11 -2 -8 -13 3 -11 -8 -32 -29 -53 -18 -20 -42 -47 -54 -59 -27 -30 -105 -99 -134 -119 -12 -8 -28 -21 -36 -27 -7 -7 -15 -13 -19 -13 -4 0 -14 -7 -22 -16 -9 -8 -24 -13 -34 -11 -10 3 -16 0 -14 -7 4 -11 -57 -56 -76 -56 -5 0 -9 -4 -9 -10 0 -5 -18 -13 -40 -16 -22 -4 -37 -10 -34 -15 3 -5 -6 -9 -19 -9 -13 0 -27 -3 -31 -7 -7 -7 -18 -11 -68 -20 -18 -3 -39 -10 -46 -16 -8 -6 -113 -9 -285 -9 -149 1 -278 -2 -285 -7 -9 -5 -31 0 -60 15 -26 12 -54 24 -62 26 -8 2 -22 10 -30 19 -8 9 -25 19 -37 23 -13 4 -23 11 -23 16 0 5 -16 12 -35 16 -19 3 -35 10 -35 14 0 4 -16 11 -36 15 -20 3 -42 12 -49 18 -7 7 -29 26 -49 42 -76 62 -142 138 -140 161 1 7 -4 10 -11 7 -15 -5 -30 31 -20 47 3 6 0 7 -9 4 -10 -4 -18 1 -23 12 -3 11 -9 21 -12 24 -15 13 -60 114 -54 123 3 6 1 7 -5 3 -7 -4 -13 7 -18 29 -3 19 -10 35 -15 35 -5 0 -9 6 -9 14 0 7 -7 27 -15 42 -8 16 -15 41 -15 56 0 15 -4 29 -9 33 -6 3 -13 37 -17 75 -4 39 -11 73 -15 76 -5 3 -9 73 -9 155 0 83 4 148 9 145 4 -3 11 27 15 67 4 40 11 74 16 75 6 2 10 15 10 29 0 14 7 40 15 59 8 19 22 49 30 68 8 19 15 39 15 45 0 6 4 11 9 11 5 0 12 14 16 30 4 17 10 30 15 30 4 0 10 8 14 18 9 28 80 129 101 144 5 4 6 8 2 8 -4 0 11 20 34 45 24 25 49 43 55 41 8 -3 11 1 7 9 -3 9 4 19 18 25 13 5 33 16 44 22 18 12 24 17 57 43 28 23 119 75 131 75 6 0 21 7 31 15 11 8 28 15 38 15 10 0 18 4 18 9 0 5 19 12 43 16 23 4 45 12 48 17 3 5 31 12 62 15 31 3 54 10 51 14 -3 5 108 9 246 9 165 0 249 -3 245 -10z"}),Object(s.createElement)(l.Path,{d:"M820 1920 c0 -5 -6 -10 -12 -10 -26 -1 -58 -38 -58 -67 0 -26 9 -38 50 -63 12 -7 12 -12 1 -34 -11 -21 -17 -23 -32 -13 -13 8 -15 13 -6 19 7 5 -1 8 -20 8 -18 0 -33 -4 -33 -10 0 -5 -19 -10 -42 -10 -40 -1 -88 -26 -88 -45 0 -14 43 -45 61 -45 9 0 19 -5 21 -12 3 -9 12 -9 36 1 41 17 47 11 31 -33 -10 -29 -11 -43 -1 -68 14 -38 2 -56 -22 -32 -13 12 -28 15 -63 11 -25 -3 -49 -10 -53 -17 -4 -7 -17 -10 -29 -7 -12 3 -19 1 -15 -5 3 -5 -2 -18 -12 -29 -22 -24 -10 -52 25 -57 11 -2 21 -8 21 -13 0 -5 29 -9 65 -9 37 0 65 4 65 10 0 12 77 14 82 2 2 -4 18 -18 36 -31 18 -13 31 -25 29 -28 -3 -2 -42 -6 -88 -9 -46 -3 -86 -9 -89 -14 -3 -6 -41 -13 -83 -16 -42 -4 -77 -11 -77 -17 0 -5 -9 -7 -19 -4 -14 3 -18 1 -14 -9 3 -8 0 -14 -6 -14 -6 0 -11 -9 -11 -20 0 -11 7 -20 15 -20 8 0 15 -4 15 -9 0 -5 25 -12 55 -16 30 -3 53 -10 50 -14 -6 -11 184 -24 229 -16 20 4 36 11 36 16 0 5 21 9 48 9 66 0 88 8 100 36 10 20 16 23 44 18 42 -8 88 -27 88 -36 0 -5 3 -8 8 -7 15 2 52 -14 52 -22 0 -5 3 -8 8 -7 4 1 18 -2 30 -6 18 -6 30 -2 48 15 13 12 24 18 24 12 0 -6 -16 -25 -35 -42 -19 -17 -35 -35 -35 -40 0 -5 -5 -11 -11 -13 -6 -2 -11 -29 -11 -61 -1 -55 1 -59 44 -102 26 -26 59 -48 77 -51 17 -4 31 -10 31 -15 0 -4 21 -9 48 -11 42 -3 47 -6 47 -27 0 -17 -11 -29 -40 -45 -22 -11 -42 -24 -45 -27 -7 -8 -53 -24 -62 -21 -5 1 -8 -3 -8 -8 0 -6 -9 -10 -19 -10 -11 0 -22 -4 -25 -9 -3 -5 -32 -12 -63 -16 -32 -4 -60 -11 -63 -15 -3 -5 -41 -12 -85 -16 -44 -4 -82 -10 -85 -14 -3 -4 -32 -11 -64 -16 -70 -11 -89 -34 -27 -34 22 0 43 -4 46 -10 7 -12 102 -13 107 -2 2 5 38 12 81 15 75 7 79 6 104 -19 14 -14 41 -28 59 -31 19 -3 34 -10 34 -14 0 -5 18 -9 40 -9 22 0 40 4 40 9 0 5 20 12 45 15 25 4 45 10 45 14 0 11 77 42 104 42 14 0 28 5 31 10 3 6 22 10 41 10 26 0 34 4 34 18 0 10 -11 25 -25 32 -20 11 -25 21 -25 52 0 21 4 38 9 38 5 0 13 9 16 20 4 11 17 32 31 47 31 33 31 74 -1 121 -14 20 -25 32 -25 27 0 -5 -5 -4 -12 3 -7 7 -20 12 -31 12 -10 0 -16 4 -13 9 6 8 -63 21 -115 21 -16 0 -29 5 -29 10 0 6 -9 10 -21 10 -26 0 -59 18 -59 32 0 15 48 58 65 58 7 0 15 5 17 11 2 5 22 13 46 16 23 3 39 9 36 14 -2 4 18 11 45 15 28 4 48 10 46 14 -3 5 23 10 57 12 50 3 67 0 80 -13 16 -16 38 -17 230 -12 222 6 238 10 238 52 0 14 -8 23 -25 27 -14 3 -25 10 -25 15 0 6 -12 8 -27 7 -20 -2 -28 2 -31 16 -2 11 -10 25 -17 33 -7 7 -15 18 -17 24 -2 7 -30 14 -61 17 -31 2 -57 8 -57 12 0 5 -28 11 -62 15 -35 4 -69 12 -75 17 -9 7 -13 7 -13 -1 0 -6 -11 -11 -25 -11 -14 0 -25 -5 -25 -11 0 -7 -14 -8 -40 -4 -23 4 -40 3 -40 -3 0 -5 -25 -12 -57 -15 -31 -3 -59 -11 -63 -16 -3 -6 -25 -12 -48 -13 -49 -2 -82 -27 -82 -64 0 -19 6 -26 30 -30 67 -14 14 -32 -72 -25 -16 1 -28 -2 -28 -7 0 -5 -8 -12 -17 -15 -10 -2 -27 -8 -38 -12 -11 -4 -15 -3 -9 2 15 12 13 52 -4 46 -20 -8 -38 25 -36 68 2 45 18 69 45 69 11 0 19 4 19 9 0 6 63 12 143 15 193 7 207 8 207 18 0 4 13 8 30 8 19 0 33 7 40 19 11 21 4 51 -12 51 -6 0 -8 6 -5 13 4 10 -3 12 -24 9 -16 -2 -29 0 -29 5 0 6 -44 13 -97 16 -54 4 -99 11 -101 17 -6 16 -134 12 -156 -5 -11 -9 -41 -15 -68 -15 -28 0 -48 -5 -48 -11 0 -6 -7 -9 -14 -6 -10 4 -13 1 -9 -9 3 -7 0 -14 -6 -14 -6 0 -11 -7 -11 -15 0 -21 41 -66 60 -64 40 4 45 -2 20 -21 -14 -11 -30 -20 -36 -20 -6 0 -17 -7 -24 -15 -7 -8 -21 -15 -30 -15 -10 0 -20 -5 -22 -12 -3 -7 -32 -14 -74 -16 -38 -3 -78 -11 -89 -18 -23 -16 -61 -18 -70 -4 -4 6 10 10 34 10 23 0 41 3 41 8 0 4 -19 16 -43 27 -53 25 -62 34 -63 65 -2 42 50 69 133 71 110 2 123 6 123 40 0 16 -5 29 -11 29 -6 0 -9 6 -6 13 3 7 -3 13 -12 14 -9 1 -38 5 -64 9 -38 5 -59 2 -95 -14 -26 -11 -59 -25 -74 -31 -35 -13 -36 -34 -3 -49 32 -15 31 -22 -6 -50 -24 -20 -32 -22 -44 -12 -8 7 -15 17 -15 22 0 6 -10 24 -22 40 -19 28 -20 31 -5 40 10 5 17 17 17 26 1 21 37 65 66 80 15 8 39 8 87 -1 87 -14 118 -2 115 45 l-3 33 -80 3 c-64 2 -85 -1 -107 -16 -29 -19 -88 -99 -88 -119 0 -7 -4 -13 -10 -13 -17 0 -11 58 10 95 11 20 20 42 20 51 0 8 7 17 15 20 8 4 15 14 15 24 0 16 6 18 35 13 23 -4 35 -2 35 6 0 6 11 11 23 11 13 0 34 8 45 19 23 19 30 51 11 51 -6 0 -8 7 -5 16 4 9 2 13 -5 8 -6 -4 -15 -1 -19 6 -4 7 -31 15 -59 18 -28 2 -51 8 -51 13 0 5 -11 9 -25 9 -14 0 -25 -4 -25 -10z"})))}},28:function(e,t){e.exports=function(e){if(Array.isArray(e))return e},e.exports.default=e.exports,e.exports.__esModule=!0},29:function(e,t){e.exports=function(e,t){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e)){var n=[],_n=!0,o=!1,r=void 0;try{for(var s,l=e[Symbol.iterator]();!(_n=(s=l.next()).done)&&(n.push(s.value),!t||n.length!==t);_n=!0);}catch(c){o=!0,r=c}finally{try{_n||null==l.return||l.return()}finally{if(o)throw r}}return n}},e.exports.default=e.exports,e.exports.__esModule=!0},3:function(e,t,n){var o=n(10);function r(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);t&&(o=o.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,o)}return n}e.exports=function(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?r(Object(n),!0).forEach((function(t){o(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):r(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e},e.exports.default=e.exports,e.exports.__esModule=!0},30:function(e,t){e.exports=function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")},e.exports.default=e.exports,e.exports.__esModule=!0},32:function(e,t){e.exports=function(e,t){if(null==e)return{};var n,o,r={},s=Object.keys(e);for(o=0;o<s.length;o++)n=s[o],t.indexOf(n)>=0||(r[n]=e[n]);return r},e.exports.default=e.exports,e.exports.__esModule=!0},35:function(e,t,n){var o=n(20);e.exports=function(e){if(Array.isArray(e))return o(e)},e.exports.default=e.exports,e.exports.__esModule=!0},36:function(e,t){e.exports=function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)},e.exports.default=e.exports,e.exports.__esModule=!0},37:function(e,t){e.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")},e.exports.default=e.exports,e.exports.__esModule=!0},38:function(e,t,n){"use strict";var o=n(12),r=n.n(o),s=n(13),l=n(23);t.a=function(e){Object(s.updateCategory)("sensei-lms",{icon:Object(l.g)({width:"20",height:"20"})}),e.forEach((function(e){var t=e.name,n=r()(e,["name"]);Object(s.registerBlockType)(t,n)}))}},4:function(e,t){e.exports=window.wp.data},46:function(e,t,n){"use strict";var o=n(5),r=n.n(o),s=n(12),l=n.n(s),c=n(0),i=n(7),a=n.n(i),u=n(2),b=n(1);t.a=function(e){var t=e.className,n=e.id,o=e.label,s=e.value,i=e.help,m=e.allowReset,d=void 0!==m&&m,p=e.resetLabel,f=e.onChange,v=e.suffix,O=l()(e,["className","id","label","value","help","allowReset","resetLabel","onChange","suffix"]);return Object(c.createElement)(u.BaseControl,{id:n,label:o,help:i},Object(c.createElement)("div",{className:"sensei-number-control"},Object(c.createElement)("div",{className:"sensei-number-control__input-container"},Object(c.createElement)("input",r()({className:a()("sensei-number-control__input components-text-control__input",t),type:"number",id:n,onChange:function(e){f(parseInt(e.target.value,10)||O.min||0)},value:null===s?"":s},O)),v&&Object(c.createElement)("span",{className:"sensei-number-control__input-suffix"},v)),d&&Object(c.createElement)(u.Button,{className:"sensei-number-control__button",isSmall:!0,isSecondary:!0,onClick:function(){return f(null)}},p||Object(b.__)("Reset","sensei-lms"))))}},47:function(e,t,n){"use strict";var o=n(5),r=n.n(o),s=n(3),l=n.n(s),c=n(12),i=n.n(c),a=n(0),u=n(7),b=n.n(u),m=n(2),d=n(17);t.a=function(e){var t=e.options,n=e.optionsLabel,o=e.icon,s=e.value,c=e.onChange,u=e.toggleProps,p=e.getMenuItemProps,f=e.popoverProps,v=i()(e,["options","optionsLabel","icon","value","onChange","toggleProps","getMenuItemProps","popoverProps"]),O=t.find((function(e){return s===e.value}));return Object(a.createElement)(m.Dropdown,r()({className:"sensei-toolbar-dropdown",popoverProps:l()(l()({isAlternate:!0,position:"bottom right left",focusOnMount:!0},f),{},{className:b()(null==f?void 0:f.className,"sensei-toolbar-dropdown__popover")}),renderToggle:function(e){var t=e.isOpen,n=e.onToggle;return Object(a.createElement)(m.Button,r()({onClick:n,icon:o,"aria-expanded":t,"aria-haspopup":"true"},u,{children:null!=u&&u.children?u.children(O):null==O?void 0:O.label}))},renderContent:function(e){var o=e.onClose;return Object(a.createElement)(m.NavigableMenu,{role:"menu",stopNavigationEvents:!0},Object(a.createElement)(m.MenuGroup,{label:n},t.map((function(e){var t=e.value===(null==O?void 0:O.value),n=null==p?void 0:p(e);return Object(a.createElement)(m.MenuItem,r()({key:e.value,role:"menuitemradio",isSelected:t,icon:t?d.c:null,className:b()("sensei-toolbar-dropdown__option",{"is-selected":t},null==n?void 0:n.className),onClick:function(){c(e.value),o()},children:e.label},n))}))))}},v))}},5:function(e,t){function n(){return e.exports=n=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var o in n)Object.prototype.hasOwnProperty.call(n,o)&&(e[o]=n[o])}return e},e.exports.default=e.exports,e.exports.__esModule=!0,n.apply(this,arguments)}e.exports=n,e.exports.default=e.exports,e.exports.__esModule=!0},6:function(e,t){e.exports=window.wp.blockEditor},7:function(e,t,n){var o;
+/******/(()=>{// webpackBootstrap
+/******/var e={
+/***/8770:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s,r=n(9196);
+/* harmony import */function o(){return o=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var s in n)Object.prototype.hasOwnProperty.call(n,s)&&(e[s]=n[s])}return e},o.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return r.createElement("svg",o({viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},e),s||(s=r.createElement("path",{d:"M17 3H7c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm.5 6c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5V5c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v4zm-8-1.2h5V6.2h-5v1.6zM17 13H7c-1.1 0-2 .9-2 2v4c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2v-4c0-1.1-.9-2-2-2zm.5 6c0 .3-.2.5-.5.5H7c-.3 0-.5-.2-.5-.5v-4c0-.3.2-.5.5-.5h10c.3 0 .5.2.5.5v4zm-8-1.2h5v-1.5h-5v1.5z",fill:"currentColor"})))};
+/***/},
+/***/6867:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var s,r,o=n(9196);
+/* harmony import */function l(){return l=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var s in n)Object.prototype.hasOwnProperty.call(n,s)&&(e[s]=n[s])}return e},l.apply(this,arguments)}
+/* harmony default export */const i=function(e){
+return o.createElement("svg",l({xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},e),s||(s=o.createElement("path",{d:"M16.181 17.381a7.61 7.61 0 0 1-2.13.133L15.778 20H18l-1.819-2.619zm-5.479-.953a7.712 7.712 0 0 1-2.12-1.928H5.5v-9h2.759A7.793 7.793 0 0 1 9.523 4H4v12h4.778L6 20h2.222l2.48-3.572zM15.541 8.944h-1.5v3.997h1.5V8.944zm0-1h-1.5V6.55h1.5v1.395z"})),r||(r=o.createElement("path",{d:"M20.79 9.768c0 3.425-2.714 6.269-6.145 6.269-3.43 0-6.145-2.844-6.145-6.269 0-3.424 2.714-6.268 6.145-6.268 3.43 0 6.145 2.844 6.145 6.268zm-6.145 4.769c2.565 0 4.645-2.135 4.645-4.769C19.29 7.135 17.21 5 14.645 5 12.08 5 10 7.135 10 9.768c0 2.634 2.08 4.769 4.645 4.769z"})))};
+/***/},
+/***/8930:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s,r=n(9196);
+/* harmony import */function o(){return o=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var s in n)Object.prototype.hasOwnProperty.call(n,s)&&(e[s]=n[s])}return e},o.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return r.createElement("svg",o({viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},e),s||(s=r.createElement("path",{d:"M12 24a12 12 0 1 0 0-24 12 12 0 0 0 0 24Zm-.1-4.723c-2.849 0-4.517-1.072-4.575-3.011 0-.203 0-.405.029-.608 1.208 1.013 2.733 1.65 4.603 1.65 1.64 0 2.733-.695 2.733-1.708 0-.608-.978-.897-2.244-1.274-2.33-.752-5.553-1.736-5.553-5.181 0-2.721 1.957-4.458 5.323-4.458 2.905 0 4.66 1.042 4.689 3.242v.376c-1.496-1.187-3.107-1.794-4.862-1.794-1.64 0-2.848.636-2.848 1.592 0 .55.978.868 2.244 1.273 2.33.753 5.667 1.824 5.667 5.24 0 2.808-2.186 4.66-5.207 4.66Z",fill:"currentColor"})))};
+/***/},
+/***/9839:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var s=n(9307),r=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,s.createElement)(r.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},(0,s.createElement)(r.Path,{d:"M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 12.8h8v-1.5H8v1.5z"}));
+/* harmony default export */}
+//# sourceMappingURL=button.js.map
+/***/,
+/***/454:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var s=n(9307),r=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,s.createElement)(r.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,s.createElement)(r.Path,{d:"M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"}));
+/* harmony default export */}
+//# sourceMappingURL=check.js.map
+/***/,
+/***/42:
+/***/(e,t)=>{var n;
 /*!
-  Copyright (c) 2017 Jed Watson.
+  Copyright (c) 2018 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
-*/!function(){"use strict";var n={}.hasOwnProperty;function r(){for(var e=[],t=0;t<arguments.length;t++){var o=arguments[t];if(o){var s=typeof o;if("string"===s||"number"===s)e.push(o);else if(Array.isArray(o)&&o.length){var l=r.apply(null,o);l&&e.push(l)}else if("object"===s)for(var c in o)n.call(o,c)&&o[c]&&e.push(c)}}return e.join(" ")}e.exports?(r.default=r,e.exports=r):void 0===(o=function(){return r}.apply(t,[]))||(e.exports=o)}()},8:function(e,t){e.exports=window.lodash},83:function(e){e.exports=JSON.parse('{"name":"sensei-lms/lesson-actions","category":"sensei-lms","supports":{"html":false},"attributes":{"toggledBlocks":{"type":"object","default":{"sensei-lms/button-reset-lesson":true}}}}')},84:function(e){e.exports=JSON.parse('{"name":"sensei-lms/lesson-properties","category":"sensei-lms","textdomain":"sensei-lms","attributes":{"difficulty":{"type":"string","source":"meta","meta":"_lesson_complexity"},"length":{"type":"number","source":"meta","meta":"_lesson_length"}}}')},9:function(e,t,n){var o=n(28),r=n(29),s=n(21),l=n(30);e.exports=function(e,t){return o(e)||r(e,t)||s(e,t)||l()},e.exports.default=e.exports,e.exports.__esModule=!0}});
+*/
+/* global define */!function(){"use strict";var s={}.hasOwnProperty;function r(){for(var e=[],t=0;t<arguments.length;t++){var n=arguments[t];if(n){var o=typeof n;if("string"===o||"number"===o)e.push(n);else if(Array.isArray(n)){if(n.length){var l=r.apply(null,n);l&&e.push(l)}}else if("object"===o)if(n.toString===Object.prototype.toString)for(var i in n)s.call(n,i)&&n[i]&&e.push(i);else e.push(n.toString())}}return e.join(" ")}e.exports?(r.default=r,e.exports=r):void 0===(n=function(){return r}.apply(t,[]))||(e.exports=n)}()}
+/***/,
+/***/3731:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var s=n(5773),r=n(189),o=n(9307),l=n(9818),i=n(2175),a=n(5736),c=n(4760),u=n(924),__=a.__;
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.placeholder,n=e.attributes,a=e.setAttributes,m=n.text,d=(0,l.useSelect)((function(e){return e("core/block-editor").getSettings()}),[]).colors,p=void 0!==e.text,v=(0,c/* .getButtonProps */._m)((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{colors:d}));return(0,o.createElement)("div",(0,c/* .getButtonWrapperProps */.St)(e),p?(0,o.createElement)("div",v,e.text):(0,o.createElement)(i.RichText,(0,s/* ["default"] */.Z)({placeholder:t||__("Add text…","sensei-lms"),value:m,onChange:function(e){return a({text:e})}},v,{tagName:"a",identifier:"text",withoutInteractiveFormatting:!0})),(0,o.createElement)(u/* ["default"] */.Z,e))};
+/***/},
+/***/4760:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */_m:()=>/* binding */i
+/* harmony export */,St:()=>/* binding */a
+/* harmony export */,xc:()=>/* binding */c
+/* harmony export */});
+/* unused harmony export getBorderRadiusProps */
+/* harmony import */var s=n(189),r=n(42),o=n.n(r),l=n(3189);
+/* harmony import */
+/**
+ * Class and style attributes for the button.
+ *
+ * @param {{attributes}} props Block properties.
+ * @return {{className, style}} Output HTML attributes.
+ */
+function i(e){var t,n,r=c(e),i=(0,l/* .getColorAndStyleProps */.Y)(e),a={className:{"no-border-radius":0===(n=e.attributes.borderRadius)},style:{borderRadius:n?n+"px":void 0}};return{className:o()({"wp-block-button__link":!r},a.className,i.className,null==e||null===(t=e.attributes)||void 0===t?void 0:t.buttonClassName),style:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},a.style),i.style)}}
+/**
+ * Class and style attributes for the wrapper element.
+ *
+ * @param {Object} props                  Block properties.
+ * @param {string} props.className        Block classname.
+ * @param {Object} props.attributes       Block attributes.
+ * @param {string} props.attributes.align Alignment attribute.
+ * @return {{className}} Output HTML attributes.
+ */function a(e){var t=e.className,n=e.attributes.align;return{className:o()(t,"wp-block-sensei-button","wp-block-button","has-text-align-".concat(n||"left"))}}
+/**
+ * Check if block has the 'Link' block style.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean} Is it a link block style.
+ */var c=function(e){var t;return/\bis-style-link\b/.test(null==e||null===(t=e.attributes)||void 0===t?void 0:t.className)};
+/***/},
+/***/7889:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var s=n(4649),r=n(5773),o=n(9307),l=n(42),i=n.n(l),a=n(2175),c=n(4981),u=n(4760);
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.attributes,n=e.className,l=e.tagName,m=e.blockName,d=t.text,p=t.inContainer,v=t.align,b=l;l||(b=(0,u/* .isLinkStyle */.xc)({attributes:t})?"a":"button");var f=(0,o.createElement)("div",(0,u/* .getButtonWrapperProps */.St)({className:n,attributes:t}),(0,o.createElement)(a.RichText.Content,(0,r/* ["default"] */.Z)({},(0,u/* .getButtonProps */._m)({attributes:t}),{tagName:b,value:d})));return p?(0,o.createElement)("div",{className:i()(n,"sensei-buttons-container__button-block",(0,c.getBlockDefaultClassName)(m)+"__wrapper",(0,s/* ["default"] */.Z)({},"sensei-buttons-container__button-align-".concat(v),v))},f):f};
+/***/},
+/***/924:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var s=n(5773),r=n(9307),o=n(2175),l=n(5609),i=n(5736),__=i.__,a=function(e){var t=e.borderRadius,n=e.setAttributes;return(0,r.createElement)(l.PanelBody,{title:__("Border settings","sensei-lms"),initialOpen:!1},(0,r.createElement)(l.RangeControl,{label:__("Border radius","sensei-lms"),value:t,min:0,max:50,allowReset:!0,onChange:function(e){return n({borderRadius:e})}}))};
+/* harmony import */
+/* harmony default export */const c=function(e){var t,n=e.attributes,l=e.setAttributes,i=n.borderRadius,c=n.align;return(0,r.createElement)(r.Fragment,null,(0,r.createElement)(o.BlockControls,null,(0,r.createElement)(o.BlockAlignmentToolbar,(0,s/* ["default"] */.Z)({label:__("Change button alignment","sensei-lms"),value:c||(null===(t=e.alignmentOptions)||void 0===t?void 0:t.default),onChange:function(e){e&&l({align:e})}},e.alignmentOptions))),(0,r.createElement)(o.InspectorControls,null,(0,r.createElement)(a,{borderRadius:i,setAttributes:l})))};
+/***/},
+/***/3490:
+/***/(e,t,n)=>{"use strict";
+/* unused harmony exports addColorSettings, removeColorSaveProps, removeColorEditProps, removeWrapperProps */
+/* harmony import */var s=n(5773),r=n(189),o=n(9307),l=n(2819),i=n(2694),a=n(5736),c=n(3112),__=a.__,u=function(e){return(e="string"==typeof e?e:e.name)&&e.startsWith("sensei-lms/button")},m=function(e){var t;return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{className:null==e||null===(t=e.className)||void 0===t?void 0:t.replace(/\s*has-[\w-]*(color|background)/g,""),style:(0,l.omitBy)(null==e?void 0:e.style,(function(e,t){return t.match(/(color|background|background-color)/)}))})};
+/* harmony import */(0,i.addFilter)("blocks.getSaveContent.extraProps","sensei/button/removeColorSaveProps",(function(e,t){return u(t)?m(e):e})),(0,i.addFilter)("blocks.registerBlockType","sensei/button/removeColorEditProps",(function(e){if(!u(e))return e;var t=e.getEditWrapperProps;return t&&(e.getEditWrapperProps=function(e){var n=t(e);return m(n)}),e})),(0,i.addFilter)("blocks.registerBlockType","sensei/button/addColorSettings",(function(e){var t,n;return u(e)?(null===(t=e.supports)||void 0===t||!t.color||null!==(n=e.attributes)&&void 0!==n&&n.backgroundColor||(e.edit=(0,c/* .withColorSettings */.ku)({backgroundColor:{style:"background-color",label:__("Background color","sensei-lms")},textColor:{style:"color",label:__("Text color","sensei-lms")}})(e.edit),e.attributes=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e.attributes),{},{backgroundColor:{type:"string"},customBackgroundColor:{type:"string"},textColor:{type:"string"},customTextColor:{type:"string"}})),e):e})),(0,i.addFilter)("editor.BlockListBlock","sensei/button/removeWrapperProps",(function(e){return function(t){var n=t.name,r=t.wrapperProps;return u(n)&&r&&(r=m(r)),(0,o.createElement)(e,(0,s/* ["default"] */.Z)({},t,{wrapperProps:r}))}}),1)}
+/***/,
+/***/3189:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Y:()=>/* binding */i
+/* harmony export */});
+/* unused harmony export getGradientClass */
+/* harmony import */var s=n(4649),r=n(42),o=n.n(r),l=n(2175),i=function(e){var t,n,r,i,a,c,u,m,d,p,v,b=e.attributes,f=e.colors,g=b.backgroundColor,h=b.customBackgroundColor,y=b.textColor,Z=b.customTextColor,w=b.gradient,k=b.style,C=void 0===k?{}:k,E=(0,l.getColorClassName)("background-color",g);C.color||(C.color={}),h&&(C.color.background=h),Z&&(C.color.text=Z);var _=function(e){if(e)return"has-".concat(e,"-gradient-background")}(w),x=(0,l.getColorClassName)("color",y),N=o()(x,_,(a={},(0,s/* ["default"] */.Z)(a,E,!(null!=C&&null!==(t=C.color)&&void 0!==t&&t.gradient||!E)),(0,s/* ["default"] */.Z)(a,"has-text-color",y||(null==C||null===(n=C.color)||void 0===n?void 0:n.text)),(0,s/* ["default"] */.Z)(a,"has-background",g||(null==C||null===(r=C.color)||void 0===r?void 0:r.background)||w||(null==C||null===(i=C.color)||void 0===i?void 0:i.gradient)),a)),O=null!=C&&null!==(c=C.color)&&void 0!==c&&c.background||null!=C&&null!==(u=C.color)&&void 0!==u&&u.text||null!=C&&null!==(m=C.color)&&void 0!==m&&m.gradient?{background:null!=C&&null!==(d=C.color)&&void 0!==d&&d.gradient?C.color.gradient:void 0,backgroundColor:null!=C&&null!==(p=C.color)&&void 0!==p&&p.background?C.color.background:void 0,color:null!=C&&null!==(v=C.color)&&void 0!==v&&v.text?C.color.text:void 0}:{};// This is needed only for themes that don't load their color stylesheets in the editor
+// We force an inline style to apply the color.
+if(f){if(g){var B=(0,l.getColorObjectByAttributeValues)(f,g);O.backgroundColor=B.color}if(y){var P=(0,l.getColorObjectByAttributeValues)(f,y);O.color=P.color}}return{className:N||void 0,style:O}};
+/* harmony import */}
+/***/,
+/***/6877:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */i:()=>/* binding */h
+/* harmony export */,M:()=>/* binding */y
+/* harmony export */});
+/* harmony import */var s=n(4649),r=n(5773),o=n(189),l=n(3782),i=n(9307),a=n(2819),c=n(42),u=n.n(c),m=n(5736),d=n(4981),p=n(9839),v=(n(3490),n(3731)),b=n(7889),f=n(3112),g=["settings","EditWrapper"],__=m.__,h={Fill:{name:"default",label:__("Fill","sensei-lms")},Outline:{name:"outline",label:__("Outline","sensei-lms")},Link:{name:"link",label:__("Link","sensei-lms")}},y=function(e){var t,n=e.settings,c=e.EditWrapper,m=(0,l/* ["default"] */.Z)(e,g);m=(0,o/* ["default"] */.Z)({alignmentOptions:{controls:["left","center","right","full"],default:"left"}},m);var y=n.styles?n.styles:[(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},h.Fill),{},{isDefault:!0}),h.Outline],Z=null===(t=(0,a.find)(y,"isDefault"))||void 0===t?void 0:t.name,w=(0,f/* .withDefaultBlockStyle */.WJ)(Z)(v/* ["default"] */.Z),k=(0,f/* .withDefaultBlockStyle */.WJ)(Z)(b/* ["default"] */.Z);return(0,a.merge)({name:"sensei-lms/button",title:"Sensei Button",category:"sensei-lms",attributes:{text:{type:"string",source:"html",selector:"a,button"},align:{type:"string"},borderRadius:{type:"number"},style:{type:"object"},isPreview:{type:"boolean",default:!1},inContainer:{type:"boolean",default:!1},buttonClassName:{type:"array",default:[]}},supports:{color:{gradients:!0},__experimentalColor:{gradients:!0},align:!1,html:!1},icon:p/* ["default"] */.Z,styles:y,edit:function(e){var t=(0,i.createElement)(w,(0,r/* ["default"] */.Z)({},e,m));return c?(0,i.createElement)(c,e,t):t},save:function(e){return(0,i.createElement)(k,(0,r/* ["default"] */.Z)({},e,m,{blockName:n.name}))},getEditWrapperProps:function(e){var t=e.inContainer,r=e.align;return t?{className:u()("sensei-buttons-container__button-block",(0,d.getBlockDefaultClassName)(n.name)+"__wrapper",(0,s/* ["default"] */.Z)({},"sensei-buttons-container__button-align-".concat(r),r))}:{}},example:{attributes:{align:"center",isPreview:!0}}},n)};
+/* harmony import */}
+/***/,
+/***/768:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var s=n(5773),r=n(3782),o=n(9307),l=n(42),i=n.n(l),a=n(5609),c=n(5736),u=["className","id","label","value","help","allowReset","resetLabel","onChange","suffix","hideLabelFromVision"],__=c.__;
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.className,n=e.id,l=e.label,c=e.value,m=e.help,d=e.allowReset,p=void 0!==d&&d,v=e.resetLabel,b=e.onChange,f=e.suffix,g=e.hideLabelFromVision,h=(0,r/* ["default"] */.Z)(e,u);return(0,o.createElement)(a.BaseControl,{id:n,label:l,help:m,hideLabelFromVision:g},(0,o.createElement)("div",{className:"sensei-number-control"},(0,o.createElement)("div",{className:"sensei-number-control__input-container"},(0,o.createElement)("input",(0,s/* ["default"] */.Z)({className:i()("sensei-number-control__input components-text-control__input",t),type:"number",id:n,onChange:function(e){b(parseInt(e.target.value,10)||h.min||0)},value:null===c?"":c},h)),f&&(0,o.createElement)("span",{className:"sensei-number-control__input-suffix"},f)),p&&(0,o.createElement)(a.Button,{className:"sensei-number-control__button",isSmall:!0,isSecondary:!0,onClick:function(){return b(null)}},v||__("Reset","sensei-lms"))))};
+/***/},
+/***/1042:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var s=n(5773),r=n(189),o=n(3782),l=n(9307),i=n(42),a=n.n(i),c=n(5609),u=n(454),m=["options","optionsLabel","icon","value","onChange","toggleProps","getMenuItemProps","popoverProps"];
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.options,n=e.optionsLabel,i=e.icon,d=e.value,p=e.onChange,v=e.toggleProps,b=e.getMenuItemProps,f=e.popoverProps,g=(0,o/* ["default"] */.Z)(e,m),h=t.find((function(e){return d===e.value}));return(0,l.createElement)(c.Dropdown,(0,s/* ["default"] */.Z)({className:"sensei-toolbar-dropdown",popoverProps:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({isAlternate:!0,position:"bottom right left",focusOnMount:!0},f),{},{className:a()(null==f?void 0:f.className,"sensei-toolbar-dropdown__popover")}),renderToggle:function(e){var t=e.isOpen,n=e.onToggle;return(0,l.createElement)(c.Button,(0,s/* ["default"] */.Z)({onClick:n,icon:i,"aria-expanded":t,"aria-haspopup":"true"},v,{children:null!=v&&v.children?v.children(h):null==h?void 0:h.label}))},renderContent:function(e){var r=e.onClose;return(0,l.createElement)(c.NavigableMenu,{role:"menu",stopNavigationEvents:!0},(0,l.createElement)(c.MenuGroup,{label:n},t.map((function(e){var t=e.value===(null==h?void 0:h.value),n=null==b?void 0:b(e);return(0,l.createElement)(c.MenuItem,(0,s/* ["default"] */.Z)({key:e.value,role:"menuitemradio",isSelected:t,icon:t?u/* ["default"] */.Z:null,className:a()("sensei-toolbar-dropdown__option",{"is-selected":t},null==n?void 0:n.className),onClick:function(){p(e.value),r()},children:e.label},n))}))))}},g))};
+/***/},
+/***/2074:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s=n(189),r=n(5736),o=n(6877),__=r.__;
+/* harmony import */
+/**
+ * Complete lesson button block.
+ */
+/* harmony default export */const l=(0,o/* .createButtonBlockType */.M)({settings:{name:"sensei-lms/button-complete-lesson",parent:["sensei-lms/lesson-actions"],title:__("Complete Lesson","sensei-lms"),description:__("Enable a student to mark the lesson as complete. This block is only displayed if the lesson has no quiz or the quiz is optional.","sensei-lms"),keywords:[__("Complete","sensei-lms"),__("Finish","sensei-lms"),__("Lesson","sensei-lms"),__("Button","sensei-lms")],attributes:{text:{default:__("Complete Lesson","sensei-lms")},buttonClassName:{default:["sensei-stop-double-submission"]}},styles:[(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},o/* .BlockStyles.Fill */.i.Fill),{},{isDefault:!0}),o/* .BlockStyles.Outline */.i.Outline,o/* .BlockStyles.Link */.i.Link]}});
+/***/},
+/***/7670:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */M3:()=>/* reexport safe */s.Z
+/* harmony export */,Jo:()=>/* reexport safe */r.Z
+/* harmony export */,ey:()=>/* reexport safe */o.Z
+/* harmony export */,nW:()=>/* reexport safe */l.Z
+/* harmony export */,XC:()=>/* reexport safe */i.Z
+/* harmony export */});
+/* harmony import */var s=n(482),r=n(2074),o=n(4076),l=n(6362),i=n(5764);
+/* harmony import */}
+/**
+ * Internal dependencies
+ */
+/***/,
+/***/3570:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */dk:()=>/* binding */l
+/* harmony export */,Zb:()=>/* binding */i
+/* harmony export */,Ql:()=>/* binding */a
+/* harmony export */,fj:()=>/* binding */c
+/* harmony export */,WD:()=>/* binding */u
+/* harmony export */,Cn:()=>/* binding */m
+/* harmony export */});
+/* harmony import */var s,r=n(4649),o=n(189),l=["sensei-lms/button-view-quiz","sensei-lms/button-complete-lesson","sensei-lms/button-next-lesson","sensei-lms/button-reset-lesson"],i={"sensei-lms/button-complete-lesson":{inContainer:!0},"sensei-lms/button-next-lesson":{inContainer:!0},"sensei-lms/button-reset-lesson":{inContainer:!0},"sensei-lms/button-view-quiz":{inContainer:!0}},a=l.map((function(e){return[e,(0,o/* ["default"] */.Z)({},i[e])]})),c="completed",u="in-progress",m=(s={},(0,r/* ["default"] */.Z)(s,c,["sensei-lms/button-next-lesson","sensei-lms/button-reset-lesson"]),(0,r/* ["default"] */.Z)(s,u,["sensei-lms/button-view-quiz","sensei-lms/button-complete-lesson"]),s);
+/* harmony import */}
+/***/,
+/***/482:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var s=n(189),r=n(5736),o=n(2396),l=n(4911),i=n(5008),a=n(8770),__=r.__;
+/* harmony import */
+/* harmony default export */const c=(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({title:__("Lesson Actions","sensei-lms"),description:__("Enable a student to perform specific actions for a lesson.","sensei-lms"),keywords:[__("Lesson","sensei-lms"),__("Actions","sensei-lms"),__("Buttons","sensei-lms"),__("Complete","sensei-lms"),__("Next","sensei-lms"),__("Reset","sensei-lms")],example:{innerBlocks:[{name:"sensei-lms/button-complete-lesson"},{name:"sensei-lms/button-next-lesson"},{name:"sensei-lms/button-reset-lesson"}]}},o),{},{icon:a/* ["default"] */.Z,edit:l/* ["default"] */.Z,save:i/* ["default"] */.Z});
+/***/},
+/***/4911:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>y
+/* harmony export */});
+/* harmony import */var s,r,o=n(6886),l=n(9307),i=n(42),a=n.n(i),c=n(5609),u=n(2175),m=n(5736),d=n(8327),p=n(3205),v=n(7447),b=n(3451),f=n(9480),g=n(3570),__=m.__,h=(null===(s=window)||void 0===s||null===(r=s.sensei)||void 0===r?void 0:r.courseThemeEnabled)||!1;
+/* harmony import */
+/* harmony default export */const y=function(e){var t=e.className,n=e.clientId,s=e.setAttributes,r=e.attributes.toggledBlocks,i=(0,d/* ["default"] */.Z)(g/* .IN_PROGRESS_PREVIEW */.WD),m=(0,o/* ["default"] */.Z)(i,2),y=m[0],Z=m[1],w=(0,p/* ["default"] */.Z)({parentClientId:n,setAttributes:s,toggledBlocks:r,blocks:[{blockName:"sensei-lms/button-reset-lesson",label:__("Reset Lesson","sensei-lms")}]}),k=(0,v/* ["default"] */.Z)(),C=k?"has-quiz":"no-quiz",E=(0,b/* ["default"] */.Z)(k)?"allowed":"not-allowed";if(h)return(0,l.createElement)(c.Notice,{status:"warning",isDismissible:!1,className:"wp-block-sensei-lms-lesson-actions__notice"},__("Lesson Actions block is not displayed when Learning Mode is enabled.","sensei-lms"));// Filter inner blocks based on the settings.
+var _=g/* .INNER_BLOCKS_TEMPLATE.filter */.Ql.filter((function(e){return!1!==r[e[0]]}));return(0,l.createElement)(l.Fragment,null,(0,l.createElement)(f/* ["default"] */.Z,{previewState:y,onPreviewChange:Z,toggleBlocks:w}),(0,l.createElement)("div",{className:a()(t,"wp-block-sensei-lms-lesson-actions__preview-".concat(y),"wp-block-sensei-lms-lesson-actions__".concat(C),"wp-block-sensei-lms-lesson-actions__complete_lessons-".concat(E))},(0,l.createElement)("div",{className:"sensei-buttons-container"},(0,l.createElement)(u.InnerBlocks,{allowedBlocks:g/* .ACTION_BLOCKS */.dk,template:_,templateLock:"all",templateInsertUpdatesSelection:!1}))))};
+/***/},
+/***/5008:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var s=n(9307),r=n(2175);
+/* harmony import */
+/* harmony default export */const o=function(e){var t=e.className;return(0,s.createElement)("div",{className:t},(0,s.createElement)("div",{className:"sensei-buttons-container"},(0,s.createElement)(r.InnerBlocks.Content,null)))};
+/***/},
+/***/9480:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var s=n(9307),r=n(2175),o=n(5609),l=n(5736),i=n(1042),a=n(3570),__=l.__;
+/* harmony import */
+/* harmony default export */const c=function(e){var t=e.toggleBlocks,n=e.previewState,l=e.onPreviewChange;return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(r.BlockControls,null,(0,s.createElement)(o.ToolbarGroup,null,(0,s.createElement)(i/* ["default"] */.Z,{options:[{label:__("In Progress","sensei-lms"),value:a/* .IN_PROGRESS_PREVIEW */.WD},{label:__("Completed","sensei-lms"),value:a/* .COMPLETED_PREVIEW */.fj}],optionsLabel:__("Preview lesson state","sensei-lms"),value:n,onChange:l}))),(0,s.createElement)(r.InspectorControls,null,(0,s.createElement)(o.PanelBody,{title:__("Additional Actions","sensei-lms")},t.map((function(e){return(0,s.createElement)(o.ToggleControl,{key:e.label,checked:e.active,onChange:e.onToggle,label:e.label})})))))};
+/***/},
+/***/3451:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var s=n(6886),r=n(9307);
+/* harmony import */
+/* harmony default export */const o=function(e){var t=document.getElementById("pass_required"),n=(0,r.useState)((function(){return!t||!t.checked})),o=(0,s/* ["default"] */.Z)(n,2),l=o[0],i=o[1];return(0,r.useEffect)((function(){
+// Ignore if the checkbox isn't present.
+if(t){var e=function(){i(!t.checked)};return t.addEventListener("change",e),function(){t.removeEventListener("change",e)}}}),[t]),!e||l};
+/***/},
+/***/7447:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s=n(6886),r=n(9818),o=n(9307);
+/* harmony import */
+/* harmony default export */const l=function(){var e=(0,o.useState)((function(){var e=document.getElementById("question_counter");return e?parseInt(e.value,10)>0:null})),t=(0,s/* ["default"] */.Z)(e,2),n=t[0],l=t[1];(0,o.useEffect)((function(){var e=function(e){l(e.detail.questions>0)};// eslint-disable-next-line @wordpress/no-global-event-listener
+return window.addEventListener("sensei-quiz-editor-question-count-updated",e),function(){
+// eslint-disable-next-line @wordpress/no-global-event-listener
+window.removeEventListener("sensei-quiz-editor-question-count-updated",e)}}),[]);var i=((0,r.useSelect)((function(e){return e("core/editor").getEditedPostAttribute("meta")}))||{})._quiz_has_questions;return null!==n?n:i};
+/***/},
+/***/8327:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var s=n(6886),r=n(9307),o=n(9818),l=n(3570);
+/* harmony import */
+/* harmony default export */const i=function(e){var t=(0,r.useState)(e),n=(0,s/* ["default"] */.Z)(t,2),i=n[0],a=n[1],c=(0,o.useSelect)((function(e){return e("core/block-editor").getSelectedBlock()}));// Update the preview state based on the block selection.
+return(0,r.useEffect)((function(){if(l/* .ACTION_BLOCKS.includes */.dk.includes(null==c?void 0:c.name)){var e=Object.keys(l/* .PREVIEW_STATE */.Cn).find((function(e){return l/* .PREVIEW_STATE */.Cn[e].includes(c.name)}));e!==i&&a(e)}}),[c,i]),[i,a]};
+/***/},
+/***/3205:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var s=n(4649),r=n(189),o=n(228),l=n(6886),i=n(9307),a=n(9818),c=n(4981),u=n(3570);
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.parentClientId,n=e.setAttributes,m=e.toggledBlocks,d=e.blocks,p=(0,a.useSelect)((function(e){return e("core/block-editor").getBlock(t)}),[]),v=(0,a.useDispatch)("core/block-editor").replaceInnerBlocks,b=(0,i.useState)({}),f=(0,l/* ["default"] */.Z)(b,2),g=f[0],h=f[1];return d.map((function(e){return{active:!1!==m[e.blockName],onToggle:(l=e.blockName,function(e){var i=p.innerBlocks.find((function(e){return e.name===l})),a=null;e&&!i?
+// Add block using the default attributes, and the previous attributes if it exists.
+a=[].concat((0,o/* ["default"] */.Z)(p.innerBlocks),[(0,c.createBlock)(l,(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},u/* .BLOCKS_DEFAULT_ATTRIBUTES */.Zb[l]),g[l]))]).sort((function(e,t){return u/* .ACTION_BLOCKS.indexOf */.dk.indexOf(e.name)-u/* .ACTION_BLOCKS.indexOf */.dk.indexOf(t.name)})):!e&&i&&(
+// Remove block.
+a=p.innerBlocks.filter((function(e){return e.name!==l})),// Save block attributes to restore, if needed.
+h((function(e){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},(0,s/* ["default"] */.Z)({},l,i.attributes))}))),a&&v(t,a,!1),n({toggledBlocks:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},m),{},(0,s/* ["default"] */.Z)({},l,e))})}),label:e.label};var l}))};
+/***/},
+/***/4076:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s=n(189),r=n(5736),o=n(6877),__=r.__;
+/* harmony import */
+/**
+ * Next lesson button block.
+ */
+/* harmony default export */const l=(0,o/* .createButtonBlockType */.M)({settings:{name:"sensei-lms/button-next-lesson",title:__("Next Lesson","sensei-lms"),parent:["sensei-lms/lesson-actions"],description:__("Enable a student to move to the next lesson. This block is only displayed if the current lesson has been completed.","sensei-lms"),keywords:[__("Next","sensei-lms"),__("Continue","sensei-lms"),__("Lesson","sensei-lms"),__("Button","sensei-lms")],attributes:{text:{default:__("Next Lesson","sensei-lms")}},styles:[(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},o/* .BlockStyles.Fill */.i.Fill),{},{isDefault:!0}),o/* .BlockStyles.Outline */.i.Outline,o/* .BlockStyles.Link */.i.Link]}});
+/***/},
+/***/6362:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s=n(189),r=n(5736),o=n(6877),__=r.__;
+/* harmony import */
+/**
+ * Reset lesson button block.
+ */
+/* harmony default export */const l=(0,o/* .createButtonBlockType */.M)({settings:{name:"sensei-lms/button-reset-lesson",title:__("Reset Lesson","sensei-lms"),parent:["sensei-lms/lesson-actions"],description:__("Enable a student to reset their progress. This block is only displayed if the lesson is completed and has no quiz, or the quiz is completed and retakes are enabled.","sensei-lms"),keywords:[__("Reset","sensei-lms"),__("Restart","sensei-lms"),__("Revert","sensei-lms"),__("Progress","sensei-lms"),__("Lesson","sensei-lms"),__("Button","sensei-lms")],attributes:{text:{default:__("Reset Lesson","sensei-lms")},buttonClassName:{default:["sensei-stop-double-submission"]}},styles:[o/* .BlockStyles.Fill */.i.Fill,(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},o/* .BlockStyles.Outline */.i.Outline),{},{isDefault:!0}),o/* .BlockStyles.Link */.i.Link]}});
+/***/},
+/***/5764:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var s=n(189),r=n(5736),o=n(6877),__=r.__;
+/* harmony import */
+/**
+ * View quiz button block.
+ */
+/* harmony default export */const l=(0,o/* .createButtonBlockType */.M)({settings:{name:"sensei-lms/button-view-quiz",title:__("View Quiz","sensei-lms"),parent:["sensei-lms/lesson-actions"],description:__("Enable a student to view the quiz.","sensei-lms"),keywords:[__("Quiz","sensei-lms"),__("Lesson","sensei-lms"),__("Button","sensei-lms")],attributes:{text:{default:__("View Quiz","sensei-lms")}},styles:[(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},o/* .BlockStyles.Fill */.i.Fill),{},{isDefault:!0}),o/* .BlockStyles.Outline */.i.Outline,o/* .BlockStyles.Link */.i.Link]}});
+/***/},
+/***/3456:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */D:()=>/* binding */o
+/* harmony export */});
+/* harmony import */var s=n(2694),r=n(5736),__=r.__,o=(0,s.applyFilters)("sensei-lms.Lesson.difficulties",[{label:__("None","sensei-lms"),value:""},{label:__("Easy","sensei-lms"),value:"easy"},{label:__("Standard","sensei-lms"),value:"std"},{label:__("Hard","sensei-lms"),value:"hard"}]);
+/* harmony import */}
+/***/,
+/***/5824:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var s=n(189),r=n(5736),o=n(6867),l=n(5826),i=n(9757),__=r.__;
+/* harmony import */
+/* harmony default export */const a=(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({title:__("Lesson Properties","sensei-lms"),description:__("Add lesson properties such as length and difficulty.","sensei-lms"),keywords:[__("Metadata","sensei-lms"),__("Length","sensei-lms"),__("Complexity","sensei-lms"),__("Difficulty","sensei-lms"),__("Lesson Information","sensei-lms"),__("Lesson Properties","sensei-lms")],icon:o/* ["default"] */.Z},l),{},{example:{attributes:{difficulty:"easy",length:10}},edit:i/* ["default"] */.Z,save:function(){return null}});
+/***/},
+/***/9757:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var s=n(9307),r=n(42),o=n.n(r),l=n(2175),i=n(5609),a=n(5736),c=n(768),u=n(3456),__=a.__,_n=a._n;
+/* harmony import */
+/* harmony default export */const m=function(e){var t,n=e.className,r=e.attributes,a=r.difficulty,m=r.length,d=e.setAttributes;return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(l.InspectorControls,null,(0,s.createElement)(i.PanelBody,{title:__("Properties","sensei-lms")},(0,s.createElement)(c/* ["default"] */.Z,{id:"sensei-lesson-length",label:__("Length","sensei-lms"),min:0,step:1,value:m,onChange:function(e){return d({length:e})},suffix:_n("minute","minutes",m,"sensei-lms")}),(0,s.createElement)(i.SelectControl,{label:__("Difficulty","sensei-lms"),options:u/* .DIFFICULTIES.map */.D.map((function(e){return{label:e.label,value:e.value}})),value:a,onChange:function(e){return d({difficulty:e})}}))),(0,s.createElement)("div",{className:n},(0,s.createElement)("span",{className:o()("wp-block-sensei-lms-lesson-properties__length",{disabled:!m})},__("Length","sensei-lms")+": "+m+" "+_n("minute","minutes",m,"sensei-lms")),(0,s.createElement)("span",{className:o()("wp-block-sensei-lms-lesson-properties__separator",{disabled:!m||!a})},"|"),(0,s.createElement)("span",{className:o()("wp-block-sensei-lms-lesson-properties__difficulty",{disabled:!a})},__("Difficulty","sensei-lms")+": "+(null===(t=u/* .DIFFICULTIES.find */.D.find((function(e){return a===e.value})))||void 0===t?void 0:t.label))))};
+/***/},
+/***/3227:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var s=n(3782),r=n(9307),o=n(4981),l=n(8930),i=["name"];
+/* harmony import */
+/* harmony default export */const a=function(e){(0,o.updateCategory)("sensei-lms",{icon:(0,r.createElement)(l/* ["default"] */.Z,{width:"20",height:"20"})}),e.forEach((function(e){var t=e.name,n=(0,s/* ["default"] */.Z)(e,i);(0,o.registerBlockType)(t,n)}))};
+/***/},
+/***/9359:
+/***/(e,t,n)=>{"use strict";
+/* unused harmony exports useColorsByProbe, getProbeStyles */
+/* harmony import */var s=n(2819),r=(n(9307),n(9818),window.getComputedStyle);
+/* harmony import */(0,s.memoize)((function(){
+// Create temporary probe elements.
+var e=document.createElement("div");e.className="editor-styles-wrapper sensei-probe-element";var t=document.createElement("div");t.className="wp-block-button";var n=document.createElement("div");n.className="wp-block-button__link",n.textContent="Probe",// Set probe position outside the screen to be hidden.
+e.style.position="fixed",e.style.top="-100vh",// Add probe to the screen.
+t.appendChild(n),e.appendChild(t),document.body.appendChild(e);// Save styles.
+var s={primaryColor:r(n).backgroundColor,primaryContrastColor:r(n).color};// Remove probe.
+return document.body.removeChild(e),s}))}
+/***/,
+/***/3112:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */ku:()=>/* binding */c
+/* harmony export */,WJ:()=>/* binding */m
+/* harmony export */});
+/* unused harmony exports ColorSettings, withDefaultColor */
+/* harmony import */var s=n(5773),r=n(189),o=n(9307),l=n(2819),i=n(2175),a=n(5736),__=(n(9359),a.__),c=function(e){return function(t){var n=(0,l.mapValues)(e,(function(e){return e.style}));return(0,i.withColors)(n)((function(n){return(0,o.createElement)(o.Fragment,null,(0,o.createElement)(t,n),(0,o.createElement)(u,{colorSettings:e,props:n}))}))}},u=function(e){var t=e.colorSettings,n=e.props,s=Object.keys(t);return(0,o.createElement)(i.InspectorControls,null,(0,o.createElement)(i.PanelColorSettings,{title:__("Color settings","sensei-lms"),initialOpen:!1,colorSettings:s.map((function(e){return{value:n[e].color,label:t[e].label,onChange:function(s){n["set".concat((0,l.upperFirst)(e))](s),t[e].onChange&&t[e].onChange((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},n),{},{colorValue:s}))}}}))},n.backgroundColor&&n.textColor&&(0,o.createElement)(i.ContrastChecker,{textColor:n.textColor.color,backgroundColor:n.backgroundColor.color,isLargeText:!1})))},m=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"default";return function(t){return function(n){var r=n.className,l={};r&&r.includes("is-style-")||(r=l.className=[r,"is-style-".concat(e)].join(" "));var i=r.match(/is-style-(\w+)/);return i&&(l.blockStyle=i[1]),(0,o.createElement)(t,(0,s/* ["default"] */.Z)({},n,l))}}};
+/* harmony import */}
+/***/,
+/***/9196:
+/***/e=>{"use strict";e.exports=window.React}
+/***/,
+/***/2819:
+/***/e=>{"use strict";e.exports=window.lodash}
+/***/,
+/***/2175:
+/***/e=>{"use strict";e.exports=window.wp.blockEditor}
+/***/,
+/***/4981:
+/***/e=>{"use strict";e.exports=window.wp.blocks}
+/***/,
+/***/5609:
+/***/e=>{"use strict";e.exports=window.wp.components}
+/***/,
+/***/9818:
+/***/e=>{"use strict";e.exports=window.wp.data}
+/***/,
+/***/9307:
+/***/e=>{"use strict";e.exports=window.wp.element}
+/***/,
+/***/2694:
+/***/e=>{"use strict";e.exports=window.wp.hooks}
+/***/,
+/***/5736:
+/***/e=>{"use strict";e.exports=window.wp.i18n}
+/***/,
+/***/444:
+/***/e=>{"use strict";e.exports=window.wp.primitives}
+/***/,
+/***/1793:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,s=new Array(t);n<t;n++)s[n]=e[n];return s}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/6470:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(e){if(Array.isArray(e))return e}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/8138:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */});
+/* harmony import */var s=n(1793);function r(e){if(Array.isArray(e))return(0,s/* ["default"] */.Z)(e)}
+/***/},
+/***/4649:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/5773:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(){return s=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var s in n)Object.prototype.hasOwnProperty.call(n,s)&&(e[s]=n[s])}return e},s.apply(this,arguments)}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/5181:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(e){if("undefined"!=typeof Symbol&&null!=e[Symbol.iterator]||null!=e["@@iterator"])return Array.from(e)}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/2446:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var s,r,o=[],_n=!0,l=!1;try{for(n=n.call(e);!(_n=(s=n.next()).done)&&(o.push(s.value),!t||o.length!==t);_n=!0);}catch(e){l=!0,r=e}finally{try{_n||null==n.return||n.return()}finally{if(l)throw r}}return o}}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/3764:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/3314:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/189:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */o
+/* harmony export */});
+/* harmony import */var s=n(4649);function r(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var s=Object.getOwnPropertySymbols(e);t&&(s=s.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,s)}return n}function o(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?r(Object(n),!0).forEach((function(t){(0,s/* ["default"] */.Z)(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):r(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}
+/***/},
+/***/3782:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */});
+/* harmony import */var s=n(808);function r(e,t){if(null==e)return{};var n,r,o=(0,s/* ["default"] */.Z)(e,t);if(Object.getOwnPropertySymbols){var l=Object.getOwnPropertySymbols(e);for(r=0;r<l.length;r++)n=l[r],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(o[n]=e[n])}return o}
+/***/},
+/***/808:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function s(e,t){if(null==e)return{};var n,s,r={},o=Object.keys(e);for(s=0;s<o.length;s++)n=o[s],t.indexOf(n)>=0||(r[n]=e[n]);return r}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */})},
+/***/6886:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */i
+/* harmony export */});
+/* harmony import */var s=n(6470),r=n(2446),o=n(4013),l=n(3764);
+/* harmony import */function i(e,t){return(0,s/* ["default"] */.Z)(e)||(0,r/* ["default"] */.Z)(e,t)||(0,o/* ["default"] */.Z)(e,t)||(0,l/* ["default"] */.Z)()}
+/***/},
+/***/228:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */i
+/* harmony export */});
+/* harmony import */var s=n(8138),r=n(5181),o=n(4013),l=n(3314);
+/* harmony import */function i(e){return(0,s/* ["default"] */.Z)(e)||(0,r/* ["default"] */.Z)(e)||(0,o/* ["default"] */.Z)(e)||(0,l/* ["default"] */.Z)()}
+/***/},
+/***/4013:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */});
+/* harmony import */var s=n(1793);function r(e,t){if(e){if("string"==typeof e)return(0,s/* ["default"] */.Z)(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?(0,s/* ["default"] */.Z)(e,t):void 0}}
+/***/},
+/***/2396:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/lesson-actions","category":"sensei-lms","supports":{"html":false},"attributes":{"toggledBlocks":{"type":"object","default":{"sensei-lms/button-reset-lesson":true}}}}')}
+/***/,
+/***/5826:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/lesson-properties","category":"sensei-lms","textdomain":"sensei-lms","attributes":{"difficulty":{"type":"string","source":"meta","meta":"_lesson_complexity"},"length":{"type":"number","source":"meta","meta":"_lesson_length"}}}')}
+/***/
+/******/},t={};
+/************************************************************************/
+/******/ // The module cache
+/******/
+/******/
+/******/ // The require function
+/******/function n(s){
+/******/ // Check if module is in cache
+/******/var r=t[s];
+/******/if(void 0!==r)
+/******/return r.exports;
+/******/
+/******/ // Create a new module (and put it into the cache)
+/******/var o=t[s]={
+/******/ // no module.id needed
+/******/ // no module.loaded needed
+/******/exports:{}
+/******/};
+/******/
+/******/ // Execute the module function
+/******/
+/******/
+/******/ // Return the exports of the module
+/******/return e[s](o,o.exports,n),o.exports;
+/******/}
+/******/
+/************************************************************************/
+/******/ /* webpack/runtime/compat get default export */
+/******/
+/******/ // getDefaultExport function for compatibility with non-harmony modules
+/******/n.n=e=>{
+/******/var t=e&&e.__esModule?
+/******/()=>e.default
+/******/:()=>e
+/******/;
+/******/return n.d(t,{a:t}),t;
+/******/},
+/******/ // define getter functions for harmony exports
+/******/n.d=(e,t)=>{
+/******/for(var s in t)
+/******/n.o(t,s)&&!n.o(e,s)&&
+/******/Object.defineProperty(e,s,{enumerable:!0,get:t[s]})
+/******/;
+/******/},
+/******/n.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t)
+/******/,
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(()=>{"use strict";
+/* harmony import */var e=n(9818),t=n(3227),s=n(7670),r=n(5824);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+/**
+ * Internal dependencies
+ */
+(0,t/* ["default"] */.Z)([s/* .LessonActionsBlock */.M3,r/* ["default"] */.Z,s/* .CompleteLessonBlock */.Jo,s/* .NextLessonBlock */.ey,s/* .ResetLessonBlock */.nW,s/* .ViewQuizBlock */.XC]);var o=(0,e.subscribe)((function(){var t;// eslint-disable-line camelcase
+!0===(null===(t=(0,e.select)("core/editor").getEditedPostAttribute("meta"))||void 0===t?void 0:t._needs_template)&&(// Add default lesson template to the editor.
+setTimeout((0,e.dispatch)("core/block-editor").synchronizeTemplate,1),(0,e.dispatch)("core/editor").editPost({meta:{_needs_template:!1}}),o())}))})()})
+/******/();

@@ -5,7 +5,7 @@ Tags: woocommerce, utility, framework, aelia
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 Requires at least: 5.0
-Tested up to: 5.7
+Tested up to: 6.0.9
 
 Adds a set of classes that can simplify the development of other plugins for WooCommerce.
 
@@ -28,13 +28,17 @@ The Aelia Foundation Classes add several classes that can simplify the developme
 
 This product includes GeoLite2 data created by MaxMind, available from [https://www.maxmind.com](https://www.maxmind.com). By using this software, you agree to use the GeoLite2 exclusively according to the terms set in the GeoLite2 End User License Agreement, which is available here: https://www.maxmind.com/en/geolite2/eula. If you do not wish to accept the terms, you must stop using the software immediately.
 
-##Requirements
+= Acknowledgements =
+* The Aelia Currency Switcher for WooCommerce includes GeoLite data created by MaxMind, available from https://www.maxmind.com.
+* The Aelia Currency Switcher for WooCommerce includes <div>icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a></div>
+
+== Requirements ==
 * WordPress 4.0 or newer.
-* PHP 7.0 or newer.
+* PHP 7.1 or newer.
 * WooCommerce 2.6 or newer.
 
-## Notes
-* This plugin is provided as-is, and it's not automatically covered by free support. See FAQ for more details.
+= Notes =
+* This plugin is provided as-is, and it's not covered by our support service. See FAQ for more details.
 
 == Frequently Asked Questions ==
 
@@ -64,13 +68,87 @@ For more information about installation and management of plugins, please refer 
 
 == Upgrade Notice ==
 
-= 2.1.1.201208 =
+= 2.1.1 =
 This is a major update, which introduces several important changes. **The required PHP version is now 7.0 or newer**. Please make sure that your server is configured correctly, before installing this update.
 
 == Changelog ==
 
+= 2.2.8.220607 =
+* Updated supported WooCommerce versions.
+
+= 2.2.7.220502 =
+* Updated supported WordPress versions.
+* Added function `aelia_set_object_read()`.
+
+= 2.2.6.220421 =
+* Updated ISO2 currency code for Mauritanian ouguiya.
+* Updated supported WooCommerce versions.
+
+= 2.2.5.220330 =
+* Updated supported WooCommerce versions.
+
+= 2.2.4.220224 =
+* Updated supported WooCommerce versions.
+
+= 2.2.3.220124 =
+* Updated supported WooCommerce versions.
+
+= 2.2.2.220104 =
+* Updated supported WooCommerce versions.
+
+= 2.2.1.211208 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 2.2.0.211117 =
+* Feature - Added new class `Aelia\WC\Exceptions\NotInitializedException`.
+
+= 2.1.21.211102 =
+* Updated supported WooCommerce versions.
+
+= 2.1.20.211024 =
+* Fix - The Freemius support form embedded in the settings pages no longer covers the "Save" buttons at the bottom of the page.
+
+= 2.1.19.211020 =
+* Tweak - Refactored class `NotImplementedException` to use a default message and error code.
+
+= 2.1.18.211006 =
+* UI - Added note on the legacy Aelia Licenses page, to help customers to migrate their licences to Freemius.
+
+= 2.1.17.211005 =
+* Updated supported WooCommerce versions.
+* Updated Composer bundle.
+
+= 2.1.16.210906 =
+* Updated supported WooCommerce versions.
+
+= 2.1.15.210831 =
+* Tweak - Rewritten logic used to initialise the Freemius framework. The previous logic relied on Composer, and it could trigger an errors in some edge case scenarios.
+* Updated supported WordPress and WooCommerce versions.
+
+= 2.1.14.210805 =
+* Updated embedded library `Yahnis Elsts - Plugin Update Checker`.
+* Updated supported WordPress and WooCommerce versions.
+
+= 2.1.13.210706 =
+* Fix - Fixed bug in method `Country_Flags::get_country_flags()`.
+
+= 2.1.12.210608 =
+* Feature - Added functions to manage country flags.
+
+= 2.1.11.210623 =
+* Updated requirements. The AFC now requires at least PHP 7.1.
+
+= 2.1.10.210622 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 2.1.9.210525 =
+* Feature - Added shortcodes to Freemius integration: `aelia_freemius_account_page`, `aelia_freemius_contact_form`, `aelia_freemius_plugin_pricing`.
+
 = 2.1.8.210518 =
 * Tweak - Added `addons` path to the paths handled by the base plugin class.
+* Tweak - Added logic to initialise plugin updaters on "init", for compatibility with WP CLI tool.
 
 = 2.1.7.210513 =
 * Updated supported WooCommerce versions.
@@ -121,6 +199,9 @@ This is a major update, which introduces several important changes. **The requir
 = 2.0.21.200813 =
 * Updated supported WordPress and WooCommerce versions.
 
+= 2.1.0.200724 =
+* Tweak - Improved UI on the premium licence management page.
+
 = 2.0.21.200629 =
 * Fix - Fixed signature of method `Aelia\WC\Settings:factory()` to restore backward compatibility.
 
@@ -128,6 +209,10 @@ This is a major update, which introduces several important changes. **The requir
 * Tweak - Fixed admin UI to show that the log files now contain a timestamp in their name.
 * Fix - Fixed bug in the logic used to install the GeoIP database manually.
 * Updated supported WooCommerce versions.
+
+= 2.0.20.200605 =
+* UI - Added message to invite administrators to reactivate premium licences when a site changes domain or URL.
+* Feature - Added new function `aelia_array_insert_after()`.
 
 = 2.0.19.200527 =
 * Tweak - Configured default logger to use rotating log files. The new logic will create one file per day, keeping a maximum of 30 files.

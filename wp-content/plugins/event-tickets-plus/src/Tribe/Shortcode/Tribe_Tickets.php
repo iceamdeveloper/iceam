@@ -6,6 +6,7 @@ use Tribe\Shortcode\Shortcode_Abstract;
 use Tribe__Tickets__Editor__Blocks__Tickets;
 use Tribe__Tickets__Editor__Template;
 use Tribe__Tickets__Tickets as Tickets;
+use Tribe__Tickets_Plus__Tickets;
 use WP_Post;
 
 /**
@@ -26,7 +27,8 @@ class Tribe_Tickets extends Shortcode_Abstract {
 	 * {@inheritDoc}
 	 */
 	protected $default_arguments = [
-		'post_id' => null,
+		'post_id'   => null,
+		'ticket_id' => null,
 	];
 
 	/**
@@ -67,9 +69,17 @@ class Tribe_Tickets extends Shortcode_Abstract {
 			return '';
 		}
 
-		$post_id = absint( $this->get_argument( 'post_id' ) );
+		$post_id   = absint( $this->get_argument( 'post_id' ) );
+		$ticket_id = $this->get_argument( 'ticket_id' );
 
-		return $this->get_tickets_block( $post_id );
+		if ( empty( $post_id ) || empty( $ticket_id ) ) {
+			return $this->get_tickets_block( $post_id );
+		}
+
+		// When post id and ticket id are present, send array of ticket ids to include.
+		$include_tickets = array_map( 'intval', explode( ',', $ticket_id ) );
+
+		return $this->get_tickets_block( $post_id, $include_tickets );
 	}
 
 	/**
@@ -82,7 +92,7 @@ class Tribe_Tickets extends Shortcode_Abstract {
 	 *
 	 * @return string HTML.
 	 */
-	public function get_tickets_block( $post ) {
+	public function get_tickets_block( $post, $include_tickets = [] ) {
 		if ( empty( $post ) ) {
 			return '';
 		}
@@ -147,6 +157,19 @@ class Tribe_Tickets extends Shortcode_Abstract {
 
 		$tickets = $provider->get_tickets( $post_id );
 
+		if ( ! empty( $include_tickets ) ) {
+			$tickets = Tribe__Tickets_Plus__Tickets::filter_tickets_by_ids( $tickets, $include_tickets );
+		}
+
+		/**
+		 * Filters the arg to determine whether or not to hide the view link.
+		 *
+		 * @since 5.4.2
+		 *
+		 * @param bool True/false to hide view link.
+		 */
+		$hide_view_my_tickets_link = apply_filters( 'tec_tickets_hide_view_my_tickets_link', true );
+
 		$args = [
 			'post_id'                     => $post_id,
 			'provider'                    => $provider,
@@ -168,6 +191,7 @@ class Tribe_Tickets extends Shortcode_Abstract {
 			'submit_button_name'          => $submit_button_name,
 			'cart_url'                    => method_exists( $provider, 'get_cart_url' ) ? $provider->get_cart_url() : '',
 			'checkout_url'                => method_exists( $provider, 'get_checkout_url' ) ? $provider->get_checkout_url() : '',
+			'hide_view_my_tickets_link'   => $hide_view_my_tickets_link,
 		];
 
 		// Enqueue assets.

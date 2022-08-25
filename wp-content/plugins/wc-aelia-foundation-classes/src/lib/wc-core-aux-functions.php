@@ -1,4 +1,4 @@
-<?php if(!defined('ABSPATH')) exit; // Exit if accessed directly
+<?php if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use Aelia\WC\Settings;
 
@@ -13,7 +13,6 @@ if(!function_exists('get_raw_number')) {
 	 * @return double A raw number.
 	 */
 	function get_raw_number($formatted_number) {
-		//$num_decimals = (int)get_option('woocommerce_price_num_decimals');
 		$decimal_sep = Settings::decimal_separator();
 		$thousands_sep = Settings::thousand_separator();
 
@@ -34,7 +33,7 @@ if(!function_exists('default_currency_decimals')) {
 	 * @param string currency A currency code.
 	 * @return int
 	 */
-	function default_currency_decimals($currency) {
+	function default_currency_decimals($currency) { // NOSONAR
 		$currency_decimals = array(
 			'AED' => 2, // UAE Dirham
 			'AFN' => 2, // Afghanistan Afghani
@@ -130,7 +129,7 @@ if(!function_exists('default_currency_decimals')) {
 			'MMK' => 2, // Myanmar Kyat
 			'MNT' => 2, // Mongolian Tugrik
 			'MOP' => 2, // Macau Pataca
-			'MRO' => 2, // Mauritania Ouguiya
+			'MRU' => 2, // Mauritania Ouguiya
 			'MTL' => 2, // Maltese Lira
 			'MUR' => 2, // Mauritius Rupee
 			'MVR' => 2, // Maldives Rufiyaa
@@ -320,6 +319,29 @@ if(!function_exists('aelia_date_to_string')) {
 	}
 }
 
+if(!function_exists('aelia_array_insert_after')) {
+	/**
+	 * Inserts a new key/value after the key in the array.
+	 *
+	 * @param string $key
+	 * @param array $target_array
+	 * @param array $new_elements
+	 * @return array
+	 * @since 2.0.20.200605
+	 */
+	function aelia_array_insert_after($key, array $target_array, array $new_elements) {
+		// Insert new fields after the identity token
+		$insert_position = (array_search($key, array_keys($target_array)) + 1);
+
+		// Split the target in two parts
+		$target_first_part = array_slice($target_array, 0, $insert_position);
+		$target_second_part = array_slice($target_array, $insert_position);
+
+		// Merge the first part, the new elements and the second
+		return $target_first_part + $new_elements + $target_second_part;
+	}
+}
+
 if(!function_exists('aelia_apply_deprecated_filters')) {
 	/**
 	 * Runs a deprecated filter with notice only if used.
@@ -338,5 +360,26 @@ if(!function_exists('aelia_apply_deprecated_filters')) {
 
 		wc_deprecated_hook($tag, $version, $replacement, $message);
 		return apply_filters_ref_array($tag, $args);
+	}
+}
+
+if(!function_exists('aelia_set_object_read')) {
+	/**
+	 * Sets the "object read" property against an object. The property can have two values:
+	 * - true: this will make any changes to the object's property go to the "changes" list. These changes
+	 *         will then be committed to the database when the save() method is called.
+	 * - false: this will make changes directly to the object's "data" list, but it won't track them to
+	 *          save them against the database.
+	 *
+	 * @param WC_Data $obj
+	 * @param bool $object_read
+	 * @return bool The function returns the original value of the "object_read" property. This can be
+	 * used to restore it at a later stage.
+	 * @since 2.2.7.220502
+	 */
+	function aelia_set_object_read(\WC_Data $obj, bool $object_read): bool {
+		$original_value = $obj->get_object_read();
+		$obj->set_object_read($object_read);
+		return $original_value;
 	}
 }

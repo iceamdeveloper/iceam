@@ -10,9 +10,9 @@
  *
  * @since   4.12.1
  * @since 5.1.0 Updated template link.
- * @since TBD Added placeholder attribute support.
+ * @since 5.2.5 Added placeholder attribute support.
  *
- * @version TBD
+ * @version 5.2.5
  *
  * @var Tribe__Tickets_Plus__Meta__Field__Telephone $this
  */

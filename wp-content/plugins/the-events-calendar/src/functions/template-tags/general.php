@@ -33,7 +33,12 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 	 *
 	 **/
 	function tribe_get_view( $view = false ) {
-
+		if (
+			! in_array( $view, [ 'single-event', 'embed' ] )
+			&& tec_events_views_v1_should_display_deprecated_notice()
+		) {
+			_deprecated_function( __FUNCTION__, '5.13.0', 'On version 6.0.0 this function will be removed. Please refer to <a href="https://evnt.is/v1-removal">https://evnt.is/v1-removal</a> for template customization assistance.' );
+		}
 		do_action( 'tribe_pre_get_view' );
 
 		if ( ! $view ) {
@@ -243,7 +248,7 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 	 * Checks type of $postId to determine if it is an Event
 	 *
 	 * @category Events
-	 * @param int $postId (optional)
+	 * @param int|WP_Post The event/post id or object. (optional)
 	 *
 	 * @return bool true if this post is an Event post type
 	 */
@@ -252,7 +257,7 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 		 * Filter: 'tribe_is_event'.
 		 *
 		 * @param bool $is_event
-		 * @param int $postId
+		 * @param int|WP_Post The event/post id or object. (optional)
 		 */
 		return apply_filters( 'tribe_is_event', Tribe__Events__Main::instance()->isEvent( $postId ), $postId );
 	}
@@ -551,13 +556,72 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 		}
 
 		$tribe_ecp = Tribe__Events__Main::instance();
-		$list      = get_the_term_list( get_the_ID(), 'post_tag', '<dt>' . $label . '</dt><dd class="tribe-event-tags">', $separator, '</dd>' );
+		$list      = get_the_term_list( get_the_ID(), 'post_tag', '<dt class="tribe-event-tags-label">' . $label . '</dt><dd class="tribe-event-tags">', $separator, '</dd>' );
 		$list      = apply_filters( 'tribe_meta_event_tags', $list, $label, $separator, $echo );
 		if ( $echo ) {
 			echo $list;
 		} else {
 			return $list;
 		}
+	}
+
+	/**
+	 * Display the event tags in a list with links to the event tag archive.
+	 *
+	 * @since 5.16.0
+	 *
+	 * @param null|string $label The label for the term list.
+	 * @param string      $separator The separator of each term.
+	 * @param bool        $echo, Whether to echo or return the list.
+	 *
+	 * @return string|void The html list of tags or void if no terms.
+	 */
+	function tribe_meta_event_archive_tags( $label = null, $separator = ', ', $echo = true ) {
+		/**
+		 * Filter whether to use the WordPress tag archive urls, default false.
+		 *
+		 * @since 5.16.0
+		 *
+		 * @param boolean Whether to use the WordPress tag archive urls.
+		 */
+		$use_wp_tag = apply_filters( 'tec_events_use_wordpress_tag_archive_url', false );
+		if ( $use_wp_tag ) {
+			return tribe_meta_event_tags( $label, $separator, $echo );
+		}
+
+		if ( ! $label ) {
+			$label = esc_html__( 'Tags:', 'the-events-calendar' );
+		}
+
+		$terms = get_the_terms( get_the_ID(), 'post_tag' );
+
+		if ( is_wp_error( $terms ) ) {
+			return;
+		}
+
+		if ( empty( $terms ) ) {
+			return;
+		}
+
+		$term_links = [];
+		foreach ( $terms as $term ) {
+			$link = tribe_events_get_url( [ 'tag' => $term->slug, 'post_type' => 'tribe_events', 'eventDisplay' => 'default' ] );
+			if ( is_wp_error( $link ) ) {
+				continue;
+			}
+			$term_links[] = '<a href="' . esc_url( $link ) . '" rel="tag">' . $term->name . '</a>';
+		}
+
+		$before = '<dt class="tribe-event-tags-label">' . $label . '</dt><dd class="tribe-event-tags">';
+		$after  = '</dd>';
+		$list   = $before . implode( $separator, $term_links ) . $after;
+
+		if ( $echo ) {
+			echo $list;
+			return;
+		}
+
+		return $list;
 	}
 
 	/**
@@ -1374,9 +1438,8 @@ if ( class_exists( 'Tribe__Events__Main' ) ) {
 
 				$category_classes = tribe_events_event_classes( $event->ID, false );
 				$day              = tribe_events_get_current_month_day();
-				$event_id         = "{$event->ID}-{$day['date']}";
-
-				$json['eventId']         = $event_id;
+				// tribe_events_get_current_month_day() can return boolean false.
+				$json['eventId']         = isset($day['date']) ? "{$event->ID}-{$day['date']}" : "{$event->ID}";
 				$json['title']           = wp_kses_post( apply_filters( 'the_title', $event->post_title, $event->ID ) );
 				$json['permalink']       = tribe_get_event_link( $event->ID );
 				$json['imageSrc']        = $image_src;

@@ -2,11 +2,11 @@
 Tags: woocommerce, multi-currency, multiple currency, caching
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Requires at least: 4.0
-Tested up to: 5.7
+Tested up to: 6.0.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 5.0
+WC tested up to: 6.6
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
@@ -14,9 +14,9 @@ Implements a workaround to allow plugins to work with caching systems that don't
 
 The Cache Handler plugin can work around the limitations of rigid caching systems. Its purpose is to ensure that the correct content is served to the visitors, depending on their country, province, currency and tax status.
 
-= Requirements =
+== Requirements ==
 * WordPress 4.0 or newer.
-* PHP 5.3 or newer.
+* PHP 7.1 or newer.
 * WooCommerce 3.0 or newer
 * [AFC plugin for WooCommerce](http://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.8.2.161216 or later.
 
@@ -32,6 +32,46 @@ The Cache Handler plugin can work around the limitations of rigid caching system
 5. Clear all the caching systems you are using (plugins, Nginx, Varnish, CloudFlare, etc). This is important, as it will allow the Cache Handler to add its scripts to your pages, and ensure that the correct content is served.
 
 == Changelog ==
+
+= 1.0.36.220607 =
+* Updated supported WooCommerce versions.
+
+= 1.0.35.220502 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.34.220330 =
+* Updated supported WooCommerce versions.
+
+= 1.0.33.220224 =
+* Updated supported WooCommerce versions.
+
+= 1.0.32.220124 =
+* Updated supported WooCommerce versions.
+
+= 1.0.31.220104 =
+* Updated supported WooCommerce versions.
+
+= 1.0.30.211208 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.29.211102 =
+* Updated supported WooCommerce versions.
+
+= 1.0.28.211005 =
+* Updated supported WooCommerce versions.
+
+= 1.0.27.210906 =
+* Updated supported WooCommerce versions.
+
+= 1.0.26.210816 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.25.210622 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
 
 = 1.0.24.210513 =
 * Updated supported WordPress versions.

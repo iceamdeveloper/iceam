@@ -34,6 +34,39 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 	}
 
 	/**
+	 * Hook the filter for forcing Cart functionality over REST API.
+	 *
+	 * @since 5.4.2
+	 */
+	public function force_woo_cart_for_rest_api() {
+		add_filter( 'woocommerce_is_rest_api_request', [ $this, 'simulate_as_not_rest' ] );
+	}
+
+	/**
+	 * Mock REST request as frontend to load cart session.
+	 *
+	 * @since 5.4.2
+	 *
+	 * @param bool $is_rest_api_request
+	 * @return bool
+	 */
+	public function simulate_as_not_rest( $is_rest_api_request ) {
+
+		if ( ! $is_rest_api_request ) {
+			return $is_rest_api_request;
+		}
+
+		$namespace = tribe( 'tickets.rest-v1.main' )->get_events_route_namespace();
+
+		// Bail early if this is not our request.
+		if ( false === strpos( $_SERVER['REQUEST_URI'], $namespace . '/cart' ) ) {
+			return $is_rest_api_request;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Hooked to the tribe_tickets_attendee_registration_checkout_url filter to hijack URL if on cart and there
 	 * are attendee registration fields that need to be filled out.
 	 *
@@ -184,7 +217,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 
 		$ticket_provider  = $woo->attendee_object;
 		$attendee_reg_url = $attendee_reg->get_url();
-		$attendee_reg_url = add_query_arg( 'provider', $ticket_provider, $attendee_reg_url );
+		$provider_slug = tribe_tickets_get_provider_query_slug();
+		$attendee_reg_url = add_query_arg( $provider_slug, $ticket_provider, $attendee_reg_url );
 
 		return $attendee_reg_url;
 	}
@@ -326,7 +360,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Cart extends Tribe__Tickets_Pl
 		foreach ( $contents as $item ) {
 			$ticket_id = $item['product_id'];
 			$optout    = false;
-			
+
 			/*
 			 * Sometimes there are WooCommerce integrations that set this as a float,
 			 * it needs to be an int for our strict checks later down the line.

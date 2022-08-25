@@ -92,7 +92,7 @@ class Sensei_Learner_Profiles {
 
 			$name = Sensei_Learner::get_full_name( $learner_user->ID );
 
-			// translators: Placeholder is the full name of the learner.
+			// translators: Placeholder is the name of the student.
 			$title = apply_filters( 'sensei_learner_profile_courses_heading', sprintf( __( 'Courses %s is taking', 'sensei-lms' ), $name ) ) . ' ' . $sep . ' ';
 		}
 		return $title;
@@ -134,27 +134,6 @@ class Sensei_Learner_Profiles {
 	}
 
 	/**
-	 * Load content for learner profiles
-	 *
-	 * @since  1.4.0
-	 * @return void
-	 */
-	public function content() {
-		global $wp_query;
-
-		_deprecated_function( __METHOD__, '2.2.0' );
-
-		if ( isset( Sensei()->settings->settings['learner_profile_enable'] ) && Sensei()->settings->settings['learner_profile_enable'] ) {
-
-			if ( isset( $wp_query->query_vars['learner_profile'] ) ) {
-
-				Sensei_Templates::get_template( 'learner-profile/learner-info.php' );
-
-			}
-		}
-	}
-
-	/**
 	 * Set heading for courses section of learner profiles
 	 *
 	 * @since  1.4.0
@@ -168,7 +147,7 @@ class Sensei_Learner_Profiles {
 			$name = $user->display_name;
 		}
 		$name = apply_filters( 'sensei_learner_profile_courses_heading_name', $name );
-		// translators: Placeholder is the first name or the display name of the user.
+		// translators: Placeholder is the name of the student.
 		echo '<h2>' . wp_kses_post( apply_filters( 'sensei_learner_profile_courses_heading', sprintf( __( 'Courses %s is taking', 'sensei-lms' ), $name ) ) ) . '</h2>';
 	}
 

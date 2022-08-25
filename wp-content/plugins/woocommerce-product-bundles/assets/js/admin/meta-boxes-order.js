@@ -73,19 +73,12 @@ jQuery( function( $ ) {
 						$order_items.find( '.inside' ).empty();
 						$order_items.find( '.inside' ).append( response.html );
 
-						if ( 'yes' === wc_bundles_admin_order_params.is_wc_version_gte_3_4 ) {
-							$order_items.trigger( 'wc_order_items_reloaded' );
-						} else {
-							functions.core.init_tiptip();
-							functions.core.stupidtable.init();
-						}
+						$order_items.trigger( 'wc_order_items_reloaded' );
 
-						if ( 'yes' === wc_bundles_admin_order_params.is_wc_version_gte_3_6 ) {
-							// Update notes.
-							if ( response.notes_html ) {
-								$( 'ul.order_notes' ).empty();
-								$( 'ul.order_notes' ).append( $( response.notes_html ).find( 'li' ) );
-							}
+						// Update notes.
+						if ( response.notes_html ) {
+							$( 'ul.order_notes' ).empty();
+							$( 'ul.order_notes' ).append( $( response.notes_html ).find( 'li' ) );
 						}
 
 						functions.unblock( view.$el.find( '.wc-backbone-modal-content' ) );
@@ -181,43 +174,6 @@ jQuery( function( $ ) {
 			}
 
 		};
-
-	/*
-	 * Add some extra duplicated bits if the 'wc_order_items_reloaded' event handler is missing from WC core.
-	 */
-	if ( 'no' === wc_bundles_admin_order_params.is_wc_version_gte_3_4 ) {
-
-		functions.core = {
-
-			init_tiptip: function() {
-
-				$( '#tiptip_holder' ).removeAttr( 'style' );
-				$( '#tiptip_arrow' ).removeAttr( 'style' );
-				$( '.tips' ).tipTip( {
-					'attribute': 'data-tip',
-					'fadeIn':    50,
-					'fadeOut':   50,
-					'delay':     200
-				} );
-			},
-
-			stupidtable: {
-
-				init: function() {
-					$( '.woocommerce_order_items' ).stupidtable();
-					$( '.woocommerce_order_items' ).on( 'aftertablesort', this.add_arrows );
-				},
-
-				add_arrows: function( event, data ) {
-					var th    = $( this ).find( 'th' );
-					var arrow = data.direction === 'asc' ? '&uarr;' : '&darr;';
-					var index = data.column;
-					th.find( '.wc-arrow' ).remove();
-					th.eq( index ).append( '<span class="wc-arrow">' + arrow + '</span>' );
-				}
-			}
-		};
-	}
 
 	/*
 	 * Initialize.

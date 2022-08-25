@@ -39,11 +39,12 @@ class Tribe__Tickets_Plus__Meta__Render {
 		}
 
 		$toggle = $this->get_meta_toggle( $item );
+
 		return $toggle;
 	}
 
 	public function get_meta_toggle( array $item ) {
-		$meta_data = get_post_meta( $item['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$meta_data = Tribe__Tickets_Plus__Meta::get_attendee_meta_fields( absint( $item['product_id'] ), $item['attendee_id'] );
 
 		if ( ! $meta_data ) {
 			return '<span class="event-tickets-no-meta-toggle">&ndash;</span>';
@@ -69,8 +70,9 @@ class Tribe__Tickets_Plus__Meta__Render {
 		wp_enqueue_style( 'event-tickets-meta' );
 		wp_enqueue_script( 'event-tickets-meta-report' );
 
-		$meta_fields   = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $item['product_id'] );
-		$meta_data     = get_post_meta( $item['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$meta_fields = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $item['product_id'] );
+
+		$meta_data     = Tribe__Tickets_Plus__Meta::get_attendee_meta_fields( $item['product_id'], $item['attendee_id'] );
 		$orphaned_data = (array) $meta_data;
 
 		$valid_meta_html    = '';
@@ -207,16 +209,16 @@ class Tribe__Tickets_Plus__Meta__Render {
 		$meta_fields = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $item['product_id'] );
 
 		/**
- 		 * Filters the ticket meta fields to be included in the tickets email
- 		 *
-  		 * @since 4.5.4
-  		 *
-  		 * @param array $meta_fields
-  		 * @param array $item
-  		 */
+		 * Filters the ticket meta fields to be included in the tickets email
+		 *
+		 * @since 4.5.4
+		 *
+		 * @param array $meta_fields
+		 * @param array $item
+		 */
 		$meta_fields = apply_filters( 'tribe_event_tickets_plus_email_meta_fields', $meta_fields, $item );
 
-		$meta_data = get_post_meta( $item['qr_ticket_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$meta_data = Tribe__Tickets_Plus__Meta::get_attendee_meta_fields( $item['qr_ticket_id'], $item['attendee_id'] );
 
 		if ( ! $meta_fields || ! $meta_data ) {
 			return;

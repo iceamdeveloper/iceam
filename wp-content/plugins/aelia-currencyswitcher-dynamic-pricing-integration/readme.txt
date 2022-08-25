@@ -1,19 +1,19 @@
 === WooCommerce Currency Switcher - Dynamic Pricing Integration ===
 Tags: woocommerce, currency switcher, dynamic-pricing, integration, dynamic pricing
 Requires at least: 3.6
-Tested up to: 5.7
+Tested up to: 6.0.9
 License: GPLv3
 WC requires at least: 2.6
-WC tested up to: 5.3
+WC tested up to: 6.6
 
 Implements the integration between [Aelia Currency Switcher](https://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Dynamic Pricing plugin](https://www.woothemes.com/products/woocommerce-dynamic-pricing/).
 
 == Description ==
 This plugin is a temporary workaround for the lack of multi-currency support in the Dynamic Pricing plugin. It acts as a bridge between [Aelia Currency Switcher](https://aelia.co/shop/currency-switcher-woocommerce/) and [WooCommerce Dynamic Pricing plugin](http://www.woothemes.com/products/woocommerce-dynamic-pricing/), ensuring that Dynamic Pricing prices are converted correctly into the currency being used to place an order.
 
-= Requirements =
+== Requirements ==
 
-* PHP 5.4 or newer.
+* PHP 7.1 or newer.
 * WordPress 4.7 or newer.
 * WooCommerce 2.6.x to 3.6.x
 * Aelia Currency Switcher 4.4.6.170120 or newer.
@@ -26,6 +26,49 @@ This plugin is a temporary workaround for the lack of multi-currency support in 
 3. That's it! Now the price of the Dynamic Pricing you enter will be converted automatically in the appropriate currency.
 
 == Changelog ==
+
+= 1.0.27.220607 =
+* Updated supported WooCommerce versions.
+
+= 1.0.26.220502 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.25.220330 =
+* Updated supported WooCommerce versions.
+
+= 1.0.24.220224 =
+* Updated supported WooCommerce versions.
+
+= 1.0.23.220124 =
+* Updated supported WooCommerce versions.
+
+= 1.0.22.220104 =
+* Updated supported WooCommerce versions.
+
+= 1.0.21.211208 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.20.211102 =
+* Updated supported WooCommerce versions.
+
+= 1.0.19.211005 =
+* Updated supported WooCommerce versions.
+
+= 1.0.18.210921 =
+* Fix - Fixed warning about the call to an obsolete method, no longer in use.
+
+= 1.0.17.210906 =
+* Updated supported WooCommerce versions.
+
+= 1.0.16.210816 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.15.210622 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
 
 = 1.0.14.210513 =
 * Updated supported WooCommerce versions.

@@ -108,9 +108,9 @@ class Sensei_Grading_User_Quiz {
 				<span class="total_grade_total"><?php echo esc_html( $user_quiz_grade_total ); ?></span> / <span class="quiz_grade_total"><?php echo esc_html( $quiz_grade_total ); ?></span> (<span class="total_grade_percent"><?php echo esc_html( $quiz_grade ); ?></span>%)
 			</div>
 			<div class="buttons">
-				<input type="submit" value="<?php esc_attr_e( 'Save', 'sensei-lms' ); ?>" class="grade-button button-primary" title="Saves grades as currently marked on this page" />
-				<input type="button" value="<?php esc_attr_e( 'Auto grade', 'sensei-lms' ); ?>" class="autograde-button button-secondary" title="Where possible, automatically grades questions that have not yet been graded" />
-				<input type="button" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-link button-link-delete" title="Resets all questions to ungraded and total grade to 0" />
+				<input type="submit" value="<?php esc_attr_e( 'Save', 'sensei-lms' ); ?>" class="grade-button button-primary" title="<?php esc_attr_e( 'Saves grades as currently marked on this page', 'sensei-lms' ); ?>" />
+				<input type="button" value="<?php esc_attr_e( 'Auto grade', 'sensei-lms' ); ?>" class="autograde-button button-secondary" title="<?php esc_attr_e( 'Where possible, automatically grades questions that have not yet been graded', 'sensei-lms' ); ?>" />
+				<input type="button" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-link button-link-delete" title="<?php esc_attr_e( 'Resets all questions to ungraded and total grade to 0', 'sensei-lms' ); ?>" />
 			</div>
 			<div class="clear"></div><br/>
 			<?php
@@ -134,7 +134,15 @@ class Sensei_Grading_User_Quiz {
 
 				$type = Sensei()->question->get_question_type( $question_id );
 
+				$custom_feedback       = Sensei()->quiz->get_user_answers_feedback( $lesson_id, $user_id );
+				$custom_feedback       = $custom_feedback[ $question_id ] ?? '';
+				$correct_feedback      = Sensei_Quiz::get_correct_answer_feedback( $question_id );
+				$incorrect_feedback    = Sensei_Quiz::get_incorrect_answer_feedback( $question_id );
 				$question_answer_notes = Sensei()->quiz->get_user_question_feedback( $lesson_id, $question_id, $user_id );
+
+				if ( ! $correct_feedback && ! $incorrect_feedback ) {
+					$custom_feedback = $question_answer_notes;
+				}
 
 				$question_grade_total = Sensei()->question->get_question_grade( $question_id );
 				$quiz_grade_total    += $question_grade_total;
@@ -215,6 +223,36 @@ class Sensei_Grading_User_Quiz {
 						break;
 				}
 
+				/**
+				 * Filters the various values which are displayed in the grading admin page for each quiz question.
+				 * The expected values are type_name, right_answer, user_answer_content and grade_type
+				 *
+				 * @since 3.15.0
+				 *
+				 * @hook sensei_grading_display_quiz_question
+				 *
+				 * @param {array|null}   $display_values {
+				 *     Optional. An array of arguments or null.
+				 *
+				 *     @key {string}       $type_name           The question type.
+				 *     @key {string|array} $right_answer        The right answer to the quiz.
+				 *     @key {string|array} $user_answer_content The user supplied answer to the quiz.
+				 *     @key {string}       $grade_type          Auto or manual grading.
+				 * }
+				 * @param {string} $type
+				 * @param {int}    $question_id
+				 *
+				 * @return {array|null}
+				 */
+				$possibly_new_args = apply_filters( 'sensei_grading_display_quiz_question', null, $type, $question_id, $right_answer, $user_answer_content );
+
+				if ( null !== $possibly_new_args && 0 < count( $possibly_new_args ) ) {
+					$type_name           = $possibly_new_args['type_name'] ?? $type_name;
+					$right_answer        = $possibly_new_args['right_answer'] ?? $right_answer;
+					$user_answer_content = $possibly_new_args['user_answer_content'] ?? $user_answer_content;
+					$grade_type          = $possibly_new_args['grade_type'] ?? $grade_type;
+				}
+
 				$quiz_grade_type = get_post_meta( $this->quiz_id, '_quiz_grade_type', true );
 
 				// Don't auto-grade if "Grade quiz automatically" isn't selected in Quiz Settings,
@@ -276,7 +314,7 @@ class Sensei_Grading_User_Quiz {
 						<h4><?php echo wp_kses_post( apply_filters( 'sensei_question_title', $question->post_title ) ); ?></h4>
 						<?php
 						// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Output escaped before core filter applied.
-						echo apply_filters( 'the_content', wp_kses_post( $question->post_content ) );
+						echo Sensei_Question::get_the_question_description( $question_id );
 						?>
 						<p class="user-answer">
 						<?php
@@ -313,7 +351,9 @@ class Sensei_Grading_User_Quiz {
 						</div>
 						<div class="answer-notes">
 							<h5><?php esc_html_e( 'Answer Feedback', 'sensei-lms' ); ?></h5>
-							<textarea class="correct-answer" name="questions_feedback[<?php echo esc_attr( $question_id ); ?>]" placeholder="<?php esc_attr_e( 'Add feedback here...', 'sensei-lms' ); ?>"><?php echo esc_html( $question_answer_notes ); ?></textarea>
+							<div class="answer-feedback-correct"><?php echo wp_kses_post( $correct_feedback ); ?></div>
+							<div class="answer-feedback-incorrect"><?php echo wp_kses_post( $incorrect_feedback ); ?></div>
+							<textarea class="correct-answer" name="questions_feedback[<?php echo esc_attr( $question_id ); ?>]" placeholder="<?php esc_attr_e( 'Add custom feedback here...', 'sensei-lms' ); ?>"><?php echo esc_html( $custom_feedback ); ?></textarea>
 						</div>
 					</div>
 				</div>
@@ -343,12 +383,6 @@ class Sensei_Grading_User_Quiz {
 				<input type="button" value="<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>" class="reset-button button-link button-link-delete" title="Resets all questions to ungraded and total grade to 0" />
 			</div>
 			<div class="clear"></div>
-			<script type="text/javascript">
-				jQuery( window ).on( 'load', function() {
-					// Calculate total grade on page load to make sure everything is set up correctly
-					jQuery.fn.autoGrade();
-				});
-			</script>
 		</form>
 		<?php
 	}

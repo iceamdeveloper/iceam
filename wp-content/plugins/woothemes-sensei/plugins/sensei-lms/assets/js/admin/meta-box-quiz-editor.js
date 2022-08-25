@@ -342,7 +342,7 @@ jQuery( document ).ready( function () {
 	/**
 	 * Upload media file to questions
 	 *
-	 * @param object button Button that was clicked
+	 * @param {object} button Button that was clicked
 	 * @return void
 	 *
 	 * @since  1.5.0
@@ -1796,7 +1796,7 @@ jQuery( document ).ready( function () {
 		items: 'label.answer',
 	} );
 
-	jQuery( '.multiple-choice-answers' ).bind( 'sortstop', function () {
+	jQuery( '.multiple-choice-answers' ).on( 'sortstop', function () {
 		jQuery.fn.updateAnswerOrder( jQuery( this ) );
 	} );
 
@@ -1807,7 +1807,7 @@ jQuery( document ).ready( function () {
 		},
 	} );
 
-	jQuery( '#sortable-questions' ).bind( 'sortstop', function () {
+	jQuery( '#sortable-questions' ).on( 'sortstop', function () {
 		jQuery.fn.updateQuestionOrder();
 		jQuery.fn.updateQuestionRows();
 	} );

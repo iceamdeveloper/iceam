@@ -2,7 +2,6 @@
 /**
  * WC_PB_Order_Again class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.8.1
  */
@@ -16,11 +15,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Order-again functions and filters.
  *
  * @class    WC_PB_Order_Again
- * @version  5.8.1
+ * @version  6.12.2
  */
 class WC_PB_Order_Again {
 
-	/*
+	/**
 	 * Initilize.
 	 */
 	public static function init() {
@@ -28,14 +27,11 @@ class WC_PB_Order_Again {
 		// Put back cart item data to allow re-ordering of bundles.
 		add_filter( 'woocommerce_order_again_cart_item_data', array( __CLASS__, 'order_again_cart_item_data' ), 10, 3 );
 
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.5' ) ) {
+		// Initialize parent-child associations from order-again keys.
+		add_filter( 'woocommerce_get_cart_item_from_session', array( __CLASS__, 'get_cart_item_from_session' ), -100, 3 );
 
-			// Initialize parent-child associations from order-again keys.
-			add_filter( 'woocommerce_get_cart_item_from_session', array( __CLASS__, 'get_cart_item_from_session' ), -100, 3 );
-
-			// Finalize parent-child associations from order-again keys.
-			add_action( 'woocommerce_cart_loaded_from_session', array( __CLASS__, 'cart_loaded_from_session' ), -100 );
-		}
+		// Finalize parent-child associations from order-again keys.
+		add_action( 'woocommerce_cart_loaded_from_session', array( __CLASS__, 'cart_loaded_from_session' ), -100 );
 	}
 
 	/*
@@ -48,9 +44,9 @@ class WC_PB_Order_Again {
 	 * Inialize cart item data when re-ordering.
 	 * Depending on whether cart session data is loaded, a different technique is needed.
 	 *
-	 * @param  array     $cart_item
-	 * @param  array     $order_item
-	 * @param  WC_Order  $order
+	 * @param  array                $cart_item
+	 * @param  WC_Order_Item|array  $order_item
+	 * @param  WC_Order             $order
 	 * @return array
 	 */
 	public static function order_again_cart_item_data( $cart_item, $order_item, $order ) {
@@ -63,6 +59,38 @@ class WC_PB_Order_Again {
 
 			$cart_item[ 'stamp' ]         = $order_item->get_meta( '_stamp', true );
 			$cart_item[ 'bundled_items' ] = array();
+
+			$bundle = wc_get_product( $order_item->get_product_id() );
+
+			if ( $bundle && $bundle->is_type( 'bundle' ) ) {
+
+				$bundled_items = $bundle->get_bundled_items();
+
+				// If an item was optional + unselected, but no longer exists, there is no reason to include its config as it will trigger a validation error downstream.
+				foreach ( $cart_item[ 'stamp' ] as $bundled_item_id => $bundled_item_configuration ) {
+
+					if ( isset( $bundled_item_configuration[ 'optional_selected' ] ) && 'no' === $bundled_item_configuration[ 'optional_selected' ] ) {
+
+						if ( ! $bundle->has_bundled_item( $bundled_item_id ) ) {
+							unset( $cart_item[ 'stamp' ][ $bundled_item_id ] );
+						}
+					}
+				}
+
+				// If an item was not optional, but became later, include the 'optional_selected' variable in its config.
+				foreach ( $bundled_items as $bundled_item_id => $bundled_item ) {
+
+					if ( ! isset( $cart_item[ 'stamp' ][ $bundled_item_id ] ) ) {
+						continue;
+					}
+
+					$bundled_item_configuration = $cart_item[ 'stamp' ][ $bundled_item_id ];
+
+					if ( $bundled_item->is_optional() && ! isset( $bundled_item_configuration[ 'optional_selected' ] ) ) {
+						$cart_item[ 'stamp' ][ $bundled_item_id ][ 'optional_selected' ] = isset( $bundled_item_configuration[ 'quantity' ] ) && absint( $bundled_item_configuration[ 'quantity' ] ) > 0 ? 'yes' : 'no';
+					}
+				}
+			}
 
 			if ( WC_PB()->cart->is_cart_session_loaded() ) {
 

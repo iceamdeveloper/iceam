@@ -12,6 +12,457 @@ if (!defined('ABSPATH')) {
  * @global type $wp_roles
  * @return html Display block user list
  */
+function ublk_export_date_time_details($block_day) {
+    $sunday_time = $monday_time = $tuesday_time = $wednesday_time = $thursday_time = $friday_time = $saturday_time = '';
+    if (!empty($block_day)) {
+        if (array_key_exists('sunday', $block_day)) {
+            $from_time = $block_day['sunday']['from'];
+            $to_time = $block_day['sunday']['to'];
+            if ($from_time == '') {
+                $sunday_time .= __('not set', 'user-blocker');
+            } else {
+                $sunday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $sunday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $sunday_time .=  __('not set', 'user-blocker');
+        }
+        if (array_key_exists('monday', $block_day)) {
+            $from_time = $block_day['monday']['from'];
+            $to_time = $block_day['monday']['to'];
+            if ($from_time == '') {
+                $monday_time .= __('not set', 'user-blocker');
+            } else {
+                $monday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $monday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $monday_time .=  __('not set', 'user-blocker');
+        }
+        if (array_key_exists('tuesday', $block_day)) {
+            $from_time = $block_day['tuesday']['from'];
+            $to_time = $block_day['tuesday']['to'];
+            if ($from_time == '') {
+                $tuesday_time .= __('not set', 'user-blocker');
+            } else {
+                $tuesday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $tuesday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $tuesday_time .=  __('not set', 'user-blocker');
+        }
+        if (array_key_exists('wednesday', $block_day)) {
+            $from_time = $block_day['wednesday']['from'];
+            $to_time = $block_day['wednesday']['to'];
+            if ($from_time == '') {
+                $wednesday_time .= __('not set', 'user-blocker');
+            } else {
+                $wednesday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $wednesday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $wednesday_time .=  __('not set', 'user-blocker');
+        }
+        if (array_key_exists('thursday', $block_day)) {
+            $from_time = $block_day['thursday']['from'];
+            $to_time = $block_day['thursday']['to'];
+            if ($from_time == '') {
+                $thursday_time .= __('not set', 'user-blocker');
+            } else {
+                $thursday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $thursday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $thursday_time .=  __('not set', 'user-blocker');
+        }
+        if (array_key_exists('friday', $block_day)) {
+            $from_time = $block_day['friday']['from'];
+            $to_time = $block_day['friday']['to'];
+            if ($from_time == '') {
+                $friday_time .= __('not set', 'user-blocker');
+            } else {
+                $friday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $friday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $friday_time .=  __('not set', 'user-blocker');
+        }
+        if (array_key_exists('saturday', $block_day)) {
+            $from_time = $block_day['saturday']['from'];
+            $to_time = $block_day['saturday']['to'];
+            if ($from_time == '') {
+                $saturday_time .= __('not set', 'user-blocker');
+            } else {
+                $saturday_time .= ublk_timeToTwelveHour($from_time);
+            }
+            if ($from_time != '' && $to_time != '') {
+                $saturday_time .= ' ' . __('to', 'user-blocker') . ' ' . ublk_timeToTwelveHour($to_time);
+            }
+        } else {
+            $saturday_time .=  __('not set', 'user-blocker');
+        }
+    } else {
+        $sunday_time .=  __('not set', 'user-blocker');
+        $monday_time .=  __('not set', 'user-blocker');
+        $tuesday_time .=  __('not set', 'user-blocker');
+        $wednesday_time .=  __('not set', 'user-blocker');
+        $thursday_time .=  __('not set', 'user-blocker');
+        $friday_time .=  __('not set', 'user-blocker');
+        $saturday_time .=  __('not set', 'user-blocker');
+    }
+    $data = $sunday_time . ','.$monday_time . ','.$tuesday_time . ','.$wednesday_time . ','.$thursday_time . ','.$friday_time . ','.$saturday_time;
+    return $data;
+}
+function user_blocker_export_data(){
+    global $wpdb;
+    global $wp_roles;
+    $get_roles = $wp_roles->roles;
+    $orderby            = 'user_login';
+    $order              = 'ASC';
+    $orderby = (isset($_GET['orderby']) && $_GET['orderby'] != '') ? esc_attr($_GET['orderby']) : 'user_login';
+    $order = (isset($_GET['order']) && $_GET['order'] != '') ? esc_attr($_GET['order']) : 'ASC';
+    add_filter('pre_user_query', 'ublk_sort_by_member_number');
+    if(isset($_POST['ublk_export_blk_time']) && isset($_GET['page']) && $_GET['page'] == 'blocked_user_list') {
+        $meta_query_array[] = array('relation' => 'AND');
+        $meta_query_array[] = array('key' => 'block_day');
+        $meta_query_array[] = array(
+            array(
+                'relation' => 'OR',
+                array(
+                    'key' => 'is_active',
+                    'compare' => 'NOT EXISTS'
+                ),
+                array(
+                    'key' => 'is_active',
+                    'value' => 'n',
+                    'compare' => '!='
+                )
+            )
+        );
+    }
+    if(isset($_POST['ublk_export_blk_date']) && isset($_GET['page']) && $_GET['page'] == 'datewise_blocked_user_list') {
+        $meta_query_array[] = array('relation' => 'AND');
+        $meta_query_array[] = array('key' => 'block_date');
+        $meta_query_array[] = array(
+            array(
+                'relation' => 'OR',
+                array(
+                    'key' => 'is_active',
+                    'compare' => 'NOT EXISTS'
+                ),
+                array(
+                    'key' => 'is_active',
+                    'value' => 'n',
+                    'compare' => '!='
+                )
+            )
+        );
+    }
+   
+    if(isset($_POST['ublk_export_blk_permanent']) && isset($_GET['page']) && $_GET['page'] == 'permanent_blocked_user_list') {
+        $meta_query_array[] = array(
+            'key' => 'is_active',
+            'value' => 'n',
+            'compare' => '=');
+    }
+    if(isset($_POST['ublk_export_blk_all_users']) && isset($_GET['page']) && $_GET['page'] == 'all_type_blocked_user_list') {
+        $meta_query_array[] = array(
+            'relation' => 'OR',
+            array(
+                'key' => 'block_date',
+                'compare' => 'EXISTS'),
+            array(
+                'key' => 'is_active',
+                'value' => 'n',
+                'compare' => '='),
+            array(
+                'key' => 'block_day',
+                'compare' => 'EXISTS')
+        );
+    }
+    
+    $filter_ary['orderby'] = $orderby;
+    $filter_ary['order'] = $order;
+    if( !empty($meta_query_array) ) {
+        $filter_ary['meta_query'] = $meta_query_array;
+    }
+
+    /* export csv by pagination */
+    $export_blocked_user_list_time = get_user_meta( get_current_user_id(),'ublk_list_by_time_per_page', true );
+    $export_blocked_user_list_date = get_user_meta( get_current_user_id(),'ublk_list_by_date_per_page', true );
+    $export_blocked_user_list_permanent = get_user_meta( get_current_user_id(),'ublk_list_by_permanent_per_page', true );
+    $export_blocked_user_list_alltypes = get_user_meta( get_current_user_id(),'ublk_list_by_alltypes_per_page', true );
+    $paged = isset($_GET['paged']) ? esc_attr($_GET['paged']) : 1;
+    if( empty($export_blocked_user_list_time) ) {
+        $export_blocked_user_list_time = 10;
+    }
+    if( empty($export_blocked_user_list_date) ) {
+        $export_blocked_user_list_date = 10;
+    }
+    if( empty($export_blocked_user_list_permanent) ) {
+        $export_blocked_user_list_permanent = 10;
+    }
+    if( empty($export_blocked_user_list_alltypes) ) {
+        $export_blocked_user_list_alltypes = 10;
+    }
+    if(isset($_POST['ublk_export_blk_time']) && isset($_GET['page']) && $_GET['page']== 'blocked_user_list' ) {    
+        $filter_ary['number'] = $export_blocked_user_list_time;
+        $offset = ($paged - 1) * $export_blocked_user_list_time;
+        $filter_ary['offset'] = $offset;
+    }
+    elseif(isset($_POST['ublk_export_blk_date']) && isset($_GET['page']) && $_GET['page']== 'datewise_blocked_user_list' ) {    
+        $filter_ary['number'] = $export_blocked_user_list_date;
+        $offset = ($paged - 1) * $export_blocked_user_list_date;
+        $filter_ary['offset'] = $offset;
+    }
+    elseif(isset($_POST['ublk_export_blk_permanent']) && isset($_GET['page']) && $_GET['page']== 'permanent_blocked_user_list' ) {  
+        $filter_ary['number'] = $export_blocked_user_list_permanent;
+        $offset = ($paged - 1) * $export_blocked_user_list_permanent;
+        $filter_ary['offset'] = $offset;
+    }
+    elseif(isset($_POST['ublk_export_blk_all_users']) && isset($_GET['page']) && $_GET['page']== 'all_type_blocked_user_list' ) {  
+        $filter_ary['number'] = $export_blocked_user_list_alltypes;
+        $offset = ($paged - 1) * $export_blocked_user_list_alltypes;
+        $filter_ary['offset'] = $offset;
+    }
+    $get_users_u = new WP_User_Query($filter_ary);
+    remove_filter('pre_user_query', 'ublk_sort_by_member_number');
+    $get_users = $get_users_u->get_results();
+    
+
+    if(isset($_POST['ublk_export_blk_time']) && isset($_GET['page']) && $_GET['page']== 'blocked_user_list' ) {        
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'users') {
+            $csv_output = 'Username, Role, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Message';
+            $csv_output .= "\n";
+            foreach($get_users as $user){
+                $block_day = get_user_meta($user->ID, 'block_day', true);
+                $block_msg_day = get_user_meta($user->ID, 'block_msg_day', true);
+                if ($block_day == '' || $block_day == '0') {
+                    $block_day = get_option($user->roles[0] . '_block_day');
+                }
+                $data = ublk_export_date_time_details($block_day);
+                $csv_output .= $user->user_login . ','.ucfirst(str_replace('_', ' ', $user->roles[0])) . ','  .$data. ','.ublk_disp_msg($block_msg_day);
+                $csv_output .= "\n";
+            }
+        }
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'roles') {
+            $csv_output = ' Role, Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday, Message';
+            if ($get_roles) {
+                $k = 1;
+                $csv_output .= "\n";
+                foreach ($get_roles as $key => $value) {
+                    $block_day = get_option($key . '_block_day');
+                    $block_msg_day = get_option($key . '_block_msg_day');
+                    $data = ublk_export_date_time_details($block_day);
+                    if(!empty($block_day)) {
+                        $csv_output .= $value['name'] . ','  .$data. ','.ublk_disp_msg($block_msg_day);
+                        $csv_output .= "\n";
+                    }
+                }
+            }
+        }
+        $generatedDate = date('d-m-Y His');
+        $filename = 'User-Blocker-List-By-Time';
+        $csvFile = $csv_output;
+        header("Pragma: public");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);                    //Forces the browser to download
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=\"" . $filename . " " . $generatedDate . ".csv\";");
+        header("Content-Transfer-Encoding: binary");
+        ob_start();
+        echo $csvFile;
+        echo ob_get_clean();
+        exit();
+    }
+    if(isset($_POST['ublk_export_blk_date']) && isset($_GET['page']) && $_GET['page'] == 'datewise_blocked_user_list'){
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'users') {
+            $csv_output = 'Username, Name, Email, Role, Block Date, Message';
+            $csv_output .= "\n";
+            foreach($get_users as $user){
+                $block_date = get_user_meta($user->ID, 'block_date', true);
+                if (!empty($block_date)) {
+                    if (array_key_exists('frmdate', $block_date) && array_key_exists('todate', $block_date)) {
+                        $frmdate = $block_date['frmdate'];
+                        $todate = $block_date['todate'];
+                        if ($frmdate != '' && $todate != '') {
+                            $data = ublk_dateTimeToTwelveHour($frmdate) . ' ' . __('to', 'user-blocker') . ' ' . ublk_dateTimeToTwelveHour($todate);
+                        }
+                    }
+                }
+                $block_msg_date = get_user_meta($user->ID, 'block_msg_date', true);
+                $csv_output .= $user->user_login . ','.$user->display_name. ','.$user->user_email. ',' .ucfirst(str_replace('_', ' ', $user->roles[0])). ',' .$data. ','.ublk_disp_msg($block_msg_date);
+                $csv_output .= "\n";
+            }
+        }
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'roles') {
+            $csv_output = 'Role, Block Date, Message';
+            if ($get_roles) {
+                $k = 1;
+                $csv_output .= "\n";
+                foreach ($get_roles as $key => $value) {
+                    $block_date = get_option($key . '_block_date');
+                    if (!empty($block_date) && isset($block_date) && $block_date != '') {
+                        if (array_key_exists('frmdate', $block_date) && array_key_exists('todate', $block_date)) {
+                            $frmdate = $block_date['frmdate'];
+                            $todate = $block_date['todate'];
+                            if ($frmdate != '' && $todate != '') {
+                                $data =  ublk_dateTimeToTwelveHour($frmdate) . ' ' . __('to', 'user-blocker') . ' ' . ublk_dateTimeToTwelveHour($todate);
+                            }
+                        }
+                    }
+                    $block_msg_date = get_option($key . '_block_msg_date');
+                    if(!empty($block_date)) {
+                        $csv_output .= $value['name'] . ','  .$data. ','.ublk_disp_msg($block_msg_date);
+                        $csv_output .= "\n";
+                    }
+                }
+            }
+        }
+        $generatedDate = date('d-m-Y His');
+        $filename = 'User-Blocker-List-By-Date';
+        $csvFile = $csv_output;
+        header("Pragma: public");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);                    //Forces the browser to download
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=\"" . $filename . " " . $generatedDate . ".csv\";");
+        header("Content-Transfer-Encoding: binary");
+        ob_start();
+        echo $csvFile;
+        echo ob_get_clean();
+        exit();
+    }
+    if(isset($_POST['ublk_export_blk_permanent']) && isset($_GET['page']) && $_GET['page'] == 'permanent_blocked_user_list') {
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'users') {
+            $csv_output = 'Username, Name, Email, Role, Message';
+            $csv_output .= "\n";
+            foreach($get_users as $user){
+                $block_msg_permenant = get_user_meta($user->ID, 'block_msg_permenant', true);
+                $csv_output .= $user->user_login . ','.$user->display_name. ','.$user->user_email. ',' .ucfirst(str_replace('_', ' ', $user->roles[0])). ','.ublk_disp_msg($block_msg_permenant);
+                $csv_output .= "\n";
+            }
+        }
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'roles') {
+            $csv_output = 'Role, Message';
+            if ($get_roles) {
+                $k = 1;
+                $csv_output .= "\n";
+                foreach ($get_roles as $key => $value) {
+                    $block_msg_permenant = get_option($key . '_block_msg_permenant');
+                    if(!empty($block_msg_permenant)) {
+                        $csv_output .= $value['name'] . ','.ublk_disp_msg($block_msg_permenant);
+                        $csv_output .= "\n";
+                    }
+                }
+            }
+        }
+        $generatedDate = date('d-m-Y His');
+        $filename = 'User-Blocker-List-By-Permanent';
+        $csvFile = $csv_output;
+        header("Pragma: public");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);                    //Forces the browser to download
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=\"" . $filename . " " . $generatedDate . ".csv\";");
+        header("Content-Transfer-Encoding: binary");
+        ob_start();
+        echo $csvFile;
+        echo ob_get_clean();
+        exit();
+    }
+    if(isset($_POST['ublk_export_blk_all_users']) && isset($_GET['page']) && $_GET['page'] == 'all_type_blocked_user_list'){
+        
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'users') {
+            $csv_output = 'Username, Name, Email, Role , Message';
+            $csv_output .= "\n";
+            foreach($get_users as $user){
+                $user_id = $user->ID;
+                $block_msg_user = '';
+                $is_active = get_user_meta($user_id, 'is_active', true);
+                $block_day = get_user_meta($user_id, 'block_day', true);
+                $block_date = get_user_meta($user_id, 'block_date', true);
+                if ($is_active == 'n') {
+                    $block_msg_user = get_user_meta($user_id, 'block_msg_permenant', true);
+                } 
+                else if(isset($block_day) && !empty($block_day) && $block_day != '' && isset($block_date) && !empty($block_date) && $block_date != '')
+                {
+                    $block_msg_user = get_user_meta($user_id, 'block_msg_day', true) . " And ". get_user_meta($user_id, 'block_msg_date', true) ;
+                }
+                else if(isset($block_day) && !empty($block_day) && $block_day != '') 
+                {
+                    $block_msg_user = get_user_meta($user_id, 'block_msg_day', true);
+                }
+                else if(isset($block_date) && !empty($block_date) && $block_date != '') 
+                {
+                    $block_msg_user = get_user_meta($user_id, 'block_msg_date', true);
+                }
+                
+                $csv_output .= $user->user_login . ','.$user->display_name . ','.$user->user_email. ',' .ucfirst(str_replace('_', ' ', $user->roles[0])).',' .ublk_disp_msg($block_msg_user);
+                $csv_output .= "\n";
+
+            }    
+        }
+        if(isset($_POST['export_display']) && $_POST['export_display'] == 'roles') {
+            $csv_output = 'Role, Message';
+            if ($get_roles) {
+                $k = 1;
+                $csv_output .= "\n";
+                foreach ($get_roles as $key => $value) {
+                    $block_msg_role = '';
+                    $is_active = get_option($key . '_is_active');
+                    $block_day = get_option($key . '_block_day');
+                    $block_date = get_option($key . '_block_date');
+                    if ($is_active == 'n') {
+                       $block_msg_role = get_option($key . '_block_msg_permenant');
+                    } else {
+                        if (isset($block_day) && !empty($block_day) && $block_day != '') {
+                            $block_msg_role = get_option($key . '_block_msg_day');
+                        }
+                        if (isset($block_date) && !empty($block_date) && $block_date != '') {
+                            $block_msg_role = get_option($key . '_block_msg_date');
+                        }
+                    }
+
+                    if(!empty($block_msg_role)) {
+                        $csv_output .= $value['name'] . ','.ublk_disp_msg($block_msg_role);
+                        $csv_output .= "\n";
+                    }
+                }
+            }
+        }
+        $generatedDate = date('d-m-Y His');
+        $filename = 'User-Blocker-List-By-All';
+        $csvFile = $csv_output;
+        header("Pragma: public");
+        header("Expires: 0");
+        header("Cache-Control: must-revalidate, post-check=0, pre-check=0");
+        header("Cache-Control: private", false);                    //Forces the browser to download
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=\"" . $filename . " " . $generatedDate . ".csv\";");
+        header("Content-Transfer-Encoding: binary");
+        ob_start();
+        echo $csvFile;
+        echo ob_get_clean();
+        exit();
+    }
+ }
+add_action('admin_init','user_blocker_export_data');
 if (!function_exists('ublk_block_user_list_page')) {
 
     function ublk_block_user_list_page() {
@@ -26,9 +477,31 @@ if (!function_exists('ublk_block_user_list_page')) {
         $next_page          = '';
         $prev_page          = '';
         $search_arg         = '';
+        
+
+        $user = get_current_user_id();
+        $screen_listbytime = get_current_screen();
+        $screen_option_listbytime = $screen_listbytime->get_option('per_page', 'option');
+        
+        
+        $limit = get_user_meta($user, $screen_option_listbytime, true);
+        
         $records_per_page   = 10;
-        $paged              = 1;
-        $sr_no              = 1;
+        if (isset($_GET['page']) && absint($_GET['page'])) {
+            $records_per_page = absint($_GET['page']);
+        } elseif (isset($limit)) {
+            $records_per_page = $limit;
+        } else {
+            $records_per_page = get_option('posts_per_page');
+        }
+        if (!isset($records_per_page) || empty($records_per_page)) {
+            $records_per_page = 10;
+        }
+        if (!isset($limit) || empty($limit)) {
+            $limit = 10;
+        }
+        $paged = $total_pages = 1;
+
         $orderby            = 'user_login';
         $order              = 'ASC';
         
@@ -45,6 +518,7 @@ if (!function_exists('ublk_block_user_list_page')) {
                 $paged = 1;
             }
         }
+        
         
         $offset = ($paged - 1) * $records_per_page;
         //Only for roles
@@ -138,13 +612,17 @@ if (!function_exists('ublk_block_user_list_page')) {
         $prev_page = (int) $paged - 1;
         if ($prev_page < 1)
             $prev_page = 1;
-        if (isset($paged) && $paged > 1) {
-            $sr_no = ( $records_per_page * ( $paged - 1 ) + 1);
+        /* Sr no start sith 1 on every page */    
+        if (isset($paged)) {
+            $sr_no=0;
+            $sr_no++;
         }
-        //Main query
+
         $get_users_u = new WP_User_Query($filter_ary);
         remove_filter('pre_user_query', 'ublk_sort_by_member_number');
         $get_users = $get_users_u->get_results();
+       
+        
         ?>
         <div class="wrap" id="blocked-list">
             <h2 class="ublocker-page-title"><?php _e('Blocked User list', 'user-blocker') ?></h2>
@@ -181,10 +659,16 @@ if (!function_exists('ublk_block_user_list_page')) {
                                 <?php
                                 ublk_blocked_user_category_dropdown($display);
                                 ublk_blocked_role_selection_dropdown($display, $get_roles, $srole);
-                                ublk_blocked_pagination($total_pages, $total_items, $paged, $prev_page, $next_page, $srole, $txtUsername, $orderby, $order, 'blocked_user_list');
+                                ublk_blocked_pagination($total_pages, $total_items, $paged, $prev_page, $next_page, $srole, $txtUsername, $orderby, $order, $display, 'blocked_user_list');
                                 ?>
                             </div>
                             <?php ublk_search_field($display, $txtUsername, 'blocked_user_list'); ?>
+                        </form>
+                        <form id="frmExport" method="post" class="frmExport">
+                            <div class="actions">
+                                <input type="hidden" name="export_display" class="export_display" value="<?php echo $display; ?>">
+                                <input type="submit" name="ublk_export_blk_time" value="Export CSV" class="button ublk_export_blk_time">
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -690,9 +1174,16 @@ if (!function_exists('ublk_block_user_list_page')) {
  * @global type $wp_roles
  * @return html Display datewise block user list
  */
+/**
+ *
+ * @global type $wpdb
+ * @global type $wp_roles
+ * @return html Display datewise block user list
+ */
 if (!function_exists('ublk_datewise_block_user_list_page')) {
 
     function ublk_datewise_block_user_list_page() {
+       
         global $wpdb;
         global $wp_roles;
         $txtUsername = '';
@@ -704,10 +1195,28 @@ if (!function_exists('ublk_datewise_block_user_list_page')) {
         $next_page = '';
         $prev_page = '';
         $search_arg = '';
-        $records_per_page = 10;
-        $paged = 1;
         $orderby = 'user_login';
         $order = 'ASC';
+
+        $user = get_current_user_id();
+        $screen_listbydate = get_current_screen();
+        $screen_option_listbydate = $screen_listbydate->get_option('per_page', 'option');
+        $limit = get_user_meta($user, $screen_option_listbydate, true);
+        $records_per_page   = 10;
+        if (isset($_GET['page']) && absint($_GET['page'])) {
+            $records_per_page = absint($_GET['page']);
+        } elseif (isset($limit)) {
+            $records_per_page = $limit;
+        } else {
+            $records_per_page = get_option('posts_per_page');
+        }
+        if (!isset($records_per_page) || empty($records_per_page)) {
+            $records_per_page = 10;
+        }
+        if (!isset($limit) || empty($limit)) {
+            $limit = 10;
+        }
+        $paged = $total_pages = 1;
         
         
         $msg = (isset($_GET['msg']) && $_GET['msg'] != '') ? esc_attr($_GET['msg']) : '';
@@ -812,10 +1321,13 @@ if (!function_exists('ublk_datewise_block_user_list_page')) {
         $prev_page = (int) $paged - 1;
         if ($prev_page < 1)
             $prev_page = 1;
-        $sr_no = 1;
-        if (isset($paged) && $paged > 1) {
-            $sr_no = ( $records_per_page * ( $paged - 1 ) + 1);
+        
+        /* Sr no start sith 1 on every page */    
+        if (isset($paged)) {
+            $sr_no=0;
+            $sr_no++;
         }
+
         //Main query
         $get_users_u = new WP_User_Query($filter_ary);
         remove_filter('pre_user_query', 'ublk_sort_by_member_number');
@@ -855,6 +1367,13 @@ if (!function_exists('ublk_datewise_block_user_list_page')) {
                                 ?>
                             </div>
                             <?php ublk_search_field($display, $txtUsername, 'datewise_blocked_user_list'); ?>
+
+                        </form>
+                        <form id="frmExport" method="post" class="frmExport">
+                            <div class="actions">
+                                <input type="hidden" name="export_display" class="export_display" value="<?php echo $display; ?>">
+                                <input type="submit" name="ublk_export_blk_date" value="Export CSV" class="button ublk_export_blk_date">
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -1029,6 +1548,7 @@ if (!function_exists('ublk_datewise_block_user_list_page')) {
                                     <td class="user-role"><?php echo ucfirst(str_replace('_', ' ', $user->roles[0])); ?></td>
                                     <td>
                                         <?php
+                                        
                                         $block_date = get_user_meta($user->ID, 'block_date', true);
                                         if (!empty($block_date)) {
                                             if (array_key_exists('frmdate', $block_date) && array_key_exists('todate', $block_date)) {
@@ -1088,10 +1608,28 @@ if (!function_exists('ublk_permanent_block_user_list_page')) {
         $next_page          = '';
         $prev_page          = '';
         $search_arg         = '';
-        $records_per_page   = 10;
-        $paged              = 1;
         $orderby            = 'user_login';
         $order              = 'ASC';
+
+        $user = get_current_user_id();
+        $screen_listbypermanent = get_current_screen();
+        $screen_option_listbypermanent = $screen_listbypermanent->get_option('per_page', 'option');
+        $limit = get_user_meta($user, $screen_option_listbypermanent, true);
+        $records_per_page   = 10;
+        if (isset($_GET['page']) && absint($_GET['page'])) {
+            $records_per_page = absint($_GET['page']);
+        } elseif (isset($limit)) {
+            $records_per_page = $limit;
+        } else {
+            $records_per_page = get_option('posts_per_page');
+        }
+        if (!isset($records_per_page) || empty($records_per_page)) {
+            $records_per_page = 10;
+        }
+        if (!isset($limit) || empty($limit)) {
+            $limit = 10;
+        }
+        $paged = $total_pages = 1;
         
         $msg = (isset($_GET['msg']) && $_GET['msg'] != '') ? esc_attr($_GET['msg']) : '';
         $msg_class = (isset($_GET['msg_class']) && $_GET['msg_class'] != '') ? esc_attr($_GET['msg_class']) : '';
@@ -1183,10 +1721,13 @@ if (!function_exists('ublk_permanent_block_user_list_page')) {
         $prev_page = (int) $paged - 1;
         if ($prev_page < 1)
             $prev_page = 1;
-        $sr_no = 1;
-        if (isset($paged) && $paged > 1) {
-            $sr_no = ( $records_per_page * ( $paged - 1 ) + 1);
+
+        /* Sr no start sith 1 on every page */    
+        if (isset($paged)) {
+            $sr_no=0;
+            $sr_no++;
         }
+
         //Main query
         $get_users_u = new WP_User_Query($filter_ary);
         $get_users = $get_users_u->get_results();
@@ -1225,6 +1766,12 @@ if (!function_exists('ublk_permanent_block_user_list_page')) {
                                 ?>
                             </div>
                             <?php ublk_search_field($display, $txtUsername, 'permanent_blocked_user_list'); ?>
+                        </form>
+                        <form id="frmExport" method="post" class="frmExport">
+                            <div class="actions">
+                                <input type="hidden" name="export_display" class="export_display" value="<?php echo $display; ?>">
+                                <input type="submit" name="ublk_export_blk_permanent" value="Export CSV" class="button ublk_export_blk_permanent">
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -1423,8 +1970,29 @@ if (!function_exists('ublk_all_type_block_user_list_page')) {
         $next_page          = '';
         $prev_page          = '';
         $search_arg         = '';
+
         $records_per_page   = 10;
-        $paged              = 1;
+        $user = get_current_user_id();
+        $screen_listbyalltype = get_current_screen();
+        $screen_option_listbyalltype = $screen_listbyalltype->get_option('per_page', 'option');
+        $limit = get_user_meta($user, $screen_option_listbyalltype, true);
+        $records_per_page   = 10;
+        if (isset($_GET['page']) && absint($_GET['page'])) {
+            $records_per_page = absint($_GET['page']);
+        } elseif (isset($limit)) {
+            $records_per_page = $limit;
+        } else {
+            $records_per_page = get_option('posts_per_page');
+        }
+        if (!isset($records_per_page) || empty($records_per_page)) {
+            $records_per_page = 10;
+        }
+        if (!isset($limit) || empty($limit)) {
+            $limit = 10;
+        }
+        $paged = $total_pages = 1;
+
+
         $orderby            = 'user_login';
         $order              = 'ASC';
 
@@ -1562,10 +2130,13 @@ if (!function_exists('ublk_all_type_block_user_list_page')) {
         $prev_page = (int) $paged - 1;
         if ($prev_page < 1)
             $prev_page = 1;
-        $sr_no = 1;
-        if (isset($paged) && $paged > 1) {
-            $sr_no = ( $records_per_page * ( $paged - 1 ) + 1);
+        
+        /* Sr no start sith 1 on every page */    
+        if (isset($paged)) {
+            $sr_no=0;
+            $sr_no++;
         }
+        
         //Main query
         $get_users_u = new WP_User_Query($filter_ary);
         remove_filter('pre_user_query', 'ublk_sort_by_member_number');
@@ -1605,6 +2176,12 @@ if (!function_exists('ublk_all_type_block_user_list_page')) {
                                 ?>
                             </div>
                             <?php ublk_search_field($display, $txtUsername, 'all_type_blocked_user_list'); ?>
+                        </form>
+                        <form id="frmExport" method="post" class="frmExport">
+                            <div class="actions">
+                                <input type="hidden" name="export_display" class="export_display" value="<?php echo $display; ?>">
+                                <input type="submit" name="ublk_export_blk_all_users" value="Export CSV" class="button ublk_export_blk_all_users">
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -1763,10 +2340,11 @@ if (!function_exists('ublk_all_type_block_user_list_page')) {
                                     <td><?php echo $user->user_email; ?></td>
                                     <td class="user-role"><?php echo ucfirst(str_replace('_', ' ', $user->roles[0])); ?></td>
                                     <td style="text-align:center">
-                                        <?php echo ublk_all_block_data_msg($user->ID); ?>
+                                
+                                        <?php ublk_all_block_data_msg($user->ID); ?>
                                     </td>
                                     <td class="aligntextcenter">
-                                        <?php ublk_all_block_data_view($user->ID); ?>
+                                        <?php echo ublk_all_block_data_view($user->ID); ?>
                                     </td>
                                 </tr>
                                 <?php
@@ -1784,5 +2362,4 @@ if (!function_exists('ublk_all_type_block_user_list_page')) {
         </div>
         <?php
     }
-
 }

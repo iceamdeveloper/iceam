@@ -57,9 +57,6 @@ class Logger {
 			$log_level = \Monolog\Logger::DEBUG;
 
 			$this->init_debug_log_handlers();
-			$this->logger->info('Debug mode enabled', array(
-				'Logger ID' => $this->log_id,
-			));
 		}
 		else {
 			$log_level = \Monolog\Logger::NOTICE;

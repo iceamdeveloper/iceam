@@ -35,7 +35,7 @@ tribe.tickets.table = {};
 			forcePlaceholderSize: true,
 			handle: '.tribe-handle',
 			helper: fixHelper,
-			update: function( event, ui ) {
+			update: function() {
 				if ( tribe.tickets.editor ) {
 					$( window ).off( 'beforeunload.tribe' );
 				}
@@ -60,8 +60,8 @@ tribe.tickets.table = {};
 	};
 
 	obj.toggle_sortable = function() {
-		var $table         = $( document.getElementById( 'tribe_ticket_list_table' ) ).find( '.tribe-tickets-editor-table-tickets-body' );
-		var $tribe_tickets = $( document.getElementById( 'tribetickets' ) );
+		var $table = $( document.getElementById( 'tribe_ticket_list_table' ) )
+			.find( '.tribe-tickets-editor-table-tickets-body' );
 
 		if ( window.matchMedia( '( min-width: 786px )' ).matches ) {
 			if ( ! $table.hasClass( 'ui-sortable' ) ) {

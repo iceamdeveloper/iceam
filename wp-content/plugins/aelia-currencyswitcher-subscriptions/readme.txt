@@ -1,7 +1,7 @@
 === WooCommerce Currency Switcher - Subscriptions Integration ===
 Tags: woocommerce, currency switcher, subscriptions, integration
 Requires at least: 4.0
-Tested up to: 5.7
+Tested up to: 6.0.9
 icense: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -12,7 +12,7 @@ This plugin acts as a bridge between [Aelia Currency Switcher](https://aelia.co/
 
 == Requirements ==
 
-* PHP 5.4 or newer.
+* PHP 7.1 or newer.
 * WordPress 3.6 or newer.
 * WooCommerce 3.0.x or newer.
 * Aelia Currency Switcher 4.4.7.170202 or newer
@@ -31,6 +31,48 @@ This is a free plugin, and it's provided as is, without explicit or implicit gua
 Should you need assistance, please feel free to [contact us](https://aelia.co/contact) andto avail of our paid support service (standard charges apply).
 
 == Changelog ==
+
+= 1.6.4.220607 =
+* Updated supported WooCommerce versions.
+
+= 1.6.3.220502 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.6.2.220330 =
+* Updated supported WooCommerce versions.
+
+= 1.6.1.220224 =
+* Updated supported WooCommerce versions.
+
+= 1.6.0.220202 =
+* Tweak - Added check to force currency during the processing of re-subscriptions.
+* Tested with Subscriptions 4.0.1.
+* Updated supported WooCommerce versions.
+
+= 1.5.20.220104 =
+* Updated supported WooCommerce versions.
+
+= 1.5.19.211208 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.5.18.211102 =
+* Updated supported WooCommerce versions.
+
+= 1.5.17.211005 =
+* Updated supported WooCommerce versions.
+
+= 1.5.16.210906 =
+* Updated supported WooCommerce versions.
+
+= 1.5.15.210816 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.5.14.210622 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
 
 = 1.5.13.210513 =
 * Updated supported WooCommerce versions.

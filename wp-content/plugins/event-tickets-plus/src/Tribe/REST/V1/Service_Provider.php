@@ -79,6 +79,8 @@ class  Tribe__Tickets_Plus__REST__V1__Service_Provider extends tad_DI52_ServiceP
 
 		add_filter( 'tribe_tickets_rest_api_ticket_data', tribe_callback( 'tickets-plus.rest-v1.response', 'filter_single_ticket_data' ) );
 		add_filter( 'tribe_tickets_rest_api_attendee_data', tribe_callback( 'tickets-plus.rest-v1.response', 'filter_single_attendee_data' ), 10, 2 );
+		add_filter( 'tribe_tickets_rest_api_update_attendee_data', tribe_callback( 'tickets-plus.rest-v1.response', 'filter_single_attendee_update_data' ), 10, 3 );
+		add_filter( 'tribe_tickets_rest_api_post_attendee_data', tribe_callback( 'tickets-plus.rest-v1.response', 'filter_single_attendee_create_data' ), 10, 2 );
 	}
 
 }

@@ -89,7 +89,7 @@ class Field_Type_Country extends \BP_XProfile_Field_Type implements Field_Type_S
 		$html = '';
 
 		if ( ! empty( $_POST[ 'field_' . $this->field_obj->id ] ) ) {
-			$new_selected_country  = (int) $_POST[ 'field_' . $this->field_obj->id ];
+			$new_selected_country  = wp_unslash( $_POST[ 'field_' . $this->field_obj->id ] );
 			$user_selected_country = ( $user_selected_country != $new_selected_country ) ? $new_selected_country : $user_selected_country;
 		}
 
@@ -215,8 +215,9 @@ class Field_Type_Country extends \BP_XProfile_Field_Type implements Field_Type_S
 	 *
 	 * @return array
 	 */
-	private static function get_countries() {
-		return array(
+	public static function get_countries() {
+
+		$countries = array(
 			'AF' => __( 'Afghanistan', 'bp-xprofile-custom-field-types' ),
 			'AX' => __( 'Åland Islands', 'bp-xprofile-custom-field-types' ),
 			'AL' => __( 'Albania', 'bp-xprofile-custom-field-types' ),
@@ -467,5 +468,7 @@ class Field_Type_Country extends \BP_XProfile_Field_Type implements Field_Type_S
 			'ZM' => __( 'Zambia', 'bp-xprofile-custom-field-types' ),
 			'ZW' => __( 'Zimbabwe', 'bp-xprofile-custom-field-types' ),
 		);
+
+		return (array) apply_filters( 'bpxcftr_countries_list', $countries );
 	}
 }

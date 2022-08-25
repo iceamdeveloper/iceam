@@ -40,13 +40,66 @@ class Tribe__Tickets_Plus__Meta {
 	}
 
 	/**
+	 * Fetch the meta fields key for attendee/ticket.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @param string|int $ticket_id   Which ticket we are fetching for.
+	 * @param string|int $attendee_id Which attendee we are fetching for.
+	 *
+	 * @return string
+	 */
+	public static function get_attendee_meta_fields_key( $ticket_id, $attendee_id = null ) {
+		/**
+		 * Allow the modification of the key used to fetch attendee registration fields.
+		 *
+		 * @since 5.3.0
+		 *
+		 * @param string     $meta_key    Which key is used to get the meta fields.
+		 * @param string|int $ticket_id   Which ticket we are fetching for.
+		 * @param string|int $attendee_id Which attendee we are fetching for.
+		 */
+		return apply_filters( 'tec_tickets_commerce_legacy_attendee_meta_key', static::META_KEY, $ticket_id, $attendee_id );
+	}
+
+	/**
+	 * Fetch the meta fields for attendee/ticket.
+	 *
+	 * @since 5.3.0
+	 *
+	 * @param string|int $ticket_id   Which ticket we are fetching for.
+	 * @param string|int $attendee_id Which attendee we are fetching for.
+	 *
+	 * @return array
+	 */
+	public static function get_attendee_meta_fields( $ticket_id, $attendee_id = null ) {
+		$meta_key  = static::get_attendee_meta_fields_key( $ticket_id, $attendee_id );
+		$meta_data = get_post_meta( $ticket_id, $meta_key, true );
+		if ( ! empty( $attendee_id ) ) {
+			$meta_data = get_post_meta( $attendee_id, $meta_key, true );
+		}
+
+		/**
+		 * Allow the modification of where we look for attendee fields.
+		 *
+		 * @since 5.3.0
+		 *
+		 * @param array      $meta_data   Attendee registration fields.
+		 * @param string|int $ticket_id   Which ticket we are fetching for.
+		 * @param string|int $attendee_id Which attendee we are fetching for.
+		 */
+		return apply_filters( 'tec_tickets_commerce_legacy_attendee_meta_fields', $meta_data, $ticket_id, $attendee_id );
+	}
+
+	/**
 	 * Tribe__Tickets_Plus__Meta constructor.
 	 *
-	 * @param string                                   $path
-	 * @param Tribe__Tickets_Plus__Meta__Storage|null $storage An instance of the meta storage handler.
+	 * @param string $path
+	 *
+	 * @since 5.4.4 Removed $storage parameter and set the storage value from singleton.
 	 */
-	public function __construct( $path = null, Tribe__Tickets_Plus__Meta__Storage $storage = null ) {
-		$this->storage = $storage ? $storage : new Tribe__Tickets_Plus__Meta__Storage();
+	public function __construct( $path = null ) {
+		$this->storage = tribe( 'tickets-plus.meta.storage' );
 
 		if ( ! is_null( $path ) ) {
 			$this->path = trailingslashit( $path );
@@ -62,7 +115,6 @@ class Tribe__Tickets_Plus__Meta {
 
 		add_action( 'event_tickets_after_save_ticket', [ $this, 'save_meta' ], 10, 3 );
 
-		add_action( 'event_tickets_ticket_list_after_ticket_name', [ $this, 'maybe_render_custom_meta_icon' ] );
 		add_action( 'event_tickets_ticket_list_after_ticket_name', [ $this, 'maybe_render_attendee_registration_fields_list' ] );
 
 		add_action( 'tribe_events_tickets_metabox_edit_accordion_content', [ $this, 'accordion_content' ], 10, 2 );
@@ -218,7 +270,7 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Metabox to output the Custom Meta fields
 	 *
-	 * @since 4.1
+	 * @since      4.1
 	 *
 	 * @deprecated 4.6
 	 */
@@ -234,7 +286,7 @@ class Tribe__Tickets_Plus__Meta {
 	 * @since 4.6
 	 *
 	 * @param int $unused_post_id ID of parent "event" post.
-	 * @param int $ticket_id ID of ticket post.
+	 * @param int $ticket_id      ID of ticket post.
 	 */
 	public function accordion_content( $unused_post_id, $ticket_id = null ) {
 		$is_admin = tribe_is_truthy( tribe_get_request_var( 'is_admin', is_admin() ) );
@@ -266,7 +318,7 @@ class Tribe__Tickets_Plus__Meta {
 	 * @since 4.10
 	 *
 	 * @param int $unused_post_id ID of parent "event" post
-	 * @param int $ticket_id ID of ticket post
+	 * @param int $ticket_id      ID of ticket post
 	 */
 	public function meta_content( $ticket_id = null ) {
 		$is_admin = tribe_is_truthy( tribe_get_request_var( 'is_admin', is_admin() ) );
@@ -383,8 +435,9 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Builds an array of fields
 	 *
-	 * @param int $ticket_id ID of ticket post
-	 * @param array $data field data
+	 * @param int   $ticket_id ID of ticket post
+	 * @param array $data      field data
+	 *
 	 * @return array array of fields
 	 */
 	public function build_field_array( $ticket_id, $data ) {
@@ -583,11 +636,10 @@ class Tribe__Tickets_Plus__Meta {
 			return array();
 		}
 
-		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
-		$meta        = [];
+		$meta = [];
 
 		foreach ( $product_ids as $product_id ) {
-			$data = $meta_object->get_meta_cookie_data( $product_id, $include_empty );
+			$data = $this->get_meta_cookie_data( $product_id, $include_empty );
 
 			if ( ! $data ) {
 				continue;
@@ -625,9 +677,13 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * If the given ticket has attendee meta, render an icon to indicate that
 	 *
+	 * @deprecated 5.4.4
+	 *
 	 * @param Tribe__Tickets__Ticket_Object $ticket
 	 */
 	public function maybe_render_custom_meta_icon( $ticket ) {
+		_deprecated_function( __METHOD__, '5.4.4' );
+
 		if ( ! is_admin() ) {
 			return;
 		}
@@ -644,7 +700,7 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * If the given ticket has attendee meta, render a list of the fields.
 	 *
-	 * @since TBD
+	 * @since 5.2.5
 	 *
 	 * @param Tribe__Tickets__Ticket_Object $ticket The ticket object.
 	 */
@@ -684,20 +740,23 @@ class Tribe__Tickets_Plus__Meta {
 
 		?>
 
-		<div class="tribe-tickets__tickets-editor-ticket-name-attendee-registration-fields">
+		<div class="tribe-tickets__tickets-editor-ticket-name-attendee-registration-fields dashicons-before dashicons-admin-users">
 			<?php echo esc_html( implode( ', ', $fields ) ); ?>
 		</div>
 		<?php
 	}
+
 	/**
 	 * Injects fieldsets into JSON data during ticket add ajax output
 	 *
-	 * @param array $return Data array to be output in the ajax response for ticket adds
-	 * @param int $post_id ID of parent "event" post
+	 * @param array $return  Data array to be output in the ajax response for ticket adds
+	 * @param int   $post_id ID of parent "event" post
+	 *
 	 * @return array $return output Data array with added fieldsets
 	 */
 	public function inject_fieldsets_in_json( $return, $unused_post_id ) {
 		$return['fieldsets'] = $this->meta_fieldset()->get_fieldsets();
+
 		return $return;
 	}
 
@@ -852,6 +911,7 @@ class Tribe__Tickets_Plus__Meta {
 	 * @since 4.9
 	 *
 	 * @param int $ticket_id
+	 *
 	 * @return bool
 	 */
 	public function ticket_has_required_meta( $ticket_id ) {
@@ -925,8 +985,9 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Injects additional elements into the main ticket admin panel "header"
 	 *
+	 * @since      4.6
+	 *
 	 * @deprecated 4.6.2
-	 * @since 4.6
 	 *
 	 * @param int $post_id ID of parent "event" post
 	 */
@@ -938,8 +999,8 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Injects "New Ticket" button into initial view
 	 *
+	 * @since      4.6
 	 * @deprecated 4.6.2
-	 * @since 4.6
 	 */
 	public function tickets_new_ticket_button() {
 		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'button-new-ticket' )" );
@@ -949,10 +1010,11 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Injects additional columns into tickets table body
 	 *
-	 * @deprecated 4.6.2
-	 * @since 4.6
+	 * @since      4.6
 	 *
-	 * @param $ticket_ID (obj) the ticket object
+	 * @deprecated 4.6.2
+	 *
+	 * @param $ticket_ID    (obj) the ticket object
 	 * @param $provider_obj (obj) the ticket provider object
 	 */
 	public function ticket_table_add_tbody_column( $ticket, $provider_obj ) {
@@ -963,8 +1025,8 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Injects additional columns into tickets table header
 	 *
+	 * @since      4.6
 	 * @deprecated 4.6.2
-	 * @since 4.6
 	 */
 	public function ticket_table_add_header_column() {
 		_deprecated_function( __METHOD__, '4.6.2', "tribe( 'tickets-plus.admin.views' )->template( 'editor/column-head-price' )" );
@@ -974,7 +1036,7 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Creates and outputs the capacity table for the ticket settings panel
 	 *
-	 * @since 4.6
+	 * @since      4.6
 	 * @deprecated 4.6.2
 	 *
 	 * @param int $post_id ID of parent "event" post
@@ -989,8 +1051,9 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Get the total capacity for the event, format it and display.
 	 *
+	 * @since      4.6
+	 *
 	 * @deprecated 4.6.2
-	 * @since 4.6
 	 *
 	 * @param int $post_id ID of parent "event" post
 	 *
@@ -1004,8 +1067,9 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Injects additional fields into the event settings form below the capacity table
 	 *
+	 * @since      4.6
+	 *
 	 * @deprecated 4.6.2
-	 * @since 4.6
 	 *
 	 * @param int $post_id - the post id of the parent "event" post
 	 *
@@ -1019,7 +1083,7 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Allows for the insertion of additional content into the ticket edit form - main section
 	 *
-	 * @since 4.6
+	 * @since      4.6
 	 * @deprecated 4.6.2
 	 *
 	 */
@@ -1128,7 +1192,7 @@ class Tribe__Tickets_Plus__Meta {
 
 		$first_provider = current( $providers );
 
-		$data['attendee_registration_url'] = add_query_arg( 'provider', $first_provider, $attendee_reg->get_url() );
+		$data['attendee_registration_url'] = add_query_arg( tribe_tickets_get_provider_query_slug(), $first_provider, $attendee_reg->get_url() );
 
 		if ( ! empty( $post_id ) ) {
 			$data['attendee_registration_url'] = add_query_arg( 'tribe_tickets_post_id', (int) $post_id, $data['attendee_registration_url'] );
@@ -1203,5 +1267,28 @@ class Tribe__Tickets_Plus__Meta {
 		}
 
 		return $meta[ $ticket_id ][ $attendee_number ][ $key ];
+	}
+
+	/**
+	 * Check if the Ticket has associated Attendee Registration fields or not.
+	 *
+	 * @since 5.4.2
+	 *
+	 * @param int $ticket_id Ticket ID.
+	 *
+	 * @return bool
+	 */
+	public function ticket_has_arf( $ticket_id ) {
+		/** @var \Tribe\Tickets\Plus\Attendee_Registration\IAC $iac */
+		$iac            = tribe( 'tickets-plus.attendee-registration.iac' );
+		$iac_for_ticket = $iac->get_iac_setting_for_ticket( $ticket_id );
+		$iac_enabled    = $iac_for_ticket === $iac::ALLOWED_KEY || $iac_for_ticket === $iac::REQUIRED_KEY;
+		$meta           = $this->get_meta_fields_by_ticket( $ticket_id );
+
+		if ( empty( $meta ) && empty( $iac_enabled ) ) {
+			return false;
+		}
+
+		return true;
 	}
 }

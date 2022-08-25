@@ -1,6 +1,1225 @@
-!function(e){var t={};function n(r){if(t[r])return t[r].exports;var o=t[r]={i:r,l:!1,exports:{}};return e[r].call(o.exports,o,o.exports,n),o.l=!0,o.exports}n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var o in e)n.d(r,o,function(t){return e[t]}.bind(null,o));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=147)}([function(e,t){e.exports=window.wp.element},function(e,t){e.exports=window.wp.i18n},function(e,t){e.exports=window.wp.components},function(e,t,n){var r=n(10);function o(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}e.exports=function(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?o(Object(n),!0).forEach((function(t){r(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):o(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.data},function(e,t){function n(){return e.exports=n=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},e.exports.default=e.exports,e.exports.__esModule=!0,n.apply(this,arguments)}e.exports=n,e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.blockEditor},function(e,t,n){var r;
+/******/(()=>{// webpackBootstrap
+/******/var e={
+/***/9375:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r,s,o=n(9196);
+/* harmony import */function i(){return i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},i.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return o.createElement("svg",i({viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=o.createElement("path",{d:"M20 16V4H4v12h16z"})),s||(s=o.createElement("path",{d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12zM6 20h2.222L11 16H8.778L6 20zm12 0h-2.222L13 16h2.222L18 20z"})))};
+/***/},
+/***/3362:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r,s=n(9196);
+/* harmony import */function o(){return o=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},o.apply(this,arguments)}
+/* harmony default export */const i=function(e){
+return s.createElement("svg",o({viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=s.createElement("path",{d:"M4 4v12h4.777L6 20h2.223L11 16h2l2.777 4H18l-2.777-4H20V4zm1.5 1.5h13v9h-13zM9 8v1.5h6V8zm0 3v1.5h6V11z",clipRule:"evenodd",fillRule:"evenodd"})))};
+/***/},
+/***/180:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r,s,o=n(9196);
+/* harmony import */function i(){return i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},i.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return o.createElement("svg",i({viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=o.createElement("path",{fillRule:"evenodd",clipRule:"evenodd",d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12z"})),s||(s=o.createElement("path",{fillRule:"evenodd",clipRule:"evenodd",d:"M9 12h6V8H9v4zm-3 8h2.222L11 16H8.778L6 20zm12 0h-2.222L13 16h2.222L18 20z"})))};
+/***/},
+/***/2070:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r,s,o=n(9196);
+/* harmony import */function i(){return i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},i.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return o.createElement("svg",i({viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=o.createElement("rect",{x:2.75,y:7.75,width:18.5,height:6.5,rx:3.25,stroke:"currentColor",strokeWidth:1.5,fill:"none"})),s||(s=o.createElement("path",{d:"M6 7.75h10.7l-6.5 6.5H6c-1.8 0-3.25-1.45-3.25-3.25S4.2 7.75 6 7.75Z"})))};
+/***/},
+/***/8930:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r,s=n(9196);
+/* harmony import */function o(){return o=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},o.apply(this,arguments)}
+/* harmony default export */const i=function(e){
+return s.createElement("svg",o({viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=s.createElement("path",{d:"M12 24a12 12 0 1 0 0-24 12 12 0 0 0 0 24Zm-.1-4.723c-2.849 0-4.517-1.072-4.575-3.011 0-.203 0-.405.029-.608 1.208 1.013 2.733 1.65 4.603 1.65 1.64 0 2.733-.695 2.733-1.708 0-.608-.978-.897-2.244-1.274-2.33-.752-5.553-1.736-5.553-5.181 0-2.721 1.957-4.458 5.323-4.458 2.905 0 4.66 1.042 4.689 3.242v.376c-1.496-1.187-3.107-1.794-4.862-1.794-1.64 0-2.848.636-2.848 1.592 0 .55.978.868 2.244 1.273 2.33.753 5.667 1.824 5.667 5.24 0 2.808-2.186 4.66-5.207 4.66Z",fill:"currentColor"})))};
+/***/},
+/***/6414:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>s
+/* harmony export */});
+/* harmony import */var r=n(9307);
+/* harmony import */
+/* harmony default export */const s=
+/**
+ * WordPress dependencies
+ */
+/** @typedef {{icon: JSX.Element, size?: number} & import('@wordpress/primitives').SVGProps} IconProps */
+/**
+ * Return an SVG icon.
+ *
+ * @param {IconProps} props icon is the SVG component to render
+ *                          size is a number specifiying the icon size in pixels
+ *                          Other props will be passed to wrapped SVG component
+ *
+ * @return {JSX.Element}  Icon component
+ */
+function({icon:e,size:t=24,...n}){return(0,r.cloneElement)(e,{width:t,height:t,...n})};
+//# sourceMappingURL=index.js.map
+/***/},
+/***/9839:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},(0,r.createElement)(s.Path,{d:"M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 12.8h8v-1.5H8v1.5z"}));
+/* harmony default export */}
+//# sourceMappingURL=button.js.map
+/***/,
+/***/454:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"}));
+/* harmony default export */}
+//# sourceMappingURL=check.js.map
+/***/,
+/***/3455:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"}));
+/* harmony default export */}
+//# sourceMappingURL=chevron-right.js.map
+/***/,
+/***/2585:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},(0,r.createElement)(s.Path,{d:"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"}));
+/* harmony default export */}
+//# sourceMappingURL=chevron-up.js.map
+/***/,
+/***/528:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"}));
+/* harmony default export */}
+//# sourceMappingURL=plus.js.map
+/***/,
+/***/42:
+/***/(e,t)=>{var n;
 /*!
-  Copyright (c) 2017 Jed Watson.
+  Copyright (c) 2018 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
-*/!function(){"use strict";var n={}.hasOwnProperty;function o(){for(var e=[],t=0;t<arguments.length;t++){var r=arguments[t];if(r){var s=typeof r;if("string"===s||"number"===s)e.push(r);else if(Array.isArray(r)&&r.length){var l=o.apply(null,r);l&&e.push(l)}else if("object"===s)for(var i in r)n.call(r,i)&&r[i]&&e.push(i)}}return e.join(" ")}e.exports?(o.default=o,e.exports=o):void 0===(r=function(){return o}.apply(t,[]))||(e.exports=r)}()},function(e,t){e.exports=window.lodash},function(e,t,n){var r=n(28),o=n(29),s=n(21),l=n(30);e.exports=function(e,t){return r(e)||o(e,t)||s(e,t)||l()},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){var r=n(35),o=n(36),s=n(21),l=n(37);e.exports=function(e){return r(e)||o(e)||s(e)||l()},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){var r=n(32);e.exports=function(e,t){if(null==e)return{};var n,o,s=r(e,t);if(Object.getOwnPropertySymbols){var l=Object.getOwnPropertySymbols(e);for(o=0;o<l.length;o++)n=l[o],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(s[n]=e[n])}return s},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.blocks},,function(e,t,n){"use strict";n.d(t,"a",(function(){return P})),n.d(t,"b",(function(){return T}));var r=n(10),o=n.n(r),s=n(5),l=n.n(s),i=n(3),c=n.n(i),a=n(12),u=n.n(a),d=n(0),m=n(8),b=n(7),p=n.n(b),f=n(1),v=n(13),g=n(19),h=n(16),O=function(e){return(e="string"==typeof e?e:e.name)&&e.startsWith("sensei-lms/button")},j=function(e){var t;return c()(c()({},e),{},{className:null==e||null===(t=e.className)||void 0===t?void 0:t.replace(/\s*has-[\w-]*(color|background)/g,""),style:Object(m.omitBy)(null==e?void 0:e.style,(function(e,t){return t.match(/(color|background|background-color)/)}))})};Object(g.addFilter)("blocks.getSaveContent.extraProps","sensei/button/removeColorSaveProps",(function(e,t){return O(t)?j(e):e})),Object(g.addFilter)("blocks.registerBlockType","sensei/button/removeColorEditProps",(function(e){if(!O(e))return e;var t=e.getEditWrapperProps;return t&&(e.getEditWrapperProps=function(e){var n=t(e);return j(n)}),e})),Object(g.addFilter)("blocks.registerBlockType","sensei/button/addColorSettings",(function(e){var t,n;return O(e)?(null===(t=e.supports)||void 0===t||!t.color||null!==(n=e.attributes)&&void 0!==n&&n.backgroundColor||(e.edit=Object(h.a)({backgroundColor:{style:"background-color",label:Object(f.__)("Background color","sensei-lms")},textColor:{style:"color",label:Object(f.__)("Text color","sensei-lms")}})(e.edit),e.attributes=c()(c()({},e.attributes),{},{backgroundColor:{type:"string"},customBackgroundColor:{type:"string"},textColor:{type:"string"},customTextColor:{type:"string"}})),e):e})),Object(g.addFilter)("editor.BlockListBlock","sensei/button/removeWrapperProps",(function(e){return function(t){var n=t.name,r=t.wrapperProps;return O(n)&&r&&(r=j(r)),Object(d.createElement)(e,l()({},t,{wrapperProps:r}))}}),1);var _=n(4),y=n(6);function E(e){var t,n,r=C(e),s=function(e){var t,n,r,s,l,i,c,a,u,d,m,b=e.attributes,f=e.colors,v=b.backgroundColor,g=b.customBackgroundColor,h=b.textColor,O=b.customTextColor,j=b.gradient,_=b.style,E=void 0===_?{}:_,k=Object(y.getColorClassName)("background-color",v);E.color||(E.color={}),g&&(E.color.background=g),O&&(E.color.text=O);var C=function(e){if(e)return"has-".concat(e,"-gradient-background")}(j),w=Object(y.getColorClassName)("color",h),S=p()(w,C,(l={},o()(l,k,!(null!=E&&null!==(t=E.color)&&void 0!==t&&t.gradient||!k)),o()(l,"has-text-color",h||(null==E||null===(n=E.color)||void 0===n?void 0:n.text)),o()(l,"has-background",v||(null==E||null===(r=E.color)||void 0===r?void 0:r.background)||j||(null==E||null===(s=E.color)||void 0===s?void 0:s.gradient)),l)),x=null!=E&&null!==(i=E.color)&&void 0!==i&&i.background||null!=E&&null!==(c=E.color)&&void 0!==c&&c.text||null!=E&&null!==(a=E.color)&&void 0!==a&&a.gradient?{background:null!=E&&null!==(u=E.color)&&void 0!==u&&u.gradient?E.color.gradient:void 0,backgroundColor:null!=E&&null!==(d=E.color)&&void 0!==d&&d.background?E.color.background:void 0,color:null!=E&&null!==(m=E.color)&&void 0!==m&&m.text?E.color.text:void 0}:{};if(f){if(v){var B=Object(y.getColorObjectByAttributeValues)(f,v);x.backgroundColor=B.color}if(h){var N=Object(y.getColorObjectByAttributeValues)(f,h);x.color=N.color}}return{className:S||void 0,style:x}}(e),l={className:{"no-border-radius":0===(n=e.attributes.borderRadius)},style:{borderRadius:n?n+"px":void 0}};return{className:p()({"wp-block-button__link":!r},l.className,s.className,null==e||null===(t=e.attributes)||void 0===t?void 0:t.buttonClassName),style:c()(c()({},l.style),s.style)}}function k(e){var t=e.className,n=e.attributes.align;return{className:p()(t,"wp-block-sensei-button","wp-block-button","has-text-align-".concat(n||"left"))}}var C=function(e){var t;return/\bis-style-link\b/.test(null==e||null===(t=e.attributes)||void 0===t?void 0:t.className)},w=n(2),S=function(e){var t=e.borderRadius,n=e.setAttributes;return Object(d.createElement)(w.PanelBody,{title:Object(f.__)("Border settings","sensei-lms"),initialOpen:!1},Object(d.createElement)(w.RangeControl,{label:Object(f.__)("Border radius","sensei-lms"),value:t,min:0,max:50,allowReset:!0,onChange:function(e){return n({borderRadius:e})}}))},x=function(e){var t,n=e.attributes,r=e.setAttributes,o=n.borderRadius,s=n.align;return Object(d.createElement)(d.Fragment,null,Object(d.createElement)(y.BlockControls,null,Object(d.createElement)(y.BlockAlignmentToolbar,l()({label:Object(f.__)("Change button alignment","sensei-lms"),value:s||(null===(t=e.alignmentOptions)||void 0===t?void 0:t.default),onChange:function(e){e&&r({align:e})}},e.alignmentOptions))),Object(d.createElement)(y.InspectorControls,null,Object(d.createElement)(S,{borderRadius:o,setAttributes:r})))},B=function(e){var t=e.placeholder,n=e.attributes,r=e.setAttributes,o=n.text,s=Object(_.useSelect)((function(e){return e("core/block-editor").getSettings()}),[]).colors,i=void 0!==e.text,a=E(c()(c()({},e),{},{colors:s}));return Object(d.createElement)("div",k(e),i?Object(d.createElement)("div",a,e.text):Object(d.createElement)(y.RichText,l()({placeholder:t||Object(f.__)("Add text…","sensei-lms"),value:o,onChange:function(e){return r({text:e})}},a,{tagName:"a",identifier:"text",withoutInteractiveFormatting:!0})),Object(d.createElement)(x,e))},N=function(e){var t=e.attributes,n=e.className,r=e.tagName,s=e.blockName,i=t.text,c=t.inContainer,a=t.align,u=r;r||(u=C({attributes:t})?"a":"button");var m=Object(d.createElement)("div",k({className:n,attributes:t}),Object(d.createElement)(y.RichText.Content,l()({},E({attributes:t}),{tagName:u,value:i})));return c?Object(d.createElement)("div",{className:p()(n,"sensei-buttons-container__button-block",Object(v.getBlockDefaultClassName)(s)+"__wrapper",o()({},"sensei-buttons-container__button-align-".concat(a),a))},m):m},L=n(17),P={Fill:{name:"default",label:Object(f.__)("Fill","sensei-lms")},Outline:{name:"outline",label:Object(f.__)("Outline","sensei-lms")},Link:{name:"link",label:Object(f.__)("Link","sensei-lms")}},T=function(e){var t,n=e.settings,r=e.EditWrapper,s=u()(e,["settings","EditWrapper"]);s=c()({alignmentOptions:{controls:["left","center","right","full"],default:"left"}},s);var i=n.styles?n.styles:[c()(c()({},P.Fill),{},{isDefault:!0}),P.Outline],a=null===(t=Object(m.find)(i,"isDefault"))||void 0===t?void 0:t.name,b=Object(h.b)(a)(B),f=Object(h.b)(a)(N);return Object(m.merge)({name:"sensei-lms/button",title:"Sensei Button",category:"sensei-lms",attributes:{text:{type:"string",source:"html",selector:"a,button"},align:{type:"string"},borderRadius:{type:"number"},style:{type:"object"},isPreview:{type:"boolean",default:!1},inContainer:{type:"boolean",default:!1},buttonClassName:{type:"array",default:[]}},supports:{color:{gradients:!0},__experimentalColor:{gradients:!0},align:!1,html:!1},icon:L.b,styles:i,edit:function(e){var t=Object(d.createElement)(b,l()({},e,s));return r?Object(d.createElement)(r,e,t):t},save:function(e){return Object(d.createElement)(f,l()({},e,s,{blockName:n.name}))},getEditWrapperProps:function(e){var t=e.inContainer,r=e.align;return t?{className:p()("sensei-buttons-container__button-block",Object(v.getBlockDefaultClassName)(n.name)+"__wrapper",o()({},"sensei-buttons-container__button-align-".concat(r),r))}:{}},example:{attributes:{align:"center",isPreview:!0}}},n)}},function(e,t,n){"use strict";n.d(t,"a",(function(){return O})),n.d(t,"b",(function(){return _})),n.d(t,"c",(function(){return y}));var r=n(11),o=n.n(r),s=n(9),l=n.n(s),i=n(5),c=n.n(i),a=n(3),u=n.n(a),d=n(0),m=n(8),b=n(6),p=n(1),f=n(4),v=function(e){if(!e||null===e.match("#"))return e;var t=0,n=0,r=0,o=4===e.length?"#".concat(e[1]+e[1]+e[2]+e[2]+e[3]+e[3]):e;return 7===o.length&&(t=parseInt(o.substr(1,2),16)||0,n=parseInt(o.substr(3,2),16)||0,r=parseInt(o.substr(5,2),16)||0),"rgb(".concat(t,", ").concat(n,", ").concat(r,")")},g=window.getComputedStyle,h=Object(m.memoize)((function(){var e=document.createElement("div");e.className="editor-styles-wrapper sensei-probe-element";var t=document.createElement("div");t.className="wp-block-button";var n=document.createElement("div");n.className="wp-block-button__link",n.textContent="Probe",e.style.position="fixed",e.style.top="-100vh",t.appendChild(n),e.appendChild(t),document.body.appendChild(e);var r={primaryColor:g(n).backgroundColor,primaryContrastColor:g(n).color};return document.body.removeChild(e),r})),O=function(e){return function(t){var n=Object(m.mapValues)(e,(function(e){return e.style}));return Object(b.withColors)(n)((function(n){return Object(d.createElement)(d.Fragment,null,Object(d.createElement)(t,n),Object(d.createElement)(j,{colorSettings:e,props:n}))}))}},j=function(e){var t=e.colorSettings,n=e.props,r=Object.keys(t);return Object(d.createElement)(b.InspectorControls,null,Object(d.createElement)(b.PanelColorSettings,{title:Object(p.__)("Color settings","sensei-lms"),initialOpen:!1,colorSettings:r.map((function(e){return{value:n[e].color,label:t[e].label,onChange:function(r){n["set".concat(Object(m.upperFirst)(e))](r),t[e].onChange&&t[e].onChange(u()(u()({},n),{},{colorValue:r}))}}}))},n.backgroundColor&&n.textColor&&Object(d.createElement)(b.ContrastChecker,{textColor:n.textColor.color,backgroundColor:n.backgroundColor.color,isLargeText:!1})))},_=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"default";return function(t){return function(n){var r=n.className,o={};r&&r.includes("is-style-")||(r=o.className=[r,"is-style-".concat(e)].join(" "));var s=r.match(/is-style-(\w+)/);return s&&(o.blockStyle=s[1]),Object(d.createElement)(t,c()({},n,o))}}},y=function(e){return function(t){return function(n){var r=n.setAttributes,s=n.attributes,i=function(){var e=Object(f.useSelect)((function(e){return e("core/editor").getEditorSettings().colors}),[]),t=Object(d.useState)({}),n=l()(t,2),r=n[0],o=n[1];return Object(d.useEffect)((function(){var t=h(),n={},r=Object(m.mapValues)(Object(m.keyBy)(e,(function(e){return v(e.color)})),"slug");Object.entries(t).forEach((function(e){var t=l()(e,2),o=t[0],s=t[1],i=r[v(s)];i&&(n[o]={slug:i,color:s})})),o(n)}),[e]),r}(),a=Object(d.useState)({}),p=l()(a,2),g=p[0],O=p[1],j=Object.keys(e).map((function(e){return s[e]}));return Object(d.useEffect)((function(){var t={};Object.entries(e).forEach((function(e){var n=l()(e,2),o=n[0],c=n[1],a=c.style,d=c.probeKey,m=i[d]||{},p=m.slug;if(p&&(t[o]=u()(u()({},m),{},{className:Object(b.getColorClassName)(a,p)})),s[o]!==p){var f={};f[o]=p,"border-color"===a&&(f["".concat(o,"Value")]=m.color),r(f)}})),O(t)}),[i,r].concat(o()(j))),Object(d.createElement)(t,c()({},n,g))}}}},function(e,t,n){"use strict";n.d(t,"d",(function(){return s})),n.d(t,"e",(function(){return l})),n.d(t,"c",(function(){return i})),n.d(t,"b",(function(){return c})),n.d(t,"a",(function(){return a}));var r=n(0),o=n(2),s=Object(r.createElement)(o.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(o.Path,{d:"M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"})),l=Object(r.createElement)(o.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(o.Path,{d:"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"})),i=Object(r.createElement)(o.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(o.Path,{d:"M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"})),c=Object(r.createElement)(o.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(r.createElement)(o.Path,{d:"M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13h8v-1.5H8V13z"})),a=Object(r.createElement)(o.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(o.Path,{d:"M13 7h-2v6h2V7zM13 15h-2v2h2v-2z"}),Object(r.createElement)(o.Path,{d:"M12 4.75a7.25 7.25 0 100 14.5 7.25 7.25 0 000-14.5zM3.25 12a8.75 8.75 0 1117.5 0 8.75 8.75 0 01-17.5 0z"}))},function(e,t){e.exports=window.wp.compose},function(e,t){e.exports=window.wp.hooks},function(e,t){e.exports=function(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){var r=n(20);e.exports=function(e,t){if(e){if("string"==typeof e)return r(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?r(e,t):void 0}},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.apiFetch},function(e,t,n){"use strict";n.d(t,"a",(function(){return i})),n.d(t,"b",(function(){return c})),n.d(t,"c",(function(){return a})),n.d(t,"d",(function(){return u})),n.d(t,"e",(function(){return d})),n.d(t,"f",(function(){return m})),n.d(t,"g",(function(){return b}));var r=n(5),o=n.n(r),s=n(0),l=n(2),i=function(e){return Object(s.createElement)(l.SVG,o()({},e,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"}),Object(s.createElement)(l.Path,{d:"M20 16V4H4v12h16z"}),Object(s.createElement)(l.Path,{d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12zM6 20h2.222L11 16H8.778L6 20zM18 20h-2.222L13 16h2.222L18 20z"}))},c=function(){return Object(s.createElement)(l.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Rect,{stroke:"currentColor",fill:"transparent",x:"-0.75",y:"-0.75",width:"10",height:"14.5",transform:"matrix(4.37114e-08 -1 -1 -4.37114e-08 18.5 14)",strokeWidth:"1.5"}),Object(s.createElement)(l.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M8 12L16 12L16 8L8 8L8 12Z"}),Object(s.createElement)(l.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M7.2215 19.8616L10.7791 14.8707L9.55762 14L6.00005 18.9909L7.2215 19.8616Z"}),Object(s.createElement)(l.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M16.5578 19.8616L13.0002 14.8707L14.2217 14L17.7792 18.9909L16.5578 19.8616Z"}))},a=function(){return Object(s.createElement)(l.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Path,{d:"m4 4v12h4.7773l-2.7773 4h2.2227l2.7773-4h2l2.7773 4h2.2227l-2.7773-4h4.7773v-12zm1.5 1.5h13v9h-13zm3.5 2.5v1.5h6v-1.5zm0 3v1.5h6v-1.5z",clipRule:"evenodd",fillRule:"evenodd"}))},u=function(){return Object(s.createElement)(l.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(s.createElement)(l.Path,{d:"M16.181 17.381a7.61 7.61 0 01-2.13.133L15.778 20H18l-1.819-2.619zm-5.479-.953a7.712 7.712 0 01-2.12-1.928H5.5v-9h2.759A7.793 7.793 0 019.523 4H4v12h4.778L6 20h2.222l2.48-3.572z"}),Object(s.createElement)(l.Path,{d:"M15.541 8.944h-1.5v3.997h1.5V8.944zM15.541 7.944h-1.5V6.55h1.5v1.395z"}),Object(s.createElement)(l.Path,{d:"M20.79 9.768c0 3.425-2.714 6.269-6.145 6.269-3.43 0-6.145-2.844-6.145-6.269 0-3.424 2.714-6.268 6.145-6.268 3.43 0 6.145 2.844 6.145 6.268zm-6.145 4.769c2.565 0 4.645-2.135 4.645-4.769C19.29 7.135 17.21 5 14.645 5 12.08 5 10 7.135 10 9.768c0 2.634 2.08 4.769 4.645 4.769z"}))},d=function(){return Object(s.createElement)(l.SVG,{width:"24",height:"24",viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Path,{fillRule:"evenodd",clipRule:"evenodd",d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12z"}),Object(s.createElement)(l.Path,{fillRule:"evenodd",clipRule:"evenodd",d:"M9 12h6V8H9v4zM6 20h2.222L11 16H8.778L6 20zM18 20h-2.222L13 16h2.222L18 20z"}))},m=function(){return Object(s.createElement)(l.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(s.createElement)(l.Rect,{x:"2.75",y:"7.75",width:"18.5",height:"6.5",rx:"3.25",stroke:"currentColor",strokeWidth:"1.5",fillOpacity:"0"}),Object(s.createElement)(l.Path,{d:"M6 7.75 H 16.7 L 10.2 14.25 H 6 C 4.2 14.25 2.75 12.8 2.75 11 C 2.75 9.2 4.2 7.75 6 7.75Z",strokeWidth:"1.5"}))},b=function(e){return Object(s.createElement)(l.SVG,o()({},e,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 256.000000 256.000000",preserveAspectRatio:"xMidYMid meet"}),Object(s.createElement)(l.G,{transform:"translate(0.000000,256.000000) scale(0.100000,-0.100000)",stroke:"none"},Object(s.createElement)(l.Path,{d:"M1174 2541 c-28 -3 -58 -12 -67 -19 -9 -8 -25 -11 -37 -7 -11 3 -20 2 -20 -4 0 -5 -11 -8 -25 -5 -14 2 -25 0 -25 -6 0 -5 -13 -10 -30 -10 -16 0 -30 -4 -30 -9 0 -4 -23 -11 -52 -14 -28 -4 -54 -11 -58 -16 -3 -6 -25 -13 -48 -17 -23 -3 -39 -10 -37 -15 3 -4 -10 -11 -30 -15 -19 -3 -33 -9 -31 -13 2 -3 -15 -15 -37 -26 -23 -11 -48 -26 -55 -32 -7 -7 -19 -13 -27 -13 -7 0 -15 -7 -19 -15 -3 -8 -12 -15 -21 -15 -8 0 -15 -4 -15 -9 0 -5 -8 -12 -17 -15 -47 -15 -189 -157 -290 -291 -5 -5 -32 -59 -61 -120 -29 -60 -58 -118 -63 -127 -5 -10 -9 -25 -9 -33 0 -10 -5 -13 -11 -9 -9 5 -10 -1 -5 -20 4 -15 2 -26 -4 -26 -5 0 -9 -10 -9 -22 1 -23 -13 -104 -31 -186 -13 -54 -13 -254 -1 -301 6 -20 15 -71 22 -114 7 -43 15 -80 20 -82 4 -3 5 -15 1 -27 -3 -14 -2 -19 6 -14 7 4 12 2 12 -4 0 -6 14 -38 30 -72 17 -33 30 -64 30 -70 0 -5 7 -16 15 -24 8 -9 15 -24 15 -35 0 -10 4 -19 8 -19 5 0 14 -10 19 -23 23 -47 145 -179 177 -191 10 -3 16 -12 13 -21 -4 -8 -1 -12 6 -10 7 3 34 -16 60 -40 27 -25 53 -45 59 -45 6 0 19 -9 29 -21 9 -11 29 -21 43 -23 14 -1 29 -5 32 -9 3 -3 12 -3 20 0 8 3 14 -1 14 -11 0 -9 -8 -16 -17 -16 -14 0 -9 -8 16 -30 18 -17 38 -30 43 -30 6 0 8 -6 5 -13 -4 -10 2 -13 20 -9 18 3 24 1 19 -6 -4 -7 3 -14 19 -18 14 -3 25 -10 25 -14 0 -4 18 -10 40 -14 22 -3 40 -11 40 -17 0 -6 7 -9 15 -5 9 3 21 -4 31 -19 9 -14 25 -25 35 -25 10 0 20 -4 23 -9 4 -5 25 -12 49 -16 23 -4 47 -11 53 -16 12 -10 246 -5 263 5 5 4 12 2 16 -4 8 -13 41 -13 82 2 27 10 38 10 53 0 27 -17 71 -15 109 4 28 14 56 21 99 26 6 1 12 5 12 10 0 4 11 8 25 8 14 0 25 4 25 10 0 5 15 12 33 15 19 4 40 15 47 25 10 14 22 17 51 13 26 -4 39 -2 39 6 0 6 5 11 11 11 6 0 27 13 46 30 18 16 44 30 58 30 13 0 26 6 28 13 4 9 8 8 16 -3 7 -10 11 -11 11 -2 0 6 6 12 13 12 18 0 49 24 134 104 40 38 73 75 73 83 0 7 4 13 8 13 5 0 17 16 28 35 10 19 22 35 25 35 4 0 10 11 13 25 4 14 11 23 16 20 6 -3 10 1 10 9 0 21 42 116 51 116 4 0 10 13 14 30 4 16 11 30 16 30 5 0 9 9 9 20 0 11 5 20 11 20 6 0 8 9 4 20 -3 11 -2 20 3 20 5 0 18 40 30 90 18 71 22 120 22 240 0 82 -4 169 -10 192 -5 24 -17 97 -26 163 -9 66 -19 122 -23 125 -3 3 -15 30 -25 60 -11 30 -26 66 -33 80 -7 14 -13 31 -13 38 0 6 -4 12 -10 12 -5 0 -12 11 -16 25 -3 14 -10 25 -14 25 -4 0 -10 8 -14 18 -6 20 -25 50 -43 70 -7 7 -13 18 -13 23 0 5 -5 15 -10 22 -41 48 -50 62 -50 74 0 7 -5 13 -11 13 -6 0 -9 7 -6 14 4 10 1 13 -8 10 -8 -4 -20 6 -28 23 -13 25 -170 181 -209 208 -31 22 -54 35 -73 44 -11 5 -30 18 -42 30 -12 11 -33 23 -47 27 -14 3 -26 10 -26 15 0 5 -8 9 -17 9 -10 0 -31 7 -47 15 -15 8 -35 15 -42 15 -8 0 -14 4 -14 10 0 5 -10 10 -22 10 -13 0 -63 6 -113 13 -111 18 -313 27 -381 18z m381 -201 c-4 -6 6 -10 22 -10 45 0 103 -12 98 -20 -3 -4 14 -10 37 -13 22 -3 44 -10 47 -15 3 -5 20 -13 37 -16 17 -4 40 -15 50 -25 11 -9 22 -18 26 -19 24 -8 44 -17 54 -26 6 -6 22 -18 35 -26 38 -24 169 -161 169 -176 0 -8 5 -14 11 -14 6 0 9 -7 6 -14 -4 -10 -1 -13 9 -9 10 4 12 0 7 -13 -4 -12 -3 -15 5 -10 7 4 12 1 12 -7 0 -8 7 -20 16 -28 9 -7 14 -22 11 -35 -3 -15 0 -21 9 -17 8 3 16 -5 20 -21 3 -14 10 -26 14 -26 5 0 12 -20 16 -45 3 -25 10 -45 15 -45 5 0 9 -7 9 -16 0 -9 6 -28 14 -42 24 -48 46 -102 46 -117 0 -7 6 -15 13 -17 16 -6 18 -455 1 -466 -6 -4 -14 -42 -17 -86 -3 -43 -10 -83 -16 -89 -6 -6 -11 -19 -11 -30 0 -10 -4 -16 -9 -13 -5 3 -11 -17 -15 -44 -4 -28 -10 -50 -15 -50 -5 0 -11 -14 -15 -31 -4 -23 -10 -30 -21 -25 -9 3 -13 2 -10 -4 10 -16 -5 -52 -20 -46 -8 3 -11 -2 -8 -13 3 -11 -8 -32 -29 -53 -18 -20 -42 -47 -54 -59 -27 -30 -105 -99 -134 -119 -12 -8 -28 -21 -36 -27 -7 -7 -15 -13 -19 -13 -4 0 -14 -7 -22 -16 -9 -8 -24 -13 -34 -11 -10 3 -16 0 -14 -7 4 -11 -57 -56 -76 -56 -5 0 -9 -4 -9 -10 0 -5 -18 -13 -40 -16 -22 -4 -37 -10 -34 -15 3 -5 -6 -9 -19 -9 -13 0 -27 -3 -31 -7 -7 -7 -18 -11 -68 -20 -18 -3 -39 -10 -46 -16 -8 -6 -113 -9 -285 -9 -149 1 -278 -2 -285 -7 -9 -5 -31 0 -60 15 -26 12 -54 24 -62 26 -8 2 -22 10 -30 19 -8 9 -25 19 -37 23 -13 4 -23 11 -23 16 0 5 -16 12 -35 16 -19 3 -35 10 -35 14 0 4 -16 11 -36 15 -20 3 -42 12 -49 18 -7 7 -29 26 -49 42 -76 62 -142 138 -140 161 1 7 -4 10 -11 7 -15 -5 -30 31 -20 47 3 6 0 7 -9 4 -10 -4 -18 1 -23 12 -3 11 -9 21 -12 24 -15 13 -60 114 -54 123 3 6 1 7 -5 3 -7 -4 -13 7 -18 29 -3 19 -10 35 -15 35 -5 0 -9 6 -9 14 0 7 -7 27 -15 42 -8 16 -15 41 -15 56 0 15 -4 29 -9 33 -6 3 -13 37 -17 75 -4 39 -11 73 -15 76 -5 3 -9 73 -9 155 0 83 4 148 9 145 4 -3 11 27 15 67 4 40 11 74 16 75 6 2 10 15 10 29 0 14 7 40 15 59 8 19 22 49 30 68 8 19 15 39 15 45 0 6 4 11 9 11 5 0 12 14 16 30 4 17 10 30 15 30 4 0 10 8 14 18 9 28 80 129 101 144 5 4 6 8 2 8 -4 0 11 20 34 45 24 25 49 43 55 41 8 -3 11 1 7 9 -3 9 4 19 18 25 13 5 33 16 44 22 18 12 24 17 57 43 28 23 119 75 131 75 6 0 21 7 31 15 11 8 28 15 38 15 10 0 18 4 18 9 0 5 19 12 43 16 23 4 45 12 48 17 3 5 31 12 62 15 31 3 54 10 51 14 -3 5 108 9 246 9 165 0 249 -3 245 -10z"}),Object(s.createElement)(l.Path,{d:"M820 1920 c0 -5 -6 -10 -12 -10 -26 -1 -58 -38 -58 -67 0 -26 9 -38 50 -63 12 -7 12 -12 1 -34 -11 -21 -17 -23 -32 -13 -13 8 -15 13 -6 19 7 5 -1 8 -20 8 -18 0 -33 -4 -33 -10 0 -5 -19 -10 -42 -10 -40 -1 -88 -26 -88 -45 0 -14 43 -45 61 -45 9 0 19 -5 21 -12 3 -9 12 -9 36 1 41 17 47 11 31 -33 -10 -29 -11 -43 -1 -68 14 -38 2 -56 -22 -32 -13 12 -28 15 -63 11 -25 -3 -49 -10 -53 -17 -4 -7 -17 -10 -29 -7 -12 3 -19 1 -15 -5 3 -5 -2 -18 -12 -29 -22 -24 -10 -52 25 -57 11 -2 21 -8 21 -13 0 -5 29 -9 65 -9 37 0 65 4 65 10 0 12 77 14 82 2 2 -4 18 -18 36 -31 18 -13 31 -25 29 -28 -3 -2 -42 -6 -88 -9 -46 -3 -86 -9 -89 -14 -3 -6 -41 -13 -83 -16 -42 -4 -77 -11 -77 -17 0 -5 -9 -7 -19 -4 -14 3 -18 1 -14 -9 3 -8 0 -14 -6 -14 -6 0 -11 -9 -11 -20 0 -11 7 -20 15 -20 8 0 15 -4 15 -9 0 -5 25 -12 55 -16 30 -3 53 -10 50 -14 -6 -11 184 -24 229 -16 20 4 36 11 36 16 0 5 21 9 48 9 66 0 88 8 100 36 10 20 16 23 44 18 42 -8 88 -27 88 -36 0 -5 3 -8 8 -7 15 2 52 -14 52 -22 0 -5 3 -8 8 -7 4 1 18 -2 30 -6 18 -6 30 -2 48 15 13 12 24 18 24 12 0 -6 -16 -25 -35 -42 -19 -17 -35 -35 -35 -40 0 -5 -5 -11 -11 -13 -6 -2 -11 -29 -11 -61 -1 -55 1 -59 44 -102 26 -26 59 -48 77 -51 17 -4 31 -10 31 -15 0 -4 21 -9 48 -11 42 -3 47 -6 47 -27 0 -17 -11 -29 -40 -45 -22 -11 -42 -24 -45 -27 -7 -8 -53 -24 -62 -21 -5 1 -8 -3 -8 -8 0 -6 -9 -10 -19 -10 -11 0 -22 -4 -25 -9 -3 -5 -32 -12 -63 -16 -32 -4 -60 -11 -63 -15 -3 -5 -41 -12 -85 -16 -44 -4 -82 -10 -85 -14 -3 -4 -32 -11 -64 -16 -70 -11 -89 -34 -27 -34 22 0 43 -4 46 -10 7 -12 102 -13 107 -2 2 5 38 12 81 15 75 7 79 6 104 -19 14 -14 41 -28 59 -31 19 -3 34 -10 34 -14 0 -5 18 -9 40 -9 22 0 40 4 40 9 0 5 20 12 45 15 25 4 45 10 45 14 0 11 77 42 104 42 14 0 28 5 31 10 3 6 22 10 41 10 26 0 34 4 34 18 0 10 -11 25 -25 32 -20 11 -25 21 -25 52 0 21 4 38 9 38 5 0 13 9 16 20 4 11 17 32 31 47 31 33 31 74 -1 121 -14 20 -25 32 -25 27 0 -5 -5 -4 -12 3 -7 7 -20 12 -31 12 -10 0 -16 4 -13 9 6 8 -63 21 -115 21 -16 0 -29 5 -29 10 0 6 -9 10 -21 10 -26 0 -59 18 -59 32 0 15 48 58 65 58 7 0 15 5 17 11 2 5 22 13 46 16 23 3 39 9 36 14 -2 4 18 11 45 15 28 4 48 10 46 14 -3 5 23 10 57 12 50 3 67 0 80 -13 16 -16 38 -17 230 -12 222 6 238 10 238 52 0 14 -8 23 -25 27 -14 3 -25 10 -25 15 0 6 -12 8 -27 7 -20 -2 -28 2 -31 16 -2 11 -10 25 -17 33 -7 7 -15 18 -17 24 -2 7 -30 14 -61 17 -31 2 -57 8 -57 12 0 5 -28 11 -62 15 -35 4 -69 12 -75 17 -9 7 -13 7 -13 -1 0 -6 -11 -11 -25 -11 -14 0 -25 -5 -25 -11 0 -7 -14 -8 -40 -4 -23 4 -40 3 -40 -3 0 -5 -25 -12 -57 -15 -31 -3 -59 -11 -63 -16 -3 -6 -25 -12 -48 -13 -49 -2 -82 -27 -82 -64 0 -19 6 -26 30 -30 67 -14 14 -32 -72 -25 -16 1 -28 -2 -28 -7 0 -5 -8 -12 -17 -15 -10 -2 -27 -8 -38 -12 -11 -4 -15 -3 -9 2 15 12 13 52 -4 46 -20 -8 -38 25 -36 68 2 45 18 69 45 69 11 0 19 4 19 9 0 6 63 12 143 15 193 7 207 8 207 18 0 4 13 8 30 8 19 0 33 7 40 19 11 21 4 51 -12 51 -6 0 -8 6 -5 13 4 10 -3 12 -24 9 -16 -2 -29 0 -29 5 0 6 -44 13 -97 16 -54 4 -99 11 -101 17 -6 16 -134 12 -156 -5 -11 -9 -41 -15 -68 -15 -28 0 -48 -5 -48 -11 0 -6 -7 -9 -14 -6 -10 4 -13 1 -9 -9 3 -7 0 -14 -6 -14 -6 0 -11 -7 -11 -15 0 -21 41 -66 60 -64 40 4 45 -2 20 -21 -14 -11 -30 -20 -36 -20 -6 0 -17 -7 -24 -15 -7 -8 -21 -15 -30 -15 -10 0 -20 -5 -22 -12 -3 -7 -32 -14 -74 -16 -38 -3 -78 -11 -89 -18 -23 -16 -61 -18 -70 -4 -4 6 10 10 34 10 23 0 41 3 41 8 0 4 -19 16 -43 27 -53 25 -62 34 -63 65 -2 42 50 69 133 71 110 2 123 6 123 40 0 16 -5 29 -11 29 -6 0 -9 6 -6 13 3 7 -3 13 -12 14 -9 1 -38 5 -64 9 -38 5 -59 2 -95 -14 -26 -11 -59 -25 -74 -31 -35 -13 -36 -34 -3 -49 32 -15 31 -22 -6 -50 -24 -20 -32 -22 -44 -12 -8 7 -15 17 -15 22 0 6 -10 24 -22 40 -19 28 -20 31 -5 40 10 5 17 17 17 26 1 21 37 65 66 80 15 8 39 8 87 -1 87 -14 118 -2 115 45 l-3 33 -80 3 c-64 2 -85 -1 -107 -16 -29 -19 -88 -99 -88 -119 0 -7 -4 -13 -10 -13 -17 0 -11 58 10 95 11 20 20 42 20 51 0 8 7 17 15 20 8 4 15 14 15 24 0 16 6 18 35 13 23 -4 35 -2 35 6 0 6 11 11 23 11 13 0 34 8 45 19 23 19 30 51 11 51 -6 0 -8 7 -5 16 4 9 2 13 -5 8 -6 -4 -15 -1 -19 6 -4 7 -31 15 -59 18 -28 2 -51 8 -51 13 0 5 -11 9 -25 9 -14 0 -25 -4 -25 -10z"})))}},function(e,t){e.exports=window.wp.dataControls},,,function(e,t,n){"use strict";n.d(t,"a",(function(){return o})),n.d(t,"b",(function(){return s})),n.d(t,"c",(function(){return l}));var r=n(4),o=function(e,t,n,r){return regeneratorRuntime.mark((function o(){var s,l=arguments;return regeneratorRuntime.wrap((function(o){for(;;)switch(o.prev=o.next){case 0:if(!e){o.next=3;break}return o.next=3,{type:e};case 3:return o.prev=3,o.delegateYield(t.apply(void 0,l),"t0",5);case 5:return s=o.t0,o.next=8,{type:n,data:s};case 8:o.next=14;break;case 10:return o.prev=10,o.t1=o.catch(3),o.next=14,{type:r,error:o.t1};case 14:case"end":return o.stop()}}),o,null,[[3,10]])}))},s=function(e,t){return function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:t,r=arguments.length>1?arguments[1]:void 0,o=e[r.type]||e.DEFAULT;return o(r,n)}},l=function(e,t){if(r.createReduxStore){var n=Object(r.createReduxStore)(e,t);return Object(r.register)(n),n}return Object(r.registerStore)(e,t),e}},function(e,t){e.exports=function(e){if(Array.isArray(e))return e},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(e,t){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e)){var n=[],_n=!0,r=!1,o=void 0;try{for(var s,l=e[Symbol.iterator]();!(_n=(s=l.next()).done)&&(n.push(s.value),!t||n.length!==t);_n=!0);}catch(i){r=!0,o=i}finally{try{_n||null==l.return||l.return()}finally{if(r)throw o}}return n}},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.url},function(e,t){e.exports=function(e,t){if(null==e)return{};var n,r,o={},s=Object.keys(e);for(r=0;r<s.length;r++)n=s[r],t.indexOf(n)>=0||(o[n]=e[n]);return o},e.exports.default=e.exports,e.exports.__esModule=!0},,,function(e,t,n){var r=n(20);e.exports=function(e){if(Array.isArray(e))return r(e)},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){"use strict";var r=n(12),o=n.n(r),s=n(13),l=n(23);t.a=function(e){Object(s.updateCategory)("sensei-lms",{icon:Object(l.g)({width:"20",height:"20"})}),e.forEach((function(e){var t=e.name,n=o()(e,["name"]);Object(s.registerBlockType)(t,n)}))}},,function(e,t){e.exports=window.wp.keycodes},,,function(e,t,n){"use strict";var r=n(0);t.a=function(e){var t=e.attributes.isPreview,n=void 0!==t&&t,o=e.children;return Object(r.useEffect)((function(){if(!n&&window.sensei_toggle_legacy_metaboxes)return window.sensei_toggle_legacy_metaboxes(),window.sensei_toggle_legacy_metaboxes}),[n]),o}},function(e,t,n){"use strict";var r,o=n(31),s=n(22);n.n(s).a.use((r={},function(e,t){return"string"!=typeof e.path||"GET"!==e.method&&e.method||(r[e.path]?e.path=Object(o.addQueryArgs)(e.path,{__skip_preload:1}):r[e.path]=!0),t(e)}))},function(e,t,n){"use strict";var r=n(49);t.a=r.a},,function(e,t,n){"use strict";var r=n(5),o=n.n(r),s=n(3),l=n.n(s),i=n(12),c=n.n(i),a=n(0),u=n(7),d=n.n(u),m=n(2),b=n(17);t.a=function(e){var t=e.options,n=e.optionsLabel,r=e.icon,s=e.value,i=e.onChange,u=e.toggleProps,p=e.getMenuItemProps,f=e.popoverProps,v=c()(e,["options","optionsLabel","icon","value","onChange","toggleProps","getMenuItemProps","popoverProps"]),g=t.find((function(e){return s===e.value}));return Object(a.createElement)(m.Dropdown,o()({className:"sensei-toolbar-dropdown",popoverProps:l()(l()({isAlternate:!0,position:"bottom right left",focusOnMount:!0},f),{},{className:d()(null==f?void 0:f.className,"sensei-toolbar-dropdown__popover")}),renderToggle:function(e){var t=e.isOpen,n=e.onToggle;return Object(a.createElement)(m.Button,o()({onClick:n,icon:r,"aria-expanded":t,"aria-haspopup":"true"},u,{children:null!=u&&u.children?u.children(g):null==g?void 0:g.label}))},renderContent:function(e){var r=e.onClose;return Object(a.createElement)(m.NavigableMenu,{role:"menu",stopNavigationEvents:!0},Object(a.createElement)(m.MenuGroup,{label:n},t.map((function(e){var t=e.value===(null==g?void 0:g.value),n=null==p?void 0:p(e);return Object(a.createElement)(m.MenuItem,o()({key:e.value,role:"menuitemradio",isSelected:t,icon:t?b.c:null,className:d()("sensei-toolbar-dropdown__option",{"is-selected":t},null==n?void 0:n.className),onClick:function(){i(e.value),r()},children:e.label},n))}))))}},v))}},,function(e,t,n){"use strict";var r=n(5),o=n.n(r),s=n(12),l=n.n(s),i=n(0),c=n(7),a=n.n(c),u=n(6),d=n(40);t.a=Object(i.forwardRef)((function(e,t){var n=e.onChange,r=e.onKeyDown,s=e.value,c=e.onEnter,m=e.onRemove,b=l()(e,["onChange","onKeyDown","value","onEnter","onRemove"]);return Object(i.createElement)(u.PlainText,o()({ref:t,value:s,onChange:function(e){n(e.replace(/\n/g,""))},onKeyDown:function(e){switch(r&&r(e),e.keyCode){case d.ENTER:e.preventDefault(),c&&c(e);break;case d.BACKSPACE:!m||null!=s&&s.length||(e.preventDefault(),m())}}},b,{className:a()("sensei-lms-single-line-input",b.className)}))}))},function(e,t,n){"use strict";n.d(t,"b",(function(){return d})),n.d(t,"a",(function(){return p}));var r=n(5),o=n.n(r),s=n(3),l=n.n(s),i=n(0),c=n(7),a=n.n(c),u=n(1),d=function(e){var t=e.lessonsCount,n=e.completedCount,r=e.hidePercentage,s=e.wrapperAttributes,c=e.barWrapperAttributes,d=e.barAttributes,m=e.countersClassName,b=e.lessonsCountClassName,p=e.completedCountClassName,f=Math.round(n/t*100)||0,v=Math.max(3,f);return Object(i.createElement)("div",s,Object(i.createElement)("section",{className:a()("sensei-course-progress__heading",m)},Object(i.createElement)("div",{className:a()("sensei-course-progress__lessons",b)},Object(u.sprintf)(Object(u._n)("%d Lesson","%d Lessons",t,"sensei-lms"),t)),Object(i.createElement)("div",{className:a()("sensei-course-progress__completed",p)},Object(u.sprintf)(Object(u._n)("%d Completed","%d Completed",n,"sensei-lms"),n),!r&&" (".concat(f,"%)"))),Object(i.createElement)("div",o()({role:"progressbar","aria-valuenow":f,"aria-valuemin":"0","aria-valuemax":"100"},l()(l()({},c),{},{className:a()("sensei-course-progress__bar",null==c?void 0:c.className)})),Object(i.createElement)("div",l()(l()({},d),{},{style:l()(l()({},(null==d?void 0:d.style)&&d.style),{},{width:"".concat(v,"%")})}))))},m=n(6),b=n(2),p=function(e){var t=e.borderRadius,n=e.setBorderRadius,r=e.height,o=e.setHeight;return t=void 0===t?10:t,r=void 0===r?14:r,Object(i.createElement)(m.InspectorControls,null,Object(i.createElement)(b.PanelBody,{title:Object(u.__)("Progress bar settings","sensei-lms"),initialOpen:!1,className:"sensei-course-progress-settings"},Object(i.createElement)(b.PanelRow,null,Object(i.createElement)(b.RangeControl,{label:Object(u.__)("Border radius","sensei-lms"),value:t,onChange:n,min:0,max:15,allowReset:!0,initialPosition:10})),Object(i.createElement)(b.PanelRow,null,Object(i.createElement)(b.RangeControl,{label:Object(u.__)("Height","sensei-lms"),value:r,onChange:o,min:1,max:25,allowReset:!0,initialPosition:14}))))}},function(e,t){e.exports=window.React},,,,,,,,,,function(e,t,n){"use strict";n.d(t,"a",(function(){return d}));var r=n(3),o=n.n(r),s=n(12),l=n.n(s),i=n(8),c=n(24),a=n(4),u=n(27);n(44);function d(e){var t,n,r=e.storeName,s=e.getEndpoint,d=e.saveError,m=e.fetchError,b=e.clearError,p=e.updateBlock,f=e.readBlock,v=e.setServerStructure,g=l()(e,["storeName","getEndpoint","saveError","fetchError","clearError","updateBlock","readBlock","setServerStructure"]),h={loadStructure:regeneratorRuntime.mark((function e(){var t,n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.prev=0,e.delegateYield(s(),"t0",2);case 2:return t=e.t0,e.next=5,Object(c.apiFetch)({path:"/sensei-internal/v1/".concat(t),method:"GET"});case 5:return n=e.sent,e.next=8,h.setResult(n);case 8:e.next=14;break;case 10:return e.prev=10,e.t1=e.catch(0),e.next=14,null==m?void 0:m(e.t1);case 14:case"end":return e.stop()}}),e,null,[[0,10]])})),saveStructure:regeneratorRuntime.mark((function e(){var t,n,o;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,Object(a.select)(r).getEditorStructure();case 2:return t=e.sent,e.prev=3,e.delegateYield(s(),"t0",5);case 5:return n=e.t0,e.next=8,Object(c.apiFetch)({path:"/sensei-internal/v1/".concat(n),method:"POST",data:t});case 8:return o=e.sent,e.next=11,h.setResult(o);case 11:e.next=17;break;case 13:return e.prev=13,e.t1=e.catch(3),e.next=17,null==d?void 0:d(e.t1);case 17:case"end":return e.stop()}}),e,null,[[3,13]])})),setResult:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,h.setServerStructure(t);case 2:return e.next=4,p(t);case 4:case"end":return e.stop()}}),e)})),setServerStructure:function(e){return{type:"SET_SERVER_STRUCTURE",serverStructure:e}},setEditorStructure:function(e){return{type:"SET_EDITOR_STRUCTURE",editorStructure:e}},savePost:regeneratorRuntime.mark((function e(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SAVE_POST"};case 2:return e.next=4,Object(a.dispatch)("core/editor").savePost();case 4:case"end":return e.stop()}}),e)})),startPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"START_SAVE"};case 2:return t=f(),e.next=5,h.setEditorStructure(t);case 5:return e.next=7,null==b?void 0:b();case 7:if(t){e.next=9;break}return e.abrupt("return");case 9:if(!Object(a.select)(r).hasUnsavedEditorChanges()){e.next=11;break}return e.delegateYield(h.saveStructure(),"t0",11);case 11:return e.next=13,{type:"FINISH_SAVE"};case 13:case"end":return e.stop()}}),e)})),finishPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"FINISH_POST_SAVE"};case 2:if(t=Object(a.select)(r),!(0,t.hasUnsavedServerUpdates)()){e.next=5;break}return e.delegateYield(h.savePost(),"t0",5);case 5:case"end":return e.stop()}}),e)})),setBlock:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SET_BLOCK",clientId:t};case 2:case"end":return e.stop()}}),e)}))},O={SET_SERVER_STRUCTURE:function(e,t){var n=e.serverStructure,r=!t.editorStructure,s=v?v(n):n,l=!r&&!Object(i.isEqual)(s,t.editorStructure);return o()(o()({},t),{},{serverStructure:s,hasUnsavedServerUpdates:l,hasUnsavedEditorChanges:!1})},SET_EDITOR_STRUCTURE:function(e,t){var n=e.editorStructure,r=!Object(i.isEqual)(t.serverStructure,n);return o()(o()({},t),{},{editorStructure:n,hasUnsavedEditorChanges:r&&!!n})},START_SAVE:function(e,t){return o()(o()({},t),{},{isSavingStructure:!0})},FINISH_SAVE:function(e,t){return o()(o()({},t),{},{isSavingStructure:!1})},SAVE_POST:function(e,t){return o()(o()({},t),{},{hasUnsavedServerUpdates:!1})},SET_BLOCK:function(e,t){var n=e.clientId;return o()(o()({},t),{},{clientId:n})},DEFAULT:function(e,t){return t}};return{unsubscribe:(t=!1,n=!1,Object(a.subscribe)((function(){var e=Object(a.select)("core/editor");if(e){var o=e.isSavingPost()&&!e.isAutosavingPost(),s=Object(a.select)(r).getIsSavingStructure();o&&(n=!0),t||o||!n?t&&!s&&(t=!1,Object(a.dispatch)(r).finishPostSave()):(t=!0,n=!1,Object(a.dispatch)(r).startPostSave())}}))),store:Object(a.registerStore)(r,{reducer:Object(u.b)(o()(o()({},O),null==g?void 0:g.reducers),{serverStructure:null,editorStructure:null,isSavingStructure:!1,hasUnsavedServerUpdates:!1,hasUnsavedEditorChanges:!1,clientId:null}),actions:o()(o()({},h),null==g?void 0:g.actions),selectors:o()(o()({},{hasUnsavedServerUpdates:function(e){return e.hasUnsavedServerUpdates},hasUnsavedEditorChanges:function(e){return e.hasUnsavedEditorChanges},getIsSavingStructure:function(e){return e.isSavingStructure},getServerStructure:function(e){return e.serverStructure},getEditorStructure:function(e){return e.editorStructure},getBlock:function(e){return e.clientId}}),null==g?void 0:g.selectors),controls:o()(o()({},c.controls),null==g?void 0:g.controls)})}}},function(e,t,n){"use strict";n.d(t,"a",(function(){return i}));var r=n(13),o=n(4),s=n(0),l=n(8),i=function(e,t){var n=e.name,i=e.attributes,c=void 0===i?{}:i,a=e.selectFirstBlock,u=void 0!==a&&a,d=e.isEmptyBlock,m=t.clientId,b=Object(o.useDispatch)("core/block-editor"),p=b.__unstableMarkNextChangeAsNotPersistent,f=void 0===p?l.noop:p,v=b.insertBlock,g=Object(o.useSelect)((function(e){return e("core/block-editor").getBlocks(m)})),h=0===g.length,O=Object(s.useCallback)((function(){var e=Object(r.createBlock)(n,c),t=h&&u;f(),v(e,void 0,m,t)}),[f,v,m,n,c,h,u]),j=g.length&&g[g.length-1],_=j&&d(j.attributes);Object(s.useEffect)((function(){_||O()}),[_,O])}},,,,,,,,,,,,,,function(e){e.exports=JSON.parse('{"name":"sensei-lms/course-progress","category":"sensei-lms","supports":{"html":false},"attributes":{"textColor":{"type":"string"},"customTextColor":{"type":"string","default":""},"barColor":{"type":"string"},"customBarColor":{"type":"string"},"defaultBarColor":{"type":"string"},"barBackgroundColor":{"type":"string"},"customBarBackgroundColor":{"type":"string"},"height":{"type":"integer"},"borderRadius":{"type":"integer"},"isPreview":{"type":"boolean","default":false}},"example":{"attributes":{"customBarBackgroundColor":"#999999","isPreview":true}}}')},function(e){e.exports=JSON.parse('{"name":"sensei-lms/course-outline","category":"sensei-lms","supports":{"html":false,"multiple":false,"defaultStylePicker":false},"attributes":{"id":{"type":"integer"},"collapsibleModules":{"type":"boolean","default":true},"moduleBorder":{"type":"boolean","default":true},"isPreview":{"type":"boolean"}}}')},function(e,t){e.exports=window.wp.tokenList},function(e,t,n){"use strict";Object.defineProperty(t,"__esModule",{value:!0});var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},o=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},s=function(){function e(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}return function(t,n,r){return n&&e(t.prototype,n),r&&e(t,r),t}}(),l=a(n(51)),i=a(n(121)),c=a(n(7));function a(e){return e&&e.__esModule?e:{default:e}}function u(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}var d={animating:"rah-animating",animatingUp:"rah-animating--up",animatingDown:"rah-animating--down",animatingToHeightZero:"rah-animating--to-height-zero",animatingToHeightAuto:"rah-animating--to-height-auto",animatingToHeightSpecific:"rah-animating--to-height-specific",static:"rah-static",staticHeightZero:"rah-static--height-zero",staticHeightAuto:"rah-static--height-auto",staticHeightSpecific:"rah-static--height-specific"},m=["animateOpacity","animationStateClasses","applyInlineTransitions","children","contentClassName","delay","duration","easing","height","onAnimationEnd","onAnimationStart"];function b(e){for(var t=arguments.length,n=Array(t>1?t-1:0),r=1;r<t;r++)n[r-1]=arguments[r];if(!n.length)return e;for(var o={},s=Object.keys(e),l=0;l<s.length;l++){var i=s[l];-1===n.indexOf(i)&&(o[i]=e[i])}return o}function p(e){e.forEach((function(e){return cancelAnimationFrame(e)}))}function f(e){return!isNaN(parseFloat(e))&&isFinite(e)}function v(e){return"string"==typeof e&&e.search("%")===e.length-1&&f(e.substr(0,e.length-1))}function g(e,t){e&&"function"==typeof e&&e(t)}var h=function(e){function t(e){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t);var n=function(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e));n.animationFrameIDs=[];var r="auto",s="visible";f(e.height)?(r=e.height<0||"0"===e.height?0:e.height,s="hidden"):v(e.height)&&(r="0%"===e.height?0:e.height,s="hidden"),n.animationStateClasses=o({},d,e.animationStateClasses);var l=n.getStaticStateClasses(r);return n.state={animationStateClasses:l,height:r,overflow:s,shouldUseTransitions:!1},n}return function(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}(t,e),s(t,[{key:"componentDidMount",value:function(){var e=this.state.height;this.contentElement&&this.contentElement.style&&this.hideContent(e)}},{key:"componentDidUpdate",value:function(e,t){var n,r,o=this,s=this.props,l=s.delay,i=s.duration,a=s.height,d=s.onAnimationEnd,m=s.onAnimationStart;if(this.contentElement&&a!==e.height){var b;this.showContent(t.height),this.contentElement.style.overflow="hidden";var h=this.contentElement.offsetHeight;this.contentElement.style.overflow="";var O=i+l,j=null,_={height:null,overflow:"hidden"},y="auto"===t.height;f(a)?(j=a<0||"0"===a?0:a,_.height=j):v(a)?(j="0%"===a?0:a,_.height=j):(j=h,_.height="auto",_.overflow=null),y&&(_.height=j,j=h);var E=(0,c.default)((u(b={},this.animationStateClasses.animating,!0),u(b,this.animationStateClasses.animatingUp,"auto"===e.height||a<e.height),u(b,this.animationStateClasses.animatingDown,"auto"===a||a>e.height),u(b,this.animationStateClasses.animatingToHeightZero,0===_.height),u(b,this.animationStateClasses.animatingToHeightAuto,"auto"===_.height),u(b,this.animationStateClasses.animatingToHeightSpecific,_.height>0),b)),k=this.getStaticStateClasses(_.height);this.setState({animationStateClasses:E,height:j,overflow:"hidden",shouldUseTransitions:!y}),clearTimeout(this.timeoutID),clearTimeout(this.animationClassesTimeoutID),y?(_.shouldUseTransitions=!0,p(this.animationFrameIDs),this.animationFrameIDs=(n=function(){o.setState(_),g(m,{newHeight:_.height})},(r=[])[0]=requestAnimationFrame((function(){r[1]=requestAnimationFrame((function(){n()}))})),r),this.animationClassesTimeoutID=setTimeout((function(){o.setState({animationStateClasses:k,shouldUseTransitions:!1}),o.hideContent(_.height),g(d,{newHeight:_.height})}),O)):(g(m,{newHeight:j}),this.timeoutID=setTimeout((function(){_.animationStateClasses=k,_.shouldUseTransitions=!1,o.setState(_),"auto"!==a&&o.hideContent(j),g(d,{newHeight:j})}),O))}}},{key:"componentWillUnmount",value:function(){p(this.animationFrameIDs),clearTimeout(this.timeoutID),clearTimeout(this.animationClassesTimeoutID),this.timeoutID=null,this.animationClassesTimeoutID=null,this.animationStateClasses=null}},{key:"showContent",value:function(e){0===e&&(this.contentElement.style.display="")}},{key:"hideContent",value:function(e){0===e&&(this.contentElement.style.display="none")}},{key:"getStaticStateClasses",value:function(e){var t;return(0,c.default)((u(t={},this.animationStateClasses.static,!0),u(t,this.animationStateClasses.staticHeightZero,0===e),u(t,this.animationStateClasses.staticHeightSpecific,e>0),u(t,this.animationStateClasses.staticHeightAuto,"auto"===e),t))}},{key:"render",value:function(){var e,t=this,n=this.props,r=n.animateOpacity,s=n.applyInlineTransitions,i=n.children,a=n.className,d=n.contentClassName,p=n.delay,f=n.duration,v=n.easing,g=n.id,h=n.style,O=this.state,j=O.height,_=O.overflow,y=O.animationStateClasses,E=O.shouldUseTransitions,k=o({},h,{height:j,overflow:_||h.overflow});E&&s&&(k.transition="height "+f+"ms "+v+" "+p+"ms",h.transition&&(k.transition=h.transition+", "+k.transition),k.WebkitTransition=k.transition);var C={};r&&(C.transition="opacity "+f+"ms "+v+" "+p+"ms",C.WebkitTransition=C.transition,0===j&&(C.opacity=0));var w=(0,c.default)((u(e={},y,!0),u(e,a,a),e)),S=void 0!==this.props["aria-hidden"]?this.props["aria-hidden"]:0===j;return l.default.createElement("div",o({},b.apply(void 0,[this.props].concat(m)),{"aria-hidden":S,className:w,id:g,style:k}),l.default.createElement("div",{className:d,style:C,ref:function(e){return t.contentElement=e}},i))}}]),t}(l.default.Component);h.propTypes={"aria-hidden":i.default.bool,animateOpacity:i.default.bool,animationStateClasses:i.default.object,applyInlineTransitions:i.default.bool,children:i.default.any.isRequired,className:i.default.string,contentClassName:i.default.string,delay:i.default.number,duration:i.default.number,easing:i.default.string,height:function(e,t,n){var o=e[t];return"number"==typeof o&&o>=0||v(o)||"auto"===o?null:new TypeError('value "'+o+'" of type "'+(void 0===o?"undefined":r(o))+'" is invalid type for '+t+" in "+n+'. It needs to be a positive number, string "auto" or percentage string (e.g. "15%").')},id:i.default.string,onAnimationEnd:i.default.func,onAnimationStart:i.default.func,style:i.default.object},h.defaultProps={animateOpacity:!1,animationStateClasses:d,applyInlineTransitions:!0,duration:250,delay:0,easing:"ease",style:{}},t.default=h},function(e){e.exports=JSON.parse('{"name":"sensei-lms/course-outline-module","category":"sensei-lms","parent":["sensei-lms/course-outline"],"supports":{"html":false},"attributes":{"id":{"type":"integer"},"title":{"type":"string","default":""},"description":{"type":"string","default":""},"mainColor":{"type":"string"},"customMainColor":{"type":"string"},"defaultMainColor":{"type":"string"},"textColor":{"type":"string"},"customTextColor":{"type":"string"},"defaultTextColor":{"type":"string"},"borderColor":{"type":"string"},"customBorderColor":{"type":"string"},"borderColorValue":{"type":"string"},"defaultBorderColor":{"type":"string"},"defaultBorderColorValue":{"type":"string"},"className":{"type":"string"},"customClassName":{"type":"string"},"borderedSelected":{"type":"boolean"}}}')},function(e){e.exports=JSON.parse('{"name":"sensei-lms/course-outline-lesson","category":"sensei-lms","parent":["sensei-lms/course-outline","sensei-lms/course-outline-module"],"attributes":{"id":{"type":"integer"},"title":{"type":"string","default":""},"draft":{"type":"boolean","default":true},"backgroundColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"textColor":{"type":"string"},"customTextColor":{"type":"string"},"fontSize":{"type":"number"},"isExample":{"type":"boolean","default":false}},"supports":{"html":false,"customClassName":true}}')},function(e){e.exports=JSON.parse('{"name":"sensei-lms/conditional-content","category":"sensei-lms","supports":{"html":false,"align":["wide","full"]},"attributes":{"condition":{"type":"string","default":"enrolled"}}}')},,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,function(e,t,n){e.exports=n(122)()},function(e,t,n){"use strict";var r=n(123);function o(){}e.exports=function(){function e(e,t,n,o,s,l){if(l!==r){var i=new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types");throw i.name="Invariant Violation",i}}function t(){return e}e.isRequired=e;var n={array:e,bool:e,func:e,number:e,object:e,string:e,symbol:e,any:e,arrayOf:t,element:e,instanceOf:t,node:e,objectOf:t,oneOf:t,oneOfType:t,shape:t,exact:t};return n.checkPropTypes=o,n.PropTypes=n,n}},function(e,t,n){"use strict";e.exports="SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED"},,,,,,,,,,,,,,,,,,,,,,,,function(e,t,n){"use strict";n.r(t);var r=n(38),o=n(1),s=n(15),l=n(43),i=Object(s.b)({EditWrapper:l.a,settings:{name:"sensei-lms/button-take-course",title:Object(o.__)("Take Course","sensei-lms"),description:Object(o.__)("Enable a registered user to start the course. This block is only displayed if the user is not already enrolled.","sensei-lms"),keywords:[Object(o.__)("Start","sensei-lms"),Object(o.__)("Sign up","sensei-lms"),Object(o.__)("Enrol","sensei-lms"),Object(o.__)("Enroll","sensei-lms"),Object(o.__)("Course","sensei-lms")],attributes:{text:{default:Object(o.__)("Take Course","sensei-lms")}}}}),c=n(3),a=n.n(c),u=n(23),d=n(0),m=n(7),b=n.n(m),p=n(18),f=n(4),v=n(16),g=n(11),h=n.n(g),O="not-started",j="in-progress",_="completed",y=n(24),E=n(27),k={setLessonStatus:function(e,t){return{type:"SET_LESSON_STATUS",lessonId:e,status:t}},setModuleStatus:regeneratorRuntime.mark((function e(t,n){var r,o,s;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,Object(y.select)(S,"getTrackedLessons");case 2:return r=e.sent,e.next=5,Object(y.select)("core/block-editor","getClientIdsOfDescendants",[t]);case 5:if(o=e.sent,0!==(s=o.filter((function(e){return r.includes(e)}))).length){e.next=9;break}return e.abrupt("return");case 9:if(_!==n&&O!==n){e.next=13;break}return e.delegateYield(s.map((function(e){return k.setLessonStatus(e,n)})),"t0",11);case 11:e.next=15;break;case 13:return e.delegateYield(s.slice(1).map((function(e){return k.setLessonStatus(e,O)})),"t1",14);case 14:return e.abrupt("return",k.setLessonStatus(s[0],_));case 15:case"end":return e.stop()}}),e)})),stopTrackingRemovedLessons:function(e){return{type:"REMOVE_LESSONS",descendantIds:e}},trackLesson:function(e){return{type:"TRACK_LESSON",lessonId:e}},ignoreLesson:function(e){return{type:"IGNORE_LESSON",lessonId:e}}},C={getTrackedLessons:function(e){return e.trackedLessons},getLessonCounts:function(e){var t=e.trackedLessons,n=e.completedLessons;return{totalLessonsCount:t.length,completedLessonsCount:n.length}},getLessonStatus:function(e,t){return e.completedLessons.includes(t)?_:O},getModuleLessonCounts:function(e,t){var n=e.completedLessons,r=e.trackedLessons,o=Object(f.select)("core/block-editor").getClientIdsOfDescendants([t]).filter((function(e){return r.includes(e)}));return{completedLessonsCount:o.filter((function(e){return n.includes(e)})).length,totalLessonsCount:o.length}}},w={SET_LESSON_STATUS:function(e,t){var n=e.lessonId,r=e.status,o=h()(t.completedLessons);return _===r?o.includes(n)||o.push(n):o=o.filter((function(e){return e!==n})),a()(a()({},t),{},{completedLessons:o})},REMOVE_LESSONS:function(e,t){var n=e.descendantIds,r=t.completedLessons.filter((function(e){return n.includes(e)})),o=t.trackedLessons.filter((function(e){return n.includes(e)}));return o.length===t.trackedLessons.length&&r.length===t.completedLessons.length?t:a()(a()({},t),{},{completedLessons:r,trackedLessons:o})},IGNORE_LESSON:function(e,t){var n=e.lessonId,r=t.completedLessons.filter((function(e){return e!==n})),o=t.trackedLessons.filter((function(e){return e!==n}));return a()(a()({},t),{},{completedLessons:r,trackedLessons:o})},TRACK_LESSON:function(e,t){var n=e.lessonId,r=h()(t.trackedLessons);return r.includes(n)?t:(r.push(n),a()(a()({},t),{},{trackedLessons:r}))},DEFAULT:function(e,t){return t}},S="sensei/course-status";Object(f.registerStore)(S,{reducer:Object(E.b)(w,{completedLessons:[],trackedLessons:[]}),actions:k,selectors:C,controls:y.controls});var x=n(50),B=Object(p.compose)(Object(v.a)({barColor:{style:"background-color",label:Object(o.__)("Progress bar color","sensei-lms")},barBackgroundColor:{style:"background-color",label:Object(o.__)("Progress bar background color","sensei-lms")},textColor:{style:"color",label:Object(o.__)("Text color","sensei-lms")}}),Object(v.c)({defaultBarColor:{style:"background-color",probeKey:"primaryColor"}}))((function(e){var t=e.className,n=e.barColor,r=e.defaultBarColor,o=e.barBackgroundColor,s=e.textColor,i=e.attributes,c=i.height,a=i.borderRadius,u=e.setAttributes,m=Object(f.useSelect)((function(e){return e(S).getLessonCounts()}),[]),p=m.totalLessonsCount,v=m.completedLessonsCount,g={className:b()(t,null==s?void 0:s.class),style:{color:null==s?void 0:s.color}},h={className:(null==n?void 0:n.class)||(null==r?void 0:r.className),style:{backgroundColor:(null==n?void 0:n.color)||(null==r?void 0:r.color),borderRadius:a}},O={className:b()("wp-block-sensei-lms-progress-bar",null==o?void 0:o.class),style:{backgroundColor:null==o?void 0:o.color,height:c,borderRadius:a}};return Object(d.createElement)(l.a,e,Object(d.createElement)(x.b,{lessonsCount:p,completedCount:v,wrapperAttributes:g,barWrapperAttributes:O,barAttributes:h,countersClassName:"wp-block-sensei-lms-progress-heading",lessonsCountClassName:"wp-block-sensei-lms-progress-heading__lessons",completedCountClassName:"wp-block-sensei-lms-progress-heading__completed"}),Object(d.createElement)(x.a,{borderRadius:a,setBorderRadius:function(e){return u({borderRadius:e})},height:c,setHeight:function(e){return u({height:e})}}))})),N=n(76),L=a()(a()({title:Object(o.__)("Course Progress","sensei-lms"),description:Object(o.__)("Display the user's progress in the course. This block is only displayed if the user is enrolled.","sensei-lms"),keywords:[Object(o.__)("Progress","sensei-lms"),Object(o.__)("Bar","sensei-lms"),Object(o.__)("Course","sensei-lms")],icon:u.f},N),{},{edit:B}),P=n(77),T=n(6),R=n(2),I=function(e){var t=e.addBlock;return Object(d.createElement)(R.Placeholder,{className:"wp-block-sensei-lms-course-outline__placeholder",label:Object(o.__)("Course Outline","sensei-lms"),icon:Object(d.createElement)(T.BlockIcon,{icon:ie.icon,showColors:!0}),instructions:Object(o.__)("Build and display a course outline. A course is made up of modules (optional) and lessons. You can use modules to group related lessons together.","sensei-lms")},Object(d.createElement)(R.Button,{isDefault:!0,onClick:function(){return t("module")},className:"is-large"},Object(o.__)("Create a module","sensei-lms")),Object(d.createElement)(R.Button,{isDefault:!0,onClick:function(){return t("lesson")},className:"is-large"},Object(o.__)("Create a lesson","sensei-lms")))},M=n(8),A=n(78),D=n.n(A),z=function(e,t){if(t){var n=t.match(/is-style-\w+/);if(n)return n[0]}var r=Object(M.find)(e,"isDefault");return r?"is-style-"+r.name:null},V=n(12),U=n.n(V),H=n(13),F={module:"sensei-lms/course-outline-module",lesson:"sensei-lms/course-outline-lesson"},G=Object(M.invert)(F),W=function e(t,n){return(t||[]).map((function(t){var r=t.type,o=t.lessons,s=U()(t,["type","lessons"]),l=K(n,t);return t.id&&(s=a()({},s)),l?l.attributes=a()(a()({},l.attributes),s):l=Object(H.createBlock)(F[r],s),"module"===r&&(l.innerBlocks=e(o,l.innerBlocks)),l}))},K=function(e,t){var n=t.id,r=t.type,o=t.title,s=function(e){var t=e.name,s=e.attributes;return(n===s.id||!s.id&&s.title===o)&&F[r]===t};return e.find(s)||"lesson"===r&&e.reduce((function(e,t){return e||t.innerBlocks.find(s)}),!1)},Y=function e(t){var n={module:function(t){return{description:t.attributes.description,lessons:e(t.innerBlocks)}},lesson:function(e){return{draft:e.attributes.draft,preview:e.attributes.preview}}};return t.map((function(e){var t=G[e.name];return a()({type:t,id:e.attributes.id,title:e.attributes.title},n[t](e))})).filter((function(e){return"module"===e.type||!!e.title}))},q=function e(t,n){for(var r=0;r<n.length;r++){var o=n[r];if(t===o.name)return o;if(o.innerBlocks&&o.innerBlocks.length>0){var s=e(t,o.innerBlocks);if(s)return s}}return!1},Z=function(e,t){var n=Object(f.select)("core/block-editor").getBlocks(e);return(n=n.reduce((function(e,t){return[].concat(h()(e),h()(t.innerBlocks))}),n)).filter((function(e){var n=e.name;return t===n}))},J=function(e){var t=e.clientId,n=e.className,r=e.isPreview,o=e.attributes.moduleBorder,s=e.setAttributes,l=Object(d.useRef)(null),i=Object(f.useSelect)((function(e){return e("core/blocks").getBlockStyles("sensei-lms/course-outline")}),[]),c=Object(f.useDispatch)("core/block-editor").updateBlockAttributes,a=z(i,n);Object(d.useEffect)((function(){if(!r&&a&&l.current!==a){if(!l.current)return void(l.current=a);l.current=a,Z(t,"sensei-lms/course-outline-module").forEach((function(e){return function(e,t){var n=Object(f.select)("core/block-editor").getBlock(e),r=n.attributes.className,o=n.name,s=Object(f.select)("core/blocks").getBlockStyles(o);if(function(e,t){return e&&e.some((function(e){return"is-style-"+e.name===t}))}(s,t)){var l=new D.a(r),i=z(s,r);i&&l.remove(i),l.add(t),Object(f.dispatch)("core/block-editor").updateBlockAttributes(e,{className:l.value})}}(e.clientId,a)}))}}),[t,r,a,l]);return{moduleBorder:o,setModuleBorder:function(e){Z(t,"sensei-lms/course-outline-module").forEach((function(t){c(t.clientId,{borderedSelected:e})})),s({moduleBorder:e})}}},Q=function(e){var t=e.attributes,n=e.setAttributes,r=J(e),s=r.moduleBorder,l=r.setModuleBorder;return Object(d.createElement)(T.InspectorControls,null,Object(d.createElement)(R.PanelBody,{title:Object(o.__)("Modules","sensei-lms"),initialOpen:!1},Object(d.createElement)(R.ToggleControl,{checked:t.collapsibleModules,onChange:function(e){return n({collapsibleModules:e})},label:Object(o.__)("Collapsible modules","sensei-lms"),help:Object(o.__)("Modules can be collapsed or expanded.","sensei-lms")}),Object(d.createElement)(R.ToggleControl,{checked:s,onChange:l,label:Object(o.__)("Border","sensei-lms"),help:Object(o.__)("Toggle the border for all modules.","sensei-lms")})))},$=n(61),X=function(){return q("sensei-lms/course-outline",Object(f.select)("core/block-editor").getBlocks())},ee="sensei/course-structure";Object($.a)({storeName:ee,getEndpoint:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,Object(f.select)("core/editor").getCurrentPostId();case 2:return t=e.sent,e.abrupt("return","course-structure/".concat(t,"?context=edit"));case 4:case"end":return e.stop()}}),e)})),updateBlock:regeneratorRuntime.mark((function e(t){var n,r,o,s;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:if(n=X(),r=n.clientId,(o=void 0===r?null:r)&&t&&0!==t.length){e.next=3;break}return e.abrupt("return");case 3:return e.next=5,Object(f.select)("core/block-editor").getBlocks(o);case 5:return s=e.sent,e.next=8,Object(f.dispatch)("core/block-editor").replaceInnerBlocks(o,W(t,s),!1);case 8:case"end":return e.stop()}}),e)})),readBlock:function(){var e=X();return e?{structure:Y(e.innerBlocks)}:null},saveError:regeneratorRuntime.mark((function e(t){var n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=Object(o.sprintf)(Object(o.__)("Course modules and lessons could not be updated. %s","sensei-lms"),t.message),e.next=3,Object(f.dispatch)("core/notices").createErrorNotice(n,{id:"course-outline-save-error"});case 3:case"end":return e.stop()}}),e)})),clearError:function(){Object(f.dispatch)("core/notices").removeNotice("course-outline-save-error")},setServerStructure:function(e){return e?{structure:e}:{}}});var te,ne,re=["sensei-lms/course-outline-module","sensei-lms/course-outline-lesson"],oe=Object(d.createContext)(),se=Object(p.compose)(Object(v.b)())((function(e){var t=e.clientId,n=e.className,r=e.attributes,o=e.setAttributes,s=Object(f.useDispatch)(ee).loadStructure;Object(d.useEffect)((function(){r.isPreview||s()}),[r.isPreview,s]);var i=function(e){var t=Object(f.useDispatch)("core/block-editor").replaceInnerBlocks,n=Object(f.useSelect)((function(e){return e("core/block-editor")}),[]).getBlocks;return{setBlocks:Object(d.useCallback)((function(r){var o=arguments.length>1&&void 0!==arguments[1]&&arguments[1],s=n(e),l=Y(s);Object(M.isEqual)(l,r)||t(e,W(r,s),o)}),[e,t,n])}}(t).setBlocks,c=Object(f.useSelect)((function(e){return!e("core/block-editor").getBlocks(t).length}),[t]);!function(e,t){var n=Object(f.useSelect)((function(t){return t("core/block-editor").getClientIdsOfDescendants([e])}),[e]),r=Object(f.useDispatch)(S).stopTrackingRemovedLessons;Object(d.useEffect)((function(){t||r(n)}),[e,n,t,r])}(t,r.isPreview);var a=c?Object(d.createElement)(I,{addBlock:function(e){return i([{type:e}],!0)}}):Object(d.createElement)(oe.Provider,{value:{outlineAttributes:r,outlineSetAttributes:o,outlineClassName:n}},Object(d.createElement)(Q,e),Object(d.createElement)("section",{className:n},Object(d.createElement)(T.InnerBlocks,{allowedBlocks:re})));return Object(d.createElement)(l.a,e,a)})),le=function(){return Object(d.createElement)(T.InnerBlocks.Content,null)},ie=a()(a()({title:Object(o.__)("Course Outline","sensei-lms"),description:Object(o.__)("Manage your Sensei LMS course outline.","sensei-lms"),keywords:[Object(o.__)("Course","sensei-lms"),Object(o.__)("Lessons","sensei-lms"),Object(o.__)("Modules","sensei-lms"),Object(o.__)("Outline","sensei-lms"),Object(o.__)("Structure","sensei-lms")],styles:[{name:"default",label:Object(o.__)("Filled","sensei-lms"),isDefault:!0},{name:"minimal",label:Object(o.__)("Minimal","sensei-lms")}],example:{attributes:{isPreview:!0},innerBlocks:[{name:"sensei-lms/course-outline-module",attributes:{title:Object(o.__)("Module","sensei-lms"),description:Object(o.__)("About Module","sensei-lms")},innerBlocks:[{name:"sensei-lms/course-outline-lesson",attributes:{title:Object(o.__)("Lesson","sensei-lms"),id:1,draft:!1,isExample:!0}}]},{name:"sensei-lms/course-outline-lesson",attributes:{title:Object(o.__)("First Lesson","sensei-lms"),id:2,draft:!1,isExample:!0}},{name:"sensei-lms/course-outline-lesson",attributes:{title:Object(o.__)("Second Lesson","sensei-lms"),id:3,draft:!1,isExample:!0}}]}},P),{},{icon:u.a,edit:se,save:le}),ce=n(9),ae=n.n(ce),ue=n(79),de=n.n(ue),me=n(17),be=n(62),pe=n(45),fe=n(5),ve=n.n(fe),ge=n(10),he=n.n(ge),Oe=(te={},he()(te,O,Object(o.__)("Not Started","sensei-lms")),he()(te,j,Object(o.__)("In Progress","sensei-lms")),he()(te,_,Object(o.__)("Completed","sensei-lms")),te),je=function(e){var t=e.options,n=void 0===t?[j,_]:t,r=e.status,s=e.setStatus,l=e.disabled,i=U()(e,["options","status","setStatus","disabled"]),c=n.map((function(e){return{label:Oe[e],value:e}})),a=Object(d.createElement)(R.RadioControl,ve()({className:"wp-block-sensei-lms-course-outline-status-control",help:Object(o.__)("Preview a status. The actual status that the learner sees is determined by their progress in the course.","sensei-lms")},i,{options:c,selected:r,onChange:function(e){return s(e)}}));return l&&(a=Object(d.createElement)(R.Disabled,null,a)),a},_e=function(e){var t=e.clientId,n=Object(f.useDispatch)(S).setModuleStatus,r=Object(f.useSelect)((function(e){return e(S).getModuleLessonCounts(t)}),[t]),s=j;0===r.completedLessonsCount?s=O:r.totalLessonsCount===r.completedLessonsCount&&r.totalLessonsCount>0&&(s=_);var l=r.totalLessonsCount>1?[O,j,_]:[O,_],i=O!==s,c=Object(d.createElement)("div",{className:b()("wp-block-sensei-lms-course-outline-module__progress-indicator",s)},Object(d.createElement)("span",{className:"wp-block-sensei-lms-course-outline-module__progress-indicator__text"},Oe[s]));return Object(d.createElement)(d.Fragment,null,i&&c,Object(d.createElement)(T.InspectorControls,null,Object(d.createElement)(R.PanelBody,{title:Object(o.__)("Status","sensei-lms"),initialOpen:!1},Object(d.createElement)(je,{options:l,status:s,disabled:0===r.totalLessonsCount,setStatus:function(e){n(t,e)}}))))},ye=function(e){var t=e.bordered,n=e.setBordered;return Object(d.createElement)(T.InspectorControls,null,Object(d.createElement)(R.PanelBody,{title:Object(o.__)("Border settings","sensei-lms"),initialOpen:!1},Object(d.createElement)(R.ToggleControl,{checked:t,onChange:n,label:Object(o.__)("Border","sensei-lms"),help:Object(o.__)("Toggle to enable the border.","sensei-lms")})))},Ee=["sensei-lms/course-outline-lesson"],ke=Object(p.compose)(Object(v.a)({mainColor:{style:"background-color",label:Object(o.__)("Main color","sensei-lms")},textColor:{style:"color",label:Object(o.__)("Text color","sensei-lms")},borderColor:{style:"border-color",label:Object(o.__)("Border color","sensei-lms"),onChange:function(e){var t=e.clientId,n=e.colorValue;return Object(f.dispatch)("core/block-editor").updateBlockAttributes(t,{borderColorValue:n})}}}),Object(v.c)({defaultMainColor:{style:"background-color",probeKey:"primaryColor"},defaultTextColor:{style:"color",probeKey:"primaryContrastColor"},defaultBorderColor:{style:"border-color",probeKey:"primaryColor"}}))((function(e){var t,n,r=e.clientId,s=e.className,l=e.attributes,i=l.title,c=l.description,a=l.borderedSelected,u=l.borderColorValue,m=e.mainColor,p=e.defaultMainColor,f=e.textColor,v=e.defaultTextColor,g=e.defaultBorderColor,h=e.setAttributes,O=Object(d.useContext)(oe)||{outlineAttributes:{},outlineClassName:""},j=O.outlineAttributes,_=j.collapsibleModules,y=j.moduleBorder,E=O.outlineClassName;Object(be.a)({name:"sensei-lms/course-outline-lesson",isEmptyBlock:function(e){return!e.title}},e);var k,C=Object(d.useState)(!0),w=ae()(C,2),S=w[0],x=w[1],B=/is-style-(\w+)/,N=(null===(t=s.match(B))||void 0===t?void 0:t[1])||(null===(n=E.match(B))||void 0===n?void 0:n[1]),L={default:{background:(null==m?void 0:m.color)||(null==p?void 0:p.color),color:(null==f?void 0:f.color)||(null==v?void 0:v.color)},minimal:{color:null==f?void 0:f.color}}[N];"minimal"===N&&(k=Object(d.createElement)("div",{className:"wp-block-sensei-lms-course-outline-module__name__minimal-border",style:{background:(null==m?void 0:m.color)||(null==p?void 0:p.color)}}));var P=void 0!==a?a:y;return Object(d.createElement)(d.Fragment,null,Object(d.createElement)(ye,{bordered:P,setBordered:function(e){return h({borderedSelected:e})}}),Object(d.createElement)("section",{className:b()(s,{"wp-block-sensei-lms-course-outline-module-bordered":P}),style:{borderColor:u||(null==g?void 0:g.color)}},Object(d.createElement)("header",{className:"wp-block-sensei-lms-course-outline-module__header",style:L},Object(d.createElement)("h2",{className:"wp-block-sensei-lms-course-outline-module__title"},Object(d.createElement)(pe.a,{className:"wp-block-sensei-lms-course-outline-module__title-input",placeholder:Object(o.__)("Module name","sensei-lms"),value:i,onChange:function(e){h({title:e})}})),Object(d.createElement)(_e,{clientId:r}),_&&Object(d.createElement)("button",{type:"button",className:b()("wp-block-sensei-lms-course-outline__arrow",{collapsed:!S}),onClick:function(){return x(!S)}},Object(d.createElement)(R.Icon,{icon:me.e}),Object(d.createElement)("span",{className:"screen-reader-text"},Object(o.__)("Toggle module content","sensei-lms")))),k,Object(d.createElement)(de.a,{className:"wp-block-sensei-lms-collapsible",duration:500,animateOpacity:!0,height:!_||S?"auto":0},Object(d.createElement)("div",{className:"wp-block-sensei-lms-course-outline-module__description"},Object(d.createElement)(T.RichText,{className:"wp-block-sensei-lms-course-outline-module__description-input",placeholder:Object(o.__)("Module description","sensei-lms"),value:c,onChange:function(e){h({description:e})}})),Object(d.createElement)("h3",{className:"wp-block-sensei-lms-course-outline-module__lessons-title"},Object(o.__)("Lessons","sensei-lms")),Object(d.createElement)(T.InnerBlocks,{allowedBlocks:Ee,templateInsertUpdatesSelection:!1,renderAppender:function(){return null}}))))})),Ce={from:[{type:"block",blocks:["sensei-lms/course-outline-lesson"],isMultiBlock:!0,transform:function(e){var t=e.map((function(e){return Object(H.createBlock)("sensei-lms/course-outline-lesson",e)}));return Object(H.createBlock)("sensei-lms/course-outline-module",{},t)}}]},we=n(80),Se=a()(a()({title:Object(o.__)("Module","sensei-lms"),description:Object(o.__)("Group related lessons together.","sensei-lms"),keywords:[Object(o.__)("Module","sensei-lms"),Object(o.__)("Course Module","sensei-lms"),Object(o.__)("Group","sensei-lms"),Object(o.__)("Lessons","sensei-lms")]},we),{},{icon:u.e,example:{attributes:{title:Object(o.__)("Module","sensei-lms"),description:Object(o.__)("About Module","sensei-lms")},innerBlocks:[{name:"sensei-lms/course-outline-lesson",attributes:{title:Object(o.__)("Lesson","sensei-lms"),id:1,draft:!1,isExample:!0}}]},styles:[{name:"default",label:Object(o.__)("Filled","sensei-lms"),isDefault:!0},{name:"minimal",label:Object(o.__)("Minimal","sensei-lms")}],transforms:Ce,edit:ke,save:function(){return Object(d.createElement)(T.InnerBlocks.Content,null)}}),xe=n(40),Be=function(e){var t=e.insertBlocksAfter,n=e.name,r=e.clientId,o=e.attributes.title,s=Object(f.useDispatch)("core/block-editor"),l=s.selectNextBlock,i=s.removeBlock;return{onKeyDown:function(e){switch(e.keyCode){case xe.ENTER:s=Object(f.select)("core/block-editor"),!(c=s.getBlock(s.getNextBlockClientId()))||c.attributes.title?t([Object(H.createBlock)(n)]):l(r);break;case xe.BACKSPACE:!function(e){0===o.length&&(e.preventDefault(),i(r))}(e)}var s,c}}},Ne=function(e){var t=e.previewStatus,n=e.setPreviewStatus,r=e.setAttributes,s=e.attributes,l=s.id,i=s.fontSize,c=s.title,a=Object(f.useSelect)((function(e){return e("core/block-editor").getSettings()})).fontSizes,u=Object(d.createElement)(R.ExternalLink,{href:"post.php?post=".concat(l,"&action=edit"),target:"lesson",className:"wp-block-sensei-lms-course-outline-lesson__edit"},Object(o.__)("Edit lesson","sensei-lms"));return Object(d.createElement)(d.Fragment,null,Object(d.createElement)(T.InspectorControls,null,l&&Object(d.createElement)(R.PanelBody,{title:Object(o.__)("Lesson","sensei-lms")},Object(d.createElement)("h2",null,u),Object(d.createElement)("p",null,Object(o.__)("Edit details such as lesson content, prerequisite, quiz settings and more.","sensei-lms"))),Object(d.createElement)(R.PanelBody,{title:Object(o.__)("Typography","sensei-lms")},Object(d.createElement)(R.FontSizePicker,{fontSizes:a,value:i,onChange:function(e){r({fontSize:e})}})),Object(d.createElement)(R.PanelBody,{title:Object(o.__)("Status","sensei-lms"),initialOpen:!1},Object(d.createElement)(je,{status:t,setStatus:n,options:[O,_],disabled:!c}))),Object(d.createElement)(T.BlockControls,null,l&&Object(d.createElement)(R.Toolbar,{className:"components-button"},u)))},Le=Object(v.a)({backgroundColor:{style:"background-color",label:Object(o.__)("Background color","sensei-lms")},textColor:{style:"color",label:Object(o.__)("Text color","sensei-lms")}})((function(e){var t=e.className,n=e.attributes,r=n.title,s=n.id,l=n.fontSize,i=n.draft,c=n.preview,a=e.backgroundColor,u=e.textColor,m=e.setAttributes,p=Be(e).onKeyDown,v=function(e){var t=e.attributes,n=t.isExample,r=t.title,o=e.clientId,s=Object(f.useDispatch)(S),l=s.setLessonStatus,i=s.trackLesson,c=s.ignoreLesson;return Object(d.useEffect)((function(){n||(r.length>0?i(o):c(o))}),[o,i,c,r,n]),{setPreviewStatus:function(e){return l(o,e)},previewStatus:Object(f.useSelect)((function(e){return e(S).getLessonStatus(o)}),[o])}}(e),g="";!s&&r.length?g=Object(o.__)("Unsaved","sensei-lms"):s&&i&&(g=Object(o.__)("Draft","sensei-lms"));var h={className:b()(t,null==a?void 0:a.class,null==u?void 0:u.class,{completed:v.previewStatus===_,"is-auto-draft":!s&&!r}),style:{backgroundColor:null==a?void 0:a.color,color:null==u?void 0:u.color}};return Object(d.createElement)(d.Fragment,null,Object(d.createElement)(Ne,ve()({},e,v)),Object(d.createElement)("div",h,Object(d.createElement)(R.Icon,{icon:me.c,className:"wp-block-sensei-lms-course-outline-lesson__status"}),Object(d.createElement)(pe.a,{className:"wp-block-sensei-lms-course-outline-lesson__input",placeholder:Object(o.__)("Lesson name","sensei-lms"),value:r,onChange:function(e){m({title:e})},onKeyDown:p,style:{fontSize:l}}),c&&Object(d.createElement)("span",{className:"wp-block-sensei-lms-course-outline-lesson__badge"},Object(o.__)("Preview","sensei-lms")),g&&Object(d.createElement)("div",{className:"wp-block-sensei-lms-course-outline-lesson__post-status"},g),Object(d.createElement)(R.Icon,{icon:me.d,className:"wp-block-sensei-lms-course-outline-lesson__chevron"})))})),Pe=n(81),Te=a()(a()({title:Object(o.__)("Lesson","sensei-lms"),description:Object(o.__)("Where your course content lives.","sensei-lms"),icon:u.c,keywords:[Object(o.__)("Course","sensei-lms"),Object(o.__)("Lesson","sensei-lms")]},Pe),{},{example:{attributes:{title:Object(o.__)("Start learning","sensei-lms")}},edit:Le}),Re=n(47),Ie=function(e){var t=e.selectedCondition,n=e.onConditionChange,r=e.clientId,s=e.hasInnerBlocks,l=function(e){return Object(f.useSelect)((function(t){var n=t("core/block-editor").getSelectedBlockClientIds();return 1===n.length&&n[0]===e}),[e])}(r),i=function(e){var t=Object(f.useSelect)((function(t){return t("core/block-editor").getBlock(e)}),[e]),n=Object(f.useDispatch)("core/block-editor").replaceBlocks;return function(){t.innerBlocks.length&&n(e,t.innerBlocks)}}(r),c=Object.keys(Me).map((function(e){return{value:Me[e],label:Ae[Me[e]]}}));return Object(d.createElement)(d.Fragment,null,Object(d.createElement)(T.BlockControls,null,Object(d.createElement)(R.ToolbarGroup,null,Object(d.createElement)(Re.a,{options:c,optionsLabel:Object(o.__)("Visible when","sensei-lms"),value:t,onChange:n}))),l&&s&&T.BlockSettingsMenuControls&&Object(d.createElement)(T.BlockSettingsMenuControls,null,(function(e){var t=e.onClose;return Object(d.createElement)(R.MenuItem,{onClick:function(){i(),t()}},Object(o.__)("Remove condition","sensei-lms"))})))},Me={ENROLLED:"enrolled",UNENROLLED:"unenrolled",COURSE_COMPLETED:"course-completed"},Ae=(ne={},he()(ne,Me.ENROLLED,Object(o.__)("Enrolled","sensei-lms")),he()(ne,Me.UNENROLLED,Object(o.__)("Not Enrolled","sensei-lms")),he()(ne,Me.COURSE_COMPLETED,Object(o.__)("Course Completed","sensei-lms")),ne),De=Object(p.compose)([Object(f.withSelect)((function(e,t){var n=t.clientId,r=(0,e("core/block-editor").getBlock)(n);return{hasInnerBlocks:!(!r||!r.innerBlocks.length)}}))])((function(e){var t=e.className,n=e.hasInnerBlocks,r=e.clientId,o=e.attributes.condition,s=e.setAttributes;return Object(d.createElement)(d.Fragment,null,Object(d.createElement)("div",{className:t},Object(d.createElement)(T.InnerBlocks,{renderAppender:!n&&T.InnerBlocks.ButtonBlockAppender})),Object(d.createElement)(Ie,{selectedCondition:o,onConditionChange:function(e){return s({condition:e})},clientId:r,hasInnerBlocks:n}))})),ze=function(e){var t=e.className;return Object(d.createElement)("div",{className:b()("wp-block-group",t)},Object(d.createElement)("div",{className:"wp-block-group__inner-container"},Object(d.createElement)(T.InnerBlocks.Content,null)))},Ve=n(82),Ue=Object(d.createElement)(R.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(d.createElement)(R.Path,{d:"M5.5 18V6a.5.5 0 01.5-.5h4.5V4H6a2 2 0 00-2 2v12a2 2 0 002 2h4.5v-1.5H6a.5.5 0 01-.5-.5zm11-14v1.5H15V4h1.5zM20 6a2 2 0 00-2-2v1.5a.5.5 0 01.5.5H20zm-1.5 10.5v-2H20v2h-1.5zM20 13h-1.5v-2H20v2zm-2 5.5a.5.5 0 00.5-.5H20a2 2 0 01-2 2v-1.5zM16.5 20v-1.5H15V20h1.5zm2-10.5H20v-2h-1.5v2zm-5-5.5v1.5H12V4h1.5zm0 14.5V20H12v-1.5h1.5z"})),He=a()(a()({title:Object(o.__)("Conditional Content","sensei-lms"),description:Object(o.__)("Content inside this block will be shown to the selected subgroup of users.","sensei-lms"),keywords:[Object(o.__)("Enrolled","sensei-lms"),Object(o.__)("Content","sensei-lms"),Object(o.__)("Locked","sensei-lms"),Object(o.__)("Private","sensei-lms"),Object(o.__)("Completed","sensei-lms"),Object(o.__)("Not Enrolled","sensei-lms"),Object(o.__)("Restrict","sensei-lms"),Object(o.__)("Access","sensei-lms")],icon:Ue,edit:De,save:ze},Ve),{},{transforms:{from:[{type:"block",isMultiBlock:!0,blocks:["*"],__experimentalConvert:function(e){if(1!==e.length||"sensei-lms/conditional-content"!==e[0].name){var t=e.map((function(e){return Object(H.createBlock)(e.name,e.attributes,e.innerBlocks)})),n=["wide","full"],r=e.reduce((function(e,t){var r=t.attributes.align;return n.indexOf(r)>n.indexOf(e)?r:e}),void 0);return Object(H.createBlock)("sensei-lms/conditional-content",{align:r},t)}}}]}}),Fe=Object(s.b)({tagName:"a",EditWrapper:l.a,settings:{name:"sensei-lms/button-view-results",description:Object(o.__)("Enable a learner to view their course results.","sensei-lms"),title:Object(o.__)("View Results","sensei-lms"),attributes:{text:{default:Object(o.__)("View Results","sensei-lms")}},styles:[s.a.Fill,a()(a()({},s.a.Outline),{},{isDefault:!0}),s.a.Link]}});Object(r.a)([ie,Se,Te,i,L,He,Fe])}]);
+*/
+/* global define */!function(){"use strict";var r={}.hasOwnProperty;function s(){for(var e=[],t=0;t<arguments.length;t++){var n=arguments[t];if(n){var o=typeof n;if("string"===o||"number"===o)e.push(n);else if(Array.isArray(n)){if(n.length){var i=s.apply(null,n);i&&e.push(i)}}else if("object"===o)if(n.toString===Object.prototype.toString)for(var l in n)r.call(n,l)&&n[l]&&e.push(l);else e.push(n.toString())}}return e.join(" ")}e.exports?(s.default=s,e.exports=s):void 0===(n=function(){return s}.apply(t,[]))||(e.exports=n)}()}
+/***/,
+/***/8772:
+/***/(e,t,n)=>{"use strict";
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */var r=n(331);function s(){}function o(){}o.resetWarningCache=s,e.exports=function(){function e(e,t,n,s,o,i){if(i!==r){var l=new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types");throw l.name="Invariant Violation",l}}function t(){return e}e.isRequired=e;
+// Important!
+// Keep this list in sync with production version in `./factoryWithTypeCheckers.js`.
+var n={array:e,bigint:e,bool:e,func:e,number:e,object:e,string:e,symbol:e,any:e,arrayOf:t,element:e,elementType:e,instanceOf:t,node:e,objectOf:t,oneOf:t,oneOfType:t,shape:t,exact:t,checkPropTypes:o,resetWarningCache:s};return n.PropTypes=n,n}}
+/***/,
+/***/3615:
+/***/(e,t,n)=>{
+// By explicitly using `prop-types` you are opting into new production behavior.
+// http://fb.me/prop-types-in-prod
+e.exports=n(8772)()}
+/***/,
+/***/331:
+/***/e=>{"use strict";
+/**
+ * Copyright (c) 2013-present, Facebook, Inc.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */e.exports="SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED"}
+/***/,
+/***/8286:
+/***/(e,t,n)=>{"use strict";var r="function"==typeof Symbol&&"symbol"==typeof Symbol.iterator?function(e){return typeof e}:function(e){return e&&"function"==typeof Symbol&&e.constructor===Symbol&&e!==Symbol.prototype?"symbol":typeof e},s=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},o=function(){function e(e,t){for(var n=0;n<t.length;n++){var r=t[n];r.enumerable=r.enumerable||!1,r.configurable=!0,"value"in r&&(r.writable=!0),Object.defineProperty(e,r.key,r)}}return function(t,n,r){return n&&e(t.prototype,n),r&&e(t,r),t}}(),i=u(n(9196)),l=u(n(3615)),a=u(n(42));function u(e){return e&&e.__esModule?e:{default:e}}function c(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}var d={animating:"rah-animating",animatingUp:"rah-animating--up",animatingDown:"rah-animating--down",animatingToHeightZero:"rah-animating--to-height-zero",animatingToHeightAuto:"rah-animating--to-height-auto",animatingToHeightSpecific:"rah-animating--to-height-specific",static:"rah-static",staticHeightZero:"rah-static--height-zero",staticHeightAuto:"rah-static--height-auto",staticHeightSpecific:"rah-static--height-specific"},m=["animateOpacity","animationStateClasses","applyInlineTransitions","children","contentClassName","delay","duration","easing","height","onAnimationEnd","onAnimationStart"];function p(e){for(var t=arguments.length,n=Array(t>1?t-1:0),r=1;r<t;r++)n[r-1]=arguments[r];if(!n.length)return e;for(var s={},o=Object.keys(e),i=0;i<o.length;i++){var l=o[i];-1===n.indexOf(l)&&(s[l]=e[l])}return s}
+// Start animation helper using nested requestAnimationFrames
+function f(e){e.forEach((function(e){return cancelAnimationFrame(e)}))}function v(e){return!isNaN(parseFloat(e))&&isFinite(e)}function g(e){
+// Percentage height
+return"string"==typeof e&&e.search("%")===e.length-1&&v(e.substr(0,e.length-1))}function h(e,t){e&&"function"==typeof e&&e(t)}var b=function(e){function t(e){!function(e,t){if(!(e instanceof t))throw new TypeError("Cannot call a class as a function")}(this,t);var n=function(e,t){if(!e)throw new ReferenceError("this hasn't been initialised - super() hasn't been called");return!t||"object"!=typeof t&&"function"!=typeof t?e:t}(this,(t.__proto__||Object.getPrototypeOf(t)).call(this,e));n.animationFrameIDs=[];var r="auto",o="visible";v(e.height)?(
+// If value is string "0" make sure we convert it to number 0
+r=e.height<0||"0"===e.height?0:e.height,o="hidden"):g(e.height)&&(
+// If value is string "0%" make sure we convert it to number 0
+r="0%"===e.height?0:e.height,o="hidden"),n.animationStateClasses=s({},d,e.animationStateClasses);var i=n.getStaticStateClasses(r);return n.state={animationStateClasses:i,height:r,overflow:o,shouldUseTransitions:!1},n}return function(e,t){if("function"!=typeof t&&null!==t)throw new TypeError("Super expression must either be null or a function, not "+typeof t);e.prototype=Object.create(t&&t.prototype,{constructor:{value:e,enumerable:!1,writable:!0,configurable:!0}}),t&&(Object.setPrototypeOf?Object.setPrototypeOf(e,t):e.__proto__=t)}(t,e),o(t,[{key:"componentDidMount",value:function(){var e=this.state.height;
+// Hide content if height is 0 (to prevent tabbing into it)
+// Check for contentElement is added cause this would fail in tests (react-test-renderer)
+// Read more here: https://github.com/Stanko/react-animate-height/issues/17
+this.contentElement&&this.contentElement.style&&this.hideContent(e)}},{key:"componentDidUpdate",value:function(e,t){var n,r,s=this,o=this.props,i=o.delay,l=o.duration,u=o.height,d=o.onAnimationEnd,m=o.onAnimationStart;
+// Check if 'height' prop has changed
+if(this.contentElement&&u!==e.height){var p;
+// Remove display: none from the content div
+// if it was hidden to prevent tabbing into it
+this.showContent(t.height),
+// Cache content height
+this.contentElement.style.overflow="hidden";var b=this.contentElement.offsetHeight;this.contentElement.style.overflow="";
+// set total animation time
+var y=l+i,E=null,C={height:null,// it will be always set to either 'auto' or specific number
+overflow:"hidden"},k="auto"===t.height;v(u)?(
+// If value is string "0" make sure we convert it to number 0
+E=u<0||"0"===u?0:u,C.height=E):g(u)?(
+// If value is string "0%" make sure we convert it to number 0
+E="0%"===u?0:u,C.height=E):(
+// If not, animate to content height
+// and then reset to auto
+E=b,// TODO solve contentHeight = 0
+C.height="auto",C.overflow=null),k&&(
+// This is the height to be animated to
+C.height=E,
+// If previous height was 'auto'
+// set starting height explicitly to be able to use transition
+E=b);
+// Animation classes
+var S=(0,a.default)((c(p={},this.animationStateClasses.animating,!0),c(p,this.animationStateClasses.animatingUp,"auto"===e.height||u<e.height),c(p,this.animationStateClasses.animatingDown,"auto"===u||u>e.height),c(p,this.animationStateClasses.animatingToHeightZero,0===C.height),c(p,this.animationStateClasses.animatingToHeightAuto,"auto"===C.height),c(p,this.animationStateClasses.animatingToHeightSpecific,C.height>0),p)),w=this.getStaticStateClasses(C.height);
+// Animation classes to be put after animation is complete
+// Set starting height and animating classes
+// We are safe to call set state as it will not trigger infinite loop
+// because of the "height !== prevProps.height" check
+this.setState({// eslint-disable-line react/no-did-update-set-state
+animationStateClasses:S,height:E,overflow:"hidden",
+// When animating from 'auto' we first need to set fixed height
+// that change should be animated
+shouldUseTransitions:!k}),
+// Clear timeouts
+clearTimeout(this.timeoutID),clearTimeout(this.animationClassesTimeoutID),k?(
+// When animating from 'auto' we use a short timeout to start animation
+// after setting fixed height above
+C.shouldUseTransitions=!0,f(this.animationFrameIDs),this.animationFrameIDs=(n=function(){s.setState(C),
+// ANIMATION STARTS, run a callback if it exists
+h(m,{newHeight:C.height})},(r=[])[0]=requestAnimationFrame((function(){r[1]=requestAnimationFrame((function(){n()}))})),r),
+// Set static classes and remove transitions when animation ends
+this.animationClassesTimeoutID=setTimeout((function(){s.setState({animationStateClasses:w,shouldUseTransitions:!1}),
+// ANIMATION ENDS
+// Hide content if height is 0 (to prevent tabbing into it)
+s.hideContent(C.height),
+// Run a callback if it exists
+h(d,{newHeight:C.height})}),y)):(
+// ANIMATION STARTS, run a callback if it exists
+h(m,{newHeight:E}),
+// Set end height, classes and remove transitions when animation is complete
+this.timeoutID=setTimeout((function(){C.animationStateClasses=w,C.shouldUseTransitions=!1,s.setState(C),
+// ANIMATION ENDS
+// If height is auto, don't hide the content
+// (case when element is empty, therefore height is 0)
+"auto"!==u&&
+// Hide content if height is 0 (to prevent tabbing into it)
+s.hideContent(E),
+// Run a callback if it exists
+h(d,{newHeight:E})}),y))}}},{key:"componentWillUnmount",value:function(){f(this.animationFrameIDs),clearTimeout(this.timeoutID),clearTimeout(this.animationClassesTimeoutID),this.timeoutID=null,this.animationClassesTimeoutID=null,this.animationStateClasses=null}},{key:"showContent",value:function(e){0===e&&(this.contentElement.style.display="")}},{key:"hideContent",value:function(e){0===e&&(this.contentElement.style.display="none")}},{key:"getStaticStateClasses",value:function(e){var t;return(0,a.default)((c(t={},this.animationStateClasses.static,!0),c(t,this.animationStateClasses.staticHeightZero,0===e),c(t,this.animationStateClasses.staticHeightSpecific,e>0),c(t,this.animationStateClasses.staticHeightAuto,"auto"===e),t))}},{key:"render",value:function(){var e,t=this,n=this.props,r=n.animateOpacity,o=n.applyInlineTransitions,l=n.children,u=n.className,d=n.contentClassName,f=n.delay,v=n.duration,g=n.easing,h=n.id,b=n.style,y=this.state,E=y.height,C=y.overflow,k=y.animationStateClasses,S=y.shouldUseTransitions,w=s({},b,{height:E,overflow:C||b.overflow});S&&o&&(w.transition="height "+v+"ms "+g+" "+f+"ms",
+// Include transition passed through styles
+b.transition&&(w.transition=b.transition+", "+w.transition),
+// Add webkit vendor prefix still used by opera, blackberry...
+w.WebkitTransition=w.transition);var Z={};r&&(Z.transition="opacity "+v+"ms "+g+" "+f+"ms",
+// Add webkit vendor prefix still used by opera, blackberry...
+Z.WebkitTransition=Z.transition,0===E&&(Z.opacity=0));var x=(0,a.default)((c(e={},k,!0),c(e,u,u),e)),_=void 0!==this.props["aria-hidden"]?this.props["aria-hidden"]:0===E;
+// Check if user passed aria-hidden prop
+return i.default.createElement("div",s({},p.apply(void 0,[this.props].concat(m)),{"aria-hidden":_,className:x,id:h,style:w}),i.default.createElement("div",{className:d,style:Z,ref:function(e){return t.contentElement=e}},l))}}]),t}(i.default.Component);b.propTypes={"aria-hidden":l.default.bool,animateOpacity:l.default.bool,animationStateClasses:l.default.object,applyInlineTransitions:l.default.bool,children:l.default.any.isRequired,className:l.default.string,contentClassName:l.default.string,delay:l.default.number,duration:l.default.number,easing:l.default.string,height:function(e,t,n){var s=e[t];return"number"==typeof s&&s>=0||g(s)||"auto"===s?null:new TypeError('value "'+s+'" of type "'+(void 0===s?"undefined":r(s))+'" is invalid type for '+t+" in "+n+'. It needs to be a positive number, string "auto" or percentage string (e.g. "15%").')},id:l.default.string,onAnimationEnd:l.default.func,onAnimationStart:l.default.func,style:l.default.object},b.defaultProps={animateOpacity:!1,animationStateClasses:d,applyInlineTransitions:!0,duration:250,delay:0,easing:"ease",style:{}},t.Z=b}
+/***/,
+/***/3731:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(189),o=n(9307),i=n(9818),l=n(2175),a=n(5736),u=n(4760),c=n(924),__=a.__;
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.placeholder,n=e.attributes,a=e.setAttributes,d=n.text,m=(0,i.useSelect)((function(e){return e("core/block-editor").getSettings()}),[]).colors,p=void 0!==e.text,f=(0,u/* .getButtonProps */._m)((0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{colors:m}));return(0,o.createElement)("div",(0,u/* .getButtonWrapperProps */.St)(e),p?(0,o.createElement)("div",f,e.text):(0,o.createElement)(l.RichText,(0,r/* ["default"] */.Z)({placeholder:t||__("Add text…","sensei-lms"),value:d,onChange:function(e){return a({text:e})}},f,{tagName:"a",identifier:"text",withoutInteractiveFormatting:!0})),(0,o.createElement)(c/* ["default"] */.Z,e))};
+/***/},
+/***/4760:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */_m:()=>/* binding */l
+/* harmony export */,St:()=>/* binding */a
+/* harmony export */,xc:()=>/* binding */u
+/* harmony export */});
+/* unused harmony export getBorderRadiusProps */
+/* harmony import */var r=n(189),s=n(42),o=n.n(s),i=n(3189);
+/* harmony import */
+/**
+ * Class and style attributes for the button.
+ *
+ * @param {{attributes}} props Block properties.
+ * @return {{className, style}} Output HTML attributes.
+ */
+function l(e){var t,n,s=u(e),l=(0,i/* .getColorAndStyleProps */.Y)(e),a={className:{"no-border-radius":0===(n=e.attributes.borderRadius)},style:{borderRadius:n?n+"px":void 0}};return{className:o()({"wp-block-button__link":!s},a.className,l.className,null==e||null===(t=e.attributes)||void 0===t?void 0:t.buttonClassName),style:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},a.style),l.style)}}
+/**
+ * Class and style attributes for the wrapper element.
+ *
+ * @param {Object} props                  Block properties.
+ * @param {string} props.className        Block classname.
+ * @param {Object} props.attributes       Block attributes.
+ * @param {string} props.attributes.align Alignment attribute.
+ * @return {{className}} Output HTML attributes.
+ */function a(e){var t=e.className,n=e.attributes.align;return{className:o()(t,"wp-block-sensei-button","wp-block-button","has-text-align-".concat(n||"left"))}}
+/**
+ * Check if block has the 'Link' block style.
+ *
+ * @param {Object} props Block props.
+ * @return {boolean} Is it a link block style.
+ */var u=function(e){var t;return/\bis-style-link\b/.test(null==e||null===(t=e.attributes)||void 0===t?void 0:t.className)};
+/***/},
+/***/7889:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(4649),s=n(5773),o=n(9307),i=n(42),l=n.n(i),a=n(2175),u=n(4981),c=n(4760);
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.attributes,n=e.className,i=e.tagName,d=e.blockName,m=t.text,p=t.inContainer,f=t.align,v=i;i||(v=(0,c/* .isLinkStyle */.xc)({attributes:t})?"a":"button");var g=(0,o.createElement)("div",(0,c/* .getButtonWrapperProps */.St)({className:n,attributes:t}),(0,o.createElement)(a.RichText.Content,(0,s/* ["default"] */.Z)({},(0,c/* .getButtonProps */._m)({attributes:t}),{tagName:v,value:m})));return p?(0,o.createElement)("div",{className:l()(n,"sensei-buttons-container__button-block",(0,u.getBlockDefaultClassName)(d)+"__wrapper",(0,r/* ["default"] */.Z)({},"sensei-buttons-container__button-align-".concat(f),f))},g):g};
+/***/},
+/***/924:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(9307),o=n(2175),i=n(5609),l=n(5736),__=l.__,a=function(e){var t=e.borderRadius,n=e.setAttributes;return(0,s.createElement)(i.PanelBody,{title:__("Border settings","sensei-lms"),initialOpen:!1},(0,s.createElement)(i.RangeControl,{label:__("Border radius","sensei-lms"),value:t,min:0,max:50,allowReset:!0,onChange:function(e){return n({borderRadius:e})}}))};
+/* harmony import */
+/* harmony default export */const u=function(e){var t,n=e.attributes,i=e.setAttributes,l=n.borderRadius,u=n.align;return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(o.BlockControls,null,(0,s.createElement)(o.BlockAlignmentToolbar,(0,r/* ["default"] */.Z)({label:__("Change button alignment","sensei-lms"),value:u||(null===(t=e.alignmentOptions)||void 0===t?void 0:t.default),onChange:function(e){e&&i({align:e})}},e.alignmentOptions))),(0,s.createElement)(o.InspectorControls,null,(0,s.createElement)(a,{borderRadius:l,setAttributes:i})))};
+/***/},
+/***/3490:
+/***/(e,t,n)=>{"use strict";
+/* unused harmony exports addColorSettings, removeColorSaveProps, removeColorEditProps, removeWrapperProps */
+/* harmony import */var r=n(5773),s=n(189),o=n(9307),i=n(2819),l=n(2694),a=n(5736),u=n(3112),__=a.__,c=function(e){return(e="string"==typeof e?e:e.name)&&e.startsWith("sensei-lms/button")},d=function(e){var t;return(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{className:null==e||null===(t=e.className)||void 0===t?void 0:t.replace(/\s*has-[\w-]*(color|background)/g,""),style:(0,i.omitBy)(null==e?void 0:e.style,(function(e,t){return t.match(/(color|background|background-color)/)}))})};
+/* harmony import */(0,l.addFilter)("blocks.getSaveContent.extraProps","sensei/button/removeColorSaveProps",(function(e,t){return c(t)?d(e):e})),(0,l.addFilter)("blocks.registerBlockType","sensei/button/removeColorEditProps",(function(e){if(!c(e))return e;var t=e.getEditWrapperProps;return t&&(e.getEditWrapperProps=function(e){var n=t(e);return d(n)}),e})),(0,l.addFilter)("blocks.registerBlockType","sensei/button/addColorSettings",(function(e){var t,n;return c(e)?(null===(t=e.supports)||void 0===t||!t.color||null!==(n=e.attributes)&&void 0!==n&&n.backgroundColor||(e.edit=(0,u/* .withColorSettings */.ku)({backgroundColor:{style:"background-color",label:__("Background color","sensei-lms")},textColor:{style:"color",label:__("Text color","sensei-lms")}})(e.edit),e.attributes=(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e.attributes),{},{backgroundColor:{type:"string"},customBackgroundColor:{type:"string"},textColor:{type:"string"},customTextColor:{type:"string"}})),e):e})),(0,l.addFilter)("editor.BlockListBlock","sensei/button/removeWrapperProps",(function(e){return function(t){var n=t.name,s=t.wrapperProps;return c(n)&&s&&(s=d(s)),(0,o.createElement)(e,(0,r/* ["default"] */.Z)({},t,{wrapperProps:s}))}}),1)}
+/***/,
+/***/3189:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Y:()=>/* binding */l
+/* harmony export */});
+/* unused harmony export getGradientClass */
+/* harmony import */var r=n(4649),s=n(42),o=n.n(s),i=n(2175),l=function(e){var t,n,s,l,a,u,c,d,m,p,f,v=e.attributes,g=e.colors,h=v.backgroundColor,b=v.customBackgroundColor,y=v.textColor,E=v.customTextColor,C=v.gradient,k=v.style,S=void 0===k?{}:k,w=(0,i.getColorClassName)("background-color",h);S.color||(S.color={}),b&&(S.color.background=b),E&&(S.color.text=E);var Z=function(e){if(e)return"has-".concat(e,"-gradient-background")}(C),x=(0,i.getColorClassName)("color",y),_=o()(x,Z,(a={},(0,r/* ["default"] */.Z)(a,w,!(null!=S&&null!==(t=S.color)&&void 0!==t&&t.gradient||!w)),(0,r/* ["default"] */.Z)(a,"has-text-color",y||(null==S||null===(n=S.color)||void 0===n?void 0:n.text)),(0,r/* ["default"] */.Z)(a,"has-background",h||(null==S||null===(s=S.color)||void 0===s?void 0:s.background)||C||(null==S||null===(l=S.color)||void 0===l?void 0:l.gradient)),a)),T=null!=S&&null!==(u=S.color)&&void 0!==u&&u.background||null!=S&&null!==(c=S.color)&&void 0!==c&&c.text||null!=S&&null!==(d=S.color)&&void 0!==d&&d.gradient?{background:null!=S&&null!==(m=S.color)&&void 0!==m&&m.gradient?S.color.gradient:void 0,backgroundColor:null!=S&&null!==(p=S.color)&&void 0!==p&&p.background?S.color.background:void 0,color:null!=S&&null!==(f=S.color)&&void 0!==f&&f.text?S.color.text:void 0}:{};// This is needed only for themes that don't load their color stylesheets in the editor
+// We force an inline style to apply the color.
+if(g){if(h){var O=(0,i.getColorObjectByAttributeValues)(g,h);T.backgroundColor=O.color}if(y){var B=(0,i.getColorObjectByAttributeValues)(g,y);T.color=B.color}}return{className:_||void 0,style:T}};
+/* harmony import */}
+/***/,
+/***/6877:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */i:()=>/* binding */b
+/* harmony export */,M:()=>/* binding */y
+/* harmony export */});
+/* harmony import */var r=n(4649),s=n(5773),o=n(189),i=n(3782),l=n(9307),a=n(2819),u=n(42),c=n.n(u),d=n(5736),m=n(4981),p=n(9839),f=(n(3490),n(3731)),v=n(7889),g=n(3112),h=["settings","EditWrapper"],__=d.__,b={Fill:{name:"default",label:__("Fill","sensei-lms")},Outline:{name:"outline",label:__("Outline","sensei-lms")},Link:{name:"link",label:__("Link","sensei-lms")}},y=function(e){var t,n=e.settings,u=e.EditWrapper,d=(0,i/* ["default"] */.Z)(e,h);d=(0,o/* ["default"] */.Z)({alignmentOptions:{controls:["left","center","right","full"],default:"left"}},d);var y=n.styles?n.styles:[(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},b.Fill),{},{isDefault:!0}),b.Outline],E=null===(t=(0,a.find)(y,"isDefault"))||void 0===t?void 0:t.name,C=(0,g/* .withDefaultBlockStyle */.WJ)(E)(f/* ["default"] */.Z),k=(0,g/* .withDefaultBlockStyle */.WJ)(E)(v/* ["default"] */.Z);return(0,a.merge)({name:"sensei-lms/button",title:"Sensei Button",category:"sensei-lms",attributes:{text:{type:"string",source:"html",selector:"a,button"},align:{type:"string"},borderRadius:{type:"number"},style:{type:"object"},isPreview:{type:"boolean",default:!1},inContainer:{type:"boolean",default:!1},buttonClassName:{type:"array",default:[]}},supports:{color:{gradients:!0},__experimentalColor:{gradients:!0},align:!1,html:!1},icon:p/* ["default"] */.Z,styles:y,edit:function(e){var t=(0,l.createElement)(C,(0,s/* ["default"] */.Z)({},e,d));return u?(0,l.createElement)(u,e,t):t},save:function(e){return(0,l.createElement)(k,(0,s/* ["default"] */.Z)({},e,d,{blockName:n.name}))},getEditWrapperProps:function(e){var t=e.inContainer,s=e.align;return t?{className:c()("sensei-buttons-container__button-block",(0,m.getBlockDefaultClassName)(n.name)+"__wrapper",(0,r/* ["default"] */.Z)({},"sensei-buttons-container__button-align-".concat(s),s))}:{}},example:{attributes:{align:"center",isPreview:!0}}},n)};
+/* harmony import */}
+/***/,
+/***/7260:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */h:()=>/* binding */l
+/* harmony export */,z:()=>/* binding */a
+/* harmony export */});
+/* harmony import */var r=n(2819),s=n(9818),o=n(9512),i=n.n(o),l=function(e,t){if(t){var n=t.match(/is-style-\w+/);if(n)return n[0]}var s=(0,r.find)(e,"isDefault");return s?"is-style-"+s.name:null},a=function(e,t){var n=(0,s.select)("core/block-editor").getBlock(e),r=n.attributes.className,o=n.name,a=(0,s.select)("core/blocks").getBlockStyles(o);if(function(e,t){return e&&e.some((function(e){return"is-style-"+e.name===t}))}(a,t)){var u=new(i())(r),c=l(a,r);c&&u.remove(c),u.add(t),(0,s.dispatch)("core/block-editor").updateBlockAttributes(e,{className:u.value})}};
+/* harmony import */}
+/***/,
+/***/1849:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */v:()=>/* binding */a
+/* harmony export */});
+/* harmony import */var r=n(9818),s=n(5736),o=n(3728),i=n(9973),__=s.__,l=function(){return(0,i/* .getFirstBlockByName */.H4)("sensei-lms/course-outline",(0,r.select)("core/block-editor").getBlocks())},a="sensei/course-structure";
+/* harmony import */(0,o/* .registerStructureStore */.x)({storeName:a,getEndpoint:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,(0,r.select)("core/editor").getCurrentPostId();case 2:return t=e.sent,e.abrupt("return","course-structure/".concat(t,"?context=edit"));case 4:case"end":return e.stop()}}),e)})),updateBlock:regeneratorRuntime.mark((function e(t){var n,s,o,a;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:if(n=l(),s=n.clientId,(o=void 0===s?null:s)&&t&&0!==t.length){e.next=3;break}return e.abrupt("return");case 3:return e.next=5,(0,r.select)("core/block-editor").getBlocks(o);case 5:return a=e.sent,e.next=8,(0,r.dispatch)("core/block-editor").replaceInnerBlocks(o,(0,i/* .syncStructureToBlocks */.pu)(t,a),!1);case 8:case"end":return e.stop()}}),e)})),readBlock:function(){var e=l();return e?{structure:(0,i/* .extractStructure */.Vw)(e.innerBlocks)}:null},saveError:regeneratorRuntime.mark((function e(t){var n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=(0,s.sprintf)(
+/* translators: Error message. */
+__("Course modules and lessons could not be updated. %s","sensei-lms"),t.message),e.next=3,(0,r.dispatch)("core/notices").createErrorNotice(n,{id:"course-outline-save-error"});case 3:case"end":return e.stop()}}),e)})),clearError:function(){
+// Clear error notices.
+(0,r.dispatch)("core/notices").removeNotice("course-outline-save-error")},
+/**
+   * Prepend structure in server's response.
+   *
+   * @param {Object} structure The structure response.
+   *
+   * @return {Object} The modified response.
+   */
+setServerStructure:function(e){return e?{structure:e}:{}}})}
+/***/,
+/***/9973:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */pu:()=>/* binding */m
+/* harmony export */,Vw:()=>/* binding */f
+/* harmony export */,H4:()=>/* binding */v
+/* harmony export */,tf:()=>/* binding */g
+/* harmony export */});
+/* unused harmony exports blockNames, blockTypes */
+/* harmony import */var r=n(228),s=n(189),o=n(3782),i=n(4981),l=n(9818),a=n(2819),u=["type","lessons"],c={module:"sensei-lms/course-outline-module",lesson:"sensei-lms/course-outline-lesson"},d=(0,a.invert)(c),m=function e(t,n){return(t||[]).map((function(t){var r=t.type,l=t.lessons,a=(0,o/* ["default"] */.Z)(t,u),d=p(n,t);return t.id&&(a=(0,s/* ["default"] */.Z)({},a)),d?d.attributes=(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},d.attributes),a):d=(0,i.createBlock)(c[r],a),"module"===r&&(d.innerBlocks=e(l,d.innerBlocks)),d}))},p=function(e,t){var n=t.id,r=t.type,s=t.title,o=function(e){var t=e.name,o=e.attributes;return(n===o.id||!o.id&&o.title===s)&&c[r]===t};return e.find(o)||"lesson"===r&&e.reduce((function(e,t){return e||t.innerBlocks.find(o)}),!1)},f=function e(t){var n={module:function(t){return{description:t.attributes.description,lessons:e(t.innerBlocks),teacher:t.attributes.teacher,lastTitle:t.attributes.lastTitle}},lesson:function(e){return{draft:e.attributes.draft,preview:e.attributes.preview}}};return t.map((function(e){var t=d[e.name];return(0,s/* ["default"] */.Z)({type:t,id:e.attributes.id,title:e.attributes.title},n[t](e))})).filter((function(e){return"module"===e.type||!!e.title}))},v=function e(t,n){for(var r=0;r<n.length;r++){var s=n[r];if(t===s.name)return s;if(s.innerBlocks&&s.innerBlocks.length>0){var o=e(t,s.innerBlocks);if(o)return o}}return!1},g=function(e,t){var n=(0,l.select)("core/block-editor").getBlocks(e);return(n=n.reduce((function(e,t){return[].concat((0,r/* ["default"] */.Z)(e),(0,r/* ["default"] */.Z)(t.innerBlocks))}),n)).filter((function(e){var n=e.name;return t===n}))};
+/* harmony import */}
+/***/,
+/***/5913:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */He:()=>/* reexport safe */r.Z
+/* harmony export */,iT:()=>/* reexport safe */s.Z
+/* harmony export */,G$:()=>/* reexport safe */o.Z
+/* harmony export */});
+/* harmony import */var r=n(6173),s=n(86),o=n(1458);
+/* harmony import */n(1849),n(2993)}
+/**
+ * Internal dependencies
+ */
+/***/,
+/***/1458:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(5736),o=n(3362),i=n(8880),l=n(7231),__=s.__;
+/* harmony import */
+/* harmony default export */const a=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({title:__("Lesson","sensei-lms"),description:__("Where your course content lives.","sensei-lms"),icon:o/* ["default"] */.Z,keywords:[__("Course","sensei-lms"),__("Lesson","sensei-lms")]},l),{},{example:{attributes:{title:__("Start learning","sensei-lms")}},edit:i/* ["default"] */.Z});
+/***/},
+/***/8880:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>h
+/* harmony export */});
+/* unused harmony export LessonEdit */
+/* harmony import */var r=n(5773),s=n(9307),o=n(42),i=n.n(o),l=n(6414),a=n(454),u=n(3455),c=n(5736),d=n(3112),m=n(6622),p=n(3295),f=n(2469),v=n(5598),g=n(6515),__=c.__;
+/* harmony import */
+/* harmony default export */const h=(0,d/* .withColorSettings */.ku)({backgroundColor:{style:"background-color",label:__("Background color","sensei-lms")},textColor:{style:"color",label:__("Text color","sensei-lms")}})((function(e){var t=e.className,n=e.attributes,o=n.title,c=n.id,d=n.fontSize,h=n.draft,b=n.preview,y=n.placeholder,E=e.backgroundColor,C=e.textColor,k=e.setAttributes,S=(0,m/* .useKeydownInserter */.V)(e).onKeyDown,w=(0,g/* .useLessonPreviewStatus */.z)(e),Z="";
+/**
+   * Update lesson title.
+   *
+   * @param {string} value Lesson title.
+   */!c&&o.length?Z=__("Unsaved","sensei-lms"):c&&h&&(Z=__("Draft","sensei-lms"));var x={className:i()(t,null==E?void 0:E.class,null==C?void 0:C.class,{completed:w.previewStatus===f/* .Status.COMPLETED */.q.COMPLETED,"is-auto-draft":!c&&!o}),style:{backgroundColor:null==E?void 0:E.color,color:null==C?void 0:C.color}};return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(v/* ["default"] */.Z,(0,r/* ["default"] */.Z)({},e,w)),(0,s.createElement)("div",x,(0,s.createElement)(l/* ["default"] */.Z,{icon:a/* ["default"] */.Z,className:"wp-block-sensei-lms-course-outline-lesson__status"}),(0,s.createElement)(p/* ["default"] */.Z,{className:"wp-block-sensei-lms-course-outline-lesson__input",placeholder:y||__("Add Lesson","sensei-lms"),value:o,onChange:function(e){k({title:e})},onKeyDown:S,style:{fontSize:d}}),b&&(0,s.createElement)("span",{className:"wp-block-sensei-lms-course-outline-lesson__badge"},__("Preview","sensei-lms")),Z&&(0,s.createElement)("div",{className:"wp-block-sensei-lms-course-outline-lesson__post-status"},Z),(0,s.createElement)(l/* ["default"] */.Z,{icon:u/* ["default"] */.Z,className:"wp-block-sensei-lms-course-outline-lesson__chevron"})))}));
+/***/},
+/***/5598:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(5609),i=n(9818),l=n(5736),a=n(2469),u=n(3500),__=l.__;
+/* harmony import */
+/* harmony default export */const c=function(e){var t=e.previewStatus,n=e.setPreviewStatus,l=e.setAttributes,c=e.attributes,d=c.id,m=c.fontSize,p=c.title,f=(0,i.useSelect)((function(e){return e("core/block-editor").getSettings()})).fontSizes,v=(0,r.createElement)(o.ExternalLink,{href:"post.php?post=".concat(d,"&action=edit"),target:"lesson",className:"wp-block-sensei-lms-course-outline-lesson__edit"},__("Edit lesson","sensei-lms"));return(0,r.createElement)(r.Fragment,null,(0,r.createElement)(s.InspectorControls,null,d&&(0,r.createElement)(o.PanelBody,{title:__("Lesson","sensei-lms")},(0,r.createElement)("h2",null,v),(0,r.createElement)("p",null,__("Edit details such as lesson content, prerequisite, quiz settings and more.","sensei-lms"))),(0,r.createElement)(o.PanelBody,{title:__("Typography","sensei-lms")},(0,r.createElement)(o.FontSizePicker,{fontSizes:f,value:m,onChange:function(e){l({fontSize:e})}})),(0,r.createElement)(o.PanelBody,{title:__("Status","sensei-lms"),initialOpen:!1},(0,r.createElement)(u/* .StatusControl */.I,{status:t,setStatus:n,options:[a/* .Status.NOT_STARTED */.q.NOT_STARTED,a/* .Status.COMPLETED */.q.COMPLETED],disabled:!p}))),(0,r.createElement)(s.BlockControls,null,d&&(0,r.createElement)(o.Toolbar,{className:"components-button"},v)))};
+/***/},
+/***/6515:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */z:()=>/* binding */i
+/* harmony export */});
+/* harmony import */var r=n(9818),s=n(9307),o=n(2993),i=function(e){var t=e.attributes,n=t.isExample,i=t.title,l=e.clientId,a=(0,r.useDispatch)(o/* .COURSE_STATUS_STORE */.o),u=a.setLessonStatus,c=a.trackLesson,d=a.ignoreLesson;// If the lesson has a title and it isn't an example, add it to the tracked lessons in the status store.
+return(0,s.useEffect)((function(){n||(i.length>0?c(l):d(l))}),[l,c,d,i,n]),{setPreviewStatus:function(e){return u(l,e)},previewStatus:(0,r.useSelect)((function(e){return e(o/* .COURSE_STATUS_STORE */.o).getLessonStatus(l)}),[l])}};
+/* harmony import */}
+/***/,
+/***/86:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(180),a=n(6811),u=n(5077),c=n(6057),__=i.__;
+/* harmony import */
+/* harmony default export */const d=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({title:__("Module","sensei-lms"),description:__("Group related lessons together.","sensei-lms"),keywords:[__("Module","sensei-lms"),__("Course Module","sensei-lms"),__("Group","sensei-lms"),__("Lessons","sensei-lms")]},c),{},{icon:l/* ["default"] */.Z,example:{attributes:{title:__("Module","sensei-lms"),description:__("About Module","sensei-lms")},innerBlocks:[{name:"sensei-lms/course-outline-lesson",attributes:{title:__("Lesson","sensei-lms"),id:1,draft:!1,isExample:!0}}]},styles:[{name:"default",label:__("Filled","sensei-lms"),isDefault:!0},{name:"minimal",label:__("Minimal","sensei-lms")}],transforms:u/* ["default"] */.Z,edit:a/* ["default"] */.Z,save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)}});
+/***/},
+/***/6811:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>C
+/* harmony export */});
+/* unused harmony export ModuleEdit */
+/* harmony import */var r=n(6886),s=n(9307),o=n(42),i=n.n(o),l=n(8286),a=n(2175),u=n(6414),c=n(2585),d=n(4333),m=n(9818),p=n(5736),f=n(3112),v=n(5245),g=n(1836),h=n(3295),b=n(6774),y=n(6081),__=p.__,E=["sensei-lms/course-outline-lesson"];
+/* harmony import */
+/* harmony default export */const C=(0,d.compose)((0,f/* .withColorSettings */.ku)({mainColor:{style:"background-color",label:__("Main color","sensei-lms")},textColor:{style:"color",label:__("Text color","sensei-lms")},borderColor:{style:"border-color",label:__("Border color","sensei-lms"),onChange:function(e){var t=e.clientId,n=e.colorValue;return(0,m.dispatch)("core/block-editor").updateBlockAttributes(t,{borderColorValue:n})}}}),(0,f/* .withDefaultColor */.vD)({defaultMainColor:{style:"background-color",probeKey:"primaryColor"},defaultTextColor:{style:"color",probeKey:"primaryContrastColor"},defaultBorderColor:{style:"border-color",probeKey:"primaryColor"}}))((function(e){var t,n,o=e.clientId,d=e.className,m=e.attributes,p=m.title,f=m.description,C=m.borderedSelected,k=m.borderColorValue,S=m.teacher,w=e.mainColor,Z=e.defaultMainColor,x=e.textColor,_=e.defaultTextColor,T=e.defaultBorderColor,O=e.setAttributes,B=(0,s.useContext)(g/* .OutlineAttributesContext */.G)||{outlineAttributes:{},outlineClassName:""},N=B.outlineAttributes,P=N.collapsibleModules,R=N.moduleBorder,L=B.outlineClassName;(0,v/* .useAutoInserter */.l)({name:"sensei-lms/course-outline-lesson",isEmptyBlock:function(e){return!e.title}},e);
+/**
+   * Handle update name.
+   *
+   * @param {string} value Name value.
+   */
+var A,I=(0,s.useState)(!0),D=(0,r/* ["default"] */.Z)(I,2),M=D[0],j=D[1],U=/is-style-(\w+)/,V=(null===(t=d.match(U))||void 0===t?void 0:t[1])||(null===(n=L.match(U))||void 0===n?void 0:n[1]),H={default:{background:(null==w?void 0:w.color)||(null==Z?void 0:Z.color),color:(null==x?void 0:x.color)||(null==_?void 0:_.color)},minimal:{color:null==x?void 0:x.color}}[V];
+/**
+   * Handle update description.
+   *
+   * @param {string} value Description value.
+   */"minimal"===V&&(A=(0,s.createElement)("div",{className:"wp-block-sensei-lms-course-outline-module__name__minimal-border",style:{background:(null==w?void 0:w.color)||(null==Z?void 0:Z.color)}}));var F=void 0!==C?C:R;return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(y/* ["default"] */.Z,{bordered:F,setBordered:function(e){return O({borderedSelected:e})}}),(0,s.createElement)("section",{className:i()(d,{"wp-block-sensei-lms-course-outline-module-bordered":F}),style:{borderColor:k||(null==T?void 0:T.color)}},(0,s.createElement)("header",{className:"wp-block-sensei-lms-course-outline-module__header",style:H},(0,s.createElement)("h2",{className:"wp-block-sensei-lms-course-outline-module__title"},(0,s.createElement)(h/* ["default"] */.Z,{className:"wp-block-sensei-lms-course-outline-module__title-input",placeholder:__("Module name","sensei-lms"),value:p,onChange:function(e){O({title:e})}})),S&&(0,s.createElement)("span",{className:"teacher-name"},"(",S,")"),(0,s.createElement)(b/* .ModuleStatus */.n,{clientId:o}),P&&(0,s.createElement)("button",{type:"button",className:i()("wp-block-sensei-lms-course-outline__arrow",{collapsed:!M}),onClick:function(){return j(!M)}},(0,s.createElement)(u/* ["default"] */.Z,{icon:c/* ["default"] */.Z}),(0,s.createElement)("span",{className:"screen-reader-text"},__("Toggle module content","sensei-lms")))),A,(0,s.createElement)(l/* ["default"] */.Z,{className:"wp-block-sensei-lms-collapsible",duration:500,animateOpacity:!0,height:!P||M?"auto":0},(0,s.createElement)("div",{className:"wp-block-sensei-lms-course-outline-module__description"},(0,s.createElement)(a.RichText,{className:"wp-block-sensei-lms-course-outline-module__description-input",placeholder:__("Module description","sensei-lms"),value:f,onChange:function(e){O({description:e})}})),(0,s.createElement)("h3",{className:"wp-block-sensei-lms-course-outline-module__lessons-title"},__("Lessons","sensei-lms")),(0,s.createElement)(a.InnerBlocks,{allowedBlocks:E,templateInsertUpdatesSelection:!1,renderAppender:function(){return null}}))))}));
+/***/},
+/***/6081:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(5609),i=n(5736),__=i.__;
+/* harmony import */
+/* harmony default export */const l=function(e){var t=e.bordered,n=e.setBordered;return(0,r.createElement)(s.InspectorControls,null,(0,r.createElement)(o.PanelBody,{title:__("Border settings","sensei-lms"),initialOpen:!1},(0,r.createElement)(o.ToggleControl,{checked:t,onChange:n,label:__("Border","sensei-lms"),help:__("Toggle to enable the border.","sensei-lms")})))};
+/***/},
+/***/6774:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */n:()=>/* binding */p
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(42),o=n.n(s),i=n(9818),l=n(2175),a=n(5609),u=n(5736),c=n(2469),d=n(3500),m=n(2993),__=u.__,p=function(e){var t=e.clientId,n=(0,i.useDispatch)(m/* .COURSE_STATUS_STORE */.o).setModuleStatus,s=(0,i.useSelect)((function(e){return e(m/* .COURSE_STATUS_STORE */.o).getModuleLessonCounts(t)}),[t]),u=c/* .Status.IN_PROGRESS */.q.IN_PROGRESS;0===s.completedLessonsCount?u=c/* .Status.NOT_STARTED */.q.NOT_STARTED:s.totalLessonsCount===s.completedLessonsCount&&s.totalLessonsCount>0&&(u=c/* .Status.COMPLETED */.q.COMPLETED);var p=s.totalLessonsCount>1?[c/* .Status.NOT_STARTED */.q.NOT_STARTED,c/* .Status.IN_PROGRESS */.q.IN_PROGRESS,c/* .Status.COMPLETED */.q.COMPLETED]:[c/* .Status.NOT_STARTED */.q.NOT_STARTED,c/* .Status.COMPLETED */.q.COMPLETED],f=c/* .Status.NOT_STARTED */.q.NOT_STARTED!==u,v=(0,r.createElement)("div",{className:o()("wp-block-sensei-lms-course-outline-module__progress-indicator",u)},(0,r.createElement)("span",{className:"wp-block-sensei-lms-course-outline-module__progress-indicator__text"},d/* .StatusLabels */.C[u]));return(0,r.createElement)(r.Fragment,null,f&&v,(0,r.createElement)(l.InspectorControls,null,(0,r.createElement)(a.PanelBody,{title:__("Status","sensei-lms"),initialOpen:!1},(0,r.createElement)(d/* .StatusControl */.I,{options:p,status:u,disabled:0===s.totalLessonsCount,setStatus:function(e){n(t,e)}}))))};
+/* harmony import */}
+/***/,
+/***/5077:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>s
+/* harmony export */});
+/* harmony import */var r=n(4981);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+/**
+ * Module block transform.
+ */
+/* harmony default export */const s={from:[{type:"block",blocks:["sensei-lms/course-outline-lesson"],isMultiBlock:!0,
+/**
+     * Group selected lesson blocks into a module.
+     *
+     * @param {Object[]} blocks Attributes of the selected blocks.
+     */
+transform:function(e){var t=e.map((function(e){return(0,r.createBlock)("sensei-lms/course-outline-lesson",e)}));return(0,r.createBlock)("sensei-lms/course-outline-module",{},t)}}]};
+/***/},
+/***/6173:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(5736),o=n(9375),i=n(9200),l=n(1836),a=n(553),__=s.__;
+/* harmony import */
+/* harmony default export */const u=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({title:__("Course Outline","sensei-lms"),description:__("Manage your Sensei LMS course outline.","sensei-lms"),keywords:[__("Course","sensei-lms"),__("Lessons","sensei-lms"),__("Modules","sensei-lms"),__("Outline","sensei-lms"),__("Structure","sensei-lms")],styles:[{name:"default",label:__("Filled","sensei-lms"),isDefault:!0},{name:"minimal",label:__("Minimal","sensei-lms")}],example:{attributes:{isPreview:!0},innerBlocks:[{name:"sensei-lms/course-outline-module",attributes:{title:__("Module","sensei-lms"),description:__("About Module","sensei-lms")},innerBlocks:[{name:"sensei-lms/course-outline-lesson",attributes:{title:__("Lesson","sensei-lms"),id:1,draft:!1,isExample:!0}}]},{name:"sensei-lms/course-outline-lesson",attributes:{title:__("First Lesson","sensei-lms"),id:2,draft:!1,isExample:!0}},{name:"sensei-lms/course-outline-lesson",attributes:{title:__("Second Lesson","sensei-lms"),id:3,draft:!1,isExample:!0}}]}},i),{},{icon:o/* ["default"] */.Z,edit:l/* ["default"] */.Z,save:a/* ["default"] */.Z});
+/***/},
+/***/1333:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(4981),o=n(9818),i=n(5736),l=n(3362),a=n(180),u=n(2239),__=i.__;
+/* harmony import */
+/* harmony default export */const c=function(e){var t=e.clientId,n=(0,o.useDispatch)("core/block-editor").insertBlock,i=(0,o.useSelect)((function(e){return e("core/block-editor").getBlockCount(t)}),[]),c=[{title:__("Lesson","sensei-lms"),icon:l/* ["default"] */.Z,onClick:function(){return n((0,s.createBlock)("sensei-lms/course-outline-lesson",{placeholder:__("Lesson name","sensei-lms")}),i,t,!0)}},{title:__("Module","sensei-lms"),icon:a/* ["default"] */.Z,onClick:function(){return n((0,s.createBlock)("sensei-lms/course-outline-module"),i,t,!0)}}],d=__("Add Module or Lesson","sensei-lms");return(0,r.createElement)(u/* ["default"] */.Z,{controls:c,text:d,label:d})};
+/***/},
+/***/1836:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */G:()=>/* binding */v
+/* harmony export */,Z:()=>g
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(4333),i=n(9818),l=n(9650),a=n(9384),u=n(3112),c=n(1884),d=n(1849),m=n(1529),p=n(1333),f=["sensei-lms/course-outline-module","sensei-lms/course-outline-lesson"],v=(0,r.createContext)();
+/* harmony import */
+/* harmony default export */const g=(0,o.compose)((0,u/* .withDefaultBlockStyle */.WJ)())((function(e){var t=e.clientId,n=e.className,o=e.attributes,u=e.setAttributes,g=(0,i.useDispatch)(d/* .COURSE_STORE */.v).loadStructure;(0,r.useEffect)((function(){o.isPreview||g()}),[o.isPreview,g]);var h=(0,m/* .useBlocksCreator */.g)(t).setBlocks,b=(0,i.useSelect)((function(e){return!e("core/block-editor").getBlocks(t).length}),[t]);(0,c/* .useCourseLessonsStatusSync */.X)(t,o.isPreview);var y=(0,r.useCallback)((function(){return(0,r.createElement)(p/* ["default"] */.Z,{clientId:t})}),[t]);return b?(0,r.createElement)(l/* ["default"] */.Z,{addBlock:function(e){return h([{type:e}],!0)}}):(0,r.createElement)(v.Provider,{value:{outlineAttributes:o,outlineSetAttributes:u,outlineClassName:n}},(0,r.createElement)(a/* ["default"] */.Z,e),(0,r.createElement)("section",{className:n},(0,r.createElement)(s.InnerBlocks,{allowedBlocks:f,renderAppender:y})))}));
+/***/},
+/***/9650:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(5609),i=n(5736),l=n(6173),__=i.__;
+/* harmony import */
+/* harmony default export */const a=function(e){var t=e.addBlock;return(0,r.createElement)(o.Placeholder,{className:"wp-block-sensei-lms-course-outline__placeholder",label:__("Course Outline","sensei-lms"),icon:(0,r.createElement)(s.BlockIcon,{icon:l/* ["default"].icon */.Z.icon,showColors:!0}),instructions:__("Build and display a course outline. A course is made up of modules (optional) and lessons. You can use modules to group related lessons together.","sensei-lms")},(0,r.createElement)(o.Button,{isDefault:!0,onClick:function(){return t("module")},className:"is-large"},__("Create a module","sensei-lms")),(0,r.createElement)(o.Button,{isDefault:!0,onClick:function(){return t("lesson")},className:"is-large"},__("Create a lesson","sensei-lms")))};
+/***/},
+/***/553:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175);
+/* harmony import */
+/* harmony default export */const o=function(){return(0,r.createElement)(s.InnerBlocks.Content,null)};
+/***/},
+/***/9384:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5736),o=n(2175),i=n(5609),l=n(799),__=s.__;
+/* harmony import */
+/* harmony default export */const a=function(e){var t=e.attributes,n=e.setAttributes,s=(0,l/* .useSharedModuleStyles */.j)(e),a=s.moduleBorder,u=s.setModuleBorder;return(0,r.createElement)(o.InspectorControls,null,(0,r.createElement)(i.PanelBody,{title:__("Modules","sensei-lms"),initialOpen:!1},(0,r.createElement)(i.ToggleControl,{checked:t.collapsibleModules,onChange:function(e){return n({collapsibleModules:e})},label:__("Collapsible modules","sensei-lms"),help:__("Modules can be collapsed or expanded.","sensei-lms")}),(0,r.createElement)(i.ToggleControl,{checked:a,onChange:u,label:__("Border","sensei-lms"),help:__("Toggle the border for all modules.","sensei-lms")})))};
+/***/},
+/***/799:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */j:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(9818),s=n(9307),o=n(7260),i=n(9973),l=function(e){var t=e.clientId,n=e.className,l=e.isPreview,a=e.attributes.moduleBorder,u=e.setAttributes,c=(0,s.useRef)(null),d=(0,r.useSelect)((function(e){return e("core/blocks").getBlockStyles("sensei-lms/course-outline")}),[]),m=(0,r.useDispatch)("core/block-editor").updateBlockAttributes,p=(0,o/* .getActiveStyleClass */.h)(d,n);(0,s.useEffect)((function(){if(!l&&p&&c.current!==p){if(!c.current)return void(c.current=p);c.current=p,(0,i/* .getCourseInnerBlocks */.tf)(t,"sensei-lms/course-outline-module").forEach((function(e){return(0,o/* .applyStyleClass */.z)(e.clientId,p)}))}}),[t,l,p,c]);return{moduleBorder:a,setModuleBorder:function(e){(0,i/* .getCourseInnerBlocks */.tf)(t,"sensei-lms/course-outline-module").forEach((function(t){m(t.clientId,{borderedSelected:e})})),u({moduleBorder:e})}}};
+/* harmony import */}
+/***/,
+/***/2469:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */q:()=>/* binding */r
+/* harmony export */});
+/**
+ * An enum of Status constants.
+ */
+var r={NOT_STARTED:"not-started",IN_PROGRESS:"in-progress",COMPLETED:"completed"};
+/***/},
+/***/3500:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */C:()=>/* binding */m
+/* harmony export */,I:()=>/* binding */p
+/* harmony export */});
+/* harmony import */var r,s=n(5773),o=n(3782),i=n(4649),l=n(9307),a=n(5609),u=n(5736),c=n(2469),d=["options","status","setStatus","disabled"],__=u.__,m=(r={},(0,i/* ["default"] */.Z)(r,c/* .Status.NOT_STARTED */.q.NOT_STARTED,__("Not Started","sensei-lms")),(0,i/* ["default"] */.Z)(r,c/* .Status.IN_PROGRESS */.q.IN_PROGRESS,__("In Progress","sensei-lms")),(0,i/* ["default"] */.Z)(r,c/* .Status.COMPLETED */.q.COMPLETED,__("Completed","sensei-lms")),r),p=function(e){var t=e.options,n=void 0===t?[c/* .Status.IN_PROGRESS */.q.IN_PROGRESS,c/* .Status.COMPLETED */.q.COMPLETED]:t,r=e.status,i=e.setStatus,u=e.disabled,p=(0,o/* ["default"] */.Z)(e,d),f=n.map((function(e){return{label:m[e],value:e}})),v=(0,l.createElement)(a.RadioControl,(0,s/* ["default"] */.Z)({className:"wp-block-sensei-lms-course-outline-status-control",help:__("Preview a status. The actual status that the student sees is determined by their progress in the course.","sensei-lms")},p,{options:f,selected:r,onChange:function(e){return i(e)}}));return u&&(v=(0,l.createElement)(a.Disabled,null,v)),v};
+/* harmony import */}
+/***/,
+/***/2993:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */o:()=>/* binding */m
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(228),o=n(9818),i=n(2469),l=n(3418),a=n(832),u={
+/**
+   * Sets thecreateReducerFromActionMap status of a lesson.
+   *
+   * @param {string} lessonId The lesson id.
+   * @param {string} status   The lesson status.
+   *
+   * @return {Object} The setLessonStatus action.
+   */
+setLessonStatus:function(e,t){return{type:"SET_LESSON_STATUS",lessonId:e,status:t}},
+/**
+   * Sets the status of a module by updating the status of its lessons.
+   *
+   * @param {string} moduleId The module block id.
+   * @param {string} status   The module status.
+   *
+   * @return {Object} Yields the lesson update actions.
+   */
+setModuleStatus:regeneratorRuntime.mark((function e(t,n){var r,s,o;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,(0,l.select)(m,"getTrackedLessons");case 2:return r=e.sent,e.next=5,(0,l.select)("core/block-editor","getClientIdsOfDescendants",[t]);case 5:if(s=e.sent,0!==(o=s.filter((function(e){return r.includes(e)}))).length){e.next=9;break}return e.abrupt("return");case 9:if(i/* .Status.COMPLETED */.q.COMPLETED!==n&&i/* .Status.NOT_STARTED */.q.NOT_STARTED!==n){e.next=13;break}return e.delegateYield(o.map((function(e){return u.setLessonStatus(e,n)})),"t0",11);case 11:e.next=15;break;case 13:return e.delegateYield(o.slice(1).map((function(e){return u.setLessonStatus(e,i/* .Status.NOT_STARTED */.q.NOT_STARTED)})),"t1",14);case 14:return e.abrupt("return",u.setLessonStatus(o[0],i/* .Status.COMPLETED */.q.COMPLETED));case 15:case"end":return e.stop()}}),e)})),
+/**
+   * Creates the action to update state after a possible removal of a lesson.
+   *
+   * @param {string[]} descendantIds The ids of all outline block descendants.
+   *
+   * @return {Object} The action.
+   */
+stopTrackingRemovedLessons:function(e){return{type:"REMOVE_LESSONS",descendantIds:e}},
+/**
+   * Creates the action which marks a lesson as tracked by the store.
+   *
+   * @param {string} lessonId The lesson id.
+   *
+   * @return {Object} The action.
+   */
+trackLesson:function(e){return{type:"TRACK_LESSON",lessonId:e}},
+/**
+   * Creates the action which marks a lesson as not tracked by the store.
+   *
+   * @param {string} lessonId The lesson id.
+   *
+   * @return {Object} The action.
+   */
+ignoreLesson:function(e){return{type:"IGNORE_LESSON",lessonId:e}}},c={
+/**
+   * Get all the lessons that are tracked by the store.
+   *
+   * @param {Object} state                The state.
+   * @param {Array}  state.trackedLessons The tracked lessons.
+   *
+   * @return {Object} An object with the total and completed lesson counts.
+   */
+getTrackedLessons:function(e){return e.trackedLessons},
+/**
+   * Get the lesson counts.
+   *
+   * @param {Object} state                  The state.
+   * @param {Array}  state.trackedLessons   The ids of all the lessons.
+   * @param {Array}  state.completedLessons The ids of the completed lessons.
+   *
+   * @return {Object} An object with the total and completed lesson counts.
+   */
+getLessonCounts:function(e){var t=e.trackedLessons,n=e.completedLessons;return{totalLessonsCount:t.length,completedLessonsCount:n.length}},
+/**
+   * Gets the lesson status.
+   *
+   * @param {Object} state                  The state.
+   * @param {Array}  state.completedLessons The ids of the completed lessons.
+   * @param {string} lessonId               The lesson id.
+   *
+   * @return {string} The lesson status.
+   */
+getLessonStatus:function(e,t){return e.completedLessons.includes(t)?i/* .Status.COMPLETED */.q.COMPLETED:i/* .Status.NOT_STARTED */.q.NOT_STARTED},
+/**
+   * Returns the number of total and completed lessons of a module.
+   *
+   * @param {Object} state                  The state.
+   * @param {Array}  state.completedLessons The ids of the completed lessons.
+   * @param {Array}  state.trackedLessons   The ids of  all the lessons.
+   * @param {string} moduleId               The module id.
+   *
+   * @return {Object} The module lesson counts.
+   */
+getModuleLessonCounts:function(e,t){var n=e.completedLessons,r=e.trackedLessons,s=(0,o.select)("core/block-editor").getClientIdsOfDescendants([t]).filter((function(e){return r.includes(e)}));return{completedLessonsCount:s.filter((function(e){return n.includes(e)})).length,totalLessonsCount:s.length}}},d={
+/**
+   * Updates the lesson status.
+   *
+   * @param {Object} action          The action.
+   * @param {string} action.status   The lesson status.
+   * @param {string} action.lessonId The lesson id.
+   * @param {Object} state           The state.
+   *
+   * @return {Object} The new state.
+   */
+SET_LESSON_STATUS:function(e,t){var n=e.lessonId,o=e.status,l=(0,s/* ["default"] */.Z)(t.completedLessons);return i/* .Status.COMPLETED */.q.COMPLETED===o?l.includes(n)||l.push(n):l=l.filter((function(e){return e!==n})),(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{completedLessons:l})},
+/**
+   * Removes any lessons that don't exist in list of descendantIds.
+   *
+   * @param {Object} action               The action.
+   * @param {Array}  action.descendantIds The ids of all descendants of the outline block.
+   * @param {Object} state                The state.
+   *
+   * @return {Object} The new state.
+   */
+REMOVE_LESSONS:function(e,t){var n=e.descendantIds,s=t.completedLessons.filter((function(e){return n.includes(e)})),o=t.trackedLessons.filter((function(e){return n.includes(e)}));// Do not update the state if no lessons were removed.
+return o.length===t.trackedLessons.length&&s.length===t.completedLessons.length?t:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{completedLessons:s,trackedLessons:o})},
+/**
+   * Removes a lesson from the arrays of tracked lessons.
+   *
+   * @param {Object} action          The action.
+   * @param {Array}  action.lessonId The ids of the lesson to ignore.
+   * @param {Object} state           The state.
+   *
+   * @return {Object} The new state.
+   */
+IGNORE_LESSON:function(e,t){var n=e.lessonId,s=t.completedLessons.filter((function(e){return e!==n})),o=t.trackedLessons.filter((function(e){return e!==n}));return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{completedLessons:s,trackedLessons:o})},
+/**
+   * Adds a lesson from the arrays of tracked lessons.
+   *
+   * @param {Object} action          The action.
+   * @param {Array}  action.lessonId The ids of the lesson to track.
+   * @param {Object} state           The state.
+   *
+   * @return {Object} The new state.
+   */
+TRACK_LESSON:function(e,t){var n=e.lessonId,o=(0,s/* ["default"] */.Z)(t.trackedLessons);return o.includes(n)?t:(o.push(n),(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{trackedLessons:o}))},DEFAULT:function(e,t){return t}},m="sensei/course-status";
+/* harmony import */(0,o.registerStore)(m,{reducer:(0,a/* .createReducerFromActionMap */.lA)(d,{completedLessons:[],trackedLessons:[]}),actions:u,selectors:c,controls:l.controls})}
+/***/,
+/***/1884:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */X:()=>/* binding */i
+/* harmony export */});
+/* harmony import */var r=n(9818),s=n(9307),o=n(2993),i=function(e,t){var n=(0,r.useSelect)((function(t){return t("core/block-editor").getClientIdsOfDescendants([e])}),[e]),i=(0,r.useDispatch)(o/* .COURSE_STATUS_STORE */.o).stopTrackingRemovedLessons;(0,s.useEffect)((function(){t||i(n)}),[e,n,t,i])};
+/* harmony import */}
+/***/,
+/***/1529:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */g:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(2819),s=n(9818),o=n(9307),i=n(9973),l=function(e){var t=(0,s.useDispatch)("core/block-editor").replaceInnerBlocks,n=(0,s.useSelect)((function(e){return e("core/block-editor")}),[]).getBlocks,l=(0,o.useCallback)((function(s){var o=arguments.length>1&&void 0!==arguments[1]&&arguments[1],l=n(e),a=(0,i/* .extractStructure */.Vw)(l);(0,r.isEqual)(a,s)||t(e,(0,i/* .syncStructureToBlocks */.pu)(s,l),o)}),[e,t,n]);return{setBlocks:l}};
+/* harmony import */}
+/***/,
+/***/8872:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* unused harmony export CourseProgressEdit */
+/* harmony import */var r=n(9307),s=n(42),o=n.n(s),i=n(4333),l=n(5736),a=n(9818),u=n(3112),c=n(2993),d=n(2484),__=l.__;
+/* harmony import */
+/* harmony default export */const m=(0,i.compose)((0,u/* .withColorSettings */.ku)({barColor:{style:"background-color",label:__("Progress bar color","sensei-lms")},barBackgroundColor:{style:"background-color",label:__("Progress bar background color","sensei-lms")},textColor:{style:"color",label:__("Text color","sensei-lms")}}),(0,u/* .withDefaultColor */.vD)({defaultBarColor:{style:"background-color",probeKey:"primaryColor"}}))((function(e){var t=e.className,n=e.barColor,s=e.defaultBarColor,i=e.barBackgroundColor,l=e.textColor,u=e.attributes,m=u.height,p=u.borderRadius,f=e.setAttributes,v=(0,a.useSelect)((function(e){return e(c/* .COURSE_STATUS_STORE */.o).getLessonCounts()}),[]),g=v.totalLessonsCount,h=v.completedLessonsCount,b={className:o()(t,null==l?void 0:l.class),style:{color:null==l?void 0:l.color}},y={className:(null==n?void 0:n.class)||(null==s?void 0:s.className),style:{backgroundColor:(null==n?void 0:n.color)||(null==s?void 0:s.color),borderRadius:p}},E={className:o()("wp-block-sensei-lms-course-progress",null==i?void 0:i.class),style:{backgroundColor:null==i?void 0:i.color,height:m,borderRadius:p}};return(0,r.createElement)(r.Fragment,null,(0,r.createElement)(d/* ["default"] */.Z,{totalCount:g,completedCount:h,wrapperAttributes:b,barWrapperAttributes:E,barAttributes:y,countersClassName:"wp-block-sensei-lms-progress-heading",label:__("lessons","sensei-lms"),completedCountClassName:"wp-block-sensei-lms-progress-heading__completed"}),(0,r.createElement)(d/* .ProgressBarSettings */.y,{borderRadius:p,setBorderRadius:function(e){return f({borderRadius:e})},height:m,setHeight:function(e){return f({height:e})}}))}));
+/***/},
+/***/8015:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(5736),o=n(2070),i=n(8872),l=n(7695),__=s.__;
+/* harmony import */
+/* harmony default export */const a=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({title:__("Course Progress","sensei-lms"),description:__("Display the user's progress in the course. This block is only displayed if the user is enrolled.","sensei-lms"),keywords:[__("Progress","sensei-lms"),__("Bar","sensei-lms"),__("Course","sensei-lms")],icon:o/* ["default"] */.Z},l),{},{edit:i/* ["default"] */.Z});
+/***/},
+/***/3227:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(3782),s=n(9307),o=n(4981),i=n(8930),l=["name"];
+/* harmony import */
+/* harmony default export */const a=function(e){(0,o.updateCategory)("sensei-lms",{icon:(0,s.createElement)(i/* ["default"] */.Z,{width:"20",height:"20"})}),e.forEach((function(e){var t=e.name,n=(0,r/* ["default"] */.Z)(e,l);(0,o.registerBlockType)(t,n)}))};
+/***/},
+/***/9750:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(5736),s=n(6877),__=r.__;
+/* harmony import */
+/**
+ * Take course button block.
+ */
+/* harmony default export */const o=(0,s/* .createButtonBlockType */.M)({settings:{name:"sensei-lms/button-take-course",title:__("Course Signup","sensei-lms"),description:__("Enable a registered user to start the course. This block is only displayed if the user is not already enrolled.","sensei-lms"),keywords:[__("Start","sensei-lms"),__("Sign up","sensei-lms"),__("Signup","sensei-lms"),__("Enrol","sensei-lms"),__("Enroll","sensei-lms"),__("Course","sensei-lms"),__("Take course","sensei-lms")],attributes:{text:{default:__("Take Course","sensei-lms")}}}});
+/***/},
+/***/2207:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(5736),o=n(6877),__=s.__;
+/* harmony import */
+/**
+ * View results button block.
+ */
+/* harmony default export */const i=(0,o/* .createButtonBlockType */.M)({tagName:"a",settings:{name:"sensei-lms/button-view-results",description:__("Enable a student to view their course results.","sensei-lms"),title:__("View Results","sensei-lms"),attributes:{text:{default:__("View Results","sensei-lms")}},styles:[o/* .BlockStyles.Fill */.i.Fill,(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},o/* .BlockStyles.Outline */.i.Outline),{},{isDefault:!0}),o/* .BlockStyles.Link */.i.Link]}});
+/***/},
+/***/9359:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */o:()=>/* binding */u
+/* harmony export */});
+/* unused harmony export getProbeStyles */
+/* harmony import */var r=n(6886),s=n(2819),o=n(9307),i=n(9818),l=n(7227),a=window.getComputedStyle,u=function(){var e=(0,i.useSelect)((function(e){return e("core/editor").getEditorSettings().colors}),[]),t=(0,o.useState)({}),n=(0,r/* ["default"] */.Z)(t,2),a=n[0],u=n[1];return(0,o.useEffect)((function(){var t=c(),n={},o=(0,s.mapValues)((0,s.keyBy)(e,(function(e){return(0,l/* .hexToRGB */.$)(e.color)})),"slug");Object.entries(t).forEach((function(e){var t=(0,r/* ["default"] */.Z)(e,2),s=t[0],i=t[1],a=o[(0,l/* .hexToRGB */.$)(i)];a&&(n[s]={slug:a,color:i})})),u(n)}),[e]),a},c=(0,s.memoize)((function(){
+// Create temporary probe elements.
+var e=document.createElement("div");e.className="editor-styles-wrapper sensei-probe-element";var t=document.createElement("div");t.className="wp-block-button";var n=document.createElement("div");n.className="wp-block-button__link",n.textContent="Probe",// Set probe position outside the screen to be hidden.
+e.style.position="fixed",e.style.top="-100vh",// Add probe to the screen.
+t.appendChild(n),e.appendChild(t),document.body.appendChild(e);// Save styles.
+var r={primaryColor:a(n).backgroundColor,primaryContrastColor:a(n).color};// Remove probe.
+return document.body.removeChild(e),r}));
+/* harmony import */}
+/***/,
+/***/2484:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* reexport safe */r.Z
+/* harmony export */,y:()=>/* reexport safe */s.Z
+/* harmony export */});
+/* harmony import */var r=n(100),s=n(1833);
+/* harmony import */}
+/***/,
+/***/1833:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(5609),i=n(5736),__=i.__;
+/* harmony import */
+/* harmony default export */const l=function(e){var t=e.borderRadius,n=e.setBorderRadius,i=e.height,l=e.setHeight;return t=void 0===t?10:t,i=void 0===i?14:i,(0,r.createElement)(s.InspectorControls,null,(0,r.createElement)(o.PanelBody,{title:__("Progress bar settings","sensei-lms"),initialOpen:!1,className:"sensei-progress-bar-settings"},(0,r.createElement)(o.PanelRow,null,(0,r.createElement)(o.RangeControl,{label:__("Border radius","sensei-lms"),value:t,onChange:n,min:0,max:15,allowReset:!0,initialPosition:10})),(0,r.createElement)(o.PanelRow,null,(0,r.createElement)(o.RangeControl,{label:__("Height","sensei-lms"),value:i,onChange:l,min:1,max:25,allowReset:!0,initialPosition:14}))))};
+/***/},
+/***/100:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(189),o=n(9307),i=n(42),l=n.n(i),a=n(5736),__=a.__;
+/* harmony import */
+/* harmony default export */const u=function(e){var t=e.totalCount,n=e.completedCount,i=e.hidePercentage,u=e.wrapperAttributes,c=e.barWrapperAttributes,d=e.barAttributes,m=e.countersClassName,p=e.completedCountClassName,f=e.hideDefault,v=e.label,g=Math.round(n/t*100)||0,h=Math.max(f?0:3,g);return(0,o.createElement)("div",u,(0,o.createElement)("section",{className:l()("sensei-progress-bar__heading",m)},(0,o.createElement)("div",{className:l()("sensei-progress-bar__label",p)},(0,a.sprintf)(// translators: Placeholder %1$d is the completed progress count, %2$d is the total count and %3$s is the label for progress bar.
+__("%1$d of %2$d %3$s completed","sensei-lms"),n,t,v||""),!i&&" (".concat(g,"%)"))),(0,o.createElement)("div",(0,r/* ["default"] */.Z)({role:"progressbar","aria-valuenow":g,"aria-valuemin":"0","aria-valuemax":"100"},(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},c),{},{className:l()("sensei-progress-bar__bar",null==c?void 0:c.className)})),(0,o.createElement)("div",(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},d),{},{className:l()("sensei-progress-bar__progress",null==d?void 0:d.className),style:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},(null==d?void 0:d.style)&&d.style),{},{width:"".concat(h,"%")})}))))};
+/***/},
+/***/3112:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */ku:()=>/* binding */m
+/* harmony export */,WJ:()=>/* binding */f
+/* harmony export */,vD:()=>/* binding */v
+/* harmony export */});
+/* unused harmony export ColorSettings */
+/* harmony import */var r=n(228),s=n(6886),o=n(5773),i=n(189),l=n(9307),a=n(2819),u=n(2175),c=n(5736),d=n(9359),__=c.__,m=function(e){return function(t){var n=(0,a.mapValues)(e,(function(e){return e.style}));return(0,u.withColors)(n)((function(n){return(0,l.createElement)(l.Fragment,null,(0,l.createElement)(t,n),(0,l.createElement)(p,{colorSettings:e,props:n}))}))}},p=function(e){var t=e.colorSettings,n=e.props,r=Object.keys(t);return(0,l.createElement)(u.InspectorControls,null,(0,l.createElement)(u.PanelColorSettings,{title:__("Color settings","sensei-lms"),initialOpen:!1,colorSettings:r.map((function(e){return{value:n[e].color,label:t[e].label,onChange:function(r){n["set".concat((0,a.upperFirst)(e))](r),t[e].onChange&&t[e].onChange((0,i/* ["default"] */.Z)((0,i/* ["default"] */.Z)({},n),{},{colorValue:r}))}}}))},n.backgroundColor&&n.textColor&&(0,l.createElement)(u.ContrastChecker,{textColor:n.textColor.color,backgroundColor:n.backgroundColor.color,isLargeText:!1})))},f=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:"default";return function(t){return function(n){var r=n.className,s={};r&&r.includes("is-style-")||(r=s.className=[r,"is-style-".concat(e)].join(" "));var i=r.match(/is-style-(\w+)/);return i&&(s.blockStyle=i[1]),(0,l.createElement)(t,(0,o/* ["default"] */.Z)({},n,s))}}},v=function(e){return function(t){return function(n){var a=n.setAttributes,c=n.attributes,m=(0,d/* .useColorsByProbe */.o)(),p=(0,l.useState)({}),f=(0,s/* ["default"] */.Z)(p,2),v=f[0],g=f[1],h=Object.keys(e).map((function(e){return c[e]}));return(0,l.useEffect)((function(){var t={};Object.entries(e).forEach((function(e){var n=(0,s/* ["default"] */.Z)(e,2),r=n[0],o=n[1],l=o.style,d=o.probeKey,p=m[d]||{},f=p.slug;if(f&&(t[r]=(0,i/* ["default"] */.Z)((0,i/* ["default"] */.Z)({},p),{},{className:(0,u.getColorClassName)(l,f)})),c[r]!==f){var v={};v[r]=f,// Border color is not compatible with all themes as className, so the color value is needed.
+"border-color"===l&&(v["".concat(r,"Value")]=p.color),a(v)}})),g(t)}),[m,a].concat((0,r/* ["default"] */.Z)(h))),(0,l.createElement)(t,(0,o/* ["default"] */.Z)({},n,v))}}};
+/* harmony import */}
+/***/,
+/***/3295:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>r
+/* harmony export */});
+/**
+ * Internal dependencies
+ */
+/* harmony default export */const r=n(5436).Z;
+/***/},
+/***/5436:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(42),l=n.n(i),a=n(2175),u=n(9630),c=["onChange","onKeyDown","value","onEnter","onRemove"];
+/* harmony import */
+/* harmony default export */const d=(0,o.forwardRef)((function(e,t){var n=e.onChange,i=e.onKeyDown,d=e.value,m=e.onEnter,p=e.onRemove,f=(0,s/* ["default"] */.Z)(e,c);
+/**
+   * Handle change.
+   *
+   * @param {string} nextValue Change value.
+   */return(0,o.createElement)(a.PlainText,(0,r/* ["default"] */.Z)({ref:t,value:d,onChange:function(e){n(e.replace(/\n/g,""))},onKeyDown:function(e){switch(i&&i(e),e.keyCode){case u.ENTER:e.preventDefault(),m&&m(e);break;case u.BACKSPACE:!p||null!=d&&d.length||(e.preventDefault(),p())}}},f,{className:l()("sensei-lms-single-line-input",f.className)}))}));
+/***/},
+/***/5245:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */l:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(4981),s=n(9818),o=n(9307),i=n(2819),l=function(e,t){var n=e.name,l=e.attributes,a=void 0===l?{}:l,u=e.selectFirstBlock,c=void 0!==u&&u,d=e.isEmptyBlock,m=t.clientId,p=(0,s.useDispatch)("core/block-editor"),f=p.__unstableMarkNextChangeAsNotPersistent,v=void 0===f?i.noop:f,g=p.insertBlock,h=(0,s.useSelect)((function(e){return e("core/block-editor").getBlocks(m)})),b=0===h.length,y=(0,o.useCallback)((function(){var e=(0,r.createBlock)(n,a),t=b&&c;v(),g(e,void 0,m,t)}),[v,g,m,n,a,b,c]),E=h.length&&h[h.length-1],C=E&&d(E.attributes);(0,o.useEffect)((function(){C||y()}),[C,y])};
+/* harmony import */}
+/***/,
+/***/6622:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */V:()=>/* binding */i
+/* harmony export */});
+/* harmony import */var r=n(4981),s=n(9818),o=n(9630),i=function(e){var t=e.insertBlocksAfter,n=e.name,i=e.clientId,l=e.attributes.title,a=(0,s.useDispatch)("core/block-editor"),u=a.selectNextBlock,c=a.removeBlock;return{onKeyDown:function(e){switch(e.keyCode){case o.ENTER:a=(0,s.select)("core/block-editor"),!(d=a.getBlock(a.getNextBlockClientId()))||d.attributes.title?t([(0,r.createBlock)(n)]):u(i);break;case o.BACKSPACE:!function(e){0===l.length&&(e.preventDefault(),c(i))}(e)}var a,d}}};
+/* harmony import */}
+/***/,
+/***/2239:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(528);
+/* harmony import */
+/* harmony default export */const i=function(e){var t=e.controls,n=e.text,i=e.label;return(0,r.createElement)("div",{className:"sensei-lms-text-appender block-editor-default-block-appender"},(0,r.createElement)(s.DropdownMenu,{icon:o/* ["default"] */.Z,toggleProps:{className:"block-editor-inserter__toggle",onMouseDown:function(e){return e.preventDefault()}},label:i,controls:t,popoverProps:{position:"bottom center"},menuProps:{className:"sensei-lms-text-appender__menu"}}),(0,r.createElement)("p",{className:"sensei-lms-text-appender__placeholder","data-placeholder":n}))};
+/***/},
+/***/6400:
+/***/(e,t,n)=>{"use strict";
+/* unused harmony export preloadedDataUsedOnceMiddleware */
+/* harmony import */var r,s=n(6483),o=n(6989);
+/* harmony import */n.n(o)().use((r={},function(e,t){return"string"!=typeof e.path||"GET"!==e.method&&e.method||(r[e.path]?e.path=(0,s.addQueryArgs)(e.path,{__skip_preload:1}):r[e.path]=!0),t(e)}))}
+/***/,
+/***/832:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */lA:()=>/* binding */r
+/* harmony export */});
+/* unused harmony exports composeFetchAction, createStore */
+/* harmony import */n(9818);
+/* harmony import */var r=function(e,t){return function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:t,r=arguments.length>1?arguments[1]:void 0,s=e[r.type]||e.DEFAULT;return s(r,n)}}}
+/***/,
+/***/7227:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */$:()=>/* binding */r
+/* harmony export */});
+/**
+ * Converts css color hex to rgb.
+ *
+ * @param {string} h The hex color string.
+ *
+ * @return {string} The rgb value.
+ */
+var r=function(e){
+// Returns if it's not an hexadecimal.
+if(!e||null===e.match("#"))return e;var t=0,n=0,r=0,s=4===e.length?"#".concat(e[1]+e[1]+e[2]+e[2]+e[3]+e[3]):e;return 7===s.length&&(t=parseInt(s.substr(1,2),16)||0,n=parseInt(s.substr(3,2),16)||0,r=parseInt(s.substr(5,2),16)||0),"rgb(".concat(t,", ").concat(n,", ").concat(r,")")};
+/***/},
+/***/3728:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */x:()=>/* binding */c
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(3782),o=n(2819),i=n(3418),l=n(9818),a=n(832),u=(n(6400),["storeName","getEndpoint","saveError","fetchError","clearError","updateBlock","readBlock","setServerStructure"]);
+/* harmony import */
+/**
+ * External dependencies
+ */
+/**
+ * WordPress dependencies
+ */
+/**
+ * Internal dependencies
+ */
+/**
+ * Register structure store and subscribe to block editor save.
+ *
+ * @param {Object}   opts
+ * @param {string}   opts.storeName          Name of store.
+ * @param {Function} opts.getEndpoint        REST API endpoint.
+ * @param {Function} opts.saveError          Handler for displaying save errors.
+ * @param {Function} opts.fetchError         Handler for displaying fetch errors.
+ * @param {Function} opts.clearError         Handler for clearing errors.
+ * @param {Function} opts.updateBlock        Update block with given structure.
+ * @param {Function} opts.readBlock          Extract structure from block.
+ * @param {Function} opts.setServerStructure Set the server structure which is used to track differences.
+ */
+function c(e){var t,n,c,d=e.storeName,m=e.getEndpoint,p=e.saveError,f=e.fetchError,v=e.clearError,g=e.updateBlock,h=e.readBlock,b=e.setServerStructure,y=(0,s/* ["default"] */.Z)(e,u),E={
+/**
+     * Fetch structure data from REST API.
+     */
+loadStructure:regeneratorRuntime.mark((function e(){var t,n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.prev=0,e.delegateYield(m(),"t0",2);case 2:return t=e.t0,e.next=5,(0,i.apiFetch)({path:"/sensei-internal/v1/".concat(t),method:"GET"});case 5:return n=e.sent,e.next=8,E.setResult(n);case 8:e.next=14;break;case 10:return e.prev=10,e.t1=e.catch(0),e.next=14,null==f?void 0:f(e.t1);case 14:case"end":return e.stop()}}),e,null,[[0,10]])})),
+/**
+     * Persist editor's structure to the REST API.
+     */
+saveStructure:regeneratorRuntime.mark((function e(){var t,n,r;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,(0,l.select)(d).getEditorStructure();case 2:return t=e.sent,e.prev=3,e.delegateYield(m(),"t0",5);case 5:return n=e.t0,e.next=8,(0,i.apiFetch)({path:"/sensei-internal/v1/".concat(n),method:"POST",data:t});case 8:return r=e.sent,e.next=11,E.setResult(r);case 11:e.next=17;break;case 13:return e.prev=13,e.t1=e.catch(3),e.next=17,null==p?void 0:p(e.t1);case 17:case"end":return e.stop()}}),e,null,[[3,13]])})),
+/**
+     * Set fetched structure.
+     *
+     * @param {Array} serverStructure
+     */
+setResult:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,E.setServerStructure(t);case 2:return e.next=4,g(t);case 4:case"end":return e.stop()}}),e)})),
+/**
+     * Keep last fetched server state for comparison.
+     *
+     * @param {Array} serverStructure
+     */
+setServerStructure:function(e){return{type:"SET_SERVER_STRUCTURE",serverStructure:e}},
+/**
+     * Keep last editor state.
+     *
+     * @param {Array} editorStructure
+     */
+setEditorStructure:function(e){return{type:"SET_EDITOR_STRUCTURE",editorStructure:e}},
+/**
+     * Initiate saving the post.
+     */
+savePost:regeneratorRuntime.mark((function e(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SAVE_POST"};case 2:return e.next=4,(0,l.dispatch)("core/editor").savePost();case 4:case"end":return e.stop()}}),e)})),
+/**
+     * Post is saving. Save the structure too if it has changed.
+     */
+startPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"START_SAVE"};case 2:return t=h(),e.next=5,E.setEditorStructure(t);case 5:return e.next=7,null==v?void 0:v();case 7:if(t){e.next=9;break}return e.abrupt("return");case 9:if(!(0,l.select)(d).hasUnsavedEditorChanges()){e.next=11;break}return e.delegateYield(E.saveStructure(),"t0",11);case 11:return e.next=13,{type:"FINISH_SAVE"};case 13:case"end":return e.stop()}}),e)})),
+/**
+     * Finished saving post and structure.
+     * Check if either needs to be saved again due to new changes.
+     */
+finishPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"FINISH_POST_SAVE"};case 2:if(t=(0,l.select)(d),!(0,t.hasUnsavedServerUpdates)()){e.next=5;break}return e.delegateYield(E.savePost(),"t0",5);case 5:case"end":return e.stop()}}),e)})),
+/**
+     * Set linked block.
+     *
+     * @param {string} clientId Block ID.
+     */
+setBlock:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SET_BLOCK",clientId:t};case 2:case"end":return e.stop()}}),e)}))},C={SET_SERVER_STRUCTURE:function(e,t){var n=e.serverStructure,s=!t.editorStructure,i=b?b(n):n,l=!s&&!(0,o.isEqual)(i,t.editorStructure);return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{serverStructure:i,hasUnsavedServerUpdates:l,hasUnsavedEditorChanges:!1})},SET_EDITOR_STRUCTURE:function(e,t){var n=e.editorStructure,s=!(0,o.isEqual)(t.serverStructure,n);return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{editorStructure:n,hasUnsavedEditorChanges:s&&!!n})},START_SAVE:function(e,t){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{isSavingStructure:!0})},FINISH_SAVE:function(e,t){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{isSavingStructure:!1})},SAVE_POST:function(e,t){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{hasUnsavedServerUpdates:!1})},SET_BLOCK:function(e,t){var n=e.clientId;return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{clientId:n})},DEFAULT:function(e,t){return t}};return{unsubscribe:(t=!1,n=!1,c=!1,(0,l.subscribe)((function(){var e=(0,l.select)("core/editor"),r=(0,l.select)("core/edit-post");if(e&&r){var s=e.isSavingPost()&&!e.isAutosavingPost(),o=(0,l.select)(d).getIsSavingStructure();s&&(n=!0,c=!1),n&&!c&&(c=r.isSavingMetaBoxes()),t||s||!n||!c||r.isSavingMetaBoxes()?t&&!o&&(
+// Call finishPostSave when structure has finished saving.
+t=!1,(0,l.dispatch)(d).finishPostSave()):(
+// Start saving structure when post has finished saving.
+t=!0,n=!1,c=!1,(0,l.dispatch)(d).startPostSave())}}))),store:(0,l.registerStore)(d,{reducer:(0,a/* .createReducerFromActionMap */.lA)((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},C),null==y?void 0:y.reducers),{serverStructure:null,editorStructure:null,isSavingStructure:!1,hasUnsavedServerUpdates:!1,hasUnsavedEditorChanges:!1,clientId:null}),actions:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},E),null==y?void 0:y.actions),selectors:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},{hasUnsavedServerUpdates:function(e){return e.hasUnsavedServerUpdates},hasUnsavedEditorChanges:function(e){return e.hasUnsavedEditorChanges},getIsSavingStructure:function(e){return e.isSavingStructure},getServerStructure:function(e){return e.serverStructure},getEditorStructure:function(e){return e.editorStructure},getBlock:function(e){return e.clientId}}),null==y?void 0:y.selectors),controls:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},i.controls),null==y?void 0:y.controls)})}}
+/***/},
+/***/9196:
+/***/e=>{"use strict";e.exports=window.React}
+/***/,
+/***/2819:
+/***/e=>{"use strict";e.exports=window.lodash}
+/***/,
+/***/6989:
+/***/e=>{"use strict";e.exports=window.wp.apiFetch}
+/***/,
+/***/2175:
+/***/e=>{"use strict";e.exports=window.wp.blockEditor}
+/***/,
+/***/4981:
+/***/e=>{"use strict";e.exports=window.wp.blocks}
+/***/,
+/***/5609:
+/***/e=>{"use strict";e.exports=window.wp.components}
+/***/,
+/***/4333:
+/***/e=>{"use strict";e.exports=window.wp.compose}
+/***/,
+/***/9818:
+/***/e=>{"use strict";e.exports=window.wp.data}
+/***/,
+/***/3418:
+/***/e=>{"use strict";e.exports=window.wp.dataControls}
+/***/,
+/***/9307:
+/***/e=>{"use strict";e.exports=window.wp.element}
+/***/,
+/***/2694:
+/***/e=>{"use strict";e.exports=window.wp.hooks}
+/***/,
+/***/5736:
+/***/e=>{"use strict";e.exports=window.wp.i18n}
+/***/,
+/***/9630:
+/***/e=>{"use strict";e.exports=window.wp.keycodes}
+/***/,
+/***/444:
+/***/e=>{"use strict";e.exports=window.wp.primitives}
+/***/,
+/***/9512:
+/***/e=>{"use strict";e.exports=window.wp.tokenList}
+/***/,
+/***/6483:
+/***/e=>{"use strict";e.exports=window.wp.url}
+/***/,
+/***/1793:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/6470:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e){if(Array.isArray(e))return e}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/8138:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(1793);function s(e){if(Array.isArray(e))return(0,r/* ["default"] */.Z)(e)}
+/***/},
+/***/4649:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/5773:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(){return r=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},r.apply(this,arguments)}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/5181:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e){if("undefined"!=typeof Symbol&&null!=e[Symbol.iterator]||null!=e["@@iterator"])return Array.from(e)}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/2446:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,s,o=[],_n=!0,i=!1;try{for(n=n.call(e);!(_n=(r=n.next()).done)&&(o.push(r.value),!t||o.length!==t);_n=!0);}catch(e){i=!0,s=e}finally{try{_n||null==n.return||n.return()}finally{if(i)throw s}}return o}}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/3764:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/3314:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/189:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */o
+/* harmony export */});
+/* harmony import */var r=n(4649);function s(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}function o(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?s(Object(n),!0).forEach((function(t){(0,r/* ["default"] */.Z)(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):s(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}
+/***/},
+/***/3782:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(808);function s(e,t){if(null==e)return{};var n,s,o=(0,r/* ["default"] */.Z)(e,t);if(Object.getOwnPropertySymbols){var i=Object.getOwnPropertySymbols(e);for(s=0;s<i.length;s++)n=i[s],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(o[n]=e[n])}return o}
+/***/},
+/***/808:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t){if(null==e)return{};var n,r,s={},o=Object.keys(e);for(r=0;r<o.length;r++)n=o[r],t.indexOf(n)>=0||(s[n]=e[n]);return s}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/6886:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(6470),s=n(2446),o=n(4013),i=n(3764);
+/* harmony import */function l(e,t){return(0,r/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e,t)||(0,o/* ["default"] */.Z)(e,t)||(0,i/* ["default"] */.Z)()}
+/***/},
+/***/228:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(8138),s=n(5181),o=n(4013),i=n(3314);
+/* harmony import */function l(e){return(0,r/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e)||(0,o/* ["default"] */.Z)(e)||(0,i/* ["default"] */.Z)()}
+/***/},
+/***/4013:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(1793);function s(e,t){if(e){if("string"==typeof e)return(0,r/* ["default"] */.Z)(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?(0,r/* ["default"] */.Z)(e,t):void 0}}
+/***/},
+/***/7231:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/course-outline-lesson","category":"sensei-lms","parent":["sensei-lms/course-outline","sensei-lms/course-outline-module"],"attributes":{"id":{"type":"integer"},"title":{"type":"string","default":""},"draft":{"type":"boolean","default":true},"backgroundColor":{"type":"string"},"customBackgroundColor":{"type":"string"},"textColor":{"type":"string"},"customTextColor":{"type":"string"},"fontSize":{"type":"number"},"isExample":{"type":"boolean","default":false},"placeholder":{"type":"string"}},"supports":{"html":false,"customClassName":true}}')}
+/***/,
+/***/6057:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/course-outline-module","category":"sensei-lms","parent":["sensei-lms/course-outline"],"supports":{"html":false},"attributes":{"id":{"type":"integer"},"title":{"type":"string","default":""},"description":{"type":"string","default":""},"teacher":{"type":"string","default":""},"lastTitle":{"type":"string","default":""},"mainColor":{"type":"string"},"customMainColor":{"type":"string"},"defaultMainColor":{"type":"string"},"textColor":{"type":"string"},"customTextColor":{"type":"string"},"defaultTextColor":{"type":"string"},"borderColor":{"type":"string"},"customBorderColor":{"type":"string"},"borderColorValue":{"type":"string"},"defaultBorderColor":{"type":"string"},"defaultBorderColorValue":{"type":"string"},"className":{"type":"string"},"customClassName":{"type":"string"},"borderedSelected":{"type":"boolean"}}}')}
+/***/,
+/***/9200:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/course-outline","category":"sensei-lms","supports":{"html":false,"multiple":false,"defaultStylePicker":false},"attributes":{"id":{"type":"integer"},"collapsibleModules":{"type":"boolean","default":true},"moduleBorder":{"type":"boolean","default":true},"isPreview":{"type":"boolean"}}}')}
+/***/,
+/***/7695:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/course-progress","category":"sensei-lms","supports":{"html":false},"attributes":{"textColor":{"type":"string"},"customTextColor":{"type":"string","default":""},"barColor":{"type":"string"},"customBarColor":{"type":"string"},"defaultBarColor":{"type":"string"},"barBackgroundColor":{"type":"string"},"customBarBackgroundColor":{"type":"string"},"height":{"type":"integer"},"borderRadius":{"type":"integer"},"isPreview":{"type":"boolean","default":false}},"example":{"attributes":{"customBarBackgroundColor":"#999999","isPreview":true}}}')}
+/***/
+/******/},t={};
+/************************************************************************/
+/******/ // The module cache
+/******/
+/******/
+/******/ // The require function
+/******/function n(r){
+/******/ // Check if module is in cache
+/******/var s=t[r];
+/******/if(void 0!==s)
+/******/return s.exports;
+/******/
+/******/ // Create a new module (and put it into the cache)
+/******/var o=t[r]={
+/******/ // no module.id needed
+/******/ // no module.loaded needed
+/******/exports:{}
+/******/};
+/******/
+/******/ // Execute the module function
+/******/
+/******/
+/******/ // Return the exports of the module
+/******/return e[r](o,o.exports,n),o.exports;
+/******/}
+/******/
+/************************************************************************/
+/******/ /* webpack/runtime/compat get default export */
+/******/
+/******/ // getDefaultExport function for compatibility with non-harmony modules
+/******/n.n=e=>{
+/******/var t=e&&e.__esModule?
+/******/()=>e.default
+/******/:()=>e
+/******/;
+/******/return n.d(t,{a:t}),t;
+/******/},
+/******/ // define getter functions for harmony exports
+/******/n.d=(e,t)=>{
+/******/for(var r in t)
+/******/n.o(t,r)&&!n.o(e,r)&&
+/******/Object.defineProperty(e,r,{enumerable:!0,get:t[r]})
+/******/;
+/******/},
+/******/n.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t)
+/******/,
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(()=>{"use strict";
+/* harmony import */var e=n(3227),t=n(9750),r=n(8015),s=n(5913),o=n(2207);
+/* harmony import */
+/**
+ * Internal dependencies
+ */
+(0,e/* ["default"] */.Z)([s/* .OutlineBlock */.He,s/* .ModuleBlock */.iT,s/* .LessonBlock */.G$,t/* ["default"] */.Z,r/* ["default"] */.Z,o/* ["default"] */.Z])})()})
+/******/();

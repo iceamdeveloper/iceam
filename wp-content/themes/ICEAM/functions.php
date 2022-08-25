@@ -903,36 +903,46 @@ function show_cart_registration_prompt($woocommerce_before_cart){
 
 add_action( 'get_footer', 'add_disclaimer_to_single_lessons' );
 function add_disclaimer_to_single_lessons() {
-	$signature = get_user_meta(get_current_user_id(), 'wpcf-disclaimer-signature', true);
-	
+	$signature = get_user_meta(get_current_user_id(), 'wpcf-disclaimer-signature-updated', true);
+
 	if ( is_singular('lesson') && $signature == '' ) {
+
+		$name_to_sign = '';
+		if (get_user_meta(get_current_user_id(), "first_name", true) && get_user_meta(get_current_user_id(), "last_name", true)) {
+			$name_to_sign = get_user_meta(get_current_user_id(), "first_name", true) . " " . get_user_meta(get_current_user_id(), "last_name", true);
+		} else if (get_user_meta(get_current_user_id(), "billing_first_name", true) && get_user_meta(get_current_user_id(), "billing_last_name", true)) {
+			$name_to_sign = get_user_meta(get_current_user_id(), "billing_first_name", true) . " " . get_user_meta(get_current_user_id(), "billing_last_name", true);
+		} else {
+			$current_user = wp_get_current_user();
+			$name_to_sign = $current_user->user_login;
+		}
+
+		$aggreement_post = get_post(16487);
+		$aggreement_post_title = get_the_title(16487);
+		$content = $aggreement_post->post_content;
+		$content = apply_filters('the_content', $content);
+		$content = str_replace(']]>', ']]&gt;', $content);
 ?>
 
 <div class="modal fade" id="signature-form" tabindex="-1" role="dialog" aria-labelledby="signatureForm">
 	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
-				<h2 class="modal-title">Online Course Terms & Conditions</h2>
+				<h2 class="modal-title"><?php echo $aggreement_post_title ?> (required)</h2>
 			</div>
 			<div class="modal-body">
 				
-				<h3>Proprietary Information</h3>
-				
-				<p>Participant acknowledges that all information provided during this continuing education course training series is proprietary information and shall continue to be the exclusive property of Dr. Arnaud Versluys and ICEAM, LLC. </p>
-				
-				<p>Participant agrees not to disclose the proprietary information, directly or indirectly, under any circumstances or by any means, to any third person without the express written consent of Dr. Arnaud Versluys. </p>
-				
-				<p>Participant may use the proprietary information for their own personal practice, but shall not copy, transmit, teach, reproduce, summarize, quote, or make any commercial use whatsoever of proprietary information, with or without financial gain, without the express written consent of Dr. Arnaud Versluys.</p>
-				
-				<hr/>
-				
-				<p>To accept these terms please provide your digital signature by typing in your full name below. The name we have on file is: <strong><?php echo get_user_meta(get_current_user_id(), "billing_first_name", true) . " " . get_user_meta(get_current_user_id(), "billing_last_name", true); ?></strong>. (You will only need to do this once.)</p>
+				<?php echo $content ?>
+
+				<hr />
+
+				<p>To accept these terms please provide your digital signature by typing in your full name below. The name we have on file is: <strong><?php echo $name_to_sign; ?></strong>. (You will only need to do this once.)</p>
 				
 				<form>
 					<p>
 						<label for="signature">Full Name</label>
 						<input type="text" name="signature" id="signature" />
-						<input type="hidden" name="name-on-file" id="name-on-file" value="<?php echo get_user_meta(get_current_user_id(), "billing_first_name", true) . " " . get_user_meta(get_current_user_id(), "billing_last_name", true); ?>" />
+						<input type="hidden" name="name-on-file" id="name-on-file" value="<?php echo $name_to_sign; ?>" />
 					</p>
 					<p>
 						<input type="button" value="Cancel" class="btn-primary" id="signature-cancel" />
@@ -1008,7 +1018,7 @@ function disclaimer_signature_callback() {
 	global $wpdb; // this is how you get access to the database
 
 	if (isset($_POST['uid']) && isset($_POST['signature'])) {
-	    add_user_meta( $_POST['uid'], 'wpcf-disclaimer-signature', $_POST['signature']);
+	    add_user_meta( $_POST['uid'], 'wpcf-disclaimer-signature-updated', $_POST['signature']);
 	}
 	
 	echo "<h2>Thank you " . $_POST['signature'] . "!</h2>";

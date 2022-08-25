@@ -121,11 +121,8 @@ trait Widget_Shortcode {
 			'tribe-events-widget-shortcode',
 			'tribe-events-widget-shortcode-' . static::get_widget_slug(),
 		];
-		/**
-		 * @var Theme_Compatibility $theme_compatibility
-		 */
-		$theme_compatibility   = tribe( Theme_Compatibility::class );
-		$compatibility_classes = $theme_compatibility->get_container_classes();
+
+		$compatibility_classes = Theme_Compatibility::get_container_classes();
 		$container_classes     = array_merge( $compatibility_classes, $container_classes );
 
 
@@ -233,8 +230,8 @@ trait Widget_Shortcode {
 			/**
 			 * @var Tribe\Events\Pro\Views\V2\Shortcodes\Tribe_Events $shortcode.
 			 */
-			$shortcode = new Tribe_Events;
-			$widget_args        = $shortcode->get_database_arguments( $widget_id_raw );
+			$shortcode   = new Tribe_Events;
+			$widget_args = $shortcode->get_database_arguments( $widget_id_raw );
 		}
 
 		// Safety net.
@@ -247,6 +244,6 @@ trait Widget_Shortcode {
 		 */
 		$widget = new $widget_class;
 		$widget->setup( [], $widget_args );
-		$widget->toggle_hooks( true );
+		$widget->toggle_hooks( true, 'display' );
 	}
 }

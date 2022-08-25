@@ -2,7 +2,6 @@
 /**
  * WC_PB_Notices class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    6.3.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin notices handling.
  *
  * @class    WC_PB_Notices
- * @version  6.3.0
+ * @version  6.12.4
  */
 class WC_PB_Notices {
 
@@ -33,6 +32,12 @@ class WC_PB_Notices {
 	public static $notice_options = array();
 
 	/**
+	 * Determines if notice options should be updated in the DB.
+	 * @var boolean
+	 */
+	private static $should_update = false;
+
+	/**
 	 * Constructor.
 	 */
 	public static function init() {
@@ -41,8 +46,8 @@ class WC_PB_Notices {
 
 		self::$plugin_data = array(
 			'wc-pb-bulk-discounts' => array(
-				'install_path'   => 'product-bundles-bulk-discounts-for-woocommerce/product-bundles-bulk-discounts-for-woocommerce.php',
-				'install_check'  => 'WC_PB_Bulk_Discounts'
+				'install_path'  => 'product-bundles-bulk-discounts-for-woocommerce/product-bundles-bulk-discounts-for-woocommerce.php',
+				'install_check' => 'WC_PB_Bulk_Discounts'
 			)
 		);
 
@@ -72,26 +77,41 @@ class WC_PB_Notices {
 	 * @param  string  $notice_name
 	 * @param  string  $key
 	 * @param  mixed   $value
-	 * @return array
+	 * @return void
 	 */
 	public static function set_notice_option( $notice_name, $key, $value ) {
 
-		if ( ! isset( self::$notice_options ) ) {
+		if ( ! is_scalar( $value ) && ! is_array( $value ) ) {
+			return;
+		}
+
+		if ( ! is_string( $key ) ) {
+			$key = (string) $key;
+		}
+
+		if ( ! is_string( $notice_name ) ) {
+			$notice_name = (string) $notice_name;
+		}
+
+		if ( ! isset( self::$notice_options ) || ! is_array( self::$notice_options ) ) {
 			self::$notice_options = array();
 		}
 
-		if ( ! isset( self::$notice_options[ $notice_name ] ) ) {
+		if ( ! isset( self::$notice_options[ $notice_name ] ) || ! is_array( self::$notice_options[ $notice_name ] ) ) {
 			self::$notice_options[ $notice_name ] = array();
 		}
 
 		self::$notice_options[ $notice_name ][ $key ] = $value;
+		self::$should_update                          = true;
 	}
 
 	/**
 	 * Save notice options to the DB.
 	 */
 	public static function save_notice_options() {
-		update_option( 'wc_pb_notice_options', self::$notice_options );
+		if ( self::$should_update ) {
+			update_option( 'wc_pb_notice_options', self::$notice_options );
+		}
 	}
 
 	/**

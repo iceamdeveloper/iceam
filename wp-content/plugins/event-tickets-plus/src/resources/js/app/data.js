@@ -112,10 +112,8 @@ __webpack_require__.r(__webpack_exports__);
  */
 
 
-
 var dispatch = _moderntribe_common_store__WEBPACK_IMPORTED_MODULE_1__["store"].dispatch;
 var TICKETS_PLUS = _moderntribe_common_data__WEBPACK_IMPORTED_MODULE_0__["plugins"].constants.TICKETS_PLUS;
-
 dispatch(_moderntribe_common_data__WEBPACK_IMPORTED_MODULE_0__["plugins"].actions.addPlugin(TICKETS_PLUS));
 
 /***/ })

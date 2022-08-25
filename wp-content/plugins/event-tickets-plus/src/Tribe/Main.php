@@ -12,7 +12,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		/**
 		 * Current version of this plugin
 		 */
-		const VERSION = '5.2.4';
+		const VERSION = '5.5.1';
 
 		/**
 		 * Used to store the version history.
@@ -131,7 +131,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			add_action( 'init', [ $this, 'csv_import_support' ], 6 );
 			add_filter( 'tribe_support_registered_template_systems', [ $this, 'add_template_updates_check' ] );
 			add_action( 'tribe_events_tickets_attendees_event_details_top', [ $this, 'setup_attendance_totals' ], 5 );
-			add_filter( 'tribe_tickets_settings_tab_fields', [ $this, 'tribe_tickets_plus_settings' ] );
 
 			// Unique ticket identifiers
 			add_action( 'event_tickets_rsvp_attendee_created', [ Tribe__Tickets_Plus__Meta__Unique_ID::instance(), 'assign_unique_id' ], 10, 2 );
@@ -141,6 +140,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			add_action( 'admin_init', [ $this, 'run_updates' ], 10, 0 );
 
 			add_filter( 'tribe-events-save-options', [ $this, 'retro_attendee_page_option' ] );
+
+			// Force Woo cart functionality over REST API.
+			add_action( 'before_woocommerce_init', tribe_callback( Tribe__Tickets_Plus__Commerce__WooCommerce__Cart::class, 'force_woo_cart_for_rest_api' ) );
 		}
 
 		/**
@@ -176,6 +178,12 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			// Views v2 compatibility.
 			tribe_register_provider( Tribe\Tickets\Plus\Views\V2\Service_Provider::class );
+
+			// Attendee List Resend Tickets Handler.
+			tribe_register_provider( Tribe\Tickets\Plus\Service_Providers\Resend_Tickets_Handler::class );
+
+			// WooCommerce Enhanced Templates.
+			tribe_register_provider( Tribe\Tickets\Plus\Commerce\WooCommerce\Enhanced_Templates\Service_Provider::class );
 
 			$this->commerce_loader();
 			$this->bind_implementations();
@@ -229,6 +237,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 
 			// Blocks editor
 			tribe_register_provider( 'Tribe__Tickets_Plus__Editor__Provider' );
+
+			// Load integrations.
+			Tribe\Tickets\Plus\Integrations\Manager::instance()->load_integrations();
 		}
 
 		/**
@@ -461,36 +472,6 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			}
 
 			return apply_filters( 'tribe_events_tickets_template_' . $template, $file );
-		}
-
-		/**
-		 * Filter the tickets settings tab to include tickets plus settings
-		 *
-		 * @param $settings array Field settings for the tickets settings tab in the dashboard.
-		 *
-		 * @since 4.11.0
-		 */
-		public function tribe_tickets_plus_settings( $settings ) {
-			include $this->plugin_path . 'src/admin-views/ticket-settings.php';
-
-			return $settings;
-		}
-
-		/**
-		 * Add additional ticket settings to define slug and choose the template for the attendee info page.
-		 *
-		 * @deprecated 4.11.0
-		 *
-		 * @since 4.10.1
-		 *
-		 * @param array $tickets_fields List of ticket fields.
-		 *
-		 * @return array List of ticket fields with additional setting fields added.
-		 */
-		public function additional_ticket_settings( $tickets_fields ) {
-			_deprecated_function( __METHOD__, '4.11.0', 'tribe_tickets_plus_settings' );
-
-			$this->tribe_tickets_plus_settings( $tickets_fields );
 		}
 
 		/**

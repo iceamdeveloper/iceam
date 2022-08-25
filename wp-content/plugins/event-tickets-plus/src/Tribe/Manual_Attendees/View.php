@@ -184,8 +184,8 @@ class View {
 
 		$multiple_tickets = 1 < count( $tickets );
 
-		// If there's only one ticket, always default to the first ticket as selected.
-		if ( ! $multiple_tickets && $tickets ) {
+		// If $tickets is set to an array, and no $ticket_id is passed, set $ticket to the first iteration of $tickets.
+		if ( $tickets && ( ! $multiple_tickets || empty( $ticket_id ) ) ) {
 			$ticket = reset( $tickets );
 		}
 
@@ -243,16 +243,20 @@ class View {
 			$ticket_post = get_post( $ticket_id );
 		}
 
+		// Check the logic of the provider if email sending is allowed to occur.
+		$allow_resending_email = $provider->allow_resending_email( $ticket_post, $attendee );
+
 		/**
 		 * This filter allows the admin to control the re-send email option when an attendee's email is updated.
 		 *
+		 * @since 5.3.1 - Added $allow_resending_email variable to check if provider allows emailing to occur.
 		 * @since 5.1.0
 		 *
 		 * @param bool         $allow_resending_email Whether to allow email resending.
 		 * @param WP_Post|null $ticket                The ticket post object if available, otherwise null.
 		 * @param array|null   $attendee              The attendee information if available, otherwise null.
 		 */
-		$allow_resending_email = (bool) apply_filters( 'tribe_tickets_my_tickets_allow_email_resend_on_attendee_email_update', true, $ticket_post, $attendee );
+		$allow_resending_email = (bool) apply_filters( 'tribe_tickets_my_tickets_allow_email_resend_on_attendee_email_update', $allow_resending_email, $ticket_post, $attendee );
 
 		$step = 'tribe_tickets_manual_attendees_add' === $vars['request'] ? 'add' : 'edit';
 

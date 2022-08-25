@@ -2,7 +2,6 @@
 /**
  * WC_PB_BS_Product class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.8.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product-related functions and filters.
  *
  * @class    WC_PB_BS_Product
- * @version  6.7.6
+ * @version  6.15.4
  */
 class WC_PB_BS_Product {
 
@@ -40,7 +39,7 @@ class WC_PB_BS_Product {
 			$product = wc_get_product( $product );
 		}
 
-		if ( ( $product instanceof WC_Product ) && false === $product->is_type( 'bundle' ) ) {
+		if ( ( $product instanceof WC_Product ) && self::supports_bundle_sells( $product ) ) {
 
 			$bundle_sell_ids = $product->get_meta( '_wc_pb_bundle_sell_ids', true );
 
@@ -87,6 +86,10 @@ class WC_PB_BS_Product {
 
 			$title = $product->get_meta( '_wc_pb_bundle_sells_title', true );
 
+			if ( is_null( $title ) ) {
+				$title = '';
+			}
+
 			/**
 			 * 'wc_pb_bundle_sells_title' filter.
 			 *
@@ -124,6 +127,11 @@ class WC_PB_BS_Product {
 
 			if ( null === $discount ) {
 				$discount = $product->get_meta( '_wc_pb_bundle_sells_discount', true, 'edit' );
+
+				if ( is_null( $discount ) ) {
+					$discount = 0;
+				}
+
 				WC_PB_Helpers::cache_get( 'bundle_sells_discount_' . $product->get_id(), $discount );
 			}
 
@@ -193,6 +201,49 @@ class WC_PB_BS_Product {
 
 		$bundle->set_bundled_data_items( $bundled_data_items );
 
+		// Set default values for Bundle properties.
+		// If the database has different settings associated with the product ID, the following code resets their values.
+		// The following changes do not persist in the DB due to the "runtime" nature of the $bundle object.
+		$bundle->set_layout( 'default' );
+		$bundle->set_add_to_cart_form_location( 'default' );
+		$bundle->set_group_mode( 'parent' );
+
 		return apply_filters( 'wc_pb_bundle_sells_dummy_bundle', $bundle );
 	}
+
+	/**
+	 * Get product types that don't support bundle-sells.
+	 *
+	 * @since  6.13.0
+	 *
+	 * @return array
+	 */
+	public static function get_unsupported_product_types() {
+		return (array) apply_filters( 'wc_pb_bundle_sells_unsupported_product_types', array( 'bundle', 'grouped', 'external' ) );
+	}
+
+	/**
+	 * True if product supports bundle-sells.
+	 *
+	 * @since  6.13.0
+	 *
+	 * @param  mixed  $product
+	 * @return boolean
+	 */
+	public static function supports_bundle_sells( $product ) {
+
+		$is_supported = false;
+
+		if ( ! ( $product instanceof WC_Product ) ) {
+			$product = wc_get_product( $product );
+		}
+
+		if ( $product instanceof WC_Product ) {
+			$is_supported = ! $product->is_type( self::get_unsupported_product_types() );
+		}
+
+		return $is_supported;
+
+	}
+
 }

@@ -28,6 +28,7 @@ const READ_ONLY_ATTRIBUTES = [
 	'options.studentHelp',
 	'media',
 	'categoryName',
+	'lock',
 ];
 
 /**
@@ -121,7 +122,11 @@ registerStructureStore( {
 			'id'
 		);
 
+		const lesson = select( 'core/editor' ).getCurrentPost();
+
 		return {
+			lesson_status: lesson?.status,
+			lesson_title: lesson?.title,
 			options,
 			questions: questionBlockAttributes.map( ( question ) =>
 				// Avoid overriding non-editable question.

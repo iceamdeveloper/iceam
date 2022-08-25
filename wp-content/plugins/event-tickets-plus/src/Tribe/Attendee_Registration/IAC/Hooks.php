@@ -332,6 +332,13 @@ class Hooks {
 			return;
 		}
 
+		if (
+			'cancelled' === $attendee['order_status']
+			|| 'refunded' === $attendee['order_status']
+		) {
+			return;
+		}
+
 		$send_args = [
 			'post_id'  => $post_id,
 			'order_id' => $order_id,

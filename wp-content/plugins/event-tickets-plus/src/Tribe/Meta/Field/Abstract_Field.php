@@ -45,6 +45,15 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 	 */
 	public $placeholder;
 
+	/**
+	 * The description text to be shown.
+	 *
+	 * @since 5.2.9
+	 *
+	 * @var string
+	 */
+	public $description;
+
 	// @todo Future: Look into why this is not used at all and if it's intention is still needed.
 	abstract public function save_value( $attendee_id, $field, $value );
 
@@ -80,6 +89,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 		$this->classes     = isset( $data['classes'] ) ? $data['classes'] : [];
 		$this->attributes  = isset( $data['attributes'] ) ? $data['attributes'] : [];
 		$this->placeholder = isset( $data['placeholder'] ) ? $data['placeholder'] : '';
+		$this->description = isset( $data['description'] ) ? $data['description'] : '';
 
 		if ( $this->label && null === $this->slug ) {
 			$this->slug = sanitize_title( $this->label );
@@ -178,6 +188,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 			'classes'     => isset( $data['classes'] ) ? $data['classes'] : [],
 			'attributes'  => isset( $data['attributes'] ) ? $data['attributes'] : [],
 			'placeholder' => isset( $data['placeholder'] ) ? $data['placeholder'] : '',
+			'description' => isset( $data['description'] ) ? $data['description'] : '',
 		];
 
 		return $this->build_extra_field_settings( $meta, $data );
@@ -256,7 +267,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 		}
 
 		$value  = null;
-		$values = (array) get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$values = (array) get_post_meta( $attendee_id, Tribe__Tickets_Plus__Meta::get_attendee_meta_fields_key( null, $attendee_id ), true );
 
 		if (
 			'checkbox' === $this->type
@@ -399,6 +410,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 		$field = $this;
 		$label = ! empty( $this->label ) ? $this->label : '';
 		$placeholder = ! empty( $this->get_placeholder() ) ? $this->get_placeholder() : '';
+		$description = ! empty( $this->get_description() ) ? $this->get_description() : '';
 
 		/** @var \Tribe__Tickets_Plus__Admin__Views $view */
 		$template = tribe( 'tickets-plus.admin.views' );
@@ -414,6 +426,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 			'extra'     => $this->extra,
 			'open'      => $open,
 			'placeholder' => $placeholder,
+			'description' => $description,
 		];
 
 		$template->add_template_globals( $args );
@@ -476,6 +489,17 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 	}
 
 	/**
+	 * Get the description value for field.
+	 *
+	 * @since 5.2.9
+	 *
+	 * @return string
+	 */
+	public function get_description() {
+		return $this->description;
+	}
+
+	/**
 	 * Get the formatted value.
 	 *
 	 * @since 5.2.0
@@ -491,7 +515,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 	/**
 	 * Check if the field has placeholder enabled.
 	 *
-	 * @since TBD
+	 * @since 5.2.5
 	 *
 	 * @return bool
 	 */
@@ -509,7 +533,7 @@ abstract class Tribe__Tickets_Plus__Meta__Field__Abstract_Field implements Field
 		 * @param array                                            $placeholder_types List of types that support Placeholder.
 		 * @param Tribe__Tickets_Plus__Meta__Field__Abstract_Field $field             The field object.
 		 *
-		 * @since TBD
+		 * @since 5.2.5
 		 */
 		$placeholder_types = (array) apply_filters( 'event_tickets_plus_placeholder_enabled_ar_fields', $placeholder_types, $this );
 

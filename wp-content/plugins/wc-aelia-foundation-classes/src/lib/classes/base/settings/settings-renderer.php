@@ -471,6 +471,7 @@ class Settings_Renderer {
 		$this->render_buttons();
 		echo '</div>';
 		echo '</form>';
+		echo '</div>'; // Closing <div class="wrap">
 	}
 
 	/**

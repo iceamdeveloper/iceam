@@ -2,7 +2,6 @@
 /**
  * WC_PB_Admin_Notices class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin notices handling.
  *
  * @class    WC_PB_Admin_Notices
- * @version  6.7.2
+ * @version  6.14.1
  */
 class WC_PB_Admin_Notices {
 
@@ -204,7 +203,7 @@ class WC_PB_Admin_Notices {
 	public static function output_notices() {
 
 		$saved_notices = get_option( 'wc_pb_meta_box_notices', array() );
-		$notices       = $saved_notices + self::$admin_notices;
+		$notices       = array_merge( self::$admin_notices, $saved_notices );
 
 		if ( ! empty( $notices ) ) {
 
@@ -399,15 +398,17 @@ class WC_PB_Admin_Notices {
 		ob_start();
 
 		?>
-		<div class="sw-welcome-icon"></div>
-		<h2 class="sw-welcome-title"><?php esc_attr_e( 'Ready to bundle some products?', 'woocommerce-product-bundles' ); ?></h2>
-		<p class="sw-welcome-text"><?php esc_attr_e( 'Thank you for installing WooCommerce Product Bundles.', 'woocommerce-product-bundles' ); ?><br/><?php esc_attr_e( 'Let\'s get started by creating your first bundle!', 'woocommerce-product-bundles' ); ?></p>
-		<a href="<?php echo admin_url( 'post-new.php?post_type=product&wc_pb_first_bundle=1' ); ?>" class="sw-welcome-button button-primary"><?php esc_attr_e( 'Let\'s go!', 'woocommerce-product-bundles' ); ?></a>
+		<p class="sw-welcome-text">
+			<?php
+				/* translators: onboarding url */
+				echo wp_kses_post( sprintf( __( 'Thank you for installing <strong>WooCommerce Product Bundles</strong>. Ready to get started? <a href="%s">Click here to create your first bundle</a>.', 'woocommerce-product-bundles' ), admin_url( 'post-new.php?post_type=product&wc_pb_first_bundle=1' ) ) );
+			?>
+		</p>
 		<?php
 
 		$notice = ob_get_clean();
 
-		self::add_dismissible_notice( $notice, array( 'type' => 'native', 'dismiss_class' => 'welcome' ) );
+		self::add_dismissible_notice( $notice, array( 'type' => 'info', 'dismiss_class' => 'welcome' ) );
 	}
 
 	/**

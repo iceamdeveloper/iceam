@@ -1,4 +1,3 @@
-/* global tribe, jQuery */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
@@ -40,7 +39,7 @@ tribe.tickets.iac = {};
 		ticketsPageMeta: '.tribe-event-tickets-plus-meta',
 		ticketsPageMetaEmail: '.tribe-tickets-meta-email',
 		ticketsPageMetaEmailReSend: '.tribe-tickets__tickets-page-attendee-meta-resend-email',
-		ticketsPageMetaEmailReSendTemplate: '.tribe-tickets__tickets-page-attendee-meta-resend-email-template',
+		ticketsPageMetaEmailReSendTemplate: '.tribe-tickets__tickets-page-attendee-meta-resend-email-template', /* eslint-disable-line max-len */
 		formFieldName: '.tribe-tickets__iac-field--name',
 		formFieldEmail: '.tribe-tickets__iac-field--email',
 		formFieldNameUniqueErrorTemplate: '.tribe-tickets__iac-unique-name-error-template',
@@ -235,7 +234,9 @@ tribe.tickets.iac = {};
 	 * @return {void}
 	 */
 	obj.addIacUniqueErrorMessage = function( $input, field ) {
-		const hasError = $input.siblings( tribe.tickets.meta.selectors.formFieldInputHelperError ).length;
+		const hasError = $input
+			.siblings( tribe.tickets.meta.selectors.formFieldInputHelperError )
+			.length;
 
 		if ( hasError ) {
 			return;
@@ -269,7 +270,7 @@ tribe.tickets.iac = {};
 		const ticketId = $attendeeTicketsForm.data( 'ticket-id' );
 
 		// Create the ticketId if it wasn't there before.
-		if ( ! obj.attendeeTicketData.hasOwnProperty( ticketId ) ) {
+		if ( ! Object.prototype.hasOwnProperty.call( obj, ticketId ) ) {
 			obj.attendeeTicketData[ ticketId ] = {};
 		}
 

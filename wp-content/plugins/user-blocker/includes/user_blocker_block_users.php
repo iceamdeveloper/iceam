@@ -431,6 +431,7 @@ if (!function_exists('ublk_block_user_page')) {
                             //get Blocking Time
                             if (($get_role != '' && $GLOBALS['wp_roles']->is_role($get_role) ) || ($get_username != '' && get_userdata($get_username) != false )) {
                                 if ($get_role != '') {
+                                    global $wpdb;
                                     $old_block_day = get_option($get_role . '_block_day');
                                     $old_block_msg_day = get_option($get_role . '_block_msg_day');
                                     update_option($get_role . '_block_day', $block_time_array);
@@ -445,8 +446,11 @@ if (!function_exists('ublk_block_user_page')) {
                                     //Update all users of this role end
                                     $msg_class = 'updated';
                                     $msg = __('Blocking time for ', 'user-blocker') . $GLOBALS['wp_roles']->roles[$get_role]['name']. __(' is successfully updated.', 'user-blocker');
-                                    $sessions = WP_Session_Tokens::get_instance($get_username);
-                                    $sessions->destroy_all();
+                                    $roles_data = $wpdb->get_results("SELECT * from $wpdb->usermeta WHERE meta_key = 'wp_capabilities' AND meta_value = 'a:1:{s:".strlen($get_role).":\"".$get_role."\";b:1;}'");
+                                    foreach ($roles_data as $role_date) {
+                                        $sessions = WP_Session_Tokens::get_instance($role_date->user_id);
+                                        $sessions->destroy_all();
+                                    }
                                 }
                                 if ($get_username != '') {
                                     update_user_meta($get_username, 'block_day', $block_time_array);
@@ -482,7 +486,8 @@ if (!function_exists('ublk_block_user_page')) {
                                     if (isset($_POST['block_msg_day']) && $_POST['block_msg_day'] != '') {
                                         $block_msg_day = sanitize_textarea_field($_POST['block_msg_day']);
                                     }
-                                    while (list ($key, $val) = @each($reocrd_id)) {
+                                    foreach($reocrd_id as $key => $val) {
+                                    //while (list ($key, $val) = @each($reocrd_id)) {
                                         $old_block_day = get_option($val . '_block_day');
                                         $old_block_msg_day = get_option($val . '_block_msg_day');
                                         update_option($val . '_block_day', $block_time_array);
@@ -495,7 +500,7 @@ if (!function_exists('ublk_block_user_page')) {
                                         $msg = __('Role wise time blocking is successfully added.', 'user-blocker');
                                         $txtSunFrom = $txtSunTo = $txtMonFrom = $txtMonTo = $txtTueFrom = $txtTueTo = $txtWedFrom = $txtWedTo = $txtThuFrom = $txtThuTo = $txtThuTo = $txtFriFrom = $txtFriTo = $txtSatFrom = $txtSatTo = '';
                                         $cmbUserBy = '';
-                                        $block_msg_day = '';
+                                        $block_msg_day = $default_msg;
                                     }
                                 } else {
                                     $msg_class = 'error';
@@ -510,7 +515,8 @@ if (!function_exists('ublk_block_user_page')) {
                                     if (isset($_POST['block_msg_day']) && $_POST['block_msg_day'] != '') {
                                         $block_msg_day = sanitize_textarea_field($_POST['block_msg_day']);
                                     }
-                                    while (list ($key, $val) = @each($reocrd_id)) {
+                                    foreach($reocrd_id as $key => $val) {
+                                    //while (list ($key, $val) = @each($reocrd_id)) {
                                         update_user_meta($val, 'block_day', $block_time_array);
                                         update_user_meta($val, 'block_msg_day', $block_msg_day);
                                     }
@@ -1453,8 +1459,10 @@ if (!function_exists('ublk_block_user_date_page')) {
             $is_display_role = 1;
             if ($GLOBALS['wp_roles']->is_role($get_role)) {
                 $block_date = get_option($get_role . '_block_date');
-                $frmdate = $block_date['frmdate'];
-                $todate = $block_date['todate'];
+                if ($block_date != '' && !empty($block_date)) {
+                    $frmdate = $block_date['frmdate'];
+                    $todate = $block_date['todate'];
+                }
                 $block_msg_date = get_option($get_role . '_block_msg_date');
                 $curr_edit_msg = __('Update for role', 'user-blocker') . ': ' . $GLOBALS['wp_roles']->roles[$get_role]['name'];
             } else {
@@ -1546,7 +1554,8 @@ if (!function_exists('ublk_block_user_date_page')) {
                             if ($_POST['block_msg_date'] != '') {
                                 $block_msg_date = sanitize_textarea_field($_POST['block_msg_date']);
                             }
-                            while (list ($key, $val) = @each($reocrd_id)) {
+                            foreach($reocrd_id as $key => $val) {
+                            //while (list ($key, $val) = @each($reocrd_id)) {
                                 $block_date = array();
                                 $block_date['frmdate'] = sanitize_text_field($_POST['frmdate']);
                                 $block_date['todate'] = sanitize_text_field($_POST['todate']);
@@ -1572,7 +1581,8 @@ if (!function_exists('ublk_block_user_date_page')) {
                             if ($_POST['block_msg_date'] != '') {
                                 $block_msg_date = sanitize_textarea_field($_POST['block_msg_date']);
                             }
-                            while (list ($key, $val) = @each($reocrd_id)) {
+                            foreach($reocrd_id as $key => $val) {
+                            //while (list ($key, $val) = @each($reocrd_id)) {
                                 $block_msg_date =  $default_msg;
                                 $block_date['frmdate'] = sanitize_text_field($_POST['frmdate']);
                                 $block_date['todate'] = sanitize_text_field($_POST['todate']);
@@ -1721,7 +1731,7 @@ if (!function_exists('ublk_block_user_date_page')) {
                         ?>
                     </div>
                     <div class="search_box">
-                        <?php ublk_user_search_field($display_users, $txtUsername, 'block_user'); ?>
+                        <?php ublk_user_search_field($display_users, $txtUsername, 'block_user_date'); ?>
                     </div>
                 </form>
                 <form method="post" action="?page=block_user_date" id="frmBlockUser">
@@ -2182,7 +2192,8 @@ if (!function_exists('ublk_block_user_permenant_page')) {
                         if ($_POST['block_msg_permenant'] != '') {
                             $block_msg_permenant = sanitize_textarea_field($_POST['block_msg_permenant']);
                         }
-                        while (list ($key, $val) = @each($reocrd_id)) {
+                        foreach($reocrd_id as $key => $val) {
+                        //while (list ($key, $val) = @each($reocrd_id)) {
                             $old_block_msg_permenant = get_option($val . '_block_msg_permenant');
                             update_option($val . '_is_active', 'n');
                             update_option($val . '_block_msg_permenant', $block_msg_permenant);
@@ -2216,7 +2227,8 @@ if (!function_exists('ublk_block_user_permenant_page')) {
                         if ($_POST['block_msg_permenant'] != '') {
                             $block_msg_permenant = sanitize_textarea_field($_POST['block_msg_permenant']);
                         }
-                        while (list ($key, $val) = @each($reocrd_id)) {
+                        foreach($reocrd_id as $key => $val) {
+                        // while (list ($key, $val) = @each($reocrd_id)) {
                             update_user_meta($val, 'is_active', 'n');
                             update_user_meta($val, 'block_msg_permenant', $block_msg_permenant);
                         }

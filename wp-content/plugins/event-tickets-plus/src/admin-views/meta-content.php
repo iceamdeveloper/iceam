@@ -23,7 +23,7 @@ $meta_object = $etp_main->meta(); ?>
 		tribe_get_ticket_label_singular_lowercase( 'attendee_info' )
 	) );
 	?>
-	<a href="<?php echo esc_url( 'https://theeventscalendar.com/knowledgebase/collecting-attendee-information/?utm_source=tec&utm_medium=eventticketsplusapp&utm_term=adminnotice&utm_campaign=evergreen&cid=tec_eventticketsplusapp_adminnotice_evergreen' ) ?>">
+	<a target="_blank" rel="noopener noreferrer" href="<?php echo esc_url( 'https://theeventscalendar.com/knowledgebase/collecting-attendee-information/?utm_source=tec&utm_medium=eventticketsplusapp&utm_term=adminnotice&utm_campaign=evergreen&cid=tec_eventticketsplusapp_adminnotice_evergreen' ) ?>">
 		<?php esc_html_e( 'Learn more', 'event-tickets-plus' ) ?>
 	</a>.
 </p>

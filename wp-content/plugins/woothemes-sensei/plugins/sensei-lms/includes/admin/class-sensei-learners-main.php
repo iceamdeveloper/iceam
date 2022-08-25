@@ -50,6 +50,13 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	private $page_slug;
 
 	/**
+	 * Post type that the Student Management menu is associated with.
+	 *
+	 * @var string $menu_post_type
+	 */
+	private $menu_post_type;
+
+	/**
 	 * The enrollment status of the learners.
 	 *
 	 * @var string
@@ -123,15 +130,15 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 			$this->view = 'learners';
 		}
 
-		$this->page_slug = 'sensei_learners';
+		$this->page_slug      = 'sensei_learners';
+		$this->menu_post_type = 'course';
 
 		// Load Parent token into constructor.
 		parent::__construct( 'learners_main' );
 
 		// Actions.
 		add_action( 'sensei_before_list_table', array( $this, 'data_table_header' ) );
-		add_action( 'sensei_learners_extra', array( $this, 'add_learners_box' ) );
-
+		add_action( 'sensei_after_list_table', array( $this, 'add_learners_box' ) );
 		add_filter( 'sensei_list_table_search_button_text', array( $this, 'search_button' ) );
 	}
 
@@ -164,18 +171,18 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 		switch ( $this->view ) {
 			case 'learners':
 				$columns = array(
-					'title'            => __( 'Learner', 'sensei-lms' ),
+					'title'            => __( 'Students', 'sensei-lms' ),
+					'enrolment_status' => __( 'Enrolled', 'sensei-lms' ),
+					'user_status'      => __( 'Status', 'sensei-lms' ),
 					'date_started'     => __( 'Date Started', 'sensei-lms' ),
 					'date_completed'   => __( 'Date Completed', 'sensei-lms' ),
-					'user_status'      => __( 'Status', 'sensei-lms' ),
-					'enrolment_status' => __( 'Enrollment', 'sensei-lms' ),
 				);
 				break;
 
 			case 'lessons':
 				$columns = array(
 					'title'        => __( 'Lesson', 'sensei-lms' ),
-					'num_learners' => __( '# Learners', 'sensei-lms' ),
+					'num_learners' => __( '# Students', 'sensei-lms' ),
 					'updated'      => __( 'Last Updated', 'sensei-lms' ),
 				);
 				break;
@@ -184,7 +191,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 			default:
 				$columns = array(
 					'title'        => __( 'Course', 'sensei-lms' ),
-					'num_learners' => __( '# Learners', 'sensei-lms' ),
+					'num_learners' => __( '# Students', 'sensei-lms' ),
 					'updated'      => __( 'Last Updated', 'sensei-lms' ),
 				);
 				break;
@@ -201,6 +208,16 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 			);
 		}
 
+		/**
+		 * Filter sensei_learners_default_columns
+		 *
+		 * Filters the columns that are displayed in learner management
+		 *
+		 * @param {array}   $columns              The default columns.
+		 * @param {object}  $sensei_learners_main Sensei_Learners_Main instance.
+		 *
+		 * @return {array} The modified default columns
+		 */
 		$columns = apply_filters( 'sensei_learners_default_columns', $columns, $this );
 		return $columns;
 	}
@@ -336,8 +353,6 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	 * @return array Escaped column data.
 	 */
 	protected function get_row_data( $item ) {
-		global $wp_version;
-
 		if ( ! $item ) {
 			return array(
 				'title'        => esc_html__( 'No results found', 'sensei-lms' ),
@@ -354,63 +369,43 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 				// in this case the item passed in is actually the users activity on course of lesson.
 				$user_activity = $item;
 				$post_id       = false;
+				$post_type     = false;
+				$object_type   = false;
 
 				if ( $this->lesson_id ) {
 
-					$post_id     = intval( $this->lesson_id );
+					$post_id     = $this->lesson_id;
 					$object_type = __( 'lesson', 'sensei-lms' );
 					$post_type   = 'lesson';
 
 				} elseif ( $this->course_id ) {
 
-					$post_id     = intval( $this->course_id );
+					$post_id     = $this->course_id;
 					$object_type = __( 'course', 'sensei-lms' );
 					$post_type   = 'course';
 
 				}
 
-				if ( 'complete' === $user_activity->comment_approved || 'graded' === $user_activity->comment_approved || 'passed' === $user_activity->comment_approved ) {
-
-					$progress_status_html =
-						'<span class="graded">' .
-							esc_html__( 'Completed', 'sensei-lms' ) .
-						'</span>';
-
+				if ( in_array( $user_activity->comment_approved, [ 'complete', 'graded', 'passed' ], true ) ) {
+					$progress_status_html = esc_html__( 'Completed', 'sensei-lms' );
 				} else {
-
-					$progress_status_html =
-						'<span class="in-progress">' .
-							esc_html__( 'In Progress', 'sensei-lms' ) .
-						'</span>';
-
+					$user_not_started     = 'course' === $post_type && 0 === Sensei_Utils::user_started_lesson_count( $post_id, $user_activity->user_id );
+					$progress_status_html = $user_not_started ? esc_html__( 'Not Started', 'sensei-lms' ) : esc_html__( 'In Progress', 'sensei-lms' );
 				}
 
-				$is_user_enrolled  = Sensei_Course::is_user_enrolled( $this->course_id, $user_activity->user_id );
-				$course_enrolment  = Sensei_Course_Enrolment::get_course_instance( $this->course_id );
-				$enrolment_results = $course_enrolment->get_enrolment_check_results( $user_activity->user_id );
-				$provider_results  = [];
-
-				if ( $enrolment_results ) {
-					$provider_results = $enrolment_results->get_provider_results();
-				}
-
+				$is_user_enrolled       = Sensei_Course::is_user_enrolled( $this->course_id, $user_activity->user_id );
+				$course_enrolment       = Sensei_Course_Enrolment::get_course_instance( $this->course_id );
+				$enrolment_results      = $course_enrolment->get_enrolment_check_results( $user_activity->user_id );
+				$provider_results       = $enrolment_results ? $enrolment_results->get_provider_results() : [];
 				$enrolment_tooltip_html = '';
 
 				if ( Sensei()->feature_flags->is_enabled( 'enrolment_provider_tooltip' ) ) {
 					if ( ! empty( $provider_results ) ) {
-						$enrolment_tooltip_html   = [];
-						$enrolment_tooltip_html[] = '<ul class="enrolment-helper">';
+						$enrolment_tooltip_html = [ '<ul class="enrolment-helper">' ];
 
 						foreach ( $provider_results as $id => $result ) {
-							$name = Sensei_Course_Enrolment_Manager::instance()->get_enrolment_provider_name_by_id( $id );
-							if ( ! $name ) {
-								$name = $id;
-							}
-
-							$item_class = 'does-not-provide-enrolment';
-							if ( $result ) {
-								$item_class = 'provides-enrolment';
-							}
+							$name       = Sensei_Course_Enrolment_Manager::instance()->get_enrolment_provider_name_by_id( $id ) ?? $id;
+							$item_class = $result ? 'provides-enrolment' : 'does-not-provide-enrolment';
 
 							$enrolment_tooltip_html[] =
 								'<li class="' . esc_attr( $item_class ) . '">' .
@@ -425,23 +420,17 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 					}
 				}
 
-				if ( $is_user_enrolled ) {
-					$enrolment_label             = __( 'Enrolled', 'sensei-lms' );
-					$enrolment_label_extra_class = 'enrolled';
-				} else {
-					$enrolment_label             = __( 'Not Enrolled', 'sensei-lms' );
-					$enrolment_label_extra_class = 'not-enrolled';
-				}
+				$enrolment_label = $is_user_enrolled ? __( 'Yes', 'sensei-lms' ) : __( 'No', 'sensei-lms' );
 
 				$enrolment_status_html =
-					'<span class="sensei-tooltip ' . esc_attr( $enrolment_label_extra_class ) . '" data-tooltip="' . esc_attr( htmlentities( $enrolment_tooltip_html ) ) . '">' .
+					'<span class="sensei-tooltip" data-tooltip="' . esc_attr( htmlentities( $enrolment_tooltip_html ) ) . '">' .
 						esc_html( $enrolment_label ) .
 					'</span>';
 
 				$title = Sensei_Learner::get_full_name( $user_activity->user_id );
-				// translators: Placeholder is the full name of the learner.
-				$a_title              = sprintf( esc_html__( 'Edit &#8220;%s&#8221;', 'sensei-lms' ), esc_html( $title ) );
-				$edit_start_date_form = $this->get_edit_start_date_form( $user_activity, $post_id, $post_type, $object_type );
+				// translators: Placeholder is the item title/name.
+				$a_title              = sprintf( __( 'Edit &#8220;%s&#8221;', 'sensei-lms' ), $title );
+				$edit_start_date_form = $this->get_edit_start_date_form( $user_activity, $post_id, $post_type );
 
 				$actions     = [];
 				$row_actions = [];
@@ -458,6 +447,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 						$withdraw_action_url = wp_nonce_url(
 							add_query_arg(
 								array(
+									'post_type'        => $this->menu_post_type,
 									'page'             => 'sensei_learners',
 									'view'             => 'learners',
 									'learner_action'   => 'withdraw',
@@ -465,7 +455,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 									'user_id'          => $user_activity->user_id,
 									'enrolment_status' => $this->enrolment_status,
 								),
-								admin_url( 'admin.php' )
+								admin_url( 'edit.php' )
 							),
 							'sensei-learner-action-withdraw'
 						);
@@ -499,6 +489,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 						$enrol_action_url = wp_nonce_url(
 							add_query_arg(
 								array(
+									'post_type'        => $this->menu_post_type,
 									'page'             => 'sensei_learners',
 									'view'             => 'learners',
 									'learner_action'   => $enrol_data_action,
@@ -506,7 +497,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 									'user_id'          => $user_activity->user_id,
 									'enrolment_status' => $this->enrolment_status,
 								),
-								admin_url( 'admin.php' )
+								admin_url( 'edit.php' )
 							),
 							'sensei-learner-action-' . $enrol_data_action
 						);
@@ -546,23 +537,28 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 					$actions[] = $edit_start_date_form;
 				}
 
+				$date_started = get_comment_meta( $user_activity->comment_ID, 'start', true );
+				$date_input   = '<input class="edit-date-date-picker" data-name="start-date" type="text" value="' . esc_attr( $date_started ) . '">';
+
 				/**
 				 * Filter sensei_learners_main_column_data
 				 *
 				 * This filter runs on the learner management screen for a specific course.
 				 * It provides the learner row column details.
 				 *
-				 * @param array   $columns {
-				 *   @type string   $title             Learner name.
-				 *   @type string   $date_started      Course start date.
-				 *   @type string   $date_completed    Course completion date (if completed).
-				 *   @type string   $course_status     Course status (e.g. completed, started etc).
-				 *   @type string   $enrolment_status  Enrolment status.
-				 *   @type html     $action_buttons    Actions that can be taken for this learner.
+				 * @param {array}   $columns {
+				 *   @type {string}   $title             Learner name.
+				 *   @type {string}   $date_started      Course start date.
+				 *   @type {string}   $date_completed    Course completion date (if completed).
+				 *   @type {string}   $course_status     Course status (e.g. completed, started etc).
+				 *   @type {string}   $enrolment_status  Enrolment status.
+				 *   @type {string}   $action_buttons    Actions that can be taken for this learner.
 				 * }
-				 * @param object  $item       Current WP_Comment item.
-				 * @param int     $post_id    Course ID.
-				 * @param string  $post_type  Post type.
+				 * @param {object}  $item       Current WP_Comment item.
+				 * @param {int}     $post_id    Course ID.
+				 * @param {string}  $post_type  Post type.
+				 *
+				 * @return {array} The modified columns
 				 */
 				$column_data = apply_filters(
 					'sensei_learners_main_column_data',
@@ -576,8 +572,8 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 							'<div class="row-actions">' .
 								implode( ' | ', $row_actions ) .
 							'</div>',
-						'date_started'     => get_comment_meta( $user_activity->comment_ID, 'start', true ),
-						'date_completed'   => ( 'complete' === $user_activity->comment_approved ) ? $user_activity->comment_date : '',
+						'date_started'     => $date_input,
+						'date_completed'   => ( 'complete' === $user_activity->comment_approved ) ? $user_activity->comment_date : '-',
 						'user_status'      => $progress_status_html,
 						'enrolment_status' => $enrolment_status_html,
 						'actions'          => implode( ' ', $actions ),
@@ -606,9 +602,10 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 							'class' => array(),
 						),
 						'input' => array(
-							'class' => array(),
-							'type'  => array(),
-							'value' => array(),
+							'class'     => array(),
+							'type'      => array(),
+							'value'     => array(),
+							'data-name' => array(),
 						),
 					)
 				);
@@ -626,19 +623,20 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 					)
 				);
 				$title           = get_the_title( $item );
-				// translators: Placeholder is the item title.
-				$a_title = sprintf( esc_html__( 'Edit &#8220;%s&#8221;', 'sensei-lms' ), esc_html( $title ) );
+				// translators: Placeholder is the item title/name.
+				$a_title = sprintf( __( 'Edit &#8220;%s&#8221;', 'sensei-lms' ), $title );
 
 				$grading_action = '';
 				if ( Sensei_Lesson::lesson_quiz_has_questions( $item->ID ) ) {
 					$grading_action = ' <a class="button" href="' . esc_url(
 						add_query_arg(
 							array(
+								'post_type' => $this->menu_post_type,
 								'page'      => 'sensei_grading',
 								'lesson_id' => $item->ID,
 								'course_id' => $this->course_id,
 							),
-							admin_url( 'admin.php' )
+							admin_url( 'edit.php' )
 						)
 					) . '">' . esc_html__( 'Grading', 'sensei-lms' ) . '</a>';
 				}
@@ -657,14 +655,15 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 						'actions'      => '<a class="button" href="' . esc_url(
 							add_query_arg(
 								array(
+									'post_type' => $this->menu_post_type,
 									'page'      => $this->page_slug,
 									'lesson_id' => $item->ID,
 									'course_id' => $this->course_id,
 									'view'      => 'learners',
 								),
-								admin_url( 'admin.php' )
+								admin_url( 'edit.php' )
 							)
-						) . '">' . esc_html__( 'Manage learners', 'sensei-lms' ) . '</a> ' . $grading_action,
+						) . '">' . esc_html__( 'Manage students', 'sensei-lms' ) . '</a> ' . $grading_action,
 					),
 					$item,
 					$this->course_id
@@ -686,21 +685,19 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 					)
 				);
 				$title           = get_the_title( $item );
-				// translators: Placeholder is the item title.
-				$a_title = sprintf( esc_html__( 'Edit &#8220;%s&#8221;', 'sensei-lms' ), esc_html( $title ) );
+				// translators: Placeholder is the item title/name.
+				$a_title = sprintf( __( 'Edit &#8220;%s&#8221;', 'sensei-lms' ), $title );
 
-				$grading_action = '';
-				if ( version_compare( $wp_version, '4.1', '>=' ) ) {
-					$grading_action = ' <a class="button" href="' . esc_url(
-						add_query_arg(
-							array(
-								'page'      => 'sensei_grading',
-								'course_id' => $item->ID,
-							),
-							admin_url( 'admin.php' )
-						)
-					) . '">' . esc_html__( 'Grading', 'sensei-lms' ) . '</a>';
-				}
+				$grading_action = ' <a class="button" href="' . esc_url(
+					add_query_arg(
+						array(
+							'post_type' => $this->menu_post_type,
+							'page'      => 'sensei_grading',
+							'course_id' => $item->ID,
+						),
+						admin_url( 'edit.php' )
+					)
+				) . '">' . esc_html__( 'Grading', 'sensei-lms' ) . '</a>';
 
 				$column_data = apply_filters(
 					'sensei_learners_main_column_data',
@@ -710,11 +707,12 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 								'<a class="row-title" href="' . esc_url(
 									add_query_arg(
 										array(
+											'post_type' => $this->menu_post_type,
 											'page'      => 'sensei_learners',
 											'course_id' => $item->ID,
 											'view'      => 'learners',
 										),
-										admin_url( 'admin.php' )
+										admin_url( 'edit.php' )
 									)
 								) . '" title="' . esc_attr( $a_title ) . '">' .
 									esc_html( $title ) .
@@ -722,16 +720,8 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 							'</strong>',
 						'num_learners' => esc_html( $course_learners ),
 						'updated'      => esc_html( $item->post_modified ),
-						'actions'      => '<a class="button" href="' . esc_url(
-							add_query_arg(
-								array(
-									'page'      => $this->page_slug,
-									'course_id' => $item->ID,
-									'view'      => 'learners',
-								),
-								admin_url( 'admin.php' )
-							)
-						) . '">' . esc_html__( 'Manage learners', 'sensei-lms' ) . '</a> ' . $grading_action,
+						'actions'      =>
+							'<div class="student-action-menu" data-course-id="' . esc_attr( $item->ID ) . '"></div>',
 					),
 					$item
 				);
@@ -739,7 +729,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 				$escaped_column_data = Sensei_Wp_Kses::wp_kses_array( $column_data );
 
 				break;
-		} // switch
+		}
 
 		return $escaped_column_data;
 	}
@@ -750,19 +740,15 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	 * @param WP_Comment $user_activity The sensei user activity.
 	 * @param integer    $post_id       The post id.
 	 * @param string     $post_type     The post type (lesson or course).
-	 * @param string     $object_type   The object type.
 	 *
 	 * @return string The form.
 	 */
-	private function get_edit_start_date_form( $user_activity, $post_id, $post_type, $object_type ) {
-		$comment_id   = $user_activity->comment_ID;
-		$date_started = get_comment_meta( $comment_id, 'start', true );
-		$form         = '<form class="edit-start-date">';
-		$form        .= '<input class="edit-start-date-date-picker" type="text" value="' . esc_attr( $date_started ) . '">';
-		$form        .= '<a class="edit-start-date-submit button" data-user-id="' . esc_attr( $user_activity->user_id ) . '" data-post-id="' . esc_attr( $post_id ) . '" data-post-type="' . esc_attr( $post_type ) . '" data-comment-id="' . esc_attr( $comment_id ) . '">' . sprintf( esc_html__( 'Edit Start Date', 'sensei-lms' ), esc_html( $object_type ) ) . '</a>';
-		$form        .= '</form>';
+	private function get_edit_start_date_form( $user_activity, $post_id, $post_type ) : string {
+		$submit_button_text = __( 'Update Student', 'sensei-lms' );
 
-		return $form;
+		return '<form class="edit-start-date">
+				<a class="edit-start-date-submit button" data-user-id="' . esc_attr( $user_activity->user_id ) . '" data-post-id="' . esc_attr( $post_id ) . '" data-post-type="' . esc_attr( $post_type ) . '" data-comment-id="' . esc_attr( $user_activity->comment_ID ) . '">' . esc_html( $submit_button_text ) . '</a>
+			</form>';
 	}
 
 	/**
@@ -986,7 +972,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	public function no_items() {
 		switch ( $this->view ) {
 			case 'learners':
-				$text = __( 'No learners found.', 'sensei-lms' );
+				$text = __( 'No students found.', 'sensei-lms' );
 				break;
 
 			case 'lessons':
@@ -1055,22 +1041,6 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 
 			$menu['lessons'] = $this->lessons_link();
 
-		} elseif ( $this->course_id && $this->lesson_id ) {
-
-			$query_args = array(
-				'page'      => $this->page_slug,
-				'course_id' => $this->course_id,
-				'view'      => 'lessons',
-			);
-
-			$course = get_the_title( $this->course_id );
-
-			$menu['back'] = '<a href="'
-				. esc_url( add_query_arg( $query_args, admin_url( 'admin.php' ) ) )
-				. '"><em>&larr; '
-				// translators: Placeholder is the Course title.
-				. esc_html( sprintf( __( 'Back to %s', 'sensei-lms' ), $course ) )
-				. '</em></a>';
 		}
 
 		$menu = apply_filters( 'sensei_learners_sub_menu', $menu );
@@ -1094,6 +1064,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	 */
 	private function learners_link( $enrolment_status ) {
 		$query_args = array(
+			'post_type'        => $this->menu_post_type,
 			'page'             => $this->page_slug,
 			'course_id'        => $this->course_id,
 			'view'             => 'learners',
@@ -1101,21 +1072,26 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 		);
 
 		$is_selected = 'learners' === $this->view && $enrolment_status === $this->enrolment_status;
-		$url         = add_query_arg( $query_args, admin_url( 'admin.php' ) );
+		$url         = add_query_arg( $query_args, admin_url( 'edit.php' ) );
+		$link_title  = false;
 
 		switch ( $enrolment_status ) {
 			case 'enrolled':
-				$link_title = esc_html__( 'Enrolled Learners', 'sensei-lms' );
+				$link_title = esc_html__( 'Enrolled Students', 'sensei-lms' );
 				break;
 			case 'unenrolled':
-				$link_title = esc_html__( 'Unenrolled Learners', 'sensei-lms' );
+				$link_title = esc_html__( 'Unenrolled Students', 'sensei-lms' );
 				break;
 			case 'manual':
-				$link_title = esc_html__( 'Manually Enrolled Learners', 'sensei-lms' );
+				$link_title = esc_html__( 'Manually Enrolled Students', 'sensei-lms' );
 				break;
 			case 'all':
-				$link_title = esc_html__( 'All Learners', 'sensei-lms' );
+				$link_title = esc_html__( 'All Students', 'sensei-lms' );
 				break;
+		}
+
+		if ( ! $link_title ) {
+			return '';
 		}
 
 		return '<a ' . ( $is_selected ? 'class="current"' : '' ) . ' href="' . esc_url( $url ) . '">' . $link_title . '</a>';
@@ -1128,12 +1104,13 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	 */
 	private function lessons_link() {
 		$query_args = array(
+			'post_type' => $this->menu_post_type,
 			'page'      => $this->page_slug,
 			'course_id' => $this->course_id,
 			'view'      => 'lessons',
 		);
 
-		$url = add_query_arg( $query_args, admin_url( 'admin.php' ) );
+		$url = add_query_arg( $query_args, admin_url( 'edit.php' ) );
 
 		return '<a ' . ( 'lessons' === $this->view ? 'class="current"' : '' ) . ' href="' . esc_url( $url ) . '">' . esc_html__( 'Lessons', 'sensei-lms' ) . '</a>';
 	}
@@ -1183,36 +1160,33 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 		}
 		?>
 		<div class="postbox">
-			<h2 class="postbox-title">
+			<h2 id="add-student-to-course-header">
 				<?php
 				// translators: Placeholder is the post type.
-				printf( esc_html__( 'Add Learner to %1$s', 'sensei-lms' ), esc_html( $post_type ) );
+				printf( esc_html__( 'Add Student to %1$s', 'sensei-lms' ), esc_html( $post_type ) );
 				?>
 			</h2>
 			<div class="inside">
 				<form name="add_learner" action="" method="post">
-					<p>
-						<select name="add_user_id[]" id="add_learner_search" multiple="multiple" style="min-width:300px;">
-						</select>
+					<p class="add-student-form-container student-search-empty">
+						<select name="add_user_id[]" id="add_learner_search" multiple="multiple" style="min-width:300px;"></select>
 						<?php if ( 'lesson' === $form_post_type ) { ?>
-							<label for="add_complete_lesson"><input type="checkbox" id="add_complete_lesson" name="add_complete_lesson"  value="yes" /> <?php esc_html_e( 'Complete lesson for learner', 'sensei-lms' ); ?></label>
+							<label for="add_complete_lesson"><input type="checkbox" id="add_complete_lesson" name="add_complete_lesson"  value="yes" /> <?php esc_html_e( 'Complete lesson for selected student(s)', 'sensei-lms' ); ?></label>
 						<?php } elseif ( 'course' === $form_post_type ) { ?>
-							<label for="add_complete_course"><input type="checkbox" id="add_complete_course" name="add_complete_course"  value="yes" /> <?php esc_html_e( 'Complete course for learner', 'sensei-lms' ); ?></label>
+							<label for="add_complete_course"><input type="checkbox" id="add_complete_course" name="add_complete_course"  value="yes" /> <?php esc_html_e( 'Complete course for selected student(s)', 'sensei-lms' ); ?></label>
 						<?php } ?>
-						<br/>
-						<span class="description"><?php esc_html_e( 'Search for a user by typing their name or username.', 'sensei-lms' ); ?></span>
 					</p>
 					<p>
 						<?php
 						// translators: Placeholder is the post title.
-						submit_button( sprintf( __( 'Add to \'%1$s\'', 'sensei-lms' ), $post_title ), 'primary', 'add_learner_submit', false, array() );
+						submit_button( sprintf( __( 'Add to \'%1$s\'', 'sensei-lms' ), $post_title ), 'primary', 'add_learner_submit', false, array( 'disabled' => true ) );
 						?>
 					</p>
-					<?php if ( 'lesson' === $form_post_type ) { ?>
+					<?php if ( 'lesson' === $form_post_type && isset( $course_title ) ) { ?>
 						<p><span class="description">
 							<?php
 							// translators: Placeholder is the course title.
-							printf( esc_html__( 'Learner will also be added to the course \'%1$s\' if they are not already taking it.', 'sensei-lms' ), esc_html( $course_title ) );
+							printf( esc_html__( 'Student will also be added to the course \'%1$s\' if they are not already taking it.', 'sensei-lms' ), esc_html( $course_title ) );
 							?>
 						</span></p>
 					<?php } ?>
@@ -1240,7 +1214,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 
 		switch ( $this->view ) {
 			case 'learners':
-				$text = __( 'Search Learners', 'sensei-lms' );
+				$text = __( 'Search Students', 'sensei-lms' );
 				break;
 
 			case 'lessons':
@@ -1256,7 +1230,7 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 	}
 
 	/**
-	 * Helper method which calculates if the 'Manually Enrolled Learners' filter should be displayed.
+	 * Helper method which calculates if the 'Manually Enrolled Students' filter should be displayed.
 	 *
 	 * @return bool
 	 * @throws Exception If the providers weren't initialized yet.
@@ -1266,6 +1240,15 @@ class Sensei_Learners_Main extends Sensei_List_Table {
 		$all_providers   = Sensei_Course_Enrolment_Manager::instance()->get_all_enrolment_providers();
 
 		return $manual_provider instanceof Sensei_Course_Manual_Enrolment_Provider && count( $all_providers ) > 1;
+	}
+
+	/**
+	 * Get the current view.
+	 *
+	 * @return string
+	 */
+	public function get_view() : string {
+		return $this->view;
 	}
 }
 

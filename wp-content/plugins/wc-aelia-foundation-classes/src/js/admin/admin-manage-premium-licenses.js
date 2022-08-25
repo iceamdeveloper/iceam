@@ -51,8 +51,27 @@ jQuery(document).ready(function($) {
 				var site_status = response['response']['license']['site_status'] || 'inactive';
 				$license_section.find('.license_status').text(site_status);
 
-				var date_expiration = response['response']['license']['date_expiration'] || '';
-				$license_section.find('.date_expiration').text(date_expiration.split(' ')[0]);
+				if(site_status === 'inactive') {
+					$license_section.find('.license_expiration').text(premium_licenses_manager.params.premium_updater.messages.expiration_not_available);
+				}
+				else {
+					var date_expiration_text = '';
+					var date_expiration = response['response']['license']['date_expiration'] || '';
+					// Format the date expiration
+					// @since 2.1.0.200724
+					if(date_expiration) {
+						date_expiration = new Date(date_expiration);
+						if(date_expiration.getFullYear() > 2999) {
+							date_expiration_text = premium_licenses_manager.params.premium_updater.messages.expiration_forever;
+						}
+						else {
+							const month_names = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+							const month = month_names[date_expiration.getMonth()];
+							date_expiration_text = date_expiration.getDay() + ' ' + month + ' ' + date_expiration.getFullYear();
+						}
+					}
+					$license_section.find('.license_expiration').text(date_expiration_text);
+				}
 
 				$license_section.removeClass('active inactive').addClass(site_status);
 			}

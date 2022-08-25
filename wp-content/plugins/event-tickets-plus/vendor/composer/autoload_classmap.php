@@ -6,4 +6,19 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'TEC\\Tickets_Plus\\Admin\\Tabs\\Attendee_Registration' => $baseDir . '/src/Tickets_Plus/Admin/Tabs/Attendee_Registration.php',
+    'TEC\\Tickets_Plus\\Admin\\Tabs\\Provider' => $baseDir . '/src/Tickets_Plus/Admin/Tabs/Provider.php',
+    'TEC\\Tickets_Plus\\Assets' => $baseDir . '/src/Tickets_Plus/Assets.php',
+    'TEC\\Tickets_Plus\\Commerce\\Assets' => $baseDir . '/src/Tickets_Plus/Commerce/Assets.php',
+    'TEC\\Tickets_Plus\\Commerce\\Attendee' => $baseDir . '/src/Tickets_Plus/Commerce/Attendee.php',
+    'TEC\\Tickets_Plus\\Commerce\\Attendee_Registration\\Hooks' => $baseDir . '/src/Tickets_Plus/Commerce/Attendee_Registration/Hooks.php',
+    'TEC\\Tickets_Plus\\Commerce\\Attendee_Registration\\Provider' => $baseDir . '/src/Tickets_Plus/Commerce/Attendee_Registration/Provider.php',
+    'TEC\\Tickets_Plus\\Commerce\\Gateways\\Stripe\\Hooks' => $baseDir . '/src/Tickets_Plus/Commerce/Gateways/Stripe/Hooks.php',
+    'TEC\\Tickets_Plus\\Commerce\\Gateways\\Stripe\\Provider' => $baseDir . '/src/Tickets_Plus/Commerce/Gateways/Stripe/Provider.php',
+    'TEC\\Tickets_Plus\\Commerce\\Gateways\\Stripe\\Settings' => $baseDir . '/src/Tickets_Plus/Commerce/Gateways/Stripe/Settings.php',
+    'TEC\\Tickets_Plus\\Commerce\\Hooks' => $baseDir . '/src/Tickets_Plus/Commerce/Hooks.php',
+    'TEC\\Tickets_Plus\\Commerce\\Order' => $baseDir . '/src/Tickets_Plus/Commerce/Order.php',
+    'TEC\\Tickets_Plus\\Commerce\\Provider' => $baseDir . '/src/Tickets_Plus/Commerce/Provider.php',
+    'TEC\\Tickets_Plus\\Hooks' => $baseDir . '/src/Tickets_Plus/Hooks.php',
+    'TEC\\Tickets_Plus\\Provider' => $baseDir . '/src/Tickets_Plus/Provider.php',
 );

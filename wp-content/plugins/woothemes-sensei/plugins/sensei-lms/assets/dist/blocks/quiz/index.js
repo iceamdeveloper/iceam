@@ -1,6 +1,1472 @@
-!function(e){var t={};function n(r){if(t[r])return t[r].exports;var s=t[r]={i:r,l:!1,exports:{}};return e[r].call(s.exports,s,s.exports,n),s.l=!0,s.exports}n.m=e,n.c=t,n.d=function(e,t,r){n.o(e,t)||Object.defineProperty(e,t,{enumerable:!0,get:r})},n.r=function(e){"undefined"!=typeof Symbol&&Symbol.toStringTag&&Object.defineProperty(e,Symbol.toStringTag,{value:"Module"}),Object.defineProperty(e,"__esModule",{value:!0})},n.t=function(e,t){if(1&t&&(e=n(e)),8&t)return e;if(4&t&&"object"==typeof e&&e&&e.__esModule)return e;var r=Object.create(null);if(n.r(r),Object.defineProperty(r,"default",{enumerable:!0,value:e}),2&t&&"string"!=typeof e)for(var s in e)n.d(r,s,function(t){return e[t]}.bind(null,s));return r},n.n=function(e){var t=e&&e.__esModule?function(){return e.default}:function(){return e};return n.d(t,"a",t),t},n.o=function(e,t){return Object.prototype.hasOwnProperty.call(e,t)},n.p="",n(n.s=146)}([function(e,t){e.exports=window.wp.element},function(e,t){e.exports=window.wp.i18n},function(e,t){e.exports=window.wp.components},function(e,t,n){var r=n(10);function s(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}e.exports=function(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?s(Object(n),!0).forEach((function(t){r(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):s(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.data},function(e,t){function n(){return e.exports=n=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},e.exports.default=e.exports,e.exports.__esModule=!0,n.apply(this,arguments)}e.exports=n,e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.blockEditor},function(e,t,n){var r;
+/******/(()=>{// webpackBootstrap
+/******/var e={
+/***/8965:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r,s,o=n(9196);
+/* harmony import */function i(){return i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},i.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return o.createElement("svg",i({xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},e),r||(r=o.createElement("path",{d:"M13 7h-2v6h2V7zm0 8h-2v2h2v-2z"})),s||(s=o.createElement("path",{d:"M12 4.75a7.25 7.25 0 1 0 0 14.5 7.25 7.25 0 0 0 0-14.5zM3.25 12a8.75 8.75 0 1 1 17.5 0 8.75 8.75 0 0 1-17.5 0z"})))};
+/***/},
+/***/4280:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r,s,o=n(9196);
+/* harmony import */function i(){return i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},i.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return o.createElement("svg",i({width:24,height:24,xmlns:"http://www.w3.org/2000/svg"},e),r||(r=o.createElement("path",{fillRule:"evenodd",clipRule:"evenodd",d:"M11.929 18.5a6 6 0 1 0 0-12 6 6 0 0 0 0 12Zm0-3a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z",fill:"currentColor"})),s||(s=o.createElement("path",{fillRule:"evenodd",clipRule:"evenodd",d:"M11.276 4.5a1 1 0 0 0-.987.836L9.93 7.5h4l-.361-2.164a1 1 0 0 0-.986-.836h-1.306Zm1.306 16a1 1 0 0 0 .986-.836l.36-2.164h-4l.361 2.164a1 1 0 0 0 .987.836h1.306ZM18.53 7.934a1 1 0 0 0-1.217-.436l-2.055.77 2 3.464 1.694-1.395a1 1 0 0 0 .23-1.272l-.652-1.13ZM5.326 17.065a1 1 0 0 0 1.217.436l2.055-.77-2-3.463-1.694 1.394a1 1 0 0 0-.23 1.272l.652 1.131ZM4.675 9.066a1 1 0 0 0 .23 1.272l1.694 1.394 2-3.464-2.055-.77a1 1 0 0 0-1.217.437l-.652 1.13Zm14.509 6.869a1 1 0 0 0-.23-1.272l-1.695-1.395-2 3.464 2.055.77a1 1 0 0 0 1.217-.436l.653-1.131Z",fill:"currentColor"})))};
+/***/},
+/***/5889:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r,s,o=n(9196);
+/* harmony import */function i(){return i=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},i.apply(this,arguments)}
+/* harmony default export */const l=function(e){
+return o.createElement("svg",i({xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},e),r||(r=o.createElement("path",{d:"M12.408 7.277A2.999 2.999 0 0 0 9 10.25h1.5c0-.677.375-1.14.886-1.37.512-.228 1.11-.198 1.614.253.504.45.6 1.04.43 1.574-.171.534-.592.958-1.264 1.033l.021-.002a1.034 1.034 0 0 0-.937.99V14h1.5v-.95c1.02-.28 1.817-.979 2.107-1.888a2.998 2.998 0 0 0-2.449-3.885z"})),s||(s=o.createElement("path",{d:"M6 4c-1.096 0-2 .904-2 2v12c0 1.096.904 2 2 2h12c1.096 0 2-.904 2-2V6c0-1.096-.904-2-2-2H6zm0 1.5h12c.284 0 .5.216.5.5v12a.49.49 0 0 1-.5.5H6a.49.49 0 0 1-.5-.5V6c0-.284.216-.5.5-.5zm5.25 9.5v1.5h1.5V15h-1.5z"})))};
+/***/},
+/***/2691:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r,s,o,i=n(9196);
+/* harmony import */function l(){return l=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},l.apply(this,arguments)}
+/* harmony default export */const a=function(e){
+return i.createElement("svg",l({viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=i.createElement("path",{fill:"transparent",stroke:"currentColor",strokeWidth:1.5,d:"M21 8v11c0 1.105-.894 2-1.999 2H6"})),s||(s=i.createElement("rect",{x:3.75,y:3.75,width:13.5,height:13.5,rx:.875,stroke:"currentColor",strokeWidth:1.5,fill:"transparent"})),o||(o=i.createElement("path",{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M12 9a1.5 1.5 0 0 0-3 0H7.5a3 3 0 1 1 3.75 2.905v.845h-1.5V11.5c0-.57.452-.958.917-1.01A1.5 1.5 0 0 0 12 9Zm-2.25 4.75v1.5h1.5v-1.5h-1.5Z"})))};
+/***/},
+/***/8930:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r,s=n(9196);
+/* harmony import */function o(){return o=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},o.apply(this,arguments)}
+/* harmony default export */const i=function(e){
+return s.createElement("svg",o({viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},e),r||(r=s.createElement("path",{d:"M12 24a12 12 0 1 0 0-24 12 12 0 0 0 0 24Zm-.1-4.723c-2.849 0-4.517-1.072-4.575-3.011 0-.203 0-.405.029-.608 1.208 1.013 2.733 1.65 4.603 1.65 1.64 0 2.733-.695 2.733-1.708 0-.608-.978-.897-2.244-1.274-2.33-.752-5.553-1.736-5.553-5.181 0-2.721 1.957-4.458 5.323-4.458 2.905 0 4.66 1.042 4.689 3.242v.376c-1.496-1.187-3.107-1.794-4.862-1.794-1.64 0-2.848.636-2.848 1.592 0 .55.978.868 2.244 1.273 2.33.753 5.667 1.824 5.667 5.24 0 2.808-2.186 4.66-5.207 4.66Z",fill:"currentColor"})))};
+/***/},
+/***/6414:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>s
+/* harmony export */});
+/* harmony import */var r=n(9307);
+/* harmony import */
+/* harmony default export */const s=
+/**
+ * WordPress dependencies
+ */
+/** @typedef {{icon: JSX.Element, size?: number} & import('@wordpress/primitives').SVGProps} IconProps */
+/**
+ * Return an SVG icon.
+ *
+ * @param {IconProps} props icon is the SVG component to render
+ *                          size is a number specifiying the icon size in pixels
+ *                          Other props will be passed to wrapped SVG component
+ *
+ * @return {JSX.Element}  Icon component
+ */
+function({icon:e,size:t=24,...n}){return(0,r.cloneElement)(e,{width:t,height:t,...n})};
+//# sourceMappingURL=index.js.map
+/***/},
+/***/454:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M18.3 5.6L9.9 16.9l-4.6-3.4-.9 1.2 5.8 4.3 9.3-12.6z"}));
+/* harmony default export */}
+//# sourceMappingURL=check.js.map
+/***/,
+/***/9316:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},(0,r.createElement)(s.Path,{d:"M17.5 11.6L12 16l-5.5-4.4.9-1.2L12 14l4.5-3.6 1 1.2z"}));
+/* harmony default export */}
+//# sourceMappingURL=chevron-down.js.map
+/***/,
+/***/2585:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},(0,r.createElement)(s.Path,{d:"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"}));
+/* harmony default export */}
+//# sourceMappingURL=chevron-up.js.map
+/***/,
+/***/3851:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"}));
+/* harmony default export */}
+//# sourceMappingURL=info.js.map
+/***/,
+/***/528:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"}));
+/* harmony default export */}
+//# sourceMappingURL=plus.js.map
+/***/,
+/***/9854:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(444);
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+const o=(0,r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,r.createElement)(s.Path,{d:"M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"}));
+/* harmony default export */}
+//# sourceMappingURL=search.js.map
+/***/,
+/***/42:
+/***/(e,t)=>{var n;
 /*!
-  Copyright (c) 2017 Jed Watson.
+  Copyright (c) 2018 Jed Watson.
   Licensed under the MIT License (MIT), see
   http://jedwatson.github.io/classnames
-*/!function(){"use strict";var n={}.hasOwnProperty;function s(){for(var e=[],t=0;t<arguments.length;t++){var r=arguments[t];if(r){var o=typeof r;if("string"===o||"number"===o)e.push(r);else if(Array.isArray(r)&&r.length){var c=s.apply(null,r);c&&e.push(c)}else if("object"===o)for(var i in r)n.call(r,i)&&r[i]&&e.push(i)}}return e.join(" ")}e.exports?(s.default=s,e.exports=s):void 0===(r=function(){return s}.apply(t,[]))||(e.exports=r)}()},function(e,t){e.exports=window.lodash},function(e,t,n){var r=n(28),s=n(29),o=n(21),c=n(30);e.exports=function(e,t){return r(e)||s(e,t)||o(e,t)||c()},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){var r=n(35),s=n(36),o=n(21),c=n(37);e.exports=function(e){return r(e)||s(e)||o(e)||c()},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){var r=n(32);e.exports=function(e,t){if(null==e)return{};var n,s,o=r(e,t);if(Object.getOwnPropertySymbols){var c=Object.getOwnPropertySymbols(e);for(s=0;s<c.length;s++)n=c[s],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(o[n]=e[n])}return o},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.blocks},,,,function(e,t,n){"use strict";n.d(t,"d",(function(){return o})),n.d(t,"e",(function(){return c})),n.d(t,"c",(function(){return i})),n.d(t,"b",(function(){return l})),n.d(t,"a",(function(){return a}));var r=n(0),s=n(2),o=Object(r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(s.Path,{d:"M10.6 6L9.4 7l4.6 5-4.6 5 1.2 1 5.4-6z"})),c=Object(r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(s.Path,{d:"M6.5 12.4L12 8l5.5 4.4-.9 1.2L12 10l-4.5 3.6-1-1.2z"})),i=Object(r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(s.Path,{d:"M9 18.6L3.5 13l1-1L9 16.4l9.5-9.9 1 1z"})),l=Object(r.createElement)(s.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(r.createElement)(s.Path,{d:"M19 6.5H5c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zm.5 9c0 .3-.2.5-.5.5H5c-.3 0-.5-.2-.5-.5v-7c0-.3.2-.5.5-.5h14c.3 0 .5.2.5.5v7zM8 13h8v-1.5H8V13z"})),a=Object(r.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(r.createElement)(s.Path,{d:"M13 7h-2v6h2V7zM13 15h-2v2h2v-2z"}),Object(r.createElement)(s.Path,{d:"M12 4.75a7.25 7.25 0 100 14.5 7.25 7.25 0 000-14.5zM3.25 12a8.75 8.75 0 1117.5 0 8.75 8.75 0 01-17.5 0z"}))},function(e,t){e.exports=window.wp.compose},function(e,t){e.exports=window.wp.hooks},function(e,t){e.exports=function(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){var r=n(20);e.exports=function(e,t){if(e){if("string"==typeof e)return r(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?r(e,t):void 0}},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.apiFetch},function(e,t,n){"use strict";n.d(t,"a",(function(){return i})),n.d(t,"b",(function(){return l})),n.d(t,"c",(function(){return a})),n.d(t,"d",(function(){return u})),n.d(t,"e",(function(){return b})),n.d(t,"f",(function(){return m})),n.d(t,"g",(function(){return d}));var r=n(5),s=n.n(r),o=n(0),c=n(2),i=function(e){return Object(o.createElement)(c.SVG,s()({},e,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"}),Object(o.createElement)(c.Path,{d:"M20 16V4H4v12h16z"}),Object(o.createElement)(c.Path,{d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12zM6 20h2.222L11 16H8.778L6 20zM18 20h-2.222L13 16h2.222L18 20z"}))},l=function(){return Object(o.createElement)(c.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(o.createElement)(c.Rect,{stroke:"currentColor",fill:"transparent",x:"-0.75",y:"-0.75",width:"10",height:"14.5",transform:"matrix(4.37114e-08 -1 -1 -4.37114e-08 18.5 14)",strokeWidth:"1.5"}),Object(o.createElement)(c.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M8 12L16 12L16 8L8 8L8 12Z"}),Object(o.createElement)(c.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M7.2215 19.8616L10.7791 14.8707L9.55762 14L6.00005 18.9909L7.2215 19.8616Z"}),Object(o.createElement)(c.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M16.5578 19.8616L13.0002 14.8707L14.2217 14L17.7792 18.9909L16.5578 19.8616Z"}))},a=function(){return Object(o.createElement)(c.SVG,{viewBox:"0 0 24 24",xmlns:"http://www.w3.org/2000/svg"},Object(o.createElement)(c.Path,{d:"m4 4v12h4.7773l-2.7773 4h2.2227l2.7773-4h2l2.7773 4h2.2227l-2.7773-4h4.7773v-12zm1.5 1.5h13v9h-13zm3.5 2.5v1.5h6v-1.5zm0 3v1.5h6v-1.5z",clipRule:"evenodd",fillRule:"evenodd"}))},u=function(){return Object(o.createElement)(c.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(o.createElement)(c.Path,{d:"M16.181 17.381a7.61 7.61 0 01-2.13.133L15.778 20H18l-1.819-2.619zm-5.479-.953a7.712 7.712 0 01-2.12-1.928H5.5v-9h2.759A7.793 7.793 0 019.523 4H4v12h4.778L6 20h2.222l2.48-3.572z"}),Object(o.createElement)(c.Path,{d:"M15.541 8.944h-1.5v3.997h1.5V8.944zM15.541 7.944h-1.5V6.55h1.5v1.395z"}),Object(o.createElement)(c.Path,{d:"M20.79 9.768c0 3.425-2.714 6.269-6.145 6.269-3.43 0-6.145-2.844-6.145-6.269 0-3.424 2.714-6.268 6.145-6.268 3.43 0 6.145 2.844 6.145 6.268zm-6.145 4.769c2.565 0 4.645-2.135 4.645-4.769C19.29 7.135 17.21 5 14.645 5 12.08 5 10 7.135 10 9.768c0 2.634 2.08 4.769 4.645 4.769z"}))},b=function(){return Object(o.createElement)(c.SVG,{width:"24",height:"24",viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(o.createElement)(c.Path,{fillRule:"evenodd",clipRule:"evenodd",d:"M18.5 5.5v9h-13v-9h13zM20 16H4V4h16v12z"}),Object(o.createElement)(c.Path,{fillRule:"evenodd",clipRule:"evenodd",d:"M9 12h6V8H9v4zM6 20h2.222L11 16H8.778L6 20zM18 20h-2.222L13 16h2.222L18 20z"}))},m=function(){return Object(o.createElement)(c.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(o.createElement)(c.Rect,{x:"2.75",y:"7.75",width:"18.5",height:"6.5",rx:"3.25",stroke:"currentColor",strokeWidth:"1.5",fillOpacity:"0"}),Object(o.createElement)(c.Path,{d:"M6 7.75 H 16.7 L 10.2 14.25 H 6 C 4.2 14.25 2.75 12.8 2.75 11 C 2.75 9.2 4.2 7.75 6 7.75Z",strokeWidth:"1.5"}))},d=function(e){return Object(o.createElement)(c.SVG,s()({},e,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 256.000000 256.000000",preserveAspectRatio:"xMidYMid meet"}),Object(o.createElement)(c.G,{transform:"translate(0.000000,256.000000) scale(0.100000,-0.100000)",stroke:"none"},Object(o.createElement)(c.Path,{d:"M1174 2541 c-28 -3 -58 -12 -67 -19 -9 -8 -25 -11 -37 -7 -11 3 -20 2 -20 -4 0 -5 -11 -8 -25 -5 -14 2 -25 0 -25 -6 0 -5 -13 -10 -30 -10 -16 0 -30 -4 -30 -9 0 -4 -23 -11 -52 -14 -28 -4 -54 -11 -58 -16 -3 -6 -25 -13 -48 -17 -23 -3 -39 -10 -37 -15 3 -4 -10 -11 -30 -15 -19 -3 -33 -9 -31 -13 2 -3 -15 -15 -37 -26 -23 -11 -48 -26 -55 -32 -7 -7 -19 -13 -27 -13 -7 0 -15 -7 -19 -15 -3 -8 -12 -15 -21 -15 -8 0 -15 -4 -15 -9 0 -5 -8 -12 -17 -15 -47 -15 -189 -157 -290 -291 -5 -5 -32 -59 -61 -120 -29 -60 -58 -118 -63 -127 -5 -10 -9 -25 -9 -33 0 -10 -5 -13 -11 -9 -9 5 -10 -1 -5 -20 4 -15 2 -26 -4 -26 -5 0 -9 -10 -9 -22 1 -23 -13 -104 -31 -186 -13 -54 -13 -254 -1 -301 6 -20 15 -71 22 -114 7 -43 15 -80 20 -82 4 -3 5 -15 1 -27 -3 -14 -2 -19 6 -14 7 4 12 2 12 -4 0 -6 14 -38 30 -72 17 -33 30 -64 30 -70 0 -5 7 -16 15 -24 8 -9 15 -24 15 -35 0 -10 4 -19 8 -19 5 0 14 -10 19 -23 23 -47 145 -179 177 -191 10 -3 16 -12 13 -21 -4 -8 -1 -12 6 -10 7 3 34 -16 60 -40 27 -25 53 -45 59 -45 6 0 19 -9 29 -21 9 -11 29 -21 43 -23 14 -1 29 -5 32 -9 3 -3 12 -3 20 0 8 3 14 -1 14 -11 0 -9 -8 -16 -17 -16 -14 0 -9 -8 16 -30 18 -17 38 -30 43 -30 6 0 8 -6 5 -13 -4 -10 2 -13 20 -9 18 3 24 1 19 -6 -4 -7 3 -14 19 -18 14 -3 25 -10 25 -14 0 -4 18 -10 40 -14 22 -3 40 -11 40 -17 0 -6 7 -9 15 -5 9 3 21 -4 31 -19 9 -14 25 -25 35 -25 10 0 20 -4 23 -9 4 -5 25 -12 49 -16 23 -4 47 -11 53 -16 12 -10 246 -5 263 5 5 4 12 2 16 -4 8 -13 41 -13 82 2 27 10 38 10 53 0 27 -17 71 -15 109 4 28 14 56 21 99 26 6 1 12 5 12 10 0 4 11 8 25 8 14 0 25 4 25 10 0 5 15 12 33 15 19 4 40 15 47 25 10 14 22 17 51 13 26 -4 39 -2 39 6 0 6 5 11 11 11 6 0 27 13 46 30 18 16 44 30 58 30 13 0 26 6 28 13 4 9 8 8 16 -3 7 -10 11 -11 11 -2 0 6 6 12 13 12 18 0 49 24 134 104 40 38 73 75 73 83 0 7 4 13 8 13 5 0 17 16 28 35 10 19 22 35 25 35 4 0 10 11 13 25 4 14 11 23 16 20 6 -3 10 1 10 9 0 21 42 116 51 116 4 0 10 13 14 30 4 16 11 30 16 30 5 0 9 9 9 20 0 11 5 20 11 20 6 0 8 9 4 20 -3 11 -2 20 3 20 5 0 18 40 30 90 18 71 22 120 22 240 0 82 -4 169 -10 192 -5 24 -17 97 -26 163 -9 66 -19 122 -23 125 -3 3 -15 30 -25 60 -11 30 -26 66 -33 80 -7 14 -13 31 -13 38 0 6 -4 12 -10 12 -5 0 -12 11 -16 25 -3 14 -10 25 -14 25 -4 0 -10 8 -14 18 -6 20 -25 50 -43 70 -7 7 -13 18 -13 23 0 5 -5 15 -10 22 -41 48 -50 62 -50 74 0 7 -5 13 -11 13 -6 0 -9 7 -6 14 4 10 1 13 -8 10 -8 -4 -20 6 -28 23 -13 25 -170 181 -209 208 -31 22 -54 35 -73 44 -11 5 -30 18 -42 30 -12 11 -33 23 -47 27 -14 3 -26 10 -26 15 0 5 -8 9 -17 9 -10 0 -31 7 -47 15 -15 8 -35 15 -42 15 -8 0 -14 4 -14 10 0 5 -10 10 -22 10 -13 0 -63 6 -113 13 -111 18 -313 27 -381 18z m381 -201 c-4 -6 6 -10 22 -10 45 0 103 -12 98 -20 -3 -4 14 -10 37 -13 22 -3 44 -10 47 -15 3 -5 20 -13 37 -16 17 -4 40 -15 50 -25 11 -9 22 -18 26 -19 24 -8 44 -17 54 -26 6 -6 22 -18 35 -26 38 -24 169 -161 169 -176 0 -8 5 -14 11 -14 6 0 9 -7 6 -14 -4 -10 -1 -13 9 -9 10 4 12 0 7 -13 -4 -12 -3 -15 5 -10 7 4 12 1 12 -7 0 -8 7 -20 16 -28 9 -7 14 -22 11 -35 -3 -15 0 -21 9 -17 8 3 16 -5 20 -21 3 -14 10 -26 14 -26 5 0 12 -20 16 -45 3 -25 10 -45 15 -45 5 0 9 -7 9 -16 0 -9 6 -28 14 -42 24 -48 46 -102 46 -117 0 -7 6 -15 13 -17 16 -6 18 -455 1 -466 -6 -4 -14 -42 -17 -86 -3 -43 -10 -83 -16 -89 -6 -6 -11 -19 -11 -30 0 -10 -4 -16 -9 -13 -5 3 -11 -17 -15 -44 -4 -28 -10 -50 -15 -50 -5 0 -11 -14 -15 -31 -4 -23 -10 -30 -21 -25 -9 3 -13 2 -10 -4 10 -16 -5 -52 -20 -46 -8 3 -11 -2 -8 -13 3 -11 -8 -32 -29 -53 -18 -20 -42 -47 -54 -59 -27 -30 -105 -99 -134 -119 -12 -8 -28 -21 -36 -27 -7 -7 -15 -13 -19 -13 -4 0 -14 -7 -22 -16 -9 -8 -24 -13 -34 -11 -10 3 -16 0 -14 -7 4 -11 -57 -56 -76 -56 -5 0 -9 -4 -9 -10 0 -5 -18 -13 -40 -16 -22 -4 -37 -10 -34 -15 3 -5 -6 -9 -19 -9 -13 0 -27 -3 -31 -7 -7 -7 -18 -11 -68 -20 -18 -3 -39 -10 -46 -16 -8 -6 -113 -9 -285 -9 -149 1 -278 -2 -285 -7 -9 -5 -31 0 -60 15 -26 12 -54 24 -62 26 -8 2 -22 10 -30 19 -8 9 -25 19 -37 23 -13 4 -23 11 -23 16 0 5 -16 12 -35 16 -19 3 -35 10 -35 14 0 4 -16 11 -36 15 -20 3 -42 12 -49 18 -7 7 -29 26 -49 42 -76 62 -142 138 -140 161 1 7 -4 10 -11 7 -15 -5 -30 31 -20 47 3 6 0 7 -9 4 -10 -4 -18 1 -23 12 -3 11 -9 21 -12 24 -15 13 -60 114 -54 123 3 6 1 7 -5 3 -7 -4 -13 7 -18 29 -3 19 -10 35 -15 35 -5 0 -9 6 -9 14 0 7 -7 27 -15 42 -8 16 -15 41 -15 56 0 15 -4 29 -9 33 -6 3 -13 37 -17 75 -4 39 -11 73 -15 76 -5 3 -9 73 -9 155 0 83 4 148 9 145 4 -3 11 27 15 67 4 40 11 74 16 75 6 2 10 15 10 29 0 14 7 40 15 59 8 19 22 49 30 68 8 19 15 39 15 45 0 6 4 11 9 11 5 0 12 14 16 30 4 17 10 30 15 30 4 0 10 8 14 18 9 28 80 129 101 144 5 4 6 8 2 8 -4 0 11 20 34 45 24 25 49 43 55 41 8 -3 11 1 7 9 -3 9 4 19 18 25 13 5 33 16 44 22 18 12 24 17 57 43 28 23 119 75 131 75 6 0 21 7 31 15 11 8 28 15 38 15 10 0 18 4 18 9 0 5 19 12 43 16 23 4 45 12 48 17 3 5 31 12 62 15 31 3 54 10 51 14 -3 5 108 9 246 9 165 0 249 -3 245 -10z"}),Object(o.createElement)(c.Path,{d:"M820 1920 c0 -5 -6 -10 -12 -10 -26 -1 -58 -38 -58 -67 0 -26 9 -38 50 -63 12 -7 12 -12 1 -34 -11 -21 -17 -23 -32 -13 -13 8 -15 13 -6 19 7 5 -1 8 -20 8 -18 0 -33 -4 -33 -10 0 -5 -19 -10 -42 -10 -40 -1 -88 -26 -88 -45 0 -14 43 -45 61 -45 9 0 19 -5 21 -12 3 -9 12 -9 36 1 41 17 47 11 31 -33 -10 -29 -11 -43 -1 -68 14 -38 2 -56 -22 -32 -13 12 -28 15 -63 11 -25 -3 -49 -10 -53 -17 -4 -7 -17 -10 -29 -7 -12 3 -19 1 -15 -5 3 -5 -2 -18 -12 -29 -22 -24 -10 -52 25 -57 11 -2 21 -8 21 -13 0 -5 29 -9 65 -9 37 0 65 4 65 10 0 12 77 14 82 2 2 -4 18 -18 36 -31 18 -13 31 -25 29 -28 -3 -2 -42 -6 -88 -9 -46 -3 -86 -9 -89 -14 -3 -6 -41 -13 -83 -16 -42 -4 -77 -11 -77 -17 0 -5 -9 -7 -19 -4 -14 3 -18 1 -14 -9 3 -8 0 -14 -6 -14 -6 0 -11 -9 -11 -20 0 -11 7 -20 15 -20 8 0 15 -4 15 -9 0 -5 25 -12 55 -16 30 -3 53 -10 50 -14 -6 -11 184 -24 229 -16 20 4 36 11 36 16 0 5 21 9 48 9 66 0 88 8 100 36 10 20 16 23 44 18 42 -8 88 -27 88 -36 0 -5 3 -8 8 -7 15 2 52 -14 52 -22 0 -5 3 -8 8 -7 4 1 18 -2 30 -6 18 -6 30 -2 48 15 13 12 24 18 24 12 0 -6 -16 -25 -35 -42 -19 -17 -35 -35 -35 -40 0 -5 -5 -11 -11 -13 -6 -2 -11 -29 -11 -61 -1 -55 1 -59 44 -102 26 -26 59 -48 77 -51 17 -4 31 -10 31 -15 0 -4 21 -9 48 -11 42 -3 47 -6 47 -27 0 -17 -11 -29 -40 -45 -22 -11 -42 -24 -45 -27 -7 -8 -53 -24 -62 -21 -5 1 -8 -3 -8 -8 0 -6 -9 -10 -19 -10 -11 0 -22 -4 -25 -9 -3 -5 -32 -12 -63 -16 -32 -4 -60 -11 -63 -15 -3 -5 -41 -12 -85 -16 -44 -4 -82 -10 -85 -14 -3 -4 -32 -11 -64 -16 -70 -11 -89 -34 -27 -34 22 0 43 -4 46 -10 7 -12 102 -13 107 -2 2 5 38 12 81 15 75 7 79 6 104 -19 14 -14 41 -28 59 -31 19 -3 34 -10 34 -14 0 -5 18 -9 40 -9 22 0 40 4 40 9 0 5 20 12 45 15 25 4 45 10 45 14 0 11 77 42 104 42 14 0 28 5 31 10 3 6 22 10 41 10 26 0 34 4 34 18 0 10 -11 25 -25 32 -20 11 -25 21 -25 52 0 21 4 38 9 38 5 0 13 9 16 20 4 11 17 32 31 47 31 33 31 74 -1 121 -14 20 -25 32 -25 27 0 -5 -5 -4 -12 3 -7 7 -20 12 -31 12 -10 0 -16 4 -13 9 6 8 -63 21 -115 21 -16 0 -29 5 -29 10 0 6 -9 10 -21 10 -26 0 -59 18 -59 32 0 15 48 58 65 58 7 0 15 5 17 11 2 5 22 13 46 16 23 3 39 9 36 14 -2 4 18 11 45 15 28 4 48 10 46 14 -3 5 23 10 57 12 50 3 67 0 80 -13 16 -16 38 -17 230 -12 222 6 238 10 238 52 0 14 -8 23 -25 27 -14 3 -25 10 -25 15 0 6 -12 8 -27 7 -20 -2 -28 2 -31 16 -2 11 -10 25 -17 33 -7 7 -15 18 -17 24 -2 7 -30 14 -61 17 -31 2 -57 8 -57 12 0 5 -28 11 -62 15 -35 4 -69 12 -75 17 -9 7 -13 7 -13 -1 0 -6 -11 -11 -25 -11 -14 0 -25 -5 -25 -11 0 -7 -14 -8 -40 -4 -23 4 -40 3 -40 -3 0 -5 -25 -12 -57 -15 -31 -3 -59 -11 -63 -16 -3 -6 -25 -12 -48 -13 -49 -2 -82 -27 -82 -64 0 -19 6 -26 30 -30 67 -14 14 -32 -72 -25 -16 1 -28 -2 -28 -7 0 -5 -8 -12 -17 -15 -10 -2 -27 -8 -38 -12 -11 -4 -15 -3 -9 2 15 12 13 52 -4 46 -20 -8 -38 25 -36 68 2 45 18 69 45 69 11 0 19 4 19 9 0 6 63 12 143 15 193 7 207 8 207 18 0 4 13 8 30 8 19 0 33 7 40 19 11 21 4 51 -12 51 -6 0 -8 6 -5 13 4 10 -3 12 -24 9 -16 -2 -29 0 -29 5 0 6 -44 13 -97 16 -54 4 -99 11 -101 17 -6 16 -134 12 -156 -5 -11 -9 -41 -15 -68 -15 -28 0 -48 -5 -48 -11 0 -6 -7 -9 -14 -6 -10 4 -13 1 -9 -9 3 -7 0 -14 -6 -14 -6 0 -11 -7 -11 -15 0 -21 41 -66 60 -64 40 4 45 -2 20 -21 -14 -11 -30 -20 -36 -20 -6 0 -17 -7 -24 -15 -7 -8 -21 -15 -30 -15 -10 0 -20 -5 -22 -12 -3 -7 -32 -14 -74 -16 -38 -3 -78 -11 -89 -18 -23 -16 -61 -18 -70 -4 -4 6 10 10 34 10 23 0 41 3 41 8 0 4 -19 16 -43 27 -53 25 -62 34 -63 65 -2 42 50 69 133 71 110 2 123 6 123 40 0 16 -5 29 -11 29 -6 0 -9 6 -6 13 3 7 -3 13 -12 14 -9 1 -38 5 -64 9 -38 5 -59 2 -95 -14 -26 -11 -59 -25 -74 -31 -35 -13 -36 -34 -3 -49 32 -15 31 -22 -6 -50 -24 -20 -32 -22 -44 -12 -8 7 -15 17 -15 22 0 6 -10 24 -22 40 -19 28 -20 31 -5 40 10 5 17 17 17 26 1 21 37 65 66 80 15 8 39 8 87 -1 87 -14 118 -2 115 45 l-3 33 -80 3 c-64 2 -85 -1 -107 -16 -29 -19 -88 -99 -88 -119 0 -7 -4 -13 -10 -13 -17 0 -11 58 10 95 11 20 20 42 20 51 0 8 7 17 15 20 8 4 15 14 15 24 0 16 6 18 35 13 23 -4 35 -2 35 6 0 6 11 11 23 11 13 0 34 8 45 19 23 19 30 51 11 51 -6 0 -8 7 -5 16 4 9 2 13 -5 8 -6 -4 -15 -1 -19 6 -4 7 -31 15 -59 18 -28 2 -51 8 -51 13 0 5 -11 9 -25 9 -14 0 -25 -4 -25 -10z"})))}},function(e,t){e.exports=window.wp.dataControls},,,function(e,t,n){"use strict";n.d(t,"a",(function(){return s})),n.d(t,"b",(function(){return o})),n.d(t,"c",(function(){return c}));var r=n(4),s=function(e,t,n,r){return regeneratorRuntime.mark((function s(){var o,c=arguments;return regeneratorRuntime.wrap((function(s){for(;;)switch(s.prev=s.next){case 0:if(!e){s.next=3;break}return s.next=3,{type:e};case 3:return s.prev=3,s.delegateYield(t.apply(void 0,c),"t0",5);case 5:return o=s.t0,s.next=8,{type:n,data:o};case 8:s.next=14;break;case 10:return s.prev=10,s.t1=s.catch(3),s.next=14,{type:r,error:s.t1};case 14:case"end":return s.stop()}}),s,null,[[3,10]])}))},o=function(e,t){return function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:t,r=arguments.length>1?arguments[1]:void 0,s=e[r.type]||e.DEFAULT;return s(r,n)}},c=function(e,t){if(r.createReduxStore){var n=Object(r.createReduxStore)(e,t);return Object(r.register)(n),n}return Object(r.registerStore)(e,t),e}},function(e,t){e.exports=function(e){if(Array.isArray(e))return e},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(e,t){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e)){var n=[],_n=!0,r=!1,s=void 0;try{for(var o,c=e[Symbol.iterator]();!(_n=(o=c.next()).done)&&(n.push(o.value),!t||n.length!==t);_n=!0);}catch(i){r=!0,s=i}finally{try{_n||null==c.return||c.return()}finally{if(r)throw s}}return n}},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=window.wp.url},function(e,t){e.exports=function(e,t){if(null==e)return{};var n,r,s={},o=Object.keys(e);for(r=0;r<o.length;r++)n=o[r],t.indexOf(n)>=0||(s[n]=e[n]);return s},e.exports.default=e.exports,e.exports.__esModule=!0},,function(e,t){e.exports=window.wp.primitives},function(e,t,n){var r=n(20);e.exports=function(e){if(Array.isArray(e))return r(e)},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(e){if("undefined"!=typeof Symbol&&Symbol.iterator in Object(e))return Array.from(e)},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t){e.exports=function(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")},e.exports.default=e.exports,e.exports.__esModule=!0},function(e,t,n){"use strict";var r=n(12),s=n.n(r),o=n(13),c=n(23);t.a=function(e){Object(o.updateCategory)("sensei-lms",{icon:Object(c.g)({width:"20",height:"20"})}),e.forEach((function(e){var t=e.name,n=s()(e,["name"]);Object(o.registerBlockType)(t,n)}))}},,function(e,t){e.exports=window.wp.keycodes},,,,function(e,t,n){"use strict";var r,s=n(31),o=n(22);n.n(o).a.use((r={},function(e,t){return"string"!=typeof e.path||"GET"!==e.method&&e.method||(r[e.path]?e.path=Object(s.addQueryArgs)(e.path,{__skip_preload:1}):r[e.path]=!0),t(e)}))},function(e,t,n){"use strict";var r=n(49);t.a=r.a},function(e,t,n){"use strict";var r=n(5),s=n.n(r),o=n(12),c=n.n(o),i=n(0),l=n(7),a=n.n(l),u=n(2),b=n(1);t.a=function(e){var t=e.className,n=e.id,r=e.label,o=e.value,l=e.help,m=e.allowReset,d=void 0!==m&&m,p=e.resetLabel,f=e.onChange,v=e.suffix,O=c()(e,["className","id","label","value","help","allowReset","resetLabel","onChange","suffix"]);return Object(i.createElement)(u.BaseControl,{id:n,label:r,help:l},Object(i.createElement)("div",{className:"sensei-number-control"},Object(i.createElement)("div",{className:"sensei-number-control__input-container"},Object(i.createElement)("input",s()({className:a()("sensei-number-control__input components-text-control__input",t),type:"number",id:n,onChange:function(e){f(parseInt(e.target.value,10)||O.min||0)},value:null===o?"":o},O)),v&&Object(i.createElement)("span",{className:"sensei-number-control__input-suffix"},v)),d&&Object(i.createElement)(u.Button,{className:"sensei-number-control__button",isSmall:!0,isSecondary:!0,onClick:function(){return f(null)}},p||Object(b.__)("Reset","sensei-lms"))))}},function(e,t,n){"use strict";var r=n(5),s=n.n(r),o=n(3),c=n.n(o),i=n(12),l=n.n(i),a=n(0),u=n(7),b=n.n(u),m=n(2),d=n(17);t.a=function(e){var t=e.options,n=e.optionsLabel,r=e.icon,o=e.value,i=e.onChange,u=e.toggleProps,p=e.getMenuItemProps,f=e.popoverProps,v=l()(e,["options","optionsLabel","icon","value","onChange","toggleProps","getMenuItemProps","popoverProps"]),O=t.find((function(e){return o===e.value}));return Object(a.createElement)(m.Dropdown,s()({className:"sensei-toolbar-dropdown",popoverProps:c()(c()({isAlternate:!0,position:"bottom right left",focusOnMount:!0},f),{},{className:b()(null==f?void 0:f.className,"sensei-toolbar-dropdown__popover")}),renderToggle:function(e){var t=e.isOpen,n=e.onToggle;return Object(a.createElement)(m.Button,s()({onClick:n,icon:r,"aria-expanded":t,"aria-haspopup":"true"},u,{children:null!=u&&u.children?u.children(O):null==O?void 0:O.label}))},renderContent:function(e){var r=e.onClose;return Object(a.createElement)(m.NavigableMenu,{role:"menu",stopNavigationEvents:!0},Object(a.createElement)(m.MenuGroup,{label:n},t.map((function(e){var t=e.value===(null==O?void 0:O.value),n=null==p?void 0:p(e);return Object(a.createElement)(m.MenuItem,s()({key:e.value,role:"menuitemradio",isSelected:t,icon:t?d.c:null,className:b()("sensei-toolbar-dropdown__option",{"is-selected":t},null==n?void 0:n.className),onClick:function(){i(e.value),r()},children:e.label},n))}))))}},v))}},,function(e,t,n){"use strict";var r=n(5),s=n.n(r),o=n(12),c=n.n(o),i=n(0),l=n(7),a=n.n(l),u=n(6),b=n(40);t.a=Object(i.forwardRef)((function(e,t){var n=e.onChange,r=e.onKeyDown,o=e.value,l=e.onEnter,m=e.onRemove,d=c()(e,["onChange","onKeyDown","value","onEnter","onRemove"]);return Object(i.createElement)(u.PlainText,s()({ref:t,value:o,onChange:function(e){n(e.replace(/\n/g,""))},onKeyDown:function(e){switch(r&&r(e),e.keyCode){case b.ENTER:e.preventDefault(),l&&l(e);break;case b.BACKSPACE:!m||null!=o&&o.length||(e.preventDefault(),m())}}},d,{className:a()("sensei-lms-single-line-input",d.className)}))}))},,,,,,,function(e,t){e.exports=window.wp.editPost},,,,,function(e,t,n){"use strict";n.d(t,"a",(function(){return b}));var r=n(3),s=n.n(r),o=n(12),c=n.n(o),i=n(8),l=n(24),a=n(4),u=n(27);n(44);function b(e){var t,n,r=e.storeName,o=e.getEndpoint,b=e.saveError,m=e.fetchError,d=e.clearError,p=e.updateBlock,f=e.readBlock,v=e.setServerStructure,O=c()(e,["storeName","getEndpoint","saveError","fetchError","clearError","updateBlock","readBlock","setServerStructure"]),j={loadStructure:regeneratorRuntime.mark((function e(){var t,n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.prev=0,e.delegateYield(o(),"t0",2);case 2:return t=e.t0,e.next=5,Object(l.apiFetch)({path:"/sensei-internal/v1/".concat(t),method:"GET"});case 5:return n=e.sent,e.next=8,j.setResult(n);case 8:e.next=14;break;case 10:return e.prev=10,e.t1=e.catch(0),e.next=14,null==m?void 0:m(e.t1);case 14:case"end":return e.stop()}}),e,null,[[0,10]])})),saveStructure:regeneratorRuntime.mark((function e(){var t,n,s;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,Object(a.select)(r).getEditorStructure();case 2:return t=e.sent,e.prev=3,e.delegateYield(o(),"t0",5);case 5:return n=e.t0,e.next=8,Object(l.apiFetch)({path:"/sensei-internal/v1/".concat(n),method:"POST",data:t});case 8:return s=e.sent,e.next=11,j.setResult(s);case 11:e.next=17;break;case 13:return e.prev=13,e.t1=e.catch(3),e.next=17,null==b?void 0:b(e.t1);case 17:case"end":return e.stop()}}),e,null,[[3,13]])})),setResult:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,j.setServerStructure(t);case 2:return e.next=4,p(t);case 4:case"end":return e.stop()}}),e)})),setServerStructure:function(e){return{type:"SET_SERVER_STRUCTURE",serverStructure:e}},setEditorStructure:function(e){return{type:"SET_EDITOR_STRUCTURE",editorStructure:e}},savePost:regeneratorRuntime.mark((function e(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SAVE_POST"};case 2:return e.next=4,Object(a.dispatch)("core/editor").savePost();case 4:case"end":return e.stop()}}),e)})),startPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"START_SAVE"};case 2:return t=f(),e.next=5,j.setEditorStructure(t);case 5:return e.next=7,null==d?void 0:d();case 7:if(t){e.next=9;break}return e.abrupt("return");case 9:if(!Object(a.select)(r).hasUnsavedEditorChanges()){e.next=11;break}return e.delegateYield(j.saveStructure(),"t0",11);case 11:return e.next=13,{type:"FINISH_SAVE"};case 13:case"end":return e.stop()}}),e)})),finishPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"FINISH_POST_SAVE"};case 2:if(t=Object(a.select)(r),!(0,t.hasUnsavedServerUpdates)()){e.next=5;break}return e.delegateYield(j.savePost(),"t0",5);case 5:case"end":return e.stop()}}),e)})),setBlock:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SET_BLOCK",clientId:t};case 2:case"end":return e.stop()}}),e)}))},h={SET_SERVER_STRUCTURE:function(e,t){var n=e.serverStructure,r=!t.editorStructure,o=v?v(n):n,c=!r&&!Object(i.isEqual)(o,t.editorStructure);return s()(s()({},t),{},{serverStructure:o,hasUnsavedServerUpdates:c,hasUnsavedEditorChanges:!1})},SET_EDITOR_STRUCTURE:function(e,t){var n=e.editorStructure,r=!Object(i.isEqual)(t.serverStructure,n);return s()(s()({},t),{},{editorStructure:n,hasUnsavedEditorChanges:r&&!!n})},START_SAVE:function(e,t){return s()(s()({},t),{},{isSavingStructure:!0})},FINISH_SAVE:function(e,t){return s()(s()({},t),{},{isSavingStructure:!1})},SAVE_POST:function(e,t){return s()(s()({},t),{},{hasUnsavedServerUpdates:!1})},SET_BLOCK:function(e,t){var n=e.clientId;return s()(s()({},t),{},{clientId:n})},DEFAULT:function(e,t){return t}};return{unsubscribe:(t=!1,n=!1,Object(a.subscribe)((function(){var e=Object(a.select)("core/editor");if(e){var s=e.isSavingPost()&&!e.isAutosavingPost(),o=Object(a.select)(r).getIsSavingStructure();s&&(n=!0),t||s||!n?t&&!o&&(t=!1,Object(a.dispatch)(r).finishPostSave()):(t=!0,n=!1,Object(a.dispatch)(r).startPostSave())}}))),store:Object(a.registerStore)(r,{reducer:Object(u.b)(s()(s()({},h),null==O?void 0:O.reducers),{serverStructure:null,editorStructure:null,isSavingStructure:!1,hasUnsavedServerUpdates:!1,hasUnsavedEditorChanges:!1,clientId:null}),actions:s()(s()({},j),null==O?void 0:O.actions),selectors:s()(s()({},{hasUnsavedServerUpdates:function(e){return e.hasUnsavedServerUpdates},hasUnsavedEditorChanges:function(e){return e.hasUnsavedEditorChanges},getIsSavingStructure:function(e){return e.isSavingStructure},getServerStructure:function(e){return e.serverStructure},getEditorStructure:function(e){return e.editorStructure},getBlock:function(e){return e.clientId}}),null==O?void 0:O.selectors),controls:s()(s()({},l.controls),null==O?void 0:O.controls)})}}},function(e,t,n){"use strict";n.d(t,"a",(function(){return i}));var r=n(13),s=n(4),o=n(0),c=n(8),i=function(e,t){var n=e.name,i=e.attributes,l=void 0===i?{}:i,a=e.selectFirstBlock,u=void 0!==a&&a,b=e.isEmptyBlock,m=t.clientId,d=Object(s.useDispatch)("core/block-editor"),p=d.__unstableMarkNextChangeAsNotPersistent,f=void 0===p?c.noop:p,v=d.insertBlock,O=Object(s.useSelect)((function(e){return e("core/block-editor").getBlocks(m)})),j=0===O.length,h=Object(o.useCallback)((function(){var e=Object(r.createBlock)(n,l),t=j&&u;f(),v(e,void 0,m,t)}),[f,v,m,n,l,j,u]),g=O.length&&O[O.length-1],_=g&&b(g.attributes);Object(o.useEffect)((function(){_||h()}),[_,h])}},,function(e){e.exports=JSON.parse('{"name":"sensei-lms/quiz-question","parent":["sensei-lms/quiz"],"category":"sensei-lms","supports":{"html":false},"attributes":{"id":{"type":"integer"},"title":{"type":"string"},"type":{"type":"string","default":"multiple-choice"},"answer":{"type":"object"},"options":{"type":"object","default":{"grade":1}},"editable":{"type":"boolean","default":true,"source":false}}}')},,,,,function(e,t){var n="undefined"!=typeof crypto&&crypto.getRandomValues&&crypto.getRandomValues.bind(crypto)||"undefined"!=typeof msCrypto&&"function"==typeof window.msCrypto.getRandomValues&&msCrypto.getRandomValues.bind(msCrypto);if(n){var r=new Uint8Array(16);e.exports=function(){return n(r),r}}else{var s=new Array(16);e.exports=function(){for(var e,t=0;t<16;t++)0==(3&t)&&(e=4294967296*Math.random()),s[t]=e>>>((3&t)<<3)&255;return s}}},function(e,t){for(var n=[],r=0;r<256;++r)n[r]=(r+256).toString(16).substr(1);e.exports=function(e,t){var r=t||0,s=n;return[s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]]].join("")}},,,,,,,,,,,,,,,function(e,t,n){var r=n(127),s=n(128),o=s;o.v1=r,o.v4=s,e.exports=o},function(e){e.exports=JSON.parse('{"name":"sensei-lms/quiz-category-question","parent":["sensei-lms/quiz"],"category":"sensei-lms","supports":{"html":false},"attributes":{"id":{"type":"integer"},"type":{"type":"string","default":"category-question"},"categoryName":{"type":"string"},"options":{"type":"object","default":{"category":null,"number":1}}}}')},function(e){e.exports=JSON.parse('{"name":"sensei-lms/quiz","category":"sensei-lms","supports":{"html":false,"multiple":false},"attributes":{"id":{"type":"integer"},"options":{"type":"object"},"isPostTemplate":{"type":"boolean","default":false}}}')},,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,function(e,t,n){var r,s,o=n(69),c=n(70),i=0,l=0;e.exports=function(e,t,n){var a=t&&n||0,u=t||[],b=(e=e||{}).node||r,m=void 0!==e.clockseq?e.clockseq:s;if(null==b||null==m){var d=o();null==b&&(b=r=[1|d[0],d[1],d[2],d[3],d[4],d[5]]),null==m&&(m=s=16383&(d[6]<<8|d[7]))}var p=void 0!==e.msecs?e.msecs:(new Date).getTime(),f=void 0!==e.nsecs?e.nsecs:l+1,v=p-i+(f-l)/1e4;if(v<0&&void 0===e.clockseq&&(m=m+1&16383),(v<0||p>i)&&void 0===e.nsecs&&(f=0),f>=1e4)throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");i=p,l=f,s=m;var O=(1e4*(268435455&(p+=122192928e5))+f)%4294967296;u[a++]=O>>>24&255,u[a++]=O>>>16&255,u[a++]=O>>>8&255,u[a++]=255&O;var j=p/4294967296*1e4&268435455;u[a++]=j>>>8&255,u[a++]=255&j,u[a++]=j>>>24&15|16,u[a++]=j>>>16&255,u[a++]=m>>>8|128,u[a++]=255&m;for(var h=0;h<6;++h)u[a+h]=b[h];return t||c(u)}},function(e,t,n){var r=n(69),s=n(70);e.exports=function(e,t,n){var o=t&&n||0;"string"==typeof e&&(t="binary"===e?new Array(16):null,e=null);var c=(e=e||{}).random||(e.rng||r)();if(c[6]=15&c[6]|64,c[8]=63&c[8]|128,t)for(var i=0;i<16;++i)t[o+i]=c[i];return t||s(c)}},,,,,,,,,,,,,,,,,,function(e,t,n){"use strict";n.r(t);var r=n(38),s=n(3),o=n.n(s),c=n(0),i=n(6),l=n(1),a=n(5),u=n.n(a),b=n(4),m=n(18),d=n(7),p=n.n(d),f=n(9),v=n.n(f),O=function(e){return Object(m.createHigherOrderComponent)((function(t){return function(n){return function(e,t){var n=t.attributes,r=t.setMeta;Object(c.useEffect)((function(){var t=j(e(n));r({validationErrors:t})}),[e,n,r])}(e,n),Object(c.createElement)(t,n)}}),"withBlockValidation")},j=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return Object.entries(e).filter((function(e){return v()(e,2)[1]})).map((function(e){return v()(e,1)[0]}))},h=function(e){return Object(b.useSelect)((function(t){var n=t("core/block-editor"),r=n.getBlockRootClientId(e);return(n.getBlocks(r)||[]).slice(0,n.getBlockIndex(e,r))}),[e]).reduce((function(e,t){var n;return e+("category-question"===t.attributes.type&&(null===(n=t.attributes.options)||void 0===n?void 0:n.number)||1)}),0)+1},g=n(45),_=n(10),E=n.n(_),w=n(8),k=n(27),y={reducer:Object(k.b)({SET_BLOCK_META:function(e,t){var n=e.clientId,r=e.metadata;return o()(o()({},t),{},E()({},n,o()(o()({},t[n]||{}),r)))},CLEAR:function(e,t){return t?o()(o()({},e),{},E()({},t,void 0)):{}},DEFAULT:function(e){return e}},{}),actions:{setBlockMeta:function(e,t){return{type:"SET_BLOCK_META",clientId:e,metadata:t}},clear:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;return{type:"CLEAR",clientId:e}}},selectors:{getBlockMeta:function(e,t){var n,r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null;return r?null===(n=e[t])||void 0===n?void 0:n[r]:e[t]},getMultipleBlockMeta:function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null,r=null!=t&&t.length?Object(w.pick)(e,t):o()({},e);return n?Object(w.mapValues)(r,n):r}}},x=Object(k.c)("sensei/block-metadata",y),q=Object(c.createContext)({}),S=function(e){var t=Object(b.useSelect)((function(t){return t(x).getBlockMeta(e)}),[e]),n=Object(b.useDispatch)(x).setBlockMeta,r=P(),s=Object(c.useCallback)((function(t){return n(e,t)}),[e,n]);return[Object(c.useMemo)((function(){return o()(o()({},r),t)}),[t,r]),s]},C=Object(m.createHigherOrderComponent)((function(e){return N((function(t){var n=S(t.clientId),r=v()(n,1)[0];return Object(c.createElement)(q.Provider,{value:r},Object(c.createElement)(e,t))}))}),"withBlockMetaProvider"),P=function(){return Object(c.useContext)(q)},N=Object(m.createHigherOrderComponent)((function(e){return function(t){var n=S(t.clientId),r=v()(n,2),s=r[0],o=r[1];return Object(c.createElement)(e,u()({},t,{meta:s,setMeta:o}))}}),"withBlockMeta"),B=n(11),M=n.n(B),R=function(e){var t=e.onMount;return Object(c.useEffect)((function(){t()}),[t]),null},z=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=Object(b.useSelect)((function(e){return e("core/editor").isSavingPost()&&!e("core/editor").isAutosavingPost()}));Object(c.useEffect)((function(){n&&e()}),[n].concat(M()(t)))},A=n(19),I=function(){return Object(c.createElement)("div",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--file-upload"},Object(c.createElement)("div",{className:"sensei-lms-question-block__file-input-placeholder"},Object(l.__)("Browse…","sensei-lms")))},T=n(2),V=n(49),L=function(e){var t=e.attributes,n=t.before,r=t.after,s=t.gap,o=e.setAttributes,i=e.hasSelected;return Object(c.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--gap-fill"},Object(c.createElement)("li",null,Object(c.createElement)(V.a,{className:"sensei-lms-question-block__answer--gap-fill__text",placeholder:Object(l.__)("Text before the gap","sensei-lms"),value:n,onChange:function(e){return o({before:e})}})),Object(c.createElement)("li",{className:"sensei-lms-question-block__answer--gap-fill__right-answers",onBlur:function(e){var t=e.target;null!=t&&t.value&&(o({gap:[].concat(M()(null!=s?s:[]),[t.value])}),D(t,""))}},Object(c.createElement)(T.FormTokenField,{className:"sensei-lms-question-block__text-input-placeholder",value:s||[],label:!1,onChange:function(e){return o({gap:e})}}),i&&Object(c.createElement)("div",{className:"sensei-lms-question-block__answer--gap-fill__hint"},Object(l.__)("Add right answers. Separate with commas or the Enter key.","sensei-lms"))),Object(c.createElement)("li",null,Object(c.createElement)(V.a,{className:"sensei-lms-question-block__answer--gap-fill__text",placeholder:Object(l.__)("Text after the gap","sensei-lms"),value:r,onChange:function(e){return o({after:e})}})))};L.view=function(e){var t=e.attributes,n=t.before,r=t.after,s=t.gap;return Object(c.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--gap-fill"},Object(c.createElement)("li",null,n),Object(c.createElement)("li",{className:"sensei-lms-question-block__answer--gap-fill__right-answers sensei-lms-question-block__text-input-placeholder"},s.map((function(e){return Object(c.createElement)("span",{key:e,className:"sensei-lms-question-block__answer--gap-fill__token"},e)}))),Object(c.createElement)("li",null,r))};var Q=L,D=function(e,t){delete e.value,e.value=t,e.dispatchEvent(new window.Event("change",{bubbles:!0}))},F=function(){return Object(c.createElement)("div",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--multi-line"},Object(c.createElement)("small",{className:"sensei-lms-question-block__input-label"},Object(l.__)("Answer:","sensei-lms")),Object(c.createElement)("div",{className:"sensei-lms-question-block__text-input-placeholder multi-line"}))},H=n(12),G=n.n(H),U=n(17),W=function(e){var t=e.className,n=e.isChecked,r=e.isCheckbox,s=e.children,o=G()(e,["className","isChecked","isCheckbox","children"]);return Object(c.createElement)("div",u()({className:p()("sensei-lms-question-block__option-toggle",t)},o),Object(c.createElement)("div",{className:p()("sensei-lms-question-block__option-toggle__control",{"is-checked":n,"is-checkbox":r})},n&&r&&U.c),s)},K=function(e){var t=e.attributes,n=t.label,r=t.correct,s=e.setAttributes,o=e.hasFocus,i=e.hasSelected,a=e.isCheckbox,b=G()(e,["attributes","setAttributes","hasFocus","hasSelected","isCheckbox"]),m=Object(c.useRef)(null);Object(c.useEffect)((function(){if(o){var e,t=(null===(e=m.current)||void 0===e?void 0:e.textarea)||m.current;null==t||t.focus()}}),[o,m]);return Object(c.createElement)("div",{className:"sensei-lms-question-block__multiple-choice-answer-option"},Object(c.createElement)(W,{isChecked:r,isCheckbox:a}),Object(c.createElement)(g.a,u()({ref:m,placeholder:Object(l.__)("Add Answer","sensei-lms"),className:"sensei-lms-question-block__multiple-choice-answer-option__input",onChange:function(e){return s({label:e})},value:n},b)),i&&Object(c.createElement)("div",{className:"sensei-lms-question-block__answer--multiple-choice__toggle__wrapper"},Object(c.createElement)(T.Button,{isPrimary:!0,className:"sensei-lms-question-block__answer--multiple-choice__toggle",onClick:function(){return s({correct:!r})}},r?Object(l.__)("Right","sensei-lms"):Object(l.__)("Wrong","sensei-lms"))))},Y=[{label:"",correct:!0},{label:"",correct:!1}],Z=function(e){return e.filter((function(e){return e.correct})).length>1},J=function e(t){var n,r=t.setAttributes,s=t.hasSelected,i=t.attributes.answers,l=void 0===i?[]:i;0===l.length&&(l=Y);var a=Z(l),u=!(null!==(n=l[l.length-1])&&void 0!==n&&n.label),b=M()(l);s&&!u&&b.push({label:"",correct:!1});var m=function(e,t){var n=M()(l);n[e]=o()(o()({},n[e]),t),r({answers:n})},d=Object(c.useState)(null),p=v()(d,2),f=p[0],O=p[1];return Object(c.createElement)(e.Options,{answers:b},(function(e,t){return Object(c.createElement)(K,{hasFocus:t===f,isCheckbox:a,attributes:e,setAttributes:function(e){return m(t,e)},onEnter:function(){return function(e){var t=M()(l);t.splice(e+1,0,{label:"",correct:!1}),r({answers:t}),O(e+1)}(t)},onRemove:function(){return function(e){if(1!==l.length){O(e-1);var t=M()(l);t.splice(e,1),r({answers:t})}}(t)},hasSelected:s})}))};J.Options=function(e){var t=e.answers,n=e.children;return Object(c.createElement)("ol",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--multiple-choice"},t.map((function(e,t){return Object(c.createElement)("li",{key:t,className:p()("sensei-lms-question-block__answer--multiple-choice__option",{"is-draft":!e.label})},n(e,t))})))},J.view=function(e){var t=e.attributes.answers,n=void 0===t?[]:t,r=Z(n);return Object(c.createElement)(J.Options,{answers:n},(function(e){return Object(c.createElement)(c.Fragment,null,Object(c.createElement)(W,{isChecked:e.correct,isCheckbox:r}),e.label)}))};var X=J,$=function(){return Object(c.createElement)("div",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--single-line"},Object(c.createElement)("small",{className:"sensei-lms-question-block__input-label"},Object(l.__)("Answer:","sensei-lms")),Object(c.createElement)("div",{className:"sensei-lms-question-block__text-input-placeholder"}))},ee=function(e){var t=e.attributes.correct,n=void 0===t||t,r=e.setAttributes,s=e.hasSelected,o=[{label:Object(l.__)("True","sensei-lms"),value:!0},{label:Object(l.__)("False","sensei-lms"),value:!1}];return Object(c.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--true-false"},o.map((function(e){var t=e.label,o=e.value;return Object(c.createElement)("li",{key:o,className:"sensei-lms-question-block__answer--true-false__option"},Object(c.createElement)(W,{isChecked:n===o},Object(c.createElement)("span",null,t)),s&&Object(c.createElement)("div",{className:"sensei-lms-question-block__answer--multiple-choice__toggle__wrapper"},Object(c.createElement)(T.Button,{isPrimary:!0,className:"sensei-lms-question-block__answer--true-false__toggle",onClick:function(){return r({correct:o===n?!o:o})}},n===o?Object(l.__)("Right","sensei-lms"):Object(l.__)("Wrong","sensei-lms"))))})))};ee.view=function(e){var t=e.attributes.correct,n=void 0===t||t,r=[{label:Object(l.__)("True","sensei-lms"),value:!0},{label:Object(l.__)("False","sensei-lms"),value:!1}];return Object(c.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--true-false"},r.map((function(e){var t=e.label,r=e.value;return Object(c.createElement)("li",{key:r,className:"sensei-lms-question-block__answer--true-false__option"},Object(c.createElement)(W,{isChecked:n===r},Object(c.createElement)("span",null,t)))})))};var te=ee,ne=function(e){var t=e.options.answerFeedback,n=e.setOptions;return Object(c.createElement)(T.TextareaControl,{label:Object(l.__)("Answer Feedback","sensei-lms"),onChange:function(e){return n({answerFeedback:e})},value:t||"",help:Object(l.__)("Displayed to the learner after the quiz has been graded.","sensei-lms")})},re=function(e){var t=e.options.teacherNotes,n=e.setOptions;return Object(c.createElement)(T.TextareaControl,{label:Object(l.__)("Grading Notes","sensei-lms"),onChange:function(e){return n({teacherNotes:e})},value:t||"",help:Object(l.__)("Displayed to the teacher when grading the question.","sensei-lms")})},se=n(85),oe=n(46),ce=function(e){var t=Object(c.useMemo)((function(){return Object(se.v4)()}),[]);return Object(c.createElement)(oe.a,u()({id:t,min:0,step:1},e,{suffix:Object(l._n)("Point","Points",e.value,"sensei-lms")}))},ie=function(e){var t=e.options.grade,n=void 0===t?1:t,r=e.setOptions;return Object(c.createElement)(ce,{label:Object(l.__)("Grade","sensei-lms"),value:n,onChange:function(e){return r({grade:null!=e?e:1})},allowReset:!0})},le=function(e){var t=e.options.randomOrder,n=void 0===t||t,r=e.setOptions;return Object(c.createElement)(T.CheckboxControl,{label:Object(l.__)("Random Order","sensei-lms"),checked:n,onChange:function(e){return r({randomOrder:e})}})},ae={"multiple-choice":{title:Object(l.__)("Multiple Choice","sensei-lms"),description:Object(l.__)("Select from a list of options.","sensei-lms"),edit:X,view:X.view,settings:[le,ne],validate:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=e.answers,n=void 0===t?[]:t;return{noAnswers:n.filter((function(e){return e.label})).length<2,noRightAnswer:!n.some((function(e){return e.correct})),noWrongAnswer:!n.some((function(e){return!e.correct}))}},messages:{noAnswers:Object(l.__)("Add at least one right and one wrong answer.","sensei-lms"),noRightAnswer:Object(l.__)("Add a right answer to this question.","sensei-lms"),noWrongAnswer:Object(l.__)("Add a wrong answer to this question.","sensei-lms")}},boolean:{title:Object(l.__)("True/False","sensei-lms"),description:Object(l.__)("Select whether a statement is true or false.","sensei-lms"),edit:te,view:te.view,settings:[ne]},"gap-fill":{title:Object(l.__)("Gap Fill","sensei-lms"),description:Object(l.__)("Fill in the blank.","sensei-lms"),edit:Q,view:Q.view,settings:[ne],validate:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=e.before,n=e.after,r=e.gap;return{noGap:!(null!=r&&r.length),noBefore:!t,noAfter:!n}},messages:{noGap:Object(l.__)("Add a right answer to this question.","sensei-lms"),noBefore:Object(l.__)("Add text before and after the gap.","sensei-lms"),noAfter:Object(l.__)("Add text before and after the gap.","sensei-lms")}},"single-line":{title:Object(l.__)("Single Line","sensei-lms"),description:Object(l.__)("Short answer to an open-ended question.","sensei-lms"),edit:$,view:$,settings:[re]},"multi-line":{title:Object(l.__)("Multi Line","sensei-lms"),description:Object(l.__)("Long answer to an open-ended question.","sensei-lms"),edit:F,view:F,settings:[re]},"file-upload":{title:Object(l.__)("File Upload","sensei-lms"),description:Object(l.__)("Upload a file or document.","sensei-lms"),edit:I,view:I,settings:[re]}},ue={QuestionAnswerFeedbackSettings:ne,QuestionGradingNotesSettings:re},be=Object(A.applyFilters)("sensei-lms.Question.questionTypes",ae,ue),me=n(155),de=n(34),pe=Object(c.createElement)(de.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(c.createElement)(de.Path,{d:"M12 3.2c-4.8 0-8.8 3.9-8.8 8.8 0 4.8 3.9 8.8 8.8 8.8 4.8 0 8.8-3.9 8.8-8.8 0-4.8-4-8.8-8.8-8.8zm0 16c-4 0-7.2-3.3-7.2-7.2C4.8 8 8 4.8 12 4.8s7.2 3.3 7.2 7.2c0 4-3.2 7.2-7.2 7.2zM11 17h2v-6h-2v6zm0-8h2V7h-2v2z"})),fe=function(){return Object(c.createElement)("div",{className:"sensei-lms-question-block__notice"},Object(c.createElement)(me.a,{icon:pe}),Object(c.createElement)(T.Tooltip,{text:Object(l.__)("Any updates made to this question will also update it in any other quiz that includes it.","sensei-lms")},Object(c.createElement)("span",null,Object(l.__)("Shared Question","sensei-lms"))))},ve=function(e){var t=e.attributes.type,n=e.meta,r=n.validationErrors,s=n.showValidationErrors,o=e.getErrorMessages;if(!s||null==r||!r.length)return null;var i=o(r,t);return Object(c.createElement)(Oe,{errors:i})},Oe=function(e){var t=e.errors,n=void 0===t?[]:t;if(!n||!n.length)return null;var r=n[0];return Object(c.createElement)(T.Notice,{isDismissible:!1,status:"warning",className:"sensei-lms-block-validation-notice"},Object(c.createElement)(me.a,{icon:U.a,className:"sensei-lms-block-validation-notice__icon"}),r)},je=function(e){var t=e.value,n=e.onChange;return Object(c.createElement)(c.Fragment,null,Object(c.createElement)(T.ToolbarGroup,{className:"sensei-lms-question-block__grade-toolbar"},Object(c.createElement)(ce,{value:t,onChange:n})))},he=function(e,t){return e.map((function(e){var n,r;return(null==be||null===(n=be[t])||void 0===n||null===(r=n.messages)||void 0===r?void 0:r[e])||Me.messages[e]}))},ge=n(13),_e=function(){return Object(c.createElement)(c.Fragment,null,Object(c.createElement)(i.BlockControls,null,Object(c.createElement)(T.Toolbar,null,Object(c.createElement)(T.ToolbarButton,{disabled:!0},Object(l.__)("Locked","sensei-lms")))),Object(c.createElement)(i.InspectorControls,null,Object(c.createElement)(T.PanelBody,{title:Object(l.__)("Question Details","sensei-lms"),initialOpen:!0},Object(c.createElement)("div",null,Object(l.__)("You are not allowed to edit this question.","sensei-lms")))))},Ee=function(e){var t=e.clientId,n=e.attributes,r=n.title,s=n.answer,o=n.editable,i=e.questionIndex,l=e.questionGrade,a=e.AnswerBlock,u=Object(b.useSelect)((function(e){return e("core/block-editor").getBlock(t)}),[t]);return Object(c.createElement)("div",{className:"sensei-lms-question-block"},i,Object(c.createElement)("h2",{className:"sensei-lms-question-block__title"},r),l,Object(c.createElement)(c.RawHTML,null,Object(ge.getBlockContent)(u)),(null==a?void 0:a.view)&&Object(c.createElement)(a.view,{attributes:s}),!o&&Object(c.createElement)(_e,null))},we=function(e){var t=e.controls,n=void 0===t?[]:t,r=e.attributes.options,s=void 0===r?{}:r,a=e.setAttributes,b=G()(e,["controls","attributes","setAttributes"]),m=function(e){return a({options:o()(o()({},s),e)})};return Object(c.createElement)(i.InspectorControls,null,Object(c.createElement)(T.PanelBody,{title:Object(l.__)("Question Settings","sensei-lms"),initialOpen:!0},[ie].concat(M()(n)).map((function(e){return Object(c.createElement)(e,u()({key:e},b,{options:s,setOptions:m}))}))))},ke=n(47),ye=Object.entries(be).map((function(e){var t=v()(e,2),n=t[0],r=t[1];return o()(o()({},r),{},{label:r.title,value:n})})),xe=function(e){var t=e.value,n=e.onSelect;return Object(c.createElement)(T.Toolbar,{className:"sensei-lms-question-block__type-selector__toolbar"},Object(c.createElement)(ke.a,{className:"sensei-lms-question-block__type-selector",label:Object(l.__)("Question Type","sensei-lms"),options:ye,value:t,onChange:function(e){return n(e)},optionsLabel:Object(l.__)("Question Type","sensei-lms"),popoverProps:{className:"sensei-lms-question-block__type-selector__popover"},toggleProps:{children:function(e){return Object(c.createElement)("b",null,null==e?void 0:e.title)}},getMenuItemProps:function(e){return{children:Object(c.createElement)("div",null,Object(c.createElement)("strong",null," ",e.title),Object(c.createElement)("div",{className:"sensei-lms-question-block__type-selector__option__description"},e.description))}}}))},qe=n(56),Se=function(e){var t=e.meta,n=t.validationErrors,r=t.showValidationErrors,s=e.setMeta,o=Object(c.useCallback)((function(){var e=!(arguments.length>0&&void 0!==arguments[0])||arguments[0];s({showValidationErrors:e})}),[s]);if(z((function(){return o(!1)}),[o]),null==n||!n.length)return null;var i=Object(c.createElement)(T.Notice,{isDismissible:!1,status:"warning",className:"sensei-lms-quiz-block__pre-publish-validation__notice",actions:r?[]:[{label:Object(l.__)("View issues","sensei-lms"),onClick:function(){return o(!0)},className:"is-link"}]},Object(l.__)("This question is incomplete.","sensei-lms"));return Object(c.createElement)(c.Fragment,null,Object(c.createElement)(qe.PluginPostStatusInfo,null,i),Object(c.createElement)(qe.PluginPrePublishPanel,{title:Object(l.__)("Validation","sensei-lms"),initialOpen:!0},Object(c.createElement)(R,{onMount:o}),i,Object(c.createElement)("p",null,Object(l.__)("Incomplete questions added to a quiz won't be displayed to the learner.","sensei-lms"))))},Ce=Object(m.compose)(N,O((function(e){var t,n=e.id,r=e.type,s=e.title,c=e.answer,i=r&&be[r],l=(null===(t=i.validate)||void 0===t?void 0:t.call(i,c))||{},a=null==s?void 0:s.length;return!a&&!c&&!n?{}:o()({noTitle:!a},l)})))((function(e){var t,n,r=e.attributes,s=r.title,a=r.type,m=r.answer,d=void 0===m?{}:m,f=r.options,v=r.shared,O=r.editable,j=void 0===O||O,_=e.setAttributes,E=e.clientId,w=e.context,k=Object(b.useDispatch)("core/block-editor"),y=k.removeBlock,x=k.selectBlock,q=Object(c.useCallback)((function(){var e=Object(b.select)("core/block-editor").getBlocks(E);e.length&&x(e[0].clientId)}),[E,x]),S=h(E),C=a&&be[a],P=function(e){var t=e.isSelected,n=e.clientId;return Object(b.useSelect)((function(e){return e("core/block-editor").hasSelectedInnerBlock(n)}),[n])||t}(e),N=w&&!("sensei-lms/quizId"in w),B=s||P||N,M=!N&&Object(c.createElement)("h2",{className:"sensei-lms-question-block__index"},S,"."),R=e.meta.showValidationErrors&&(null===(t=e.meta.validationErrors)||void 0===t?void 0:t.length),z=Object(c.createElement)("div",{className:"sensei-lms-question-block__grade"},(n=f.grade,Object(l.sprintf)(Object(l._n)("%d point","%d points",n,"sensei-lms"),n)));return j?Object(c.createElement)("div",{className:p()("sensei-lms-question-block",{"is-draft":!s,"is-invalid":R})},M,N&&Object(c.createElement)(Se,e),Object(c.createElement)("h2",{className:"sensei-lms-question-block__title"},Object(c.createElement)(g.a,{placeholder:Object(l.__)("Question Title","sensei-lms"),value:s,onChange:function(e){return _({title:e})},onEnter:q,onRemove:function(){return y(E)}})),B&&z,P&&v&&Object(c.createElement)(fe,null),B&&Object(c.createElement)(c.Fragment,null,Object(c.createElement)(i.InnerBlocks,{template:[["core/paragraph",{placeholder:Object(l.__)("Question Description","sensei-lms")}]],templateInsertUpdatesSelection:!1,templateLock:!1}),(null==C?void 0:C.edit)&&Object(c.createElement)(C.edit,{attributes:d,setAttributes:function(e){return _({answer:o()(o()({},d),e)})},hasSelected:P})),Object(c.createElement)(ve,u()({},e,{getErrorMessages:he})),Object(c.createElement)(i.BlockControls,null,Object(c.createElement)(c.Fragment,null,Object(c.createElement)(xe,{value:a,onSelect:function(e){return _({type:e})}}),Object(c.createElement)(je,{value:f.grade,onChange:function(e){return _({options:o()(o()({},f),{},{grade:e})})}}))),Object(c.createElement)(we,u()({controls:null==C?void 0:C.settings},e))):Object(c.createElement)(Ee,u()({},e,{questionGrade:z,questionIndex:M,AnswerBlock:C}))})),Pe=n(64),Ne=[{onProgrammaticCreation:!0,isEligible:function(e){var t;return e.media||"file-upload"===e.type&&!(null===(t=e.options)||void 0===t||!t.studentHelp)},attributes:o()(o()({},Pe.attributes),{},{media:{type:"object"}}),migrate:function(e,t){var n,r=M()(t);return e.media&&r.push(function(e){switch(e.type){case"image":return Object(ge.createBlock)("core/image",{id:e.id,url:e.url});case"audio":return Object(ge.createBlock)("core/audio",{id:e.id,src:e.url});case"video":return Object(ge.createBlock)("core/video",{id:e.id,src:e.url});default:var t=Object(c.createElement)("a",{href:e.url},e.title);return Object(ge.createBlock)("core/paragraph",{content:Object(c.renderToString)(t)})}}(e.media)),"file-upload"===e.type&&null!==(n=e.options)&&void 0!==n&&n.studentHelp&&r.push(Object(ge.createBlock)("core/paragraph",{content:e.options.studentHelp})),[o()(o()({},Object(w.omit)(e,"media")),{},{options:Object(w.omit)(e.options,"studentHelp")}),r]},save:function(){return Object(c.createElement)(i.InnerBlocks.Content,null)}}],Be=Object(c.createElement)(T.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(c.createElement)(T.Path,{d:"M12.408 7.277A2.999 2.999 0 009 10.25h1.5c0-.677.375-1.14.886-1.37.512-.228 1.11-.198 1.614.253.504.45.6 1.04.43 1.574-.171.534-.592.958-1.264 1.033l.021-.002a1.034 1.034 0 00-.937.99V14h1.5v-.95c1.02-.28 1.817-.979 2.107-1.888a2.998 2.998 0 00-2.449-3.885z"}),Object(c.createElement)(T.Path,{d:"M6 4c-1.096 0-2 .904-2 2v12c0 1.096.904 2 2 2h12c1.096 0 2-.904 2-2V6c0-1.096-.904-2-2-2H6zm0 1.5h12c.284 0 .5.216.5.5v12a.49.49 0 01-.5.5H6a.49.49 0 01-.5-.5V6c0-.284.216-.5.5-.5zm5.25 9.5v1.5h1.5V15h-1.5z"})),Me=o()(o()({},Pe),{},{title:Object(l.__)("Question","sensei-lms"),icon:Be,usesContext:["sensei-lms/quizId"],description:Object(l.__)("The building block of all quizzes.","sensei-lms"),example:{attributes:{title:Object(l.__)("Example Quiz Question","sensei-lms")}},deprecated:Ne,edit:Ce,save:function(){return Object(c.createElement)(i.InnerBlocks.Content,null)},messages:{noTitle:Object(l.__)("Add a title to this question.","sensei-lms")}}),Re=function(){var e=Object(b.useSelect)((function(e){var t=e("core").getEntityRecords("taxonomy","question-category",{per_page:-1});return null!=t?t:[]}),[]),t=Object(c.useMemo)((function(){return(e||[]).map((function(e){return o()(o()({},e),{},{name:unescape(e.name)})}))}),[e]),n=Object(c.useMemo)((function(){return Object(w.keyBy)(null!=t?t:[],"id")}),[t]);return[t,function(e){var t;return!(!n||0===n.length)&&(null!==(t=n[e])&&void 0!==t&&t)}]},ze=n(22),Ae=n.n(ze),Ie=function(e){var t,n,r,s,a,u,b,m,d=e.attributes.options,p=void 0===d?{}:d,f=e.setAttributes,O=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return f(o()(o()({},t),{},{options:o()(o()({},p),e)}))},j=Re(),h=v()(j,2),g=h[0],_=h[1],E=Object(c.useState)(null),w=v()(E,2),k=w[0],y=w[1],x=(r=p.category,s=y,a=Object(c.useState)({}),u=v()(a,2),b=u[0],m=u[1],Object(c.useEffect)((function(){r&&!b.hasOwnProperty(r)&&Ae()({path:"/wp/v2/questions?question-category=".concat(r),method:"GET",parse:!1}).then((function(e){b[r]=+e.headers.get("X-WP-Total"),m(o()({},b))})).catch((function(e){e.json().then((function(e){return s(e.message)}))}))}),[r,b,s]),!!b.hasOwnProperty(r)&&b[r]),q=[{value:"",label:""}].concat(M()((g||[]).map((function(e){return{value:e.id,label:e.name}}))));return Object(c.createElement)(i.InspectorControls,null,Object(c.createElement)(T.PanelBody,{title:Object(l.__)("Category Question Settings","sensei-lms"),initialOpen:!0},!q.length&&Object(c.createElement)(T.Notice,{status:"warning",isDismissible:!1},Object(l.__)("No question categories exist.","sensei-lms")),q.length>0&&Object(c.createElement)(c.Fragment,null,Object(c.createElement)(T.SelectControl,{label:Object(l.__)("Category","sensei-lms"),options:q,value:null!==(t=p.category)&&void 0!==t?t:"",onChange:function(e){var t,n=_(+e);O({category:null!==(t=+e)&&void 0!==t?t:null},{categoryName:null==n?void 0:n.name}),y(null)}}),Object(c.createElement)(oe.a,{label:Object(l.__)("Number of Questions","sensei-lms"),min:1,step:1,value:null!==(n=p.number)&&void 0!==n?n:1,onChange:function(e){return e&&O({number:e||1})}}),null!==k&&Object(c.createElement)(T.Notice,{status:"error",isDismissible:!1},Object(l.sprintf)(Object(l.__)("An error occurred while retrieving questions: %s","sensei-lms"),k)),!1!==x&&null===k&&p.number>x&&Object(c.createElement)(T.Notice,{status:"warning",isDismissible:!1},Object(l.sprintf)(Object(l._n)("The selected category has %d question.","The selected category has %d questions.",x,"sensei-lms"),x)))))},Te=function(e){return e.map((function(e){return Qe.messages[e]}))},Ve=Object(m.compose)(N,O((function(e){var t=e.options;return{noCategory:!((null==t?void 0:t.category)>0)}})))((function(e){var t,n,r=e.attributes.options,s=r.number,o=void 0===s?1:s,i=r.category,a=e.clientId,b=e.setAttributes,m=h(a),d=Re(),p=v()(d,2)[1],f=o&&1!==o?"".concat(m," - ").concat(m+o-1):m,O=Object(c.createElement)("h2",{className:"sensei-lms-question-block__index"},f,"."),j=null!==(t=null===(n=p(i))||void 0===n?void 0:n.name)&&void 0!==t?t:e.attributes.categoryName,g=j===e.attributes.categoryName;return Object(c.useEffect)((function(){j&&!g&&b({categoryName:j})}),[j,g,b]),Object(c.createElement)(c.Fragment,null,Object(c.createElement)(Ie,e),Object(c.createElement)("div",{className:"sensei-lms-question-block sensei-lms-category-question-block ".concat(i?"":"is-draft")},O,Object(c.createElement)("h2",{className:"sensei-lms-question-block__title"},j?Object(c.createElement)("strong",null,j):Object(l.__)("Category Question","sensei-lms"),j&&o>0&&" ("+Object(l.sprintf)(Object(l._n)("%d question","%d questions",o,"sensei-lms"),o)+")")),Object(c.createElement)(ve,u()({},e,{getErrorMessages:Te})))})),Le=n(86),Qe=o()(o()({},Le),{},{title:Object(l.__)("Category Question","sensei-lms"),icon:Be,usesContext:["sensei-lms/quizId"],description:Object(l.__)("Pull questions from a question category.","sensei-lms"),example:{attributes:{categoryName:Object(l.__)("Example Category","sensei-lms")}},edit:Ve,save:function(){return Object(c.createElement)(i.InnerBlocks.Content,null)},messages:{noCategory:Object(l.__)("Assign a category to this question.","sensei-lms")}}),De=Object(c.createElement)(T.SVG,{viewBox:"0 0 24 24",fill:"none",xmlns:"http://www.w3.org/2000/svg"},Object(c.createElement)(T.Path,{fillOpacity:"0",stroke:"currentColor",strokeWidth:"1.5",d:"M21 8V19C21 20.1046 20.1057 21 19.0011 21C15.8975 21 9.87435 21 6 21"}),Object(c.createElement)(T.Rect,{x:"3.75",y:"3.75",width:"13.5",height:"13.5",rx:"0.875",stroke:"currentColor",strokeWidth:"1.5",fillOpacity:"0"}),Object(c.createElement)(T.Path,{fill:"currentColor",fillRule:"evenodd",clipRule:"evenodd",d:"M12 9C12 8.17157 11.3284 7.5 10.5 7.5C9.67157 7.5 9 8.17157 9 9H7.5C7.5 7.34315 8.84315 6 10.5 6C12.1569 6 13.5 7.34315 13.5 9C13.5 10.3981 12.5442 11.5721 11.25 11.9053V12.75H9.75V11.5C9.75 10.9291 10.2023 10.5422 10.6673 10.4908C11.4167 10.4081 12 9.77168 12 9ZM9.75 13.75V15.25H11.25V13.75H9.75Z"})),Fe=n(62),He=n(61);function Ge(e,t){return e&&0!==e.length?(e||[]).map((function(e){var n=e.description,r=G()(e,["description"]),s=t?We(t,e):null;if(s){s.attributes=o()(o()({},s.attributes),r);var c=n&&Object(ge.rawHandler)({HTML:n})||[];Object(b.dispatch)("core/block-editor").replaceInnerBlocks(s.clientId,c)}else s=Ue(e);return s})):[Object(ge.createBlock)("sensei-lms/quiz-question",{})]}function Ue(e){if("category-question"===e.type)return Object(ge.createBlock)(Qe.name,e,[]);var t=function(e,t){return Me.deprecated.forEach((function(n){if(n.onProgrammaticCreation&&n.isEligible(e,t)){var r=n.migrate(e,t),s=v()(r,2);e=s[0],t=s[1]}})),[e,t]}(e,e.description&&Object(ge.rawHandler)({HTML:e.description})||[]),n=v()(t,2),r=n[0],s=n[1];return Object(ge.createBlock)(Me.name,r,s)}var We=function(e,t){var n=t.id,r=t.title,s=t.options,o=null==s?void 0:s.category;return e.find((function(e){var t,s,c=e.attributes;return n===c.id||!c.id&&c.title&&c.title===r||!c.id&&(null===(t=c.options)||void 0===t?void 0:t.category)&&(null===(s=c.options)||void 0===s?void 0:s.category)===o}))},Ke=function e(t,n){var r=Object(w.mapKeys)(t,(function(e,t){return n(t)}));return Object(w.mapValues)(r,(function(t){return Object(w.isObject)(t)?e(t,n):t}))},Ye=function(e){return"category-question"===e.type?!e.options.category:!e.title},Ze="sensei/quiz-structure",Je=["categories","shared","options.studentHelp","media","categoryName"];Object(He.a)({storeName:Ze,getEndpoint:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,Object(b.select)("core/editor").getCurrentPostId();case 2:return t=e.sent,e.abrupt("return","lesson-quiz/".concat(t,"?context=edit"));case 4:case"end":return e.stop()}}),e)})),updateBlock:regeneratorRuntime.mark((function e(t){var n,r,s;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,Object(b.select)(Ze).getBlock();case 2:if((r=e.sent)&&t){e.next=5;break}return e.abrupt("return");case 5:return e.next=7,Object(b.select)("core/block-editor").getBlock(r);case 7:if(e.sent){e.next=10;break}return e.abrupt("return");case 10:return e.next=12,Object(b.dispatch)("core/block-editor").updateBlockAttributes(r,{options:Ke(t.options,w.camelCase)});case 12:if(null!==(n=t.questions)&&void 0!==n&&n.length){e.next=14;break}return e.abrupt("return");case 14:return e.next=16,Object(b.select)("core/block-editor").getBlocks(r);case 16:return s=e.sent,e.next=19,Object(b.dispatch)("core/block-editor").replaceInnerBlocks(r,Ge(t.questions,s),!1);case 19:case"end":return e.stop()}}),e)})),readBlock:function(){var e=Object(b.select)(Ze).getBlock();if(e){var t=Object(b.select)("core/block-editor").getBlock(e);if(t){var n,r,s,c=Ke(t.attributes.options,w.snakeCase),i=Object(b.select)("core/block-editor").getBlocks(e),l=(r=null==(n=i)?void 0:n.map((function(e){return"category-question"===e.attributes.type?e.attributes:o()(o()({},e.attributes),{},{description:Object(ge.getBlockContent)(e)})})),s=r.pop(),Ye(s)||r.push(s),r),a=Object(w.keyBy)(Object(b.select)(Ze).getServerStructure().questions,"id");return{options:c,questions:l.map((function(e){return!1===e.editable?a[e.id]:Object(w.omit)(e,Je)}))}}}},fetchError:regeneratorRuntime.mark((function e(t){var n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=Object(l.sprintf)(Object(l.__)("Quiz settings and questions could not be loaded. %s","sensei-lms"),t.message),e.next=3,Object(b.dispatch)("core/notices").createErrorNotice(n,{id:"quiz-structure-save-error"});case 3:case"end":return e.stop()}}),e)})),saveError:regeneratorRuntime.mark((function e(t){var n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=Object(l.sprintf)(Object(l.__)("Quiz settings and questions could not be updated. %s","sensei-lms"),t.message),e.next=3,Object(b.dispatch)("core/notices").createErrorNotice(n,{id:"quiz-structure-save-error"});case 3:case"end":return e.stop()}}),e)})),clearError:function(){Object(b.dispatch)("core/notices").removeNotice("quiz-structure-save-error")},setServerStructure:function(e){return e?o()(o()({},e),{},{questions:e.questions.map((function(e){return Object(w.omit)(e,Je)}))}):{}}});var Xe=function(e){var t=e.count,n=e.onClick;return Object(c.createElement)("div",null,Object(c.createElement)(T.Notice,{isDismissible:!1,status:"warning",className:"sensei-lms-quiz-block__pre-publish-validation__notice",actions:[{label:Object(l.__)("View issues","sensei-lms"),onClick:n,className:"is-link"}]},Object(l.sprintf)(Object(l._n)("There is %d incomplete question in your lesson quiz.","There are %d incomplete questions in your lesson quiz.",t,"sensei-lms"),t)))},$e=function(e){var t=e.clientId,n=e.setMeta,r=Object(b.useSelect)((function(e){var n=e("core/block-editor").getBlocks(t),r=e(x).getMultipleBlockMeta(n.map((function(e){return e.clientId})),"validationErrors");return n.map((function(e){return o()(o()({},e),{},{errors:r[e.clientId]})})).filter((function(e){var t;return null===(t=e.errors)||void 0===t?void 0:t.length}))}),[t]),s=Object(c.useCallback)((function(){var e=!(arguments.length>0&&void 0!==arguments[0])||arguments[0];n({showValidationErrors:e})}),[n]),i=Object(b.useDispatch)("core/block-editor").selectBlock;if(z((function(){return s(!1)}),[s]),!r.length)return null;var a=Object(c.createElement)(Xe,{onClick:function(){r.length&&(s(!0),i(r[0].clientId))},count:r.length});return Object(c.createElement)(c.Fragment,null,Object(c.createElement)(qe.PluginPostStatusInfo,null,a),Object(c.createElement)(qe.PluginPrePublishPanel,{title:Object(l.__)("Lesson Quiz","sensei-lms"),initialOpen:!0},Object(c.createElement)(R,{onMount:s}),a,Object(c.createElement)("p",null,Object(l.__)("Incomplete questions won't be displayed to the learner when taking the quiz.","sensei-lms"))))},et=Object(c.createElement)(de.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(c.createElement)(de.Path,{d:"M18 11.2h-5.2V6h-1.6v5.2H6v1.6h5.2V18h1.6v-5.2H18z"})),tt=function(e){var t=Object(b.useSelect)((function(t){return t("core/block-editor").getBlocks(e)}),[]),n=t.length&&t[t.length-1];return n&&Ye(n.attributes)?t.length-1:t.length},nt=function(e){var t=e.clientId,n=e.openModal,r=Object(b.useDispatch)("core/block-editor").insertBlock,s=tt(t),o=function(e){r(Object(ge.createBlock)(e.name),s,t,!0)},i=[{title:Object(l.__)("New Question","sensei-lms"),icon:Me.icon,onClick:function(){return o(Me)}},{title:Object(l.__)("Category Question(s)","sensei-lms"),icon:De,onClick:function(){return o(Qe)}},{title:Object(l.__)("Existing Question(s)","sensei-lms"),icon:De,onClick:n}];return Object(c.createElement)("div",{className:"sensei-lms-quiz-block__appender block-editor-default-block-appender"},Object(c.createElement)(T.DropdownMenu,{icon:et,toggleProps:{className:"block-editor-inserter__toggle",onMouseDown:function(e){return e.preventDefault()}},label:Object(l.__)("Add Block","sensei-lms"),controls:i}),Object(c.createElement)("p",{className:"sensei-lms-quiz-block__appender__placeholder","data-placeholder":Object(l.__)("Add new or existing question(s)","sensei-lms")}))},rt=Object(c.createElement)(de.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},Object(c.createElement)(de.Path,{d:"M13.5 6C10.5 6 8 8.5 8 11.5c0 1.1.3 2.1.9 3l-3.4 3 1 1.1 3.4-2.9c1 .9 2.2 1.4 3.6 1.4 3 0 5.5-2.5 5.5-5.5C19 8.5 16.5 6 13.5 6zm0 9.5c-2.2 0-4-1.8-4-4s1.8-4 4-4 4 1.8 4 4-1.8 4-4 4z"})),st=function(e){var t=e.className,n=e.id,r=e.label,s=e.value,o=e.help,i=e.iconRight,l=e.onChange,a=G()(e,["className","id","label","value","help","iconRight","onChange"]);return Object(c.createElement)(T.BaseControl,{id:n,label:r,help:o},Object(c.createElement)("div",{className:"sensei-input-control"},Object(c.createElement)("input",u()({className:p()("sensei-input-control__input",{"sensei-input-control__input--with-icon-right":i},t),type:"text",id:n,value:null===s?"":s,onChange:function(e){return l(e.target.value)}},a)),i&&Object(c.createElement)("span",{className:"sensei-input-control__icon"},Object(c.createElement)(T.Icon,{icon:i}))))},ot=function(e){var t=e.questionCategories,n=e.filters,r=e.setFilters,s=Object(c.useState)(n.search).searchValue,i=function(){var e=Object(c.useState)([]),t=v()(e,2),n=t[0],r=t[1];return Object(c.useEffect)((function(){Ae()({path:"/wp/v2/question-type?per_page=-1"}).then(r)}),[r]),n}(),a=function(e,t){return Object(w.debounce)((function(t){r((function(n){return o()(o()({},n),{},E()({},e,t))}))}),t)},u=[{value:"",label:Object(l.__)("Type","sensei-lms")}].concat(M()((i||[]).map((function(e){var t;return{value:e.id,label:null===(t=be[e.slug])||void 0===t?void 0:t.title}})))),b=[{value:"",label:Object(l.__)("Category","sensei-lms")}].concat(M()((t||[]).map((function(e){return{value:e.id,label:e.name}}))));return Object(c.createElement)("ul",{className:"sensei-lms-quiz-block__questions-modal__filters"},Object(c.createElement)("li",null,Object(c.createElement)(T.SelectControl,{options:u,value:n["question-type"],onChange:a("question-type",0)})),Object(c.createElement)("li",null,Object(c.createElement)(T.SelectControl,{options:b,value:n["question-category"],onChange:a("question-category",0)})),Object(c.createElement)("li",null,Object(c.createElement)(st,{className:"sensei-lms-quiz-block__questions-modal__search-input",placeholder:Object(l.__)("Search questions","sensei-lms"),iconRight:rt,value:s,onChange:a("search",400)})))},ct=function(e){var t=e.clientId,n=e.questionCategories,r=e.filters,s=e.selectedQuestionIds,i=e.setSelectedQuestionIds,a=Object(b.useSelect)((function(e){return e("core/block-editor").getBlocks(t)})).map((function(e){var t;return null===(t=e.attributes)||void 0===t?void 0:t.id})),u=Object(b.useSelect)((function(e){return e("core").getEntityRecords("postType","question",o()({per_page:100},Object(w.omitBy)(r,(function(e){return""===e}))))}),[r]);if(!u||!n)return Object(c.createElement)("div",{className:"sensei-lms-quiz-block__questions-modal__questions sensei-lms-quiz-block__questions-modal__questions--loading"},Object(c.createElement)(T.Spinner,null));u=u.filter((function(e){return!a.includes(e.id)}));var m=Object(w.keyBy)(n,"id"),d=u.length>0&&u.every((function(e){return s.includes(e.id)})),p=function(e){return function(t){i(t?function(t){return[].concat(M()(t),[e])}:function(t){return t.filter((function(t){return t!==e}))})}};return Object(c.createElement)("div",{className:"sensei-lms-quiz-block__questions-modal__questions"},Object(c.createElement)("table",{className:"sensei-lms-quiz-block__questions-modal__table"},Object(c.createElement)("thead",null,Object(c.createElement)("tr",null,Object(c.createElement)("th",{className:"sensei-lms-quiz-block__questions-modal__question-checkbox"},Object(c.createElement)(T.CheckboxControl,{title:Object(l.__)("Toggle all visible questions selection.","sensei-lms"),checked:d,onChange:function(e){var t=u.map((function(e){return e.id}));i((function(n){return e?Object(w.uniq)([].concat(M()(n),M()(t))):n.filter((function(e){return!t.includes(e)}))}))}})),Object(c.createElement)("th",null,Object(l.__)("Question","sensei-lms")),Object(c.createElement)("th",null,Object(l.__)("Type","sensei-lms")),Object(c.createElement)("th",null,Object(l.__)("Category","sensei-lms")))),Object(c.createElement)("tbody",null,0===u.length?Object(c.createElement)("tr",null,Object(c.createElement)("td",{colSpan:"4"},Object(c.createElement)("p",null,Object(l.__)("No questions found.","sensei-lms")))):u.map((function(e){var t,n=null===(t=be[e["question-type-slug"]])||void 0===t?void 0:t.title,r=e["question-category"].map((function(e){var t;return null===(t=m[e])||void 0===t?void 0:t.name})).join(", "),o=e.id,i=e.title.raw;return Object(c.createElement)("tr",{key:e.id},Object(c.createElement)("td",null,Object(c.createElement)(T.CheckboxControl,{id:"question-".concat(o),title:i,checked:s.includes(o),onChange:p(o)})),Object(c.createElement)("td",{className:"sensei-lms-quiz-block__questions-modal__question-title"},Object(c.createElement)("label",{htmlFor:"question-".concat(o),title:i},i)),Object(c.createElement)("td",null,n),Object(c.createElement)("td",null,r))})))))},it=function(e){var t=e.selectedQuestionIds,n=e.setSelectedQuestionIds,r=e.onAdd,s=e.closeModal,o=e.setErrorAddingSelected,i=Object(c.useState)(!1),a=v()(i,2),u=a[0],b=a[1],m=0===t.length?Object(l.__)("Add Selected","sensei-lms"):Object(l.sprintf)(Object(l.__)("Add Selected (%s)","sensei-lms"),t.length);return Object(c.createElement)("ul",{className:"sensei-lms-quiz-block__questions-modal__actions"},t.length>0&&Object(c.createElement)("li",null,Object(c.createElement)(T.Button,{isTertiary:!0,onClick:function(){n([])}},Object(l.__)("Clear Selected","sensei-lms"))),Object(c.createElement)("li",null,Object(c.createElement)(T.Button,{disabled:u,onClick:function(){b(!0),r(t).then(s).catch((function(){o(!0),b(!1)}))},isPrimary:!0},m)))},lt=function(e){var t=e.clientId,n=e.onClose,r=function(e){var t=Object(b.select)("core/block-editor").getBlocks(e),n=Object(b.useDispatch)("core/block-editor").insertBlock,r=tt(e);return function(s){var o=s.filter((function(e){return 0===t.length||!We(t,{id:e})}));if(0===o.length)return Promise.resolve({});var c=r;return Ae()({path:"/sensei-internal/v1/question-options?question_ids="+o.join(","),method:"GET"}).then((function(t){Array.isArray(t)&&t.length>0&&t.forEach((function(t){n(Ue(t),c,e,!1),c++}))}))}}(t),s=Object(c.useState)({search:"","question-type":"","question-category":""}),o=v()(s,2),i=o[0],a=o[1],u=Object(c.useState)(!1),m=v()(u,2),d=m[0],p=m[1],f=Object(c.useState)([]),O=v()(f,2),j=O[0],h=O[1],g=Re(),_=v()(g,1)[0];return Object(c.createElement)(T.Modal,{className:"sensei-lms-quiz-block__questions-modal",title:Object(l.__)("Questions","sensei-lms"),onRequestClose:n},d&&Object(c.createElement)(T.Notice,{status:"error",isDismissible:!1,className:"sensei-lms-quiz-block__questions-modal__notice"},Object(l.__)("Unable to add the selected question(s). Please make sure you are still logged in and try again.","sensei-lms")),Object(c.createElement)(ot,{questionCategories:_,filters:i,setFilters:a}),Object(c.createElement)(ct,{clientId:t,questionCategories:_,filters:i,selectedQuestionIds:j,setSelectedQuestionIds:h}),Object(c.createElement)(it,{selectedQuestionIds:j,setSelectedQuestionIds:h,onAdd:r,closeModal:n,setErrorAddingSelected:p}))},at=function(e){var t=e.attributes.options,n=void 0===t?{}:t,r=e.setAttributes,s=e.clientId,a=n.passRequired,u=void 0!==a&&a,m=n.quizPassmark,d=void 0===m?100:m,p=n.autoGrade,f=void 0===p||p,v=n.allowRetakes,O=void 0===v||v,j=n.randomQuestionOrder,h=void 0!==j&&j,g=n.showQuestions,_=void 0===g?null:g,w=function(e){return function(t){return r({options:o()(o()({},n),{},E()({},e,t))})}},k=Object(b.useSelect)((function(e){return e("core/block-editor").getBlock(s).innerBlocks.filter((function(e){return!Ye(e.attributes)}))}),[s]).reduce((function(e,t){return e+("category-question"===t.attributes.type?t.attributes.options.number:1)}),0);return Object(c.useEffect)((function(){_>k&&r({options:o()(o()({},n),{},{showQuestions:k})})}),[n,k,r,_]),Object(c.createElement)(i.InspectorControls,null,Object(c.createElement)(T.PanelBody,{title:Object(l.__)("Quiz Settings","sensei-lms"),initialOpen:!0},Object(c.createElement)(T.PanelRow,null,Object(c.createElement)(T.ToggleControl,{checked:u,onChange:w("passRequired"),label:Object(l.__)("Pass Required","sensei-lms")})),u&&Object(c.createElement)(T.PanelRow,null,Object(c.createElement)(T.RangeControl,{label:"Passing Grade (%)",value:d,onChange:w("quizPassmark"),min:0,max:100,initialPosition:100})),Object(c.createElement)(T.PanelRow,null,Object(c.createElement)(T.ToggleControl,{checked:f,onChange:w("autoGrade"),label:Object(l.__)("Auto Grade","sensei-lms"),help:Object(l.__)("Automatically grade Multiple Choice, True/False and Gap Fill questions that have a non-zero point value.","sensei-lms")})),Object(c.createElement)(T.PanelRow,null,Object(c.createElement)(T.ToggleControl,{checked:O,onChange:w("allowRetakes"),label:Object(l.__)("Allow Retakes","sensei-lms")})),Object(c.createElement)(T.PanelRow,null,Object(c.createElement)(T.ToggleControl,{checked:h,onChange:w("randomQuestionOrder"),label:Object(l.__)("Random Question Order","sensei-lms")})),Object(c.createElement)(T.PanelRow,null,Object(c.createElement)(oe.a,{id:"sensei-quiz-settings-show-questions",label:Object(l.__)("Number of Questions","sensei-lms"),help:Object(l.__)("Display a random selection of questions.","sensei-lms"),allowReset:!0,resetLabel:Object(l.__)("All","sensei-lms"),min:0,max:k,step:1,value:_,placeholder:Object(l.__)("All","sensei-lms"),onChange:w("showQuestions")}))))},ut=["sensei-lms/quiz-question","sensei-lms/quiz-category-question"],bt=C((function(e){var t=e.clientId;!function(e){var t=e.clientId,n=Object(b.useDispatch)(Ze),r=n.setBlock,s=n.loadStructure;Object(c.useEffect)((function(){r(t),s()}),[r,s,t])}(e),Object(Fe.a)({name:Me.name,selectFirstBlock:!e.attributes.isPostTemplate,isEmptyBlock:Ye},e),function(e){var t="_quiz_has_questions",n=Object(b.useSelect)((function(t){return t("core/block-editor").getBlocks(e).filter((function(e){return!Ye(e.attributes)}))})),r=Object(b.useSelect)((function(e){return{editedValue:e("core/editor").getEditedPostAttribute("meta")[t]}})).editedValue,s=Object(b.useDispatch)("core/editor").editPost,o=Object(c.useCallback)((function(e){return s({meta:E()({},t,e?1:0)})}),[s]);Object(c.useEffect)((function(){!r&&n.length&&o(!0),r&&!n.length&&o(!1)}),[n.length,r,o]),Object(c.useEffect)((function(){return function(){o(!1)}}),[o])}(t);var n=Object(c.useState)(!1),r=v()(n,2),s=r[0],o=r[1],a=Object(c.useCallback)((function(){return Object(c.createElement)(nt,{clientId:t,openModal:function(){return o(!0)}})}),[t]);return Object(c.createElement)(c.Fragment,null,Object(c.createElement)($e,e),Object(c.createElement)("div",{className:"sensei-lms-quiz-block__separator"},Object(c.createElement)("span",null,Object(l.__)("Lesson Quiz","sensei-lms"))),Object(c.createElement)(i.InnerBlocks,{allowedBlocks:ut,templateInsertUpdatesSelection:!1,renderAppender:a}),s&&Object(c.createElement)(lt,{clientId:t,onClose:function(){return o(!1)}}),Object(c.createElement)("div",{className:"sensei-lms-quiz-block__separator"}),Object(c.createElement)(at,e))})),mt=n(87),dt=[o()(o()({},mt),{},{title:Object(l.__)("Quiz","sensei-lms"),icon:De,description:Object(l.__)("Evaluate progress and strengthen understanding of course concepts.","sensei-lms"),keywords:[Object(l.__)("Exam","sensei-lms"),Object(l.__)("Questions","sensei-lms"),Object(l.__)("Test","sensei-lms"),Object(l.__)("Assessment","sensei-lms"),Object(l.__)("Evaluation","sensei-lms")],providesContext:{"sensei-lms/quizId":"id"},example:{innerBlocks:[{name:"sensei-lms/quiz-question",attributes:{title:Object(l.__)("First Example Question","sensei-lms")}},{name:"sensei-lms/quiz-question",attributes:{title:Object(l.__)("Second Example Question","sensei-lms")}}]},edit:bt,save:function(){return Object(c.createElement)(i.InnerBlocks.Content,null)}}),Me,Qe];Object(r.a)(dt)},,,,,,,,,function(e,t,n){"use strict";function r(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}function s(e,t){if(null==e)return{};var n,r,s=function(e,t){if(null==e)return{};var n,r,s={},o=Object.keys(e);for(r=0;r<o.length;r++)n=o[r],t.indexOf(n)>=0||(s[n]=e[n]);return s}(e,t);if(Object.getOwnPropertySymbols){var o=Object.getOwnPropertySymbols(e);for(r=0;r<o.length;r++)n=o[r],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(s[n]=e[n])}return s}var o=n(0);function c(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}t.a=function(e){var t=e.icon,n=e.size,i=void 0===n?24:n,l=s(e,["icon","size"]);return Object(o.cloneElement)(t,function(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?c(Object(n),!0).forEach((function(t){r(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):c(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}({width:i,height:i},l))}}]);
+*/
+/* global define */!function(){"use strict";var r={}.hasOwnProperty;function s(){for(var e=[],t=0;t<arguments.length;t++){var n=arguments[t];if(n){var o=typeof n;if("string"===o||"number"===o)e.push(n);else if(Array.isArray(n)){if(n.length){var i=s.apply(null,n);i&&e.push(i)}}else if("object"===o)if(n.toString===Object.prototype.toString)for(var l in n)r.call(n,l)&&n[l]&&e.push(l);else e.push(n.toString())}}return e.join(" ")}e.exports?(s.default=s,e.exports=s):void 0===(n=function(){return s}.apply(t,[]))||(e.exports=n)}()}
+/***/,
+/***/1442:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(42),l=n.n(i),a=n(5609),c=["className","id","label","value","help","iconRight","onChange"];
+/* harmony import */
+/* harmony default export */const u=function(e){var t=e.className,n=e.id,i=e.label,u=e.value,m=e.help,d=e.iconRight,p=e.onChange,v=(0,s/* ["default"] */.Z)(e,c);return(0,o.createElement)(a.BaseControl,{id:n,label:i,help:m},(0,o.createElement)("div",{className:"sensei-input-control"},(0,o.createElement)("input",(0,r/* ["default"] */.Z)({className:l()("sensei-input-control__input",{"sensei-input-control__input--with-icon-right":d},t),type:"text",id:n,value:null===u?"":u,onChange:function(e){return p(e.target.value)}},v)),d&&(0,o.createElement)("span",{className:"sensei-input-control__icon"},(0,o.createElement)(a.Icon,{icon:d}))))};
+/***/},
+/***/768:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(42),l=n.n(i),a=n(5609),c=n(5736),u=["className","id","label","value","help","allowReset","resetLabel","onChange","suffix","hideLabelFromVision"],__=c.__;
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.className,n=e.id,i=e.label,c=e.value,m=e.help,d=e.allowReset,p=void 0!==d&&d,v=e.resetLabel,f=e.onChange,g=e.suffix,h=e.hideLabelFromVision,b=(0,s/* ["default"] */.Z)(e,u);return(0,o.createElement)(a.BaseControl,{id:n,label:i,help:m,hideLabelFromVision:h},(0,o.createElement)("div",{className:"sensei-number-control"},(0,o.createElement)("div",{className:"sensei-number-control__input-container"},(0,o.createElement)("input",(0,r/* ["default"] */.Z)({className:l()("sensei-number-control__input components-text-control__input",t),type:"number",id:n,onChange:function(e){f(parseInt(e.target.value,10)||b.min||0)},value:null===c?"":c},b)),g&&(0,o.createElement)("span",{className:"sensei-number-control__input-suffix"},g)),p&&(0,o.createElement)(a.Button,{className:"sensei-number-control__button",isSmall:!0,isSecondary:!0,onClick:function(){return f(null)}},v||__("Reset","sensei-lms"))))};
+/***/},
+/***/1042:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(189),o=n(3782),i=n(9307),l=n(42),a=n.n(l),c=n(5609),u=n(454),m=["options","optionsLabel","icon","value","onChange","toggleProps","getMenuItemProps","popoverProps"];
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.options,n=e.optionsLabel,l=e.icon,d=e.value,p=e.onChange,v=e.toggleProps,f=e.getMenuItemProps,g=e.popoverProps,h=(0,o/* ["default"] */.Z)(e,m),b=t.find((function(e){return d===e.value}));return(0,i.createElement)(c.Dropdown,(0,r/* ["default"] */.Z)({className:"sensei-toolbar-dropdown",popoverProps:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({isAlternate:!0,position:"bottom right left",focusOnMount:!0},g),{},{className:a()(null==g?void 0:g.className,"sensei-toolbar-dropdown__popover")}),renderToggle:function(e){var t=e.isOpen,n=e.onToggle;return(0,i.createElement)(c.Button,(0,r/* ["default"] */.Z)({onClick:n,icon:l,"aria-expanded":t,"aria-haspopup":"true"},v,{children:null!=v&&v.children?v.children(b):null==b?void 0:b.label}))},renderContent:function(e){var s=e.onClose;return(0,i.createElement)(c.NavigableMenu,{role:"menu",stopNavigationEvents:!0},(0,i.createElement)(c.MenuGroup,{label:n},t.map((function(e){var t=e.value===(null==b?void 0:b.value),n=null==f?void 0:f(e);return(0,i.createElement)(c.MenuItem,(0,r/* ["default"] */.Z)({key:e.value,role:"menuitemradio",isSelected:t,icon:t?u/* ["default"] */.Z:null,className:a()("sensei-toolbar-dropdown__option",{"is-selected":t},null==n?void 0:n.className),onClick:function(){p(e.value),s()},children:e.label},n))}))))}},h))};
+/***/},
+/***/2434:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5736),__=s.__;
+/* harmony import */
+/* harmony default export */const o=function(){return(0,r.createElement)("div",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--file-upload"},(0,r.createElement)("div",{className:"sensei-lms-question-block__file-input-placeholder"},__("Browse…","sensei-lms")))};
+/***/},
+/***/2892:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var r=n(228),s=n(9307),o=n(5609),i=n(5736),l=n(5436),__=i.__,a=function(e){var t=e.attributes,n=t.before,i=t.after,a=t.gap,c=e.setAttributes,m=e.hasSelected;return(0,s.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--gap-fill"},(0,s.createElement)("li",null,(0,s.createElement)(l/* ["default"] */.Z,{className:"sensei-lms-question-block__answer--gap-fill__text",placeholder:__("Text before the gap","sensei-lms"),value:n,onChange:function(e){return c({before:e})}})),(0,s.createElement)("li",{className:"sensei-lms-question-block__answer--gap-fill__right-answers",onBlur:function(e){var t=e.target;null!=t&&t.value&&(c({gap:[].concat((0,r/* ["default"] */.Z)(null!=a?a:[]),[t.value])}),u(t,""))}},(0,s.createElement)(o.FormTokenField,{className:"sensei-lms-question-block__text-input-placeholder",value:a||[],label:!1,onChange:function(e){return c({gap:e})}}),m&&(0,s.createElement)("div",{className:"sensei-lms-question-block__answer--gap-fill__hint"},__("Add right answers. Separate with commas or the Enter key.","sensei-lms"))),(0,s.createElement)("li",null,(0,s.createElement)(l/* ["default"] */.Z,{className:"sensei-lms-question-block__answer--gap-fill__text",placeholder:__("Text after the gap","sensei-lms"),value:i,onChange:function(e){return c({after:e})}})))};
+/* harmony import */
+/**
+ * Read-only answer component gap fill question block.
+ *
+ * @param {Object}   props
+ * @param {Object}   props.attributes
+ * @param {string}   props.attributes.before Text before the gap.
+ * @param {string}   props.attributes.after  Text after the gap.
+ * @param {string[]} props.attributes.gap    Right answers.
+ */
+a.view=function(e){var t=e.attributes,n=t.before,r=t.after,o=t.gap;return(0,s.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--gap-fill"},(0,s.createElement)("li",null,n),(0,s.createElement)("li",{className:"sensei-lms-question-block__answer--gap-fill__right-answers sensei-lms-question-block__text-input-placeholder"},o.map((function(e){return(0,s.createElement)("span",{key:e,className:"sensei-lms-question-block__answer--gap-fill__token"},e)}))),(0,s.createElement)("li",null,r))};
+/* harmony default export */const c=a;
+/**
+ * Update input value, making sure React event handlers are triggered.
+ *
+ * @param {HTMLInputElement} node       Input element.
+ * @param {string}           inputValue New input value.
+ */var u=function(e,t){delete e.value,e.value=t,e.dispatchEvent(new window.Event("change",{bubbles:!0}))};
+/***/},
+/***/9395:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>v
+/* harmony export */});
+/* unused harmony export unfilteredQuestionTypes */
+/* harmony import */var r=n(5736),s=n(2694),o=n(2434),i=n(2892),l=n(958),a=n(6830),c=n(3949),u=n(1145),m=n(3216),__=r.__,d={"multiple-choice":{title:__("Multiple Choice","sensei-lms"),description:__("Select from a list of options.","sensei-lms"),edit:a/* ["default"] */.Z,view:a/* ["default"].view */.Z.view,settings:[m/* .QuestionMultipleChoiceSettings */.F0],feedback:!0,validate:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=e.answers,n=void 0===t?[]:t;return{noAnswers:n.filter((function(e){return e.label})).length<2,noRightAnswer:!n.some((function(e){return e.correct&&e.label})),noRightAnswerWhitespace:!n.some((function(e){return e.correct&&e.label.trim()})),noWrongAnswer:!n.some((function(e){return!e.correct&&e.label})),noWrongAnswerWhitespace:!n.some((function(e){return!e.correct&&e.label.trim()}))}},messages:{noAnswers:__("Add at least one right and one wrong answer.","sensei-lms"),noRightAnswer:__("Add a right answer to this question.","sensei-lms"),noRightAnswerWhitespace:__("The value of the right answer can not be blank space.","sensei-lms"),noWrongAnswer:__("Add a wrong answer to this question. Value can not be blank space.","sensei-lms"),noWrongAnswerWhitespace:__("The value of the wrong answer can not be blank space.","sensei-lms")}},boolean:{title:__("True/False","sensei-lms"),description:__("Select whether a statement is true or false.","sensei-lms"),edit:u/* ["default"] */.Z,view:u/* ["default"].view */.Z.view,feedback:!0,settings:[]},"gap-fill":{title:__("Gap Fill","sensei-lms"),description:__("Fill in the blank.","sensei-lms"),edit:i/* ["default"] */.Z,view:i/* ["default"].view */.Z.view,feedback:!0,settings:[],validate:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{},t=e.before,n=e.after,r=e.gap;return{noGap:!(null!=r&&r.filter((function(e){return""!==e})).length),noGapWhitespace:!(null!=r&&r.filter((function(e){return""!==e.trim()})).length),noBeforeAndNoAfter:!t&&!n,noBeforeAndNoAfterWhitespace:!(null!=t&&t.trim()||null!=n&&n.trim())}},messages:{noGap:__("Add a right answer to this question.","sensei-lms"),noGapWhitespace:__("The value of a right answer can not be blank space.","sensei-lms"),noBeforeAndNoAfter:__("Add text before or after the gap. Value can not be blank space.","sensei-lms"),noBeforeAndNoAfterWhitespace:__("Value of the text before or after the gap can not be blank space.","sensei-lms")}},"single-line":{title:__("Single Line","sensei-lms"),description:__("Short answer to an open-ended question.","sensei-lms"),edit:c/* ["default"] */.Z,view:c/* ["default"] */.Z,settings:[m/* .QuestionGradingNotesSettings */.Zw]},"multi-line":{title:__("Multi Line","sensei-lms"),description:__("Long answer to an open-ended question.","sensei-lms"),edit:l/* ["default"] */.Z,view:l/* ["default"] */.Z,settings:[m/* .QuestionGradingNotesSettings */.Zw]},"file-upload":{title:__("File Upload","sensei-lms"),description:__("Upload a file or document.","sensei-lms"),edit:o/* ["default"] */.Z,view:o/* ["default"] */.Z,settings:[m/* .QuestionGradingNotesSettings */.Zw]}},p={QuestionGradingNotesSettings:m/* .QuestionGradingNotesSettings */.Zw};
+/* harmony import */
+/**
+ * Filters the quiz editor question types in order to support custom ones.
+ *
+ * @param {Object}   questionTypes             The question types.
+ * @param {string}   questionTypes.title       The title of the question.
+ * @param {string}   questionTypes.description The description of the question.
+ * @param {Function} questionTypes.edit        The block edit function for the question. Attributes under
+ *                                             'answer', will be passed to this component.
+ * @param {Array}    questionTypes.settings    An array of settings components to use in the sidebar.
+ *                                             Attributes under 'options', will be passed to all settings
+ *                                             components.
+ * @param {Object}   availableCoreSettings     Core settings that can be included in custom question types.
+ */
+/* harmony default export */const v=(0,s.applyFilters)("sensei-lms.Question.questionTypes",d,p);
+/***/},
+/***/958:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5736),__=s.__;
+/* harmony import */
+/* harmony default export */const o=function(){return(0,r.createElement)("div",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--multi-line"},(0,r.createElement)("small",{className:"sensei-lms-question-block__input-label"},__("Answer:","sensei-lms")),(0,r.createElement)("div",{className:"sensei-lms-question-block__text-input-placeholder multi-line"}))};
+/***/},
+/***/3937:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(5609),l=n(5736),a=n(3295),c=n(6480),u=["attributes","setAttributes","hasFocus","hasSelected","isCheckbox"],__=l.__;
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.attributes,n=t.label,l=t.correct,m=e.setAttributes,d=e.hasFocus,p=e.hasSelected,v=e.isCheckbox,f=(0,s/* ["default"] */.Z)(e,u),g=(0,o.useRef)(null);(0,o.useEffect)((function(){if(d){var e,t=(null===(e=g.current)||void 0===e?void 0:e.textarea)||g.current;null==t||t.focus()}}),[d,g]);return(0,o.createElement)("div",{className:"sensei-lms-question-block__multiple-choice-answer-option"},(0,o.createElement)(c/* .OptionToggle */.n,{isChecked:l,isCheckbox:v}),(0,o.createElement)(a/* ["default"] */.Z,(0,r/* ["default"] */.Z)({ref:g,placeholder:__("Add Answer","sensei-lms"),className:"sensei-lms-question-block__multiple-choice-answer-option__input",onChange:function(e){return m({label:e})},value:n},f)),p&&(0,o.createElement)("div",{className:"sensei-lms-question-block__answer--multiple-choice__toggle__wrapper"},(0,o.createElement)(i.Button,{isPrimary:!0,className:"sensei-lms-question-block__answer--multiple-choice__toggle",onClick:function(){return m({correct:!l})}},l&&__("Right","sensei-lms"),!l&&__("Wrong","sensei-lms"))))};
+/***/},
+/***/6830:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>v
+/* harmony export */});
+/* harmony import */var r=n(6886),s=n(189),o=n(228),i=n(9307),l=n(42),a=n.n(l),c=n(3937),u=n(6480),m=[{label:"",correct:!0},{label:"",correct:!1}],d=function(e){return e.filter((function(e){return e.correct})).length>1},p=function e(t){var n,l=t.setAttributes,a=t.hasSelected,u=t.attributes.answers,p=void 0===u?[]:u;0===p.length&&(p=m);var v=d(p),f=!(null!==(n=p[p.length-1])&&void 0!==n&&n.label),g=(0,o/* ["default"] */.Z)(p);a&&!f&&g.push({label:"",correct:!1})
+/**
+   * Add a new answer option.
+   *
+   * @param {number} index Answer position
+   */;var h=function(e,t){var n=(0,o/* ["default"] */.Z)(p);n[e]=(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},n[e]),t),l({answers:n})},b=(0,i.useState)(null),E=(0,r/* ["default"] */.Z)(b,2),_=E[0],w=E[1];
+/**
+   * Remove an answer option.
+   *
+   * @param {number} index Answer position
+   */return(0,i.createElement)(e.Options,{answers:g},(function(e,t){return(0,i.createElement)(c/* ["default"] */.Z,{hasFocus:t===_,isCheckbox:v,attributes:e,setAttributes:function(e){return h(t,e)},onEnter:function(){return function(e){var t=(0,o/* ["default"] */.Z)(p);t.splice(e+1,0,{label:"",correct:!1}),l({answers:t}),w(e+1)}(t)},onRemove:function(){return function(e){
+// Do not allow the user to remove all the answers.
+if(1!==p.length){w(e-1);var t=(0,o/* ["default"] */.Z)(p);t.splice(e,1),l({answers:t})}}(t)},hasSelected:a})}))};
+/* harmony import */
+/**
+ * Render a list of answer options.
+ *
+ * @param {Object}   props
+ * @param {Array}    props.answers  Answer list.
+ * @param {Function} props.children Answer render function
+ */
+p.Options=function(e){var t=e.answers,n=e.children;return(0,i.createElement)("ol",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--multiple-choice"},t.map((function(e,t){return(0,i.createElement)("li",{key:t,className:a()("sensei-lms-question-block__answer--multiple-choice__option",{"is-draft":!e.label})},n(e,t))})))},
+/**
+ * Read-only multiple choice answer component.
+ *
+ * @param {Object} props
+ * @param {Object} props.attributes
+ * @param {Array}  props.attributes.answers Answers.
+ */
+p.view=function(e){var t=e.attributes.answers,n=void 0===t?[]:t,r=d(n);return(0,i.createElement)(p.Options,{answers:n},(function(e){return(0,i.createElement)(i.Fragment,null,(0,i.createElement)(u/* .OptionToggle */.n,{isChecked:e.correct,isCheckbox:r}),e.label)}))};
+/* harmony default export */const v=p;
+/***/},
+/***/6480:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */n:()=>/* binding */u
+/* harmony export */});
+/* unused harmony export InputToggle */
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(42),l=n.n(i),a=n(454),c=["className","isChecked","isCheckbox","input","children"],u=function(e){var t=e.className,n=e.isChecked,i=e.isCheckbox,u=e.input,m=e.children,d=(0,s/* ["default"] */.Z)(e,c);return(0,o.createElement)("div",(0,r/* ["default"] */.Z)({className:l()("sensei-lms-question-block__option-toggle",t)},d),u,(0,o.createElement)("div",{className:l()("sensei-lms-question-block__option-toggle__control",{"is-checked":n,"is-checkbox":i})},i&&a/* ["default"] */.Z),m)};
+/* harmony import */}
+/***/,
+/***/3949:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>o
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5736),__=s.__;
+/* harmony import */
+/* harmony default export */const o=function(e){var t=e.children;return(0,r.createElement)("div",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--single-line"},(0,r.createElement)("small",{className:"sensei-lms-question-block__input-label"},__("Answer:","sensei-lms")),(0,r.createElement)("div",{className:"sensei-lms-question-block__text-input-placeholder"},t))};
+/***/},
+/***/1145:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(5736),i=n(6480),__=o.__,l=function(e){var t=e.attributes.correct,n=void 0===t||t,o=e.setAttributes,l=e.hasSelected,a=[{label:__("True","sensei-lms"),value:!0},{label:__("False","sensei-lms"),value:!1}];return(0,r.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--true-false"},a.map((function(e){var t=e.label,a=e.value;return(0,r.createElement)("li",{key:a,className:"sensei-lms-question-block__answer--true-false__option"},(0,r.createElement)(i/* .OptionToggle */.n,{isChecked:n===a},(0,r.createElement)("span",null,t)),l&&(0,r.createElement)("div",{className:"sensei-lms-question-block__answer--multiple-choice__toggle__wrapper"},(0,r.createElement)(s.Button,{isPrimary:!0,className:"sensei-lms-question-block__answer--true-false__toggle",onClick:function(){return o({correct:a===n?!a:a})}},n===a&&__("Right","sensei-lms"),n!==a&&__("Wrong","sensei-lms"))))})))};
+/* harmony import */
+/**
+ * Read-only answer component true/false question block.
+ *
+ * @param {Object}  props
+ * @param {Object}  props.attributes
+ * @param {boolean} props.attributes.correct The correct answer.
+ */
+l.view=function(e){var t=e.attributes.correct,n=void 0===t||t,s=[{label:__("True","sensei-lms"),value:!0},{label:__("False","sensei-lms"),value:!1}];return(0,r.createElement)("ul",{className:"sensei-lms-question-block__answer sensei-lms-question-block__answer--true-false"},s.map((function(e){var t=e.label,s=e.value;return(0,r.createElement)("li",{key:s,className:"sensei-lms-question-block__answer--true-false__option"},(0,r.createElement)(i/* .OptionToggle */.n,{isChecked:n===s},(0,r.createElement)("span",null,t)))})))};
+/* harmony default export */const a=l;
+/***/},
+/***/5385:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */F:()=>/* binding */m
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(6414),o=n(2585),i=n(9316),l=n(5736),a=n(42),c=n.n(a),u=n(2505),__=l.__,m=function(){var e=(0,r.useContext)(u/* .QuestionContext */.G).answerFeedback,t=e.showAnswerFeedback,n=e.toggleAnswerFeedback;return(0,r.createElement)("div",{className:c()("sensei-lms-question-block__answer-feedback-toggle",{"is-visible":t})},(0,r.createElement)("button",{className:"sensei-lms-question-block__answer-feedback-toggle__header",onClick:function(){return n(!t)}},__("Answer Feedback","sensei-lms"),(0,r.createElement)(s/* ["default"] */.Z,{className:"sensei-lms-question-block__answer-feedback-toggle__icon",icon:t?o/* ["default"] */.Z:i/* ["default"] */.Z})),(0,r.createElement)("div",{className:"sensei-lms-question-block__answer-feedback-toggle__help"},__("Show feedback once the question is answered.","sensei-lms")))};
+/* harmony import */}
+/***/,
+/***/2978:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(5736),i=n(42),l=n.n(i),__=o.__,a={correct:{title:__("Correct","sensei-lms"),placeholder:__("Show a message when the question is answered correctly. Type / to choose a block.","sensei-lms")},incorrect:{title:__("Incorrect","sensei-lms"),placeholder:__("Show a message when the question is answered incorrectly. Type / to choose a block.","sensei-lms")}};
+/* harmony import */
+/* harmony default export */const c=function(e){var t=e.type,n=a[t],o=n.title,i=n.placeholder;return(0,r.createElement)("div",{className:l()("sensei-lms-question__answer-feedback","sensei-lms-question__answer-feedback--".concat(t))},(0,r.createElement)("div",{className:"sensei-lms-question__answer-feedback__header"},(0,r.createElement)("span",{className:"sensei-lms-question__answer-feedback__icon"}),(0,r.createElement)("span",null,o)),(0,r.createElement)("div",{className:"sensei-lms-question__answer-feedback__content"},(0,r.createElement)(s.InnerBlocks,{template:[["core/paragraph",{placeholder:i}]],templateInsertUpdatesSelection:!1,templateLock:!1})))};
+/***/},
+/***/8544:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */p:()=>/* binding */u
+/* harmony export */,h:()=>/* binding */m
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(2978),a=n(5889),__=i.__,c={parent:["sensei-lms/quiz-question"],category:"sensei-lms",supports:{html:!1},attributes:{id:{type:"integer"}}},u=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},c),{},{name:"sensei-lms/quiz-question-feedback-correct",title:__("Correct Answer Feedback","sensei-lms"),icon:a/* ["default"] */.Z,description:__("Display correct answer feedback.","sensei-lms"),edit:function(e){return(0,l/* ["default"] */.Z)((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{type:"correct"}))},save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)}}),m=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},c),{},{name:"sensei-lms/quiz-question-feedback-incorrect",title:__("Incorrect Answer Feedback","sensei-lms"),icon:a/* ["default"] */.Z,description:__("Display incorrect answer feedback.","sensei-lms"),edit:function(e){return(0,l/* ["default"] */.Z)((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{type:"incorrect"}))},save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)}});
+/* harmony import */}
+/***/,
+/***/6943:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>f
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(6886),o=n(9307),i=n(5736),l=n(4333),a=n(5137),c=n(9608),u=n(8308),m=n(688),d=n(677),p=n(598),v=n(1835),__=i.__,_n=i._n;
+/* harmony import */
+/* harmony default export */const f=(0,l.compose)(m/* .withBlockMeta */.vf,(0,d/* .withBlockValidation */.z)(p/* .validateCategoryQuestionBlock */.g))((function(e){var t,n,l=e.attributes.options,m=l.number,d=void 0===m?1:m,f=l.category,g=e.clientId,h=e.setAttributes,b=(0,a/* .useQuestionNumber */.Q)(g),E=(0,c/* .useQuestionCategories */.J)(),_=(0,s/* ["default"] */.Z)(E,2)[1],w=d&&1!==d?"".concat(b," - ").concat(b+d-1):b,k=(0,o.createElement)("h2",{className:"sensei-lms-question-block__index"},w,"."),Z=null!==(t=null===(n=_(f))||void 0===n?void 0:n.name)&&void 0!==t?t:e.attributes.categoryName,y=Z===e.attributes.categoryName;return(0,o.useEffect)((function(){Z&&!y&&h({categoryName:Z})}),[Z,y,h]),(0,o.createElement)(o.Fragment,null,(0,o.createElement)(u/* ["default"] */.Z,e),(0,o.createElement)("div",{className:"sensei-lms-question-block sensei-lms-category-question-block ".concat(f?"":"is-draft")},k,(0,o.createElement)("h2",{className:"sensei-lms-question-block__title"},Z?(0,o.createElement)("strong",null,Z):__("Category Question","sensei-lms"),Z&&d>0&&" ("+(0,i.sprintf)(// translators: placeholder is number of questions to show from category.
+_n("%d question","%d questions",d,"sensei-lms"),d)+")")),(0,o.createElement)(v/* .QuestionValidationNotice */.me,(0,r/* ["default"] */.Z)({},e,{getErrorMessages:p/* .getCategoryQuestionBlockValidationErrorMessages */.h})))}));
+/***/},
+/***/8308:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>v
+/* harmony export */});
+/* harmony import */var r=n(228),s=n(189),o=n(6886),i=n(9307),l=n(2175),a=n(5609),c=n(5736),u=n(6989),m=n.n(u),d=n(768),p=n(9608),__=c.__,_n=c._n;
+/* harmony import */
+/* harmony default export */const v=function(e){var t,n,u,v,f,g,h,b,E=e.attributes.options,_=void 0===E?{}:E,w=e.setAttributes,k=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:{};return w((0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},t),{},{options:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},_),e)}))},Z=(0,p/* .useQuestionCategories */.J)(),y=(0,o/* ["default"] */.Z)(Z,2),q=y[0],C=y[1],S=(0,i.useState)(null),x=(0,o/* ["default"] */.Z)(S,2),N=x[0],B=x[1],P=(u=_.category,v=B,f=(0,i.useState)({}),g=(0,o/* ["default"] */.Z)(f,2),h=g[0],b=g[1],(0,i.useEffect)((function(){u&&!h.hasOwnProperty(u)&&m()({path:"/wp/v2/questions?question-category=".concat(u),method:"GET",parse:!1}).then((function(e){h[u]=+e.headers.get("X-WP-Total"),b((0,s/* ["default"] */.Z)({},h))})).catch((function(e){e.json().then((function(e){return v(e.message)}))}))}),[u,h,v]),!!h.hasOwnProperty(u)&&h[u]),A=[{value:"",label:""}].concat((0,r/* ["default"] */.Z)((q||[]).map((function(e){return{value:e.id,label:e.name}}))));return(0,i.createElement)(l.InspectorControls,null,(0,i.createElement)(a.PanelBody,{title:__("Category Question Settings","sensei-lms"),initialOpen:!0},!A.length&&(0,i.createElement)(a.Notice,{status:"warning",isDismissible:!1},__("No question categories exist.","sensei-lms")),A.length>0&&(0,i.createElement)(i.Fragment,null,(0,i.createElement)(a.SelectControl,{label:__("Category","sensei-lms"),options:A,value:null!==(t=_.category)&&void 0!==t?t:"",onChange:function(e){var t,n=C(+e);k({category:null!==(t=+e)&&void 0!==t?t:null},{categoryName:null==n?void 0:n.name}),B(null)}}),(0,i.createElement)(d/* ["default"] */.Z,{label:__("Number of Questions","sensei-lms"),min:1,step:1,value:null!==(n=_.number)&&void 0!==n?n:1,onChange:function(e){return e&&k({number:e||1})}}),null!==N&&(0,i.createElement)(a.Notice,{status:"error",isDismissible:!1},(0,c.sprintf)(// translators: The underlying error message.
+__("An error occurred while retrieving questions: %s","sensei-lms"),N)),!1!==P&&null===N&&_.number>P&&(0,i.createElement)(a.Notice,{status:"warning",isDismissible:!1},(0,c.sprintf)(// translators: Placeholder is number of questions in category.
+_n("The selected category has %d question.","The selected category has %d questions.",P,"sensei-lms"),P)))))};
+/***/},
+/***/598:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */g:()=>/* binding */s
+/* harmony export */,h:()=>/* binding */o
+/* harmony export */});
+/* harmony import */var r=n(5220),s=function(e){var t=e.options;return{noCategory:!((null==t?void 0:t.category)>0)}},o=function(e){return e.map((function(e){return r/* ["default"].messages */.Z.messages[e]}))};
+/**
+ * Internal dependencies
+ */
+/**
+ * Validate category question block.
+ *
+ * @param {Object} attributes Block attributes.
+ * @return {Array} Validation errors.
+ */}
+/***/,
+/***/5220:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(6943),a=n(8842),c=n(5889),__=i.__;
+/* harmony import */
+/**
+ * Quiz category question block definition.
+ */
+/* harmony default export */const u=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},a),{},{title:__("Category Question","sensei-lms"),icon:c/* ["default"] */.Z,usesContext:["sensei-lms/quizId"],description:__("Pull questions from a question category.","sensei-lms"),example:{attributes:{categoryName:__("Example Category","sensei-lms")}},edit:l/* ["default"] */.Z,save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)},messages:{noCategory:__("Assign a category to this question.","sensei-lms")}});
+/***/},
+/***/7843:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */TO:()=>/* binding */d
+/* harmony export */,gS:()=>/* binding */p
+/* harmony export */,yR:()=>/* binding */v
+/* harmony export */,uw:()=>/* binding */f
+/* harmony export */,mY:()=>/* binding */g
+/* harmony export */,tv:()=>/* binding */h
+/* harmony export */});
+/* harmony import */var r=n(6886),s=n(189),o=n(3782),i=n(4981),l=n(9818),a=n(8399),c=n(5220),u=n(2819),m=["description"];
+/* harmony import */
+/**
+ * WordPress dependencies
+ */
+/**
+ * Internal dependencies
+ */
+/**
+ * External dependencies
+ */
+/**
+ * Quiz settings and questions data.
+ *
+ * @typedef {Object} QuizStructure
+ * @property {Object}         settings  Quiz settings.
+ * @property {QuizQuestion[]} questions Questions.
+ */
+/**
+ * Quiz question data.
+ *
+ * @typedef {Object} QuizQuestion
+ * @property {number} id          Question ID.
+ * @property {string} type        Question type
+ * @property {string} title       Question title
+ * @property {string} description Question description blocks
+ * @property {Object} answers     Question answer settings
+ * @property {Object} options     Question options.
+ */
+/**
+ * Quiz category question data.
+ *
+ * @typedef {Object} QuizCategoryQuestion
+ * @property {number} id               Question ID.
+ * @property {string} type             Question type
+ * @property {Object} options          Question settings
+ * @property {number} options.category Category for question.
+ * @property {number} options.number   Number of questions to show from category.
+ */
+/**
+ * Create blocks based on the structure, keeping existing block attributes.
+ *
+ * Matches blocks based on question ID.
+ *
+ * @param {QuizQuestion[]} structure Quiz questions.
+ * @param {Object[]}       blocks    Existing blocks.
+ * @return {Object[]} Updated blocks.
+ */
+function d(e,t){return e&&0!==e.length?(e||[]).map((function(e){var n=e.description,r=(0,o/* ["default"] */.Z)(e,m),a=t?f(t,e):null;if(a){a.attributes=(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},a.attributes),r);var c=n&&(0,i.rawHandler)({HTML:n})||[];(0,l.dispatch)("core/block-editor").replaceInnerBlocks(a.clientId,c)}else a=v(e);return a})):[(0,i.createBlock)("sensei-lms/quiz-question",{})]}
+/**
+ * Manually run our deprecated migrations for the question block.
+ *
+ * @param {Object} attributes  Block attributes.
+ * @param {Array}  innerBlocks Inner blocks.
+ * @return {Array} Tuple of attributes and innerBlocks
+ */
+/**
+ * Convert blocks to question structure.
+ *
+ * @param {Object[]} blocks Blocks.
+ *
+ * @return {QuizQuestion[]} Question structure
+ */
+function p(e){var t=null==e?void 0:e.map((function(e){var t=(0,u.omit)(e.attributes,["className"]);return"category-question"===e.attributes.type?t:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},t),{},{description:(0,i.getBlockContent)(e)})})),n=t.pop();return h(n)||t.push(n),t}
+/**
+ * Create a new question block.
+ *
+ * @param {Object} question Question item.
+ *
+ * @return {QuizQuestion} Block.
+ */function v(e){if("category-question"===e.type)return(0,i.createBlock)(c/* ["default"].name */.Z.name,e,[]);var t=function(e,t){return a/* ["default"].deprecated.forEach */.Z.deprecated.forEach((function(n){
+// Check our flag for deprecations that should run here.
+if(n.onProgrammaticCreation&&n.isEligible(e,t)){var s=n.migrate(e,t),o=(0,r/* ["default"] */.Z)(s,2);e=o[0],t=o[1]}})),[e,t]}(e,e.description&&(0,i.rawHandler)({HTML:e.description})||[]),n=(0,r/* ["default"] */.Z)(t,2),s=n[0],o=n[1];return(0,i.createBlock)(a/* ["default"].name */.Z.name,s,o)}
+/**
+ * Find a question block based on question ID, or title if ID is missing.
+ *
+ * @param {Array}                             blocks
+ * @param {QuizQuestion|QuizCategoryQuestion} item
+ */var f=function(e,t){var n=t.id,r=t.title,s=t.options,o=null==s?void 0:s.category;return e.find((function(e){var t,s,i=e.attributes;return n===i.id||!i.id&&i.title&&i.title===r||!i.id&&(null===(t=i.options)||void 0===t?void 0:t.category)&&(null===(s=i.options)||void 0===s?void 0:s.category)===o}))},g=function e(t,n){var r=(0,u.mapKeys)(t,(function(e,t){return n(t)}));return(0,u.mapValues)(r,(function(t){return(0,u.isObject)(t)?e(t,n):t}))},h=function(e){return"category-question"===e.type?!e.options.category:!e.title};
+/**
+ * Normalize an object by applying a mapping function to it's keys, including nested ones.
+ *
+ * @param {Object}   options     Options object to normalize.
+ * @param {Function} mapFunction Function to apply.
+ */}
+/***/,
+/***/5354:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(4194),a=n(5073),c=n(5889),__=i.__;
+/* harmony import */
+/**
+ * Question answers block.
+ */
+/* harmony default export */const u=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},a),{},{title:__("Answers","sensei-lms"),icon:c/* ["default"] */.Z,description:__("Question Answers.","sensei-lms"),edit:l/* ["default"] */.Z,save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)}});
+/***/},
+/***/4194:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(42),i=n.n(o),l=n(5385),a=n(2505);
+/* harmony import */
+/* harmony default export */const c=function(){var e=(0,s.useContext)(a/* .QuestionContext */.G),t=e.answer,n=e.setAttributes,o=e.AnswerBlock,c=e.hasSelected,u=e.canHaveFeedback;return(0,s.createElement)("div",{className:i()("sensei-lms-question-answers-block")},(null==o?void 0:o.edit)&&(0,s.createElement)(s.Fragment,null,(0,s.createElement)(o.edit,{attributes:t,setAttributes:function(e){return n({answer:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),e)})},hasSelected:c}),u&&c&&(0,s.createElement)(l/* .AnswerFeedbackToggle */.F,null)))};
+/***/},
+/***/8399:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(4702),a=n(9954),c=n(7629),u=n(5889),__=i.__;
+/* harmony import */
+/**
+ * Quiz question block definition.
+ */
+/* harmony default export */const m=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},c),{},{title:__("Question","sensei-lms"),icon:u/* ["default"] */.Z,usesContext:["sensei-lms/quizId"],description:__("The building block of all quizzes.","sensei-lms"),example:{attributes:{title:__("Example Quiz Question","sensei-lms")}},deprecated:a/* ["default"] */.Z,edit:l/* ["default"] */.Z,save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)},messages:{noTitle:__("Add a title to this question.","sensei-lms")}});
+/***/},
+/***/1835:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Ud:()=>/* binding */c
+/* harmony export */,me:()=>/* binding */u
+/* harmony export */});
+/* unused harmony export BlockValidationNotice */
+/* harmony import */var r=n(9307),s=n(5609),o=n(5736),i=n(6414),l=n(3851),a=n(8965),__=o.__,c=function(){return(0,r.createElement)("div",{className:"sensei-lms-question-block__notice"},(0,r.createElement)(i/* ["default"] */.Z,{icon:l/* ["default"] */.Z}),(0,r.createElement)(s.Tooltip,{text:__("Any updates made to this question will also update it in any other quiz that includes it.","sensei-lms")},(0,r.createElement)("span",null,__("Shared Question","sensei-lms"))))},u=function(e){var t=e.attributes.type,n=e.meta,s=n.validationErrors,o=n.showValidationErrors,i=e.getErrorMessages;if(!o||null==s||!s.length)return null;var l=i(s,t);return(0,r.createElement)(m,{errors:l})},m=function(e){var t=e.errors,n=void 0===t?[]:t;if(!n||!n.length)return null;var o=n[0];return(0,r.createElement)(s.Notice,{isDismissible:!1,status:"warning",className:"sensei-lms-block-validation-notice"},(0,r.createElement)(a/* ["default"] */.Z,{className:"sensei-lms-block-validation-notice__icon"}),o)};
+/* harmony import */}
+/***/,
+/***/2505:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */G:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(9307),s=(0,r.createContext)({});
+/* harmony import */}
+/***/,
+/***/9954:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>p
+/* harmony export */});
+/* harmony import */var r=n(228),s=n(189),o=n(9307),i=n(2175),l=n(4981),a=n(2819),c=n(8544),u=n(2365),m=n(5354),d=n(7629);
+/* harmony import */
+/* harmony default export */const p=[{onProgrammaticCreation:!0,isEligible:function(e,t){var n,r=!0;return null!==(n=e.options)&&void 0!==n&&n.answerFeedback&&(r=!0),t.map((function(e){return[u/* ["default"].name */.Z.name,c/* .answerFeedbackCorrectBlock.name */.p.name,c/* .answerFeedbackIncorrectBlock.name */.h.name].includes(e.name)&&(r=!1),!0})),r},attributes:(0,s/* ["default"] */.Z)({},d.attributes),migrate:function(e,t){var n,r=[];// Shift the description into the new question description block container.
+return r.push((0,l.createBlock)(u/* ["default"].name */.Z.name,{},t),(0,l.createBlock)(m/* ["default"].name */.Z.name,{})),// Replace the answerFeedback attribute with dedicated blocks.
+null!==(n=e.options)&&void 0!==n&&n.answerFeedback&&(r.push((0,l.createBlock)(c/* .answerFeedbackCorrectBlock.name */.p.name,{},[(0,l.createBlock)("core/paragraph",{content:e.options.answerFeedback})])),r.push((0,l.createBlock)(c/* .answerFeedbackIncorrectBlock.name */.h.name,{},[(0,l.createBlock)("core/paragraph",{content:e.options.answerFeedback})]))),[(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},e),{},{options:(0,a.omit)(e.options,"answerFeedback")}),r]},save:function(){return(0,o.createElement)(i.InnerBlocks.Content,null)}},{onProgrammaticCreation:!0,isEligible:function(e){var t;return e.media||"file-upload"===e.type&&!(null===(t=e.options)||void 0===t||!t.studentHelp)},attributes:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},d.attributes),{},{media:{type:"object"}}),migrate:function(e,t){var n,i=(0,r/* ["default"] */.Z)(t);// Add the media to the description (if it exists).
+return e.media&&i.push(function(e){switch(e.type){case"image":return(0,l.createBlock)("core/image",{id:e.id,url:e.url});case"audio":return(0,l.createBlock)("core/audio",{id:e.id,src:e.url});case"video":return(0,l.createBlock)("core/video",{id:e.id,src:e.url});default:var t=(0,o.createElement)("a",{href:e.url},e.title);return(0,l.createBlock)("core/paragraph",{content:(0,o.renderToString)(t)})}}(e.media)),// Add the student help text to the description (if it exists).
+"file-upload"===e.type&&null!==(n=e.options)&&void 0!==n&&n.studentHelp&&i.push((0,l.createBlock)("core/paragraph",{content:e.options.studentHelp})),[(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},(0,a.omit)(e,"media")),{},{options:(0,a.omit)(e.options,"studentHelp")}),i]},save:function(){return(0,o.createElement)(i.InnerBlocks.Content,null)}}];
+/***/},
+/***/4702:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>R
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(228),o=n(189),i=n(6886),l=n(9307),a=n(42),c=n.n(a),u=n(2175),m=n(9818),d=n(4333),p=n(5736),v=n(2694),f=n(677),g=n(8544),h=n(2365),b=n(5354),E=n(5137),_=n(3295),w=n(688),k=n(1831),Z=n(9395),y=n(1835),q=n(2505),C=n(1209),S=n(2889),x=n(8166),N=n(8900),B=n(1622),P=n(4558),__=p.__,_n=p._n,A=Object.entries(Z/* ["default"] */.Z).map((function(e){var t=(0,i/* ["default"] */.Z)(e,2),n=t[0],r=t[1];return(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},r),{},{label:r.title,value:n})}));
+/* harmony import */
+/**
+ * Filters the available question type options.
+ *
+ * @since 4.1.0
+ *
+ * @param {Array} options The available question type options.
+ * @return {Array} The filtered question type options.
+ */
+A=(0,v.applyFilters)("senseiQuestionTypeToolbarOptions",A);
+/* harmony default export */const R=(0,d.compose)(w/* .withBlockMeta */.vf,(0,f/* .withBlockValidation */.z)(S/* .validateQuestionBlock */.O))((function(e){var t,n,a=e.attributes,d=a.title,v=a.type,f=a.answer,w=void 0===f?{}:f,R=a.options,T=a.shared,I=a.editable,O=void 0===I||I,z=e.setAttributes,M=e.clientId,F=e.context,Q=(0,m.useDispatch)("core/block-editor"),j=Q.removeBlock,V=Q.selectBlock,D=(0,l.useCallback)((function(){var e=(0,m.select)("core/block-editor").getBlocks(M);e.length&&V(e[0].clientId)}),[M,V]),U=(0,E/* .useQuestionNumber */.Q)(M),L=v&&Z/* ["default"] */.Z[v],G=null==L?void 0:L.feedback,H=(0,k/* .useHasSelected */.g9)(e),W=F&&!("sensei-lms/quizId"in F),K=d||H||W,J=!W&&(0,l.createElement)("h2",{className:"sensei-lms-question-block__index"},U,"."),Y=e.meta.showValidationErrors&&(null===(t=e.meta.validationErrors)||void 0===t?void 0:t.length),$=(0,l.createElement)("div",{className:"sensei-lms-question-block__grade"},(n=R.grade,// Translators: placeholder is the grade for the questions.
+(0,p.sprintf)(_n("%d point","%d points",n,"sensei-lms"),n))),X=(0,l.useState)(!1),ee=(0,i/* ["default"] */.Z)(X,2),te=ee[0],ne=ee[1],re=(0,l.useMemo)((function(){return{answer:w,setAttributes:z,AnswerBlock:L,hasSelected:H,canHaveFeedback:G,answerFeedback:{showAnswerFeedback:te,toggleAnswerFeedback:ne}}}),[L,w,H,z,te,G]),se=(0,l.useMemo)((function(){return[[h/* ["default"].name */.Z.name,{}],[b/* ["default"].name */.Z.name,{}]].concat((0,s/* ["default"] */.Z)(G?[[g/* .answerFeedbackCorrectBlock.name */.p.name,{}],[g/* .answerFeedbackIncorrectBlock.name */.h.name,{}]]:[]))}),[G]);return O?(0,l.createElement)("div",{className:c()("sensei-lms-question-block",{"is-draft":!d,"is-invalid":Y,"show-answer-feedback":te})},J,W&&(0,l.createElement)(P/* ["default"] */.Z,e),(0,l.createElement)("h2",{className:"sensei-lms-question-block__title"},(0,l.createElement)(_/* ["default"] */.Z,{placeholder:__("Question Title","sensei-lms"),value:d,onChange:function(e){return z({title:e})},onEnter:D,onRemove:function(){return j(M)}})),L.subtitle&&(0,l.createElement)(L.subtitle,{isQuestionSelected:H}),K&&$,H&&T&&(0,l.createElement)(y/* .SharedQuestionNotice */.Ud,null),K&&(0,l.createElement)(q/* .QuestionContext.Provider */.G.Provider,{value:re},(0,l.createElement)(u.InnerBlocks,{template:se,templateInsertUpdatesSelection:!1,templateLock:"all",renderAppender:null})),(0,l.createElement)(y/* .QuestionValidationNotice */.me,(0,r/* ["default"] */.Z)({},e,{getErrorMessages:S/* .getQuestionBlockValidationErrorMessages */.b})),(0,l.createElement)(u.BlockControls,null,(0,l.createElement)(l.Fragment,null,(0,l.createElement)(B/* .QuestionTypeToolbar */.C,{value:v,onSelect:function(e){return z({type:e})},options:A}),(0,l.createElement)(C/* .QuestionGradeToolbar */.G,{value:R.grade,onChange:function(e){return z({options:(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},R),{},{grade:e})})}}))),(0,l.createElement)(N/* ["default"] */.Z,(0,r/* ["default"] */.Z)({controls:null==L?void 0:L.settings},e))):(0,l.createElement)(x/* ["default"] */.Z,(0,r/* ["default"] */.Z)({},e,{questionGrade:$,questionIndex:J,AnswerBlock:L}))}));
+/***/},
+/***/4366:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */y:()=>/* binding */a
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(9307),o=n(5736),i=n(1719),l=n(768),_n=o._n,a=function(e){var t=(0,s.useMemo)((function(){return(0,i.v4)()}),[]);return(0,s.createElement)(l/* ["default"] */.Z,(0,r/* ["default"] */.Z)({id:t,min:0,step:1},e,{suffix:_n("Point","Points",e.value,"sensei-lms")}))};
+/* harmony import */}
+/***/,
+/***/1209:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */G:()=>/* binding */i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(4366),i=function(e){var t=e.value,n=e.onChange;return(0,r.createElement)(r.Fragment,null,(0,r.createElement)(s.ToolbarGroup,{className:"sensei-lms-question-block__grade-toolbar"},(0,r.createElement)(o/* .QuestionGradeControl */.y,{value:t,onChange:n})))};
+/* harmony import */}
+/***/,
+/***/8900:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>p
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(228),o=n(189),i=n(3782),l=n(9307),a=n(2175),c=n(5609),u=n(5736),m=n(3216),d=["controls","attributes","setAttributes"],__=u.__;
+/* harmony import */
+/* harmony default export */const p=function(e){var t=e.controls,n=void 0===t?[]:t,u=e.attributes.options,p=void 0===u?{}:u,v=e.setAttributes,f=(0,i/* ["default"] */.Z)(e,d),g=function(e){return v({options:(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},p),e)})};return(0,l.createElement)(a.InspectorControls,null,(0,l.createElement)(c.PanelBody,{title:__("Question settings","sensei-lms"),initialOpen:!0},[m/* .QuestionGradeSettings */.rd].concat((0,s/* ["default"] */.Z)(n)).map((function(e){return(0,l.createElement)(e,(0,r/* ["default"] */.Z)({key:e},f,{options:p,setOptions:g}))}))))};
+/***/},
+/***/1622:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */C:()=>/* binding */a
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(2694),i=n(5736),l=n(1042),__=i.__,a=function(e){var t=e.value,n=e.onSelect,i=e.options;return(0,r.createElement)(s.Toolbar,{className:"sensei-lms-question-block__type-selector__toolbar"},(0,r.createElement)(l/* ["default"] */.Z,{className:"sensei-lms-question-block__type-selector",label:__("Question Type","sensei-lms"),options:i,value:t,onChange:function(e){return n(e)},optionsLabel:__("Question Type","sensei-lms"),popoverProps:{className:"sensei-lms-question-block__type-selector__popover"},toggleProps:{children:function(e){return(0,r.createElement)("b",null,null==e?void 0:e.title)}},getMenuItemProps:function(e){var t=(0,r.createElement)("div",null,(0,r.createElement)("strong",null," ",e.title),(0,r.createElement)("div",{className:"sensei-lms-question-block__type-selector__option__description"},e.description));
+/**
+       * Filters the children of the menu item.
+       *
+       * @since 4.1.0
+       *
+       * @param {JSX.Element} children Menu element children.
+       * @param {Object}      option   The question type option.
+       * @return {JSX.Element} Retuns the filtered children for the menu item.
+       */t=(0,o.applyFilters)("senseiQuestionTypeToolbarOptionChildren",t,e);var n={};return n.children=t,e.disabled&&(n.onClick=function(){}),n}}))};
+/* harmony import */}
+/***/,
+/***/2889:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */O:()=>/* binding */i
+/* harmony export */,b:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(8399),o=n(9395),i=function(e){var t,n=e.id,s=e.type,i=e.title,l=e.answer,a=s&&o/* ["default"] */.Z[s],c=(null===(t=a.validate)||void 0===t?void 0:t.call(a,l))||{},u=null==i?void 0:i.length;return!u&&!l&&!n?{}:(0,r/* ["default"] */.Z)({noTitle:!u},c)},l=function(e,t){return e.map((function(e){var n,r;return(null===o/* ["default"] */.Z||void 0===o/* ["default"] */.Z||null===(n=o/* ["default"] */.Z[t])||void 0===n||null===(r=n.messages)||void 0===r?void 0:r[e])||s/* ["default"].messages */.Z.messages[e]}))};
+/* harmony import */}
+/***/,
+/***/8166:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(4981),i=n(5609),l=n(9818),a=n(5736),__=a.__,c=function(){return(0,r.createElement)(r.Fragment,null,(0,r.createElement)(s.BlockControls,null,(0,r.createElement)(i.Toolbar,null,(0,r.createElement)(i.ToolbarButton,{disabled:!0},__("Locked","sensei-lms")))),(0,r.createElement)(s.InspectorControls,null,(0,r.createElement)(i.PanelBody,{title:__("Question Details","sensei-lms"),initialOpen:!0},(0,r.createElement)("div",null,__("You are not allowed to edit this question.","sensei-lms")))))};
+/* harmony import */
+/* harmony default export */const u=function(e){var t=e.clientId,n=e.attributes,s=n.title,i=n.answer,a=n.editable,u=e.questionIndex,m=e.questionGrade,d=e.AnswerBlock,p=(0,l.useSelect)((function(e){return e("core/block-editor").getBlock(t)}),[t]);return(0,r.createElement)("div",{className:"sensei-lms-question-block"},u,(0,r.createElement)("h2",{className:"sensei-lms-question-block__title"},s),m,(0,r.createElement)(r.RawHTML,null,(0,o.getBlockContent)(p)),(null==d?void 0:d.view)&&(0,r.createElement)(d.view,{attributes:i}),!a&&(0,r.createElement)(c,null))};
+/***/},
+/***/3216:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Zw:()=>/* reexport safe */r.Z
+/* harmony export */,rd:()=>/* reexport safe */s.Z
+/* harmony export */,F0:()=>/* reexport safe */o.Z
+/* harmony export */});
+/* harmony import */var r=n(7811),s=n(6160),o=n(2010);
+/* harmony import */}
+/***/,
+/***/6160:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5736),o=n(4366),__=s.__;
+/* harmony import */
+/* harmony default export */const i=function(e){var t=e.options.grade,n=void 0===t?1:t,s=e.setOptions;return(0,r.createElement)(o/* .QuestionGradeControl */.y,{label:__("Grade","sensei-lms"),value:n,onChange:function(e){return s({grade:null!=e?e:1})},allowReset:!0})};
+/***/},
+/***/7811:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(5736),__=o.__;
+/* harmony import */
+/* harmony default export */const i=function(e){var t=e.options.teacherNotes,n=e.setOptions;return(0,r.createElement)(s.TextareaControl,{label:__("Grading Notes","sensei-lms"),onChange:function(e){return n({teacherNotes:e})},value:t||"",help:__("Displayed to the teacher when grading the question.","sensei-lms")})};
+/***/},
+/***/2010:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(5736),__=o.__;
+/* harmony import */
+/* harmony default export */const i=function(e){var t=e.options.randomOrder,n=void 0!==t&&t,o=e.setOptions;return(0,r.createElement)(s.CheckboxControl,{label:__("Random Order","sensei-lms"),checked:n,onChange:function(e){return o({randomOrder:e})}})};
+/***/},
+/***/4558:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(5736),i=n(2067),l=n(1831),__=o.__;
+/* harmony import */
+/* harmony default export */const a=function(e){var t=e.meta,n=t.validationErrors,o=t.showValidationErrors,a=e.setMeta,c=(0,r.useCallback)((function(){var e=!(arguments.length>0&&void 0!==arguments[0])||arguments[0];a({showValidationErrors:e})}),[a]);if((0,l/* .usePostSavingEffect */.H3)((function(){return c(!1)}),[c]),null==n||!n.length)return null;var u=(0,r.createElement)(s.Notice,{isDismissible:!1,status:"warning",className:"sensei-lms-quiz-block__pre-publish-validation__notice",actions:o?[]:[{label:__("View issues","sensei-lms"),onClick:function(){return c(!0)},className:"is-link"}]},__("This question is incomplete.","sensei-lms"));return(0,r.createElement)(r.Fragment,null,(0,r.createElement)(i.PluginPostStatusInfo,null,u),(0,r.createElement)(i.PluginPrePublishPanel,{title:__("Validation","sensei-lms"),initialOpen:!0},(0,r.createElement)(l/* .Effect */.Qm,{onMount:c}),u,(0,r.createElement)("p",null,__("Incomplete questions added to a quiz won't be displayed to the student.","sensei-lms"))))};
+/***/},
+/***/9608:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */J:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9818),o=n(9307),i=n(2819),l=function(){var e=(0,s.useSelect)((function(e){var t=e("core").getEntityRecords("taxonomy","question-category",{per_page:-1});return null!=t?t:[]}),[]),t=(0,o.useMemo)((function(){return(e||[]).map((function(e){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{name:unescape(e.name)})}))}),[e]),n=(0,o.useMemo)((function(){return(0,i.keyBy)(null!=t?t:[],"id")}),[t]);return[t,function(e){var t;return!(!n||0===n.length)&&(null!==(t=n[e])&&void 0!==t&&t)}]};
+/* harmony import */}
+/***/,
+/***/2365:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(3564),a=n(9627),c=n(5889),__=i.__;
+/* harmony import */
+/**
+ * Question description block.
+ */
+/* harmony default export */const u=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},a),{},{title:__("Description","sensei-lms"),icon:c/* ["default"] */.Z,usesContext:["sensei-lms/quizId"],description:__("Question Description.","sensei-lms"),edit:l/* ["default"] */.Z,save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)}});
+/***/},
+/***/3564:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(2175),o=n(4333),i=n(5736),l=n(42),a=n.n(l),c=n(688),__=i.__;
+/* harmony import */
+/* harmony default export */const u=(0,o.compose)(c/* .withBlockMeta */.vf)((function(){return(0,r.createElement)("div",{className:a()("sensei-lms-question-description-block")},(0,r.createElement)(s.InnerBlocks,{template:[["core/paragraph",{placeholder:__("Add question description or type / to choose a block.","sensei-lms")}]],templateInsertUpdatesSelection:!1,templateLock:!1}))}));
+/***/},
+/***/5137:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Q:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(9818),s=function(e){return(0,r.useSelect)((function(t){var n=t("core/block-editor"),r=n.getBlockRootClientId(e);return(n.getBlocks(r)||[]).slice(0,n.getBlockIndex(e,r))}),[e]).reduce((function(e,t){var n;return e+("category-question"===t.attributes.type&&(null===(n=t.attributes.options)||void 0===n?void 0:n.number)||1)}),0)+1};
+/* harmony import */}
+/***/,
+/***/7698:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>u
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(2175),i=n(5736),l=n(2691),a=n(3400),c=n(5744),__=i.__;
+/* harmony import */
+/* harmony default export */const u=(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},c),{},{title:__("Quiz","sensei-lms"),icon:l/* ["default"] */.Z,description:__("Evaluate progress and strengthen understanding of course concepts.","sensei-lms"),keywords:[__("Exam","sensei-lms"),__("Questions","sensei-lms"),__("Test","sensei-lms"),__("Assessment","sensei-lms"),__("Evaluation","sensei-lms")],providesContext:{"sensei-lms/quizId":"id"},example:{innerBlocks:[{name:"sensei-lms/quiz-question",attributes:{title:__("First Example Question","sensei-lms")}},{name:"sensei-lms/quiz-question",attributes:{title:__("Second Example Question","sensei-lms")}}]},edit:a/* ["default"] */.Z,save:function(){return(0,s.createElement)(o.InnerBlocks.Content,null)}});
+/***/},
+/***/9986:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */K:()=>/* binding */o
+/* harmony export */});
+/* harmony import */var r=n(9818),s=n(7843),o=function(e){var t=(0,r.useSelect)((function(t){return t("core/block-editor").getBlocks(e)}),[]),n=t.length&&t[t.length-1];return n&&(0,s/* .isQuestionEmpty */.tv)(n.attributes)?t.length-1:t.length};
+/* harmony import */}
+/***/,
+/***/7632:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */I:()=>/* binding */g
+/* harmony export */,K:()=>/* binding */h
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(5609),l=n(5736),a=n(768),c=n(1042),u=["settings","updatePagination"],__=l.__,_n=l._n,m="single",d="multi",p=[{label:__("Single page","sensei-lms"),value:m},{label:__("Multi-page","sensei-lms"),value:d}],v=function(e){return function(t){e({paginationNumber:t===d?1:null})}},f=function(e){var t=e.settings,n=e.updatePagination,i=(0,s/* ["default"] */.Z)(e,u),l=t.paginationNumber;return(0,o.createElement)(o.Fragment,null,(0,o.createElement)(a/* ["default"] */.Z,(0,r/* ["default"] */.Z)({label:__("Number of Questions","sensei-lms"),min:1,step:1,hideLabelFromVision:!0,suffix:_n("question","questions",l,"sensei-lms"),value:l,onChange:function(e){return n({paginationNumber:e})}},i)),(0,o.createElement)("span",null,__("per page","sensei-lms")))},g=function(e){var t=e.settings,n=e.updatePagination,r=t.paginationNumber,s=t.showProgressBar,l=t.progressBarRadius,c=t.progressBarHeight;return(0,o.createElement)(o.Fragment,null,(0,o.createElement)(i.PanelBody,{title:__("Pagination","sensei-lms"),initialOpen:!0},(0,o.createElement)(i.PanelRow,{className:"sensei-lms-quiz-block-settings__pagination"},(0,o.createElement)(i.SelectControl,{label:__("Pagination","sensei-lms"),hideLabelFromVision:!0,value:null===r?m:d,options:p,onChange:v(n)})),null!==r&&(0,o.createElement)(i.PanelRow,{className:"sensei-lms-quiz-block-settings__question-count"},(0,o.createElement)(f,{settings:t,updatePagination:n})),null!==r&&(0,o.createElement)(o.Fragment,null,(0,o.createElement)(i.PanelRow,null,(0,o.createElement)(i.ToggleControl,{checked:s,label:__("Show Progress Bar","sensei-lms"),value:l,onChange:function(e){return n({showProgressBar:e})}})),(0,o.createElement)(i.PanelRow,{className:"sensei-lms-quiz-block-settings__progress-bar"},(0,o.createElement)(a/* ["default"] */.Z,{label:__("Radius","sensei-lms"),min:1,step:1,suffix:__("PX","sensei-lms"),value:l,onChange:function(e){return n({progressBarRadius:e})}}),(0,o.createElement)(a/* ["default"] */.Z,{label:__("Height","sensei-lms"),min:1,step:1,suffix:__("PX","sensei-lms"),value:c,onChange:function(e){return n({progressBarHeight:e})}})))))},h=function(e){var t=e.settings,n=e.updatePagination,r=t.paginationNumber;return(0,o.createElement)(o.Fragment,null,(0,o.createElement)(i.Toolbar,null,(0,o.createElement)(c/* ["default"] */.Z,{options:p,optionsLabel:__("Quiz pagination","sensei-lms"),value:null===r?m:d,onChange:v(n)})),null!==r&&(0,o.createElement)(i.ToolbarGroup,{className:"sensei-lms-quiz-block__toolbar-group"},(0,o.createElement)(f,{settings:t,updatePagination:n})))};
+/* harmony import */}
+/***/,
+/***/1933:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r=n(6886),s=n(9307),o=n(5609),i=n(5736),__=i.__;
+/* harmony import */
+/* harmony default export */const l=function(e){var t=e.selectedQuestionIds,n=e.setSelectedQuestionIds,l=e.onAdd,a=e.closeModal,c=e.setErrorAddingSelected,u=(0,s.useState)(!1),m=(0,r/* ["default"] */.Z)(u,2),d=m[0],p=m[1],v=0===t.length?__("Add Selected","sensei-lms"):(0,i.sprintf)(
+/* translators: Number of selected questions. */
+__("Add Selected (%s)","sensei-lms"),t.length);return(0,s.createElement)("ul",{className:"sensei-lms-quiz-block__questions-modal__actions"},t.length>0&&(0,s.createElement)("li",null,(0,s.createElement)(o.Button,{isTertiary:!0,onClick:function(){n([])}},__("Clear Selected","sensei-lms"))),(0,s.createElement)("li",null,(0,s.createElement)(o.Button,{disabled:d,onClick:function(){p(!0),l(t).then(a).catch((function(){c(!0),p(!1)}))},isPrimary:!0},v)))};
+/***/},
+/***/7635:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>v
+/* harmony export */});
+/* harmony import */var r=n(228),s=n(4649),o=n(189),i=n(9307),l=n(5609),a=n(9854),c=n(5736),u=n(1442),m=n(9395),d=n(3166),p=n(2819),__=c.__;
+/* harmony import */
+/* harmony default export */const v=function(e){var t=e.questionCategories,n=e.filters,c=e.setFilters,v=(0,i.useState)(n.search).searchValue,f=(0,d/* .useQuestionTypes */.j)(),g=function(e,t){return(0,p.debounce)((function(t){c((function(n){return(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},n),{},(0,s/* ["default"] */.Z)({},e,t))}))}),t)},h=[{value:"",label:__("Type","sensei-lms")}].concat((0,r/* ["default"] */.Z)((f||[]).map((function(e){var t;return{value:e.id,label:null===(t=m/* ["default"] */.Z[e.slug])||void 0===t?void 0:t.title}})))),b=[{value:"",label:__("Category","sensei-lms")}].concat((0,r/* ["default"] */.Z)((t||[]).map((function(e){return{value:e.id,label:e.name}}))));return(0,i.createElement)("ul",{className:"sensei-lms-quiz-block__questions-modal__filters"},(0,i.createElement)("li",null,(0,i.createElement)(l.SelectControl,{options:h,value:n["question-type"],onChange:g("question-type",0)})),(0,i.createElement)("li",null,(0,i.createElement)(l.SelectControl,{options:b,value:n["question-category"],onChange:g("question-category",0)})),(0,i.createElement)("li",null,(0,i.createElement)(u/* ["default"] */.Z,{className:"sensei-lms-quiz-block__questions-modal__search-input",placeholder:__("Search questions","sensei-lms"),iconRight:a/* ["default"] */.Z,value:v,onChange:g("search",400)})))};
+/***/},
+/***/2318:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(6886),s=n(9307),o=n(5609),i=n(5736),l=n(7635),a=n(2842),c=n(1933),u=n(9608),m=n(1069),__=i.__;
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.clientId,n=e.onClose,i=(0,m/* .useAddExistingQuestions */.j)(t),d=(0,s.useState)({search:"","question-type":"","question-category":""}),p=(0,r/* ["default"] */.Z)(d,2),v=p[0],f=p[1],g=(0,s.useState)(!1),h=(0,r/* ["default"] */.Z)(g,2),b=h[0],E=h[1],_=(0,s.useState)([]),w=(0,r/* ["default"] */.Z)(_,2),k=w[0],Z=w[1],y=(0,u/* .useQuestionCategories */.J)(),q=(0,r/* ["default"] */.Z)(y,1)[0];return(0,s.createElement)(o.Modal,{className:"sensei-lms-quiz-block__questions-modal",title:__("Questions","sensei-lms"),onRequestClose:n},b&&(0,s.createElement)(o.Notice,{status:"error",isDismissible:!1,className:"sensei-lms-quiz-block__questions-modal__notice"},__("Unable to add the selected question(s). Please make sure you are still logged in and try again.","sensei-lms")),(0,s.createElement)(l/* ["default"] */.Z,{questionCategories:q,filters:v,setFilters:f}),(0,s.createElement)(a/* ["default"] */.Z,{clientId:t,questionCategories:q,filters:v,selectedQuestionIds:k,setSelectedQuestionIds:Z}),(0,s.createElement)(c/* ["default"] */.Z,{selectedQuestionIds:k,setSelectedQuestionIds:Z,onAdd:i,closeModal:n,setErrorAddingSelected:E}))};
+/***/},
+/***/2842:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var r=n(228),s=n(189),o=n(9307),i=n(2819),l=n(9818),a=n(5609),c=n(5736),u=n(9395),__=c.__;
+/* harmony import */
+/* harmony default export */const m=function(e){var t=e.clientId,n=e.questionCategories,c=e.filters,m=e.selectedQuestionIds,d=e.setSelectedQuestionIds,p=(0,l.useSelect)((function(e){return e("core/block-editor").getBlocks(t)})).map((function(e){var t;return null===(t=e.attributes)||void 0===t?void 0:t.id})),v=(0,l.useSelect)((function(e){return e("core").getEntityRecords("postType","question",(0,s/* ["default"] */.Z)({per_page:100},(0,i.omitBy)(c,(function(e){return""===e}))))}),[c]);
+// Ids of the already added questions.
+if(!v||!n)return(0,o.createElement)("div",{className:"sensei-lms-quiz-block__questions-modal__questions sensei-lms-quiz-block__questions-modal__questions--loading"},(0,o.createElement)(a.Spinner,null));// Filter out already added questions.
+v=v.filter((function(e){return!p.includes(e.id)}));var f=(0,i.keyBy)(n,"id"),g=v.length>0&&v.every((function(e){return m.includes(e.id)})),h=function(e){return function(t){d(t?function(t){return[].concat((0,r/* ["default"] */.Z)(t),[e])}:function(t){return t.filter((function(t){return t!==e}))})}};return(0,o.createElement)("div",{className:"sensei-lms-quiz-block__questions-modal__questions"},(0,o.createElement)("table",{className:"sensei-lms-quiz-block__questions-modal__table"},(0,o.createElement)("thead",null,(0,o.createElement)("tr",null,(0,o.createElement)("th",{className:"sensei-lms-quiz-block__questions-modal__question-checkbox"},(0,o.createElement)(a.CheckboxControl,{title:__("Toggle all visible questions selection.","sensei-lms"),checked:g,onChange:function(e){var t=v.map((function(e){return e.id}));d((function(n){return e?(0,i.uniq)([].concat((0,r/* ["default"] */.Z)(n),(0,r/* ["default"] */.Z)(t))):n.filter((function(e){return!t.includes(e)}))}))}})),(0,o.createElement)("th",null,__("Question","sensei-lms")),(0,o.createElement)("th",null,__("Type","sensei-lms")),(0,o.createElement)("th",null,__("Category","sensei-lms")))),(0,o.createElement)("tbody",null,0===v.length?(0,o.createElement)("tr",null,(0,o.createElement)("td",{colSpan:"4"},(0,o.createElement)("p",null,__("No questions found.","sensei-lms")))):v.map((function(e){var t,n=null===(t=u/* ["default"] */.Z[e["question-type-slug"]])||void 0===t?void 0:t.title,r=e["question-category"].map((function(e){var t;return null===(t=f[e])||void 0===t?void 0:t.name})).join(", "),s=e.id,i=e.title.raw;return(0,o.createElement)("tr",{key:e.id},(0,o.createElement)("td",null,(0,o.createElement)(a.CheckboxControl,{id:"question-".concat(s),title:i,checked:m.includes(s),onChange:h(s)})),(0,o.createElement)("td",{className:"sensei-lms-quiz-block__questions-modal__question-title"},(0,o.createElement)("label",{htmlFor:"question-".concat(s),title:i},i)),(0,o.createElement)("td",null,n),(0,o.createElement)("td",null,r))})))))};
+/***/},
+/***/3856:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(4981),o=n(9818),i=n(5736),l=n(2691),a=n(8399),c=n(5220),u=n(9986),m=n(2239),__=i.__;
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.clientId,n=e.openModal,i=(0,o.useDispatch)("core/block-editor").insertBlock,d=(0,u/* .useNextQuestionIndex */.K)(t),p=function(e){i((0,s.createBlock)(e.name),d,t,!0)},v=[{title:__("New Question","sensei-lms"),icon:a/* ["default"].icon */.Z.icon,onClick:function(){return p(a/* ["default"] */.Z)}},{title:__("Category Question(s)","sensei-lms"),icon:l/* ["default"] */.Z,onClick:function(){return p(c/* ["default"] */.Z)}},{title:__("Existing Question(s)","sensei-lms"),icon:l/* ["default"] */.Z,onClick:n}],f=__("Add new or existing question(s)","sensei-lms");return(0,r.createElement)(m/* ["default"] */.Z,{controls:v,text:f,label:f})};
+/***/},
+/***/3400:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>E
+/* harmony export */});
+/* harmony import */var r=n(6886),s=n(9307),o=n(2175),i=n(5736),l=n(688),a=n(5245),c=n(8399),u=n(7895),m=n(7932),d=n(3856),p=n(2318),v=n(7801),f=n(1421),g=n(7843),h=n(8977),__=i.__,b=["sensei-lms/quiz-question","sensei-lms/quiz-category-question"];
+/* harmony import */
+/* harmony default export */const E=(0,l/* .withBlockMetaProvider */.n_)((function(e){var t,n,i=e.clientId;(0,u/* .useQuizStructure */.R)(e),(0,a/* .useAutoInserter */.l)({name:c/* ["default"].name */.Z.name,selectFirstBlock:!e.attributes.isPostTemplate,isEmptyBlock:g/* .isQuestionEmpty */.tv},e),(0,f/* .useUpdateQuizHasQuestionsMeta */.E)(i);var l=(0,s.useState)(!1),E=(0,r/* ["default"] */.Z)(l,2),_=E[0],w=E[1],k=(0,s.useCallback)((function(){return(0,s.createElement)(d/* ["default"] */.Z,{clientId:i,openModal:function(){return w(!0)}})}),[i]),Z=null==e||null===(t=e.attributes)||void 0===t||null===(n=t.options)||void 0===n?void 0:n.pagination,y=(null==Z?void 0:Z.paginationNumber)&&(null==Z?void 0:Z.showProgressBar);return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(m/* ["default"] */.Z,e),(0,s.createElement)("div",{className:"sensei-lms-quiz-block__separator"},(0,s.createElement)("span",null,__("Lesson Quiz","sensei-lms"))),y&&(0,s.createElement)(h/* ["default"] */.Z,{pagination:Z}),(0,s.createElement)(o.InnerBlocks,{allowedBlocks:b,templateInsertUpdatesSelection:!1,renderAppender:k}),_&&(0,s.createElement)(p/* ["default"] */.Z,{clientId:i,onClose:function(){return w(!1)}}),(0,s.createElement)("div",{className:"sensei-lms-quiz-block__separator"}),(0,s.createElement)(v/* ["default"] */.Z,e))}));
+/***/},
+/***/8977:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>l
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(5736),i=n(2484),__=o.__;
+/* harmony import */
+/* harmony default export */const l=function(e){var t=e.pagination,n={style:(0,r/* ["default"] */.Z)({},(null==t?void 0:t.progressBarColor)&&{backgroundColor:t.progressBarColor})},o={style:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},(null==t?void 0:t.progressBarBackground)&&{backgroundColor:t.progressBarBackground}),(null==t?void 0:t.progressBarHeight)&&{height:t.progressBarHeight}),(null==t?void 0:t.progressBarRadius)&&{borderRadius:t.progressBarRadius})};return(0,s.createElement)(i/* ["default"] */.Z,{totalCount:10,completedCount:2,wrapperAttributes:{className:"sensei-lms-quiz-block__progress-bar wp-block"},barAttributes:n,label:__("questions","sensei-lms"),barWrapperAttributes:o})};
+/***/},
+/***/7801:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>h
+/* harmony export */});
+/* harmony import */var r=n(4649),s=n(189),o=n(9307),i=n(2175),l=n(5609),a=n(9818),c=n(2694),u=n(5736),m=n(768),d=n(7843),p=n(7632),v=n(3235),f=n(4151),g=n(4280),__=u.__;
+/* harmony import */
+/* harmony default export */const h=function(e){var t=e.attributes.options,n=e.setAttributes,u=e.clientId,h=t.passRequired,b=t.quizPassmark,E=t.autoGrade,_=t.allowRetakes,w=t.randomQuestionOrder,k=t.showQuestions,Z=t.failedShowAnswerFeedback,y=t.failedShowCorrectAnswers,q=t.failedIndicateIncorrect,C=t.buttonTextColor,S=t.buttonBackgroundColor,x=t.pagination,N=function(e){return function(o){return n({options:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},t),{},(0,r/* ["default"] */.Z)({},e,o))})}},B=function(e){return n({options:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},t),{},{pagination:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},x),e)})})},P=(0,f/* .useOpenQuizSettings */.V)(u),A=(0,a.useSelect)((function(e){return e("core/block-editor").getBlock(u).innerBlocks.filter((function(e){return!(0,d/* .isQuestionEmpty */.tv)(e.attributes)}))}),[u]).reduce((function(e,t){return e+("category-question"===t.attributes.type?t.attributes.options.number:1)}),0),R=(0,c.applyFilters)("senseiQuizTimerHide",!1);return(0,o.useEffect)((function(){k>A&&n({options:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},t),{},{showQuestions:A})})}),[t,A,n,k]),(0,o.createElement)(o.Fragment,null,(0,o.createElement)("div",{className:"sensei-lms-quiz-block__settings-quick-nav"},(0,o.createElement)(l.Button,{onClick:P,icon:g/* ["default"] */.Z},__("Quiz settings","sensei-lms"))),(0,o.createElement)(i.InspectorControls,null,(0,o.createElement)(l.PanelBody,{title:__("Quiz settings","sensei-lms"),initialOpen:!0},(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(l.ToggleControl,{checked:h,onChange:N("passRequired"),label:__("Pass Required","sensei-lms")})),h&&(0,o.createElement)(o.Fragment,null,(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(l.RangeControl,{label:__("Passing Grade (%)","sensei-lms"),value:b,onChange:N("quizPassmark"),min:0,max:100,initialPosition:100})),(0,o.createElement)(l.PanelRow,null,(0,o.createElement)("div",null,(0,o.createElement)(l.BaseControl,{id:"sensei-lms-quiz-block-failed-feedback-options",className:"sensei-lms-subsection-control",help:__("What students see when reviewing their quiz after grading.","sensei-lms")},(0,o.createElement)("h3",null,__("If student does not pass quiz","sensei-lms"))),(0,o.createElement)(l.ToggleControl,{checked:q,onChange:N("failedIndicateIncorrect"),label:__("Indicate which questions are incorrect.","sensei-lms")}),(0,o.createElement)(l.ToggleControl,{checked:y,onChange:N("failedShowCorrectAnswers"),label:__("Show correct answers.","sensei-lms")}),(0,o.createElement)(l.ToggleControl,{checked:Z,onChange:N("failedShowAnswerFeedback"),label:__("Show “Answer Feedback” text.","sensei-lms")}))),(0,o.createElement)("hr",null)),(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(l.ToggleControl,{checked:E,onChange:N("autoGrade"),label:__("Auto Grade","sensei-lms"),help:__("Automatically grade Multiple Choice, True/False and Gap Fill questions that have a non-zero point value.","sensei-lms")})),(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(l.ToggleControl,{checked:_,onChange:N("allowRetakes"),label:__("Allow Retakes","sensei-lms")})),(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(l.ToggleControl,{checked:w,onChange:N("randomQuestionOrder"),label:__("Random Question Order","sensei-lms")})),w&&(0,o.createElement)(o.Fragment,null,(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(m/* ["default"] */.Z,{id:"sensei-quiz-settings-show-questions",label:__("Number of Questions","sensei-lms"),help:__("Display a random selection of questions.","sensei-lms"),allowReset:!0,resetLabel:__("All","sensei-lms"),min:0,max:A,step:1,value:k,placeholder:__("All","sensei-lms"),onChange:N("showQuestions")})),(0,o.createElement)(l.Slot,{name:"SenseiQuizSettings"})),!R&&(0,o.createElement)(l.PanelRow,null,(0,o.createElement)(v/* ["default"] */.Z,null))),(0,o.createElement)(p/* .PaginationSidebarSettings */.I,{settings:x,updatePagination:B}),(0,o.createElement)(i.PanelColorSettings,{title:__("Color settings","sensei-lms"),initialOpen:!1,colorSettings:[{value:C||void 0,onChange:N("buttonTextColor"),label:__("Button text color","sensei-lms")},{value:S||void 0,onChange:N("buttonBackgroundColor"),label:__("Button background color","sensei-lms")},{value:(null==x?void 0:x.progressBarColor)||void 0,onChange:function(e){return B({progressBarColor:e})},label:__("Progress bar color","sensei-lms")},{value:(null==x?void 0:x.progressBarBackground)||void 0,onChange:function(e){return B({progressBarBackground:e})},label:__("Progress bar background color","sensei-lms")}]})),(0,o.createElement)(i.BlockControls,null,(0,o.createElement)(p/* .PaginationToolbarSettings */.K,{settings:x,updatePagination:B})))};
+/***/},
+/***/3235:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(5736),__=o.__;
+/* harmony import */
+/* harmony default export */const i=function(){return(0,r.createElement)("div",{className:"sensei-lms-quiz-block-settings__quiz-timer-promo"},(0,r.createElement)(s.ToggleControl,{disabled:!0,label:__("Quiz Timer","sensei-lms"),help:__("The quiz timer enables you to control how much time a student has to complete the quiz.","sensei-lms")}),(0,r.createElement)("p",null,(0,r.createElement)(s.ExternalLink,{href:"https://senseilms.com/pricing/?utm_source=plugin_sensei&utm_medium=upsell&utm_campaign=quiz_timer"},__("Upgrade to Sensei Pro","sensei-lms"))))};
+/***/},
+/***/7932:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>d
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(9307),o=n(5609),i=n(9818),l=n(2067),a=n(5736),c=n(688),u=n(1831),__=a.__,_n=a._n,m=function(e){var t=e.count,n=e.onClick;return(0,s.createElement)("div",null,(0,s.createElement)(o.Notice,{isDismissible:!1,status:"warning",className:"sensei-lms-quiz-block__pre-publish-validation__notice",actions:[{label:__("View issues","sensei-lms"),onClick:n,className:"is-link"}]},(0,a.sprintf)(// Translators: placeholder is the numer of incomplete questions.
+_n("There is %d incomplete question in this lesson's quiz.","There are %d incomplete questions in this lesson's quiz.",t,"sensei-lms"),t)))};
+/* harmony import */
+/* harmony default export */const d=function(e){var t=e.clientId,n=e.setMeta,o=(0,i.useSelect)((function(e){var n=e("core/block-editor").getBlocks(t),s=e(c/* .BLOCK_META_STORE */.fv).getMultipleBlockMeta(n.map((function(e){return e.clientId})),"validationErrors");return n.map((function(e){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{errors:s[e.clientId]})})).filter((function(e){var t;return null===(t=e.errors)||void 0===t?void 0:t.length}))}),[t]),a=(0,s.useCallback)((function(){var e=!(arguments.length>0&&void 0!==arguments[0])||arguments[0];n({showValidationErrors:e})}),[n]),d=(0,i.useDispatch)("core/block-editor").selectBlock;if((0,u/* .usePostSavingEffect */.H3)((function(){return a(!1)}),[a]),!o.length)return null;var p=(0,s.createElement)(m,{onClick:function(){o.length&&(a(!0),d(o[0].clientId))},count:o.length});return(0,s.createElement)(s.Fragment,null,(0,s.createElement)(l.PluginPostStatusInfo,null,p),(0,s.createElement)(l.PluginPrePublishPanel,{title:__("Lesson Quiz","sensei-lms"),initialOpen:!0},(0,s.createElement)(u/* .Effect */.Qm,{onMount:a}),p,(0,s.createElement)("p",null,__("Incomplete questions won't be displayed to the student when taking the quiz.","sensei-lms"))))};
+/***/},
+/***/1069:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */j:()=>/* binding */a
+/* harmony export */});
+/* harmony import */var r=n(9818),s=n(6989),o=n.n(s),i=n(7843),l=n(9986),a=function(e){var t=(0,r.select)("core/block-editor").getBlocks(e),n=(0,r.useDispatch)("core/block-editor").insertBlock,s=(0,l/* .useNextQuestionIndex */.K)(e);return function(r){var l=r.filter((function(e){return 0===t.length||!(0,i/* .findQuestionBlock */.uw)(t,{id:e})}));if(0===l.length)return Promise.resolve({});// Put this before the auto-block.
+var a=s;return o()({path:"/sensei-internal/v1/question-options?question_ids="+l.join(","),method:"GET"}).then((function(t){Array.isArray(t)&&t.length>0&&t.forEach((function(t){n((0,i/* .createQuestionBlock */.yR)(t),a,e,!1),a++}))}))}};
+/* harmony import */}
+/***/,
+/***/4151:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */V:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(9818),s=function(e){var t=(0,r.useDispatch)("core/edit-post").openGeneralSidebar,n=(0,r.useDispatch)("core/block-editor").selectBlock;return function(){n(e),t("edit-post/block")}};
+/* harmony import */}
+/***/,
+/***/3166:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */j:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(6886),s=n(6989),o=n.n(s),i=n(9307),l=function(){var e=(0,i.useState)([]),t=(0,r/* ["default"] */.Z)(e,2),n=t[0],s=t[1];return(0,i.useEffect)((function(){o()({path:"/wp/v2/question-type?per_page=-1"}).then(s)}),[s]),n};
+/* harmony import */}
+/***/,
+/***/1421:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */E:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(4649),s=n(9307),o=n(9818),i=n(7843),l=function(e){var t="_quiz_has_questions",n=(0,o.useSelect)((function(t){return t("core/block-editor").getBlocks(e).filter((function(e){return!(0,i/* .isQuestionEmpty */.tv)(e.attributes)}))})),l=(0,o.useSelect)((function(e){return{editedValue:e("core/editor").getEditedPostAttribute("meta")[t]}})).editedValue,a=(0,o.useDispatch)("core/editor").editPost,c=(0,s.useCallback)((function(e){return a({meta:(0,r/* ["default"] */.Z)({},t,e?1:0)})}),[a]);// Monitor for valid questions.
+(0,s.useEffect)((function(){!l&&n.length&&c(!0),l&&!n.length&&c(!1)}),[n.length,l,c]),// Monitor for quiz block removal.
+(0,s.useEffect)((function(){return function(){c(!1)}}),[c])};
+/* harmony import */}
+/***/,
+/***/7895:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */R:()=>/* binding */d
+/* harmony export */});
+/* unused harmony export QUIZ_STORE */
+/* harmony import */var r=n(189),s=n(2819),o=n(9818),i=n(9307),l=n(5736),a=n(3728),c=n(7843),__=l.__,u="sensei/quiz-structure",m=["categories","shared","options.studentHelp","media","categoryName","lock"];
+/* harmony import */
+/**
+ * Syncronize this block with quiz data.
+ *
+ * @param {Object} props
+ * @param {string} props.clientId Block ID.
+ */
+function d(e){var t=e.clientId,n=(0,o.useDispatch)(u),r=n.setBlock,s=n.loadStructure;(0,i.useEffect)((function(){r(t),s()}),[r,s,t])}(0,a/* .registerStructureStore */.x)({storeName:u,getEndpoint:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,(0,o.select)("core/editor").getCurrentPostId();case 2:return t=e.sent,e.abrupt("return","lesson-quiz/".concat(t,"?context=edit"));case 4:case"end":return e.stop()}}),e)})),
+/**
+   * Update Quiz block with settings and questions.
+   *
+   * @param {Object} structure Quiz structure.
+   */
+updateBlock:regeneratorRuntime.mark((function e(t){var n,r,i;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,(0,o.select)(u).getBlock();case 2:if((r=e.sent)&&t){e.next=5;break}return e.abrupt("return");case 5:return e.next=7,(0,o.select)("core/block-editor").getBlock(r);case 7:if(e.sent){e.next=10;break}return e.abrupt("return");case 10:return e.next=12,(0,o.dispatch)("core/block-editor").updateBlockAttributes(r,{options:(0,c/* .normalizeAttributes */.mY)(t.options,s.camelCase)});case 12:if(null!==(n=t.questions)&&void 0!==n&&n.length){e.next=14;break}return e.abrupt("return");case 14:return e.next=16,(0,o.select)("core/block-editor").getBlocks(r);case 16:return i=e.sent,e.next=19,(0,o.dispatch)("core/block-editor").replaceInnerBlocks(r,(0,c/* .syncQuestionBlocks */.TO)(t.questions,i),!1);case 19:case"end":return e.stop()}}),e)})),
+/**
+   * Parse question blocks and quiz settings from Quiz block.
+   *
+   * @throws {Object} Quiz structure.
+   */
+readBlock:function(){var e=(0,o.select)(u).getBlock();if(e){var t=(0,o.select)("core/block-editor").getBlock(e);if(t){var n=(0,c/* .normalizeAttributes */.mY)(t.attributes.options,s.snakeCase),r=(0,o.select)("core/block-editor").getBlocks(e),i=(0,c/* .parseQuestionBlocks */.gS)(r),l=(0,s.keyBy)((0,o.select)(u).getServerStructure().questions,"id"),a=(0,o.select)("core/editor").getCurrentPost();return{lesson_status:null==a?void 0:a.status,lesson_title:null==a?void 0:a.title,options:n,questions:i.map((function(e){// Avoid overriding non-editable question.
+return!1===e.editable?l[e.id]:(0,s.omit)(e,m)}))}}}},fetchError:regeneratorRuntime.mark((function e(t){var n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=(0,l.sprintf)(
+/* translators: Error message. */
+__("Quiz settings and questions could not be loaded. %s","sensei-lms"),t.message),e.next=3,(0,o.dispatch)("core/notices").createErrorNotice(n,{id:"quiz-structure-save-error"});case 3:case"end":return e.stop()}}),e)})),
+/**
+   * Display save error notice.
+   *
+   * @param {Object} error
+   */
+saveError:regeneratorRuntime.mark((function e(t){var n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return n=(0,l.sprintf)(
+/* translators: Error message. */
+__("Quiz settings and questions could not be updated. %s","sensei-lms"),t.message),e.next=3,(0,o.dispatch)("core/notices").createErrorNotice(n,{id:"quiz-structure-save-error"});case 3:case"end":return e.stop()}}),e)})),
+/**
+   * Clear error notices.
+   */
+clearError:function(){(0,o.dispatch)("core/notices").removeNotice("quiz-structure-save-error")},
+/**
+   * Remove derived elements from quiz response.
+   *
+   * @param {Object} structure The quiz response.
+   *
+   * @return {Object} The modified response.
+   */
+setServerStructure:function(e){return e?(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},e),{},{questions:e.questions.map((function(e){return(0,s.omit)(e,m)}))}):{}}})}
+/***/,
+/***/3227:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>a
+/* harmony export */});
+/* harmony import */var r=n(3782),s=n(9307),o=n(4981),i=n(8930),l=["name"];
+/* harmony import */
+/* harmony default export */const a=function(e){(0,o.updateCategory)("sensei-lms",{icon:(0,s.createElement)(i/* ["default"] */.Z,{width:"20",height:"20"})}),e.forEach((function(e){var t=e.name,n=(0,r/* ["default"] */.Z)(e,l);(0,o.registerBlockType)(t,n)}))};
+/***/},
+/***/688:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */fv:()=>/* binding */p
+/* harmony export */,n_:()=>/* binding */g
+/* harmony export */,vf:()=>/* binding */b
+/* harmony export */});
+/* unused harmony exports useBlockMeta, useBlockMetaContext, setBlockMeta */
+/* harmony import */var r=n(5773),s=n(6886),o=n(4649),i=n(189),l=n(9307),a=n(4333),c=n(9818),u=n(2819),m=n(832),d={reducer:(0,m/* .createReducerFromActionMap */.lA)({SET_BLOCK_META:function(e,t){var n=e.clientId,r=e.metadata;return(0,i/* ["default"] */.Z)((0,i/* ["default"] */.Z)({},t),{},(0,o/* ["default"] */.Z)({},n,(0,i/* ["default"] */.Z)((0,i/* ["default"] */.Z)({},t[n]||{}),r)))},CLEAR:function(e,t){return t?(0,i/* ["default"] */.Z)((0,i/* ["default"] */.Z)({},e),{},(0,o/* ["default"] */.Z)({},t,void 0)):{}},DEFAULT:function(e){return e}},{}),actions:{
+/**
+     * Set metadata for a block.
+     *
+     * Input is merged with existing metadata.
+     *
+     * @param {string} clientId Block ID.
+     * @param {string} metadata Changed block metadata.
+     */
+setBlockMeta:function(e,t){return{type:"SET_BLOCK_META",clientId:e,metadata:t}},
+/**
+     * Clear metadata for the block or all blocks.
+     *
+     * @param {string} [clientId] Block ID, or null to clear all blocks.
+     */
+clear:function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:null;return{type:"CLEAR",clientId:e}}},selectors:{
+/**
+     * Get metadata for a block.
+     *
+     * @param {Object} state
+     * @param {string} clientId Block ID.
+     * @param {string} [key]    Only return metadata for the given key.
+     * @return {*} Block metadata.
+     */
+getBlockMeta:function(e,t){var n,r=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null;return r?null===(n=e[t])||void 0===n?void 0:n[r]:e[t]},
+/**
+     * Get metadata for multiple blocks.
+     *
+     * @param {Object}   state
+     * @param {string[]} clientIds Block ID.
+     * @param {string}   [key]     Only return metadata for the given key.
+     * @return {Object} Blocks metadata, indexed by block ID.
+     */
+getMultipleBlockMeta:function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=arguments.length>2&&void 0!==arguments[2]?arguments[2]:null,r=null!=t&&t.length?(0,u.pick)(e,t):(0,i/* ["default"] */.Z)({},e);return n?(0,u.mapValues)(r,n):r}}},p=(0,m/* .createStore */.MT)("sensei/block-metadata",d),v=(0,l.createContext)({}),f=function(e){var t=(0,c.useSelect)((function(t){return t(p).getBlockMeta(e)}),[e]),n=(0,c.useDispatch)(p).setBlockMeta,r=h(),s=(0,l.useCallback)((function(t){return n(e,t)}),[e,n]);return[(0,l.useMemo)((function(){return(0,i/* ["default"] */.Z)((0,i/* ["default"] */.Z)({},r),t)}),[t,r]),s]},g=(0,a.createHigherOrderComponent)((function(e){return b((function(t){var n=f(t.clientId),r=(0,s/* ["default"] */.Z)(n,1)[0];return(0,l.createElement)(v.Provider,{value:r},(0,l.createElement)(e,t))}))}),"withBlockMetaProvider"),h=function(){return(0,l.useContext)(v)},b=(0,a.createHigherOrderComponent)((function(e){return function(t){var n=f(t.clientId),o=(0,s/* ["default"] */.Z)(n,2),i=o[0],a=o[1];return(0,l.createElement)(e,(0,r/* ["default"] */.Z)({},t,{meta:i,setMeta:a}))}}),"withBlockMeta");
+/* harmony import */}
+/***/,
+/***/677:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */z:()=>/* binding */i
+/* harmony export */});
+/* unused harmony export useBlockValidation */
+/* harmony import */var r=n(6886),s=n(9307),o=n(4333),i=function(e){return(0,o.createHigherOrderComponent)((function(t){return function(n){return function(e,t){var n=t.attributes,r=t.setMeta;(0,s.useEffect)((function(){var t=l(e(n));r({validationErrors:t})}),[e,n,r])}(e,n),(0,s.createElement)(t,n)}}),"withBlockValidation")},l=function(){var e=arguments.length>0&&void 0!==arguments[0]?arguments[0]:{};return Object.entries(e).filter((function(e){return(0,r/* ["default"] */.Z)(e,2)[1]})).map((function(e){return(0,r/* ["default"] */.Z)(e,1)[0]}))};
+/* harmony import */}
+/***/,
+/***/2484:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* reexport safe */r.Z
+/* harmony export */});
+/* harmony import */var r=n(100);
+/* harmony import */n(1833)}
+/***/,
+/***/1833:
+/***/(e,t,n)=>{"use strict";
+/* harmony import */n(9307),n(2175),n(5609)
+/* harmony import */;var r=n(5736);r.__}
+/***/,
+/***/100:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>c
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(189),o=n(9307),i=n(42),l=n.n(i),a=n(5736),__=a.__;
+/* harmony import */
+/* harmony default export */const c=function(e){var t=e.totalCount,n=e.completedCount,i=e.hidePercentage,c=e.wrapperAttributes,u=e.barWrapperAttributes,m=e.barAttributes,d=e.countersClassName,p=e.completedCountClassName,v=e.hideDefault,f=e.label,g=Math.round(n/t*100)||0,h=Math.max(v?0:3,g);return(0,o.createElement)("div",c,(0,o.createElement)("section",{className:l()("sensei-progress-bar__heading",d)},(0,o.createElement)("div",{className:l()("sensei-progress-bar__label",p)},(0,a.sprintf)(// translators: Placeholder %1$d is the completed progress count, %2$d is the total count and %3$s is the label for progress bar.
+__("%1$d of %2$d %3$s completed","sensei-lms"),n,t,f||""),!i&&" (".concat(g,"%)"))),(0,o.createElement)("div",(0,r/* ["default"] */.Z)({role:"progressbar","aria-valuenow":g,"aria-valuemin":"0","aria-valuemax":"100"},(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},u),{},{className:l()("sensei-progress-bar__bar",null==u?void 0:u.className)})),(0,o.createElement)("div",(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},m),{},{className:l()("sensei-progress-bar__progress",null==m?void 0:m.className),style:(0,s/* ["default"] */.Z)((0,s/* ["default"] */.Z)({},(null==m?void 0:m.style)&&m.style),{},{width:"".concat(h,"%")})}))))};
+/***/},
+/***/3295:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>r
+/* harmony export */});
+/**
+ * Internal dependencies
+ */
+/* harmony default export */const r=n(5436).Z;
+/***/},
+/***/5436:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>m
+/* harmony export */});
+/* harmony import */var r=n(5773),s=n(3782),o=n(9307),i=n(42),l=n.n(i),a=n(2175),c=n(9630),u=["onChange","onKeyDown","value","onEnter","onRemove"];
+/* harmony import */
+/* harmony default export */const m=(0,o.forwardRef)((function(e,t){var n=e.onChange,i=e.onKeyDown,m=e.value,d=e.onEnter,p=e.onRemove,v=(0,s/* ["default"] */.Z)(e,u);
+/**
+   * Handle change.
+   *
+   * @param {string} nextValue Change value.
+   */return(0,o.createElement)(a.PlainText,(0,r/* ["default"] */.Z)({ref:t,value:m,onChange:function(e){n(e.replace(/\n/g,""))},onKeyDown:function(e){switch(i&&i(e),e.keyCode){case c.ENTER:e.preventDefault(),d&&d(e);break;case c.BACKSPACE:!p||null!=m&&m.length||(e.preventDefault(),p())}}},v,{className:l()("sensei-lms-single-line-input",v.className)}))}));
+/***/},
+/***/5245:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */l:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(4981),s=n(9818),o=n(9307),i=n(2819),l=function(e,t){var n=e.name,l=e.attributes,a=void 0===l?{}:l,c=e.selectFirstBlock,u=void 0!==c&&c,m=e.isEmptyBlock,d=t.clientId,p=(0,s.useDispatch)("core/block-editor"),v=p.__unstableMarkNextChangeAsNotPersistent,f=void 0===v?i.noop:v,g=p.insertBlock,h=(0,s.useSelect)((function(e){return e("core/block-editor").getBlocks(d)})),b=0===h.length,E=(0,o.useCallback)((function(){var e=(0,r.createBlock)(n,a),t=b&&u;f(),g(e,void 0,d,t)}),[f,g,d,n,a,b,u]),_=h.length&&h[h.length-1],w=_&&m(_.attributes);(0,o.useEffect)((function(){w||E()}),[w,E])};
+/* harmony import */}
+/***/,
+/***/2239:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>i
+/* harmony export */});
+/* harmony import */var r=n(9307),s=n(5609),o=n(528);
+/* harmony import */
+/* harmony default export */const i=function(e){var t=e.controls,n=e.text,i=e.label;return(0,r.createElement)("div",{className:"sensei-lms-text-appender block-editor-default-block-appender"},(0,r.createElement)(s.DropdownMenu,{icon:o/* ["default"] */.Z,toggleProps:{className:"block-editor-inserter__toggle",onMouseDown:function(e){return e.preventDefault()}},label:i,controls:t,popoverProps:{position:"bottom center"},menuProps:{className:"sensei-lms-text-appender__menu"}}),(0,r.createElement)("p",{className:"sensei-lms-text-appender__placeholder","data-placeholder":n}))};
+/***/},
+/***/6400:
+/***/(e,t,n)=>{"use strict";
+/* unused harmony export preloadedDataUsedOnceMiddleware */
+/* harmony import */var r,s=n(6483),o=n(6989);
+/* harmony import */n.n(o)().use((r={},function(e,t){return"string"!=typeof e.path||"GET"!==e.method&&e.method||(r[e.path]?e.path=(0,s.addQueryArgs)(e.path,{__skip_preload:1}):r[e.path]=!0),t(e)}))}
+/***/,
+/***/832:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */lA:()=>/* binding */s
+/* harmony export */,MT:()=>/* binding */o
+/* harmony export */});
+/* unused harmony export composeFetchAction */
+/* harmony import */var r=n(9818),s=function(e,t){return function(){var n=arguments.length>0&&void 0!==arguments[0]?arguments[0]:t,r=arguments.length>1?arguments[1]:void 0,s=e[r.type]||e.DEFAULT;return s(r,n)}},o=function(e,t){if(r.createReduxStore){var n=(0,r.createReduxStore)(e,t);return(0,r.register)(n),n}return(0,r.registerStore)(e,t),e};
+/* harmony import */}
+/***/,
+/***/1831:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */g9:()=>/* binding */i
+/* harmony export */,Qm:()=>/* binding */l
+/* harmony export */,H3:()=>/* binding */a
+/* harmony export */});
+/* harmony import */var r=n(228),s=n(9818),o=n(9307),i=function(e){var t=e.isSelected,n=e.clientId;return(0,s.useSelect)((function(e){return e("core/block-editor").hasSelectedInnerBlock(n,!0)}),[n])||t},l=function(e){var t=e.onMount;return(0,o.useEffect)((function(){t()}),[t]),null},a=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:[],n=(0,s.useSelect)((function(e){return e("core/editor").isSavingPost()&&!e("core/editor").isAutosavingPost()}));(0,o.useEffect)((function(){n&&e();// eslint-disable-next-line react-hooks/exhaustive-deps
+}),[n].concat((0,r/* ["default"] */.Z)(t)))};
+/* harmony import */}
+/***/,
+/***/3728:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */x:()=>/* binding */u
+/* harmony export */});
+/* harmony import */var r=n(189),s=n(3782),o=n(2819),i=n(3418),l=n(9818),a=n(832),c=(n(6400),["storeName","getEndpoint","saveError","fetchError","clearError","updateBlock","readBlock","setServerStructure"]);
+/* harmony import */
+/**
+ * External dependencies
+ */
+/**
+ * WordPress dependencies
+ */
+/**
+ * Internal dependencies
+ */
+/**
+ * Register structure store and subscribe to block editor save.
+ *
+ * @param {Object}   opts
+ * @param {string}   opts.storeName          Name of store.
+ * @param {Function} opts.getEndpoint        REST API endpoint.
+ * @param {Function} opts.saveError          Handler for displaying save errors.
+ * @param {Function} opts.fetchError         Handler for displaying fetch errors.
+ * @param {Function} opts.clearError         Handler for clearing errors.
+ * @param {Function} opts.updateBlock        Update block with given structure.
+ * @param {Function} opts.readBlock          Extract structure from block.
+ * @param {Function} opts.setServerStructure Set the server structure which is used to track differences.
+ */
+function u(e){var t,n,u,m=e.storeName,d=e.getEndpoint,p=e.saveError,v=e.fetchError,f=e.clearError,g=e.updateBlock,h=e.readBlock,b=e.setServerStructure,E=(0,s/* ["default"] */.Z)(e,c),_={
+/**
+     * Fetch structure data from REST API.
+     */
+loadStructure:regeneratorRuntime.mark((function e(){var t,n;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.prev=0,e.delegateYield(d(),"t0",2);case 2:return t=e.t0,e.next=5,(0,i.apiFetch)({path:"/sensei-internal/v1/".concat(t),method:"GET"});case 5:return n=e.sent,e.next=8,_.setResult(n);case 8:e.next=14;break;case 10:return e.prev=10,e.t1=e.catch(0),e.next=14,null==v?void 0:v(e.t1);case 14:case"end":return e.stop()}}),e,null,[[0,10]])})),
+/**
+     * Persist editor's structure to the REST API.
+     */
+saveStructure:regeneratorRuntime.mark((function e(){var t,n,r;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,(0,l.select)(m).getEditorStructure();case 2:return t=e.sent,e.prev=3,e.delegateYield(d(),"t0",5);case 5:return n=e.t0,e.next=8,(0,i.apiFetch)({path:"/sensei-internal/v1/".concat(n),method:"POST",data:t});case 8:return r=e.sent,e.next=11,_.setResult(r);case 11:e.next=17;break;case 13:return e.prev=13,e.t1=e.catch(3),e.next=17,null==p?void 0:p(e.t1);case 17:case"end":return e.stop()}}),e,null,[[3,13]])})),
+/**
+     * Set fetched structure.
+     *
+     * @param {Array} serverStructure
+     */
+setResult:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,_.setServerStructure(t);case 2:return e.next=4,g(t);case 4:case"end":return e.stop()}}),e)})),
+/**
+     * Keep last fetched server state for comparison.
+     *
+     * @param {Array} serverStructure
+     */
+setServerStructure:function(e){return{type:"SET_SERVER_STRUCTURE",serverStructure:e}},
+/**
+     * Keep last editor state.
+     *
+     * @param {Array} editorStructure
+     */
+setEditorStructure:function(e){return{type:"SET_EDITOR_STRUCTURE",editorStructure:e}},
+/**
+     * Initiate saving the post.
+     */
+savePost:regeneratorRuntime.mark((function e(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SAVE_POST"};case 2:return e.next=4,(0,l.dispatch)("core/editor").savePost();case 4:case"end":return e.stop()}}),e)})),
+/**
+     * Post is saving. Save the structure too if it has changed.
+     */
+startPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"START_SAVE"};case 2:return t=h(),e.next=5,_.setEditorStructure(t);case 5:return e.next=7,null==f?void 0:f();case 7:if(t){e.next=9;break}return e.abrupt("return");case 9:if(!(0,l.select)(m).hasUnsavedEditorChanges()){e.next=11;break}return e.delegateYield(_.saveStructure(),"t0",11);case 11:return e.next=13,{type:"FINISH_SAVE"};case 13:case"end":return e.stop()}}),e)})),
+/**
+     * Finished saving post and structure.
+     * Check if either needs to be saved again due to new changes.
+     */
+finishPostSave:regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"FINISH_POST_SAVE"};case 2:if(t=(0,l.select)(m),!(0,t.hasUnsavedServerUpdates)()){e.next=5;break}return e.delegateYield(_.savePost(),"t0",5);case 5:case"end":return e.stop()}}),e)})),
+/**
+     * Set linked block.
+     *
+     * @param {string} clientId Block ID.
+     */
+setBlock:regeneratorRuntime.mark((function e(t){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,{type:"SET_BLOCK",clientId:t};case 2:case"end":return e.stop()}}),e)}))},w={SET_SERVER_STRUCTURE:function(e,t){var n=e.serverStructure,s=!t.editorStructure,i=b?b(n):n,l=!s&&!(0,o.isEqual)(i,t.editorStructure);return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{serverStructure:i,hasUnsavedServerUpdates:l,hasUnsavedEditorChanges:!1})},SET_EDITOR_STRUCTURE:function(e,t){var n=e.editorStructure,s=!(0,o.isEqual)(t.serverStructure,n);return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{editorStructure:n,hasUnsavedEditorChanges:s&&!!n})},START_SAVE:function(e,t){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{isSavingStructure:!0})},FINISH_SAVE:function(e,t){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{isSavingStructure:!1})},SAVE_POST:function(e,t){return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{hasUnsavedServerUpdates:!1})},SET_BLOCK:function(e,t){var n=e.clientId;return(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},t),{},{clientId:n})},DEFAULT:function(e,t){return t}};return{unsubscribe:(t=!1,n=!1,u=!1,(0,l.subscribe)((function(){var e=(0,l.select)("core/editor"),r=(0,l.select)("core/edit-post");if(e&&r){var s=e.isSavingPost()&&!e.isAutosavingPost(),o=(0,l.select)(m).getIsSavingStructure();s&&(n=!0,u=!1),n&&!u&&(u=r.isSavingMetaBoxes()),t||s||!n||!u||r.isSavingMetaBoxes()?t&&!o&&(
+// Call finishPostSave when structure has finished saving.
+t=!1,(0,l.dispatch)(m).finishPostSave()):(
+// Start saving structure when post has finished saving.
+t=!0,n=!1,u=!1,(0,l.dispatch)(m).startPostSave())}}))),store:(0,l.registerStore)(m,{reducer:(0,a/* .createReducerFromActionMap */.lA)((0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},w),null==E?void 0:E.reducers),{serverStructure:null,editorStructure:null,isSavingStructure:!1,hasUnsavedServerUpdates:!1,hasUnsavedEditorChanges:!1,clientId:null}),actions:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},_),null==E?void 0:E.actions),selectors:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},{hasUnsavedServerUpdates:function(e){return e.hasUnsavedServerUpdates},hasUnsavedEditorChanges:function(e){return e.hasUnsavedEditorChanges},getIsSavingStructure:function(e){return e.isSavingStructure},getServerStructure:function(e){return e.serverStructure},getEditorStructure:function(e){return e.editorStructure},getBlock:function(e){return e.clientId}}),null==E?void 0:E.selectors),controls:(0,r/* ["default"] */.Z)((0,r/* ["default"] */.Z)({},i.controls),null==E?void 0:E.controls)})}}
+/***/},
+/***/1719:
+/***/(e,t,n)=>{var r=n(2998),s=n(6541),o=s;o.v1=r,o.v4=s,e.exports=o}
+/***/,
+/***/3973:
+/***/e=>{for(
+/**
+ * Convert array of 16 byte values to UUID string format of the form:
+ * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
+ */
+var t=[],n=0;n<256;++n)t[n]=(n+256).toString(16).substr(1);e.exports=function(e,n){var r=n||0,s=t;
+// join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+return[s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],"-",s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]],s[e[r++]]].join("")}}
+/***/,
+/***/6963:
+/***/e=>{
+// Unique ID creation requires a high quality random # generator.  In the
+// browser this is a little complicated due to unknown quality of Math.random()
+// and inconsistent support for the `crypto` API.  We do the best we can via
+// feature-detection
+// getRandomValues needs to be invoked in a context where "this" is a Crypto
+// implementation. Also, find the complete implementation of crypto on IE11.
+var t="undefined"!=typeof crypto&&crypto.getRandomValues&&crypto.getRandomValues.bind(crypto)||"undefined"!=typeof msCrypto&&"function"==typeof window.msCrypto.getRandomValues&&msCrypto.getRandomValues.bind(msCrypto);if(t){
+// WHATWG crypto RNG - http://wiki.whatwg.org/wiki/Crypto
+var n=new Uint8Array(16);// eslint-disable-line no-undef
+e.exports=function(){return t(n),n}}else{
+// Math.random()-based (RNG)
+// If all else fails, use Math.random().  It's fast, but is of unspecified
+// quality.
+var r=new Array(16);e.exports=function(){for(var e,t=0;t<16;t++)0==(3&t)&&(e=4294967296*Math.random()),r[t]=e>>>((3&t)<<3)&255;return r}}
+/***/},
+/***/2998:
+/***/(e,t,n)=>{var r,s,o=n(6963),i=n(3973),l=0,a=0;e.exports=
+// See https://github.com/broofa/node-uuid for API details
+function(e,t,n){var c=t&&n||0,u=t||[],m=(e=e||{}).node||r,d=void 0!==e.clockseq?e.clockseq:s;
+// node and clockseq need to be initialized to random values if they're not
+// specified.  We do this lazily to minimize issues related to insufficient
+// system entropy.  See #189
+if(null==m||null==d){var p=o();null==m&&(
+// Per 4.5, create and 48-bit node id, (47 random bits + multicast bit = 1)
+m=r=[1|p[0],p[1],p[2],p[3],p[4],p[5]]),null==d&&(
+// Per 4.2.2, randomize (14 bit) clockseq
+d=s=16383&(p[6]<<8|p[7]))}
+// UUID timestamps are 100 nano-second units since the Gregorian epoch,
+// (1582-10-15 00:00).  JSNumbers aren't precise enough for this, so
+// time is handled internally as 'msecs' (integer milliseconds) and 'nsecs'
+// (100-nanoseconds offset from msecs) since unix epoch, 1970-01-01 00:00.
+var v=void 0!==e.msecs?e.msecs:(new Date).getTime(),f=void 0!==e.nsecs?e.nsecs:a+1,g=v-l+(f-a)/1e4;
+// Per 4.2.1.2, use count of uuid's generated during the current clock
+// cycle to simulate higher resolution clock
+// Per 4.2.1.2 Throw error if too many uuids are requested
+if(
+// Per 4.2.1.2, Bump clockseq on clock regression
+g<0&&void 0===e.clockseq&&(d=d+1&16383),
+// Reset nsecs if clock regresses (new clockseq) or we've moved onto a new
+// time interval
+(g<0||v>l)&&void 0===e.nsecs&&(f=0),f>=1e4)throw new Error("uuid.v1(): Can't create more than 10M uuids/sec");l=v,a=f,s=d;
+// `time_low`
+var h=(1e4*(268435455&(
+// Per 4.1.4 - Convert from unix epoch to Gregorian epoch
+v+=122192928e5))+f)%4294967296;u[c++]=h>>>24&255,u[c++]=h>>>16&255,u[c++]=h>>>8&255,u[c++]=255&h;
+// `time_mid`
+var b=v/4294967296*1e4&268435455;u[c++]=b>>>8&255,u[c++]=255&b,
+// `time_high_and_version`
+u[c++]=b>>>24&15|16,// include version
+u[c++]=b>>>16&255,
+// `clock_seq_hi_and_reserved` (Per 4.2.2 - include variant)
+u[c++]=d>>>8|128,
+// `clock_seq_low`
+u[c++]=255&d;
+// `node`
+for(var E=0;E<6;++E)u[c+E]=m[E];return t||i(u)}}
+/***/,
+/***/6541:
+/***/(e,t,n)=>{var r=n(6963),s=n(3973);e.exports=function(e,t,n){var o=t&&n||0;"string"==typeof e&&(t="binary"===e?new Array(16):null,e=null);var i=(e=e||{}).random||(e.rng||r)();
+// Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+// Copy bytes to buffer, if provided
+if(i[6]=15&i[6]|64,i[8]=63&i[8]|128,t)for(var l=0;l<16;++l)t[o+l]=i[l];return t||s(i)}}
+/***/,
+/***/9196:
+/***/e=>{"use strict";e.exports=window.React}
+/***/,
+/***/2819:
+/***/e=>{"use strict";e.exports=window.lodash}
+/***/,
+/***/6989:
+/***/e=>{"use strict";e.exports=window.wp.apiFetch}
+/***/,
+/***/2175:
+/***/e=>{"use strict";e.exports=window.wp.blockEditor}
+/***/,
+/***/4981:
+/***/e=>{"use strict";e.exports=window.wp.blocks}
+/***/,
+/***/5609:
+/***/e=>{"use strict";e.exports=window.wp.components}
+/***/,
+/***/4333:
+/***/e=>{"use strict";e.exports=window.wp.compose}
+/***/,
+/***/9818:
+/***/e=>{"use strict";e.exports=window.wp.data}
+/***/,
+/***/3418:
+/***/e=>{"use strict";e.exports=window.wp.dataControls}
+/***/,
+/***/2067:
+/***/e=>{"use strict";e.exports=window.wp.editPost}
+/***/,
+/***/9307:
+/***/e=>{"use strict";e.exports=window.wp.element}
+/***/,
+/***/2694:
+/***/e=>{"use strict";e.exports=window.wp.hooks}
+/***/,
+/***/5736:
+/***/e=>{"use strict";e.exports=window.wp.i18n}
+/***/,
+/***/9630:
+/***/e=>{"use strict";e.exports=window.wp.keycodes}
+/***/,
+/***/444:
+/***/e=>{"use strict";e.exports=window.wp.primitives}
+/***/,
+/***/6483:
+/***/e=>{"use strict";e.exports=window.wp.url}
+/***/,
+/***/1793:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t){(null==t||t>e.length)&&(t=e.length);for(var n=0,r=new Array(t);n<t;n++)r[n]=e[n];return r}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/6470:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e){if(Array.isArray(e))return e}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/8138:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(1793);function s(e){if(Array.isArray(e))return(0,r/* ["default"] */.Z)(e)}
+/***/},
+/***/4649:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t,n){return t in e?Object.defineProperty(e,t,{value:n,enumerable:!0,configurable:!0,writable:!0}):e[t]=n,e}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/5773:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(){return r=Object.assign||function(e){for(var t=1;t<arguments.length;t++){var n=arguments[t];for(var r in n)Object.prototype.hasOwnProperty.call(n,r)&&(e[r]=n[r])}return e},r.apply(this,arguments)}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/5181:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e){if("undefined"!=typeof Symbol&&null!=e[Symbol.iterator]||null!=e["@@iterator"])return Array.from(e)}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/2446:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t){var n=null==e?null:"undefined"!=typeof Symbol&&e[Symbol.iterator]||e["@@iterator"];if(null!=n){var r,s,o=[],_n=!0,i=!1;try{for(n=n.call(e);!(_n=(r=n.next()).done)&&(o.push(r.value),!t||o.length!==t);_n=!0);}catch(e){i=!0,s=e}finally{try{_n||null==n.return||n.return()}finally{if(i)throw s}}return o}}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/3764:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(){throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/3314:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(){throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method.")}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/189:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */o
+/* harmony export */});
+/* harmony import */var r=n(4649);function s(e,t){var n=Object.keys(e);if(Object.getOwnPropertySymbols){var r=Object.getOwnPropertySymbols(e);t&&(r=r.filter((function(t){return Object.getOwnPropertyDescriptor(e,t).enumerable}))),n.push.apply(n,r)}return n}function o(e){for(var t=1;t<arguments.length;t++){var n=null!=arguments[t]?arguments[t]:{};t%2?s(Object(n),!0).forEach((function(t){(0,r/* ["default"] */.Z)(e,t,n[t])})):Object.getOwnPropertyDescriptors?Object.defineProperties(e,Object.getOwnPropertyDescriptors(n)):s(Object(n)).forEach((function(t){Object.defineProperty(e,t,Object.getOwnPropertyDescriptor(n,t))}))}return e}
+/***/},
+/***/3782:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(808);function s(e,t){if(null==e)return{};var n,s,o=(0,r/* ["default"] */.Z)(e,t);if(Object.getOwnPropertySymbols){var i=Object.getOwnPropertySymbols(e);for(s=0;s<i.length;s++)n=i[s],t.indexOf(n)>=0||Object.prototype.propertyIsEnumerable.call(e,n)&&(o[n]=e[n])}return o}
+/***/},
+/***/808:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */function r(e,t){if(null==e)return{};var n,r,s={},o=Object.keys(e);for(r=0;r<o.length;r++)n=o[r],t.indexOf(n)>=0||(s[n]=e[n]);return s}
+/***/n.d(t,{
+/* harmony export */Z:()=>/* binding */r
+/* harmony export */})},
+/***/6886:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(6470),s=n(2446),o=n(4013),i=n(3764);
+/* harmony import */function l(e,t){return(0,r/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e,t)||(0,o/* ["default"] */.Z)(e,t)||(0,i/* ["default"] */.Z)()}
+/***/},
+/***/228:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */l
+/* harmony export */});
+/* harmony import */var r=n(8138),s=n(5181),o=n(4013),i=n(3314);
+/* harmony import */function l(e){return(0,r/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e)||(0,o/* ["default"] */.Z)(e)||(0,i/* ["default"] */.Z)()}
+/***/},
+/***/4013:
+/***/(e,t,n)=>{"use strict";
+/* harmony export */n.d(t,{
+/* harmony export */Z:()=>/* binding */s
+/* harmony export */});
+/* harmony import */var r=n(1793);function s(e,t){if(e){if("string"==typeof e)return(0,r/* ["default"] */.Z)(e,t);var n=Object.prototype.toString.call(e).slice(8,-1);return"Object"===n&&e.constructor&&(n=e.constructor.name),"Map"===n||"Set"===n?Array.from(e):"Arguments"===n||/^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)?(0,r/* ["default"] */.Z)(e,t):void 0}}
+/***/},
+/***/8842:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/quiz-category-question","parent":["sensei-lms/quiz"],"category":"sensei-lms","supports":{"html":false},"attributes":{"id":{"type":"integer"},"type":{"type":"string","default":"category-question"},"categoryName":{"type":"string"},"options":{"type":"object","default":{"category":null,"number":1}}}}')}
+/***/,
+/***/5073:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/question-answers","parent":["sensei-lms/quiz-question"],"category":"sensei-lms","supports":{"html":false},"attributes":{}}')}
+/***/,
+/***/7629:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/quiz-question","parent":["sensei-lms/quiz"],"category":"sensei-lms","supports":{"html":false},"attributes":{"id":{"type":"integer"},"title":{"type":"string"},"type":{"type":"string","default":"multiple-choice"},"answer":{"type":"object"},"options":{"type":"object","default":{"grade":1}},"editable":{"type":"boolean","default":true,"source":false}}}')}
+/***/,
+/***/9627:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/question-description","parent":["sensei-lms/quiz-question"],"category":"sensei-lms","supports":{"html":false},"attributes":{"id":{"type":"integer"}}}')}
+/***/,
+/***/5744:
+/***/e=>{"use strict";e.exports=JSON.parse('{"name":"sensei-lms/quiz","category":"sensei-lms","supports":{"html":false,"multiple":false},"attributes":{"id":{"type":"integer"},"options":{"type":"object","default":{"passRequired":false,"quizPassmark":100,"autoGrade":true,"allowRetakes":true,"randomQuestionOrder":false,"showQuestions":null,"failedShowAnswerFeedback":false,"failedShowCorrectAnswers":false,"failedIndicateIncorrect":false,"buttonTextColor":null,"buttonBackgroundColor":null,"pagination":{}}},"isPostTemplate":{"type":"boolean","default":false}}}')}
+/***/
+/******/},t={};
+/************************************************************************/
+/******/ // The module cache
+/******/
+/******/
+/******/ // The require function
+/******/function n(r){
+/******/ // Check if module is in cache
+/******/var s=t[r];
+/******/if(void 0!==s)
+/******/return s.exports;
+/******/
+/******/ // Create a new module (and put it into the cache)
+/******/var o=t[r]={
+/******/ // no module.id needed
+/******/ // no module.loaded needed
+/******/exports:{}
+/******/};
+/******/
+/******/ // Execute the module function
+/******/
+/******/
+/******/ // Return the exports of the module
+/******/return e[r](o,o.exports,n),o.exports;
+/******/}
+/******/
+/************************************************************************/
+/******/ /* webpack/runtime/compat get default export */
+/******/
+/******/ // getDefaultExport function for compatibility with non-harmony modules
+/******/n.n=e=>{
+/******/var t=e&&e.__esModule?
+/******/()=>e.default
+/******/:()=>e
+/******/;
+/******/return n.d(t,{a:t}),t;
+/******/},
+/******/ // define getter functions for harmony exports
+/******/n.d=(e,t)=>{
+/******/for(var r in t)
+/******/n.o(t,r)&&!n.o(e,r)&&
+/******/Object.defineProperty(e,r,{enumerable:!0,get:t[r]})
+/******/;
+/******/},
+/******/n.o=(e,t)=>Object.prototype.hasOwnProperty.call(e,t)
+/******/,
+// This entry need to be wrapped in an IIFE because it need to be in strict mode.
+(()=>{"use strict";
+/* harmony import */var e=n(3227),t=n(8544),r=n(2365),s=n(5354),o=n(8399),i=n(5220),l=n(7698),a=(n(7895),[l/* ["default"] */.Z,o/* ["default"] */.Z,i/* ["default"] */.Z,r/* ["default"] */.Z,t/* .answerFeedbackCorrectBlock */.p,t/* .answerFeedbackIncorrectBlock */.h,s/* ["default"] */.Z]);
+/* harmony import */(0,e/* ["default"] */.Z)(a)})()})
+/******/();

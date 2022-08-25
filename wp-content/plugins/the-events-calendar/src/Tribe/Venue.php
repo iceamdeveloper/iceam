@@ -57,6 +57,22 @@ class Tribe__Events__Venue extends Tribe__Events__Linked_Posts__Base {
 		'Phone',
 	];
 
+
+
+	public $venueTags = [
+		'_VenueCountry',
+		'_VenueAddress',
+		'_VenueCity',
+		'_VenueStateProvince',
+		'_VenueState',
+		'_VenueProvince',
+		'_VenueZip',
+		'_VenuePhone',
+		'_VenueURL',
+		'_VenueShowMap',
+		'_VenueShowMapLink',
+	];
+
 	/**
 	 * @var string
 	 */
@@ -96,6 +112,7 @@ class Tribe__Events__Venue extends Tribe__Events__Linked_Posts__Base {
 		$this->post_type_args['rewrite']['slug']   = $rewrite->prepare_slug( $this->singular_venue_label, self::POSTTYPE, false );
 		$this->post_type_args['show_in_nav_menus'] = class_exists( 'Tribe__Events__Pro__Main' ) ? true : false;
 		$this->post_type_args['public']            = class_exists( 'Tribe__Events__Pro__Main' ) ? true : false;
+		$this->post_type_args['show_in_rest']      = class_exists( 'Tribe__Events__Pro__Main' ) && current_user_can( 'manage_options' );
 
 		/**
 		 * Provides an opportunity to modify the labels used for the venue post type.
@@ -122,7 +139,7 @@ class Tribe__Events__Venue extends Tribe__Events__Linked_Posts__Base {
 			'item_updated'             => sprintf( esc_html__( '%s updated.', 'the-events-calendar' ), $this->singular_venue_label ),
 			'item_link'                => sprintf(
 				// Translators: %s: Venue singular.
-				esc_html__( '%s Link.', 'the-events-calendar' ), $this->singular_venue_label
+				esc_html__( '%s Link', 'the-events-calendar' ), $this->singular_venue_label
 			),
 			'item_link_description'    => sprintf(
 				// Translators: %s: Venue singular.
@@ -248,6 +265,28 @@ class Tribe__Events__Venue extends Tribe__Events__Linked_Posts__Base {
 		}
 
 		return $title;
+	}
+
+	/**
+	 * Include the venue editor meta box.
+	 *
+	 * @since 5.14.0
+	 */
+	public static function add_post_type_metabox() {
+
+		if ( ! Tribe__Admin__Helpers::instance()->is_post_type_screen( self::POSTTYPE ) ) {
+			return;
+		}
+
+		add_meta_box(
+			'tribe_events_venue_details',
+			sprintf( esc_html__( '%s Information', 'the-events-calendar' ), tribe( 'tec.linked-posts.venue' )->get_venue_label_singular() ),
+			[ Tribe__Events__Main::instance(), 'VenueMetaBox' ],
+			self::POSTTYPE,
+			'normal',
+			'high'
+		);
+
 	}
 
 	/**
@@ -725,5 +764,41 @@ class Tribe__Events__Venue extends Tribe__Events__Linked_Posts__Base {
 
 			return array_filter( $venues );
 		};
+	}
+
+	/**
+	 * Returns a string version of the full address of an event.
+	 *
+	 * @since 5.16.0
+	 *
+	 * @see Tribe__Events__Main->fullAddressString()
+	 *
+	 * @param int|WP_Post|null $event The post object or post id.
+	 *
+	 * @return string The event venue's address. Empty string if the event or venue isn't found.
+	 */
+	public static function generate_string_address( $event = null ) {
+		if ( empty( $event ) ) {
+			$event = get_the_ID();
+		}
+
+		if ( is_integer( $event ) ) {
+			$event = tribe_get_event( $event );
+		}
+
+		// Not an event? Bail.
+		if ( ! tribe_is_event( $event ) ) {
+			return '';
+		}
+
+		if ( ! tribe_has_venue( $event ) ) {
+			return '';
+		}
+
+		$tec     = Tribe__Events__Main::instance();
+		$address = $tec->fullAddressString( $event );
+		// The above includes the venue name.
+
+		return $address;
 	}
 }

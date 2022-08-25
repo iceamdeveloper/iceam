@@ -1,4 +1,162 @@
-*** Sensei with WooCommerce Paid Courses Changelog ***
+*** Sensei Pro (WC Paid Courses) ***
+
+
+2022-06-15 - version 4.4.3.1.3.0
+* Sensei Pro: Version bump to 1.3.0
+	* Add premium patterns for Lessons and Courses.
+	* Fix flashcard styles on some themes
+	* Fix incompatibility with Gutenberg breaking the popovers in the editor.
+
+2022-05-31 - version 4.4.3.1.2.0
+* Sensei LMS: Version bump to 4.4.3 https://raw.githubusercontent.com/Automattic/sensei/version/4.4.3/changelog.txt
+* Sensei Pro: Version bump to 1.2.0
+	* New: Add support for Required Blocks.
+	* New: Add a new sensei notice for version checks.
+	* Tweak: Bump minimum PHP version supported to 7.2
+	* Fix: Task List block autofocus fix.
+	* Fix: The styles enqueue that was causing a conflict with Setup Wizard style
+	* Fix: Translations for sidebar color settings in task list block.
+
+2022.05.23 - version 4.4.2.1.1.1
+* Sensei LMS: Version bump to 4.4.2 https://raw.githubusercontent.com/Automattic/sensei/version/4.4.2/changelog.txt
+
+2022.05.17 - version 4.4.1.1.1.1
+* Sensei LMS: Version bump to 4.4.1 https://raw.githubusercontent.com/Automattic/sensei/version/4.4.1/changelog.txt
+
+2022.05.04 - version 4.4.0.1.1.1
+* Sensei LMS: Version bump to 4.4.0 https://raw.githubusercontent.com/Automattic/sensei/version/4.4.0/changelog.txt
+* Sensei Pro: Version bump to 1.1.1
+	* New: Register `sensei-pro` text domain in `woothemes-sensei` [#1163](https://github.com/Automattic/sensei-pro/pull/1163)
+	* Fix: Color supports api and Task List checked attribute [#1165](https://github.com/Automattic/sensei-pro/pull/1165)
+	* Fix: Hotspot image size in Twenty Twenty Two [#1161](https://github.com/Automattic/sensei-pro/pull/1161)
+
+2022.04.26 - version 4.3.0.1.1.0
+* Sensei Pro: Version bump to 1.1.0
+	* New: Add Flash Cards block [#945](https://github.com/Automattic/sensei-pro/pull/945)
+	* New: Add Image Hotspots block [#958](https://github.com/Automattic/sensei-pro/pull/958)
+	* New: Add Task List block [#963](https://github.com/Automattic/sensei-pro/pull/963)
+	* New: Add Question block [#960](https://github.com/Automattic/sensei-pro/pull/960)
+	* New: Add generic block running library [#987](https://github.com/Automattic/sensei-pro/pull/987)
+	* New: Add default Loco translate configuration for `woothemes-sensei` [#1146](https://github.com/Automattic/sensei-pro/pull/1146)
+	* Tweak: Update references to WCPCP [#887](https://github.com/Automattic/sensei-pro/pull/887)
+	* Tweak: Run Frontend Lint workflow when SCSS changes [#1103](https://github.com/Automattic/sensei-pro/pull/1103)
+	* Tweak: Activate dependency group eslint rule [#1082](https://github.com/Automattic/sensei-pro/pull/1082)
+	* Fix: Translations in modules [#1051](https://github.com/Automattic/sensei-pro/pull/1061)
+	* Fix: Translations in `woothemes-sensei` [#1069](https://github.com/Automattic/sensei-pro/pull/1069)
+
+2022.04.04 - version 4.3.0.1.0.2
+* Sensei LMS: Version bump to 4.3.0 https://raw.githubusercontent.com/Automattic/sensei/version/4.3.0/changelog.txt
+
+2022.03.22 - version 4.2.0.1.0.2
+* Sensei LMS: Version bump to 4.2.0 https://raw.githubusercontent.com/Automattic/sensei/version/4.2.0/changelog.txt
+
+2022.03.08 - version 4.1.1.1.0.2
+* This is a significant update. WooCommerce Paid Courses is being renamed as Sensei Pro and now includes all features from the Paid Courses and Content Drip extensions. [Learn more about Sensei Pro here](https://senseilms.com/introducing-sensei-pro/).
+* Sensei Pro: Version bump to 1.0.2
+	* New: Subscriptions with WooCommerce Payments compatibility [#863](https://github.com/Automattic/sensei-pro/pull/863)
+	* New: Add/action scheduler [#859](https://github.com/Automattic/sensei-pro/pull/859)
+	* Tweak: Revert job names back to WCPC naming for now [#873](https://github.com/Automattic/sensei-pro/pull/873)
+	* Tweak: Update legacy content drip message to be displayed in the plugins page [#870](https://github.com/Automattic/sensei-pro/pull/870)
+	* Tweak: Set correct background job schedular import path. [#865](https://github.com/Automattic/sensei-pro/pull/865)
+	* Tweak: Course Expiration Module v2 [#851](https://github.com/Automattic/sensei-pro/pull/851)
+
+2022.03.02 - version 4.1.1.1.0.1
+* Add a notice to connect the account to WooCommerce.com [#843](https://github.com/Automattic/sensei-pro/pull/843)
+* Sensei LMS: Version bump to 4.1.1 https://raw.githubusercontent.com/Automattic/sensei/version/4.1.1/changelog.txt
+* Sensei Pro: Version bump to 1.0.1
+	* New: Add clarification for ordering question type under the question title. [#847](https://github.com/Automattic/sensei-pro/pull/847)
+	* New: Add a Shared Module [#846](https://github.com/Automattic/sensei-pro/pull/846)
+	* Tweak: Simplifying plugin updater response processing. [#854](https://github.com/Automattic/sensei-pro/pull/854)
+	* Tweak: Occupy all the admin body content when on licensing page. [#855](https://github.com/Automattic/sensei-pro/pull/855)
+	* Fix: multi-choice to ordering question switch bug [#848](https://github.com/Automattic/sensei-pro/pull/848)
+	* Fix: drag&drop for ordering question type on mobile [#833](https://github.com/Automattic/sensei-pro/pull/833)
+	* Fix: quiz timer mobile view [#844](https://github.com/Automattic/sensei-pro/pull/844)
+
+2022.02.17 - version 4.0.2.2.6.4
+* Tweak: Update purchase course link for logged out users - #775
+* Fix: Remove PHP nullable types (and void return type) to fix compatibility with PHP 7.0 - #804
+* Fix: Fix learning mode notices in preview lessons - #772
+* Fix: Fix issue when lesson is not part of a course - #724
+* Sensei LMS: Version bump to 4.0.2 https://raw.githubusercontent.com/Automattic/sensei/version/4.0.2/changelog.txt
+
+2022.02.03 - version 4.0.1.2.6.3
+* Sensei LMS: Version bump to 4.0.1 https://raw.githubusercontent.com/Automattic/sensei/version/4.0.1/changelog.txt
+
+2022.02.01 - version 4.0.0.2.6.3
+* Sensei LMS: Version bump to 4.0.0 https://raw.githubusercontent.com/Automattic/sensei/version/4.0.0/changelog.txt
+
+2022.01.20 - version 3.15.2.2.6.3
+* Sensei LMS: Version bump to 3.15.2 https://raw.githubusercontent.com/Automattic/sensei/version/3.15.2/changelog.txt
+
+2022.01.19 - version 3.15.1.2.6.3
+* Sensei LMS: Version bump to 3.15.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.15.1/changelog.txt
+
+2022.01.18 - version 3.15.0.2.6.3
+* Tweak: Register ProductTour as a separate block-editor plugin - #714
+* Tweak: Update product tour opening logic - #719
+* Sensei LMS: Version bump to 3.15.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.15.0/changelog.txt
+
+2021.11.25 - version 3.14.0.2.6.2
+* Sensei LMS: Version bump to 3.14.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.14.0/changelog.txt
+
+2021.10.27 - version 3.13.3.2.6.2
+* Fix: Fix learner courses pagination - #694
+
+2021.10.14 - version 3.13.3.2.6.1
+* Fix: Do not display notices for unrelated products - #689
+* Fix: Set a default value to post__in - #692
+
+2021.10.12 - version 3.13.3.2.6.0
+* New: Course expiration
+	* Add course expiration settings in the sidebar - #658
+	* Add job to remove learner access to a course when the access expiry date passes - #661
+	* Add course expiry notification - #662
+	* Add enrollment expiration check - #664
+	* Hide Take Course button when access is expired - #666
+	* Handle manual enrolments with expiries - #668
+	* Add notice when trying to buy expired courses - #670
+	* Show view results button and course enrollment actions for expired learners - #672
+	* Add expired courses to learner courses page - #673
+	* Add expired warning to course and lesson page - #675
+	* Add expiration notifications - #677
+	* Update expiration time to 23:59:59 instead of midnight - #679
+	* Remove course expiration feature flag - #680
+	* Handles timezone variations while scheduling cron jobs - #681
+	* Add notices in module page, hide registration notices when expired - #682
+	* Set the expiry date on manual enrolment - #683
+	* Fix time issues in course expiration - #684
+	* Add a template from Sensei core in the Course Expiration email notification - #685
+	* Add help message to the expiration configuration - #686
+	* Ensure that enrolment term is in sync before manual modifications - #687
+* Tweak: Add product assignment usage tracking  - #656
+* Sensei LMS: Version bump to 3.13.3 https://raw.githubusercontent.com/Automattic/sensei/version/3.13.3/changelog.txt
+
+2021.10.01 - version 3.13.2.2.5.0
+* Sensei LMS: Version bump to 3.13.2 https://raw.githubusercontent.com/Automattic/sensei/version/3.13.2/changelog.txt
+
+2021.08.26 - version 3.13.1.2.5.0
+* New: Add the ability to create a product from the course page - #651
+* New: Add product assignment usage logging - #654
+* Tweak: Exclude products from the selector that are already associated with the course via a membership - #653
+* Sensei LMS: Version bump to 3.13.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.13.1/changelog.txt
+
+2021.08.12 - version 3.13.0.2.4.0
+* New: Add a product tour - #611, #623
+* New: Add the ability to select courses on the product page - #616
+* Tweak: Product selection workflow
+	* Add product association modal - #614, #622, #641
+	* Add product association sidebar - #617
+	* Refactor linked products list in the purchase block - #619
+	* Deprecate sidebar plugin and modal warning - #624, #625
+	* Add notice and modal when adding or removing products with purchase - #640
+* Fix: Translations not working for paid courses functionality - #621
+* Sensei LMS: Version bump to 3.13.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.13.0/changelog.txt
+
+2021.07.19 - version 3.12.0.2.3.3
+* Sensei LMS: Version bump to 3.12.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.12.0/changelog.txt
+
+2021.06.24 - version 3.11.1.2.3.3
+* Sensei LMS: Version bump to 3.11.1 https://raw.githubusercontent.com/Automattic/sensei/version/3.11.1/changelog.txt
 
 2021.05.10 - version 3.11.0.2.3.3
 * Sensei LMS: Version bump to 3.11.0 https://raw.githubusercontent.com/Automattic/sensei/version/3.11.0/changelog.txt

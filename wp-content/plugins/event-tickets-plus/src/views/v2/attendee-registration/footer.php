@@ -11,8 +11,9 @@
  * @link    https://evnt.is/1amp
  *
  * @since   5.1.0
+ * @since   5.2.5 Added plural/singular support for the notice string content.
  *
- * @version 5.1.0
+ * @version 5.2.5
  *
  * @var \Tribe\Tickets\Plus\Attendee_Registration\View $this                   [Global] The AR View instance.
  * @var array                                          $events                 [Global] Multidimensional array of post IDs with their ticket data.
@@ -46,11 +47,15 @@ $et_template = tribe( 'tickets.editor.template' );
 		[
 			'notice_classes' => $notice_classes,
 			'content'        => sprintf(
-			// Translators: %s HTML wrapped number of tickets.
-				esc_html_x(
-					'There are %s other tickets in your cart that do not require attendee information.',
-					'Note that there are more tickets in the cart, %s is the html-wrapped number.',
-					'event-tickets-plus'
+				esc_html(
+					// Translators: %s HTML wrapped number of tickets.
+					_nx(
+						'There is %s other ticket in your cart that does not require attendee information.',
+						'There are %s other tickets in your cart that do not require attendee information.',
+						absint( $non_meta_count ),
+						'Note that there are more tickets in the cart, %s is the html-wrapped number.',
+						'event-tickets-plus'
+					)
 				),
 				'<span id="tribe-tickets__non-ar-count">' . absint( $non_meta_count ) . '</span>'
 			),

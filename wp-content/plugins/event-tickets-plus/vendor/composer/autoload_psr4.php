@@ -6,4 +6,5 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'TEC\\Tickets_Plus\\' => array($baseDir . '/src/Tickets_Plus'),
 );

@@ -19,6 +19,18 @@ class Sensei_Messages {
 	public $meta_fields;
 
 	/**
+	 * The nonce name when submitting a new message.
+	 *
+	 * @var string
+	 */
+	const NONCE_FIELD_NAME = 'sensei_message_teacher_nonce';
+
+	/**
+	 * The nonce action name when submitting a new message.
+	 */
+	const NONCE_ACTION_NAME = 'message_teacher';
+
+	/**
 	 * Constructor.
 	 *
 	 * @since  1.6.0
@@ -28,8 +40,6 @@ class Sensei_Messages {
 		$this->post_type   = 'sensei_message';
 		$this->meta_fields = array( 'sender', 'receiver' );
 
-		// Add Messages page to admin menu
-		add_action( 'admin_menu', array( $this, 'add_menu_item' ), 40 );
 		add_action( 'add_meta_boxes', array( $this, 'add_meta_box' ), 10, 2 );
 		add_action( 'admin_menu', array( $this, 'remove_meta_box' ) );
 
@@ -110,9 +120,15 @@ class Sensei_Messages {
 	}
 
 	public function add_menu_item() {
-
 		if ( ! isset( Sensei()->settings->settings['messages_disable'] ) || ! Sensei()->settings->settings['messages_disable'] ) {
-			add_submenu_page( 'sensei', __( 'Messages', 'sensei-lms' ), __( 'Messages', 'sensei-lms' ), 'edit_courses', 'edit.php?post_type=sensei_message' );
+
+			add_submenu_page(
+				'edit.php?post_type=course',
+				__( 'Messages', 'sensei-lms' ),
+				__( 'Messages', 'sensei-lms' ),
+				'edit_courses',
+				'edit.php?post_type=sensei_message'
+			);
 		}
 	}
 
@@ -133,7 +149,7 @@ class Sensei_Messages {
 			array(
 				'id'          => 'sender',
 				'label'       => __( 'Message sent by:', 'sensei-lms' ),
-				'description' => __( 'The username of the learner who sent this message.', 'sensei-lms' ),
+				'description' => __( 'The username of the student who sent this message.', 'sensei-lms' ),
 				'type'        => 'plain-text',
 				'default'     => get_post_meta( $post->ID, '_sender', true ),
 			),
@@ -334,7 +350,7 @@ class Sensei_Messages {
 			$html     .= '</p>';
 			$html     .= '<p class="form-row">';
 				$html .= '<input type="hidden" name="post_id" value="' . esc_attr( absint( $post->ID ) ) . '" />';
-				$html .= wp_nonce_field( 'message_teacher', 'sensei_message_teacher_nonce', true, false );
+				$html .= wp_nonce_field( self::NONCE_ACTION_NAME, self::NONCE_FIELD_NAME, true, false );
 				$html .= '<input type="submit" class="send_message" value="' . esc_attr__( 'Send Message', 'sensei-lms' ) . '" />';
 			$html     .= '</p>';
 			$html     .= '<div class="fix"></div>';
@@ -345,11 +361,12 @@ class Sensei_Messages {
 
 	public function save_new_message() {
 
-		if ( ! isset( $_POST['sensei_message_teacher_nonce'] ) || ! isset( $_POST['post_id'] ) ) {
+		if ( ! isset( $_POST[ self::NONCE_FIELD_NAME ] ) || ! isset( $_POST['post_id'] ) ) {
 			return;
 		}
 
-		if ( ! wp_verify_nonce( $_POST['sensei_message_teacher_nonce'], 'message_teacher' ) ) {
+		// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Argument is used for comparison only.
+		if ( ! wp_verify_nonce( wp_unslash( $_POST[ self::NONCE_FIELD_NAME ] ), self::NONCE_ACTION_NAME ) ) {
 			return;
 		}
 
@@ -360,7 +377,15 @@ class Sensei_Messages {
 			return false;
 		}
 
-		$this->save_new_message_post( $current_user->ID, $post->post_author, sanitize_text_field( $_POST['contact_message'] ), $post->ID );
+		$message = empty( $_POST['contact_message'] )
+			? ''
+			: sanitize_text_field( wp_unslash( $_POST['contact_message'] ) );
+
+		$message_id = $this->save_new_message_post( $current_user->ID, $post->post_author, $message, $post->ID );
+
+		if ( $message_id ) {
+			do_action( 'sensei_new_private_message', $message_id );
+		}
 	}
 
 	public function message_reply_received( $comment_id = 0 ) {
@@ -418,7 +443,7 @@ class Sensei_Messages {
 	 * @param  string  $post_id     ID of post related to message
 	 * @return mixed                Message ID on success, boolean false on failure
 	 */
-	private function save_new_message_post( $sender_id = 0, $receiver_id = 0, $message = '', $post_id = 0 ) {
+	public function save_new_message_post( $sender_id = 0, $receiver_id = 0, $message = '', $post_id = 0 ) {
 
 		$message_id = false;
 
@@ -455,8 +480,6 @@ class Sensei_Messages {
 				$post = get_post( $post_id );
 				add_post_meta( $message_id, '_posttype', $post->post_type );
 				add_post_meta( $message_id, '_post', $post->ID );
-
-				do_action( 'sensei_new_private_message', $message_id );
 
 			} else {
 
@@ -791,7 +814,7 @@ class Sensei_Messages {
 		$content_post_id = get_post_meta( $post->ID, '_post', true );
 		if ( $content_post_id ) {
 			// translators: Placeholder is a link to post, with the post's title as the link text.
-			$title = wp_kses_post( sprintf( __( 'Re: %1$s', 'sensei-lms' ), '<a href="' . esc_url( get_permalink( $content_post_id ) ) . '">' . esc_html( get_the_title( $content_post_id ) ) . '</a>' ) );
+			$title = wp_kses_post( sprintf( _x( 'Re: %1$s', 'message title with a link to the post', 'sensei-lms' ), '<a href="' . esc_url( get_permalink( $content_post_id ) ) . '">' . esc_html( get_the_title( $content_post_id ) ) . '</a>' ) );
 		} else {
 			$title = esc_html( get_the_title( $post->ID ) );
 		}
@@ -877,7 +900,7 @@ class Sensei_Messages {
 		if ( $content_post_id ) {
 
 			// translators: Placeholder is the post title.
-			$title = sprintf( __( 'Re: %1$s', 'sensei-lms' ), get_the_title( $content_post_id ) );
+			$title = sprintf( _x( 'Re: %1$s', 'message title without a link to the post', 'sensei-lms' ), get_the_title( $content_post_id ) );
 
 		} else {
 

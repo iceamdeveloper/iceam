@@ -4,9 +4,9 @@
  *
  * @since 4.1
  * @since 5.2.2 Use admin views to render this template.
- * @since TBD Added placeholder template.
+ * @since 5.2.5 Added placeholder template.
  *
- * @version TBD
+ * @version 5.2.5
  *
  * @var Tribe__Tickets_Plus__Admin__Views                 $this      [Global] Template object.
  * @var string                                            $type      [Global] The field type.
@@ -79,17 +79,43 @@ $classes = [
 		<input type="hidden" class="ticket_field" name="tribe-tickets-input[<?php echo esc_attr( $field_id ); ?>][type]" value="<?php echo esc_attr( $type ); ?>">
 
 		<div class="tribe-tickets-input tribe-tickets-input-text">
-			<label for="tickets_attendee_info_field"><?php echo esc_html_x( 'Label:', 'Attendee information fields', 'event-tickets-plus' ); ?></label>
-			<input type="text" class="ticket_field" name="tribe-tickets-input[<?php echo esc_attr( $field_id ); ?>][label]" value="<?php echo esc_attr( $label ); ?>">
+			<div class="tribe-tickets-input-row">
+				<div class="tribe-tickets-input-col1">
+					<label for="tickets_attendee_info_field">
+						<?php echo esc_html_x( 'Label:', 'Attendee information fields', 'event-tickets-plus' ); ?>
+					</label>
+				</div>
+				<div class="tribe-tickets-input-col2">
+					<input
+						type="text"
+						class="ticket_field"
+						name="tribe-tickets-input[<?php echo esc_attr( $field_id ); ?>][label]"
+						value="<?php echo esc_attr( $label ); ?>"
+					>
+				</div>
+			</div>
 		</div>
 
 		<?php $this->template( 'meta-fields/_placeholder' ); ?>
+		<?php $this->template( 'meta-fields/_description' ); ?>
 		<?php $this->template( 'meta-fields/' . $type ); ?>
 
 		<div class="tribe-tickets-input tribe-tickets-input-checkbox tribe-tickets-required">
-			<label class="prompt"><input type="checkbox" <?php checked( $required, 'on' ); ?> class="ticket_field" name="tribe-tickets-input[<?php echo esc_attr( $field_id );?>][required]" value="on">
-				<?php echo esc_html_x( 'Required?', 'Attendee information fields', 'event-tickets-plus' ); ?>
-			</label>
+			<div class="tribe-tickets-input-row">
+				<div class="tribe-tickets-input-col1"></div>
+				<div class="tribe-tickets-input-col2">
+					<label class="prompt">
+						<input
+							type="checkbox"
+							<?php checked( $required, 'on' ); ?>
+							class="ticket_field"
+							name="tribe-tickets-input[<?php echo esc_attr( $field_id );?>][required]"
+							value="on"
+						>
+						<?php echo esc_html_x( 'Required?', 'Attendee information fields', 'event-tickets-plus' ); ?>
+					</label>
+				</div>
+			</div>
 		</div>
 		<div class="tribe-tickets-delete-field">
 			<a href="#" class="delete-attendee-field" ><?php echo esc_html_x( 'Delete this field', 'Attendee information fields', 'event-tickets-plus' ); ?></a>

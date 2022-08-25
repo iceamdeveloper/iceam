@@ -8,7 +8,7 @@ import AnimateHeight from 'react-animate-height';
  * WordPress dependencies
  */
 import { InnerBlocks, RichText } from '@wordpress/block-editor';
-import { Icon } from '@wordpress/components';
+import { Icon, chevronUp } from '@wordpress/icons';
 import { compose } from '@wordpress/compose';
 import { useContext, useState } from '@wordpress/element';
 import { dispatch } from '@wordpress/data';
@@ -17,7 +17,6 @@ import { __ } from '@wordpress/i18n';
 /**
  * Internal dependencies
  */
-import { chevronUp } from '../../../icons/wordpress-icons';
 import {
 	withColorSettings,
 	withDefaultColor,
@@ -53,7 +52,13 @@ export const ModuleEdit = ( props ) => {
 	const {
 		clientId,
 		className,
-		attributes: { title, description, borderedSelected, borderColorValue },
+		attributes: {
+			title,
+			description,
+			borderedSelected,
+			borderColorValue,
+			teacher,
+		},
 		mainColor,
 		defaultMainColor,
 		textColor,
@@ -159,6 +164,9 @@ export const ModuleEdit = ( props ) => {
 							onChange={ updateName }
 						/>
 					</h2>
+					{ teacher && (
+						<span className="teacher-name">({ teacher })</span>
+					) }
 					<ModuleStatus clientId={ clientId } />
 					{ collapsibleModules && (
 						<button

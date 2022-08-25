@@ -104,7 +104,7 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 	}
 
 	public function is_applied_to_product( $_product ) {
-		if ( is_admin() && ! is_ajax() && apply_filters( 'woocommerce_dynamic_pricing_skip_admin', true ) ) {
+		if ( is_admin() && ! wp_doing_ajax() && apply_filters( 'woocommerce_dynamic_pricing_skip_admin', true ) ) {
 			return false;
 		}
 
@@ -235,6 +235,11 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 				$variation_rules      = isset( $pricing_rule_set['variation_rules'] ) ? $pricing_rule_set['variation_rules'] : '';
 				$applied_to_variation = $variation_rules && isset( $variation_rules['args']['type'] ) && $variation_rules['args']['type'] == 'variations';
 
+				if ($variation_rules && isset( $variation_rules['args']['type'] ) &&  $variation_rules['args']['type'] == 'product') {
+					$variation_rules = '';
+					$applied_to_variation = false;
+				}
+
 				/** Commented out the is_single in 2.9.8 **/
 				//if ( is_single() ) {
 				if ( $applied_to_variation && ( $_product->is_type( 'variable' ) || $_product->is_type( 'variation' ) ) && $variation_rules ) {
@@ -272,6 +277,33 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 					$execute_rules = wc_dynamic_pricing_is_within_date_range( $pricing_rule_set['date_from'], $pricing_rule_set['date_to'] );
 				}
 
+				if ($execute_rules) {
+					$quantity = 0;
+					if (isset($pricing_rule_set['collector']) && $pricing_rule_set['collector']['type'] == 'cat' ) {
+						$collector = $pricing_rule_set['collector'];
+						if ( isset( $collector['args'] ) && isset( $collector['args']['cats'] ) && is_array( $collector['args']['cats'] ) ) {
+
+							if ( isset( $collector['args'] ) && isset( $collector['args']['cats'] ) && is_array( $collector['args']['cats'] ) ) {
+
+								if ( is_object_in_term( $_product->get_id(), 'product_cat', $collector['args']['cats'] ) ) {
+									$quantity += 1;
+								}
+
+								$temp_cart = WC_Dynamic_Pricing_Compatibility::WC()->cart->cart_contents;
+								foreach ( $temp_cart as $lck => $check_cart_item ) {
+									if ( is_object_in_term( $check_cart_item['product_id'], 'product_cat', $collector['args']['cats'] ) ) {
+										$quantity += (int) $check_cart_item['quantity'];
+									}
+								}
+							}
+						}
+
+						$execute_rules = $quantity > 0;
+					}
+
+
+				}
+
 				if ( $execute_rules ) {
 					$pricing_rules = $pricing_rule_set['rules'];
 					if ( is_array( $pricing_rules ) && sizeof( $pricing_rules ) > 0 ) {
@@ -284,7 +316,7 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 							$show_pricing_in_shop = apply_filters( 'woocommerce_dynamic_pricing_show_adjustments_in_shop', ( $rule['from'] == '0' || $rule['from']  == '1'), $rule, $_product );
 							if ( $show_pricing_in_shop ) {
 
-								//first rule matched takes precedence for the item. 
+								//first rule matched takes precedence for the item.
 								if ( ! $applied_rule ) {
 									if ( $applied_to_variation && $variation_id ) {
 										$applied_rule = $rule;
@@ -335,7 +367,7 @@ class WC_Dynamic_Pricing_Simple_Membership extends WC_Dynamic_Pricing_Simple_Bas
 				if ( $this->available_rulesets && count( $this->available_rulesets ) ) {
 					$available_rule = reset( $this->available_rulesets );
 
-					$s_working_price = apply_filters( 'woocommerce_dyanmic_pricing_working_price', $working_price, 'membership', $fake_cart_item );
+					$s_working_price = apply_filters( 'woocommerce_dyanmic_pricing_working_price', $discounted_price ? $discounted_price : $working_price, 'membership', $fake_cart_item );
 
 					return $this->get_adjusted_price( $fake_cart_item, $available_rule, $s_working_price );
 				} else {

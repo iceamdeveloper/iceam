@@ -5,7 +5,7 @@
  * src/resources/postcss/ file. For more information, check out our engineering
  * docs on how we handle CSS in our engineering docs.
  *
- * @see: http://moderntribe.github.io/products-engineering/css/
+ * @see: https://the-events-calendar.github.io/products-engineering/docs/code-standards/css/
  */
 
 /**
@@ -23,87 +23,7 @@
  *
  * ----------------------------------------------------------------------------- */
 
-/* Variables */
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Borders - Radius
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Borders - Width
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Layers of z-index
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Colors - Typography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Iconography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - UI
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Borders & Misc
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Forms - Colors
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Forms - Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Page
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Relative
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Opacities
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Spacers
-	 * ----------------------------------------------------------------------------- */
-}
+/* Variables - needed everywhere. */
 
 /* -----------------------------------------------------------------------------
  * SVG - Arrow Right
@@ -189,6 +109,8 @@
  * SVG - Messages
  * ----------------------------------------------------------------------------- */
 
+/* stylelint-disable-line block-no-empty */
+
 /* -----------------------------------------------------------------------------
  * SVG - Month
  * ----------------------------------------------------------------------------- */
@@ -196,6 +118,8 @@
 /* -----------------------------------------------------------------------------
  * SVG - No Map
  * ----------------------------------------------------------------------------- */
+
+/* stylelint-disable-line block-no-empty */
 
 /* -----------------------------------------------------------------------------
  * SVG - Paper Plane
@@ -237,29 +161,11 @@
  * SVG - Week
  * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Transitions
-	 * ----------------------------------------------------------------------------- */
-}
+/* -----------------------------------------------------------------------------
+ * SVG - Cal Export
+ * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Font Stacks
-	 * ----------------------------------------------------------------------------- */ /* stylelint-disable-line value-keyword-case */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Weights
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Sizing
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Line Height
-	 * ----------------------------------------------------------------------------- */
-}
+/* stylelint-disable-line block-no-empty */
 
 /* Mixins */
 
@@ -344,6 +250,13 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * Anchor - Event Title
+ *
+ * This mixin intentionally only affects the text and border _colors_
+ * to make sure they all follow the Customizer overrides.
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * Button - Global
  * ----------------------------------------------------------------------------- */
 
@@ -410,7 +323,7 @@ body.page-tribe-attendee-registration .entry-content,
 	}
 
 body.page-tribe-attendee-registration .tribe-tickets__registration {
-		padding: 0 20px;
+		padding: 0 var(--tec-spacer-4);
 	}
 
 /* -----------------------------------------------------------------------------
@@ -423,8 +336,8 @@ body.page-tribe-attendee-registration .tribe-common-a11y-hidden {
 	}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-events-single, body.page-tribe-attendee-registration .event-tickets .tribe-events-single {
-			max-width: 1000px;
 			margin: 0 auto;
+			max-width: 1000px;
 		}
 
 /*
@@ -433,25 +346,25 @@ body.page-tribe-attendee-registration .tribe-common .tribe-events-single, body.p
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-event, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-event {
 			border-radius: 0;
-			margin: 40px auto 32px;
+			margin: var(--tec-spacer-8) auto var(--tec-spacer-7);
 			max-width: 800px;
 			width: 100%;
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-actions, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-actions {
-			margin: 32px auto 8px;
+			margin: var(--tec-spacer-7) auto var(--tec-spacer-1);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-back-to-cart, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-back-to-cart {
-			color: #141827;
+			border: 0;
 			box-shadow: none;
 			box-shadow: initial;
-			border: 0;
+			color: var(--tec-color-text-primary);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-back-to-cart:before, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-back-to-cart:before {
-				margin-right: 4px;
 				content: url("data:image/svg+xml;charset=utf-8,%3Csvg width='12px' height='8px' viewBox='0 0 12 8' version='1.1' xmlns='http://www.w3.org/2000/svg'%3E%3Cg id='arrow' transform='translate(1.000000, 0.000000)' stroke='%23141827' stroke-width='1' fill='none' fill-rule='evenodd'%3E%3Cline x1='10.7' y1='4' x2='0.1' y2='4' id='Path'/%3E%3Cpolyline id='Path' stroke-linecap='square' points='4.1 0 0.1 4 4.1 8'/%3E%3C/g%3E%3C/svg%3E");
+				margin-right: var(--tec-spacer-0);
 				vertical-align: baseline;
 			}
 
@@ -461,15 +374,15 @@ body.tribe-theme-twentyseventeen body.page-tribe-attendee-registration .tribe-co
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-page-title, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-page-title {
-			margin: 8px 0 24px;
+			margin: var(--tec-spacer-1) 0 var(--tec-spacer-5);
 			padding: 0;
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-grid, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-grid {
 			display: grid;
 			-ms-grid-columns: auto;
-			grid-template-columns: auto;
 			-ms-grid-rows: auto;
+			grid-template-columns: auto;
 			grid-template-rows: auto;
 		}
 
@@ -492,14 +405,14 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart {
 			background-color: white;
-			border-top:  1px solid #e4e4e4;
+			border-top: 1px solid var(--tec-color-border-secondary);
 			-ms-grid-column: 1;
 			grid-column: 1;
 			-ms-grid-row: 1;
 			grid-row: 1;
 			margin: auto auto;
 			max-width: 800px;
-			padding-top: 24px;
+			padding-top: var(--tec-spacer-5);
 			width: 100%;
 		}
 
@@ -508,6 +421,7 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-total,
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-quantity {
 				display: block;
+				font-size: var(--tec-font-size-2);
 			}
 
 /* AR override styles */
@@ -523,9 +437,9 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 				}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra {
+				align-self: center;
 				-ms-grid-row: 1;
 				grid-row: 1;
-				align-self: center;
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra,
@@ -536,7 +450,7 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-total-wrap, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-total-wrap {
-				font-weight: 700;
+				font-weight: var(--tec-font-weight-bold);
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-ticket-quantity,
@@ -545,9 +459,9 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-ticket-quantity,
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-total,
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra-price {
-				font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-				font-size: 14px;
-				font-weight: 700;
+				font-family: var(--tec-font-family-sans-serif);
+				font-size: var(--tec-font-size-2);
+				font-weight: var(--tec-font-weight-bold);
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-ticket-quantity, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-ticket-quantity {
@@ -559,25 +473,24 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-content-subtitle, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-content-subtitle {
-				color: #5d5d5d;
+				color: var(--tec-color-text-secondary);
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-footer, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-footer {
-				padding-top: 24px;
+				padding-top: var(--tec-spacer-5);
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link {
-				box-shadow: none;
-				color: #5d5d5d;
+				box-shadow: inset 0 -1px 0 0 var(--tec-color-text-secondary);
+				color: var(--tec-color-text-secondary);
 				display: none;
 				margin-right: auto;
-				box-shadow: inset 0 -1px 0 0 #5d5d5d;
 				text-decoration: none;
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link:visited, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link:visited {
 					box-shadow: none;
-					color: #5d5d5d;
+					color: var(--tec-color-text-secondary);
 				}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link:active,
@@ -586,31 +499,24 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart a.
 				body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link:active,
 				body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link:focus,
 				body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link:hover {
-					color: #141827;
-					box-shadow: inset 0 -1px 0 0 #141827;
+					box-shadow: inset 0 -1px 0 0 var(--tec-color-text-primary);
+					color: var(--tec-color-text-primary);
 				}
-
-body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-total,
-			body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-quantity,
-			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-total,
-			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-quantity {
-				font-size: 14px;
-			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-total-label, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-footer-total-label {
 				display: none;
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart-title, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart-title {
-			margin: 0 0 16px 0;
+			margin: 0 0 var(--tec-spacer-3) 0;
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-summary, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-summary {
-			margin-bottom: 20px;
+			margin-bottom: var(--tec-spacer-4);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-description, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-description {
-			margin: 0 0 8px;
+			margin: 0 0 var(--tec-spacer-1);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-title, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-title {
@@ -632,12 +538,12 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration
 				body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-title a:active,
 				body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-title a:focus,
 				body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-title a:hover {
-					box-shadow: inset 0 -2px 0 0 #141827;
+					box-shadow: inset 0 -2px 0 0 var(--tec-color-text-primary);
 				}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-ticket__tickets-heading, body.page-tribe-attendee-registration .event-tickets .tribe-ticket__tickets-heading {
-			font-size: 16px;
-			margin-bottom: 16px;
+			font-size: var(--tec-font-size-3);
+			margin-bottom: var(--tec-spacer-3);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__attendee-tickets, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__attendee-tickets {
@@ -645,28 +551,28 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__attendee-tic
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__attendee-tickets-item, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__attendee-tickets-item {
-			padding-bottom: 24px;
+			padding-bottom: var(--tec-spacer-5);
 			padding-top: 0;
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__attendee-tickets-item h4, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__attendee-tickets-item h4 {
-				margin: 16px 0 12px;
+				margin: var(--tec-spacer-3) 0 var(--tec-spacer-2);
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-field, body.page-tribe-attendee-registration .event-tickets .tribe-field {
-			margin-top: 12px;
+			margin-top: var(--tec-spacer-2);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-footer, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-footer {
 			display: flex;
 			flex-flow: row wrap;
 			justify-content: flex-end;
-			margin-bottom: 40px;
+			margin-bottom: var(--tec-spacer-8);
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-footer .tribe-tickets__notice.tribe-tickets__notice--non-ar, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-footer .tribe-tickets__notice.tribe-tickets__notice--non-ar {
-				margin: 0 0 32px;
-				padding-bottom: 24px;
+				margin: 0 0 var(--tec-spacer-7);
+				padding-bottom: var(--tec-spacer-5);
 				width: 100%;
 			}
 
@@ -693,8 +599,8 @@ body.page-tribe-attendee-registration.tribe-theme-twentyseventeen.page.page-one-
 body.page-tribe-attendee-registration.tribe-theme-twentyseventeen.page-one-column #primary .entry-content, body.page-tribe-attendee-registration.tribe-theme-twentyseventeen.page-two-column #primary .entry-content {
 				float: none;
 				float: initial;
-				max-width: 960px !important;
 				margin: auto auto;
+				max-width: 960px !important;
 				width: 100%;
 			}
 
@@ -713,11 +619,11 @@ body.page-tribe-attendee-registration.tribe-theme-twentytwenty .entry-content .t
 /* Theme overrides */
 
 .page-tribe-attendee-registration .wrap {
-	padding-left: 20px;
-	padding-right: 20px;
+	padding-left: var(--tec-spacer-4);
+	padding-right: var(--tec-spacer-4);
 }
 
-@media(min-width: 768px) {
+@media (min-width: 768px) {
 
 body.page-tribe-attendee-registration header.entry-header,
 	body.page-tribe-attendee-registration header.entry-meta,
@@ -733,11 +639,11 @@ body.page-tribe-attendee-registration .tribe-tickets__registration {
 	}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-actions, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-actions {
-				margin: 96px auto 28px
+				margin: var(--tec-spacer-13) auto var(--tec-spacer-6)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-page-title, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-page-title {
-				margin: 28px 0 32px
+				margin: var(--tec-spacer-6) 0 var(--tec-spacer-7)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-ticket-quantity,
@@ -746,11 +652,11 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-ticket-quantity,
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-total,
 			body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra-price {
-					font-size: 14px
+					font-size: var(--tec-font-size-2)
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-content-subtitle, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-content-subtitle {
-					font-size: 11px
+					font-size: var(--tec-font-size-0)
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart a.tribe-tickets__tickets-footer-back-link {
@@ -762,45 +668,45 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart-ti
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-summary, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-summary {
-				margin-bottom: 32px
+				margin-bottom: var(--tec-spacer-7)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-ticket__tickets-heading, body.page-tribe-attendee-registration .event-tickets .tribe-ticket__tickets-heading {
-				font-size: 18px;
-				margin-bottom: 20px
+				font-size: var(--tec-font-size-4);
+				margin-bottom: var(--tec-spacer-4)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__attendee-tickets-item h4, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__attendee-tickets-item h4 {
-					margin: 16px 0
+					margin: var(--tec-spacer-3) 0
 			}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-field, body.page-tribe-attendee-registration .event-tickets .tribe-field {
-				margin-top: 16px
+				margin-top: var(--tec-spacer-3)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-footer, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-footer {
-				margin-bottom: 96px;
+				margin-bottom: var(--tec-spacer-13);
 				max-width: calc(100% - 384px);
 				width: 100%
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-footer .tribe-tickets__notice.tribe-tickets__notice--non-ar, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-footer .tribe-tickets__notice.tribe-tickets__notice--non-ar {
-					margin-bottom: 24px
+					margin-bottom: var(--tec-spacer-5)
 			}
 		}
 
-@media(min-width: 960px) {
+@media (min-width: 960px) {
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-event, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-event {
-				padding: 0 24px 8px 0;
-				margin: 0
+				margin: 0;
+				padding: 0 var(--tec-spacer-5) var(--tec-spacer-1) 0
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-grid, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-grid {
-				border-top: 1px solid #e4e4e4;
+				border-top: 1px solid var(--tec-color-border-secondary);
 				-ms-grid-columns: calc(100% - 360px) 360px;
 				grid-template-columns: calc(100% - 360px) 360px;
-				padding-top: 56px
+				padding-top: var(--tec-spacer-10)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__validation-notice, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__validation-notice {
@@ -808,7 +714,7 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__validation-n
 				grid-column: 1;
 				-ms-grid-row: 1;
 				grid-row: 1;
-				margin-right: 24px
+				margin-right: var(--tec-spacer-5)
 		}
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-content, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-content {
@@ -820,23 +726,23 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart {
 				align-self: baseline;
-				border-radius: 4px;
-				border: 1px solid #e4e4e4;
+				border: 1px solid var(--tec-color-border-secondary);
+				border-radius: var(--tec-border-radius-default);
 				-ms-grid-column: 2;
 				grid-column: 2;
 				-ms-grid-row: 1;
-				-ms-grid-row-span: 2;
 				grid-row: 1/span 2;
-				margin: 160px 0 24px 0;
-				padding: 24px 16px;
+				-ms-grid-row-span: 2;
+				margin: 160px 0 var(--tec-spacer-5) 0;
+				padding: var(--tec-spacer-5) var(--tec-spacer-3);
 				position: -webkit-sticky;
 				position: sticky;
-				top: 24px;
+				top: var(--tec-spacer-5);
 				width: 360px
 		}
 			}
 
-@media(min-width: 1440px) {
+@media (min-width: 1440px) {
 
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__registration-event, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__registration-event {
 				max-width: 100%

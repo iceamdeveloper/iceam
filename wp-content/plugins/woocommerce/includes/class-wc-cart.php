@@ -284,7 +284,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	 *
 	 * @since 3.2.0
 	 * @param string $context If the context is view, the value will be formatted for display. This keeps it compatible with pre-3.2 versions.
-	 * @return float
+	 * @return float|string
 	 */
 	public function get_total( $context = 'view' ) {
 		$total = apply_filters( 'woocommerce_cart_' . __FUNCTION__, $this->get_totals_var( 'total' ) );
@@ -430,7 +430,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	 * @param string $value Value to set.
 	 */
 	public function set_subtotal( $value ) {
-		$this->totals['subtotal'] = wc_format_decimal( $value, wc_get_price_decimals() );
+		$this->totals['subtotal'] = wc_format_decimal( $value );
 	}
 
 	/**
@@ -470,7 +470,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	 * @param string $value Value to set.
 	 */
 	public function set_shipping_total( $value ) {
-		$this->totals['shipping_total'] = wc_format_decimal( $value, wc_get_price_decimals() );
+		$this->totals['shipping_total'] = wc_format_decimal( $value );
 	}
 
 	/**
@@ -490,7 +490,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	 * @param string $value Value to set.
 	 */
 	public function set_cart_contents_total( $value ) {
-		$this->totals['cart_contents_total'] = wc_format_decimal( $value, wc_get_price_decimals() );
+		$this->totals['cart_contents_total'] = wc_format_decimal( $value );
 	}
 
 	/**
@@ -531,7 +531,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	 * @param string $value Value to set.
 	 */
 	public function set_fee_total( $value ) {
-		$this->totals['fee_total'] = wc_format_decimal( $value, wc_get_price_decimals() );
+		$this->totals['fee_total'] = wc_format_decimal( $value );
 	}
 
 	/**
@@ -626,7 +626,7 @@ class WC_Cart extends WC_Legacy_Cart {
 	/**
 	 * Empties the cart and optionally the persistent cart too.
 	 *
-	 * @param bool $clear_persistent_cart Should the persistant cart be cleared too. Defaults to true.
+	 * @param bool $clear_persistent_cart Should the persistent cart be cleared too. Defaults to true.
 	 */
 	public function empty_cart( $clear_persistent_cart = true ) {
 

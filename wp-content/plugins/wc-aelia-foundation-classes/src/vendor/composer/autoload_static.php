@@ -4,10 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit1084896066622e9f12bdee154a78faa4
+class ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1
 {
     public static $files = array (
-        '89ff252b349d4d088742a09c25f5dd74' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php',
+        '49a1299791c25c6fd83542c6fedacddd' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/load-v4p11.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -76,6 +76,7 @@ class ComposerStaticInit1084896066622e9f12bdee154a78faa4
     public static $classMap = array (
         'Aelia\\WC\\AFC\\Messages' => __DIR__ . '/../..' . '/lib/classes/messages/messages.php',
         'Aelia\\WC\\AFC\\Settings' => __DIR__ . '/../..' . '/lib/classes/settings/settings.php',
+        'Aelia\\WC\\AFC\\Traits\\Logger_Trait' => __DIR__ . '/../..' . '/lib/traits/logger.php',
         'Aelia\\WC\\Admin_Message' => __DIR__ . '/../..' . '/lib/classes/base/messages/admin_message.php',
         'Aelia\\WC\\AeliaSimpleXMLElement' => __DIR__ . '/../..' . '/lib/classes/base/xml/aelia-simplexmlelement.php',
         'Aelia\\WC\\Aelia_Install' => __DIR__ . '/../..' . '/lib/classes/base/install/install.php',
@@ -84,23 +85,35 @@ class ComposerStaticInit1084896066622e9f12bdee154a78faa4
         'Aelia\\WC\\Aelia_SessionManager' => __DIR__ . '/../..' . '/lib/classes/base/session/aelia-session-manager.php',
         'Aelia\\WC\\Aelia_Upgrade_Handler' => __DIR__ . '/../..' . '/lib/classes/install/aelia-upgrade-handler.php',
         'Aelia\\WC\\Base_Class' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/aelia-base-class.php',
+        'Aelia\\WC\\Base_Data_Object' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/base-data-object.php',
+        'Aelia\\WC\\Countries\\Country_Flags' => __DIR__ . '/../..' . '/lib/classes/countries/country-flags.php',
         'Aelia\\WC\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
+        'Aelia\\WC\\Exceptions\\Invalid_Shortcode_Argument_Exception' => __DIR__ . '/../..' . '/lib/classes/exceptions/exception.invalid-shortcode-argument.php',
+        'Aelia\\WC\\Exceptions\\Invalid_Shortcode_Exception' => __DIR__ . '/../..' . '/lib/classes/exceptions/exception.invalid-shortcode.php',
+        'Aelia\\WC\\Exceptions\\NotImplementedException' => __DIR__ . '/../..' . '/lib/classes/base/exceptions/exception.not-implemented-exception.php',
+        'Aelia\\WC\\Exceptions\\NotInitializedException' => __DIR__ . '/../..' . '/lib/classes/base/exceptions/exception.not-initialized-exception.php',
         'Aelia\\WC\\ExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
         'Aelia\\WC\\Free_Plugin_Dev_Version_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/free-plugin-dev-version-updater.php',
         'Aelia\\WC\\Free_Plugin_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/free-plugin-updater.php',
+        'Aelia\\WC\\Freemius_Integration\\Shortcodes\\Freemius_Account_Page_Shortcode' => __DIR__ . '/../..' . '/lib/classes/integrations/freemius/shortcodes/shortcode-freemius-account-page.php',
+        'Aelia\\WC\\Freemius_Integration\\Shortcodes\\Freemius_Contact_Form_Shortcode' => __DIR__ . '/../..' . '/lib/classes/integrations/freemius/shortcodes/shortcode-freemius-contact-form.php',
+        'Aelia\\WC\\Freemius_Integration\\Shortcodes\\Freemius_Plugin_Pricing_Shortcode' => __DIR__ . '/../..' . '/lib/classes/integrations/freemius/shortcodes/shortcode-freemius-plugin-pricing.php',
         'Aelia\\WC\\IAelia_Plugin' => __DIR__ . '/../..' . '/lib/classes/base/plugin/aelia-plugin.php',
         'Aelia\\WC\\IExchangeRatesModel' => __DIR__ . '/../..' . '/lib/classes/currency/aelia-wc-exchangeratesmodel.php',
         'Aelia\\WC\\IP2Location' => __DIR__ . '/../..' . '/lib/classes/ip2location/ip2location.php',
+        'Aelia\\WC\\Integrations\\Freemius\\Freemius_Plugin_Integration' => __DIR__ . '/../..' . '/lib/classes/integrations/freemius/freemius-plugin-integration.php',
+        'Aelia\\WC\\Integrations\\Freemius\\Freemius_Plugins_Manager' => __DIR__ . '/../..' . '/lib/classes/integrations/freemius/license-management/freemius-plugin-manager.php',
         'Aelia\\WC\\Logger' => __DIR__ . '/../..' . '/lib/classes/logger/logger.php',
         'Aelia\\WC\\Message' => __DIR__ . '/../..' . '/lib/classes/base/messages/message.php',
         'Aelia\\WC\\Messages' => __DIR__ . '/../..' . '/lib/classes/base/messages/messages.php',
         'Aelia\\WC\\Model' => __DIR__ . '/../..' . '/lib/classes/base/model/model.php',
-        'Aelia\\WC\\NotImplementedException' => __DIR__ . '/../..' . '/lib/classes/base/exceptions/aelia-exceptions.php',
         'Aelia\\WC\\Order' => __DIR__ . '/../..' . '/lib/classes/base/orders/order.php',
         'Aelia\\WC\\Premium_Plugin_Updater' => __DIR__ . '/../..' . '/lib/classes/updater/premium-plugin-updater.php',
         'Aelia\\WC\\Semaphore' => __DIR__ . '/../..' . '/lib/classes/base/semaphore/semaphore.php',
         'Aelia\\WC\\Settings' => __DIR__ . '/../..' . '/lib/classes/base/settings/settings.php',
         'Aelia\\WC\\Settings_Renderer' => __DIR__ . '/../..' . '/lib/classes/base/settings/settings-renderer.php',
+        'Aelia\\WC\\Shortcodes\\Base_Shortcode' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/shortcodes/base-shortcode.php',
+        'Aelia\\WC\\Shortcodes\\Shortcode_Settings' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/shortcodes/shortcode-settings.php',
         'Aelia\\WC\\Traits\\Singleton' => __DIR__ . '/../..' . '/lib/traits/singleton.php',
         'Aelia\\WC\\Updater' => __DIR__ . '/../..' . '/lib/classes/updater/updater.php',
         'Aelia\\WC\\WC_AeliaFoundationClasses_Install' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-install.php',
@@ -284,10 +297,10 @@ class ComposerStaticInit1084896066622e9f12bdee154a78faa4
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit1084896066622e9f12bdee154a78faa4::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit1084896066622e9f12bdee154a78faa4::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit1084896066622e9f12bdee154a78faa4::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit1084896066622e9f12bdee154a78faa4::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit03365ada1a1ed653bdfd23d8ae8942b1::$classMap;
 
         }, null, ClassLoader::class);
     }

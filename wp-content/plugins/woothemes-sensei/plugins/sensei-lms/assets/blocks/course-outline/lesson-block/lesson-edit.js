@@ -6,13 +6,12 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
-import { Icon } from '@wordpress/components';
+import { Icon, check, chevronRight } from '@wordpress/icons';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
-import { checked, chevronRight } from '../../../icons/wordpress-icons';
 import { withColorSettings } from '../../../shared/blocks/settings';
 import { useKeydownInserter } from '../../../shared/blocks/use-keydown-inserter';
 import SingleLineInput from '../../../shared/blocks/single-line-input';
@@ -38,7 +37,7 @@ import { useLessonPreviewStatus } from './use-lesson-preview-status';
 export const LessonEdit = ( props ) => {
 	const {
 		className,
-		attributes: { title, id, fontSize, draft, preview },
+		attributes: { title, id, fontSize, draft, preview, placeholder },
 		backgroundColor,
 		textColor,
 		setAttributes,
@@ -84,12 +83,14 @@ export const LessonEdit = ( props ) => {
 			<LessonSettings { ...props } { ...lessonStatus } />
 			<div { ...wrapperStyles }>
 				<Icon
-					icon={ checked }
+					icon={ check }
 					className="wp-block-sensei-lms-course-outline-lesson__status"
 				/>
 				<SingleLineInput
 					className="wp-block-sensei-lms-course-outline-lesson__input"
-					placeholder={ __( 'Lesson name', 'sensei-lms' ) }
+					placeholder={
+						placeholder || __( 'Add Lesson', 'sensei-lms' )
+					}
 					value={ title }
 					onChange={ updateTitle }
 					onKeyDown={ onKeyDown }

@@ -47,7 +47,10 @@ class Definitions {
 	// Error codes
 	const OK = 0;
 	const RES_OK = 0;
+
 	const ERR_COULD_NOT_UPDATE_GEOIP_DATABASE = 1100;
+	// @since 2.1.19.211020
+	const ERR_NOT_IMPLEMENTED = 1101;
 
 	const ERR_PRODUCT_LICENSE_NOT_SET = 2100;
 	// @since 1.9.10.171201
@@ -95,6 +98,11 @@ class Definitions {
 	const ERR_COULD_NOT_VALIDATE_DEACTIVATION = 6008;
 	const ERR_SITE_DOES_NOT_EXIST = 6009;
 	const ERR_SITE_NOT_ACTIVE = 6010;
+
+	// Shortcodes
+	// @since 2.1.8.210518
+	const ERR_SHORTCODE_NOT_VALID = 3001;
+	const ERR_SHORTCODE_INVALID_ARGUMENTS = 3002;
 
 	// Session/User Keys
 	const SESSION_USER_LOGGED_IN = 'aelia_user_logged_in';

@@ -5,7 +5,7 @@
  * src/resources/postcss/ file. For more information, check out our engineering
  * docs on how we handle CSS in our engineering docs.
  *
- * @see: http://moderntribe.github.io/products-engineering/css/
+ * @see: https://the-events-calendar.github.io/products-engineering/docs/code-standards/css/
  */
 
 /**
@@ -23,87 +23,7 @@
  *
  * ----------------------------------------------------------------------------- */
 
-/* Variables */
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Borders - Radius
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Borders - Width
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Layers of z-index
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Colors - Typography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Iconography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - UI
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Borders & Misc
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Forms - Colors
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Forms - Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Page
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Relative
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Opacities
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Spacers
-	 * ----------------------------------------------------------------------------- */
-}
+/* Variables - needed everywhere. */
 
 /* -----------------------------------------------------------------------------
  * SVG - Arrow Right
@@ -189,6 +109,8 @@
  * SVG - Messages
  * ----------------------------------------------------------------------------- */
 
+/* stylelint-disable-line block-no-empty */
+
 /* -----------------------------------------------------------------------------
  * SVG - Month
  * ----------------------------------------------------------------------------- */
@@ -196,6 +118,8 @@
 /* -----------------------------------------------------------------------------
  * SVG - No Map
  * ----------------------------------------------------------------------------- */
+
+/* stylelint-disable-line block-no-empty */
 
 /* -----------------------------------------------------------------------------
  * SVG - Paper Plane
@@ -237,29 +161,11 @@
  * SVG - Week
  * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Transitions
-	 * ----------------------------------------------------------------------------- */
-}
+/* -----------------------------------------------------------------------------
+ * SVG - Cal Export
+ * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Font Stacks
-	 * ----------------------------------------------------------------------------- */ /* stylelint-disable-line value-keyword-case */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Weights
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Sizing
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Line Height
-	 * ----------------------------------------------------------------------------- */
-}
+/* stylelint-disable-line block-no-empty */
 
 /* Mixins */
 
@@ -344,6 +250,13 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * Anchor - Event Title
+ *
+ * This mixin intentionally only affects the text and border _colors_
+ * to make sure they all follow the Customizer overrides.
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * Button - Global
  * ----------------------------------------------------------------------------- */
 
@@ -390,15 +303,15 @@
  * ----------------------------------------------------------------------------- */
 
 .event-tickets .tribe-tickets__attendee-tickets-title, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-title {
-		margin-bottom: 20px;
+		margin-bottom: var(--tec-spacer-4);
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-item, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item {
-		background-color: #fff;
-		border: solid #e4e4e4;
+		background-color: var(--tec-color-background);
+		border: solid var(--tec-color-border-secondary);
 		border-width: 1px 1px 1px 4px;
 		clear: both;
-		padding: 16px;
+		padding: var(--tec-spacer-3);
 		position: relative;
 	}
 
@@ -406,13 +319,13 @@
 		.event-tickets .tribe-tickets__attendee-tickets-item:before,
 		.entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item:after,
 		.entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item:before {
-			background: #e4e4e4;
+			background: var(--tec-color-border-secondary);
 			content: '';
 			display: block;
-			height: 4px;
-			left: -4px;
+			height: var(--tec-spacer-0);
+			left: calc(var(--tec-spacer-0)*-1);
 			position: absolute;
-			width: 4px;
+			width: var(--tec-spacer-0);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-item:after, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item:after {
@@ -424,39 +337,39 @@
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-item + .tribe-tickets__attendee-tickets-item, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item + .tribe-tickets__attendee-tickets-item {
-			margin-top: 16px;
+			margin-top: var(--tec-spacer-3);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-item--has-focus, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item--has-focus {
-		border-left-color: #334aff;
+		border-left-color: var(--tec-color-icon-focus);
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-item--has-focus:after,
 		.event-tickets .tribe-tickets__attendee-tickets-item--has-focus:before,
 		.entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item--has-focus:after,
 		.entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item--has-focus:before {
-			background: #334aff;
+			background: var(--tec-color-icon-focus);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-item--has-error, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item--has-error {
-		border-left-color: #da394d;
+		border-left-color: var(--tec-color-icon-error);
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-item--has-error:after,
 		.event-tickets .tribe-tickets__attendee-tickets-item--has-error:before,
 		.entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item--has-error:after,
 		.entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item--has-error:before {
-			background: #da394d
+			background: var(--tec-color-icon-error);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets {
-		margin-top: 24px;
+		margin-top: var(--tec-spacer-5);
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field {
 			display: flex;
 			flex-flow: column nowrap;
-			margin-bottom: 16px;
+			margin-bottom: var(--tec-spacer-3);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field:last-child, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field:last-child {
@@ -464,11 +377,16 @@
 			}
 
 .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field-label, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field-label {
-			color: #141827;
+			color: var(--tec-color-text-primary);
 			display: block;
-			font-weight: 400;
-			margin-bottom: 4px;
+			font-weight: var(--tec-font-weight-regular);
+			margin-bottom: var(--tec-spacer-0);
 		}
+
+.event-tickets .tribe-tickets__form-field-description, .entry .entry-content .event-tickets .tribe-tickets__form-field-description {
+		color: var(--tec-color-icon-primary-alt);
+		margin: var(--tec-spacer-1) 0;
+	}
 
 /* @todo: check if we can deprecate this, it's not being used. */
 
@@ -489,32 +407,32 @@
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-container + .tribe-tickets__attendee-tickets-container, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-container + .tribe-tickets__attendee-tickets-container {
-			margin-top: 24px;
+			margin-top: var(--tec-spacer-5);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-container--has-tickets, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-container--has-tickets {
 		display: block;
-		margin-bottom: 16px;
+		margin-bottom: var(--tec-spacer-3);
 	}
 
 /* @todo: check if this is still relevant. Can't find it. */
 
 .event-tickets .tribe-tickets__button--next, .entry .entry-content .event-tickets .tribe-tickets__button--next {
 		align-items: center;
-		border: 1px solid #e4e4e4;
-		background-color: #334aff;
-		color: #fff;
+		background-color: var(--tec-color-accent-primary);
+		border: 1px solid var(--tec-color-border-secondary);
+		color: var(--tec-color-background);
 		display: inline-flex;
 		justify-content: center;
-		min-height: 54px;
 		max-width: 100%;
+		min-height: 54px;
 	}
 
 .event-tickets .tribe-tickets__button--next:hover,
 		.event-tickets .tribe-tickets__button--next:focus,
 		.entry .entry-content .event-tickets .tribe-tickets__button--next:hover,
 		.entry .entry-content .event-tickets .tribe-tickets__button--next:focus {
-			color: #fff;
+			color: var(--tec-color-background);
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-footer, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-footer {
@@ -524,9 +442,9 @@
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-footer-divider, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-footer-divider {
-		color: #5d5d5d;
-		font-family: "Helvetica Neue", Helvetica, -apple-system, BlinkMacSystemFont, Roboto, Arial, sans-serif;
-		margin-right: 20px;
+		color: var(--tec-color-text-secondary);
+		font-family: var(--tec-font-family-sans-serif);
+		margin-right: var(--tec-spacer-4);
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-footer-submit, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-footer-submit {
@@ -538,10 +456,10 @@
 			white-space: nowrap;
 		}
 
-@media(min-width: 768px) {
+@media (min-width: 768px) {
 
 .event-tickets .tribe-tickets__attendee-tickets, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets {
-			margin-top: 16px
+			margin-top: var(--tec-spacer-3)
 	}
 
 .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field {
@@ -549,7 +467,7 @@
 		}
 
 .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field-label, .entry .entry-content .event-tickets .tribe-tickets__attendee-tickets-item.tribe-tickets__form .tribe-tickets__form-field-label {
-				flex: 0 0 134px;
-				margin-right: 20px
+				flex: 0 0 102px;
+				margin-right: var(--tec-spacer-0)
 		}
 		}

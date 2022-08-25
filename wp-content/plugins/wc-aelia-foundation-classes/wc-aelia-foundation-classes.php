@@ -4,13 +4,13 @@ Plugin Name: Aelia Foundation Classes for WooCommerce
 Description: This plugin implements common classes for other WooCommerce plugins developed by Aelia.
 Author: Aelia
 Author URI: https://aelia.co
-Version: 2.1.8.210518
+Version: 2.2.8.220607
 Plugin URI: https://aelia.co/shop/product-category/woocommerce/
 Text Domain: wc-aelia-foundation-classes
 Domain Path: /languages
 WC requires at least: 3.0
-WC tested up to: 5.3
-Requires PHP: 7.0
+WC tested up to: 6.6
+Requires PHP: 7.1
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-afc-requirementscheck.php');

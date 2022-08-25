@@ -6,11 +6,13 @@ import { __ } from '@wordpress/i18n';
 import { useSelect } from '@wordpress/data';
 import { EditorNotices } from '@wordpress/editor';
 import { RawHTML } from '@wordpress/element';
+import { applyFilters } from '@wordpress/hooks';
 
 /**
  * Internal dependencies
  */
 import { useSenseiColorTheme } from '../react-hooks/use-sensei-color-theme';
+import FeaturedProductSenseiPro from './featured-product-sensei-pro';
 import Header from './header';
 import Tabs from './tabs';
 import UpdateNotification from './update-notification';
@@ -24,10 +26,19 @@ import { Grid, Col } from './grid';
 const Main = () => {
 	useSenseiColorTheme();
 
-	const { extensions, connected, layout, error } = useSelect( ( select ) => {
+	const {
+		extensions,
+		connected,
+		layout,
+		isExtensionsLoading,
+		error,
+	} = useSelect( ( select ) => {
 		const store = select( EXTENSIONS_STORE );
 
 		return {
+			isExtensionsLoading: ! store.hasFinishedResolution(
+				'getExtensions'
+			),
 			extensions: store.getExtensions(),
 			connected: store.getConnectionStatus(),
 			layout: store.getLayout(),
@@ -35,12 +46,16 @@ const Main = () => {
 		};
 	} );
 
-	if ( 0 === extensions.length || 0 === layout.length ) {
+	if ( isExtensionsLoading ) {
 		return (
 			<div className="sensei-extensions__loader">
 				<Spinner />
 			</div>
 		);
+	}
+
+	if ( 0 === extensions.length || 0 === layout.length ) {
+		return <div>{ __( 'No extensions found.', 'sensei-lms' ) }</div>;
 	}
 
 	const freeExtensions = extensions.filter(
@@ -77,13 +92,39 @@ const Main = () => {
 		},
 	];
 
+	/**
+	 * Filters the featured product display.
+	 *
+	 * @since 4.1.0
+	 *
+	 * @param {boolean} hideFeaturedProduct Whether to hide the extensions featured product.
+	 */
+	const hideFeaturedProduct = applyFilters(
+		'senseiExtensionsFeaturedProductHide',
+		false
+	);
+
+	/**
+	 * Filters the featured product component.
+	 *
+	 * @param {Object} FeaturedProduct Component.
+	 */
+	const FeaturedProduct = applyFilters(
+		'senseiExtensionsFeaturedProduct',
+		FeaturedProductSenseiPro
+	);
+
 	return (
 		<>
 			<Grid as="main" className="sensei-extensions">
 				<QueryStringRouter paramName="tab" defaultRoute="all">
 					<Col className="sensei-extensions__section" cols={ 12 }>
+						{ ! hideFeaturedProduct && <FeaturedProduct /> }
+
 						<Header />
+
 						<Tabs tabs={ tabs } />
+
 						{ error !== null && (
 							<Notice status="error" isDismissible={ false }>
 								<RawHTML>{ error }</RawHTML>

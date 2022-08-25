@@ -1,6 +1,7 @@
 <?php
 
 use Tribe__Utils__Array as Arr;
+use TEC\Tickets\Commerce\Attendee;
 
 if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 	/**
@@ -653,7 +654,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 
 			$event_id = get_post_meta( $ticket_product, $this->get_event_key(), true );
 
-			if ( ! $event_id && '' === ( $event_id = get_post_meta( $ticket_product, $this->attendee_event_key, true ) ) ) {
+			if ( ! empty( $this->attendee_event_key ) && ! $event_id && '' === ( $event_id = get_post_meta( $ticket_product, $this->attendee_event_key, true ) ) ) {
 				return false;
 			}
 
@@ -674,7 +675,19 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 * @return mixed
 		 */
 		public function delete_ticket( $post_id, $ticket_id ) {
+
+			/**
+			 * Trigger action when any attendee is deleted.
+			 *
+			 * @since 5.1.5
+			 *
+			 * @param int $post_id Post or Event ID.
+			 * @param int $ticket_id Attendee ID.
+			 */
+			do_action( 'event_tickets_attendee_ticket_deleted', $post_id, $ticket_id );
+
 			$this->clear_ticket_cache_for_post( $post_id );
+			$this->clear_attendees_cache( $post_id );
 		}
 
 		/**
@@ -872,7 +885,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 *
 		 * @return array List of attendees.
 		 */
-		protected function get_attendees_by_order_id( $order_id ) {
+		public function get_attendees_by_order_id( $order_id ) {
 			$ticket_id = null;
 
 			// Support an optional second argument while not causing warnings from other ticket provider classes.
@@ -977,6 +990,32 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 */
 		public function attendee_decreases_inventory( array $attendee ) {
 			return true;
+		}
+
+		/**
+		 * Handles if email sending is allowed.
+		 *
+		 * @since 5.2.1
+		 *
+		 * @param WP_Post|null $ticket   The ticket post object if available, otherwise null.
+		 * @param array|null   $attendee The attendee information if available, otherwise null.
+		 *
+		 *  @return boolean
+		 */
+		public function allow_resending_email( $ticket = null, $attendee = null ) {
+			/**
+			 *
+			 * Shared filter between Woo, EDD, and the default logic.
+			 * This filter allows the admin to control the re-send email option when an attendee's email is updated per a payment type (EDD, Woo, etc).
+			 * True means allow email resend, false means disallow email resend.
+			 *
+			 * @since 5.2.1
+			 *
+			 * @param WP_Post|null $ticket The ticket post object if available, otherwise null.
+			 * @param array|null $attendee The attendee information if available, otherwise null.
+			 *
+			 */
+			return (bool) apply_filters( 'tribe_tickets_my_tickets_allow_email_resend_on_attendee_email_update', true, $ticket, $attendee );
 		}
 
 		/**
@@ -1121,6 +1160,9 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			add_action( 'event_tickets_checkin', [ $this, 'purge_attendees_transient' ] );
 			add_action( 'event_tickets_uncheckin', [ $this, 'purge_attendees_transient' ] );
 			add_action( 'template_redirect', [ $this, 'maybe_redirect_to_attendees_registration_screen' ], 0 );
+
+			// Event cost may need to be formatted to the provider's currency settings.
+			add_filter( 'tribe_currency_cost', [ $this, 'maybe_format_event_cost' ], 10, 2 );
 		}
 
 		/**
@@ -2380,7 +2422,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 
 				$headers[] = sprintf(
 					'From: %1$s <%2$s>',
-					filter_var( $from_name, FILTER_SANITIZE_STRING ),
+					stripcslashes( $from_name ),
 					$from_email
 				);
 
@@ -2655,6 +2697,25 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		}
 
 		/**
+		 * Formats the cost based on the provider of a ticket of an event.
+		 *
+		 * @param  float|string $cost
+		 * @param  int   		$post_id
+		 *
+		 * @return string
+		 */
+		public function maybe_format_event_cost( $cost, $post_id ) {
+			$tickets = self::get_all_event_tickets( $post_id );
+			// If $cost isn't a number or there are no tickets, no filter needed.
+			if ( ! is_numeric( $cost ) || empty( $tickets ) ) {
+				return $cost;
+			}
+			$currency = tribe( 'tickets.commerce.currency' );
+			// We will convert to the format of the first ticket's provider class.
+			return $currency->get_formatted_currency( $cost, null, $tickets[0]->provider_class );
+		}
+
+		/**
 		 * Queries ticketing providers to establish the range of tickets/pricepoints for the specified
 		 * event and ensures those costs are included in the $costs array.
 		 *
@@ -2682,7 +2743,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		/**
 		 * Filter past tickets from showing up in cost range.
 		 *
-		 * @since TBD
+		 * @since 5.1.5
 		 *
 		 * @param array  $costs List of ticket costs.
 		 * @param int    $post_id Target Event's ID.
@@ -2700,11 +2761,13 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			/**
 			 * Allow filtering of whether to exclude past tickets in the event cost range.
 			 *
-			 * @since TBD
+			 * @since 5.1.4
 			 *
-			 * @param bool $exclude_past_tickets Whether to exclude past tickets in the event cost range.
+			 * @param bool  $exclude_past_tickets Whether to exclude past tickets in the event cost range.
+			 * @param array $costs                Which costs are going to be displayed.
+			 * @param int   $post_id              Which Event/Post we are dealign with.
 			 */
-			$exclude_past_tickets = apply_filters( 'event_tickets_exclude_past_tickets_from_cost_range', true );
+			$exclude_past_tickets = apply_filters( 'event_tickets_exclude_past_tickets_from_cost_range', false, $costs, $post_id );
 
 			if ( ! $exclude_past_tickets ) {
 				return $costs;
@@ -2723,8 +2786,8 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			foreach ( $tickets as $ticket ) {
 
 				$now        = Tribe__Date_Utils::build_date_object( 'now', $timezone );
-				$start_date = Tribe__Date_Utils::build_date_object( $ticket->start_date, $timezone );
-				$end_date   = Tribe__Date_Utils::build_date_object( $ticket->end_date, $timezone );
+				$start_date = Tribe__Date_Utils::build_date_object( $ticket->start_date . ' ' . $ticket->start_time, $timezone );
+				$end_date   = Tribe__Date_Utils::build_date_object( $ticket->end_date . ' ' . $ticket->end_time, $timezone );
 
 				// If the ticket has not yet become available for sale or has already ended.
 				if ( $now < $start_date || $end_date < $now ) {
@@ -3401,7 +3464,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		 * @param array       $raw_data
 		 * @param string      $save_type
 		 */
-		protected function update_capacity( $ticket, $data, $save_type ) {
+		public function update_capacity( $ticket, $data, $save_type ) {
 			if ( empty( $data ) ) {
 				return;
 			}
@@ -3562,6 +3625,86 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 		}
 
 		/**
+		 * Creates a duplicate ticket based on post id and ticket id.
+		 *
+		 * @since 5.2.3
+		 *
+		 * @param int $post_id   ID of parent "event" post.
+		 * @param int $ticket_id ID of ticket to duplicate.
+		 *
+		 * @return int|boolean $duplicate_ticket_id New ticket ID or false, if unable to create duplicate.
+		 */
+		public function duplicate_ticket( $post_id, $ticket_id ) {
+
+			// Get ticket data.
+			$ticket = $this->get_ticket( $post_id, $ticket_id );
+
+			if ( ! $ticket instanceof Tribe__Tickets__Ticket_Object ) {
+				return false;
+			}
+
+			// Create data for duplicate ticket.
+			$data = [
+				'ticket_name'             => $ticket->name . __( '(copy)', 'event-tickets' ),
+				'ticket_description'      => $ticket->description,
+				'ticket_price'            => $ticket->price,
+				'ticket_show_description' => $ticket->show_description,
+				'ticket_start_date'       => $ticket->start_date,
+				'ticket_start_time'       => $ticket->start_time,
+				'ticket_end_date'         => $ticket->end_date,
+				'ticket_end_time'         => $ticket->end_time,
+				'tribe-ticket'            => [
+					'capacity' => $ticket->capacity(),
+					'mode'     => $ticket->global_stock_mode(),
+				]
+			];
+
+			// Add the ticket.
+			$duplicate_ticket_id = $this->ticket_add( $post_id, $data );
+
+			if ( ! $duplicate_ticket_id ) {
+				return false;
+			}
+
+			// Copy ticket meta from old ticket to new ticket.
+			$ignore_meta = [
+				'_sku',
+				'_tribe_ticket_manual_updated',
+				'_wp_old_slug',
+				'total_sales',
+			];
+			$ticket_meta = get_post_meta( $ticket->ID );
+
+			if ( $ticket_meta ) {
+				foreach ( $ticket_meta as $meta_key => $meta_values ) {
+					// Skip meta we don't want to duplicate.
+					if ( false !== strpos( $meta_key, '_tec_tc_ticket_status_count' ) ){
+						continue;
+					}
+					if ( in_array( $meta_key, $ignore_meta ) ) {
+						continue;
+					}
+
+					// Delete duplicate tickets meta before adding new meta.
+					delete_post_meta( $duplicate_ticket_id, $meta_key );
+
+					foreach ( $meta_values as $meta_value ) {
+						// Maybe convert to object, in case meta is serialized.
+						$meta_value_obj = maybe_unserialize( $meta_value );
+						add_post_meta( $duplicate_ticket_id, $meta_key, $meta_value_obj );
+					}
+				}
+			}
+
+			// Update SKU of new ticket to remove '(COPY)'.
+			$old_sku = get_post_meta( $duplicate_ticket_id, '_sku', true );
+			$new_sku = str_replace( '(COPY)', '', $old_sku );
+			update_post_meta( $duplicate_ticket_id, '_sku', $new_sku, $old_sku );
+
+			return $duplicate_ticket_id;
+		}
+
+		/**
 		 * Creates a ticket object and calls the child save_ticket function
 		 *
 		 * @param int $post_id ID of parent "event" post
@@ -3573,7 +3716,7 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			$ticket                   = new Tribe__Tickets__Ticket_Object();
 			$ticket->ID               = isset( $data['ticket_id'] ) ? absint( $data['ticket_id'] ) : null;
 			$ticket->name             = isset( $data['ticket_name'] ) ? esc_html( $data['ticket_name'] ) : null;
-			$ticket->description      = isset( $data['ticket_description'] ) ? sanitize_textarea_field( $data['ticket_description'] ) : '';
+			$ticket->description      = isset( $data['ticket_description'] ) ? wp_kses_post( $data['ticket_description'] ) : '';
 			$ticket->price            = ! empty( $data['ticket_price'] ) ? filter_var( trim( $data['ticket_price'] ), FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION | FILTER_FLAG_ALLOW_THOUSAND ) : 0;
 			$ticket->show_description = isset( $data['ticket_show_description'] ) ? 'yes' : 'no';
 			$ticket->provider_class   = $this->class_name;
@@ -3912,10 +4055,8 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 				return;
 			}
 
-			/** @var Tribe__Tickets_Plus__Main $tickets_plus_main */
-			$tickets_plus_main = tribe( 'tickets-plus.main' );
-
-			$meta = $tickets_plus_main->meta();
+			/** @var Tribe__Tickets_Plus__Meta $meta */
+			$meta = tribe( 'tickets-plus.meta' );
 
 			$cart_has_meta = true;
 
@@ -3945,7 +4086,8 @@ if ( ! class_exists( 'Tribe__Tickets__Tickets' ) ) {
 			$url = $attendee_reg->get_url();
 
 			if ( ! empty( $q_provider ) ) {
-				$url = add_query_arg( 'provider', $q_provider, $url );
+				$provider_slug = tribe_tickets_get_provider_query_slug();
+				$url = add_query_arg( $provider_slug, $q_provider, $url );
 			}
 
 			if ( ! empty( $redirect ) ) {

@@ -49,10 +49,10 @@ var tribe_ticket_plus_qr = tribe_ticket_plus_qr || {};
 			request,
 			function( results ) {
 				if ( results.success ) {
-					obj.$generate_key_msg.html( "<p class=\'optin-success\'>" + results.data.msg + "</p>" );
+					obj.$generate_key_msg.html( '<p class="optin-success">' + results.data.msg + '</p>' );
 					obj.$generate_key_input.val( results.data.key );
 				} else {
-					obj.$generate_key_msg.html( "<p class=\'optin-fail\'>" + results.data + "</p>" );
+					obj.$generate_key_msg.html( '<p class="optin-fail">' + results.data + '</p>' );
 				}
 			}
 		);

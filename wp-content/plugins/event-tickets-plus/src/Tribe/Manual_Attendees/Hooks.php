@@ -2,6 +2,7 @@
 
 namespace Tribe\Tickets\Plus\Manual_Attendees;
 
+use TEC\Tickets\Commerce\Module;
 use Tribe__Tickets__Tickets;
 
 /**
@@ -187,6 +188,14 @@ class Hooks {
 
 		$event_id  = tribe_get_request_var( 'event_id', false );
 		$providers = Tribe__Tickets__Tickets::get_active_providers_for_post( $event_id );
+
+		if (
+			empty( $providers )
+			&& tec_tickets_commerce_is_enabled()
+			&& 0 < tec_tc_tickets()->by( 'event', $event_id )->found()
+		) {
+			$providers = [ Module::class ];
+		}
 
 		// Do not continue if this event has no available provider.
 		if ( empty( $providers ) ) {

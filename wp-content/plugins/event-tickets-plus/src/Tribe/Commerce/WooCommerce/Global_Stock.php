@@ -35,6 +35,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 	public function __construct() {
 		add_action( 'woocommerce_check_cart_items', array( $this, 'cart_check_stock' ) );
 		add_action( 'woocommerce_reduce_order_stock', array( $this, 'stock_equalize' ) );
+		add_action( 'woocommerce_restore_order_stock', [ $this, 'increase_shared_capacity_stock_by_order' ] );
 
 		/*
 		 * This currently causes a fatal error because it needs a ticket object but the ticket has already been deleted.
@@ -364,4 +365,61 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Global_Stock {
 		}
 	}
 
+	/**
+	 * Increase Global stock for each event within an order.
+	 *
+	 * @since 5.2.5
+	 *
+	 * @param WC_Order $order The Order object.
+	 *
+	 * @return void
+	 */
+	public function increase_shared_capacity_stock_by_order( $order ) {
+
+		if ( empty( $order ) || ! $order instanceof WC_Order ) {
+			return;
+		}
+
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
+		$woo_provider = tribe( 'tickets-plus.commerce.woo' );
+		$has_tickets  = $order->get_meta( $woo_provider->order_has_tickets );
+
+		if ( ! $has_tickets ) {
+			return;
+		}
+		// get the active attendees for this order.
+		$attendees = $woo_provider->get_attendees_by_id( $order->get_id() );
+
+		$events = [];
+		foreach ( $attendees as $attendee ) {
+
+			$event_id = $attendee['event_id'];
+
+			// Update Event quantity counter.
+			if ( isset( $events[ $event_id ] ) ) {
+				$events[ $event_id ]['count'] = $events[ $event_id ]['count'] + 1;
+			} else {
+
+				$global_stock = new Tribe__Tickets__Global_Stock( $event_id );
+
+				// If global stock is not available for event, then skip.
+				if ( ! $global_stock->is_enabled() ) {
+					continue;
+				}
+
+				$events[ $event_id ]['count'] = 1;
+				$events[ $event_id ]['stock'] = $global_stock;
+			}
+		}
+
+		// Update global stock for each event.
+		foreach ( $events as $event_id => $event ) {
+
+			$stock     = $event['stock'];
+			$level     = $stock->get_stock_level();
+			$new_level = (int) $level + (int) $event['count'];
+
+			$stock->set_stock_level( $new_level );
+		}
+	}
 }

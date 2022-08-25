@@ -2,7 +2,6 @@
 /**
  * WC_PB_PIP_Compatibility class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    4.14.3
  */
@@ -313,8 +312,6 @@ class WC_PB_PIP_Compatibility {
 		if ( wc_pb_is_bundled_order_item( $order_item, $order ) ) {
 
 			if ( $overridden_title = $order_item->get_meta( '_bundled_item_title', true ) ) {
-
-				$product_name = $overridden_title;
 
 				if ( $is_visible ) {
 					$product_name = sprintf( '<a href="%1$s" target="_blank">%2$s</a>', get_permalink( $product->get_id() ), $product_name );

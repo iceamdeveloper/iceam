@@ -22,7 +22,7 @@ class Aelia_WC_CS_Dynamic_Pricing_RequirementsChecks extends Aelia_WC_Requiremen
 			'url' => 'http://bit.ly/WC_AFC_S3',
 		),
 		'Aelia Currency Switcher for WooCommerce' => array(
-			'version' => '4.4.6.170120',
+			'version' => '4.11.0.210517',
 			'extra_info' => 'You can buy the plugin <a href="https://aelia.co/shop/currency-switcher-woocommerce/">from our shop</a>.',
 		),
 		'WooCommerce Dynamic Pricing' => array(

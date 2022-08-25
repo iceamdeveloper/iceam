@@ -2,7 +2,6 @@
 /**
  * WC_PB_Product_Prices class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Price functions and hooks.
  *
  * @class    WC_PB_Product_Prices
- * @version  6.7.7
+ * @version  6.13.2
  */
 class WC_PB_Product_Prices {
 
@@ -56,13 +55,13 @@ class WC_PB_Product_Prices {
 		// Always-on price filters used in cart context.
 		if ( 'filters' === self::get_bundled_cart_item_discount_method() ) {
 
-			add_filter( 'woocommerce_product_get_price', array( __CLASS__, 'filter_get_price_cart' ), 99, 2 );
-			add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'filter_get_sale_price_cart' ), 99, 2 );
-			add_filter( 'woocommerce_product_get_regular_price', array( __CLASS__, 'filter_get_regular_price_cart' ), 99, 2 );
+			add_filter( 'woocommerce_product_get_price', array( __CLASS__, 'filter_get_price_cart' ), 98, 2 );
+			add_filter( 'woocommerce_product_get_sale_price', array( __CLASS__, 'filter_get_sale_price_cart' ), 98, 2 );
+			add_filter( 'woocommerce_product_get_regular_price', array( __CLASS__, 'filter_get_regular_price_cart' ), 98, 2 );
 
-			add_filter( 'woocommerce_product_variation_get_price', array( __CLASS__, 'filter_get_price_cart' ), 99, 2 );
-			add_filter( 'woocommerce_product_variation_get_sale_price', array( __CLASS__, 'filter_get_sale_price_cart' ), 99, 2 );
-			add_filter( 'woocommerce_product_variation_get_regular_price', array( __CLASS__, 'filter_get_regular_price_cart' ), 99, 2 );
+			add_filter( 'woocommerce_product_variation_get_price', array( __CLASS__, 'filter_get_price_cart' ), 98, 2 );
+			add_filter( 'woocommerce_product_variation_get_sale_price', array( __CLASS__, 'filter_get_sale_price_cart' ), 98, 2 );
+			add_filter( 'woocommerce_product_variation_get_regular_price', array( __CLASS__, 'filter_get_regular_price_cart' ), 98, 2 );
 		}
 	}
 
@@ -83,11 +82,45 @@ class WC_PB_Product_Prices {
 	 */
 	public static function is_bundled_pricing_context( $product, $context = 'any' ) {
 
+		$is_bundled_pricing_context = false;
+
 		if ( in_array( $context, array( 'any', 'catalog' ) ) ) {
-			return self::$bundled_item && in_array( self::$bundled_item->get_product_id(), array( $product->get_id(), $product->get_parent_id() ) );
-		} elseif ( in_array( $context, array( 'any', 'cart' ) ) ) {
-			return isset( $product->bundled_cart_item );
+			$is_bundled_pricing_context =  self::$bundled_item && in_array( self::$bundled_item->get_product_id(), array( $product->get_id(), $product->get_parent_id() ) );
 		}
+
+		if ( 'cart' === $context || ( ! $is_bundled_pricing_context && 'any' === $context) ){
+			$is_bundled_pricing_context =  isset( $product->bundled_cart_item );
+		}
+
+		return $is_bundled_pricing_context;
+	}
+
+	/**
+	 * A non-strict way to get the bundled_item, depending on if a product's prices are being altered due to the presence of a parent "bundle".
+	 *
+	 * @since  6.12.0
+	 *
+	 * @param  WC_Product  $product
+	 * @param  string      $context
+	 * @return WC_Bundled_Item|boolean
+	 */
+	public static function get_filtered_bundled_item( $product, $context = 'any' ) {
+
+		$bundled_item = false;
+
+		if ( in_array( $context, array( 'any', 'catalog' ), true ) ) {
+			if ( self::$bundled_item && in_array( self::$bundled_item->get_product_id(), array( $product->get_id(), $product->get_parent_id() ) ) ) {
+				$bundled_item = self::$bundled_item;
+			}
+		}
+
+		if ( 'cart' === $context || ( ! $bundled_item && 'any' === $context ) ) {
+			if ( isset( $product->bundled_cart_item ) ) {
+				$bundled_item = $product->bundled_cart_item;
+			}
+		}
+
+		return $bundled_item;
 	}
 
 	/**
@@ -290,6 +323,8 @@ class WC_PB_Product_Prices {
 			add_filter( 'woocommerce_show_variation_price', array( __CLASS__, 'filter_show_variation_price' ), 10, 3 );
 			add_filter( 'woocommerce_get_variation_prices_hash', array( __CLASS__, 'filter_variation_prices_hash' ), 10, 2 );
 
+			add_filter( 'woocommerce_product_is_on_sale', array( __CLASS__, 'filter_is_on_sale' ), 99, 2 );
+
 			/**
 			 * 'woocommerce_bundled_product_price_filters_added' hook.
 			 *
@@ -326,6 +361,8 @@ class WC_PB_Product_Prices {
 			remove_filter( 'woocommerce_show_variation_price', array( __CLASS__, 'filter_show_variation_price' ), 10, 3 );
 			remove_filter( 'woocommerce_get_variation_prices_hash', array( __CLASS__, 'filter_variation_prices_hash' ), 10, 2 );
 
+			remove_filter( 'woocommerce_product_is_on_sale', array( __CLASS__, 'filter_is_on_sale' ), 99, 2 );
+
 			/**
 			 * 'woocommerce_bundled_product_price_filters_removed' hook.
 			 *
@@ -350,7 +387,7 @@ class WC_PB_Product_Prices {
 	 */
 	public static function filter_variation_prices_hash( $hash, $product ) {
 
-		$bundled_item = self::$bundled_item;
+		$bundled_item = self::get_filtered_bundled_item( $product );
 
 		if ( $bundled_item ) {
 
@@ -374,7 +411,7 @@ class WC_PB_Product_Prices {
 	 */
 	public static function filter_children( $children, $product ) {
 
-		$bundled_item = self::$bundled_item;
+		$bundled_item = self::get_filtered_bundled_item( $product );
 
 		if ( $bundled_item ) {
 
@@ -405,7 +442,7 @@ class WC_PB_Product_Prices {
 	 */
 	public static function filter_get_variation_prices( $prices_array, $product ) {
 
-		$bundled_item = self::$bundled_item;
+		$bundled_item = self::get_filtered_bundled_item( $product );
 
 		if ( $bundled_item ) {
 
@@ -475,7 +512,7 @@ class WC_PB_Product_Prices {
 	 */
 	public static function filter_show_variation_price( $show, $product, $variation ) {
 
-		$bundled_item = self::$bundled_item;
+		$bundled_item = self::get_filtered_bundled_item( $variation );
 
 		if ( $bundled_item ) {
 
@@ -502,15 +539,9 @@ class WC_PB_Product_Prices {
 	 * @param  string      $context
 	 * @return double
 	 */
-	public static function filter_get_price( $price, $product, $context = '' ) {
+	public static function filter_get_price( $price, $product, $context = 'any' ) {
 
-		$bundled_item = false;
-
-		if ( self::$bundled_item ) {
-			$bundled_item = self::$bundled_item;
-		} elseif ( isset( $product->bundled_cart_item ) ) {
-			$bundled_item = $product->bundled_cart_item;
-		}
+		$bundled_item = self::get_filtered_bundled_item( $product, $context );
 
 		if ( $bundled_item && ( $bundled_item instanceof WC_Bundled_Item ) ) {
 
@@ -567,17 +598,12 @@ class WC_PB_Product_Prices {
 	 *
 	 * @param  double      $price
 	 * @param  WC_Product  $product
+	 * @param  string      $context
 	 * @return double
 	 */
-	public static function filter_get_regular_price( $regular_price, $product ) {
+	public static function filter_get_regular_price( $regular_price, $product, $context = 'any' ) {
 
-		$bundled_item = false;
-
-		if ( self::$bundled_item ) {
-			$bundled_item = self::$bundled_item;
-		} elseif ( isset( $product->bundled_cart_item ) ) {
-			$bundled_item = $product->bundled_cart_item;
-		}
+		$bundled_item = self::get_filtered_bundled_item( $product, $context );
 
 		if ( $bundled_item && ( $bundled_item instanceof WC_Bundled_Item ) ) {
 
@@ -597,15 +623,9 @@ class WC_PB_Product_Prices {
 	 * @param  string      $context
 	 * @return double
 	 */
-	public static function filter_get_sale_price( $sale_price, $product, $context = '' ) {
+	public static function filter_get_sale_price( $sale_price, $product, $context = 'any' ) {
 
-		$bundled_item = false;
-
-		if ( self::$bundled_item ) {
-			$bundled_item = self::$bundled_item;
-		} elseif ( isset( $product->bundled_cart_item ) ) {
-			$bundled_item = $product->bundled_cart_item;
-		}
+		$bundled_item = self::get_filtered_bundled_item( $product, $context );
 
 		if ( $bundled_item && ( $bundled_item instanceof WC_Bundled_Item ) ) {
 
@@ -719,7 +739,7 @@ class WC_PB_Product_Prices {
 			return $price_html;
 		}
 
-		$bundled_item = self::$bundled_item;
+		$bundled_item = self::get_filtered_bundled_item( $product );
 
 		if ( $bundled_item ) {
 
@@ -745,6 +765,32 @@ class WC_PB_Product_Prices {
 		}
 
 		return $price_html;
+	}
+
+	/**
+	 * Filter WC_Product::is_on_sale() calls.
+	 *
+	 * @since  6.12.0
+	 *
+	 * @param  bool        $is_on_sale
+	 * @param  WC_Product  $product
+	 * @return bool
+	 */
+	public static function filter_is_on_sale( $is_on_sale, $product ) {
+
+		$bundled_item = self::get_filtered_bundled_item( $product );
+
+		if ( $bundled_item ) {
+
+			if ( ! $bundled_item->is_priced_individually() ) {
+				return $is_on_sale;
+			}
+
+			if ( ! empty( $bundled_item->get_discount() ) ) {
+				$is_on_sale = true;
+			}
+		}
+		return $is_on_sale;
 	}
 
 	/*

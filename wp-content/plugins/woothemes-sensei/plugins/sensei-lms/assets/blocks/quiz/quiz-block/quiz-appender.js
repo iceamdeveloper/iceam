@@ -2,18 +2,17 @@
  * WordPress dependencies
  */
 import { createBlock } from '@wordpress/blocks';
-import { DropdownMenu } from '@wordpress/components';
 import { useDispatch } from '@wordpress/data';
 import { __ } from '@wordpress/i18n';
-import { plus } from '@wordpress/icons';
 
 /**
  * Internal dependencies
  */
-import quizIcon from '../../../icons/quiz-icon';
+import QuizIcon from '../../../icons/quiz.svg';
 import questionBlock from '../question-block';
 import categoryQuestionBlock from '../category-question-block';
 import { useNextQuestionIndex } from './next-question-index';
+import TextAppender from '../../../shared/components/text-appender';
 
 /**
  * Quiz block inserter for adding new or existing questions.
@@ -43,36 +42,19 @@ const QuizAppender = ( { clientId, openModal } ) => {
 		},
 		{
 			title: __( 'Category Question(s)', 'sensei-lms' ),
-			icon: quizIcon,
+			icon: QuizIcon,
 			onClick: () => addNewQuestionBlock( categoryQuestionBlock ),
 		},
 		{
 			title: __( 'Existing Question(s)', 'sensei-lms' ),
-			icon: quizIcon,
+			icon: QuizIcon,
 			onClick: openModal,
 		},
 	];
 
-	return (
-		<div className="sensei-lms-quiz-block__appender block-editor-default-block-appender">
-			<DropdownMenu
-				icon={ plus }
-				toggleProps={ {
-					className: 'block-editor-inserter__toggle',
-					onMouseDown: ( event ) => event.preventDefault(),
-				} }
-				label={ __( 'Add Block', 'sensei-lms' ) }
-				controls={ controls }
-			/>
-			<p
-				className="sensei-lms-quiz-block__appender__placeholder"
-				data-placeholder={ __(
-					'Add new or existing question(s)',
-					'sensei-lms'
-				) }
-			/>
-		</div>
-	);
+	const text = __( 'Add new or existing question(s)', 'sensei-lms' );
+
+	return <TextAppender controls={ controls } text={ text } label={ text } />;
 };
 
 export default QuizAppender;

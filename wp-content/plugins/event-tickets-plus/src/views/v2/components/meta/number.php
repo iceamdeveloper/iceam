@@ -10,8 +10,9 @@
  * @since 5.0.0
  * @since 5.1.0 Support the min/max/step extra arguments to manually set HTML attributes and added support for div HTML attributes.
  * @since 5.1.1 Added support for placeholders.
+ * @since 5.2.9 Added support for description.
  *
- * @version 5.1.1
+ * @version 5.2.9
  *
  * @var string $field_name The meta field name.
  * @var string $field_id The meta field id.
@@ -24,6 +25,7 @@
  * @var Tribe__Tickets__Ticket_Object $ticket The ticket object.
  * @var Tribe__Tickets_Plus__Meta__Field__Number $field The field object.
  * @var string $value The current field value.
+ * @var string $description A user-defined description for meta field.
  *
  * @see Tribe__Tickets_Plus__Meta__Field__Number
  */
@@ -60,5 +62,10 @@ $step = isset( $field->extra['step'] ) && '' !== $field->extra['step'] ? $field-
 			<?php tribe_required( $required ); ?>
 			<?php tribe_disabled( $disabled ); ?>
 		/>
+		<?php if ( ! empty( $description ) ) : ?>
+			<div class="tribe-common-b3 tribe-tickets__form-field-description">
+				<?php echo wp_kses_post( $description ); ?>
+			</div>
+		<?php endif; ?>
 	</div>
 </div>

@@ -117,14 +117,16 @@ class Sensei_REST_API_Lessons_Controller extends WP_REST_Posts_Controller {
 	 * @return array Modified data object with additional fields.
 	 */
 	protected function add_additional_fields_to_object( $prepared, $request ) {
-		if ( ! Sensei()->quiz->is_block_based_editor_enabled() ) {
+		global $pagenow;
+
+		if ( ! Sensei()->quiz->is_block_based_editor_enabled() || 'post-new.php' === $pagenow ) {
 			return $prepared;
 		}
 
 		$context = ! empty( $request['context'] ) ? $request['context'] : 'view';
 		if ( 'edit' === $context && isset( $prepared['content']['raw'] ) ) {
 			$post = get_post();
-			if ( Sensei()->lesson::lesson_quiz_has_questions( $post->ID ) && ! has_block( 'sensei-lms/quiz' ) ) {
+			if ( ! has_block( 'sensei-lms/quiz' ) ) {
 				$prepared['content']['raw'] .= serialize_block(
 					[
 						'blockName'    => 'sensei-lms/quiz',

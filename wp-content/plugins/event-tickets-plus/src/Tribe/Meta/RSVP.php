@@ -11,8 +11,8 @@ class Tribe__Tickets_Plus__Meta__RSVP {
 	 * @since 4.7
 	 */
 	public function hook() {
-		add_action( 'wp_loaded', [ $this, 'process_front_end_tickets_form' ], 50 );
-		add_action( 'event_tickets_rsvp_ticket_created', [ $this, 'save_attendee_meta_to_ticket' ], 10, 4 );
+		add_action( 'event_tickets_rsvp_ticket_created', [ $this, 'process_front_end_tickets_form' ], 10, 4 );
+		add_action( 'event_tickets_rsvp_ticket_created', [ $this, 'save_attendee_meta_to_ticket' ], 20, 4 );
 		add_action( 'event_tickets_rsvp_tickets_generated_for_product', [ $this, 'clear_meta_for_ticket' ] );
 		add_action( 'event_tickets_rsvp_after_ticket_row', [ $this, 'front_end_meta_fields' ], 10, 2 );
 		add_action( 'tribe_template_entry_point:tickets/v2/rsvp/ari/form/fields/meta:rsvp_attendee_fields', [ $this, 'rsvp_attendee_fields' ], 10, 3 );
@@ -93,7 +93,7 @@ class Tribe__Tickets_Plus__Meta__RSVP {
 	 * Processes the front-end tickets form data.
 	 */
 	public function process_front_end_tickets_form() {
-		$storage = new Tribe__Tickets_Plus__Meta__Storage();
+		$storage = tribe( 'tickets-plus.meta.storage' );
 		$storage->maybe_set_attendee_meta_cookie();
 	}
 

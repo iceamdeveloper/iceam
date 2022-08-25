@@ -275,6 +275,101 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		add_filter( 'tribe_tickets_cart_urls', [ $this, 'add_cart_url' ] );
 		add_filter( 'tribe_tickets_checkout_urls', [ $this, 'add_checkout_url' ] );
+		add_action( 'tribe_tickets_ticket_moved', [ $this, 'create_order_for_moved_ticket' ], 10, 6 );
+	}
+
+	/**
+	 * Create a duplicate order with the attendee data to show order report.
+	 *
+	 * @since 5.4.1
+	 *
+	 * @param int $attendee_id              the ticket which has been moved.
+	 * @param int $src_ticket_type_id       the ticket type it belonged to originally.
+	 * @param int $tgt_ticket_type_id       the ticket type it now belongs to.
+	 * @param int $src_event_id             the event/post which the ticket originally belonged to.
+	 * @param int $tgt_event_id             the event/post which the ticket now belongs to.
+	 * @param int $instigator_id            the user who initiated the change.
+	 */
+	public function create_order_for_moved_ticket( $attendee_id, $src_ticket_type_id, $tgt_ticket_type_id, $src_event_id, $tgt_event_id, $instigator_id ) {
+
+		$from_product = edd_get_download( $src_ticket_type_id );
+		$to_product   = edd_get_download( $tgt_ticket_type_id );
+
+		if ( ! $from_product || ! $to_product ) {
+			return;
+		}
+
+		$attendee = $this->get_attendee( $attendee_id );
+
+		$order_id = Tribe__Utils__Array::get( $attendee, 'order_id' );
+		$order    = edd_get_payment( $order_id );
+
+		if ( ! $order ) {
+			return;
+		}
+
+		$order_data = $order->get_meta();
+		$payment_data = [
+				'price'        => 0,
+				'user_email'   => $order_data['email'],
+				'purchase_key' => uniqid( 'edd-ticket-', true ),
+				'currency'     => $order_data['currency'],
+				'downloads'    => [
+						[
+								'id'       => $tgt_ticket_type_id,
+								'quantity' => 1,
+						],
+				],
+				'user_info'    => $order_data['user_info'],
+				'cart_details' => [
+						[
+								'id'         => $tgt_ticket_type_id,
+								'quantity'   => 1,
+								'price_id'   => null,
+								'tax'        => 0,
+								'item_price' => 0,
+								'fees'       => [],
+								'discount'   => 0,
+						],
+				],
+				'status'       => empty( $overrides['status'] ) ? 'publish' : $overrides['status'],
+		];
+
+		// Create duplicate order.
+		$new_order = edd_insert_payment( $payment_data );
+
+		// Add order meta.
+		update_post_meta( $new_order, $this->order_has_tickets, true );
+
+		$old_meta = get_post_meta( $new_order, Tribe__Tickets_Plus__Meta::META_KEY );
+		update_post_meta( $new_order, Tribe__Tickets_Plus__Meta::META_KEY, $old_meta );
+
+		// Add note for new order.
+		$note = sprintf(
+		// Translators: %1$s: The Attendee Name. %2$s: Parent order edit URL. %3$s: Parent order ID.
+				__( '<b> Attendee Moved : </b> <br> <i>%s</i> was moved into this order from <a href="%s">Order %s</a>', 'event-tickets-plus' ),
+				$attendee['holder_name'],
+				admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $order_id ),
+				$order_id
+		);
+
+		edd_insert_payment_note( $new_order, $note );
+
+		// Add note for old order.
+		$note = sprintf(
+		// Translators: %1$s: The Attendee Name. %2$s: Copied order edit URL. %3$s: Copied order ID.
+				__( '<b> Attendee Moved : </b> <br> <i>%s</i> is moved from this order to <a href="%s">Order %s</a>',  'event-tickets-plus' ),
+				$attendee['holder_name'],
+				admin_url( 'edit.php?post_type=download&page=edd-payment-history&view=view-order-details&id=' . $new_order ),
+				$new_order
+		);
+
+		edd_insert_payment_note( $order_id, $note );
+
+		/** @var Tribe__Tickets__Tickets_Handler $handler */
+		$handler = tribe( 'tickets.handler' );
+		$handler->sync_shared_capacity( $src_event_id, tribe_tickets_get_capacity( $src_event_id ) );
+		$handler->sync_shared_capacity( $tgt_event_id, tribe_tickets_get_capacity( $tgt_event_id ) );
 	}
 
 	/**
@@ -1037,6 +1132,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			return false;
 		}
 
+		// Run anything we might need on parent method.
+		parent::delete_ticket( $post_id, $ticket_id );
+
 		Tribe__Tickets__Attendance::instance( $post_id )->increment_deleted_attendees_count();
 
 		$this->clear_attendees_cache( $post_id );
@@ -1174,7 +1272,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$cart_has_meta   = Tribe__Tickets_Plus__Main::instance()->meta()->cart_has_meta( $tickets_in_cart );
 
 		if ( $tickets_in_cart && $cart_has_meta ) {
-			$url = add_query_arg( 'provider', $this->attendee_object, tribe( 'tickets.attendee_registration' )->get_url() );
+			$url = add_query_arg( tribe_tickets_get_provider_query_slug(), $this->attendee_object, tribe( 'tickets.attendee_registration' )->get_url() );
 			wp_safe_redirect( $url );
 			tribe_exit();
 		}
@@ -1744,8 +1842,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		 *
 		 * @param int Post ID
 		 * @param string the provider class name
+		 * @param int $ticket_id The ticket ID.
 		 */
-		do_action( 'tribe_events_tickets_metabox_edit_ajax_advanced', $post_id, $provider );
+		do_action( 'tribe_events_tickets_metabox_edit_ajax_advanced', $post_id, $provider, $ticket_id );
 
 		echo '</div>';
 	}
@@ -2400,16 +2499,18 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$individual_attendee_email = apply_filters( 'tribe_tickets_attendee_create_individual_email', $email, $i, $order_id, $product_id, $post_id, $this );
 
 			$attendee_data = [
-				'title'          => $order_id . ' | ' . $individual_attendee_name . ' | ' . ( $i + 1 ),
-				'full_name'      => $individual_attendee_name,
-				'email'          => $individual_attendee_email,
-				'ticket_id'      => $product_id,
-				'order_id'       => $order_id,
-				'post_id'        => $post_id,
-				'optout'         => $optout,
-				'price_paid'     => $this->get_price_value( $product_id ),
-				'price_currency' => $currency_symbol,
-				'user_id'        => $user_id,
+				'title'					=> $order_id . ' | ' . $individual_attendee_name . ' | ' . ( $i + 1 ),
+				'full_name'				=> $individual_attendee_name,
+				'email'					=> $individual_attendee_email,
+				'ticket_id'				=> $product_id,
+				'order_id'				=> $order_id,
+				// Order of submitted attendees, used for meta data.
+				'order_attendee_id'		=> $i,
+				'post_id'				=> $post_id,
+				'optout'					=> $optout,
+				'price_paid'				=> $this->get_price_value( $product_id ),
+				'price_currency'			=> $currency_symbol,
+				'user_id'				=> $user_id,
 			];
 
 			$this->create_attendee( $ticket, $attendee_data );
@@ -2521,10 +2622,40 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		echo sprintf(
 			'<a class="tribe-checkout-backlink" href="%1$s">%2$s</a>',
-			esc_url( add_query_arg( 'provider', $commerce_edd->attendee_object, $attendee_registration->get_url() ) ),
+			esc_url( add_query_arg( tribe_tickets_get_provider_query_slug(), $commerce_edd->attendee_object, $attendee_registration->get_url() ) ),
 			esc_html__( 'Edit attendee info', 'event-tickets-plus' )
 		);
 
 		echo '</div>';
+	}
+
+	/**
+	 * Handles if email sending is allowed.
+	 *
+	 * @since 5.3.1
+	 *
+	 * @param WP_Post|null $ticket                The ticket post object if available, otherwise null.
+	 * @param array|null   $attendee              The attendee information if available, otherwise null.
+	 *
+	 * @return boolean
+	 */
+	public function allow_resending_email( $ticket = null, $attendee = null ) {
+		// Check for cancelled or refunded orders. Cancelled orders for EDD are false.
+		$allow_email_resend = ! ( empty( $attendee['order_status'] ) || 'Refunded' === $attendee['order_status'] );
+
+		/**
+		 *
+		 * Shared filter between Woo, EDD, and the default logic.
+		 * This filter allows the admin to control the re-send email option when an attendee's email is updated per a payment type (EDD, Woo, etc).
+		 * True means allow email resend, false means disallow email resend.
+		 *
+		 * @since 5.3.1
+		 *
+		 * @param bool         						  Whether to allow email resending.
+		 * @param WP_Post|null $ticket                The ticket post object if available, otherwise null.
+		 * @param array|null   $attendee              The attendee information if available, otherwise null.
+		 */
+		return (bool) apply_filters( 'tribe_tickets_manual_attendee_allow_email_resend', $allow_email_resend, $ticket, $attendee );
+
 	}
 }

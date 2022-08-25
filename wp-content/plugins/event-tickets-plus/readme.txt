@@ -1,11 +1,11 @@
 === Event Tickets Plus ===
 
-Contributors: theeventscalendar, brianjessee, camwynsp, paulkim, sc0ttkclark, aguseo, bordoni, borkweb, GeoffBel, geoffgraham, jentheo, leahkoerper, lucatume, neillmcshea, patriciahillebrandt, tribecari, vicskf, zbtirrell, juanfra
+Contributors: theeventscalendar, brianjessee, camwynsp, aguseo, bordoni, borkweb, GeoffBel, jentheo, leahkoerper, lucatume, neillmcshea, tribecari, vicskf, zbtirrell, juanfra, moraleida.me
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
-Requires at least: 4.9.14
-Tested up to: 5.7.1
-Stable tag: 5.2.4
-Requires PHP: 5.6
+Requires at least: 5.6
+Tested up to: 6.0
+Stable tag: 5.5.1
+Requires PHP: 7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,135 @@ Our Premium Plugins:
 * <a href="https://evnt.is/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [5.5.1] 2022-06-08 =
+
+* Enhancement - Attendee Registration settings moved to a separate tab. [ETP-797]
+* Fix - Fixed wrong text domains in few places. [ETP-795]
+
+= [5.5.0] 2022-05-19 =
+
+* Version - Event Tickets Plus 5.5.0 is only compatible with Event Tickets 5.4.0 and higher
+* Feature - Adding compatibility for the new Tickets menu on the WordPress admin. [ET-1335]
+* Language - 0 new strings added, 12 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.4.4.1] 2022-05-12 =
+
+* Fix - Ensure that Event Tickets Plus customers never encounter application fees on Stripe for Tickets Commerce purchases. [ET-1513]
+
+= [5.4.4] 2022-05-11 =
+
+* Fix - In some cases, enabling Object Cache was not saving Attendee Registration data properly. [ETP-796]
+* Fix - Fixed missing target and rel attribute for admin view links. [ETP-792]
+* Enhancement - Added icon and styling to field info in the classic editor's ticket list. [ET-1494]
+* Feature - Added Elementor widgets for Event Tickets and RSVP. [ETP-731]
+* Tweak - Added filters: `tribe_event_tickets_plus_elementor_registered_{$this->type}`.
+* Language - 11 new strings added, 15 updated, 0 fuzzied, and 0 obsoleted.
+
+= [5.4.3] 2022-04-28 =
+
+* Fix - Resolve issue where a valid license key was sometimes identified as invalid when transients were cleared. [ET-1498]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted.
+
+= [5.4.2] 2022-04-05 =
+
+* Enhancement - Hide 'View My Tickets' link when showing tickets within the `[tribe_tickets]` shortcode. [ETP-775]
+* Enhancement - Add `tec_tickets_hide_view_my_tickets_link` filter to override the hiding of the 'View My Tickets' link. [ETP-775]
+* Fix - Avoid saving `,` as decimal separator for WooCommerce Ticket prices on some currency configurations. [ETP-782]
+* Fix - Fixed Attendee Registration page not working with WooCommerce 6.3.0. [ETP-785]
+* Fix - Show the modify attendee link text properly depending on the count of attendees with Attendee Registration fields. [ETP-768]
+* Tweak - Added filters: `tec_tickets_hide_view_my_tickets_link`
+* Tweak - Changed views: `v2/attendee-registration/content/event`, `v2/commerce/checkout/header/links/modify-attendees`
+* Language - 2 new strings added, 20 updated, 1 fuzzied, and 0 obsoleted
+
+= [5.4.1] 2022-03-15 =
+
+* Fix - Fixed an issue when viewing attendees using Community Event Tickets and Tickets Commerce. [CT-52]
+* Fix - Fixed shared capacity calculation while moving Easy Digital Download attendees from shared capacity tickets. [ETP-284]
+* Language - 0 new strings added, 12 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.4.0] 2022-02-24 =
+
+* Version - Event Tickets Plus 5.4.0 is only compatible with Event Tickets 5.3.0 and higher
+* Feature - Introduction of premium features for Stripe for Tickets Commerce. [ET-1342]
+* Language - 16 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.3.3] 2022-01-19 =
+
+* Fix - Fixed shared capacity calculation while moving WooCommerce attendees from shared capacity tickets. [ETP-283]
+* Fix - Removed ajax caching from the Attendee Registration page. [GTRIA-626]
+* Language - 2 new strings added, 19 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.3.2] 2021-12-15 =
+
+* Feature - Added a way to remove specific attendees from the Attendee Registration Modal prior to checking out. [ETP-143]
+* Enhancement - Added a `ticket_id` parameter to filter a specific ticket or tickets within the RSVP and Tickets shortcodes. [ETP-763]
+* Fix - Fixed the `Add Attendee` modal from generating a 500 error when two or more tickets have been enabled for an event. [ETP-764]
+* Language - 1 new strings added, 2 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.3.1] 2021-11.17 =
+
+* Enhancement - Added filter `tribe_tickets_manual_attendee_allow_email_resend` to allow customization of email resending via Manual Attendees depending on status. [ETP-703]
+* Fix - When an Attendee has cancelled or refunded a ticket resending the email is now disabled. [ETP-703]
+* Fix - Fixed Attendee Registration meta data when using EDD and having multiple attendees. [ETP-755]
+* Fix - Totals on attendee registration page fixed when period is used as the thousand separator. [ETP-757]
+* Language - 0 new strings added, 5 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.3.0] 2021-11-04 =
+
+* Feature - Introduction of Tickets Commerce, the new and improved solution you can set up to sell tickets with Event Tickets.
+* Language - 2 new strings added, 30 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.2.10] 2021-09-28 =
+
+* Tweak - Changed the `provider` URL variable name to `tickets_provider`. The filter `tribe_tickets_get_provider_query_slug` allows for customization. [ET-543]
+* Tweak - Added the `isValidForm.eventTicketsModal` JS event to allow for third party plugins to provide their own validation logic. [ETP-752]
+* Fix - Removed the ability to resend tickets from the Attendees page to Attendees who cancelled or refunded their ticket. [ETP-703]
+* Fix - Fix the inconsistent vertical spacing between attendee registration fields in admin view. [ETP-748]
+* Language - 0 new strings added, 23 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.2.9] 2021-08-31 =
+
+* Fix - Fixed cart calculation inconsistency with WooCommerce when the "Number of decimals" setting was set to `0`. [ETP-324]
+* Enhancement - Added description field support for Attendee Registration Fields. [ETP-712]
+* Enhancement - Updated layout and content for attendee registration fields. [ETP-741]
+* Tweak - Added the ability to hide attendee data from public view via the AR Modal. [ETP-127]
+* Language - 5 new strings added, 14 updated, 0 fuzzied, and 2 obsoleted
+
+= [5.2.8] 2021-08-03 =
+
+* Feature - Added filter `tribe_tickets_plus_woo_meta_data_enabled` to toggle additional fields in WooCommerce. [ETP-737]
+* Feature - Added filter `tribe_tickets_plus_woo_meta_data_filter` to filter additional fields in WooCommerce. [ETP-737]
+* Tweak - Updated WooCommerce to use `wc_get_order` instead of `new WC_Order`. [ETP-141]
+* Fix - Fix the validation for the text and telephone "Attendee Registration Fields" so that it doesn't take empty spaces as valid when the field is required. [ETP-733]
+* Language - 0 new strings added, 31 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.2.7.1] 2021-07-20 =
+
+* Fix - Conflict with WooCommerce Analytics. Ensure admin JS is enqueued only on relevant pages in the dashboard. [ETP-736]
+
+= [5.2.7] 2021-07-07 =
+
+* Tweak - Added `$ticket_id` parameter to the `tribe_events_tickets_metabox_edit_ajax_advanced` filter. [ETP-111]
+* Feature - Allow regeneration of attendees for WooCommerce orders. [ETP-707]
+* Feature - Enhanced WooCommerce templates for showing ticket and attendee data in Order details pages and emails. [ETP-724]
+* Language - 10 new strings added, 25 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.2.6] 2021-06-23 =
+
+* Tweak - Ensure admin JS is only enqueued on relevant pages in the dashboard. [TEC-3904]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.2.5] 2021-06-09 =
+
+* Feature - Add a new Resend-tickets action link for attendees within the admin attendee list view. [ETP-704]
+* Fix - Fixed shared capacity stock sync after attendee deletion, for WooCommerce tickets. [ETP-651]
+* Fix - Fixed shared capacity stock sync after attendee deletion, for Easy Digital Downloads tickets. [ETP-285]
+* Fix - Fixed shared capacity stock not getting updated when any WooCommerce Order is cancelled. [ETP-664]
+* Fix - Allow admins to restock refunded order tickets manually. [ETP-475]
+* Fix - Problem with the "opt-out" being always on when using the Attendee Registration Modal. [ETP-727]
+* Tweak - Added singular and plural support for the Attendee Registration notice regarding tickets without Attendee Registration fields in cart. [ETP-657]
+* Language - 8 new strings added, 26 updated, 1 fuzzied, and 0 obsoleted
 
 = [5.2.4] 2021-05-12 =
 

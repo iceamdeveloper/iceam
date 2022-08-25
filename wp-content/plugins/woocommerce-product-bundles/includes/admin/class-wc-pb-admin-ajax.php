@@ -2,7 +2,6 @@
 /**
  * WC_PB_Admin_Ajax class
  *
- * @author   SomewhereWarm <info@somewherewarm.com>
  * @package  WooCommerce Product Bundles
  * @since    5.0.0
  */
@@ -16,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Admin AJAX meta-box handlers.
  *
  * @class    WC_PB_Admin_Ajax
- * @version  6.7.3
+ * @version  6.12.3
  */
 class WC_PB_Admin_Ajax {
 
@@ -454,201 +453,125 @@ class WC_PB_Admin_Ajax {
 				$bundled_items_to_remove = wc_pb_get_bundled_order_items( $item, $order );
 				$items_to_remove         = array( $item ) + $bundled_items_to_remove;
 
-				/*
-				 * Adjust stock.
-				 */
-				if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ) {
+				$changes_map = array();
+				$product_ids = array();
 
-					if ( $item_reduced_stock = $item->get_meta( '_reduced_stock', true ) ) {
-						$new_container_item->add_meta_data( '_reduced_stock', $item_reduced_stock, true );
-						$new_container_item->save();
+				foreach ( $bundled_items_to_remove as $bundled_item_to_remove ) {
+
+					$bundled_item_id = $bundled_item_to_remove->get_meta( '_bundled_item_id', true );
+					$product_id      = $bundled_item_to_remove->get_product_id();
+
+					if ( $variation_id = $bundled_item_to_remove->get_variation_id() ) {
+						$product_id = $variation_id;
 					}
 
-					$stock_map   = array();
-					$changes_map = array();
-					$product_ids = array();
+					$product_ids[ $bundled_item_id ] = $product_id;
 
-					foreach ( $bundled_items_to_remove as $bundled_item_to_remove ) {
+					// Store change to add in order note.
+					$changes_map[ $bundled_item_id ] = array(
+						'id'      => $product_id,
+						'actions' => array(
+							'remove' => array(
+								'title' => $bundled_item_to_remove->get_name(),
+								'sku'   => '#' . $product_id
+							)
+						)
+					);
+				}
 
-						$bundled_item_id = $bundled_item_to_remove->get_meta( '_bundled_item_id', true );
-						$product_id      = $bundled_item_to_remove->get_product_id();
+				$bundled_order_items = wc_pb_get_bundled_order_items( $new_container_item, $order );
 
-						if ( $variation_id = $bundled_item_to_remove->get_variation_id() ) {
-							$product_id = $variation_id;
+				foreach ( $bundled_order_items as $order_item_id => $order_item ) {
+
+					$bundled_item_id = $order_item->get_meta( '_bundled_item_id', true );
+					$product         = $order_item->get_product();
+					$product_id      = $product->get_id();
+					$action          = 'add';
+
+					$product_ids[ $bundled_item_id ] = $product_id;
+
+					// Store change to add in order note.
+					if ( isset( $changes_map[ $bundled_item_id ] ) ) {
+
+						// If the selection didn't change, log it as an adjustment.
+						if ( $product_id === $changes_map[ $bundled_item_id ][ 'id' ] ) {
+
+							$action = 'adjust';
+
+							$changes_map[ $bundled_item_id ][ 'actions' ] = array(
+								'adjust' => array(
+									'title' => $order_item->get_name(),
+									'sku'   => '#' . $product_id
+								)
+							);
+
+						// Otherwise, log another 'add' action.
+						} else {
+
+							$changes_map[ $bundled_item_id ][ 'actions' ][ 'add' ] = array(
+								'title' => $order_item->get_name(),
+								'sku'   => '#' . $product_id
+							);
 						}
 
-						$product_ids[ $bundled_item_id ] = $product_id;
+					// If we're seeing this bundled item for the first, time, log an 'add' action.
+					} else {
 
-						// Store change to add in order note.
 						$changes_map[ $bundled_item_id ] = array(
 							'id'      => $product_id,
 							'actions' => array(
-								'remove' => array(
-									'title' => $bundled_item_to_remove->get_name(),
+								'add' => array(
+									'title' => $order_item->get_name(),
 									'sku'   => '#' . $product_id
 								)
 							)
 						);
+					}
+				}
 
-						$changed_stock = wc_maybe_adjust_line_item_product_stock( $bundled_item_to_remove, 0 );
+				$duplicate_product_ids              = array_diff_assoc( $product_ids, array_unique( $product_ids ) );
+				$duplicate_product_bundled_item_ids = array_keys( array_intersect( $product_ids, $duplicate_product_ids ) );
 
-						if ( $changed_stock && ! is_wp_error( $changed_stock ) ) {
+				$change_strings = array(
+					'add'    => array(),
+					'remove' => array(),
+					'adjust' => array()
+				);
 
-							$product             = $bundled_item_to_remove->get_product();
-							$product_sku         = $product->get_sku();
-							$stock_managed_by_id = $product->get_stock_managed_by_id();
+				foreach ( $changes_map as $item_id => $item_changes ) {
 
-							if ( ! $product_sku ) {
-								$product_sku = '#' . $product->get_id();
-							}
+					$actions = array( 'add', 'remove', 'adjust' );
 
-							// Associate change with stock.
-							$changes_map[ $bundled_item_id ][ 'actions' ][ 'remove' ][ 'stock_managed_by_id' ] = $stock_managed_by_id;
-							$changes_map[ $bundled_item_id ][ 'actions' ][ 'remove' ][ 'sku' ]                 = $product_sku;
+					foreach ( $actions as $action ) {
 
-							if ( isset( $stock_map[ $stock_managed_by_id ] ) ) {
-								$stock_map[ $stock_managed_by_id ][ 'to' ] = $changed_stock[ 'to' ];
+						if ( isset( $item_changes[ 'actions' ][ $action ] ) ) {
+
+							if ( in_array( $item_id, $duplicate_product_bundled_item_ids ) ) {
+								/* translators: %1$s: SKU, %2$s: Bundled item ID */
+								$stock_id = sprintf( _x( '%1$s:%2$s', 'bundled items stock change note sku with id format', 'woocommerce-product-bundles' ), $item_changes[ 'actions' ][ $action ][ 'sku' ], $item_id );
 							} else {
-								$stock_map[ $stock_managed_by_id ] = array(
-									'from' => $changed_stock[ 'from' ],
-									'to'   => $changed_stock[ 'to' ]
-								);
+								$stock_id = $item_changes[ 'actions' ][ $action ][ 'sku' ];
 							}
+
+							/* translators: %1$s: Product title, %2$s: SKU */
+							$change_strings[ $action ][] = sprintf( _x( '%1$s (%2$s)', 'bundled items change note format', 'woocommerce-product-bundles' ), $item_changes[ 'actions' ][ $action ][ 'title' ], $stock_id );
 						}
 					}
+				}
 
-					$bundled_order_items = wc_pb_get_bundled_order_items( $new_container_item, $order );
-
-					foreach ( $bundled_order_items as $order_item_id => $order_item ) {
-
-						$bundled_item_id = $order_item->get_meta( '_bundled_item_id', true );
-						$product         = $order_item->get_product();
-						$product_id      = $product->get_id();
-						$action          = 'add';
-
-						$product_ids[ $bundled_item_id ] = $product_id;
-
-						// Store change to add in order note.
-						if ( isset( $changes_map[ $bundled_item_id ] ) ) {
-
-							// If the selection didn't change, log it as an adjustment.
-							if ( $product_id === $changes_map[ $bundled_item_id ][ 'id' ] ) {
-
-								$action = 'adjust';
-
-								$changes_map[ $bundled_item_id ][ 'actions' ] = array(
-									'adjust' => array(
-										'title' => $order_item->get_name(),
-										'sku'   => '#' . $product_id
-									)
-								);
-
-							// Otherwise, log another 'add' action.
-							} else {
-
-								$changes_map[ $bundled_item_id ][ 'actions' ][ 'add' ] = array(
-									'title' => $order_item->get_name(),
-									'sku'   => '#' . $product_id
-								);
-							}
-
-						// If we're seeing this bundled item for the first, time, log an 'add' action.
-						} else {
-
-							$changes_map[ $bundled_item_id ] = array(
-								'id'      => $product_id,
-								'actions' => array(
-									'add' => array(
-										'title' => $order_item->get_name(),
-										'sku'   => '#' . $product_id
-									)
-								)
-							);
-						}
-
-						if ( $product && $product->managing_stock() ) {
-
-							$product_sku         = $product->get_sku();
-							$stock_managed_by_id = $product->get_stock_managed_by_id();
-							$qty                 = $order_item->get_quantity();
-
-							if ( ! $product_sku ) {
-								$product_sku = '#' . $product->get_id();
-							}
-
-							// Associate change with stock.
-							$changes_map[ $bundled_item_id ][ 'actions' ][ $action ][ 'stock_managed_by_id' ] = $stock_managed_by_id;
-							$changes_map[ $bundled_item_id ][ 'actions' ][ $action ][ 'sku' ]                 = $product_sku;
-
-							$old_stock = $product->get_stock_quantity();
-							$new_stock = wc_update_product_stock( $product, $qty, 'decrease' );
-
-							if ( isset( $stock_map[ $stock_managed_by_id ] ) ) {
-								$stock_map[ $stock_managed_by_id ][ 'to' ] = $new_stock;
-							} else {
-								$stock_map[ $stock_managed_by_id ] = array(
-									'from'    => $old_stock,
-									'to'      => $new_stock
-								);
-							}
-
-							$order_item->add_meta_data( '_reduced_stock', $qty, true );
-							$order_item->save();
-						}
-					}
-
-					$duplicate_product_ids              = array_diff_assoc( $product_ids, array_unique( $product_ids ) );
-					$duplicate_product_bundled_item_ids = array_keys( array_intersect( $product_ids, $duplicate_product_ids ) );
-
-					$stock_strings = array(
-						'add'    => array(),
-						'remove' => array(),
-						'adjust' => array()
-					);
-
-					foreach ( $changes_map as $item_id => $item_changes ) {
-
-						$actions = array( 'add', 'remove', 'adjust' );
-
-						foreach ( $actions as $action ) {
-
-							if ( isset( $item_changes[ 'actions' ][ $action ] ) ) {
-
-								$stock_changes        = isset( $item_changes[ 'actions' ][ $action ][ 'stock_managed_by_id' ] ) && isset( $stock_map[ $item_changes[ 'actions' ][ $action ][ 'stock_managed_by_id' ] ] ) ? $stock_map[ $item_changes[ 'actions' ][ $action ][ 'stock_managed_by_id' ] ] : false;
-								$stock_from_to_string = $stock_changes && $stock_changes[ 'from' ] && $stock_changes[ 'from' ] !== $stock_changes[ 'to' ] ? ( $stock_changes[ 'from' ] . '&rarr;' . $stock_changes[ 'to' ] ) : '';
-
-								if ( in_array( $item_id, $duplicate_product_bundled_item_ids ) ) {
-									/* translators: %1$s: SKU, %2$s: Bundled item ID */
-									$stock_id = sprintf( _x( '%1$s:%2$s', 'bundled items stock change note sku with id format', 'woocommerce-product-bundles' ), $item_changes[ 'actions' ][ $action ][ 'sku' ], $item_id );
-								} else {
-									$stock_id = $item_changes[ 'actions' ][ $action ][ 'sku' ];
-								}
-
-								if ( $stock_from_to_string ) {
-									/* translators: %1$s: Product title, %2$s: SKU, %3$s: Stock modification */
-									$stock_strings[ $action ][] = sprintf( _x( '%1$s (%2$s) &ndash; %3$s', 'bundled items stock change note format', 'woocommerce-product-bundles' ), $item_changes[ 'actions' ][ $action ][ 'title' ], $stock_id, $stock_from_to_string );
-								} else {
-									/* translators: %1$s: Product title, %2$s: SKU */
-									$stock_strings[ $action ][] = sprintf( _x( '%1$s (%2$s)', 'bundled items change note format', 'woocommerce-product-bundles' ), $item_changes[ 'actions' ][ $action ][ 'title' ], $stock_id );
-								}
-							}
-						}
-					}
-
-					if ( ! empty( $stock_strings[ 'remove' ] ) ) {
-							/* translators: List of items */
-						$order->add_order_note( sprintf( __( 'Deleted bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $stock_strings[ 'remove' ] ) ), false, true );
-					}
-
-					if ( ! empty( $stock_strings[ 'add' ] ) ) {
+				if ( ! empty( $change_strings[ 'remove' ] ) ) {
 						/* translators: List of items */
-						$order->add_order_note( sprintf( __( 'Added bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $stock_strings[ 'add' ] ) ), false, true );
-					}
+					$order->add_order_note( sprintf( __( 'Deleted bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $change_strings[ 'remove' ] ) ), false, true );
+				}
 
-					if ( ! empty( $stock_strings[ 'adjust' ] ) ) {
-						/* translators: List of items */
-						$order->add_order_note( sprintf( __( 'Adjusted bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $stock_strings[ 'adjust' ] ) ), false, true );
-					}
+				if ( ! empty( $change_strings[ 'add' ] ) ) {
+					/* translators: List of items */
+					$order->add_order_note( sprintf( __( 'Added bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $change_strings[ 'add' ] ) ), false, true );
+				}
+
+				if ( ! empty( $change_strings[ 'adjust' ] ) ) {
+					/* translators: List of items */
+					$order->add_order_note( sprintf( __( 'Adjusted bundled line items: %s', 'woocommerce-product-bundles' ), implode( ', ', $change_strings[ 'adjust' ] ) ), false, true );
 				}
 
 				/*
@@ -684,24 +607,16 @@ class WC_PB_Admin_Ajax {
 		include ( WC_ABSPATH . 'includes/admin/meta-boxes/views/html-order-items.php' );
 		$html = ob_get_clean();
 
-		if ( WC_PB_Core_Compatibility::is_wc_version_gte( '3.6' ) ) {
+		ob_start();
+		$notes = wc_get_order_notes( array( 'order_id' => $order->get_id() ) );
+		include ( WC_ABSPATH . 'includes/admin/meta-boxes/views/html-order-notes.php' );
+		$notes_html = ob_get_clean();
 
-			ob_start();
-			$notes = wc_get_order_notes( array( 'order_id' => $order->get_id() ) );
-			include ( WC_ABSPATH . 'includes/admin/meta-boxes/views/html-order-notes.php' );
-			$notes_html = ob_get_clean();
-			$response = array(
-				'result'     => 'success',
-				'html'       => $html,
-				'notes_html' => $notes_html
-			);
-
-		} else {
-			$response = array(
-				'result'     => 'success',
-				'html'       => $html,
-			);
-		}
+		$response = array(
+			'result'     => 'success',
+			'html'       => $html,
+			'notes_html' => $notes_html
+		);
 
 		wp_send_json( $response );
 	}

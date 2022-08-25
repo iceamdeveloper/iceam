@@ -76,6 +76,7 @@ class Tribe__Events__Organizer extends Tribe__Events__Linked_Posts__Base {
 		$this->post_type_args['rewrite']['slug']   = $rewrite->prepare_slug( $this->singular_organizer_label, self::POSTTYPE, false );
 		$this->post_type_args['show_in_nav_menus'] = class_exists( 'Tribe__Events__Pro__Main' ) ? true : false;
 		$this->post_type_args['public']            = class_exists( 'Tribe__Events__Pro__Main' ) ? true : false;
+		$this->post_type_args['show_in_rest']      = class_exists( 'Tribe__Events__Pro__Main' ) && current_user_can( 'manage_options' );
 
 		/**
 		 * Provides an opportunity to modify the labels used for the organizer post type.
@@ -102,7 +103,7 @@ class Tribe__Events__Organizer extends Tribe__Events__Linked_Posts__Base {
 			'item_updated'             => sprintf( esc_html__( '%s updated.', 'the-events-calendar' ), $this->singular_organizer_label ),
 			'item_link'                => sprintf(
 				// Translators: %s: Organizer singular.
-				esc_html__( '%s Link.', 'the-events-calendar' ), $this->singular_organizer_label
+				esc_html__( '%s Link', 'the-events-calendar' ), $this->singular_organizer_label
 			),
 			'item_link_description'    => sprintf(
 				// Translators: %s: Organizer singular.
@@ -709,5 +710,25 @@ class Tribe__Events__Organizer extends Tribe__Events__Linked_Posts__Base {
 
 			return array_filter( $organizers );
 		};
+	}
+
+	/**
+	 * Include the organizer editor meta box.
+	 *
+	 * @since 5.14.0
+	 */
+	public static function add_post_type_metabox() {
+		if ( ! Tribe__Admin__Helpers::instance()->is_post_type_screen( self::POSTTYPE ) ) {
+			return;
+		}
+
+		add_meta_box(
+			'tribe_events_organizer_details',
+			sprintf( esc_html__( '%s Information', 'the-events-calendar' ), tribe( 'tec.linked-posts.organizer' )->get_organizer_label_singular() ),
+			[ Tribe__Events__Main::instance(), 'OrganizerMetaBox' ],
+			self::POSTTYPE,
+			'normal',
+			'high'
+		);
 	}
 }

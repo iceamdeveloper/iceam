@@ -2,19 +2,13 @@
  * WordPress dependencies
  */
 import { Toolbar } from '@wordpress/components';
+import { applyFilters } from '@wordpress/hooks';
 import { __ } from '@wordpress/i18n';
 
 /**
  * Internal dependencies
  */
 import ToolbarDropdown from '../../editor-components/toolbar-dropdown';
-import types from '../answer-blocks';
-
-const options = Object.entries( types ).map( ( [ value, settings ] ) => ( {
-	...settings,
-	label: settings.title,
-	value,
-} ) );
 
 /**
  * Question type selector toolbar control.
@@ -22,8 +16,9 @@ const options = Object.entries( types ).map( ( [ value, settings ] ) => ( {
  * @param {Object}   props
  * @param {string}   props.value    Selected type.
  * @param {Function} props.onSelect Selection callback.
+ * @param {Array}    props.options  Question options.
  */
-export const QuestionTypeToolbar = ( { value, onSelect } ) => {
+export const QuestionTypeToolbar = ( { value, onSelect, options } ) => {
 	return (
 		<Toolbar className="sensei-lms-question-block__type-selector__toolbar">
 			<ToolbarDropdown
@@ -42,16 +37,38 @@ export const QuestionTypeToolbar = ( { value, onSelect } ) => {
 						<b>{ selectedOption?.title }</b>
 					),
 				} }
-				getMenuItemProps={ ( option ) => ( {
-					children: (
+				getMenuItemProps={ ( option ) => {
+					let children = (
 						<div>
 							<strong> { option.title }</strong>
 							<div className="sensei-lms-question-block__type-selector__option__description">
 								{ option.description }
 							</div>
 						</div>
-					),
-				} ) }
+					);
+					/**
+					 * Filters the children of the menu item.
+					 *
+					 * @since 4.1.0
+					 *
+					 * @param {JSX.Element} children Menu element children.
+					 * @param {Object}      option   The question type option.
+					 * @return {JSX.Element} Retuns the filtered children for the menu item.
+					 */
+					children = applyFilters(
+						'senseiQuestionTypeToolbarOptionChildren',
+						children,
+						option
+					);
+
+					const props = {};
+					props.children = children;
+					if ( option.disabled ) {
+						props.onClick = () => {};
+					}
+
+					return props;
+				} }
 			/>
 		</Toolbar>
 	);

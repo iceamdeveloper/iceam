@@ -31,14 +31,20 @@ class Sensei_Quiz {
 		$this->meta_fields = array( 'quiz_passmark', 'quiz_lesson', 'quiz_type', 'quiz_grade_type', 'pass_required', 'enable_quiz_reset' );
 		add_action( 'save_post', array( $this, 'update_after_lesson_change' ) );
 
+		// Redirect if the lesson is protected.
+		add_action( 'template_redirect', array( $this, 'redirect_if_lesson_is_protected' ) );
+
+		// Listen for a page change.
+		add_action( 'template_redirect', array( $this, 'page_change_listener' ) );
+
 		// Listen to the reset button click.
 		add_action( 'template_redirect', array( $this, 'reset_button_click_listener' ) );
 
 		// Fire the complete quiz button submit for grading action.
-		add_action( 'sensei_single_quiz_content_inside_before', array( $this, 'user_quiz_submit_listener' ) );
+		add_action( 'template_redirect', array( $this, 'user_quiz_submit_listener' ) );
 
 		// Fire the save user answers quiz button click responder.
-		add_action( 'sensei_single_quiz_content_inside_before', array( $this, 'user_save_quiz_answers_listener' ) );
+		add_action( 'template_redirect', array( $this, 'user_save_quiz_answers_listener' ) );
 
 		// Fire the load global data function.
 		add_action( 'sensei_single_quiz_content_inside_before', array( $this, 'load_global_quiz_data' ), 80 );
@@ -116,6 +122,7 @@ class Sensei_Quiz {
 			'ID'          => $quiz_id,
 			'post_author' => $new_lesson_author_id,
 			'post_name'   => $saved_lesson->post_name,
+			'post_title'  => $saved_lesson->post_title,
 		);
 
 		// Remove the action so that it doesn't fire again.
@@ -130,10 +137,10 @@ class Sensei_Quiz {
 	 * Get the lesson this quiz belongs to.
 	 *
 	 * @since 1.7.2
-	 * @param int $quiz_id Quiz ID.
+	 * @param int|null $quiz_id (Optional) The quiz post ID. Defaults to the current post ID.
 	 * @return int|bool Lesson ID or false if not found.
 	 */
-	public function get_lesson_id( $quiz_id ) {
+	public function get_lesson_id( $quiz_id = null ) {
 
 		if ( empty( $quiz_id ) || ! intval( $quiz_id ) > 0 ) {
 			global $post;
@@ -151,32 +158,40 @@ class Sensei_Quiz {
 
 	}
 
-
 	/**
 	 * user_save_quiz_answers_listener
 	 *
 	 * This function hooks into the quiz page and accepts the answer form save post.
 	 *
 	 * @since 1.7.3
-	 * @return bool $saved;
 	 */
 	public function user_save_quiz_answers_listener() {
 
 		if ( ! isset( $_POST['quiz_save'] )
-			|| ! isset( $_POST['sensei_question'] )
 			|| empty( $_POST['sensei_question'] )
-			|| ! wp_verify_nonce( $_POST['woothemes_sensei_save_quiz_nonce'], 'woothemes_sensei_save_quiz_nonce' ) ) {
+			|| empty( $_POST['questions_asked'] )
+			|| ! isset( $_POST['woothemes_sensei_save_quiz_nonce'] )
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Do not change the nonce.
+			|| ! wp_verify_nonce( wp_unslash( $_POST['woothemes_sensei_save_quiz_nonce'] ), 'woothemes_sensei_save_quiz_nonce' ) ) {
 			return;
 		}
 
-		global $post;
-		$lesson_id    = $this->get_lesson_id( $post->ID );
-		$quiz_answers = $this->merge_quiz_answers_with_questions_asked( $_POST, $post->ID );
+		$quiz_id   = get_the_ID();
+		$lesson_id = $this->get_lesson_id( $quiz_id );
+		$user_id   = get_current_user_id();
+
+		$answers = $this->parse_form_answers(
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The answers value can vary, so we do the sanitization on output.
+			wp_unslash( $_POST['sensei_question'] ),
+			array_map( 'intval', $_POST['questions_asked'] ),
+			$lesson_id,
+			$user_id
+		);
 
 		// call the save function
-		$answers_saved = self::save_user_answers( $quiz_answers, $_FILES, $lesson_id, get_current_user_id() );
+		$success = self::save_user_answers( $answers, $_FILES, $lesson_id, $user_id );
 
-		if ( intval( $answers_saved ) > 0 ) {
+		if ( $success ) {
 			// update the message showed to user
 			Sensei()->frontend->messages = '<div class="sensei-message note">' . __( 'Quiz Saved Successfully.', 'sensei-lms' ) . '</div>';
 		}
@@ -184,6 +199,37 @@ class Sensei_Quiz {
 		// remove the hook as it should only fire once per click
 		remove_action( 'sensei_single_quiz_content_inside_before', 'user_save_quiz_answers_listener' );
 
+	}
+
+	/**
+	 * Parse the provided answers by filling in missing answers or removing answers not part of the quiz.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param array $answers         The submitted answers.
+	 * @param array $questions_asked The ID's of all the asked quiz questions.
+	 * @param int   $lesson_id       The lesson ID.
+	 * @param int   $user_id         The user ID.
+	 *
+	 * @return array
+	 */
+	private function parse_form_answers( array $answers, array $questions_asked, int $lesson_id, int $user_id ): array {
+
+		// If we have a fraction of the answers (e.g. pagination), include the previously saved answers.
+		if ( count( $answers ) !== count( $questions_asked ) ) {
+			$previous_answers = self::get_user_answers( $lesson_id, $user_id );
+
+			if ( $previous_answers ) {
+				// Merge and preserve the indexes.
+				$answers = array_replace( $previous_answers, $answers );
+			}
+		}
+
+		// Merge with the questions asked.
+		return $this->merge_quiz_answers_with_questions_asked(
+			$answers,
+			$questions_asked
+		);
 	}
 
 	/**
@@ -201,7 +247,7 @@ class Sensei_Quiz {
 	 *
 	 * @return false or int $answers_saved
 	 */
-	public static function save_user_answers( $quiz_answers, $files = array(), $lesson_id, $user_id = 0 ) {
+	public static function save_user_answers( $quiz_answers, $files = array(), $lesson_id = 0, $user_id = 0 ) {
 
 		if ( ! ( $user_id > 0 ) ) {
 			$user_id = get_current_user_id();
@@ -315,7 +361,9 @@ class Sensei_Quiz {
 	public function reset_button_click_listener() {
 
 		if ( ! isset( $_POST['quiz_reset'] )
-			|| ! wp_verify_nonce( $_POST['woothemes_sensei_reset_quiz_nonce'], 'woothemes_sensei_reset_quiz_nonce' ) ) {
+			|| ! isset( $_POST['woothemes_sensei_reset_quiz_nonce'] )
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Do not change the nonce.
+			|| ! wp_verify_nonce( wp_unslash( $_POST['woothemes_sensei_reset_quiz_nonce'] ), 'woothemes_sensei_reset_quiz_nonce' ) ) {
 
 			return; // exit
 		}
@@ -327,8 +375,11 @@ class Sensei_Quiz {
 		// reset all user data
 		$this->reset_user_lesson_data( $lesson_id, get_current_user_id() );
 
-		// this function should only run once
-		remove_action( 'template_redirect', array( $this, 'reset_button_click_listener' ) );
+		// Redirect to the start of the quiz.
+		wp_safe_redirect(
+			remove_query_arg( 'quiz-page' )
+		);
+		exit;
 
 	}
 
@@ -347,18 +398,102 @@ class Sensei_Quiz {
 	public function user_quiz_submit_listener() {
 
 		// only respond to valid quiz completion submissions
-		if ( ! isset( $_POST['quiz_complete'] )
-			|| ! isset( $_POST['sensei_question'] )
-			|| empty( $_POST['sensei_question'] )
-			|| ! wp_verify_nonce( $_POST['woothemes_sensei_complete_quiz_nonce'], 'woothemes_sensei_complete_quiz_nonce' ) ) {
+		if (
+			! isset( $_POST['quiz_complete'] )
+			|| empty( $_POST['questions_asked'] )
+			|| ! isset( $_POST['woothemes_sensei_complete_quiz_nonce'] )
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Do not change the nonce.
+			|| ! wp_verify_nonce( wp_unslash( $_POST['woothemes_sensei_complete_quiz_nonce'] ), 'woothemes_sensei_complete_quiz_nonce' )
+			|| ! self::is_quiz_available()
+			|| self::is_quiz_completed()
+		) {
 			return;
 		}
 
-		global $post, $current_user;
-		$lesson_id    = $this->get_lesson_id( $post->ID );
-		$quiz_answers = $this->merge_quiz_answers_with_questions_asked( $_POST, $post->ID );
+		$quiz_id   = get_the_ID();
+		$lesson_id = $this->get_lesson_id( $quiz_id );
+		$user_id   = get_current_user_id();
 
-		self::submit_answers_for_grading( $quiz_answers, $_FILES, $lesson_id, $current_user->ID );
+		$answers = $this->parse_form_answers(
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The answers value can vary, so we do the sanitization on output.
+			wp_unslash( $_POST['sensei_question'] ?? [] ),
+			array_map( 'intval', $_POST['questions_asked'] ),
+			$lesson_id,
+			$user_id
+		);
+
+		self::submit_answers_for_grading( $answers, $_FILES, $lesson_id, $user_id );
+
+		// Redirect to the start of the quiz.
+		wp_safe_redirect(
+			remove_query_arg( 'quiz-page' )
+		);
+		exit;
+
+	}
+
+	/**
+	 * Redirect back to the lesson if the lesson is password protected.
+	 *
+	 * @since  4.4.3
+	 * @access private
+	 */
+	public function redirect_if_lesson_is_protected() {
+		if ( ! is_singular( 'quiz' ) ) {
+			return;
+		}
+
+		$lesson_id = $this->get_lesson_id();
+
+		if ( post_password_required( $lesson_id ) ) {
+			wp_safe_redirect( get_permalink( $lesson_id ) );
+			exit;
+		}
+	}
+
+	/**
+	 * Handle the page change form submission and redirects to the target page.
+	 *
+	 * The quiz form is submitted on each page change.
+	 * This is needed to save the answers for each page.
+	 * Used when the quiz pagination is enabled.
+	 *
+	 * @since  3.15.0
+	 * @access private
+	 */
+	public function page_change_listener() {
+
+		if (
+			! isset( $_POST['quiz_target_page'] )
+			|| empty( $_POST['questions_asked'] )
+			|| ! isset( $_POST['sensei_quiz_page_change_nonce'] )
+			// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- Do not change the nonce.
+			|| ! wp_verify_nonce( wp_unslash( $_POST['sensei_quiz_page_change_nonce'] ), 'sensei_quiz_page_change_nonce' )
+		) {
+			return;
+		}
+
+		if ( self::is_quiz_available() && ! self::is_quiz_completed() ) {
+			$quiz_id   = get_the_ID();
+			$user_id   = get_current_user_id();
+			$lesson_id = $this->get_lesson_id( $quiz_id );
+
+			$answers = $this->parse_form_answers(
+				// phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized -- The answers value can vary, so we do the sanitization on output.
+				wp_unslash( $_POST['sensei_question'] ?? [] ),
+				array_map( 'intval', $_POST['questions_asked'] ),
+				$lesson_id,
+				$user_id
+			);
+
+			self::save_user_answers( $answers, $_FILES, $lesson_id, $user_id );
+		}
+
+		// Redirect to the target page.
+		wp_safe_redirect(
+			wp_unslash( $_POST['quiz_target_page'] )
+		);
+		exit;
 
 	}
 
@@ -601,7 +736,7 @@ class Sensei_Quiz {
 	 *
 	 * @return bool $answers_submitted
 	 */
-	public static function submit_answers_for_grading( $quiz_answers, $files = array(), $lesson_id, $user_id = 0 ) {
+	public static function submit_answers_for_grading( $quiz_answers, $files = array(), $lesson_id = 0, $user_id = 0 ) {
 
 		$answers_submitted = false;
 
@@ -1096,7 +1231,7 @@ class Sensei_Quiz {
 		$all_feedback = $this->get_user_answers_feedback( $lesson_id, $user_id );
 
 		if ( ! $all_feedback || empty( $all_feedback )
-			|| ! is_array( $all_feedback ) || ! isset( $all_feedback[ $question_id ] ) ) {
+			|| ! is_array( $all_feedback ) || empty( $all_feedback[ $question_id ] ) ) {
 
 			// fallback to data pre 1.7.4
 			// setup the sensei data query
@@ -1114,7 +1249,15 @@ class Sensei_Quiz {
 
 			// finally use the default question feedback
 			if ( empty( $feedback ) ) {
-				$feedback = get_post_meta( $question_id, '_answer_feedback', true );
+				$feedback       = get_post_meta( $question_id, '_answer_feedback', true );
+				$user_grade     = $this->get_user_question_grade( $lesson_id, $question_id, $user_id );
+				$answer_correct = is_int( $user_grade ) && $user_grade > 0;
+
+				$feedback_block = $answer_correct ? self::get_correct_answer_feedback( $question_id ) : self::get_incorrect_answer_feedback( $question_id );
+
+				if ( $feedback_block ) {
+					$feedback = $feedback_block;
+				}
 			}
 		} else {
 			$feedback = $all_feedback[ $question_id ];
@@ -1131,6 +1274,54 @@ class Sensei_Quiz {
 		 */
 		return apply_filters( 'sensei_user_question_feedback', $feedback, $lesson_id, $question_id, $user_id );
 
+	}
+
+	/**
+	 * Get a top-level inner block.
+	 *
+	 * @param int    $question_id
+	 * @param string $block_name
+	 *
+	 * @return array|null
+	 */
+	public static function get_question_inner_block( $question_id, $block_name ) {
+
+		$question = get_post( $question_id );
+
+		if ( has_blocks( $question->post_content ) ) {
+			$blocks = parse_blocks( $question->post_content );
+			foreach ( $blocks as $block ) {
+				if ( $block_name === $block['blockName'] ) {
+					return $block;
+				}
+			}
+		}
+
+		return null;
+	}
+
+	/**
+	 * Get the contents for the correct answer feedback block.
+	 *
+	 * @param int $question_id
+	 *
+	 * @return string
+	 */
+	public static function get_correct_answer_feedback( $question_id ) {
+		$block = self::get_question_inner_block( $question_id, 'sensei-lms/quiz-question-feedback-correct' );
+		return $block ? render_block( $block ) : '';
+	}
+
+	/**
+	 * Get the contents for the incorrect answer feedback block.
+	 *
+	 * @param int $question_id
+	 *
+	 * @return string
+	 */
+	public static function get_incorrect_answer_feedback( $question_id ) {
+		$block = self::get_question_inner_block( $question_id, 'sensei-lms/quiz-question-feedback-incorrect' );
+		return $block ? render_block( $block ) : '';
 	}
 
 	/**
@@ -1165,6 +1356,86 @@ class Sensei_Quiz {
 			exit;
 
 		}
+
+	}
+
+	/**
+	 * Check if the quiz is available to the user.
+	 *
+	 * The quiz becomes available to the user if he is enrolled to the course
+	 * and has completed the prerequisite (if any).
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param int|null $quiz_id (Optional) The quiz post ID. Defaults to the current post ID.
+	 * @param int|null $user_id (Optional) The user ID. Defaults to the current user ID.
+	 *
+	 * @return bool
+	 */
+	public static function is_quiz_available( int $quiz_id = null, int $user_id = null ): bool {
+
+		$quiz_id = $quiz_id ? $quiz_id : get_the_ID();
+		$user_id = $user_id ? $user_id : get_current_user_id();
+
+		if ( ! $user_id ) {
+			return false;
+		}
+
+		$lesson_id = Sensei()->quiz->get_lesson_id( $quiz_id );
+		$course_id = (int) get_post_meta( $lesson_id, '_lesson_course', true );
+
+		// Check if the user has enrolled in the course.
+		if ( ! Sensei_Course::is_user_enrolled( $course_id, $user_id ) ) {
+			return false;
+		}
+
+		// Check if there is a lesson prerequisite and if the user has completed it.
+		$prerequisite_id = (int) get_post_meta( $lesson_id, '_lesson_prerequisite', true );
+		if (
+			$prerequisite_id
+			&& ! Sensei_Utils::user_completed_lesson( $prerequisite_id, $user_id )
+		) {
+			return false;
+		}
+
+		return true;
+
+	}
+
+	/**
+	 * Check if the user has completed the quiz.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param int|null $quiz_id (Optional) The quiz post ID. Defaults to the current post ID.
+	 * @param int|null $user_id (Optional) The user ID. Defaults to the current user ID.
+	 *
+	 * @return bool
+	 */
+	public static function is_quiz_completed( int $quiz_id = null, int $user_id = null ): bool {
+
+		$quiz_id = $quiz_id ? $quiz_id : get_the_ID();
+		$user_id = $user_id ? $user_id : get_current_user_id();
+
+		$lesson_id = Sensei()->quiz->get_lesson_id( $quiz_id );
+
+		// Check the lesson status.
+		$lesson_status = Sensei_Utils::user_lesson_status( $lesson_id, $user_id );
+		if ( $lesson_status ) {
+			$lesson_status = is_array( $lesson_status ) ? $lesson_status[0] : $lesson_status;
+
+			if ( 'ungraded' === $lesson_status->comment_approved ) {
+				return true;
+			}
+
+			// Check for a quiz grade.
+			$quiz_grade = get_comment_meta( $lesson_status->comment_ID, 'grade', true );
+			if ( '' !== $quiz_grade ) {
+				return true;
+			}
+		}
+
+		return false;
 
 	}
 
@@ -1213,21 +1484,58 @@ class Sensei_Quiz {
 	 * @since 1.9.0
 	 */
 	public static function start_quiz_questions_loop() {
-
 		global $sensei_question_loop;
 
 		// Initialise the questions loop object.
-		$sensei_question_loop['current']   = -1;
-		$sensei_question_loop['total']     = 0;
-		$sensei_question_loop['questions'] = array();
+		$sensei_question_loop['current']         = -1;
+		$sensei_question_loop['total']           = 0;
+		$sensei_question_loop['questions']       = [];
+		$sensei_question_loop['questions_asked'] = [];
+		$sensei_question_loop['posts_per_page']  = -1;
+		$sensei_question_loop['current_page']    = 1;
+		$sensei_question_loop['total_pages']     = 1;
 
-		$questions = Sensei()->lesson->lesson_quiz_questions( get_the_ID(), 'publish' );
+		$quiz_id             = get_the_ID();
+		$pagination_settings = json_decode(
+			get_post_meta( $quiz_id, '_pagination', true ),
+			true
+		);
 
-		if ( count( $questions ) > 0 ) {
-			$sensei_question_loop['total']     = count( $questions );
-			$sensei_question_loop['questions'] = $questions;
-			$sensei_question_loop['quiz_id']   = get_the_ID();
+		if ( ! empty( $pagination_settings['pagination_number'] ) ) {
+			$sensei_question_loop['posts_per_page'] = (int) $pagination_settings['pagination_number'];
+
+			// phpcs:ignore WordPress.Security.NonceVerification -- Argument is used for pagination in the frontend.
+			if ( ! empty( $_GET['quiz-page'] ) ) {
+				// phpcs:ignore WordPress.Security.NonceVerification
+				$sensei_question_loop['current_page'] = max( 1, (int) $_GET['quiz-page'] );
+			}
 		}
+		// Fetch the questions.
+		$all_questions = Sensei()->lesson->lesson_quiz_questions( $quiz_id, 'publish' );
+
+		if ( ! $all_questions ) {
+			return;
+		}
+
+		$sensei_question_loop['questions_asked'] = wp_list_pluck( $all_questions, 'ID' );
+		$sensei_question_loop['total']           = count( $all_questions );
+
+		// Paginate the questions.
+		if ( $sensei_question_loop['posts_per_page'] > 0 ) {
+			$offset         = $sensei_question_loop['posts_per_page'] * ( $sensei_question_loop['current_page'] - 1 );
+			$loop_questions = array_slice( $all_questions, $offset, $sensei_question_loop['posts_per_page'] );
+
+			// Calculate the number of pages.
+			$sensei_question_loop['total_pages'] = (int) ceil(
+				$sensei_question_loop['total'] / $sensei_question_loop['posts_per_page']
+			);
+		} else {
+			$loop_questions = $all_questions;
+		}
+
+		$sensei_question_loop['questions'] = $loop_questions;
+		$sensei_question_loop['quiz_id']   = $quiz_id;
+
 	}
 
 	/**
@@ -1243,10 +1551,14 @@ class Sensei_Quiz {
 
 		_deprecated_function( __METHOD__, '3.10.0' );
 
-		$sensei_question_loop              = [];
-		$sensei_question_loop['total']     = 0;
-		$sensei_question_loop['questions'] = array();
-		$sensei_question_loop['quiz_id']   = '';
+		$sensei_question_loop                    = [];
+		$sensei_question_loop['total']           = 0;
+		$sensei_question_loop['questions']       = [];
+		$sensei_question_loop['questions_asked'] = [];
+		$sensei_question_loop['quiz_id']         = '';
+		$sensei_question_loop['posts_per_page']  = -1;
+		$sensei_question_loop['current_page']    = 1;
+		$sensei_question_loop['total_pages']     = 1;
 
 	}
 
@@ -1278,7 +1590,7 @@ class Sensei_Quiz {
 	/**
 	 * Output the sensei quiz status message.
 	 *
-	 * @param $quiz_id
+	 * @param int $quiz_id quiz id.
 	 */
 	public static function the_user_status_message( $quiz_id ) {
 
@@ -1297,6 +1609,78 @@ class Sensei_Quiz {
 	}
 
 	/**
+	 * Outputs the quiz hidden fields.
+	 *
+	 * @since 3.15.0
+	 */
+	public static function output_quiz_hidden_fields() {
+
+		global $sensei_question_loop;
+
+		foreach ( $sensei_question_loop['questions_asked'] as $question_id ) {
+			?>
+			<input type="hidden" name="questions_asked[]" form="sensei-quiz-form" value="<?php echo esc_attr( $question_id ); ?>">
+			<?php
+		}
+
+	}
+
+	/**
+	 * Displays the quiz questions pagination when enabled from the quiz pagination settings.
+	 * Replaces the default action buttons.
+	 *
+	 * @since 3.15.0
+	 */
+	public static function the_quiz_pagination() {
+
+		global $sensei_question_loop;
+
+		if ( $sensei_question_loop['total_pages'] <= 1 ) {
+			return;
+		}
+
+		wp_enqueue_script( 'sensei-stop-double-submission' );
+
+		// Remove the default action buttons. We will replace them in the pagination template.
+		remove_action( 'sensei_single_quiz_questions_after', array( 'Sensei_Quiz', 'action_buttons' ), 10 );
+
+		// Load the pagination template.
+		Sensei_Templates::get_template( 'single-quiz/pagination.php' );
+
+	}
+
+	/**
+	 * Rendering html element that will be replaced with Progress Bar.
+	 *
+	 * @since 3.15.0
+	 */
+	public static function the_quiz_progress_bar() {
+		$quiz_id             = get_the_ID();
+		$pagination_settings = json_decode(
+			get_post_meta( $quiz_id, '_pagination', true ),
+			true
+		);
+
+		global $sensei_question_loop;
+
+		// Make sure the quiz is paginated and the progress bar enabled.
+		if ( $sensei_question_loop['total_pages'] <= 1 || empty( $pagination_settings['show_progress_bar'] ) ) {
+			return;
+		}
+
+		$attributes = [
+			'radius'                   => $pagination_settings['progress_bar_radius'],
+			'height'                   => $pagination_settings['progress_bar_height'],
+			'customBarColor'           => empty( $pagination_settings['progress_bar_color'] ) ? '' : $pagination_settings['progress_bar_color'],
+			'customBarBackgroundColor' => empty( $pagination_settings['progress_bar_background'] ) ? '' : $pagination_settings['progress_bar_background'],
+		];
+
+		Sensei()->assets->enqueue( 'sensei-shared-blocks-style', 'blocks/shared-style.scss' );
+
+		echo wp_kses_post( ( new Sensei_Block_Quiz_Progress() )->render( $attributes ) );
+	}
+
+	/**
 	 * The quiz action buttons needed to output quiz
 	 * action such as reset complete and save.
 	 *
@@ -1304,75 +1688,96 @@ class Sensei_Quiz {
 	 */
 	public static function action_buttons() {
 
-		global $post, $current_user;
-
-		$lesson_id           = Sensei()->quiz->get_lesson_id( $post->ID );
-		$lesson_course_id    = (int) get_post_meta( $lesson_id, '_lesson_course', true );
-		$lesson_prerequisite = (int) get_post_meta( $lesson_id, '_lesson_prerequisite', true );
-		$show_actions        = true;
-		$user_lesson_status  = Sensei_Utils::user_lesson_status( $lesson_id, $current_user->ID );
-
-		// setup quiz grade
-		$user_quiz_grade = '';
-		if ( ! empty( $user_lesson_status ) ) {
-
-			// user lesson status can return as an array.
-			if ( is_array( $user_lesson_status ) ) {
-				$comment_ID = $user_lesson_status[0]->comment_ID;
-
-			} else {
-				$comment_ID = $user_lesson_status->comment_ID;
-			}
-
-			$user_quiz_grade = get_comment_meta( $comment_ID, 'grade', true );
+		if ( ! self::is_quiz_available() ) {
+			return;
 		}
 
-		if ( intval( $lesson_prerequisite ) > 0 ) {
+		$lesson_id         = Sensei()->quiz->get_lesson_id();
+		$is_quiz_completed = self::is_quiz_completed();
+		$is_reset_allowed  = self::is_reset_allowed( $lesson_id );
+		$has_actions       = $is_reset_allowed || ! $is_quiz_completed;
 
-			// If the user hasn't completed the prereq then hide the current actions
-			$show_actions = Sensei_Utils::user_completed_lesson( $lesson_prerequisite, $current_user->ID );
-
+		if ( ! $has_actions ) {
+			return;
 		}
-		if ( $show_actions && is_user_logged_in() && Sensei_Course::is_user_enrolled( $lesson_course_id, $current_user->ID ) ) {
-			wp_enqueue_script( 'sensei-stop-double-submission' );
-			// Get Reset Settings
-			$reset_quiz_allowed = get_post_meta( $post->ID, '_enable_quiz_reset', true );
-			?>
 
-			<!-- Action Nonce's -->
-			<input type="hidden" name="woothemes_sensei_complete_quiz_nonce" id="woothemes_sensei_complete_quiz_nonce"
-				value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_complete_quiz_nonce' ) ); ?>" />
-			<input type="hidden" name="woothemes_sensei_reset_quiz_nonce" id="woothemes_sensei_reset_quiz_nonce"
-				value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_reset_quiz_nonce' ) ); ?>" />
-			<input type="hidden" name="woothemes_sensei_save_quiz_nonce" id="woothemes_sensei_save_quiz_nonce"
-				value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_save_quiz_nonce' ) ); ?>" />
-			<!-- End Action Nonce's -->
-			<div class="wp-block-buttons">
-				<?php if ( '' == $user_quiz_grade && ( ! $user_lesson_status || 'ungraded' !== $user_lesson_status->comment_approved ) ) { ?>
+		$button_inline_styles = self::get_button_inline_styles();
 
-					<div class="wp-block-button">
-						<button type="submit" name="quiz_complete"
-							class="wp-block-button__link button quiz-submit complete sensei-stop-double-submission"><?php esc_attr_e( 'Complete Quiz', 'sensei-lms' ); ?></button>
+		wp_enqueue_script( 'sensei-stop-double-submission' );
+		?>
+
+		<div class="sensei-quiz-actions">
+			<?php if ( ! $is_quiz_completed ) : ?>
+				<div class="sensei-quiz-actions-primary wp-block-buttons">
+					<div class="sensei-quiz-action wp-block-button">
+						<button
+							type="submit"
+							name="quiz_complete"
+							form="sensei-quiz-form"
+							class="wp-block-button__link button quiz-submit complete sensei-stop-double-submission"
+							style="<?php echo esc_attr( $button_inline_styles ); ?>"
+						>
+							<?php esc_attr_e( 'Complete', 'sensei-lms' ); ?>
+						</button>
+
+						<input type="hidden" name="woothemes_sensei_complete_quiz_nonce" form="sensei-quiz-form" id="woothemes_sensei_complete_quiz_nonce" value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_complete_quiz_nonce' ) ); ?>" />
 					</div>
+				</div>
+			<?php endif ?>
 
-					<div class="wp-block-button is-style-outline">
-						<button type="submit" name="quiz_save"
-							class="wp-block-button__link button quiz-submit save sensei-stop-double-submission"><?php esc_attr_e( 'Save Quiz', 'sensei-lms' ); ?></button>
+			<div class="sensei-quiz-actions-secondary">
+				<?php if ( $is_reset_allowed ) : ?>
+					<div class="sensei-quiz-action">
+						<button type="submit" name="quiz_reset" form="sensei-quiz-form" class="quiz-submit reset sensei-stop-double-submission">
+							<?php esc_attr_e( 'Reset', 'sensei-lms' ); ?>
+						</button>
+
+						<input type="hidden" name="woothemes_sensei_reset_quiz_nonce" form="sensei-quiz-form" id="woothemes_sensei_reset_quiz_nonce" value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_reset_quiz_nonce' ) ); ?>" />
 					</div>
+				<?php endif ?>
 
-				<?php } ?>
+				<?php if ( ! $is_quiz_completed ) : ?>
+					<div class="sensei-quiz-action">
+						<button type="submit" name="quiz_save" form="sensei-quiz-form" class="quiz-submit save sensei-stop-double-submission">
+							<?php esc_attr_e( 'Save', 'sensei-lms' ); ?>
+						</button>
 
-				<?php if ( isset( $reset_quiz_allowed ) && $reset_quiz_allowed ) { ?>
-
-					<div class="wp-block-button is-style-outline">
-						<button type="submit" name="quiz_reset"
-							class="wp-block-button__link button quiz-submit reset sensei-stop-double-submission"><?php esc_attr_e( 'Reset Quiz', 'sensei-lms' ); ?></button>
+						<input type="hidden" name="woothemes_sensei_save_quiz_nonce" form="sensei-quiz-form" id="woothemes_sensei_save_quiz_nonce" value="<?php echo esc_attr( wp_create_nonce( 'woothemes_sensei_save_quiz_nonce' ) ); ?>" />
 					</div>
-
-				<?php } ?>
+				<?php endif ?>
 			</div>
-			<?php
+		</div>
+		<?php
+
+	}
+
+	/**
+	 * Get the quiz button inline styles.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param int|null $quiz_id (Optional) The quiz post ID. Defaults to the current post ID.
+	 *
+	 * @return string
+	 */
+	public static function get_button_inline_styles( int $quiz_id = null ): string {
+
+		$quiz_id = $quiz_id ? $quiz_id : get_the_ID();
+
+		$button_text_color       = get_post_meta( $quiz_id, '_button_text_color', true );
+		$button_background_color = get_post_meta( $quiz_id, '_button_background_color', true );
+
+		$styles = [];
+
+		if ( $button_text_color ) {
+			$styles[] = sprintf( 'color: %s', $button_text_color );
 		}
+
+		if ( $button_background_color ) {
+			$styles[] = sprintf( 'background-color: %s', $button_background_color );
+		}
+
+		return implode( '; ', $styles );
 
 	}
 
@@ -1388,7 +1793,7 @@ class Sensei_Quiz {
 	 */
 	public static function get_user_quiz_grade( $lesson_id, $user_id ) {
 
-		// get the quiz grade
+		// get the quiz grade.
 		$user_lesson_status = Sensei_Utils::user_lesson_status( $lesson_id, $user_id );
 		$user_quiz_grade    = 0;
 		if ( isset( $user_lesson_status->comment_ID ) ) {
@@ -1415,7 +1820,7 @@ class Sensei_Quiz {
 		$quiz_id = Sensei()->lesson->lesson_quizzes( $lesson_id );
 
 		$reset_allowed = get_post_meta( $quiz_id, '_enable_quiz_reset', true );
-		// backwards compatibility
+		// backwards compatibility.
 		if ( 'on' == $reset_allowed ) {
 			$reset_allowed = 1;
 		}
@@ -1425,7 +1830,33 @@ class Sensei_Quiz {
 	}
 
 	/**
-	 * @param $lesson_id
+	 * Get a quiz option's value.
+	 *
+	 * @since 3.14.0
+	 *
+	 * @param int    $lesson_id Lesson ID.
+	 * @param string $option    Option name.
+	 * @param mixed  $default   Default value to be returned if the option is unset.
+	 *
+	 * @return mixed
+	 */
+	public static function get_option( $lesson_id, $option, $default = null ) {
+
+		$quiz_id = Sensei()->lesson->lesson_quizzes( $lesson_id );
+		$option  = get_post_meta( $quiz_id, '_' . $option, true );
+
+		if ( ! $option ) {
+			return $default;
+		} else {
+			return 'yes' === $option;
+		}
+
+	}
+
+	/**
+	 * Checking if password is required.
+	 *
+	 * @param int $lesson_id lesson id.
 	 *
 	 * @return bool
 	 */
@@ -1434,7 +1865,7 @@ class Sensei_Quiz {
 		$quiz_id = Sensei()->lesson->lesson_quizzes( $lesson_id );
 
 		$reset_allowed = get_post_meta( $quiz_id, '_pass_required', true );
-		// backwards compatibility
+		// backwards compatibility.
 		if ( 'on' == $reset_allowed ) {
 			$reset_allowed = 1;
 		}
@@ -1443,9 +1874,11 @@ class Sensei_Quiz {
 	}
 
 	/**
+	 * Maybe delete the quiz post after checking if the post exists.
+	 *
 	 * @since 1.9.5
 	 *
-	 * @param integer $post_id of the post being permanently deleted
+	 * @param integer $post_id of the post being permanently deleted.
 	 */
 	public function maybe_delete_quiz( $post_id ) {
 
@@ -1460,38 +1893,36 @@ class Sensei_Quiz {
 	}
 
 	/**
-	 * Merge quiz answers with questions asked
+	 * Merge quiz answers with questions asked.
 	 *
 	 * Also, remove any question_ids not part of
-	 * the question set for this lesson quiz
+	 * the question set for this lesson quiz.
 	 *
-	 * @param $post_global
-	 * @param $quiz_id
+	 * @param  array $questions_answered The user answers.
+	 * @param  array $questions_asked    The ID's of all the asked quiz questions.
 	 * @return array
 	 */
-	private function merge_quiz_answers_with_questions_asked( $post_global, $quiz_id ) {
-		$quiz_answers              = isset( $post_global['sensei_question'] ) ? $post_global['sensei_question'] : array();
-		$questions_asked_this_time = isset( $post_global['questions_asked'] ) ? $post_global['questions_asked'] : array();
-		$merged                    = array();
+	private function merge_quiz_answers_with_questions_asked( array $questions_answered, array $questions_asked ): array {
+		$merged = [];
 
-		foreach ( array_unique( $questions_asked_this_time ) as $question_id ) {
-			$merged[ $question_id ] = isset( $quiz_answers[ $question_id ] ) ? $quiz_answers[ $question_id ] : '';
+		foreach ( array_unique( $questions_asked ) as $question_id ) {
+			$merged[ $question_id ] = $questions_answered[ $question_id ] ?? '';
 		}
 
 		return $merged;
 	}
 
 	/**
-	 * Get all the questions of a quiz.
+	 * Get all the questions of a quiz or get all complete questions if filtering flag is true and is not preview.
 	 *
-	 * @param int    $quiz_id     The quiz id.
+	 * @param int    $quiz_id The quiz id.
 	 * @param string $post_status Question post status.
-	 * @param string $orderby     Question order by.
-	 * @param string $order       Question order.
-	 *
+	 * @param string $orderby Question order by.
+	 * @param string $order Question order.
+	 * @param bool   $filter_incomplete_questions
 	 * @return WP_Post[]
 	 */
-	public function get_questions( $quiz_id, $post_status = 'any', $orderby = 'meta_value_num title', $order = 'ASC' ) : array {
+	public function get_questions( $quiz_id, $post_status = 'any', $orderby = 'meta_value_num title', $order = 'ASC', $filter_incomplete_questions = false ) : array {
 
 		// Set the default question order if it has not already been set for this quiz.
 		Sensei()->lesson->set_default_question_order( $quiz_id );
@@ -1515,7 +1946,76 @@ class Sensei_Quiz {
 
 		$questions_query = new WP_Query( $question_query_args );
 
-		return $questions_query->posts;
+		$posts = $questions_query->posts;
+
+		if ( is_preview() || ! $filter_incomplete_questions ) {
+			return $posts;
+		}
+		return $this->filter_out_incomplete_questions( $posts );
+	}
+
+	/**
+	 * Filter out incomplete questions.
+	 *
+	 * @param array $questions  All questions.
+	 *
+	 * @return array
+	 */
+	private function filter_out_incomplete_questions( array $questions ): array {
+		$filtered_questions = [];
+		foreach ( $questions as $question ) {
+			$question_id   = $question->ID;
+			$question_type = Sensei()->question->get_question_type( $question_id );
+			if ( 'multiple-choice' === $question_type && ! $this->is_multiple_choice_question_complete( $question_id ) ) {
+				continue;
+			}
+			if ( 'gap-fill' === $question_type && ! $this->is_gap_fill_question_complete( $question_id ) ) {
+				continue;
+			}
+			array_push( $filtered_questions, $question );
+		}
+		return $filtered_questions;
+	}
+	/**
+	 * Return true if multiple choice question has valid answers
+	 *
+	 * @param int $question_id  question id.
+	 *
+	 * @return boolean
+	 */
+	private function is_multiple_choice_question_complete( int $question_id ): bool {
+		$right_answers = get_post_meta( $question_id, '_question_right_answer', true );
+		$wrong_answers = get_post_meta( $question_id, '_question_wrong_answers', true );
+
+		// Multiple choice question is incomplete if there isn't at least one right and one wrong answer.
+		if ( ! is_array( $right_answers ) || count( $right_answers ) < 1 || ! is_array( $wrong_answers ) || count( $wrong_answers ) < 1 ) {
+			return false;
+		}
+		// Wrong or right answers values can't be whitespace.
+		return ! count(
+			array_filter(
+				array_merge( $right_answers, $wrong_answers ),
+				function( $value ) {
+					return '' === trim( $value );
+				}
+			)
+		);
+	}
+
+	/**
+	 * Return true if gap fill question has valid answers
+	 *
+	 * @param int $question_id  question id.
+	 *
+	 * @return boolean
+	 */
+	private function is_gap_fill_question_complete( int $question_id ): bool {
+		$gapfill_array = explode( '||', get_post_meta( $question_id, '_question_right_answer', true ) );
+		$text_before   = $gapfill_array[0] ?? '';
+		$answer_text   = $gapfill_array[1] ?? '';
+		$text_after    = $gapfill_array[2] ?? '';
+		// Gap fill question is incomplete if gap text is null or whitespace, or if text before or text after are null or whitespace.
+		return ! ( '' === trim( $answer_text ) || ( '' === trim( $text_before ) && '' === trim( $text_after ) ) );
 	}
 
 	/**
@@ -1644,6 +2144,23 @@ class Sensei_Quiz {
 
 			Sensei()->question->maybe_update_question_author( $question->ID, $new_author_id );
 		}
+	}
+
+	/**
+	 * Replace all pagination links with buttons (<a> => <button>).
+	 *
+	 * @since 3.15.0
+	 *
+	 * @param string $html The pagination html.
+	 *
+	 * @return string
+	 */
+	public function replace_pagination_links_with_buttons( $html ): string {
+		return preg_replace(
+			'/<a.+?href="(.+?)">(.+?)<\/a>/',
+			'<button type="submit" name="quiz_target_page" form="sensei-quiz-form" value="$1" class="page-numbers">$2</button>',
+			$html
+		);
 	}
 }
 

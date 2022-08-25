@@ -1,4 +1,3 @@
-/* global tribe, jQuery, TribeTicketOptions */
 /**
  * Makes sure we have all the required levels on the Tribe Object
  *
@@ -48,6 +47,7 @@ tribe.tickets.modal = {};
 		itemRemove: '.tribe-tickets__tickets-item-remove',
 		itemTotal: '.tribe-tickets__tickets-item-total .tribe-amount',
 		itemError: '.tribe-tickets__attendee-tickets-item--has-error',
+		attendeeItemRemove: '.tribe-tickets__attendee-tickets-item-remove',
 		metaForm: '.tribe-modal__wrapper--ar #tribe-modal__attendee-registration',
 		metaContainer: '.tribe-tickets__attendee-tickets-container',
 		metaContainerHasTickets: '.tribe-tickets__attendee-tickets-container--has-tickets',
@@ -56,6 +56,10 @@ tribe.tickets.modal = {};
 		hidden: '.tribe-common-a11y-hidden',
 		validationNotice: '.tribe-tickets__notice--error',
 		ticketInCartNotice: '#tribe-tickets__notice__tickets-in-cart',
+		noticeNonAr: '.tribe-tickets__notice--non-ar',
+		noticeNonArCount: '.tribe-tickets__non-ar-count',
+		noticeNonArSingular: '.tribe-tickets__notice--non-ar-singular',
+		noticeNonArPlural: '.tribe-tickets__notice--non-ar-plural',
 	};
 
 	/**
@@ -71,8 +75,11 @@ tribe.tickets.modal = {};
 				const $cartItem = $( this );
 
 				if ( $cartItem.is( ':visible' ) ) {
-					const ticketID = $cartItem.closest( tribe.tickets.block.selectors.item ).data( 'ticket-id' );
-					const $ticketContainer = $( obj.selectors.metaForm ).find( obj.selectors.metaContainer + '[data-ticket-id="' + ticketID + '"]' );
+					const ticketID = $cartItem
+						.closest( tribe.tickets.block.selectors.item )
+						.data( 'ticket-id' );
+					const $ticketContainer = $( obj.selectors.metaForm )
+						.find( obj.selectors.metaContainer + '[data-ticket-id="' + ticketID + '"]' );
 
 					// Ticket does not have meta - no need to jump through hoops (and throw errors).
 					if ( ! $ticketContainer.length ) {
@@ -91,7 +98,9 @@ tribe.tickets.modal = {};
 
 					if ( $existing.length > qty ) {
 						const removeCount = $existing.length - qty;
-						$ticketContainer.find( obj.selectors.metaItem + ':nth-last-child( -n+' + removeCount + ' )' ).remove();
+						$ticketContainer
+							.find( obj.selectors.metaItem + ':nth-last-child( -n+' + removeCount + ' )' )
+							.remove();
 					} else if ( $existing.length < qty ) {
 						const ticketTemplate = window.wp.template( 'tribe-registration--' + ticketID );
 						const counter = 0 < $existing.length ? $existing.length + 1 : 1;
@@ -141,8 +150,11 @@ tribe.tickets.modal = {};
 					return;
 				}
 
-				const ticketID = $cartItem.closest( tribe.tickets.block.selectors.item ).data( 'ticket-id' );
-				const $ticketContainer = $( obj.selectors.metaForm ).find( obj.selectors.metaContainer + '[data-ticket-id="' + ticketID + '"]' );
+				const ticketID = $cartItem
+					.closest( tribe.tickets.block.selectors.item )
+					.data( 'ticket-id' );
+				const $ticketContainer = $( obj.selectors.metaForm )
+					.find( obj.selectors.metaContainer + '[data-ticket-id="' + ticketID + '"]' );
 
 				// Ticket does not have meta - no need to jump through hoops ( and throw errors ).
 				if ( ! $ticketContainer.length ) {
@@ -153,17 +165,25 @@ tribe.tickets.modal = {};
 			}
 		);
 
-		const $notice = $( '.tribe-tickets__notice--non-ar' );
+		const $notice = $( obj.selectors.noticeNonAr );
+		const $noticeSingular = $( obj.selectors.noticeNonArSingular );
+		const $noticePlural = $( obj.selectors.noticeNonArPlural );
 		const $title = $( '.tribe-tickets__attendee-tickets-title' );
+
+		$notice.addClass( obj.selectors.hidden.className() );
 
 		// If there are no non-meta tickets, we don't need the notice.
 		// Likewise, if there are no tickets with meta the notice seems redundant.
 		if ( 0 < nonMetaCount && 0 < metaCount ) {
-			$( '#tribe-tickets__non-ar-count' ).text( nonMetaCount );
-			$notice.removeClass( obj.selectors.hidden.className() );
+			$notice.find( obj.selectors.noticeNonArCount ).text( nonMetaCount );
+			if ( 1 < nonMetaCount ) {
+				$noticePlural.removeClass( obj.selectors.hidden.className() );
+			} else {
+				$noticeSingular.removeClass( obj.selectors.hidden.className() );
+			}
+
 			$title.show();
 		} else {
-			$notice.addClass( obj.selectors.hidden.className() );
 			$title.hide();
 		}
 	};
@@ -188,10 +208,12 @@ tribe.tickets.modal = {};
 					let $eventCount = 0;
 
 					tickets.forEach( function( ticket ) {
-						const $ticketRow = $container.find( '.tribe-tickets__tickets-item[data-ticket-id="' + ticket.ticket_id + '"]' );
+						const $ticketRow = $container.find( tribe.tickets.block.selectors.item + '[data-ticket-id="' + ticket.ticket_id + '"]' ); // eslint-disable-line max-len
 						if ( 'true' === $ticketRow.attr( 'data-available' ) ) {
-							const $field = $ticketRow.find( tribe.tickets.block.selectors.itemQuantityInput );
-							const $optOut = $ticketRow.find( tribe.tickets.block.selectors.itemOptOutInput + ticket.ticket_id );
+							const $field = $ticketRow
+								.find( tribe.tickets.block.selectors.itemQuantityInput );
+							const $optOut = $ticketRow
+								.find( tribe.tickets.block.selectors.itemOptOutInput + ticket.ticket_id + '--modal' ); // eslint-disable-line max-len
 
 							if ( $field.length ) {
 								$field.val( ticket.quantity );
@@ -214,8 +236,12 @@ tribe.tickets.modal = {};
 				$errorNotice
 					.removeClass( 'tribe-tickets__notice--barred tribe-tickets__notice--barred-left' )
 					.addClass( obj.selectors.validationNotice.className() );
-				$errorNotice.find( '.tribe-tickets-notice__title' ).text( TribeMessages.api_error_title );
-				$errorNotice.find( '.tribe-tickets-notice__content' ).text( TribeMessages.connection_error );
+				$errorNotice
+					.find( '.tribe-tickets-notice__title' )
+					.text( TribeMessages.api_error_title );
+				$errorNotice
+					.find( '.tribe-tickets-notice__content' )
+					.text( TribeMessages.connection_error );
 				$errorNotice.fadeIn();
 			}
 		);
@@ -238,7 +264,9 @@ tribe.tickets.modal = {};
 
 		$.each( meta, function( idx, ticket ) {
 			let current = 0;
-			const $currentContainers = $containers.find( obj.selectors.metaItem ).filter( '[data-ticket-id="' + ticket.ticket_id + '"]' );
+			const $currentContainers = $containers
+				.find( obj.selectors.metaItem )
+				.filter( '[data-ticket-id="' + ticket.ticket_id + '"]' );
 
 			if ( ! $currentContainers.length ) {
 				return;
@@ -288,7 +316,8 @@ tribe.tickets.modal = {};
 		// Override the data with what's in the tickets block.
 		$.each( $items, function( index, item ) {
 			const $blockItem = $( item );
-			const $item = $form.find( '[data-ticket-id="' + $blockItem.attr( 'data-ticket-id' ) + '"]' );
+			const $item = $form
+				.find( '[data-ticket-id="' + $blockItem.attr( 'data-ticket-id' ) + '"]' );
 
 			if ( $item ) {
 				const quantity = $blockItem.find( tribe.tickets.block.selectors.itemQuantityInput ).val();
@@ -424,6 +453,98 @@ tribe.tickets.modal = {};
 	};
 
 	/**
+	 * Remove click event listeners from modal form.
+	 *
+	 * @since 5.3.2
+	 *
+	 * @return {void}
+	 */
+	obj.unbindModalFormClick = function( $form ) {
+		$form.off( 'click', obj.selectors.attendeeItemRemove );
+	};
+
+	/**
+	 * Handle form click to remove attendee item.
+	 *
+	 * @since 5.3.2
+	 *
+	 * @return {void}
+	 */
+	obj.bindModalFormClick = function( $form ) {
+		$form.on(
+			'click',
+			obj.selectors.attendeeItemRemove,
+			function() {
+				const $metaItem = $( this ).closest( obj.selectors.metaItem );
+				const $form = $metaItem.closest( obj.selectors.form );
+				const ticketID = $metaItem.data( 'ticket-id' );
+				const $ticketContainer = $form.find( obj.selectors.metaContainer + '[data-ticket-id="' + ticketID + '"]' ); // eslint-disable-line max-len
+
+				// If meta item is last child, just remove.
+				if ( $metaItem.is( ':last-child' ) ) {
+					$metaItem.remove();
+				} else {
+					const $metaItems = $ticketContainer.find( obj.selectors.metaItem );
+					let found = false;
+
+					// For each meta item, loop through.
+					$metaItems.each( function( index, item ) {
+						// Skip until we find the meta item being removed.
+						if ( ! found ) {
+							// If item is meta item being removed, remove and return.
+							if ( $metaItem.is( item ) ) {
+								found = true;
+								$( item ).remove();
+							}
+
+							return;
+						}
+
+						// Insert new item before old item.
+						const $item = $( item );
+						const data = { attendee_id: index };
+						const ticketTemplate = window.wp.template( 'tribe-registration--' + ticketID );
+						const $newItem = $( ticketTemplate( data ) )
+						$newItem.insertBefore( $item );
+
+						// For each form field in the new item, move over values from old item.
+						const $itemFields = $item.find( 'input, select' );
+						$newItem.find( 'input, select' ).each(
+							function( index, input ) {
+								const $itemField = $( $itemFields[ index ] );
+
+								// Update input elements by type.
+								switch( $( input ).attr( 'type' ) ) {
+									case 'radio':
+									case 'checkbox':
+										$( input ).prop( 'checked', $itemField.prop( 'checked' ) );
+										break;
+									default:
+										$( input ).val( $itemField.val() );
+								}
+							}
+						);
+
+						// Finally, remove old item.
+						$item.remove();
+					} );
+				}
+
+				// If we removed the last meta item, remove the ticket item.
+				if ( ! $ticketContainer.find( obj.selectors.metaItem ).length ) {
+					$form
+						.find( tribe.tickets.block.selectors.item + '[data-ticket-id="' + ticketID + '"] ' + obj.selectors.itemRemove ) // eslint-disable-line max-len
+						.trigger( 'click' );
+				}
+
+				// Click quantity remove button.
+				const $button = $form.find( tribe.tickets.block.selectors.item + '[data-ticket-id="' + ticketID + '"] ' + tribe.tickets.block.selectors.itemQuantityRemove ); // eslint-disable-line max-len
+				$button.trigger( 'click' );
+			}
+		);
+	};
+
+	/**
 	 * Unbind Modal submission.
 	 *
 	 * @since 5.1.0
@@ -466,8 +587,16 @@ tribe.tickets.modal = {};
 
 				tribe.tickets.loader.show( $form );
 
+				// Allow 3rd party to send back false to terminate submit.
+				if ( false === $document.triggerHandler( 'isValidForm.eventTicketsModal', [ $form ] ) ) {
+					tribe.tickets.loader.hide( $form );
+					return false;
+				}
+
 				if ( ! isValidForm[ 0 ] ) {
-					$errorNotice.find( '.tribe-tickets-notice__title' ).text( TribeMessages.validation_error_title );
+					$errorNotice
+						.find( '.tribe-tickets-notice__title' )
+						.text( TribeMessages.validation_error_title );
 					$errorNotice.find( 'p' ).html( TribeMessages.validation_error );
 					$( obj.selectors.validationNotice + '__count' ).text( isValidForm[ 1 ] );
 					$errorNotice.show();
@@ -570,7 +699,9 @@ tribe.tickets.modal = {};
 				// Again, short delay to ensure the fadeOut has finished.
 				window.setTimeout(
 					function() {
-						const $items = $cart.find( tribe.tickets.block.selectors.item ).filter( ':visible' );
+						const $items = $cart
+							.find( tribe.tickets.block.selectors.item )
+							.filter( ':visible' );
 
 						// Update the form totals.
 						tribe.tickets.block.updateFormTotals( $cart );
@@ -616,16 +747,24 @@ tribe.tickets.modal = {};
 			item.qty = tribe.tickets.block.getQty( $blockCartItem );
 			item.price = tribe.tickets.block.getPrice( $modalCartItem );
 
-			$modalCartItem.find( tribe.tickets.block.selectors.itemQuantityInput ).val( item.qty ).trigger( 'change' );
+			$modalCartItem
+				.find( tribe.tickets.block.selectors.itemQuantityInput )
+				.val( item.qty )
+				.trigger( 'change' );
 
 			// We force new DOM queries here to be sure we pick up dynamically generated items.
-			const optOutSelector = tribe.tickets.block.selectors.itemOptOutInput + $blockCartItem.data( 'ticket-id' );
+			const optOutSelector = tribe.tickets.block.selectors.itemOptOutInput
+				+ $blockCartItem.data( 'ticket-id' );
+			const optOutSelectorModal = tribe.tickets.block.selectors.itemOptOutInput
+				+ $blockCartItem.data( 'ticket-id' )
+				+ '--modal';
 			item.$optOut = $( optOutSelector );
-			const $optOutInput = $( optOutSelector + '-modal' );
-
-			( item.$optOut.length && item.$optOut.is( ':checked' ) )
-				? $optOutInput.val( '1' )
-				: $optOutInput.val( '0' );
+			const $optOutInput = $( optOutSelectorModal );
+			if ( item.$optOut.length && item.$optOut.is( ':checked' ) ) {
+				$optOutInput.val( '1' ).prop( 'checked' , true );
+			} else {
+				$optOutInput.val( '0' ).prop( 'checked' , false );
+			}
 		}
 
 		obj.updateItemTotal( item.qty, item.price, $modalCartItem );
@@ -707,7 +846,7 @@ tribe.tickets.modal = {};
 	 * @since 5.1.0
 	 *
 	 * @param {event} event The event.
-	 * @param {jQuery} $form The input we're manipulating.
+	 * @param {jQuery} $form The form we're manipulating.
 	 * @param {object} params The object with the parameters.
 	 */
 	obj.bindBeforeTicketsSubmit = function( event, $form, params ) {
@@ -737,8 +876,10 @@ tribe.tickets.modal = {};
 				tribe.tickets.block.unbindTicketsAddRemove( $modalCart );
 				tribe.tickets.block.unbindTicketsQuantityInput( $modalCart );
 				tribe.tickets.block.unbindDescriptionToggle( $modalCart );
+				obj.unbindOptOutChange( $form );
 				obj.unbindModalSubmit( $form );
 				obj.unbindModalItemRemove( $form );
+				obj.unbindModalFormClick( $form );
 			}
 		);
 	};
@@ -757,7 +898,9 @@ tribe.tickets.modal = {};
 				const $modal = $( dialogEl );
 				const $form = $modal.find( obj.selectors.form );
 				const $modalCart = $modal.find( obj.selectors.cartForm );
-				const $tribeTicket = $document.find( tribe.tickets.block.selectors.form ).filter( '[data-post-id="' + $form.data( 'postId' ) + '"]' );
+				const $tribeTicket = $document
+					.find( tribe.tickets.block.selectors.form )
+					.filter( '[data-post-id="' + $form.data( 'postId' ) + '"]' );
 				const $cartItems = $tribeTicket.find( tribe.tickets.block.selectors.item );
 
 				// Show the loader.
@@ -789,6 +932,10 @@ tribe.tickets.modal = {};
 
 				tribe.tickets.block.updateFormTotals( $modalCart );
 
+				obj.bindOptOutChange( $form );
+
+				obj.bindModalFormClick( $form );
+
 				// Hide the loader.
 				tribe.tickets.loader.hide( $form );
 			}
@@ -818,13 +965,13 @@ tribe.tickets.modal = {};
 	 * @return {void}
 	 */
 	obj.maybeSubmitBlockIfNoArTicketInCart = function() {
-		if ( !! TribeTicketsModal.ShowIfNoTicketWithArInCart ) {
+		if ( TribeTicketsModal.ShowIfNoTicketWithArInCart ) {
 			return;
 		}
 
 		$document.find( tribe.tickets.block.selectors.blockSubmit ).on(
 			'click',
-			function( e ) {
+			function() {
 				const $button = $( this );
 				const $form = $( this ).closest( 'form' );
 				const $cartItems = $form.find( tribe.tickets.block.selectors.item );
@@ -872,6 +1019,44 @@ tribe.tickets.modal = {};
 			}
 		);
 	};
+
+	/**
+	 * Add change binding to Opt Out checkbox in AR Modal. Will toggle the check/uncheck of the
+	 * Opt Out checkbox outside AR Modal.
+	 *
+	 * @since 5.2.9
+	 *
+	 * @param {jQuery} $form The form we're manipulating.
+	 *
+	 * @return {void}
+	 */
+	obj.bindOptOutChange = function( $form ) {
+		const $optOutInput = $form.find( '[id^=tribe-tickets-attendees-list-optout-]' );
+		$optOutInput.change( function() {
+			const $this = $( this );
+			const mainOptOutCheckboxid = $this.attr( 'id' );
+			const $mainOptOutCheckbox = $( '#' + $this.attr( 'id' ).substr(0, mainOptOutCheckboxid.indexOf( '--' ) ) ); // eslint-disable-line max-len
+			if ( $this.is( ':checked' ) ) {
+				$mainOptOutCheckbox.val( '1' ).prop( 'checked' , true );
+			} else {
+				$mainOptOutCheckbox.val( '0' ).prop( 'checked' , false );
+			}
+		} );
+	}
+
+	/**
+	 * Unbind Opt Out change.
+	 *
+	 * @since 5.2.9
+	 *
+	 * @param {jQuery} $form The form we're manipulating.
+	 *
+	 * @return {void}
+	 */
+	obj.unbindOptOutChange = function( $form ) {
+		const $optOutCheckbox = $form.find( '[id^=tribe-tickets-attendees-list-optout-]' );
+		$optOutCheckbox.unbind( 'change' );
+	}
 
 	/**
 	 * Handles the initialization of the scripts when document is ready.

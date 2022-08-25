@@ -23,6 +23,8 @@ class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
 	 * @since 4.6
 	 */
 	public function register() {
+		tribe_register_provider( TEC\Tickets_Plus\Provider::class );
+
 		$this->container->singleton( 'tickets-plus.assets', new Tribe__Tickets_Plus__Assets() );
 		$this->container->singleton( 'tickets-plus.admin.views', 'Tribe__Tickets_Plus__Admin__Views' );
 		$this->container->singleton( 'tickets-plus.admin.notices', 'Tribe__Tickets_Plus__Admin__Notices', [ 'hook' ] );

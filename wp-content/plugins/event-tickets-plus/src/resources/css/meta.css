@@ -5,7 +5,7 @@
  * src/resources/postcss/ file. For more information, check out our engineering
  * docs on how we handle CSS in our engineering docs.
  *
- * @see: http://moderntribe.github.io/products-engineering/css/
+ * @see: https://the-events-calendar.github.io/products-engineering/docs/code-standards/css/
  */
 
 /* -----------------------------------------------------------------------------
@@ -17,87 +17,7 @@
  *
  * ----------------------------------------------------------------------------- */
 
-/* Variables */
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Borders - Radius
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Borders - Width
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Layers of z-index
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Colors - Typography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Iconography
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - UI
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Colors - Borders & Misc
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Forms - Colors
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Forms - Box Shadows
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Gutter - Page
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Default
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Grid Width - Relative
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Opacities
-	 * ----------------------------------------------------------------------------- */
-}
-
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Spacers
-	 * ----------------------------------------------------------------------------- */
-}
+/* Variables - needed everywhere. */
 
 /* -----------------------------------------------------------------------------
  * SVG - Arrow Right
@@ -183,6 +103,8 @@
  * SVG - Messages
  * ----------------------------------------------------------------------------- */
 
+/* stylelint-disable-line block-no-empty */
+
 /* -----------------------------------------------------------------------------
  * SVG - Month
  * ----------------------------------------------------------------------------- */
@@ -190,6 +112,8 @@
 /* -----------------------------------------------------------------------------
  * SVG - No Map
  * ----------------------------------------------------------------------------- */
+
+/* stylelint-disable-line block-no-empty */
 
 /* -----------------------------------------------------------------------------
  * SVG - Paper Plane
@@ -231,29 +155,11 @@
  * SVG - Week
  * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Transitions
-	 * ----------------------------------------------------------------------------- */
-}
+/* -----------------------------------------------------------------------------
+ * SVG - Cal Export
+ * ----------------------------------------------------------------------------- */
 
-:root {
-	/* -----------------------------------------------------------------------------
-	 * Font Stacks
-	 * ----------------------------------------------------------------------------- */ /* stylelint-disable-line value-keyword-case */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Weights
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Font Sizing
-	 * ----------------------------------------------------------------------------- */
-
-	/* -----------------------------------------------------------------------------
-	 * Line Height
-	 * ----------------------------------------------------------------------------- */
-}
+/* stylelint-disable-line block-no-empty */
 
 /* Mixins */
 
@@ -338,6 +244,13 @@
  * ----------------------------------------------------------------------------- */
 
 /* -----------------------------------------------------------------------------
+ * Anchor - Event Title
+ *
+ * This mixin intentionally only affects the text and border _colors_
+ * to make sure they all follow the Customizer overrides.
+ * ----------------------------------------------------------------------------- */
+
+/* -----------------------------------------------------------------------------
  * Button - Global
  * ----------------------------------------------------------------------------- */
 
@@ -390,8 +303,8 @@
 }
 
 .edit_attendee .edit-attendee-column-icon.dashicons {
-		transform: rotate(90deg);
 		margin-top: 4px;
+		transform: rotate(90deg);
 	}
 
 .tribe-tickets-show-attendee-info td {
@@ -432,7 +345,7 @@
 		}
 
 #tribe-tickets-attendee-sortables .tribe-tickets-attendee-info-active-field .handlediv.tribe-tickets-attendee-info-compat-toggle:before {
-				margin-top: .5rem;
+				margin-top: 0.5rem;
 			}
 
 #tribe-tickets-attendee-sortables .tribe-tickets-attendee-info-active-field .handlediv.tribe-tickets-attendee-info-compat-toggle,
@@ -458,14 +371,14 @@
 }
 
 #poststuff .tribe-tickets__admin-attendee-info-field-title {
-	font-size: 12px;
 	color: #141827;
+	font-size: 12px;
 }
 
 .tribe-tickets__admin-attendee-info-field-handle-actions {
-	display: flex;
 	align-items: center;
 	color: #727272;
+	display: flex;
 }
 
 .tribe-tickets__admin-attendee-info-field-handle-actions i {
@@ -529,7 +442,7 @@
 		font-family: sans-serif;
 		font-size: 12px;
 		font-weight: 700;
-		opacity: .75;
+		opacity: 0.75;
 	}
 
 .tribe-tickets-attendee-saved-fields,
@@ -572,7 +485,7 @@
 
 .meta-postbox {
 	border: 1px solid #e5e5e5;
-	box-shadow: 0 1px 1px rgba( 0, 0, 0, .04 );
+	box-shadow: 0 1px 1px rgba(0, 0, 0, 0.04);
 	min-width: 255px;
 }
 
@@ -581,17 +494,38 @@
 }
 
 .tribe-tickets-input {
-	margin: 10px 0;
+	margin: var(--tec-spacer-4) 0;
 }
 
 .tribe-tickets-input label {
+		color: var(--tec-color-text-primary);
 		display: block;
 	}
 
 .tribe-tickets-input input[type=text],
 	.tribe-tickets-input textarea {
+		display: block;
 		width: 100%;
 	}
+
+.tribe-tickets-input p {
+		color: var(--tec-color-icon-primary-alt);
+		font-size: var(--tec-font-size-0);
+		margin: var(--tec-spacer-1) 0;
+	}
+
+.tribe-tickets-input-row {
+	display: block;
+}
+
+.tribe-tickets-input-col1 {
+	flex-basis: var(--tec-grid-width-1-of-8);
+	min-width: 90px;
+}
+
+.tribe-tickets-input-col2 {
+	flex-grow: 1;
+}
 
 .tribe-tickets-required {
 	font-size: 11px;
@@ -603,7 +537,7 @@
 }
 
 .tribe-tickets-delete-field a {
-		color: red;
+		color: #a00;
 	}
 
 .tribe-tickets-attendee-saved-fieldset-name {
@@ -665,7 +599,7 @@
 
 .event-tickets-ticket-purchaser {
 	color: #999;
-	font-size: .9em;
+	font-size: 0.9em;
 }
 
 .event-tickets-meta-toggle-hide {
@@ -698,7 +632,7 @@ tr.event-tickets-meta-toggle-open {
 }
 
 #tribe_show_attendees {
-	margin-left: .4em;
+	margin-left: 0.4em;
 }
 
 /* Tribe Events Modal Styles */
@@ -740,9 +674,9 @@ tr.event-tickets-meta-toggle-open {
 
 .tribe-tickets__admin-attendees-info-iac-notice.ticket-editor-notice .dashicons {
 	font-size: 22px;
-	width: 22px;
 	height: 22px;
 	margin-right: 6px;
+	width: 22px;
 }
 
 .tribe-tickets__admin-attendees-info-iac-notice p:last-child {
@@ -760,7 +694,7 @@ tr.event-tickets-meta-toggle-open {
 }
 
 .tribe-tickets__admin-attendees-info-iac-notice p {
-	margin: .325rem 0;
+	margin: 0.325rem 0;
 }
 
 .tribe-tickets__admin-attendee-info-field--iac {
@@ -773,18 +707,18 @@ tr.event-tickets-meta-toggle-open {
 
 .tribe-tickets__admin-attendee-info-field-title-label,
 .tribe-tickets__admin-attendee-info-field-handle-actions {
-	color: #727272;
+	color: var(--tec-color-icon-primary-alt);
 }
 
 .tribe-tickets__admin-attendee-info-field-title-label--required {
 	font-style: italic;
 }
 
-@media screen and ( max-width: 782px ) {
+@media screen and (max-width: 782px) {
 
 .tribe-attendee-fields-box .tribe-attendee-fields-new {
-			width: 100%;
-			display: block
+			display: block;
+			width: 100%
 	}
 
 			.tribe-attendee-fields-box .tribe-attendee-fields-new .tribe-tickets-attendee-info-options {
@@ -792,10 +726,17 @@ tr.event-tickets-meta-toggle-open {
 			}
 
 .tribe-attendee-fields-box .tribe-attendee-fields-existing {
-			width: 100%;
-			display: block
+			display: block;
+			width: 100%
 	}
 		}
+
+@media (min-width: 768px) {
+
+.tribe-tickets-input-row {
+		display: flex
+}
+	}
 
 @media (min-width: 783px) {
 

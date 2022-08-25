@@ -1,15 +1,15 @@
 <?php
 /**
-  Plugin Name: User Blocker
-  Plugin URI: https://wordpress.org/plugins/user-blocker/
-  Description: Block your unwanted site users except admin based on day, time and date or permanently.
-  Author: Solwin Infotech
-  Author URI: https://www.solwininfotech.com/
-  Copyright: Solwin Infotech
-  Version: 1.5.2
-  Requires at least: 4.0
-  Tested up to: 5.5
-  License: GPLv2 or later
+*  Plugin Name: User Blocker
+*  Plugin URI: https://wordpress.org/plugins/user-blocker/
+*  Description: Block your unwanted site users except admin based on day, time and date or permanently.
+*  Author: Solwin Infotech
+*  Author URI: https://www.solwininfotech.com/
+*  Copyright: Solwin Infotech
+*  Version: 1.5.5
+*  Requires at least: 5.4
+*  Tested up to: 6.0
+*  License: GPLv2 or later
  */
 /**
  * Exit if accessed directly
@@ -41,6 +41,9 @@ add_action('current_screen', 'ublk_footer');
 add_action('admin_enqueue_scripts', 'ublk_enqueueStyleScript');
 add_action('plugins_loaded', 'ublk_load_text_domain');
 add_action('admin_enqueue_scripts', 'ublk_admin_scripts');
+
+add_filter('set-screen-option', 'ublk_set_screen_option', 10, 3);
+
 $plugin = plugin_basename( __FILE__ );
 add_filter("plugin_action_links_$plugin", 'ublk_settings_link', 10, 2);
 add_action('init', 'ublk_session_start');
@@ -53,91 +56,49 @@ add_action('wp_ajax_close_tab', 'wp_ajax_blocker_close_tab');
 if (!function_exists('ublk_plugin_setup')) {
 
     function ublk_plugin_setup() {
+        global $screen_option_listbytime, $screen_option_listbydate, $screen_option_listbypermanent, $screen_option_listbyalltypes;
         $ublk_is_optin = get_option('ublk_is_optin');
         if($ublk_is_optin == 'yes' || $ublk_is_optin == 'no') {
             add_menu_page(esc_html__('User Blocker', 'user-blocker'), esc_html__('User Blocker', 'user-blocker'), 'manage_options', 'block_user', 'ublk_block_user_page', 'dashicons-admin-users',80);
         }
         else {
             add_menu_page(esc_html__('User Blocker', 'user-blocker'), esc_html__('User Blocker', 'user-blocker'), 'manage_options', 'welcome_block_user', 'ublk_welcome_page', 'dashicons-admin-users',80);
-        }        
+        }         
         $block_date_page = add_submenu_page('', esc_html__('Block User Date Wise', 'user-blocker'), esc_html__('Date Wise Block User', 'user-blocker'), 'manage_options', 'block_user_date', 'ublk_block_user_date_page', 1);
         $block_permanent = add_submenu_page('', esc_html__('Block User Permanent', 'user-blocker'), esc_html__('Permanently Block User', 'user-blocker'), 'manage_options', 'block_user_permenant', 'ublk_block_user_permenant_page', 2);
-        add_submenu_page('block_user', esc_html__('Blocked User list', 'user-blocker'), esc_html__('Blocked User list', 'user-blocker'), 'manage_options', 'blocked_user_list', 'ublk_block_user_list_page', 3);
-        $list_user_date = add_submenu_page('', esc_html__('Date Wise Blocked User list', 'user-blocker'), esc_html__('Date Wise Blocked User list', 'user-blocker'), 'manage_options', 'datewise_blocked_user_list', 'ublk_datewise_block_user_list_page', 4);
-        $list_user_permanent = add_submenu_page('', esc_html__('Permanent Blocked User list', 'user-blocker'), esc_html__('Permanent Blocked User list', 'user-blocker'), 'manage_options', 'permanent_blocked_user_list', 'ublk_permanent_block_user_list_page', 5);
-        $list_user_all = add_submenu_page('', esc_html__('All Type Blocked User list', 'user-blocker'), esc_html__('All Type Blocked User list', 'user-blocker'), 'manage_options', 'all_type_blocked_user_list', 'ublk_all_type_block_user_list_page', 6);
+
+        $screen_option_listbytime = add_submenu_page('block_user', esc_html__('Blocked User list', 'user-blocker'), esc_html__('Blocked User list', 'user-blocker'), 'manage_options', 'blocked_user_list', 'ublk_block_user_list_page', 3);
+        add_action("load-$screen_option_listbytime", 'ublk_screen_options_list_by_time'); 
+        
+        if($ublk_is_optin == 'yes' || $ublk_is_optin == 'no') {
+            $screen_option_listbydate = add_submenu_page(null,esc_html__('Date Wise Blocked User list', 'user-blocker'), esc_html__('Date Wise Blocked User list', 'user-blocker'), 'manage_options', 'datewise_blocked_user_list', 'ublk_datewise_block_user_list_page', 4);
+            add_action("load-$screen_option_listbydate", 'ublk_screen_options_list_by_date'); 
+        }
+        else {
+            $screen_option_listbydate  = add_submenu_page(null,esc_html__('Date Wise Blocked User list', 'user-blocker'), esc_html__('Date Wise Blocked User list', 'user-blocker'), 'manage_options', 'datewise_blocked_user_list', 'ublk_datewise_block_user_list_page', 4);
+            add_action("load-$screen_option_listbydate", 'ublk_screen_options_list_by_date');
+        }  
+        
+        if($ublk_is_optin == 'yes' || $ublk_is_optin == 'no') {
+            $screen_option_listbypermanent = add_submenu_page('', esc_html__('Permanent Blocked User list', 'user-blocker'), esc_html__('Permanent Blocked User list', 'user-blocker'), 'manage_options', 'permanent_blocked_user_list', 'ublk_permanent_block_user_list_page', 5);
+            add_action("load-$screen_option_listbypermanent", 'ublk_screen_options_list_by_permanent'); 
+        }
+        else {
+            $screen_option_listbypermanent = add_submenu_page('', esc_html__('Permanent Blocked User list', 'user-blocker'), esc_html__('Permanent Blocked User list', 'user-blocker'), 'manage_options', 'permanent_blocked_user_list', 'ublk_permanent_block_user_list_page', 5);
+            add_action("load-$screen_option_listbypermanent", 'ublk_screen_options_list_by_permanent'); 
+        }  
+
+        if($ublk_is_optin == 'yes' || $ublk_is_optin == 'no') {
+            $screen_option_listbyalltypes = add_submenu_page('', esc_html__('All Type Blocked User list', 'user-blocker'), esc_html__('All Type Blocked User list', 'user-blocker'), 'manage_options', 'all_type_blocked_user_list', 'ublk_all_type_block_user_list_page', 6);
+            add_action("load-$screen_option_listbyalltypes", 'ublk_screen_options_list_by_alltypes'); 
+        }
+        else {
+            $screen_option_listbyalltypes = add_submenu_page('', esc_html__('All Type Blocked User list', 'user-blocker'), esc_html__('All Type Blocked User list', 'user-blocker'), 'manage_options', 'all_type_blocked_user_list', 'ublk_all_type_block_user_list_page', 6);
+            add_action("load-$screen_option_listbyalltypes", 'ublk_screen_options_list_by_alltypes'); 
+        }  
         add_submenu_page('block_user', esc_html__('User Blocker Settings', 'user-blocker'), esc_html__('User Blocker Settings', 'user-blocker'), 'manage_options', 'user_blocker_settings', 'ublk_block_user_setting_page', 3);
 
         // Enqueue script in submenu page to fix the current menu indicator
-        add_action("admin_footer-$block_date_page", function() {
-            ?>
-            <script type="text/javascript">
-                jQuery(document).ready(function ($) {
-                    jQuery('#toplevel_page_block_user, #toplevel_page_block_user > a')
-                            .removeClass('wp-not-current-submenu')
-                            .addClass('wp-has-current-submenu');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li.wp-first-item')
-                            .addClass('current');
-                });
-            </script>
-            <?php
-        });
-        add_action("admin_footer-$block_permanent", function() {
-            ?>
-            <script type="text/javascript">
-                jQuery(document).ready(function ($) {
-                    jQuery('#toplevel_page_block_user, #toplevel_page_block_user > a')
-                            .removeClass('wp-not-current-submenu')
-                            .addClass('wp-has-current-submenu');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li')
-                            .addClass('current');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li:first-child')
-                            .removeClass('current');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li:last-child')
-                            .removeClass('current');
-                });
-            </script>
-            <?php
-        });
-        add_action("admin_footer-$list_user_date", function() {
-            ?>
-            <script type="text/javascript">
-                jQuery(document).ready(function ($) {
-                    jQuery('#toplevel_page_block_user, #toplevel_page_block_user > a')
-                            .removeClass('wp-not-current-submenu')
-                            .addClass('wp-has-current-submenu');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li:last-child')
-                            .addClass('current');
-                });
-            </script>
-            <?php
-        });
-        add_action("admin_footer-$list_user_permanent", function() {
-            ?>
-            <script type="text/javascript">
-                jQuery(document).ready(function ($) {
-                    jQuery('#toplevel_page_block_user, #toplevel_page_block_user > a')
-                            .removeClass('wp-not-current-submenu')
-                            .addClass('wp-has-current-submenu');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li:last-child')
-                            .addClass('current');
-                });
-            </script>
-            <?php
-        });
-        add_action("admin_footer-$list_user_all", function() {
-            ?>
-            <script type="text/javascript">
-                jQuery(document).ready(function ($) {
-                    jQuery('#toplevel_page_block_user, #toplevel_page_block_user > a')
-                            .removeClass('wp-not-current-submenu')
-                            .addClass('wp-has-current-submenu');
-                    jQuery('#toplevel_page_block_user .wp-submenu-wrap li:last-child')
-                            .addClass('current');
-                });
-            </script>
-            <?php
-        });
     }
 
 }
@@ -149,6 +110,120 @@ if (!function_exists('ublk_plugin_setup')) {
  * @param type $password
  * @return \WP_Error
  */
+if (!function_exists('ublk_screen_options_list_by_time')) {
+
+    function ublk_screen_options_list_by_time() {
+        global $screen_option_listbytime;
+        $screen_listbytime = get_current_screen();
+
+        // get out of here if we are not on our settings page
+        if (!is_object($screen_listbytime) || $screen_listbytime->id != $screen_option_listbytime)
+            return;
+
+        $args = array(
+            'label' => __('Number of Users per page', 'user-blocker') . ' : ',
+            'default' => 10,
+            'option' => 'ublk_list_by_time_per_page'
+        );
+        add_screen_option('per_page', $args);
+    }
+}
+
+/**
+ *
+ * @param type $user
+ * @param type $username
+ * @param type $password
+ * @return \WP_Error
+ */
+if (!function_exists('ublk_screen_options_list_by_date')) {
+
+    function ublk_screen_options_list_by_date() {
+        global $screen_option_listbydate;
+        $screen_listbydate = get_current_screen();
+
+        // get out of here if we are not on our settings page
+        if (!is_object($screen_listbydate) || $screen_listbydate->id != $screen_option_listbydate)
+            return;
+
+        $args = array(
+            'label' => __('Number of Users per page', 'user-blocker') . ' : ',
+            'default' => 10,
+            'option' => 'ublk_list_by_date_per_page'
+        );
+        add_screen_option('per_page', $args);
+    }
+}
+
+/**
+ *
+ * @param type $user
+ * @param type $username
+ * @param type $password
+ * @return \WP_Error
+ */
+if (!function_exists('ublk_screen_options_list_by_permanent')) {
+
+    function ublk_screen_options_list_by_permanent() {
+        global $screen_option_listbypermanent;
+        $screen_listbypermanent = get_current_screen();
+
+        // get out of here if we are not on our settings page
+        if (!is_object($screen_listbypermanent) || $screen_listbypermanent->id != $screen_option_listbypermanent)
+            return;
+
+        $args = array(
+            'label' => __('Number of Users per page', 'user-blocker') . ' : ',
+            'default' => 10,
+            'option' => 'ublk_list_by_permanent_per_page'
+        );
+        add_screen_option('per_page', $args);
+    }
+}
+
+/**
+ *
+ * @param type $user
+ * @param type $username
+ * @param type $password
+ * @return \WP_Error
+ */
+if (!function_exists('ublk_screen_options_list_by_alltypes')) {
+
+    function ublk_screen_options_list_by_alltypes() {
+        global $screen_option_listbyalltypes;
+        $screen_listbyalltypes = get_current_screen();
+
+        // get out of here if we are not on our settings page
+        if (!is_object($screen_listbyalltypes) || $screen_listbyalltypes->id != $screen_option_listbyalltypes)
+            return;
+
+        $args = array(
+            'label' => __('Number of Users per page', 'user-blocker') . ' : ',
+            'default' => 10,
+            'option' => 'ublk_list_by_alltypes_per_page'
+        );
+        add_screen_option('per_page', $args);
+    }
+}
+
+/**
+ *
+ * @param type $status
+ * @param type $option
+ * @param type $value
+ * @return type
+ */
+if (!function_exists('ublk_set_screen_option')) {
+    function ublk_set_screen_option($status, $option, $value) {
+        if ( 'ublk_list_by_time_per_page' == $option || 'ublk_list_by_date_per_page' === $option || 'ublk_list_by_permanent_per_page' === $option || 'ublk_list_by_alltypes_per_page' === $option ) {
+            return $value;
+        }
+        return $status;
+    }
+}
+
+
 if (!function_exists('ublk_auth_signon')) {
 
     function ublk_auth_signon($user, $username, $password) {
@@ -177,7 +252,7 @@ if (!function_exists('ublk_auth_signon')) {
                             $error_msg = ' '.$block_msg_day;
                         }
                     }
-                } else if ($block_date != 0 && $block_date != '' && !empty($block_date)) {
+                } if ($block_date != 0 && $block_date != '' && !empty($block_date)) {
                     $frmdate = $sfrmdate = $block_date['frmdate'];
                     $todate = $stodate = $block_date['todate'];
                     $frmdate = strtotime($frmdate) . '</br>';
@@ -185,10 +260,14 @@ if (!function_exists('ublk_auth_signon')) {
                     $current_date = current_time('timestamp');
                     if ($current_date >= $frmdate && $current_date <= $todate) {
                         $block_msg_date = get_user_meta($user_id, 'block_msg_date', true);
-                        if ($error_msg == '')
+                        if ($error_msg == ''){
                             $error_msg = ' '.$block_msg_date;
-                        else
+                        }
+                            
+                        else{
                             $error_msg .= ' ' . $block_msg_date;
+                        }
+                            
                     }
                 }
                 if ($error_msg != '') {
@@ -211,6 +290,7 @@ add_filter('authenticate', 'ublk_auth_signon', 30, 3);
 if (!function_exists('ublk_login_error')) {
 
     function ublk_login_error($parm){
+        $my_message = $parm;
         $username = $user_id = ''; 
         if(isset($_REQUEST)){
             foreach((array) $_REQUEST as $key=>$val){
@@ -230,7 +310,7 @@ if (!function_exists('ublk_login_error')) {
                 $my_message = '<strong>' . __('ERROR', 'user-blocker') . '</strong>:' .' '. $block_msg_permenant;
             } else {
                 $error_msg = '';
-                if (!empty($block_day) && $block_day != 0 && $block_day != '') {
+                 if (!empty($block_day) && $block_day != 0 && $block_day != '') {
                     $full_date = getdate();
                     $current_day = strtolower($full_date['weekday']);
                     $current_time = current_time('timestamp');
@@ -244,7 +324,7 @@ if (!function_exists('ublk_login_error')) {
                             $error_msg = ' '.$block_msg_day;
                         }
                     }
-                } else if ($block_date != 0 && $block_date != '' && !empty($block_date)) {
+                } if ($block_date != 0 && $block_date != '' && !empty($block_date)) {
                     $frmdate = $sfrmdate = $block_date['frmdate'];
                     $todate = $stodate = $block_date['todate'];
                     $frmdate = strtotime($frmdate) . '</br>';
@@ -261,8 +341,10 @@ if (!function_exists('ublk_login_error')) {
                 if ($error_msg != '') {
                     $my_message = '<strong>' . __('ERROR', 'user-blocker') . '</strong>:' .' '. $error_msg;
                 }
+               
             }
         }
+      
         return $my_message;
     }
     
@@ -288,6 +370,7 @@ if (!function_exists('ublk_when_register')) {
             $date_wise_block = get_option($user_role . '_block_date');
             $day_wise_block_msg = get_option($user_role . '_block_msg_day');
             $date_wise_block_msg = get_option($user_role . '_block_msg_date');
+            $all = get_option($user_role . '_all');
             if ($day_wise_block != 0 && $day_wise_block != '') {
                 update_user_meta($user_id, 'block_day', $day_wise_block);
                 update_user_meta($user_id, 'block_msg_day', $day_wise_block_msg);
@@ -295,6 +378,9 @@ if (!function_exists('ublk_when_register')) {
             if ($date_wise_block != 0 && $date_wise_block != '') {
                 update_user_meta($user_id, 'block_date', $date_wise_block);
                 update_user_meta($user_id, 'block_msg_date', $date_wise_block_msg);
+            }
+            if ($all != 0 && $all != '') {
+                update_user_meta($user_id, 'all', $date_wise_block_msg);
             }
         }
     }
@@ -664,16 +750,21 @@ if (!function_exists('ublk_all_block_data_msg')) {
         $block_date = get_user_meta($user_id, 'block_date', true);
         if ($is_active == 'n') {
             echo ublk_disp_msg(get_user_meta($user_id, 'block_msg_permenant', true));
-        } else {
-            if (isset($block_day) && !empty($block_day) && $block_day != '') {
+        } 
+       
+        else if(isset($block_day) && !empty($block_day) && $block_day != '' && isset($block_date) && !empty($block_date) && $block_date != '')
+        {
+           echo ublk_disp_msg(get_user_meta($user_id, 'block_msg_day', true) . " And ". get_user_meta($user_id, 'block_msg_date', true) );
+        }
+        else if(isset($block_day) && !empty($block_day) && $block_day != '') 
+        {
                 echo ublk_disp_msg(get_user_meta($user_id, 'block_msg_day', true));
-            }
-            if (isset($block_date) && !empty($block_date) && $block_date != '') {
+        }
+        else if(isset($block_date) && !empty($block_date) && $block_date != '') 
+        {
                 echo ublk_disp_msg(get_user_meta($user_id, 'block_msg_date', true));
-            }
         }
     }
-
 }
 
 /**

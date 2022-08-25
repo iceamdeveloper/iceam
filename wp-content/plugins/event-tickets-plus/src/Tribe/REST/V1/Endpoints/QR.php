@@ -183,7 +183,7 @@ implements Tribe__REST__Endpoints__READ_Endpoint_Interface, Tribe__Documentation
 		/**
 		 * Allow filtering the API key validation status.
 		 *
-		 * @since TBD
+		 * @since 5.2.5
 		 *
 		 * @param bool  $is_valid Whether the provided API key is valid or not.
 		 * @param array $qr_arr The request data for Check in.

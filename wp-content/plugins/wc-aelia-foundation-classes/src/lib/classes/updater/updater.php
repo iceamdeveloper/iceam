@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use \Exception;
 use \InvalidArgumentException;
@@ -84,10 +84,6 @@ abstract class Updater extends Base_Class {
 	 */
 	protected function set_hooks() {
 		// Automatic updates
-		// TODO Remove hook for filter pre_set_site_transient_update_plugins, it should no longer be required
-		//add_filter('pre_set_site_transient_update_plugins', array($this, 'pre_set_site_transient_update_plugins'), 10, 1);
-
-		//add_filter('init', array($this, 'add_license_management_settings'), 20);
 		$this->add_license_management_settings();
 	}
 
@@ -126,7 +122,7 @@ abstract class Updater extends Base_Class {
 	}
 
 	/**
-	 * Updates the plugin settings.
+	 * Saves the licences managed by this updater.
 	 *
 	 * @since 1.8.3.170110
 	 */
@@ -183,11 +179,6 @@ abstract class Updater extends Base_Class {
 		// TODO Process $this->product_licenses and build a list of fields
 		return array();
 	}
-
-	// TODO Remove hook for filter pre_set_site_transient_update_plugins, it should no longer be required
-	//public function pre_set_site_transient_update_plugins($checked_data) {
-	//	return $checked_data;
-	//}
 
 	/**
 	 * Loads the licenses handled by this updater.
@@ -287,12 +278,6 @@ abstract class Updater extends Base_Class {
 			));
 			$updater_class = isset($plugin_updaters_map[$product_type]) ? $plugin_updaters_map[$product_type] : '';
 			if(empty($updater_class)) {
-				// $this->logger->error(__('Updater could not be loaded. Invalid product type ' .
-				// 												'specified.', Definitions::TEXT_DOMAIN),
-				// 										 array(
-				// 											 'Product Type' => $product_type
-				// 										 ));
-
 				$error_msg = sprintf(__('Aelia Updater - Updater could not be loaded. ' .
 																'Invalid product type specified: "%s". Please ' .
 																'contact Aelia Support team and provide them ' .

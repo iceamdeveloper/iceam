@@ -48,6 +48,19 @@ class Sensei_Lesson_Blocks extends Sensei_Blocks_Initializer {
 			[ 'sensei-shared-blocks' ],
 			true
 		);
+
+		$course_id = Sensei_Utils::get_current_course();
+		if ( ! empty( $course_id ) ) {
+			wp_add_inline_script(
+				'sensei-single-lesson-blocks',
+				sprintf(
+					'window.sensei = window.sensei || {}; window.sensei.courseThemeEnabled = %s;',
+					Sensei_Course_Theme_Option::has_learning_mode_enabled( $course_id ) ? 'true' : 'false'
+				),
+				'before'
+			);
+		}
+
 		Sensei()->assets->enqueue(
 			'sensei-single-lesson-blocks-editor-style',
 			'blocks/single-lesson-style-editor.css',
@@ -63,15 +76,34 @@ class Sensei_Lesson_Blocks extends Sensei_Blocks_Initializer {
 
 		$post_type_object = get_post_type_object( 'lesson' );
 
-		$block_template = [
-			[ 'sensei-lms/lesson-properties' ],
-			[ 'sensei-lms/button-contact-teacher' ],
-			[
-				'core/paragraph',
-				[ 'placeholder' => __( 'Write lesson content...', 'sensei-lms' ) ],
-			],
-			[ 'sensei-lms/lesson-actions' ],
-		];
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$lesson_id = isset( $_GET['post'] ) ? intval( $_GET['post'] ) : 0; // WP query is not ready yet.
+		$course_id = Sensei()->lesson->get_course_id( $lesson_id );
+
+		// Notice that for new Lessons, the `lesson_id` will return `0` (post query string not set).
+		// It means the following check will return `false`. It's expected and works well because
+		// new lessons don't have associated courses yet.
+		$sensei_theme_enabled = Sensei_Course_Theme_Option::has_learning_mode_enabled( $course_id );
+
+		if ( $sensei_theme_enabled ) {
+			$block_template = [
+				[ 'sensei-lms/lesson-properties' ],
+				[
+					'core/paragraph',
+					[ 'placeholder' => __( 'Write lesson content...', 'sensei-lms' ) ],
+				],
+			];
+		} else {
+			$block_template = [
+				[ 'sensei-lms/lesson-properties' ],
+				[ 'sensei-lms/button-contact-teacher' ],
+				[
+					'core/paragraph',
+					[ 'placeholder' => __( 'Write lesson content...', 'sensei-lms' ) ],
+				],
+				[ 'sensei-lms/lesson-actions' ],
+			];
+		}
 
 		if ( Sensei()->quiz->is_block_based_editor_enabled() ) {
 			$block_template[] = [ 'sensei-lms/quiz', [ 'isPostTemplate' => true ] ];
@@ -89,6 +121,8 @@ class Sensei_Lesson_Blocks extends Sensei_Blocks_Initializer {
 		 * @return {string[][]} Array of blocks to use as the default initial state for a lesson.
 		 */
 		$post_type_object->template = apply_filters( 'sensei_lesson_block_template', $block_template, $post_type_object->template ?? [] );
+
+		new Sensei_Conditional_Content_Block();
 
 		if ( ! Sensei()->lesson->has_sensei_blocks() ) {
 			return;

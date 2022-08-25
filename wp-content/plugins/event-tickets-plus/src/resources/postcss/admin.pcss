@@ -6,7 +6,7 @@
 }
 
 #tribe_show_attendees {
-	margin-left: .4em;
+	margin-left: 0.4em;
 }
 
 .tribe-warning-toggle {
@@ -14,7 +14,7 @@
 	box-shadow: none;
 	float: right;
 	margin: 0 10px 0 0;
-	transition: all .5s ease;
+	transition: all 0.5s ease;
 
 	label {
 		line-height: 33px;
@@ -22,13 +22,13 @@
 		.event-warnings {
 			color: red;
 		}
+
 		.event-warnings,
 		.event-warnings-close {
 
 			.dashicons {
 				font-size: 18px;
 				line-height: 33px;
-
 			}
 		}
 	}
@@ -41,7 +41,7 @@
 .recurring-warning {
 	color: red;
 	padding: 10px;
-	transition: all .5s ease;
+	transition: all 0.5s ease;
 
 	.dashicons {
 		font-size: 40px;
@@ -56,15 +56,25 @@
 	}
 }
 
-.tribe_attendee-collection_meta::after {
+.tribe_attendee-collection_meta:after {
 	width: calc(100% - 160px);
 }
 
 .tribe-tickets__tickets-editor-ticket-name-attendee-registration-fields {
 	color: #999;
 	display: block;
-	font-style: italic;
+	font-size: var(--tec-font-size-1);
+	line-height: var(--tec-spacer-4);
 	overflow: hidden;
 	text-overflow: ellipsis;
 	white-space: nowrap;
+
+	&:before {
+		color: #ccc;
+		font-size: var(--tec-spacer-3);
+		height: var(--tec-spacer-3);
+		line-height: var(--tec-spacer-3);
+		margin-top: calc(var(--tec-spacer-0) / 2);
+		width: var(--tec-spacer-3);
+	}
 }

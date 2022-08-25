@@ -25,9 +25,6 @@ class Sensei_Course_Results {
 	 */
 	public function __construct() {
 
-		// Setup learner profile URL base
-		$this->courses_url_base = apply_filters( 'sensei_course_slug', _x( 'course', 'post type single url slug', 'sensei-lms' ) );
-
 		// Setup permalink structure for course results
 		add_action( 'init', array( $this, 'setup_permastruct' ) );
 
@@ -49,6 +46,10 @@ class Sensei_Course_Results {
 	 * @return void
 	 */
 	public function setup_permastruct() {
+		// Setup course results URL base.
+		$this->courses_url_base = apply_filters( 'sensei_course_slug', _x( 'course', 'post type single url slug', 'sensei-lms' ) );
+
+		// Setup permalinks structure.
 		add_rewrite_rule( '^' . $this->courses_url_base . '/([^/]*)/results/?', 'index.php?course_results=$matches[1]', 'top' );
 		add_rewrite_tag( '%course_results%', '([^&]+)' );
 	}
@@ -97,22 +98,6 @@ class Sensei_Course_Results {
 		}
 
 		return $permalink;
-	}
-
-	/**
-	 * Load content for course results
-	 *
-	 * @since  1.4.0
-	 * @return void
-	 */
-	public function content() {
-		global $wp_query;
-
-		_deprecated_function( __METHOD__, '2.2.0' );
-
-		if ( isset( $wp_query->query_vars['course_results'] ) ) {
-			Sensei_Templates::get_template( 'course-results/course-info.php' );
-		}
 	}
 
 	/**

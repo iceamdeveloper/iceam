@@ -18,10 +18,9 @@ import {
 	withDefaultColor,
 } from '../../shared/blocks/settings';
 import { COURSE_STATUS_STORE } from '../course-outline/status-preview/status-store';
-import CourseProgress, {
-	CourseProgressSettings,
-} from '../../shared/blocks/course-progress';
-import ToggleLegacyCourseMetaboxesWrapper from '../toggle-legacy-course-metaboxes-wrapper';
+import ProgressBar, {
+	ProgressBarSettings,
+} from '../../shared/blocks/progress-bar';
 
 /**
  * Edit course progress bar component.
@@ -68,7 +67,7 @@ export const CourseProgressEdit = ( props ) => {
 	};
 	const barWrapperAttributes = {
 		className: classnames(
-			'wp-block-sensei-lms-progress-bar',
+			'wp-block-sensei-lms-course-progress',
 			barBackgroundColor?.class
 		),
 		style: {
@@ -79,18 +78,18 @@ export const CourseProgressEdit = ( props ) => {
 	};
 
 	return (
-		<ToggleLegacyCourseMetaboxesWrapper { ...props }>
-			<CourseProgress
-				lessonsCount={ totalLessonsCount }
+		<>
+			<ProgressBar
+				totalCount={ totalLessonsCount }
 				completedCount={ completedLessonsCount }
 				wrapperAttributes={ wrapperAttributes }
 				barWrapperAttributes={ barWrapperAttributes }
 				barAttributes={ barAttributes }
 				countersClassName="wp-block-sensei-lms-progress-heading"
-				lessonsCountClassName="wp-block-sensei-lms-progress-heading__lessons"
+				label={ __( 'lessons', 'sensei-lms' ) }
 				completedCountClassName="wp-block-sensei-lms-progress-heading__completed"
 			/>
-			<CourseProgressSettings
+			<ProgressBarSettings
 				borderRadius={ borderRadius }
 				setBorderRadius={ ( newRadius ) =>
 					setAttributes( { borderRadius: newRadius } )
@@ -100,7 +99,7 @@ export const CourseProgressEdit = ( props ) => {
 					setAttributes( { height: newHeight } )
 				}
 			/>
-		</ToggleLegacyCourseMetaboxesWrapper>
+		</>
 	);
 };
 

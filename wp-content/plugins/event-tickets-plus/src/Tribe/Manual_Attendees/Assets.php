@@ -35,6 +35,7 @@ class Assets {
 			static::$group_key . '-modal-styles',
 			'tickets-manual-attendees.css',
 			[
+				'tec-variables-full',
 				'tribe-common-full-style',
 				'tribe-common-responsive',
 				'tribe-dialog',

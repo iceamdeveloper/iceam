@@ -43,10 +43,8 @@ class Sensei_Blocks {
 
 	/**
 	 * Sensei_Blocks constructor.
-	 *
-	 * @param Sensei_Main $sensei Sensei instance.
 	 */
-	public function __construct( Sensei_Main $sensei ) {
+	public function __construct() {
 		// Skip if Gutenberg is not available.
 		if ( ! function_exists( 'register_block_type' ) ) {
 			return;
@@ -55,13 +53,19 @@ class Sensei_Blocks {
 		// Register generic blocks assets.
 		add_action( 'init', [ $this, 'register_generic_assets' ] );
 
-		add_filter( 'block_categories', [ $this, 'sensei_block_categories' ], 10, 2 );
+		if ( is_wp_version_compatible( '5.8' ) ) {
+			add_filter( 'block_categories_all', [ $this, 'sensei_block_categories' ], 10, 2 );
+		} else {
+			add_filter( 'block_categories', [ $this, 'sensei_block_categories' ], 10, 2 );
+		}
 
 		// Init blocks.
 		$this->course = new Sensei_Course_Blocks();
 		$this->lesson = new Sensei_Lesson_Blocks();
 		$this->quiz   = new Sensei_Quiz_Blocks();
 		$this->page   = new Sensei_Page_Blocks();
+
+		new Sensei\Blocks\Course_Theme_Blocks();
 	}
 
 	/**
@@ -77,6 +81,7 @@ class Sensei_Blocks {
 		Sensei()->assets->register( 'sensei-editor-components-style', 'blocks/editor-components/editor-components-style.css' );
 
 		Sensei()->assets->register( 'sensei-blocks-frontend', 'blocks/frontend.js', [], true );
+		Sensei()->assets->register( 'sensei-theme-blocks', 'css/sensei-theme-blocks.css' );
 	}
 
 	/**
@@ -84,15 +89,12 @@ class Sensei_Blocks {
 	 *
 	 * @access private
 	 *
-	 * @param array   $categories Current categories.
-	 * @param WP_Post $post       Filtered post.
+	 * @param array                           $categories Current categories.
+	 * @param WP_Post|WP_Block_Editor_Context $context    Either the WP Post (pre-WP 5.8) or the context object.
 	 *
 	 * @return array Filtered categories.
 	 */
-	public function sensei_block_categories( $categories, $post ) {
-		if ( ! in_array( $post->post_type, [ 'course', 'lesson', 'question', 'page' ], true ) ) {
-			return $categories;
-		}
+	public function sensei_block_categories( $categories, $context ) {
 
 		return array_merge(
 			[
@@ -134,7 +136,6 @@ class Sensei_Blocks {
 		 * @hook sensei_block_type_args
 		 * @see register_block_type
 		 * @see register_block_type_from_metadata
-		 * @see includes/blocks/compat.php
 		 *
 		 * @param {array}  $block_args The block arguments as defined by register_block_type.
 		 * @param {string} $block_name Block name.
@@ -166,5 +167,49 @@ class Sensei_Blocks {
 		}
 
 		return false !== strpos( (string) $post, '<!-- wp:sensei-lms/' );
+	}
+
+	/**
+	 * Update the URL of a button block.
+	 *
+	 * @param string $block_content The block content about to be appended.
+	 * @param array  $block         The full block, including name and attributes.
+	 * @param string $class_name    The CSS class name used to identify the correct block.
+	 * @param string $url           The URL to navigate to when the button is clicked.
+	 *
+	 * @return string Block HTML.
+	 */
+	public static function update_button_block_url( $block_content, $block, $class_name, $url ): string {
+		if (
+			! isset( $block['blockName'] )
+			|| 'core/button' !== $block['blockName']
+			|| ! isset( $block['attrs']['className'] )
+			|| false === strpos( $block['attrs']['className'], $class_name )
+		) {
+			return $block_content;
+		}
+
+		if ( ! $url ) {
+			return $block_content;
+		}
+
+		$dom = new DomDocument();
+		$dom->loadHTML( $block_content );
+		$parent_node = $dom->getElementsByTagName( 'div' )->length > 0 ? $dom->getElementsByTagName( 'div' )[0] : '';
+
+		if ( ! $parent_node || ! $parent_node->hasAttributes() ) {
+			return $block_content;
+		}
+
+		// Get anchor node.
+		$anchor_node = $parent_node->getElementsByTagName( 'a' )->length > 0 ? $parent_node->getElementsByTagName( 'a' )[0] : '';
+
+		// Open the appropriate page when the button is clicked.
+		if ( $anchor_node ) {
+			$anchor_node->setAttribute( 'href', $url );
+			$block_content = $dom->saveHTML( $parent_node );
+		}
+
+		return $block_content;
 	}
 }

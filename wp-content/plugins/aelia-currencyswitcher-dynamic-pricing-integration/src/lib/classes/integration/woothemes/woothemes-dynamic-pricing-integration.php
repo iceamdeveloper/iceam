@@ -133,13 +133,13 @@ class Dynamic_Pricing_Integration {
 		// Remove the filter used to override the decimal separator. This will allow
 		// WooCommerce to re-format the amount correctly, returning a value with
 		// the point as the decimal separator
-		remove_filter('pre_option_woocommerce_price_decimal_sep', array($this->currency_switcher(), 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
+		remove_filter('pre_option_woocommerce_price_decimal_sep', array(\Aelia\WC\CurrencySwitcher\Currency_Formatting::instance(), 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
 
 		// Return the amount, now as raw float
 		$amount = floatval(wc_format_decimal($amount));
 
 		// Restore the filter used to override the decimal separator
-		add_filter('pre_option_woocommerce_price_decimal_sep', array($this->currency_switcher(), 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
+		add_filter('pre_option_woocommerce_price_decimal_sep', array(\Aelia\WC\CurrencySwitcher\Currency_Formatting::instance(), 'pre_option_woocommerce_price_decimal_sep'), 10, 1);
 
 		return $amount;
 	}

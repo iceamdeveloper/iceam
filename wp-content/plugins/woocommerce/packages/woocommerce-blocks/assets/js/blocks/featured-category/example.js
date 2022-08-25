@@ -1,15 +1,16 @@
 /**
  * External dependencies
  */
-import { DEFAULT_HEIGHT } from '@woocommerce/block-settings';
+import { getSetting } from '@woocommerce/settings';
 import { previewCategories } from '@woocommerce/resource-previews';
 
 export const example = {
 	attributes: {
+		alt: '',
 		contentAlign: 'center',
 		dimRatio: 50,
 		editMode: false,
-		height: DEFAULT_HEIGHT,
+		height: getSetting( 'default_height', 500 ),
 		mediaSrc: '',
 		showDesc: true,
 		categoryId: 'preview',

@@ -99,4 +99,68 @@ class Tribe__Tickets_Plus__REST__V1__Response {
 
 		return $data;
 	}
+
+	/**
+	 * Filter and validate attendee meta data for update.
+	 *
+	 * @since 5.4.2
+	 *
+	 * @param array $updated_data Data that needs to be updated.
+	 * @param WP_REST_Request $request Request object.
+	 * @param array $attendee_data Attendee data that will be updated.
+	 *
+	 * @return array | WP_Error
+	 */
+	public function filter_single_attendee_update_data( $data, $request, $attendee ) {
+		if ( ! isset( $data['attendee_meta'] ) ) {
+			return $data;
+		}
+
+		return $this->validate_attendee_meta( $attendee['product_id'], $data );
+	}
+
+	/**
+	 * Filter and validate attendee meta data for create.
+	 *
+	 * @since 5.4.2
+	 *
+	 * @param array $updated_data Data that needs to be updated.
+	 * @param WP_REST_Request $request Request object.
+	 *
+	 * @return array | WP_Error
+	 */
+	public function filter_single_attendee_create_data( $data, $request ) {
+		if ( ! isset( $data['attendee_meta'] ) ) {
+			return $data;
+		}
+
+		return $this->validate_attendee_meta( $data['ticket_id'], $data );
+	}
+
+	/**
+	 * Validate attendee data.
+	 *
+	 * @since 5.4.2
+	 *
+	 * @param int $ticket_id Ticket ID.
+	 * @param array $data Ticket Data.
+	 *
+	 * @return mixed|WP_Error
+	 */
+	public function validate_attendee_meta( $ticket_id, $data ) {
+		if ( ! tribe_tickets_has_meta_fields( $ticket_id ) ) {
+			return new WP_Error( 'invalid-meta-fields', __( 'This attendee has no meta fields associated with it.', 'event-tickets-plus' ), [ 'status' => 400 ] );
+		}
+
+		$meta_fields   = (array) get_post_meta( $ticket_id, Tribe__Tickets_Plus__Meta::META_KEY , true );
+		$attendee_meta = $data['attendee_meta'];
+
+		foreach ( $meta_fields as $field ) {
+			if ( 'on' === $field['required'] && ! isset( $attendee_meta[ $field[ 'slug' ] ] ) ) {
+				return new WP_Error( 'missing-required-meta-fields', __( 'Some required attendee data is missing.', 'event-tickets-plus' ), [ 'status' => 400, 'attendee_meta' => $meta_fields ] );
+			}
+		}
+
+		return $data;
+	}
 }

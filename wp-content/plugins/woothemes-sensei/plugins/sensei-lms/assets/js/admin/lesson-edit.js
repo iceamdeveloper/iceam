@@ -1,43 +1,15 @@
 /**
  * WordPress dependencies
  */
-import { select, dispatch } from '@wordpress/data';
+import domReady from '@wordpress/dom-ready';
 
-( () => {
-	const blockEditorSelector = select( 'core/block-editor' );
-	const editPostSelector = select( 'core/edit-post' );
-	const editPostDispatcher = dispatch( 'core/edit-post' );
+/**
+ * Internal dependencies
+ */
+import { startBlocksTogglingControl } from './blocks-toggling-control';
 
-	/**
-	 * Toggle Lesson Information metabox depending on whether the Lesson Properties block has been
-	 * added to the lesson.
-	 */
-	window.sensei_toggle_legacy_lesson_metaboxes = () => {
-		if ( ! blockEditorSelector ) {
-			return;
-		}
-
-		const metaboxName = 'meta-box-lesson-info';
-		const lessonPropertiesBlockCount = blockEditorSelector.getGlobalBlockCount(
-			'sensei-lms/lesson-properties'
-		);
-		const enable = lessonPropertiesBlockCount === 0;
-
-		if ( enable !== editPostSelector.isEditorPanelEnabled( metaboxName ) ) {
-			editPostDispatcher.toggleEditorPanelEnabled( metaboxName );
-		}
-
-		// Don't submit lesson length and complexity values in metaboxes.
-		document
-			.querySelectorAll( '#lesson-info input, #lesson-info select' )
-			.forEach( ( input ) => {
-				input.disabled = lessonPropertiesBlockCount > 0;
-			} );
-	};
-} )();
-
-jQuery( document ).ready( function () {
-	window.sensei_toggle_legacy_lesson_metaboxes();
+domReady( () => {
+	startBlocksTogglingControl( 'lesson' );
 
 	// Lessons Write Panel.
 	const complexityOptionElements = jQuery( '#lesson-complexity-options' );
@@ -47,9 +19,7 @@ jQuery( document ).ready( function () {
 
 	const prerequisiteOptionElements = jQuery( '#lesson-prerequisite-options' );
 	if ( prerequisiteOptionElements.length > 0 ) {
-		prerequisiteOptionElements.select2( {
-			width: 'resolve',
-		} );
+		prerequisiteOptionElements.select2( { width: 'resolve' } );
 	}
 
 	const courseOptionElements = jQuery( '#lesson-course-options' );
@@ -61,4 +31,36 @@ jQuery( document ).ready( function () {
 	if ( moduleOptionElements.length > 0 ) {
 		moduleOptionElements.select2( { width: 'resolve' } );
 	}
+
+	// Refresh the prerequisite meta box when the course changes in order to get the relevant prerequisites.
+	jQuery( '#lesson-course-options' ).on( 'change', function () {
+		// Try to get the lesson ID from the wp data store. If not present, fallback to getting it from the DOM.
+		const lessonId =
+			wp.data.select( 'core/editor' )?.getCurrentPostId() ||
+			jQuery( '#post_ID' ).val();
+		const courseId = jQuery( this ).val();
+
+		jQuery.get(
+			ajaxurl,
+			{
+				action: 'get_prerequisite_meta_box_content',
+				lesson_id: lessonId,
+				course_id: courseId,
+				security:
+					window.sensei_lesson_metadata
+						.get_prerequisite_meta_box_content_nonce,
+			},
+			function ( response ) {
+				if ( '' !== response ) {
+					// Replace the meta box and re-initialize select2.
+					jQuery( '> .inside', '#lesson-prerequisite' ).html(
+						response
+					);
+					jQuery( '#lesson-prerequisite-options' ).select2( {
+						width: 'resolve',
+					} );
+				}
+			}
+		);
+	} );
 } );

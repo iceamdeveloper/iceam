@@ -5,7 +5,7 @@
  * A private messages component, for users to send messages to each other.
  *
  * @package BuddyPress
- * @subpackage MessagesLoader
+ * @subpackage MessagesClasses
  * @since 1.5.0
  */
 
@@ -62,6 +62,7 @@ class BP_Messages_Component extends BP_Component {
 			'template',
 			'functions',
 			'widgets',
+			'blocks',
 		);
 
 		// Conditional includes.
@@ -101,7 +102,7 @@ class BP_Messages_Component extends BP_Component {
 
 			// Authenticated action variables.
 			if ( is_user_logged_in() && bp_action_variable( 0 ) &&
-				in_array( bp_action_variable( 0 ), array( 'delete', 'read', 'unread', 'bulk-manage', 'bulk-delete' ), true )
+				in_array( bp_action_variable( 0 ), array( 'delete', 'read', 'unread', 'bulk-manage', 'bulk-delete', 'exit' ), true )
 			) {
 				require $this->path . 'bp-messages/actions/' . bp_action_variable( 0 ) . '.php';
 			}
@@ -267,36 +268,27 @@ class BP_Messages_Component extends BP_Component {
 			'user_has_access' => $access
 		);
 
-		// Show certain screens only if the current user is the displayed user.
-		if ( bp_is_my_profile() ) {
+		// Show "Compose" on the logged-in user's profile only.
+		$sub_nav[] = array(
+			'name'            => __( 'Compose', 'buddypress' ),
+			'slug'            => 'compose',
+			'parent_url'      => $messages_link,
+			'parent_slug'     => $slug,
+			'screen_function' => 'messages_screen_compose',
+			'position'        => 30,
+			'user_has_access' => bp_is_my_profile(),
+		);
 
-			// Show "Compose" on the logged-in user's profile only.
-			$sub_nav[] = array(
-				'name'            => __( 'Compose', 'buddypress' ),
-				'slug'            => 'compose',
-				'parent_url'      => $messages_link,
-				'parent_slug'     => $slug,
-				'screen_function' => 'messages_screen_compose',
-				'position'        => 30,
-				'user_has_access' => $access
-			);
-
-			/*
-			 * Show "Notices" on the logged-in user's profile only
-			 * and then only if the user can create notices.
-			 */
-			if ( bp_current_user_can( 'bp_moderate' ) ) {
-				$sub_nav[] = array(
-					'name'            => __( 'Notices', 'buddypress' ),
-					'slug'            => 'notices',
-					'parent_url'      => $messages_link,
-					'parent_slug'     => $slug,
-					'screen_function' => 'messages_screen_notices',
-					'position'        => 90,
-					'user_has_access' => true
-				);
-			}
-		}
+		// Show "Notices" to community admins only.
+		$sub_nav[] = array(
+			'name'            => __( 'Notices', 'buddypress' ),
+			'slug'            => 'notices',
+			'parent_url'      => $messages_link,
+			'parent_slug'     => $slug,
+			'screen_function' => 'messages_screen_notices',
+			'position'        => 90,
+			'user_has_access' => bp_current_user_can( 'bp_moderate' )
+		);
 
 		parent::setup_nav( $main_nav, $sub_nav );
 	}
@@ -345,7 +337,7 @@ class BP_Messages_Component extends BP_Component {
 				'parent'   => 'my-account-' . $this->id,
 				'id'       => 'my-account-' . $this->id . '-inbox',
 				'title'    => $inbox,
-				'href'     => $messages_link,
+				'href'     => trailingslashit( $messages_link . 'inbox' ),
 				'position' => 10
 			);
 
@@ -407,6 +399,7 @@ class BP_Messages_Component extends BP_Component {
 				$bp->bp_options_avatar = bp_core_fetch_avatar( array(
 					'item_id' => bp_displayed_user_id(),
 					'type'    => 'thumb',
+					/* translators: %s: member name */
 					'alt'     => sprintf( __( 'Profile picture of %s', 'buddypress' ), bp_get_displayed_user_fullname() )
 				) );
 				$bp->bp_options_title = bp_get_displayed_user_fullname();
@@ -444,5 +437,43 @@ class BP_Messages_Component extends BP_Component {
 	 */
 	public function rest_api_init( $controllers = array() ) {
 		parent::rest_api_init( array( 'BP_REST_Messages_Endpoint' ) );
+	}
+
+	/**
+	 * Register the BP Messages Blocks.
+	 *
+	 * @since 9.0.0
+	 *
+	 * @param array $blocks Optional. See BP_Component::blocks_init() for
+	 *                      description.
+	 */
+	public function blocks_init( $blocks = array() ) {
+		parent::blocks_init(
+			array(
+				'bp/sitewide-notices' => array(
+					'name'               => 'bp/sitewide-notices',
+					'editor_script'      => 'bp-sitewide-notices-block',
+					'editor_script_url'  => plugins_url( 'js/blocks/sitewide-notices.js', dirname( __FILE__ ) ),
+					'editor_script_deps' => array(
+						'wp-blocks',
+						'wp-element',
+						'wp-components',
+						'wp-i18n',
+						'wp-block-editor',
+						'wp-server-side-render',
+						'bp-block-data',
+					),
+					'style'              => 'bp-sitewide-notices-block',
+					'style_url'          => plugins_url( 'css/blocks/sitewide-notices.css', dirname( __FILE__ ) ),
+					'attributes'         => array(
+						'title' => array(
+							'type'    => 'string',
+							'default' => '',
+						),
+					),
+					'render_callback'    => 'bp_messages_render_sitewide_notices_block',
+				),
+			)
+		);
 	}
 }

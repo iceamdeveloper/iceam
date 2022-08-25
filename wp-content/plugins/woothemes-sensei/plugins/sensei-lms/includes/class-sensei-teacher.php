@@ -254,19 +254,20 @@ class Sensei_Teacher {
 		$current_author = $post->post_author;
 
 		// get the users authorised to author courses
-		$users = $this->get_teachers_and_authors();
+		$users = $this->get_teachers_and_authors_with_fields( [ 'ID', 'display_name' ] );
 
 		?>
 		<input type="hidden" name="post_author_override" value="<?php echo intval( $current_author ); ?>" />
 		<select name="sensei-course-teacher-author" class="sensei course teacher">
 
-			<?php foreach ( $users as $user_id ) { ?>
+			<?php foreach ( $users as $user_data ) { ?>
 
 					<?php
-						$user = get_user_by( 'id', $user_id );
+						$user_id           = $user_data->ID;
+						$user_display_name = $user_data->display_name;
 					?>
 					<option <?php selected( $current_author, $user_id, true ); ?> value="<?php echo esc_attr( $user_id ); ?>" >
-						<?php echo esc_html( $user->display_name ); ?>
+						<?php echo esc_html( $user_display_name ); ?>
 					</option>
 
 				<?php
@@ -285,30 +286,47 @@ class Sensei_Teacher {
 	 * Get a list of users who can author courses, lessons and quizes.
 	 *
 	 * @since 1.8.0
-	 * @access public
+	 * @access private
 	 * @parameters
 	 * @return array $users user id array
 	 */
 	public function get_teachers_and_authors() {
+		$edit_course_roles = [];
+		foreach ( wp_roles()->roles as $role_slug => $role ) {
+			if ( ! empty( $role['capabilities']['edit_courses'] ) ) {
+				$edit_course_roles[] = $role_slug;
+			}
+		}
 
-		$author_query_args = array(
-			'blog_id' => $GLOBALS['blog_id'],
-			'fields'  => 'any',
-			'who'     => 'authors',
+		return get_users(
+			[
+				'blog_id'  => $GLOBALS['blog_id'],
+				'fields'   => 'any',
+				'role__in' => $edit_course_roles,
+			]
 		);
+	}
 
-		$authors = get_users( $author_query_args );
+	/**
+	 * Get list of users who can author courses, lessons, and quizzes.
+	 * Optionally specify the fields to return from the DB.
+	 *
+	 * @since 3.13.4
+	 * @access private
+	 *
+	 * @param  string|array $fields Fields to return from DB. Defaults to 'ID'.
+	 * @return array
+	 */
+	private function get_teachers_and_authors_with_fields( $fields = 'ID' ) {
+		$ids = $this->get_teachers_and_authors();
 
-		$teacher_query_args = array(
-			'blog_id' => $GLOBALS['blog_id'],
-			'fields'  => 'any',
-			'role'    => 'teacher',
+		return get_users(
+			[
+				'blog_id' => $GLOBALS['blog_id'],
+				'include' => $ids,
+				'fields'  => $fields,
+			]
 		);
-
-		$teachers = get_users( $teacher_query_args );
-
-		return array_unique( array_merge( $teachers, $authors ) );
-
 	}
 
 	/**
@@ -390,16 +408,17 @@ class Sensei_Teacher {
 		}
 
 		remove_filter( 'get_terms', array( Sensei()->modules, 'append_teacher_name_to_module' ), 70 );
-		$terms_selected_on_course = wp_get_object_terms( $course_id, 'module' );
+		$modules = Sensei()->modules->get_course_modules( $course_id );
 		add_filter( 'get_terms', array( Sensei()->modules, 'append_teacher_name_to_module' ), 70, 3 );
 
-		if ( empty( $terms_selected_on_course ) ) {
+		if ( empty( $modules ) ) {
 			return;
 		}
 
-		$lessons = Sensei()->course->course_lessons( $course_id );
+		$lessons      = Sensei()->course->course_lessons( $course_id, null );
+		$module_order = [];
 
-		foreach ( $terms_selected_on_course as $term ) {
+		foreach ( $modules as $term ) {
 			$term_author = Sensei_Core_Modules::get_term_author( $term->slug );
 
 			if ( ! $term_author || intval( $new_teacher_id ) !== intval( $term_author->ID ) ) {
@@ -442,7 +461,8 @@ class Sensei_Teacher {
 					continue;
 				}
 
-				$term_id = $new_term['term_id'];
+				$term_id        = $new_term['term_id'];
+				$module_order[] = $term_id;
 
 				// Set the terms selected on the course.
 				wp_set_object_terms( $course_id, $term_id, 'module', true );
@@ -477,6 +497,8 @@ class Sensei_Teacher {
 				Sensei()->modules->remove_if_unused( $term->term_id );
 			}
 		}
+
+		Sensei_Course_Structure::instance( $course_id )->save_module_order( $module_order );
 	}
 
 	/**
@@ -561,7 +583,7 @@ class Sensei_Teacher {
 		$sensei_post_types = array( 'course', 'lesson', 'question' );
 
 		// exit early for the following conditions
-		$limit_screen_ids = array( 'sensei-lms_page_sensei_analysis', 'course_page_module-order' );
+		$limit_screen_ids = array( 'course_page_' . Sensei_Analysis::PAGE_SLUG, 'course_page_module-order' );
 
 		if ( ! $this->is_admin_teacher() || empty( $screen ) || ! in_array( $screen->id, $limit_screen_ids )
 			|| ! in_array( $query->query['post_type'], $sensei_post_types ) ) {
@@ -669,9 +691,9 @@ class Sensei_Teacher {
 			return $query;
 		}
 		switch ( $screen->id ) {
-			case 'sensei-lms_page_sensei_grading':
-			case 'sensei-lms_page_sensei_analysis':
-			case 'sensei-lms_page_sensei_learners':
+			case 'course_page_sensei_grading':
+			case 'course_page_' . Sensei_Analysis::PAGE_SLUG:
+			case 'course_page_sensei_learners':
 			case 'lesson':
 			case 'course':
 			case 'question':
@@ -1451,7 +1473,7 @@ class Sensei_Teacher {
 			'edit-course',
 			'edit-question',
 			'course_page_course-order',
-			'lesson_page_lesson-order',
+			'course_page_lesson-order',
 		);
 
 		if ( in_array( $screen->id, $limit_screens ) ) {
@@ -1481,10 +1503,10 @@ class Sensei_Teacher {
 		if ( user_can( $user, 'edit_courses' ) ) {
 
 			// phpcs:ignore WordPress.Security.NonceVerification -- We are not making any changes based on this.
-			if ( isset( $_POST['redirect_to'] ) ) {
+			if ( isset( $_REQUEST['redirect_to'] ) ) {
 
 				// phpcs:ignore WordPress.Security.NonceVerification -- We are not making any changes based on this.
-				wp_safe_redirect( $_POST['redirect_to'], 303 );
+				wp_safe_redirect( wp_unslash( $_REQUEST['redirect_to'] ), 303 );
 
 				exit;
 

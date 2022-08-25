@@ -12,7 +12,7 @@ class Tribe__Tickets_Plus__Assets {
 		$plugin = tribe( 'tickets-plus.main' );
 		// Set up our base list of enqueues.
 		$enqueue_array = [
-			[ 'event-tickets-plus-tickets-css', 'tickets.css', [ 'dashicons' ] ],
+			[ 'event-tickets-plus-tickets-css', 'tickets.css', [ 'tec-variables-full', 'dashicons' ] ],
 			[ 'jquery-deparam', 'vendor/jquery.deparam/jquery.deparam.js', [ 'jquery' ] ],
 			[ 'jquery-cookie', 'vendor/jquery.cookie/jquery.cookie.js', [ 'jquery' ] ],
 			[ 'event-tickets-plus-attendees-list-js', 'attendees-list.js', [ 'event-tickets-attendees-list-js' ] ],
@@ -100,7 +100,7 @@ class Tribe__Tickets_Plus__Assets {
 				$plugin,
 				'tribe-tickets-plus-modal-styles',
 				'tickets-modal.css',
-				[],
+				[ 'tec-variables-full' ],
 				null,
 				[
 					'groups' => [
@@ -115,7 +115,7 @@ class Tribe__Tickets_Plus__Assets {
 				$plugin,
 				'tribe-tickets-plus-attendee-tickets-styles',
 				'tickets-attendee-tickets.css',
-				[],
+				[ 'tec-variables-full' ],
 				null,
 				[
 					'groups' => [
@@ -149,7 +149,7 @@ class Tribe__Tickets_Plus__Assets {
 				$plugin,
 				'tribe-tickets-plus-registration-page-styles',
 				'tickets-registration-page.css',
-				[],
+				[ 'tec-variables-full' ],
 				null,
 				[
 					'groups' => [
@@ -201,7 +201,7 @@ class Tribe__Tickets_Plus__Assets {
 				$plugin,
 				'tribe-tickets-plus-iac-styles',
 				'tickets-iac.css',
-				[],
+				[ 'tec-variables-full' ],
 				null,
 				[
 					'groups' => [
@@ -221,7 +221,7 @@ class Tribe__Tickets_Plus__Assets {
 	public function admin_enqueue_scripts() {
 		// Set up our base list of enqueues.
 		$enqueue_array = [
-			[ 'event-tickets-plus-meta-admin-css', 'meta.css', [] ],
+			[ 'event-tickets-plus-meta-admin-css', 'meta.css', [ 'tec-variables-full' ] ],
 			[ 'event-tickets-plus-meta-report-js', 'meta-report.js', [] ],
 			[ 'event-tickets-plus-attendees-list-js', 'attendees-list.js', [ 'event-tickets-attendees-list-js' ] ],
 			[ 'event-tickets-plus-meta-admin-js', 'meta-admin.js', [ 'tribe-common', 'jquery-ui-draggable', 'jquery-ui-droppable', 'jquery-ui-sortable', 'event-tickets-admin-js' ] ],
@@ -256,6 +256,7 @@ class Tribe__Tickets_Plus__Assets {
 			[
 				'priority' => 0,
 				'groups'       => 'event-tickets-plus-admin',
+				'conditionals' => [ $this, 'should_enqueue_admin' ],
 				'localize' => (object) [
 					'name' => 'tribe_qr',
 					'data' => [
@@ -264,5 +265,30 @@ class Tribe__Tickets_Plus__Assets {
 				],
 			]
 		);
+	}
+
+	/**
+	 * Determine if the admin assets should be enqueued.
+	 *
+	 * @since 5.2.6
+	 *
+	 * @return bool
+	 */
+	public function should_enqueue_admin() {
+		global $post;
+
+		$et_should_enqueue = tribe( 'tickets.assets' )->should_enqueue_admin();
+
+		$et_plus_should_enqueue = false;
+
+		if ( ! empty( $_GET['post_type'] ) && in_array( $_GET['post_type'], tribe( 'tickets.main' )->post_types(), true ) ) {
+			$et_plus_should_enqueue = true;
+		}
+
+		if ( ! empty( $post->post_type ) && \Tribe__Tickets_Plus__Meta__Fieldset::POSTTYPE === $post->post_type ) {
+			$et_plus_should_enqueue = true;
+		}
+
+		return $et_should_enqueue || $et_plus_should_enqueue;
 	}
 }

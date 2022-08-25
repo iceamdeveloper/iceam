@@ -27,34 +27,37 @@ class Sensei_Usage_Tracking_Data {
 		$question_type_count = self::get_question_type_count();
 		$quiz_stats          = self::get_quiz_stats();
 		$usage_data          = array(
-			'courses'                 => wp_count_posts( 'course' )->publish,
-			'course_active'           => self::get_course_active_count(),
-			'course_completed'        => self::get_course_completed_count(),
-			'course_completion_rate'  => self::get_course_completion_rate(),
-			'course_videos'           => self::get_course_videos_count(),
-			'course_no_notifications' => self::get_course_no_notifications_count(),
-			'course_prereqs'          => self::get_course_prereqs_count(),
-			'course_featured'         => self::get_course_featured_count(),
-			'enrolments'              => self::get_course_enrolments(),
-			'enrolment_first'         => self::get_first_course_enrolment(),
-			'enrolment_last'          => self::get_last_course_enrolment(),
-			'enrolment_calculated'    => self::get_is_enrolment_calculated() ? 1 : 0,
-			'learners'                => self::get_learner_count(),
-			'lessons'                 => wp_count_posts( 'lesson' )->publish,
-			'lesson_modules'          => self::get_lesson_module_count(),
-			'lesson_prereqs'          => self::get_lesson_prerequisite_count(),
-			'lesson_previews'         => self::get_lesson_preview_count(),
-			'lesson_length'           => self::get_lesson_has_length_count(),
-			'lesson_complexity'       => self::get_lesson_with_complexity_count(),
-			'lesson_videos'           => self::get_lesson_with_video_count(),
-			'messages'                => wp_count_posts( 'sensei_message' )->publish,
-			'modules'                 => wp_count_terms( 'module' ),
-			'modules_max'             => self::get_max_module_count(),
-			'modules_min'             => self::get_min_module_count(),
-			'questions'               => wp_count_posts( 'question' )->publish,
-			'question_media'          => self::get_question_media_count(),
-			'question_random_order'   => self::get_question_random_order_count(),
-			'teachers'                => self::get_teacher_count(),
+			'courses'                       => wp_count_posts( 'course' )->publish,
+			'course_active'                 => self::get_course_active_count(),
+			'course_completed'              => self::get_course_completed_count(),
+			'course_completion_rate'        => self::get_course_completion_rate(),
+			'course_videos'                 => self::get_course_videos_count(),
+			'course_no_notifications'       => self::get_course_no_notifications_count(),
+			'course_prereqs'                => self::get_course_prereqs_count(),
+			'course_featured'               => self::get_course_featured_count(),
+			'enrolments'                    => self::get_course_enrolments(),
+			'enrolment_first'               => self::get_first_course_enrolment(),
+			'enrolment_last'                => self::get_last_course_enrolment(),
+			'enrolment_calculated'          => self::get_is_enrolment_calculated() ? 1 : 0,
+			'learners'                      => self::get_learner_count(),
+			'lessons'                       => wp_count_posts( 'lesson' )->publish,
+			'lesson_modules'                => self::get_lesson_module_count(),
+			'lesson_prereqs'                => self::get_lesson_prerequisite_count(),
+			'lesson_previews'               => self::get_lesson_preview_count(),
+			'lesson_length'                 => self::get_lesson_has_length_count(),
+			'lesson_complexity'             => self::get_lesson_with_complexity_count(),
+			'lesson_videos'                 => self::get_lesson_with_video_count(),
+			'messages'                      => wp_count_posts( 'sensei_message' )->publish,
+			'modules'                       => wp_count_terms( 'module' ),
+			'modules_max'                   => self::get_max_module_count(),
+			'modules_min'                   => self::get_min_module_count(),
+			'questions'                     => wp_count_posts( 'question' )->publish,
+			'question_media'                => self::get_question_media_count(),
+			'question_random_order'         => self::get_question_random_order_count(),
+			'teachers'                      => self::get_teacher_count(),
+			'courses_using_course_theme'    => self::get_courses_using_course_theme_count(),
+			'course_theme_enabled_globally' => self::get_is_course_theme_enabled_globally() ? 1 : 0,
+			'course_theme_theme_styles'     => self::get_course_theme_has_theme_styles_enabled() ? 1 : 0,
 		);
 
 		return array_merge( $question_type_count, $usage_data, $quiz_stats );
@@ -70,7 +73,7 @@ class Sensei_Usage_Tracking_Data {
 	public static function get_event_logging_base_fields() {
 		$base_fields = [
 			'paid'     => 0,
-			'courses'  => wp_count_posts( 'course' )->publish,
+			'courses'  => post_type_exists( 'course' ) ? wp_count_posts( 'course' )->publish : 0,
 			'learners' => self::get_learner_count(),
 		];
 
@@ -912,6 +915,53 @@ class Sensei_Usage_Tracking_Data {
 		}
 
 		return $count;
+	}
+
+	/**
+	 * Get the total number of courses with Sensei course theme enabled.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @return int Number of active courses.
+	 **/
+	private static function get_courses_using_course_theme_count() {
+		$query = new WP_Query(
+			array(
+				'post_type'  => 'course',
+				'fields'     => 'ids',
+				// phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query -- Needed to identify courses with Sensei theme.
+				'meta_query' => array(
+					array(
+						'key'   => Sensei_Course_Theme_Option::THEME_POST_META_NAME,
+						'value' => Sensei_Course_Theme_Option::SENSEI_THEME,
+					),
+				),
+			)
+		);
+
+		return $query->found_posts;
+	}
+
+	/**
+	 * Checks if learning mode is enabled globally.
+	 *
+	 * @since 3.15.0
+	 *
+	 * @return bool
+	 */
+	private static function get_is_course_theme_enabled_globally() {
+		return (bool) \Sensei()->settings->get( 'sensei_learning_mode_all' );
+	}
+
+	/**
+	 * Checks if theme styles are enabled for learning mode
+	 *
+	 * @since 4.0.2
+	 *
+	 * @return bool
+	 */
+	private static function get_course_theme_has_theme_styles_enabled() {
+		return (bool) \Sensei()->settings->get( 'sensei_learning_mode_theme' );
 	}
 
 	/**

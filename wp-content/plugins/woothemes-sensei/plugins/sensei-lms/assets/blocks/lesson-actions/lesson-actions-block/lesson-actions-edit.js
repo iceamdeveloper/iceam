@@ -6,6 +6,7 @@ import classnames from 'classnames';
 /**
  * WordPress dependencies
  */
+import { Notice } from '@wordpress/components';
 import { InnerBlocks } from '@wordpress/block-editor';
 import { __ } from '@wordpress/i18n';
 
@@ -23,6 +24,8 @@ import {
 	IN_PROGRESS_PREVIEW,
 } from './constants';
 
+const courseThemeEnabled = window?.sensei?.courseThemeEnabled || false;
+
 /**
  * Edit lesson actions block component.
  *
@@ -33,12 +36,13 @@ import {
  * @param {Object}   props.attributes               Block attributes.
  * @param {Object}   props.attributes.toggledBlocks Toggled blocks, where the key is the block name.
  */
-const LessonActionsEdit = ( {
-	className,
-	clientId,
-	setAttributes,
-	attributes: { toggledBlocks },
-} ) => {
+const LessonActionsEdit = ( props ) => {
+	const {
+		className,
+		clientId,
+		setAttributes,
+		attributes: { toggledBlocks },
+	} = props;
 	const [ previewState, onPreviewChange ] = usePreviewState(
 		IN_PROGRESS_PREVIEW
 	);
@@ -62,6 +66,21 @@ const LessonActionsEdit = ( {
 	const completeLessonAllowedClass = completeLessonAllowed
 		? 'allowed'
 		: 'not-allowed';
+
+	if ( courseThemeEnabled ) {
+		return (
+			<Notice
+				status="warning"
+				isDismissible={ false }
+				className="wp-block-sensei-lms-lesson-actions__notice"
+			>
+				{ __(
+					'Lesson Actions block is not displayed when Learning Mode is enabled.',
+					'sensei-lms'
+				) }
+			</Notice>
+		);
+	}
 
 	// Filter inner blocks based on the settings.
 	const filteredInnerBlocksTemplate = INNER_BLOCKS_TEMPLATE.filter(

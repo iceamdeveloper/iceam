@@ -105,6 +105,11 @@ class WooThemes_Sensei_Certificates {
 		$instance = self::instance();
 
 		self::load_files();
+
+		if ( class_exists( 'Sensei_Assets' ) ) {
+			$instance->assets = new \Sensei_Assets( $instance->plugin_url, dirname( __DIR__ ), SENSEI_CERTIFICATES_VERSION );
+		}
+
 		$GLOBALS['woothemes_sensei_certificates']          = self::instance();
 		$GLOBALS['woothemes_sensei_certificate_templates'] = new WooThemes_Sensei_Certificate_Templates();
 
@@ -176,6 +181,12 @@ class WooThemes_Sensei_Certificates {
 		add_action( 'sensei_certificates_set_background_image', array( $instance, 'certificate_background' ), 10, 1 );
 		// Text to display on certificate
 		add_action( 'sensei_certificates_before_pdf_output', array( $instance, 'certificate_text' ), 10, 2 );
+
+		// Blocks
+		add_action( 'enqueue_block_editor_assets', [ $instance, 'enqueue_block_editor_assets' ] );
+		add_filter( 'render_block', [ $instance, 'update_view_certificate_button_url' ], 10, 2 );
+		add_filter( 'sensei_course_completed_page_template', [ $instance, 'add_certificate_button_to_course_completed_template' ] );
+		add_action( 'init', [ $instance, 'add_certificate_button_to_current_course_completed_page' ] );
 	}
 
 	/**
@@ -1445,6 +1456,182 @@ class WooThemes_Sensei_Certificates {
 			</p>
 			<?php
 		}
+	}
+
+	/**
+	 * Enqueue block assets for the editing interface.
+	 *
+	 * @access private
+	 */
+	public function enqueue_block_editor_assets() {
+		$screen = get_current_screen();
+
+		if ( $screen && 'page' === $screen->post_type ) {
+			WooThemes_Sensei_Certificates::instance()->assets->enqueue(
+				'sensei-certificates-block',
+				'blocks/index.js'
+			);
+		}
+	}
+
+	/**
+	 * Update the URL of the "View Certificate" button.
+	 *
+	 * @access private
+	 *
+	 * @param string $block_content The block content about to be appended.
+	 * @param array  $block         The full block, including name and attributes.
+	 *
+	 * @return string Block HTML.
+	 */
+	public function update_view_certificate_button_url( $block_content, $block ): string {
+		$class_name = 'view-certificate';
+
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- Only used if the learner completed the course.
+		$course_id = isset( $_GET['course_id'] ) ? (int) $_GET['course_id'] : false;
+
+		if (
+			// Check that the course ID exists and that the user has completed the course.
+			! $course_id
+			|| ! get_current_user_id()
+			|| 'course' !== get_post_type( $course_id )
+			|| ! Sensei_Utils::user_completed_course( $course_id, get_current_user_id() )
+
+			// Check that the block is a core/button and it contains the respective class name.
+			|| ! isset( $block['blockName'] )
+			|| 'core/button' !== $block['blockName']
+			|| ! isset( $block['attrs']['className'] )
+			|| false === strpos( $block['attrs']['className'], $class_name )
+		) {
+			return $block_content;
+		}
+
+		// Check if course has template and core method exists.
+		if (
+			! get_post_meta( $course_id, '_course_certificate_template', true )
+			|| ! method_exists( 'Sensei_Blocks', 'update_button_block_url' )
+		) {
+			return '';
+		}
+
+		return Sensei_Blocks::update_button_block_url( $block_content, $block, $class_name,
+			WooThemes_Sensei_Certificates::instance()->get_certificate_url( $course_id, get_current_user_id() ) );
+	}
+
+	/**
+	 * Add certificate button to course completed template.
+	 * This template is used when creating the page through Sensei Setup Wizard.
+	 *
+	 * @since 2.2.1
+	 *
+	 * @access private
+	 *
+	 * @param {array} $blocks Blocks array.
+	 *
+	 * @return {array} Blocks array.
+	 */
+	public function add_certificate_button_to_course_completed_template( $blocks ) {
+		return $this->add_view_certificate_block_to_course_completed_actions( $blocks );
+	}
+
+	/**
+	 * Add certificate button to Course Completed page, when already created.
+	 * It's useful for cases where the user already created the Course Completed
+	 * page, and then they activate this plugin.
+	 *
+	 * @since 2.2.1
+	 *
+	 * @access private
+	 */
+	public function add_certificate_button_to_current_course_completed_page() {
+		$option_name = 'sensei_certificates_view_certificate_button_added';
+
+		if ( get_option( $option_name ) ) {
+			return;
+		}
+
+		update_option( $option_name, 1 );
+
+		$page_id = isset( Sensei()->settings->settings['course_completed_page'] ) ? intval( Sensei()->settings->settings['course_completed_page'] ) : 0;
+		if ( ! $page_id ) {
+			return;
+		}
+
+		$page = get_post( $page_id );
+		if ( ! $page ) {
+			return;
+		}
+
+		$blocks = parse_blocks( $page->post_content );
+
+		wp_update_post(
+			[
+				'ID'           => $page_id,
+				'post_content' => serialize_blocks(
+					$this->add_view_certificate_block_to_course_completed_actions( $blocks )
+				),
+			]
+		);
+	}
+
+	/**
+	 * It adds the View Certificate button as inner block to the course completed actions.
+	 * If it's not found or if the button is already added, it's not changed.
+	 *
+	 * @param array $blocks Parsed blocks.
+	 *
+	 * @return array Parsed blocks with the view certificate button.
+	 */
+	private function add_view_certificate_block_to_course_completed_actions( $blocks ) {
+		$class_name = 'view-certificate';
+
+		$blocks = array_map(
+			function( $block ) use ( $class_name ) {
+				/**
+				 * Notice that we check the block through the innerContent and not through
+				 * the anchor attribute directly, which is what we use to check the block
+				 * variation. The reason is that the back-end doesn't contain this attribute
+				 * when created through the block editor.
+				 */
+				if (
+					'core/buttons' !== $block['blockName']
+					|| ! isset( $block['innerContent'] )
+					|| ! isset( $block['innerContent'][0] )
+					|| false === strpos( $block['innerContent'][0], 'id="course-completed-actions"' )
+				) {
+					return $block;
+				}
+
+				// Check if action buttons contains the View Certificate button.
+				foreach ( $block['innerBlocks'] as $inner_block ) {
+					if (
+						isset( $inner_block['attrs'] )
+						&& isset( $inner_block['attrs']['className'] )
+						&& false !== strpos( $inner_block['attrs']['className'], $class_name )
+					) {
+						return $block;
+					}
+				}
+
+				// Add space for the button in the second to last item in the innerContent.
+				array_splice( $block['innerContent'], count( $block['innerContent'] ) - 1, 0, [ null ] );
+
+				// Add button to the innerBlocks.
+				array_push(
+					$block['innerBlocks'],
+					[
+						'blockName'    => 'core/button',
+						'innerContent' => [ '<div class="wp-block-button ' . $class_name . '"><a class="wp-block-button__link">' . __( 'View Certificate', 'sensei-certificates' ) . '</a></div>' ],
+						'attrs'        => [ 'className' => $class_name ],
+					]
+				);
+
+				return $block;
+			},
+			$blocks
+		);
+
+		return $blocks;
 	}
 
 	/**

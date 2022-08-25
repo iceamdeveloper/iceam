@@ -62,7 +62,7 @@ class Tribe__Tickets_Plus__Meta__Export {
 		// Go through the event attendees and get the fields.
 		foreach ( Tribe__Tickets__Tickets::get_event_attendees( $event_id ) as $attendee ) {
 			// Get the meta fields of that attendee.
-			$meta_fields = get_post_meta( $attendee['attendee_id'], Tribe__Tickets_Plus__Meta::META_KEY, true );
+			$meta_fields = Tribe__Tickets_Plus__Meta::get_attendee_meta_fields( null, $attendee['attendee_id'] );
 
 			// If we have some meta fields.
 			if ( ! is_array( $meta_fields ) ) {
@@ -143,7 +143,7 @@ class Tribe__Tickets_Plus__Meta__Export {
 		foreach ( $this->meta_columns as $meta_field ) {
 			if ( 'checkbox' === $meta_field->type && isset( $meta_field->extra['options'] ) ) {
 				foreach ( $meta_field->extra['options'] as $option ) {
-					$key = $meta_field->slug . '_' . sanitize_title( $option );
+					$key = $meta_field->slug . '_' . md5( sanitize_title( $option ) );
 
 					$columns[ $key ] = "{$meta_field->label}: {$option}";
 				}

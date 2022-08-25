@@ -14,7 +14,6 @@ import MultipleChoiceAnswer from './multiple-choice';
 import SingleLineAnswer from './single-line';
 import TrueFalseAnswer from './true-false';
 import {
-	QuestionAnswerFeedbackSettings,
 	QuestionGradingNotesSettings,
 	QuestionMultipleChoiceSettings,
 } from '../question-block/settings';
@@ -25,6 +24,7 @@ import {
  * @property {string}   title       Question type name.
  * @property {string}   description Question type description.
  * @property {Function} edit        Editor component.
+ * @property {boolean}  feedback    Question type can have answer feedback.
  * @property {Function} validate    Validation callback.
  * @property {Object}   messages    Message string.s
  */
@@ -40,15 +40,21 @@ const questionTypes = {
 		description: __( 'Select from a list of options.', 'sensei-lms' ),
 		edit: MultipleChoiceAnswer,
 		view: MultipleChoiceAnswer.view,
-		settings: [
-			QuestionMultipleChoiceSettings,
-			QuestionAnswerFeedbackSettings,
-		],
+		settings: [ QuestionMultipleChoiceSettings ],
+		feedback: true,
 		validate: ( { answers = [] } = {} ) => {
 			return {
 				noAnswers: answers.filter( ( a ) => a.label ).length < 2,
-				noRightAnswer: ! answers.some( ( a ) => a.correct ),
-				noWrongAnswer: ! answers.some( ( a ) => ! a.correct ),
+				noRightAnswer: ! answers.some( ( a ) => a.correct && a.label ),
+				noRightAnswerWhitespace: ! answers.some(
+					( a ) => a.correct && a.label.trim()
+				),
+				noWrongAnswer: ! answers.some(
+					( a ) => ! a.correct && a.label
+				),
+				noWrongAnswerWhitespace: ! answers.some(
+					( a ) => ! a.correct && a.label.trim()
+				),
 			};
 		},
 		messages: {
@@ -60,8 +66,16 @@ const questionTypes = {
 				'Add a right answer to this question.',
 				'sensei-lms'
 			),
+			noRightAnswerWhitespace: __(
+				'The value of the right answer can not be blank space.',
+				'sensei-lms'
+			),
 			noWrongAnswer: __(
-				'Add a wrong answer to this question.',
+				'Add a wrong answer to this question. Value can not be blank space.',
+				'sensei-lms'
+			),
+			noWrongAnswerWhitespace: __(
+				'The value of the wrong answer can not be blank space.',
 				'sensei-lms'
 			),
 		},
@@ -74,25 +88,40 @@ const questionTypes = {
 		),
 		edit: TrueFalseAnswer,
 		view: TrueFalseAnswer.view,
-		settings: [ QuestionAnswerFeedbackSettings ],
+		feedback: true,
+		settings: [],
 	},
 	'gap-fill': {
 		title: __( 'Gap Fill', 'sensei-lms' ),
 		description: __( 'Fill in the blank.', 'sensei-lms' ),
 		edit: GapFillAnswer,
 		view: GapFillAnswer.view,
-		settings: [ QuestionAnswerFeedbackSettings ],
+		feedback: true,
+		settings: [],
 		validate: ( { before, after, gap } = {} ) => {
 			return {
-				noGap: ! gap?.length,
-				noBefore: ! before,
-				noAfter: ! after,
+				noGap: ! gap?.filter( ( val ) => val !== '' ).length,
+				noGapWhitespace: ! gap?.filter( ( val ) => val.trim() !== '' )
+					.length,
+				noBeforeAndNoAfter: ! before && ! after,
+				noBeforeAndNoAfterWhitespace:
+					! before?.trim() && ! after?.trim(),
 			};
 		},
 		messages: {
 			noGap: __( 'Add a right answer to this question.', 'sensei-lms' ),
-			noBefore: __( 'Add text before and after the gap.', 'sensei-lms' ),
-			noAfter: __( 'Add text before and after the gap.', 'sensei-lms' ),
+			noGapWhitespace: __(
+				'The value of a right answer can not be blank space.',
+				'sensei-lms'
+			),
+			noBeforeAndNoAfter: __(
+				'Add text before or after the gap. Value can not be blank space.',
+				'sensei-lms'
+			),
+			noBeforeAndNoAfterWhitespace: __(
+				'Value of the text before or after the gap can not be blank space.',
+				'sensei-lms'
+			),
 		},
 	},
 	'single-line': {
@@ -126,9 +155,13 @@ const questionTypes = {
 
 // Commonly used core settings for use in custom question types.
 const availableCoreSettings = {
-	QuestionAnswerFeedbackSettings,
 	QuestionGradingNotesSettings,
 };
+
+/**
+ * Question types before the filter being applied.
+ */
+export const unfilteredQuestionTypes = questionTypes;
 
 /**
  * Filters the quiz editor question types in order to support custom ones.
