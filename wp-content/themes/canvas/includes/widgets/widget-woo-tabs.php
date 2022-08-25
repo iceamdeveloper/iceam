@@ -228,7 +228,11 @@ class Woo_Widget_WooTabs extends WP_Widget {
   * Registers this widget.
 ----------------------------------------*/
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_WooTabs");' ), 1 );
+function register_wootabs_widget () {
+	return register_widget("Woo_Widget_WooTabs");
+}
+
+add_action( 'widgets_init', 'register_wootabs_widget', 1 );
 
 /*-----------------------------------------------------------------------------------*/
 /* WooTabs - Javascript */

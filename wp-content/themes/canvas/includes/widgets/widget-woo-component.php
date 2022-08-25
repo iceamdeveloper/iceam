@@ -235,5 +235,10 @@ class Woo_Widget_Component extends WP_Widget {
 } // End Class
 
 /* Register the widget. */
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_Component");' ), 1 );
+
+function register_woocomponent_widget () {
+	return register_widget("Woo_Widget_Component");
+}
+
+add_action( 'widgets_init', 'register_woocomponent_widget', 1 );
 ?>

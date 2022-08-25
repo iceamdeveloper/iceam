@@ -233,5 +233,10 @@ class Woo_Widget_Flickr extends WP_Widget {
   * Registers this widget.
 ----------------------------------------*/
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_Flickr");' ), 1 );
+
+function register_wooflickr_widget () {
+	return register_widget("Woo_Widget_Flickr");
+}
+
+add_action( 'widgets_init', 'register_wooflickr_widget', 1 );
 ?>

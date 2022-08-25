@@ -201,5 +201,9 @@ class Woo_Widget_AdSpace extends WP_Widget {
   * Registers this widget.
 ----------------------------------------*/
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_AdSpace");' ), 1 );
+function register_wooadspace_widget () {
+	return register_widget("Woo_Widget_AdSpace");
+}
+
+add_action( 'widgets_init', 'register_wooadspace_widget', 1 );
 ?>

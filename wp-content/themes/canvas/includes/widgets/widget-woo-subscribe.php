@@ -172,5 +172,9 @@ class Woo_Widget_Subscribe extends WP_Widget {
   * Registers this widget.
 ----------------------------------------*/
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_Subscribe");' ), 1 );
+function register_woosubscribe_widget () {
+	return register_widget("Woo_Widget_Subscribe");
+}
+
+add_action( 'widgets_init', 'register_woosubscribe_widget', 1 );
 ?>

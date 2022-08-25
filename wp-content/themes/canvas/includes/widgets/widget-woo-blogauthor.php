@@ -241,5 +241,9 @@ class Woo_Widget_BlogAuthorInfo extends WP_Widget {
   * Registers this widget.
 ----------------------------------------*/
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_BlogAuthorInfo");' ), 1 );
+function register_wooblogauthor_widget () {
+	return register_widget("Woo_Widget_BlogAuthorInfo");
+}
+
+add_action( 'widgets_init', 'register_wooblogauthor_widget', 1 );
 ?>

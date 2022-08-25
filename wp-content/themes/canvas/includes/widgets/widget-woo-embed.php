@@ -226,7 +226,12 @@ class Woo_Widget_Embed extends WP_Widget {
   * Registers this widget.
 ----------------------------------------*/
 
-add_action( 'widgets_init', create_function( '', 'return register_widget("Woo_Widget_Embed");' ), 1 );
+
+function register_wooembed_widget () {
+	return register_widget("Woo_Widget_Embed");
+}
+
+add_action( 'widgets_init', 'register_wooembed_widget', 1 );
 ?>
 <?php
 if(is_active_widget( null,null,'woo_embed' ) == true) {
