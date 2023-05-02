@@ -31,6 +31,8 @@ if( wcs_user_has_subscription( $user_ID, 9604, 'active' ) == true && has_term( '
 	$need_to_resubscribe = false;
 } else if ( wcs_user_has_subscription( $user_ID, 9607, 'active' ) == true && has_term( 'jingui-yaolue', 'product_cat', $wc_post_id ) ){
 	$need_to_resubscribe = false;
+} else if ( wcs_user_has_subscription( $user_ID, 17192, 'active' ) == true ){
+	$need_to_resubscribe = false;
 }
 
 if ( have_posts() ) {
