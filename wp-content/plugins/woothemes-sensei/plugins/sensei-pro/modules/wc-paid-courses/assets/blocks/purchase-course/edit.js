@@ -36,7 +36,7 @@ export const EditPurchaseButton = ( props ) => {
 		selectedProduct = products[ 0 ];
 	}
 
-	let buttonText = __( 'Buy Course', 'sensei-pro' );
+	let buttonText = __( 'Buy', 'sensei-pro' );
 
 	if ( selectedProduct ) {
 		buttonText = `${ buttonText } - ${ selectedProduct.price_html }`;

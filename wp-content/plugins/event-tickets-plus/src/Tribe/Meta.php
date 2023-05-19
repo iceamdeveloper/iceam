@@ -1295,7 +1295,7 @@ class Tribe__Tickets_Plus__Meta {
 	/**
 	 * Get the readable values of an attendee meta.
 	 *
-	 * @since TBD
+	 * @since 5.6.0
 	 *
 	 * @param int $ticket_id The ticket ID.
 	 * @param int $attendee_id The attendee ID.
@@ -1304,7 +1304,7 @@ class Tribe__Tickets_Plus__Meta {
 	 */
 	public function get_attendee_meta_values( $ticket_id, $attendee_id ) {
 		$meta_fields   = Tribe__Tickets_Plus__Main::instance()->meta()->get_meta_fields_by_ticket( $ticket_id );
-		$meta_data     = Tribe__Tickets_Plus__Meta::get_attendee_meta_fields( $ticket_id, $attendee_id );
+		$meta_data     = static::get_attendee_meta_fields( $ticket_id, $attendee_id );
 		$readable_meta = [];
 
 		foreach ( $meta_fields as $field ) {

@@ -1,4 +1,19 @@
 <?php
+
+use Sensei\Internal\Emails\Email_Customization;
+use Sensei\Internal\Quiz_Submission\Answer\Repositories\Answer_Repository_Factory;
+use Sensei\Internal\Quiz_Submission\Answer\Repositories\Answer_Repository_Interface;
+use Sensei\Internal\Quiz_Submission\Grade\Repositories\Grade_Repository_Factory;
+use Sensei\Internal\Quiz_Submission\Grade\Repositories\Grade_Repository_Interface;
+use Sensei\Internal\Quiz_Submission\Submission\Repositories\Submission_Repository_Factory;
+use Sensei\Internal\Quiz_Submission\Submission\Repositories\Submission_Repository_Interface;
+use Sensei\Internal\Student_Progress\Course_Progress\Repositories\Course_Progress_Repository_Factory;
+use Sensei\Internal\Student_Progress\Course_Progress\Repositories\Course_Progress_Repository_Interface;
+use Sensei\Internal\Student_Progress\Lesson_Progress\Repositories\Lesson_Progress_Repository_Factory;
+use Sensei\Internal\Student_Progress\Lesson_Progress\Repositories\Lesson_Progress_Repository_Interface;
+use Sensei\Internal\Student_Progress\Quiz_Progress\Repositories\Quiz_Progress_Repository_Factory;
+use Sensei\Internal\Student_Progress\Quiz_Progress\Repositories\Quiz_Progress_Repository_Interface;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -31,6 +46,15 @@ class Sensei_Main {
 	 * Main reference to the plugins current version
 	 */
 	public $version;
+
+	/**
+	 * Main reference to the plugin's version when it was installed.
+	 * Or false if the install version is not available.
+	 *
+	 * @since 4.7.0
+	 * @var string|false
+	 */
+	public $install_version;
 
 	/**
 	 * Public token, referencing for the text domain.
@@ -222,6 +246,55 @@ class Sensei_Main {
 	public $blocks;
 
 	/**
+	 * Admin notices.
+	 *
+	 * @var Sensei_Admin_Notices
+	 */
+	public $admin_notices;
+
+	/**
+	 * Course progress repository.
+	 *
+	 * @var Course_Progress_Repository_Interface
+	 */
+	public $course_progress_repository;
+
+	/**
+	 * Lesson progress repository.
+	 *
+	 * @var Lesson_Progress_Repository_Interface
+	 */
+	public $lesson_progress_repository;
+
+	/**
+	 * Quiz progress repository.
+	 *
+	 * @var Quiz_Progress_Repository_Interface
+	 */
+	public $quiz_progress_repository;
+
+	/**
+	 * Quiz submission repository.
+	 *
+	 * @var Submission_Repository_Interface
+	 */
+	public $quiz_submission_repository;
+
+	/**
+	 * Quiz answer repository.
+	 *
+	 * @var Answer_Repository_Interface
+	 */
+	public $quiz_answer_repository;
+
+	/**
+	 * Quiz grade repository.
+	 *
+	 * @var Grade_Repository_Interface
+	 */
+	public $quiz_grade_repository;
+
+	/**
 	 * Constructor method.
 	 *
 	 * @param  string $file The base file of the plugin.
@@ -236,13 +309,15 @@ class Sensei_Main {
 		$this->template_url          = apply_filters( 'sensei_template_url', 'sensei/' );
 		$this->version               = isset( $args['version'] ) ? $args['version'] : null;
 
+		// Only set the install version if it is included in alloptions. This prevents a query on every page load.
+		$alloptions            = wp_load_alloptions();
+		$this->install_version = $alloptions['sensei-install-version'] ?? null;
+
 		// Initialize the core Sensei functionality
 		$this->init();
 
 		// Installation
-		if ( is_admin() && ! defined( 'DOING_AJAX' ) ) {
-			$this->install();
-		}
+		$this->install();
 
 		// Run this on deactivation.
 		register_deactivation_hook( $this->main_plugin_file_name, array( $this, 'deactivation' ) );
@@ -278,6 +353,7 @@ class Sensei_Main {
 		$this->initialize_cache_groups();
 		$this->initialize_global_objects();
 		$this->initialize_cli();
+		$this->initialize_3rd_party_compatibility();
 	}
 
 	/**
@@ -425,6 +501,9 @@ class Sensei_Main {
 		// Setup Wizard.
 		$this->setup_wizard = Sensei_Setup_Wizard::instance();
 
+		// Sensei Home.
+		Sensei_Home::instance()->init();
+
 		Sensei_Scheduler::init();
 
 		// Block patterns.
@@ -433,18 +512,26 @@ class Sensei_Main {
 		// Editor Wizard.
 		Sensei_Editor_Wizard::instance()->init();
 
+		// Load Analysis Reports.
+		$this->analysis = new Sensei_Analysis( $this->main_plugin_file_name );
+
+		// Admin notices.
+		$this->admin_notices = Sensei_Admin_Notices::instance()->init();
+
+		Sensei_Temporary_User::init();
+
 		// Differentiate between administration and frontend logic.
 		if ( is_admin() ) {
-			// Load Admin Class
+			// Load Admin Class.
 			$this->admin = new Sensei_Admin();
-
-			// Load Analysis Reports
-			$this->analysis = new Sensei_Analysis( $this->main_plugin_file_name );
 
 			new Sensei_Import();
 			new Sensei_Export();
 			new Sensei_Exit_Survey();
-			new Sensei_Admin_Notices();
+
+			Sensei_No_Users_Table_Relationship::instance()->init();
+			SenseiLMS_Plugin_Updater::init();
+
 		} else {
 
 			// Load Frontend Class
@@ -472,6 +559,41 @@ class Sensei_Main {
 		$this->Sensei_WPML = new Sensei_WPML();
 
 		$this->rest_api_internal = new Sensei_REST_API_Internal();
+
+		// Student progress repositories.
+		$this->course_progress_repository = ( new Course_Progress_Repository_Factory() )->create();
+		$this->lesson_progress_repository = ( new Lesson_Progress_Repository_Factory() )->create();
+		$this->quiz_progress_repository   = ( new Quiz_Progress_Repository_Factory() )->create();
+
+		// Quiz submission repositories.
+		$this->quiz_submission_repository = ( new Submission_Repository_Factory() )->create();
+		$this->quiz_answer_repository     = ( new Answer_Repository_Factory() )->create();
+		$this->quiz_grade_repository      = ( new Grade_Repository_Factory() )->create();
+
+		// Cron for periodically cleaning guest user related data.
+		Sensei_Temporary_User_Cleaner::instance()->init();
+
+		$email_customization_enabled = $this->feature_flags->is_enabled( 'email_customization' );
+		if ( $email_customization_enabled ) {
+			Email_Customization::instance( $this->settings, $this->assets, $this->lesson_progress_repository )->init();
+		}
+		// MailPoet integration.
+		/**
+		 * Integrate MailPoet by adding lists for courses and groups.
+		 *
+		 * @hook  sensei_email_mailpoet_feature
+		 * @since 4.13.0
+		 *
+		 * @param {bool} $enable Enable feature. Default true.
+		 *
+		 * @return {bool} Whether to enable feature.
+		 */
+		if ( apply_filters( 'sensei_email_mailpoet_feature', true ) ) {
+			if ( class_exists( \MailPoet\API\API::class ) ) {
+				$mailpoet_api = \MailPoet\API\API::MP( 'v1' );
+				new Sensei\Emails\MailPoet\Main( $mailpoet_api );
+			}
+		}
 	}
 
 	/**
@@ -485,6 +607,15 @@ class Sensei_Main {
 
 			new Sensei_CLI();
 		}
+	}
+
+	/**
+	 * Load the 3rd party compatibility tweaks.
+	 *
+	 * @since 4.13.1
+	 */
+	private function initialize_3rd_party_compatibility(): void {
+		require_once $this->resolve_path( 'includes/3rd-party/3rd-party.php' );
 	}
 
 	/**
@@ -657,7 +788,7 @@ class Sensei_Main {
 
 		// Make sure the current version is up-to-date.
 		if ( ! $current_version || $is_upgrade ) {
-			$this->register_plugin_version();
+			$this->register_plugin_version( $is_new_install );
 		}
 
 		$this->updates = new Sensei_Updates( $current_version, $is_new_install, $is_upgrade );
@@ -730,13 +861,21 @@ class Sensei_Main {
 	public function activate_sensei() {
 
 		if ( false === get_option( 'sensei_installed', false ) ) {
-			set_transient( 'sensei_activation_redirect', 1, 30 );
 
-			update_option( Sensei_Setup_Wizard::SUGGEST_SETUP_WIZARD_OPTION, 1 );
+			// Do not enable the wizard for sites that are created with the onboarding flow.
+			if ( 'sensei' !== get_option( 'site_intent' ) ) {
+
+				set_transient( 'sensei_activation_redirect', 1, 30 );
+				update_option( Sensei_Setup_Wizard::SUGGEST_SETUP_WIZARD_OPTION, 1 );
+
+			} else {
+				Sensei_Setup_Wizard::instance()->finish_setup_wizard();
+			}
+		} else {
+			return;
 		}
 
 		update_option( 'sensei_installed', 1 );
-
 	}
 
 	/**
@@ -744,13 +883,17 @@ class Sensei_Main {
 	 *
 	 * @access public
 	 * @since  1.0.0
+	 * @param boolean $is_new_install Is this a new install.
 	 * @return void
 	 */
-	private function register_plugin_version() {
+	private function register_plugin_version( $is_new_install ) {
 		if ( isset( $this->version ) ) {
 
 			update_option( 'sensei-version', $this->version );
 
+			if ( $is_new_install ) {
+				update_option( 'sensei-install-version', $this->version );
+			}
 		}
 	}
 

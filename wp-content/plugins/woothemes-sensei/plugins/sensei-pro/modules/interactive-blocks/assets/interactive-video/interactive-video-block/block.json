@@ -25,6 +25,9 @@
 		"videoType": {
 			"type": "string",
 			"default": "video-file"
+		},
+		"hiddenTimeline": {
+			"type": "boolean"
 		}
 	},
 	"textdomain": "sensei-pro"

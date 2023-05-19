@@ -1,4 +1,8 @@
 .wp-block-sensei-pro-interactive-video {
+	&--with-hidden-timeline .wp-block-sensei-pro-timeline {
+		display: none;
+	}
+
 	// Hide caption field from the editor.
 	.wp-block-embed,
 	.wp-block-video {

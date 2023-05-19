@@ -5,9 +5,9 @@ Plugin URI: https://wppopupmaker.com/?utm_campaign=readme&utm_medium=referral&ut
 Donate link:
 Tags:  marketing, ecommerce, popup, popups, optin, conversion, promotion, pop-up, lightbox, modal, popupmaker
 Requires at least: 4.9
-Tested up to: 6.0
+Tested up to: 6.1.1
 Requires PHP: 5.6
-Stable tag: 1.16.7
+Stable tag: 1.18.1
 License: GPLv2 or later
 License URI:  http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -31,7 +31,7 @@ With Popup Maker, you can create popups such as:
 * Ecommerce popups,
 * Contact form popups,
 * Coronavirus/COVID-19 announcements,
-* [EU cookie notices](https://ninjaforms.com/eu-cookie-notices-ninja-forms/),
+* [EU cookie notices](https://ninjaforms.com/blog/eu-cookie-notices-ninja-forms/),
 * Popups to greet visitors from ProductHunt (requires [premium Advanced Targeting Conditions feature](https://wppopupmaker.com/extensions/advanced-targeting-conditions/?utm_campaign=readme&utm_medium=referral&utm_source=readme-description&utm_content=example-popups&utm_term=greet-producthunt)),
 * WooCommerce upsell popups (requires [premium WooCommerce feature](https://wppopupmaker.com/extensions/woocommerce-pro/?utm_campaign=readme&utm_medium=referral&utm_source=readme-description&utm_content=example-popups&utm_term=woocommerce-upsells)),
 * WooCommerce cross-sell popups (requires [premium WooCommerce feature](https://wppopupmaker.com/extensions/woocommerce-pro/?utm_campaign=readme&utm_medium=referral&utm_source=readme-description&utm_content=example-popups&utm_term=woocommerce-crosssells)),
@@ -181,6 +181,83 @@ There are several common causes for this, check [this guide for help](https://do
 
 View our [complete changelog](https://github.com/PopupMaker/Popup-Maker/blob/master/CHANGELOG.md) for up-to-date information on what has been going on with the development of Popup Maker.
 
+= v1.18.1 - 03/08/23 =
+
+* Improvement: Add nonce to asset cache purging for admins.
+* Fix: PHP 8.2 Deprecated notices.
+* Fix: Bug in asset caching causing assets to falsly determine they couldn't be writtien.
+* Fix: Add backcompat fix for WP >5.3 `wp_date` errors.
+
+= v1.18.0 - 02/10/2023 =
+
+* Accessibility: Use newer WCAG `aria-modal` attributes and remove `aria-hidden` methods.
+* Improvement: Font Awesome 6 support for close button text.
+* Improvement: Add currently loaded popup count to Admin toolbar if enabled.
+* Improvement: Debug logging now auto truncates, and limits to 1 write per page load.
+* Tweak: Remove extra slash `/` from some asset paths.
+* Fix: Removes html from displaying in popup in place of privacy policy link.
+* Fix: Resolve issues with upgrade process button not always starting when clicked.
+* Fix: Extra escaping was causing some code to HTML to not render in dashboard notices.
+* Fix: Bug causing disabled name field to be shown in sub forms.
+* Fix: HTML entities in some trigger option fields were not being rendered properly.
+* Security: Obfuscate debug log file location using hash in file.
+* Security: Only allow users with permission to edit popup to toggle it on/off.
+* Security: Add nonce to object search API requests
+* Developer: New `pum_cookie_domain` filter.
+* Developer: Lots of PHPCS notices cleaned up, more to come.
+
+= v1.17.1 - 12/04/2022 =
+
+* Improvement: Update EDD Updater to latest for extension update handling.
+* Improvement: Add handler for properly renaming extension folder names during update without manual reactivation by user.
+* Tweak: Set proper default tab on Tools page.
+* Tweak: Removed deprecated Scheduled Actions tab.
+* Fix: Rendering issue with review request.
+* Fix: ATC Cookie condition was preventing popup from loading.
+
+= v1.17.0 - 11/24/2022 =
+
+* Improvement: Added contextual notification system to be able to notify site admins about important information including security notices, beta tests, extension sales & more without requiring a plugin update.
+* Improvement: Render analytic reset times in server properly rather than UTC.
+* Tweak: Remove all reference to `select2` without the prefixed `pumselect2` to prevent confusion and further isolate our dependencies from 3rd party interference.
+
+= v1.16.14 - 11/08/2022 =
+
+* Version bump do to release issue.
+
+= v1.16.13 - 11/08/2022 =
+
+* Improvement: Removed some complex functionalities that were no longer needed but causing intermittent issues.
+* Improvement: Replace wp_remote_post with wp_remote_get for extension API calls to allow caching.
+* Improvement: Fixed low quality images on welcome screen.
+
+= v1.16.12 - 10/26/2022 =
+
+* Improvement: Optimize dashboard support page to load much quicker.
+
+= v1.16.11 - 10/25/2022 =
+
+* Security: Cleaned up mustache js templates usage of unescaped output.
+* Fix: Bug in `popup_trigger` & `popup_close` shortcode's when using `tag="button"`.
+
+= v1.16.10 - 10/18/2022 =
+
+* Improvement: Added nonce to previews.
+* Improvement: Standardizing coding standards, convert to short arrays.
+* Improvement: First phase of a large clean up of older code.
+* Fix: Recent improvements to conditions handling caused some issues in some cases.
+* Fix: Bug caused by security patch in v1.16.9 which caused shortcodes to render content strangely.
+
+= v1.16.9 - 09/23/2022 =
+
+* Security: Patched XSS vulnerability allowing contributors to run unfiltered JavaScript.
+
+= v1.16.8 - 09/12/2022 =
+
+* Fix: Error on widgets screen when using the new `Block` based widget editor due to an old script being loaded.
+* Fix: Previews were not working when popup was in draft status, or when not enabled. Now they always work.
+* Fix: Error caused by non unicode characters when Debug Mode was enabled.
+
 = v1.16.7 - 04/05/2022 =
 
 * Note: Bumped 2 versions as v1.16.6 may not have fully fixed it fully.
@@ -188,7 +265,7 @@ View our [complete changelog](https://github.com/PopupMaker/Popup-Maker/blob/mas
 
 = v1.16.5 - 04/04/2022 =
 
-* Improvement: Add precautionary escaping of some generated outputs.
+* Improvement: Add precautionary escaping of some generated outputs. Shout out to [@roelvb79](https://twitter.com/roelvb79) for the report.
 * Improvement: Remove leftover console logging code.
 * Fix: Typo in admin template rendering for cookie editor.
 

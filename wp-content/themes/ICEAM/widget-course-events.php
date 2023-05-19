@@ -26,7 +26,7 @@
 		// before and after widget arguments are defined by themes
 		echo $args['before_widget'];
         
-        wp_enqueue_style( 'widget-calendar-pro-style', TribeEventsPro::instance()->pluginUrl . 'src/resources/css/widget-calendar-full.css', array(), apply_filters( 'tribe_events_pro_css_version', TribeEventsPro::VERSION ) );
+        // wp_enqueue_style( 'widget-calendar-pro-style', TribeEventsPro::instance()->pluginUrl . 'src/resources/css/widget-calendar-full.css', array(), apply_filters( 'tribe_events_pro_css_version', TribeEventsPro::VERSION ) );
 		
 		$post_obj = $GLOBALS['post'];
         setup_postdata( $post_obj );

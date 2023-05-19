@@ -137,23 +137,23 @@ var t=/\s/;
  * // Cancel the trailing debounced invocation.
  * jQuery(window).on('popstate', debounced.cancel);
  */
-function(e,t,n){var a,u,d,l,f,p,v=0,m=!1,b=!1,y=!0;if("function"!=typeof e)throw new TypeError("Expected a function");function w(t){var n=a,r=u;return a=u=void 0,v=t,l=e.apply(r,n)}function h(e){
+function(e,t,n){var a,u,l,d,f,v,p=0,m=!1,y=!1,b=!0;if("function"!=typeof e)throw new TypeError("Expected a function");function w(t){var n=a,r=u;return a=u=void 0,p=t,d=e.apply(r,n)}function h(e){
 // Invoke the leading edge.
 // Reset any `maxWait` timer.
-return v=e,
+return p=e,
 // Start the timer for the trailing edge.
-f=setTimeout(O,t),m?w(e):l}function g(e){var n=e-p;
+f=setTimeout(O,t),m?w(e):d}function g(e){var n=e-v;
 // Either this is the first call, activity has stopped and we're at the
 // trailing edge, the system time has gone backwards and we're treating
 // it as the trailing edge, or we've hit the `maxWait` limit.
-return void 0===p||n>=t||n<0||b&&e-v>=d}function O(){var e=o();if(g(e))return j(e);
+return void 0===v||n>=t||n<0||y&&e-p>=l}function O(){var e=o();if(g(e))return j(e);
 // Restart the timer.
-f=setTimeout(O,function(e){var n=t-(e-p);return b?c(n,d-(e-v)):n}(e))}function j(e){
+f=setTimeout(O,function(e){var n=t-(e-v);return y?c(n,l-(e-p)):n}(e))}function j(e){
 // Only invoke if we have `lastArgs` which means `func` has been
 // debounced at least once.
-return f=void 0,y&&a?w(e):(a=u=void 0,l)}function S(){var e=o(),n=g(e);if(a=arguments,u=this,p=e,n){if(void 0===f)return h(p);if(b)
+return f=void 0,b&&a?w(e):(a=u=void 0,d)}function S(){var e=o(),n=g(e);if(a=arguments,u=this,v=e,n){if(void 0===f)return h(v);if(y)
 // Handle invocations in a tight loop.
-return clearTimeout(f),f=setTimeout(O,t),w(p)}return void 0===f&&(f=setTimeout(O,t)),l}return t=i(t)||0,r(n)&&(m=!!n.leading,d=(b="maxWait"in n)?s(i(n.maxWait)||0,t):d,y="trailing"in n?!!n.trailing:y),S.cancel=function(){void 0!==f&&clearTimeout(f),v=0,a=p=u=f=void 0},S.flush=function(){return void 0===f?l:j(o())},S}}
+return clearTimeout(f),f=setTimeout(O,t),w(v)}return void 0===f&&(f=setTimeout(O,t)),d}return t=i(t)||0,r(n)&&(m=!!n.leading,l=(y="maxWait"in n)?s(i(n.maxWait)||0,t):l,b="trailing"in n?!!n.trailing:b),S.cancel=function(){void 0!==f&&clearTimeout(f),p=0,a=v=u=f=void 0},S.flush=function(){return void 0===f?d:j(o())},S}}
 /***/,
 /***/11611:
 /***/e=>{e.exports=
@@ -281,11 +281,11 @@ function(e){return"symbol"==typeof e||o(e)&&"[object Symbol]"==r(e)}}
  */
 function(e){if("number"==typeof e)return e;if(i(e))return NaN;if(o(e)){var t="function"==typeof e.valueOf?e.valueOf():e;e=o(t)?t+"":t}if("string"!=typeof e)return 0===e?e:+e;e=r(e);var n=c.test(e);return n||a.test(e)?u(e.slice(2),n?2:8):s.test(e)?NaN:+e}}
 /***/,
-/***/5308:
+/***/49977:
 /***/(e,t,n)=>{"use strict";
 /* harmony import */var r=n(66726),o=n.n(r);
 /* harmony import */ // eslint-disable-next-line @wordpress/no-global-event-listener
-window.addEventListener("DOMContentLoaded",(function(){var e=document.querySelector("#wpadminbar");function t(){var t=e.getBoundingClientRect(),n=t.top,r=t.height,o=Math.max(0,r+n);document.documentElement.style.setProperty("--sensei-wpadminbar-offset",o+"px")}e&&(t(),// eslint-disable-next-line @wordpress/no-global-event-listener
+window.addEventListener("DOMContentLoaded",(function(){var e=document.querySelector("#wpadminbar");function t(){if(e){var t=e.getBoundingClientRect(),n=t.top,r=t.height,o=Math.max(0,r+n);document.documentElement.style.setProperty("--sensei-wpadminbar-offset",o+"px")}}e&&(t(),// eslint-disable-next-line @wordpress/no-global-event-listener
 window.addEventListener("scroll",t,{capture:!1,passive:!0}),
 /**
    * The debounce has 2 reasons here:
@@ -299,10 +299,10 @@ window.addEventListener("resize",o()(t,500)))}))}
 /***/68825:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */n.d(t,{
-/* harmony export */F:()=>/* binding */s
+/* harmony export */F:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var r=n(47701),o=n.n(r),i=n(65736),__=i.__,s=function(){o()((function(){var e=document.querySelectorAll('[data-id="complete-lesson-form"]'),t=document.querySelectorAll('[data-id="complete-lesson-button"]'),n=document.querySelectorAll(".sensei-course-theme-course-progress-bar-inner"),r=document.querySelector(".sensei-course-theme__main-content"),o=function(e,n){e.preventDefault(),t.forEach((function(e){e.setAttribute("disabled","disabled"),e.classList.add("is-busy")})),setTimeout((function(){n.submit()}),1e3)},i=function(e){var t=e.target;o(e,t),n.forEach((function(e){var t=e.dataset,n=(+t.completed+1)/+t.count*100;// Percentage with one more completed.
-e.style.width="".concat(n,"%")})),r.insertAdjacentHTML("beforebegin",'<div class="sensei-course-theme-lesson-completion-notice">\n\t\t\t\t\t'.concat(window.sensei.checkCircleIcon,'\n\t\t\t\t\t<p role="alert" class="sensei-course-theme-lesson-completion-notice__text">\n\t\t\t\t\t\t').concat(__("Lesson complete","sensei-lms"),"\n\t\t\t\t\t</p>\n\t\t\t\t</div>"))};e.forEach((function(e){e.addEventListener("submit",i)}))}))};
+/* harmony import */var r=n(47701),o=n.n(r),i=function(){o()((function(){var e=document.querySelectorAll('[data-id="complete-lesson-form"]'),t=document.querySelectorAll('[data-id="complete-lesson-button"]'),n=document.querySelectorAll(".sensei-course-theme-course-progress-bar-inner"),r=function(e,n){e.preventDefault(),t.forEach((function(e){e.setAttribute("disabled","disabled"),e.classList.add("is-busy")})),setTimeout((function(){n.submit()}),1e3)},o=function(e){var t=e.target;r(e,t),n.forEach((function(e){var t=e.dataset,n=(+t.completed+1)/+t.count*100;// Percentage with one more completed.
+e.style.width="".concat(n,"%")}))};e.forEach((function(e){e.addEventListener("submit",o)}))}))};
 /* harmony import */}
 /***/,
 /***/1487:
@@ -329,7 +329,30 @@ if(n){// Prevent browser from refreshing.
 e.preventDefault();var i=e.target,s=i.querySelector("button.sensei-contact-teacher-form__submit"),c=i.parentElement.querySelector(".sensei-contact-teacher-close");s.classList.add("sensei-course-theme__button","is-busy"),s.disabled=!0;var a=["sensei_message_teacher_nonce","_wpnonce","post_id","contact_message"].reduce((function(e,t){return(0,o/* ["default"] */.Z)((0,o/* ["default"] */.Z)({},e),{},(0,r/* ["default"] */.Z)({},t,i.elements[t].value))}),{});window.fetch("".concat(n,"sensei-internal/v1/messages?_locale=user"),{method:"POST",body:JSON.stringify(a),headers:{"Content-Type":"application/json","X-WP-Nonce":a._wpnonce}}).then((function(){i.classList.add("is-success"),c.focus()})).catch((function(){// TODO: Show submit failed message.
 }))}}}
 /***/},
-/***/3814:
+/***/91729:
+/***/(e,t,n)=>{"use strict";
+/* harmony import */var r=n(47701);
+/* harmony import */
+/**
+ * Update video height when its width changes to keep original aspect ratio.
+ *
+ * @param {HTMLElement} block Container to track. Must have an <iframe> width and height attributes.
+ */
+function o(e){var t,n,r,o=function(){return e.querySelector("iframe")},i=o(),s=i&&(n=(t=i).width,(r=t.height)&&n?+n/+r:null);function c(){if(i=o()){var e=i,t=e.offsetHeight,n=e.offsetWidth/s;n&&n!==t&&i.style.setProperty("height","".concat(n,"px"))}}s&&(new window.ResizeObserver(c).observe(e),c())}n.n(r)()((
+/**
+ * WordPress dependencies
+ */
+function(){document.querySelectorAll(".sensei-course-theme-lesson-video").forEach(o)}
+/**
+ * Get aspect ratio from element width and height attribute.
+ *
+ * @param {HTMLElement} element
+ * @param {string}      element.width
+ * @param {string}      element.height
+ * @return {null|number} Width / Height aspect ratio.
+ */))}
+/***/,
+/***/40365:
 /***/(e,t,n)=>{"use strict";
 /* harmony export */n.d(t,{
 /* harmony export */w:()=>/* binding */s
@@ -339,8 +362,8 @@ e.preventDefault();var i=e.target,s=i.querySelector("button.sensei-contact-teach
  *
  * @type {string}
  */
-var r="sensei-course-theme--focus-mode",o="sensei-course-theme__sidebar--hidden",i=function(){var e=window.sessionStorage.getItem(r);if(e)try{var t=JSON.parse(e);"boolean"==typeof t&&s(t,!0)}catch(e){}},s=function(e,t){var n=document.body.classList,i=document.querySelector(".sensei-course-theme__sidebar"),s=n.contains(r),c=void 0===e?!s:e;c?t&&i.classList.add(o):i.classList.remove(o),n.toggle(r,c),window.sessionStorage.setItem(r,JSON.stringify(c))};// eslint-disable-next-line @wordpress/no-global-event-listener
-window.addEventListener("DOMContentLoaded",(function(){i(),setTimeout((function(){document.body.classList.add("".concat(r,"--animated"))}),500),document.querySelector(".sensei-course-theme__sidebar").addEventListener("transitionend",(function(e){"left"===e.propertyName&&document.body.classList.contains(r)&&document.querySelector(".sensei-course-theme__sidebar").classList.add(o)}))}))}
+var r="sensei-course-theme--focus-mode",o="sensei-course-theme__sidebar--hidden",i=function(){var e=window.sessionStorage.getItem(r);if(e)try{var t=JSON.parse(e);"boolean"==typeof t&&s(t,!0)}catch(e){}},s=function(e,t){var n=document.body.classList,i=document.querySelector(".sensei-course-theme__sidebar"),s=n.contains(r),c=void 0===e?!s:e;c?t&&(null==i||i.classList.add(o)):null==i||i.classList.remove(o),n.toggle(r,c),window.sessionStorage.setItem(r,JSON.stringify(c))};// eslint-disable-next-line @wordpress/no-global-event-listener
+window.addEventListener("DOMContentLoaded",(function(){var e;i(),setTimeout((function(){document.body.classList.add("".concat(r,"--animated"))}),500),null===(e=document.querySelector(".sensei-course-theme__sidebar"))||void 0===e||e.addEventListener("transitionend",(function(e){var t;"left"===e.propertyName&&document.body.classList.contains(r)&&(null===(t=document.querySelector(".sensei-course-theme__sidebar"))||void 0===t||t.classList.add(o))}))}))}
 /***/,
 /***/91971:
 /***/(e,t,n)=>{"use strict";
@@ -349,9 +372,6 @@ window.addEventListener("scroll",(function(){var e=document.documentElement,t=e.
 /***/,
 /***/47701:
 /***/e=>{"use strict";e.exports=window.wp.domReady}
-/***/,
-/***/65736:
-/***/e=>{"use strict";e.exports=window.wp.i18n}
 /***/,
 /***/1793:
 /***/(e,t,n)=>{"use strict";
@@ -453,8 +473,8 @@ window.addEventListener("scroll",(function(){var e=document.documentElement,t=e.
 /******/,
 // This entry need to be wrapped in an IIFE because it need to be in strict mode.
 (()=>{"use strict";
-/* harmony import */n(91971),n(5308)
-/* harmony import */;var e=n(3814),t=n(1487),r=n(68825);
+/* harmony import */n(91971),n(49977),n(91729)
+/* harmony import */;var e=n(40365),t=n(1487),r=n(68825);
 /**
  * Internal dependencies
  */

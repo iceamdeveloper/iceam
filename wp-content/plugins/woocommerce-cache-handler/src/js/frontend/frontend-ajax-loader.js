@@ -193,6 +193,24 @@ jQuery(document).ready(function($) {
 			$widget.find('button:not(.' + currency_code + ')').removeClass('active');
 			$widget.find('button.' + currency_code).addClass('active');
 		});
+
+		// Updates the "flags" currency selectors
+		// @since 1.1.0.230328
+		$('.widget_wc_aelia_currencyswitcher_widget.currency_selector.flags').each(function() {
+			const $currency_selector = $(this);
+
+			// Take the flag from the active currency
+			const $currency_image = $currency_selector.find(`.currencies .currency.${currency_code} .currency_flag img`);
+			$currency_selector.find('.selected_currency .currency_flag img').attr('src', $currency_image.attr('src'));
+
+			// Take the label from the active currency
+			const currency_name = $currency_selector.find(`.currencies .currency.${currency_code} .currency_name`).html();
+			$currency_selector.find('.selected_currency .currency_name').html(currency_name);
+
+			// Add the "selected" attribute to the active currency in the dropdown
+			$currency_selector.find(`.currencies .selected`).removeClass('selected');
+			$currency_selector.find(`.currencies .currency.${currency_code}`).addClass('selected');
+		});
 	}
 
 	/**
@@ -249,6 +267,32 @@ jQuery(document).ready(function($) {
 			if(location_changed) {
 				$widget.find('select.countries').change();
 			}
+		});
+
+		// Updates the "flags" country selectors
+		// @since 1.1.0.230328
+		$('.widget_wc_aelia_currencyswitcher_widget.country_switcher.flags').each(function() {
+			const $country_selector = $(this);
+
+			// Find the country in the dropdown list
+			const $active_country_item = $country_selector.find(`.countries .country.${country_code}`);
+
+			// If the country is not in the list, do nothing
+			if($active_country_item.length <= 0) {
+				return;
+			}
+
+			// Take the flag from the active country
+			const $country_image = $active_country_item.find('.country_flag img');
+			$country_selector.find('.selected_country .country_flag img').attr('src', $country_image.attr('src'));
+
+			// Take the label from the active country
+			const country_name = $active_country_item.find('.country_name').html();
+			$country_selector.find('.selected_country .country_name').html(country_name);
+
+			// Add the "selected" attribute to the active country in the dropdown
+			$country_selector.find(`.countries .selected`).removeClass('selected');
+			$country_selector.find(`.countries .country.${country_code}`).addClass('selected');
 		});
 	}
 
@@ -337,11 +381,6 @@ jQuery(document).ready(function($) {
 			}
 			$slider_widget.unblock();
 		});
-
-		//$(".price_slider").slider('values', [50, 100]);
-		//$("input#min_price").val(50);
-		//$("input#max_price").val(100);
-		//$(document.body).trigger("price_slider_slide", [50, 100]);
 	}
 
 	// Update the values on the page when the active currency is retrieved

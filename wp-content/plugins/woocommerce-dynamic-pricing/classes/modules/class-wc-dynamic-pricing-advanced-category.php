@@ -52,7 +52,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 
 				//check if this set is valid for the current user;
 				$is_valid_for_user = $set->is_valid_for_user();
-				if ( !( $is_valid_for_user ) ) {
+				if ( ! ( $is_valid_for_user ) ) {
 					continue;
 				}
 
@@ -72,6 +72,11 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 				}
 
 				$rule = reset( $set->pricing_rules ); //block rules can only have one line item.
+
+				$rule['to'] = floatval( $rule['to'] ?? 0 );
+				$rule['from'] = floatval( $rule['from'] ?? 0 );
+				$rule['adjust'] = floatval( $rule['adjust'] ?? 0 );
+
 				if ( $q < $rule['from'] ) {
 					//continue;
 				}
@@ -173,7 +178,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 						}
 
 						$process_discounts = apply_filters( 'woocommerce_dynamic_pricing_process_product_discounts', true, $ctitem['data'], 'advanced_category', $this, $ctitem );
-						if ( !$process_discounts ) {
+						if ( ! $process_discounts ) {
 							continue;
 						}
 
@@ -258,14 +263,14 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 	 *
 	 */
 	public function get_bulk_cart_item_adjusted_price_by_adjustment_set( $adjustment_set, $cart_item, $cart_item_key, $original_price_override = false ) {
-		if ( !$adjustment_set->is_valid_for_user() ) {
+		if ( ! $adjustment_set->is_valid_for_user() ) {
 			return false;
 		}
 
 		$product = $cart_item['data'];
 
 		$process_discounts = apply_filters( 'woocommerce_dynamic_pricing_process_product_discounts', true, $cart_item['data'], 'advanced_category', $this, $cart_item );
-		if ( !$process_discounts ) {
+		if ( ! $process_discounts ) {
 			return false;
 		}
 
@@ -312,25 +317,26 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 		}
 
 		$amount       = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, $cart_item, $this );
+		$amount       = floatval( $amount );
 		$num_decimals = apply_filters( 'woocommerce_dynamic_pricing_get_decimals', (int) get_option( 'woocommerce_price_num_decimals' ) );
 
 		switch ( $rule['type'] ) {
 			case 'fixed_adjustment':
-				$adjusted            = floatval( $price ) - floatval( $amount );
-				$adjusted            = $adjusted >= 0 ? $adjusted : 0;
+				$adjusted            = floatval( $price ) - $amount;
+				$adjusted            = max( $adjusted, 0 );
 				$line_total          = 0;
-				$full_price_quantity = $cart_item['quantity'] - $a;
+				$full_price_quantity = intval( $cart_item['quantity'] ) - $a;
 
 				$discount_quantity = $a;
 
 				$line_total = ( $discount_quantity * $adjusted ) + ( $full_price_quantity * $price );
 				$result     = $line_total / $cart_item['quantity'];
-				$result     = $result >= 0 ? $result : 0;
+				$result     = max( $result, 0 );
 
 				break;
 			case 'percent_adjustment':
 				$amount     = $amount / 100;
-				$adjusted   = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
+				$adjusted   = round( floatval( $price ) - ( $amount * $price ), (int) $num_decimals );
 				$line_total = 0;
 
 				$full_price_quantity = $cart_item['available_quantity'] - $a;
@@ -339,7 +345,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 				$line_total = ( $discount_quantity * $adjusted ) + ( $full_price_quantity * $price );
 				$result     = $line_total / $cart_item['quantity'];
 
-				$result = $result >= 0 ? $result : 0;
+				$result = max( $result, 0 );
 				break;
 			case 'fixed_price':
 				$adjusted            = round( $amount, (int) $num_decimals );
@@ -348,7 +354,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 				$discount_quantity   = $a;
 				$line_total          = ( $discount_quantity * $adjusted ) + ( $full_price_quantity * $price );
 				$result              = $line_total / $cart_item['quantity'];
-				$result              = $result >= 0 ? $result : 0;
+				$result              = max( $result, 0 );
 
 				break;
 			default:
@@ -360,13 +366,13 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 	}
 
 	protected function calculate_bulk_adjusted_price( $cart_item, $price, $rule, $q ) {
-		if ( !is_numeric( $price ) ) {
+		if ( ! is_numeric( $price ) ) {
 			return $price;
 		}
 
 		$result = false;
 
-		$amount       = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, $cart_item, $this );
+		$amount       = floatval( apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, $cart_item, $this ) );
 		$num_decimals = apply_filters( 'woocommerce_dynamic_pricing_get_decimals', (int) get_option( 'woocommerce_price_num_decimals' ) );
 
 
@@ -378,10 +384,13 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 			$rule['to'] = $q;
 		}
 
+		$rule['to'] = floatval( $rule['to'] );
+		$rule['from'] = floatval( $rule['from'] );
+
 		if ( $q >= $rule['from'] && $q <= $rule['to'] ) {
 			switch ( $rule['type'] ) {
 				case 'price_discount':
-					$adjusted = floatval( $price ) - floatval( $amount );
+					$adjusted = floatval( $price ) - $amount;
 					$result   = $adjusted >= 0 ? $adjusted : 0;
 					break;
 				case 'percentage_discount':
@@ -398,7 +407,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 					}
 
 					if ( isset( $cart_item['addons_price_before_calc'] ) ) {
-						$addons_total = $price - $cart_item['addons_price_before_calc'];
+						$addons_total = floatval($price) - floatval($cart_item['addons_price_before_calc']);
 						$amount       += $addons_total;
 					}
 
@@ -437,7 +446,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 	 */
 	public function get_adjustment_sets_for_product( $product ) {
 
-		if ( !is_object( $product ) ) {
+		if ( ! is_object( $product ) ) {
 			return false;
 		}
 
@@ -489,12 +498,12 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 
 		$sets = array();
 		foreach ( $cart_item_sets as $adjustment_set ) {
-			if ( !$this->is_cumulative( $cart_item, $cart_item_key ) ) {
-				if ( !$this->is_item_discounted( $cart_item, $cart_item_key ) ) {
+			if ( ! $this->is_cumulative( $cart_item, $cart_item_key ) ) {
+				if ( ! $this->is_item_discounted( $cart_item, $cart_item_key ) ) {
 					$sets[ $adjustment_set->set_id ] = $adjustment_set;
 				}
 			} else {
-				if ( !$this->is_item_discounted( $cart_item, $cart_item_key, $adjustment_set->set_id ) ) {
+				if ( ! $this->is_item_discounted( $cart_item, $cart_item_key, $adjustment_set->set_id ) ) {
 					$sets[ $adjustment_set->set_id ] = $adjustment_set;
 				}
 			}
@@ -511,7 +520,7 @@ class WC_Dynamic_Pricing_Advanced_Category extends WC_Dynamic_Pricing_Advanced_B
 	}
 
 	private function is_applied_to_product( $product, $targets ) {
-		if ( is_admin() && !wp_doing_ajax() ) {
+		if ( is_admin() && ! wp_doing_ajax() ) {
 			return false;
 		}
 

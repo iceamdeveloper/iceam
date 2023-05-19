@@ -72,7 +72,7 @@ jQuery.fn.calculateTotalGrade=function(){var e,r,a=0,n=0;jQuery(".question_box.u
    */
 e.fn.autoGrade=function(){e(".question_box").each((function(){var r,a,n=e(this),t=!1;// Only grade questions that haven't already been graded.
 if(n.hasClass("user_right")||n.hasClass("user_wrong")||n.hasClass("zero-graded"))jQuery(this).hasClass("zero-graded")&&(n.find(".grading-mark.icon_wrong input").attr("checked",!1),n.find(".grading-mark.icon_right input").attr("checked",!1),n.find("input.question-grade").val(0));else// Auto-grading
-if(n.addClass("ungraded"),n.hasClass("gap-fill")?(r=n.find(".user-answer .highlight").html(),a=n.find(".correct-answer .highlight").html()):(r=n.find(".user-answer").html(),a=n.find(".correct-answer").html()),r=r.trim(),a=a.trim(),n.hasClass("auto-grade")){
+if(n.addClass("ungraded"),n.hasClass("gap-fill")?(r=n.find(".user-answer").contents().find(".highlight").html(),a=n.find(".correct-answer .highlight").html()):(r=n.find(".user-answer").contents().find("body").html(),a=n.find(".correct-answer").html()),r=r.trim(),a=a.trim(),n.hasClass("auto-grade")){
 // Split answers to multiple choice questions into an array since there may be
 // multiple correct answers.
 if(n.hasClass("multiple-choice")){var i=r.split("<br>"),s=a.split("<br>");t=!0,i.forEach((function(r){-1===e.inArray(r,s)&&(t=!1)})),i.length!==s.length&&(t=!1)}t||r===a?(

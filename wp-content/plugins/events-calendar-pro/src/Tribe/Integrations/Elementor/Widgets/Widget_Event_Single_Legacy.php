@@ -39,6 +39,8 @@ class Widget_Event_Single_Legacy extends Widget_Abstract {
 	public function __construct( $data = [], $args = null ) {
 		parent::__construct( $data, $args );
 
+		add_filter( 'tec_events_virtual_enqueue_single_virtual_editor_assets', '__return_true' );
+
 		$this->widget_title = __( 'Event', 'tribe-events-calendar-pro' );
 	}
 
@@ -51,9 +53,6 @@ class Widget_Event_Single_Legacy extends Widget_Abstract {
 		$settings = $this->get_settings_for_display();
 		$event_query_settings = $this->get_event_query_settings( $settings );
 		$event_query_settings = $this->set_id_from_repository_if_unset( $event_query_settings );
-
-		// display the recurring events info tooltip
-		Tribe__Events__Pro__Main::instance()->enable_recurring_info_tooltip();
 
 		/** @var Template_Bootstrap $bootstrap */
 		$bootstrap = tribe( Template_Bootstrap::class );
@@ -172,7 +171,7 @@ class Widget_Event_Single_Legacy extends Widget_Abstract {
 				'.tribe-venue-url-label',
 				'.tribe-venue-url',
 			],
-			'virtual_video_embed' => '.tribe-events-virtual-single-video-embed',
+			'virtual_video_embed' => '.tribe-events-virtual-single-video-embed, .tribe-events-virtual-single-youtube__embed-wrap',
 			'virtual_watch_button' => [
 				'.tribe-events-virtual-link-button',
 				'.tribe-events-virtual-single-zoom-details__meta-group--link-button',
@@ -264,7 +263,6 @@ class Widget_Event_Single_Legacy extends Widget_Abstract {
 		tribe_asset_enqueue( 'tribe-events-v2-single-blocks' );
 		tribe_asset_enqueue( 'tribe-common-full-style' );
 		tribe_asset_enqueue( 'tribe-events-views-v2-full' );
-		tribe_asset_enqueue( 'tribe-events-v2-single-skeleton-full' );
 
 		if ( tribe_is_truthy( Arr::get( $settings, 'related-events' ) ) ) {
 			tribe_asset_enqueue( 'tribe-events-full-pro-calendar-style' );
@@ -2027,6 +2025,9 @@ class Widget_Event_Single_Legacy extends Widget_Abstract {
 			[
 				'label' => esc_html__( 'Navigation', 'tribe-events-calendar-pro' ),
 				'tab' => Controls_Manager::TAB_STYLE,
+				'condition' => [
+					'navigation' => 'yes'
+				],
 			]
 		);
 

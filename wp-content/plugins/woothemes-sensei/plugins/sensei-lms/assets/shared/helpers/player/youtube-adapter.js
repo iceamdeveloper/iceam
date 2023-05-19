@@ -82,7 +82,7 @@ export const getCurrentTime = ( player ) =>
  */
 export const setCurrentTime = ( player, seconds ) =>
 	new Promise( ( resolve ) => {
-		if ( player.i.dataset.hasPlayed ) {
+		if ( player.getIframe().dataset.hasPlayed ) {
 			player.seekTo( seconds );
 			resolve();
 		} else {
@@ -160,5 +160,28 @@ export const onTimeupdate = ( player, callback, w = window ) => {
 	return () => {
 		clearInterval( interval );
 		player.removeEventListener( 'onStateChange', onEnded );
+	};
+};
+
+/**
+ * Add an ended event listener to the player.
+ *
+ * @param {Object}   player   The YouTube player instance.
+ * @param {Function} callback Listener callback.
+ * @param {Window}   w        A custom window.
+ *
+ * @return {Function} The function to unsubscribe the event.
+ */
+export const onEnded = ( player, callback, w = window ) => {
+	const transformedCallback = () => {
+		if ( player.getPlayerState() === w.YT.PlayerState.ENDED ) {
+			callback();
+		}
+	};
+
+	player.addEventListener( 'onStateChange', transformedCallback );
+
+	return () => {
+		player.removeEventListener( 'onStateChange', transformedCallback );
 	};
 };

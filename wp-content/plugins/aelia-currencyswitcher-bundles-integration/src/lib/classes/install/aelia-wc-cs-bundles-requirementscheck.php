@@ -22,11 +22,11 @@ class Aelia_WC_CS_Bundles_RequirementsChecks extends Aelia_WC_RequirementsChecks
 			'url' => 'http://bit.ly/WC_AFC_S3',
 		),
 		'Aelia Currency Switcher for WooCommerce' => array(
-			'version' => '3.8.14.151214',
+			'version' => '4.9.9.210102',
 			'extra_info' => 'You can buy the plugin <a href="https://aelia.co/shop/currency-switcher-woocommerce/">from our shop</a>.',
 		),
 		'WooCommerce Product Bundles' => array(
-			'version' => '5.2',
+			'version' => '6.0',
 		),
 	);
 

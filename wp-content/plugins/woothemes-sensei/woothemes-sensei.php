@@ -3,15 +3,15 @@
  * Plugin Name: Sensei Pro (WC Paid Courses)
  * Plugin URI: https://senseilms.com
  * Description: Whether you want to teach, tutor or train, we have you covered.
- * Version: 4.6.3.1.6.0
+ * Version: 4.14.0.1.14.1
  * Author: Automattic
  * Author URI: https://automattic.com
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Requires at least: 5.8
- * Tested up to: 6.0
+ * Requires at least: 6.0
+ * Tested up to: 6.2
  * Requires PHP: 7.2
  * WC requires at least: 4.0
- * WC tested up to: 6.1.1
+ * WC tested up to: 7.3
  * Text Domain: sensei-compat
  * Domain Path: /languages
  *
@@ -36,24 +36,11 @@ if ( Sensei_Compat_Dependency_Checker::is_php_version_at_least( '7.2.0' ) ) {
 }
 
 add_action( 'plugins_loaded', 'sensei_compat_load', 1 );
-add_action( 'init', 'sensei_compat_load_i18n', 10 );
 register_activation_hook( __FILE__, 'sensei_compat_activate' );
 register_deactivation_hook( __FILE__, 'sensei_compat_deactivate' );
 
-if ( is_admin() ) {
-	require_once dirname( __FILE__ ) . '/class-sensei-compat-admin.php';
-	add_action( 'admin_init', array( 'Sensei_Compat_Admin', 'init' ) );
-}
-
-/**
- * Load the plugin text domain. Sensei LMS handles its own text domain. Sensei Pro is
- * usually registered from the plugin header.
- *
- * @access private
- */
-function sensei_compat_load_i18n() {
-	load_plugin_textdomain( 'sensei-pro' );
-}
+require_once dirname( __FILE__ ) . '/class-sensei-compat-admin.php';
+add_action( 'init', array( 'Sensei_Compat_Admin', 'init' ) );
 
 /**
  * Load Sensei Pro (WC Paid Courses).

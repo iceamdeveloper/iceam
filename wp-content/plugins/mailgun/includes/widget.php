@@ -19,7 +19,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
  */
 
-class list_widget extends WP_Widget
+class list_widget extends \WP_Widget
 {
     public function __construct()
     {
@@ -37,8 +37,11 @@ class list_widget extends WP_Widget
     // This is where the action happens
     public function widget($args, $instance)
     {
-        global $mailgun;
+        $mailgun = Mailgun::getInstance();
 
+        if (!isset($instance['list_address']) || !$instance['list_address']) {
+            return;
+        }
         // vars
         $list_address = apply_filters('list_address', $instance['list_address']);
 
@@ -60,8 +63,6 @@ class list_widget extends WP_Widget
     // Widget Backend
     public function form($instance)
     {
-        global $mailgun;
-
         if (isset($instance['list_address'])) {
             $list_address = $instance['list_address'];
         } else {
@@ -74,27 +75,27 @@ class list_widget extends WP_Widget
             $collect_name = '';
         }
 
-        $list_title = isset($instance['list_title']) ? $instance['list_title'] : null;
-        $list_description = isset($instance['list_description']) ? $instance['list_description'] : null;
+        $list_title = $instance['list_title'] ?? null;
+        $list_description = $instance['list_description'] ?? null;
 
         // Widget admin form
         ?>
         <div class="mailgun-list-widget-back">
             <p>
-                <label for="<?php echo $this->get_field_id('list_title'); ?>"><?php _e('Title (optional):'); ?></label> 
-                <input class="widefat" id="<?php echo $this->get_field_id('list_title'); ?>" name="<?php echo $this->get_field_name('list_title'); ?>" type="text" value="<?php echo esc_attr($list_title); ?>" />
+                <label for="<?php echo esc_attr($this->get_field_id('list_title')); ?>"><?php _e('Title (optional):'); ?></label>
+                <input class="widefat" id="<?php echo esc_attr($this->get_field_id('list_title')); ?>" name="<?php echo esc_attr($this->get_field_name('list_title')); ?>" type="text" value="<?php echo esc_attr($list_title); ?>" />
             </p>
             <p>
                 <label for="<?php echo $this->get_field_id('list_description'); ?>"><?php _e('Description (optional):'); ?></label> 
-                <input class="widefat" id="<?php echo $this->get_field_id('list_description'); ?>" name="<?php echo $this->get_field_name('list_description'); ?>" type="text" value="<?php echo esc_attr($list_description); ?>" />
+                <input class="widefat" id="<?php echo esc_attr($this->get_field_id('list_description')); ?>" name="<?php echo esc_attr($this->get_field_name('list_description')); ?>" type="text" value="<?php echo esc_attr($list_description); ?>" />
             </p>
             <p>
                 <label for="<?php echo $this->get_field_id('list_address'); ?>"><?php _e('List addresses (required):'); ?></label> 
-                <input class="widefat" id="<?php echo $this->get_field_id('list_address'); ?>" name="<?php echo $this->get_field_name('list_address'); ?>" type="text" value="<?php echo esc_attr($list_address); ?>" />
+                <input class="widefat" id="<?php echo esc_attr($this->get_field_id('list_address')); ?>" name="<?php echo esc_attr($this->get_field_name('list_address')); ?>" type="text" value="<?php echo esc_attr($list_address); ?>" />
             </p>
             <p>
                 <label for="<?php echo $this->get_field_id('collect_name'); ?>"><?php _e('Collect name:'); ?></label> 
-                <input class="widefat" id="<?php echo $this->get_field_id('collect_name'); ?>" name="<?php echo $this->get_field_name('collect_name'); ?>" type="checkbox" <?php echo esc_attr($collect_name); ?> />
+                <input class="widefat" id="<?php echo esc_attr($this->get_field_id('collect_name')); ?>" name="<?php echo esc_attr($this->get_field_name('collect_name')); ?>" type="checkbox" <?php echo esc_attr($collect_name); ?> />
             </p>
         </div>
         <?php 

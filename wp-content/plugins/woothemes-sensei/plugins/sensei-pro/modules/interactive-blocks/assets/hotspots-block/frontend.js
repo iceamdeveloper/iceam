@@ -159,7 +159,7 @@ registerBlockFrontend( {
 domReady( () => {
 	document
 		.querySelectorAll(
-			'.sensei-lms-image-hotspots__hotspot-tooltip .sensei-course-video-container video'
+			'.sensei-lms-image-hotspots__hotspot-tooltip .wp-block-video video'
 		)
 		.forEach( ( el ) => {
 			if ( el.style.width === '0px' ) {

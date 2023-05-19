@@ -6,13 +6,12 @@ require_once('lib/classes/definitions/definitions.php');
 
 use Aelia\WC\Aelia_Plugin;
 use Aelia\WC\Messages;
-use Aelia\WC\Logger;
 
 /**
  * Aelia Currency Switcher Subscriptions Integration plugin.
  **/
 class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
-	public static $version = '1.7.0.220730';
+	public static $version = '1.7.11.230503';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -49,14 +48,16 @@ class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
 
 		parent::__construct($settings_controller, $messages_controller);
 
-		// Instantiate the logger specific to this plugin
-		$this->logger = new Logger(Definitions::PLUGIN_SLUG);
-
 		$this->initialize_integration();
 	}
 
-	protected function initialize_integration() {
-		$this->subscriptions_integration = new Subscriptions_Integration();
+	/**
+	 * Initialises the patch for the Subscriptions plugin.
+	 *
+	 * @return void
+	 */
+	protected function initialize_integration(): void {
+		$this->subscriptions_integration = new Subscriptions_Integration($this->get_logger());
 	}
 
 	/**
@@ -66,7 +67,7 @@ class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
 	 * @return bool
 	 */
 	protected function rendering_plugin_admin_page() {
-		global $post, $woocommerce;
+		global $post;
 
 		return isset($post) && ($post->post_type == 'product');
 	}

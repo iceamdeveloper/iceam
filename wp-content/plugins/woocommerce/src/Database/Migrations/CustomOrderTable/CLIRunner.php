@@ -58,6 +58,7 @@ class CLIRunner {
 	public function register_commands() {
 		WP_CLI::add_command( 'wc cot count_unmigrated', array( $this, 'count_unmigrated' ) );
 		WP_CLI::add_command( 'wc cot migrate', array( $this, 'migrate' ) );
+		WP_CLI::add_command( 'wc cot sync', array( $this, 'sync' ) );
 		WP_CLI::add_command( 'wc cot verify_cot_data', array( $this, 'verify_cot_data' ) );
 	}
 
@@ -75,7 +76,7 @@ class CLIRunner {
 					sprintf(
 						// translators: %s - link to testing instructions webpage.
 						__( 'Custom order table usage is not enabled. If you are testing, you can enable it by following the testing instructions in %s', 'woocommerce' ),
-						'https://developer.woocommerce.com/' // TODO: Change the link when testing instructin page is live.
+						'https://github.com/woocommerce/woocommerce/wiki/High-Performance-Order-Storage-Upgrade-Recipe-Book'
 					)
 				);
 			}
@@ -121,10 +122,10 @@ class CLIRunner {
 		if ( isset( $assoc_args['log'] ) && $assoc_args['log'] ) {
 			WP_CLI::log(
 				sprintf(
-					/* Translators: %1$d is the number of orders to be migrated. */
+					/* Translators: %1$d is the number of orders to be synced. */
 					_n(
-						'There is %1$d order to be migrated.',
-						'There are %1$d orders to be migrated.',
+						'There is %1$d order to be synced.',
+						'There are %1$d orders to be synced.',
 						$order_count,
 						'woocommerce'
 					),
@@ -137,7 +138,7 @@ class CLIRunner {
 	}
 
 	/**
-	 * Migrate order data to the custom orders table.
+	 * Sync order data between the custom order tables and the core WordPress post tables.
 	 *
 	 * ## OPTIONS
 	 *
@@ -149,26 +150,22 @@ class CLIRunner {
 	 *
 	 * ## EXAMPLES
 	 *
-	 *     wp wc cot migrate --batch-size=500
+	 *     wp wc cot sync --batch-size=500
 	 *
 	 * @param array $args Positional arguments passed to the command.
 	 * @param array $assoc_args Associative arguments (options) passed to the command.
 	 */
-	public function migrate( $args = array(), $assoc_args = array() ) {
+	public function sync( $args = array(), $assoc_args = array() ) {
 		$this->log_production_warning();
 		if ( ! $this->is_enabled() ) {
 			return;
-		}
-
-		if ( $this->synchronizer->custom_orders_table_is_authoritative() ) {
-			return WP_CLI::error( __( 'Migration is not yet supported when custom tables are authoritative. Switch to post tables as authoritative source if you are testing.', 'woocommerce' ) );
 		}
 
 		$order_count = $this->count_unmigrated();
 
 		// Abort if there are no orders to migrate.
 		if ( ! $order_count ) {
-			return WP_CLI::warning( __( 'There are no orders to migrate, aborting.', 'woocommerce' ) );
+			return WP_CLI::warning( __( 'There are no orders to sync, aborting.', 'woocommerce' ) );
 		}
 
 		$assoc_args  = wp_parse_args(
@@ -178,7 +175,7 @@ class CLIRunner {
 			)
 		);
 		$batch_size  = ( (int) $assoc_args['batch-size'] ) === 0 ? 500 : (int) $assoc_args['batch-size'];
-		$progress    = WP_CLI\Utils\make_progress_bar( 'Order Data Migration', $order_count / $batch_size );
+		$progress    = WP_CLI\Utils\make_progress_bar( 'Order Data Sync', $order_count / $batch_size );
 		$processed   = 0;
 		$batch_count = 1;
 		$total_time  = 0;
@@ -194,9 +191,9 @@ class CLIRunner {
 				)
 			);
 			$batch_start_time = microtime( true );
-			$order_ids        = $this->synchronizer->get_ids_of_orders_pending_sync( $this->synchronizer::ID_TYPE_MISSING_IN_ORDERS_TABLE, $batch_size );
+			$order_ids        = $this->synchronizer->get_next_batch_to_process( $batch_size );
 			if ( count( $order_ids ) ) {
-				$this->post_to_cot_migrator->migrate_orders( $order_ids );
+				$this->synchronizer->process_batch( $order_ids );
 			}
 			$processed       += count( $order_ids );
 			$batch_total_time = microtime( true ) - $batch_start_time;
@@ -227,17 +224,17 @@ class CLIRunner {
 
 		// Issue a warning if no orders were migrated.
 		if ( ! $processed ) {
-			return WP_CLI::warning( __( 'No orders were migrated.', 'woocommerce' ) );
+			return WP_CLI::warning( __( 'No orders were synced.', 'woocommerce' ) );
 		}
 
-		WP_CLI::log( __( 'Migration completed.', 'woocommerce' ) );
+		WP_CLI::log( __( 'Sync completed.', 'woocommerce' ) );
 
 		return WP_CLI::success(
 			sprintf(
 				/* Translators: %1$d is the number of migrated orders and %2$d is the execution time in seconds. */
 				_n(
-					'%1$d order was migrated in %2$d seconds.',
-					'%1$d orders were migrated in %2$d seconds.',
+					'%1$d order was synced in %2$d seconds.',
+					'%1$d orders were synced in %2$d seconds.',
 					$processed,
 					'woocommerce'
 				),
@@ -269,8 +266,9 @@ class CLIRunner {
 	 * @param array $args Positional arguments passed to the command.
 	 * @param array $assoc_args Associative arguments (options) passed to the command.
 	 */
-	public function backfill( $args = array(), $assoc_args = array() ) {
-		return WP_CLI::error( __( 'Error: Backfill is not implemented yet.', 'woocommerce' ) );
+	public function migrate( $args = array(), $assoc_args = array() ) {
+		$this->log_production_warning();
+		WP_CLI::log( __( 'Migrate command is deprecated. Please use `sync` instead.', 'woocommerce' ) );
 	}
 
 	/**
@@ -290,10 +288,22 @@ class CLIRunner {
 	 * default: 0
 	 * ---
 	 *
+	 * [--end-at=<order_id>]
+	 * : Order ID to end at.
+	 * ---
+	 * default: -1
+	 * ---
+	 *
+	 * [--verbose]
+	 * : Whether to output errors as they happen in batch, or output them all together at the end.
+	 * ---
+	 * default: false
+	 * ---
+	 *
 	 * ## EXAMPLES
 	 *
 	 *     # Verify migrated order data, 500 orders at a time.
-	 *     wp wc cot verify_cot_data --batch-size=500 --start-from=0
+	 *     wp wc cot verify_cot_data --batch-size=500 --start-from=0 --end-at=10000
 	 *
 	 * @param array $args Positional arguments passed to the command.
 	 * @param array $assoc_args Associative arguments (options) passed to the command.
@@ -310,6 +320,8 @@ class CLIRunner {
 			array(
 				'batch-size' => 500,
 				'start-from' => 0,
+				'end-at'     => -1,
+				'verbose'    => false,
 			)
 		);
 
@@ -318,8 +330,11 @@ class CLIRunner {
 		$failed_ids     = array();
 		$processed      = 0;
 		$order_id_start = (int) $assoc_args['start-from'];
-		$order_count    = $this->get_verify_order_count( $order_id_start );
+		$order_id_end   = (int) $assoc_args['end-at'];
+		$order_id_end   = -1 === $order_id_end ? PHP_INT_MAX : $order_id_end;
+		$order_count    = $this->get_verify_order_count( $order_id_start, $order_id_end, false );
 		$batch_size     = ( (int) $assoc_args['batch-size'] ) === 0 ? 500 : (int) $assoc_args['batch-size'];
+		$verbose        = (bool) $assoc_args['verbose'];
 
 		$progress = WP_CLI\Utils\make_progress_bar( 'Order Data Verification', $order_count / $batch_size );
 
@@ -337,20 +352,40 @@ class CLIRunner {
 				)
 			);
 
-			$order_ids        = $wpdb->get_col(
+			$order_ids                   = $wpdb->get_col(
 				$wpdb->prepare(
-					"SELECT ID FROM $wpdb->posts WHERE post_type = 'shop_order' AND ID > %d ORDER BY ID ASC LIMIT %d",
+					"SELECT ID FROM $wpdb->posts WHERE post_type = 'shop_order' AND ID >= %d AND ID <= %d ORDER BY ID ASC LIMIT %d",
 					$order_id_start,
+					$order_id_end,
 					$batch_size
 				)
 			);
-			$batch_start_time = microtime( true );
-			$failed_ids       = $failed_ids + $this->post_to_cot_migrator->verify_migrated_orders( $order_ids );
-			$failed_ids       = $this->verify_meta_data( $order_ids, $failed_ids );
-			$processed       += count( $order_ids );
-			$batch_total_time = microtime( true ) - $batch_start_time;
+			$batch_start_time            = microtime( true );
+			$failed_ids_in_current_batch = $this->post_to_cot_migrator->verify_migrated_orders( $order_ids );
+			$failed_ids_in_current_batch = $this->verify_meta_data( $order_ids, $failed_ids_in_current_batch );
+			$failed_ids                  = $verbose ? array() : $failed_ids + $failed_ids_in_current_batch;
+			$processed                  += count( $order_ids );
+			$batch_total_time            = microtime( true ) - $batch_start_time;
 			$batch_count ++;
 			$total_time += $batch_total_time;
+
+			if ( $verbose && count( $failed_ids_in_current_batch ) > 0 ) {
+				// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_print_r -- This is a CLI command and debugging code is intended.
+				$errors = print_r( $failed_ids_in_current_batch, true );
+				WP_CLI::warning(
+					sprintf(
+					/* Translators: %1$d is number of errors and %2$s is the formatted array of order IDs. */
+						_n(
+							'%1$d error found: %2$s. Please review the error above.',
+							'%1$d errors found: %2$s. Please review the errors above.',
+							count( $failed_ids_in_current_batch ),
+							'woocommerce'
+						),
+						count( $failed_ids_in_current_batch ),
+						$errors
+					)
+				);
+			}
 
 			$progress->tick();
 
@@ -364,8 +399,8 @@ class CLIRunner {
 				)
 			);
 
-			$order_id_start  = max( $order_ids );
-			$remaining_count = $this->get_verify_order_count( $order_id_start, false );
+			$order_id_start  = max( $order_ids ) + 1;
+			$remaining_count = $this->get_verify_order_count( $order_id_start, $order_id_end, false );
 			if ( $remaining_count === $order_count ) {
 				return WP_CLI::error( __( 'Infinite loop detected, aborting. No errors found.', 'woocommerce' ) );
 			}
@@ -374,6 +409,10 @@ class CLIRunner {
 
 		$progress->finish();
 		WP_CLI::log( __( 'Verification completed.', 'woocommerce' ) );
+
+		if ( $verbose ) {
+			return;
+		}
 
 		if ( 0 === count( $failed_ids ) ) {
 			return WP_CLI::success(
@@ -426,17 +465,19 @@ class CLIRunner {
 	 * Helper method to get count for orders needing verification.
 	 *
 	 * @param int  $order_id_start Order ID to start from.
+	 * @param int  $order_id_end   Order ID to end at.
 	 * @param bool $log Whether to also log an error message.
 	 *
 	 * @return int Order count.
 	 */
-	private function get_verify_order_count( int $order_id_start, $log = true ) : int {
+	private function get_verify_order_count( int $order_id_start, int $order_id_end, $log = true ) : int {
 		global $wpdb;
 
 		$order_count = (int) $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT COUNT(*) FROM $wpdb->posts WHERE post_type = 'shop_order' AND ID > %d",
-				$order_id_start
+				"SELECT COUNT(*) FROM $wpdb->posts WHERE post_type = 'shop_order' AND ID >= %d AND ID <= %d",
+				$order_id_start,
+				$order_id_end
 			)
 		);
 

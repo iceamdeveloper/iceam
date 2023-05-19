@@ -53,7 +53,11 @@ body .editor-styles-wrapper { // Just for specificity purpose.
 				align-items: center;
 			}
 
-			&--white-icon svg {
+			> svg {
+				color: #000;
+			}
+
+			&--white-icon > svg {
 				color: #fff;
 			}
 

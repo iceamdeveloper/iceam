@@ -21,7 +21,7 @@
     border-collapse: collapse;
 }
 .form-table.tbl-timing td {
-    padding: 15px 0;
+    padding: 15px 6px;
     border: 1px solid #e1e1e1;
 }
 .form-table.tbl-timing th {
@@ -127,16 +127,6 @@
 }
 .tab_parent a:hover {
     color: #484848;
-}
-.admin_page_block_user_permenant #wpcontent,
-.toplevel_page_block_user #wpcontent,
-.admin_page_block_user_date #wpcontent,
-.user-blocker_page_blocked_user_list #wpcontent,
-.admin_page_datewise_blocked_user_list #wpcontent,
-.admin_page_permanent_blocked_user_list #wpcontent,
-.admin_page_all_type_blocked_user_list #wpcontent {
-    /*    background: #ffffff;
-        height: auto;*/
 }
 .tr_head {
     background: #fff;
@@ -710,6 +700,66 @@ ul.plugins_list {
 .search_box #frmExport div.actions {
     position: relative;
 }
+.user_blocking_button {
+    background-color: #4CAF50; /* Green */
+    border: none;
+    color: white;
+    padding: 8px 16px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    -webkit-transition-duration: 0.4s; /* Safari */
+    transition-duration: 0.4s;
+    cursor: pointer;
+}
+.user_blocking_button:focus{
+    border: none;
+    color: white;
+}
+.user_blocking_button1 {
+    color: white;
+    background-color: #4CAF50;
+    border:3px solid #4CAF50;
+}
+.user_blocking_button1:hover {
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
+    color: white;
+    border:3px solid #4CAF50;
+}
+.user_blocking_button2 {
+    color: white;
+    background-color: #0085ba;
+}
+.user_blocking_button2:hover {
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
+    color: white;
+}
+.user_blocking_button3 {
+    color: white;
+    background-color: #365899;
+}
+.user_blocking_button3:hover {
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
+    color: white;
+}
+.user_blocking_button4 {
+    color: white;
+    background-color: rgb(66, 184, 221);
+}
+.user_blocking_button4:hover {
+    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
+    color: white;
+}
+.user_blocking_promo-close {
+    float:right;
+    text-decoration:none;
+    margin: 5px 10px 0px 0px;
+}
+.user_blocking_promo-close:hover {
+    color: red;
+}
 @media screen and (max-width: 1200px) {
     
     #blocked-list .cover_form {
@@ -815,4 +865,7 @@ ul.plugins_list {
 }
 form#frmSearch {
     width: 100%;
+}
+.search_box .ublk_actions {
+    margin-bottom: 10px;
 }

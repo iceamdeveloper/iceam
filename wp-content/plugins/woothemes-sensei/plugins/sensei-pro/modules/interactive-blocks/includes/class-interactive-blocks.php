@@ -7,6 +7,9 @@
 
 namespace Sensei_Pro_Interactive_Blocks;
 
+use Sensei_Interactive_Blocks_Sensei_Home\Sensei_Home;
+use Sensei_Interactive_Blocks_Sensei_Home\Sensei_LMS_Home;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
@@ -68,6 +71,33 @@ class Interactive_Blocks {
 		} else {
 			add_filter( 'block_categories', [ $instance, 'sensei_block_categories' ], 10, 2 );
 		}
+
+		add_action( 'plugins_loaded', [ $instance, 'load_sensei_home' ], 100 );
+	}
+
+	/**
+	 * Load Sensei Home.
+	 *
+	 * @internal
+	 */
+	public function load_sensei_home() {
+		if ( class_exists( 'Sensei_Home' ) && class_exists( 'Sensei_Interactive_Blocks_Sensei_Home\Sensei_LMS_Home' ) ) {
+			// Sensei LMS is active. We just need to integrate with it.
+			Sensei_LMS_Home::instance()->init();
+
+			return;
+		}
+
+		if ( ! class_exists( 'Sensei_Home' ) && class_exists( 'Sensei_Interactive_Blocks_Sensei_Home\Sensei_Home' ) ) {
+			$assets_provider = new Assets_Provider(
+				SENSEI_IB_PLUGIN_DIR_URL,
+				SENSEI_IB_PLUGIN_DIR_PATH,
+				SENSEI_IB_VERSION,
+				'sensei-pro',
+				Sensei_Home::MODULE_NAME
+			);
+			( new Sensei_Home( $assets_provider ) )->init();
+		}
 	}
 
 	/**
@@ -79,6 +109,7 @@ class Interactive_Blocks {
 		new Hotspots_Block();
 		new TaskList_Block();
 		new Interactive_Video_Block();
+		new Accordion_Block();
 	}
 
 	/**
@@ -133,7 +164,17 @@ class Interactive_Blocks {
 	 */
 	public function enqueue_frontend_assets() {
 
-		$blocks        = [ 'sensei-pro/question', 'sensei-pro/flashcard', 'sensei-pro/hotspots', 'sensei-pro/task-list', 'sensei-pro/interactive-video', 'core/video', 'core/embed' ];
+		$blocks = [
+			'sensei-pro/question',
+			'sensei-pro/flashcard',
+			'sensei-lms/accordion',
+			'sensei-pro/hotspots',
+			'sensei-pro/task-list',
+			'sensei-pro/interactive-video',
+			'core/video',
+			'core/embed',
+		];
+
 		$has_any_block = false;
 		$post          = get_post();
 
@@ -176,6 +217,7 @@ class Interactive_Blocks {
 	 * Include required files.
 	 */
 	private function include_dependencies() {
+		include_once __DIR__ . '/blocks/class-accordion-block.php';
 		include_once __DIR__ . '/blocks/class-question-block.php';
 		include_once __DIR__ . '/blocks/class-flashcard-block.php';
 		include_once __DIR__ . '/blocks/class-hotspots-block.php';

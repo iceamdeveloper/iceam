@@ -6,6 +6,9 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bug_Fixes\\Bug_Fix_Manager' => $baseDir . '/lib/classes/integration/woothemes-bundles-plugin/bug-fix/wc-aelia-cs-bundles-bug-fix-manager.php',
+    'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bug_Fixes\\IBug_Fix' => $baseDir . '/lib/classes/integration/woothemes-bundles-plugin/bug-fix/wc-aelia-cs-bundles-bug-fix-interface.php',
+    'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bug_Fixes\\Patches\\Bug_Fix_3' => $baseDir . '/lib/classes/integration/woothemes-bundles-plugin/bug-fix/patches/wc-aelia-cs-bundles-bug-fix-3.php',
     'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bundles_Integration' => $baseDir . '/lib/classes/integration/woothemes-bundles-plugin/wc-aelia-cs-bundles-integration.php',
     'Aelia\\WC\\CurrencySwitcher\\Bundles\\Definitions' => $baseDir . '/lib/classes/definitions/definitions.php',
     'Aelia_WC_CS_Bundles_RequirementsChecks' => $baseDir . '/lib/classes/install/aelia-wc-cs-bundles-requirementscheck.php',

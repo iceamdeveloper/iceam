@@ -3,6 +3,7 @@
  */
 import classnames from 'classnames';
 import { useVideoDuration } from 'sensei/assets/shared/helpers/player';
+import roundWithDecimals from 'sensei/assets/shared/helpers/player/round-with-decimals.js';
 
 /**
  * WordPress dependencies
@@ -29,7 +30,7 @@ import BreakPointButton from './break-point-button';
 import EditTime from './edit-time';
 import useBreakPointPositionStyle from './use-break-point-position-style';
 import { useContextEditorPlayer } from '../editor-player-context';
-import usePrevious from '../use-previous';
+import usePrevious from 'shared-module/use-previous';
 import useDragging from '../../use-dragging';
 import BreakPointPopover from './break-point-popover';
 
@@ -84,9 +85,13 @@ const usePointDragging = ( { pointRef, duration, time, setAttributes } ) => {
 
 			if ( duration && barWidth ) {
 				const movedTime = ( duration * position.diffX ) / barWidth;
+
+				// It prevents JS math issues with decimals.
+				const roundedMovedTime = roundWithDecimals( movedTime, 3 );
+
 				setAttributes( {
 					time: Math.min(
-						Math.max( 0, timeBeforeDragging + movedTime ),
+						Math.max( 0, timeBeforeDragging + roundedMovedTime ),
 						duration
 					),
 				} );

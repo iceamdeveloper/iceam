@@ -3,13 +3,13 @@
  * Plugin Name: Sensei Blocks
  * Plugin URI: https://senseilms.com/
  * Description: A collection of interactive blocks for making your content and lessons more engaging.
- * Version: 1.0.0
+ * Version: 1.3.1
  * License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
- * Requires at least: 5.7
- * Tested up to: 5.9
+ * Requires at least: 6.0
+ * Tested up to: 6.2
  * Requires PHP: 7.2
  * Author: Automattic
- * Author URI: https://senseilms.com/
+ * Author URI: https://automattic.com/
  * Text Domain: sensei-pro
  * Domain Path: /lang
  *
@@ -26,8 +26,8 @@ if ( sensei_interactive_blocks_has_conflicts() ) {
 }
 
 // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedConstantFound
-define( 'SENSEI_PRO_VERSION', '1.6.0' ); // Note: this is the current sensei-pro version this plugin was built from, needed so the correct language packs are loaded (in shared module).
-define( 'SENSEI_IB_VERSION', '1.0.0' );
+define( 'SENSEI_PRO_VERSION', '1.14.1' ); // Note: this is the current sensei-pro version this plugin was built from, needed so the correct language packs are loaded (in shared module).
+define( 'SENSEI_IB_VERSION', '1.3.1' );
 define( 'SENSEI_IB_PLUGIN_FILE', __FILE__ );
 define( 'SENSEI_IB_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'SENSEI_IB_PLUGIN_DIR_URL', plugin_dir_url( __FILE__ ) );
@@ -46,6 +46,7 @@ function sensei_interactive_blocks_setup_plugin() { // phpcs:ignore WordPress.Na
 	require_once __DIR__ . '/includes/class-interactive-blocks.php';
 	require_once __DIR__ . '/includes/class-assets-provider.php';
 	require_once __DIR__ . '/shared-module/includes/class-shared-module.php';
+	require_once __DIR__ . '/sensei-blocks-home/sensei-blocks-home.php';
 
 	$shared_module_assets_provider = new Sensei_Pro_Interactive_Blocks\Assets_Provider(
 		SENSEI_IB_PLUGIN_DIR_URL,
@@ -69,3 +70,12 @@ function sensei_interactive_blocks_setup_plugin() { // phpcs:ignore WordPress.Na
 }
 
 add_action( 'plugins_loaded', 'sensei_interactive_blocks_setup_plugin' );
+
+/**
+ * Loads the plugin textdomain.
+ */
+function sensei_interactive_blocks_load_textdomain() {
+	load_plugin_textdomain( 'sensei-pro', false, dirname( SENSEI_IB_PLUGIN_BASENAME ) . '/lang' );
+}
+
+add_action( 'init', 'sensei_interactive_blocks_load_textdomain', 0 );

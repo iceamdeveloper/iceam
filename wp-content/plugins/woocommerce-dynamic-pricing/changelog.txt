@@ -1,4 +1,26 @@
 *** Dynamic Pricing Changelog ***
+2023.04.11 - version 3.2.2
+    * Update: WC and WP version updates.
+    * Update:  Allow pricing rules to be applied to products with a 0 based price and a fixed price adjustment
+               when using category targets.
+    * Update:  Remove some deprecated functions and other legacy code compatibility functions.
+
+2023.03.27 - version 3.2.1
+    * Fix:  Fix issue with thousands separator for fixed price product discounts.
+
+2023.03.08 - version 3.2.0
+    * Fix: More PHP 8 compatibility fixes.
+    * Fix: Fix issues with echo statements in the admin.
+    * Compatibility:  Add support for WooCommerce HPOS.
+    * Compatibility:  WP and WC updates.
+
+2022.11.14 - version 3.1.29
+    * Update: Remove legacy woo-themes updater.
+    * Fix:  Fix problem when registering additional taxonomies with advanced rules.
+    * Fix:  Proper casting of values before performing operations - PHP 8.x compatibility.
+    * Fix:  Fix problem with PHP 8.x compatibility.
+    * New:  Added filter, current_user_can_manage_dynamic_pricing, to allow users to disable the dynamic pricing management section.
+
 2022.06.05 - version 3.1.28
     * Fix:  Fix deprecation notice for is_ajax.
     * Update:  Check pricing rules are an array before attempting to use.

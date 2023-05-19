@@ -4,9 +4,12 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInite3d8b739eb786127814998b52ae1e249
+class ComposerStaticInit0506ce50dbea6bc6e21086ee4a624121
 {
     public static $classMap = array (
+        'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bug_Fixes\\Bug_Fix_Manager' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes-bundles-plugin/bug-fix/wc-aelia-cs-bundles-bug-fix-manager.php',
+        'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bug_Fixes\\IBug_Fix' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes-bundles-plugin/bug-fix/wc-aelia-cs-bundles-bug-fix-interface.php',
+        'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bug_Fixes\\Patches\\Bug_Fix_3' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes-bundles-plugin/bug-fix/patches/wc-aelia-cs-bundles-bug-fix-3.php',
         'Aelia\\WC\\CurrencySwitcher\\Bundles\\Bundles_Integration' => __DIR__ . '/../..' . '/lib/classes/integration/woothemes-bundles-plugin/wc-aelia-cs-bundles-integration.php',
         'Aelia\\WC\\CurrencySwitcher\\Bundles\\Definitions' => __DIR__ . '/../..' . '/lib/classes/definitions/definitions.php',
         'Aelia_WC_CS_Bundles_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-cs-bundles-requirementscheck.php',
@@ -17,7 +20,7 @@ class ComposerStaticInite3d8b739eb786127814998b52ae1e249
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->classMap = ComposerStaticInite3d8b739eb786127814998b52ae1e249::$classMap;
+            $loader->classMap = ComposerStaticInit0506ce50dbea6bc6e21086ee4a624121::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -1,33 +1,155 @@
 /* =========================================================
  * admin_script.js
- * =========================================================
- * Started by Solwin theme
  * ========================================================= */
 
+'use strict';
 jQuery(document).ready(function () {
+
+    jQuery("#user_blocking_promo .user_blocking_promo-close").on('click', function () {
+        var data;
+        // Hide it
+        jQuery("#user_blocking_promo").hide();
+
+        // Save this preference
+        jQuery.post(adminURL + "?user_blocking_promo=0", data, function (response) {
+        });
+    });
+
+    jQuery('#week-sun .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-sun .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var sun_time = document.getElementById('week-sun');
+    if(sun_time) {
+        var sun_time_pair = new Datepair(sun_time);
+    }
+    
+
+    jQuery('#week-mon .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-mon .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var mon_time = document.getElementById('week-mon');
+    if(mon_time) {
+        var mon_time_pair = new Datepair(mon_time);
+    }
+
+    jQuery('#week-tue .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-tue .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var tue_time = document.getElementById('week-tue');
+    if(tue_time) {
+        var tue_time_pair = new Datepair(tue_time);
+    }
+
+    jQuery('#week-wed .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-wed .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var wed_time = document.getElementById('week-wed');
+    if(wed_time) {
+        var wed_time_pair = new Datepair(wed_time);
+    }    
+
+    jQuery('#week-thu .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-thu .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var thu_time = document.getElementById('week-thu');
+    if(thu_time) {
+        var thu_time_pair = new Datepair(thu_time);
+    }    
+
+    jQuery('#week-fri .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-fri .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var fri_time = document.getElementById('week-fri');
+    if(fri_time) {
+        var fri_time_pair = new Datepair(fri_time);
+    }    
+
+    jQuery('#week-sat .start').timepicker({
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    jQuery('#week-sat .end').timepicker({
+        'maxTime': '11:45 PM',
+        'showDuration': true,
+        'step': 15,
+        'timeFormat': 'h:i A'
+    });
+    var sat_time = document.getElementById('week-sat');
+    if(sat_time) {
+        var sat_time_pair = new Datepair(sat_time);
+    }    
 
     // deactivation popup code
     var ublk_plugin_admin = jQuery('.documentation_ublk_plugin').closest('div').find('.deactivate').find('a');
-    ublk_plugin_admin.on( 'click', function (event) {
+    ublk_plugin_admin.on('click', function (event) {
         event.preventDefault();
         jQuery('#deactivation_thickbox_ublk').trigger('click');
         jQuery('#TB_window').removeClass('thickbox-loading');
         change_thickbox_size_ublk();
     });
     checkOtherDeactivate();
-    jQuery('.sol_deactivation_reasons').on( 'click', function () {
+    jQuery('.sol_deactivation_reasons').on('click', function () {
         checkOtherDeactivate();
     });
-    jQuery('#sbtDeactivationFormCloseublk').on( 'click', function (event) {
+    jQuery('#sbtDeactivationFormCloseublk').on('click', function (event) {
         event.preventDefault();
         jQuery("#TB_closeWindowButton").trigger('click');
     });
 
-    jQuery('.ublk-deactivation').on( 'click', function() {
+    jQuery('.ublk-deactivation').on('click', function () {
         window.location.href = ublk_plugin_admin.attr('href');
     });
 
-    jQuery('#txtUsername').on( 'keypress', function (event) {
+    jQuery('#txtUsername').on('keypress', function (event) {
         var keycode = (event.keyCode ? event.keyCode : event.which);
         if (keycode == '13') {
             jQuery('#filter_action').trigger('click');
@@ -54,13 +176,13 @@ jQuery(document).ready(function () {
             jQuery("#frmdate").datepicker("option", "maxDate", selectedDate);
         }
     });
-    jQuery('#display_status').on( 'change', function () {
+    jQuery('#display_status').on('change', function () {
         if (jQuery(this).val() == 'roles') {
             jQuery('.role_records').show();
             jQuery('.export_display').val('roles');
             jQuery('.users_records, .filter_div').hide();
             jQuery(".frmExport .actions").css("top", "-15px");
-            jQuery(".frmExport").css({ "left":"225px", "bottom":"-36px"});
+            jQuery(".frmExport").css({ "left": "225px", "bottom": "-36px" });
 
         }
         else {
@@ -68,10 +190,10 @@ jQuery(document).ready(function () {
             jQuery('.export_display').val('users');
             jQuery('.users_records, .filter_div').show();
             jQuery(".frmExport .actions").css("top", "0px");
-            jQuery(".frmExport").css({ "left":"395px", "bottom":"-76px"});
+            jQuery(".frmExport").css({ "left": "395px", "bottom": "-76px" });
         }
     });
-    jQuery('#chkapply').on( 'click', function () {
+    jQuery('#chkapply').on('click', function () {
         var txtSunFrom = jQuery('#txtSunFrom').val();
         var txtSunTo = jQuery('#txtSunTo').val();
         var txtMonFrom = jQuery('#txtMonFrom').val();
@@ -86,27 +208,27 @@ jQuery(document).ready(function () {
         var txtFriTo = jQuery('#txtFriTo').val();
         var txtSatFrom = jQuery('#txtSatFrom').val();
         var txtSatTo = jQuery('#txtSatTo').val();
-        if(txtSunFrom != '' && txtSunTo != '') {
+        if (txtSunFrom != '' && txtSunTo != '') {
             var from = txtSunFrom;
-            var to  = txtSunTo;
-        } else if(txtMonFrom != '' && txtMonTo != '') {
+            var to = txtSunTo;
+        } else if (txtMonFrom != '' && txtMonTo != '') {
             var from = txtMonFrom;
-            var to  = txtMonTo;
-        } else if(txtTueFrom != '' && txtTueTo != '') {
+            var to = txtMonTo;
+        } else if (txtTueFrom != '' && txtTueTo != '') {
             var from = txtTueFrom;
-            var to  = txtTueTo;
-        } else if(txtWedFrom != '' && txtWedTo != '') {
+            var to = txtTueTo;
+        } else if (txtWedFrom != '' && txtWedTo != '') {
             var from = txtWedFrom;
-            var to  = txtWedTo;
-        } else if(txtThuFrom != '' && txtThuTo != '') {
+            var to = txtWedTo;
+        } else if (txtThuFrom != '' && txtThuTo != '') {
             var from = txtThuFrom;
-            var to  = txtThuTo;
-        } else if(txtFriFrom != '' && txtFriTo != '') {
+            var to = txtThuTo;
+        } else if (txtFriFrom != '' && txtFriTo != '') {
             var from = txtFriFrom;
-            var to  = txtFriTo;
-        } else if(txtSatFrom != '' && txtSatTo != '') {
+            var to = txtFriTo;
+        } else if (txtSatFrom != '' && txtSatTo != '') {
             var from = txtSatFrom;
-            var to  = txtSatTo;
+            var to = txtSatTo;
         }
         jQuery('#txtSunFrom').val(from);
         jQuery('#txtSunTo').val(to);
@@ -123,7 +245,7 @@ jQuery(document).ready(function () {
         jQuery('#txtSatFrom').val(from);
         jQuery('#txtSatTo').val(to);
     });
-    jQuery('#chkreset').on( 'click', function () {
+    jQuery('#chkreset').on('click', function () {
         jQuery('#txtSunFrom').val('');
         jQuery('#txtSunTo').val('');
         jQuery('#txtMonFrom').val('');
@@ -139,7 +261,7 @@ jQuery(document).ready(function () {
         jQuery('#txtSatFrom').val('');
         jQuery('#txtSatTo').val('');
     });
-    jQuery('.view_block_data').on( 'click', function (event) {
+    jQuery('.view_block_data').on('click', function (event) {
         event.preventDefault();
         jQuery(this).closest('tr').next('tr').slideToggle();
     });
@@ -151,20 +273,40 @@ jQuery(document).ready(function () {
         jQuery('#srole').val('');
     });
     //Datepicker
-    jQuery('.view_block_data_all').on( 'click', function (event) {
+    jQuery('.view_block_data_all').on('click', function (event) {
         event.preventDefault();
         jQuery(this).closest('tr').next('tr').slideToggle();
     });
 
     //Pagination
-    jQuery('#display_status').on( 'change', function() {
-        if(this.value == "roles" || parseInt(jQuery(".total-pages").html()) == 0){
+    jQuery('#display_status').on('change', function () {
+        if (this.value == "roles" || parseInt(jQuery(".total-pages").html()) == 0) {
             jQuery(".tablenav-pages").css("display", "none");
             jQuery("div#screen-options-link-wrap").css("display", "none");
         }
-        else if (parseInt(jQuery(".total-pages").html()) > 0){
+        else if (parseInt(jQuery(".total-pages").html()) > 0) {
             jQuery(".tablenav-pages").css("display", "block");
             jQuery("div#screen-options-link-wrap").css("display", "block");
+        }
+    });
+
+    jQuery('tbody .check-column input[type=checkbox]').on("change", function () {
+        var selected = [];
+        jQuery('tbody .check-column input[type=checkbox]:checked').each(function () {
+            selected.push(jQuery(this).val());
+        });
+        jQuery('#blk_username_role').val(selected.join(','));
+    });
+
+    jQuery('.ublk_bulk_btn').on("click", function () {
+        var blk_action = jQuery('#ublk_bulk_actions').val();
+        var blk_username_role = jQuery('#blk_username_role').val();
+        var multi_user_roles = jQuery('#hidden_cmbUserBy').val();
+        var data = String(window.location.href).replace(/#/, "");
+        if (multi_user_roles == 'role') {
+            window.location.href = data + '&action=' + blk_action + '&role=' + blk_username_role;
+        } else {
+            window.location.href = data + '&action=' + blk_action + '&username=' + blk_username_role;
         }
     });
 });
@@ -207,25 +349,17 @@ function searchUser() {
     jQuery('#filter_action').trigger('click');
 }
 
-jQuery(window).on('load',function () {
-    jQuery('#subscribe_thickbox').trigger('click');
-    jQuery("#TB_closeWindowButton").on( 'click', function () {
-        jQuery.post(ajaxurl,
-                {
-                    'action': 'close_tab'
-                });
-    });
-});
-
 function ublk_show_hide_permission() {
     jQuery('.ublk_permission_cover').slideToggle();
 }
 
 function ublk_submit_optin(options) {
-    result = {};
+    var result = {};
     result.action = 'ublk_submit_optin';
     result.email = jQuery('#ublk_admin_email').val();
     result.type = options;
+    var nonce = jQuery('#ublk_submit_optin_nonce').val();
+    result.nonce = nonce;
 
     if (options == 'submit') {
         if (jQuery('input#ublk_agree_gdpr').is(':checked')) {
@@ -308,3 +442,13 @@ function checkOtherDeactivate() {
         jQuery('.sol_deactivation_reason_other_ublk').hide();
     }
 }
+
+jQuery(window).on('load', function () {
+    jQuery('#subscribe_thickbox').trigger('click');
+    jQuery("#TB_closeWindowButton").on('click', function () {
+        jQuery.post(ajaxurl,
+            {
+                'action': 'close_tab'
+            });
+    });
+});

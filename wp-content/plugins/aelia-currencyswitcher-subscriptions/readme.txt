@@ -1,7 +1,7 @@
 === WooCommerce Currency Switcher - Subscriptions Integration ===
 Tags: woocommerce, currency switcher, subscriptions, integration
 Requires at least: 4.0
-Tested up to: 6.0.9
+Tested up to: 6.2.9
 icense: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -31,6 +31,41 @@ This is a free plugin, and it's provided as is, without explicit or implicit gua
 Should you need assistance, please feel free to [contact us](https://aelia.co/contact) andto avail of our paid support service (standard charges apply).
 
 == Changelog ==
+
+= 1.7.11.230503 =
+* Updated supported WooCommerce versions.
+
+= 1.7.10.230418 =
+* Fix - Fixed bug that generated warnings when subscriptions don't have regular prices, sale prices or sign up fees.
+
+= 1.7.9.230406 =
+* Updated supported WordPress versions.
+
+= 1.7.8.230322 =
+* Tweak - Optimised the logic for the conversion of variable subscriptions.
+* Updated supported WooCommerce versions.
+
+= 1.7.7.230315 =
+* Updated supported WooCommerce versions.
+
+= 1.7.6.230214 =
+* Updated supported WooCommerce versions.
+
+= 1.7.5.230109 =
+* Updated supported WooCommerce versions.
+
+= 1.7.4.221203 =
+* Updated supported WooCommerce versions.
+
+= 1.7.3.221110 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.7.2.221012 =
+* Updated supported WooCommerce versions.
+
+= 1.7.1.220830 =
+* Updated supported WooCommerce versions.
 
 = 1.7.0.220730 =
 * Improved compatibility with PHP 8.2. Introduced new logic to track auxiliary object data, without relying on dynamic properties.

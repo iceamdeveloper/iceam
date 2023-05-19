@@ -319,7 +319,7 @@ function bps_custom_directory ($page_ids)
 
 	if ($dir = bps_is_directory ())  if (!empty ($dir->replace))
 	{
-		$bps_directory_name = get_post_field ('post_name', $page_ids['members']);
+		$bps_directory_name = get_page_uri ($page_ids['members']);
 		add_filter ('bp_get_members_root_slug', function($slug) {return $GLOBALS['bps_directory_name'];});
 		$page_ids['members'] = $dir->id;
 	}

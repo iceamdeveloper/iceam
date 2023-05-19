@@ -72,11 +72,13 @@ class Sensei_Block_View_Results {
 			return '';
 		}
 
-		return preg_replace(
-			'/<a(.*)>/',
-			'<a href="' . esc_url( Sensei_Course::get_view_results_link( $course_id ) ) . '" $1>',
-			$content,
-			1
-		);
+		return '<form method="get" action="' . esc_url( Sensei_Course::get_view_results_link( $course_id ) ) . '" class="sensei-block-wrapper sensei-cta">' .
+			preg_replace(
+				'/<a(.*)>/',
+				'<button type="submit" $1>',
+				$content,
+				1
+			) .
+		'</form>';
 	}
 }

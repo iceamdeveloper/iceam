@@ -1,18 +1,20 @@
 /**
  * External dependencies
  */
+import { isEmpty } from 'lodash';
+import { Provider } from 'react-redux';
+
 /**
  * WordPress dependencies
  */
 import { createElement, isValidElement, render } from '@wordpress/element';
-import { isEmpty } from 'lodash';
-import { Provider } from 'react-redux';
 
 /**
  * Internal dependencies
  */
 import { blocksStore } from './data';
 import { useBlocksStore } from './data/use-blocks-store';
+import { parseBlocks } from './parse';
 
 /**
  * @typedef {module:block-frontend/parse~FrontendBlock} FrontendBlock
@@ -40,14 +42,19 @@ export function renderBlock( block ) {
 		if ( isValidElement( element ) ) {
 			return element;
 		}
-		return <RawElement key={ clientId } block={ block } />;
+		return (
+			<RawElement
+				key={ clientId }
+				block={ block }
+				html={ element.innerHTML }
+			/>
+		);
 	}
 
 	return (
-		<Provider store={ blocksStore }>
+		<Provider store={ blocksStore } key={ clientId }>
 			<BlockComponent
 				block={ block }
-				key={ clientId }
 				children={ innerBlocks?.map( renderBlock ) ?? [] }
 			/>
 		</Provider>
@@ -68,13 +75,21 @@ export const BlockFrontend = ( { block } ) => {
  *
  * @param {Object}        props
  * @param {FrontendBlock} props.block
+ * @param {string}        props.html
  */
-export function RawElement( { block } ) {
+export function RawElement( { block, html } ) {
 	const { element, blockProps } = block;
 
 	return createElement( element.tagName.toLowerCase(), {
 		...blockProps,
-		dangerouslySetInnerHTML: { __html: element.innerHTML },
+		ref: ( el ) => {
+			// It renders blocks that weren't rendered previously because they
+			// are inside a raw HTML block.
+			if ( el ) {
+				parseBlocks( el ).forEach( runBlock );
+			}
+		},
+		dangerouslySetInnerHTML: { __html: html },
 	} );
 }
 

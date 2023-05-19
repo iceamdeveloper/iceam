@@ -15,7 +15,7 @@ use Aelia\WC\Integrations\Freemius\Freemius_Plugin_Integration;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.3.0.220730';
+	public static $version = '2.4.4.230503';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -35,8 +35,7 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		$settings_controller = new Settings(self::$text_domain);
 		$messages_controller = new Messages(self::$text_domain);
 
-		$plugin_instance = new self($settings_controller, $messages_controller);
-		return $plugin_instance;
+		return new self($settings_controller, $messages_controller);
 	}
 
 	/**

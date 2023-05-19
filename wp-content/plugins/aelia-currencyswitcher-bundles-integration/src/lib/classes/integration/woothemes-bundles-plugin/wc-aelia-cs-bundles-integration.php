@@ -2,6 +2,7 @@
 namespace Aelia\WC\CurrencySwitcher\Bundles;
 if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
+use Aelia\WC\CurrencySwitcher\Bundles\Bug_Fixes\Bug_Fix_Manager;
 use \WC_Aelia_CurrencySwitcher;
 use \WC_Aelia_CurrencyPrices_Manager;
 use \WC_Bundles;
@@ -108,6 +109,10 @@ class Bundles_Integration {
 	 */
 	public function __construct() {
 		$this->set_hooks();
+
+		// Initialise the bug fix manager, which will load all the bug fixes
+		// @since 1.3.2.221011
+		Bug_Fix_Manager::init();
 	}
 
 	/**

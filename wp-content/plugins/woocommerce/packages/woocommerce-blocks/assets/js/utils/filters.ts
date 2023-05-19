@@ -1,7 +1,15 @@
 /**
  * External dependencies
  */
-import { getQueryArg } from '@wordpress/url';
+import { getQueryArg, getQueryArgs, addQueryArgs } from '@wordpress/url';
+import { getSettingWithCoercion } from '@woocommerce/settings';
+import { isBoolean } from '@woocommerce/types';
+
+const filteringForPhpTemplate = getSettingWithCoercion(
+	'is_rendering_php_template',
+	false,
+	isBoolean
+);
 
 /**
  * Returns specified parameter from URL
@@ -18,3 +26,26 @@ export function getUrlParameter( name: string ) {
 	}
 	return getQueryArg( window.location.href, name );
 }
+
+/**
+ * Change the URL and reload the page if filtering for PHP templates.
+ *
+ * @param {string} newUrl New URL to be set.
+ */
+export function changeUrl( newUrl: string ) {
+	if ( filteringForPhpTemplate ) {
+		window.location.href = newUrl;
+	} else {
+		window.history.replaceState( {}, '', newUrl );
+	}
+}
+
+/**
+ * Run the query params through buildQueryString to normalise the params.
+ *
+ * @param {string} url URL to encode the search param from.
+ */
+export const normalizeQueryParams = ( url: string ) => {
+	const queryArgs = getQueryArgs( url );
+	return addQueryArgs( url, queryArgs );
+};

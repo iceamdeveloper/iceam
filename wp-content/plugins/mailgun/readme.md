@@ -4,13 +4,12 @@ Mailgun for WordPress
 Contributors: mailgun, sivel, lookahead.io, m35dev
 Tags: mailgun, smtp, http, api, mail, email
 Requires at least: 3.3
-Tested up to: 6.0.1
-Stable tag: 1.8.2
+Tested up to: 6.1.1
+Stable tag: 1.9.3
+Requires PHP: 5.6
 License: GPLv2 or later
 
-
 Easily send email from your WordPress site through Mailgun using the HTTP API or SMTP.
-
 
 ## Description
 
@@ -131,6 +130,36 @@ MAILGUN_FROM_ADDRESS Type: string
 
 
 == Changelog ==
+
+= 1.9.3 (2023-04-08): =
+- Fixed `Reply-to` header. It's not overridden anymore
+
+= 1.9.2 (2023-03-28): =
+- Added action for better dev experience in tracking error `mailgun_error_track`
+- Added header `h:Sender`
+
+= 1.9.1 (2023-03-26): =
+- Remove not needed error logging.
+- Fixed bug with Override param for Woocommerce
+
+- = 1.9 (2023-01-18): =
+- Sanitizing and escaping vars. Possible security issues
+
+= 1.8.10 (2022-12-26): =
+- Fixed bug with not overriding `from name` for Woocommerce
+
+= 1.8.9 (2022-12-14): =
+- Fixed bug with removed wp_mail filter
+
+= 1.8.8 (2022-12-11): =
+- Fixed bug when `$to` override in the `wp_mail` function
+
+= 1.8.7 (2022-11-12): =
+- Fixed bug when field `Override "From" Details` was not updated
+
+= 1.8.3 (2022-08-30): =
+- Plugin refactoring. Widget fixes for working with Legacy Widget Block. PHP8.0 support check
+
 = 1.8.2 (2022-08-24): =
 - Plugin refactoring. Small fixes
 

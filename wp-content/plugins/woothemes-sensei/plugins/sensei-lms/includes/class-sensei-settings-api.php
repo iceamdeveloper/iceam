@@ -208,19 +208,29 @@ class Sensei_Settings_API {
 				}
 
 				$sections[ $k ] = array(
-					'href'  => '#' . esc_attr( $k ),
+					'href'  => isset( $v['href'] )
+						? esc_attr( $v['href'] )
+						: admin_url( 'admin.php?page=' . $this->token . '#' . esc_attr( $k ) ),
 					'name'  => esc_attr( $v['name'] ),
 					'class' => esc_attr( $classes ),
 				);
+
+				if ( ! empty( $v['badge'] ) ) {
+					$sections[ $k ]['badge'] = esc_html( $v['badge'] );
+				}
 			}
 
 			$count = 1;
 			foreach ( $sections as $k => $v ) {
 				$count++;
 				$html .= '<li><a href="' . esc_url( $v['href'] ) . '"';
-				if ( isset( $v['class'] ) && ( $v['class'] != '' ) ) {
+				if ( isset( $v['class'] ) && ( '' !== $v['class'] ) ) {
 					$html .= ' class="' . esc_attr( $v['class'] ) . '"'; }
-				$html .= '>' . esc_html( $v['name'] ) . '</a>';
+				$html .= '>' . esc_html( $v['name'] );
+				if ( ! empty( $v['badge'] ) ) {
+					$html .= ' <span class="sensei-settings-tab__badge">' . $v['badge'] . '</span>';
+				}
+				$html .= '</a>';
 				if ( $count <= count( $sections ) ) {
 					$html .= ' | '; }
 				$html .= '</li>' . "\n";
@@ -406,43 +416,52 @@ class Sensei_Settings_API {
 	public function settings_screen() {
 		?>
 		<div id="woothemes-sensei" class="wrap <?php echo esc_attr( $this->token ); ?>">
-		<h1><?php echo esc_html( $this->name ); ?>
-					   <?php
-						if ( '' != $this->settings_version ) {
+			<div id="sensei-custom-navigation" class="sensei-custom-navigation">
+				<div class="sensei-custom-navigation__heading">
+					<div class="sensei-custom-navigation__title">
+						<h1>
+							<?php
+							echo esc_html( $this->name );
+
+							if ( '' != $this->settings_version ) {
 								echo ' <span class="version">' . esc_html( $this->settings_version ) . '</span>';
-						}
-						?>
-			</h1>
+							}
+							?>
+						</h1>
+					</div>
+					<div class="sensei-custom-navigation__links">
+						<?php $this->settings_tabs(); ?>
+					</div>
+				</div>
+			</div>
 
-		<?php do_action( 'settings_before_form' ); ?>
+			<?php do_action( 'settings_before_form' ); ?>
 
-		<form action="options.php" method="post">
+			<form id="<?php echo esc_attr( $this->token ); ?>-form" action="options.php" method="post">
+				<?php
+				settings_fields( $this->token );
+				$page = 'sensei-settings';
 
-		<?php
-		$this->settings_tabs();
-		settings_fields( $this->token );
-		$page = 'sensei-settings';
-		foreach ( $this->sections as $section_id => $section ) {
+				foreach ( $this->sections as $section_id => $section ) {
+					echo '<section id="' . esc_attr( $section_id ) . '">';
 
-			echo '<section id="' . esc_attr( $section_id ) . '">';
+					if ( $section['name'] ) {
+						echo '<h2>' . esc_html( $section['name'] ) . '</h2>' . "\n";
+					}
 
-			if ( $section['name'] ) {
-				echo '<h2>' . esc_html( $section['name'] ) . '</h2>' . "\n";
-			}
-			$this->render_additional_section_elements( $section_id );
-			echo '<table class="form-table">';
-			do_settings_fields( $page, $section_id );
-			echo '</table>';
+					$this->render_additional_section_elements( $section_id );
+					echo '<table class="form-table">';
+					do_settings_fields( $page, $section_id );
+					echo '</table>';
+					echo '</section>';
+				}
 
-			echo '</section>';
+				submit_button();
+				?>
+			</form>
 
-		}
-
-		submit_button();
-		?>
-	</form>
-		<?php do_action( 'settings_after_form' ); ?>
-</div><!--/#woothemes-sensei-->
+			<?php do_action( 'settings_after_form' ); ?>
+		</div><!--/#woothemes-sensei-->
 		<?php
 	}
 
@@ -583,7 +602,9 @@ class Sensei_Settings_API {
 	public function form_field_text( $args ) {
 		$options = $this->get_settings();
 
-		echo '<input id="' . esc_attr( $args['key'] ) . '" name="' . esc_attr( $this->token ) . '[' . esc_attr( $args['key'] ) . ']" size="40" type="text" value="' . esc_attr( $options[ $args['key'] ] ) . '" />' . "\n";
+		$type = in_array( $args['data']['type'] ?? '', [ 'email', 'text' ], true ) ? $args['data']['type'] : 'text';
+
+		echo '<input id="' . esc_attr( $args['key'] ) . '" name="' . esc_attr( $this->token ) . '[' . esc_attr( $args['key'] ) . ']" size="40" type="' . esc_attr( $type ) . '" value="' . esc_attr( $options[ $args['key'] ] ) . '" />' . "\n";
 		if ( isset( $args['data']['description'] ) ) {
 			echo '<span class="description">' . wp_kses_post( $args['data']['description'] ) . '</span>' . "\n";
 		}
@@ -923,6 +944,12 @@ class Sensei_Settings_API {
 		$options = $this->get_settings();
 
 		foreach ( $this->fields as $k => $v ) {
+			if ( 'color' === $v['type'] ) {
+				$input[ $k ] = str_replace( '#', '', $input[ $k ] );
+				if ( ! ctype_xdigit( $input[ $k ] ) || strlen( $input[ $k ] ) !== 6 ) {
+					$input[ $k ] = false;
+				}
+			}
 			// Make sure checkboxes are present even when false.
 			if ( $v['type'] == 'checkbox' && ! isset( $input[ $k ] ) ) {
 				$input[ $k ] = false; }

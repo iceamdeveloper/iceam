@@ -10,6 +10,7 @@ $base_currency = WC_Aelia_CurrencySwitcher::settings()->base_currency();
 $text_domain = WC_Aelia_CS_Subscriptions::$text_domain;
 
 $post_id = $currencyprices_manager->current_post->ID;
+$loop = $currencyprices_manager->loop_idx;
 
 echo '<div class="form-row form-row-full wc_aelia_cs_subscription_prices clearfix show_if_subscription">';
 // Debug

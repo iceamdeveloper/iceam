@@ -16,15 +16,14 @@ use Tribe\Utils\Date_I18n;
 use Tribe\Utils\Date_I18n_Immutable;
 
 class Summary_View extends List_View {
-
 	/**
-	 * Slug for this view.
+	 * Statically accessible slug for this view.
 	 *
 	 * @since 5.7.0
 	 *
 	 * @var string
 	 */
-	public static $view_slug = 'summary';
+	protected static $view_slug = 'summary';
 
 	/**
 	 * @inheritdoc
@@ -36,6 +35,24 @@ class Summary_View extends List_View {
 
 		add_action( 'tribe_template_before_include:events-pro/v2/summary', [ $this, 'add_view_hooks' ] );
 		add_action( 'tribe_template_after_include:events-pro/v2/summary', [ $this, 'remove_view_hooks' ] );
+	}
+
+	/**
+	 * Default untranslated value for the label of this view.
+	 *
+	 * @since 6.0.3
+	 *
+	 * @var string
+	 */
+	protected static $label = 'Summary';
+
+	/**
+	 * @inheritDoc
+	 */
+	public static function get_view_label(): string {
+		static::$label = _x( 'Summary', 'The text label for the Summary View.', 'tribe-events-calendar-pro' );
+
+		return static::filter_view_label( static::$label );
 	}
 
 	/**
@@ -84,8 +101,6 @@ class Summary_View extends List_View {
 	protected function setup_template_vars() {
 		$template_vars             = parent::setup_template_vars();
 		$events_by_date            = [];
-		$month_transition          = [];
-		$month_transition_datetime = [];
 		$injectable_events         = [];
 		$earliest_event            = current( $template_vars['events'] );
 		$ids                       = wp_list_pluck( $template_vars['events'], 'ID' );
@@ -94,6 +109,7 @@ class Summary_View extends List_View {
 			? $this->get_previous_event( $earliest_event, $ids )
 			: false;
 
+		$shown_month_separator = [];
 		foreach ( $template_vars['events'] as $event  ) {
 			$event_start            = $event->dates->start_display;
 			$start_date_day_of_year = tribe_beginning_of_day( $event_start->format( Dates::DBDATEFORMAT ), 'z' );
@@ -109,15 +125,17 @@ class Summary_View extends List_View {
 					$event_day = $event_day->add( Dates::interval( "P{$x}D" ) );
 				}
 
-				$event_date  = $event_day->format( Dates::DBDATEFORMAT );
-				$event_month = $event_day->format( Dates::DBYEARMONTHTIMEFORMAT );
+				$event_date       = $event_day->format( Dates::DBDATEFORMAT );
+				$event_year_month = $event_day->format( Dates::DBYEARMONTHTIMEFORMAT );
 
-				if ( ! isset( $month_transition[ $event_month ] ) ) {
-					$month_transition[ $event_month ]          = $event->ID;
-					$month_transition_datetime[ $event_month ] = $event_start_datetime;
-				}
+				// Adds the summary_view object to this event.
+				$new_event = $this->add_view_specific_properties_to_event( $new_event, $event_date );
 
-				$events_by_date[ $event_date ][ $event_start_datetime  . ' - ' . $new_event->ID ] = $this->add_view_specific_properties_to_event( $new_event, $event_date );
+				// Flag whether we need a month separator (month-separator.php template) to show.
+				$new_event->summary_view->should_show_month_separator = ! isset( $shown_month_separator[ $event_year_month ] );
+				$shown_month_separator[ $event_year_month ]           = true;
+
+				$events_by_date[ $event_date ][ $event_start_datetime . ' - ' . $new_event->ID ] = $new_event;
 			}
 		}
 
@@ -125,35 +143,12 @@ class Summary_View extends List_View {
 			$injectable_events = $this->maybe_include_overlapping_events( $events_by_date, $previous_event, $injectable_events );
 		}
 
-		// Ensure that the correct event is set during month transitions.
-		foreach ( $injectable_events as $dates ) {
-			foreach ( $dates as $event_group_date => $event ) {
-				$event_month          = substr( $event_group_date, 0, 7 );
-				$event_start_datetime = $event->dates->start_display->format( Dates::DBDATETIMEFORMAT );
-
-				// If we've found an event that starts earlier than the one that is already stored, let's use the event we found.
-				if ( isset( $month_transition_datetime[ $event_month ] ) && $month_transition_datetime[ $event_month ] > $event_start_datetime ) {
-					$month_transition[ $event_month ]          = $event->ID;
-					$month_transition_datetime[ $event_month ] = $event_start_datetime;
-				}
-			}
-		}
-
 		$events_by_date = $this->inject_events_into_result_dates( $injectable_events, $events_by_date );
 
 		// Ensure event dates are sorted in ascending order.
 		ksort( $events_by_date );
 
-		// Mark the first event in the first date with events.
-		foreach ( $events_by_date as &$date ) {
-			foreach ( $date as &$event ) {
-				$event->summary_view->is_first_event_in_view = true;
-				break 2;
-			}
-		}
-
 		$template_vars['events_by_date']   = $events_by_date;
-		$template_vars['month_transition'] = $month_transition;
 
 		return $template_vars;
 	}
@@ -179,8 +174,10 @@ class Summary_View extends List_View {
 
 		$is_multiday_start              = false !== $event->multiday && $formatted_group_date === $formatted_start_date_beginning;
 		$is_multiday_end                = false !== $event->multiday && $formatted_group_date === $formatted_end_date_ending;
-		$is_multiday_and_start_of_month = false !== $event->multiday && substr( $group_date, 7 ) !== substr( $start_date, 7 ) && substr( $group_date, -2 ) === '01';
 		$is_all_day                     = $event->all_day;
+
+
+
 
 		// @TODO: Decouple the hard dependency with Event Tickets and replace with a filter.
 		$counts = class_exists( 'Tribe__Tickets__Tickets' ) ? \Tribe__Tickets__Tickets::get_ticket_counts( $event->ID ) : [];
@@ -209,19 +206,18 @@ class Summary_View extends List_View {
 		}
 
 		$event->summary_view = (object) [
-			'is_first_event_in_view'         => false,
-			'start_time'                     => $start_time,
-			'end_time'                       => $end_time,
-			'start_date'                     => $start_date,
-			'end_date'                       => $end_date,
-			'formatted_start_date'           => $formatted_start_date_beginning,
-			'formatted_end_date'             => $formatted_end_date_ending,
-			'is_multiday_start'              => $is_multiday_start,
-			'is_multiday_end'                => $is_multiday_end,
-			'is_multiday_and_start_of_month' => $is_multiday_and_start_of_month,
-			'is_all_day'                     => $is_all_day,
-			'has_tickets'                    => $has_tickets,
-			'has_rsvp'                       => $has_rsvp,
+			'start_time'                  => $start_time,
+			'end_time'                    => $end_time,
+			'start_date'                  => $start_date,
+			'end_date'                    => $end_date,
+			'formatted_start_date'        => $formatted_start_date_beginning,
+			'formatted_end_date'          => $formatted_end_date_ending,
+			'is_multiday_start'           => $is_multiday_start,
+			'is_multiday_end'             => $is_multiday_end,
+			'is_all_day'                  => $is_all_day,
+			'has_tickets'                 => $has_tickets,
+			'has_rsvp'                    => $has_rsvp,
+			'should_show_month_separator' => false,
 		];
 
 		return $event;
@@ -242,6 +238,7 @@ class Summary_View extends List_View {
 		$last_date_end_of_day        = tribe_end_of_day( $last_date->format( Dates::DBDATEFORMAT ) );
 
 		return tribe_events()
+			->by_args( $this->get_global_repository_args() )
 			->where( 'starts_before', $first_date_beginning_of_day )
 			->where( 'ends_between', $first_date_beginning_of_day, $last_date_end_of_day )
 			->all();
@@ -262,6 +259,7 @@ class Summary_View extends List_View {
 		$last_date_beginning_of_day  = tribe_beginning_of_day( $last_date->format( Dates::DBDATEFORMAT ) );
 
 		return tribe_events()
+			->by_args( $this->get_global_repository_args() )
 			->where( 'starts_before', $first_date_beginning_of_day )
 			->where( 'ends_after', $last_date_beginning_of_day )
 			->all();
@@ -279,6 +277,7 @@ class Summary_View extends List_View {
 	 */
 	protected function get_previous_event( \WP_Post $earliest_event, array $exclude_ids = [] ) {
 		return tribe_events()
+			->by_args( $this->get_global_repository_args() )
 			->where( 'starts_before', $earliest_event->dates->start )
 			->not_in( $exclude_ids )
 			->per_page( 1 )
@@ -426,5 +425,15 @@ class Summary_View extends List_View {
 	 */
 	public static function get_asset_origin( $slug ) {
 		return tribe( 'events-pro.main' );
+	}
+
+	/**
+	 * Overrides the base method to provide the correct text domain to translate the rewrite slug.
+	 *
+	 * {@inheritdoc }
+	 */
+	public function get_rewrite_slugs(): array {
+		return  [ static::get_view_slug(), translate( static::get_view_slug(), 'tribe-events-calendar-pro' ) ];
+
 	}
 }

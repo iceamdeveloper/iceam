@@ -9,10 +9,12 @@ import {
 /**
  * WordPress dependencies
  */
+import { useState, useEffect } from '@wordpress/element';
 import {
 	store as blockEditorStore,
 	BlockControls,
 	BlockIcon,
+	InspectorControls,
 } from '@wordpress/block-editor';
 import { useSelect, useDispatch } from '@wordpress/data';
 import {
@@ -25,6 +27,8 @@ import {
 	ToolbarDropdownMenu,
 	ToolbarButton,
 	Tooltip,
+	PanelBody,
+	ToggleControl,
 } from '@wordpress/components';
 import { __ } from '@wordpress/i18n';
 
@@ -158,9 +162,8 @@ const useVideoTypeDropdownProps = (
  * @return {Function} Function to add a break point to the timeline.
  */
 const useAddBreakPointProps = ( clientId ) => {
-	const { playerBlock, timelineBlock } = useInteractiveVideoInnerBlocks(
-		clientId
-	);
+	const [ isPlayerReady, setPlayerReady ] = useState( false );
+	const { timelineBlock } = useInteractiveVideoInnerBlocks( clientId );
 	const timelineClientId = timelineBlock.clientId;
 	const { insertBlock } = useDispatch( blockEditorStore );
 	const player = useContextEditorPlayer();
@@ -169,9 +172,15 @@ const useAddBreakPointProps = ( clientId ) => {
 		points: select( blockEditorStore ).getBlocks( timelineClientId ),
 	} ) );
 
-	const isVideoSet =
-		playerBlock?.attributes?.url || playerBlock?.attributes?.src;
-	if ( ! isVideoSet ) {
+	useEffect( () => {
+		if ( player ) {
+			player.getPlayer().then( () => {
+				setPlayerReady( true );
+			} );
+		}
+	}, [ player ] );
+
+	if ( ! isPlayerReady ) {
 		return {
 			isDisabled: true,
 		};
@@ -270,6 +279,20 @@ const InteractiveVideoSettings = ( {
 				</ToolbarGroup>
 				<ToolbarGroup>{ toolbarButton }</ToolbarGroup>
 			</BlockControls>
+			<InspectorControls>
+				<PanelBody title={ __( 'Timeline', 'sensei-pro' ) }>
+					<ToggleControl
+						checked={ ! attributes.hiddenTimeline }
+						onChange={ ( showTimeline ) => {
+							setAttributes( { hiddenTimeline: ! showTimeline } );
+						} }
+						label={ __(
+							'Show the timeline in the frontend',
+							'sensei-pro'
+						) }
+					/>
+				</PanelBody>
+			</InspectorControls>
 			<ConfirmDialog
 				title={ __( 'Transform video type', 'sensei-pro' ) }
 				confirmButtonText={ __( 'Transform video type', 'sensei-pro' ) }

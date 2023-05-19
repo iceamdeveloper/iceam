@@ -321,6 +321,11 @@ function w3tc_csp_reference() {
 }
 
 function cdn_cf_check() {
+	// Prevents JS error for non W3TC pages.
+	if ( typeof w3tcData === 'undefined' ) {
+		return;
+	}
+
 	var cdnEnabled = jQuery( '#cdn__enabled' ).is( ':checked' ),
 		cdnEngine = jQuery( '#cdn__engine' ).find( ':selected' ).val(),
 		cdnFlushManually = jQuery( '[name="cdn__flush_manually"]' ).is( ':checked' );
@@ -988,6 +993,9 @@ jQuery(function() {
 		jQuery.post('admin.php?page=w3tc_dashboard', {
 			w3tc_test_memcached: 1,
 			servers: jQuery('#memcached_servers').val(),
+			binary_protocol: jQuery('[id$=__memcached__binary_protocol]').is(':checked'),
+			username: jQuery('#memcached_username').val(),
+			password: jQuery('#memcached_password').val(),
 			_wpnonce: jQuery(this).metadata().nonce
 		}, function(data) {
 			status.addClass(data.result ? 'w3tc-success' : 'w3tc-error');

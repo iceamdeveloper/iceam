@@ -114,10 +114,7 @@ class Cache_Handler_Cache_Handler extends Base_Cache_Handler {
 	 * @since 1.0.6.170520
 	 */
 	protected function get_customer_country($customer) {
-		if(aelia_wc_version_is('<', '3.0')) {
-			return $customer->get_country();
-		}
-		return $customer->get_billing_country();
+		return $customer instanceof \WC_Customer ? $customer->get_billing_country() : WC()->countries->get_base_country();
 	}
 
 	/**
@@ -128,10 +125,7 @@ class Cache_Handler_Cache_Handler extends Base_Cache_Handler {
 	 * @since 1.0.6.170520
 	 */
 	protected function get_customer_state($customer) {
-		if(aelia_wc_version_is('<', '3.0')) {
-			return $customer->get_state();
-		}
-		return $customer->get_billing_state();
+		return $customer instanceof \WC_Customer ? $customer->get_billing_state() : WC()->countries->get_base_state();
 	}
 
 	public function get_page_hash() {

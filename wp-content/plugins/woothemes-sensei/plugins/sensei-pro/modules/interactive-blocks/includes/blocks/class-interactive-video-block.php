@@ -21,7 +21,10 @@ class Interactive_Video_Block {
 	public function __construct() {
 		add_action( 'init', [ $this, 'init' ], 11 );
 		add_action( 'save_post', [ $this, 'log_on_save_post' ], 10, 2 );
+		// When there's no embed handler for YouTube, it uses the oembed filter.
 		add_filter( 'embed_oembed_html', [ $this, 'maybe_replace_iframe_youtube_url' ], 12, 2 );
+		// When there is an embed handler registered, it uses the embed handler filter.
+		add_filter( 'embed_handler_html', [ $this, 'maybe_replace_iframe_youtube_url' ], 12, 2 );
 	}
 
 	/**
@@ -131,10 +134,16 @@ class Interactive_Video_Block {
 	 * @return string
 	 */
 	public function maybe_replace_iframe_youtube_url( $html, $url ) {
+		add_filter( 'deprecated_function_trigger_error', [ $this, 'disable_deprecated_warnings' ] );
+		$check_deprecated_replace_iframe_url = class_exists( '\Sensei_Course_Video_Blocks_Youtube_Extension' ) && has_filter( 'embed_oembed_html', [ \Sensei_Course_Video_Blocks_Youtube_Extension::instance(), 'replace_iframe_url' ] );
+		remove_filter( 'deprecated_function_trigger_error', [ $this, 'disable_deprecated_warnings' ] );
+
 		// Skip if it is already being handled by Sensei LMS.
 		if (
-			class_exists( '\Sensei_Course_Video_Blocks_Youtube_Extension' )
-			&& has_filter( 'embed_oembed_html', [ \Sensei_Course_Video_Blocks_Youtube_Extension::instance(), 'replace_iframe_url' ] )
+			$check_deprecated_replace_iframe_url || (
+				class_exists( '\Sensei_Course_Video_Settings' )
+				&& has_filter( 'embed_oembed_html', [ \Sensei_Course_Video_Settings::instance(), 'enable_youtube_api' ] )
+			)
 		) {
 			return $html;
 		}
@@ -161,5 +170,16 @@ class Interactive_Video_Block {
 			},
 			$html
 		);
+	}
+
+	/**
+	 * Method to disable deprecated warnings through a filter.
+	 *
+	 * @access private
+	 *
+	 * @return false
+	 */
+	public function disable_deprecated_warnings() {
+		return false;
 	}
 }

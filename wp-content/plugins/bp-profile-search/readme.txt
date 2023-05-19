@@ -1,9 +1,9 @@
 === BP Profile Search ===
 Contributors: dontdream
 Tags: buddypress, directory, members, users, search, filter
-Requires at least: 5.7
-Tested up to: 6.0
-Stable tag: 5.4.6
+Requires at least: 5.8
+Tested up to: 6.2
+Stable tag: 5.4.8
 
 Member search and member directories for BuddyPress and the BuddyBoss Platform.
 
@@ -103,7 +103,7 @@ In the screenshots below, the <em>City</em> field is provided by the free compan
 
 == Installation ==
 
-See the standard installation procedure, in [Managing Plugins](https://wordpress.org/support/article/managing-plugins/#installing-plugins).
+Standard installation, see [Installing Plugins](https://wordpress.org/support/article/managing-plugins/#installing-plugins-1).
 
 == Screenshots ==
 
@@ -115,6 +115,10 @@ See the standard installation procedure, in [Managing Plugins](https://wordpress
 
 == Changelog ==
 
+= 5.4.8 =
+* Fixed: user permalinks in custom directory when standard directory is a subpage
+= 5.4.7 =
+* Fixed: platform detection (BuddyPress or the BuddyBoss Platform)
 = 5.4.6 =
 * Added: debug information under *Tools -> Site Health*
 = 5.4.5 =

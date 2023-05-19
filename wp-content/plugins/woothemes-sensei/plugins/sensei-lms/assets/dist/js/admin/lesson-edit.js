@@ -6,14 +6,14 @@
 /* harmony export */o.d(t,{
 /* harmony export */F:()=>/* binding */v
 /* harmony export */});
-/* harmony import */var n=o(66886),s=o(9818),r=o(65736),i=o(41650),__=r.__,l={course:{outline:"sensei-lms/course-outline",takeCourse:"sensei-lms/button-take-course",contactTeacher:"sensei-lms/button-contact-teacher",courseProgress:"sensei-lms/course-progress",viewResults:"sensei-lms/button-view-results"},lesson:{lessonActions:"sensei-lms/lesson-actions",lessonProperties:"sensei-lms/lesson-properties",contactTeacher:"sensei-lms/button-contact-teacher"}},u={course:{"meta-box-course-lessons":[l.course.outline],"meta-box-module_course_mb":[l.course.outline],"meta-box-course-video":Object.values(l.course)},lesson:{"meta-box-lesson-info":[l.lesson.lessonProperties]}},c=(0,s.select)("core/block-editor"),a=(0,s.select)("core/edit-post"),d=(0,s.dispatch)("core/edit-post"),v=function(e){if(c){var t,o=(0,s.dispatch)("core/notices"),r=o.createWarningNotice,v=o.removeNotice;(0,i/* ["default"] */.Z)({subscribeListener:function(){var e=c.getBlocks();// Check if blocks were changed.
+/* harmony import */var n=o(66886),s=o(9818),r=o(65736),i=o(41650),__=r.__,l={course:{outline:"sensei-lms/course-outline",takeCourse:"sensei-lms/button-take-course",contactTeacher:"sensei-lms/button-contact-teacher",courseProgress:"sensei-lms/course-progress",viewResults:"sensei-lms/button-view-results"},lesson:{lessonActions:"sensei-lms/lesson-actions",lessonProperties:"sensei-lms/lesson-properties",contactTeacher:"sensei-lms/button-contact-teacher",featuredVideo:"sensei-lms/featured-video"}},u={course:{"meta-box-course-lessons":[l.course.outline],"meta-box-module_course_mb":[l.course.outline],"meta-box-course-video":Object.values(l.course)},lesson:{"meta-box-lesson-info":[l.lesson.lessonProperties]}},a=(0,s.select)("core/block-editor"),c=(0,s.select)("core/edit-post"),d=(0,s.dispatch)("core/edit-post"),v=function(e){if(a){var t,o=(0,s.dispatch)("core/notices"),r=o.createWarningNotice,v=o.removeNotice;(0,i/* ["default"] */.Z)({subscribeListener:function(){var e=a.getBlocks();// Check if blocks were changed.
 e!==t&&(t=e,m(),p())}});
 /**
    * Check whether it has Sensei blocks.
    */
-var m=function(){Object.entries(u[e]).forEach((function(e){var t=(0,n/* ["default"] */.Z)(e,2),o=t[0],s=t[1];!b(s)!==a.isEditorPanelEnabled(o)&&d.toggleEditorPanelEnabled(o)})),// Prevent submit course modules.
-document.querySelectorAll("#module_course_mb input").forEach((function(e){e.disabled=!a.isEditorPanelEnabled("meta-box-module_course_mb")})),// Don't submit lesson length and complexity values in metaboxes.
-document.querySelectorAll("#lesson-info input, #lesson-info select").forEach((function(e){e.disabled=!a.isEditorPanelEnabled("meta-box-lesson-info")}))},p=function(){var t,o,n=b(Object.values(l[e])),s=null===(t=window)||void 0===t||null===(o=t.sensei)||void 0===o?void 0:o.courseThemeEnabled;n||s?v("sensei-using-template"):r(__("It looks like this course page doesn't have any Sensei blocks. This means that content will be handled by custom templates.","sensei-lms"),{id:"sensei-using-template",isDismissible:!0,actions:[{label:__("Learn more","sensei-lms"),url:"https://senseilms.com/documentation/course-page-blocks/"}]})},b=function(e){return e.some((function(e){return c.getGlobalBlockCount(e)>0}))};
+var m=function(){Object.entries(u[e]).forEach((function(e){var t=(0,n/* ["default"] */.Z)(e,2),o=t[0],s=t[1];!f(s)!==c.isEditorPanelEnabled(o)&&d.toggleEditorPanelEnabled(o)})),// Prevent submit course modules.
+document.querySelectorAll("#module_course_mb input").forEach((function(e){e.disabled=!c.isEditorPanelEnabled("meta-box-module_course_mb")})),// Don't submit lesson length and complexity values in metaboxes.
+document.querySelectorAll("#lesson-info input, #lesson-info select").forEach((function(e){e.disabled=!c.isEditorPanelEnabled("meta-box-lesson-info")}))},p=function(){var t,o,n=f(Object.values(l[e])),s=null===(t=window)||void 0===t||null===(o=t.sensei)||void 0===o?void 0:o.courseThemeEnabled;n||s?v("sensei-using-template"):r(__("It looks like this course page doesn't have any Sensei blocks. This means that content will be handled by custom templates.","sensei-lms"),{id:"sensei-using-template",isDismissible:!0,actions:[{label:__("Learn more","sensei-lms"),url:"https://senseilms.com/documentation/course-page-blocks/"}]})},f=function(e){return e.some((function(e){return a.getGlobalBlockCount(e)>0}))};
 /**
    * Toggle metaboxes if a replacement block is present or not.
    */}};
@@ -26,11 +26,11 @@ document.querySelectorAll("#lesson-info input, #lesson-info select").forEach((fu
 /* harmony export */});
 /* harmony import */var n=o(9818);
 /* harmony import */
-/* harmony default export */const s=function(e){var t=e.subscribeListener,o=void 0===t?function(){}:t,s=e.onSetDirty,r=void 0===s?function(){}:s,i=e.onSaveStart,l=void 0===i?function(){}:i,u=e.onSave,c=void 0===u?function(){}:u,a=(0,n.select)("core/editor"),d=!1,v=!1;return(0,n.subscribe)((function(){o();var e=a.isEditedPostDirty(),t=a.isSavingPost()&&!a.isAutosavingPost();!v&&e?(
+/* harmony default export */const s=function(e){var t=e.subscribeListener,o=void 0===t?function(){}:t,s=e.onSetDirty,r=void 0===s?function(){}:s,i=e.onSaveStart,l=void 0===i?function(){}:i,u=e.onSave,a=void 0===u?function(){}:u,c=(0,n.select)("core/editor"),d=!1,v=!1;return(0,n.subscribe)((function(){o();var e=c.isEditedPostDirty(),t=c.isSavingPost()&&!c.isAutosavingPost();!v&&e?(
 // If editor becomes dirty.
 v=!0,r()):v=e,d&&!t?(
 // If it completed a saving.
-d=t,c()):!d&&t?(
+d=t,a()):!d&&t?(
 // If it started saving.
 d=t,l()):d=t}))};
 /***/},

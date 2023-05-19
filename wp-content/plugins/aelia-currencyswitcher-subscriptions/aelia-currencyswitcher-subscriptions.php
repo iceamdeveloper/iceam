@@ -5,11 +5,11 @@ Plugin URI: https://aelia.co/
 Description: Subscriptions integration for Aelia Currency Switcher for WooCommerce
 Author: Aelia
 Author URI: https://aelia.co
-Version: 1.7.0.220730
+Version: 1.7.11.230503
 Text Domain: wc-aelia-cs-subscriptions
 Domain Path: /languages
 WC requires at least: 3.0
-WC tested up to: 6.8
+WC tested up to: 7.7
 */
 
 require_once(dirname(__FILE__) . '/src/lib/classes/install/aelia-wc-cs-subscriptions-requirementscheck.php');

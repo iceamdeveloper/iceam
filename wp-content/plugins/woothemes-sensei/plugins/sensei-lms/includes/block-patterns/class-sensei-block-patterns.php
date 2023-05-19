@@ -71,6 +71,7 @@ class Sensei_Block_Patterns {
 		require __DIR__ . '/course-list/class-sensei-course-list-block-patterns.php';
 		( new Sensei_Course_List_Block_Patterns() )->register_course_list_block_patterns();
 	}
+
 	/**
 	 * Register block patterns.
 	 *
@@ -91,11 +92,11 @@ class Sensei_Block_Patterns {
 			];
 		} elseif ( 'lesson' === $post_type ) {
 			$block_patterns = [
-				'default',
-				'default-with-quiz',
 				'video-lesson',
-				'files-to-download',
+				'default-with-quiz',
 				'zoom-meeting',
+				'files-to-download',
+				'default',
 			];
 
 			if (
@@ -104,6 +105,11 @@ class Sensei_Block_Patterns {
 			) {
 				$block_patterns[] = 'discussion-question';
 			}
+		} elseif ( 'page' === $post_type ) {
+			$block_patterns = [
+				'landing-page-list',
+				'landing-page-grid',
+			];
 		}
 
 		foreach ( $block_patterns as $block_pattern ) {
@@ -162,6 +168,10 @@ class Sensei_Block_Patterns {
 
 		if ( in_array( $post_type, $post_types, true ) ) {
 			Sensei()->assets->enqueue( 'sensei-block-patterns-style', 'css/block-patterns.css' );
+		}
+
+		if ( 'page' === $post_type ) {
+			Sensei()->assets->enqueue( 'sensei-page-block-patterns-style', 'css/page-block-patterns.css' );
 		}
 	}
 

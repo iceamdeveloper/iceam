@@ -1,5 +1,39 @@
 Changelog
 =========
+1.9.3 (2023-04-08)
+- Fixed `Reply-to` header. It's not overridden anymore
+
+1.9.2 (2023-03-28)
+- Added action for better dev experience in tracking error `mailgun_error_track`
+- Added header `h:Sender`
+
+1.9.1 (2023-03-26)
+- Remove not needed error logging.
+- Fixed bug with Override param for Woocommerce
+
+1.9 (2023-01-18)
+- Sanitizing and escaping vars. Possible security issues
+
+1.8.10 (2022-12-26)
+- Fixed bug with not overriding `from name` for Woocommerce
+
+1.8.9 (2022-12-14)
+- Fixed bug with removed wp_mail filter
+
+1.8.8 (2022-12-11)
+- Fixed bug when `$to` override in the `wp_mail` function
+
+1.8.7 (2022-11-12)
+- Fixed bug when field `Override "From" Details` was not updated
+
+1.8.6 (2022-11-09)
+- Version update
+
+1.8.5 (2022-09-21)
+- Make code changes to have more optimized way to use Mailgun object in the code
+
+1.8.3 (2022-08-30)
+- Plugin refactoring. Widget fixes for working with Legacy Widget Block. PHP8.0 support check
 
 1.7.9 (2021-05-24)
 - API Key description

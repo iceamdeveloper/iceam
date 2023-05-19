@@ -113,8 +113,10 @@ class EDD extends Order {
 
 		// Build list of downloads and cart items to use.
 		foreach ( $tickets as $ticket ) {
+			$download = edd_get_download( $ticket['id'] );
 			$cart_item = [
-				'id'         => 0,
+				'name'       => $download->post_title,
+				'id'         => $download->ID,
 				'quantity'   => 0,
 				'price_id'   => null,
 				'tax'        => 0,
@@ -122,6 +124,7 @@ class EDD extends Order {
 				'item_price' => 0,
 				'fees'       => [],
 				'discount'   => 0,
+				'price'      => 0,
 			];
 
 			$cart_item = array_merge( $cart_item, $ticket );
@@ -144,7 +147,7 @@ class EDD extends Order {
 		}
 
 		// Set up payment data to use.
-		$payment_data = [
+		$purchase_data = [
 			// Force zero price because order has no real payment.
 			'price'        => 0,
 			'date'         => current_time( 'mysql' ),
@@ -188,7 +191,7 @@ class EDD extends Order {
 		}
 
 		// Record the pending payment.
-		$order_id = edd_insert_payment( $payment_data );
+		$order_id = edd_insert_payment( $purchase_data );
 
 		// Add actions that need to be reset.
 		if ( ! empty( $reset_actions ) ) {

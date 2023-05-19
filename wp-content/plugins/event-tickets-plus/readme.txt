@@ -2,10 +2,10 @@
 
 Contributors: theeventscalendar, brianjessee, camwynsp, aguseo, bordoni, borkweb, GeoffBel, jentheo, leahkoerper, lucatume, neillmcshea, tribecari, vicskf, zbtirrell, juanfra, moraleida.me
 Tags: events, WooCommerce, WooTickets, add-on, ticket sales, tickets, calendar, community, registration, api, dates, date, posts, workshop, conference, meeting, seminar, concert, summit, The Events Calendar, Events Calendar PRO, ticket integration, event ticketing, RSVP, EDD, Easy Digital Downloads
-Requires at least: 5.6
-Tested up to: 6.0.1
-Stable tag: 5.5.3
-Requires PHP: 7.1
+Requires at least: 5.8.5
+Tested up to: 6.2.0
+Stable tag: 5.6.10
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -134,6 +134,84 @@ Our Premium Plugins:
 * <a href="https://evnt.is/fa" target="_blank">The Events Calendar: Filter Bar</a>
 
 == Changelog ==
+
+= [5.6.10] 2023-05-04 =
+
+* Fix - Resolved missing default IAC setting during Ticket CSV Import. [ETP-840]
+* Language - 3 new strings added, 13 updated, 3 fuzzied, and 0 obsoleted
+
+= [5.6.9] 2023-04-03 =
+
+* Fix - When using WooCommerce the SKU will properly appear when creating a ticket using Community Tickets. [CT-64]
+* Language - 3 new strings added, 17 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.6.8] 2023-03-08 =
+
+* Fix - Resolved missing Attendee Collection and Information for the blocks editor while on Post and Pages. [ETP-831]
+* Tweak - Code maintenance for the attendees screen. [ET-1635]
+* Enhancement - Add description for the Attendees Registration settings tab. [ETP-855]
+* Enhancement - Add options to alter RSVP status from Admin edit screen for attendees. [ETP-843]
+* Language - 4 new strings added, 27 updated, 0 fuzzied, and 1 obsoleted
+
+= [5.6.7] 2023-02-22 =
+
+* Version - Event Tickets Plus 5.6.7 is only compatible with Event Tickets 5.5.8 and higher.
+* Tweak - PHP version compatibility bumped to PHP 7.4
+* Tweak - Version Composer updated to 2
+* Tweak - Version Node updated to 18.13.0
+* Tweak - Version NPM update to 8.19.3
+
+= [5.6.6.1] 2023-02-14 =
+
+* Fix - Add a safe-check for the Easy Digital Downloads implementation to prevent a fatal error. [ETP-857]
+
+= [5.6.6] 2023-02-09 =
+
+* Fix - Resolved attendance count on Public Attendee List while using the `tribe_tickets_attendees` shortcode. [ETP-850]
+* Fix - Resolved attendee check-in list for Easy Digital Downloads not working and Order edit URL. [ETP-842]
+* Fix - Prevent error occurring when `register_uninstall_hook` was being called. [ETP-852]
+* Language - 2 new strings added, 9 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.6.5] 2023-01-16 =
+
+* Fix - Fixed Attendee info date field format not matching the date format set in the settings. [ETP-816]
+* Fix - Fixed order report showing error when WooCommerce orders are refunded. [ETP-849]
+* Language - 0 new strings added, 8 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.6.4] 2022-12-08 =
+
+* Fix - WooCommerce stock updates with Ticket Stock to keep the stock within max capacity. [ETP-830]
+* Fix - Going into a Ticket Fieldsets menu keeps the sidebar menu active. [ETP-809]
+* Enhancement - Sorting support added on WooCommerce Order report page Order, Email, Date, Status, and Total columns. [ET-1527]
+* Language - 24 new strings added, 55 updated, 0 fuzzied, and 18 obsoleted
+
+= [5.6.3] 2022-11-09 =
+
+* Fix - Helps multiple of the same ticket form modals by targeting the selected form instead of a global parameter. [ETP-810]
+* Fix - Added attendee label validation so duplicate labels can't be used which was creating database issues. [ETP-803]
+* Fix - Helps multiple of the same ticket form modals by targeting the selected form instead of a global parameter. [GTRIA-729]
+
+= [5.6.2] 2022-10-31 =
+
+* Fix - Properly save the check-in details for attendees on check-in. [ETP-819]
+* Tweak - Display dependency missing warning notice for QR code setup. [ETP-759]
+* Enhancement - Add option to check-in QR codes only for events that are happening now. [ETP-820]
+* Enhancement - Introduced new Integrations tab for Tickets Settings. [ETP-806]
+* Enhancement - Introduced new QR code banner for Event Tickets Plus App connection. [ETP-822]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.6.1] 2022-09-22 =
+
+* Enhancement - Improved stability and compatibility with latest version of EDD (v3.0)
+* Version - Updated the Minimum Required Version of PHP to 7.3
+* Language - 0 new strings added, 12 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.6.0] 2022-09-06 =
+
+* Version - Event Tickets Plus 5.6.0 is only compatible with Event Tickets 5.5.0 and higher
+* Version - Event Tickets Plus 5.6.0 is only compatible with The Events Calendar 6.0.0 and higher.
+* Enhancement - Adds a compatibility layer to work with the new Recurrence Backend Engine in TEC/ECP.
+* Language - 0 new strings added, 15 updated, 0 fuzzied, and 0 obsoleted
 
 = [5.5.3] 2022-08-15 =
 

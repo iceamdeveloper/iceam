@@ -40,7 +40,6 @@ class Sensei_Question {
 
 			// Add custom navigation.
 			add_action( 'in_admin_header', [ $this, 'add_custom_navigation' ] );
-			add_filter( 'submenu_file', [ $this, 'highlight_menu_item' ] );
 		}
 
 		add_action( 'sensei_question_initial_publish', [ $this, 'log_initial_publish_event' ] );
@@ -67,6 +66,8 @@ class Sensei_Question {
 	/**
 	 * Highlight the menu item for the question pages.
 	 *
+	 * @deprecated 4.8.0
+	 *
 	 * @since 4.0.0
 	 * @access private
 	 *
@@ -75,6 +76,8 @@ class Sensei_Question {
 	 * @return string
 	 */
 	public function highlight_menu_item( $submenu_file ) {
+		_deprecated_function( __METHOD__, '4.8.0' );
+
 		$screen = get_current_screen();
 
 		if ( $screen && 'edit-question-category' === $screen->id ) {
@@ -102,7 +105,7 @@ class Sensei_Question {
 			</div>
 			<div class="sensei-custom-navigation__tabbar">
 				<a class="sensei-custom-navigation__tab <?php echo '' === $screen->taxonomy ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'edit.php?post_type=question' ) ); ?>"><?php esc_html_e( 'All Questions', 'sensei-lms' ); ?></a>
-				<a class="sensei-custom-navigation__tab <?php echo 'question-category' === $screen->taxonomy ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=question-category&post_type=course' ) ); ?>"><?php esc_html_e( 'Question Categories', 'sensei-lms' ); ?></a>
+				<a class="sensei-custom-navigation__tab <?php echo 'question-category' === $screen->taxonomy ? 'active' : ''; ?>" href="<?php echo esc_url( admin_url( 'edit-tags.php?taxonomy=question-category&post_type=question' ) ); ?>"><?php esc_html_e( 'Question Categories', 'sensei-lms' ); ?></a>
 			</div>
 		</div>
 		<?php
@@ -225,8 +228,23 @@ class Sensei_Question {
 			if ( ! Sensei()->quiz->is_block_based_editor_enabled() ) {
 				add_meta_box( 'multiple-question-lessons-panel', __( 'Quizzes', 'sensei-lms' ), array( $this, 'question_lessons_panel' ), 'multiple_question', 'side', 'default' );
 				add_meta_box( 'question-edit-panel', $metabox_title, array( $this, 'question_edit_panel' ), 'question', 'normal', 'high' );
+				add_filter( 'sensei_scripts_allowed_post_types', [ $this, 'load_lesson_edit_script' ] );
 			}
 		}
+	}
+
+	/**
+	 * Also load the lesson metabox scripts for the question post type when using the legacy editor.
+	 *
+	 * @access private
+	 *
+	 * @param array $post_types Post types.
+	 *
+	 * @return array
+	 */
+	public function load_lesson_edit_script( $post_types ) {
+		$post_types[] = 'question';
+		return $post_types;
 	}
 
 	public function question_edit_panel() {
@@ -633,7 +651,9 @@ class Sensei_Question {
 
 		$title_html  = '<span class="question question-title">';
 		$title_html .= esc_html( $title );
-		$title_html .= Sensei()->view_helper->format_question_points( $question_grade );
+		if ( $question_grade > 0 ) {
+			$title_html .= Sensei()->view_helper->format_question_points( $question_grade );
+		}
 		$title_html .= '</span>';
 
 		return $title_html;
@@ -845,6 +865,11 @@ class Sensei_Question {
 	 */
 	public static function the_answer_feedback( $question_id ) {
 
+		$hide_answer_feedback = get_post_meta( $question_id, '_hide_answer_feedback', true );
+		if ( $hide_answer_feedback ) {
+			return;
+		}
+
 		$quiz_id   = get_the_ID();
 		$lesson_id = Sensei()->quiz->get_lesson_id( $quiz_id );
 
@@ -981,7 +1006,7 @@ class Sensei_Question {
 					<span class="sensei-lms-question__answer-feedback__icon"></span>
 					<span
 						class="sensei-lms-question__answer-feedback__title"><?php echo wp_kses_post( $answer_feedback_title ); ?></span>
-					<?php if ( $grade ) { ?>
+					<?php if ( $grade && $question_grade > 0 ) { ?>
 						<span class="sensei-lms-question__answer-feedback__points"><?php echo wp_kses_post( $grade ); ?></span>
 					<?php } ?>
 				</div>

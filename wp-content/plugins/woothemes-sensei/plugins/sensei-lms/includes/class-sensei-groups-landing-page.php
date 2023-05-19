@@ -26,14 +26,12 @@ class Sensei_Groups_Landing_Page {
 	 * @since 4.5.2
 	 */
 	public function add_groups_landing_page_menu_item() {
-		// Enqueue styles.
-		Sensei()->assets->enqueue( 'sensei-settings-api', 'css/settings.css' );
 
 		// Add new menu item.
 		$menu_item_title = __( 'Groups', 'sensei-lms' );
 		$badge_text      = __( 'Pro', 'sensei-lms' );
 		add_submenu_page(
-			'edit.php?post_type=course',
+			'sensei',
 			__( 'Groups', 'sensei-lms' ),
 			// Translators: first placeholder value is menu item title, second is badge text.
 			sprintf( '%s <span class="awaiting-mod sensei-promo-groups__badge">%s</span>', $menu_item_title, $badge_text ),
@@ -50,6 +48,12 @@ class Sensei_Groups_Landing_Page {
 	 * @since 4.5.2
 	 */
 	public function display_student_groups_landing_page() {
+		// Get the price of Pro. Return if it's not available.
+		$sensei_pro_product = Sensei_Extensions::instance()->get_extension( Sensei_Extensions::PRODUCT_SENSEI_PRO_SLUG );
+		$sensei_pro_price   = $sensei_pro_product ? str_replace( '.00', '', $sensei_pro_product->price ) : '-';
+
+		// Enqueue styles.
+		Sensei()->assets->enqueue( 'sensei-settings-api', 'css/settings.css' );
 
 		$this->wrapper_container( 'top' );
 
@@ -89,7 +93,11 @@ class Sensei_Groups_Landing_Page {
 				</li>
 			</ul>
 			<h3 class="sensei-promo-groups__important-info">
-					<?php echo esc_html( __( '$149.00 USD / year (1 site)', 'sensei-lms' ) ); ?>
+			<?php
+				// translators: Placeholder is the price of Sensei Pro.
+				echo esc_html( sprintf( __( '%s USD', 'sensei-lms' ), $sensei_pro_price ) );
+			?>
+			<span class="sensei-promo-groups__price-period"><?php esc_html_e( 'per year, 1 site', 'sensei-lms' ); ?></span>
 			</h3>
 			<div class="sensei-promo-groups__actions">
 				<a

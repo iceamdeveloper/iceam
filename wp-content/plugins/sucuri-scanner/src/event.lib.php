@@ -280,7 +280,7 @@ class SucuriScanEvent extends SucuriScan
      * Sends information of a security event to the API.
      *
      * If the website owner has enabled the security log exporter, this method
-     * will also write the information about the security event to taht file.
+     * will also write the information about the security event to that file.
      * This allows to integrate with different monitoring systems like OSSEC or
      * OpenVAS.
      *
@@ -357,22 +357,9 @@ class SucuriScanEvent extends SucuriScan
             }
         }
 
-        /**
-         * Send event to the API if possible.
-         *
-         * If the user have not disabled the communication with the API service,
-         * the plugin will send a message with information about every triggered
-         * event in the website in realtime with a maximum connection time of
-         * two seconds. If the API service does not responds on time the plugin
-         * will insert the event into the local queue system and it will try to
-         * send the message again with a scheduled task every 24 hours, once the
-         * operation succeeds the event will be deleted from the queue.
-         */
-        if (SucuriScanOption::isEnabled(':api_service')) {
-            $cache = new SucuriScanCache('auditqueue');
-            $key = str_replace('.', '_', microtime(true));
-            $written = $cache->add($key, $message);
-        }
+        $cache = new SucuriScanCache('auditqueue');
+        $key = str_replace('.', '_', microtime(true));
+        $written = $cache->add($key, $message);
 
         return true;
     }
@@ -384,7 +371,7 @@ class SucuriScanEvent extends SucuriScan
      */
     public static function sendLogsFromQueue()
     {
-        if (SucuriScanOption::isDisabled(':api_service')) {
+        if (SucuriScanOption::isDisabled(':api_service') || !defined('SUCURISCAN_API_URL') || empty(SUCURISCAN_API_URL)) {
             return false;
         }
 
@@ -740,7 +727,7 @@ class SucuriScanEvent extends SucuriScan
             return false;
         }
 
-        $reset_password_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'login' );
+        $reset_password_url = network_site_url("wp-login.php?action=rp&key=$key&login=" . rawurlencode($user_login), 'https' );
 
         $message = SucuriScanTemplate::getSection(
             'settings-posthack-reset-password-alert',

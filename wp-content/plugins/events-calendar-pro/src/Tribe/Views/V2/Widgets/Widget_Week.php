@@ -428,11 +428,11 @@ class Widget_Week extends Widget_Abstract {
 		/* translators: %s: date of the first day of the week, like "April 01" */
 		$request_date = sprintf(
 			_x( 'Week of %s', 'The "week of" header', 'tribe-events-calendar-pro' ),
-			$request_date->format( $date_format )
+			$request_date->format_i18n( $date_format )
 		);
 
 		$new_vars = [
-			'now'          => $now->format( 'F Y' ),
+			'now'          => $now->format_i18n( 'F Y' ),
 			'request_date' => $request_date,
 			'prev_url'     => $template->get( 'prev_url' ),
 			'next_url'     => $template->get( 'next_url' ),
@@ -461,7 +461,7 @@ class Widget_Week extends Widget_Abstract {
 		}
 
 		$view      = $template->get_view();
-		$view_slug = $view->get_slug();
+		$view_slug = $view::get_view_slug();
 
 		// Bail if it's not week view for some reason.
 		if ( 'week' !== $view_slug && 'widget-week' !== $view_slug ) {

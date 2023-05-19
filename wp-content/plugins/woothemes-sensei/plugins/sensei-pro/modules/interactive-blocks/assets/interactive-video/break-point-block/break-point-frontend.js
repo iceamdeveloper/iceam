@@ -20,10 +20,11 @@ import useBreakPointPositionStyle from './use-break-point-position-style';
 import { registerBlockFrontend } from '../../shared/block-frontend';
 import meta from './block.json';
 import { useContextFrontendPlayer } from '../frontend-player-context';
-import usePrevious from '../use-previous';
+import usePrevious from 'shared-module/use-previous';
 import ignorePersistedAttributes from '../../shared/ignore-persisted-attributes';
 import { selectors as parentSelector } from '../../shared/block-frontend/data/parents';
 import { selectors as attributeSelector } from '../../shared/block-frontend/data/attributes';
+import { BLOCK_ID_ATTRIBUTE } from '../../shared/supports-block-id';
 
 /**
  * Exits the fullscreen mode, if the page is in the fullscreen mode, naturally
@@ -72,6 +73,7 @@ const renderBreakPointFooter = ( onClose ) => (
  * @param {number}       props.time        Point time in seconds.
  * @param {Object}       props.player      The player instance.
  * @param {Function}     props.onClose     Callback to call when closing the modal.
+ * @param {string}       props.blockId     The Block ID of the breakpoint.
  * @param {Array|Object} props.children    Component children.
  */
 const BreakPointContent = ( {
@@ -80,6 +82,7 @@ const BreakPointContent = ( {
 	player,
 	onClose,
 	children,
+	blockId,
 } ) => {
 	useEffect( () => {
 		if ( isModalOpen ) {
@@ -91,6 +94,7 @@ const BreakPointContent = ( {
 	}, [ isModalOpen, time, player ] );
 
 	const onCloseCallback = isModalOpen ? onClose : () => {};
+	const extraContentProps = { [ BLOCK_ID_ATTRIBUTE ]: blockId };
 
 	// We need to force rendering the children because otherwise the
 	// required blocks logic will not detect them, which can be very
@@ -103,7 +107,9 @@ const BreakPointContent = ( {
 			onClose={ onCloseCallback }
 			renderFooter={ renderBreakPointFooter }
 		>
-			<div className="entry-content">{ children }</div>
+			<div className="entry-content" { ...extraContentProps }>
+				{ children }
+			</div>
 		</Modal>
 	);
 };
@@ -205,6 +211,7 @@ const BreakPointFrontend = ( {
 				time={ time }
 				player={ player }
 				onClose={ close }
+				blockId={ blockId }
 			>
 				{ children }
 			</BreakPointContent>

@@ -205,7 +205,7 @@ export function addVideoSaveProps( extraProps, blockType, attributes ) {
 if ( window.sensei?.supportsRequired ) {
 	addFilter(
 		'blocks.registerBlockType',
-		'sensei/extend-supports/requried/addVideoRequiredSupport',
+		'sensei/extend-supports/required/addVideoRequiredSupport',
 		addVideoRequiredSupport
 	);
 

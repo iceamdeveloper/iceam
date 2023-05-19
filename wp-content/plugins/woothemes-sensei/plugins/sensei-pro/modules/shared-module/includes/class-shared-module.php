@@ -8,6 +8,8 @@
 
 namespace Sensei_Pro;
 
+use Sensei_Pro\Background_Jobs\Scheduler;
+
 /**
  * Shared Module class.
  *
@@ -86,25 +88,17 @@ class Shared_Module {
 	 * @access private
 	 */
 	private function include_dependencies() {
-		// Action scheduler.
-		if (
-			! class_exists( 'ActionScheduler_Versions' )
-			|| ! function_exists( 'as_unschedule_all_actions' )
-			|| ! function_exists( 'as_next_scheduled_action' )
-			|| ! function_exists( 'as_schedule_single_action' )
-		) {
-			$as_plugin_file = $this->vendor_path . 'woocommerce/action-scheduler/action-scheduler.php';
-			require_once $as_plugin_file;
-			require_once $this->vendor_path . 'woocommerce/action-scheduler/classes/abstracts/ActionScheduler.php';
-			\ActionScheduler::init( $as_plugin_file );
-		}
 		// Background jobs.
 		include_once $this->module_dir . '/includes/background-jobs/class-job.php';
 		include_once $this->module_dir . '/includes/background-jobs/class-cron-job.php';
 		include_once $this->module_dir . '/includes/background-jobs/class-completable-job.php';
 		include_once $this->module_dir . '/includes/background-jobs/class-scheduler.php';
+		// Other shared classes.
 		include_once $this->module_dir . '/includes/class-language-packs.php';
 		include_once $this->module_dir . '/includes/class-course-helper.php';
+		include_once $this->module_dir . '/includes/class-screen-id-helper.php';
+		// Initialize Scheduler.
+		Scheduler::init( $this->vendor_path );
 	}
 
 	/**

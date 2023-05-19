@@ -42,6 +42,7 @@ function mg_api_last_error($error = null)
         return $last_error;
     }
 
+    do_action('mailgun_error_track', $error);
     $tmp = $last_error;
     $last_error = $error;
 
@@ -69,26 +70,24 @@ function mg_mutate_to_rcpt_vars_cb($to_addrs)
     if (has_filter('mg_use_recipient_vars_syntax')) {
         $use_rcpt_vars = apply_filters('mg_use_recipient_vars_syntax', null);
         if ($use_rcpt_vars) {
-            $vars = array();
 
             $idx = 0;
             foreach ($to_addrs as $addr) {
-                $rcpt_vars[$addr] = array('batch_msg_id' => $idx);
+                $rcpt_vars[$addr] = ['batch_msg_id' => $idx];
                 $idx++;
             }
 
-            // TODO: Also add folding to prevent hitting the 998 char limit on headers.
-            return array(
+            return [
                 'to' => '%recipient%',
                 'rcpt_vars' => json_encode($rcpt_vars),
-            );
+            ];
         }
     }
 
-    return array(
+    return [
         'to' => $to_addrs,
         'rcpt_vars' => null,
-    );
+    ];
 }
 
 /**
@@ -108,14 +107,10 @@ function mg_mutate_to_rcpt_vars_cb($to_addrs)
  *
  * @global PHPMailer\PHPMailer\PHPMailer $phpmailer
  *
- * @since    0.1
  */
 if (!function_exists('wp_mail')) {
-    function wp_mail($to, $subject, $message, $headers = '', $attachments = array())
+    function wp_mail($to, $subject, $message, $headers = '', $attachments = [])
     {
-        // Compact the input, apply the filters, and extract them back out
-        extract(apply_filters('wp_mail', compact('to', 'subject', 'message', 'headers', 'attachments')));
-
         $mailgun = get_option('mailgun');
         $region = (defined('MAILGUN_REGION') && MAILGUN_REGION) ? MAILGUN_REGION : $mailgun['region'];
         $apiKey = (defined('MAILGUN_APIKEY') && MAILGUN_APIKEY) ? MAILGUN_APIKEY : $mailgun['apiKey'];
@@ -126,9 +121,36 @@ if (!function_exists('wp_mail')) {
         }
 
         // If a region is not set via defines or through the options page, default to US region.
-        if (!((bool)$region)) {
+        if (!($region)) {
             error_log('[Mailgun] No region configuration was found! Defaulting to US region.');
             $region = 'us';
+        }
+        
+        // Respect WordPress core filters
+        $atts = apply_filters( 'wp_mail', compact( 'to', 'subject', 'message', 'headers', 'attachments' ) );
+
+        if (isset($atts['to'])) {
+            $to = $atts['to'];
+        }
+
+        if (!is_array($to)) {
+            $to = explode(',', $to);
+        }
+
+        if (isset($atts['subject'])) {
+            $subject = $atts['subject'];
+        }
+
+        if (isset($atts['message'])) {
+            $message = $atts['message'];
+        }
+
+        if (isset($atts['headers'])) {
+            $headers = $atts['headers'];
+        }
+
+        if (isset($atts['attachments'])) {
+            $attachments = $atts['attachments'];
         }
 
         if (!is_array($attachments)) {
@@ -162,7 +184,7 @@ if (!function_exists('wp_mail')) {
                         continue;
                     }
                     // Explode them out
-                    list($name, $content) = explode(':', trim($header), 2);
+                    [$name, $content] = explode(':', trim($header), 2);
 
                     // Cleanup crew
                     $name = trim($name);
@@ -172,7 +194,6 @@ if (!function_exists('wp_mail')) {
                         // Mainly for legacy -- process a From: header if it's there
                         case 'from':
                             if (strpos($content, '<') !== false) {
-                                // So... making my life hard again?
                                 $from_name = substr($content, 0, strpos($content, '<') - 1);
                                 $from_name = str_replace('"', '', $from_name);
                                 $from_name = trim($from_name);
@@ -186,12 +207,12 @@ if (!function_exists('wp_mail')) {
                             break;
                         case 'content-type':
                             if (strpos($content, ';') !== false) {
-                                list($type, $charset) = explode(';', $content);
+                                [$type, $charset] = explode(';', $content);
                                 $content_type = trim($type);
                                 if (false !== stripos($charset, 'charset=')) {
-                                    $charset = trim(str_replace(array('charset=', '"'), '', $charset));
+                                    $charset = trim(str_replace(['charset=', '"'], '', $charset));
                                 } elseif (false !== stripos($charset, 'boundary=')) {
-                                    $boundary = trim(str_replace(array('BOUNDARY=', 'boundary=', '"'), '', $charset));
+                                    $boundary = trim(str_replace(['BOUNDARY=', 'boundary=', '"'], '', $charset));
                                     $charset = '';
                                 }
                             } else {
@@ -223,19 +244,22 @@ if (!function_exists('wp_mail')) {
 
         $from_name = mg_detect_from_name($from_name);
         $from_email = mg_detect_from_address($from_email);
+        $fromString = "{$from_name} <{$from_email}>";
 
-        $body = array(
-            'from' => "{$from_name} <{$from_email}>",
+        $body = [
+            'from' => $fromString,
+            'h:Sender' => $from_email,
             'to' => $to,
             'subject' => $subject,
-        );
+        ];
+
 
         $rcpt_data = apply_filters('mg_mutate_to_rcpt_vars', $to);
         if (!is_null($rcpt_data['rcpt_vars'])) {
             $body['recipient-variables'] = $rcpt_data['rcpt_vars'];
         }
 
-        $body['o:tag'] = array();
+        $body['o:tag'] = [];
         $body['o:tracking-clicks'] = !empty($mailgun['track-clicks']) ? $mailgun['track-clicks'] : 'no';
         $body['o:tracking-opens'] = empty($mailgun['track-opens']) ? 'no' : 'yes';
 
@@ -253,7 +277,7 @@ if (!function_exists('wp_mail')) {
             } elseif (is_array($body['o:tag'])) {
                 $body['o:tag'] = array_merge($body['o:tag'], $tags);
             } else {
-                $body['o:tag'] .= ',' . $tags;
+                $body['o:tag'] .= ',' . implode(',', $tags);
             }
         }
 
@@ -309,8 +333,6 @@ if (!function_exists('wp_mail')) {
         } else if ('text/html' === $content_type) {
             $body['html'] = $message;
         } else {
-            // Unknown Content-Type??
-            error_log('[mailgun] Got unknown Content-Type: ' . $content_type);
             $body['text'] = $message;
             $body['html'] = $message;
         }
@@ -339,7 +361,7 @@ if (!function_exists('wp_mail')) {
              *
              * @param PHPMailer $phpmailer The PHPMailer instance (passed by reference).
              */
-            do_action_ref_array('phpmailer_init', array(&$phpmailer));
+            do_action_ref_array('phpmailer_init', [&$phpmailer]);
 
             $plainTextMessage = $phpmailer->AltBody;
 
@@ -393,13 +415,13 @@ if (!function_exists('wp_mail')) {
 
         $payload .= '--' . $boundary . '--';
 
-        $data = array(
+        $data = [
             'body' => $payload,
-            'headers' => array(
+            'headers' => [
                 'Authorization' => 'Basic ' . base64_encode("api:{$apiKey}"),
                 'Content-Type' => 'multipart/form-data; boundary=' . $boundary,
-            ),
-        );
+            ],
+        ];
 
         $endpoint = mg_api_get_region($region);
         $endpoint = ($endpoint) ? $endpoint : 'https://api.mailgun.net/v3/';
@@ -431,7 +453,7 @@ if (!function_exists('wp_mail')) {
         }
 
         // Not sure there is any additional checking that needs to be done here, but why not?
-        if ($response_body->message != 'Queued. Thank you.') {
+        if ($response_body->message !== 'Queued. Thank you.') {
             mg_api_last_error($response_body->message);
 
             return false;

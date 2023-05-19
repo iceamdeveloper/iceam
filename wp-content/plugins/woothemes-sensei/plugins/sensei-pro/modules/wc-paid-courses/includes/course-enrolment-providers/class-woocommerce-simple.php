@@ -309,10 +309,10 @@ class WooCommerce_Simple
 	/**
 	 * Get the courses IDs that are provided by an order.
 	 *
-	 * @param \WC_Order $order
+	 * @param \WC_Order|OrderRefund $order
 	 * @return int[]
 	 */
-	private function get_order_courses( \WC_Order $order ) {
+	private function get_order_courses( $order ) {
 		$course_ids = [];
 
 		// Run through each product ordered.

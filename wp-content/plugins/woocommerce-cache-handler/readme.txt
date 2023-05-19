@@ -2,11 +2,11 @@
 Tags: woocommerce, multi-currency, multiple currency, caching
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Requires at least: 4.0
-Tested up to: 6.0.9
+Tested up to: 6.2.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 6.8
+WC tested up to: 7.7
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
@@ -32,6 +32,42 @@ The Cache Handler plugin can work around the limitations of rigid caching system
 5. Clear all the caching systems you are using (plugins, Nginx, Varnish, CloudFlare, etc). This is important, as it will allow the Cache Handler to add its scripts to your pages, and ensure that the correct content is served.
 
 == Changelog ==
+
+= 1.1.2.230503 =
+* Updated supported WooCommerce versions.
+
+= 1.1.1.230406 =
+* Updated supported WordPress versions.
+
+= 1.1.0.230328 =
+* Feature - Extended Ajax mode to support the "flags" currency selector widgets.
+* Feature - Extended Ajax mode to support the "flags" country selector widgets.
+* Updated supported WooCommerce versions.
+
+= 1.0.46.230315 =
+* Updated supported WooCommerce versions.
+
+= 1.0.45.230214 =
+* Updated supported WooCommerce versions.
+
+= 1.0.44.230118 =
+* Fix - Updated Cache Buster to hanble the edge condition in which the `WC()->customer` is not set.
+
+= 1.0.43.230109 =
+* Updated supported WooCommerce versions.
+
+= 1.0.42.221203 =
+* Updated supported WooCommerce versions.
+
+= 1.0.41.221110 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.0.40.221012 =
+* Updated supported WooCommerce versions.
+
+= 1.0.39.220830 =
+* Updated supported WooCommerce versions.
 
 = 1.0.38.220804 =
 * Updated supported WooCommerce versions.

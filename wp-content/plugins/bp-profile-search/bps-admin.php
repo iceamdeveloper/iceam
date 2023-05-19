@@ -283,12 +283,8 @@ function bps_get_option ($name, $default)
 add_filter ('debug_information', 'bps_site_info', 20);
 function bps_site_info ($debug_info)
 {
-	if (bps_platform () == 'buddypress')
-		$platform = 'BuddyPress';
-	else if (bps_platform () == 'buddyboss')
-		$platform = 'BuddyBoss Platform';
-
 	$theme = wp_get_theme ();
+	$platform_name = (bps_platform () == 'buddypress')? 'BuddyPress': 'BuddyBoss Platform';
 
 	$debug_info['bp-profile-search'] = array (
 		'label'  => 'BP Profile Search',
@@ -299,7 +295,7 @@ function bps_site_info ($debug_info)
 			),
 			'platform' => array (
 				'label' => 'Platform',
-				'value' => $platform. ' '. bp_get_version (),
+				'value' => $platform_name. ' '. bp_get_version (),
 			),
 			'theme' => array (
 				'label' => 'Theme',

@@ -53,7 +53,7 @@ class Field_Type_Tags extends \BP_XProfile_Field_Type_Textbox {
 	 * @param BP_XProfile_Field $current_field Current field object.
 	 * @param string            $control_type Current field object.
 	 */
-	public function admin_new_field_html( $current_field, $control_type = '' ) {
+	public function admin_new_field_html( \BP_XProfile_Field $current_field, $control_type = '' ) {
 	    $type = array_search( get_class( $this ), bp_xprofile_get_field_types(), false );
 
 		if ( false === $type ) {
@@ -75,7 +75,7 @@ class Field_Type_Tags extends \BP_XProfile_Field_Type_Textbox {
                 <p>
                     <label>
                         <input type="checkbox" name="bpxcftr_tags_allow_new_tags" id="bpxcftr_tags_allow_new_tags" value="1" <?php checked(true, self::allow_new_tags( $current_field->id ) );?> />
-			            <?php _e( 'Allow users to add new tags( If you tick this option, please make sure to <strong>enable select2</strong>strong> from right sidebar).', 'bp-xprofile-custom-field-types' ); ?>
+			            <?php _e( 'Allow users to add new tags( If you tick this option, please make sure to <strong>enable select2</strong> from right sidebar).', 'bp-xprofile-custom-field-types' ); ?>
                     </label>
                 </p>
             </div>

@@ -2,10 +2,10 @@
 
 Contributors: theeventscalendar, brianjessee, camwynsp, aguseo, bordoni, borkweb, GeoffBel, jentheo, leahkoerper, lucatume, neillmcshea, vicskf, zbtirrell, juanfra, moraleida.me
 Tags: tickets, registration, event registration, RSVP, ticket sales, attendee management
-Requires at least: 5.6
-Tested up to: 6.0.1
-Stable tag: 5.4.4
-Requires PHP: 7.1
+Requires at least: 5.8.5
+Tested up to: 6.2.0
+Stable tag: 5.5.11.1
+Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -20,6 +20,8 @@ This plugin makes it easy to sell tickets, collect registrations, and manage att
 Connect to Stripe and take advantage of one of the world’s most popular payment gateways. Our Stripe integration lets you accept credit card payments on your website, along with additional payment methods including AfterPay, ClearPay, AliPay, Giropay, and Klarna.
 
 https://vimeo.com/480516958
+
+[See more videos on our YouTube channel](https://evnt.is/1b4-)
 
 Easily connect to PayPal without any complicated API keys or code through our quick connection wizard in your WordPress backend. With just a few clicks, you can begin selling tickets and enable payment through PayPal, Venmo, and credit cards.
 
@@ -188,98 +190,121 @@ Check out our extensive [knowledgebase](https://evnt.is/18wm) for articles on us
 
 == Changelog ==
 
-= [5.4.4] 2022-08-15 =
+= [5.5.11.1] 2023-05-09 =
 
-* Fix - Tickets/RSVP blocks appear in wrong place on non-events when block editor is disabled in The Events Calendar. [ET-1544]
-* Fix - Fixed searching attendees by purchaser name and email for Tickets Commerce attendees. [ET-1543]
-* Fix - Fixed concurrent RSVP booking not showing error messages for out of stock tickets. [ET-1506]
-* Fix - Fixed showing proper ticket unavailable message for past events. [ET-1146]
-* Fix - Fixed Shared Capacity calculation with capped tickets. [ETP-801]
-* Fix - Fixed logic that was causing fatal errors when using Elementor. [ET-1561]
-* Enhancement - Sorting support added on Tickets Commerce Order Report page columns. [ET-1527]
-* Enhancement - Sorting support added on Attendee Report page for Ticket, Security Code, and Check In columns. [ET-1526]
-* Enhancement - Added section about Tickets Commerce on the Tickets Home page. [ET-1539]
-* Enhancement - Tickets Commerce Stripe gateway now shows additional purchaser info metadata in Stripe dashboard. [ET-1542]
-* Enhancement - Update REST API Endpoints to have access via API KEY and remove the restriction to be using Event Tickets Plus to access the `attendees` endpoint. [ET-1559]
-* Enhancement - Allow filtering of Events Archive REST API using `ticketed` parameter to filter Ticketed and Non-ticketed events. [TEC-4439]
-* Language - 6 new strings added, 162 updated, 0 fuzzied, and 9 obsoleted
+* Fix - Admin Dashboard loading slowly while counting attendees. [ET-1698]
+* Fix - Resolve Fatal occurring for some Tickets Commerce users around Order Models and Cart usage. [ET-1735]
 
-= [5.4.3.1] 2022-07-21 =
+= [5.5.11] 2023-05-04 =
 
-* Fix - Update Freemius to avoid PHP 8 fatals. [TEC-4330]
+* Enhancement - Add Ticket data with attendee data as checkin response. [ET-1694]
+* Enhancement - Added the ability to disable the Attendees column on the Events admin dashboard using `tec_tickets_admin_post_type_table_column` or `tec_tickets_admin_post_type_table_column_{$column}`. [ET-1701]
+* Enhancement - Save number of attendees checked-in via Event Tickets Plus app. [ET-1695]
+* Fix - When using Tickets Commerce tickets under the price of $1 will no longer display improperly. Deprecated `maybe_reset_cost_format`. [ET-1697]
+* Language - 21 new strings added, 85 updated, 0 fuzzied, and 10 obsoleted
 
-= [5.4.3] 2022-07-20 =
+= [5.5.10] 2023-04-03 =
 
-* Tweak - update TCMN to match TEC 5.16.3 [TEC-4433]
-* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted.
+* Enhancement - Added functionality to properly restock deleted attendee ticket for Tickets Commerce. [ETP-860]
+* Enhancement - Add the Attendee count for the site to the `At a Glance` admin widget. [ET-1654]
+* Enhancement - Add `post_title` data for attendees created using Tickets Commerce. [ET-1590]
+* Fix - When using Tickets Commerce the SKU will properly appear when creating a ticket using Community Tickets. [CT-64]
+* Fix - Fixed Tickets/RSVP blocks crashing when hovering over their tooltips. [ET-1674]
+* Fix - Undefined $going variable on Ajax request. [ET-1612]
+* Tweak - Added filters: `tec_tickets_emails_heading_plural`, `tec_tickets_emails_{$this->slug}_heading_plural`, `tec_tickets_emails_subject_plural`, `tec_tickets_emails_{$this->slug}_subject_plural`, `tec_tickets_emails_{$this->slug}_from_email`, `tec_tickets_emails_{$this->slug}_from_name`, `tec_tickets_emails_{$this->slug}_headers`, `tec_tickets_emails_{$this->slug}_attachments`, `tec_tickets_emails_{$this->slug}_placeholders`, `tec_tickets_emails_recipient`, `tec_tickets_emails_{$this->slug}_recipient`, `tec_tickets_emails_subject`, `tec_tickets_emails_{$this->slug}_subject`, `tec_tickets_emails_heading`, `tec_tickets_emails_{$this->slug}_heading`, `tec_tickets_emails_additional_content`, `tec_tickets_emails_{$this->slug}_additional_content`, `tec_tickets_emails_settings`, `tec_tickets_emails_{$this->slug}_settings`, `tribe_tickets_rsvp_tickets_to_send`
+* Tweak - Removed filters: `tec_tickets_emails_heading_`, `tec_tickets_emails_subject_`, `tribe_rsvp_non_attendance_email_subject`
+* Tweak - Changed views: `v2/emails/customer-completed-order`, `v2/emails/rsvp-not-going`, `v2/emails/rsvp-not-going/body`, `v2/emails/template-parts/body/title`
+* Language - 33 new strings added, 83 updated, 1 fuzzied, and 6 obsoleted
 
-= [5.4.2.1] 2022-07-12 =
+= [5.5.9.1] 2023-03-13 =
 
-* Fix - Fixes compatibility with Elementor-based themes. [ET-1554]
-* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted.
+* Fix - Fixed unlimited capacity tickets showing as sold out on calendar views. [ET-1678]
+* Fix - Fix fatal on the attendees screen when accessing as a non-admin user. [ET-1679]
 
-= [5.4.2] 2022-07-05 =
+= [5.5.9] 2023-03-08 =
 
-* Enhancement - Unify CSS class names for many admin elements. [ET-1536]
-* Enhancement - Add a `Currency Position` setting for Tickets Commerce. [ET-1534]
-* Tweak - Added helpful heading labels for Tickets Commerce Payments settings tab fields. [ET-1529]
-* Fix - Fixed changing of Shared Capacity stock when a single ticket stock is updated. [ETP-800]
-* Fix - Cannot edit events with Elementor on The Events Calendar with Event Tickets activated. [ET-1538]
-* Fix - Remove duplicate `Total Event Capacity` wording when ET+ is activated. [ET-1535]
-* Fix - When using Event Tickets as a standalone plugin, the SelectWoo asset was not being properly loaded. [ET-1531]
-* Fix - Some CSS issues within the tickets block in the block editor. [ET-1530]
-* Fix - The wrong `Ticket #` was being sent in attendee emails for Ticket Commerce tickets. [ET-1537]
-* Fix - Allow price block to override the string that is dynamically created from ticket values. [ET-1524]
-* Language - 9 new strings added, 177 updated, 0 fuzzied, and 1 obsoleted.
+* Tweak - Code maintenance for the attendees screen. [ET-1635]
+* Tweak - Save activation time for Event Tickets. [ET-1639]
+* Tweak - Added wrapper method to fetch RSVP ticket not going option data. [ETP-843]
+* Tweak - Save last check-in time for tickets scanned via the Event Tickets Plus APP. [ET-1640]
+* Fix - Fixed shared capacity ticket counts not showing properly on calendar views. [ETP-851]
+* Fix - Fixed attendee ticket title for moved TicketsCommerce tickets. [ET-1611]
+* Fix - Fixed fatal error on the Tickets Settings page when site language was set to Italian. [ET-1645]
+* Tweak - Added filters: `tec_tickets_emails_heading_`, `tec_tickets_emails_subject_`, `tec_tickets_emails_from_email`, `tec_tickets_emails_from_name`, `tec_tickets_emails_headers`, `tec_tickets_emails_attachments`, `tec_tickets_emails_placeholders`, `tec_tickets_emails_format_string`, `tec_tickets_emails_registered_emails`, `tec_tickets_emails_default_emails`, `tec_tickets_emails_post_type_args`
+* Tweak - Removed filters: `tribe_tickets_caps_can_manage_attendees`
+* Tweak - Added actions: `tribe_log`
+* Tweak - Changed views: `v2/emails/admin-failed-order`, `v2/emails/admin-new-order`, `v2/emails/customer-completed-order`, `v2/emails/email-template`, `v2/emails/email-template/body`, `v2/emails/email-template/body/add-links`, `v2/emails/email-template/body/date`, `v2/emails/email-template/body/event-description`, `v2/emails/email-template/body/event-image`, `v2/emails/email-template/body/event-title`, `v2/emails/email-template/body/footer-content`, `v2/emails/email-template/body/footer`, `v2/emails/email-template/body/greeting`, `v2/emails/email-template/body/header-image`, `v2/emails/email-template/body/header`, `v2/emails/email-template/body/recipient-name`, `v2/emails/email-template/body/ticket-info`, `v2/emails/email-template/body/top-link`, `v2/emails/email-template/main`, `v2/emails/email-template/preview`, `v2/emails/email-template/style`, `v2/emails/rsvp`, `v2/emails/template-parts/body`, `v2/emails/template-parts/body/event/date`, `v2/emails/template-parts/body/event/description`, `v2/emails/template-parts/body/event/image`, `v2/emails/template-parts/body/event/links`, `v2/emails/template-parts/body/event/title`, `v2/emails/email-template/body/event-location`, `v2/emails/template-parts/body/footer`, `v2/emails/template-parts/body/footer/content`, `v2/emails/email-template/body/footer-credit`, `v2/emails/template-parts/body/header`, `v2/emails/template-parts/body/header/image`, `v2/emails/template-parts/body/ticket/holder-name`, `v2/emails/template-parts/body/ticket/number-from-total`, `v2/emails/template-parts/body/ticket/security-code`, `v2/emails/template-parts/body/ticket/ticket-name`, `v2/emails/template-parts/body/tickets-total`, `v2/emails/template-parts/body/tickets`, `v2/emails/template-parts/body/title`, `v2/emails/template-parts/footer`, `v2/emails/template-parts/footer/footer-preview`, `v2/emails/template-parts/footer/footer`, `v2/emails/template-parts/header`, `v2/emails/template-parts/header/head/json-ld`, `v2/emails/template-parts/header/head/meta`, `v2/emails/template-parts/header/head/scripts`, `v2/emails/template-parts/header/head/styles`, `v2/emails/template-parts/header/head/title`, `v2/emails/template-parts/header/header-preview`, `v2/emails/template-parts/header/header`, `v2/emails/template-parts/header/top-link`, `v2/emails/template`, `v2/emails/ticket`
+* Language - 16 new strings added, 181 updated, 1 fuzzied, and 94 obsoleted
 
-= [5.4.1] 2022-06-08 =
+= [5.5.8] 2023-02-22 =
 
-* Enhancement - Expanded list of supported currencies for Tickets Commerce, for details visit: https://evnt.is/tec-tc-currencies. [ET-1454, ET-1455, ET-1456]
-* Fix - In the blocks editor, the ticket sale start/end times always load as midnight. [ET-1518]
-* Fix - Encoding issue in the block editor's price block of The Events Calendar events. [ET-1434]
-* Fix - Add India to the list of countries ET cannot process fees from. [ET-1522]
-* Fix - Avoid loading PayPal partner JS script on all admin pages. [ET-1520]
-* Fix - Disable saving Stripe Webhook Signing Secret before validation. [ET-1497]
-* Enhancement - Add a new notice to set up permalinks to something different than "Plain" in order to use Tickets Commerce. [ET-1521]
-* Enhancement - Add links to "Settings" and "Getting started" on the plugin action links. [ET-1525]
-* Language - 2 new strings added, 20 updated, 0 fuzzied, and 3 obsoleted
+* Version - Event Tickets 5.5.8 is only compatible with The Events Calendar 6.0.10 and higher.
+* Version - Event Tickets 5.5.8 is only compatible with Event Tickets Plus 5.6.7 and higher.
+* Tweak - PHP version compatibility bumped to PHP 7.4
+* Tweak - Version Composer updated to 2
+* Tweak - Version Node updated to 18.13.0
+* Tweak - Version NPM update to 8.19.3
+* Tweak - Reduce JavaScript bundle sizes for Blocks editor
 
-= [5.4.0.2] 2022-06-06 =
+= [5.5.7] 2023-02-09 =
 
-* Fix - Adds a safety check to avoid issuing tickets for late-declined purchases in PayPal, when the Order status returned is valid. [ET-1533]
-* Tweak - Added filters: `tec_tickets_commerce_cart_order_hash`
-* Language - 1 new strings added, 15 updated, 0 fuzzied, and 0 obsoleted.
+* Enhancement - Added currency format options to alter currency decimal separator, thousand separator, and number of decimal places. [ET-1608]
+* Tweak - Updated Currency options in Tickets Commerce settings for Croatian users from Kuna (HRK) to Euro (EUR). [ET-1625]
+* Tweak - Updated Attendee Registration Fields upsell notice to only display in admin dashboard. [CT-67]
+* Fix - Resolve provisional IDs properly on the event edit screen for ticket management actions. [ET-1632]
+* Fix - Fixed Ticket Commerce cart cookies not getting saved. [ET-1629]
+* Language - 28 new strings added, 189 updated, 5 fuzzied, and 3 obsoleted
 
-= [5.4.0.1] 2022-05-23 =
+= [5.5.6] 2023-01-16 =
 
-* Fix - Check if function exists for `get_current_screen` to avoid a fatal if not.
+* Tweak - Updated the settings description for stock handling options. [ET-1603]
+* Tweak - Added the `tribe-tickets__tickets-item--shared-capacity` wrapper class for tickets having shared capacity. [ETP-841]
+* Tweak - Added a dashboard notice for sites running PHP versions lower than 7.4 to alert them that the minimum version of PHP is changing to 7.4 in February 2023.
+* Enhancement - Added search capabilities to the Tickets Commerce Orders report page. [ET-1259]
+* Fix - Allow loading attendance page with `event_id` params that use The Events Calendar provisional IDs. [ET-1624]
+* Language - 4 new strings added, 43 updated, 0 fuzzied, and 2 obsoleted
 
-= [5.4.0] 2022-05-19 =
+= [5.5.5] 2022-12-08 =
 
-* Version - Event Tickets 5.4.0 is only compatible with The Events Calendar 5.15.0 and higher
-* Version - Event Tickets 5.4.0 is only compatible with Event Tickets Plus 5.5.0 and higher
-* Feature - Introducing the new Tickets menu on the WordPress admin. [ET-1335]
-* Language - 6 new strings added, 171 updated, 1 fuzzied, and 2 obsoleted
+* Fix - Remove need for Platform Controls to verify webhook signatures in Stripe. [ET-1508]
+* Fix - Fixed the order of tickets in an event changing when you haven't manually requested it. [ET-1568]
+* Fix - Fixed shared capacity tickets only showing the lowest capacity between the shared pool tickets. [ETP-815]
+* Tweak - Removed locale param for Tickets Commerce JS SDK as per PayPal recommendation. [ET-1615]
+* Language - 110 new strings added, 193 updated, 5 fuzzied, and 24 obsoleted
 
-= [5.3.4.1] 2022-05-12 =
+= [5.5.4] 2022-11-09 =
 
-* Version - Event Tickets 5.3.4.1 is only compatible with Event Tickets Plus 5.4.4.1 and higher
-* Fix - Ensure that Event Tickets Plus customers never encounter application fees on Stripe for Tickets Commerce purchases. [ET-1513]
+* Fix - Fixes multiple of the same ticket form being on the same page being out of sync. [GTRIA-729]
+* Fix - Added a JS event that checks for attendee label validation if ET+ is active. [ETP-803]
 
-= [5.3.4] 2022-05-11 =
+= [5.5.3] 2022-10-31 =
 
-* Fix - Typo was causing a JS `setAttribute` error in `vue.min.js`. [ET-1504]
-* Fix - Fatal error when exporting attendees in PHP 8. [ET-1502]
-* Fix - Tickets Commerce manual attendee's ticket price is set to 0. [ETP-781]
-* Fix - RSVP title is being encoded within the block editor fields. [ET-1478]
-* Fix - Tickets Commerce manual attendee's ticket price is set to 0. [ETP-781]
-* Fix - Fixed template override path for a few templates. [ET-1491]
-* Enhancement - Added availability dates and icons to ticket listing in classic editor. [ET-1494]
-* Enhancement - Notify users of the Manual Addition of Attendees feature that is available. [ET-1492]
-* Enhancement - Notify users of Capacity and Attendee Registration Field features that are available. [ET-1493]
-* Tweak - Lighten color of disabled "Get Tickets" button text when using the Genesis theme. [ET-1435]
-* Tweak - Added actions: `tec_tickets_attendees_event_summary_table_extra`
-* Tweak - Changed views: `blocks/tickets/opt-out-hidden`, `blocks/tickets/registration/summary/content`, `registration-js/attendees/fields/number`, `v2/tickets/commerce/fields/tribe-commerce`, `v2/tickets/item/extra/description-toggle`, `v2/tickets/submit/must-login`.
-* Language - 2 new strings added, 46 updated, 0 fuzzied, and 0 obsoleted.
+* Fix - Orderby param not working for Attendee archive REST API. [ET-1591]
+* Fix - Properly save the check-in details for attendees on check-in. [ETP-819]
+* Fix - TicketsCommerce ticketed events not showing up for Events REST API. [ET-1567]
+* Fix - Update version of Firebase/JWT in Common from 5.x to 6.3.0
+* Enhancement - Added support for `name` and `email` param for searching in Attendee archive REST API. [ET-1591]
+* Enhancement - Add template tag to properly check if The Events Calendar is active. [ETP-820]
+* Enhancement - Add `attendance` information to the `events` REST API endpoint. [ET-1580]
+* Enhancement - Add `check_in` argument support for `attendees` REST API endpoint. [ET-1588]
+* Language - 0 new strings added, 18 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.5.2] 2022-10-20 =
+
+* Fix - Update version of Firebase/JWT in Common from 5.x to 6.3.0
+
+= [5.5.1] 2022-09-22 =
+
+* Fix - Listing tickets is no longer limited by the global settings. [ET-1584]
+* Fix - Correct parameter type hinting when param can be null. [ET-1582]
+* Fix - Showing Checkout not available and credit card fields at the same time for PayPal gateway in TicketsCommerce. [ETP-812]
+* Language - 0 new strings added, 1 updated, 0 fuzzied, and 0 obsoleted
+
+= [5.5.0] 2022-09-06 =
+
+* Version - Event Tickets 5.5.0 is only compatible with The Events Calendar 6.0.0 and higher.
+* Version - Event Tickets 5.5.0 is only compatible with Event Tickets Plus 5.6.0 and higher.
+* Enhancement - Adds a compatibility layer to work with the new Recurrence Backend Engine in TEC/ECP.
+* Language - 4 new strings added, 49 updated, 0 fuzzied, and 3 obsoleted
 
 [See changelog for all versions](https://evnt.is/1b5k)

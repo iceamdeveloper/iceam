@@ -13,6 +13,7 @@ import {
 	getFrontendBlockType,
 	getFrontendBlockTypes,
 } from './registry';
+import { BLOCK_ID_ATTRIBUTE } from '../supports-block-id';
 
 export const INNER_BLOCKS_DELIMITER = 'sensei:inner-blocks';
 
@@ -47,6 +48,7 @@ export function parseBlocks( root = document ) {
 		const elements = root.querySelectorAll(
 			getBlockTypeSelector( blockType )
 		);
+
 		return Array.from( elements ).map( ( element ) => {
 			element.setAttribute( BLOCK_NAME_ATTRIBUTE, blockType.name );
 			return {
@@ -96,9 +98,7 @@ const parseBlock = ( { element, blockType, parent = null } ) => {
 		let innerBlocks = [];
 
 		const blockId =
-			attributes.blockId ||
-			blockProps[ 'data-sensei-block-id' ] ||
-			clientId;
+			attributes.blockId || blockProps[ BLOCK_ID_ATTRIBUTE ] || clientId;
 
 		if ( blockType ) {
 			innerBlocks = getInnerBlockElements( element ).map(

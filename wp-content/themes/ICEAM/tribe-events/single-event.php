@@ -7,15 +7,7 @@
  * Override this template in your own theme by creating a file at [your-theme]/tribe-events/single-event.php
  *
  * @package TribeEventsCalendar
- *
- * This template override shifts the layout to a two column layout.
- * This site uses the Wootickets plugin, which is added to the page via
- * the tribe_events_single_event_after_the_meta action (now in the right sidebar).
- *
- * I am wrapping the Tickets section in code that detects if the user is an admin, teacher, or diplomate.
- * If this event is an Advanced Course, only those users should be able to purchast tickets.
- *
- * I also remove navigation to prev | next events, and comments.
+ * @version 4.6.19
  *
  */
 
@@ -24,145 +16,143 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 $events_label_singular = tribe_get_event_label_singular();
-$events_label_plural = tribe_get_event_label_plural();
+$events_label_plural   = tribe_get_event_label_plural();
 
-$event_id = get_the_ID();
+$event_id = Tribe__Events__Main::postIdHelper( get_the_ID() );
+
+/**
+ * Allows filtering of the event ID.
+ *
+ * @since 6.0.1
+ *
+ * @param int $event_id
+ */
+$event_id = apply_filters( 'tec_events_single_event_id', $event_id );
+
+/**
+ * Allows filtering of the single event template title classes.
+ *
+ * @since 5.8.0
+ *
+ * @param array  $title_classes List of classes to create the class string from.
+ * @param string $event_id The ID of the displayed event.
+ */
+$title_classes = apply_filters( 'tribe_events_single_event_title_classes', [ 'tribe-events-single-event-title' ], $event_id );
+$title_classes = implode( ' ', tribe_get_classes( $title_classes ) );
+
+/**
+ * Allows filtering of the single event template title before HTML.
+ *
+ * @since 5.8.0
+ *
+ * @param string $before HTML string to display before the title text.
+ * @param string $event_id The ID of the displayed event.
+ */
+$before = apply_filters( 'tribe_events_single_event_title_html_before', '<h1 class="' . $title_classes . '">', $event_id );
+
+/**
+ * Allows filtering of the single event template title after HTML.
+ *
+ * @since 5.8.0
+ *
+ * @param string $after HTML string to display after the title text.
+ * @param string $event_id The ID of the displayed event.
+ */
+$after = apply_filters( 'tribe_events_single_event_title_html_after', '</h1>', $event_id );
+
+/**
+ * Allows filtering of the single event template title HTML.
+ *
+ * @since 5.8.0
+ *
+ * @param string $after HTML string to display. Return an empty string to not display the title.
+ * @param string $event_id The ID of the displayed event.
+ */
+$title = apply_filters( 'tribe_events_single_event_title_html', the_title( $before, $after, false ), $event_id );
+$cost  = tribe_get_formatted_cost( $event_id );
 
 ?>
 
+<div id="tribe-events-content" class="tribe-events-single">
 
-<div id="content" class="col-full">
-	
-	<div id="main-sidebar-container" class="clearfix">
-		<section id="main">
-			
-			<div id="tribe-events-content" class="tribe-events-single vevent hentry">
-			
-				<p class="tribe-events-back">
-					<a href="<?php echo esc_url( tribe_get_events_link() ); ?>"> <?php printf( __( '&laquo; All %s', 'tribe-events-calendar' ), $events_label_plural ); ?></a>
-				</p>
-			
-				<!-- Notices -->
-				<?php tribe_the_notices() ?>
-			
-				<?php the_title( '<h2 class="tribe-events-single-event-title summary entry-title">', '</h2>' ); ?>
-			
-				<div class="tribe-events-schedule updated published tribe-clearfix">
-					<?php echo tribe_events_event_schedule_details( $event_id, '<h3>', '</h3>' ); ?>
-					<?php if ( tribe_get_cost() ) : ?>
-						<span class="tribe-events-divider">|</span>
-						<span class="tribe-events-cost"><?php echo tribe_get_cost( null, true ) ?></span>
-					<?php endif; ?>
+	<p class="tribe-events-back">
+		<a href="<?php echo esc_url( tribe_get_events_link() ); ?>"> <?php printf( '&laquo; ' . esc_html_x( 'All %s', '%s Events plural label', 'the-events-calendar' ), $events_label_plural ); ?></a>
+	</p>
+
+	<!-- Notices -->
+	<?php tribe_the_notices() ?>
+
+	<?php echo $title; ?>
+
+	<div class="tribe-events-schedule tribe-clearfix">
+		<?php echo tribe_events_event_schedule_details( $event_id, '<h2>', '</h2>' ); ?>
+		<?php if ( ! empty( $cost ) ) : ?>
+			<span class="tribe-events-cost"><?php echo esc_html( $cost ) ?></span>
+		<?php endif; ?>
+	</div>
+
+	<!-- Event header -->
+	<div id="tribe-events-header" <?php tribe_events_the_header_attributes() ?>>
+		<!-- Navigation -->
+		<nav class="tribe-events-nav-pagination" aria-label="<?php printf( esc_html__( '%s Navigation', 'the-events-calendar' ), $events_label_singular ); ?>">
+			<ul class="tribe-events-sub-nav">
+				<li class="tribe-events-nav-previous"><?php tribe_the_prev_event_link( '<span>&laquo;</span> %title%' ) ?></li>
+				<li class="tribe-events-nav-next"><?php tribe_the_next_event_link( '%title% <span>&raquo;</span>' ) ?></li>
+			</ul>
+			<!-- .tribe-events-sub-nav -->
+		</nav>
+	</div>
+	<!-- #tribe-events-header -->
+
+	<?php while ( have_posts() ) :  the_post(); ?>
+		<?php
+			// show sidebar if event has tickets
+			$event_id = get_the_id();
+			$tickets = Tribe__Tickets__Tickets::get_all_event_tickets( $event_id );
+			$event_has_tickets = count($tickets) != 0;
+
+			// restrict advanced course signups
+			$terms = get_the_terms( $event_id, 'tribe_events_cat' );
+			$term_names = array();
+			if ( $terms && ! is_wp_error( $terms ) ) { 
+				foreach ( $terms as $term ) {
+					$term_names[] = $term->name;
+				}
+			}
+				
+			// get the current user's info
+			$user_ID = get_current_user_id();
+			$member_info = get_userdata($user_ID);
+		?>
+		<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
+			<div class="event-content" style="padding-right:20px;float:left;width: <?php if($event_has_tickets){echo "75%";} else {echo "100%";} ?>">
+				<!-- Event featured image, but exclude link -->
+				<?php echo tribe_event_featured_image( $event_id, 'full', false ); ?>
+
+				<!-- Event content -->
+				<?php do_action( 'tribe_events_single_event_before_the_content' ) ?>
+				<div class="tribe-events-single-event-description tribe-events-content">
+					<?php the_content(); ?>
 				</div>
-			
-				<?php while ( have_posts() ) :  the_post(); ?>
-					<div id="post-<?php the_ID(); ?>" <?php post_class(); ?>>
-						<!-- Event featured image, but exclude link -->
-						<?php echo tribe_event_featured_image( $event_id, 'full', false ); ?>
-			
-						<!-- Event content -->
-						<?php do_action( 'tribe_events_single_event_before_the_content' ) ?>
-						<div class="tribe-events-single-event-description tribe-events-content entry-content description">
-							<?php the_content(); ?>
-						</div>
-						<!-- .tribe-events-single-event-description -->
-						<?php
-							// embed add to calendar button? nah
-							//do_action( 'tribe_events_single_event_after_the_content' )
-						?>
-			
-						<!-- Event meta -->
-						<?php do_action( 'tribe_events_single_event_before_the_meta' ) ?>
-						<?php
-						/**
-						 * The tribe_events_single_event_meta() function has been deprecated and has been
-						 * left in place only to help customers with existing meta factory customizations
-						 * to transition: if you are one of those users, please review the new meta templates
-						 * and make the switch!
-						 */
-						if ( ! apply_filters( 'tribe_events_single_event_meta_legacy_mode', false ) ) {
-							tribe_get_template_part( 'modules/meta' );
-						} else {
-							echo tribe_events_single_event_meta();
-						}
-						?>
-					</div> <!-- #post-x -->
-				<?php endwhile; ?>
-			
-			</div><!-- #tribe-events-content -->
-		</section>
-		
-		<aside id="sidebar">
-			<h2>Live Course Registration</h2>
-			<?php
-				// create an array of event category names for this event
-				
-				$register_offsite = types_render_field( "register-offsite", array( 'raw'=>true ) );
-				
-				$terms = get_the_terms( get_the_ID(), 'tribe_events_cat' );
-				$term_names = array();
-				if ( $terms && ! is_wp_error( $terms ) ) { 
-					foreach ( $terms as $term ) {
-						$term_names[] = $term->name;
-					}
-				}
-				$eventId = get_the_ID();
-				$singleSignupRestricted = array(8390,8356,8480,7055,10710,10876,14346);
-				if($eventId === (8480||7055||8483||7064)){
-					$ven = 'london';
-				} else if ($eventId === 10710) {
-					$ven = 'new-orleans';
-				} else if ($eventId === 10876) {
-					$ven = 'bamberg';
-				} else if ($eventId === 14346) {
-					$ven = 'byron-bay';
-				} else {
-					$ven = 'potland';
-				}
-				
-				// get the current user's info
-				$user_ID = get_current_user_id();
-				$member_info = get_userdata($user_ID);
-				
-				if ($register_offsite == 1){
-					$venue_ID = get_post_meta(get_the_ID(), "_EventVenueID", true );
-				?>
-					<div class="register-offsite">
-						<p>Please contact the venue for registration information for this course.</p>
-						<a href="<?php echo get_permalink( $venue_ID ); ?>" class="btn btn-primary">Contact Venue</a>
-					</div>
-					
-				<?php	
-				// if this is an Advanced course
-				} else if( !in_array('diplomate',$member_info->roles ) && in_array($eventId,$singleSignupRestricted)){ ?>
-						<div class="tribe-events-non-diplomate">
-							<h3>We're Sorry</h3>
-							<p>You must be a Diplomate to register for this course outside of a training module.</p>
+				<!-- .tribe-events-single-event-description -->
+				<?php do_action( 'tribe_events_single_event_after_the_content' ) ?>
+			</div>
+			<?php if($event_has_tickets){ ?>
+				<div class="event-sidebar" style="width:25%;float:right;">
+					<h2>Live Course Registration</h2>
+					<?php if(in_array('Advanced',$term_names)){
+						// if the user is logged in as a diplomate or administrator or teacher
+						// show the purchase tickets module
+						if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) || $user_ID != 0 && in_array('teacher',$member_info->roles)) {
+							do_action( 'tribe_events_single_event_after_the_meta' );
 							
-							<p>Please 
-							<?php if ($user_ID == 0){ ?>
-								<a href="/my-courses/">login</a> or
-							<?php } ?>
-							view our <?php if($ven=='portland'){ 
-								?><a href="/venue/iceam-portland/">Portland ICEAM Course Modules.</a><?php 
-							} else if ($ven == 'new-orleans' || $ven == 'bamberg' || $ven == 'byron-bay' ){ 
-								?><a href="/courses">Online Courses</a><?php 
-							} else { 
-								?><a href="/venue/iceam-london/">London ICEAM Course Modules.</a><?php 
-							} ?></p>
-						</div>
-				<?php } else if(in_array('Advanced',$term_names)){
-					// if the user is logged in as a diplomate or administrator or teacher
-					// show the purchase tickets module
-					if ($user_ID != 0 && in_array('diplomate',$member_info->roles) || $user_ID != 0 && in_array('administrator',$member_info->roles) || $user_ID != 0 && in_array('teacher',$member_info->roles)) {
-						do_action( 'tribe_events_single_event_after_the_meta' );
+							// Display the currency selector widget with currencies as buttons
+							?><div id="top"><?php
+							echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
+							?></div><?php
 						
-						// Display the currency selector widget with currencies as buttons
-						echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
-					
-					// else tell the user he/she is inelligible
-					} else {
-			?>
+						// else tell the user he/she is inelligible
+						} else { ?>
 						<div class="tribe-events-non-diplomate">
 							<h3>We're Sorry</h3>
 							<p>You must be a Diplomate to register for this course.</p>
@@ -173,18 +163,38 @@ $event_id = get_the_ID();
 							<?php } ?>
 							view other <a href="/courses/">ICEAM Courses.</a></p>
 						</div>
-			<?
-					}
-				} else {
-					// if it's not an Advanced course, show the tickets module
-					do_action( 'tribe_events_single_event_after_the_meta' );
+						<?php
+						}
+					} else {
+						do_action( 'tribe_events_single_event_after_the_meta' );
+						// Display the currency selector widget with currencies as buttons
+						?><div id="top"><?php
+						echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
+						?></div><?php
+					} ?>
+				</div>
+			<?php } ?>
+			<div class="clearfix"></div>
+			<div class="event-meta">
+				<!-- Event meta -->
+				<?php do_action( 'tribe_events_single_event_before_the_meta' ) ?>
+				<?php tribe_get_template_part( 'modules/meta' ); ?>
+			</div>
+		</div> <!-- #post-x -->
+		<?php if ( get_post_type() == Tribe__Events__Main::POSTTYPE && tribe_get_option( 'showComments', false ) ) comments_template() ?>
+	<?php endwhile; ?>
 
-			
-					// Display the currency selector widget with currencies as buttons
-					echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
-
-				}
-			?>
-		</aside>
+	<!-- Event footer -->
+	<div id="tribe-events-footer">
+		<!-- Navigation -->
+		<nav class="tribe-events-nav-pagination" aria-label="<?php printf( esc_html__( '%s Navigation', 'the-events-calendar' ), $events_label_singular ); ?>">
+			<ul class="tribe-events-sub-nav">
+				<li class="tribe-events-nav-previous"><?php tribe_the_prev_event_link( '<span>&laquo;</span> %title%' ) ?></li>
+				<li class="tribe-events-nav-next"><?php tribe_the_next_event_link( '%title% <span>&raquo;</span>' ) ?></li>
+			</ul>
+			<!-- .tribe-events-sub-nav -->
+		</nav>
 	</div>
-</div>
+	<!-- #tribe-events-footer -->
+
+</div><!-- #tribe-events-content -->

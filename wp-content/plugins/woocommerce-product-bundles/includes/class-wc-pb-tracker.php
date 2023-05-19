@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product Bundles Tracker.
  *
  * @class    WC_PB_Tracker
- * @version  6.16.0
+ * @version  6.18.5
  */
 class WC_PB_Tracker {
 
@@ -41,6 +41,27 @@ class WC_PB_Tracker {
 	private static $start_time = 0;
 
 	/**
+	 * Property to store the tracking events.
+	 *
+	 * @var array
+	 */
+	private static $tracking_events = array();
+
+	/**
+	 * Property to store the HPOS table name.
+	 *
+	 * @var string
+	 */
+	private static $hpos_orders_table = '';
+
+	/**
+	 * Property to store how often the data will be invalidated.
+	 *
+	 * @var string
+	 */
+	private static $invalidation_interval = '-1 week';
+
+	/**
 	 * Initialize the tracker.
 	 */
 	public static function init() {
@@ -48,8 +69,16 @@ class WC_PB_Tracker {
 			add_filter( 'woocommerce_tracker_data', array( __CLASS__, 'add_tracking_data' ), 10 );
 
 			// Async tasks.
-			add_action( 'wc_pb_daily', array( __CLASS__, 'maybe_calculate_tracking_data' ) );
+			if ( defined( 'WC_CALYPSO_BRIDGE_TRACKER_FREQUENCY' ) ) {
+				add_action( 'wc_pb_hourly', array( __CLASS__, 'maybe_calculate_tracking_data' ) );
+			} else {
+				add_action( 'wc_pb_daily', array( __CLASS__, 'maybe_calculate_tracking_data' ) );
+			}
+
 		}
+
+		add_action( 'woocommerce_admin_process_product_object', array( __CLASS__, 'track_bundle_sell_ids' ), 100 );
+
 	}
 
 	/**
@@ -72,15 +101,14 @@ class WC_PB_Tracker {
 		self::read_data();
 		self::maybe_initialize_data();
 
+		// if there are no data calculated, it will calculate them and then send the data.
+
 		if ( self::has_pending_calculations() ) {
 			return array();
 		}
 
-		if ( isset( self::$data[ 'info' ][ 'month' ] ) ) {
-			unset( self::$data[ 'info' ][ 'month' ] );
-		}
-		if ( isset( self::$data[ 'info' ][ 'year' ] ) ) {
-			unset( self::$data[ 'info' ][ 'year' ] );
+		if ( isset( self::$data[ 'info' ][ 'started_time' ] ) ) {
+			unset( self::$data[ 'info' ][ 'started_time' ] );
 		}
 
 		return self::$data;
@@ -90,13 +118,13 @@ class WC_PB_Tracker {
 	 * Calculates all tracking-related data for the previous month and year.
 	 * Runs independently in a background task.
 	 *
-	 * @return array All the tracking data.
 	 * @see ::maybe_calculate_tracking_data().
 	 */
 	private static function calculate_tracking_data() {
 		self::set_start_time();
 		self::calculate_product_data();
 		self::calculate_bundled_item_data();
+		self::calculate_order_data();
 		self::calculate_integration_data();
 	}
 
@@ -106,6 +134,7 @@ class WC_PB_Tracker {
 	 * @return bool Returns true if the data are re-calculated, false otherwise.
 	 */
 	public static function maybe_calculate_tracking_data() {
+
 		self::read_data();
 		self::maybe_initialize_data();
 
@@ -120,6 +149,25 @@ class WC_PB_Tracker {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Track bundle sells first date when saving a product (wp-admin / rest api).
+	 *
+	 * @param  WC_Product  $product
+	 */
+	public static function track_bundle_sell_ids( $product ) {
+
+		$bundle_sell_ids = WC_PB_BS_Product::get_bundle_sell_ids( $product, 'edit' );
+
+		if ( ! empty( $bundle_sell_ids ) ) {
+			$events = get_option( 'woocommerce_pb_tracking_events', array() );
+
+			if ( is_array( $events ) && ! isset( $events[ 'products_bundle_sells_first_create_date' ] ) ) {
+				$events[ 'products_bundle_sells_first_create_date' ] = gmdate( 'Y-m-d H:i:s' );
+				update_option( 'woocommerce_pb_tracking_events', $events );
+			}
+		}
 	}
 
 	/**
@@ -150,6 +198,31 @@ class WC_PB_Tracker {
 		if ( ! isset( $data[ 'product_bundles_count' ] ) ) {
 			// Number of bundles in use.
 			$data[ 'product_bundles_count' ] = self::get_reusable_data( 'product_bundles_count' );
+
+			if ( self::time_or_memory_exceeded() ) {
+				return;
+			}
+		}
+
+		// Creation date of first bundle.
+		if ( ! isset( $data[ 'product_bundles_first_create_date' ] ) ) {
+
+			// @see maybe_initialize_data() for tracking events default values.
+			if ( self::get_reusable_data( 'product_bundles_count' )
+			     && null === self::$tracking_events[ 'product_bundles_first_create_date' ] ) {
+
+				self::$tracking_events[ 'product_bundles_first_create_date' ] = $wpdb->get_var( "
+					SELECT post_date_gmt
+					FROM `{$wpdb->posts}` AS posts
+					WHERE posts.ID IN ( " . self::get_reusable_data( 'product_bundles_ids' ) . ")
+					ORDER BY post_date_gmt ASC
+					LIMIT 1
+				" );
+
+				update_option( 'woocommerce_pb_tracking_events', self::$tracking_events );
+			}
+
+			$data[ 'product_bundles_first_create_date' ] = self::$tracking_events[ 'product_bundles_first_create_date' ];
 
 			if ( self::time_or_memory_exceeded() ) {
 				return;
@@ -194,12 +267,27 @@ class WC_PB_Tracker {
 
 		// Number of products with bundle-sells.
 		if ( ! isset( $data[ 'products_bundle_sells_count' ] ) ) {
-			$data[ 'products_bundle_sells_count' ] = (int) $wpdb->get_var( "
-				SELECT COUNT(*)
-				FROM `{$wpdb->postmeta}` AS postmeta
-				WHERE postmeta.post_id NOT IN ( " . self::get_reusable_data( 'product_bundles_ids' ) . ")
-					AND postmeta.meta_key = '_wc_pb_bundle_sell_ids'
-			" );
+
+			$data[ 'products_bundle_sells_count' ] = self::get_reusable_data( 'products_bundle_sells_count' );
+
+			if ( self::time_or_memory_exceeded() ) {
+				return;
+			}
+		}
+
+		// Creation date of first bundle-sell.
+		if ( ! isset( $data[ 'products_bundle_sells_first_create_date' ] ) ) {
+
+			// @see maybe_initialize_data() for tracking events default values.
+			if ( self::get_reusable_data( 'products_bundle_sells_count' )
+			     && null === self::$tracking_events[ 'products_bundle_sells_first_create_date' ] ) {
+
+				self::$tracking_events[ 'products_bundle_sells_first_create_date' ] = gmdate( 'Y-m-d H:i:s' );
+
+				update_option( 'woocommerce_pb_tracking_events', self::$tracking_events );
+			}
+
+			$data[ 'products_bundle_sells_first_create_date' ] = self::$tracking_events[ 'products_bundle_sells_first_create_date' ];
 
 			if ( self::time_or_memory_exceeded() ) {
 				return;
@@ -595,6 +683,7 @@ class WC_PB_Tracker {
 				FROM `{$wpdb->prefix}woocommerce_bundled_items` AS bundled_items
 					INNER JOIN `{$wpdb->prefix}woocommerce_bundled_itemmeta` AS bundled_itemmeta ON bundled_items.bundled_item_id = bundled_itemmeta.bundled_item_id
 				WHERE bundled_items.bundle_id IN ( " . self::get_reusable_data( 'product_bundles_ids' ) . ")
+					AND bundled_itemmeta.meta_key = 'single_product_price_visibility'
 					AND bundled_itemmeta.meta_value = 'hidden'
 			" );
 
@@ -677,6 +766,112 @@ class WC_PB_Tracker {
 					AND bundled_itemmeta.meta_key = 'hide_thumbnail'
 					AND bundled_itemmeta.meta_value = 'yes'
 			" );
+
+			if ( self::time_or_memory_exceeded() ) {
+				// If we don't unset now, it would exit and would need
+				// an additional run just to remove the pending flag.
+				unset( $data[ 'pending' ] );
+				return;
+			}
+		}
+
+		unset( $data[ 'pending' ] );
+
+	}
+
+	/**
+	 * Calculate order data.
+	 *
+	 * @since 6.18.3
+	 * @return void
+	 */
+	private static function calculate_order_data() {
+		global $wpdb;
+
+		$hpos_orders_table = self::$hpos_orders_table;
+
+		$data = &self::$data[ 'orders' ];
+
+		// Number of orders containing bundles.
+		if ( ! isset( $data[ 'product_bundles_count' ] ) ) {
+			$data[ 'product_bundles_count' ] = (int) $wpdb->get_var( "
+				SELECT COUNT(DISTINCT pb_lookup.order_id)
+				FROM `{$wpdb->prefix}wc_order_bundle_lookup` AS pb_lookup
+			" );
+
+			if ( self::time_or_memory_exceeded() ) {
+				return;
+			}
+		}
+
+		// Number of orders containing bundle-sells.
+		if ( ! isset( $data[ 'bundle_sells_count' ] ) ) {
+
+			$data[ 'bundle_sells_count' ] = (int) $wpdb->get_var( "
+				SELECT
+					COUNT(DISTINCT orders.order_id)
+				FROM
+					`{$wpdb->prefix}wc_order_product_lookup` AS orders
+					INNER JOIN `{$wpdb->prefix}woocommerce_order_items` AS order_items ON orders.order_item_id = order_items.order_item_id
+						AND orders.order_id = order_items.order_id
+					INNER JOIN `{$wpdb->prefix}woocommerce_order_itemmeta` AS order_itemmeta ON order_itemmeta.order_item_id = order_items.order_item_id
+				WHERE
+					order_itemmeta.meta_key = '_bundle_sell_of'
+			" );
+
+			if ( self::time_or_memory_exceeded() ) {
+				return;
+			}
+		}
+
+		// Revenue from bundles over time.
+		if ( ! isset( $data[ 'product_bundles_revenue' ] ) ) {
+			$data[ 'product_bundles_revenue' ] = (float) $wpdb->get_var( "
+				SELECT SUM(pb_lookup.product_gross_revenue)
+				FROM `{$wpdb->prefix}wc_order_bundle_lookup` AS pb_lookup
+			" );
+
+			if ( self::time_or_memory_exceeded() ) {
+				return;
+			}
+		}
+
+		// Revenue from bundle-sells over time.
+		if ( ! isset( $data[ 'bundle_sells_revenue' ] ) ) {
+			$data[ 'bundle_sells_revenue' ] = (float) $wpdb->get_var( "
+				SELECT
+					SUM(orders.product_gross_revenue)
+				FROM
+					`{$wpdb->prefix}wc_order_product_lookup` AS orders
+					INNER JOIN `{$wpdb->prefix}woocommerce_order_items` AS order_items ON orders.order_item_id = order_items.order_item_id
+						AND orders.order_id = order_items.order_id
+					INNER JOIN `{$wpdb->prefix}woocommerce_order_itemmeta` AS order_itemmeta ON order_itemmeta.order_item_id = order_items.order_item_id
+				WHERE
+					order_itemmeta.meta_key = '_bundle_sell_of'
+			" );
+
+			if ( self::time_or_memory_exceeded() ) {
+				return;
+			}
+		}
+
+		// Multi-currency data.
+		if ( ! isset( $data[ 'in_multiple_currencies' ] ) ) {
+
+			if ( WC_PB_Core_Compatibility::is_hpos_enabled() ) {
+				$orders_currencies_count = (int) $wpdb->get_var( "
+					SELECT COUNT( DISTINCT( `currency` ) )
+					FROM `{$hpos_orders_table}` AS `orders`
+				" );
+			} else {
+				$orders_currencies_count = (int) $wpdb->get_var( "
+					SELECT COUNT( DISTINCT( `meta_value` ) )
+					FROM `{$wpdb->postmeta}` AS `orders_meta`
+					WHERE `orders_meta`.`meta_key` = '_order_currency'
+				" );
+			}
+
+			$data[ 'in_multiple_currencies' ] = ( $orders_currencies_count > 1 ) ? true : false;
 
 			if ( self::time_or_memory_exceeded() ) {
 				// If we don't unset now, it would exit and would need
@@ -783,9 +978,10 @@ class WC_PB_Tracker {
 				$subscription_products_query = new WC_Product_Query( $args );
 				$subscription_products       = $subscription_products_query->get_products();
 
-				$subscription_products_count = count( $subscription_products );
+				$subscription_products_array = is_array( $subscription_products ) ? $subscription_products : array();
+				$subscription_products_count = count( $subscription_products_array );
 				$subscription_products_ids   = $subscription_products_count
-					? implode( ',', array_map( 'absint', $subscription_products ) )
+					? implode( ',', array_map( 'absint', $subscription_products_array ) )
 					: 0;
 
 				$data[ 'subscriptions' ][ 'bundled_items_subscription_type_count' ] = (int) $wpdb->get_var( "
@@ -847,6 +1043,7 @@ class WC_PB_Tracker {
 			'product_bundles_virtual_array',
 			'product_bundles_virtual_count',
 			'product_bundles_virtual_ids',
+			'products_bundle_sells_count',
 		);
 
 		if ( ! in_array( $key, $valid_keys ) ) {
@@ -870,7 +1067,7 @@ class WC_PB_Tracker {
 			$bundled_products_query = new WC_Product_Query( $bundled_args );
 			$bundled_products       = $bundled_products_query->get_products();
 
-			self::$reusable_data[ 'product_bundles_array' ] = $bundled_products;
+			self::$reusable_data[ 'product_bundles_array' ] = is_array( $bundled_products ) ? $bundled_products : array();
 			self::$reusable_data[ 'product_bundles_count' ] = count( self::$reusable_data[ 'product_bundles_array' ] );
 			self::$reusable_data[ 'product_bundles_ids' ]   = self::$reusable_data[ 'product_bundles_count' ]
 				? implode( ',', array_map( 'absint', self::$reusable_data[ 'product_bundles_array' ] ) )
@@ -904,6 +1101,13 @@ class WC_PB_Tracker {
 				? implode( ',', array_map( 'absint', self::$reusable_data[ 'product_bundles_virtual_array' ] ) )
 				: 0;
 
+		} elseif ( $key === 'products_bundle_sells_count' ) {
+			self::$reusable_data[ 'products_bundle_sells_count' ] = (int) $wpdb->get_var( "
+				SELECT COUNT(*)
+				FROM `{$wpdb->postmeta}` AS postmeta
+				WHERE postmeta.post_id NOT IN ( " . self::get_reusable_data( 'product_bundles_ids' ) . ")
+					AND postmeta.meta_key = '_wc_pb_bundle_sell_ids'
+			" );
 		}
 
 		return self::$reusable_data[ $key ];
@@ -920,6 +1124,7 @@ class WC_PB_Tracker {
 		if (
 			! isset( self::$data[ 'products' ][ 'pending' ] )
 			&& ! isset( self::$data[ 'bundled_items' ][ 'pending' ] )
+			&& ! isset( self::$data[ 'orders' ][ 'pending' ] )
 			&& ! isset( self::$data[ 'integrations' ][ 'pending' ] )
 		) {
 			return false;
@@ -944,26 +1149,44 @@ class WC_PB_Tracker {
 	 */
 	private static function maybe_initialize_data() {
 
-		$current_month = (int) gmdate( 'm' );
-		$current_year  = (int) gmdate( 'Y' );
+		// Default interval is -1 week.
+		if ( defined( 'WC_CALYPSO_BRIDGE_TRACKER_FREQUENCY' ) ) {
+			self::$invalidation_interval = '-1 day';
+		}
 
 		if (
 			empty( self::$data )
-			|| ! isset( self::$data[ 'info' ][ 'month' ] )
-			|| ! isset( self::$data[ 'info' ][ 'year' ] )
-			|| $current_month !== self::$data[ 'info' ][ 'month' ]
-			|| $current_year !== self::$data[ 'info' ][ 'year' ]
+			|| ! isset( self::$data[ 'info' ][ 'started_time' ] )
+			|| self::$data[ 'info' ][ 'started_time' ] <= strtotime( self::$invalidation_interval )
 		) {
 			self::$data = array(
 				'products'      => array( 'pending' => true ),
 				'bundled_items' => array( 'pending' => true ),
+				'orders'        => array( 'pending' => true ),
 				'integrations'  => array( 'pending' => true ),
 				'info'          => array(
-					'iterations' => 0,
-					'month'      => $current_month,
-					'year'       => $current_year,
+					'iterations'     => 0,
+					'started_time'   => time(),
 				),
 			);
+		}
+
+		self::$tracking_events = get_option( 'woocommerce_pb_tracking_events', array() );
+		$defaults              = array(
+			'product_bundles_first_create_date'       => null,
+			'products_bundle_sells_first_create_date' => null,
+		);
+		self::$tracking_events = wp_parse_args( self::$tracking_events, $defaults );
+
+		// Convert timestamps to dates. Needed to keep previous data.
+		foreach ( self::$tracking_events as $key => $value ) {
+			if ( is_int( $value ) ) {
+				self::$tracking_events[ $key ] = gmdate( 'Y-m-d H:i:s', $value );
+			}
+		}
+
+		if ( WC_PB_Core_Compatibility::is_hpos_enabled() ) {
+			self::$hpos_orders_table = Automattic\WooCommerce\Internal\DataStores\Orders\OrdersTableDataStore::get_orders_table_name();
 		}
 	}
 

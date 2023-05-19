@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit30ba9895520bddaa0c47342927fb07ef
+class ComposerStaticInit5ac97c291ba42b52c4c04ef20fc440c1
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -26,6 +26,8 @@ class ComposerStaticInit30ba9895520bddaa0c47342927fb07ef
     );
 
     public static $classMap = array (
+        'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'TEC\\Tickets\\Admin\\Glance_Items' => __DIR__ . '/../..' . '/src/Tickets/Admin/Glance_Items.php',
         'TEC\\Tickets\\Admin\\Hooks' => __DIR__ . '/../..' . '/src/Tickets/Admin/Hooks.php',
         'TEC\\Tickets\\Admin\\Plugin_Action_Links' => __DIR__ . '/../..' . '/src/Tickets/Admin/Plugin_Action_Links.php',
         'TEC\\Tickets\\Admin\\Provider' => __DIR__ . '/../..' . '/src/Tickets/Admin/Provider.php',
@@ -58,6 +60,8 @@ class ComposerStaticInit30ba9895520bddaa0c47342927fb07ef
         'TEC\\Tickets\\Commerce\\Flag_Actions\\Increase_Sales' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Flag_Actions/Increase_Sales.php',
         'TEC\\Tickets\\Commerce\\Flag_Actions\\Increase_Stock' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Flag_Actions/Increase_Stock.php',
         'TEC\\Tickets\\Commerce\\Flag_Actions\\Send_Email' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Flag_Actions/Send_Email.php',
+        'TEC\\Tickets\\Commerce\\Flag_Actions\\Send_Email_Completed_Order' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Flag_Actions/Send_Email_Completed_Order.php',
+        'TEC\\Tickets\\Commerce\\Flag_Actions\\Send_Email_Purchase_Receipt' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Flag_Actions/Send_Email_Purchase_Receipt.php',
         'TEC\\Tickets\\Commerce\\Gateways\\Contracts\\Abstract_Gateway' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Gateways/Contracts/Abstract_Gateway.php',
         'TEC\\Tickets\\Commerce\\Gateways\\Contracts\\Abstract_Merchant' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Gateways/Contracts/Abstract_Merchant.php',
         'TEC\\Tickets\\Commerce\\Gateways\\Contracts\\Abstract_REST_Endpoint' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Gateways/Contracts/Abstract_REST_Endpoint.php',
@@ -166,9 +170,33 @@ class ComposerStaticInit30ba9895520bddaa0c47342927fb07ef
         'TEC\\Tickets\\Commerce\\Traits\\Has_Mode' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Traits/Has_Mode.php',
         'TEC\\Tickets\\Commerce\\Utils\\Currency' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Utils/Currency.php',
         'TEC\\Tickets\\Commerce\\Utils\\Value' => __DIR__ . '/../..' . '/src/Tickets/Commerce/Utils/Value.php',
+        'TEC\\Tickets\\Custom_Tables\\V1\\Migration\\Maintenance_Mode\\Maintenance_Mode' => __DIR__ . '/../..' . '/src/Tickets/Custom_Tables/V1/Migration/Maintenance_Mode/Maintenance_Mode.php',
+        'TEC\\Tickets\\Custom_Tables\\V1\\Migration\\Maintenance_Mode\\Provider' => __DIR__ . '/../..' . '/src/Tickets/Custom_Tables/V1/Migration/Maintenance_Mode/Provider.php',
+        'TEC\\Tickets\\Custom_Tables\\V1\\Provider' => __DIR__ . '/../..' . '/src/Tickets/Custom_Tables/V1/Provider.php',
+        'TEC\\Tickets\\Emails\\Admin\\Emails_Tab' => __DIR__ . '/../..' . '/src/Tickets/Emails/Admin/Emails_Tab.php',
+        'TEC\\Tickets\\Emails\\Admin\\Preview_Data' => __DIR__ . '/../..' . '/src/Tickets/Emails/Admin/Preview_Data.php',
+        'TEC\\Tickets\\Emails\\Admin\\Preview_Modal' => __DIR__ . '/../..' . '/src/Tickets/Emails/Admin/Preview_Modal.php',
+        'TEC\\Tickets\\Emails\\Admin\\Settings' => __DIR__ . '/../..' . '/src/Tickets/Emails/Admin/Settings.php',
+        'TEC\\Tickets\\Emails\\Assets' => __DIR__ . '/../..' . '/src/Tickets/Emails/Assets.php',
+        'TEC\\Tickets\\Emails\\Email\\Completed_Order' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email/Completed_Order.php',
+        'TEC\\Tickets\\Emails\\Email\\Failed_Order' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email/Failed_Order.php',
+        'TEC\\Tickets\\Emails\\Email\\Purchase_Receipt' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email/Purchase_Receipt.php',
+        'TEC\\Tickets\\Emails\\Email\\RSVP' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email/RSVP.php',
+        'TEC\\Tickets\\Emails\\Email\\RSVP_Not_Going' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email/RSVP_Not_Going.php',
+        'TEC\\Tickets\\Emails\\Email\\Ticket' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email/Ticket.php',
+        'TEC\\Tickets\\Emails\\Email_Abstract' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email_Abstract.php',
+        'TEC\\Tickets\\Emails\\Email_Handler' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email_Handler.php',
+        'TEC\\Tickets\\Emails\\Email_Sender' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email_Sender.php',
+        'TEC\\Tickets\\Emails\\Email_Template' => __DIR__ . '/../..' . '/src/Tickets/Emails/Email_Template.php',
+        'TEC\\Tickets\\Emails\\Hooks' => __DIR__ . '/../..' . '/src/Tickets/Emails/Hooks.php',
+        'TEC\\Tickets\\Emails\\Provider' => __DIR__ . '/../..' . '/src/Tickets/Emails/Provider.php',
+        'TEC\\Tickets\\Emails\\Web_View' => __DIR__ . '/../..' . '/src/Tickets/Emails/Web_View.php',
         'TEC\\Tickets\\Event' => __DIR__ . '/../..' . '/src/Tickets/Event.php',
         'TEC\\Tickets\\Hooks' => __DIR__ . '/../..' . '/src/Tickets/Hooks.php',
         'TEC\\Tickets\\Provider' => __DIR__ . '/../..' . '/src/Tickets/Provider.php',
+        'TEC\\Tickets\\Recurrence\\Compatibility' => __DIR__ . '/../..' . '/src/Tickets/Recurrence/Compatibility.php',
+        'TEC\\Tickets\\Recurrence\\Hooks' => __DIR__ . '/../..' . '/src/Tickets/Recurrence/Hooks.php',
+        'TEC\\Tickets\\Recurrence\\Provider' => __DIR__ . '/../..' . '/src/Tickets/Recurrence/Provider.php',
         'TEC\\Tickets\\Settings' => __DIR__ . '/../..' . '/src/Tickets/Settings.php',
         'Tribe\\Tickets\\Admin\\Home\\Service_Provider' => __DIR__ . '/../..' . '/src/Tribe/Admin/Home/Service_Provider.php',
         'Tribe\\Tickets\\Admin\\Manager\\Service_Provider' => __DIR__ . '/../..' . '/src/Tribe/Admin/Manager/Service_Provider.php',
@@ -207,9 +235,9 @@ class ComposerStaticInit30ba9895520bddaa0c47342927fb07ef
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit30ba9895520bddaa0c47342927fb07ef::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit30ba9895520bddaa0c47342927fb07ef::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit30ba9895520bddaa0c47342927fb07ef::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit5ac97c291ba42b52c4c04ef20fc440c1::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit5ac97c291ba42b52c4c04ef20fc440c1::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit5ac97c291ba42b52c4c04ef20fc440c1::$classMap;
 
         }, null, ClassLoader::class);
     }

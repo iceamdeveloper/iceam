@@ -1,4 +1,9 @@
 /**
+ * External dependencies
+ */
+import roundWithDecimals from 'sensei/assets/shared/helpers/player/round-with-decimals.js';
+
+/**
  * WordPress dependencies
  */
 import { useEffect, useState, forwardRef } from '@wordpress/element';
@@ -90,10 +95,14 @@ const EditTime = forwardRef( ( { duration, time, setAttributes }, ref ) => {
 			return;
 		}
 		const newValue = value.map( toInt ).reduce( sumParts, 0 );
+
+		// It prevents JS math issues with decimals.
+		const roundedValue = roundWithDecimals( newValue, 3 );
+
 		setAttributes( {
-			time: Math.min( newValue, duration ),
+			time: Math.min( roundedValue, duration ),
 		} );
-	}, [ value, duration ] );
+	}, [ value, duration, setAttributes ] );
 
 	const onInput = ( index ) => ( e ) => {
 		const newValue = toTimePart(

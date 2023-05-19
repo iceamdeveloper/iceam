@@ -19,6 +19,7 @@ use Sensei_Pro_Student_Groups\Rest_Api\Controllers\Group_Courses_Controller;
 use Sensei_Pro_Student_Groups\Rest_Api\Controllers\Group_Students_Controller;
 use Sensei_Pro_Student_Groups\Rest_Api\Controllers\Groups_Controller;
 use Sensei_Pro_Student_Groups\Rest_Api\Controllers\WP_REST_Groups_Controller;
+use Sensei_Pro_Student_Groups\Students\Group_Bulk_Actions;
 use Sensei_Pro_Student_Groups\View\Student_Groups_View;
 use WP_Post;
 
@@ -251,6 +252,9 @@ class Student_Groups {
 
 		// Init the group reports.
 		Group_Reports::instance()->init();
+
+		// Init the group related bulk actions.
+		Group_Bulk_Actions::instance()->init();
 	}
 
 	/**
@@ -432,6 +436,7 @@ class Student_Groups {
 		require_once $this->ssg_dir . '/includes/enrolment/class-providers.php';
 		require_once $this->ssg_dir . '/includes/enrolment/class-enrolment-handler.php';
 		require_once $this->ssg_dir . '/includes/reports/class-group-reports.php';
+		require_once $this->ssg_dir . '/includes/students/class-group-bulk-actions.php';
 	}
 
 	/**
@@ -521,12 +526,11 @@ class Student_Groups {
 	private function get_edit_group_students_url( $post_id ) {
 		return add_query_arg(
 			[
-				'post_type' => 'course',
-				'view'      => 'group_students',
-				'page'      => 'student_groups',
-				'group_id'  => $post_id,
+				'view'     => 'group_students',
+				'page'     => 'student_groups',
+				'group_id' => $post_id,
 			],
-			admin_url( 'edit.php' )
+			admin_url( 'admin.php' )
 		);
 	}
 
@@ -542,12 +546,11 @@ class Student_Groups {
 	private function get_group_settings_url( $post_id ) {
 		return add_query_arg(
 			[
-				'post_type' => 'course',
-				'view'      => 'group_access_period',
-				'page'      => 'student_groups',
-				'group_id'  => $post_id,
+				'view'     => 'group_access_period',
+				'page'     => 'student_groups',
+				'group_id' => $post_id,
 			],
-			admin_url( 'edit.php' )
+			admin_url( 'admin.php' )
 		);
 	}
 
@@ -629,7 +632,7 @@ class Student_Groups {
 			$this->assets->enqueue_component( 'group-action-menu', [], [] );
 		}
 
-		if ( in_array( $screen->id, [ 'course_page_student_groups' ], true ) ) {
+		if ( in_array( $screen->id, [ 'sensei-lms_page_student_groups' ], true ) ) {
 			$this->assets->enqueue_component( 'group-action-menu', [], [] );
 			$this->assets->enqueue_component( 'group-student-action-menu', [ 'wp-components' ], [ 'wp-components' ] );
 			$this->assets->enqueue_component( 'add-student-to-group-button', [ 'wp-components' ], [ 'wp-components' ] );
@@ -642,6 +645,10 @@ class Student_Groups {
 			if ( 'group_access_period' === $view ) {
 				$this->assets->enqueue_component( 'add-courses-to-group', [ 'wp-components' ], [ 'wp-components' ] );
 			}
+		}
+
+		if ( 'sensei-lms_page_sensei_learners' === $screen->id ) {
+			$this->assets->enqueue_component( 'student-management-bulk-actions', [ 'wp-hooks' ], [], false );
 		}
 	}
 
@@ -704,7 +711,7 @@ class Student_Groups {
 		// Adding the group-students submenu with parent slug will make the menu
 		// item visible on the navbar. So once we're done registering it, we remove it
 		// in the code below, so we get the parent highlighting, but no menu item.
-		remove_submenu_page( 'edit.php?post_type=course', $this->page_slug );
+		remove_submenu_page( 'sensei', $this->page_slug );
 	}
 
 	/**
@@ -722,8 +729,15 @@ class Student_Groups {
 		// so we won't have control over which menu item gets highlighted. Deifining
 		// the parent slug makes sure when this page is rendered, the parent menu item
 		// will be highlighted.
+
+		// We're removing the parent slug when the page is not the actual Group Students
+		// so that it doesn't show up in the Calypso menu.
+		global $pagenow;
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended
+		$parent_slug = ( 'admin.php' === $pagenow && isset( $_GET['page'] ) && 'student_groups' === $_GET['page'] ) ? 'sensei' : '';
+
 		add_submenu_page(
-			'edit.php?post_type=course',
+			$parent_slug,
 			'Group Students',
 			'Group Students',
 			'edit_courses',
@@ -742,7 +756,7 @@ class Student_Groups {
 	 */
 	public function add_groups_submenu_page() {
 		add_submenu_page(
-			'edit.php?post_type=course',
+			'sensei',
 			__( 'Groups', 'sensei-pro' ),
 			__( 'Groups', 'sensei-pro' ),
 			'edit_courses',
@@ -769,7 +783,7 @@ class Student_Groups {
 
 		$screen = get_current_screen();
 
-		if ( $screen && in_array( $screen->id, [ 'course_page_student_groups' ], true ) ) {
+		if ( $screen && in_array( $screen->id, [ 'sensei-lms_page_student_groups' ], true ) ) {
 			// phpcs:disable WordPress.WP.GlobalVariablesOverride.Prohibited
 			return 'edit.php?post_type=group';
 			// phpcs:enable WordPress.WP.GlobalVariablesOverride.Prohibited

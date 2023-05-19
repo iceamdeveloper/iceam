@@ -266,7 +266,7 @@ if(!function_exists('aelia_wc_registered_order_types')) {
 			$result = wc_get_order_types();
 			// Remove the "refund" order type, if requested
 			if(!$include_refunds && isset($result['shop_order_refund'])) {
-				unset($result['shop_order_refuns']);
+				unset($result['shop_order_refund']);
 			}
 		}
 		else {
@@ -444,5 +444,41 @@ if(!function_exists('aelia_maybe_set_object_prop')) {
 		if(property_exists($object, $name)) {
 			$object->{$name} = $value;
 		}
+	}
+}
+
+if(!function_exists('aelia_declare_feature_support')) {
+	/**
+	 * Allows plugins to declare if a specific feature is supported.
+	 *
+	 * @param string $plugin_file
+	 * @param string $feature_name
+	 * @param bool $is_feature_supported
+	 * @return void
+	 * @since 2.4.0.230202
+	 */
+	function aelia_declare_feature_support(string $plugin_file, string $feature_name, bool $is_feature_supported): void {
+		if(class_exists(\Automattic\WooCommerce\Utilities\FeaturesUtil::class)) {
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility($feature_name, $plugin_file, $is_feature_supported);
+		}
+	}
+}
+
+if(!function_exists('aelia_is_hpos_feature_enabled')) {
+	/**
+	 * Indicates if the High Performance Order Tables feature is enabled.
+	 *
+	 * @return bool
+	 * @since 2.4.0.230202
+	 */
+	function aelia_is_hpos_feature_enabled(): bool {
+		if(class_exists('\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController')) {
+			$hpos_enabled = wc_get_container()->get(\Automattic\WooCommerce\Internal\DataStores\Orders\CustomOrdersTableController::class)->custom_orders_table_usage_is_enabled();
+		}
+		else {
+			$hpos_enabled = false;
+		}
+
+		return $hpos_enabled;
 	}
 }

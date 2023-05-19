@@ -1,5 +1,63 @@
 *** WooCommerce Product Bundles ***
 
+2023.05.17 - version 6.18.6
+ * Tweak - Introduced basic event tracking support via Tracks.
+
+2023.05.10 - version 6.18.5
+* Tweak - Added support for 'bundle_price' key in the REST API schema.
+* New - Introduced the 'woocommerce_bundled_item_group_of_quantity' filter to override the bundled items' Group of quantity.
+* Fix - Fixed validation notice for Name Your Price bundled items.
+* Fix - Fixed fatal error during data collection.
+
+2023.04.04 - version 6.18.4
+* Tweak - Improved data collection.
+
+2023.03.23 - version 6.18.3
+* Tweak - Collect additional data on extension usage when tracking is enabled.
+
+2023.03.14 - version 6.18.2
+* New - Introduced compatibility with AutomateWoo - Abandoned Carts.
+* Fix - Fixed fatal error that was triggered when a bundled variation with Minimum/Maximum Quantity rules was deleted.
+
+2023.02.16 - version 6.18.1
+* Fix - Fixed compatibility notices with Product Addons and Min/Max Quantities.
+
+2023.02.14 - version 6.18.0
+* New - Important: Product Bundles is now compatible with Product Add-Ons v6+.
+* Update - Updated single product validation messages.
+
+2023.01.23 - version 6.17.4
+* New - Introduced 'woocommerce_bundled_item_get_unfiltered_regular_price_start' and 'woocommerce_bundled_item_get_unfiltered_regular_price_end' action hooks.
+* Fix - Fixed a PHP warning that showed up when importing products without bundled items.
+* Fix - Fixed tracking data for priced individually bundled items whose prices are hidden in product templates.
+
+2022.11.01 - version 6.17.3
+* Tweak - Improved security.
+* Tweak - Updated validation error that showed up when setting a low Maximum Quantity for a bundled item.
+* Tweak - Introduced compatibility with the new High-Performance Order Storage.
+
+2022.10.13 - version 6.17.2
+* Tweak - Introduced the 'woocommerce_bundles_bundled_item_visibility' filter.
+* Tweak - Added support for automated translations delivery.
+* Fix - Fixed an issue that prevented hidden bundled items from showing up when editing a Bundle order item in the admin area. 
+* Fix - Fixed a fatal error that was triggered when viewing Bundles Analytics containing Product Bundles that changed product type.
+* Fix - Fixed a fatal error that was triggered when using PHP v8 and using Cart/Checkout Blocks.
+
+2022.09.23 - version 6.17.1
+* Tweak - Hook into 'woocommerce_add_to_cart' with priority '9' instead '9.9'. 
+* Fix - Fixed fatal errors triggered when activating/deactivating the plugin via WP cli.
+
+2022.09.13 - version 6.17.0
+* Important - PHP 7.0 is now required.
+* Tweak - Prevent the 'Optional' box from being checked when the Minimum Quantity is zero.
+* Fix - Fixed a fatal error that was triggered by the Min/Max Quantities integration when an old version of the extension was in use.
+
+2022.08.29 - version 6.16.1
+* Important - The Min/Max Quantities integration requires Min/Max Quantities v3+.
+* Fix - Fixed fatal error that was triggered when trying to add a Bundle with invalid configuration to an order.
+* Tweak - Ensure that the Min/Max Quantities integration code affecting bundled item variations runs only in Product Bundles context.
+* Tweak - Update the bundled item step in the cart/checkout block based on the container's item quantity.
+
 2022.07.12 - version 6.16.0
 * Tweak - Improved support for the Min/Max Quantities 'Group of' feature.
 * Tweak - Introduced client-side min/max/default quantity validation.

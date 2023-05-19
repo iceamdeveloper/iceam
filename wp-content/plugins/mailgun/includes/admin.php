@@ -38,7 +38,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function __construct()
     {
@@ -65,11 +64,10 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function init()
     {
-        $sitename = strtolower($_SERVER['SERVER_NAME']);
+        $sitename = sanitize_text_field(strtolower($_SERVER['SERVER_NAME']));
         if (substr($sitename, 0, 4) === 'www.') {
             $sitename = substr($sitename, 4);
         }
@@ -103,7 +101,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function admin_menu()
     {
@@ -123,7 +120,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function admin_js()
     {
@@ -133,7 +129,6 @@ class MailgunAdmin extends Mailgun
     /**
      * Output JS to footer for enhanced admin page functionality.
      *
-     * @since    0.1
      */
     public function admin_footer_js()
     {
@@ -171,7 +166,7 @@ class MailgunAdmin extends Mailgun
                         ajaxurl,
                         {
                             action: 'mailgun-test',
-                            _wpnonce: '<?php echo wp_create_nonce(); ?>'
+                            _wpnonce: '<?php echo esc_attr(wp_create_nonce()); ?>'
                         }
                     )
                         .complete(function () {
@@ -201,7 +196,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function options_page()
     {
@@ -216,7 +210,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function lists_page()
     {
@@ -233,7 +226,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function admin_init()
     {
@@ -251,7 +243,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function register_settings()
     {
@@ -265,7 +256,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    array
      *
-     * @since    0.1
      */
     public function validation(array $options)
     {
@@ -316,7 +306,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    void
      *
-     * @since    0.1
      */
     public function admin_notices()
     {
@@ -376,7 +365,6 @@ class MailgunAdmin extends Mailgun
      *
      * @return    array
      *
-     * @since    0.1
      */
     public function filter_plugin_actions($links)
     {
@@ -392,14 +380,13 @@ class MailgunAdmin extends Mailgun
      * @return    string
      *
      * @throws JsonException
-     * @since    0.1
      */
     public function ajax_send_test()
     {
         nocache_headers();
         header('Content-Type: application/json');
 
-        if (!current_user_can('manage_options') || !wp_verify_nonce($_GET['_wpnonce'])):
+        if (!current_user_can('manage_options') || !wp_verify_nonce(sanitize_text_field($_GET['_wpnonce']))):
             die(
             json_encode(array(
                 'message' => __('Unauthorized', 'mailgun'),
@@ -478,7 +465,7 @@ class MailgunAdmin extends Mailgun
         }
 
         // Error message will always be returned in case of failure, if not - connection wasn't successful
-        $error_msg = $error_msg ? $error_msg : "Can't connect to Mailgun";
+        $error_msg = $error_msg ?: "Can't connect to Mailgun";
         die(
             json_encode(array(
                 'message' => __('Failure', 'mailgun'),

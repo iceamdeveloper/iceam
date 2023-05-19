@@ -90,7 +90,7 @@ __('Delete', 'sucuri-scanner');
 __('Save', 'sucuri-scanner');
 __('Name', 'sucuri-scanner');
 __('Value', 'sucuri-scanner');
-__('<em>[1]</em> More information about the <a href="https://sucuri.net/website-firewall/" target="_blank" rel="noopener">Sucuri Firewall</a>, features and pricing.<br><em>[2]</em> Instructions and videos in the official <a href="https://kb.sucuri.net/firewall" target="_blank" rel="noopener">Knowledge Base</a> site.<br><em>[3]</em> <a href="https://login.sucuri.net/signup2/create?CloudProxy" target="_blank" rel="noopener">Sign up</a> for a new account and start protecting your site.', 'sucuri-scanner');
+__('<em>[1]</em> More information about the <a href="https://sucuri.net/website-firewall/" target="_blank" rel="noopener">Sucuri Firewall</a>, features and pricing.<br><em>[2]</em> Instructions and videos in the official <a href="https://kb.sucuri.net/firewall" target="_blank" rel="noopener">Knowledge Base</a> site.<br><em>[3]</em> <a href="https://sucuri.net/website-security-platform/signup/" target="_blank" rel="noopener">Sign up</a> for a new account and start protecting your site.', 'sucuri-scanner');
 
 // firewall.html.tpl
 __('Settings', 'sucuri-scanner');
@@ -310,16 +310,6 @@ __('API Service Communication', 'sucuri-scanner');
 __('Once the API key is generate the plugin will communicate with a remote API service that will act as a safe data storage for the audit logs generated when the website triggers certain events that the plugin monitors. If the website is hacked the attacker will not have access to these logs and that way you can investigate what was modified <em>(for malware infaction)</em> and/or how the malicious person was able to gain access to the website.', 'sucuri-scanner');
 __('Disabling the API service communication will stop the event monitoring, consider to enable the <a href="%%SUCURI.URL.Settings%%#general">Log Exporter</a> to keep the monitoring working while the HTTP requests are ignored, otherwise an attacker may execute an action that will not be registered in the security logs and you will not have a way to investigate the attack in the future.', 'sucuri-scanner');
 __('<strong>Are you a developer?</strong> You may be interested in our API. Feel free to use the URL shown below to access the latest 50 entries in your security log, change the value for the parameter <code>l=N</code> if you need more. Be aware that the API doesn’t provides an offset parameter, so if you have the intention to query specific sections of the log you will need to wrap the HTTP request around your own cache mechanism. We <strong>DO NOT</strong> take feature requests for the API, this is a semi-private service tailored for the specific needs of the plugin and not intended to be used by 3rd-party apps, we may change the behavior of each API endpoint without previous notice, use it at your own risk.', 'sucuri-scanner');
-
-// settings-general-apikey.html.tpl
-__('API Key', 'sucuri-scanner');
-__('An API key is required to prevent attackers from deleting audit logs that can help you investigate and recover after a hack, and allows the plugin to display statistics. By generating an API key, you agree that Sucuri will collect and store anonymous data about your website. We take your privacy seriously.', 'sucuri-scanner');
-__('Your domain <code>%%SUCURI.CleanDomain%%</code> does not seems to have a DNS <code>A</code> record so it will be considered as <em>invalid</em> by the API interface when you request the generation of a new key. Adding <code>www</code> at the beginning of the domain name may fix this issue. If you do not understand what is this then send an email to our support team requesting the key.', 'sucuri-scanner');
-__('Recover Via E-mail', 'sucuri-scanner');
-__('Manual Activation', 'sucuri-scanner');
-__('If you do not have access to the administrator email, you can reinstall the plugin. The API key is generated using an administrator email and the domain of the website. Click the "Manual Activation" button if you already have a valid API key to authenticate this website with the remote API web service.', 'sucuri-scanner');
-__('Delete', 'sucuri-scanner');
-__('API Key:', 'sucuri-scanner');
 
 // settings-general-datastorage.html.tpl
 __('Data Storage', 'sucuri-scanner');

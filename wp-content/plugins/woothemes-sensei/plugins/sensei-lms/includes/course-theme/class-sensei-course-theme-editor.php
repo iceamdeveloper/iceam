@@ -118,21 +118,27 @@ class Sensei_Course_Theme_Editor {
 	 */
 	public function maybe_add_site_editor_hooks() {
 
+		if ( $this->is_site_editor_request() ) {
+			$this->add_site_editor_hooks();
+		}
+	}
+
+	/**
+	 * Check if the current request is for the site editor.
+	 *
+	 * @since 4.7.0
+	 */
+	public static function is_site_editor_request() {
+
 		$uri = isset( $_SERVER['REQUEST_URI'] ) ? esc_url_raw( wp_unslash( $_SERVER['REQUEST_URI'] ) ) : '';
 
 		$is_site_editor      = preg_match( '#/wp-admin/site-editor.php#i', $uri ) || preg_match( '#/wp-admin/themes.php\?.*page=gutenberg-edit-site#i', $uri );
 		$is_site_editor_rest = preg_match( '#/wp-json/.*/' . self::THEME_PREFIX . '#i', $uri ) || preg_match( '#/wp-json/wp/v2/templates#i', $uri );
 
-		if ( $is_site_editor || $is_site_editor_rest ) {
-
-			$this->add_site_editor_hooks();
-
-			if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() && ! Sensei_Course_Theme::instance()->is_active() ) {
-				Sensei_Course_Theme::instance()->override_theme();
-			}
-		}
-
+		return $is_site_editor || $is_site_editor_rest;
 	}
+
+
 
 	/**
 	 * Add template editing hooks.
@@ -145,6 +151,60 @@ class Sensei_Course_Theme_Editor {
 
 		add_action( 'enqueue_block_editor_assets', [ $this, 'enqueue_site_editor_assets' ] );
 		add_action( 'admin_init', [ $this, 'add_editor_styles' ] );
+
+		if ( ! function_exists( 'wp_is_block_theme' ) || ! wp_is_block_theme() ) {
+			$this->substitute_theme_cache();
+			add_filter( 'theme_file_path', [ $this, 'override_theme_block_template_file' ], 10, 2 );
+		}
+	}
+
+	/**
+	 * Substitute cache to enable site editor for non-block themes.
+	 *
+	 * This is a temporary workaround until the site editor is enabled for non-block themes.
+	 * Or there will be a way to override the value for the theme.
+	 */
+	private function substitute_theme_cache() {
+		$theme = wp_get_theme();
+		if ( ! $theme ) {
+			return;
+		}
+
+		$cache_hash = md5( $theme->theme_root . '/' . $theme->stylesheet );
+		$cache_key  = "theme-{$cache_hash}";
+
+		wp_cache_delete( $cache_key, 'themes' );
+		wp_cache_add(
+			$cache_key,
+			array(
+				'block_theme' => true,
+				'headers'     => $theme->headers,
+				'errors'      => $theme->errors,
+				'stylesheet'  => $theme->stylesheet,
+				'template'    => $theme->template,
+			),
+			'themes',
+			0
+		);
+	}
+
+	/**
+	 * Enable the site editor by returning a block file template for the wp_is_block_theme check.
+	 *
+	 * @access private
+	 *
+	 * @param string $path The file path.
+	 * @param string $file The requested file to search for.
+	 *
+	 * @return string
+	 */
+	public function override_theme_block_template_file( $path, $file ) {
+
+		if ( 'index.html' === substr( $file, -1 * strlen( 'index.html' ) ) ) {
+			return Sensei_Course_Theme::instance()->get_course_theme_root() . '/templates/index.html';
+		}
+
+		return $path;
 	}
 
 	/**
@@ -155,13 +215,15 @@ class Sensei_Course_Theme_Editor {
 	public function enqueue_site_editor_assets() {
 
 		if ( $this->lesson_has_learning_mode() || $this->is_site_editor() ) {
-			Sensei()->assets->enqueue( Sensei_Course_Theme::THEME_NAME . '-blocks', 'course-theme/blocks/blocks.js', [ 'sensei-shared-blocks' ] );
+			Sensei()->assets->enqueue( Sensei_Course_Theme::THEME_NAME . '-blocks', 'course-theme/blocks/index.js', [ 'sensei-shared-blocks' ] );
 			Sensei()->assets->enqueue_style( 'sensei-shared-blocks-editor-style' );
+			Sensei()->assets->enqueue_style( 'sensei-learning-mode-editor' );
+			Sensei()->assets->enqueue( 'sensei-email-editor-style', 'css/email-notifications/email-editor-style.css' );
+
 			Sensei_Course_Theme::instance()->enqueue_fonts();
 
-			if ( Sensei_Course_Theme_Option::should_override_theme() ) {
-				Sensei()->assets->enqueue( Sensei_Course_Theme::THEME_NAME . '-editor', 'course-theme/course-theme.editor.js' );
-			}
+			Sensei()->assets->enqueue( Sensei_Course_Theme::THEME_NAME . '-editor', 'course-theme/course-theme.editor.js' );
+
 		}
 	}
 
@@ -172,16 +234,15 @@ class Sensei_Course_Theme_Editor {
 	 */
 	public function add_editor_styles() {
 
+		add_editor_style( Sensei()->assets->asset_url( 'css/frontend.css' ) );
 		add_editor_style( Sensei()->assets->asset_url( 'css/learning-mode.css' ) );
 		add_editor_style( Sensei()->assets->asset_url( 'css/learning-mode.editor.css' ) );
-		add_editor_style( Sensei()->assets->asset_url( 'css/frontend.css' ) );
-
 	}
 
 	/**
 	 * Check if the post being edited is a lesson with Learning Mode enabled.
 	 *
-	 * @param WP_Post? $post
+	 * @param WP_Post? $post The post to check.
 	 *
 	 * @return bool
 	 */

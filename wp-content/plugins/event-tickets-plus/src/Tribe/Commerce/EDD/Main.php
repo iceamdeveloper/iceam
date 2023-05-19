@@ -239,7 +239,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		add_action( 'init', array( $this, 'register_eddtickets_type' ), 1 );
 		add_action( 'add_meta_boxes', array( $this, 'edd_meta_box' ) );
 		add_action( 'before_delete_post', array( $this, 'handle_delete_post' ) );
-		add_action( 'edd_complete_purchase', array( $this, 'generate_tickets' ), 12 );
+		add_action( 'edd_insert_payment', array( $this, 'generate_tickets' ), 12 );
 		add_action( 'pre_get_posts', array( $this, 'hide_tickets_from_shop' ) );
 		add_action( 'pre_get_posts', array( $this, 'filter_ticket_reports' ) );
 		add_action( 'edd_cart_footer_buttons', '__return_true' );
@@ -309,7 +309,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		$order_data = $order->get_meta();
-		$payment_data = [
+		$purchase_data = [
 				'price'        => 0,
 				'user_email'   => $order_data['email'],
 				'purchase_key' => uniqid( 'edd-ticket-', true ),
@@ -323,6 +323,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				'user_info'    => $order_data['user_info'],
 				'cart_details' => [
 						[
+								'name'       => $to_product->post_title,
 								'id'         => $tgt_ticket_type_id,
 								'quantity'   => 1,
 								'price_id'   => null,
@@ -336,7 +337,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		];
 
 		// Create duplicate order.
-		$new_order = edd_insert_payment( $payment_data );
+		$new_order = edd_insert_payment( $purchase_data );
 
 		// Add order meta.
 		update_post_meta( $new_order, $this->order_has_tickets, true );
@@ -548,7 +549,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		 *
 		 * @param int $order_id The order ID.
 		 */
-		do_action( 'tribe_tickets_plus_woo_before_generate_tickets', $order_id );
+		do_action( 'tribe_tickets_plus_edd_before_generate_tickets', $order_id );
 
 		// Bail if we already generated the info for this order
 		$done = get_post_meta( $order_id, $this->order_has_tickets, true );
@@ -573,7 +574,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		if ( $has_tickets ) {
-			update_post_meta( $order_id, $this->order_has_tickets, '1' );
+			edd_update_payment_meta( $order_id, $this->order_has_tickets, '1' );
 
 			// Send the email to the user
 			do_action( 'eddtickets-send-tickets-email', $order_id );
@@ -633,15 +634,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		$from_name  = Tribe__Utils__Array::get( 'from_name', $edd_options, get_bloginfo( 'name' ) );
 		$from_email = Tribe__Utils__Array::get( 'from_email', $edd_options, get_option( 'admin_email' ) );
-
-		if ( isset( $user_id ) && 0 < $user_id ) {
-			$user_data = get_userdata( $user_id );
-			$name      = $user_data->display_name;
-		} elseif ( isset( $user_info['first_name'], $user_info['last_name'] ) ) {
-			$name = $user_info['first_name'] . ' ' . $user_info['last_name'];
-		} else {
-			$name = $email;
-		}
 
 		/**
 		 * Allow filtering the Easy Digital Downloads ticket email headers.
@@ -1269,7 +1261,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		}
 
 		$tickets_in_cart = tribe( 'tickets-plus.commerce.edd.cart' )->get_tickets_in_cart();
-		$cart_has_meta   = Tribe__Tickets_Plus__Main::instance()->meta()->cart_has_meta( $tickets_in_cart );
+
+		/** @var Tribe__Tickets_Plus__Meta $meta */
+		$meta = tribe( 'tickets-plus.meta' );
+		$cart_has_meta   = $meta->cart_has_meta( $tickets_in_cart );
 
 		if ( $tickets_in_cart && $cart_has_meta ) {
 			$url = add_query_arg( tribe_tickets_get_provider_query_slug(), $this->attendee_object, tribe( 'tickets.attendee_registration' )->get_url() );
@@ -1576,6 +1571,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				'optout'        => $optout,
 				'user_id'       => $user_id,
 				'ticket_sent'   => $ticket_sent,
+				'order_id_url'  => $this->get_order_edit_url( $order_id ),
 
 				// Fields for Email Tickets.
 				'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
@@ -1681,6 +1677,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			return array();
 		}
 
+		$payment   = edd_get_payment( $order_id );
 		$user_info = edd_get_payment_meta_user_info( $order_id );
 
 		// The order does not exist so return some default values.
@@ -1700,8 +1697,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 
 		$name          = $user_info['first_name'] . ' ' . $user_info['last_name'];
 		$email         = $user_info['email'];
-		$order_status  = get_post_field( 'post_status', $order_id );
-		$status_label  = edd_get_payment_status( get_post( $order_id ), true );
+		$order_status  = edd_get_payment_status( $order_id );
+		$status_label  = edd_get_payment_status( $order_id, true );
 
 		// Warning flag for refunded, cancelled, failed, and revoked orders
 		$order_warning      = false;
@@ -1719,7 +1716,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			'purchaser_email'    => $email,
 			'provider'           => __CLASS__,
 			'provider_slug'      => $this->orm_provider,
-			'purchase_time'      => get_post_time( Tribe__Date_Utils::DBDATETIMEFORMAT, false, $order_id ),
+			'purchase_time'      => Tribe__Date_Utils::reformat( $payment->date, Tribe__Date_Utils::DBDATETIMEFORMAT ),
 		];
 
 		/**
@@ -1756,6 +1753,8 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		if ( func_num_args() > 1 && $qr = func_get_arg( 1 ) ) {
 			update_post_meta( $attendee_id, '_tribe_qr_status', 1 );
 		}
+
+		parent::save_checkin_details( $attendee_id, $qr );
 
 		/**
 		 * Fires a checkin action
@@ -2462,7 +2461,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$email     = $user_info['email'];
 
 		// The ID of the customer who paid for the tickets.
-		$user_id = get_post_meta( $order_id, '_edd_payment_user_id', true );
+		$user_id = edd_get_payment_meta( $order_id, '_edd_payment_user_id' );
 
 		// If no EDD-provided user id is found, set to null. The record_attendee_user_id method will handle it from there.
 		if ( empty( $user_id ) ) {
@@ -2499,24 +2498,43 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			$individual_attendee_email = apply_filters( 'tribe_tickets_attendee_create_individual_email', $email, $i, $order_id, $product_id, $post_id, $this );
 
 			$attendee_data = [
-				'title'					=> $order_id . ' | ' . $individual_attendee_name . ' | ' . ( $i + 1 ),
-				'full_name'				=> $individual_attendee_name,
-				'email'					=> $individual_attendee_email,
-				'ticket_id'				=> $product_id,
-				'order_id'				=> $order_id,
-				// Order of submitted attendees, used for meta data.
-				'order_attendee_id'		=> $i,
-				'post_id'				=> $post_id,
-				'optout'					=> $optout,
-				'price_paid'				=> $this->get_price_value( $product_id ),
-				'price_currency'			=> $currency_symbol,
-				'user_id'				=> $user_id,
+					'title'             => $order_id . ' | ' . $individual_attendee_name . ' | ' . ( $i + 1 ),
+					'full_name'         => $individual_attendee_name,
+					'email'             => $individual_attendee_email,
+					'ticket_id'         => $product_id,
+					'order_id'          => $order_id,
+					// Order of submitted attendees, used for meta data.
+					'order_attendee_id' => $i,
+					'post_id'           => $post_id,
+					'optout'            => $optout,
+					'price_paid'        => $this->get_price_value( $product_id ),
+					'price_currency'    => $currency_symbol,
+					'user_id'           => $user_id,
 			];
 
 			$this->create_attendee( $ticket, $attendee_data );
 		}
 
 		return true;
+	}
+
+	/**
+	 * Returns the order edit link for the given id.
+	 *
+	 * @since 5.6.6
+	 *
+	 * @param int $order_id The order id.
+	 *
+	 * @return string The order edit link
+	 */
+	public function get_order_edit_url( $order_id ): string {
+		return edd_get_admin_url(
+				[
+					'page' => 'edd-payment-history',
+					'view' => 'view-order-details',
+					'id'   => absint( $order_id ),
+				]
+		);
 	}
 
 	/**

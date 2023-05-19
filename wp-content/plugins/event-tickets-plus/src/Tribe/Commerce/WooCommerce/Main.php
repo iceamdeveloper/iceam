@@ -408,6 +408,65 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		// Stock actions.
 		add_action( 'event_tickets_attendee_ticket_deleted', [ $this, 'update_order_note_for_deleted_attendee' ], 10, 2 );
 		add_action( 'tribe_tickets_ticket_moved', [ $this, 'create_order_for_moved_ticket' ], 10, 6 );
+		add_action( 'woocommerce_before_product_object_save', [ $this, 'sync_wc_product_stock_with_ticket' ], 10, 2 );
+		add_action( 'woocommerce_updated_product_stock', [ $this, 'sync_wc_product_stock_update' ] );
+	}
+
+	/**
+	 * Sync direct WooCommerce stock updates that are tied with Order status updates.
+	 *
+	 * @since 5.6.5
+	 *
+	 * @param int $product_id The Product ID.
+	 *
+	 * @return void
+	 */
+	public function sync_wc_product_stock_update( $product_id ) {
+		$event = $this->get_event_for_ticket( $product_id );
+		if ( ! $event ) {
+			return;
+		}
+
+		$product   = wc_get_product( $product_id );
+		$new_stock = $product->get_stock_quantity();
+		$ticket    = $this->get_ticket( $event->ID, $product->get_id() );
+
+		// If the new stock went over the capacity then we should set it to max capacity.
+		if ( $new_stock > $ticket->capacity ) {
+			$product->set_stock_quantity( $ticket->capacity );
+			$product->save();
+		}
+	}
+
+	/**
+	 * Sync Woo Product stock data to Ticket stock data.
+	 *
+	 * @since 5.6.5
+	 *
+	 * @param WC_Product    $product The object being saved.
+	 * @param WC_Data_Store $data_store      THe data store persisting the data.
+	 *
+	 * @return void
+	 */
+	public function sync_wc_product_stock_with_ticket( $product, $data_store ) {
+		$event = $this->get_event_for_ticket( $product->get_id() );
+
+		if ( ! $event ) {
+			return;
+		}
+
+		$changes = $product->get_changes();
+
+		if ( empty( $changes ) || ! isset( $changes['stock_quantity'] ) ) {
+			return;
+		}
+
+		$new_stock = $changes['stock_quantity'];
+		$ticket = $this->get_ticket( $event->ID, $product->get_id() );
+
+		if ( $new_stock > $ticket->capacity ) {
+			$product->set_stock_quantity( $ticket->stock() );
+		}
 	}
 
 	/**
@@ -502,7 +561,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$stylesheet_url = $this->plugin_url . 'src/resources/css/wootickets.css';
 
 		// Get minified CSS if it exists
-		$stylesheet_url = Tribe__Template_Factory::getMinFile( $stylesheet_url, true );
+		$stylesheet_url = Tribe__Assets::maybe_get_min_file( $stylesheet_url, true );
 
 		// apply filters
 		$stylesheet_url = apply_filters( 'tribe_wootickets_stylesheet_url', $stylesheet_url );
@@ -1636,8 +1695,12 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		Tribe__Tickets__Attendance::instance( $post_id )->increment_deleted_attendees_count();
 
-		// Re-stock the product inventory (on the basis that a "seat" has just been freed)
-		$this->increment_product_inventory( $product_id );
+		$ticket = $this->get_ticket( $post_id, $product_id );
+
+		if ( $ticket->capacity() > $ticket->stock() ) {
+			// Re-stock the product inventory (on the basis that a "seat" has just been freed) only if the stock is lower than capacity.
+			$this->increment_product_inventory( $product_id );
+		}
 
 		// Run anything we might need on parent method.
 		parent::delete_ticket( $post_id, $ticket_id );
@@ -2587,8 +2650,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Marks an attendee as checked in for an event
 	 *
-	 * @param $attendee_id
-	 * @param $qr true if from QR checkin process
+	 * @param int  $attendee_id The ID of the attendee that's being checked in.
+	 * @param bool $qr          True if from QR checkin process.
 	 *
 	 * @return bool
 	 */
@@ -2598,6 +2661,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		if ( func_num_args() > 1 && $qr = func_get_arg( 1 ) ) {
 			update_post_meta( $attendee_id, '_tribe_qr_status', 1 );
 		}
+
+		parent::save_checkin_details( $attendee_id, $qr );
 
 		/**
 		 * Fires a checkin action
@@ -2688,6 +2753,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Currently, that includes the sku, ecommerce links, and ticket history
 	 *
 	 * @since 4.6
+	 * @since 5.6.9 Removed `tribe_is_frontend` so the SKU displays when using Community Tickets.
 	 *
 	 * @param int $post_id id of the event post
 	 * @param int $ticket_id (null) id of the ticket
@@ -2697,10 +2763,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		echo '<div id="' . sanitize_html_class( $provider ) . '_advanced" class="tribe-dependent" data-depends="#' . sanitize_html_class( $provider ) . '_radio" data-condition-is-checked>';
 
-		if ( ! tribe_is_frontend() ) {
-			$this->do_metabox_sku_options( $post_id, $ticket_id );
-			$this->do_metabox_ecommerce_links( $post_id, $ticket_id );
-		}
+		$this->do_metabox_sku_options( $post_id, $ticket_id );
+		$this->do_metabox_ecommerce_links( $post_id, $ticket_id );
 
 		/**
 		 * Allows for the insertion of additional content into the ticket edit form - advanced section
@@ -3825,6 +3889,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		$attendee = $this->get_attendee( $attendee_id );
+
+		if ( empty( $attendee ) ) {
+			return;
+		}
 
 		$order = wc_get_order( $attendee['order_id'] );
 

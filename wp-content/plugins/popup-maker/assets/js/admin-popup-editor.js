@@ -9,6 +9,7 @@
 	window.pum_popup_settings_editor = window.pum_popup_settings_editor || {
 		form_args: {},
 		current_values: {},
+		preview_nonce: null,
 	};
 
 	$( document )
@@ -67,7 +68,7 @@
 				.attr(
 					'href',
 					pum_admin_vars.homeurl +
-						'?popup_preview=true&popup=' +
+						'?popup_preview=' + pum_popup_settings_editor.preview_nonce + '&popup=' +
 						$( '#post_ID' ).val()
 				)
 				.text( pum_admin_vars.I10n.preview_popup )
@@ -88,7 +89,7 @@
 						if ( notThese.indexOf( e.target.value ) === -1 ) {
 							var audio = new Audio(
 								pum_admin_vars.pm_dir_url +
-									'/assets/sounds/' +
+									'assets/sounds/' +
 									e.target.value
 							);
 							audio.addEventListener(

@@ -56,9 +56,9 @@ function bps_filter_members ($querystring, $object)
 	$results = bps_search ($request);
 	if ($results['validated'])
 	{
-		$args = wp_parse_args ($querystring);
 		$users = $results['users'];
 
+		parse_str ($querystring, $args);
 		if (isset ($args['include']) && $args['include'] !== '')
 		{
 			$included = explode (',', $args['include']);
@@ -69,7 +69,7 @@ function bps_filter_members ($querystring, $object)
 		if (count ($users) == 0)  $users = array (0);
 
 		$args['include'] = implode (',', $users);
-		$querystring = build_query ($args);
+		$querystring = http_build_query ($args);
 	}
 
 	return $querystring;
