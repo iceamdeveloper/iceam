@@ -3,8 +3,9 @@
  * Plugin Name:  Mailgun
  * Plugin URI:   http://wordpress.org/extend/plugins/mailgun/
  * Description:  Mailgun integration for WordPress
- * Version:      1.9.3
- * Tested up to: 6.1
+ * Version:      1.9.9
+ * Requires PHP: 7.4
+ * Requires at least: 4.4
  * Author:       Mailgun
  * Author URI:   http://www.mailgun.com/
  * License:      GPLv2 or later
@@ -82,7 +83,7 @@ class Mailgun
         // work properly. Fixed issues with 1.5.7+
         if ($this->get_option('useAPI') || (defined('MAILGUN_USEAPI') && MAILGUN_USEAPI)) {
             if (!function_exists('wp_mail')) {
-                if (!include __DIR__ . '/includes/wp-mail-api.php') {
+                if (!include_once(__DIR__ . '/includes/wp-mail-api.php')) {
                     $this->deactivate_and_die(__DIR__ . '/includes/wp-mail-api.php');
                 }
             }
@@ -303,8 +304,10 @@ class Mailgun
     {
         $name = sanitize_text_field($_POST['name'] ?? null);
         $email = sanitize_text_field($_POST['email'] ?? null);
-
-        $list_addresses = sanitize_text_field($_POST['addresses']);
+        $list_addresses = [];
+        foreach ($_POST['addresses'] as $address => $val) {
+            $list_addresses[sanitize_text_field($address)] = sanitize_text_field($val);
+        }
 
         if (!empty($list_addresses)) {
             $result = [];

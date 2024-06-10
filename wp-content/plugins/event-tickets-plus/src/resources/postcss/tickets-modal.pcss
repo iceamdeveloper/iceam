@@ -127,20 +127,11 @@
 				}
 			}
 
-			.tribe-tickets__tickets-item-content-title {
-				@mixin heading-8;
-
+			.tribe-tickets__tickets-item-content-title-container {
 				-ms-grid-column: 1;
 				grid-column: 1;
 				-ms-grid-row: 1;
 				grid-row: 1;
-
-				@media (--viewport-medium) {
-					@mixin desktop-heading-6;
-
-					-ms-grid-column: 2;
-					grid-column: 2;
-				}
 
 				&.tribe-tickets--no-description {
 					align-self: center;
@@ -148,6 +139,23 @@
 					grid-row: 1 / span 2;
 					-ms-grid-row-span: 2;
 					padding-top: 0;
+				}
+
+				.tribe-tickets__tickets-item-content-sale-label {
+					display: none;
+				}
+
+				.tribe-tickets__tickets-item-content-title {
+					@mixin heading-8;
+
+					@media (--viewport-medium) {
+						@mixin desktop-heading-6;
+					}
+				}
+
+				@media (--viewport-medium) {
+					-ms-grid-column: 2;
+					grid-column: 2;
 				}
 			}
 
@@ -175,6 +183,16 @@
 				&.tribe-tickets__tickets-item-extra--price-suffix {
 					@media (--viewport-medium) {
 						display: inline-block;
+					}
+				}
+
+				.tribe-tickets__tickets-item-extra-price {
+					flex-direction: row;
+					gap: var(--tec-spacer-1);
+
+					.tribe-tickets__tickets-original-price,
+					.tribe-tickets__tickets-sale-price {
+						line-height: 1;
 					}
 				}
 			}
@@ -311,6 +329,7 @@
 
 		.tribe-tickets__attendee-tickets-item-remove {
 			align-items: center;
+			background-image: none;
 			color: var(--tec-color-icon-secondary);
 			display: flex;
 			flex: none;

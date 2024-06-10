@@ -388,18 +388,25 @@
 					background-size: contain;
 				}
 
-.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title {
-				font-size: var(--tec-font-size-1);
-				line-height: var(--tec-line-height-0);
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container {
 				grid-column: 1;
 				grid-row: 1;
 			}
 
-.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title.tribe-tickets--no-description, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title.tribe-tickets--no-description {
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container.tribe-tickets--no-description, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container.tribe-tickets--no-description {
 					align-self: center;
 					grid-row: 1 / span 2;
 					-ms-grid-row-span: 2;
 					padding-top: 0;
+				}
+
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container .tribe-tickets__tickets-item-content-sale-label, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container .tribe-tickets__tickets-item-content-sale-label {
+					display: none;
+				}
+
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container .tribe-tickets__tickets-item-content-title, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container .tribe-tickets__tickets-item-content-title {
+					font-size: var(--tec-font-size-1);
+					line-height: var(--tec-line-height-0);
 				}
 
 .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra {
@@ -415,6 +422,19 @@
 				grid-template-rows: auto;
 				text-align: center;
 			}
+
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra .tribe-tickets__tickets-item-extra-price, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra .tribe-tickets__tickets-item-extra-price {
+					flex-direction: row;
+					grid-gap: var(--tec-spacer-1);
+					gap: var(--tec-spacer-1);
+				}
+
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra .tribe-tickets__tickets-item-extra-price .tribe-tickets__tickets-original-price,
+					.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra .tribe-tickets__tickets-item-extra-price .tribe-tickets__tickets-sale-price,
+					.entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra .tribe-tickets__tickets-item-extra-price .tribe-tickets__tickets-original-price,
+					.entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra .tribe-tickets__tickets-item-extra-price .tribe-tickets__tickets-sale-price {
+						line-height: 1;
+					}
 
 .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra-available, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-extra-available {
 				display: none !important;
@@ -515,6 +535,7 @@
 
 .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__attendee-tickets-item-remove, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-tickets__attendee-tickets-item-remove {
 			align-items: center;
+			background-image: none;
 			color: var(--tec-color-icon-secondary);
 			display: flex;
 			flex: none;
@@ -592,9 +613,12 @@
 					justify-content: center
 			}
 
-.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title {
-					font-size: var(--tec-font-size-3);
-					line-height: var(--tec-line-height-3);
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container .tribe-tickets__tickets-item-content-title, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container .tribe-tickets__tickets-item-content-title {
+						font-size: var(--tec-font-size-3);
+						line-height: var(--tec-line-height-3)
+				}
+
+.event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container, .entry .entry-content .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--ar .tribe-modal__content .tribe-tickets__tickets-item-content-title-container {
 					grid-column: 2
 			}
 

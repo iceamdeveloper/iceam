@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -62,6 +62,7 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 			'1.19.0',
 			'1.20.0',
 			'1.21.0',
+			'1.26.1',
 		];
 	}
 
@@ -689,6 +690,18 @@ class WC_Memberships_Upgrade extends Framework\Plugin\Lifecycle {
 		delete_option( 'wc_memberships_directory_shortcode_version' );
 		delete_option( 'wc_memberships_sensei_member_area_version' );
 		delete_option( 'wc_memberships_excerpt_length_version' );
+	}
+
+
+	/**
+	 * Updates to version 1.21.0
+	 *
+	 * @since 1.26.1
+	 */
+	protected function upgrade_to_1_26_1() {
+
+		// since this version, the Member Directory availability can be toggled and is disabled by default: enable it for old installs
+		update_option( 'wc_memberships_enable_member_directory', 'yes' );
 	}
 
 

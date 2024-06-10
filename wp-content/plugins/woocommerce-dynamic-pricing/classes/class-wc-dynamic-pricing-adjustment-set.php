@@ -12,7 +12,7 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 		$this->set_id   = $set_id;
 		$this->set_data = $set_data;
 
-		if ( isset( $set_data['mode'] ) && $set_data['mode'] == 'block' ) {
+		if ( isset( $set_data['mode'] ) && $set_data['mode'] === 'block' ) {
 			$this->mode = 'block';
 
 			if ( ! empty( $set_data['blockrules'] ) ) {
@@ -23,36 +23,30 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 
 			$this->pricing_rules = $set_data['rules'];
 		}
-
-
 	}
 
-	public function is_targeted_product( $product_id, $variation_id = false ) {
-		return false;
-	}
-
-	public function is_valid_for_user() {
+	public function is_valid_for_user(): bool {
 		$result             = 0;
 		$pricing_conditions = $this->set_data['conditions'];
 
-		if ( is_array( $pricing_conditions ) && sizeof( $pricing_conditions ) > 0 ) {
+		if ( is_array( $pricing_conditions ) && count( $pricing_conditions ) > 0 ) {
 			$conditions_met = 0;
 
 			foreach ( $pricing_conditions as $condition ) {
 				switch ( $condition['type'] ) {
 					case 'apply_to':
 						if ( is_array( $condition['args'] ) && isset( $condition['args']['applies_to'] ) ) {
-							if ( $condition['args']['applies_to'] == 'everyone' ) {
+							if ( $condition['args']['applies_to'] === 'everyone' ) {
 								$result = 1;
-							} elseif ( $condition['args']['applies_to'] == 'unauthenticated' ) {
+							} elseif ( $condition['args']['applies_to'] === 'unauthenticated' ) {
 								if ( ! is_user_logged_in() ) {
 									$result = 1;
 								}
-							} elseif ( $condition['args']['applies_to'] == 'authenticated' ) {
+							} elseif ( $condition['args']['applies_to'] === 'authenticated' ) {
 								if ( is_user_logged_in() ) {
 									$result = 1;
 								}
-							} elseif ( $condition['args']['applies_to'] == 'roles' && isset( $condition['args']['roles'] ) && is_array( $condition['args']['roles'] ) ) {
+							} elseif ( $condition['args']['applies_to'] === 'roles' && isset( $condition['args']['roles'] ) && is_array( $condition['args']['roles'] ) ) {
 								if ( is_user_logged_in() ) {
 									foreach ( $condition['args']['roles'] as $role ) {
 										if ( current_user_can( $role ) ) {
@@ -75,9 +69,9 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 			}
 
 			$execute_rules = false;
-			if ( $this->set_data['conditions_type'] == 'all' ) {
-				$execute_rules = $conditions_met == count( $pricing_conditions );
-			} elseif ( $this->set_data['conditions_type'] == 'any' ) {
+			if ( $this->set_data['conditions_type'] === 'all' ) {
+				$execute_rules = $conditions_met === count( $pricing_conditions );
+			} elseif ( $this->set_data['conditions_type'] === 'any' ) {
 				$execute_rules = $conditions_met > 0;
 			}
 		} else {
@@ -103,5 +97,4 @@ class WC_Dynamic_Pricing_Adjustment_Set {
 	public function get_collector_object() {
 		return new WC_Dynamic_Pricing_Collector( $this->set_data['collector'] );
 	}
-
 }

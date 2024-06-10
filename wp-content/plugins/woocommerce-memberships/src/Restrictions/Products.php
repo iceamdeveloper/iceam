@@ -17,13 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Restrictions;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -55,6 +55,9 @@ class Products {
 
 	/** @var array memoized related product IDs by member ID, parent product and query args */
 	private $related_products = array();
+
+	/** @var bool whether the checkout member login notice was output */
+	private static bool $checkout_member_login_notice_displayed = false;
 
 
 	/**
@@ -89,10 +92,10 @@ class Products {
 		// display single product purchasing discount message
 		add_action( 'woocommerce_single_product_summary',   array( $this, 'display_product_purchasing_restricted_message' ), 31 );
 
-		// display optional member login message on "Cart" page
-		add_action( 'wp',                               array( $this, 'display_cart_member_login_notice' ) );
-		// display optional member login message on "Checkout" or "Thank you" pages
-		add_action( 'woocommerce_before_template_part', array( $this, 'display_checkout_member_login_notice' ) );
+		// display optional member login message on the "Cart" page
+		add_action( 'wp', [ $this, 'display_cart_member_login_notice' ] );
+		// display optional member login message on the "Checkout" page
+		add_action( 'wp', [ $this, 'display_checkout_member_login_notice' ] );
 
 		// since WC 3.0 WP_Query is no longer used to get related products for an item, so we need to handle those specifically
 		add_filter( 'woocommerce_related_products',              array( $this, 'restrict_related_products' ), 1, 3 );
@@ -745,13 +748,27 @@ class Products {
 	 */
 	public function display_cart_member_login_notice() {
 
-		if (    ! is_user_logged_in()
-		     &&   is_cart()
-		     &&   in_array( get_option( 'wc_memberships_display_member_login_notice' ), array( 'cart', 'both' ), true )
-		     &&   ( $this->cart_has_items_with_member_discounts() && ! wp_doing_ajax() ) ) {
-
-			wc_add_notice( $this->get_member_login_message(), 'notice' );
+		if ( ! $this->should_display_cart_member_login_notice() ) {
+			return;
 		}
+
+		wc_add_notice( $this->get_member_login_message(), 'notice' );
+	}
+
+
+	/**
+	 * Determines whether the cart member login notice should be displayed.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @return bool
+	 */
+	private function should_display_cart_member_login_notice() : bool {
+
+		return ! is_user_logged_in()
+			&& is_cart()
+			&& in_array( get_option( 'wc_memberships_display_member_login_notice' ), [ 'cart', 'both' ], true )
+			&& ( $this->cart_has_items_with_member_discounts() && ! wp_doing_ajax() );
 	}
 
 
@@ -761,18 +778,34 @@ class Products {
 	 * @internal
 	 *
 	 * @since 1.9.0
-	 *
-	 * @param string $template_name template being loaded by WooCommerce
 	 */
-	public function display_checkout_member_login_notice( $template_name ) {
+	public function display_checkout_member_login_notice() {
 
-		if (      'checkout/form-login.php' === $template_name
-		     && ! is_user_logged_in()
-		     &&   $this->cart_has_items_with_member_discounts()
-		     &&   in_array( get_option( 'wc_memberships_display_member_login_notice' ), array( 'checkout', 'both' ), true ) ) {
-
-			wc_print_notice( $this->get_member_login_message(), 'notice' );
+		if ( ! $this->should_display_checkout_member_login_notice() ) {
+			return;
 		}
+
+		wc_add_notice( $this->get_member_login_message(), 'notice' );
+
+		self::$checkout_member_login_notice_displayed = true;
+	}
+
+
+	/**
+	 * Determines whether the checkout member login notice should be displayed.
+	 *
+	 * @since 1.26.0
+	 *
+	 * @return bool
+	 */
+	private function should_display_checkout_member_login_notice() : bool {
+
+		return ! self::$checkout_member_login_notice_displayed
+			&& ! is_user_logged_in()
+			&& ! is_order_received_page()
+			&& is_checkout()
+			&& in_array( get_option( 'wc_memberships_display_member_login_notice' ), [ 'checkout', 'both' ], true )
+			&& $this->cart_has_items_with_member_discounts();
 	}
 
 
@@ -801,16 +834,55 @@ class Products {
 				$code = 'cart_sole_item_discount';
 			}
 
-			// use a dummy product so we get the right message code used
-			$message = \WC_Memberships_User_Messages::get_message_html( $code, array( 'context' => 'notice', 'products' => array( 1 ) ) );
+			$message = \WC_Memberships_User_Messages::get_message_html( $code, [ 'context' => 'notice', 'products' => $this->get_products_that_grant_member_discounts() ] );
 
 		} else {
 
-			// use a dummy product so we get the right message code used
-			$message = \WC_Memberships_User_Messages::get_message_html( 'member_login', array( 'context' => 'notice', 'products' => array( 1 ) ) );
+			$message = \WC_Memberships_User_Messages::get_message_html( 'member_login', [ 'context' => 'notice', 'products' => $this->get_products_that_grant_member_discounts() ] );
 		}
 
 		return $message;
+	}
+
+
+	/**
+	 * Returns the product IDs that grant member discounts.
+	 *
+	 * @since 1.26.3
+	 *
+	 * @return int[] array of product IDs
+	 */
+	private function get_products_that_grant_member_discounts() : array {
+
+		// the dummy product here will be used to replace {products} with a meaningful string if no purchasable products exist
+		$products_that_grant_discounts = [ 1 ];
+		$products_in_cart = [];
+
+		foreach ( WC()->cart->get_cart() as $item ) {
+
+			if ( ! empty( $item['variation_id'] ) ) {
+				$products_in_cart[] = $item['variation_id'];
+			}
+
+			if ( ! empty( $item['product_id'] ) ) {
+				$products_in_cart[] = $item['product_id'];
+			}
+		}
+
+		foreach ( array_unique( $products_in_cart ) as $product_id ) {
+			foreach ( wc_memberships()->get_rules_instance()->get_product_purchasing_discount_rules( $product_id ) as $discount_rule ) {
+
+				if ( ! $discount_rule->is_active() ) {
+					continue;
+				}
+
+				$plan = $discount_rule->get_membership_plan();
+
+				$products_that_grant_discounts = $plan && $plan->is_public() ? array_merge( $products_that_grant_discounts, $plan->get_product_ids() ) : $products_that_grant_discounts;
+			}
+		}
+
+		return array_unique( $products_that_grant_discounts );
 	}
 
 

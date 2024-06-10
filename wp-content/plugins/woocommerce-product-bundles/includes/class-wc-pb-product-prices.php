@@ -2,7 +2,7 @@
 /**
  * WC_PB_Product_Prices class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.0.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Price functions and hooks.
  *
  * @class    WC_PB_Product_Prices
- * @version  6.17.4
+ * @version  7.0.0
  */
 class WC_PB_Product_Prices {
 
@@ -89,7 +89,7 @@ class WC_PB_Product_Prices {
 		}
 
 		if ( 'cart' === $context || ( ! $is_bundled_pricing_context && 'any' === $context) ){
-			$is_bundled_pricing_context =  isset( $product->bundled_cart_item );
+			$is_bundled_pricing_context = ! is_null(WC_PB()->product_data->get( $product, 'bundled_cart_item' ) );
 		}
 
 		return $is_bundled_pricing_context;
@@ -115,8 +115,8 @@ class WC_PB_Product_Prices {
 		}
 
 		if ( 'cart' === $context || ( ! $bundled_item && 'any' === $context ) ) {
-			if ( isset( $product->bundled_cart_item ) ) {
-				$bundled_item = $product->bundled_cart_item;
+			if ( ! is_null(WC_PB()->product_data->get( $product, 'bundled_cart_item' ) ) ) {
+				$bundled_item = WC_PB()->product_data->get( $product, 'bundled_cart_item' );
 			}
 		}
 
@@ -555,8 +555,8 @@ class WC_PB_Product_Prices {
 
 			if ( $discount = $bundled_item->get_discount( $context ) ) {
 
-				$offset_price     = ! empty( $product->bundled_price_offset ) ? $product->bundled_price_offset : false;
-				$offset_price_pct = ! empty( $product->bundled_price_offset_pct ) && is_array( $product->bundled_price_offset_pct ) ? $product->bundled_price_offset_pct : false;
+				$offset_price     = ! is_null( WC_PB()->product_data->get( $product, 'bundled_price_offset' ) ) ? WC_PB()->product_data->get( $product, 'bundled_price_offset' ) : false;
+				$offset_price_pct = ! is_null( WC_PB()->product_data->get( $product, 'bundled_price_offset_pct' ) ) && is_array( WC_PB()->product_data->get( $product, 'bundled_price_offset_pct' ) ) ? WC_PB()->product_data->get( $product, 'bundled_price_offset_pct' ) : false;
 
 				if ( false === $bundled_item->is_discount_allowed_on_sale_price() ) {
 					do_action( 'woocommerce_bundled_item_get_unfiltered_regular_price_start' );
@@ -586,7 +586,7 @@ class WC_PB_Product_Prices {
 				}
 			}
 
-			$product->bundled_item_price = $price;
+			WC_PB()->product_data->set( $product, 'bundled_item_price', $price );
 
 			/** Documented in 'WC_Bundled_Item::get_raw_price()'. */
 			$price = apply_filters( 'woocommerce_bundled_item_price', $price, $product, $discount, $bundled_item );
@@ -637,8 +637,8 @@ class WC_PB_Product_Prices {
 
 			if ( $discount = $bundled_item->get_discount( $context ) ) {
 
-				$offset_price     = ! empty( $product->bundled_price_offset ) ? $product->bundled_price_offset : false;
-				$offset_price_pct = ! empty( $product->bundled_price_offset_pct ) && is_array( $product->bundled_price_offset_pct ) ? $product->bundled_price_offset_pct : false;
+				$offset_price     = ! is_null( WC_PB()->product_data->get( $product, 'bundled_price_offset' ) ) ? WC_PB()->product_data->get( $product, 'bundled_price_offset' ) : false;
+				$offset_price_pct = ! is_null( WC_PB()->product_data->get( $product, 'bundled_price_offset_pct' ) ) && is_array( WC_PB()->product_data->get( $product, 'bundled_price_offset_pct' ) ) ? WC_PB()->product_data->get( $product, 'bundled_price_offset_pct' ) : false;
 
 				if ( '' === $sale_price || false === $bundled_item->is_discount_allowed_on_sale_price() ) {
 					$regular_price = $product->get_regular_price();

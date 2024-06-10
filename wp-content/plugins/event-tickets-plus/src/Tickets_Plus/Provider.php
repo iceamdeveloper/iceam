@@ -8,7 +8,7 @@ namespace TEC\Tickets_Plus;
  *
  * @package \TEC\Tickets_Plus
  */
-class Provider extends \tad_DI52_ServiceProvider {
+class Provider extends \TEC\Common\Contracts\Service_Provider {
 	/**
 	 * Register the provider singletons.
 	 *
@@ -34,6 +34,12 @@ class Provider extends \tad_DI52_ServiceProvider {
 
 		// Loads Tickets Emails.
 		$this->container->register( Emails\Provider::class );
+
+		// Register the Flexible Tickets feature if the ET feature is enabled.
+		$this->container->register_on_action( 'tec_flexible_tickets_registered', Flexible_Tickets\Provider::class );
+
+		// Loads Integrations.
+		$this->container->register( Integrations\Controller::class );
 	}
 
 	/**

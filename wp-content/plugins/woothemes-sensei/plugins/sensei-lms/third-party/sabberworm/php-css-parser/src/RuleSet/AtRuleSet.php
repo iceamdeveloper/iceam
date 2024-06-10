@@ -5,9 +5,12 @@ namespace Sensei\ThirdParty\Sabberworm\CSS\RuleSet;
 use Sensei\ThirdParty\Sabberworm\CSS\OutputFormat;
 use Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule;
 /**
- * A RuleSet constructed by an unknown at-rule. `@font-face` rules are rendered into AtRuleSet objects.
+ * This class represents rule sets for generic at-rules which are not covered by specific classes, i.e., not
+ * `@import`, `@charset` or `@media`.
+ *
+ * A common example for this is `@font-face`.
  */
-class AtRuleSet extends \Sensei\ThirdParty\Sabberworm\CSS\RuleSet\RuleSet implements \Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule
+class AtRuleSet extends RuleSet implements AtRule
 {
     /**
      * @var string
@@ -47,19 +50,20 @@ class AtRuleSet extends \Sensei\ThirdParty\Sabberworm\CSS\RuleSet\RuleSet implem
      */
     public function __toString()
     {
-        return $this->render(new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat());
+        return $this->render(new OutputFormat());
     }
     /**
      * @return string
      */
-    public function render(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oOutputFormat)
+    public function render(OutputFormat $oOutputFormat)
     {
+        $sResult = $oOutputFormat->comments($this);
         $sArgs = $this->sArgs;
         if ($sArgs) {
             $sArgs = ' ' . $sArgs;
         }
-        $sResult = "@{$this->sType}{$sArgs}{$oOutputFormat->spaceBeforeOpeningBrace()}{";
-        $sResult .= parent::render($oOutputFormat);
+        $sResult .= "@{$this->sType}{$sArgs}{$oOutputFormat->spaceBeforeOpeningBrace()}{";
+        $sResult .= $this->renderRules($oOutputFormat);
         $sResult .= '}';
         return $sResult;
     }

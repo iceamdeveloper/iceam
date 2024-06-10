@@ -2,7 +2,7 @@
 /**
  * Product Bundles deprecated global functions
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    1.0.0
  */
 

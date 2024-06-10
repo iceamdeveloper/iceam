@@ -1,5 +1,19 @@
 Changelog
 =========
+= 1.9.7 (2024-01-03): =
+- Ensure defaults are always set to remove warnings in PHP 8.1+
+
+1.9.6 (2023-09-10)
+- Added typehints to methods 
+- Added code for making plugin WP VIP GO compatible for the `From mail`
+- Added Toastr for sending nice message instead of using alerts
+
+1.9.5 (2023-06-20)
+- Fix bug with sending emails
+
+1.9.4 (2023-06-10)
+- Fixed bug `Fatal error on lists page when another plugin redeclare wp_mail()`
+
 1.9.3 (2023-04-08)
 - Fixed `Reply-to` header. It's not overridden anymore
 

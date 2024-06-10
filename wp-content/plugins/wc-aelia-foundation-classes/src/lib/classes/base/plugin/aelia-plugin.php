@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use \ReflectionClass;
 use \Exception;
@@ -19,7 +19,7 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 	}
 
 	// Load general functions file
-	require_once('general_functions.php');
+	require_once 'general_functions.php';
 
 	/**
 	 * Implements a base plugin class to be used to implement WooCommerce plugins.
@@ -138,17 +138,8 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 				$plugin_slug = static::$plugin_slug;
 			}
 
-			// Debug
-			//var_dump($this->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');die();
-
-			//var_dump(
-			//		$this->get_update_url($plugin_slug),
-			//		$plugin_file,
-			//		$plugin_slug
-			//);die();
-
-			require_once(WC_AeliaFoundationClasses::instance()->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');
-			$update_checker = \Puc_v4_Factory::buildUpdateChecker(
+			require_once WC_AeliaFoundationClasses::instance()->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php';
+			$update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker( // NOSONAR
 					$this->get_update_url($plugin_slug),
 					$plugin_file,
 					$plugin_slug
@@ -768,12 +759,26 @@ if(!class_exists('Aelia\WC\Aelia_Plugin')) {
 		 * @since 1.5.19.150625
 		 */
 		public static function editing_order() {
-			if(!empty($_GET['action']) && ($_GET['action'] == 'edit') && !empty($_GET['post'])) {
-				global $post;
-				if(!empty($post) && ($post->post_type == 'shop_order')) {
-					return $post->ID;
+			// Determine if we are on an Edit page
+			$is_edit_action = ($_GET['action'] ?? null) === 'edit';
+
+			if($is_edit_action) {
+				// Detect the legacy Edit Order page
+				if(!empty($_GET['post'])) {
+					global $post;
+					if(!empty($post) && ($post->post_type == 'shop_order')) {
+						return $post->ID;
+					}
+				}
+
+				// Detect the HPOS Edit Order page
+				// @since 2.4.6.230518
+				$is_hpos_orders_page = ($_GET['page'] ?? null) === 'wc-orders';
+				if($is_hpos_orders_page && !empty($_GET['id'])) {
+					return $_GET['id'];
 				}
 			}
+
 			return false;
 		}
 

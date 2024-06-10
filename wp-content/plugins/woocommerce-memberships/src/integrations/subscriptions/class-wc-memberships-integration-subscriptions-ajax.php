@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -105,7 +105,7 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 				if ( $subscription instanceof \WC_Subscription && $subscription_id === (int) $subscription->get_id() ) {
 
 					wp_send_json_success( [
-						'delete-subscription'    => wp_delete_post( $subscription_id ),
+						'delete-subscription'    => Framework\SV_WC_Plugin_Compatibility::is_hpos_enabled() ? $subscription->delete() : wp_delete_post( $subscription_id ),
 						'delete-user-membership' => wp_delete_post( $user_membership_id ),
 					] );
 				}
@@ -136,49 +136,69 @@ class WC_Memberships_Integration_Subscriptions_Ajax {
 			die;
 		}
 
-		if ( is_numeric( $keyword ) ) {
+		$integration = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
 
-			// query for subscription id
-			$query_args = array(
-				'p' => (int) $keyword,
-			);
+		// query for subscription id
+		if ( is_numeric( $keyword ) || '' === trim( $keyword ) ) {
 
+			$id            = (int) $keyword;
+			$subscription  = $id > 0 ? wcs_get_subscription( $id ) : null;
+			$subscriptions = $subscription ? [ $subscription->get_id() => $subscription ] : [];
+
+		// query for subscription holder name
 		} else {
 
-			// query for subscription holder name
-			$query_args = array(
-				'meta_query' => array(
-					array(
-						'key'     => '_billing_first_name',
-						'value'   => $keyword,
-						'compare' => 'LIKE',
-					),
-					array(
-						'key'     => '_billing_last_name',
-						'value'   => $keyword,
-						'compare' => 'LIKE',
-					),
-					'relation' => 'OR',
-				),
-			);
+			if ( Framework\SV_WC_Plugin_Compatibility::is_hpos_enabled() ) {
+
+				$query_args = [
+					'field_query' => [
+						'relation' => 'OR',
+						[
+							'key'     => '_billing_first_name',
+							'value'   => $keyword,
+							'compare' => 'LIKE',
+						],
+						[
+							'key'     => '_billing_last_name',
+							'value'   => $keyword,
+							'compare' => 'LIKE',
+						],
+					],
+				];
+
+			} else {
+
+				$query_args = [
+					'meta_query_relation' => 'OR',
+					'meta_query'          => [
+						[
+							'key'     => '_billing_first_name',
+							'value'   => $keyword,
+							'compare' => 'LIKE',
+						],
+						[
+							'key'     => '_billing_last_name',
+							'value'   => $keyword,
+							'compare' => 'LIKE',
+						],
+					],
+				];
+			}
+
+			$subscriptions = $integration->get_subscriptions( $query_args );
 		}
 
-		$integration   = wc_memberships()->get_integrations_instance()->get_subscriptions_instance();
-		$results       = $integration->get_subscriptions_ids( $query_args );
-		$subscriptions = array();
+		$results = [];
 
-		if ( ! empty( $results ) ) {
+		if ( ! empty( $subscriptions ) ) {
 
-			foreach ( $results as $subscription_id ) {
+			foreach ( $subscriptions as $subscription ) {
 
-				if ( $subscription = wcs_get_subscription( $subscription_id ) ) {
-
-					$subscriptions[ $subscription_id ] = $integration->get_formatted_subscription_id_holder_name( $subscription );
-				}
+				$results[ $subscription->get_id() ] = $integration->get_formatted_subscription_id_holder_name( $subscription );
 			}
 		}
 
-		wp_send_json( $subscriptions );
+		wp_send_json( $results );
 	}
 
 

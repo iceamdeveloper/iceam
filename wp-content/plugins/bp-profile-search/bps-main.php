@@ -3,13 +3,13 @@
 Plugin Name: BP Profile Search
 Plugin URI: https://dontdream.it/bp-profile-search/
 Description: Member search and member directories for BuddyPress and the BuddyBoss Platform.
-Version: 5.4.8
+Version: 5.7.4
 Author: Andrea Tarantini
 Author URI: https://dontdream.it/
 Text Domain: bp-profile-search
 */
 
-define ('BPS_VERSION', '5.4.8');
+define ('BPS_VERSION', '5.7.4');
 define ('BPS_PLUGIN_BASENAME', plugin_basename (__FILE__));
 
 add_action ('admin_notices', 'bps_no_buddypress');
@@ -43,4 +43,11 @@ function bps_platform ()
 	$platform = is_plugin_active ('buddyboss-platform/bp-loader.php')? 'buddyboss': 'buddypress';
 
 	return $platform;
+}
+
+function bps_parser ()
+{
+	if (function_exists ('bp_core_get_query_parser'))
+		return bp_core_get_query_parser ();
+	return 'undefined';
 }

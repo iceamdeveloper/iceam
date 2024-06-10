@@ -1,4 +1,76 @@
-*** WooCommerce Product Bundles ***
+*** Woo Product Bundles ***
+
+2024.03.26 - version 7.0.2
+* Fix - Disabled 'Filter Variations' option if all allowed variations have been deleted.
+
+2024.03.06 - version 7.0.1
+* Tweak - Improved product data controller to prevent potential fatal errors from integrations.
+
+2024.03.05 - version 7.0.0
+* New - Important: Added compatibility with PHP 8.3.
+* New - Important: Product Bundles now requires Composite Products 9.0+ for the integration between the two plugins to work.
+* New - Important: Product Bundles now requires Product Add-Ons 6.7.0+ for the integration between the two plugins to work.
+* Fix - Fixed an issue that prevented the 'Sale' badge from showing up in Bundles with only optional items, whose Min Bundle Size was greater than 1.
+* Fix - Fixed an issue where the 'woocommerce_variation_option_name' hook was called with the incorrect number of arguments.
+
+2024.02.14 - version 6.22.7
+* Fix - Ensure proper placement of the bundled item product link within the bundle form.
+* Fix - Resolved soft deprecation error coming from using 'substr' in plugin's scripts. 
+
+2024.01.17 - version 6.22.6
+* Tweak - Deferred plugin scripts for WordPress 6.3+ installs.
+* Tweak - Added a warning to inform users about how to correctly translate the percentage (%) characters in strings to avoid fatal errors.
+* Fix - Fixed the integration between Product Bundles and Flatsome.
+* Fix - Fixed the integration between Product Bundles and Quickview.
+
+2023.11.29 - version 6.22.5
+* Fix - Resolved PHP notice triggered when using Product Bundles together with Payment Plugins for Stripe WooCommerce.
+* Fix - Fixed incorrect cart price for Name Your Price bundled variation.
+* Fix - Resolved an issue with adding Bundles with optional items to orders via the mobile app.
+
+2023.10.17 - version 6.22.4
+* Tweak - Re-designed Product Data > Shipping notice about Unassembled Bundles.
+* Tweak - Declared compatibility with the cart/checkout Blocks.
+* Fix - Resolved a compatibility issue with Zapier related to the existence of the order object in REST API context.
+* Fix - Important: Security improvements.
+
+2023.08.28 - version 6.22.3
+* Fix - Important: Updated the 'bundle-add-to-cart-wrap.php' template to resolve an issue that prevented Bundle notices from showing up when the mini-cart block was used.
+* Tweak - Use admin theme colors in admin.
+* Fix - Ensure that the 'Currently editing' notice shows up in the block-based Single Product Template when editing a Bundle.
+* Fix - Fixed an issue that prevented the Minimum/Maximum size validation from running on the block-based Single Product template. 
+
+2023.07.19 - version 6.22.2
+* Fix - Prevent a fatal error concerning the 'wc_print_notice' function when editing a single product block with a bundle product.
+
+2023.07.05 - version 6.22.1
+* Fix - Resolved an issue with Bundle totals in the block-based cart when the number of displayed decimals was 0. 
+
+2023.07.03 - version 6.22.0
+* Tweak - Important: The 'Form Location' option is no longer supported when using a block theme. Use the following snippet to force its use: 'add_filter( 'woocommerce_bundle_has_legacy_product_template', '__return_true' );'
+* Fix - Improvements in block support for the single product template.
+* Fix - Resolved a compatibility issue with Points and Rewards that made a 'Earn at least 0 points by purchasing this product' message show up when purchasing a Product Bundle with optional components.
+
+2023.06.22 - version 6.21.1
+* Fix - Removed duplicate tooltip under Product Data > Inventory.
+* Tweak - Changed the Product Data > Inventory > Sold Individually dropdown to radio buttons for Product Bundles. 
+* Tweak - Re-designed the Product Data > Bundled Products and Product Data > Shipping empty states. 
+* Tweak - Updated tooltip messages under Product Data > Inventory. 
+* Fix - Fixed error that was triggered when creating a new product, tracking was enabled and WooCommerce 7.8 was active.
+
+2023.06.19 - version 6.21.0
+* Fix - Important: Security improvements.
+* Fix - Fixed an issue that charged subscription bundled items add-ons twice.
+
+2023.06.13 - version 6.20.0
+* Tweak - Removed add-on flat fees from per unit product prices in the cart. Requires Product Add-Ons v6.4.0.
+* New - Introduced 'woocommerce_store_api_before_bundle_aggregated_totals_calculation' and 'woocommerce_store_api_after_bundle_aggregated_totals_calculation' actions.
+* Fix - Fixed an issue that required customers to select mandatory items for optional bundled items that hadn't been selected.
+
+2023.05.29 - version 6.19.0
+* New - Introduced block theme support on existing frontend templates.
+* New - Added support for blocks-based notices styling.
+* Fix - Improvements in global styles compatibility.
 
 2023.05.17 - version 6.18.6
  * Tweak - Introduced basic event tracking support via Tracks.

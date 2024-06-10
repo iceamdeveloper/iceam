@@ -6,8 +6,5 @@ abstract class WC_Dynamic_Pricing_Advanced_Base extends WC_Dynamic_Pricing_Modul
 		parent::__construct( $module_id, 'advanced' );
 	}
 
-	public function adjust_cart( $cart ) {
-		
-	}
-
+	abstract public function adjust_cart( $cart );
 }

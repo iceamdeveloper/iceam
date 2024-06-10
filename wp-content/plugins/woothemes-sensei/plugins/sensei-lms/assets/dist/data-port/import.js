@@ -5,7 +5,7 @@
 /* harmony export */r.d(t,{
 /* harmony export */Z:()=>o
 /* harmony export */});
-/* harmony import */var n=r(69307),s=r(70444);
+/* harmony import */var n=r(99196),s=r(70444);
 /* harmony import */
 /**
  * WordPress dependencies
@@ -13,15 +13,6 @@
 const o=(0,n.createElement)(s.SVG,{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24"},(0,n.createElement)(s.Path,{d:"M12 13.06l3.712 3.713 1.061-1.06L13.061 12l3.712-3.712-1.06-1.06L12 10.938 8.288 7.227l-1.061 1.06L10.939 12l-3.712 3.712 1.06 1.061L12 13.061z"}));
 /* harmony default export */}
 //# sourceMappingURL=close-small.js.map
-/***/,
-/***/60042:
-/***/(e,t)=>{var r;
-/*!
-  Copyright (c) 2018 Jed Watson.
-  Licensed under the MIT License (MIT), see
-  http://jedwatson.github.io/classnames
-*/
-/* global define */!function(){"use strict";var n={}.hasOwnProperty;function s(){for(var e=[],t=0;t<arguments.length;t++){var r=arguments[t];if(r){var o=typeof r;if("string"===o||"number"===o)e.push(r);else if(Array.isArray(r)){if(r.length){var a=s.apply(null,r);a&&e.push(a)}}else if("object"===o)if(r.toString===Object.prototype.toString)for(var i in r)n.call(r,i)&&r[i]&&e.push(i);else e.push(r.toString())}}return e.join(" ")}e.exports?(s.default=s,e.exports=s):void 0===(r=function(){return s}.apply(t,[]))||(e.exports=r)}()}
 /***/,
 /***/33743:
 /***/e=>{"use strict";
@@ -114,12 +105,12 @@ return e.split(/(\{\{\/?\s*\w+\s*\/?\}\})/g).map(t)}}
  *
  * This source code is licensed under the MIT license found in the
  * LICENSE file in the root directory of this source tree.
- */var n=r(99196),s="function"==typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,o=r(33743),a=r(87081),i=r(82264),l="function"==typeof Symbol&&Symbol.iterator;function c(e,t){
+ */var n=r(99196),s="function"==typeof Symbol&&Symbol.for&&Symbol.for("react.element")||60103,o=r(33743),a=r(87081),i=r(82264),l=".",c=":",u="function"==typeof Symbol&&Symbol.iterator,p="@@iterator";function m(e,t){
 // Do some typechecking here since we call this blindly. We want to ensure
 // that we don't block potential future ES APIs.
 return e&&"object"==typeof e&&null!=e.key?(r=e.key,n={"=":"=0",":":"=2"},"$"+(""+r).replace(/[=:]/g,(function(e){return n[e]}))):t.toString(36);
 // Implicit key determined by the index in the set
-var r,n}function u(e,t,r,n){var o,i=typeof e;if("undefined"!==i&&"boolean"!==i||(
+var r,n}function d(e,t,r,n){var o,i=typeof e;if("undefined"!==i&&"boolean"!==i||(
 // All of the above are perceived as null.
 e=null),null===e||"string"===i||"number"===i||
 // The following is inlined from ReactElement. This means we can optimize
@@ -127,12 +118,12 @@ e=null),null===e||"string"===i||"number"===i||
 "object"===i&&e.$$typeof===s)return r(n,e,
 // If it's the only child, treat the name as if it was wrapped in an array
 // so that it's consistent if the number of children grows.
-""===t?"."+c(e,0):t),1;var p=0,m=""===t?".":t+":";// Count of children found in the current subtree.
-if(Array.isArray(e))for(var d=0;d<e.length;d++)p+=u(o=e[d],m+c(o,d),r,n);else{var f=// Before Symbol spec.
-function(e){var t=e&&(l&&e[l]||e["@@iterator"]);if("function"==typeof t)return t}(e);if(f){0;for(var v,g=f.call(e),h=0;!(v=g.next()).done;)p+=u(o=v.value,m+c(o,h++),r,n)}else if("object"===i){0;var y=""+e;a(!1,"Objects are not valid as a React child (found: %s).%s","[object Object]"===y?"object with keys {"+Object.keys(e).join(", ")+"}":y,"")}}return p}var p=/\/+/g;function m(e){return(""+e).replace(p,"$&/")}var d,f,v=g,g=function(e){var t=this;if(t.instancePool.length){var r=t.instancePool.pop();return t.call(r,e),r}return new t(e)},h=function(e){var t=this;a(e instanceof t,"Trying to release an instance into a pool of a different type."),e.destructor(),t.instancePool.length<t.poolSize&&t.instancePool.push(e)};function y(e,t,r,n){this.result=e,this.keyPrefix=t,this.func=r,this.context=n,this.count=0}function E(e,t,r){var s,a,i=e.result,l=e.keyPrefix,c=e.func,u=e.context,p=c.call(u,t,e.count++);Array.isArray(p)?b(p,i,r,o.thatReturnsArgument):null!=p&&(n.isValidElement(p)&&(s=p,a=
+""===t?l+m(e,0):t),1;var f=0,v=""===t?l:t+c;// Count of children found in the current subtree.
+if(Array.isArray(e))for(var g=0;g<e.length;g++)f+=d(o=e[g],v+m(o,g),r,n);else{var y=// Before Symbol spec.
+function(e){var t=e&&(u&&e[u]||e[p]);if("function"==typeof t)return t}(e);if(y){0;for(var h,E=y.call(e),b=0;!(h=E.next()).done;)f+=d(o=h.value,v+m(o,b++),r,n)}else if("object"===i){0;var w=""+e;a(!1,"Objects are not valid as a React child (found: %s).%s","[object Object]"===w?"object with keys {"+Object.keys(e).join(", ")+"}":w,"")}}return f}var f=/\/+/g;function v(e){return(""+e).replace(f,"$&/")}var g,y,h=E,E=function(e){var t=this;if(t.instancePool.length){var r=t.instancePool.pop();return t.call(r,e),r}return new t(e)},b=function(e){var t=this;a(e instanceof t,"Trying to release an instance into a pool of a different type."),e.destructor(),t.instancePool.length<t.poolSize&&t.instancePool.push(e)};function w(e,t,r,n){this.result=e,this.keyPrefix=t,this.func=r,this.context=n,this.count=0}function _(e,t,r){var s,a,i=e.result,l=e.keyPrefix,c=e.func,u=e.context,p=c.call(u,t,e.count++);Array.isArray(p)?S(p,i,r,o.thatReturnsArgument):null!=p&&(n.isValidElement(p)&&(s=p,a=
 // Keep both the (mapped) and old keys if they differ, just as
 // traverseAllChildren used to do for objects as children
-l+(!p.key||t&&t.key===p.key?"":m(p.key)+"/")+r,p=n.cloneElement(s,{key:a},void 0!==s.props?s.props.children:void 0)),i.push(p))}function b(e,t,r,n,s){var o="";null!=r&&(o=m(r)+"/");var a=y.getPooled(t,o,n,s);!function(e,t,r){null==e||u(e,"",t,r)}(e,E,a),y.release(a)}y.prototype.destructor=function(){this.result=null,this.keyPrefix=null,this.func=null,this.context=null,this.count=0},d=function(e,t,r,n){var s=this;if(s.instancePool.length){var o=s.instancePool.pop();return s.call(o,e,t,r,n),o}return new s(e,t,r,n)},(f=y).instancePool=[],f.getPooled=d||v,f.poolSize||(f.poolSize=10),f.release=h;e.exports=function(e){if("object"!=typeof e||!e||Array.isArray(e))return i(!1,"React.addons.createFragment only accepts a single object. Got: %s",e),e;if(n.isValidElement(e))return i(!1,"React.addons.createFragment does not accept a ReactElement without a wrapper object."),e;a(1!==e.nodeType,"React.addons.createFragment(...): Encountered an invalid child; DOM elements are not valid children of React components.");var t=[];for(var r in e)b(e[r],t,r,o.thatReturnsArgument);return t}}
+l+(!p.key||t&&t.key===p.key?"":v(p.key)+"/")+r,p=n.cloneElement(s,{key:a},void 0!==s.props?s.props.children:void 0)),i.push(p))}function S(e,t,r,n,s){var o="";null!=r&&(o=v(r)+"/");var a=w.getPooled(t,o,n,s);!function(e,t,r){null==e||d(e,"",t,r)}(e,_,a),w.release(a)}w.prototype.destructor=function(){this.result=null,this.keyPrefix=null,this.func=null,this.context=null,this.count=0},g=function(e,t,r,n){var s=this;if(s.instancePool.length){var o=s.instancePool.pop();return s.call(o,e,t,r,n),o}return new s(e,t,r,n)},(y=w).instancePool=[],y.getPooled=g||h,y.poolSize||(y.poolSize=10),y.release=b;e.exports=function(e){if("object"!=typeof e||!e||Array.isArray(e))return i(!1,"React.addons.createFragment only accepts a single object. Got: %s",e),e;if(n.isValidElement(e))return i(!1,"React.addons.createFragment does not accept a ReactElement without a wrapper object."),e;a(1!==e.nodeType,"React.addons.createFragment(...): Encountered an invalid child; DOM elements are not valid children of React components.");var t=[];for(var r in e)S(e[r],t,r,o.thatReturnsArgument);return t}}
 /***/,
 /***/90631:
 /***/(e,t,r)=>{"use strict";r.r(t),
@@ -142,8 +133,8 @@ l+(!p.key||t&&t.key===p.key?"":m(p.key)+"/")+r,p=n.cloneElement(s,{key:a},void 0
 /* harmony export */,loadCurrentJobState:()=>/* binding */f
 /* harmony export */,updateJobState:()=>/* binding */v
 /* harmony export */,pollJobProgress:()=>/* binding */g
-/* harmony export */,setJobState:()=>/* binding */h
-/* harmony export */,submitStartImport:()=>/* binding */y
+/* harmony export */,setJobState:()=>/* binding */y
+/* harmony export */,submitStartImport:()=>/* binding */h
 /* harmony export */,startImport:()=>/* binding */E
 /* harmony export */,successStartImport:()=>/* binding */b
 /* harmony export */,errorStartImport:()=>/* binding */w
@@ -159,19 +150,19 @@ l+(!p.key||t&&t.key===p.key?"":m(p.key)+"/")+r,p=n.cloneElement(s,{key:a},void 0
 /* harmony export */,resetState:()=>/* binding */I
 /* harmony export */,restartImporter:()=>/* binding */A
 /* harmony export */});
-/* harmony import */var n=r(25463),s=r(20832),o=r(70468),a=r(97769),i=regeneratorRuntime.mark(v),l=regeneratorRuntime.mark(y),c=regeneratorRuntime.mark(_),u=regeneratorRuntime.mark(k),p=regeneratorRuntime.mark(A),m=function(e){return{type:n/* .FETCH_FROM_API */.nx,request:e}},d=function(e){return{type:n/* .WAIT */.wF,timeout:e}},f=(0,s/* .composeFetchAction */.GI)(n/* .START_LOAD_CURRENT_JOB_STATE */.jn,regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,m({path:(0,a/* .buildJobEndpointUrl */.D)(n/* .API_SPECIAL_ACTIVE_JOB_ID */.BL)});case 2:return t=e.sent,e.abrupt("return",(0,o/* .normalizeImportData */.wh)(t));case 4:case"end":return e.stop()}}),e)})),n/* .SUCCESS_LOAD_CURRENT_JOB_STATE */.H1,n/* .ERROR_LOAD_CURRENT_JOB_STATE */.sw);
+/* harmony import */var n=r(25463),s=r(20832),o=r(70468),a=r(97769),i=regeneratorRuntime.mark(v),l=regeneratorRuntime.mark(h),c=regeneratorRuntime.mark(_),u=regeneratorRuntime.mark(k),p=regeneratorRuntime.mark(A),m=function(e){return{type:n/* .FETCH_FROM_API */.nx,request:e}},d=function(e){return{type:n/* .WAIT */.wF,timeout:e}},f=(0,s/* .composeFetchAction */.GI)(n/* .START_LOAD_CURRENT_JOB_STATE */.jn,regeneratorRuntime.mark((function e(){var t;return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.next){case 0:return e.next=2,m({path:(0,a/* .buildJobEndpointUrl */.D)(n/* .API_SPECIAL_ACTIVE_JOB_ID */.BL)});case 2:return t=e.sent,e.abrupt("return",(0,o/* .normalizeImportData */.wh)(t));case 4:case"end":return e.stop()}}),e)})),n/* .SUCCESS_LOAD_CURRENT_JOB_STATE */.H1,n/* .ERROR_LOAD_CURRENT_JOB_STATE */.sw);
 /* harmony import */
 /**
  * Update job state in the background.
  *
  * @param {string} jobId The job ID.
  */
-function v(e){var t;return regeneratorRuntime.wrap((function(r){for(;;)switch(r.prev=r.next){case 0:return r.prev=0,r.next=3,m({path:(0,a/* .buildJobEndpointUrl */.D)(e)});case 3:return t=r.sent,r.next=6,h((0,o/* .normalizeImportData */.wh)(t));case 6:r.next=10;break;case 8:r.prev=8,r.t0=r.catch(0);case 10:case"end":return r.stop()}}),i,null,[[0,8]])}
+function v(e){var t;return regeneratorRuntime.wrap((function(r){for(;;)switch(r.prev=r.next){case 0:return r.prev=0,r.next=3,m({path:(0,a/* .buildJobEndpointUrl */.D)(e)});case 3:return t=r.sent,r.next=6,y((0,o/* .normalizeImportData */.wh)(t));case 6:r.next=10;break;case 8:r.prev=8,r.t0=r.catch(0);case 10:case"end":return r.stop()}}),i,null,[[0,8]])}
 /**
  * Run job batches and query progress until it is completed.
  *
  * @param {string} jobId Job ID.
- */var g=regeneratorRuntime.mark((function e(t){var r;return regeneratorRuntime.wrap((function(n){for(;;)switch(n.prev=n.next){case 0:return n.prev=0,n.next=3,m({path:(0,a/* .buildJobEndpointUrl */.D)(t,["process"]),method:"POST"});case 3:return r=n.sent,n.next=6,h((0,o/* .normalizeImportData */.wh)(r));case 6:if("completed"===r.status.status){n.next=9;break}return n.delegateYield(e(t),"t0",9);case 9:n.next=16;break;case 11:return n.prev=11,n.t1=n.catch(0),n.next=15,d(2e3);case 15:return n.delegateYield(e(t),"t2",16);case 16:case"end":return n.stop()}}),e,null,[[0,11]])})),h=function(e){return{type:n/* .SET_JOB_STATE */.gL,data:e}};
+ */var g=regeneratorRuntime.mark((function e(t){var r;return regeneratorRuntime.wrap((function(n){for(;;)switch(n.prev=n.next){case 0:return n.prev=0,n.next=3,m({path:(0,a/* .buildJobEndpointUrl */.D)(t,["process"]),method:"POST"});case 3:return r=n.sent,n.next=6,y((0,o/* .normalizeImportData */.wh)(r));case 6:if("completed"===r.status.status){n.next=9;break}return n.delegateYield(e(t),"t0",9);case 9:n.next=16;break;case 11:return n.prev=11,n.t1=n.catch(0),n.next=15,d(2e3);case 15:return n.delegateYield(e(t),"t2",16);case 16:case"end":return n.stop()}}),e,null,[[0,11]])})),y=function(e){return{type:n/* .SET_JOB_STATE */.gL,data:e}};
 /**
  * @typedef  {Object} SetJobStateAction
  * @property {string} type Action type.
@@ -191,7 +182,7 @@ function v(e){var t;return regeneratorRuntime.wrap((function(r){for(;;)switch(r.
  * @param {Function} [options.onSuccess] On Success handler.
  * @param {Function} [options.onError]   On Error handler.
  */
-function y(e){var t,r,n,s,i=arguments;return regeneratorRuntime.wrap((function(l){for(;;)switch(l.prev=l.next){case 0:return t=i.length>1&&void 0!==i[1]?i[1]:{},r=t.onSuccess,n=t.onError,l.next=3,E();case 3:if(l.prev=3,e){l.next=8;break}return l.next=7,w({message:null});case 7:return l.abrupt("return");case 8:return l.next=10,m({path:(0,a/* .buildJobEndpointUrl */.D)(e,["start"]),method:"POST"});case 10:return s=l.sent,l.next=13,b((0,o/* .normalizeImportData */.wh)(s));case 13:r&&r(),l.next=21;break;case 16:return l.prev=16,l.t0=l.catch(3),l.next=20,w(l.t0);case 20:n&&n(l.t0);case 21:case"end":return l.stop()}}),l,null,[[3,16]])}
+function h(e){var t,r,n,s,i=arguments;return regeneratorRuntime.wrap((function(l){for(;;)switch(l.prev=l.next){case 0:return r=(t=i.length>1&&void 0!==i[1]?i[1]:{}).onSuccess,n=t.onError,l.next=3,E();case 3:if(l.prev=3,e){l.next=8;break}return l.next=7,w({message:null});case 7:return l.abrupt("return");case 8:return l.next=10,m({path:(0,a/* .buildJobEndpointUrl */.D)(e,["start"]),method:"POST"});case 10:return s=l.sent,l.next=13,b((0,o/* .normalizeImportData */.wh)(s));case 13:r&&r(),l.next=21;break;case 16:return l.prev=16,l.t0=l.catch(3),l.next=20,w(l.t0);case 20:n&&n(l.t0);case 21:case"end":return l.stop()}}),l,null,[[3,16]])}
 /**
  * @typedef  {Object} StartImportAction
  * @property {string} type Action type.
@@ -222,7 +213,7 @@ function y(e){var t,r,n,s,i=arguments;return regeneratorRuntime.wrap((function(l
  * @param {Function} [options.onSuccess] Callback on success.
  * @param {Function} [options.onError]   Callback on error.
  */
-function _(e,t,r){var s,i,l,u,p=arguments;return regeneratorRuntime.wrap((function(c){for(;;)switch(c.prev=c.next){case 0:return s=p.length>3&&void 0!==p[3]?p[3]:{},i=s.onSuccess,l=s.onError,c.next=3,Z(t,r);case 3:return c.prev=3,e||(e=n/* .API_SPECIAL_ACTIVE_JOB_ID */.BL),c.next=7,m({path:(0,a/* .buildJobEndpointUrl */.D)(e,["file",t]),method:"POST",body:r});case 7:return u=c.sent,c.next=10,x(t,(0,o/* .normalizeImportData */.wh)(u));case 10:i&&i(),c.next=18;break;case 13:return c.prev=13,c.t0=c.catch(3),c.next=17,R(t,c.t0);case 17:l&&l(c.t0);case 18:case"end":return c.stop()}}),c,null,[[3,13]])}
+function _(e,t,r){var s,i,l,u,p=arguments;return regeneratorRuntime.wrap((function(c){for(;;)switch(c.prev=c.next){case 0:return i=(s=p.length>3&&void 0!==p[3]?p[3]:{}).onSuccess,l=s.onError,c.next=3,Z(t,r);case 3:return c.prev=3,e||(e=n/* .API_SPECIAL_ACTIVE_JOB_ID */.BL),c.next=7,m({path:(0,a/* .buildJobEndpointUrl */.D)(e,["file",t]),method:"POST",body:r});case 7:return u=c.sent,c.next=10,x(t,(0,o/* .normalizeImportData */.wh)(u));case 10:i&&i(),c.next=18;break;case 13:return c.prev=13,c.t0=c.catch(3),c.next=17,R(t,c.t0);case 17:l&&l(c.t0);case 18:case"end":return c.stop()}}),c,null,[[3,13]])}
 /**
  * Throw an early upload error.
  *
@@ -297,8 +288,8 @@ function A(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.
 /* harmony export */,fo:()=>/* binding */f
 /* harmony export */,i7:()=>/* binding */v
 /* harmony export */,wO:()=>/* binding */g
-/* harmony export */,AI:()=>/* binding */h
-/* harmony export */,Wi:()=>/* binding */y
+/* harmony export */,AI:()=>/* binding */y
+/* harmony export */,Wi:()=>/* binding */h
 /* harmony export */,sW:()=>/* binding */E
 /* harmony export */,ao:()=>/* binding */b
 /* harmony export */,$L:()=>/* binding */w
@@ -307,7 +298,7 @@ function A(){return regeneratorRuntime.wrap((function(e){for(;;)switch(e.prev=e.
 /**
  * Data import constants.
  */
-var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="START_LOAD_CURRENT_JOB_STATE",l="SUCCESS_LOAD_CURRENT_JOB_STATE",c="ERROR_LOAD_CURRENT_JOB_STATE",u="SET_JOB_STATE",p="START_IMPORT",m="SUCCESS_START_IMPORT",d="ERROR_START_IMPORT",f="START_UPLOAD_IMPORT_DATA_FILE",v="SUCCESS_UPLOAD_IMPORT_DATA_FILE",g="ERROR_UPLOAD_IMPORT_DATA_FILE",h="START_DELETE_IMPORT_DATA_FILE",y="SUCCESS_DELETE_IMPORT_DATA_FILE",E="ERROR_DELETE_IMPORT_DATA_FILE",b="SET_IMPORT_LOG",w="ERROR_FETCH_IMPORT_LOG",_="RESET_STATE"}
+var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="START_LOAD_CURRENT_JOB_STATE",l="SUCCESS_LOAD_CURRENT_JOB_STATE",c="ERROR_LOAD_CURRENT_JOB_STATE",u="SET_JOB_STATE",p="START_IMPORT",m="SUCCESS_START_IMPORT",d="ERROR_START_IMPORT",f="START_UPLOAD_IMPORT_DATA_FILE",v="SUCCESS_UPLOAD_IMPORT_DATA_FILE",g="ERROR_UPLOAD_IMPORT_DATA_FILE",y="START_DELETE_IMPORT_DATA_FILE",h="SUCCESS_DELETE_IMPORT_DATA_FILE",E="ERROR_DELETE_IMPORT_DATA_FILE",b="SET_IMPORT_LOG",w="ERROR_FETCH_IMPORT_LOG",_="RESET_STATE"}
 /***/,
 /***/42588:
 /***/(e,t,r)=>{"use strict";
@@ -379,10 +370,10 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
 /* harmony export */,isReadyToStart:()=>/* binding */f
 /* harmony export */,getUploadedLevelKeys:()=>/* binding */v
 /* harmony export */,getSuccessResults:()=>/* binding */g
-/* harmony export */,getLogsBySeverity:()=>/* binding */h
-/* harmony export */,getLogsFetchError:()=>/* binding */y
+/* harmony export */,getLogsBySeverity:()=>/* binding */y
+/* harmony export */,getLogsFetchError:()=>/* binding */h
 /* harmony export */});
-/* harmony import */var n=r(50189),s=r(92819),o=r(47854),a=r(35345),i=["course","lesson","question"],l=function(e){return e.isFetching},c=function(e){return e.jobId},u=function(e){return e.fetchError},p=function(e,t){return e[t]},m=function(e){var t=e.completedSteps,r=o/* .steps.map */.S.map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{isComplete:t.includes(e.key),isNext:!1})}));return(r.find((function(e){return!e.isComplete}))||r[0]).isNext=!0,r},d=function(e,t){return e.completedSteps.includes(t)},f=function(e){var t=a/* .levels.map */.g.map((function(t){var r=t.key;return e.upload[r]})),r=t.some((function(e){return e.isUploaded})),n=t.some((function(e){return e.isUploading||e.isDeleting}));return r&&!n},v=function(e){var t=e.upload;return a/* .levels.filter */.g.filter((function(e){var r=e.key;return t[r].isUploaded})).map((function(e){return e.key}))},g=function(e){var t=e.done;return i.map((function(e){return{key:e,count:(0,s.get)(t,["results",e,"success"],0)+(0,s.get)(t,["results",e,"warning"],0)}})).filter((function(e){return e.count>0}))},h=function(e){var t=e.done,r=e.upload,o=(0,s.get)(t,"logs.items",[]).map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{filename:(0,s.get)(r,e.type+"s.filename","")})}));return(0,s.groupBy)(o,"severity")},y=function(e){var t=e.done;return(0,s.get)(t,"logs.fetchError",!1)};
+/* harmony import */var n=r(50189),s=r(92819),o=r(47854),a=r(35345),i=["course","lesson","question"],l=function(e){return e.isFetching},c=function(e){return e.jobId},u=function(e){return e.fetchError},p=function(e,t){return e[t]},m=function(e){var t=e.completedSteps,r=o/* .steps.map */.S.map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{isComplete:t.includes(e.key),isNext:!1})}));return(r.find((function(e){return!e.isComplete}))||r[0]).isNext=!0,r},d=function(e,t){return e.completedSteps.includes(t)},f=function(e){var t=a/* .levels.map */.g.map((function(t){var r=t.key;return e.upload[r]})),r=t.some((function(e){return e.isUploaded})),n=t.some((function(e){return e.isUploading||e.isDeleting}));return r&&!n},v=function(e){var t=e.upload;return a/* .levels.filter */.g.filter((function(e){var r=e.key;return t[r].isUploaded})).map((function(e){return e.key}))},g=function(e){var t=e.done;return i.map((function(e){return{key:e,count:(0,s.get)(t,["results",e,"success"],0)+(0,s.get)(t,["results",e,"warning"],0)}})).filter((function(e){return e.count>0}))},y=function(e){var t=e.done,r=e.upload,o=(0,s.get)(t,"logs.items",[]).map((function(e){return(0,n/* ["default"] */.Z)((0,n/* ["default"] */.Z)({},e),{},{filename:(0,s.get)(r,e.type+"s.filename","")})}));return(0,s.groupBy)(o,"severity")},h=function(e){var t=e.done;return(0,s.get)(t,"logs.fetchError",!1)};
 /* harmony import */}
 /***/,
 /***/21051:
@@ -430,7 +421,7 @@ var n="/sensei-internal/v1/import/",s="active",o="FETCH_FROM_API",a="WAIT",i="ST
 /* harmony export */r.d(t,{
 /* harmony export */D:()=>/* binding */o
 /* harmony export */});
-/* harmony import */var n=r(90228),s=r(25463),o=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,r=[].concat((0,n/* ["default"] */.Z)(e?[e]:[]),(0,n/* ["default"] */.Z)(t||[])).join("/");return s/* .API_BASE_PATH */.Lt+r};
+/* harmony import */var n=r(90228),s=r(25463),o=function(e){var t=arguments.length>1&&void 0!==arguments[1]?arguments[1]:null,r=[].concat((0,n.default)(e?[e]:[]),(0,n.default)(t||[])).join("/");return s/* .API_BASE_PATH */.Lt+r};
 /* harmony import */}
 /***/,
 /***/45879:
@@ -520,7 +511,8 @@ return p.isDeleting?l=(0,n.createElement)("div",{className:"sensei-upload-file-l
 /**
  * Internal dependencies
  */
-/* harmony default export */const a=(0,s.compose)((0,n.withSelect)((function(e){var t=e("sensei/import");return{state:t.getStepData("upload"),isReady:t.isReadyToStart()}})),(0,n.withDispatch)((function(e,t,r){var n=r.select,s=e("sensei/import").submitStartImport;return{submitStartImport:function(){s(n("sensei/import").getJobId());// Log continue to import from uploaded files.
+/* harmony default export */const a=(0,s.compose)((0,n.withSelect)((function(e){var t=e("sensei/import");return{state:t.getStepData("upload"),isReady:t.isReadyToStart()}})),(0,n.withDispatch)((function(e,t,r){var n=r.select,s=e("sensei/import").submitStartImport;return{submitStartImport:function(){s(n("sensei/import").getJobId());
+// Log continue to import from uploaded files.
 var e=n("sensei/import").getUploadedLevelKeys().join(",");window.sensei_log_event("import_continue_click",{type:e})}}})))(o/* .UploadPage */.b);
 /***/},
 /***/71247:
@@ -528,7 +520,8 @@ var e=n("sensei/import").getUploadedLevelKeys().join(",");window.sensei_log_even
 /* harmony export */r.d(t,{
 /* harmony export */b:()=>/* binding */u
 /* harmony export */});
-/* harmony import */var n=r(69307),s=r(65736),o=r(55609),a=r(31567),i=r(29822),l=r(22866),c=r(43011),__=s.__,u=function(e){var t=e.state,r=e.isReady,s=e.submitStartImport,u=t.isSubmitting,p=t.errorMsg;return(0,n.createElement)("section",{className:"sensei-data-port-step sensei-upload-page"},(0,n.createElement)("header",{className:"sensei-data-port-step__header"},(0,n.createElement)(c.H,null,__("Import content from a CSV file","sensei-lms")),(0,n.createElement)("p",null,(0,l/* .formatString */.U)(__("This tool enables you to import courses, lessons, and questions from a CSV file. Please review the {{link}}documentation{{/link}} to learn more about the expected file structure.","sensei-lms"),{link:// eslint-disable-next-line jsx-a11y/anchor-has-content
+/* harmony import */var n=r(69307),s=r(65736),o=r(55609),a=r(31567),i=r(29822),l=r(22866),c=r(43011),__=s.__,u=function(e){var t=e.state,r=e.isReady,s=e.submitStartImport,u=t.isSubmitting,p=t.errorMsg;return(0,n.createElement)("section",{className:"sensei-data-port-step sensei-upload-page"},(0,n.createElement)("header",{className:"sensei-data-port-step__header"},(0,n.createElement)(c.H,null,__("Import content from a CSV file","sensei-lms")),(0,n.createElement)("p",null,(0,l/* .formatString */.U)(__("This tool enables you to import courses, lessons, and questions from a CSV file. Please review the {{link}}documentation{{/link}} to learn more about the expected file structure.","sensei-lms"),{link:
+// eslint-disable-next-line jsx-a11y/anchor-has-content
 (0,n.createElement)("a",{className:"link__color-secondary",href:"https://senseilms.com/documentation/import/",target:"_blank",type:"external",rel:"noopener noreferrer"})}))),(0,n.createElement)(c/* .Section */.$,{className:"sensei-data-port-step__body",component:"section"},(0,n.createElement)("p",null,__("Choose one or more CSV files to upload from your computer.","sensei-lms")),(0,n.createElement)(a/* ["default"] */.Z,null),(0,n.createElement)("div",{className:"sensei-data-port-step__footer"},null!==p&&(0,n.createElement)(i/* .Notice */.q,{message:p,isError:!0}),(0,n.createElement)(o.Button,{isPrimary:!0,className:"continue-button",disabled:!r||u,onClick:s},__("Continue","sensei-lms")))))};
 /* harmony import */}
 /***/,
@@ -537,7 +530,7 @@ var e=n("sensei/import").getUploadedLevelKeys().join(",");window.sensei_log_even
 /* harmony export */r.d(t,{
 /* harmony export */q:()=>/* binding */i
 /* harmony export */});
-/* harmony import */var n=r(69307),s=r(60042),o=r.n(s),a=r(55609),i=function(e){var t=e.message,r=e.isError,s=o()({"sensei-data-port-notice__message":!0,error:r});return(0,n.createElement)("div",{className:"sensei-data-port-notice"},r&&(0,n.createElement)(a.Dashicon,{className:"sensei-data-port-notice__icon error",icon:"warning"}),(0,n.createElement)("span",{className:s},t))};
+/* harmony import */var n=r(69307),s=r(90005),o=r.n(s),a=r(55609),i=function(e){var t=e.message,r=e.isError,s=o()({"sensei-data-port-notice__message":!0,error:r});return(0,n.createElement)("div",{className:"sensei-data-port-notice"},r&&(0,n.createElement)(a.Dashicon,{className:"sensei-data-port-notice__icon error",icon:"warning"}),(0,n.createElement)("span",{className:s},t))};
 /* harmony import */}
 /***/,
 /***/17214:
@@ -545,7 +538,7 @@ var e=n("sensei/import").getUploadedLevelKeys().join(",");window.sensei_log_even
 /* harmony export */r.d(t,{
 /* harmony export */K:()=>/* binding */a
 /* harmony export */});
-/* harmony import */var n=r(69307),s=r(60042),o=r.n(s),a=function(e){var t=e.steps;return(0,n.createElement)("ol",{className:"sensei-data-port-steps"},t.map((function(e){var t=o()({active:e.isNext,done:e.isComplete});return(0,n.createElement)("li",{key:e.key,className:t},e.label)})))};
+/* harmony import */var n=r(69307),s=r(90005),o=r.n(s),a=function(e){var t=e.steps;return(0,n.createElement)("ol",{className:"sensei-data-port-steps"},t.map((function(e){var t=o()({active:e.isNext,done:e.isComplete});return(0,n.createElement)("li",{key:e.key,className:t},e.label)})))};
 /* harmony import */}
 /***/,
 /***/49373:
@@ -655,6 +648,15 @@ return regeneratorRuntime.mark((function s(){var o,a=arguments;return regenerato
 /***/96483:
 /***/e=>{"use strict";e.exports=window.wp.url}
 /***/,
+/***/90005:
+/***/(e,t)=>{var r;
+/*!
+	Copyright (c) 2018 Jed Watson.
+	Licensed under the MIT License (MIT), see
+	http://jedwatson.github.io/classnames
+*/
+/* global define */!function(){"use strict";var n={}.hasOwnProperty;function s(){for(var e="",t=0;t<arguments.length;t++){var r=arguments[t];r&&(e=a(e,o(r)))}return e}function o(e){if("string"==typeof e||"number"==typeof e)return e;if("object"!=typeof e)return"";if(Array.isArray(e))return s.apply(null,e);if(e.toString!==Object.prototype.toString&&!e.toString.toString().includes("[native code]"))return e.toString();var t="";for(var r in e)n.call(e,r)&&e[r]&&(t=a(t,r));return t}function a(e,t){return t?e?e+" "+t:e+t:e}e.exports?(s.default=s,e.exports=s):void 0===(r=function(){return s}.apply(t,[]))||(e.exports=r)}()}
+/***/,
 /***/1793:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */function n(e,t){(null==t||t>e.length)&&(t=e.length);for(var r=0,n=new Array(t);r<t;r++)n[r]=e[r];return n}
@@ -735,7 +737,7 @@ return regeneratorRuntime.mark((function s(){var o,a=arguments;return regenerato
 /***/90228:
 /***/(e,t,r)=>{"use strict";
 /* harmony export */r.d(t,{
-/* harmony export */Z:()=>/* binding */i
+/* harmony export */default:()=>/* binding */i
 /* harmony export */});
 /* harmony import */var n=r(58138),s=r(55181),o=r(64013),a=r(83314);
 /* harmony import */function i(e){return(0,n/* ["default"] */.Z)(e)||(0,s/* ["default"] */.Z)(e)||(0,o/* ["default"] */.Z)(e)||(0,a/* ["default"] */.Z)()}

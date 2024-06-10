@@ -26,7 +26,15 @@ class Data_Cleaner {
 	 * @var string[]
 	 */
 	private $post_meta = [
+		'_course_expiration_length',
+		'_course_expiration_period',
+		'_course_expiration_type',
+		'_course_expires_on_date',
+		'_course_start_type',
+		'_course_starts_on_date',
 		'_course_woocommerce_product',
+		'sensei_course_audience',
+		'sensei_course_skill_level',
 		'sensei_wc_paid_courses_calculation_version',
 	];
 
@@ -38,6 +46,8 @@ class Data_Cleaner {
 	private $options = [
 		'sensei-wc-paid-courses-memberships-cancelled-orders',
 		'sensei_pro_version',
+		'sensei_pro_home_task_created_first_product',
+		'sensei_pro_home_task_configured_to_sell_course_with_woocommerce',
 	];
 
 	/**

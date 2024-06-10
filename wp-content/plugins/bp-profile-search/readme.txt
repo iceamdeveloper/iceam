@@ -1,9 +1,9 @@
 === BP Profile Search ===
 Contributors: dontdream
-Tags: buddypress, directory, members, users, search, filter
+Tags: buddypress, directory, members, search, users
 Requires at least: 5.8
-Tested up to: 6.2
-Stable tag: 5.4.8
+Tested up to: 6.4
+Stable tag: 5.7.4
 
 Member search and member directories for BuddyPress and the BuddyBoss Platform.
 
@@ -24,7 +24,7 @@ Each search form has a <em>target directory</em>. When you run a search, the for
 With the form builder you can:
 
 <ul>
-	<li>Add, edit, reorder, and remove the search fields</li>
+	<li>Add, edit, rearrange, and remove the search fields</li>
 
 	<li>Use as search fields the BuddyPress profile fields, the <em>users</em> and <em>usermeta</em> data (including roles), the BuddyPress user groups, and the user taxonomies (including BuddyPress member types)</li>
 
@@ -115,12 +115,28 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 
 == Changelog ==
 
+= 5.7.4 =
+* Improved compatibility with other BuddyPress plugins
+= 5.7.3 =
+* Fixed: logic to call *flush_rewrite_rules*
+= 5.7.2 =
+* Fixed: old bug that prevented *Loco Translate* from working properly
+= 5.7.1 =
+* Fixed: removed redundant calls to *flush_rewrite_rules*
+= 5.7 =
+* Added: support for BuddyPress 12.0.0+ without the BP Classic plugin
+= 5.6 =
+* Security: removed a reflected XSS vulnerability, please update!
+* Fixed: incorrect links to user profiles when using the BP Classic plugin
+* Updated: jQuery UI styles to version 1.13.2
+= 5.5 =
+* Added notice: [bps_directory] currently does not work without the BP Classic plugin
 = 5.4.8 =
 * Fixed: user permalinks in custom directory when standard directory is a subpage
 = 5.4.7 =
 * Fixed: platform detection (BuddyPress or the BuddyBoss Platform)
 = 5.4.6 =
-* Added: debug information under *Tools -> Site Health*
+* Added: site information under *Tools -> Site Health*
 = 5.4.5 =
 * Fixed: limit on number of displayed groups
 = 5.4.4 =
@@ -189,7 +205,7 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 * Improved compatibility with *GEO my WP*
 * See [BP Profile Search 5.0.2](https://dontdream.it/bp-profile-search-5-0-2/) for details
 = 5.0.1 =
-* Fixed critical bug in the [bps_directory] shortcode - wrong links to user profiles
+* Fixed critical bug in the [bps_directory] shortcode - incorrect links to user profiles
 = 5.0 =
 * Fixed the [bps_directory] shortcode to work with BP Legacy and BP Nouveau
 * Added search modes *is* and *range* for date fields
@@ -350,7 +366,7 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 * Added customization of field label and description
 * Added *Value Range Search* for multiple numeric fields
 * Added *Age Range Search* for multiple date fields
-* Added reordering of form fields
+* Added ability to rearrange the search fields
 * Updated Italian translation
 * Updated Russian translation
 = 3.5.6 03/02/2014 =
@@ -418,5 +434,5 @@ Standard installation, see [Installing Plugins](https://wordpress.org/support/ar
 
 == Upgrade Notice ==
 
-= 4.6 =
+= 5.6 =
 Security release, please update immediately!

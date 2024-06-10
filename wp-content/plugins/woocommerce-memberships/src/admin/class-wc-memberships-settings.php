@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -584,7 +584,7 @@ class WC_Settings_Memberships extends \WC_Settings_Page {
 					'type'     => 'sectionend',
 				],
 
-			], $this->get_roles_settings(), $this->get_privacy_settings() ) );
+			], $this->get_member_directory_settings(), $this->get_roles_settings(), $this->get_privacy_settings() ) );
 		}
 
 		/**
@@ -596,6 +596,50 @@ class WC_Settings_Memberships extends \WC_Settings_Page {
 		 * @param string $current_section the current section being output
 		 */
 		return apply_filters( "woocommerce_get_settings_{$this->id}", $settings, $current_section );
+	}
+
+
+	/**
+	 * Gets the settings for the Member Directory.
+	 *
+	 * @since 1.26.1
+	 *
+	 * @return array<array<string, mixed>>
+	 */
+	private function get_member_directory_settings() : array {
+
+		$member_directory_settings = [
+
+			[
+				'title' => __( 'Member Directory', 'woocommerce-memberships' ),
+				'type'  => 'title',
+			],
+
+			[
+				'type'    => 'checkbox',
+				'id'      => 'wc_memberships_enable_member_directory',
+				'name'    => __( 'Enable Member Directory shortcode and block', 'woocommerce-memberships' ),
+				'desc'    => sprintf(
+					/* translators: Placeholder: %1$s - opening HTML <a> link tag, %2$s - closing HTML </a> link tag */
+				__( 'If enabled, the Member Directory will be available to display a list of members in posts and pages that include the corresponding block or shortcode. %1$sRead more about this feature%2$s.', 'woocommerce-memberships' ),
+				'<a href="https://woo.com/document/woocommerce-memberships-directory-shortcode/" target="_blank">', '</a>'
+				),
+				'default' => 'no',
+			],
+
+			[
+				'type' => 'sectionend',
+			],
+		];
+
+		/**
+		 * Filters the Member Directory settings.
+		 *
+		 * @since 1.26.1
+		 *
+		 * @param array $member_directory_settings associative array
+		 */
+		return (array) apply_filters( 'wc_memberships_member_directory_settings', $member_directory_settings );
 	}
 
 

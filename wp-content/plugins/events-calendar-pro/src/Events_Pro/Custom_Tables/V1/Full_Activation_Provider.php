@@ -13,12 +13,12 @@
 namespace TEC\Events_Pro\Custom_Tables\V1;
 
 use Exception;
-use tad_DI52_ServiceProvider as Service_Provider;
 use TEC\Events_Pro\Custom_Tables\V1\Admin\Notices\Occurrence_Notices;
 use Throwable;
 use Tribe__Admin__Notices;
 use Tribe__Events__Admin_List as TEC_Admin_List;
 use Tribe__Events__Main as TEC;
+use \TEC\Common\Contracts\Service_Provider;
 
 /**
  * Class Full_Activation_Provider
@@ -92,8 +92,6 @@ class Full_Activation_Provider extends Service_Provider {
 			} else {
 				add_action( 'current_screen', [ $this, 'remove_admin_filters' ] );
 			}
-
-			return true;
 		} catch ( Throwable $t ) {
 			// This code will never fire on PHP 5.6, but will do in PHP 7.0+.
 
@@ -121,6 +119,15 @@ class Full_Activation_Provider extends Service_Provider {
 			 */
 			do_action( 'tec_events_custom_tables_v1_error', $e );
 		}
+
+		/**
+		 * Fires an action when ECP Custom Tables v1 implementation is fully activated.
+		 *
+		 * @since 6.1.1
+		 */
+		do_action( 'tec_events_pro_custom_tables_v1_fully_activated' );
+
+		return true;
 	}
 
 	/**

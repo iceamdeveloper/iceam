@@ -32,10 +32,6 @@
 <?php wp_head(); ?>
 <?php woo_head(); ?>
 
-<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/js/bootstrap.min.js"></script>
-<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/js/jquery.validate.min.js"></script>
-<script type="text/javascript" src="<?php echo get_stylesheet_directory_uri(); ?>/site.js"></script>
-
 </head>
 <body <?php body_class(); ?>>
 <?php woo_top(); ?>

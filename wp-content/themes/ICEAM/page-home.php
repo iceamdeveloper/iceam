@@ -158,7 +158,7 @@ get_header();
                     <div class="container">
                         <div class="row">
                             <h2 style="text-align: center;">Featured Blog Posts</h2>
-            <?
+            <?php
                         while ($wp_query->have_posts()) {
                             $wp_query->the_post();
             ?>

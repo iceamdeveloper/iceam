@@ -428,6 +428,10 @@ body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .t
 					grid-template-columns: 4fr 3fr 2fr 2fr;
 				}
 
+body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-content-sale-label, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-content-sale-label {
+				display: none;
+			}
+
 body.page-tribe-attendee-registration .tribe-common .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra, body.page-tribe-attendee-registration .event-tickets .tribe-tickets__mini-cart .tribe-tickets__tickets-item-extra {
 				align-self: center;
 				grid-row: 1;

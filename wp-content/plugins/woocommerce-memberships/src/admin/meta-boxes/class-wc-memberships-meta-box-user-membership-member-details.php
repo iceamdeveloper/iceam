@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -147,16 +147,14 @@ class WC_Memberships_Meta_Box_User_Membership_Member_Details extends \WC_Members
 		<br>
 		<?php
 
-		$last_active = get_user_meta( $user->ID, 'wc_last_active', true );
-
-		if ( is_numeric( $last_active ) ) :
+		if ( $last_active = $user_membership->get_last_active_since() ) :
 
 			?>
 			<span class="last-login">
 				<?php printf(
-					/* translators: Placeholder: %s last login since */
-					esc_html__( 'Last login: %s ago', 'woocommerce-memberships' ),
-					human_time_diff( (int) $last_active )
+					/* translators: Placeholder: %s last activity (e.g. "today", "3 days ago", etc.) */
+					esc_html__( 'Last active: %s', 'woocommerce-memberships' ),
+					$last_active
 				); ?>
 			</span>
 			<?php

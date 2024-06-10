@@ -1,5 +1,8 @@
 <?php
 
+use TEC\Tickets\Event;
+use Tribe\Tickets\Plus\Commerce\EDD\Orders\Data\Order_Summary;
+
 /**
  * Class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report
  *
@@ -32,6 +35,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	/**
 	 * Returns the link to the "Orders" report for this post.
 	 *
+	 * @since 5.7.4 - tec_tickets_filter_event_id filter to normalize the $post_id.
 	 * @since 4.10
 	 *
 	 * @param WP_Post $post
@@ -39,10 +43,12 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	 * @return string The absolute URL.
 	 */
 	public static function get_tickets_report_link( $post ) {
+		$post_id = Event::filter_event_id( $post->ID, 'edd-orders-report-link' );
+
 		$url = add_query_arg( [
 			'post_type' => $post->post_type,
 			'page'      => self::$orders_slug,
-			'post_id'   => $post->ID,
+			'post_id'   => $post_id,
 		], admin_url( 'edit.php' ) );
 
 		return $url;
@@ -54,9 +60,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	 * @since 4.10
 	 */
 	public function __construct() {
-		add_filter( 'post_row_actions', array( $this, 'add_orders_row_action' ), 10, 2 );
-		add_action( 'admin_menu', array( $this, 'register_orders_page' ) );
-		add_filter( 'tribe_filter_attendee_order_link', array( $this, 'filter_editor_orders_link' ), 10, 2 );
+		add_filter( 'post_row_actions', [ $this, 'add_orders_row_action' ], 10, 2 );
+		// Register before the default priority of 10 to avoid submenu hook issues.
+		add_action( 'admin_menu', [ $this, 'register_orders_page' ], 5 );
+		add_filter( 'tribe_filter_attendee_order_link', [ $this, 'filter_editor_orders_link' ], 10, 2 );
 
 		// register the tabbed view
 		$edd_tabbed_view = new Tribe__Tickets_Plus__Commerce__EDD__Tabbed_View__Report_Tabbed_View();
@@ -79,6 +86,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 
 		// only if tickets are active on this post type
 		if ( ! in_array( $post->post_type, Tribe__Tickets__Main::instance()->post_types(), true ) ) {
+			return $actions;
+		}
+
+		if ( ! $this->can_access_page( $post_id ) ) {
 			return $actions;
 		}
 
@@ -113,8 +124,13 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	public function register_orders_page() {
 
 		$candidate_post_id = Tribe__Utils__Array::get( $_GET, 'post_id', Tribe__Utils__Array::get( $_GET, 'event_id', 0 ) );
+		$post_id           = absint( $candidate_post_id );
 
-		if ( ( $post_id = absint( $candidate_post_id ) ) != $candidate_post_id ) {
+		if ( $post_id != $candidate_post_id ) {
+			return;
+		}
+
+		if ( ! $this->can_access_page( $post_id ) ) {
 			return;
 		}
 
@@ -216,8 +232,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 	 * @since 4.10
 	 */
 	public function orders_page_inside() {
-		$this->orders_table->prepare_items();
-
 		$post_id = Tribe__Utils__Array::get( $_GET, 'event_id', Tribe__Utils__Array::get( $_GET, 'post_id', 0 ) );
 		$post    = get_post( absint( $post_id ) );
 
@@ -225,77 +239,6 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 		$tabbed_view = new Tribe__Tickets__Commerce__Orders_Tabbed_View();
 		$tabbed_view->set_active( self::$tab_slug );
 		$tabbed_view->render();
-
-		$author     = get_user_by( 'id', $post->post_author );
-		$tickets    = Tribe__Tickets__Tickets::get_event_tickets( $post_id );
-
-		/**
-		 * Setup the ticket breakdown
-		 *
-		 * @var Tribe__Tickets__Status__Manager $status_manager
-		 */
-		$status_manager = tribe( 'tickets.status' );
-
-		$order_overview      = $status_manager->get_providers_status_classes( 'edd' );
-		$complete_statuses   = (array) $status_manager->get_statuses_by_action( 'count_completed', 'edd' );
-		$incomplete_statuses = (array) $status_manager->get_statuses_by_action( 'count_incomplete', 'edd' );
-
-		$tickets_sold = [];
-
-		/**
-		 * Update ticket item counts by order status
-		 *
-		 * @var Tribe__Tickets__Ticket_Object $ticket
-		 */
-		foreach ( $tickets as $ticket ) {
-			// Only Display if a EDD Ticket otherwise kick out
-			if ( 'Tribe__Tickets_Plus__Commerce__EDD__Main' != $ticket->provider_class ) {
-				continue;
-			}
-
-			if ( empty( $tickets_sold[ $ticket->name ] ) ) {
-				$tickets_sold[ $ticket->name ] = [
-					'ticket'     => $ticket,
-					'has_stock'  => ! $ticket->stock(),
-					'sku'        => get_post_meta( $ticket->ID, '_sku', true ),
-					'sold'       => 0,
-					'pending'    => 0,
-					'completed'  => 0,
-					'refunded'   => 0,
-					'incomplete' => 0,
-				];
-			}
-
-			$orders = $this->get_all_orders_by_download_id( $ticket->ID );
-			foreach ( $orders as $order ) {
-				foreach ( $order->cart_details as $line_item ) {
-
-					if ( ! $order->status_nicename || ! isset( $line_item ) ) {
-						continue;
-					}
-
-					// only count the item if it matches the current ticket id
-					if ( $ticket->ID !== $line_item['id'] ) {
-						continue;
-					}
-
-					if ( in_array( $order->status, $complete_statuses, true ) ) {
-						$tickets_sold[ $ticket->name ]['completed'] += $line_item['quantity'];
-					}
-
-					if ( in_array( $order->status, $incomplete_statuses, true ) ) {
-						$tickets_sold[ $ticket->name ]['incomplete'] += $line_item['quantity'];
-					}
-
-					/** @var Tribe__Tickets__Status__Abstract $status_class */
-					$status_class = $order_overview->statuses[ $order->status_nicename ];
-					$status_class->add_qty( $line_item['quantity'] );
-					$status_class->add_line_total( $line_item['subtotal'] );
-					$order_overview->add_qty( $line_item['quantity'] );
-					$order_overview->add_line_total( $line_item['subtotal'] );
-				}
-			}
-		}
 
 		$post_type_object = get_post_type_object( $post->post_type );
 		$post_singular_label = $post_type_object->labels->singular_name;
@@ -308,7 +251,26 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 		$this->orders_table->display();
 		$table = ob_get_clean();
 
-		include Tribe__Tickets_Plus__Main::instance()->plugin_path . 'src/admin-views/edd-orders.php';
+		/** @var Tribe__Tickets__Admin__Views $tickets_admin_views */
+		$tickets_admin_views = tribe( 'tickets.admin.views' );
+		$order_summary_data  = new Order_Summary( $post_id );
+
+		$order_summary_context =  [
+			'post_id'             => $post_id,
+			'post'                => $post,
+			'post_singular_label' => $post_singular_label,
+			'order_summary'       => $order_summary_data,
+		];
+		$order_summary_template = $tickets_admin_views->template( 'commerce/reports/orders/summary', $order_summary_context, false );
+
+		/** @var Tribe__Tickets_Plus__Admin__Views $view */
+		$view = tribe( 'tickets-plus.admin.views' );
+		$view->template( 'edd-orders', [
+			'post_id'       => $post_id,
+			'post'          => $post,
+			'order_summary' => $order_summary_template,
+			'table'         => $table
+		] );
 	}
 
 	/**
@@ -356,6 +318,46 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Report {
 		}
 
 		return $orders;
+	}
+
+	/**
+	 * Checks if the current user can access a page based on post ownership and capabilities.
+	 *
+	 * This method determines access by checking if the current user is the author of the post
+	 * or if they have the capability to edit others' posts (edit_others_posts) within the same post type.
+	 * If neither condition is met, access is denied.
+	 *
+	 * @since 5.9.4
+	 *
+	 * @param int $post_id The ID of the post to check access against.
+	 *
+	 * @return bool True if the user can access the page, false otherwise.
+	 */
+	public function can_access_page( int $post_id ): bool {
+		$post = get_post( $post_id );
+		// Ensure $post is valid to prevent errors in cases where $post_id might be invalid.
+		if ( ! $post ) {
+			return false;
+		}
+
+		$post_type_object      = get_post_type_object( $post->post_type );
+		$can_edit_others_posts = current_user_can( $post_type_object->cap->edit_others_posts );
+
+		// Return true if the user can edit others' posts of this type or if they're the author, false otherwise.
+		$has_access = $can_edit_others_posts || get_current_user_id() == $post->post_author;
+
+		$page_slug = self::$orders_slug;
+
+		/**
+		 * Filters whether a user can access the attendees page for a given post.
+		 *
+		 * @since 5.9.4
+		 *
+		 * @param bool    $has_access True if the user has access, false otherwise.
+		 * @param int     $post_id The ID of the post being checked.
+		 * @param WP_Post $post The post object.
+		 */
+		return apply_filters( "tec_tickets_report_{$page_slug}_page_role_access", $has_access, $post_id, $post );
 	}
 
 }

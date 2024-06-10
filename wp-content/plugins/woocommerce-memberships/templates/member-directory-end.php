@@ -17,14 +17,14 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 defined( 'ABSPATH' ) or exit;
 
 /**
- * Ends output for the members directory.
+ * Ends output for the Member Directory.
  *
  * @var array $members associative array of user memberships IDS indexed by user ID
  *
@@ -38,7 +38,7 @@ defined( 'ABSPATH' ) or exit;
 <?php
 
 /**
- * Fires after outputting the member directory.
+ * Fires after outputting the Member Directory.
  *
  * @since 1.21.0
  *

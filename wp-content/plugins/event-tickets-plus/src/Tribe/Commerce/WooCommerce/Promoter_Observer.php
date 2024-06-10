@@ -107,6 +107,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Promoter_Observer {
 		add_action( 'save_post_product', tribe_callback( 'tickets.promoter.observer', 'notify_ticket_event' ), 10, 1 );
 		// Order
 		add_action( 'save_post_shop_order', [ $this, 'order_updated' ], 10, 1 );
+		add_action( 'save_post_shop_order_placehold', [ $this, 'order_updated' ], 10, 1 );
 		add_action( 'woocommerce_after_order_object_save', [ $this, 'order_updated' ], 10, 1 );
 	}
 

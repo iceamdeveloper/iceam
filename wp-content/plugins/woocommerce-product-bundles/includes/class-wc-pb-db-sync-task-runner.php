@@ -2,7 +2,7 @@
 /**
  * WC_PB_DB_Sync_Task_Runner class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.5.0
  */
 

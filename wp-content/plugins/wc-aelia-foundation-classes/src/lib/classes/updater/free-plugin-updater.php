@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 use \Exception;
 
@@ -39,8 +39,6 @@ class Free_Plugin_Updater extends Updater {
 	 * be checked.
 	 */
 	protected function check_for_product_updates($plugin) {
-		// Debug
-		//var_dump($plugin->main_plugin_file);die();
 		$this->logger->debug(__('Checking for updates for free plugin', Definitions::TEXT_DOMAIN), array(
 			'Plugin meta' => $plugin,
 		));
@@ -57,17 +55,8 @@ class Free_Plugin_Updater extends Updater {
 		// it
 		$slug_for_update_check = isset($plugin_class::$slug_for_update_check) ? $plugin_class::$slug_for_update_check : $plugin_class::$plugin_slug;
 
-		// Debug
-		//var_dump(
-		//	$this->get_api_call_url(array(
-		//				'slug' => $slug_for_update_check,
-		//	)),
-		//	$plugin->main_plugin_file,
-		//	$slug_for_update_check
-		//);
-
 		try {
-			$update_checker = \Puc_v4_Factory::buildUpdateChecker(
+			$update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker( // NOSONAR
 					$this->get_api_call_url(array(
 						'slug' => $slug_for_update_check,
 					)),
@@ -89,7 +78,7 @@ class Free_Plugin_Updater extends Updater {
 	 * Checks for updates for the registered products.
 	 */
 	public function check_for_updates() {
-		require_once(WC_AeliaFoundationClasses::instance()->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php');
+		require_once WC_AeliaFoundationClasses::instance()->path('vendor') . '/yahnis-elsts/plugin-update-checker/plugin-update-checker.php';
 		return parent::check_for_updates();
 	}
 }

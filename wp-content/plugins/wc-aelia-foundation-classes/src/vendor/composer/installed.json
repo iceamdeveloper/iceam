@@ -2,17 +2,17 @@
     "packages": [
         {
             "name": "composer/ca-bundle",
-            "version": "1.3.5",
-            "version_normalized": "1.3.5.0",
+            "version": "1.3.6",
+            "version_normalized": "1.3.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/composer/ca-bundle.git",
-                "reference": "74780ccf8c19d6acb8d65c5f39cd72110e132bbd"
+                "reference": "90d087e988ff194065333d16bc5cf649872d9cdb"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/74780ccf8c19d6acb8d65c5f39cd72110e132bbd",
-                "reference": "74780ccf8c19d6acb8d65c5f39cd72110e132bbd",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/90d087e988ff194065333d16bc5cf649872d9cdb",
+                "reference": "90d087e988ff194065333d16bc5cf649872d9cdb",
                 "shasum": ""
             },
             "require": {
@@ -26,7 +26,7 @@
                 "symfony/phpunit-bridge": "^4.2 || ^5",
                 "symfony/process": "^2.5 || ^3.0 || ^4.0 || ^5.0 || ^6.0"
             },
-            "time": "2023-01-11T08:27:00+00:00",
+            "time": "2023-06-06T12:02:59+00:00",
             "type": "library",
             "extra": {
                 "branch-alias": {
@@ -61,7 +61,7 @@
             "support": {
                 "irc": "irc://irc.freenode.org/composer",
                 "issues": "https://github.com/composer/ca-bundle/issues",
-                "source": "https://github.com/composer/ca-bundle/tree/1.3.5"
+                "source": "https://github.com/composer/ca-bundle/tree/1.3.6"
             },
             "funding": [
                 {
@@ -81,23 +81,27 @@
         },
         {
             "name": "freemius/wordpress-sdk",
-            "version": "2.5.3",
-            "version_normalized": "2.5.3.0",
+            "version": "2.5.10",
+            "version_normalized": "2.5.10.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/Freemius/wordpress-sdk.git",
-                "reference": "2e56d683dd7b30445940679ecb401d2aff746c9e"
+                "reference": "05bac841008b705bff9636f782c96fb0a73e615b"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/Freemius/wordpress-sdk/zipball/2e56d683dd7b30445940679ecb401d2aff746c9e",
-                "reference": "2e56d683dd7b30445940679ecb401d2aff746c9e",
+                "url": "https://api.github.com/repos/Freemius/wordpress-sdk/zipball/05bac841008b705bff9636f782c96fb0a73e615b",
+                "reference": "05bac841008b705bff9636f782c96fb0a73e615b",
                 "shasum": ""
             },
             "require": {
                 "php": ">=5.2"
             },
-            "time": "2022-12-05T10:31:45+00:00",
+            "require-dev": {
+                "dealerdirect/phpcodesniffer-composer-installer": "^1.0",
+                "wp-coding-standards/wpcs": "^2.3"
+            },
+            "time": "2023-07-18T06:35:08+00:00",
             "type": "library",
             "installation-source": "dist",
             "notification-url": "https://packagist.org/downloads/",
@@ -117,7 +121,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Freemius/wordpress-sdk/issues",
-                "source": "https://github.com/Freemius/wordpress-sdk/tree/2.5.3"
+                "source": "https://github.com/Freemius/wordpress-sdk/tree/2.5.10"
             },
             "install-path": "../freemius/wordpress-sdk"
         },
@@ -502,29 +506,29 @@
         },
         {
             "name": "yahnis-elsts/plugin-update-checker",
-            "version": "v4.13",
-            "version_normalized": "4.13.0.0",
+            "version": "v5.1",
+            "version_normalized": "5.1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/YahnisElsts/plugin-update-checker.git",
-                "reference": "6eb27a6911e0e0880d09e5b11f577d3f688f7da7"
+                "reference": "48b03e93c9c2587f9276dce00ce2b6d94c1190d2"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/YahnisElsts/plugin-update-checker/zipball/6eb27a6911e0e0880d09e5b11f577d3f688f7da7",
-                "reference": "6eb27a6911e0e0880d09e5b11f577d3f688f7da7",
+                "url": "https://api.github.com/repos/YahnisElsts/plugin-update-checker/zipball/48b03e93c9c2587f9276dce00ce2b6d94c1190d2",
+                "reference": "48b03e93c9c2587f9276dce00ce2b6d94c1190d2",
                 "shasum": ""
             },
             "require": {
                 "ext-json": "*",
-                "php": ">=5.2.0"
+                "php": ">=5.6.20"
             },
-            "time": "2022-07-29T12:36:25+00:00",
+            "time": "2023-05-20T11:55:43+00:00",
             "type": "library",
             "installation-source": "dist",
             "autoload": {
                 "files": [
-                    "load-v4p13.php"
+                    "load-v5p1.php"
                 ]
             },
             "notification-url": "https://packagist.org/downloads/",
@@ -535,7 +539,7 @@
                 {
                     "name": "Yahnis Elsts",
                     "email": "whiteshadow@w-shadow.com",
-                    "homepage": "http://w-shadow.com/",
+                    "homepage": "https://w-shadow.com/",
                     "role": "Developer"
                 }
             ],
@@ -549,7 +553,7 @@
             ],
             "support": {
                 "issues": "https://github.com/YahnisElsts/plugin-update-checker/issues",
-                "source": "https://github.com/YahnisElsts/plugin-update-checker/tree/v4.13"
+                "source": "https://github.com/YahnisElsts/plugin-update-checker/tree/v5.1"
             },
             "install-path": "../yahnis-elsts/plugin-update-checker"
         }

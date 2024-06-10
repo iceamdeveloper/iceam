@@ -27,6 +27,8 @@ class ParserState
      */
     private $iCurrentPosition;
     /**
+     * will only be used if the CSS does not contain an `@charset` declaration
+     *
      * @var string
      */
     private $sCharset;
@@ -39,10 +41,10 @@ class ParserState
      */
     private $iLineNo;
     /**
-     * @param string $sText
+     * @param string $sText the complete CSS as text (i.e., usually the contents of a CSS file)
      * @param int $iLineNo
      */
-    public function __construct($sText, \Sensei\ThirdParty\Sabberworm\CSS\Settings $oParserSettings, $iLineNo = 1)
+    public function __construct($sText, Settings $oParserSettings, $iLineNo = 1)
     {
         $this->oParserSettings = $oParserSettings;
         $this->sText = $sText;
@@ -51,6 +53,8 @@ class ParserState
         $this->setCharset($this->oParserSettings->sDefaultCharset);
     }
     /**
+     * Sets the charset to be used if the CSS does not contain an `@charset` declaration.
+     *
      * @param string $sCharset
      *
      * @return void
@@ -64,6 +68,8 @@ class ParserState
         }
     }
     /**
+     * Returns the charset that is used if the CSS does not contain an `@charset` declaration.
+     *
      * @return string
      */
     public function getCharset()
@@ -92,6 +98,22 @@ class ParserState
         return $this->oParserSettings;
     }
     /**
+     * @return \Sabberworm\CSS\Parsing\Anchor
+     */
+    public function anchor()
+    {
+        return new Anchor($this->iCurrentPosition, $this);
+    }
+    /**
+     * @param int $iPosition
+     *
+     * @return void
+     */
+    public function setPosition($iPosition)
+    {
+        $this->iCurrentPosition = $iPosition;
+    }
+    /**
      * @param bool $bIgnoreCase
      *
      * @return string
@@ -100,12 +122,15 @@ class ParserState
      */
     public function parseIdentifier($bIgnoreCase = \true)
     {
+        if ($this->isEnd()) {
+            throw new UnexpectedEOFException('', '', 'identifier', $this->iLineNo);
+        }
         $sResult = $this->parseCharacter(\true);
         if ($sResult === null) {
-            throw new \Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedTokenException($sResult, $this->peek(5), 'identifier', $this->iLineNo);
+            throw new UnexpectedTokenException($sResult, $this->peek(5), 'identifier', $this->iLineNo);
         }
         $sCharacter = null;
-        while (($sCharacter = $this->parseCharacter(\true)) !== null) {
+        while (!$this->isEnd() && ($sCharacter = $this->parseCharacter(\true)) !== null) {
             if (\preg_match('/[a-zA-Z0-9\\x{00A0}-\\x{FFFF}_-]/Sux', $sCharacter)) {
                 $sResult .= $sCharacter;
             } else {
@@ -177,7 +202,7 @@ class ParserState
      */
     public function consumeWhiteSpace()
     {
-        $comments = [];
+        $aComments = [];
         do {
             while (\preg_match('/\\s/isSu', $this->peek()) === 1) {
                 $this->consume(1);
@@ -185,18 +210,18 @@ class ParserState
             if ($this->oParserSettings->bLenientParsing) {
                 try {
                     $oComment = $this->consumeComment();
-                } catch (\Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedEOFException $e) {
+                } catch (UnexpectedEOFException $e) {
                     $this->iCurrentPosition = $this->iLength;
-                    return;
+                    return $aComments;
                 }
             } else {
                 $oComment = $this->consumeComment();
             }
             if ($oComment !== \false) {
-                $comments[] = $oComment;
+                $aComments[] = $oComment;
             }
         } while ($oComment !== \false);
-        return $comments;
+        return $aComments;
     }
     /**
      * @param string $sString
@@ -237,14 +262,14 @@ class ParserState
             $iLineCount = \substr_count($mValue, "\n");
             $iLength = $this->strlen($mValue);
             if (!$this->streql($this->substr($this->iCurrentPosition, $iLength), $mValue)) {
-                throw new \Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedTokenException($mValue, $this->peek(\max($iLength, 5)), $this->iLineNo);
+                throw new UnexpectedTokenException($mValue, $this->peek(\max($iLength, 5)), $this->iLineNo);
             }
             $this->iLineNo += $iLineCount;
             $this->iCurrentPosition += $this->strlen($mValue);
             return $mValue;
         } else {
             if ($this->iCurrentPosition + $mValue > $this->iLength) {
-                throw new \Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedEOFException($mValue, $this->peek(5), 'count', $this->iLineNo);
+                throw new UnexpectedEOFException($mValue, $this->peek(5), 'count', $this->iLineNo);
             }
             $sResult = $this->substr($this->iCurrentPosition, $mValue);
             $iLineCount = \substr_count($sResult, "\n");
@@ -269,7 +294,7 @@ class ParserState
         if (\preg_match($mExpression, $sInput, $aMatches, \PREG_OFFSET_CAPTURE) === 1) {
             return $this->consume($aMatches[0][0]);
         }
-        throw new \Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedTokenException($mExpression, $this->peek(5), 'expression', $this->iLineNo);
+        throw new UnexpectedTokenException($mExpression, $this->peek(5), 'expression', $this->iLineNo);
     }
     /**
      * @return Comment|false
@@ -291,7 +316,7 @@ class ParserState
         }
         if ($mComment !== \false) {
             // We skip the * which was included in the comment.
-            return new \Sensei\ThirdParty\Sabberworm\CSS\Comment\Comment(\substr($mComment, 1), $iLineNo);
+            return new Comment(\substr($mComment, 1), $iLineNo);
         }
         return $mComment;
     }
@@ -337,7 +362,7 @@ class ParserState
             return $out;
         }
         $this->iCurrentPosition = $start;
-        throw new \Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedEOFException('One of ("' . \implode('","', $aEnd) . '")', $this->peek(5), 'search', $this->iLineNo);
+        throw new UnexpectedEOFException('One of ("' . \implode('","', $aEnd) . '")', $this->peek(5), 'search', $this->iLineNo);
     }
     /**
      * @return string

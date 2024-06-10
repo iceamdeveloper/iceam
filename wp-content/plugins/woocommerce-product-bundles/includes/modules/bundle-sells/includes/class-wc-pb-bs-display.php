@@ -2,7 +2,7 @@
 /**
  * WC_PB_BS_Display class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.8.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Display-related functions and filters.
  *
  * @class    WC_PB_BS_Display
- * @version  6.12.0
+ * @version  6.22.6
  */
 class WC_PB_BS_Display {
 
@@ -141,12 +141,10 @@ class WC_PB_BS_Display {
 				}
 
 				?>
-				<div class="bundle_data bundle_data_<?php echo $bundle->get_id(); ?>" data-bundle_form_data="<?php echo esc_attr( json_encode( $bundle->get_bundle_form_data() ) ); ?>" data-bundle_id="<?php echo $bundle->get_id(); ?>">
+				<div class="bundle_data bundle_data_<?php echo esc_attr( $bundle->get_id() ); ?>" data-bundle_form_data="<?php echo wc_esc_json( json_encode( $bundle->get_bundle_form_data() ) ); ?>" data-bundle_id="<?php echo esc_attr( $bundle->get_id() ); ?>">
 					<div class="bundle_wrap">
 						<div class="bundle_error" style="display:none">
-							<div class="woocommerce-info">
-								<ul class="msg"></ul>
-							</div>
+							<?php if ( ! is_admin() && ! WC_PB_Core_Compatibility::is_rest_api_request() ) { wc_print_notice( '<ul class="msg"></ul>', 'notice' ); } ?>
 						</div>
 					</div>
 				</div>
@@ -226,7 +224,7 @@ class WC_PB_BS_Display {
 				 * @param  array   $parent_item
 				 * @param  string  $parent_item_name
 				 */
-				/* translators: %1$s: Discount %, %2$s: Product title */
+				/* translators: %1$s: Discount % (Use encoded value when translating the % character. Use &#37; instead of %.), %2$s: Product title */
 				$bundle_sell_discount = apply_filters( 'wc_pb_bundle_sell_discount_cart_item_meta_value', sprintf( _x( '%1$s&#37; (applied by %2$s)', 'bundle-sell discount', 'woocommerce-product-bundles' ), round( ( float ) $cart_item[ 'bundle_sell_discount' ], 1 ), $parent_item_name ), $cart_item, $parent_item, $parent_item_name );
 
 				if ( $bundle_sell_discount ) {

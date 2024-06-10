@@ -25,10 +25,10 @@ class Sensei_Usage_Tracking_Data {
 	 **/
 	public static function get_usage_data(): array {
 		$usage_data = array_merge(
+			self::get_event_logging_base_fields(),
 			self::get_question_type_count(),
 			self::get_quiz_stats(),
 			[
-				'courses'                        => wp_count_posts( 'course' )->publish,
 				'course_active'                  => self::get_course_active_count(),
 				'course_completed'               => self::get_course_completed_count(),
 				'course_completion_rate'         => self::get_course_completion_rate(),
@@ -41,7 +41,6 @@ class Sensei_Usage_Tracking_Data {
 				'enrolment_first'                => self::get_first_course_enrolment(),
 				'enrolment_last'                 => self::get_last_course_enrolment(),
 				'enrolment_calculated'           => self::get_is_enrolment_calculated() ? 1 : 0,
-				'learners'                       => self::get_learner_count(),
 				'lessons'                        => wp_count_posts( 'lesson' )->publish,
 				'lesson_modules'                 => self::get_lesson_module_count(),
 				'lesson_prereqs'                 => self::get_lesson_prerequisite_count(),
@@ -69,10 +68,10 @@ class Sensei_Usage_Tracking_Data {
 		 * Filter the usage tracking data.
 		 *
 		 * @since 4.10.0
+		 *
 		 * @hook sensei_usage_tracking_data
 		 *
 		 * @param {array} $usage_data The usage tracking data.
-		 *
 		 * @return {array} Returns filtered usage tracking data.
 		 */
 		return apply_filters( 'sensei_usage_tracking_data', $usage_data );
@@ -114,12 +113,16 @@ class Sensei_Usage_Tracking_Data {
 			'paid'     => 0,
 			'courses'  => post_type_exists( 'course' ) ? wp_count_posts( 'course' )->publish : 0,
 			'learners' => self::get_learner_count(),
+			'is_wpcom' => get_option( 'wpcom_active_subscriptions' ) ? 1 : 0,
 		];
 
 		/**
 		 * Filter the fields that should be sent with every event that is logged.
 		 *
-		 * @param array $base_fields The default base fields.
+		 * @hook sensei_event_logging_base_fields
+		 *
+		 * @param {array} $base_fields The default base fields.
+		 * @return {array} Returns filtered base fields.
 		 */
 		return apply_filters( 'sensei_event_logging_base_fields', $base_fields );
 	}

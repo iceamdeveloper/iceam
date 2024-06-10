@@ -2,29 +2,23 @@
 
 class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Base {
 
-	private static $instance;
+	private static WC_Dynamic_Pricing_Advanced_Product $instance;
 
 	public static function instance() {
-		if ( self::$instance == null ) {
+		if ( empty( self::$instance ) ) {
 			self::$instance = new WC_Dynamic_Pricing_Advanced_Product( 'advanced_product' );
 		}
 
 		return self::$instance;
 	}
 
-	private $used_rules = array();
-
-	public function __construct( $module_id ) {
-		parent::__construct( $module_id );
-	}
+	private array $used_rules = array();
 
 	public function adjust_cart( $temp_cart ) {
 		foreach ( $temp_cart as $cart_item_key => $values ) {
 			$temp_cart[ $cart_item_key ]                       = $values;
 			$temp_cart[ $cart_item_key ]['available_quantity'] = $values['quantity'];
-			$temp_cart[ $cart_item_key ]['available_quantity'] = $values['quantity'];
 		}
-
 
 		foreach ( $temp_cart as $cart_item_key => $cart_item ) {
 			$process_discounts = apply_filters( 'woocommerce_dynamic_pricing_process_product_discounts', true, $cart_item['data'], 'advanced_product', $this, $cart_item );
@@ -61,9 +55,9 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 					$original_price = $this->get_price_to_discount( $cart_item, $cart_item_key );
 					if ( $original_price ) {
 						$price_adjusted = false;
-						if ( $set->mode == 'block' ) {
+						if ( $set->mode === 'block' ) {
 							$price_adjusted = $this->get_block_adjusted_price( $set, $original_price, $cart_item );
-						} elseif ( $set->mode == 'bulk' ) {
+						} elseif ( $set->mode === 'bulk' ) {
 							$price_adjusted = $this->get_adjusted_price( $set, $original_price, $cart_item );
 						}
 
@@ -119,13 +113,12 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 					$rule['to'] = $q;
 				}
 
-				$rule['from']   = floatval( $rule['from'] );
-				$rule['to']     = floatval( $rule['to'] );
+				$rule['from'] = floatval( $rule['from'] );
+				$rule['to']   = floatval( $rule['to'] );
 				$amount       = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, $cart_item, $this );
 				$amount       = floatval( $amount );
 
 				if ( $q >= $rule['from'] && $q <= $rule['to'] ) {
-					$this->discount_data['rule'] = $rule;
 
 					$num_decimals = apply_filters( 'woocommerce_dynamic_pricing_get_decimals', (int) get_option( 'woocommerce_price_num_decimals' ) );
 					switch ( $rule['type'] ) {
@@ -138,14 +131,13 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 							$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
 							break;
 						case 'fixed_price':
-
 							if ( isset( $cart_item['_gform_total'] ) ) {
 								$amount += floatval( $cart_item['_gform_total'] );
 							}
 
 							if ( isset( $cart_item['addons_price_before_calc'] ) ) {
 								$addons_total = floatval( $price ) - floatval( $cart_item['addons_price_before_calc'] );
-								$amount       += $addons_total;
+								$amount      += $addons_total;
 							}
 
 							$result = round( $amount, (int) $num_decimals );
@@ -191,13 +183,13 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 							$b         = 0;
 							$remaining = $q;
 
-							for ( $i = 0; $i < $q; $i ++ ) {
+							for ( $i = 0; $i < $q; $i++ ) {
 								if ( $q > $rule['from'] && $remaining > $rule['from'] ) {
-									$b ++;
+									++$b;
 								}
 
 								$remaining -= ( $rule['from'] + $rule['adjust'] );
-								$remaining = max( 0, $remaining );
+								$remaining  = max( 0, $remaining );
 
 								if ( $remaining <= $rule['from'] ) {
 									break;
@@ -212,8 +204,7 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 								$a = 0;
 							}
 							break;
-						case 'cat' :
-
+						case 'cat':
 							$terms = $this->get_product_category_ids( $cart_item['data'] );
 
 							if ( count( array_intersect( $collector['args']['cats'], $terms ) ) > 0 ) {
@@ -235,7 +226,6 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 
 							break;
 						case 'product':
-
 							if ( $q > $cart_item['quantity'] ) {
 								//The quantity of the Product in the cart is greater than this line item quanity.  An extension must be allowing the product to be
 								//in the cart more than once ( product-addons, gravity forms, etc.. ) or this is a variation.
@@ -251,13 +241,13 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 								$b         = 0;
 								$remaining = $q;
 
-								for ( $i = 0; $i < $q; $i ++ ) {
+								for ( $i = 0; $i < $q; $i++ ) {
 									if ( $q > $rule['from'] && $remaining > $rule['from'] ) {
-										$b ++;
+										++$b;
 									}
 
 									$remaining -= ( $rule['from'] + $rule['adjust'] );
-									$remaining = max( 0, $remaining );
+									$remaining  = max( 0, $remaining );
 
 									if ( $remaining <= $rule['from'] ) {
 										break;
@@ -319,7 +309,6 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 
 							break;
 						case 'product':
-
 							$f = $rule['from'];
 							$a = min( $rule['adjust'], max( 0, $q - $f ) );
 
@@ -410,7 +399,7 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 			case 'cart_item':
 				$quantity = $cart_item['quantity'];
 				break;
-			case 'cat' :
+			case 'cat':
 				if ( isset( $collector['args'] ) && isset( $collector['args']['cats'] ) && is_array( $collector['args']['cats'] ) ) {
 					$quantity = 0;
 					if ( isset( $collector['args'] ) && isset( $collector['args']['cats'] ) && is_array( $collector['args']['cats'] ) ) {
@@ -439,5 +428,4 @@ class WC_Dynamic_Pricing_Advanced_Product extends WC_Dynamic_Pricing_Advanced_Ba
 
 		return apply_filters( 'woocommerce_dynamic_pricing_get_quantity_for_cart_item', $quantity, $cart_item, $collector, $set );
 	}
-
 }

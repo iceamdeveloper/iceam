@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin_Ajax class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.0.0
  */
 
@@ -434,7 +434,7 @@ class WC_PB_Admin_Ajax {
 
 				if ( $notice ) {
 					/* translators: %1$s: error, %2$s: reason */
-					$message = sprintf( _x( '%1$s %2$s', 'edit bundle in order: formatted validation message', 'woocommerce-product-bundles' ), $message, html_entity_decode( $notice ) );
+					$message = sprintf( _x( '%1$s %2$s', 'edit bundle in order: formatted validation message', 'woocommerce-product-bundles' ), $message, html_entity_decode( $notice, ENT_COMPAT ) );
 				}
 
 				$response = array(

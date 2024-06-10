@@ -22,7 +22,7 @@
 
 add_action( 'wp_enqueue_scripts', 'theme_enqueue_styles' );
 function theme_enqueue_styles() {
-    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css?v=1' );
+    wp_enqueue_style( 'parent-style', get_template_directory_uri() . '/style.css?v=1.1' );
     
     // load the theme stylesheet here instead of in parent theme
     wp_deregister_style('theme-stylesheet');
@@ -33,6 +33,23 @@ function theme_enqueue_styles() {
 	wp_enqueue_style( 'theme-stylesheet');
 }
 
+/***********************************************************************
+ *
+ *	ENQUEUE STYLESHEET(S)
+ *
+ **********************************************************************/
+
+ add_action( 'wp_enqueue_scripts', 'theme_enqueue_scripts' );
+ function theme_enqueue_scripts() {
+	 wp_register_script( 'bootstrap-js', get_stylesheet_directory_uri().'/js/bootstrap.min.js', array() );
+	 wp_enqueue_script( 'bootstrap-js');
+	 wp_register_script( 'jquery-validate', get_stylesheet_directory_uri().'/js/jquery.validate.min.js', array('bootstrap-js') );
+	 wp_enqueue_script( 'jquery-validate');
+	 $rand = rand( 0, 999999999999 );
+	 wp_register_script( 'site-js', get_stylesheet_directory_uri().'/site.js', array('bootstrap-js','jquery-validate'), $rand);
+	 wp_enqueue_script( 'site-js');
+ }
+ 
 
 
  
@@ -498,9 +515,9 @@ function create_top_nav(){
 ?>
 	<div id="top">
 		<div class="col-full">
-			<div id="currency-selector">
-				<?php echo do_shortcode('[aelia_currency_selector_widget title="" widget_type="buttons"]'); ?>
-			</div>
+			<!-- <div id="currency-selector">
+				<?php // echo do_shortcode('[aelia_currency_selector_widget title="" widget_type="buttons"]'); ?>
+			</div> -->
 			<?php
 				$args = array(
 					'menu' => 'utility-nav',

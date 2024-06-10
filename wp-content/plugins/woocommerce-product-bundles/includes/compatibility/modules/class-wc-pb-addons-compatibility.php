@@ -2,7 +2,7 @@
 /**
  * WC_PB_Addons_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.11.4
  */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Product Addons Compatibility.
  *
- * @version  6.18.0
+ * @version  7.0.0
  */
 class WC_PB_Addons_Compatibility {
 
@@ -146,8 +146,8 @@ class WC_PB_Addons_Compatibility {
 
 		?><div class="disable_addons">
 			<div class="form-field">
-				<label for="disable_addons"><?php echo __( 'Disable Add-Ons', 'woocommerce-product-bundles' ) ?></label>
-				<input type="checkbox" class="checkbox"<?php echo ( $disable_addons ? ' checked="checked"' : '' ); ?> name="bundle_data[<?php echo $loop; ?>][disable_addons]" <?php echo ( $disable_addons ? 'value="1"' : '' ); ?>/>
+				<label for="disable_addons"><?php echo esc_html__( 'Disable Add-Ons', 'woocommerce-product-bundles' ) ?></label>
+				<input type="checkbox" class="checkbox"<?php echo ( $disable_addons ? ' checked="checked"' : '' ); ?> name="bundle_data[<?php echo esc_attr( $loop ); ?>][disable_addons]" <?php echo ( $disable_addons ? 'value="1"' : '' ); ?>/>
 				<?php echo wc_help_tip( __( 'Check this option to disable any Product Add-Ons associated with this bundled product.', 'woocommerce-product-bundles' ) ); ?>
 			</div>
 		</div><?php
@@ -401,26 +401,40 @@ class WC_PB_Addons_Compatibility {
 				return $cart_item;
 			}
 
-			$cart_item[ 'data' ]->bundled_price_offset_pct = array();
-			$cart_item[ 'data' ]->bundled_price_offset     = 0.0;
+			WC_PB()->product_data->set( $cart_item[ 'data' ], 'bundled_price_offset_pct', array() );
+			WC_PB()->product_data->set( $cart_item[ 'data' ], 'bundled_price_offset', 0.0 );
 
 			if ( $bundle_container_item = wc_pb_get_bundled_cart_item_container( $cart_item ) ) {
 
 				// Read original % values from parent item.
 				$addons_data = ! empty( $bundle_container_item[ 'stamp' ][ $bundled_item_id ][ 'addons' ] ) ? $bundle_container_item[ 'stamp' ][ $bundled_item_id ][ 'addons' ] : array();
+				$flat_fees   = 0;
 
 				foreach ( $addons_data as $addon_key => $addon ) {
 
+					$bundled_price_offset     = WC_PB()->product_data->get( $cart_item[ 'data' ], 'bundled_price_offset' );
+					$bundled_price_offset_pct = WC_PB()->product_data->get( $cart_item[ 'data' ], 'bundled_price_offset_pct' );
+
 					// See 'WC_Bundled_Item::filter_get_price'.
 					if ( 'percentage_based' === $addon[ 'price_type' ] ) {
-						$cart_item[ 'data' ]->bundled_price_offset_pct[] = $addon[ 'price' ];
+						$bundled_price_offset_pct[]                      = $addon[ 'price' ];
 						$cart_item[ 'addons' ][ $addon_key ][ 'price' ]  = 0.0;
+
+						WC_PB()->product_data->set( $cart_item[ 'data' ], 'bundled_price_offset_pct', $bundled_price_offset_pct );
 					} elseif ( 'flat_fee' === $addon[ 'price_type' ] ) {
-						$cart_item[ 'data' ]->bundled_price_offset += (float) $addon[ 'price' ] / $cart_item[ 'quantity' ];
+						$bundled_price_offset += (float) $addon[ 'price' ] / $cart_item[ 'quantity' ];
+						$flat_fees            += (float) $addon[ 'price' ] / $cart_item[ 'quantity' ];
+
+						WC_PB()->product_data->set( $cart_item[ 'data' ], 'bundled_price_offset', $bundled_price_offset );
+
 					} else {
-						$cart_item[ 'data' ]->bundled_price_offset += (float) $addon[ 'price' ];
+						$bundled_price_offset += (float) $addon[ 'price' ];
+
+						WC_PB()->product_data->set( $cart_item[ 'data' ], 'bundled_price_offset', $bundled_price_offset );
 					}
 				}
+
+				$cart_item[ 'addons_flat_fees_sum' ] = $flat_fees;
 			}
 
 		} else {

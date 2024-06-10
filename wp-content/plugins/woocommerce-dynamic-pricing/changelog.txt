@@ -1,4 +1,22 @@
 *** Dynamic Pricing Changelog ***
+2024.03.28 - version 3.2.6
+    * Quick Fix: Revert issue caused by trying to optimize too early.
+
+2024.03.28 - version 3.2.5
+    * Fix: Fix additional issues with the Cart Checkout Blocks
+    * Fix: Fix issues with Advanced Category Rules not being applied in the cart if the rule was targeting specific roles or users.
+    * Update:  WC and WP Compatibility updates.
+    * Update:  PHP 8.2 + compatibility updates.
+
+2024.03.26 - version 3.2.4
+    * Update:  WC and WP Compatibility updates.
+    * Update:  Remove some deprecated functions and other legacy code compatibility functions.
+    * Update:  PHP 8.2 + compatibility updates.
+
+2023.08.15 - version 3.2.3
+    * Update: WC and WP Compatibility updates.
+    * Update: Float value handing for PHP 8.x servers.
+
 2023.04.11 - version 3.2.2
     * Update: WC and WP version updates.
     * Update:  Allow pricing rules to be applied to products with a 0 based price and a fixed price adjustment
@@ -31,7 +49,7 @@
 2022.01.08 - version 3.1.26
     * Fix:  Fix the sorting function to sort in the right direction.  Resolves issues with variations being discounted incorrectly.
     * Fix:  Fix problem with Membership rules not being cumulative with product specific rules.
-    * Update:  Use current_datetime() rather than current_time() for date comparision.
+    * Update:  Use current_datetime() rather than current_time() for date comparison.
     * Update:  Added, woocommerce_subscriptions_product_price filter to filter subscription price changes.
     * Update:  Only show discount price in the shop if the item is in categories to count for advanced product rules.
     * Update: WP and WC Version

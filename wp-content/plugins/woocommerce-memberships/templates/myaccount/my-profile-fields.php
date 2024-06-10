@@ -17,7 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2021, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -29,7 +29,7 @@ defined( 'ABSPATH' ) or exit;
  * @var SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field[] $profile_fields array of profile field objects
  * @var string $security nonce necessary to update profile fields
  *
- * @version 1.19.0
+ * @version 1.26.3
  * @since 1.19.0
  */
 
@@ -46,7 +46,7 @@ defined( 'ABSPATH' ) or exit;
 				<?php foreach ( $profile_fields as $profile_field ) : ?>
 					<tr>
 						<td>
-							<?php echo esc_html( $profile_field->get_definition()->get_name() ); ?>
+							<?php echo esc_html( $profile_field->get_definition()->get_label() ?: $profile_field->get_definition()->get_name() ); ?>
 							<?php echo $profile_field->is_required() ? '<abbr class="required" title="' . esc_attr_x( 'required', 'Required input field', 'woocommerce-memberships'  ) . '">*</abbr>' : '<span class="optional">(' . esc_html_x( 'optional', 'Optional input field', 'woocommerce-memberships' ) . ')</span>'; ?>
 						</td>
 						<td>

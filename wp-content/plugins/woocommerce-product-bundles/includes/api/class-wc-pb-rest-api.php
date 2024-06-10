@@ -2,7 +2,7 @@
 /**
  * WC_PB_REST_API class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.0.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Add custom REST API fields.
  *
  * @class    WC_PB_REST_API
- * @version  6.18.5
+ * @version  7.0.2
  */
 class WC_PB_REST_API {
 
@@ -49,6 +49,9 @@ class WC_PB_REST_API {
 
 		// Filter WP REST API order line item fields.
 		add_action( 'rest_api_init', array( __CLASS__, 'filter_order_fields' ), 0 );
+
+		// Product template
+		add_filter('woocommerce_product_template_csv_file_path', array( __CLASS__, 'product_bundle_template_csv_file_path' ), 10, 2 );
 
 		// Hooks to add WC v1-v3 API custom order fields.
 		self::add_legacy_hooks();
@@ -1192,7 +1195,7 @@ class WC_PB_REST_API {
 			}
 
 			// 'WC_PB_Cart::validate_bundle_configuration expects' 'optional_selected' to be 'yes'|'no', not boolean.
-			if ( ! empty( $bundled_item_configuration[ 'optional_selected' ] ) ) {
+			if ( isset( $bundled_item_configuration[ 'optional_selected' ] ) ) {
 				$configuration[ $bundled_item_id ][ 'optional_selected' ] = true === $bundled_item_configuration[ 'optional_selected' ] ? 'yes' : 'no';
 			}
 
@@ -1348,6 +1351,10 @@ class WC_PB_REST_API {
 				$object = wc_get_order( $object );
 			}
 
+			if ( ! ( is_a( $object, 'WC_Order' ) || is_a( $object, 'WC_Order_Refund' ) ) ) {
+				return $response;
+			}
+
 			$order_data = $response->get_data();
 			$order_data = self::get_extended_order_data( $order_data, $object );
 
@@ -1447,6 +1454,22 @@ class WC_PB_REST_API {
 		$order_data = self::get_extended_order_data( $order_data, $order );
 
 		return $order_data;
+	}
+
+	/**
+	 * If the requested template is 'product-bundle', return the path to the product bundle template.
+	 *
+	 * @since 7.0.2
+	 * @param string $template_path Current template path.
+	 * @param string $template_name Requested template name.
+	 * @return string
+	 */
+	public static function product_bundle_template_csv_file_path( $template_path, $template_name ) {
+		if ( 'product-bundles' === $template_name ) {
+			$template_path = WC_PB_ABSPATH . 'includes/api/templates/product-bundle-template.csv';
+		}
+
+		return $template_path;
 	}
 }
 

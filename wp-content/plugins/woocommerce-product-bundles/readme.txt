@@ -1,12 +1,12 @@
-=== WooCommerce Product Bundles ===
+=== Woo Product Bundles ===
 
 Contributors: SomewhereWarm
 Tags: woocommerce, product, bundle, bundles, kits, simple, variable, configurable
 Requires at least: 4.4
-Tested up to: 6.0
-Stable tag: 6.18.6
+Tested up to: 6.5
+Stable tag: 7.0.2
 WC requires at least: 3.9
-WC tested up to: 7.7
+WC tested up to: 8.6
 License: GNU General Public License v3.0
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 
@@ -16,4 +16,4 @@ Offer product bundles, bulk discount packages, and assembled products.
 
 Create assembled products and product bundles by grouping simple, variable and subscription products.
 
-Looking for help? Read the full documentation [here](http://docs.woocommerce.com/document/bundles/).
+Looking for help? Read the full documentation [here](http://woo.com/document/bundles/).

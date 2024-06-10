@@ -12,17 +12,18 @@ use Sensei\ThirdParty\Sabberworm\CSS\Renderable;
 use Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList;
 use Sensei\ThirdParty\Sabberworm\CSS\Value\Value;
 /**
- * RuleSets contains Rule objects which always have a key and a value.
- * In CSS, Rules are expressed as follows: “key: value[0][0] value[0][1], value[1][0] value[1][1];”
+ * `Rule`s just have a string key (the rule) and a 'Value'.
+ *
+ * In CSS, `Rule`s are expressed as follows: “key: value[0][0] value[0][1], value[1][0] value[1][1];”
  */
-class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\ThirdParty\Sabberworm\CSS\Comment\Commentable
+class Rule implements Renderable, Commentable
 {
     /**
      * @var string
      */
     private $sRule;
     /**
-     * @var RuleValueList|null
+     * @var RuleValueList|string|null
      */
     private $mValue;
     /**
@@ -66,14 +67,14 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
      * @throws UnexpectedEOFException
      * @throws UnexpectedTokenException
      */
-    public static function parse(\Sensei\ThirdParty\Sabberworm\CSS\Parsing\ParserState $oParserState)
+    public static function parse(ParserState $oParserState)
     {
         $aComments = $oParserState->consumeWhiteSpace();
-        $oRule = new \Sensei\ThirdParty\Sabberworm\CSS\Rule\Rule($oParserState->parseIdentifier(!$oParserState->comes("--")), $oParserState->currentLine(), $oParserState->currentColumn());
+        $oRule = new Rule($oParserState->parseIdentifier(!$oParserState->comes("--")), $oParserState->currentLine(), $oParserState->currentColumn());
         $oRule->setComments($aComments);
         $oRule->addComments($oParserState->consumeWhiteSpace());
         $oParserState->consume(':');
-        $oValue = \Sensei\ThirdParty\Sabberworm\CSS\Value\Value::parseValue($oParserState, self::listDelimiterForRule($oRule->getRule()));
+        $oValue = Value::parseValue($oParserState, self::listDelimiterForRule($oRule->getRule()));
         $oRule->setValue($oValue);
         if ($oParserState->getSettings()->bLenientParsing) {
             while ($oParserState->comes('\\')) {
@@ -150,14 +151,14 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
         return $this->sRule;
     }
     /**
-     * @return RuleValueList|null
+     * @return RuleValueList|string|null
      */
     public function getValue()
     {
         return $this->mValue;
     }
     /**
-     * @param RuleValueList|null $mValue
+     * @param RuleValueList|string|null $mValue
      *
      * @return void
      */
@@ -178,12 +179,12 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
     {
         $oSpaceSeparatedList = null;
         if (\count($aSpaceSeparatedValues) > 1) {
-            $oSpaceSeparatedList = new \Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList(' ', $this->iLineNo);
+            $oSpaceSeparatedList = new RuleValueList(' ', $this->iLineNo);
         }
         foreach ($aSpaceSeparatedValues as $aCommaSeparatedValues) {
             $oCommaSeparatedList = null;
             if (\count($aCommaSeparatedValues) > 1) {
-                $oCommaSeparatedList = new \Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList(',', $this->iLineNo);
+                $oCommaSeparatedList = new RuleValueList(',', $this->iLineNo);
             }
             foreach ($aCommaSeparatedValues as $mValue) {
                 if (!$oSpaceSeparatedList && !$oCommaSeparatedList) {
@@ -215,7 +216,7 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
      */
     public function getValues()
     {
-        if (!$this->mValue instanceof \Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList) {
+        if (!$this->mValue instanceof RuleValueList) {
             return [[$this->mValue]];
         }
         if ($this->mValue->getListSeparator() === ',') {
@@ -223,7 +224,7 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
         }
         $aResult = [];
         foreach ($this->mValue->getListComponents() as $mValue) {
-            if (!$mValue instanceof \Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList || $mValue->getListSeparator() !== ',') {
+            if (!$mValue instanceof RuleValueList || $mValue->getListSeparator() !== ',') {
                 $aResult[] = [$mValue];
                 continue;
             }
@@ -250,9 +251,9 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
         if (!\is_array($mValue)) {
             $mValue = [$mValue];
         }
-        if (!$this->mValue instanceof \Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList || $this->mValue->getListSeparator() !== $sType) {
+        if (!$this->mValue instanceof RuleValueList || $this->mValue->getListSeparator() !== $sType) {
             $mCurrentValue = $this->mValue;
-            $this->mValue = new \Sensei\ThirdParty\Sabberworm\CSS\Value\RuleValueList($sType, $this->iLineNo);
+            $this->mValue = new RuleValueList($sType, $this->iLineNo);
             if ($mCurrentValue) {
                 $this->mValue->addListComponent($mCurrentValue);
             }
@@ -307,16 +308,16 @@ class Rule implements \Sensei\ThirdParty\Sabberworm\CSS\Renderable, \Sensei\Thir
      */
     public function __toString()
     {
-        return $this->render(new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat());
+        return $this->render(new OutputFormat());
     }
     /**
      * @return string
      */
-    public function render(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oOutputFormat)
+    public function render(OutputFormat $oOutputFormat)
     {
-        $sResult = "{$this->sRule}:{$oOutputFormat->spaceAfterRuleName()}";
-        if ($this->mValue instanceof \Sensei\ThirdParty\Sabberworm\CSS\Value\Value) {
-            //Can also be a ValueList
+        $sResult = "{$oOutputFormat->comments($this)}{$this->sRule}:{$oOutputFormat->spaceAfterRuleName()}";
+        if ($this->mValue instanceof Value) {
+            // Can also be a ValueList
             $sResult .= $this->mValue->render($oOutputFormat);
         } else {
             $sResult .= $this->mValue;

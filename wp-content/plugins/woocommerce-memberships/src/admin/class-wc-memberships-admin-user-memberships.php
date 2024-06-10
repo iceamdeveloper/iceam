@@ -17,13 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field_Definition;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -117,11 +117,11 @@ class WC_Memberships_Admin_User_Memberships {
 			$columns[ $column_key ] = stripslashes( $profile_field_definition->get_name() );
 		}
 
-		$columns['plan']         = __( 'Plan', 'woocommerce-memberships' );         // associated membership plan
-		$columns['status']       = __( 'Status', 'woocommerce-memberships' );       // user membership status
-		$columns['member_since'] = __( 'Member since', 'woocommerce-memberships' ); // membership created
-		$columns['expires']      = __( 'Expires', 'woocommerce-memberships' );      // expiration date-time
-		$columns['last_login']   = __( 'Last login', 'woocommerce-memberships' );   // last login since
+		$columns['plan']         = __( 'Plan', 'woocommerce-memberships' );           // associated membership plan
+		$columns['status']       = __( 'Status', 'woocommerce-memberships' );         // user membership status
+		$columns['member_since'] = __( 'Member since', 'woocommerce-memberships' );   // membership created
+		$columns['expires']      = __( 'Expires', 'woocommerce-memberships' );        // expiration date-time
+		$columns['last_login']   = __( 'Last activity', 'woocommerce-memberships' );  // last activity since
 
 		return $columns;
 	}
@@ -394,13 +394,7 @@ class WC_Memberships_Admin_User_Memberships {
 
 			case 'last_login' :
 
-				$last_active = $user instanceof \WP_User ? get_user_meta( $user->ID, 'wc_last_active', true ) : null;
-
-				echo is_numeric( $last_active ) ? sprintf(
-					/* translators: Placeholder: %s last login since */
-					esc_html__( '%s ago', 'woocommerce-memberships' ),
-					human_time_diff( (int) $last_active )
-				) : '&mdash;';
+				echo $user_membership->get_last_active_since() ?: '&mdash;';
 
 			break;
 

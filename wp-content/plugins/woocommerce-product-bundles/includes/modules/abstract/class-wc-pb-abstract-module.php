@@ -2,7 +2,7 @@
 /**
  * WCS_PB_Abstract_Module class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.8.0
  */
 

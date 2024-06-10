@@ -338,7 +338,7 @@
 		box-sizing: border-box;
 		color: #fff;
 		content: '\f132';
-		font-family: 'dashicons';
+		font-family: 'dashicons', sans-serif;
 		font-size: 10px;
 		font-weight: 400;
 		height: 14px;
@@ -566,6 +566,14 @@
 			width: auto;
 		}
 
+.tribe-common button.tribe-common-c-btn--small:hover, .tribe-common input[type="button"].tribe-common-c-btn--small:hover, .tribe-common input[type="submit"].tribe-common-c-btn--small:hover, .tribe-common a.tribe-common-c-btn--small:hover {
+				padding: 11px 14px;
+			}
+
+.tribe-common button.tribe-common-c-btn--small:disabled, .tribe-common input[type="button"].tribe-common-c-btn--small:disabled, .tribe-common input[type="submit"].tribe-common-c-btn--small:disabled, .tribe-common a.tribe-common-c-btn--small:disabled {
+				padding: 11px 14px;
+			}
+
 /* -----------------------------------------------------------------------------
 	 *
 	 * Button: Link
@@ -632,6 +640,38 @@
 .tribe-common button.tribe-common-c-btn-link:disabled, .tribe-common input[type="button"].tribe-common-c-btn-link:disabled, .tribe-common input[type="submit"].tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
 				color: var(--tec-color-accent-primary-background);
 			}
+
+.tribe-common .tec-tickets__attendees-list-wrapper, .event-tickets .tec-tickets__attendees-list-wrapper {
+		margin-top: var(--tec-spacer-8);
+	}
+
+.tribe-common .tec-tickets__attendees-list, .event-tickets .tec-tickets__attendees-list {
+		background-color: var(--tec-color-background);
+		margin-top: var(--tec-spacer-3);
+	}
+
+.tribe-common .tec-tickets__attendees-list-item, .event-tickets .tec-tickets__attendees-list-item {
+		align-items: center;
+		border-left: 1px solid var(--tec-color-border-secondary);
+		border-right: 1px solid var(--tec-color-border-secondary);
+		border-top: 1px solid var(--tec-color-border-secondary);
+		container-type: inline-size;
+		display: flex;
+		flex-direction: column;
+		grid-gap: var(--tec-spacer-1);
+		gap: var(--tec-spacer-1);
+		margin: 0;
+		padding: var(--tec-spacer-4);
+	}
+
+.tribe-common .tec-tickets__attendees-list-item:last-child, .event-tickets .tec-tickets__attendees-list-item:last-child {
+			border-bottom: 1px solid var(--tec-color-border-secondary);
+		}
+
+.tribe-common .tec-tickets__attendees-list-item-attendee-details, .event-tickets .tec-tickets__attendees-list-item-attendee-details {
+		align-self: center;
+		flex-grow: 1;
+	}
 
 /**
  * Event Tickets Admin Settings
@@ -1288,11 +1328,61 @@ body.events-cal .tribe-common div.tribe-dialog, body.events-cal .event-tickets d
 	font-weight: var(--tec-font-weight-bold);
 }
 
+.tec-tickets__admin-after-pay-promo-container {
+	align-items: center;
+	background: #f6f7f7;
+	border: 1px solid #c3c4c7;
+	border-radius: 6px;
+	display: flex;
+	margin-bottom: 32px;
+	padding: 20px;
+}
+
+.tec-tickets__admin-after-pay-promo-icon-container {
+	display: none;
+	padding: 10px;
+}
+
+.tec-tickets__admin-after-pay-promo-icon {
+	height: 48px;
+	width: 48px;
+}
+
+.tec-tickets__admin-after-pay-promo-content-container {
+	padding: 10px;
+}
+
+.tec-tickets__admin-after-pay-promo-content-title {
+	font-size: 20px;
+	font-weight: 400;
+	margin-bottom: 12px;
+}
+
+.tec-tickets__admin-after-pay-promo-description {
+	font-size: 14px;
+	margin-bottom: 6px;
+}
+
+.tec-tickets__admin-after-pay-promo-links-container {
+	display: flex;
+	flex-wrap: wrap;
+	font-size: 14px;
+}
+
+.tec-tickets__admin-after-pay-promo-link {
+	display: inline-block;
+	margin-right: 12px;
+}
+
 /**
  * Event Tickets Emails Admin Settings
  *
  * @since 5.5.6
  */
+
+.tec-tickets__admin-settings-tab-heading {
+	margin-top: 55px;
+}
 
 .tec-tickets__admin-settings-emails-description {
 	color: #8e8e8e;
@@ -1307,6 +1397,8 @@ body.events-cal .tribe-common div.tribe-dialog, body.events-cal .event-tickets d
 	border: 1px var(--tec-color-border-default) solid;
 	border-radius: var(--tec-border-radius-default);
 	margin-bottom: var(--tec-spacer-5);
+	margin-top: var(--tec-spacer-8);
+	max-width: 800px;
 }
 
 .tec-tickets__admin-settings-emails-template-list-item {
@@ -1330,7 +1422,7 @@ body.events-cal .tribe-common div.tribe-dialog, body.events-cal .event-tickets d
 	}
 
 .tec-tickets__admin-settings-emails-template-list-item-icon {
-	padding: 0 var(--tec-spacer-4);
+	padding: 0 var(--tec-spacer-2);
 	width: 25px;
 }
 
@@ -1347,12 +1439,12 @@ body.events-cal .tribe-common div.tribe-dialog, body.events-cal .event-tickets d
 
 .tec-tickets__admin-settings-emails-template-list-item-title {
 	min-width: 90px;
-	padding: 0 var(--tec-spacer-4) 0 0;
+	padding: 0 var(--tec-spacer-2) 0 0;
 }
 
 .tec-tickets__admin-settings-emails-template-list-item-title-link {
 	color: #000;
-	font-size: 15px;
+	font-size: 13px;
 	font-weight: var(--tec-font-weight-bold);
 	text-decoration: none;
 }
@@ -1363,13 +1455,13 @@ body.events-cal .tribe-common div.tribe-dialog, body.events-cal .event-tickets d
 
 .tec-tickets__admin-settings-emails-template-list-item-recipient {
 	flex-grow: 1;
-	font-size: 13px;
+	font-size: 11px;
 	font-weight: var(--tec-font-weight-regular);
 	padding: 0;
 }
 
 .tec-tickets__admin-settings-emails-template-list-item-action {
-	padding: 0 var(--tec-spacer-4);
+	padding: 0 var(--tec-spacer-2);
 }
 
 .tec-tickets__admin-settings-emails-template-list-item-action-link {
@@ -1381,7 +1473,11 @@ body.events-cal .tribe-common div.tribe-dialog, body.events-cal .event-tickets d
 	}
 
 .button.tec-tickets__admin-settings-emails-preview-button {
-	margin-left: var(--tec-spacer-2);
+	font-size: 13px;
+	line-height: 2.15384615;
+	margin: 0 0 0 var(--tec-spacer-2);
+	min-height: 30px;
+	padding: 0 10px;
 }
 
 body.tickets_page_tec-tickets-settings .event-tickets div.tribe-dialog, body.tickets_page_tec-tickets-settings .tribe-common div.tribe-dialog {
@@ -1513,6 +1609,10 @@ body.tickets_page_tec-tickets-settings .event-tickets div.tribe-dialog, body.tic
 				width: auto
 		}
 
+.tribe-common .tec-tickets__attendees-list-item, .event-tickets .tec-tickets__attendees-list-item {
+			flex-direction: row
+	}
+
 .tec-tickets__admin-settings-tickets-commerce-gateway {
 		background-image: url("../images/background-gateway-connect.png");
 		background-position: center right;
@@ -1548,8 +1648,25 @@ body.tickets_page_tec-tickets-settings .event-tickets div.tribe-dialog, body.tic
 		text-align: left
 }
 
+.tec-tickets__admin-settings-emails-template-list-item-icon {
+		padding: 0 var(--tec-spacer-4)
+}
+
 .tec-tickets__admin-settings-emails-template-list-item-title {
-		min-width: 200px
+		min-width: 200px;
+		padding: 0 var(--tec-spacer-4) 0 0
+}
+
+.tec-tickets__admin-settings-emails-template-list-item-title-link {
+		font-size: 15px
+}
+
+.tec-tickets__admin-settings-emails-template-list-item-recipient {
+		font-size: 13px
+}
+
+.tec-tickets__admin-settings-emails-template-list-item-action {
+		padding: 0 var(--tec-spacer-4)
 }
 
 .event-tickets .tribe-dialog__wrapper.tribe-modal__wrapper--emails-preview, .tribe-common .tribe-dialog__wrapper.tribe-modal__wrapper--emails-preview {
@@ -1577,5 +1694,12 @@ body.tickets_page_tec-tickets-settings .event-tickets div.tribe-dialog, body.tic
 
 .tec-tickets__admin-tc-banner-content {
 		max-width: calc(100% - 450px)
+}
+	}
+
+@media (min-width: 600px) {
+
+.tec-tickets__admin-after-pay-promo-icon-container {
+		display: block
 }
 	}

@@ -17,12 +17,12 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Helpers\Strings_Helper;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -2070,6 +2070,34 @@ class WC_Memberships_Membership_Plan {
 		) );
 
 		return $user_membership->get_id();
+	}
+
+
+	/**
+	 * Determines if a membership plan has a "public" status.
+	 *
+	 * Plans are posts and as such can have statuses.
+	 * These are mostly used internally, however in some public-facing contexts we might be interested in knowing if a plan should have more "private" visibility.
+	 * This could be the case, for instance, when querying members of a plan for listing them publicly through a block or a shortcode.
+	 *
+	 * @since 1.26.0-dev.1
+	 *
+	 * @return bool
+	 */
+	public function is_public() : bool {
+
+		$plan_id = $this->get_id();
+		$status  = $plan_id > 0 ? get_post_status( $plan_id ) : 'new';
+
+		/**
+		 * Filter whether the plan has a "private" status.
+		 *
+		 * @since 1.26.0-dev.1
+		 *
+		 * @param bool $is_public
+		 * @param \WC_Memberships_Membership_Plan $plan
+		 */
+		return (bool) apply_filters( 'wc_memberships_membership_is_public', in_array( $status, wc_memberships()->get_plans_instance()->get_membership_plans_public_statuses(), true ), $this );
 	}
 
 

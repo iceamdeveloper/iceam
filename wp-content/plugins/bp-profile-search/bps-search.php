@@ -119,8 +119,10 @@ function bps_field_before_query ($f)
 {
 	if (bps_debug ())
 	{
+		$g = clone $f;
+		$g->value = esc_html($f->value);
 		echo "<!--\n";
-		echo "query "; print_r ($f);
+		echo "query "; print_r ($g);
 		echo "-->\n";
 	}
 }
@@ -133,7 +135,7 @@ function bps_field_sql ($sql, $f)
 	if (bps_debug ())
 	{
 		$where = implode (' AND ', $sql['where']);
-		$where = $wpdb->remove_placeholder_escape ($where);
+		$where = esc_html($wpdb->remove_placeholder_escape ($where));
 		echo "<!--\n";
 		echo "where $where\n";
 		echo "-->\n";

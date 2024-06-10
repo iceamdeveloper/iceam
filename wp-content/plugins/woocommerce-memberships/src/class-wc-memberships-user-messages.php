@@ -17,12 +17,12 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Helpers\Strings_Helper;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -419,7 +419,7 @@ class WC_Memberships_User_Messages {
 			'term_id'       => $the_term instanceof \WP_Term ? (int) $the_term->term_id : 0,
 			'term_taxonomy' => $the_term instanceof \WP_Term ? (string) $the_term->taxonomy : '',
 			'access_time'   => $access_time,
-			'products'      => $products,
+			'products'      => 'member_login' === $code_shorthand && ! empty( $args['products'] ) ? $args['products'] : $products,
 			'rule_type'     => $rule_type,
 			'classes'       => $args['classes'],
 		];
@@ -429,9 +429,24 @@ class WC_Memberships_User_Messages {
 		$message      = do_shortcode( self::get_message( $message_code, $message_args ) );
 		$message      = self::parse_message_merge_tags( $message, $message_args );
 
-		if ( 'content' === $message_args['context'] && '' !== trim( $message ) ) {
-			$html_message = self::get_notice_html( $message_code, $message, $args );
+		if ( 'content' === $message_args['context'] ) {
+
+			$html_message = '';
+
+			if ( '' === trim( $message ) ) {
+
+				// this is a niche case where the admin chose to delete the entire message content, but we should still display the excerpt
+				if ( $the_post && self::should_get_content_excerpt( $the_post, $code_shorthand ) ) {
+					$html_message = self::get_restricted_content_excerpt( $the_post, $code_shorthand );
+				}
+
+			} else {
+
+				$html_message = self::get_notice_html( $message_code, $message, $args );
+			}
+
 		} else { // 'notice' === $message_args['context'] : the content is going to be wrapped in a WC notice already, so we don't duplicate HTML (such is the case for cart messages for example)
+
 			$html_message = wp_kses( $message, self::get_message_allowed_html( $message_code ) );
 			$html_message = self::filter_message_html( $html_message, $message, $message_code, $message_args );
 		}
@@ -500,7 +515,7 @@ class WC_Memberships_User_Messages {
 	 */
 	private static function filter_message_html( $message_html, $message, $message_code, $message_args ) {
 
-		$the_post = isset( $message_args['post'] ) ? $message_args['post'] : null;
+		$the_post = $message_args['post'] ?? null;
 
 		/**
 		 * Filter whether to process shortcodes on user messages.
@@ -611,7 +626,7 @@ class WC_Memberships_User_Messages {
 		$excerpt = '';
 
 		// for products, use WooCommerce template instead of WordPress standard excerpt
-		if ( in_array( get_post_type( $post ), array( 'product', 'product_variation' ), true ) ) {
+		if ( in_array( get_post_type( $post ), ['product', 'product_variation'], true ) ) {
 
 			if ( Framework\SV_WC_Helper::str_exists( $message_code, 'product_viewing_restricted' )
 				 || ( Framework\SV_WC_Helper::str_exists( $message_code, 'product_access_delayed' ) && ( ! current_user_can( 'wc_memberships_view_delayed_product', $post->ID ) || ! current_user_can( 'wc_memberships_view_restricted_product', $post->ID ) ) ) ) {
@@ -630,7 +645,8 @@ class WC_Memberships_User_Messages {
 
 		} else {
 
-			$excerpt = empty( $post->post_excerpt ) ? self::trim_excerpt( $post ) : $post->post_excerpt;
+			/** @see \the_excerpt() */
+			$excerpt = apply_filters( 'the_excerpt', empty( $post->post_excerpt ) ? self::trim_excerpt( $post ) : $post->post_excerpt );
 		}
 
 		/**
@@ -737,17 +753,23 @@ class WC_Memberships_User_Messages {
 	 */
 	public static function parse_message_merge_tags( $message, $args = array() ) {
 
-		$products    = ! empty( $args['products'] )    && is_array( $args['products'] )      ? array_filter( array_unique( $args['products'] ) ) : array();
-		$access_time = ! empty( $args['access_time'] ) && is_numeric( $args['access_time'] ) ? max( 0, (int) $args['access_time'] )        : 0;
+		$products    = isset( $args['products'] )      && is_array( $args['products'] )      ? array_filter( array_unique( $args['products'] ) ) : [];
+		$access_time = ! empty( $args['access_time'] ) && is_numeric( $args['access_time'] ) ? max( 0, (int) $args['access_time'] )       : 0;
 
 		// replace {products}
 		if ( ! empty( $products ) ) {
 
-			$products_links = array();
+			$products_links = [];
 
 			foreach ( $products as $product_id ) {
 
 				if ( $product = wc_get_product( $product_id ) ) {
+
+					// skip private/unpublished products
+					if ( ! $product->is_visible() ) {
+						continue;
+					}
+
 					$products_links[ $product->get_id() ] = self::get_product_link_html( $product );
 				}
 			}

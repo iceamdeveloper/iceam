@@ -98,7 +98,8 @@ class Glossary_Handler {
 
 		$this->processed_content[ $content_key ] = true;
 
-		$regex = $this->get_phrases_regex();
+		$entries = $this->repository->get_entries();
+		$regex   = $this->get_phrases_regex( $entries );
 		if ( ! $regex ) {
 			return $content;
 		}
@@ -143,7 +144,13 @@ class Glossary_Handler {
 			}
 
 			if ( empty( $inside_block ) ) {
-				$element = preg_replace_callback( $regex, [ $this, 'replace_phrase_with_markup' ], $element );
+				$element = preg_replace_callback(
+					$regex,
+					function ( $matches ) use ( $entries ) {
+						return $this->replace_phrase_with_markup( $entries, $matches );
+					},
+					$element
+				);
 			}
 		}
 
@@ -164,11 +171,12 @@ class Glossary_Handler {
 	/**
 	 * Replace the glossary phrase with a link if appropriate.
 	 *
-	 * @param array $matches Glossary phrase regex matches.
+	 * @param Glossary_Entry[] $entries The glossary entries.
+	 * @param array            $matches The glossary phrase regex matches.
 	 *
 	 * @return string
 	 */
-	private function replace_phrase_with_markup( array $matches ): string {
+	private function replace_phrase_with_markup( array $entries, array $matches ): string {
 		$full_match   = $matches[0];
 		$phrase_match = $matches[1]; // Currently, this is the same as the $full_match, but it might not be in the future.
 
@@ -181,7 +189,7 @@ class Glossary_Handler {
 
 		$this->processed_phrases[ $phrase_key ] = true;
 
-		$entry = $this->repository->get_entry_by_phrase( $phrase_match );
+		$entry = $this->get_entry_by_phrase( $entries, $phrase_match );
 		if ( ! $entry ) {
 			return $full_match;
 		}
@@ -200,7 +208,7 @@ class Glossary_Handler {
 			return $full_match;
 		}
 
-		$this->phrases_replaced++;
+		++$this->phrases_replaced;
 
 		// Prevent recursively calling `the_content` filter when generating the markup.
 		remove_filter( 'the_content', [ $this, 'add_glossary_markup' ], 12 );
@@ -208,6 +216,26 @@ class Glossary_Handler {
 		add_filter( 'the_content', [ $this, 'add_glossary_markup' ], 12 );
 
 		return $markup;
+	}
+
+	/**
+	 * Find the glossary entry by phrase.
+	 *
+	 * @param Glossary_Entry[] $entries The glossary entries.
+	 * @param string           $phrase The glossary phrase.
+	 *
+	 * @return Glossary_Entry|null
+	 */
+	private function get_entry_by_phrase( array $entries, string $phrase ): ?Glossary_Entry {
+		$lowercase_phrase = mb_strtolower( $phrase );
+
+		foreach ( $entries as $entry ) {
+			if ( mb_strtolower( $entry->get_phrase() ) === $lowercase_phrase ) {
+				return $entry;
+			}
+		}
+
+		return null;
 	}
 
 	/**
@@ -233,11 +261,11 @@ class Glossary_Handler {
 	/**
 	 * Return all glossary phrases in a regular expression form.
 	 *
+	 * @param Glossary_Entry[] $entries The glossary entries.
+	 *
 	 * @return string|null
 	 */
-	private function get_phrases_regex(): ?string {
-		$entries = $this->repository->get_entries();
-
+	private function get_phrases_regex( array $entries ): ?string {
 		if ( ! $entries ) {
 			return null;
 		}

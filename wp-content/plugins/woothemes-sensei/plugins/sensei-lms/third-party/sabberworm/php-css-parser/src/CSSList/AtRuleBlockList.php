@@ -7,7 +7,7 @@ use Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule;
 /**
  * A `BlockList` constructed by an unknown at-rule. `@media` rules are rendered into `AtRuleBlockList` objects.
  */
-class AtRuleBlockList extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList implements \Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule
+class AtRuleBlockList extends CSSBlockList implements AtRule
 {
     /**
      * @var string
@@ -47,20 +47,21 @@ class AtRuleBlockList extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlock
      */
     public function __toString()
     {
-        return $this->render(new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat());
+        return $this->render(new OutputFormat());
     }
     /**
      * @return string
      */
-    public function render(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oOutputFormat)
+    public function render(OutputFormat $oOutputFormat)
     {
+        $sResult = $oOutputFormat->comments($this);
+        $sResult .= $oOutputFormat->sBeforeAtRuleBlock;
         $sArgs = $this->sArgs;
         if ($sArgs) {
             $sArgs = ' ' . $sArgs;
         }
-        $sResult = $oOutputFormat->sBeforeAtRuleBlock;
         $sResult .= "@{$this->sType}{$sArgs}{$oOutputFormat->spaceBeforeOpeningBrace()}{";
-        $sResult .= parent::render($oOutputFormat);
+        $sResult .= $this->renderListContents($oOutputFormat);
         $sResult .= '}';
         $sResult .= $oOutputFormat->sAfterAtRuleBlock;
         return $sResult;

@@ -16,7 +16,16 @@ use Tribe\Tickets\Plus\Repositories\Attendee\RSVP as Attendee_RSVP;
  *
  * @since 4.6
  */
-class Tribe__Tickets_Plus__Service_Provider extends tad_DI52_ServiceProvider {
+class Tribe__Tickets_Plus__Service_Provider extends \TEC\Common\Contracts\Service_Provider {
+	/**
+	 * The action to fire when this provider is registered in the container.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @var string
+	 */
+	public static string $registration_action = 'tec_tickets_plus_registered';
+
 	/**
 	 * Binds and sets up implementations.
 	 *

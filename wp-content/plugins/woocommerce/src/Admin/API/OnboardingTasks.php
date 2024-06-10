@@ -39,7 +39,7 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 	/**
 	 * Duration to milisecond mapping.
 	 *
-	 * @var string
+	 * @var array
 	 */
 	protected $duration_to_ms = array(
 		'day'  => DAY_IN_SECONDS * 1000,
@@ -295,10 +295,14 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 	/**
 	 * Check if a given request has access to manage woocommerce.
 	 *
+	 * @deprecated 7.8.0 snooze task is deprecated.
+	 *
 	 * @param  WP_REST_Request $request Full details about the request.
 	 * @return WP_Error|boolean
 	 */
 	public function snooze_task_permissions_check( $request ) {
+		wc_deprecated_function( __CLASS__ . '::' . __FUNCTION__, '7.8.0' );
+
 		if ( ! current_user_can( 'manage_woocommerce' ) ) {
 			return new \WP_Error( 'woocommerce_rest_cannot_create', __( 'Sorry, you are not allowed to snooze onboarding tasks.', 'woocommerce' ), array( 'status' => rest_authorization_required_code() ) );
 		}
@@ -355,13 +359,13 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public static function create_product_from_template( $request ) {
-		$template_name = $request->get_param( 'template_name' );
+		$template_name = basename( $request->get_param( 'template_name' ) );
 		$template_path = __DIR__ . '/Templates/' . $template_name . '_product.csv';
 		$template_path = apply_filters( 'woocommerce_product_template_csv_file_path', $template_path, $template_name );
 
 		$import = self::import_sample_products_from_csv( $template_path );
 
-		if ( is_wp_error( $import ) || 0 === count( $import['imported'] ) ) {
+		if ( is_wp_error( $import ) || ! is_array( $import['imported'] ) || 0 === count( $import['imported'] ) ) {
 			return new \WP_Error(
 				'woocommerce_rest_product_creation_error',
 				/* translators: %s is template name */
@@ -736,6 +740,14 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 
 		$lists = is_array( $task_list_ids ) && count( $task_list_ids ) > 0 ? TaskLists::get_lists_by_ids( $task_list_ids ) : TaskLists::get_lists();
 
+		// We have no use for hidden lists, it's expensive to compute individual tasks completion.
+		$lists = array_filter(
+			$lists,
+			function( $list ) {
+				return ! $list->is_hidden();
+			}
+		);
+
 		$json = array_map(
 			function( $list ) {
 				return $list->sort_tasks()->get_json();
@@ -758,6 +770,7 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 
 		if ( ! $task && $id ) {
 			$task = new DeprecatedExtendedTask(
+				null,
 				array(
 					'id'             => $id,
 					'is_dismissable' => true,
@@ -791,6 +804,7 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 
 		if ( ! $task && $id ) {
 			$task = new DeprecatedExtendedTask(
+				null,
 				array(
 					'id'             => $id,
 					'is_dismissable' => true,
@@ -816,11 +830,15 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 	/**
 	 * Snooze an onboarding task.
 	 *
+	 * @deprecated 7.8.0 snooze task is deprecated.
+	 *
 	 * @param WP_REST_Request $request Request data.
 	 *
 	 * @return WP_REST_Response|WP_Error
 	 */
 	public function snooze_task( $request ) {
+		wc_deprecated_function( __CLASS__ . '::' . __FUNCTION__, '7.8.0' );
+
 		$task_id      = $request->get_param( 'id' );
 		$task_list_id = $request->get_param( 'task_list_id' );
 		$duration     = $request->get_param( 'duration' );
@@ -829,6 +847,7 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 
 		if ( ! $task && $task_id ) {
 			$task = new DeprecatedExtendedTask(
+				null,
 				array(
 					'id'            => $task_id,
 					'is_snoozeable' => true,
@@ -853,15 +872,20 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 	/**
 	 * Undo snooze of a single task.
 	 *
+	 * @deprecated 7.8.0 undo snooze task is deprecated.
+	 *
 	 * @param WP_REST_Request $request Full details about the request.
 	 * @return WP_REST_Request|WP_Error
 	 */
 	public function undo_snooze_task( $request ) {
+		wc_deprecated_function( __CLASS__ . '::' . __FUNCTION__, '7.8.0' );
+
 		$id   = $request->get_param( 'id' );
 		$task = TaskLists::get_task( $id );
 
 		if ( ! $task && $id ) {
 			$task = new DeprecatedExtendedTask(
+				null,
 				array(
 					'id'            => $id,
 					'is_snoozeable' => true,
@@ -949,6 +973,7 @@ class OnboardingTasks extends \WC_REST_Data_Controller {
 
 		if ( ! $task && $id ) {
 			$task = new DeprecatedExtendedTask(
+				null,
 				array(
 					'id' => $id,
 				)

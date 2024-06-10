@@ -29,7 +29,7 @@ abstract class Base_Data_Object implements \JsonSerializable {
 			$setter_method = "set_{$key}";
 			// If a setter method exists for a property, use it
 			if(\method_exists($this, $setter_method)) {
-				return $this->$setter_method($value);
+				$this->$setter_method($value);
 			}
 			// Assign the value to each matching property of this class
 			elseif(property_exists($this, $key)) {

@@ -15,6 +15,15 @@ use Automattic\WooCommerce\Admin\PluginsProvider\PluginsProvider;
  * matches the specified version.
  */
 class PluginVersionRuleProcessor implements RuleProcessorInterface {
+
+	/**
+	 * Plugins provider instance.
+	 *
+	 * @var PluginsProviderInterface
+	 */
+	private $plugins_provider;
+
+
 	/**
 	 * Constructor.
 	 *
@@ -43,7 +52,7 @@ class PluginVersionRuleProcessor implements RuleProcessorInterface {
 
 		$plugin_data = $this->plugins_provider->get_plugin_data( $rule->plugin );
 
-		if ( ! $plugin_data ) {
+		if ( ! is_array( $plugin_data ) || ! array_key_exists( 'Version', $plugin_data ) ) {
 			return false;
 		}
 

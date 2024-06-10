@@ -251,31 +251,30 @@ class WC_Subscription extends WC_Order {
 	}
 
 	/**
-	 * Checks if the subscription has an unpaid order or renewal order (and therefore, needs payment).
+	 * Checks if the subscription needs payment.
 	 *
-	 * @param string $subscription_key A subscription key of the form created by @see self::get_subscription_key()
-	 * @param int $user_id The ID of the user who owns the subscriptions. Although this parameter is optional, if you have the User ID you should pass it to improve performance.
-	 * @return bool True if the subscription has an unpaid renewal order, false if the subscription has no unpaid renewal orders.
+	 * A subscription requires payment if it:
+	 *  - is pending or failed,
+	 *  - has an unpaid parent order, or
+	 *  - has an unpaid order or renewal order (and therefore, needs payment)
+	 *
 	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v2.0
+	 *
+	 * @return bool True if the subscription requires payment, otherwise false.
 	 */
 	public function needs_payment() {
-
 		$needs_payment = false;
+		$parent_order  = $this->get_parent();
 
-		// First check if the subscription is pending or failed or is for $0
+		// If the subscription is pending or failed and it has a total > 0, it needs payment.
 		if ( parent::needs_payment() ) {
-
 			$needs_payment = true;
-
-		// Now make sure the parent order doesn't need payment
-		} elseif ( ( $parent_order = $this->get_parent() ) && ( $parent_order->needs_payment() || $parent_order->has_status( array( 'on-hold', 'cancelled' ) ) ) ) {
-
+		} elseif ( $parent_order && ( $parent_order->needs_payment() || $parent_order->has_status( array( 'on-hold', 'cancelled' ) ) ) ) {
+			// If the subscription has an unpaid parent order, it needs payment.
 			$needs_payment = true;
-
-		// And finally, check that the latest order (switch or renewal) doesn't need payment
 		} else {
-
-			$order = $this->get_last_order( 'all', array( 'renewal', 'switch' ) );
+			// Lastly, check if the last non-early renewal order needs payment.
+			$order = wcs_get_last_non_early_renewal_order( $this );
 
 			if ( $order && ( $order->needs_payment() || $order->has_status( array( 'on-hold', 'failed', 'cancelled' ) ) ) ) {
 				$needs_payment = true;
@@ -946,6 +945,80 @@ class WC_Subscription extends WC_Order {
 	 */
 	public function set_start_date( $schedule_start ) {
 		$this->set_prop( 'schedule_start', $schedule_start );
+	}
+
+	/**
+	 * Set schedule trial end date.
+	 *
+	 * Note: This function is intended for internal use only and should not be accessed directly.
+	 * It only exists to support setting the trial end date prop from the data store.
+	 * Calling this function does not automatically schedule the trial end date as a Scheduled Action.
+	 *
+	 * Use WC_Subscription::update_dates() instead.
+	 *
+	 * @param string $schedule_trial_end
+	 */
+	public function set_trial_end_date( $schedule_trial_end ) {
+		$this->set_prop( 'schedule_trial_end', $schedule_trial_end );
+	}
+
+	/**
+	 * Set schedule next payment date.
+	 *
+	 * Note: This function is intended for internal use only and should not be accessed directly.
+	 * It only exists to support setting the next payment date prop from the data store.
+	 * Calling this function does not automatically schedule the next payment date as a Scheduled Action.
+	 *
+	 * Use WC_Subscription::update_dates() instead.
+	 *
+	 * @param string $schedule_next_payment
+	 */
+	public function set_next_payment_date( $schedule_next_payment ) {
+		$this->set_prop( 'schedule_next_payment', $schedule_next_payment );
+	}
+
+	/**
+	 * Set schedule cancelled date.
+	 *
+	 * Note: This function is intended for internal use only and should not be accessed directly.
+	 * It only exists to support setting the cancelled date prop from the data store.
+	 *
+	 * Use WC_Subscription::update_dates() instead.
+	 *
+	 * @param string $schedule_cancelled
+	 */
+	public function set_cancelled_date( $schedule_cancelled ) {
+		$this->set_prop( 'schedule_cancelled', $schedule_cancelled );
+	}
+
+	/**
+	 * Set schedule end date.
+	 *
+	 * Note: This function is intended for internal use only and should not be accessed directly.
+	 * It only exists to support setting the end date prop from the data store.
+	 * Calling this function does not automatically schedule the end date as a Scheduled Action.
+	 *
+	 * Use WC_Subscription::update_dates() instead.
+	 *
+	 * @param string $schedule_end
+	 */
+	public function set_end_date( $schedule_end ) {
+		$this->set_prop( 'schedule_end', $schedule_end );
+	}
+
+	/**
+	 * Set schedule payment retry date.
+	 *
+	 * Note: This function is intended for internal use only and should not be accessed directly.
+	 * It only exists to support setting the payment retry date prop from the data store.
+	 * Calling this function does not automatically schedule the payment retry date as a Scheduled Action.
+	 *
+	 * Use WC_Subscription::update_dates() instead.
+	 *
+	 * @param string $schedule_payment_retry
+	 */
+	public function set_payment_retry_date( $schedule_payment_retry ) {
+		$this->set_prop( 'schedule_payment_retry', $schedule_payment_retry );
 	}
 
 	/**
@@ -1779,7 +1852,12 @@ class WC_Subscription extends WC_Order {
 		// Add order note depending on initial payment
 		$this->add_order_note( __( 'Payment status marked complete.', 'woocommerce-subscriptions' ) );
 
-		$this->update_status( 'active' ); // also saves the subscription
+		// $this->update_status() only calls save if the status has changed.
+		if ( 'active' !== $this->get_status( 'edit' ) ) {
+			$this->update_status( 'active' );
+		} else {
+			$this->save();
+		}
 
 		do_action( 'woocommerce_subscription_payment_complete', $this );
 

@@ -194,7 +194,7 @@ class Access_Control {
 			return $blocked;
 		}
 
-		$blocked = ( function() use ( $user_id, $course_id ) {
+		$blocked = ( function () use ( $user_id, $course_id ) {
 			// Power users always have access.
 			if ( sensei_all_access( $user_id ) ) {
 				return false;
@@ -253,7 +253,7 @@ class Access_Control {
 		$provider_results         = $enrolment_check_results->get_provider_results();
 		$providers_with_enrolment = array_filter( $provider_results );
 
-		return count( $providers_with_enrolment ) === 1
+		return count( (array) $providers_with_enrolment ) === 1
 			&& isset( $providers_with_enrolment[ Groups_Provider::instance()->get_id() ] );
 	}
 
@@ -296,7 +296,7 @@ class Access_Control {
 		$group_courses = $this->get_enrolment_group_courses( $user_id, $course_id );
 
 		return array_map(
-			function( $group_course ) {
+			function ( $group_course ) {
 				return $group_course->get_access_period();
 			},
 			$group_courses
@@ -317,7 +317,7 @@ class Access_Control {
 
 		return array_reduce(
 			$access_periods,
-			function( Access_Period $carry_access_period = null, Access_Period $access_period ) {
+			function ( Access_Period $carry_access_period = null, Access_Period $access_period ) {
 				if ( ! $carry_access_period ) {
 					return $access_period;
 				}

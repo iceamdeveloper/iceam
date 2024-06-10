@@ -1,14 +1,14 @@
 <?php
 /**
- * Plugin Name: WooCommerce Subscriptions
+ * Plugin Name: Woo Subscriptions
  * Plugin URI: https://www.woocommerce.com/products/woocommerce-subscriptions/
  * Description: Sell products and services with recurring payments in your WooCommerce Store.
  * Author: WooCommerce
  * Author URI: https://woocommerce.com/
- * Version: 5.1.2
+ * Version: 6.1.0
  *
- * WC requires at least: 6.5
- * WC tested up to: 7.7.0
+ * WC requires at least: 7.7.0
+ * WC tested up to: 8.7.0
  * Woo: 27147:6115e6d7e297b623a169fdcf5728b224
  *
  * Copyright 2019 WooCommerce
@@ -31,7 +31,7 @@
  * @since   1.0
  */
 
-require_once( 'includes/class-wc-subscriptions-dependency-manager.php' );
+require_once( __DIR__ . '/includes/class-wc-subscriptions-dependency-manager.php' );
 $dependency_manager = new WC_Subscriptions_Dependency_Manager( WC_Subscriptions::$wc_minimum_supported_version );
 
 // Check the dependencies before loading the plugin. If the dependencies are not met, display an admin notice and exit
@@ -77,10 +77,10 @@ class WC_Subscriptions {
 	public static $plugin_file = __FILE__;
 
 	/** @var string */
-	public static $version = '5.1.2'; // WRCS: DEFINED_VERSION.
+	public static $version = '6.1.0'; // WRCS: DEFINED_VERSION.
 
 	/** @var string */
-	public static $wc_minimum_supported_version = '6.5';
+	public static $wc_minimum_supported_version = '7.7';
 
 	/** @var WCS_Cache_Manager */
 	public static $cache;
@@ -145,7 +145,7 @@ class WC_Subscriptions {
 		} else {
 			// Trigger an error consistant with PHP if the function called doesn't exist.
 			$class = __CLASS__;
-			$trace = debug_backtrace();
+			$trace = debug_backtrace( DEBUG_BACKTRACE_IGNORE_ARGS, 1 );
 			$file  = $trace[0]['file'];
 			$line  = $trace[0]['line'];
 			trigger_error( "Call to undefined method $class::$method() in $file on line $line", E_USER_ERROR ); //phpcs:ignore WordPress.XSS.EscapeOutput.OutputNotEscaped

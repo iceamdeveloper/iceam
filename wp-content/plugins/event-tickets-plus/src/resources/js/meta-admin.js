@@ -89,7 +89,8 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 	obj.initCustomFieldSorting = function() {
 		$( document.getElementById( 'tribe-tickets-attendee-sortables' ) ).sortable( {
 			containment: 'parent',
-			items: '> div',
+			items: '.tribe-tickets__admin-attendee-info-field',
+			handle: '.hndle',
 			tolerance: 'pointer',
 			connectWith: '#tribe-tickets-attendee-sortables',
 		} );
@@ -276,7 +277,7 @@ tribe_event_tickets_plus.meta.admin.event = tribe_event_tickets_plus.meta.admin.
 	 * Fetches saved fields via AJAX.
 	 *
 	 * @param {number} savedFieldsetId Fieldset ID to fetch via AJAX
-	 * @return {object} jqXHR
+	 * @return {Object} jqXHR
 	 */
 	obj.fetch_saved_fields = function( savedFieldsetId ) {
 		// load the saved fieldset.

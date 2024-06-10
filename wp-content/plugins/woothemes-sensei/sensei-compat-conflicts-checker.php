@@ -11,13 +11,16 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-require_once dirname( __FILE__ ) . '/plugins/sensei-pro/modules/shared-module/includes/class-conflicts-checker.php';
+require_once __DIR__ . '/plugins/sensei-pro/modules/shared-module/includes/class-conflicts-checker.php';
+
+// The namespace is replaced with `Woothemes_Sensei` in the `Conflicts_Checker` during the build.
+use Woothemes_Sensei\Conflicts_Checker;
 
 /**
  * Tells if Sensei Pro (Paid Courses) has conflicts with other activated plugins.
  */
 function woothemes_sensei_has_conflicts(): bool {
-	$checker = new \Sensei_Pro\Conflicts_Checker(
+	$checker = new Conflicts_Checker(
 		[
 			'plugin_slug' => 'woothemes-sensei',
 			'conflicts'   => [

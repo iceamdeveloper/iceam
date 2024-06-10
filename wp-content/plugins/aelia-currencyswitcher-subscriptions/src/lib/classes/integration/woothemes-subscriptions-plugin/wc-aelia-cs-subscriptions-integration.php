@@ -9,8 +9,9 @@ use \WC_Product;
 use \WC_Product_Subscription;
 use \WC_Product_Subscription_Variation;
 use \WC_Subscriptions_Cart;
-use \Aelia\WC\CurrencySwitcher\WC_Aelia_CurrencySwitcher_Widget;
-use \Aelia\WC\CurrencySwitcher\WC_Aelia_Currencies_Manager;
+use Aelia\WC\CurrencySwitcher\WC_Aelia_Currencies_Manager;
+use Aelia\WC\CurrencySwitcher\Widgets\Currency_Selector;
+use Aelia\WC\CurrencySwitcher\Orders_Integration;
 
 /**
  * Implements support for WooThemes Subscriptions plugin.
@@ -510,31 +511,34 @@ class Subscriptions_Integration {
 	}
 
 	/**
-	 * Indicates if we are editing an order.
-	 *
-	 * @param string post_type
-	 * @return bool
-	 * @since 1.3.1.170405
-	 */
-	protected static function editing_order($post_type = 'shop_order') {
-		if(!empty($_GET['action']) && ($_GET['action'] == 'edit') && !empty($_GET['post'])) {
-			$post = get_post($_GET['post']);
-
-			if(!empty($post) && ($post->post_type == $post_type)) {
-				return $post->ID;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Indicates if we are editing a subscription.
 	 *
-	 * @return bool
-	 * @since 1.3.8.171004
+	 * @return int|false The ID of the subscription being modified, or false if we are
+	 * on another page.
+	 * @since 1.8.0.230518
 	 */
 	protected static function editing_subscription() {
-		return self::editing_order('shop_subscription');
+		// Determine if we are on an Edit page
+		$is_edit_action = ($_GET['action'] ?? null) === 'edit';
+
+		if($is_edit_action) {
+			// Detect the legacy Edit Subscription page
+			if(!empty($_GET['post'])) {
+				$post = get_post($_GET['post']);
+				if(!empty($post) && ($post->post_type == 'shop_subscription')) {
+					return $post->ID;
+				}
+			}
+
+			// Detect the HPOS Edit Subscription page
+			// @since 2.0.0.230519
+			$is_hpos_orders_page = ($_GET['page'] ?? null) === 'wc-orders--shop_subscription';
+			if($is_hpos_orders_page && !empty($_GET['id'])) {
+				return $_GET['id'];
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -560,7 +564,8 @@ class Subscriptions_Integration {
 	 * Set the hooks required by the class.
 	 */
 	protected function set_hooks() {
-		if(WC_Aelia_CS_Subscriptions::is_frontend() || self::editing_order() || self::editing_subscription()) {
+		// TODO Refactor this check so that it no longer calls \Aelia\WC\Aelia_Plugin::editing_order() directly
+		if(WC_Aelia_CS_Subscriptions::is_frontend() || self::editing_subscription() || \Aelia\WC\Aelia_Plugin::editing_order()) {
 			// Price conversion
 			add_filter('wc_aelia_currencyswitcher_product_convert_callback', array($this, 'wc_aelia_currencyswitcher_product_convert_callback'), 10, 2);
 			add_filter('woocommerce_subscriptions_product_price', array($this, 'woocommerce_subscriptions_product_price'), 10, 2);
@@ -588,7 +593,7 @@ class Subscriptions_Integration {
 		// Cart hooks
 		add_action('wc_aelia_currencyswitcher_recalculate_cart_totals_before', array($this, 'wc_aelia_currencyswitcher_recalculate_cart_totals_before'), 10);
 
-		add_filter('wc_aelia_currencyswitcher_prices_type_field_map', array($this, 'wc_aelia_currencyswitcher_prices_type_field_map'), 10, 2);
+		add_filter('wc_aelia_currencyswitcher_prices_type_field_map', array($this, 'wc_aelia_currencyswitcher_prices_type_field_map'), 10);
 
 		add_action('woocommerce_scheduled_subscription_payment', array($this, 'woocommerce_scheduled_subscription_payment'), 0);
 		add_action('woocommerce_renewal_order_payment_complete', array($this, 'woocommerce_renewal_order_payment_complete'), 999);
@@ -618,8 +623,8 @@ class Subscriptions_Integration {
 
 		// Load the Edit Order scripts on the Edit Subscription page, to ensure that
 		// product prices are loaded in the correct order currency
-		// @since 1.3.11.180222
-		add_filter('wc_aelia_cs_load_order_edit_scripts', array($this, 'wc_aelia_cs_load_order_edit_scripts'), 10, 2);
+		// @since 1.8.0.230518
+		add_filter('wc_aelia_cs_load_order_edit_scripts', array($this, 'wc_aelia_cs_load_order_edit_scripts'), 10);
 	}
 
 	/**
@@ -1280,7 +1285,7 @@ class Subscriptions_Integration {
 	 * @return array
 	 * @since 1.3.5.170425
 	 */
-	public function wc_aelia_currencyswitcher_prices_type_field_map($prices_type_field_map, $post_id = null) {
+	public function wc_aelia_currencyswitcher_prices_type_field_map($prices_type_field_map) {
 		// Subscription sign up fee
 		$prices_type_field_map[self::FIELD_SIGNUP_FEE_CURRENCY_PRICES] = '_subscription_sign_up_fee';
 
@@ -1291,12 +1296,14 @@ class Subscriptions_Integration {
 	 * Fired after an order is saved. It addsa a filter to ensure that the currency
 	 * for new subscriptions is set to the active currency.
 	 *
-	 * @param int post_id The post (subscription) ID.
+	 * @param int object_id The object (subscription) ID.
 	 * @param post The post corresponding to the order that is being been saved.
 	 * @since 1.3.8.171004
 	 */
-	public function woocommerce_process_shop_order_meta($post_id, $post) {
-		if($post->post_type != 'shop_subscription') {
+	public function woocommerce_process_shop_order_meta($object_id, $post) {
+		// @since 1.8.0.230518
+		$subscription = wcs_get_subscription($object_id);
+		if(empty($subscription) || ($subscription->get_type() !== 'shop_subscription')) {
 			return;
 		}
 
@@ -1304,21 +1311,9 @@ class Subscriptions_Integration {
 		// This is done to prevent WooCommerce from returning shop's base currency
 		// when WC_Order::get_currency() is called. See old code below, for reference
 		// @since 4.5.1.171012
-		$order = wc_get_order($post_id);
-
-		if($order->has_status(array('draft', 'auto-draft', 'pending')) && !empty($_POST['aelia_cs_currency'])) {
+		if($subscription->has_status(array('draft', 'auto-draft', 'pending')) && !empty($_POST['aelia_cs_currency'])) {
 			add_filter('woocommerce_currency', array($this->currency_switcher(), 'woocommerce_currency'), 50);
 		}
-
-		// Only set the currency if the order doesn't have one set against it.
-		// Using direct access to meta is less than ideal, but it's the only way to
-		// determine if the meta is missing, as the new WC_Data layer always returns
-		// a currency value, even when the order has none.
-		// This bug has been reported in https://github.com/woocommerce/woocommerce/issues/14966
-		//$order_currency = get_post_meta($post_id, '_order_currency', true);
-		//if(empty($order_currency)) {
-		//	add_filter('woocommerce_currency', array($this->currencyswitcher(), 'woocommerce_currency'), 5);
-		//}
 	}
 
 	/**
@@ -1328,10 +1323,15 @@ class Subscriptions_Integration {
 	 * @since 1.3.8.171004
 	 */
 	public function add_meta_boxes() {
+		// Determine the ID of the edit subscription screen dynamically,
+		// checking if the HPOS feature is enabled
+		// @since 2.0.0.230519
+		$edit_subscription_screen = aelia_is_hpos_feature_enabled() ? wc_get_page_screen_id('shop-subscription') : 'shop_subscription';
+
 		add_meta_box('aelia_cs_order_currency_box',
 								 __('Subscription currency', Definitions::TEXT_DOMAIN),
 								 array($this, 'render_currency_selector_widget'),
-								 'shop_subscription',
+								 $edit_subscription_screen,
 								 'side',
 								 'default');
 	}
@@ -1339,68 +1339,90 @@ class Subscriptions_Integration {
 	/**
 	 * Renders the currency selector widget in "new subscription" page.
 	 *
-	 * @since 1.3.8.171004
+	 * @param WC_Order|WP_Post $object
+	 * @since 2.0.0.230519
 	 */
-	public function render_currency_selector_widget() {
-		$order_currency = $this->displayed_order_currency();
+	public function render_currency_selector_widget($object): void {
+		$subscription = $object instanceof \WC_Subscription ? $object : wcs_get_subscription($object->ID);
 
-		global $post;
-		if(empty($order_currency)) {
-			echo '<p>';
-			echo __('Set currency for this new subscription. It is recommended to choose ' .
-							'the order currency <b>before</b> adding the products, as changing ' .
-							'it later will not update the product prices.',
-							Definitions::TEXT_DOMAIN);
-			echo '</p>';
-			echo '<p>';
-			echo __('<b>NOTE</b>: you can only select the currency <b>once</b>. If ' .
-							'you choose the wrong currency, please discard the subscription and ' .
-							'create a new one.',
-							Definitions::TEXT_DOMAIN);
-			echo '</p>';
+		if(Orders_Integration::allow_setting_order_currency($subscription)) {
+			?>
+			<p><?php
+				echo wp_kses_post(implode(' ', [
+					__('Set currency for this subscription.', Definitions::TEXT_DOMAIN),
+				]));
+			?></p>
+			<?php
 			$currency_selector_options = array(
 				'title' => '',
 				'widget_type' => 'dropdown',
+				// Force the display of the currency selection button, which is required
+				// on the Edit Subscription page
+				// @since 4.12.6.210825
+				'show_currency_selection_button' => true,
+				'currency_selection_button_label' => __('Set subscription currency', Definitions::TEXT_DOMAIN),
+				// @since 5.0.0.230203
+				'selected_currency' => $subscription->get_currency(),
 			);
 
-			echo WC_Aelia_CurrencySwitcher_Widget::render_currency_selector($currency_selector_options);
+			echo Currency_Selector::render_currency_selector($currency_selector_options);
+			?>
+			<p><?php
+				echo wp_kses_post(implode(' ', [
+					'<strong>',
+					__('NOTE', Definitions::TEXT_DOMAIN),
+					'</strong>: ',
+					__('You can only set the subscription currency as long as the subscription is editable and it does not contain items.', Definitions::TEXT_DOMAIN),
+					// __('Please refer to our documentation for more information:', Definitions::TEXT_DOMAIN),
+					// sprintf('<a href="%2$s" target="_blank">%1$s</a>.', __('Aelia Currency Switcher - Setting the currency for manual orders',
+					// 				Definitions::TEXT_DOMAIN),
+					// 				Definitions::URL_MANUAL_ORDER_CURRENCY),
+				]));
+			?></p>
+			<?php
 		}
 		else {
-			// Prepare the text to use to display the order currency
-			$order_currency_text = $order_currency;
+			$subscription_currency = $subscription->get_currency();
+			// Prepare the text to use to display the subscription currency
+			$subscription_currency_text = $subscription_currency;
 
-			$currency_name = WC_Aelia_Currencies_Manager::get_currency_name($order_currency);
+			$currency_name = WC_Aelia_Currencies_Manager::get_currency_name($subscription_currency);
 			// If a currency name is returned, append it to the code for displau.
 			// If a currency name cannot be found, the method will return the currency
 			// code itself. In such case, there would be no point in displaying the
 			// code twice.
-			if($currency_name != $order_currency) {
-				$order_currency_text .= ' - ' . $currency_name;
+			if($currency_name != $subscription_currency) {
+				$subscription_currency_text .= ' - ' . $currency_name;
 			}
-
-			echo '<h4 class="order-currency">';
-			echo $order_currency_text;
-			echo '</h4>';
+			?>
+			<h4 class="order-currency"><?php
+				echo esc_html($subscription_currency_text);
+			?></h4>
+			<?php
 		}
 	}
 
 	/**
-	 * Indicates if we are on the Edit Subscription page.
+	 * Indicates if we are creating a new order. This method can detectd the "add order"
+	 * action when the HPOS feature is enabled or disabled.
 	 *
-	 * @param string action The action to check for ("edit" to check if we are
-	 * modifying an existing order, or "add" to check if we are creating a new order).
 	 * @return bool
-	 * @since 1.3.8.171004
-	 * @since WC 2.7
+	 * @since 2.0.0.230519
 	 */
-	protected function is_edit_subscription_page($action = 'edit') {
-		if(!function_exists('get_current_screen')) {
-			return false;
+	protected static function adding_new_subscription(): bool {
+		if(aelia_is_hpos_feature_enabled()) {
+			$adding_new_subscription = ($_GET['page'] ?? null === 'wc-orders--shop_subscription') && ($_GET['action'] ?? null === 'new');
 		}
+		else {
+			if(!function_exists('get_current_screen')) {
+				return false;
+			}
 
-		$screen = get_current_screen();
+			$screen = get_current_screen();
 
-		return is_object($screen) && ($screen->post_type == 'shop_subscription') && ($screen->action === $action);
+			$adding_new_subscription = is_object($screen) && ($screen->post_type === 'shop_subscription') && ($screen->action === 'add');
+		}
+		return $adding_new_subscription;
 	}
 
 	/**
@@ -1411,58 +1433,66 @@ class Subscriptions_Integration {
 	 * @since 1.3.8.171004
 	 */
 	public function get_currency_for_manual_subscription($currency) {
-		if(is_admin() && !defined('DOING_AJAX') && function_exists('get_current_screen')) {
-			if($this->is_edit_subscription_page('add')) {
-				$currency = null;
-			}
-			elseif($this->is_edit_subscription_page('edit')) {
-				global $post;
+		// Holds a list of subscription ID => currency pairs. Used as a basic
+		// caching mechanism
+		// @since 2.0.0.230519
+		static $subscription_currencies = [];
 
-				if($post->post_type == 'shop_subscription') {
-					// Disable this filter temporarily, to prevent infinite recursion. This
-					// is required due to changes in the admin pages in WooCommerce 2.7
-					// @since WC 2.7
-					remove_filter('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
-					$order_currency = $this->currency_switcher()->get_order_currency($post->ID);
+		// Adding a new subscription, the active currency can be taken as a default
+		if(self::adding_new_subscription()) {
+			// When adding a subscription, the order currency is not yet set. We can take the
+			// last selected currency as a default
+			// @since 2.0.0.230519
+			return $this->currency_switcher()->get_selected_currency();
+		}
 
-					if(!empty($order_currency)) {
-						$currency = $order_currency;
-					}
-					// Restore the filter
-					add_filter('woocommerce_currency', array($this, 'get_currency_for_manual_subscription'), 35, 1);
-				}
+		// Fetch the ID of the order being added or modified
+		// @since 2.0.0.230519
+		$editing_subscription_id = self::editing_subscription();
+
+		// If we already know the currency for the order, just return it
+		if(!empty($subscription_currencies[$editing_subscription_id])) {
+			return $subscription_currencies[$editing_subscription_id];
+		}
+
+		if(is_admin() && !defined('DOING_AJAX') && !empty($editing_subscription_id) && did_action('woocommerce_after_register_post_type')) {
+			// Disable this filter temporarily, to prevent infinite recursion. This
+			// is required due to changes in the admin pages in WooCommerce 2.7
+			// @since WC 2.7
+			remove_filter('woocommerce_currency', [$this, 'get_currency_for_manual_subscription'], 35, 1);
+			$subscription_currency = $this->currency_switcher()->get_order_currency($editing_subscription_id);
+
+			if(!empty($subscription_currency)) {
+				// Cache the subscription currency, to save processing the next time the method runs
+				// @since 2.0.0.230519
+				$subscription_currencies[$editing_subscription_id] = $subscription_currency;
+
+				$currency = $subscription_currency;
 			}
+			// Restore the filter
+			add_filter('woocommerce_currency', [$this, 'get_currency_for_manual_subscription'], 35, 1);
 		}
 		return $currency;
-	}
-
-	/**
-	 * Returns the currency of the subscription currently being displayed.
-	 *
-	 * @return string
-	 * @since 1.3.8.171004
-	 */
-	protected function displayed_order_currency() {
-		global $post;
-		return $this->currency_switcher()->get_order_currency($post->ID);
 	}
 
 	/**
 	 * Ensure that the JavaScript for the Edit Order page are also loaded on the
 	 * Add/Edit Subscription page.
 	 *
-	 * @param bool should_load_scripts
+	 * @param int|null An order ID, or null if we aren't modifying an order (i.e.
+	 * an actual "shop_order" entity).
 	 * @param object post
-	 * @return bool
-	 * @since 1.3.11.180222
+	 * @return int|null
+	 * @since 1.8.0.230518
 	 */
-	public function wc_aelia_cs_load_order_edit_scripts($should_load_scripts, $post) {
-		if(!$should_load_scripts) {
-			$post_type = is_object($post) ? $post->post_type : null;
-			$should_load_scripts = ($post_type === 'shop_subscription');
+	public function wc_aelia_cs_load_order_edit_scripts($order_id) {
+		// If we are not editing an order, we can check if we are editing a
+		// subscription (i.e. a "shop_subscription" entity)
+		if(empty($order_id)) {
+			$order_id = self::editing_subscription();
 		}
 
-		return $should_load_scripts;
+		return $order_id;
 	}
 
 	/**

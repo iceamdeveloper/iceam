@@ -4,10 +4,10 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03
+class ComposerStaticInit8fe9bc542c2a548f9d7f25a92fa64e93
 {
     public static $files = array (
-        '7166494aeff09009178f278afd86c83f' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/load-v4p13.php',
+        '9b77ddcfb14408a32f5aaf74e0a11694' => __DIR__ . '/..' . '/yahnis-elsts/plugin-update-checker/load-v5p1.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -170,8 +170,19 @@ class ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03
         'Aelia\\Dependencies\\Psr\\Log\\Test\\LoggerInterfaceTest' => __DIR__ . '/../..' . '/dependencies/packages/Psr/Log/Test/LoggerInterfaceTest.php',
         'Aelia\\Dependencies\\Psr\\Log\\Test\\TestLogger' => __DIR__ . '/../..' . '/dependencies/packages/Psr/Log/Test/TestLogger.php',
         'Aelia\\WC\\AFC\\Messages' => __DIR__ . '/../..' . '/lib/classes/messages/messages.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Queues\\Action_Scheduler_Queue' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/queues/action-scheduler-queue.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Queues\\Base_Queue' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/queues/base-queue.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Queues\\Queue_Settings' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/data-types/queue-settings.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Scheduled_Task_Settings' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/data-types/scheduled-task-settings.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Task_Scheduler' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/task-scheduler.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Task_Scheduler_Settings' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/data-types/task-scheduler-settings.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Tasks\\Base_Scheduled_Task' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/tasks/base-scheduled-task.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Tasks\\IScheduled_Task' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/tasks/interface-scheduled-task.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Tasks\\Task_Instance_Settings' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/tasks/data-types/task-instance-settings.php',
+        'Aelia\\WC\\AFC\\Scheduler\\Tasks\\Task_Result' => __DIR__ . '/../..' . '/lib/classes/task-scheduler/tasks/data-types/task-result.php',
         'Aelia\\WC\\AFC\\Settings' => __DIR__ . '/../..' . '/lib/classes/settings/settings.php',
-        'Aelia\\WC\\AFC\\Traits\\Logger_Trait' => __DIR__ . '/../..' . '/lib/traits/logger.php',
+        'Aelia\\WC\\AFC\\Traits\\Database_Trait' => __DIR__ . '/../..' . '/lib/traits/database-trait.php',
+        'Aelia\\WC\\AFC\\Traits\\Logger_Trait' => __DIR__ . '/../..' . '/lib/traits/logger-trait.php',
         'Aelia\\WC\\Admin_Message' => __DIR__ . '/../..' . '/lib/classes/base/messages/admin_message.php',
         'Aelia\\WC\\AeliaSimpleXMLElement' => __DIR__ . '/../..' . '/lib/classes/base/xml/aelia-simplexmlelement.php',
         'Aelia\\WC\\Aelia_Install' => __DIR__ . '/../..' . '/lib/classes/base/install/install.php',
@@ -214,7 +225,7 @@ class ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03
         'Aelia\\WC\\Settings_Renderer' => __DIR__ . '/../..' . '/lib/classes/base/settings/settings-renderer.php',
         'Aelia\\WC\\Shortcodes\\Base_Shortcode' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/shortcodes/base-shortcode.php',
         'Aelia\\WC\\Shortcodes\\Shortcode_Settings' => __DIR__ . '/../..' . '/lib/classes/base/base-classes/shortcodes/shortcode-settings.php',
-        'Aelia\\WC\\Traits\\Singleton' => __DIR__ . '/../..' . '/lib/traits/singleton.php',
+        'Aelia\\WC\\Traits\\Singleton' => __DIR__ . '/../..' . '/lib/traits/singleton-trait.php',
         'Aelia\\WC\\Updater' => __DIR__ . '/../..' . '/lib/classes/updater/updater.php',
         'Aelia\\WC\\WC_AeliaFoundationClasses_Install' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-install.php',
         'Aelia_WC_AFC_RequirementsChecks' => __DIR__ . '/../..' . '/lib/classes/install/aelia-wc-afc-requirementscheck.php',
@@ -225,10 +236,10 @@ class ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInitd6e1268b471a2392b9a3f7a0ea829e03::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8fe9bc542c2a548f9d7f25a92fa64e93::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8fe9bc542c2a548f9d7f25a92fa64e93::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInit8fe9bc542c2a548f9d7f25a92fa64e93::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInit8fe9bc542c2a548f9d7f25a92fa64e93::$classMap;
 
         }, null, ClassLoader::class);
     }

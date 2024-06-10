@@ -60,6 +60,37 @@ function bps_directories ()		// published interface, 20190324
 	return $dirs;
 }
 
+add_action ('init', 'bps_flush_rules');
+function bps_flush_rules ()
+{
+	if (bps_parser () != 'rewrites')  return;
+
+	$must_flush = false;
+	$rules = get_option ('rewrite_rules', array ());
+
+	if (!bps_is_directory ())
+	{
+		$current = bps_current_page ();
+		$path = basename ($current). '/?$';
+		if (isset ($rules[$path]))  $must_flush = true;
+	}
+
+	if ($must_flush || bps_is_directory ())
+	{
+		$dirs = bps_directories ();
+		foreach ($dirs as $dir)  if (!empty ($dir->replace))
+		{
+			$path = basename ($dir->path). '/?$';
+			add_rewrite_rule ($path, 'index.php?bp_members=1', 'top');
+
+			if (empty ($rules[$path]))  $must_flush = true;
+		}
+	}
+
+	if ($must_flush)
+		flush_rewrite_rules (false);
+}
+
 add_shortcode ('bps_directory', function() {return '';});
 function bps_set_directory_data ($attr, $content)
 {
@@ -324,6 +355,27 @@ function bps_custom_directory ($page_ids)
 		$page_ids['members'] = $dir->id;
 	}
 	return $page_ids;
+}
+
+add_filter ('bp_members_get_user_url', 'bps_user_url', 10, 4);
+function bps_user_url ($url, $user_id, $slug, $path_chunks)
+{
+	$dirs = bps_directories ();
+	if ($dir = bps_is_directory ())  if (!empty ($dir->replace))
+	{
+		$first = array_key_first ($dirs);
+		$url = str_replace ($dir->path, $dirs[$first]->path, $url);
+	}
+	return $url;
+}
+
+if (!function_exists ('array_key_first'))
+{
+	function array_key_first ($arr)
+	{
+		foreach ($arr as $key => $unused)  return $key;
+		return null;
+	}
 }
 
 add_filter ('bp_get_template_part', 'bps_directory_index', 10, 2);

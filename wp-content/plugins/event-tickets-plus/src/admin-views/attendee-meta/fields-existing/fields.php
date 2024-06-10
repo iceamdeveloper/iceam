@@ -16,7 +16,7 @@
  */
 
 ?>
-<div id="tribe-tickets-attendee-sortables" class="meta-box-sortables ui-sortable">
+<div id="tribe-tickets-attendee-sortables" class="sortable ui-sortable">
 	<?php
 	foreach ( $active_meta as $meta_field ) {
 		$field = $meta_object->generate_field( $ticket_id, $meta_field->type, (array) $meta_field );

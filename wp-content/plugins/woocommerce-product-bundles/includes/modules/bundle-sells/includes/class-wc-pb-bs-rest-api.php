@@ -2,7 +2,7 @@
 /**
  * WC_PB_BS_REST_API class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.13.0
  */
 

@@ -300,6 +300,10 @@ class Messages {
 			// the transients, or that it's expired. In such case, the data has to be
 			// retrieved from the database
 			if(self::$dismissed_messages === false) {
+				// Initialise the array that will hold the list of dismissed messages
+				// @since 2.4.5.230512
+				self::$dismissed_messages = [];
+
 				global $wpdb;
 				$SQL = "
 					SELECT

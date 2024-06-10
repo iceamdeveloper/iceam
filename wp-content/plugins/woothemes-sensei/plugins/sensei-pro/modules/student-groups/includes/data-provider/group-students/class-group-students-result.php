@@ -63,7 +63,7 @@ class Group_Students_Result {
 	 *
 	 * @return integer
 	 */
-	public function get_total_items():int {
+	public function get_total_items(): int {
 		return $this->total_items;
 	}
 

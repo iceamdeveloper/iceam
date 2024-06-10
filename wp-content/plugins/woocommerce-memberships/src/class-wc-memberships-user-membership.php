@@ -17,13 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1040,7 +1040,7 @@ class WC_Memberships_User_Membership {
 	 */
 	public function schedule_post_expiration_events( $expiration_time ) {
 
-		$hook_args = array( 'user_membership_id' => $this->id );
+		$hook_args = [ 'user_membership_id' => $this->id ];
 
 		// unschedule any previously set renewal reminder event
 		if ( (bool) as_next_scheduled_action( 'wc_memberships_user_membership_renewal_reminder', $hook_args, 'woocommerce-memberships' ) ) {
@@ -2054,6 +2054,78 @@ class WC_Memberships_User_Membership {
 		$previous_owners = get_post_meta( $this->id, $this->previous_owners_meta, true );
 
 		return ! empty( $previous_owners ) && is_array( $previous_owners ) ? $previous_owners : array();
+	}
+
+
+	/**
+	 * Sets the User Membership's last active date.
+	 *
+	 * Replicates the behavior of {@see \wc_update_user_last_active()} which our feature relies upon.
+	 *
+	 * @since 1.26.4
+	 *
+	 * @param null|DateTime $date optional: date to set, default: now - should be in UTC timezone
+	 */
+	public function set_last_active_date( ?DateTime $date = null ) {
+
+		if ( ! $date ) {
+			$timestamp = time();
+		} else {
+			$timestamp = $date->setTimezone( new DateTimeZone( 'UTC' ) )->getTimestamp();
+		}
+
+		update_user_meta( $this->user_id, 'wc_last_active', (string) strtotime( gmdate( 'Y-m-d', $timestamp ) ) );
+	}
+
+
+	/**
+	 * Gets the User Membership's last activity date.
+	 *
+	 * This relies upon {@see \wc_update_user_last_active()} which is precise to midnight.
+	 *
+	 * @since 1.26.3
+	 *
+	 * @return null|DateTime in UTC timezone
+	 */
+	public function get_last_active_date() : ?DateTime {
+
+		$timestamp = get_user_meta( (int) $this->user_id, 'wc_last_active', true );
+
+		if ( ! is_numeric( $timestamp ) ) {
+			return null;
+		}
+
+		return DateTime::createFromFormat( 'U', (int) $timestamp ) ?: null;
+	}
+
+
+	/**
+	 * Gets the User Membership's last activity relatively to today.
+	 *
+	 * @since 1.26.3
+	 *
+	 * @return null|string
+	 */
+	public function get_last_active_since() : ?string {
+
+		$last_active_date = $this->get_last_active_date();
+
+		if ( ! $last_active_date ) {
+			return null;
+		}
+
+		$now = current_time( 'timestamp', true );
+		$last_active_time = $last_active_date->getTimestamp();
+		$diff = $now - $last_active_time;
+
+		if ( $diff <= DAY_IN_SECONDS || $diff <= 2 * DAY_IN_SECONDS ) {
+			return (int) date( 'd', $last_active_time ) === (int) date( 'd', $now )
+				? __( 'Today', 'woocommerce-memberships' )
+				: __( 'Yesterday', 'woocommerce-memberships' );
+		}
+
+		// e.g. 3 days ago, 1 month ago, etc.
+		return human_time_diff( $last_active_date->getTimestamp(), $now );
 	}
 
 

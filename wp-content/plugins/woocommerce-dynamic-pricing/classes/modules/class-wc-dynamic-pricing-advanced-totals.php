@@ -2,23 +2,23 @@
 
 class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Base {
 
-	private static $instance;
+	private static WC_Dynamic_Pricing_Advanced_Totals $instance;
 
-	public static function instance() {
-		if ( self::$instance == null ) {
+	public static function instance(): WC_Dynamic_Pricing_Advanced_Totals {
+		if ( empty( self::$instance ) ) {
 			self::$instance = new WC_Dynamic_Pricing_Advanced_Totals( 'advanced_totals' );
 		}
 
 		return self::$instance;
 	}
 
-	public $adjustment_sets;
+	public array $adjustment_sets = array();
 
 	public function __construct( $module_id ) {
 		parent::__construct( $module_id );
 
 		$sets = get_option( '_a_totals_pricing_rules' );
-		if ( $sets && is_array( $sets ) && sizeof( $sets ) > 0 ) {
+		if ( $sets && is_array( $sets ) && count( $sets ) > 0 ) {
 			foreach ( $sets as $id => $set_data ) {
 				$obj_adjustment_set           = new WC_Dynamic_Pricing_Adjustment_Set_Totals( $id, $set_data );
 				$this->adjustment_sets[ $id ] = $obj_adjustment_set;
@@ -86,10 +86,10 @@ class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Bas
 
 								if ( $original_price ) {
 									$amount = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', $rule['amount'], $rule, $cart_item, $this );
-									$amount = floatval($amount) / 100;
+									$amount = floatval( $amount ) / 100;
 
 									if ( $amount > 1 ) {
-										$price_adjusted = round(floatval( $original_price )  + ( ( floatval( $amount ) * $original_price) - floatval( $original_price)), (int) $num_decimals );
+										$price_adjusted = round( floatval( $original_price ) + ( ( floatval( $amount ) * $original_price ) - floatval( $original_price ) ), (int) $num_decimals );
 									} else {
 										$price_adjusted = round( floatval( $original_price ) - ( floatval( $amount ) * $original_price ), (int) $num_decimals );
 									}
@@ -123,22 +123,18 @@ class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Bas
 	}
 
 	private function get_cart_total( $set ) {
-		global $woocommerce;
 		$collector = $set->get_collector();
 		$quantity  = 0;
 		foreach ( WC()->cart->cart_contents as $cart_item ) {
 			$product = $cart_item['data'];
-			if ( $collector['type'] == 'cat' ) {
-
+			if ( $collector['type'] === 'cat' ) {
 				if ( ! isset( $collector['args'] ) ) {
 					return 0;
 				}
-
 				if ( $this->is_applied_to_product( $product, $collector['args']['cats'] ) ) {
-
-					$q = $cart_item['quantity'] ? $cart_item['quantity'] : 1;
-
-					if ( isset( $cart_item['discounts'] ) && isset( $cart_item['discounts']['by'] ) && $cart_item['discounts']['by'][0] == $this->module_id ) {
+					$q = ! empty( $cart_item['quantity'] ) ? $cart_item['quantity'] : 1;
+					$q = floatval( $q );
+					if ( isset( $cart_item['discounts']['by'] ) && $cart_item['discounts']['by'][0] === $this->module_id ) {
 						$quantity += floatval( $cart_item['discounts']['price_base'] ) * $q;
 					} else {
 						$quantity += $cart_item['data']->get_price() * $q;
@@ -147,9 +143,9 @@ class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Bas
 			} else {
 				$process_discounts = apply_filters( 'woocommerce_dynamic_pricing_process_product_discounts', true, $cart_item['data'], 'advanced_totals', $this, $cart_item );
 				if ( $process_discounts ) {
-					$q = $cart_item['quantity'] ? $cart_item['quantity'] : 1;
-
-					if ( isset( $cart_item['discounts'] ) && isset( $cart_item['discounts']['by'] ) && $cart_item['discounts']['by'] == $this->module_id ) {
+					$q = ! empty( $cart_item['quantity'] ) ? $cart_item['quantity'] : 1;
+					$q = floatval( $q );
+					if ( isset( $cart_item['discounts']['by'] ) && $cart_item['discounts']['by'] === $this->module_id ) {
 						$quantity += floatval( $cart_item['discounts']['price_base'] ) * $q;
 					} else {
 						$quantity += $cart_item['data']->get_price() * $q;
@@ -160,5 +156,4 @@ class WC_Dynamic_Pricing_Advanced_Totals extends WC_Dynamic_Pricing_Advanced_Bas
 
 		return $quantity;
 	}
-
 }

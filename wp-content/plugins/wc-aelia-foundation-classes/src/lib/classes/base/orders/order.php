@@ -308,7 +308,12 @@ class Order extends \WC_Order {
 		$total_refunded_base_currency = 0;
 		foreach($this->get_refunds() as $refund) {
 			$refund_total = $refund->get_meta('_refund_amount_base_currency');
-			$total_refunded_base_currency += $refund_total;
+
+			// Only take into account the refunded total if it's numeric
+			// @since 2.4.9.230616
+			if(is_numeric($refund_total)) {
+				$total_refunded_base_currency += $refund_total;
+			}
 		}
 
 		wp_cache_set($cache_key, $total_refunded_base_currency, $this->cache_group);

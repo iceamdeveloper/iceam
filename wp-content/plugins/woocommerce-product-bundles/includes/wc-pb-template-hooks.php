@@ -2,7 +2,7 @@
 /**
  * Product Bundles template hooks
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.11.0
  */
 

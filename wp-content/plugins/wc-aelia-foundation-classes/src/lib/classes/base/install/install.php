@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 if(!class_exists('Aelia\WC\Aelia_Install')) {
 	/**
@@ -32,6 +32,21 @@ if(!class_exists('Aelia\WC\Aelia_Install')) {
 		protected $message_headers = array(
 			// Message headers are populated inside the constructor
 		);
+
+		/**
+		 * Holds a reference to the global $wpdb instance. This property is
+		 * initialised automatically, when the installer is instantiated.
+		 *
+		 * @var \wpdb
+		 */
+		public $wpdb;
+
+		/**
+		 * An instance of a Semaphore class, used to prevent race conditions.
+		 *
+		 * @var Semaphore
+		 */
+		public $semaphore;
 
 		/**
 		 * Class constructor.
@@ -432,7 +447,7 @@ if(!class_exists('Aelia\WC\Aelia_Install')) {
 							update_option($plugin_id, $version);
 						}
 					}
-					catch(Exception $e) {
+					catch(\Exception $e) {
 						$this->add_message(E_USER_WARNING,
 															 sprintf(__('Update method "%s::%s() raised exception "%s". Update halted. ' .
 																					'Please contact Support and provide the error details ' .

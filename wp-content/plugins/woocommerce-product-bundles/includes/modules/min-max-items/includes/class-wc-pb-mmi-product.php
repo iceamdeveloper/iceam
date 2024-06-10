@@ -2,7 +2,7 @@
 /**
  * WC_PB_MMI_Product class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.8.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Product-related functions and filters.
  *
  * @class    WC_PB_MMI_Product
- * @version  6.15.4
+ * @version  7.0.0
  */
 class WC_PB_MMI_Product {
 
@@ -471,9 +471,19 @@ class WC_PB_MMI_Product {
 	public static function synced_contents_data( $data, $bundle ) {
 
 		$min_bundle_size = $bundle->get_min_bundle_size();
+		$bundled_items   = $bundle->get_bundled_items();
 
 		if ( $min_bundle_size ) {
 			$data[ 'mandatory' ] = true;
+
+			if ( ! empty( $bundled_items ) && ( ! isset( $data[ 'discounted_mandatory' ] ) || false === $data[ 'discounted_mandatory' ] ) ) {
+				foreach ( $bundled_items as $bundled_item ) {
+					if ( $bundled_item->get_discount( 'sync' ) > 0 ) {
+						$data[ 'discounted_mandatory' ] = true;
+						break;
+					}
+				}
+			}
 		}
 
 		return $data;

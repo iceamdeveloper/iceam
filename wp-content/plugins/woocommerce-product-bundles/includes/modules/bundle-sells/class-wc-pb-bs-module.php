@@ -2,7 +2,7 @@
 /**
  * WC_PB_BS_Module class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.8.0
  */
 

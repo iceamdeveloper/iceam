@@ -1,6 +1,9 @@
 <?php
 
-class Tribe__Events__Pro__Editor__Provider extends tad_DI52_ServiceProvider {
+use TEC\Common\Contracts\Service_Provider;
+
+class Tribe__Events__Pro__Editor__Provider extends Service_Provider {
+
 
 	/**
 	 * Binds and sets up implementations.
@@ -10,7 +13,7 @@ class Tribe__Events__Pro__Editor__Provider extends tad_DI52_ServiceProvider {
 	 */
 	public function register() {
 		// Return if we shouldn't load blocks.
-		if ( ! tribe( 'editor' )->should_load_blocks()) {
+		if ( ! tribe( 'editor' )->should_load_blocks() && ! tec_is_full_site_editor() ) {
 			return;
 		}
 

@@ -449,7 +449,7 @@ a.tribe-attendees-list-showall {
 				color: #444;
 				content: '\f132';
 				display: block;
-				font-family: 'dashicons';
+				font-family: 'dashicons', sans-serif;
 				font-size: 22px;
 				height: 0;
 				left: 0;
@@ -468,78 +468,100 @@ a.tribe-attendees-list-showall {
 			display: block;
 		}
 
-.tribe-tickets-attendees-list-optout label {
-		margin-left: 5px;
-	}
+.tribe-tickets-attendees-list-optout {
+	align-items: center;
+	display: flex;
+	flex-flow: row wrap;
+}
 
 .tribe-tickets-attendees-list-optout input[type="radio"] + label,
 	.tribe-tickets-attendees-list-optout input[type="checkbox"] + label {
 		display: inline-block;
+		font-size: var(--tec-font-size-2);
+		margin: 0;
 	}
 
-.tribe-orders-list {
+.tribe-tickets-attendees-list-optout input[type='checkbox'] {
+		height: var(--tec-spacer-3);
+		width: var(--tec-spacer-3);
+	}
+
+.tribe-rsvp,
+.tribe-tickets ul.tribe-orders-list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
 }
 
-.tribe-orders-list > .tribe-item {
+.tribe-rsvp > .tribe-item, .tribe-tickets ul.tribe-orders-list > .tribe-item {
 		margin-top: 20px;
 	}
 
-.tribe-orders-list .tribe-tickets-list {
+.tribe-rsvp .tribe-rsvp-list,
+	.tribe-rsvp .tribe-tickets-list,
+	.tribe-tickets ul.tribe-orders-list .tribe-rsvp-list,
+	.tribe-tickets ul.tribe-orders-list .tribe-tickets-list {
 		list-style: none;
 		margin: 0;
 		padding: 0;
 	}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item, .tribe-rsvp .tribe-tickets-list > .tribe-item, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item {
 			background-color: var(--tec-color-background);
 			border: 1px solid #ededed;
 			border-bottom: 0;
 			padding: 20px;
 		}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item:last-child {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item:last-child, .tribe-rsvp .tribe-tickets-list > .tribe-item:last-child, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item:last-child, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item:last-child {
 				border-bottom: 1px solid #ededed;
 			}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item.tribe-disabled {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item.tribe-disabled, .tribe-rsvp .tribe-tickets-list > .tribe-item.tribe-disabled, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item.tribe-disabled, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item.tribe-disabled {
 				background-color: #efefef;
 				border-color: #ddd;
 				color: #717171;
 			}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item.tribe-disabled:last-child {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item.tribe-disabled:last-child, .tribe-rsvp .tribe-tickets-list > .tribe-item.tribe-disabled:last-child, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item.tribe-disabled:last-child, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item.tribe-disabled:last-child {
 					border-bottom-color: #ddd;
 				}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item .tribe-ticket-information {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item .tribe-ticket-information, .tribe-rsvp .tribe-tickets-list > .tribe-item .tribe-ticket-information, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item .tribe-ticket-information, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item .tribe-ticket-information {
 				display: inline-block;
 				float: right;
 			}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item .tribe-answer {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item .tribe-answer, .tribe-rsvp .tribe-tickets-list > .tribe-item .tribe-answer, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item .tribe-answer, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item .tribe-answer {
 				display: block;
 				float: right;
 			}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item table {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item table, .tribe-rsvp .tribe-tickets-list > .tribe-item table, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item table, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item table {
 				border: 0;
 				margin: 0;
 			}
 
-.tribe-orders-list .tribe-tickets-list > .tribe-item td {
+.tribe-rsvp .tribe-rsvp-list > .tribe-item td, .tribe-rsvp .tribe-tickets-list > .tribe-item td, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item td, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item td {
 				border: 0;
+			}
+
+.tribe-rsvp .tribe-rsvp-list > .tribe-item div.tribe-event-tickets-plus-meta, .tribe-rsvp .tribe-tickets-list > .tribe-item div.tribe-event-tickets-plus-meta, .tribe-tickets ul.tribe-orders-list .tribe-rsvp-list > .tribe-item div.tribe-event-tickets-plus-meta, .tribe-tickets ul.tribe-orders-list .tribe-tickets-list > .tribe-item div.tribe-event-tickets-plus-meta {
+				flex: 0 1 100%;
+				margin-top: var(--tec-spacer-1);
+				order: 4;
 			}
 
 /* Attendee Meta on orders-tickets.php */
 
 .attendee-meta.toggle {
+	color: var(--tec-color-accent-primary);
 	cursor: pointer;
 	display: block;
-	font-size: 90%;
-	margin-bottom: 10px;
+	font-family: var(--tec-font-family-sans-serif);
+	font-size: var(--tec-font-size-3);
+	font-weight: var(--tec-font-weight-regular);
+	line-height: var(--tec-line-height-0);
 }
 
 .attendee-meta.toggle:before {
@@ -550,8 +572,13 @@ a.tribe-attendees-list-showall {
 		content: '- ';
 	}
 
-.attendee-meta-row {
+.attendee-meta.toggle:hover {
+		color: var(--tec-color-accent-primary-hover);
+	}
+
+div.attendee-meta-row {
 	display: none;
+	margin-top: var(--tec-spacer-2);
 }
 
 /* Attendee meta fields */
@@ -664,7 +691,7 @@ input[type=checkbox].tribe_show_attendees {
 
 .tribe-checkout-backlinks a.tribe-checkout-backlink:before {
 		content: '\f341';
-		font-family: 'dashicons';
+		font-family: 'dashicons', sans-serif;
 		margin-right: 5px;
 		vertical-align: middle;
 	}

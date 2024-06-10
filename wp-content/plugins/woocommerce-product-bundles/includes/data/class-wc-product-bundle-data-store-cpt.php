@@ -2,7 +2,7 @@
 /**
  * WC_Product_Bundle_Data_Store_CPT class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.2.0
  */
 
@@ -16,7 +16,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Bundle data stored as Custom Post Type. For use with the WC 2.7+ CRUD API.
  *
  * @class    WC_Product_Bundle_Data_Store_CPT
- * @version  6.12.0
+ * @version  7.0.0
  */
 class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 
@@ -278,10 +278,11 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 			$min_price_meta = (array) get_post_meta( $id, '_price', false );
 			$max_price_meta = (array) get_post_meta( $id, '_wc_sw_max_price', false );
 
-			$manage_stock = get_post_meta( $id, '_manage_stock', true );
-			$stock        = 'yes' === $manage_stock ? wc_stock_amount( get_post_meta( $id, '_stock', true ) ) : null;
-			$price        = wc_format_decimal( get_post_meta( $id, '_price', true ) );
-			$sale_price   = wc_format_decimal( get_post_meta( $id, '_sale_price', true ) );
+			$manage_stock  = get_post_meta( $id, '_manage_stock', true );
+			$stock         = 'yes' === $manage_stock ? wc_stock_amount( get_post_meta( $id, '_stock', true ) ) : null;
+			$price         = wc_format_decimal( get_post_meta( $id, '_price', true ) );
+			$sale_price    = wc_format_decimal( get_post_meta( $id, '_sale_price', true ) );
+			$ratings_count = get_post_meta( $id, '_wc_rating_count', true );
 
 			// If the children don't have enough stock, the parent is seen as out of stock in the lookup table.
 			$stock_status = 'outofstock' === get_post_meta( $id, '_wc_pb_bundled_items_stock_status', true ) ? 'outofstock' : get_post_meta( $id, '_stock_status', true );
@@ -296,7 +297,7 @@ class WC_Product_Bundle_Data_Store_CPT extends WC_Product_Data_Store_CPT {
 				'onsale'         => $sale_price && $price === $sale_price ? 1 : 0,
 				'stock_quantity' => $stock,
 				'stock_status'   => $stock_status,
-				'rating_count'   => array_sum( (array) get_post_meta( $id, '_wc_rating_count', true ) ),
+				'rating_count'   => ! $ratings_count ? 0 : array_sum( (array) $ratings_count ),
 				'average_rating' => get_post_meta( $id, '_wc_average_rating', true ),
 				'total_sales'    => get_post_meta( $id, 'total_sales', true )
 			);

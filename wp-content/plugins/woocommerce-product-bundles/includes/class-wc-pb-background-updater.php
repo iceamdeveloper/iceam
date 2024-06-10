@@ -2,7 +2,7 @@
 /**
  * WC_PB_Background_Updater class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.0.0
  */
 
@@ -61,7 +61,7 @@ class WC_PB_Background_Updater extends WP_Background_Process {
 		$dispatched = parent::dispatch();
 
 		if ( is_wp_error( $dispatched ) ) {
-			WC_PB_Core_Compatibility::log( sprintf( 'Unable to dispatch WooCommerce Product Bundles updater: %s', $dispatched->get_error_message() ), 'error', 'wc_pb_db_updates' );
+			WC_PB_Core_Compatibility::log( sprintf( 'Unable to dispatch Woo Product Bundles updater: %s', $dispatched->get_error_message() ), 'error', 'wc_pb_db_updates' );
 		}
 	}
 

@@ -29,6 +29,7 @@ class Tribe__Tickets__Editor__Assets {
 				'wp-i18n',
 				'wp-element',
 				'wp-editor',
+				'wp-block-editor'
 			],
 			'enqueue_block_editor_assets',
 			[
@@ -60,7 +61,7 @@ class Tribe__Tickets__Editor__Assets {
 			$plugin,
 			'tribe-tickets-gutenberg-main-styles',
 			'app/main.css',
-			[],
+			[ 'tribe-common-full-style' ],
 			'enqueue_block_editor_assets',
 			[
 				'in_footer'    => false,

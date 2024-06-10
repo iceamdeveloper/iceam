@@ -16,6 +16,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 		add_action( 'tribe_tickets_plus_meta_storage_set_hash_cookie', [ $this, 'set_hash_cookie' ], 10, 3 );
 		add_action( 'tribe_tickets_plus_meta_storage_delete_hash_cookie', [ $this, 'delete_hash_cookie' ], 10, 3 );
 		add_filter( 'tribe_tickets_plus_meta_storage_combine_new_and_saved_meta', [ $this, 'clear_woocommerce_ar_updated' ] );
+		add_filter( 'woocommerce_hidden_order_itemmeta', [ $this, 'hide_attendee_optout_meta' ] );
 	}
 
 	/**
@@ -38,12 +39,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	 * Sets attendee data on order posts.
 	 *
 	 * @since 4.1
+	 * @since 5.9.1 updated logic to new WooCommerce HPOS requirement.
 	 *
 	 * @param int    $order_id    WooCommerce Order ID
 	 * @param string $from_status WooCommerce Status (from)
 	 */
 	public function save_attendee_meta_to_order( $order_id, $from_status = null ) {
-		$order       = wc_get_order( $order_id );
+		$order = wc_get_order( $order_id );
 
 		// Bail if order is empty.
 		if ( empty( $order ) ) {
@@ -64,7 +66,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 			$product_ids[] = isset( $item['product_id'] ) ? $item['product_id'] : $item['id'];
 		}
 
-		$meta_object = Tribe__Tickets_Plus__Main::instance()->meta();
+		$meta_object = tribe( 'tickets-plus.meta' );
 
 		// build the custom meta data that will be stored in the order meta
 		if ( ! $order_meta = $meta_object->build_order_meta( $product_ids, true ) ) {
@@ -72,7 +74,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 		}
 
 		// store the custom meta on the order
-		update_post_meta( $order_id, Tribe__Tickets_Plus__Meta::META_KEY, $order_meta, true );
+		$order->update_meta_data( Tribe__Tickets_Plus__Meta::META_KEY, $order_meta );
+		$order->save_meta_data();
 
 		if ( 'pending' === $from_status ) {
 			$this->clear_meta_cookie_data_for_products( $product_ids );
@@ -83,6 +86,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	 * Sets attendee data on attendee posts
 	 *
 	 * @since 4.1
+	 * @since 5.9.1 Updated retrieval of meta data to use WooCommece ORM.
 	 *
 	 * @param int $attendee_id       Attendee Ticket Post ID
 	 * @param int $order_id          WooCommerce Order ID
@@ -90,7 +94,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 	 * @param int $order_attendee_id Attendee number in submitted order
 	 */
 	public function save_attendee_meta_to_ticket( $attendee_id, $order_id, $product_id, $order_attendee_id ) {
-		$meta = get_post_meta( $order_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$order = wc_get_order( $order_id );
+
+		if ( ! $order ) {
+			return;
+		}
+
+		$meta = $order->get_meta(
+			Tribe__Tickets_Plus__Meta::META_KEY,
+			true
+		);
 
 		if ( ! isset( $meta[ $product_id ] ) ) {
 			return;
@@ -139,7 +152,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 			return $hash;
 		}
 
-		$hash = $wc_session->get( Tribe__Tickets_Plus__Meta__Storage::HASH_COOKIE_KEY );
+		$hash = $wc_session->get( Tribe__Tickets_Plus__Meta__Storage::get_hash_cookie_key() );
 
 		return $hash;
 	}
@@ -164,7 +177,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 			return;
 		}
 
-		$wc_session->set( Tribe__Tickets_Plus__Meta__Storage::HASH_COOKIE_KEY, $transient_id );
+		$wc_session->set( Tribe__Tickets_Plus__Meta__Storage::get_hash_cookie_key(), $transient_id );
 	}
 
 	/**
@@ -185,7 +198,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 			return;
 		}
 
-		$wc_session->__unset( Tribe__Tickets_Plus__Meta__Storage::HASH_COOKIE_KEY );
+		$wc_session->__unset( Tribe__Tickets_Plus__Meta__Storage::get_hash_cookie_key() );
 	}
 
 	/**
@@ -219,5 +232,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Meta {
 		}
 
 		return $to_be_saved;
+	}
+
+	/**
+	 * Hide the opt-out meta from the WooCommerce order item meta.
+	 *
+	 * @since 5.9.3
+	 *
+	 * @param array<string> $hidden_keys The meta keys to hide.
+	 *
+	 * @return array<string> The meta keys to hide.
+	 */
+	public function hide_attendee_optout_meta( array $hidden_keys ): array {
+		$hidden_keys[] = tribe( 'tickets-plus.commerce.woo' )->attendee_optout_key;
+
+		return $hidden_keys;
 	}
 }

@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -310,7 +310,7 @@ class WC_Memberships_Admin_Import_Export_Handler {
 	 *
 	 * @return array associative array of fields data
 	 */
-	private function get_import_fields() {
+	private function get_import_fields() : array {
 
 		$documentation_url = 'https://docs.woocommerce.com/document/woocommerce-memberships-import-and-export/';
 		$max_upload_size   = size_format( wc_let_to_num( ini_get( 'post_max_size' ) ) );
@@ -319,10 +319,10 @@ class WC_Memberships_Admin_Import_Export_Handler {
 			$site_timezone = 'UTC';
 		}
 
-		$options = array(
+		$options = [
 
 			// section start
-			array(
+			[
 				'title' => __( 'Import Members', 'woocommerce-memberships' ),
 				/* translators: Placeholders: %1$s - opening <a> link HTML tag, $2$s - closing </a> link HTML tag */
 				'desc'  => sprintf( __( 'Your CSV file must be formatted with the correct column names and cell data. Please %1$ssee the documentation%2$s for more information and a sample CSV file.', 'woocommerce-memberships' ),
@@ -330,21 +330,21 @@ class WC_Memberships_Admin_Import_Export_Handler {
 					'</a>'
 				),
 				'type'  => 'title',
-			),
+			],
 
 			// csv file to upload
-			array(
+			[
 				'id'       => 'wc_memberships_members_csv_import_file',
-				'title'    => __( 'Choose a file from your computer', 'woocommerce-memberships' ),
+				'title'    => __( 'Import File', 'woocommerce-memberships' ),
 				/* translators: Placeholder: %s - maximum uploadable file size (e.g. 8M, 20M, 100M...)  */
-				'desc_tip' => sprintf( __( 'Acceptable file types: CSV or tab-delimited text files. Maximum file size: %s', 'woocommerce-memberships' ),
+				'desc_tip' => sprintf( __( 'Choose a file from your computer. Acceptable file types: CSV or tab-delimited text files. Maximum file size: %s', 'woocommerce-memberships' ),
 					empty( $max_upload_size ) ? '<em>' . __( 'Undetermined', 'woocommerce-memberships' ) . '</em>' : $max_upload_size
 				),
 				'type'     => 'wc-memberships-import-file',
-			),
+			],
 
 			// update existing user memberships?
-			array(
+			[
 				'id'            => 'wc_memberships_members_csv_import_merge_existing_user_memberships',
 				'title'         => __( 'Import Options', 'woocommerce-memberships' ),
 				'desc'          => __( 'Update existing records if a matching user membership is found', 'woocommerce-memberships' ),
@@ -352,86 +352,114 @@ class WC_Memberships_Admin_Import_Export_Handler {
 				'default'       => 'yes',
 				'type'          => 'checkbox',
 				'checkboxgroup' => 'start',
-			),
+			],
 
 			// allow transferring memberships in case of user conflict?
-			array(
+			[
 				'id'            => 'wc_memberships_members_csv_import_allow_memberships_transfer',
 				'desc'          => __( 'Allow membership transfer between users if the imported user differs from the existing user for the membership (skips conflicting rows when disabled)', 'woocommerce-memberships' ),
 				'desc_tip'      => __( 'Will transfer a matched user membership if the user indicated in the same row differs from the one currently associated with the existing user membership.', 'woocommerce-memberships' ),
 				'default'       => 'no',
 				'type'          => 'checkbox',
 				'checkboxgroup' => '',
-			),
+			],
 
 			// create new memberships?
-			array(
+			[
 				'id'            => 'wc_memberships_members_csv_import_create_new_user_memberships',
 				'desc'          => __( 'Create new user memberships if a matching user membership is not found (skips rows when disabled)', 'woocommerce-memberships' ),
 				'desc_tip'      => __( 'Requires matching a valid plan, by ID or slug, and a user, by ID, email address or login name.', 'woocommerce-memberships' ),
 				'default'       => 'yes',
 				'type'          => 'checkbox',
 				'checkboxgroup' => '',
-			),
+			],
 
 			// create new users?
-			array(
+			[
 				'id'            => 'wc_memberships_members_csv_import_create_new_users',
 				'desc'          => __( 'Create a new user if no matching user is found (skips rows when disabled)', 'woocommerce-memberships' ),
 				'desc_tip'      => __( 'Users can be found either by ID, email address or login name provided.', 'woocommerce-memberships' ),
 				'default'       => 'no',
 				'type'          => 'checkbox',
 				'checkboxgroup' => '',
-			),
+			],
 
 			// notify new users?
-			array(
+			[
 				'id'            => 'wc_memberships_members_csv_import_new_user_email_notification',
 				'desc'          => __( 'Send new account notification emails when creating new users during an import', 'woocommerce-memberships' ),
 				'default'       => 'no',
 				'type'          => 'checkbox',
 				'checkboxgroup' => 'end',
-			),
+			],
 
 			// default start date when unspecified
-			array(
+			[
 				'id'          => 'wc_memberships_members_csv_import_default_start_date',
 				'title'       => __( 'Default Start Date', 'woocommerce-memberships' ),
-				'desc'        => __( "When creating new memberships, you can specify a default date to set a membership start date if not defined in the import data. Leave this blank to use today's date otherwise.", 'woocommerce-memberships' ),
+				/* translators: Placeholder: %s - "YYY-MM-DD" wrapped in HTML tags */
+				'desc'        => sprintf( __( 'When creating new memberships, you can specify a default date in the %s format to set a membership start date if not defined in the import data. Leave this blank to use today\'s date otherwise.', 'woocommerce-memberships' ), '<code>YYYY-MM-DD</code>' ),
 				'default'     => '',
 				'css'         => 'max-width: 120px;',
 				'placeholder' => date( 'Y-m-d' ),
 				'type'        => 'text',
 				'class'       => 'js-user-membership-date',
-			),
+			],
+
+			// date format
+			[
+				'id'       => 'wc_memberships_members_csv_import_date_format',
+				'title'    => __( 'Import Date Format', 'woocommerce-memberships' ),
+				'desc_tip' => __( 'The date and time format used in the import file.', 'woocommerce-memberships' ),
+				'desc'     => __( 'It is recommended to use "Auto-detect", unless you are experiencing issues with the result of your imported dates.', 'woocommerce-memberships' ),
+				'default'  => '',
+				'type'     => 'select',
+				'class'    => 'wc-enhanced-select',
+				'options'  => [
+					''       => __( 'Auto-detect', 'woocommerce-memberships' ),
+					'custom' => _x( 'Custom', 'Custom date format', 'woocommerce-memberships' ),
+				],
+			],
+
+			// optional custom date format
+			[
+				'id'       => 'wc_memberships_members_csv_import_custom_date_format',
+				'title'    => __( 'Custom Date Format', 'woocommerce-memberships' ),
+				/* translators: Placeholders: %1$s - opening HTML link tag, %2$s - closing HTML link tag */
+				'desc'     => sprintf( __( 'Enter the date and time format matching the expected format of the membership dates on file. %1$sRead the documentation on date and time formatting%2$s.', 'woocommerce-memberships' ), '<a href="https://wordpress.org/documentation/article/customize-date-and-time-format/" target="_blank">', '</a>' ),
+				'desc_tip' => __( 'When using a custom date format, it must perfectly and consistently match the date format as you have on file or the date will not be parsed correctly.', 'woocommerce-memberships' ),
+				'type'     => 'text',
+			],
 
 			// timezone
-			array(
+			[
 				'id'       => 'wc_memberships_members_csv_import_timezone',
-				'title'    => __( 'Dates timezone', 'woocommerce-memberships' ),
+				'title'    => __( 'Dates Timezone', 'woocommerce-memberships' ),
 				'type'     => 'select',
 				'class'    => 'wc-enhanced-select',
 				'desc_tip' => __( 'Choose the timezone the dates in the import are from.', 'woocommerce-memberships' ),
-				'options'  => array(
+				'options'  => [
 					$site_timezone => __( 'Site timezone', 'woocommerce-memberships' ),
-					'UTC'           => __( 'UTC', 'woocommerce-memberships' ),
-				),
-			),
+					'UTC'          => __( 'UTC', 'woocommerce-memberships' ),
+				],
+			],
 
 			// entries are separated by comma or tab? (filterable)
-			array(
+			[
 				'id'       => 'wc_memberships_members_csv_import_fields_delimiter',
-				'title'    => __( 'Fields are separated by', 'woocommerce-memberships' ),
+				'title'    => __( 'Fields Separated By', 'woocommerce-memberships' ),
 				'type'     => 'select',
 				'class'    => 'wc-enhanced-select',
 				'desc_tip' => __( 'Change the delimiter based on your input file format.', 'woocommerce-memberships' ),
 				'options'  => $this->get_csv_delimiter_options( 'import' ),
-			),
+			],
 
 			// end of section
-			array( 'type' => 'sectionend' ),
+			[
+				'type' => 'sectionend'
+			],
 
-		);
+		];
 
 		/**
 		 * Filters the CSV Import User Memberships options.
@@ -521,10 +549,35 @@ class WC_Memberships_Admin_Import_Export_Handler {
 				'class' => 'js-user-membership-date',
 			],
 
+			// date format
+			[
+				'id'       => 'wc_memberships_members_csv_export_date_format',
+				'title'    => __( 'Export Date Format', 'woocommerce-memberships' ),
+				'desc_tip' => __( 'The date and time format used for the exported dates.', 'woocommerce-memberships' ),
+				/* translators: Placeholder: %s - date format wrapped in HTML <code> tags */
+				'desc'     => sprintf( __( 'It is recommended to use "Default" %s, especially if you intend to re-import the exported membership data in the future.', 'woocommerce-memberships' ), '<code>Y-m-d H:i:s</code>' ),
+				'default'  => '',
+				'type'     => 'select',
+				'class'    => 'wc-enhanced-select',
+				'options'  => [
+					''       => _x( 'Default', 'Default date format', 'woocommerce-memberships' ),
+					'custom' => _x( 'Custom', 'Custom date format', 'woocommerce-memberships' ),
+				],
+			],
+
+			// optional custom date format
+			[
+				'id'    => 'wc_memberships_members_csv_export_custom_date_format',
+				'title' => __( 'Custom Date Format', 'woocommerce-memberships' ),
+				/* translators: Placeholders: %1$s - opening HTML link tag, %2$s - closing HTML link tag */
+				'desc'  => sprintf( __( 'Enter the date and time format to apply to the exported membership dates. %1$sRead the documentation on date and time formatting%2$s.', 'woocommerce-memberships' ), '<a href="https://wordpress.org/documentation/article/customize-date-and-time-format/" target="_blank">', '</a>' ),
+				'type'  => 'text',
+			],
+
 			// export profile fields
 			[
 				'id'       => 'wc_memberships_members_csv_export_profile_fields',
-				'name'     => __( 'Profile fields', 'woocommerce-memberships' ),
+				'name'     => __( 'Profile Fields', 'woocommerce-memberships' ),
 				'type'     => 'checkbox',
 				'desc'     => __( 'Include profile fields', 'woocommerce-memberships' ),
 				'desc_tip' => __( 'Include member profile field data in member export.', 'woocommerce-memberships' ),
@@ -534,17 +587,17 @@ class WC_Memberships_Admin_Import_Export_Handler {
 			// export all post meta
 			[
 				'id'       => 'wc_memberships_members_csv_export_meta_data',
-				'name'     => __( 'Meta data', 'woocommerce-memberships' ),
+				'name'     => __( 'Meta Data', 'woocommerce-memberships' ),
 				'type'     => 'checkbox',
 				'desc'     => __( 'Include additional meta data', 'woocommerce-memberships' ),
 				'desc_tip' => __( 'Add an extra column to the CSV file with all post meta of each membership in JSON format.', 'woocommerce-memberships' ),
-				'default'  => 'no'
+				'default'  => 'no',
 			],
 
 			// entries are going to be separated by comma or tab? (filterable)
 			[
 				'id'       => 'wc_memberships_members_csv_export_fields_delimiter',
-				'name'     => __( 'Separate fields by', 'woocommerce-memberships' ),
+				'name'     => __( 'Separate Fields By', 'woocommerce-memberships' ),
 				'type'     => 'select',
 				'class'    => 'wc-enhanced-select',
 				'desc_tip' => __( 'Change the delimiter based on your desired output format.', 'woocommerce-memberships' ),
@@ -553,7 +606,7 @@ class WC_Memberships_Admin_Import_Export_Handler {
 
 			// section end
 			[
-				'type' => 'sectionend'
+				'type' => 'sectionend',
 			],
 
 		];
@@ -685,7 +738,7 @@ class WC_Memberships_Admin_Import_Export_Handler {
 					class="<?php echo esc_attr( $field['class'] ); ?>"
 					style="<?php echo esc_attr( $field['css'] ); ?>"
 					value="<?php echo esc_attr( $field['value'] ); ?>"
-				/><br /><span class="description"><?php echo $field['desc_tip']; ?></span>
+				/><br /><p class="description"><?php echo $field['desc_tip']; ?></p>
 			</td>
 		</tr>
 		<?php
@@ -742,7 +795,7 @@ class WC_Memberships_Admin_Import_Export_Handler {
 						class="<?php echo esc_attr( $field['class'] ); ?>"
 					/>
 				</span>
-				<br /><span class="description"><?php echo $field['desc']; ?></span>
+				<br /><p class="description"><?php echo $field['desc']; ?></p>
 			</td>
 		</tr>
 		<?php

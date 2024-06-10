@@ -1,5 +1,5 @@
 <?php
-
+use Tribe\Tickets\Plus\Editor\Settings\Data\Capacity_Table as Capacity_Table;
 /**
  * Class Tribe__Tickets_Plus__Editor
  *
@@ -15,7 +15,7 @@ class Tribe__Tickets_Plus__Editor extends Tribe__Tickets__Editor {
 	 * @return void
 	 */
 	public function hook() {
-		add_action( 'tribe_events_tickets_settings_content_before', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/fieldset/settings-capacity' ) );
+		add_action( 'tribe_events_tickets_settings_content_before', [ $this, 'render_capacity_data' ] );
 		add_action( 'tribe_events_tickets_settings_content', tribe_callback( 'tickets-plus.admin.views', 'template', 'editor/settings-attendees' ) );
 	}
 
@@ -45,5 +45,19 @@ class Tribe__Tickets_Plus__Editor extends Tribe__Tickets__Editor {
 		$url = add_query_arg( array( 'page' => 'tickets-orders' ), $url );
 
 		return $url;
+	}
+
+	/**
+	 * Render the capacity data on the settings page.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @return void
+	 */
+	public function render_capacity_data(): void {
+		$post_id = get_the_ID();
+		$capacity_table = new Capacity_Table( $post_id );
+		$admin_views = tribe( 'tickets-plus.admin.views' );
+		$admin_views->template( 'editor/fieldset/settings-capacity', [ 'capacity_table' => $capacity_table ] );
 	}
 }

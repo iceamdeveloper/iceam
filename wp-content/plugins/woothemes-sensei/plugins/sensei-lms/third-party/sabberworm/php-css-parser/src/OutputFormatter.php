@@ -2,6 +2,7 @@
 
 namespace Sensei\ThirdParty\Sabberworm\CSS;
 
+use Sensei\ThirdParty\Sabberworm\CSS\Comment\Commentable;
 use Sensei\ThirdParty\Sabberworm\CSS\Parsing\OutputException;
 class OutputFormatter
 {
@@ -9,7 +10,7 @@ class OutputFormatter
      * @var OutputFormat
      */
     private $oFormat;
-    public function __construct(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oFormat)
+    public function __construct(OutputFormat $oFormat)
     {
         $this->oFormat = $oFormat;
     }
@@ -134,7 +135,7 @@ class OutputFormatter
             // If output exceptions are ignored, run the code with exception guards
             try {
                 return $cCode();
-            } catch (\Sensei\ThirdParty\Sabberworm\CSS\Parsing\OutputException $e) {
+            } catch (OutputException $e) {
                 return null;
             }
             // Do nothing
@@ -166,7 +167,7 @@ class OutputFormatter
             } else {
                 $sResult .= $sSeparator;
             }
-            if ($mValue instanceof \Sensei\ThirdParty\Sabberworm\CSS\Renderable) {
+            if ($mValue instanceof Renderable) {
                 $sResult .= $mValue->render($oFormat);
             } else {
                 $sResult .= $mValue;
@@ -192,6 +193,25 @@ class OutputFormatter
         $sNextToLast = \array_pop($sString);
         \array_push($sString, $sNextToLast . $sLast);
         return \implode(';', $sString);
+    }
+    /**
+     *
+     * @param array<Commentable> $aComments
+     * @return string
+     */
+    public function comments(Commentable $oCommentable)
+    {
+        if (!$this->oFormat->bRenderComments) {
+            return '';
+        }
+        $sResult = '';
+        $aComments = $oCommentable->getComments();
+        $iLastCommentIndex = \count($aComments) - 1;
+        foreach ($aComments as $i => $oComment) {
+            $sResult .= $oComment->render($this->oFormat);
+            $sResult .= $i === $iLastCommentIndex ? $this->spaceAfterBlocks() : $this->spaceBetweenBlocks();
+        }
+        return $sResult;
     }
     /**
      * @param string $sSpaceString

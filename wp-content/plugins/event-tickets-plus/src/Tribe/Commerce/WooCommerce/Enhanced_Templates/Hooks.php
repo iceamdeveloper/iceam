@@ -2,10 +2,21 @@
 
 namespace Tribe\Tickets\Plus\Commerce\WooCommerce\Enhanced_Templates;
 
+use Tribe\Tickets\Plus\Attendee_Registration\IAC;
+use Tribe__Events__Main as TEC;
+use Tribe__Simple_Table;
+use Tribe__Tickets_Plus__Commerce__WooCommerce__Main;
+use Tribe__Tickets_Plus__Meta;
+use WC_Order;
+use WC_Order_Item;
+use WC_Order_Item_Product;
+use WC_Product;
+use WP_Post;
+
 /**
  * Class Hooks
  *
- * @since 5.2.7
+ * @since   5.2.7
  *
  * @package Tribe\Tickets\Plus\Commerce\WooCommerce\Enhanced_Templates
  */
@@ -13,65 +24,68 @@ class Hooks {
 	/**
 	 * Echoes the attendee meta when attached to relevant WooCommerce action.
 	 *
-	 * @see action woocommerce_order_item_meta_start
-	 * @see Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_event_for_ticket()
-	 *
 	 * @since 5.2.7
+	 *
+	 * @param int          $item_id The item ID.
+	 * @param WC_Order_Item $item    The item to get the meta for.
+	 * @param WC_Order     $order   The order the item is part of.
+	 *
+	 * @see   Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_event_for_ticket()
+	 *
+	 * @see   action woocommerce_order_item_meta_start
 	 */
 	public function woocommerce_echo_event_info( $item_id, $item, $order ) {
 		if (
-			! $item instanceof \WC_Order_Item_Product
-			|| ! $order instanceof \WC_Order
+			! $item instanceof WC_Order_Item_Product
+			|| ! $order instanceof WC_Order
 		) {
 			return;
 		}
 
-		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $wootix */
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $wootix */
 		$wootix = tribe( 'tickets-plus.commerce.woo' );
 
 		$item_data = $item->get_data();
+		$ticket_id = $item_data['product_id'] ?? null;
 
-		// This is either true or a WP_Post, such as for any enabled post type (such as a ticket on a Page), not just for Tribe Events.
-		$event = $wootix->get_event_for_ticket( $item_data['product_id'] );
-
-		// Bail if no connected post, since it's required of a WooCommerce Ticket but not of all WooCommerce Products
-		if ( empty( $event ) ) {
+		if ( ! $ticket_id ) {
 			return;
 		}
 
-		// Show event details if this ticket is for a tribe event.
-		if (
-			$event instanceof \WP_Post
-			&& class_exists( 'Tribe__Events__Main' )
-			&& \Tribe__Events__Main::POSTTYPE === $event->post_type
-		) {
-			$event_time       = tribe_events_event_schedule_details( $event, '<em>', '</em>' );
-			$event_venue_name = tribe_get_venue( $event );
-			$event_address    = tribe_get_full_address( $event );
-			$event_details    = [];
+		// This is either true or a WP_Post, such as for any enabled post type (such as a ticket on a Page), not just for Tribe Events.
+		$post = $wootix->get_event_for_ticket( $ticket_id );
 
-			// Output event title in same format as Community Tickets.
-			$event_details[] = sprintf(
-				'<a href="%1$s" class="event-title">%2$s</a>',
-				esc_attr( get_permalink( $event ) ),
-				esc_html( get_the_title( $event ) )
-			);
+		// Bail if no connected post, since it's required of a WooCommerce Ticket but not of all WooCommerce Products
+		if ( empty( $post ) ) {
+			return;
+		}
 
-			if ( ! empty( $event_time ) ) {
-				$event_details[] = $event_time;
-			}
+		// By default, print event details if this ticket is for an Event.
+		$print_event_details = $post instanceof WP_Post && class_exists( TEC::class ) && TEC::POSTTYPE === $post->post_type;
+		$post_details        = [];
 
-			if ( ! empty( $event_venue_name ) ) {
-				$event_details[] = $event_venue_name;
-			}
+		if ( $print_event_details ) {
+			$post_details = $this->get_event_details( $post );
+		}
 
-			if ( ! empty( $event_address ) ) {
-				$event_details[] = $event_address;
-			}
+		/**
+		 * Filters the event details to print in the WooCommerce Order Item meta.
+		 *
+		 * If the filter does not return `null`, the details provided will be printed instead of the default event details.
+		 *
+		 * @since 5.9.0
+		 *
+		 * @param array<string> $post_details The event details to print.
+		 * @param bool|WP_Post  $post         Either the post object the Ticket is for, or `false` if the post is not found.
+		 * @param int           $ticket_id    The ID of the ticket product.
+		 *
+		 */
+		$post_details = apply_filters( 'tec_tickets_plus_woocommerce_order_event_details', $post_details, $post, $ticket_id );
 
+		if ( is_array( $post_details ) && count( $post_details ) ) {
 			printf(
 				'<div class="tribe-event-details">%1$s</div>',
-				implode( '<br />', $event_details )
+				implode( '<br />', $post_details )
 			);
 		}
 
@@ -88,7 +102,8 @@ class Hooks {
 		if ( empty( $data_filter ) ) {
 			return;
 		}
-		$this->echo_attendee_meta( $order->get_id(), $item_data['product_id'] );
+
+		$this->echo_attendee_meta( $order->get_id(), $ticket_id );
 	}
 
 	/**
@@ -101,7 +116,7 @@ class Hooks {
 	 */
 	protected function echo_attendee_meta( $order_id, $ticket_id = null ) {
 
-		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
 		$woo_provider = tribe( 'tickets-plus.commerce.woo' );
 		$attendees    = $woo_provider->get_attendees_by_id( $order_id );
 
@@ -152,7 +167,7 @@ class Hooks {
 				esc_html( $attendee['security_code'] ),
 			];
 
-			$table                        = new \Tribe__Simple_Table( $table_columns );
+			$table                        = new Tribe__Simple_Table( $table_columns );
 			$table->html_escape_td_values = false;
 			$table->table_attributes      = [
 				'class' => 'tribe-attendee-meta',
@@ -167,14 +182,14 @@ class Hooks {
 	 *
 	 * @since 5.2.7
 	 *
-	 * @param array $attendee Attendee data.
+	 * @param array $attendee      Attendee data.
 	 * @param array $table_columns Table columns.
 	 *
 	 * @return array $table_columns
 	 */
 	protected function maybe_add_iac_data( $attendee, $table_columns ) {
 
-		/** @var \Tribe\Tickets\Plus\Attendee_Registration\IAC $iac */
+		/** @var IAC $iac */
 		$iac            = tribe( 'tickets-plus.attendee-registration.iac' );
 		$iac_for_ticket = $iac->get_iac_setting_for_ticket( $attendee['product_id'] );
 		$iac_enabled    = $iac_for_ticket === $iac::ALLOWED_KEY || $iac_for_ticket === $iac::REQUIRED_KEY;
@@ -221,11 +236,11 @@ class Hooks {
 	protected function get_attendee_meta( $ticket_id, $qr_ticket_id ) {
 		$output = [];
 
-		/** @var \Tribe__Tickets_Plus__Meta $woo_provider */
+		/** @var Tribe__Tickets_Plus__Meta $woo_provider */
 		$meta_handler = tribe( 'tickets-plus.meta' );
 
 		$meta_fields = $meta_handler->get_meta_fields_by_ticket( $ticket_id );
-		$meta_data   = get_post_meta( $qr_ticket_id, \Tribe__Tickets_Plus__Meta::META_KEY, true );
+		$meta_data   = get_post_meta( $qr_ticket_id, Tribe__Tickets_Plus__Meta::META_KEY, true );
 
 		foreach ( $meta_fields as $field ) {
 
@@ -287,7 +302,7 @@ class Hooks {
 	 *
 	 * @since 5.2.7
 	 *
-	 * @param \WC_Order $order Order Object.
+	 * @param WC_Order $order Order Object.
 	 */
 	public function add_event_title_header( $order ) {
 
@@ -307,9 +322,9 @@ class Hooks {
 	 *
 	 * @since 5.2.7
 	 *
-	 * @param \WC_Product $product The Product object.
-	 * @param \WC_Order_Item_Product $item The Order Item object.
-	 * @param string $item_id Item ID.
+	 * @param WC_Product            $product The Product object.
+	 * @param WC_Order_Item_Product $item    The Order Item object.
+	 * @param string                $item_id Item ID.
 	 */
 	public function add_event_title_for_order_item( $product, $item, $item_id ) {
 
@@ -322,7 +337,7 @@ class Hooks {
 		}
 
 		$event_id   = $product->get_meta( '_tribe_wooticket_for_event' );
-		$event_post = ! empty( $event_id ) ? get_post( $event_id ) : '' ;
+		$event_post = ! empty( $event_id ) ? get_post( $event_id ) : '';
 		$event      = ! empty( $event_post ) ? $event_post->post_title : '';
 		$schedule   = function_exists( 'tribe_events_event_schedule_details' ) ? tribe_events_event_schedule_details( $event_post ) : '';
 		$link       = sprintf( '<a target="_blank" rel="noopener nofollow" href="%s">%s</a> %s', get_permalink( $event_post ), esc_html( $event ), $schedule );
@@ -339,9 +354,9 @@ class Hooks {
 	 *
 	 * @since 5.2.7
 	 *
-	 * @param string $item_id Order Item ID.
-	 * @param \WC_Order_Item $item Order Item.
-	 * @param \WC_Product $product WooCommerce Product Object.
+	 * @param string        $item_id Order Item ID.
+	 * @param WC_Order_Item $item    Order Item.
+	 * @param WC_Product    $product WooCommerce Product Object.
 	 */
 	public function add_attendee_data_for_order_item( $item_id, $item, $product ) {
 
@@ -353,7 +368,7 @@ class Hooks {
 			return;
 		}
 
-		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
 		$woo_provider = tribe( 'tickets-plus.commerce.woo' );
 
 		$ticket_id = $product->get_id();
@@ -361,10 +376,10 @@ class Hooks {
 		$attendees_orm = tribe_attendees( $woo_provider->orm_provider );
 
 		$attendees_orm->by( 'order', $item->get_order_id() )
-		              ->by( 'ticket', $product->get_id() )
-		              ->by( 'status', [ 'publish', 'trash' ] );
+					  ->by( 'ticket', $product->get_id() )
+					  ->by( 'status', [ 'publish', 'trash' ] );
 
-		$attendees = $woo_provider->get_attendees_from_module( $attendees_orm->all() );
+		$attendees = $woo_provider->get_attendees_from_module( $attendees_orm->all( true ) );
 
 		foreach ( $attendees as $attendee ) {
 			// Skip attendees that are not for this ticket type.
@@ -390,12 +405,12 @@ class Hooks {
 
 			$table_columns[] = [
 				esc_html_x( 'Name', 'Attendee meta table.', 'event-tickets-plus' ),
-				esc_html( $attendee[ 'holder_name' ] ),
+				esc_html( $attendee['holder_name'] ),
 			];
 
 			$table_columns[] = [
 				esc_html_x( 'Email', 'Attendee meta table.', 'event-tickets-plus' ),
-				esc_html( $attendee[ 'holder_email' ] ),
+				esc_html( $attendee['holder_email'] ),
 			];
 
 			$fields = $this->get_attendee_meta( $attendee['product_id'], $attendee['qr_ticket_id'] );
@@ -414,7 +429,7 @@ class Hooks {
 				esc_html( $attendee['security_code'] ),
 			];
 
-			$table                        = new \Tribe__Simple_Table( $table_columns );
+			$table                        = new Tribe__Simple_Table( $table_columns );
 			$table->html_escape_td_values = false;
 			$table->table_attributes      = [
 				'class' => 'tribe-attendee-meta ' . $deleted_class,
@@ -450,13 +465,50 @@ class Hooks {
 	 *
 	 * @since 5.2.7
 	 *
-	 * @param \WC_Order $order The Order object.
+	 * @param WC_Order $order The Order object.
 	 */
 	public function should_render_event_column( $order ) {
 
-		/** @var \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
+		/** @var Tribe__Tickets_Plus__Commerce__WooCommerce__Main $woo_provider */
 		$woo_provider = tribe( 'tickets-plus.commerce.woo' );
 
 		return (bool) $order->get_meta( $woo_provider->order_has_tickets );
+	}
+
+	/**
+	 * Returns the list of details to show about a Ticketed Event in the context of the WooCommerce
+	 * Order page.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param WP_Post $post The Event post object.
+	 *
+	 * @return array<string> The list of details to show about the Event.
+	 */
+	private function get_event_details( WP_Post $post ): array {
+		$event_time       = tribe_events_event_schedule_details( $post, '<em>', '</em>' );
+		$event_venue_name = tribe_get_venue( $post );
+		$event_address    = tribe_get_full_address( $post );
+
+		// Output event title in same format as Community Tickets.
+		$post_details[] = sprintf(
+			'<a href="%1$s" class="event-title">%2$s</a>',
+			esc_attr( get_permalink( $post ) ),
+			esc_html( get_the_title( $post ) )
+		);
+
+		if ( ! empty( $event_time ) ) {
+			$post_details[] = $event_time;
+		}
+
+		if ( ! empty( $event_venue_name ) ) {
+			$post_details[] = $event_venue_name;
+		}
+
+		if ( ! empty( $event_address ) ) {
+			$post_details[] = $event_address;
+		}
+
+		return $post_details;
 	}
 }

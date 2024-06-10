@@ -128,6 +128,9 @@ jQuery(document).ready(function () {
         var sat_time_pair = new Datepair(sat_time);
     }    
 
+    // stop to enter value from keyboard in time filed 
+    jQuery(".time.start.time-field.ui-timepicker-input,.time.end.time-field.ui-timepicker-input,.form-table.tbl-timing #frmdate,.form-table.tbl-timing #todate").keypress(function(event) {event.preventDefault();});
+
     // deactivation popup code
     var ublk_plugin_admin = jQuery('.documentation_ublk_plugin').closest('div').find('.deactivate').find('a');
     ublk_plugin_admin.on('click', function (event) {
@@ -189,7 +192,7 @@ jQuery(document).ready(function () {
             jQuery('.role_records').hide();
             jQuery('.export_display').val('users');
             jQuery('.users_records, .filter_div').show();
-            jQuery(".frmExport .actions").css("top", "0px");
+            jQuery(".frmExport .actions").css("top", "auto");
             jQuery(".frmExport").css({ "left": "395px", "bottom": "-76px" });
         }
     });
@@ -270,7 +273,7 @@ jQuery(document).ready(function () {
         jQuery('#txtUsername').val('');
     });
     jQuery('#txtUsername').on('focus', function () {
-        jQuery('#srole').val('');
+        // jQuery('#srole').val('');
     });
     //Datepicker
     jQuery('.view_block_data_all').on('click', function (event) {
@@ -284,7 +287,7 @@ jQuery(document).ready(function () {
             jQuery(".tablenav-pages").css("display", "none");
             jQuery("div#screen-options-link-wrap").css("display", "none");
         }
-        else if (parseInt(jQuery(".total-pages").html()) > 0) {
+        else if (parseInt(jQuery(".total-pages").html()) > 1) {
             jQuery(".tablenav-pages").css("display", "block");
             jQuery("div#screen-options-link-wrap").css("display", "block");
         }
@@ -298,17 +301,56 @@ jQuery(document).ready(function () {
         jQuery('#blk_username_role').val(selected.join(','));
     });
 
+    jQuery('#username thead .check-column input[type=checkbox], tfoot .check-column input[type=checkbox]').on("change", function () {
+        if(!jQuery('#username tbody .check-column input[name="chkUserUsername[]"]:checked').length > 0){
+            jQuery('#blk_username_role').val("");
+        }else{
+            var selected = [];
+            jQuery('#username tbody .check-column input[type=checkbox]:checked').each(function () {
+                selected.push(jQuery(this).val());
+            });
+            jQuery('#blk_username_role').val(selected.join(','));
+        }
+    });
+
+    jQuery('#role thead .check-column input[type=checkbox], tfoot .check-column input[type=checkbox]').on("change", function () {
+        if(!jQuery('#role tbody .check-column input[name="chkUserRole[]"]:checked').length > 0){
+            jQuery('#blk_username_role').val("");
+        }else{
+            var selected = [];
+            jQuery('#role tbody .check-column input[type=checkbox]:checked').each(function () {
+                selected.push(jQuery(this).val());
+            });
+            jQuery('#blk_username_role').val(selected.join(','));
+        }
+    });
+
     jQuery('.ublk_bulk_btn').on("click", function () {
         var blk_action = jQuery('#ublk_bulk_actions').val();
         var blk_username_role = jQuery('#blk_username_role').val();
         var multi_user_roles = jQuery('#hidden_cmbUserBy').val();
         var data = String(window.location.href).replace(/#/, "");
-        if (multi_user_roles == 'role') {
-            window.location.href = data + '&action=' + blk_action + '&role=' + blk_username_role;
-        } else {
-            window.location.href = data + '&action=' + blk_action + '&username=' + blk_username_role;
+        if(blk_action != ""){
+            if (multi_user_roles == 'role') {
+                window.location.href = data + '&action=' + blk_action + '&role=' + blk_username_role;
+            } else {
+                window.location.href = data + '&action=' + blk_action + '&username=' + blk_username_role;
+            }
+        }else{
+            var url = new URL(data);
+            url.searchParams.set("username", ""); 
+            window.location.href = url.href; 
         }
     });
+    
+    var url = new URL(document.location.href);
+    var params = new URLSearchParams( url.search );
+    var reset = params.get("reset");
+    var role = params.get("role");
+    if( 1 == reset && '' != role ) {
+        jQuery(".frmExport .actions").css("top", "-15px");
+        jQuery(".frmExport").css({ "left": "225px", "bottom": "-36px" });
+    }
 });
 
 /**

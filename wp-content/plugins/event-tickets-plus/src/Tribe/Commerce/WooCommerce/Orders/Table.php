@@ -353,7 +353,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 *
 	 * @since 5.6.5 Removed usage of WC REST API and make use of Order API to generate order data.
 	 *
-	 * @param $event_id
+	 * @param int $event_id The Event ID.
 	 *
 	 * @return array|mixed
 	 */
@@ -366,16 +366,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 			return self::$orders[ $event_id ];
 		}
 
-		$product_ids = tribe( 'tickets-plus.commerce.woo' )->get_tickets_ids( $event_id );
-		$order_ids_by_ticket = self::retrieve_orders_ids_from_a_product_id( $product_ids );
+		$orders  = [];
+		$results = self::get_orders_by_event( $event_id );
 
-		if ( empty( $order_ids_by_ticket ) ) {
+		if ( empty( $results ) ) {
 			return [];
 		}
 
-		$orders = [];
-
-		foreach ( $order_ids_by_ticket as $ticket ) {
+		foreach ( $results as $ticket ) {
 			foreach ( $ticket as $order_id ) {
 				if ( empty( $order_id ) ) {
 					continue;
@@ -407,57 +405,51 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 	 * Get All Orders with the given Product IDS
 	 *
 	 * @since 4.10.4 - modified to use retrieve_orders_ids_from_a_product_id method
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
 	 *
-	 * @param array $product_ids an array of product ids
+	 * @deprecated  5.9.4
+	 *
+	 * @param array $product_ids an array of product ids.
 	 *
 	 * @return array an array of order ids
 	 */
 	public static function retrieve_orders_ids_from_a_product_id( $product_ids ) {
-		if ( ! is_array( $product_ids) ) {
+		_deprecated_function( __METHOD__, '5.9.4', 'get_orders_by_event' );
+		if ( empty( $product_ids ) || ! is_array( $product_ids ) ) {
 			return [];
 		}
-		global $wpdb;
-		$order_ids_by_ticket = array();
 
 		$order_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'all', 'woo' );
-		$order_statuses = implode( ",", array_map( function ( $string ) {
-			return "'" . $string . "'";
-		}, $order_statuses ) );
 
-		foreach ( $product_ids as $id ) {
-			$sql = $wpdb->prepare( "
-						SELECT DISTINCT order_item.order_id
-						FROM {$wpdb->prefix}woocommerce_order_itemmeta as order_item_meta,
-						     {$wpdb->prefix}woocommerce_order_items as order_item,
-						     {$wpdb->prefix}posts as p
-						WHERE  order_item.order_item_id = order_item_meta.order_item_id
-						AND order_item.order_id = p.ID
-						AND p.post_status IN ( $order_statuses )
-						AND order_item_meta.meta_key LIKE '_product_id'
-						AND order_item_meta.meta_value = '%s'
-						ORDER BY order_item.order_item_id DESC
-						",
-						$id
-					);
+		$args = [
+			'limit'   => -1,
+			'orderby' => 'date',
+			'order'   => 'DESC',
+			'status'  => $order_statuses,
+		];
 
-			$order_ids = $wpdb->get_results( $sql );
+		$orders               = wc_get_orders( $args );
+		$order_ids_by_product = [];
 
-			foreach ( $order_ids as $order_id ) {
-				$order_ids_by_ticket[ $id ][] = $order_id->order_id;
+		foreach ( $orders as $order ) {
+			foreach ( $order->get_items() as $item ) {
+				$product_id = $item->get_product_id();
+				if ( in_array( $product_id, $product_ids, true ) ) {
+					$order_ids_by_product[ $product_id ][] = $order->get_id();
+				}
 			}
 		}
 
-		return $order_ids_by_ticket;
+		return $order_ids_by_product;
 	}
-
 	public static function get_valid_order_items_for_event( $event_id, $items ) {
-		$valid_order_items = array();
+		$valid_order_items = [];
 
 		$event_id = absint( $event_id );
 
 		foreach ( $items as $order ) {
 			if ( ! isset( $valid_order_items[ $order['id'] ] ) ) {
-				$valid_order_items[ $order['id'] ] = array();
+				$valid_order_items[ $order['id'] ] = [];
 			}
 
 			foreach ( $order['line_items'] as $line_item ) {
@@ -807,5 +799,57 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Table extends WP_List_
 
 		return tribe_format_currency( number_format( $this->calc_site_fee( $total ), 2 ) );
 	}//end column_site_fee
+
+	/**
+	 * Retrieve the Order ID's associated with the tickets within an Event.
+	 *
+	 * @since 5.9.4
+	 *
+	 * @param int $event_id The ID of the event for which to retrieve orders.
+	 *
+	 * @return array
+	 */
+	public static function get_orders_by_event( $event_id ) {
+		$ticket_ids = tribe( 'tickets-plus.commerce.woo' )->get_tickets_ids( $event_id );
+		if ( empty( $ticket_ids ) ) {
+			return [];
+		}
+
+		$order_statuses = (array) tribe( 'tickets.status' )->get_statuses_by_action( 'all', 'woo' );
+
+		// Preparing the status list and ticket list for use in IN clauses
+		// Note: This approach is used because $wpdb->prepare() cannot directly prepare arrays for IN clauses.
+		$status_list_placeholders = implode( ',', array_fill( 0, count( $order_statuses ), '%s' ) );
+		$ticket_list_placeholders = implode( ',', array_fill( 0, count( $ticket_ids ), '%s' ) );
+
+		global $wpdb;
+
+		$is_hpos_enabled = tribe( 'tickets-plus.commerce.woo' )->is_hpos_enabled();
+
+		if ( ! $is_hpos_enabled ) {
+			$query = $wpdb->prepare(
+				"SELECT DISTINCT woi.order_id
+					FROM {$wpdb->prefix}woocommerce_order_itemmeta AS woim
+					INNER JOIN {$wpdb->prefix}woocommerce_order_items AS woi ON woim.order_item_id = woi.order_item_id
+					INNER JOIN {$wpdb->prefix}posts AS p ON p.ID = woi.order_id
+					WHERE woim.meta_key IN ('_product_id', '_variation_id')
+					AND p.post_status IN ($status_list_placeholders)
+					AND woim.meta_value IN ($ticket_list_placeholders)",
+				array_merge( $order_statuses, $ticket_ids )
+			);
+		} else {
+			$query = $wpdb->prepare(
+				"SELECT DISTINCT opl.order_id
+					FROM {$wpdb->prefix}wc_order_product_lookup AS opl
+					INNER JOIN {$wpdb->prefix}wc_order_stats AS os ON opl.order_id = os.order_id
+					WHERE opl.product_id IN ($ticket_list_placeholders)
+					AND os.status IN ($status_list_placeholders)",
+				array_merge( $ticket_ids, $order_statuses )
+			);
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_results( $query );
+	}
 
 }//end class

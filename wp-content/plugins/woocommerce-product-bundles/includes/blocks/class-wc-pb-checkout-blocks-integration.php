@@ -2,7 +2,7 @@
 /**
  * WC_PB_Checkout_Blocks_Integration class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.15.1
  */
 
@@ -11,7 +11,7 @@ use Automattic\WooCommerce\Blocks\Integrations\IntegrationInterface;
 /**
  * Class for integrating with WooCommerce Blocks scripts.
  *
- * @version 6.15.1
+ * @version  6.22.6
  */
 class WC_PB_Checkout_Blocks_Integration implements IntegrationInterface {
 
@@ -46,14 +46,14 @@ class WC_PB_Checkout_Blocks_Integration implements IntegrationInterface {
 	 * Cloning is forbidden.
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Foul!', 'woocommerce-product-bundles' ), '6.15.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Foul!', 'woocommerce-product-bundles' ), '6.15.0' );
 	}
 
 	/**
 	 * Unserializing instances of this class is forbidden.
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Foul!', 'woocommerce-product-bundles' ), '6.15.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Foul!', 'woocommerce-product-bundles' ), '6.15.0' );
 	}
 
 	/**
@@ -93,6 +93,7 @@ class WC_PB_Checkout_Blocks_Integration implements IntegrationInterface {
 			$script_asset[ 'version' ],
 			true
 		);
+		wp_script_add_data( 'wc-pb-checkout-blocks', 'strategy', 'defer' );
 
 		// Load JS translations.
 		if ( function_exists( 'wp_set_script_translations' ) ) {

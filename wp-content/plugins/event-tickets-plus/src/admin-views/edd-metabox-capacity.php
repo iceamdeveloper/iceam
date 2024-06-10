@@ -19,8 +19,8 @@ if ( $this->supports_global_stock() ) {
 	);
 
 	$shared_capacity_title_text = sprintf(
-		__( 'Shared capacity %1$s types share a common pool of %2$s for all attendees', 'event-tickets-plus' ),
-		tribe_get_ticket_label_singular_lowercase( 'edd_metabox_capacity' ),
+		__( 'Shared capacity %1$s share a common pool of %2$s for all attendees', 'event-tickets-plus' ),
+		tribe_get_ticket_label_plural_lowercase( 'edd_metabox_capacity' ),
 		tribe_get_ticket_label_plural_lowercase( 'edd_metabox_capacity' )
 	);
 
@@ -35,8 +35,7 @@ if ( $this->supports_global_stock() ) {
 	);
 
 	$ticket_type_capacity_title_text = sprintf(
-		__( '%1$s capacity will only be used by attendees buying this %2$s type', 'event-tickets-plus' ),
-		tribe_get_ticket_label_singular( 'edd_metabox_capacity' ),
+		__( 'Capacity is specific to this %1$s', 'event-tickets-plus' ),
 		tribe_get_ticket_label_singular_lowercase( 'edd_metabox_capacity' )
 	);
 

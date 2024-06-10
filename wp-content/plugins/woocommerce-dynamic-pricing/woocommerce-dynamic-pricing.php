@@ -1,22 +1,21 @@
 <?php
-
 /*
  * Plugin Name: WooCommerce Dynamic Pricing
  * Woo: 18643:9a41775bb33843f52c93c922b0053986
  * Plugin URI: https://woocommerce.com/products/dynamic-pricing/
  * Description: WooCommerce Dynamic Pricing lets you configure dynamic pricing rules for products, categories and members.
- * Version: 3.2.2
+ * Version: 3.2.6
  * Author: Element Stark
  * Author URI: https://elementstark.com
  * Requires at least: 3.3
- * Tested up to: 6.2
+ * Tested up to: 6.4
  * Text Domain: woocommerce-dynamic-pricing
  * Domain Path: /i18n/languages/
- * Copyright: © 2009-2023 Element Stark LLC.
+ * Copyright: © 2009-2024 Element Stark LLC.
  * License: GNU General Public License v3.0
  * License URI: http://www.gnu.org/licenses/gpl-3.0.html
  * WC requires at least: 6.0
- * WC tested up to: 7.5
+ * WC tested up to: 8.8
  * Woo: 18643:9a41775bb33843f52c93c922b0053986
  */
 
@@ -25,23 +24,30 @@
  * Required functions
  */
 if ( ! function_exists( 'is_woocommerce_active' ) ) {
-	require_once( 'woo-includes/woo-functions.php' );
+	require_once 'woo-includes/woo-functions.php';
 }
 
-if ( is_woocommerce_active() ) {
+$woocommerce_dynamic_pricing_enabled = true;
+
+if ( is_woocommerce_active() && $woocommerce_dynamic_pricing_enabled ) {
 
 	// Declare support for features
-	add_action( 'before_woocommerce_init', function () {
-		if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
-			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+	add_action(
+		'before_woocommerce_init',
+		function () {
+			if ( class_exists( \Automattic\WooCommerce\Utilities\FeaturesUtil::class ) ) {
+				\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', __FILE__, true );
+				\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', __FILE__, true );
+			}
 		}
-	} );
+	);
 
 	/**
 	 * Boot up dynamic pricing
 	 */
 	WC_Dynamic_Pricing::init();
 }
+
 
 class WC_Dynamic_Pricing {
 
@@ -74,9 +80,10 @@ class WC_Dynamic_Pricing {
 	public $db_version = '2.1';
 
 	public function __construct() {
+		/* Helper Functions */
+		require 'functions.php';
 
 		add_action( 'init', array( $this, 'load_plugin_textdomain' ) );
-
 
 		if ( is_admin() ) {
 			require 'admin/admin-init.php';
@@ -84,7 +91,6 @@ class WC_Dynamic_Pricing {
 			//Include and boot up the installer.
 			include 'classes/class-wc-dynamic-pricing-installer.php';
 			WC_Dynamic_Pricing_Installer::init();
-
 		}
 
 		//Include additional integrations
@@ -96,7 +102,6 @@ class WC_Dynamic_Pricing {
 			include 'integrations/memberships/memberships.php';
 		}
 
-
 		//Paypal express
 		include 'integrations/paypal-express.php';
 		include 'integrations/woocommerce-product-bundles.php';
@@ -105,19 +110,22 @@ class WC_Dynamic_Pricing {
 		$rest_prefix         = trailingslashit( rest_get_url_prefix() );
 		$is_rest_api_request = ( false !== strpos( $_SERVER['REQUEST_URI'], $rest_prefix ) ); // phpcs:disable WordPress.Security.ValidatedSanitizedInput.MissingUnslash, WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
 
-
 		if ( ( ! is_admin() || defined( 'DOING_AJAX' ) ) && ! defined( 'DOING_CRON' ) && ! $is_rest_api_request ) {
 			$this->load_front_end();
 		} elseif ( $is_rest_api_request ) {
-			$this->load_rest_api_front_end();
+			$this->load_front_end();
 		}
 
-
 		if ( isset( $_POST['createaccount'] ) ) {
-			add_filter( 'woocommerce_dynamic_pricing_is_rule_set_valid_for_user', array(
-				$this,
-				'new_account_overrides'
-			), 10, 2 );
+			add_filter(
+				'woocommerce_dynamic_pricing_is_rule_set_valid_for_user',
+				array(
+					$this,
+					'new_account_overrides',
+				),
+				10,
+				2
+			);
 		}
 
 		add_filter( 'woocommerce_dynamic_pricing_get_rule_amount', array( $this, 'convert_decimals' ), 99, 4 );
@@ -153,7 +161,6 @@ class WC_Dynamic_Pricing {
 		include 'classes/class-wc-dynamic-pricing-adjustment-set-totals.php';
 		include 'classes/class-wc-dynamic-pricing-adjustment-set-taxonomy.php';
 
-
 		//The base pricing module.
 		include 'classes/modules/class-wc-dynamic-pricing-module-base.php';
 
@@ -170,7 +177,6 @@ class WC_Dynamic_Pricing {
 		include 'classes/modules/class-wc-dynamic-pricing-simple-category.php';
 		include 'classes/modules/class-wc-dynamic-pricing-simple-membership.php';
 		include 'classes/modules/class-wc-dynamic-pricing-simple-taxonomy.php';
-
 
 		//Boot up the instances of the pricing modules
 		$modules['advanced_product']  = WC_Dynamic_Pricing_Advanced_Product::instance();
@@ -190,7 +196,6 @@ class WC_Dynamic_Pricing {
 			WC_Dynamic_Pricing_Memberships_Integration::register();
 		}
 
-
 		$this->modules = apply_filters( 'wc_dynamic_pricing_load_modules', $modules );
 
 		/* Boot up required classes */
@@ -205,10 +210,15 @@ class WC_Dynamic_Pricing {
 		add_filter( 'woocommerce_composite_get_base_price', array( $this, 'on_get_composite_base_price' ), 10, 2 );
 		add_filter( 'woocommerce_coupon_is_valid', array( $this, 'check_cart_coupon_is_valid' ), 99, 2 );
 		add_filter( 'woocommerce_coupon_is_valid_for_product', array( $this, 'check_coupon_is_valid' ), 99, 4 );
-		add_filter( 'woocommerce_get_variation_prices_hash', array(
-			$this,
-			'on_woocommerce_get_variation_prices_hash'
-		), 99, 1 );
+		add_filter(
+			'woocommerce_get_variation_prices_hash',
+			array(
+				$this,
+				'on_woocommerce_get_variation_prices_hash',
+			),
+			99,
+			1
+		);
 
 		add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'on_cart_loaded_from_session' ), 98, 1 );
 
@@ -235,7 +245,6 @@ class WC_Dynamic_Pricing {
 		include 'classes/class-wc-dynamic-pricing-adjustment-set-totals.php';
 		include 'classes/class-wc-dynamic-pricing-adjustment-set-taxonomy.php';
 
-
 		//The base pricing module.
 		include 'classes/modules/class-wc-dynamic-pricing-module-base.php';
 
@@ -253,10 +262,8 @@ class WC_Dynamic_Pricing {
 		include 'classes/modules/class-wc-dynamic-pricing-simple-membership.php';
 		include 'classes/modules/class-wc-dynamic-pricing-simple-taxonomy.php';
 
-
 		//Include the UX module - This controls the display of discounts on cart items and products.
 		include 'classes/class-wc-dynamic-pricing-frontend-ux.php';
-
 
 		//Boot up the instances of the pricing modules
 		$modules['advanced_product']  = WC_Dynamic_Pricing_Advanced_Product::instance();
@@ -280,7 +287,6 @@ class WC_Dynamic_Pricing {
 
 		$this->modules = apply_filters( 'wc_dynamic_pricing_load_modules', $modules );
 
-
 		/* Boot up required classes */
 		WC_Dynamic_Pricing_Context::register();
 
@@ -297,10 +303,15 @@ class WC_Dynamic_Pricing {
 		add_filter( 'woocommerce_composite_get_base_price', array( $this, 'on_get_composite_base_price' ), 10, 2 );
 		add_filter( 'woocommerce_coupon_is_valid', array( $this, 'check_cart_coupon_is_valid' ), 99, 2 );
 		add_filter( 'woocommerce_coupon_is_valid_for_product', array( $this, 'check_coupon_is_valid' ), 99, 4 );
-		add_filter( 'woocommerce_get_variation_prices_hash', array(
-			$this,
-			'on_woocommerce_get_variation_prices_hash'
-		), 99, 1 );
+		add_filter(
+			'woocommerce_get_variation_prices_hash',
+			array(
+				$this,
+				'on_woocommerce_get_variation_prices_hash',
+			),
+			99,
+			1
+		);
 
 		add_action( 'woocommerce_cart_loaded_from_session', array( $this, 'on_cart_loaded_from_session' ), 98, 1 );
 
@@ -311,7 +322,7 @@ class WC_Dynamic_Pricing {
 
 	public function on_woocommerce_get_variation_prices_hash( $price_hash ) {
 		//Get a key based on role, since all rules use roles.
-		$result     = is_array( $price_hash ) ? $price_hash : array( $price_hash );
+		$result = is_array( $price_hash ) ? $price_hash : array( $price_hash );
 
 		$roles = array();
 		if ( is_user_logged_in() ) {
@@ -343,17 +354,21 @@ class WC_Dynamic_Pricing {
 	public function add_price_filters() {
 
 		add_filter( 'woocommerce_variation_prices_price', array( $this, 'on_get_variation_prices_price' ), 10, 3 );
-		add_filter( 'woocommerce_product_variation_get_price', array(
-			$this,
-			'on_get_product_variation_price'
-		), 10, 2 );
+		add_filter(
+			'woocommerce_product_variation_get_price',
+			array(
+				$this,
+				'on_get_product_variation_price',
+			),
+			10,
+			2
+		);
 
 		//Filters the regular product get price.
 		add_filter( 'woocommerce_product_get_price', array( $this, 'on_get_price' ), 10, 2 );
 
 		//Filters subscription prices.
 		add_filter( 'woocommerce_subscriptions_product_price', array( $this, 'on_get_price' ), 10, 2 );
-
 	}
 
 	/**
@@ -364,11 +379,15 @@ class WC_Dynamic_Pricing {
 	public function remove_price_filters() {
 		if ( WC_Dynamic_Pricing_Compatibility::is_wc_version_gte_2_7() ) {
 			//Filters the regular variation price
-			remove_filter( 'woocommerce_product_variation_get_price', array(
-				$this,
-				'on_get_product_variation_price'
-			), 10, 2 );
-
+			remove_filter(
+				'woocommerce_product_variation_get_price',
+				array(
+					$this,
+					'on_get_product_variation_price',
+				),
+				10,
+				2
+			);
 
 			//Filters the regular product get price.
 			remove_filter( 'woocommerce_product_get_price', array( $this, 'on_get_price' ), 10, 2 );
@@ -379,7 +398,6 @@ class WC_Dynamic_Pricing {
 		} else {
 			remove_filter( 'woocommerce_get_price', array( $this, 'on_get_price' ), 10, 2 );
 		}
-
 	}
 
 
@@ -412,7 +430,6 @@ class WC_Dynamic_Pricing {
 				if ( $advanced_taxonomy_module && class_exists( $advanced_taxonomy_module ) ) {
 					$this->modules[ 'advanced_taxonomy_' . $additional_taxonomy ] = $advanced_taxonomy_module::instance( $additional_taxonomy );
 				}
-
 			}
 		}
 	}
@@ -428,12 +445,9 @@ class WC_Dynamic_Pricing {
 			if ( $coupon->get_exclude_sale_items() && isset( $values['discounts'] ) && isset( $values['discounts']['applied_discounts'] ) && ! empty( $values['discounts']['applied_discounts'] ) ) {
 				$valid = false;
 			}
-		} else {
-			if ( $coupon->exclude_sale_items() && isset( $values['discounts']['applied_discounts'] ) && ! empty( $values['discounts']['applied_discounts'] ) ) {
-				$valid = false;
-			}
+		} elseif ( $coupon->exclude_sale_items() && isset( $values['discounts']['applied_discounts'] ) && ! empty( $values['discounts']['applied_discounts'] ) ) {
+			$valid = false;
 		}
-
 
 		return $valid;
 	}
@@ -458,16 +472,13 @@ class WC_Dynamic_Pricing {
 					}
 				}
 			}
-		} else {
-			if ( $coupon->exclude_sale_items() ) {
-				foreach ( WC()->cart->get_cart() as $values ) {
-					if ( isset( $values['discounts'] ) && isset( $values['discounts']['applied_discounts'] ) && ! empty( $values['discounts']['applied_discounts'] ) ) {
-						return false;
-					}
+		} elseif ( $coupon->exclude_sale_items() ) {
+			foreach ( WC()->cart->get_cart() as $values ) {
+				if ( isset( $values['discounts'] ) && isset( $values['discounts']['applied_discounts'] ) && ! empty( $values['discounts']['applied_discounts'] ) ) {
+					return false;
 				}
 			}
 		}
-
 
 		return $valid;
 	}
@@ -523,7 +534,6 @@ class WC_Dynamic_Pricing {
 			return;
 		}
 
-
 		//Sort the cart so that the lowest priced item is discounted when using block rules.
 		uasort( $sorted_cart, 'WC_Dynamic_Pricing_Cart_Query::sort_by_price' );
 
@@ -538,7 +548,6 @@ class WC_Dynamic_Pricing {
 				$cart->subtotal = false;
 			}
 		}
-
 	}
 
 	public function on_calculate_totals( $cart ) {
@@ -562,7 +571,6 @@ class WC_Dynamic_Pricing {
 		foreach ( $modules as $module ) {
 			$module->adjust_cart( $sorted_cart );
 		}
-
 	}
 
 	public function on_get_composite_price( $base_price, $_product ) {
@@ -590,12 +598,10 @@ class WC_Dynamic_Pricing {
 	public function on_get_price( $source_price, $_product, $force_calculation = false ) {
 		$composite_ajax = did_action( 'wp_ajax_woocommerce_show_composited_product' ) | did_action( 'wp_ajax_nopriv_woocommerce_show_composited_product' ) | did_action( 'wc_ajax_woocommerce_show_composited_product' );
 
-
 		$base_price = floatval( $source_price );
 		if ( empty( $_product ) || $source_price === '' ) {
 			return $source_price;
 		}
-
 
 		if ( class_exists( 'WCS_ATT_Product' ) && WCS_ATT_Product::is_subscription( $_product ) ) {
 			return $base_price;
@@ -656,7 +662,6 @@ class WC_Dynamic_Pricing {
 
 			$fake_cart_item = array( 'data' => $_product );
 
-
 			foreach ( $modules as $module ) {
 
 				if ( $module->module_type == 'simple' ) {
@@ -674,7 +679,6 @@ class WC_Dynamic_Pricing {
 								break;
 							}
 						}
-
 					}
 				}
 			}
@@ -690,10 +694,7 @@ class WC_Dynamic_Pricing {
 					$this->cached_adjustments[ $cache_id ] = false;
 				}
 			}
-
-
 		}
-
 
 		return $result_price;
 	}
@@ -713,7 +714,6 @@ class WC_Dynamic_Pricing {
 		$working_price  = isset( $this->discounted_products[ $id ] ) ? $this->discounted_products[ $id ] : $base_price;
 
 		$modules = apply_filters( 'wc_dynamic_pricing_load_modules', $this->modules );
-
 
 		foreach ( $modules as $module ) {
 			if ( $module->module_type == 'simple' ) {
@@ -793,7 +793,6 @@ class WC_Dynamic_Pricing {
 					$calc_price = $variation->get_price( 'view' );
 				}
 
-
 				if ( $min_price == null || $calc_price < $min_price ) {
 					$min_price = $calc_price;
 				}
@@ -858,7 +857,6 @@ class WC_Dynamic_Pricing {
 
 			$regular_price = $product->get_regular_price( 'view' );
 
-
 			if ( empty( $regular_price ) || ( empty( $dynamic_price ) && floatval( $dynamic_price ) !== 0.00 ) ) {
 				return $is_on_sale;
 			} else {
@@ -873,7 +871,7 @@ class WC_Dynamic_Pricing {
 	public static function apply_cart_item_adjustment( $cart_item_key, $original_price, $adjusted_price, $module, $set_id ) {
 
 		do_action( 'wc_memberships_discounts_disable_price_adjustments' );
-		WC_Dynamic_Pricing::instance()->remove_price_filters();
+		self::instance()->remove_price_filters();
 
 		$adjusted_price = apply_filters( 'wc_dynamic_pricing_apply_cart_item_adjustment', $adjusted_price, $cart_item_key, $original_price, $module );
 
@@ -882,9 +880,7 @@ class WC_Dynamic_Pricing {
 			return;
 		}
 
-
 		if ( isset( WC()->cart->cart_contents[ $cart_item_key ] ) && ! empty( WC()->cart->cart_contents[ $cart_item_key ] ) ) {
-
 
 			$_product = WC()->cart->cart_contents[ $cart_item_key ]['data'];
 
@@ -902,7 +898,7 @@ class WC_Dynamic_Pricing {
 
 			if ( ! isset( WC()->cart->cart_contents[ $cart_item_key ]['discounts'] ) ) {
 
-				$discount_data                                           = array(
+				$discount_data = array(
 					'by'                => array( $module ),
 					'set_id'            => $set_id,
 					'price_base'        => $original_price,
@@ -913,9 +909,9 @@ class WC_Dynamic_Pricing {
 							'by'             => $module,
 							'set_id'         => $set_id,
 							'price_base'     => $original_price,
-							'price_adjusted' => $adjusted_price
-						)
-					)
+							'price_adjusted' => $adjusted_price,
+						),
+					),
 				);
 				WC()->cart->cart_contents[ $cart_item_key ]['discounts'] = $discount_data;
 			} else {
@@ -928,25 +924,41 @@ class WC_Dynamic_Pricing {
 					'price_base'        => $original_price,
 					'display_price'     => $existing['display_price'],
 					'price_adjusted'    => $adjusted_price,
-					'applied_discounts' => $existing['applied_discounts']
+					'applied_discounts' => $existing['applied_discounts'],
 				);
 
 				WC()->cart->cart_contents[ $cart_item_key ]['discounts'] = $discount_data;
-
 
 				array_push( WC()->cart->cart_contents[ $cart_item_key ]['discounts']['by'], $module );
 				WC()->cart->cart_contents[ $cart_item_key ]['discounts']['applied_discounts'][] = array(
 					'by'             => $module,
 					'set_id'         => $set_id,
 					'price_base'     => $original_price,
-					'price_adjusted' => $adjusted_price
+					'price_adjusted' => $adjusted_price,
 				);
 			}
 		}
 		do_action( 'wc_memberships_discounts_enable_price_adjustments' );
 		do_action( 'woocommerce_dynamic_pricing_apply_cartitem_adjustment', $cart_item_key, $original_price, $adjusted_price, $module, $set_id );
-		WC_Dynamic_Pricing::instance()->add_price_filters();
+		self::instance()->add_price_filters();
+	}
 
+	public static function remove_cart_item_adjustment( string $b_cart_item_key, string $module_id ) {
+		$cart_item_key = $b_cart_item_key;
+		$module        = $module_id;
+
+		do_action( 'wc_memberships_discounts_disable_price_adjustments' );
+		self::instance()->remove_price_filters();
+
+		if ( isset( WC()->cart->cart_contents[ $cart_item_key ] ) && ! empty( WC()->cart->cart_contents[ $cart_item_key ] ) ) {
+			$db_product     = wc_get_product( WC()->cart->cart_contents[ $cart_item_key ]['data']->get_id() );
+			$cart_product   = WC()->cart->cart_contents[ $cart_item_key ]['data'];
+			$original_price = WC()->cart->cart_contents[ $cart_item_key ]['data']->set_price( $db_product->get_price() );
+		}
+
+		do_action( 'wc_memberships_discounts_enable_price_adjustments' );
+		do_action( 'woocommerce_dynamic_pricing_remove_cartitem_adjustment', $cart_item_key, $module_id );
+		self::instance()->add_price_filters();
 	}
 
 	/** Helper functions ***************************************************** */
@@ -970,88 +982,6 @@ class WC_Dynamic_Pricing {
 	public static function plugin_path() {
 		return untrailingslashit( plugin_dir_path( __FILE__ ) );
 	}
-
-}
-
-/* Helper Functions */
-
-function wc_dynamic_pricing_is_within_date_range( $from = '', $to = '' ) {
-	// Check date range
-	$from_date = empty( $from ) ? false : wc_dynamic_pricing_wp_strtotime( $from . ' ' . '00:00:00' );
-	$to_date   = empty( $to ) ? false : wc_dynamic_pricing_wp_strtotime( $to . ' ' . '23:59:00' );
-	$now       = current_datetime()->format( 'U' );
-
-	$from_date = intval( $from_date );
-	$to_date   = intval( $to_date );
-	$now       = intval( $now );
-
-
-	$execute_rules = true;
-	if ( $from_date && $to_date && ! ( $now >= $from_date && $now <= $to_date ) ) {
-		$execute_rules = false;
-	} elseif ( $from_date && ! $to_date && ! ( $now >= $from_date ) ) {
-		$execute_rules = false;
-	} elseif ( $to_date && ! $from_date && ! ( $now <= $to_date ) ) {
-		$execute_rules = false;
-	}
-
-	return $execute_rules;
-}
-
-function wc_dynamic_pricing_wp_strtotime( $str ) {
-	// This function behaves a bit like PHP's StrToTime() function, but taking into account the Wordpress site's timezone
-	// CAUTION: It will throw an exception when it receives invalid input - please catch it accordingly
-	// From https://mediarealm.com.au/
-	$tz_string = get_option( 'timezone_string' );
-	$tz_offset = get_option( 'gmt_offset', 0 );
-	if ( ! empty( $tz_string ) ) {
-		// If site timezone option string exists, use it
-		$timezone = $tz_string;
-	} elseif ( $tz_offset == 0 ) {
-		// get UTC offset, if it isn’t set then return UTC
-		$timezone = 'UTC';
-	} else {
-		$timezone = $tz_offset;
-		if ( substr( $tz_offset, 0, 1 ) != "-" && substr( $tz_offset, 0, 1 ) != "+" && substr( $tz_offset, 0, 1 ) != "U" ) {
-			$timezone = "+" . $tz_offset;
-		}
-	}
-	$datetime = new DateTime( $str, new DateTimeZone( $timezone ) );
-
-	return $datetime->format( 'U' );
-}
-
-function wc_dynamic_pricing_is_groups_active() {
-	$result = false;
-	$result = in_array( 'groups/groups.php', (array) get_option( 'active_plugins', array() ) );
-	if ( ! $result && is_multisite() ) {
-		$plugins = get_site_option( 'active_sitewide_plugins' );
-		$result  = isset( $plugins['groups/groups.php'] );
-	}
-
-	return $result;
-}
-
-function wc_dynamic_pricing_is_memberships_active() {
-	$result = false;
-	$result = in_array( 'woocommerce-memberships/woocommerce-memberships.php', (array) get_option( 'active_plugins', array() ) );
-	if ( ! $result && is_multisite() ) {
-		$plugins = get_site_option( 'active_sitewide_plugins' );
-		$result  = isset( $plugins['woocommerce-memberships/woocommerce-memberships.php'] );
-	}
-
-	return $result;
-}
-
-function wc_dynamic_pricing_is_brands_active() {
-	$result = false;
-	$result = in_array( 'woocommerce-brands/woocommerce-brands.php', (array) get_option( 'active_plugins', array() ) );
-	if ( ! $result && is_multisite() ) {
-		$plugins = get_site_option( 'active_sitewide_plugins' );
-		$result  = isset( $plugins['woocommerce-brands/woocommerce-brands.php'] );
-	}
-
-	return $result;
 }
 
 

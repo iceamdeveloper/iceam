@@ -2,7 +2,7 @@
 /**
  * WC_PB_FS_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.3.6
  */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Flatsome integration.
  *
- * @version  6.3.6
+ * @version  6.22.6
  */
 class WC_PB_FS_Compatibility {
 
@@ -45,25 +45,14 @@ class WC_PB_FS_Compatibility {
 	 */
 	public static function add_quickview_integration() {
 
+		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+
 		wp_enqueue_style( 'wc-bundle-css' );
 		wp_enqueue_script( 'wc-add-to-cart-bundle' );
-		wp_add_inline_script( 'wc-add-to-cart-bundle',
-		'
-			jQuery( document ).on( "mfpOpen", function( e ) {
 
-				jQuery( ".bundle_form .bundle_data" ).each( function() {
-
-					var $bundle_data    = jQuery( this ),
-						$composite_form = $bundle_data.closest( ".composite_form" );
-
-					if ( $composite_form.length === 0 ) {
-						$bundle_data.wc_pb_bundle_form();
-					}
-
-				} );
-
-			} );
-		' );
+		wp_register_script( 'wc-bundle-flatsome-quickview', WC_PB()->plugin_url() . '/assets/js/frontend/integrations/bundle-flatsome-quickview' . $suffix . '.js',  array( 'jquery', 'wc-add-to-cart-variation', 'wc-add-to-cart-bundle' ), WC_PB()->version, true );
+		wp_script_add_data( 'wc-bundle-flatsome-quickview', 'strategy', 'defer' );
+		wp_enqueue_script( 'wc-bundle-flatsome-quickview' );
 	}
 
 	/**

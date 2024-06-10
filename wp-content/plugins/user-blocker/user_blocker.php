@@ -6,9 +6,9 @@
  *  Author: Solwin Infotech
  *  Author URI: https://www.solwininfotech.com/
  *  Copyright: Solwin Infotech
- *  Version: 1.6
+ *  Version: 1.9
  *  Requires at least: 5.4
- *  Tested up to: 6.2
+ *  Tested up to: 6.4.3
  *  License: GPLv2 or later
  *
  * @link              https://www.solwininfotech.com/
@@ -222,11 +222,13 @@ if ( ! function_exists( 'ublk_auth_signon' ) ) {
 	 */
 	function ublk_auth_signon( $user, $username, $password ) {
 		if ( ! is_wp_error( $user ) && is_object( $user ) ) {
-			$user_id    = $user->ID;
-			$is_active  = get_user_meta( $user_id, 'is_active', true );
-			$block_day  = get_user_meta( $user_id, 'block_day', true );
-			$block_date = get_user_meta( $user_id, 'block_date', true );
-
+			$user_id      = $user->ID;
+			$is_active    = get_user_meta( $user_id, 'is_active', true );
+			$block_day    = get_user_meta( $user_id, 'block_day', true );
+			$block_date   = get_user_meta( $user_id, 'block_date', true );
+			$user         = get_userdata( $user_id );
+			$user_roles   = $user->roles;
+			$rolblock_day = get_option( $user_roles[0] . '_block_day' );
 			if ( 'n' == $is_active ) {
 				$block_msg_permenant = get_user_meta( $user_id, 'block_msg_permenant', true );
 				$block_url_permenant = get_user_meta( $user_id, 'block_url_permenant', true );
@@ -245,6 +247,21 @@ if ( ! function_exists( 'ublk_auth_signon' ) ) {
 						$to_time   = strtotime( $to_time );
 						if ( $current_time >= $from_time && $current_time <= $to_time ) {
 							$block_msg_day = get_user_meta( $user_id, 'block_msg_day', true );
+							$error_msg     = ' ' . $block_msg_day;
+						}
+					}
+				}
+				if ( ! empty( $rolblock_day ) && 0 != $rolblock_day && '' != $rolblock_day ) {
+					$full_date    = getdate();
+					$current_day  = strtolower( $full_date['weekday'] );
+					$current_time = current_time( 'timestamp' );
+					if ( array_key_exists( $current_day, $rolblock_day ) ) {
+						$from_time = $rolblock_day[ $current_day ]['from'];
+						$to_time   = $rolblock_day[ $current_day ]['to'];
+						$from_time = strtotime( $from_time );
+						$to_time   = strtotime( $to_time );
+						if ( $current_time >= $from_time && $current_time <= $to_time ) {
+							$block_msg_day = get_option( $user_roles[0] . '_block_msg_day' );
 							$error_msg     = ' ' . $block_msg_day;
 						}
 					}
@@ -291,7 +308,7 @@ if ( ! function_exists( 'ublk_login_error' ) ) {
 				if ( 'log' == $key ) {
 					$username = $val;
 					$user     = get_user_by( 'login', $username );
-					$user_id  = $user->ID;
+					$user_id  = isset( $user->ID ) ? $user->ID : '';
 				}
 			}
 		}
@@ -579,7 +596,7 @@ if ( ! function_exists( 'ublk_all_block_data_view' ) ) {
 	 * @param int $user_id User ID.
 	 */
 	function ublk_all_block_data_view( $user_id ) {
-		$is_active  = get_user_meta( $user_id, 'is_active', true );
+		$is_active = get_user_meta( $user_id, 'is_active', true );
 		if ( 'n' == $is_active ) {
 			?>
 			<img src="<?php echo esc_url( UB_PLUGIN_URL . '/images/inactive.png' ); ?>" title="<?php esc_html_e( 'Permanently Blocked', 'user-blocker' ); ?>" />
@@ -631,7 +648,7 @@ if ( ! function_exists( 'ublk_all_block_data_table' ) ) {
 		if ( 'n' != $is_active ) {
 			?>
 			<tr id='view_block_day_tr_<?php echo esc_attr( $user_id ); ?>' class="view_block_data_tr">
-				<td colspan="7" class='date_detail_row'>
+				<td colspan="8" class='date_detail_row'>
 					<table class="view_block_table form-table tbl-timing">
 						<tbody>
 							<?php
@@ -779,7 +796,7 @@ if ( ! function_exists( 'ublk_all_block_data_url' ) ) {
 		$block_date = get_user_meta( $user_id, 'block_date', true );
 		if ( 'n' == $is_active ) {
 			echo esc_html( ublk_disp_msg( get_user_meta( $user_id, 'block_url_permenant', true ) ) );
-		} elseif ( isset( $block_day ) && ! empty( $block_day ) && '' != $block_day && isset( $block_date ) && ! empty( $block_date ) && '' != $block_date && !empty( get_user_meta( $user_id, 'block_url_day', true ) ) && !empty( get_user_meta( $user_id, 'block_url_date', true ) ) ) {
+		} elseif ( isset( $block_day ) && ! empty( $block_day ) && '' != $block_day && isset( $block_date ) && ! empty( $block_date ) && '' != $block_date && ! empty( get_user_meta( $user_id, 'block_url_day', true ) ) && ! empty( get_user_meta( $user_id, 'block_url_date', true ) ) ) {
 			echo esc_html( ublk_disp_msg( get_user_meta( $user_id, 'block_url_day', true ) . ' And ' . get_user_meta( $user_id, 'block_url_date', true ) ) );
 		} elseif ( isset( $block_day ) && ! empty( $block_day ) && '' != $block_day ) {
 			echo esc_html( ublk_disp_msg( get_user_meta( $user_id, 'block_url_day', true ) ) );
@@ -971,9 +988,9 @@ if ( ! function_exists( 'ublk_submit_optin' ) ) {
 			$theme_details = array();
 			if ( $wp_version >= 3.4 ) {
 				$active_theme                   = wp_get_theme();
-				$theme_details['theme_name']    = strip_tags( $active_theme->name );
-				$theme_details['theme_version'] = strip_tags( $active_theme->version );
-				$theme_details['author_url']    = strip_tags( $active_theme->{'Author URI'} );
+				$theme_details['theme_name']    = wp_strip_all_tags( $active_theme->name );
+				$theme_details['theme_version'] = wp_strip_all_tags( $active_theme->version );
+				$theme_details['author_url']    = wp_strip_all_tags( $active_theme->{'Author URI'} );
 			}
 			$active_plugins = (array) get_option( 'active_plugins', array() );
 			if ( is_multisite() ) {
@@ -985,9 +1002,9 @@ if ( ! function_exists( 'ublk_submit_optin' ) ) {
 				foreach ( $active_plugins as $plugin ) {
 					$plugin_data = get_plugin_data( UB_PLUGIN_DIR . '/' . $plugin );
 
-					$get_plugins['plugin_name']    = strip_tags( $plugin_data['Name'] );
-					$get_plugins['plugin_author']  = strip_tags( $plugin_data['Author'] );
-					$get_plugins['plugin_version'] = strip_tags( $plugin_data['Version'] );
+					$get_plugins['plugin_name']    = wp_strip_all_tags( $plugin_data['Name'] );
+					$get_plugins['plugin_author']  = wp_strip_all_tags( $plugin_data['Author'] );
+					$get_plugins['plugin_version'] = wp_strip_all_tags( $plugin_data['Version'] );
 					array_push( $plugins, $get_plugins );
 				}
 			}
@@ -1040,9 +1057,9 @@ if ( ! function_exists( 'ublk_submit_optin' ) ) {
 			$theme_details = array();
 			if ( $wp_version >= 3.4 ) {
 				$active_theme                   = wp_get_theme();
-				$theme_details['theme_name']    = strip_tags( $active_theme->name );
-				$theme_details['theme_version'] = strip_tags( $active_theme->version );
-				$theme_details['author_url']    = strip_tags( $active_theme->{'Author URI'} );
+				$theme_details['theme_name']    = wp_strip_all_tags( $active_theme->name );
+				$theme_details['theme_version'] = wp_strip_all_tags( $active_theme->version );
+				$theme_details['author_url']    = wp_strip_all_tags( $active_theme->{'Author URI'} );
 			}
 			$active_plugins = (array) get_option( 'active_plugins', array() );
 			if ( is_multisite() ) {
@@ -1053,9 +1070,9 @@ if ( ! function_exists( 'ublk_submit_optin' ) ) {
 				$get_plugins = array();
 				foreach ( $active_plugins as $plugin ) {
 					$plugin_data                   = get_plugin_data( UB_PLUGIN_DIR . '/' . $plugin );
-					$get_plugins['plugin_name']    = strip_tags( $plugin_data['Name'] );
-					$get_plugins['plugin_author']  = strip_tags( $plugin_data['Author'] );
-					$get_plugins['plugin_version'] = strip_tags( $plugin_data['Version'] );
+					$get_plugins['plugin_name']    = wp_strip_all_tags( $plugin_data['Name'] );
+					$get_plugins['plugin_author']  = wp_strip_all_tags( $plugin_data['Author'] );
+					$get_plugins['plugin_version'] = wp_strip_all_tags( $plugin_data['Version'] );
 					array_push( $plugins, $get_plugins );
 				}
 			}

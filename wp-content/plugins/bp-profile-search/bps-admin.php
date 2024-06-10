@@ -285,6 +285,7 @@ function bps_site_info ($debug_info)
 {
 	$theme = wp_get_theme ();
 	$platform_name = (bps_platform () == 'buddypress')? 'BuddyPress': 'BuddyBoss Platform';
+	$classic = is_plugin_active ('bp-classic/class-bp-classic.php')? ', BP Classic': '';
 
 	$debug_info['bp-profile-search'] = array (
 		'label'  => 'BP Profile Search',
@@ -295,7 +296,7 @@ function bps_site_info ($debug_info)
 			),
 			'platform' => array (
 				'label' => 'Platform',
-				'value' => $platform_name. ' '. bp_get_version (),
+				'value' => $platform_name. ' '. bp_get_version (). $classic,
 			),
 			'theme' => array (
 				'label' => 'Theme',

@@ -17,7 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -43,10 +43,10 @@ function wc_memberships_get_membership_plan( $membership_plan = null, $user_memb
  *
  * @since 1.0.0
  *
- * @param array $args optional array of arguments, same as for `get_posts()`
+ * @param array<string, mixed> $args optional array of arguments, same as for `get_posts()`
  * @return \WC_Memberships_Membership_Plan[]|\WC_Memberships_Integration_Subscriptions_Membership_Plan[]
  */
-function wc_memberships_get_membership_plans( $args = array() ) {
+function wc_memberships_get_membership_plans( array $args = [] ): array {
 	return wc_memberships()->get_plans_instance()->get_membership_plans( $args );
 }
 

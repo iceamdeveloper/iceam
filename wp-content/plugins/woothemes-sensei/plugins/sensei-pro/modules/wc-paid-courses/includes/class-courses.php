@@ -13,6 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 use Sensei_WC;
+use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
 use Sensei_WC_Paid_Courses\Course_Enrolment_Providers\WooCommerce_Memberships;
 use Sensei_WC_Utils;
 use Sensei_Utils;
@@ -57,7 +58,7 @@ final class Courses {
 	public function init() {
 		add_filter( 'sensei_course_meta_fields', [ $this, 'add_course_product_meta_field' ] );
 
-		if ( \Sensei_WC_Paid_Courses\Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
+		if ( Course_Enrolment_Providers::use_legacy_enrolment_method() ) {
 			// Remove course from active courses if an order is cancelled or refunded.
 			add_action( 'woocommerce_order_status_processing_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
 			add_action( 'woocommerce_order_status_completed_to_cancelled', [ $this, 'remove_active_course' ], 10, 1 );
@@ -88,6 +89,9 @@ final class Courses {
 		// Defer list of products being added or removed from a course.
 		add_action( 'sensei_wc_paid_courses_course_product_toggled', [ $this, 'defer_products_toggled' ], 10, 3 );
 		add_action( 'shutdown', [ $this, 'recalculate_deferred_products_toggled' ] );
+
+		// Deactivate self-enrollment not allowed feature if course is handled by WCPC.
+		add_filter( 'sensei_self_enrollment_not_allowed', [ $this, 'maybe_deactivate_self_enrollment_not_allowed_feature' ], 10, 2 );
 	}
 
 	/**
@@ -244,7 +248,7 @@ final class Courses {
 		 *
 		 * @param WP_Post[] $course      The array of courses.
 		 * @param array     $product_ids The array of product IDs.
-		 * @param array     $args        The additional query args.
+		 * @return WP_Post[] Filtered array of courses.
 		 */
 		$courses = apply_filters( 'sensei_wc_paid_courses_get_product_courses', $courses, $product_ids );
 
@@ -290,7 +294,6 @@ final class Courses {
 			'orderby'          => 'menu_order date',
 			'order'            => 'ASC',
 		];
-
 	}
 
 	/**
@@ -361,10 +364,8 @@ final class Courses {
 							if ( ! in_array( $course->ID, $course_ids_from_order, true ) ) {
 								$course_ids_from_order[] = $course->ID;
 							}
-						} else {
-							if ( ! in_array( $course->ID, $course_ids_from_other_orders, true ) ) {
+						} elseif ( ! in_array( $course->ID, $course_ids_from_other_orders, true ) ) {
 								$course_ids_from_other_orders[] = $course->ID;
-							}
 						}
 					}
 				}
@@ -377,7 +378,6 @@ final class Courses {
 				Sensei_Utils::sensei_remove_user_from_course( $order_course_id, $user_id );
 			}
 		}
-
 	}
 
 	/**
@@ -529,13 +529,10 @@ final class Courses {
 							return;
 						}
 					}
-				} else {
-
+				} elseif ( in_array( intval( $item['product_id'] ), $course_product_ids, true ) ) {
 					// handle regular products.
-					if ( in_array( intval( $item['product_id'] ), $course_product_ids, true ) ) {
-						Sensei_Utils::user_start_course( $user_id, $course_id );
-						return;
-					}
+					Sensei_Utils::user_start_course( $user_id, $course_id );
+					return;
 				}
 			}
 		}
@@ -559,10 +556,10 @@ final class Courses {
 				'description'       => 'An array of Product IDs attached to this course.',
 				'single'            => false,
 				'show_in_rest'      => true,
-				'sanitize_callback' => function( $value ) {
+				'sanitize_callback' => function ( $value ) {
 					return intval( $value );
 				},
-				'auth_callback'     => function() {
+				'auth_callback'     => function () {
 					return current_user_can( 'edit_courses' );
 				},
 			]
@@ -572,7 +569,7 @@ final class Courses {
 		// to "-" from the UI component.
 		add_filter(
 			'rest_prepare_course',
-			function( $response ) {
+			function ( $response ) {
 				if ( isset( $response->data['meta'] ) && isset( $response->data['meta'][ self::META_COURSE_PRODUCT ] ) ) {
 					$response->data['meta'][ self::META_COURSE_PRODUCT ] = array_filter( $response->data['meta'][ self::META_COURSE_PRODUCT ] );
 				}
@@ -588,7 +585,7 @@ final class Courses {
 				'course',
 				'course_membership_products',
 				[
-					'get_callback' => function( $course_data ) {
+					'get_callback' => function ( $course_data ) {
 						return \Sensei_WC_Memberships::get_course_membership_product_ids( $course_data['id'], false, false, [ 'post_status' => 'any' ] );
 					},
 					'schema'       => [
@@ -668,7 +665,7 @@ final class Courses {
 	public function update_modal_confirmation_date( $request_args ) {
 		_deprecated_function( __METHOD__, '2.4.0' );
 
-		// phpcs:ignore WordPress.PHP.StrictComparisons.LooseComparison -- This is intentional. The method handles input from form and JSON.
+		// phpcs:ignore Universal.Operators.StrictComparisons.LooseNotEqual -- This is intentional. The method handles input from form and JSON.
 		if ( ! isset( $request_args['user_confirmed_modal'] ) || true != $request_args['user_confirmed_modal'] ) {
 			return;
 		}
@@ -990,19 +987,20 @@ final class Courses {
 		if ( class_exists( '\Automattic\WooCommerce\Admin\API\Reports\Variations\Query' ) ) {
 			$variation_products = array_filter(
 				$products,
-				function( $product ) {
+				function ( $product ) {
 					return 'product_variation' === $product->post_type;
 				}
 			);
 			$variation_ids      = wp_list_pluck( $variation_products, 'ID' );
+			$count_variations   = is_countable( $variation_ids ) ? count( $variation_ids ) : 0;
 
-			if ( count( $variation_ids ) > 0 ) {
+			if ( $count_variations > 0 ) {
 				$query_variations  = new \Automattic\WooCommerce\Admin\API\Reports\Variations\Query(
 					[
 						'variation_includes' => $variation_ids,
 						'fields'             => [ 'variation_id', 'items_sold' ],
 						'after'              => '2010-01-01T00:00:00+00:00',
-						'per_page'           => count( $variation_ids ),
+						'per_page'           => $count_variations,
 					]
 				);
 				$result_variations = $query_variations->get_data();
@@ -1014,7 +1012,7 @@ final class Courses {
 		}
 
 		return array_map(
-			function( $product ) use ( $variations_total_sales ) {
+			function ( $product ) use ( $variations_total_sales ) {
 				if ( 'product_variation' === $product->post_type ) {
 					$product->total_sales = $variations_total_sales[ $product->ID ] ?? 0;
 				} else {
@@ -1028,6 +1026,26 @@ final class Courses {
 	}
 
 	/**
+	 * Deactivate self-enrollment not allowed feature if course is handled by WCPC.
+	 *
+	 * @internal
+	 *
+	 * @since 1.19.0
+	 *
+	 * @param bool $self_enrollment_not_allowed The original value to be filtered.
+	 * @param int  $course_id                   Course post ID.
+	 *
+	 * @return bool False if course is handled by WCPC, otherwise the original value.
+	 */
+	public function maybe_deactivate_self_enrollment_not_allowed_feature( $self_enrollment_not_allowed, $course_id ) {
+		if ( Course_Enrolment_Providers::instance()->handles_enrolment( $course_id ) ) {
+			return false;
+		}
+
+		return $self_enrollment_not_allowed;
+	}
+
+	/**
 	 * Fetches an instance of the class.
 	 *
 	 * @return self
@@ -1038,5 +1056,4 @@ final class Courses {
 		}
 		return self::$instance;
 	}
-
 }

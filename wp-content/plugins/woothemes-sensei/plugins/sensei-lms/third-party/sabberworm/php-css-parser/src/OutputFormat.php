@@ -122,6 +122,12 @@ class OutputFormat
      */
     public $bIgnoreExceptions = \false;
     /**
+     * Render comments for lists and RuleSets
+     *
+     * @var bool
+     */
+    public $bRenderComments = \false;
+    /**
      * @var OutputFormatter|null
      */
     private $oFormatter = null;
@@ -196,7 +202,7 @@ class OutputFormat
             return $this->set(\substr($sMethodName, 3), $aArguments[0]);
         } elseif (\strpos($sMethodName, 'get') === 0) {
             return $this->get(\substr($sMethodName, 3));
-        } elseif (\method_exists(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormatter::class, $sMethodName)) {
+        } elseif (\method_exists(OutputFormatter::class, $sMethodName)) {
             return \call_user_func_array([$this->getFormatter(), $sMethodName], $aArguments);
         } else {
             throw new \Exception('Unknown OutputFormat method called: ' . $sMethodName);
@@ -245,7 +251,7 @@ class OutputFormat
     public function getFormatter()
     {
         if ($this->oFormatter === null) {
-            $this->oFormatter = new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormatter($this);
+            $this->oFormatter = new OutputFormatter($this);
         }
         return $this->oFormatter;
     }
@@ -263,7 +269,7 @@ class OutputFormat
      */
     public static function create()
     {
-        return new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat();
+        return new OutputFormat();
     }
     /**
      * Creates an instance of this class with a preset for compact formatting.
@@ -273,7 +279,7 @@ class OutputFormat
     public static function createCompact()
     {
         $format = self::create();
-        $format->set('Space*Rules', "")->set('Space*Blocks', "")->setSpaceAfterRuleName('')->setSpaceBeforeOpeningBrace('')->setSpaceAfterSelectorSeparator('');
+        $format->set('Space*Rules', "")->set('Space*Blocks', "")->setSpaceAfterRuleName('')->setSpaceBeforeOpeningBrace('')->setSpaceAfterSelectorSeparator('')->setRenderComments(\false);
         return $format;
     }
     /**
@@ -284,7 +290,7 @@ class OutputFormat
     public static function createPretty()
     {
         $format = self::create();
-        $format->set('Space*Rules', "\n")->set('Space*Blocks', "\n")->setSpaceBetweenBlocks("\n\n")->set('SpaceAfterListArgumentSeparator', ['default' => '', ',' => ' ']);
+        $format->set('Space*Rules', "\n")->set('Space*Blocks', "\n")->setSpaceBetweenBlocks("\n\n")->set('SpaceAfterListArgumentSeparator', ['default' => '', ',' => ' '])->setRenderComments(\true);
         return $format;
     }
 }

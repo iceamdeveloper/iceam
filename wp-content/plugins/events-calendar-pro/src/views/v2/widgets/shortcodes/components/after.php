@@ -17,12 +17,15 @@
  * @see     tribe_classes()
  *
  */
+ if ( empty( $widget ) ) {
+	return;
+}
 
 use Tribe__Utils__Array as Arr;
 use \Tribe__Template as Template;
 use \Tribe\Events\Views\V2\Widgets\Widget_Abstract;
 
-$sidebar_arguments = $widget instanceof Widget_Abstract ?  $widget->get_sidebar_arguments() : [];
+$sidebar_arguments = ! empty( $widget ) && $widget instanceof Widget_Abstract ?  $widget->get_sidebar_arguments() : [];
 $after_widget      = Arr::get( $sidebar_arguments, 'after_widget', '' );
 
 echo $after_widget;

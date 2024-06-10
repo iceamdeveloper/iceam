@@ -256,18 +256,18 @@ class Taxonomy_Filter {
 	 *
 	 * @since 5.2.0
 	 *
-	 * @param array<string,string> $value The input values to iterate through and display.
+	 * @param string|array<string,string> $value The input values to iterate through and display. Can be a json_encoded string.
 	 *
 	 * @return array<string,string> $list_items The array of taxonomy items.
 	 */
 	public function format_tax_value_for_list( $value ) {
-		if ( ! is_array( $value ) ) {
-			$value = json_decode( $value, true );
+		// If empty, bail-fast and return an empty array.
+		if ( empty( $value ) || 'null' === $value ) {
+			return [];
 		}
 
-		// Moved this after json_decode - because a json_encoded null is a string "null" and empty() won't catch that.
-		if ( empty( $value ) ) {
-			return [];
+		if (! is_array( $value ) ) {
+			$value = json_decode( $value, true );
 		}
 
 		$list_items = [];

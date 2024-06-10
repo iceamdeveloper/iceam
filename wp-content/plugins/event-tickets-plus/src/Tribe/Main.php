@@ -10,9 +10,9 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 	class Tribe__Tickets_Plus__Main {
 
 		/**
-		 * Current version of this plugin
+		 * Current version of this plugin.
 		 */
-		const VERSION = '5.6.10';
+		const VERSION = '5.10.0';
 
 		/**
 		 * Used to store the version history.
@@ -118,7 +118,8 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 			$this->plugin_path = trailingslashit( EVENT_TICKETS_PLUS_DIR );
 			$this->plugin_dir  = trailingslashit( basename( $this->plugin_path ) );
 			$this->plugin_url  = plugins_url() . '/' . $this->plugin_dir;
-			$this->pue         = new Tribe__Tickets_Plus__PUE;
+
+			Tribe__Tickets_Plus__Commerce__WooCommerce__Main::set_compatibility_checks();
 
 			/** @see \Tribe__Events__Pro__Main::init_apm_filters() Is on priority 10. */
 			add_action( 'plugins_loaded', [ $this, 'apm_filters' ], 5 );
@@ -245,6 +246,7 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		public function bind_implementations() {
 			// Privacy.
 			tribe_singleton( 'tickets-plus.privacy', 'Tribe__Tickets_Plus__Privacy', [ 'hook' ] );
+			tribe_singleton( Tribe__Tickets_Plus__PUE::class, Tribe__Tickets_Plus__PUE::class );
 
 			// Blocks editor.
 			tribe_register_provider( 'Tribe__Tickets_Plus__Editor__Provider' );
@@ -382,18 +384,32 @@ if ( ! class_exists( 'Tribe__Tickets_Plus__Main' ) ) {
 		 *
 		 * Expects to fire during 'tribe_tickets_attendees_page_inside', ie
 		 * before the attendee screen is rendered.
+		 *
+		 * @since 4.2.4
+		 * @since 5.9.2 Added the `$event_id` parameter.
+		 *
+		 * @param int $event_id The event ID to set up the totals for.
 		 */
-		public function setup_attendance_totals() {
-			$this->attendance_totals()->integrate_with_attendee_screen();
+		public function setup_attendance_totals( $event_id = null ) {
+			$this->attendance_totals( $event_id )->integrate_with_attendee_screen();
 		}
 
 		/**
-		 * @return Tribe__Tickets_Plus__Commerce__Attendance_Totals
+		 * Returns the attendance totals object.
+		 *
+		 * @since 4.2.4
+		 * @since 5.9.2 Added the `$event_id` parameter.
+		 *
+		 * @param int $event_id The event ID to set up the totals for.
+		 *
+		 * @return Tribe__Tickets_Plus__Commerce__Attendance_Totals The attendance totals object.
 		 */
-		public function attendance_totals() {
+		public function attendance_totals( $event_id = null ) {
 			if ( empty( $this->attendance_totals ) ) {
 				$this->attendance_totals = new Tribe__Tickets_Plus__Commerce__Attendance_Totals;
 			}
+
+			$this->attendance_totals->set_event_id( $event_id );
 
 			return $this->attendance_totals;
 		}

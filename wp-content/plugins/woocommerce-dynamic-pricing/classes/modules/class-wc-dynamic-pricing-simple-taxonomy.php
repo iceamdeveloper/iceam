@@ -2,10 +2,10 @@
 
 class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base {
 
-	private static $instances;
+	private static array $instances;
 
 	public static function instance( $taxonomy = 'product_brand' ) {
-		if ( self::$instances == null ) {
+		if ( ! isset( self::$instances ) || empty( self::$instances ) ) {
 			self::$instances = array();
 		}
 
@@ -16,9 +16,9 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 		return self::$instances[ $taxonomy ];
 	}
 
-	public $available_advanced_rulesets = array();
+	public array $available_advanced_rulesets = array();
 
-	public $taxonomy = '';
+	public string $taxonomy = '';
 
 	public function __construct( $module_id, $taxonomy ) {
 		$this->taxonomy = $taxonomy;
@@ -28,18 +28,18 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 	public function initialize_rules() {
 		$pricing_rule_sets = get_option( '_s_taxonomy_' . $this->taxonomy . '_pricing_rules', array() );
 
-		if ( is_array( $pricing_rule_sets ) && sizeof( $pricing_rule_sets ) > 0 ) {
+		if ( is_array( $pricing_rule_sets ) && count( $pricing_rule_sets ) > 0 ) {
 			foreach ( $pricing_rule_sets as $set_id => $pricing_rule_set ) {
 				$execute_rules      = false;
 				$conditions_met     = 0;
-				$pricing_conditions = $pricing_rule_set['conditions'] ?? [];
-				if ( is_array( $pricing_conditions ) && sizeof( $pricing_conditions ) > 0 ) {
+				$pricing_conditions = $pricing_rule_set['conditions'] ?? array();
+				if ( is_array( $pricing_conditions ) && count( $pricing_conditions ) > 0 ) {
 					foreach ( $pricing_conditions as $condition ) {
 						$conditions_met += $this->handle_condition( $condition );
 					}
-					if ( $pricing_rule_set['conditions_type'] == 'all' ) {
-						$execute_rules = $conditions_met == count( $pricing_conditions );
-					} elseif ( $pricing_rule_set['conditions_type'] == 'any' ) {
+					if ( $pricing_rule_set['conditions_type'] === 'all' ) {
+						$execute_rules = $conditions_met === count( $pricing_conditions );
+					} elseif ( $pricing_rule_set['conditions_type'] === 'any' ) {
 						$execute_rules = $conditions_met > 0;
 					}
 				} else {
@@ -56,7 +56,6 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 		$pricing_rule_sets = get_option( '_a_taxonomy_' . $this->taxonomy . '_pricing_rules', array() );
 		if ( is_array( $pricing_rule_sets ) && sizeof( $pricing_rule_sets ) > 0 ) {
 			foreach ( $pricing_rule_sets as $set_id => $pricing_rule_set ) {
-
 
 				$execute_rules      = false;
 				$conditions_met     = 0;
@@ -136,7 +135,7 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 	}
 
 	public function is_applied_to_product( $p, $cat_id = false ) {
-		if ( is_admin() && !wp_doing_ajax() && apply_filters( 'woocommerce_dynamic_pricing_skip_admin', true ) ) {
+		if ( is_admin() && ! wp_doing_ajax() && apply_filters( 'woocommerce_dynamic_pricing_skip_admin', true ) ) {
 			return false;
 		}
 
@@ -170,7 +169,7 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 				break;
 			case 'percentage_discount':
 			case 'percent_product':
-				$amount = floatval($amount) / 100;
+				$amount = floatval( $amount ) / 100;
 				if ( $amount <= 1 ) {
 					$result = round( floatval( $price ) - ( floatval( $amount ) * $price ), (int) $num_decimals );
 				} else {
@@ -184,7 +183,6 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 				$result = false;
 				break;
 		}
-
 
 		return $result;
 	}
@@ -244,7 +242,7 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 								$rule['from'] = 0;
 							}
 
-							$show_pricing_in_shop = apply_filters( 'woocommerce_dynamic_pricing_show_adjustments_in_shop', ( $rule['from'] == '0' || $rule['from']  == '1'), $rule, $_product );
+							$show_pricing_in_shop = apply_filters( 'woocommerce_dynamic_pricing_show_adjustments_in_shop', ( $rule['from'] == '0' || $rule['from'] == '1' ), $rule, $_product );
 							if ( $show_pricing_in_shop ) {
 								$temp = $this->get_adjusted_price( $rule, $working_price );
 
@@ -266,5 +264,4 @@ class WC_Dynamic_Pricing_Simple_Taxonomy extends WC_Dynamic_Pricing_Simple_Base 
 
 		return $working_price;
 	}
-
 }

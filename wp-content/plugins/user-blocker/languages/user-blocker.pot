@@ -2,7 +2,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: User Blocker\n"
-"POT-Creation-Date: 2023-04-03 16:51+0530\n"
+"POT-Creation-Date: 2023-12-14 19:13+0530\n"
 "PO-Revision-Date: 2017-06-24 14:12+0530\n"
 "Last-Translator: \n"
 "Language-Team: Solwin Infotech <info@solwininfotech.com>\n"
@@ -20,50 +20,50 @@ msgstr ""
 "X-Poedit-SearchPath-0: .\n"
 
 #: includes/user-blocker-block-users.php:26
-#: includes/user-blocker-block-users.php:446
-#: includes/user-blocker-block-users.php:530
-#: includes/user-blocker-block-users.php:1463
-#: includes/user-blocker-block-users.php:1663
-#: includes/user-blocker-block-users.php:1749
-#: includes/user-blocker-block-users.php:2255
-#: includes/user-blocker-block-users.php:2535
+#: includes/user-blocker-block-users.php:459
+#: includes/user-blocker-block-users.php:585
+#: includes/user-blocker-block-users.php:1571
+#: includes/user-blocker-block-users.php:1771
+#: includes/user-blocker-block-users.php:1865
+#: includes/user-blocker-block-users.php:2379
+#: includes/user-blocker-block-users.php:2683
 msgid "Block User"
 msgstr ""
 
 #: includes/user-blocker-block-users.php:27
-#: includes/user-blocker-block-users.php:1462
+#: includes/user-blocker-block-users.php:1570
 msgid "You are temporary blocked."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:79
-#: includes/user-blocker-block-users.php:133
-#: includes/user-blocker-block-users.php:1509
-#: includes/user-blocker-block-users.php:1538
-#: includes/user-blocker-block-users.php:2305
-#: includes/user-blocker-block-users.php:2330
+#: includes/user-blocker-block-users.php:92
+#: includes/user-blocker-block-users.php:146
+#: includes/user-blocker-block-users.php:1617
+#: includes/user-blocker-block-users.php:1646
+#: includes/user-blocker-block-users.php:2429
+#: includes/user-blocker-block-users.php:2454
 msgid "Update Blocked User"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:121
-#: includes/user-blocker-block-users.php:1525
+#: includes/user-blocker-block-users.php:134
+#: includes/user-blocker-block-users.php:1633
 msgid "Update for role"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:124
-#: includes/user-blocker-block-users.php:740
-#: includes/user-blocker-block-users.php:750
-#: includes/user-blocker-block-users.php:1000
-#: includes/user-blocker-block-users.php:1038
-#: includes/user-blocker-block-users.php:1528
-#: includes/user-blocker-block-users.php:1924
-#: includes/user-blocker-block-users.php:1934
-#: includes/user-blocker-block-users.php:2049
-#: includes/user-blocker-block-users.php:2087
-#: includes/user-blocker-block-users.php:2320
-#: includes/user-blocker-block-users.php:2675
-#: includes/user-blocker-block-users.php:2685
-#: includes/user-blocker-block-users.php:2796
-#: includes/user-blocker-block-users.php:2834
+#: includes/user-blocker-block-users.php:137
+#: includes/user-blocker-block-users.php:818
+#: includes/user-blocker-block-users.php:828
+#: includes/user-blocker-block-users.php:1084
+#: includes/user-blocker-block-users.php:1122
+#: includes/user-blocker-block-users.php:1636
+#: includes/user-blocker-block-users.php:2048
+#: includes/user-blocker-block-users.php:2058
+#: includes/user-blocker-block-users.php:2173
+#: includes/user-blocker-block-users.php:2211
+#: includes/user-blocker-block-users.php:2444
+#: includes/user-blocker-block-users.php:2823
+#: includes/user-blocker-block-users.php:2833
+#: includes/user-blocker-block-users.php:2944
+#: includes/user-blocker-block-users.php:2982
 #: includes/user-blocker-blocked-users-list.php:723
 #: includes/user-blocker-blocked-users-list.php:737
 #: includes/user-blocker-blocked-users-list.php:990
@@ -84,267 +84,267 @@ msgstr ""
 msgid "Role"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:124
-#: includes/user-blocker-block-users.php:1528
-#: includes/user-blocker-block-users.php:2320
+#: includes/user-blocker-block-users.php:137
+#: includes/user-blocker-block-users.php:1636
+#: includes/user-blocker-block-users.php:2444
 msgid "is not exist."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:177
-#: includes/user-blocker-block-users.php:1553
-#: includes/user-blocker-block-users.php:2350
+#: includes/user-blocker-block-users.php:190
+#: includes/user-blocker-block-users.php:1661
+#: includes/user-blocker-block-users.php:2474
 msgid "Update for user with username: "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:180
+#: includes/user-blocker-block-users.php:193
 msgid "User with "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:180
+#: includes/user-blocker-block-users.php:193
 msgid " userid is not exist."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:381
-#: includes/user-blocker-block-users.php:414
-#: includes/user-blocker-block-users.php:471
-#: includes/user-blocker-block-users.php:509
-#: includes/user-blocker-block-users.php:1598
-#: includes/user-blocker-block-users.php:1643
-#: includes/user-blocker-block-users.php:1682
-#: includes/user-blocker-block-users.php:1724
-#: includes/user-blocker-block-users.php:2390
-#: includes/user-blocker-block-users.php:2418
-#: includes/user-blocker-block-users.php:2451
-#: includes/user-blocker-block-users.php:2502
+#: includes/user-blocker-block-users.php:394
+#: includes/user-blocker-block-users.php:427
+#: includes/user-blocker-block-users.php:488
+#: includes/user-blocker-block-users.php:550
+#: includes/user-blocker-block-users.php:1706
+#: includes/user-blocker-block-users.php:1751
+#: includes/user-blocker-block-users.php:1794
+#: includes/user-blocker-block-users.php:1840
+#: includes/user-blocker-block-users.php:2514
+#: includes/user-blocker-block-users.php:2542
+#: includes/user-blocker-block-users.php:2579
+#: includes/user-blocker-block-users.php:2642
 msgid "You're breaking our security!! Please Enter Valid Message."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:401
-#: includes/user-blocker-block-users.php:432
+#: includes/user-blocker-block-users.php:414
 msgid "Blocking time for "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:401
-#: includes/user-blocker-block-users.php:432
+#: includes/user-blocker-block-users.php:414
 msgid " is successfully updated."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:481
-msgid "Role wise time blocking is successfully added."
-msgstr ""
-
-#: includes/user-blocker-block-users.php:490
-#: includes/user-blocker-block-users.php:1709
-#: includes/user-blocker-block-users.php:2471
-msgid "Please select atleast one role."
-msgstr ""
-
-#: includes/user-blocker-block-users.php:517
+#: includes/user-blocker-block-users.php:445
+#: includes/user-blocker-block-users.php:558
 msgid "Username wise time blocking is successfully added."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:525
-#: includes/user-blocker-block-users.php:1744
-#: includes/user-blocker-block-users.php:2517
+#: includes/user-blocker-block-users.php:498
+msgid "Role wise time blocking is successfully added."
+msgstr ""
+
+#: includes/user-blocker-block-users.php:521
+#: includes/user-blocker-block-users.php:1821
+#: includes/user-blocker-block-users.php:2599
+msgid "Please select atleast one role."
+msgstr ""
+
+#: includes/user-blocker-block-users.php:580
+#: includes/user-blocker-block-users.php:1860
+#: includes/user-blocker-block-users.php:2657
 msgid "Please select atleast one username."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:535
+#: includes/user-blocker-block-users.php:589
 msgid "Please add from time for respected to time."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:551
+#: includes/user-blocker-block-users.php:613
 msgid "Please enter valid time format."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:567
+#: includes/user-blocker-block-users.php:637
 msgid "Time can't be blank."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:689
+#: includes/user-blocker-block-users.php:767
 msgid "Block Users By Time"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:693
-#: includes/user-blocker-block-users.php:1875
-#: includes/user-blocker-block-users.php:2621
+#: includes/user-blocker-block-users.php:771
+#: includes/user-blocker-block-users.php:1999
+#: includes/user-blocker-block-users.php:2769
 msgid "Block User By Time"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:694
-#: includes/user-blocker-block-users.php:1876
-#: includes/user-blocker-block-users.php:2622
+#: includes/user-blocker-block-users.php:772
+#: includes/user-blocker-block-users.php:2000
+#: includes/user-blocker-block-users.php:2770
 msgid "Block User By Date"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:695
-#: includes/user-blocker-block-users.php:1877
-#: includes/user-blocker-block-users.php:2624 user_blocker.php:74
+#: includes/user-blocker-block-users.php:773
+#: includes/user-blocker-block-users.php:2001
+#: includes/user-blocker-block-users.php:2772 user_blocker.php:74
 msgid "Block User Permanent"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:741
-#: includes/user-blocker-block-users.php:751
-#: includes/user-blocker-block-users.php:1001
-#: includes/user-blocker-block-users.php:1039
+#: includes/user-blocker-block-users.php:819
+#: includes/user-blocker-block-users.php:829
+#: includes/user-blocker-block-users.php:1085
+#: includes/user-blocker-block-users.php:1123
+#: includes/user-blocker-block-users.php:1387
 msgid "Block Time"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:742
-#: includes/user-blocker-block-users.php:752
-#: includes/user-blocker-block-users.php:1002
-#: includes/user-blocker-block-users.php:1040
-#: includes/user-blocker-block-users.php:1338
-#: includes/user-blocker-block-users.php:1926
-#: includes/user-blocker-block-users.php:1936
-#: includes/user-blocker-block-users.php:2051
-#: includes/user-blocker-block-users.php:2089
-#: includes/user-blocker-block-users.php:2204
-#: includes/user-blocker-block-users.php:2677
-#: includes/user-blocker-block-users.php:2687
-#: includes/user-blocker-block-users.php:2797
+#: includes/user-blocker-block-users.php:820
+#: includes/user-blocker-block-users.php:830
+#: includes/user-blocker-block-users.php:1086
+#: includes/user-blocker-block-users.php:1124
+#: includes/user-blocker-block-users.php:1446
+#: includes/user-blocker-block-users.php:2050
+#: includes/user-blocker-block-users.php:2060
+#: includes/user-blocker-block-users.php:2175
+#: includes/user-blocker-block-users.php:2213
+#: includes/user-blocker-block-users.php:2328
+#: includes/user-blocker-block-users.php:2825
 #: includes/user-blocker-block-users.php:2835
-#: includes/user-blocker-block-users.php:2930
+#: includes/user-blocker-block-users.php:2945
+#: includes/user-blocker-block-users.php:2983
+#: includes/user-blocker-block-users.php:3078
 msgid "Block Message"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:743
-#: includes/user-blocker-block-users.php:753
-#: includes/user-blocker-block-users.php:1003
-#: includes/user-blocker-block-users.php:1041
-#: includes/user-blocker-block-users.php:1927
-#: includes/user-blocker-block-users.php:1937
-#: includes/user-blocker-block-users.php:2052
-#: includes/user-blocker-block-users.php:2090
-#: includes/user-blocker-block-users.php:2678
-#: includes/user-blocker-block-users.php:2688
-#: includes/user-blocker-block-users.php:2798
+#: includes/user-blocker-block-users.php:821
+#: includes/user-blocker-block-users.php:831
+#: includes/user-blocker-block-users.php:1087
+#: includes/user-blocker-block-users.php:1125
+#: includes/user-blocker-block-users.php:2051
+#: includes/user-blocker-block-users.php:2061
+#: includes/user-blocker-block-users.php:2176
+#: includes/user-blocker-block-users.php:2214
+#: includes/user-blocker-block-users.php:2826
 #: includes/user-blocker-block-users.php:2836
-msgid "Block URL"
+#: includes/user-blocker-block-users.php:2946
+#: includes/user-blocker-block-users.php:2984
+msgid "Redirection URL"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:744
-#: includes/user-blocker-block-users.php:754
-#: includes/user-blocker-block-users.php:1004
-#: includes/user-blocker-block-users.php:1042
-#: includes/user-blocker-block-users.php:1928
-#: includes/user-blocker-block-users.php:1938
-#: includes/user-blocker-block-users.php:2053
-#: includes/user-blocker-block-users.php:2091
-#: includes/user-blocker-block-users.php:2679
-#: includes/user-blocker-block-users.php:2689
-#: includes/user-blocker-block-users.php:2800
-#: includes/user-blocker-block-users.php:2838
+#: includes/user-blocker-block-users.php:822
+#: includes/user-blocker-block-users.php:832
+#: includes/user-blocker-block-users.php:1088
+#: includes/user-blocker-block-users.php:1126
+#: includes/user-blocker-block-users.php:2052
+#: includes/user-blocker-block-users.php:2062
+#: includes/user-blocker-block-users.php:2177
+#: includes/user-blocker-block-users.php:2215
+#: includes/user-blocker-block-users.php:2827
+#: includes/user-blocker-block-users.php:2837
+#: includes/user-blocker-block-users.php:2948
+#: includes/user-blocker-block-users.php:2986
 msgid "Action"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:807
-#: includes/user-blocker-block-users.php:1100
-#: includes/user-blocker-block-users.php:1290
+#: includes/user-blocker-block-users.php:891
+#: includes/user-blocker-block-users.php:1188
+#: includes/user-blocker-block-users.php:1398
 #: includes/user-blocker-blocked-users-list.php:724
 #: includes/user-blocker-blocked-users-list.php:738
 #: includes/user-blocker-blocked-users-list.php:991
-#: includes/user-blocker-blocked-users-list.php:1022 user_blocker.php:646
-#: user_blocker.php:710
+#: includes/user-blocker-blocked-users-list.php:1022 user_blocker.php:663
+#: user_blocker.php:727
 msgid "Sunday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:808
-#: includes/user-blocker-block-users.php:1101
-#: includes/user-blocker-block-users.php:1291
+#: includes/user-blocker-block-users.php:892
+#: includes/user-blocker-block-users.php:1189
+#: includes/user-blocker-block-users.php:1399
 #: includes/user-blocker-blocked-users-list.php:725
 #: includes/user-blocker-blocked-users-list.php:739
 #: includes/user-blocker-blocked-users-list.php:992
-#: includes/user-blocker-blocked-users-list.php:1023 user_blocker.php:647
-#: user_blocker.php:711
+#: includes/user-blocker-blocked-users-list.php:1023 user_blocker.php:664
+#: user_blocker.php:728
 msgid "Monday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:809
-#: includes/user-blocker-block-users.php:1102
-#: includes/user-blocker-block-users.php:1292
+#: includes/user-blocker-block-users.php:893
+#: includes/user-blocker-block-users.php:1190
+#: includes/user-blocker-block-users.php:1400
 #: includes/user-blocker-blocked-users-list.php:726
 #: includes/user-blocker-blocked-users-list.php:740
 #: includes/user-blocker-blocked-users-list.php:993
-#: includes/user-blocker-blocked-users-list.php:1024 user_blocker.php:648
-#: user_blocker.php:712
+#: includes/user-blocker-blocked-users-list.php:1024 user_blocker.php:665
+#: user_blocker.php:729
 msgid "Tuesday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:810
-#: includes/user-blocker-block-users.php:1103
-#: includes/user-blocker-block-users.php:1293
+#: includes/user-blocker-block-users.php:894
+#: includes/user-blocker-block-users.php:1191
+#: includes/user-blocker-block-users.php:1401
 #: includes/user-blocker-blocked-users-list.php:727
 #: includes/user-blocker-blocked-users-list.php:741
 #: includes/user-blocker-blocked-users-list.php:994
-#: includes/user-blocker-blocked-users-list.php:1025 user_blocker.php:649
-#: user_blocker.php:713
+#: includes/user-blocker-blocked-users-list.php:1025 user_blocker.php:666
+#: user_blocker.php:730
 msgid "Wednesday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:811
-#: includes/user-blocker-block-users.php:1104
-#: includes/user-blocker-block-users.php:1294
+#: includes/user-blocker-block-users.php:895
+#: includes/user-blocker-block-users.php:1192
+#: includes/user-blocker-block-users.php:1402
 #: includes/user-blocker-blocked-users-list.php:728
 #: includes/user-blocker-blocked-users-list.php:742
 #: includes/user-blocker-blocked-users-list.php:995
-#: includes/user-blocker-blocked-users-list.php:1026 user_blocker.php:650
-#: user_blocker.php:714
+#: includes/user-blocker-blocked-users-list.php:1026 user_blocker.php:667
+#: user_blocker.php:731
 msgid "Thursday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:812
-#: includes/user-blocker-block-users.php:1105
-#: includes/user-blocker-block-users.php:1295
+#: includes/user-blocker-block-users.php:896
+#: includes/user-blocker-block-users.php:1193
+#: includes/user-blocker-block-users.php:1403
 #: includes/user-blocker-blocked-users-list.php:729
 #: includes/user-blocker-blocked-users-list.php:743
 #: includes/user-blocker-blocked-users-list.php:996
-#: includes/user-blocker-blocked-users-list.php:1027 user_blocker.php:651
-#: user_blocker.php:715
+#: includes/user-blocker-blocked-users-list.php:1027 user_blocker.php:668
+#: user_blocker.php:732
 msgid "Friday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:813
-#: includes/user-blocker-block-users.php:1106
-#: includes/user-blocker-block-users.php:1296
+#: includes/user-blocker-block-users.php:897
+#: includes/user-blocker-block-users.php:1194
+#: includes/user-blocker-block-users.php:1404
 #: includes/user-blocker-blocked-users-list.php:730
 #: includes/user-blocker-blocked-users-list.php:744
 #: includes/user-blocker-blocked-users-list.php:997
-#: includes/user-blocker-blocked-users-list.php:1028 user_blocker.php:652
-#: user_blocker.php:716
+#: includes/user-blocker-blocked-users-list.php:1028 user_blocker.php:669
+#: user_blocker.php:733
 msgid "Saturday"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:824
-#: includes/user-blocker-block-users.php:832
-#: includes/user-blocker-block-users.php:842
-#: includes/user-blocker-block-users.php:850
-#: includes/user-blocker-block-users.php:860
-#: includes/user-blocker-block-users.php:868
-#: includes/user-blocker-block-users.php:878
-#: includes/user-blocker-block-users.php:886
-#: includes/user-blocker-block-users.php:896
-#: includes/user-blocker-block-users.php:904
-#: includes/user-blocker-block-users.php:914
-#: includes/user-blocker-block-users.php:922
-#: includes/user-blocker-block-users.php:932
-#: includes/user-blocker-block-users.php:940
-#: includes/user-blocker-block-users.php:1117
-#: includes/user-blocker-block-users.php:1125
-#: includes/user-blocker-block-users.php:1135
-#: includes/user-blocker-block-users.php:1143
-#: includes/user-blocker-block-users.php:1153
-#: includes/user-blocker-block-users.php:1161
-#: includes/user-blocker-block-users.php:1171
-#: includes/user-blocker-block-users.php:1179
-#: includes/user-blocker-block-users.php:1189
-#: includes/user-blocker-block-users.php:1197
-#: includes/user-blocker-block-users.php:1207
-#: includes/user-blocker-block-users.php:1215
-#: includes/user-blocker-block-users.php:1225
-#: includes/user-blocker-block-users.php:1233
-#: includes/user-blocker-block-users.php:1980
-#: includes/user-blocker-block-users.php:2133
+#: includes/user-blocker-block-users.php:908
+#: includes/user-blocker-block-users.php:916
+#: includes/user-blocker-block-users.php:926
+#: includes/user-blocker-block-users.php:934
+#: includes/user-blocker-block-users.php:944
+#: includes/user-blocker-block-users.php:952
+#: includes/user-blocker-block-users.php:962
+#: includes/user-blocker-block-users.php:970
+#: includes/user-blocker-block-users.php:980
+#: includes/user-blocker-block-users.php:988
+#: includes/user-blocker-block-users.php:998
+#: includes/user-blocker-block-users.php:1006
+#: includes/user-blocker-block-users.php:1016
+#: includes/user-blocker-block-users.php:1024
+#: includes/user-blocker-block-users.php:1205
+#: includes/user-blocker-block-users.php:1213
+#: includes/user-blocker-block-users.php:1223
+#: includes/user-blocker-block-users.php:1231
+#: includes/user-blocker-block-users.php:1241
+#: includes/user-blocker-block-users.php:1249
+#: includes/user-blocker-block-users.php:1259
+#: includes/user-blocker-block-users.php:1267
+#: includes/user-blocker-block-users.php:1277
+#: includes/user-blocker-block-users.php:1285
+#: includes/user-blocker-block-users.php:1295
+#: includes/user-blocker-block-users.php:1303
+#: includes/user-blocker-block-users.php:1313
+#: includes/user-blocker-block-users.php:1321
+#: includes/user-blocker-block-users.php:2104
+#: includes/user-blocker-block-users.php:2257
 #: includes/user-blocker-blocked-users-list.php:36
 #: includes/user-blocker-blocked-users-list.php:44
 #: includes/user-blocker-blocked-users-list.php:50
@@ -413,20 +413,20 @@ msgstr ""
 msgid "not set"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:829
-#: includes/user-blocker-block-users.php:847
-#: includes/user-blocker-block-users.php:865
-#: includes/user-blocker-block-users.php:883
-#: includes/user-blocker-block-users.php:898
-#: includes/user-blocker-block-users.php:919
-#: includes/user-blocker-block-users.php:937
-#: includes/user-blocker-block-users.php:1122
-#: includes/user-blocker-block-users.php:1140
-#: includes/user-blocker-block-users.php:1158
-#: includes/user-blocker-block-users.php:1176
-#: includes/user-blocker-block-users.php:1194
-#: includes/user-blocker-block-users.php:1212
-#: includes/user-blocker-block-users.php:1230
+#: includes/user-blocker-block-users.php:913
+#: includes/user-blocker-block-users.php:931
+#: includes/user-blocker-block-users.php:949
+#: includes/user-blocker-block-users.php:967
+#: includes/user-blocker-block-users.php:982
+#: includes/user-blocker-block-users.php:1003
+#: includes/user-blocker-block-users.php:1021
+#: includes/user-blocker-block-users.php:1210
+#: includes/user-blocker-block-users.php:1228
+#: includes/user-blocker-block-users.php:1246
+#: includes/user-blocker-block-users.php:1264
+#: includes/user-blocker-block-users.php:1282
+#: includes/user-blocker-block-users.php:1300
+#: includes/user-blocker-block-users.php:1318
 #: includes/user-blocker-blocked-users-list.php:790
 #: includes/user-blocker-blocked-users-list.php:812
 #: includes/user-blocker-blocked-users-list.php:834
@@ -443,12 +443,12 @@ msgstr ""
 msgid " to "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:984
-#: includes/user-blocker-block-users.php:1022
-#: includes/user-blocker-block-users.php:2033
-#: includes/user-blocker-block-users.php:2071
-#: includes/user-blocker-block-users.php:2780
-#: includes/user-blocker-block-users.php:2818
+#: includes/user-blocker-block-users.php:1068
+#: includes/user-blocker-block-users.php:1106
+#: includes/user-blocker-block-users.php:2157
+#: includes/user-blocker-block-users.php:2195
+#: includes/user-blocker-block-users.php:2928
+#: includes/user-blocker-block-users.php:2966
 #: includes/user-blocker-blocked-users-list.php:986
 #: includes/user-blocker-blocked-users-list.php:1017
 #: includes/user-blocker-blocked-users-list.php:1566
@@ -461,12 +461,12 @@ msgstr ""
 msgid "Username"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:990
-#: includes/user-blocker-block-users.php:1028
-#: includes/user-blocker-block-users.php:2039
-#: includes/user-blocker-block-users.php:2077
-#: includes/user-blocker-block-users.php:2786
-#: includes/user-blocker-block-users.php:2824
+#: includes/user-blocker-block-users.php:1074
+#: includes/user-blocker-block-users.php:1112
+#: includes/user-blocker-block-users.php:2163
+#: includes/user-blocker-block-users.php:2201
+#: includes/user-blocker-block-users.php:2934
+#: includes/user-blocker-block-users.php:2972
 #: includes/user-blocker-blocked-users-list.php:1572
 #: includes/user-blocker-blocked-users-list.php:1609
 #: includes/user-blocker-blocked-users-list.php:1995
@@ -476,12 +476,12 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:996
-#: includes/user-blocker-block-users.php:1034
-#: includes/user-blocker-block-users.php:2045
-#: includes/user-blocker-block-users.php:2083
-#: includes/user-blocker-block-users.php:2792
-#: includes/user-blocker-block-users.php:2830
+#: includes/user-blocker-block-users.php:1080
+#: includes/user-blocker-block-users.php:1118
+#: includes/user-blocker-block-users.php:2169
+#: includes/user-blocker-block-users.php:2207
+#: includes/user-blocker-block-users.php:2940
+#: includes/user-blocker-block-users.php:2978
 #: includes/user-blocker-blocked-users-list.php:1578
 #: includes/user-blocker-blocked-users-list.php:1615
 #: includes/user-blocker-blocked-users-list.php:2001
@@ -491,18 +491,18 @@ msgstr ""
 msgid "Email"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1080
+#: includes/user-blocker-block-users.php:1168
 msgid "view"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1090
-#: includes/user-blocker-block-users.php:1993
+#: includes/user-blocker-block-users.php:1178
+#: includes/user-blocker-block-users.php:2117
 msgid "edit"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1251
-#: includes/user-blocker-block-users.php:2001
-#: includes/user-blocker-block-users.php:2908
+#: includes/user-blocker-block-users.php:1339
+#: includes/user-blocker-block-users.php:2125
+#: includes/user-blocker-block-users.php:3056
 #: includes/user-blocker-blocked-users-list.php:1232
 #: includes/user-blocker-blocked-users-list.php:1531
 #: includes/user-blocker-blocked-users-list.php:1538
@@ -514,25 +514,21 @@ msgstr ""
 msgid "No records found."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1263
-#: includes/user-blocker-block-users.php:1269
-#: includes/user-blocker-block-users.php:2918
-#: includes/user-blocker-block-users.php:2924
+#: includes/user-blocker-block-users.php:1351
+#: includes/user-blocker-block-users.php:1357
+#: includes/user-blocker-block-users.php:3066
+#: includes/user-blocker-block-users.php:3072
 msgid "For"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1279
-msgid "Block Time "
-msgstr ""
-
-#: includes/user-blocker-block-users.php:1301
-#: includes/user-blocker-block-users.php:1306
-#: includes/user-blocker-block-users.php:1311
-#: includes/user-blocker-block-users.php:1316
-#: includes/user-blocker-block-users.php:1321
-#: includes/user-blocker-block-users.php:1326
-#: includes/user-blocker-block-users.php:1331
-#: includes/user-blocker-block-users.php:1978
+#: includes/user-blocker-block-users.php:1409
+#: includes/user-blocker-block-users.php:1414
+#: includes/user-blocker-block-users.php:1419
+#: includes/user-blocker-block-users.php:1424
+#: includes/user-blocker-block-users.php:1429
+#: includes/user-blocker-block-users.php:1434
+#: includes/user-blocker-block-users.php:1439
+#: includes/user-blocker-block-users.php:2102
 #: includes/user-blocker-blocked-users-list.php:41
 #: includes/user-blocker-blocked-users-list.php:55
 #: includes/user-blocker-blocked-users-list.php:69
@@ -545,168 +541,168 @@ msgstr ""
 #: includes/user-blocker-blocked-users-list.php:1071
 #: includes/user-blocker-blocked-users-list.php:1506
 #: includes/user-blocker-blocked-users-list.php:1658
-#: includes/user-blocker-common-functions.php:421 user_blocker.php:452
-#: user_blocker.php:670 user_blocker.php:734
+#: includes/user-blocker-common-functions.php:421 user_blocker.php:469
+#: user_blocker.php:687 user_blocker.php:751
 msgid "to"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1336
+#: includes/user-blocker-block-users.php:1444
 msgid "Apply to all"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1337
+#: includes/user-blocker-block-users.php:1445
 msgid "Reset to all"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1345
-#: includes/user-blocker-block-users.php:2211
-#: includes/user-blocker-block-users.php:2944
+#: includes/user-blocker-block-users.php:1453
+#: includes/user-blocker-block-users.php:2335
+#: includes/user-blocker-block-users.php:3092
 msgid "Note"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1346
-#: includes/user-blocker-block-users.php:2212
-#: includes/user-blocker-block-users.php:2945
+#: includes/user-blocker-block-users.php:1454
+#: includes/user-blocker-block-users.php:2336
+#: includes/user-blocker-block-users.php:3093
 msgid "If you will not set message, default message will be "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1352
-#: includes/user-blocker-block-users.php:2219
-#: includes/user-blocker-block-users.php:2952
+#: includes/user-blocker-block-users.php:1460
+#: includes/user-blocker-block-users.php:2343
+#: includes/user-blocker-block-users.php:3100
 msgid "Enter Redirection URL: "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1367
-#: includes/user-blocker-block-users.php:2235
-#: includes/user-blocker-block-users.php:2967
+#: includes/user-blocker-block-users.php:1475
+#: includes/user-blocker-block-users.php:2359
+#: includes/user-blocker-block-users.php:3115
 #: includes/user-blocker-common-functions.php:507
 msgid "Cancel"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1386
+#: includes/user-blocker-block-users.php:1494
 msgid "Hi there!"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1387
+#: includes/user-blocker-block-users.php:1495
 msgid ""
 "Don't ever miss an opportunity to opt in for Email Notifications / "
 "Announcements about exciting New Features and Update Releases."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1388
+#: includes/user-blocker-block-users.php:1496
 msgid ""
 "Contribute in helping us making our plugin compatible with most plugins "
 "and themes by allowing to share non-sensitive information about your "
 "website."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1389
+#: includes/user-blocker-block-users.php:1497
 msgid "Email Address for Notifications"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1391
+#: includes/user-blocker-block-users.php:1499
 msgid "If you're not ready to Opt-In, that's ok too!"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1392
+#: includes/user-blocker-block-users.php:1500
 msgid "User Blocker will still work fine."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1393
+#: includes/user-blocker-block-users.php:1501
 msgid "What permissions are being granted?"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1399
+#: includes/user-blocker-block-users.php:1507
 msgid "User Details"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1400
+#: includes/user-blocker-block-users.php:1508
 msgid "Name and Email Address"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1406
+#: includes/user-blocker-block-users.php:1514
 msgid "Current Plugin Status"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1407
+#: includes/user-blocker-block-users.php:1515
 msgid "Activation, Deactivation and Uninstall"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1415
+#: includes/user-blocker-block-users.php:1523
 msgid "Notifications"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1416
+#: includes/user-blocker-block-users.php:1524
 msgid "Updates & Announcements"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1422
+#: includes/user-blocker-block-users.php:1530
 msgid "Website Overview"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1423
+#: includes/user-blocker-block-users.php:1531
 msgid "Site URL, WP Version, PHP Info, Plugins & Themes Info"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1430
+#: includes/user-blocker-block-users.php:1538
 #: includes/user-blocker-common-functions.php:498
 msgid ""
 "By clicking this button, you agree with the storage and handling of your "
 "data as mentioned above by this website. (GDPR Compliance)"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1436
+#: includes/user-blocker-block-users.php:1544
 #: includes/user-blocker-common-functions.php:510
 msgid "Skip"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1438
-#: includes/user-blocker-block-users.php:1446
+#: includes/user-blocker-block-users.php:1546
+#: includes/user-blocker-block-users.php:1554
 msgid "Continue"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1444
+#: includes/user-blocker-block-users.php:1552
 msgid "Opt-In"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1556
-#: includes/user-blocker-block-users.php:2353
+#: includes/user-blocker-block-users.php:1664
+#: includes/user-blocker-block-users.php:2477
 msgid "User with"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1556
-#: includes/user-blocker-block-users.php:2353
+#: includes/user-blocker-block-users.php:1664
+#: includes/user-blocker-block-users.php:2477
 msgid "userid is not exist."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1617
-#: includes/user-blocker-block-users.php:1652
+#: includes/user-blocker-block-users.php:1725
+#: includes/user-blocker-block-users.php:1760
 msgid "date wise blocking have been updated successfully"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1699
-#: includes/user-blocker-block-users.php:2464
+#: includes/user-blocker-block-users.php:1811
+#: includes/user-blocker-block-users.php:2592
 msgid "Selected roles have beeen blocked successfully."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1736
-#: includes/user-blocker-block-users.php:2510
+#: includes/user-blocker-block-users.php:1852
+#: includes/user-blocker-block-users.php:2650
 msgid "Selected users have beeen blocked successfully."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1754
+#: includes/user-blocker-block-users.php:1870
 msgid "Please enter valid block date."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1871
+#: includes/user-blocker-block-users.php:1995
 msgid "Block Users By Date"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:1925
-#: includes/user-blocker-block-users.php:1935
-#: includes/user-blocker-block-users.php:2050
-#: includes/user-blocker-block-users.php:2088
-#: includes/user-blocker-block-users.php:2162
+#: includes/user-blocker-block-users.php:2049
+#: includes/user-blocker-block-users.php:2059
+#: includes/user-blocker-block-users.php:2174
+#: includes/user-blocker-block-users.php:2212
+#: includes/user-blocker-block-users.php:2286
 #: includes/user-blocker-blocked-users-list.php:1462
 #: includes/user-blocker-blocked-users-list.php:1470
 #: includes/user-blocker-blocked-users-list.php:1583
@@ -714,43 +710,43 @@ msgstr ""
 msgid "Block Date"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2152
+#: includes/user-blocker-block-users.php:2276
 msgid "No records Founds."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2176
+#: includes/user-blocker-block-users.php:2300
 msgid "This user is blocked for below time:"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2195
+#: includes/user-blocker-block-users.php:2319
 msgid "From"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2197
+#: includes/user-blocker-block-users.php:2321
 msgid "To"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2277
-msgid "You are permanently Blocked."
+#: includes/user-blocker-block-users.php:2401
+msgid "You are permanently blocked."
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2317
+#: includes/user-blocker-block-users.php:2441
 msgid "Update for role: "
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2402
-#: includes/user-blocker-block-users.php:2425
+#: includes/user-blocker-block-users.php:2526
+#: includes/user-blocker-block-users.php:2549
 msgid "permanent blocking has been updated successfully"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2617
+#: includes/user-blocker-block-users.php:2765
 msgid "Block Users Permanently"
 msgstr ""
 
-#: includes/user-blocker-block-users.php:2676
-#: includes/user-blocker-block-users.php:2686
-#: includes/user-blocker-block-users.php:2799
-#: includes/user-blocker-block-users.php:2837
+#: includes/user-blocker-block-users.php:2824
+#: includes/user-blocker-block-users.php:2834
+#: includes/user-blocker-block-users.php:2947
+#: includes/user-blocker-block-users.php:2985
 msgid "Status"
 msgstr ""
 
@@ -1173,7 +1169,7 @@ msgstr ""
 
 #: includes/user-blocker-common-functions.php:931
 #: includes/user-blocker-common-functions.php:961
-msgid "Username or Email or First name"
+msgid "Username or Email or Name"
 msgstr ""
 
 #: includes/user-blocker-common-functions.php:932
@@ -1227,19 +1223,19 @@ msgid ""
 "take the next step."
 msgstr ""
 
-#: includes/user-blocker-promo-notice.php:49
+#: includes/user-blocker-promo-notice.php:51
 msgid "Rate it"
 msgstr ""
 
-#: includes/user-blocker-promo-notice.php:50
+#: includes/user-blocker-promo-notice.php:55
 msgid "Like Us on Facebook"
 msgstr ""
 
-#: includes/user-blocker-promo-notice.php:51
+#: includes/user-blocker-promo-notice.php:56
 msgid "I use #userblocker to secure my #WordPress site from spam users."
 msgstr ""
 
-#: includes/user-blocker-promo-notice.php:51
+#: includes/user-blocker-promo-notice.php:56
 msgid "Tweet about User Blocker "
 msgstr ""
 
@@ -1272,31 +1268,31 @@ msgstr ""
 msgid "Number of Users per page"
 msgstr ""
 
-#: user_blocker.php:234 user_blocker.php:269 user_blocker.php:310
-#: user_blocker.php:347 user_blocker.php:353
+#: user_blocker.php:236 user_blocker.php:286 user_blocker.php:327
+#: user_blocker.php:364 user_blocker.php:370
 msgid "ERROR"
 msgstr ""
 
-#: user_blocker.php:585 user_blocker.php:609
+#: user_blocker.php:602 user_blocker.php:626
 msgid "Permanently Blocked"
 msgstr ""
 
-#: user_blocker.php:590 user_blocker.php:614
+#: user_blocker.php:607 user_blocker.php:631
 msgid "View Block Date Time"
 msgstr ""
 
-#: user_blocker.php:642 user_blocker.php:706
+#: user_blocker.php:659 user_blocker.php:723
 msgid "Blocked Detail"
 msgstr ""
 
-#: user_blocker.php:669 user_blocker.php:733
+#: user_blocker.php:686 user_blocker.php:750
 msgid "Blocked Date Detail:"
 msgstr ""
 
-#: user_blocker.php:877 user_blocker.php:909
+#: user_blocker.php:894 user_blocker.php:926
 msgid "Login Failed!"
 msgstr ""
 
-#: user_blocker.php:930
+#: user_blocker.php:947
 msgid "Documentation"
 msgstr ""

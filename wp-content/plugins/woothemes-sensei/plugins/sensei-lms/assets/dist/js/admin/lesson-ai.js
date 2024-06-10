@@ -18,7 +18,7 @@ return o.createElement("svg",i({width:24,height:24,fill:"none",xmlns:"http://www
 /* harmony export */});
 /* harmony import */var r=n(69307);
 /* harmony import */
-/* harmony default export */const o=
+/* harmony default export */const o=(0,r.forwardRef)((
 /**
  * WordPress dependencies
  */
@@ -26,13 +26,14 @@ return o.createElement("svg",i({width:24,height:24,fill:"none",xmlns:"http://www
 /**
  * Return an SVG icon.
  *
- * @param {IconProps} props icon is the SVG component to render
- *                          size is a number specifiying the icon size in pixels
- *                          Other props will be passed to wrapped SVG component
+ * @param {IconProps}                                 props icon is the SVG component to render
+ *                                                          size is a number specifiying the icon size in pixels
+ *                                                          Other props will be passed to wrapped SVG component
+ * @param {import('react').ForwardedRef<HTMLElement>} ref   The forwarded ref to the SVG element.
  *
  * @return {JSX.Element}  Icon component
  */
-function({icon:e,size:t=24,...n}){return(0,r.cloneElement)(e,{width:t,height:t,...n})};
+function({icon:e,size:t=24,...n},o){return(0,r.cloneElement)(e,{width:t,height:t,...n,ref:o})}));
 //# sourceMappingURL=index.js.map
 /***/},
 /***/99196:

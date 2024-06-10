@@ -165,7 +165,7 @@ a.tribe-attendees-list-showall {
 				color: #444;
 				content: '\f132';
 				display: block;
-				font-family: 'dashicons';
+				font-family: 'dashicons', sans-serif;
 				font-size: 22px;
 				height: 0;
 				left: 0;
@@ -190,17 +190,25 @@ a.tribe-attendees-list-showall {
 }
 
 .tribe-tickets-attendees-list-optout {
-	label {
-		margin-left: 5px;
-	}
+	align-items: center;
+	display: flex;
+	flex-flow: row wrap;
 
 	input[type="radio"] + label,
 	input[type="checkbox"] + label {
 		display: inline-block;
+		font-size: var(--tec-font-size-2);
+		margin: 0;
+	}
+
+	input[type='checkbox'] {
+		height: var(--tec-spacer-3);
+		width: var(--tec-spacer-3);
 	}
 }
 
-.tribe-orders-list {
+.tribe-rsvp,
+.tribe-tickets ul.tribe-orders-list {
 	list-style: none;
 	margin: 0;
 	padding: 0;
@@ -209,6 +217,7 @@ a.tribe-attendees-list-showall {
 		margin-top: 20px;
 	}
 
+	.tribe-rsvp-list,
 	.tribe-tickets-list {
 		list-style: none;
 		margin: 0;
@@ -252,6 +261,12 @@ a.tribe-attendees-list-showall {
 			td {
 				border: 0;
 			}
+
+			div.tribe-event-tickets-plus-meta {
+				flex: 0 1 100%;
+				margin-top: var(--tec-spacer-1);
+				order: 4;
+			}
 		}
 	}
 }
@@ -259,10 +274,13 @@ a.tribe-attendees-list-showall {
 /* Attendee Meta on orders-tickets.php */
 
 .attendee-meta.toggle {
+	color: var(--tec-color-accent-primary);
 	cursor: pointer;
 	display: block;
-	font-size: 90%;
-	margin-bottom: 10px;
+	font-family: var(--tec-font-family-sans-serif);
+	font-size: var(--tec-font-size-3);
+	font-weight: var(--tec-font-weight-regular);
+	line-height: var(--tec-line-height-0);
 
 	&:before {
 		content: '+ ';
@@ -271,10 +289,15 @@ a.tribe-attendees-list-showall {
 	&.on:before {
 		content: '- ';
 	}
+
+	&:hover {
+		color: var(--tec-color-accent-primary-hover);
+	}
 }
 
-.attendee-meta-row {
+div.attendee-meta-row {
 	display: none;
+	margin-top: var(--tec-spacer-2);
 }
 
 /* Attendee meta fields */
@@ -402,7 +425,7 @@ input[type=checkbox].tribe_show_attendees {
 
 	&:before {
 		content: '\f341';
-		font-family: 'dashicons';
+		font-family: 'dashicons', sans-serif;
 		margin-right: 5px;
 		vertical-align: middle;
 	}

@@ -10,7 +10,6 @@
 
 namespace TEC\Events_Pro\Custom_Tables\V1\WP_Query;
 
-use tad_DI52_ServiceProvider as Service_Provider;
 use TEC\Events\Custom_Tables\V1\Tables\Occurrences;
 use TEC\Events\Custom_Tables\V1\WP_Query\Custom_Tables_Query;
 use TEC\Events\Custom_Tables\V1\WP_Query\Modifiers\WP_Query_Modifier;
@@ -19,6 +18,7 @@ use TEC\Events_Pro\Custom_Tables\V1\Events\Provisional\ID_Generator as Provision
 use TEC\Events_Pro\Custom_Tables\V1\Models\Provisional_Post;
 use TEC\Events_Pro\Custom_Tables\V1\Models\Provisional_Post_Cache;
 use TEC\Events_Pro\Custom_Tables\V1\WP_Query\Repository\Custom_Tables_Query_Filters;
+use TEC\Common\Contracts\Service_Provider;
 use Tribe__Repository__Query_Filters;
 use WP_Post;
 use WP_Query;
@@ -318,9 +318,15 @@ class Provider extends Service_Provider implements \TEC\Events\Custom_Tables\V1\
 	 * @return string The filtered query.
 	 */
 	public function hydrate_provisional_post( $query_sql ) {
-		return $this->noop ?
-			$query_sql
-			: $this->container->make( Provisional_Post::class )->hydrate_provisional_post_query( $query_sql );
+		if ( $this->noop ) {
+			return $query_sql;
+		}
+
+		remove_filter( 'query', [ $this, 'hydrate_provisional_post' ], 200 );
+		$query_sql = $this->container->make( Provisional_Post::class )->hydrate_provisional_post_query( $query_sql );
+		add_filter( 'query', [ $this, 'hydrate_provisional_post' ], 200 );
+
+		return $query_sql;
 	}
 
 	/**

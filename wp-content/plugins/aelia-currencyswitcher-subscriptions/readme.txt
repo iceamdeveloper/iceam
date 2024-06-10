@@ -1,7 +1,7 @@
 === WooCommerce Currency Switcher - Subscriptions Integration ===
 Tags: woocommerce, currency switcher, subscriptions, integration
 Requires at least: 4.0
-Tested up to: 6.2.9
+Tested up to: 6.3.9
 icense: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 
@@ -15,9 +15,9 @@ This plugin acts as a bridge between [Aelia Currency Switcher](https://aelia.co/
 * PHP 7.1 or newer.
 * WordPress 3.6 or newer.
 * WooCommerce 3.0.x or newer.
-* Aelia Currency Switcher 4.4.7.170202 or newer
+* Aelia Currency Switcher 5.0.5.230703 or newer
 * WooCommerce Subscriptions (by Prospress) 2.2 or newer.
-* [AFC plugin for WooCommerce](https://aelia.co/downloads/wc-aelia-foundation-classes.zip) 1.7.5.160722 or newer.
+* [AFC plugin for WooCommerce](https://aelia.co/downloads/wc-aelia-foundation-classes.zip) 2.4.9.230616 or newer.
 
 == Installation ==
 
@@ -30,9 +30,38 @@ This plugin acts as a bridge between [Aelia Currency Switcher](https://aelia.co/
 This is a free plugin, and it's provided as is, without explicit or implicit guarantees, and it's not covered by the support service provided for premium Aelia plugins.
 Should you need assistance, please feel free to [contact us](https://aelia.co/contact) andto avail of our paid support service (standard charges apply).
 
+== Upgrade Notice ==
+
+= 2.0 =
+This is a major update, we recommend to test it update on a staging site first. Should you encounter any issue, please feel free to [contact our Support Team](https://aelia.co/contact).
+
 == Changelog ==
 
-= 1.7.11.230503 =
+= 2.1.3.230905 =
+* Updated supported WooCommerce versions.
+
+= 2.1.2.230809 =
+* Updated supported WordPress versions.
+
+= 2.1.1.230803 =
+* Compatibility - Improved compatibility with PHP 8.2. Removed dynamic properties from main class.
+* Updated supported WooCommerce versions.
+
+= 2.1.0.230705 =
+* Declared compatibility with the HPOS feature.
+* Updated supported WooCommerce versions.
+
+= 2.0.1.230524 =
+* Updated supported WooCommerce versions.
+
+= 2.0.0.230519 =
+* HPOS Compatibility - Rewritten logic to allow setting a currency for manual subscriptions.
+* HPOS Compatibility - Rewritten logic to detect the new Edit Subscription page.
+* HPOS Compatibility - Rewritten logic to handle saving subscription meta.
+* HPOS Compatibility - Rewritten logic to detect when scripts for the Edit Order/Edit Subscription page should be loaded.
+
+= 1.7.12.230524 =
+* Updated supported WooCommerce versions.= 1.7.11.230503 =
 * Updated supported WooCommerce versions.
 
 = 1.7.10.230418 =

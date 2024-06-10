@@ -11,11 +11,19 @@ use Aelia\WC\Messages;
  * Aelia Currency Switcher Subscriptions Integration plugin.
  **/
 class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
-	public static $version = '1.7.11.230503';
+	public static $version = '2.1.3.230905';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
 	public static $plugin_name = 'WooCommerce Currency Switcher - Subscriptions Integration';
+
+	/**
+	 * The instance of the integration with the Subscriptions plugin.
+	 *
+	 * @var Aelia\WC\CurrencySwitcher\Subscriptions\Subscriptions_Integration
+	 * @since 2.1.1.230803
+	 */
+	protected $subscriptions_integration;
 
 	/**
 	 * The slug used to check for updates.
@@ -27,7 +35,7 @@ class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
 
 	public static function factory() {
 		// Load Composer autoloader
-		require_once(__DIR__ . '/vendor/autoload.php');
+		require_once __DIR__ . '/vendor/autoload.php';
 
 		$messages_controller = new Messages(self::$text_domain);
 
@@ -44,7 +52,7 @@ class WC_Aelia_CS_Subscriptions extends Aelia_Plugin {
 	 */
 	public function __construct($settings_controller = null, $messages_controller = null) {
 		// Load Composer autoloader
-		require_once(__DIR__ . '/vendor/autoload.php');
+		require_once __DIR__ . '/vendor/autoload.php';
 
 		parent::__construct($settings_controller, $messages_controller);
 

@@ -1,12 +1,10 @@
 Mailgun for WordPress
 =====================
 
-Contributors: mailgun, sivel, lookahead.io, m35dev
+Contributors: mailgun, sivel, lookahead.io, m35dev, alanfuller
 Tags: mailgun, smtp, http, api, mail, email
-Requires at least: 3.3
-Tested up to: 6.1.1
-Stable tag: 1.9.3
-Requires PHP: 5.6
+Tested up to: 6.4.3
+Stable tag: 1.9.9
 License: GPLv2 or later
 
 Easily send email from your WordPress site through Mailgun using the HTTP API or SMTP.
@@ -66,6 +64,8 @@ MAILGUN_SECURE       Type: boolean  Choices: '0' or '1' (0 = false/no)
 MAILGUN_SECTYPE      Type: string   Choices: 'ssl' or 'tls'
 MAILGUN_FROM_NAME    Type: string
 MAILGUN_FROM_ADDRESS Type: string
+MAILGUN_TRACK_CLICKS Type: string Choices: 'yes' or 'no'
+MAILGUN_TRACK_OPENS  Type: string Choices: 'yes' or 'no'
 ```
 
 - What hooks are available for use with other plugins?
@@ -130,6 +130,23 @@ MAILGUN_FROM_ADDRESS Type: string
 
 
 == Changelog ==
+= 1.9.8 (2024-02-25): =
+ - Improve admin notices about not fully configured plugin
+ - Small code cleaning
+
+= 1.9.7 (2024-01-03): =
+- Ensure defaults are always set to remove warnings in PHP 8.1+
+
+= 1.9.6 (2023-09-10): =
+- Added typehints to methods
+- Added code for making plugin WP VIP GO compatible for the `From mail`
+- Added Toastr for sending nice message instead of using alerts
+
+= 1.9.5 (2023-06-20): =
+- Fix bug with sending emails
+
+= 1.9.4 (2023-06-10): =
+- Fixed bug `Fatal error on lists page when another plugin redeclare wp_mail()`
 
 = 1.9.3 (2023-04-08): =
 - Fixed `Reply-to` header. It's not overridden anymore

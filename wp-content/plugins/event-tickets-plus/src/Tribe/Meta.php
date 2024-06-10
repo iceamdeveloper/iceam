@@ -1239,6 +1239,7 @@ class Tribe__Tickets_Plus__Meta {
 	 * Get the meta field value from field value key for the attendee.
 	 *
 	 * @since 5.1.0
+	 * @since 5.9.1 Added `tec_tickets_get_field_meta_for_attendee`.
 	 *
 	 * @param string   $key             The meta field value key.
 	 * @param int      $ticket_id       The ticket ID.
@@ -1260,6 +1261,25 @@ class Tribe__Tickets_Plus__Meta {
 
 		// Get saved meta field values from the order meta key.
 		$meta = get_post_meta( $order_id, self::META_KEY, true );
+
+		/**
+		 * Allow the ability to overwrite the meta data returned for an attendee.
+		 *
+		 * @since 5.9.1
+		 *
+		 * @param array|bool|string $meta Data returned from get_post_meta
+		 * @param int               $order_id The Order ID.
+		 * @param int               $ticket_id The ticket ID.
+		 * @param string            $meta_key The Meta Key to lookup.
+		 */
+		$meta = apply_filters(
+			'tec_tickets_get_field_meta_for_attendee',
+			$meta,
+			$order_id,
+			$ticket_id,
+			self::META_KEY
+		);
+
 
 		// Check if the ticket is in the saved meta field values.
 		if ( ! is_array( $meta ) || ! isset( $meta[ $ticket_id ][ $attendee_number ][ $key ] ) ) {

@@ -17,14 +17,14 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Exceptions\Invalid_Field;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -87,10 +87,10 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 	 *
 	 * @since 1.10.0
 	 *
-	 * @param int|null $error_code a PHP error code
+	 * @param int|mixed|null $error_code a PHP error code
 	 * @return string
 	 */
-	private function get_file_upload_error_message( $error_code = null ) {
+	private function get_file_upload_error_message( $error_code = null ) : string {
 
 		switch ( $error_code ) {
 			case 1 :
@@ -128,7 +128,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param string $enclosure default double quote `"`
-		 * @param \WC_Memberships_CSV_Import_User_Memberships_Background_Job $import_instance instance of the import class
+		 * @param \WC_Memberships_CSV_Import_User_Memberships $import_instance instance of the import class
 		 * @param \stdClass $job import job
 		 */
 		return (string) apply_filters( 'wc_memberships_csv_import_enclosure', parent::get_csv_enclosure(), $this, $job );
@@ -159,7 +159,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param string $timezone a valid timezone
-		 * @param \WC_Memberships_CSV_Import_User_Memberships_Background_Job $import_instance instance of the export class
+		 * @param \WC_Memberships_CSV_Import_User_Memberships $import_instance instance of the export class
 		 * @param \stdClass $job import job
 		 */
 		return (string) apply_filters( 'wc_memberships_csv_import_timezone', $timezone, $this, $job );
@@ -171,7 +171,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 	 *
 	 * @since 1.10.0
 	 *
-	 * @param array $attrs import job properties
+	 * @param array<string, mixed> $attrs import job properties
 	 * @return null|\stdClass import job object or null on failure
 	 * @throws Framework\SV_WC_Plugin_Exception
 	 */
@@ -184,6 +184,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			'create_new_users'           => false,
 			'notify_new_users'           => false,
 			'fields_delimiter'           => 'comma',
+			'date_format'                => '',
 			'timezone'                   => wc_timezone_string(),
 			'cli'                        => false,
 			'total'                      => 0,
@@ -196,6 +197,16 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 				'html'                => '',
 			),
 		) );
+
+		if ( empty( $attrs['date_format'] ) || ! is_string( $attrs['date_format'] ) ) {
+			$attrs['date_format'] = '';
+		} elseif ( 'custom' === $attrs['date_format'] ) {
+			if ( isset( $attrs['custom_date_format'] ) && is_string( $attrs['custom_date_format'] ) ) {
+				$attrs['date_format'] = $attrs['custom_date_format'];
+			} else {
+				$attrs['date_format'] = '';
+			}
+		}
 
 		// optional default start date
 		if ( empty( $attrs['default_start_date'] ) || ! $this->is_date( $attrs['default_start_date'] ) ) {
@@ -530,16 +541,17 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			$import_data['membership_plan']       = $membership_plan;
 			$import_data['user_membership']       = $existing_user_membership;
 			$import_data['user_membership_id']    = $existing_user_membership instanceof \WC_Memberships_User_Membership ? $existing_user_membership->get_id() : 0;
-			$import_data['user_id']               = ! empty( $row['user_id'] )           ? $row['user_id']           : null;
-			$import_data['user_name']             = ! empty( $row['user_name'] )         ? $row['user_name']         : null;
-			$import_data['product_id']            = ! empty( $row['product_id'] )        ? $row['product_id']        : null;
-			$import_data['order_id']              = ! empty( $row['order_id'] )          ? $row['order_id']          : null;
-			$import_data['member_email']          = ! empty( $row['member_email'] )      ? $row['member_email']      : null;
-			$import_data['member_first_name']     = ! empty( $row['member_first_name'] ) ? $row['member_first_name'] : null;
-			$import_data['member_last_name']      = ! empty( $row['member_last_name'] )  ? $row['member_last_name']  : null;
-			$import_data['membership_status']     = ! empty( $row['membership_status'] ) ? $row['membership_status'] : null;
-			$import_data['member_since']          = ! empty( $row['member_since'] )      ? $row['member_since']      : null;
-			$import_data['member_role']           = ! empty( $row['member_role'] )       ? $row['member_role']       : null;
+			$import_data['user_id']               = ! empty( $row['user_id'] )            ? $row['user_id']            : null;
+			$import_data['user_name']             = ! empty( $row['user_name'] )          ? $row['user_name']          : null;
+			$import_data['product_id']            = ! empty( $row['product_id'] )         ? $row['product_id']         : null;
+			$import_data['order_id']              = ! empty( $row['order_id'] )           ? $row['order_id']           : null;
+			$import_data['member_email']          = ! empty( $row['member_email'] )       ? $row['member_email']       : null;
+			$import_data['member_first_name']     = ! empty( $row['member_first_name'] )  ? $row['member_first_name']  : null;
+			$import_data['member_last_name']      = ! empty( $row['member_last_name'] )   ? $row['member_last_name']   : null;
+			$import_data['membership_status']     = ! empty( $row['membership_status'] )  ? $row['membership_status']  : null;
+			$import_data['member_since']          = ! empty( $row['member_since'] )       ? $row['member_since']       : null;
+			$import_data['member_role']           = ! empty( $row['member_role'] )        ? $row['member_role']        : null;
+			$import_data['member_last_active']    = ! empty( $row['member_last_active'] ) ? $row['member_last_active'] : null;
 
 			// we don't check for empty here, because an empty string membership expiration means the membership is unlimited
 			if ( isset( $row['membership_expiration'] ) && ( is_string( $row['membership_expiration'] ) || is_numeric( $row['membership_expiration'] ) ) ) {
@@ -592,7 +604,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 	 *
 	 * @param array $row_data CSV row data
 	 * @param \WC_Memberships_Membership_Plan $membership_plan the plan
-	 * @return null|\WC_Memberships_User_Membership|\WC_Memberships_User_Membership[]
+	 * @return null|\WC_Memberships_User_Membership
 	 */
 	private function get_user_membership_from_row( $row_data, $membership_plan ) {
 
@@ -668,7 +680,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 
 		if ( in_array( $action, [ 'create', 'merge' ], false ) ) {
 
-			// make sure an user id exists
+			// make sure a user id exists
 			$user    = $this->import_user_id( $action, $import_data, $job );
 			$user_id = current( $user );
 
@@ -748,6 +760,24 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 								$import_data['member_role'],
 								true
 							);
+						}
+					}
+
+					// update member last active date
+					if ( ! empty( $import_data['member_last_active'] ) ) {
+
+						try {
+
+							$timezone = new DateTimeZone( $this->get_csv_timezone( $job ) );
+
+							if ( empty( $job->date_format ) && ( $last_active_date = DateTime::createFromFormat( $job->date_format, $import_data['member_last_active'], $timezone ) ) ) {
+								$user_membership->set_last_active_date( $last_active_date );
+							} else {
+								$user_membership->set_last_active_date( new DateTime( $import_data['member_last_active'], $timezone ) );
+							}
+
+						} catch ( Exception $exception ) {
+							// do nothing
 						}
 					}
 
@@ -950,7 +980,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 		if ( ! empty( $data['member_since'] ) ) {
 
 			if ( ( 'create' === $action || $job->merge_existing_memberships ) && $this->is_date( $data['member_since'] ) ) {
-				$user_membership->set_start_date( $this->parse_date_mysql( trim( $data['member_since'] ), $timezone ) );
+				$user_membership->set_start_date( $this->parse_date_mysql( trim( $data['member_since'] ), $timezone, $job->date_format ?: null ) );
 			}
 
 		} elseif ( 'create' === $action && $this->is_date( $job->default_start_date ) ) {
@@ -995,7 +1025,7 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 
 			// membership has an expiration date
 			if ( $this->is_date( $expiration_date ) ) {
-				$user_membership->set_end_date( $this->parse_date_mysql( $expiration_date, $timezone ) );
+				$user_membership->set_end_date( $this->parse_date_mysql( $expiration_date, $timezone, $job->date_format ?: null ) );
 			// membership is unlimited
 			} elseif ( '' === $expiration_date || 'unlimited' === $expiration_date ) {
 				$user_membership->set_end_date( '' );
@@ -1124,12 +1154,12 @@ class WC_Memberships_CSV_Import_User_Memberships extends \WC_Memberships_Job_Han
 			}
 		}
 
-		$user_data = [
+		$user_data    = [
 			'user_login' => wp_slash( $username ),
 			'user_email' => wp_slash( $email ),
 			'first_name' => ! empty( $import_data['member_first_name'] ) ? $import_data['member_first_name'] : '',
 			'last_name'  => ! empty( $import_data['member_last_name'] )  ? $import_data['member_last_name']  : '',
-			'role'       => 'customer',
+			'role'       => 'customer', // the member role will be adjusted later if using member roles
 		];
 
 		/**

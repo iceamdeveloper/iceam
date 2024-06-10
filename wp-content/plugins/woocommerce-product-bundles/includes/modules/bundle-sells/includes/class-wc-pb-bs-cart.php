@@ -2,7 +2,7 @@
 /**
  * WC_PB_BS_Cart class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.8.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Cart-related functions and filters.
  *
  * @class    WC_PB_BS_Cart
- * @version  6.12.0
+ * @version  7.0.0
  */
 class WC_PB_BS_Cart {
 
@@ -376,7 +376,7 @@ class WC_PB_BS_Cart {
 			if ( $bundled_item ) {
 
 				if ( 'filters' === WC_PB_Product_Prices::get_bundled_cart_item_discount_method() ) {
-					$cart_item[ 'data' ]->bundled_cart_item = $bundled_item;
+					WC_PB()->product_data->set( $cart_item[ 'data' ], 'bundled_cart_item', $bundled_item );
 				}
 			}
 		}

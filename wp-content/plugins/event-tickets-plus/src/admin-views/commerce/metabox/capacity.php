@@ -19,8 +19,8 @@ $shared_capacity_text = sprintf(
 );
 
 $shared_capacity_title_text = sprintf(
-	__( 'Shared capacity %1$s types share a common pool of %2$s for all attendees', 'event-tickets-plus' ),
-	tribe_get_ticket_label_singular_lowercase( 'metabox_capacity' ),
+	__( 'Shared capacity %1$s share a common pool of %2$s for all attendees', 'event-tickets-plus' ),
+	tribe_get_ticket_label_plural_lowercase( 'metabox_capacity' ),
 	tribe_get_ticket_label_plural_lowercase( 'metabox_capacity' )
 );
 
@@ -35,9 +35,8 @@ $single_ticket_capacity_label_text = sprintf(
 );
 
 $ticket_type_capacity_title_text = sprintf(
-	__( '%1$s capacity will only be used by attendees buying this %2$s type', 'event-tickets-plus' ),
-	tribe_get_ticket_label_singular( 'metabox_capacity' ),
-	tribe_get_ticket_label_singular_lowercase( 'metabox_capacity' )
+	__( 'Capacity is specific to this %1$s', 'event-tickets-plus' ),
+	tribe_get_ticket_label_singular( 'metabox_capacity' )
 );
 
 $capacity_error_text = sprintf(

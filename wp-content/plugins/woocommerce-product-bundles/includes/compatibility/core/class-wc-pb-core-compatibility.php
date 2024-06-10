@@ -2,7 +2,7 @@
 /**
  * WC_PB_Core_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.7.6
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Functions for WC core back-compatibility.
  *
  * @class    WC_PB_Core_Compatibility
- * @version  6.18.3
+ * @version  6.22.3
  */
 class WC_PB_Core_Compatibility {
 
@@ -637,11 +637,40 @@ class WC_PB_Core_Compatibility {
 	 */
 	public static function is_rest_api_request() {
 
+		if ( ! isset( $_SERVER[ 'REQUEST_URI' ] ) || false === strpos( wc_clean( wp_unslash( $_SERVER[ 'REQUEST_URI' ] ) ), rest_get_url_prefix() ) ) {
+			return false;
+		}
+
 		if ( false !== self::get_api_request() ) {
 			return true;
 		}
 
 		return method_exists( WC(), 'is_rest_api_request' ) ? WC()->is_rest_api_request() : defined( 'REST_REQUEST' );
+	}
+
+	/**
+	 *
+	 * Whether this is a Store Editor REST API request.
+	 *
+	 * @since  6.22.3
+	 *
+	 * @return boolean
+	 */
+	public static function is_block_editor_api_request( $route = '' ) {
+
+		if ( ! self::is_rest_api_request() ) {
+			return false;
+		}
+
+		$request = self::get_api_request();
+
+		if ( false !== $request && strpos( $request->get_route(), '/pages/' ) !== false ) {
+			if ( '' === $route || strpos( $request->get_route(), $route ) !== false ) {
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	/**
@@ -699,6 +728,17 @@ class WC_PB_Core_Compatibility {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns true if site is using block theme.
+	 *
+	 * @since  6.19.0
+	 *
+	 * @return boolean
+	 */
+	public static function wc_current_theme_is_fse_theme() {
+		return function_exists( 'wc_current_theme_is_fse_theme' ) ? wc_current_theme_is_fse_theme() : false;
 	}
 
 	/**

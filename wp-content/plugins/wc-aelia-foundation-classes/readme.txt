@@ -5,7 +5,7 @@ Tags: woocommerce, utility, framework, aelia
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Requires at least: 5.0
-Tested up to: 6.2.9
+Tested up to: 6.3.9
 
 Adds a set of classes that can simplify the development of other plugins for WooCommerce.
 
@@ -72,6 +72,42 @@ For more information about installation and management of plugins, please refer 
 This update adds support for the High Performance Order Storage feature. [We recommend to read the release notes and the upgrade guidelines](https://aelia.co/php-8-performance-improvements-compatibility/) before installing this update.
 
 == Changelog ==
+
+= 2.4.15.230905 =
+* Updated supported WooCommerce versions.
+
+= 2.4.14.230824 =
+* Tweak - Updated definition of interface `IScheduled_Task` to specify the additional methods that implementations must include.
+
+= 2.4.13.230809 =
+* Updated supported WordPress versions.
+
+= 2.4.12.230803 =
+* Compatibility - Improved compatibility with PHP 8.2. Removed dynamic properties from main class.
+* Updated supported WooCommerce versions.
+
+= 2.4.11.230721 =
+* Updated bundled Freemius library to version 2.5.10.
+
+= 2.4.10.230701 =
+* Updated bundled library Yahnis Elsts Plugin Update Checker to version 5.x.
+* Updated supported WooCommerce versions.
+
+= 2.4.9.230616 =
+* Feature - Added task scheduling features.
+* Fix -Fixed error that could occur on the orders list page when a refund total was not a valid number.
+
+= 2.4.8.230524 =
+* Updated supported WooCommerce versions.
+
+= 2.4.7.230524 =
+* Updated supported WooCommerce versions.
+
+= 2.4.6.230518 =
+* HPOS Compatibility - Updated base Aelia_Plugin class. Added logic to detect the new Edit Order page.
+
+= 2.4.5.230512 =
+* Fix - Fixed cause of a deprecation notice related to the notification messages handler.
 
 = 2.4.4.230503 =
 * Updated supported WooCommerce versions.

@@ -2,7 +2,7 @@
 /**
  * WC_PB_WC_Services_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.3.4
  */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WooCommerce Services Integration.
+ * Woo Services Integration.
  *
  * @version  6.3.4
  */

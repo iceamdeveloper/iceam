@@ -94,6 +94,7 @@ $classes = [
 	'tribe-tickets__tickets-item--disabled'        => ! empty( $must_login ),
 	'tribe-tickets__tickets-item--price-suffix'    => $has_suffix,
 	'tribe-tickets__tickets-item--shared-capacity' => $this->get( 'data_has_shared_cap' ),
+	'tribe-tickets__tickets-item--on-sale'         => $ticket->on_sale,
 	get_post_class( '', $ticket->ID ),
 ];
 
@@ -106,8 +107,8 @@ $has_shared_cap = isset( $has_shared_cap ) ? $has_shared_cap : $this->get( 'has_
 
 $attributes = [
 	'data-ticket-id'      => (string) $ticket->ID,
-	'data-available'      => $this->get( 'data_available' ),
-	'data-has-shared-cap' => $this->get( 'data_has_shared_cap' ),
+	'data-available'      => (string)$this->get( 'data_available' ),
+	'data-has-shared-cap' => (string)$this->get( 'data_has_shared_cap' ),
 	'data-ticket-price'   => (string) $ticket->price,
 ];
 

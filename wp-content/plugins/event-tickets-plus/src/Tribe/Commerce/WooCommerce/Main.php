@@ -7,7 +7,11 @@ if (
 	return;
 }
 
+use TEC\Tickets\Commerce\Attendee;
+use TEC\Tickets\Commerce\Order;
+use TEC\Tickets\Commerce\Ticket;
 use Tribe__Utils__Array as Arr;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Plus__Tickets {
 
@@ -41,18 +45,27 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	private $cart_location_cache_prefix = 'tribe_woo_cart_hash_';
 
 	/**
-	 * Name of the CPT that holds Orders
+	 * Name of the CPT that holds Orders when HPOS is enabled.
 	 *
 	 * @deprecated 4.7 Use $order_object variable instead
 	 */
 	const ORDER_OBJECT = 'shop_order';
 
 	/**
-	 * Name of the CPT that holds Orders
+	 * Name of the CPT that holds Orders when HPOS is disabled.
 	 *
 	 * @var string
 	 */
 	public $order_object = 'shop_order';
+
+	/**
+	 * Name of the CPT that holds Orders when HPOS is enabled.
+	 *
+	 * @since 5.9.1
+	 *
+	 * @var string
+	 */
+	protected string $order_object_hpos = 'shop_order_placehold';
 
 	/**
 	 * Meta key that relates Attendees and Products.
@@ -268,7 +281,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 */
 	const REQUIRED_WC_VERSION = '3.7';
 
-
 	/**
 	 * Creates the instance of the class
 	 *
@@ -287,6 +299,28 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 */
 	public static function get_instance() {
 		return tribe( 'tickets-plus.commerce.woo' );
+	}
+
+	/**
+	 * Sets the compatibility checks for WooCommerce.
+	 *
+	 * Used by the WooCommerce Commerce Module to configure the compatibility with certain features of WooCommerce.
+	 *
+	 * The hooks here are intentionally using anonymous methods as we do not want them to be removed.
+	 *
+	 * @since 5.9.1 Changed compatability to true.
+	 * @since 5.8.0
+	 *
+	 * @return void
+	 */
+	public static function set_compatibility_checks(): void {
+		add_action( 'before_woocommerce_init', static function() {
+			if ( ! class_exists( '\Automattic\WooCommerce\Utilities\FeaturesUtil', false ) ) {
+				return;
+			}
+
+			\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', EVENT_TICKETS_PLUS_FILE, true );
+		} );
 	}
 
 	/**
@@ -359,7 +393,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			add_action( 'woocommerce_checkout_create_order_line_item', [ $this, 'set_attendee_optout_value' ], 10, 3 );
 		}
 
-		add_action( 'woocommerce_checkout_before_order_review', [ $this, 'add_checkout_links' ] );
+		add_action( 'woocommerce_checkout_order_review', [ $this, 'add_checkout_links' ], 5 );
 
 		// Enqueue styles
 		add_action( 'wp_enqueue_scripts', [ $this, 'enqueue_styles' ], 11 );
@@ -410,6 +444,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		add_action( 'tribe_tickets_ticket_moved', [ $this, 'create_order_for_moved_ticket' ], 10, 6 );
 		add_action( 'woocommerce_before_product_object_save', [ $this, 'sync_wc_product_stock_with_ticket' ], 10, 2 );
 		add_action( 'woocommerce_updated_product_stock', [ $this, 'sync_wc_product_stock_update' ] );
+
+		// Cache invalidation.
+		add_filter( 'tec_cache_listener_save_post_types', [ $this, 'filter_cache_listener_save_post_types' ] );
+
+		add_action( 'woocommerce_after_order_details', [ $this, 'include_your_tickets' ] );
+
+		add_filter( 'tec_tickets_get_field_meta_for_attendee', [ $this, 'get_proper_attendee_order_meta_data' ], 10, 4 );
 	}
 
 	/**
@@ -499,13 +540,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			return;
 		}
 
-		$new_order = wc_create_order( [
-			'parent'        => $order->get_id(),
-			'customer_id'   => $order->get_customer_id(),
-			'customer_note' => $order->get_customer_note(),
-			'created_via'   => 'admin',
-			'status'        => $order->get_status(),
- 		] );
+		$new_order = wc_create_order(
+			[
+				'parent'        => $order->get_id(),
+				'customer_id'   => $order->get_customer_id(),
+				'customer_note' => $order->get_customer_note(),
+				'created_via'   => 'admin',
+				'status'        => $order->get_status(),
+			]
+		);
 
 		$new_order->add_product( $to_product );
 		$new_order->set_address( $order->get_address() );
@@ -514,25 +557,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$new_order->add_meta_data( $this->order_has_tickets, true );
 		$new_order->add_meta_data( Tribe__Tickets_Plus__Meta::META_KEY, $order->get_meta( Tribe__Tickets_Plus__Meta::META_KEY ) );
 		$new_order->add_order_note(
-				sprintf(
-				// Translators: %1$s: The Attendee Name. %2$s: Parent order edit URL. %3$s: Parent order ID.
-					__( '<b> Attendee Moved : </b> <br> <i>%s</i> was moved into this order from <a href="%s">Order %s</a>', 'event-tickets-plus' ),
-					$attendee['holder_name'],
-					$order->get_edit_order_url(),
-					$order->get_id()
-				)
+			sprintf(
+			// Translators: %1$s: The Attendee Name. %2$s: Parent order edit URL. %3$s: Parent order ID.
+				__( '<b> Attendee Moved : </b> <br> <i>%1$s</i> was moved into this order from <a href="%2$s">Order %3$s</a>', 'event-tickets-plus' ),
+				$attendee['holder_name'],
+				$order->get_edit_order_url(),
+				$order->get_id()
+			)
 		);
 
 		$new_order->save();
 
 		$order->add_order_note(
-				sprintf(
-				// Translators: %1$s: The Attendee Name. %2$s: Copied order edit URL. %3$s: Copied order ID.
-					__( '<b> Attendee Moved : </b> <br> <i>%s</i> is moved from this order to <a href="%s">Order %s</a>',  'event-tickets-plus' ),
-					$attendee['holder_name'],
-					$new_order->get_edit_order_url(),
-					$new_order->get_id()
-				)
+			sprintf(
+			// Translators: %1$s: The Attendee Name. %2$s: Copied order edit URL. %3$s: Copied order ID.
+				__( '<b> Attendee Moved : </b> <br> <i>%1$s</i> is moved from this order to <a href="%2$s">Order %3$s</a>', 'event-tickets-plus' ),
+				$attendee['holder_name'],
+				$new_order->get_edit_order_url(),
+				$new_order->get_id()
+			)
 		);
 
 		$order->save();
@@ -927,14 +970,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Checks if a Order has Tickets
 	 *
+	 * @since 5.9.1 Updated retrieval of meta data to use WooCommece ORM.
+	 *
 	 * @param  int $order_id
 	 *
 	 * @return boolean
 	 */
 	public function order_has_tickets( $order_id ) {
 		$has_tickets = false;
+		$order       = wc_get_order( $order_id );
 
-		$done = get_post_meta( $order_id, $this->order_has_tickets, true );
+		if ( ! $order ) {
+			return;
+		}
+
+		$done = $order->get_meta(
+			$this->order_has_tickets,
+			true
+		);
+
 		/**
 		 * get_post_meta returns empty string when the meta doesn't exists
 		 * in support 2 possible values:
@@ -943,14 +997,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 */
 		if ( '' !== $done ) {
 			return (bool) $done;
-		}
-
-		// Get the items purchased in this order
-		$order       = wc_get_order( $order_id );
-
-		// Bail if order is empty.
-		if ( empty( $order ) ) {
-			return;
 		}
 
 		$order_items = $order->get_items();
@@ -1020,9 +1066,15 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * This happens only once, as soon as an order reaches a suitable status (which is set in
 	 * the WooCommerce-specific ticket settings).
 	 *
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
+	 *
 	 * @param int $order_id
 	 */
 	public function generate_tickets( $order_id ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order instanceof WC_Order ) {
+			return;
+		}
 		/**
 		 * Hook before WooCommerce Tickets are generated in Event Tickets Plus.
 		 *
@@ -1032,17 +1084,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 */
 		do_action( 'tribe_tickets_plus_woo_before_generate_tickets', $order_id );
 
-		$order_status = get_post_status( $order_id );
+		$order_status = $order->get_status();
 
-		$generation_statuses = (array) tribe_get_option(
-			'tickets-woo-generation-status',
-			$this->settings->get_default_ticket_generation_statuses()
-		);
+		// Store the statuses cleanup.
+		$clean_up_statuses = static function ( $status ) {
+			return str_replace( 'wc-', '', $status );
+		};
 
-		$dispatch_statuses = (array) tribe_get_option(
-			'tickets-woo-dispatch-status',
-			$this->settings->get_default_ticket_dispatch_statuses()
-		);
+		// Fetch from DB.
+		$dispatch_statuses   = (array) tribe_get_option( 'tickets-woo-dispatch-status', $this->settings()->get_default_ticket_dispatch_statuses() );
+		$generation_statuses = (array) tribe_get_option( 'tickets-woo-generation-status', $this->settings()->get_default_ticket_generation_statuses() );
+
+		// Cleanup execution.
+		$dispatch_statuses   = array_map( $clean_up_statuses, $dispatch_statuses );
+		$generation_statuses = array_map( $clean_up_statuses, $generation_statuses );
 
 		/**
 		 * Filters the list of ticket order stati that should trigger the ticket generation.
@@ -1066,14 +1121,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 		$should_generate    = in_array( $order_status, $generation_statuses, true ) || in_array( 'immediate', $generation_statuses, true );
 		$should_dispatch    = in_array( $order_status, $dispatch_statuses, true ) || in_array( 'immediate', $dispatch_statuses, true );
-		$already_generated  = get_post_meta( $order_id, $this->order_has_tickets, true );
-		$already_dispatched = get_post_meta( $order_id, $this->mail_sent_meta_key, true );
+		$already_generated  = $order->get_meta( $this->order_has_tickets, true );
+		$already_dispatched = $order->get_meta( $this->mail_sent_meta_key, true );
 
 		$has_tickets       = false;
 		$created_attendees = false;
-
-		// Get the items purchased in this order
-		$order       = wc_get_order( $order_id );
 
 		// Bail if order is empty.
 		if ( empty( $order ) ) {
@@ -1208,7 +1260,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				 */
 				do_action( 'event_tickets_woocommerce_tickets_generated_for_product', $product_id, $order_id, $quantity, $post_id );
 
-				update_post_meta( $order_id, $this->order_has_tickets, '1' );
+				$order->update_meta_data( $this->order_has_tickets, '1' );
+				$order->save_meta_data();
 			}
 		}
 
@@ -1227,6 +1280,17 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			 */
 			do_action( 'event_tickets_woocommerce_tickets_generated', $order_id );
 		}
+
+		/**
+		 * Fires after all required Attendees for a WooCommerce order have been created.
+		 *
+		 * Differently from the other actions, this one is fired even if no Attendees were created.
+		 *
+		 * @since 5.7.4
+		 *
+		 * @param int $order_id ID of the WooCommerce order
+		 */
+		do_action( 'tec_tickets_plus_woo_generated_tickets', $order_id );
 	}
 
 	/**
@@ -1339,6 +1403,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				'post_excerpt' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => tribe_get_request_var( 'menu_order', -1 ),
+				'meta_input' => [
+						'_type' => $raw_data['ticket_type'] ?? 'default',
+				]
 			];
 
 			$ticket->ID = wp_insert_post( $args );
@@ -1375,6 +1442,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				'post_excerpt' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => $ticket->menu_order,
+				'meta_input' => [
+						'_type' => $raw_data['ticket_type'] ?? 'default',
+				]
 			];
 
 			$ticket->ID = wp_update_post( $args );
@@ -1398,8 +1468,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				$sku = $raw_data['ticket_sku'];
 			} else {
 				$post_author = get_post_field( 'post_author', $ticket->ID );
-				$str         = $raw_data['ticket_name'];
-				$str         = tribe_strtoupper( $str );
+				$ticket_name = $raw_data['ticket_name'] ?? $ticket->name;
+				$str         = tribe_strtoupper( $ticket_name );
 				$sku         = "{$ticket->ID}-{$post_author}-" . str_replace( ' ', '-', $str );
 			}
 
@@ -1448,7 +1518,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$data = wp_parse_args( $data, $defaults );
 
 		// Sanitize Mode
-		$data['mode'] = filter_var( $data['mode'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH );
+		$data['mode'] = tec_sanitize_string( $data['mode'] );
 
 		// Fetch the Global stock Instance for this Event
 		/**
@@ -1459,7 +1529,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		// Only need to do this if we haven't already set one - they shouldn't be able to edit it from here otherwise
 		if ( ! $event_stock->is_enabled() ) {
 			if ( isset( $data['event_capacity'] ) ) {
-				$data['event_capacity'] = trim( filter_var( $data['event_capacity'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH ) );
+				$data['event_capacity'] = trim( tec_sanitize_string( $data['event_capacity'] ) );
 
 				// If empty we need to modify to -1
 				if ( '' === $data['event_capacity'] ) {
@@ -1655,34 +1725,34 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	}
 
 	/**
-	 * Deletes a ticket
+	 * Deletes a ticket.
 	 *
-	 * @param $post_id
-	 * @param $ticket_id
+	 * @since 5.7.4 Fixed an error that was occurring when $tickets was null.
+	 *
+	 * @param int $post_id
+	 * @param int $ticket_id
 	 *
 	 * @return bool
 	 */
 	public function delete_ticket( $post_id, $ticket_id ) {
 
 		// Ensure we know the event and product IDs (the event ID may not have been passed in)
-		if ( empty( $post_id ) ) {
-			$post_id = (int) get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true );
-		}
-
+		$post_id = (int) ( $post_id ?: get_post_meta( $ticket_id, self::ATTENDEE_EVENT_KEY, true ) );
 		$product_id = (int) get_post_meta( $ticket_id, $this->attendee_product_key, true );
 
 		/**
 		 * Use this Filter to choose if you want to trash tickets instead
-		 * of deleting them directly
+		 * of deleting them directly.
 		 *
-		 * @param bool   false
-		 * @param int $ticket_id
+		 * @param bool   $trash_ticket
+		 * @param int    $ticket_id
 		 */
-		if ( apply_filters( 'tribe_tickets_plus_trash_ticket', true, $ticket_id ) ) {
-			// Move it to the trash
+		$trash_ticket = apply_filters( 'tribe_tickets_plus_trash_ticket', true, $ticket_id );
+
+		// Trash or delete the post depending on $trash_ticket.
+		if ( $trash_ticket ) {
 			$delete = wp_trash_post( $ticket_id );
 		} else {
-			// Try to kill the actual ticket/attendee post
 			$delete = wp_delete_post( $ticket_id, true );
 		}
 
@@ -1690,23 +1760,21 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			return false;
 		}
 
-		/** @var Tribe__Tickets__Tickets_Handler $tickets_handler */
-		$tickets_handler = tribe( 'tickets.handler' );
-
+		// Increment deleted attendees count.
 		Tribe__Tickets__Attendance::instance( $post_id )->increment_deleted_attendees_count();
 
+		// Get the ticket and update product inventory.
 		$ticket = $this->get_ticket( $post_id, $product_id );
-
-		if ( $ticket->capacity() > $ticket->stock() ) {
-			// Re-stock the product inventory (on the basis that a "seat" has just been freed) only if the stock is lower than capacity.
+		if ( $ticket && $ticket->capacity() > $ticket->stock() ) {
 			$this->increment_product_inventory( $product_id );
 		}
 
 		// Run anything we might need on parent method.
 		parent::delete_ticket( $post_id, $ticket_id );
 
+		// Delete event capacity if there are no shared tickets.
+		$tickets_handler = tribe( 'tickets.handler' );
 		$has_shared_tickets = 0 !== count( $tickets_handler->get_event_shared_tickets( $post_id ) );
-
 		if ( ! $has_shared_tickets ) {
 			tribe_tickets_delete_capacity( $post_id );
 		}
@@ -1908,6 +1976,8 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Gets an individual ticket
 	 *
+	 * @since 5.7.4 Fixed the `price` and `regular_price` properties to return the correct values.
+	 *
 	 * @param $post_id
 	 * @param $ticket_id
 	 *
@@ -1927,6 +1997,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			return null;
 		}
 
+		$cached = wp_cache_get( (int) $ticket_id, 'tec_tickets' );
+		if ( $cached && is_array( $cached ) ) {
+			return new Tribe__Tickets__Ticket_Object( $cached );
+		}
+
 		$return       = new Tribe__Tickets__Ticket_Object();
 		$product_post = get_post( $this->get_product_id( $product ) );
 		$qty_sold     = get_post_meta( $ticket_id, 'total_sales', true );
@@ -1939,9 +2014,6 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$return->price         = $this->get_formatted_price( $this->get_price_value_for( $product ) );
 		$return->regular_price = $this->get_formatted_price( $product->get_regular_price( 'edit' ) );
 		$return->on_sale       = (bool) $product->is_on_sale( 'edit' );
-		if ( $return->on_sale ) {
-			$return->price = $this->get_formatted_price( $product->get_sale_price( 'edit' ) );
-		}
 		$return->capacity         = tribe_tickets_get_capacity( $ticket_id );
 		$return->provider_class   = get_class( $this );
 		$return->admin_link       = admin_url( sprintf( get_post_type_object( $product_post->post_type )->_edit_link . '&action=edit', $ticket_id ) );
@@ -2013,6 +2085,13 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 * @param int    $ticket_id
 		 */
 		$ticket = apply_filters( 'tribe_tickets_plus_woo_get_ticket', $return, $post_id, $ticket_id );
+
+		if ( $ticket instanceof Tribe__Tickets__Ticket_Object ) {
+			// Before caching the ticket, resolve the `qty_pending` callback to a value.
+			$ticket->qty_pending( $ticket->qty_pending() );
+			wp_cache_set( (int) $ticket->ID, $ticket->to_array(), 'tec_tickets' );
+		}
+
 		return $ticket;
 	}
 
@@ -2151,6 +2230,9 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Get list of order items for ticket ID by order status.
 	 *
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
+	 * @since 5.9.3 Refactored WooCommerce ORM to use direct query.
+	 *
 	 * @param int    $ticket_id Ticket ID.
 	 * @param string $status    Order status.
 	 *
@@ -2159,37 +2241,50 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	protected function get_orders_by_status( $ticket_id, $status = 'incomplete' ) {
 		global $wpdb;
 
-		$order_state_sql   = '';
-		$incomplete_states = $this->incomplete_order_states();
+		$status_list = $this->incomplete_order_states();
 
-		if ( ! empty( $incomplete_states ) ) {
-			if ( 'incomplete' === $status ) {
-				$order_state_sql = "AND `posts`.`post_status` IN ( $incomplete_states )";
-			} else {
-				$order_state_sql = "AND `posts`.`post_status` NOT IN ( $incomplete_states )";
-			}
+		if ( 'incomplete' !== $status ) {
+			// If the status is not incomplete generate a list of all other status.
+			$all_statuses        = array_keys( wc_get_order_statuses() );
+			$incomplete_statuses = explode( ',', str_replace( "'", '', $status_list ) );
+			$remaining_statuses  = array_diff( $all_statuses, $incomplete_statuses );
+			$status_list         = array_map(
+				function ( $v ) {
+					return "'" . esc_sql( $v ) . "'";
+				},
+				$remaining_statuses
+			);
+			$status_list         = implode( ',', $status_list );
 		}
 
-		$query = "
-			SELECT
-			    `wc_itemmeta`.`order_item_id`,
-			    `wc_items`.`order_id`
-			FROM
-			    `{$wpdb->prefix}woocommerce_order_itemmeta` AS `wc_itemmeta`
-			INNER JOIN
-				`{$wpdb->prefix}woocommerce_order_items` AS `wc_items`
-					ON
-						`wc_itemmeta`.`order_item_id` = `wc_items`.`order_item_id`
-			INNER JOIN
-			    `{$wpdb->prefix}posts` AS `posts`
-					ON
-						`wc_items`.`order_id` = `posts`.`ID`
-			WHERE
-				`wc_itemmeta`.`meta_key` = '_product_id'
-				AND `wc_itemmeta`.`meta_value` = %d
-		" . $order_state_sql;
+		$ticket_id = intval( $ticket_id ); // Ensure $ticket_id is an integer.
 
-		return $wpdb->get_results( $wpdb->prepare( $query, $ticket_id ) );
+		if ( ! self::is_hpos_enabled() ) {
+			$query = $wpdb->prepare(
+				"SELECT woim.order_item_id,p.id as order_id
+					FROM {$wpdb->prefix}woocommerce_order_itemmeta AS woim
+					INNER JOIN {$wpdb->prefix}woocommerce_order_items AS woi ON woim.order_item_id = woi.order_item_id
+					INNER JOIN {$wpdb->prefix}posts AS p ON p.ID = woi.order_id
+					WHERE woim.meta_key IN ('_product_id', '_variation_id')
+					AND p.post_status IN ({$status_list})
+					and woim.meta_value = %d",
+				$ticket_id
+			);
+		} else {
+			// For HPOS.
+			$query = $wpdb->prepare(
+				"SELECT o.id as order_id, oi.order_item_id
+					FROM {$wpdb->prefix}wc_order_product_lookup opl
+					INNER JOIN {$wpdb->prefix}wc_orders o ON opl.order_id = o.id
+					inner join {$wpdb->prefix}woocommerce_order_items oi on oi.order_id = o.id
+					WHERE o.type = 'shop_order'
+					AND o.status IN ({$status_list})
+					AND opl.product_id = %d",
+				$ticket_id
+			);
+		}
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_results( $query );
 	}
 
 	/**
@@ -2216,46 +2311,36 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Get list of Order Meta for specific Order IDs.
 	 *
 	 * @since 4.11.0.2
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
 	 *
 	 * @param array $order_ids List of Order IDs.
 	 *
 	 * @return array List of Order Meta.
 	 */
 	protected function get_orders_meta( $order_ids ) {
-		global $wpdb;
-
 		if ( empty( $order_ids ) ) {
 			return [];
 		}
 
-		$post_id_in = implode( ', ', array_fill( 0, count( $order_ids ), '%d' ) );
-
-		$query = "
-			SELECT
-				`posts`.`ID` AS `order_id`,
-				`meta_recorded_sales`.`meta_value` AS `_recorded_sales`,
-				`meta_order_stock_reduced`.`meta_value` AS `_order_stock_reduced`
-			FROM
-				`{$wpdb->posts}` AS `posts`
-			LEFT JOIN
-				`{$wpdb->postmeta}` AS `meta_recorded_sales`
-				ON `meta_recorded_sales`.`post_id` = `posts`.`ID`
-					AND `meta_recorded_sales`.`meta_key` = '_recorded_sales'
-			LEFT JOIN
-				`{$wpdb->postmeta}` AS `meta_order_stock_reduced`
-				ON `meta_order_stock_reduced`.`post_id` = `posts`.`ID`
-					AND `meta_order_stock_reduced`.`meta_key` = '_order_stock_reduced'
-			WHERE
-				`posts`.`ID` IN ( {$post_id_in} )
-		";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $order_ids ) );
-
 		$order_meta = [];
 
-		// Build result array by Order ID.
-		foreach ( $results as $result ) {
-			$order_meta[ (int) $result->order_id ] = $result;
+		foreach ( $order_ids as $order_id ) {
+			$order = wc_get_order( $order_id );
+
+			if ( $order ) {
+				$data                       = new stdClass();
+				$data->order_id             = $order->get_id();
+				$data->_recorded_sales      = $order->get_meta(
+					'_recorded_sales',
+					true
+				);
+				$data->_order_stock_reduced = $order->get_meta(
+					'_order_stock_reduced',
+					true
+				);
+
+				$order_meta[ (int) $order->get_id() ] = $data;
+			}
 		}
 
 		return $order_meta;
@@ -2265,38 +2350,31 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Get list of Order Item Meta for specific Order Item IDs.
 	 *
 	 * @since 4.11.0.2
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
 	 *
 	 * @param array $order_item_ids List of Order Item IDs.
 	 *
 	 * @return array List of Order Item Meta.
 	 */
 	protected function get_order_items_meta( $order_item_ids ) {
-		global $wpdb;
-
 		if ( empty( $order_item_ids ) ) {
 			return [];
 		}
 
-		$order_item_ids_in = implode( ', ', array_fill( 0, count( $order_item_ids ), '%d' ) );
-
-		$query = "
-			SELECT
-				`meta_qty`.`order_item_id`,
-				`meta_qty`.`meta_value` AS `_qty`
-			FROM
-			    `{$wpdb->prefix}woocommerce_order_itemmeta` AS `meta_qty`
-			WHERE
-				`meta_qty`.`meta_key` = '_qty'
-				AND `meta_qty`.`order_item_id` IN ( {$order_item_ids_in} )
-		";
-
-		$results = $wpdb->get_results( $wpdb->prepare( $query, $order_item_ids ) );
-
 		$order_item_meta = [];
 
-		// Build result array by Order Item ID.
-		foreach ( $results as $result ) {
-			$order_item_meta[ (int) $result->order_item_id ] = $result;
+		foreach ( $order_item_ids as $item_id ) {
+			$item = WC_Order_Factory::get_order_item( $item_id );
+
+			if ( ! $item || ! ( $item instanceof WC_Order_Item_Product ) ) {
+				continue;
+			}
+
+			$data                = new stdClass();
+			$data->order_item_id = $item->get_id();
+			$data->_qty          = $item->get_quantity();
+
+			$order_item_meta[ (int) $item->get_id() ] = $data;
 		}
 
 		return $order_item_meta;
@@ -2357,6 +2435,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 
 				break;
 			case $this->order_object:
+			case $this->order_object_hpos:
 				$attendees = $this->get_attendees_by_order_id( $post_id );
 
 				break;
@@ -2423,7 +2502,11 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 			}
 		}
 
-		$order = wc_get_order( $order_id );
+		$order        = wc_get_order( $order_id );
+		$order_id_url = '';
+		if ( $order && $order instanceof WC_Order ) {
+			$order_id_url = $order->get_edit_order_url();
+		}
 
 		// Add the Attendee Data to the Order data.
 		$attendee_data = array_merge(
@@ -2438,6 +2521,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 				'optout'        => $optout,
 				'user_id'       => $user_id,
 				'ticket_sent'   => $ticket_sent,
+				'order_id_url'  => $order_id_url,
 
 				// Fields for Email Tickets.
 				'event_id'      => get_post_meta( $attendee->ID, $this->attendee_event_key, true ),
@@ -2574,7 +2658,7 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		$order_id           = $order->get_id();
 		$name               = $order->get_billing_first_name() . ' ' . $order->get_billing_last_name();
 		$email              = $order->get_billing_email();
-		$status             = get_post_status( $order_id );
+		$status             = $order->get_status();
 		$order_status       = 'wc-' === substr( $status, 0, 3 ) ? substr( $status, 3 ) : $status;
 		$order_status_label = wc_get_order_status_name( $order_status );
 		$order_warning      = false;
@@ -2598,8 +2682,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		}
 
 		$display_order_id = $order->get_order_number();
-		$order_link_src   = esc_url( get_edit_post_link( $order_id, true ) );
+
+		$order_link_src = esc_url( get_edit_post_link( $order_id, true ) ? get_edit_post_link( $order_id, true ) : '' );
 		$order_link       = sprintf( '<a class="row-title" href="%s">%s</a>', $order_link_src, esc_html( $display_order_id ) );
+
 
 		$data = [
 			'order_id'           => $order_id,
@@ -2650,12 +2736,32 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Marks an attendee as checked in for an event
 	 *
+	 * @since 3.1.2
+	 * @since 5.9.2 Add the `tec_tickets_attendee_checkin` filter to override the checkin process. Add the `$event_id`
+	 *        parameter to the method signature.
+	 *
 	 * @param int  $attendee_id The ID of the attendee that's being checked in.
 	 * @param bool $qr          True if from QR checkin process.
+	 * @param int|null $event_id The ID of the ticket-able post the Attendee is being checked into.
 	 *
-	 * @return bool
+	 * @return bool Whether the Attendee was checked in or not.
 	 */
-	public function checkin( $attendee_id, $qr = false ) {
+	public function checkin( $attendee_id, $qr = false, $event_id = null ) {
+		/**
+		 * Allows filtering the Attendee check-in action before the default logic does it.
+		 * Returning a non-null value from this filter will prevent the default logic from running.
+		 *
+		 * @since 5.9.2
+		 *
+		 * @param int      $attendee_id The post ID of the Attendee being checked-in.
+		 * @param int|null $event_id    The ID of the ticket-able post the Attendee is being checked into.
+		 * @param bool     $qr          Whether the check-in is being performed via QR code.
+		 */
+		$checkin = apply_filters( 'tec_tickets_attendee_checkin', null, (int) $attendee_id, (int) $event_id, (bool) $qr );
+		if ( $checkin !== null ) {
+			return (bool) $checkin;
+		}
+
 		update_post_meta( $attendee_id, $this->checkin_key, 1 );
 
 		if ( func_num_args() > 1 && $qr = func_get_arg( 1 ) ) {
@@ -2848,11 +2954,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Links to sales report for all tickets for this event.
 	 *
-	 * @param $post_id
+	 * @since 5.9.0 Added $url_only parameter.
+	 *
+	 * @param int  $post_id The post id.
+	 * @param bool $url_only Whether to return the URL only.
 	 *
 	 * @return string
 	 */
-	public function get_event_reports_link( $post_id ) {
+	public function get_event_reports_link( $post_id, $url_only = false ) {
 		$ticket_ids = (array) $this->get_tickets_ids( $post_id );
 		if ( empty( $ticket_ids ) ) {
 			return '';
@@ -2876,6 +2985,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 * @return string
 		 */
 		$report_url = apply_filters( 'tribe_events_tickets_report_url', $report_url, $post_id, $ticket_ids );
+
+		if ( $url_only ) {
+			return $report_url;
+		}
 
 		return '<small> <a href="' . esc_url( $report_url ) . '">' . esc_html__( 'Event sales report', 'event-tickets-plus' ) . '</a> </small>';
 	}
@@ -3039,18 +3152,20 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * Adds an action to resend the tickets to the customer
 	 * in the WooCommerce actions dropdown, in the order edit screen.
 	 *
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
+	 *
 	 * @param $emails
 	 *
 	 * @return array
 	 */
 	public function add_resend_tickets_action( $emails ) {
-		$order = get_the_ID();
+		$order = wc_get_order( get_the_ID() );
 
 		if ( empty( $order ) ) {
 			return $emails;
 		}
 
-		$has_tickets = get_post_meta( $order, $this->order_has_tickets, true );
+		$has_tickets = $order->get_meta( $this->order_has_tickets, true );
 
 		if ( ! $has_tickets ) {
 			return $emails;
@@ -3074,14 +3189,25 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 *
 	 * @param WC_Order|int $order_ref
 	 **/
-	public function send_tickets_email( $order_ref ) {
-		$order_id = $order_ref instanceof WC_Order
-			? $order_ref->get_id()
-			: $order_ref;
+	public function send_tickets_email( $order ) {
+		// Ensure $order_ref is a WC_Order object.
+		if ( ! $order instanceof WC_Order ) {
+			$order = wc_get_order( $order );
+		}
 
-		update_post_meta( $order_id, $this->mail_sent_meta_key, '1' );
+		// Once we normalize we need it to be a WC_Order.
+		if ( ! $order instanceof WC_Order ) {
+			return;
+		}
 
-		// Ensure WC_Emails exists else our attempt to mail out tickets will fail
+		$order_id = $order->get_id();
+		$order->update_meta_data(
+			$this->mail_sent_meta_key,
+			'1'
+		);
+		$order->save_meta_data();
+
+		// Ensure WC_Emails exists else our attempt to mail out tickets will fail.
 		WC_Emails::instance();
 
 		/**
@@ -3093,7 +3219,10 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 *
 		 * @param int $order_id The order post ID for the ticket.
 		 */
-		do_action( 'wootickets-send-tickets-email', $order_id );
+		do_action(
+			'wootickets-send-tickets-email',
+			$order_id
+		);
 	}
 
 	/**
@@ -3257,12 +3386,14 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	/**
 	 * Returns the ticket price taking the context of the request into account.
 	 *
+	 * @since 5.7.4 Make use of `wc_get_price_to_display` to fetch correct price.
+	 *
 	 * @param WC_Product $product
 	 *
 	 * @return string
 	 */
 	protected function get_price_value_for( $product ) {
-		return $this->should_show_regular_price() ? $product->get_regular_price() : $product->get_price();
+		return $this->should_show_regular_price() ? $product->get_regular_price() : wc_get_price_to_display( $product );
 	}
 
 	/**
@@ -3385,11 +3516,18 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * This helper allows us to support both WooCommerce 2.x and 3.x, which allow access to
 	 * the product ID in slightly different ways.
 	 *
+	 * @since 5.9.1 Added check to ensure $product is an object.
+	 *
 	 * @param WC_Data|WC_Product $product
 	 *
 	 * @return int
 	 */
 	public function get_product_id( $product ) {
+		// Ensure $product is an object.
+		if ( ! is_object( $product ) ) {
+			return 0;
+		}
+
 		return method_exists( $product, 'get_id' )
 			? (int) $product->get_id()
 			: (int) $product->id;
@@ -3401,12 +3539,19 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 	 * This helper allows us to support both WooCommerce 2.x and 3.x, which each have different
 	 * ways of providing access to that information.
 	 *
+	 * @since 5.9.1 Added check to ensure $item is an object.
+	 *
 	 * @param WC_Order      $order
 	 * @param WC_Order_Item $item
 	 *
 	 * @return WC_Product
 	 */
 	public function get_product_from_item( $order, $item ) {
+		// Ensure $item is an object.
+		if ( ! is_object( $item ) ) {
+			return null;
+		}
+
 		return method_exists( $item, 'get_product' )
 			? $item->get_product()
 			: $order->get_product_from_item( $item );
@@ -4042,5 +4187,131 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Main extends Tribe__Tickets_Pl
 		 * @param array|null   $attendee              The attendee information if available, otherwise null.
 		 */
 		return (bool) apply_filters( 'tribe_tickets_manual_attendee_allow_email_resend', $allow_email_resend, $ticket, $attendee );
+	}
+
+	/**
+	 * Filters the list of post types that should trigger a cache invalidation on `save_post` to add
+	 * all the ones modeling WooCommerce Tickets, Attendees and Orders.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param string[] $post_types The list of post types that should trigger a cache invalidation on `save_post`.
+	 *
+	 * @return string[] The filtered list of post types that should trigger a cache invalidation on `save_post`.
+	 */
+	public function filter_cache_listener_save_post_types( array $post_types = [] ): array {
+		$post_types[] = $this->ticket_object;
+		$post_types[] = $this->attendee_object;
+		$post_types[] = $this->get_active_order_post_type_name();
+
+		return $post_types;
+	}
+
+	/**
+	 * Includes the "Your Tickets" template for the checkout page.
+	 *
+	 * This method initializes the Tribe__Template instance, fetches the attendees by the order ID,
+	 * and then calls the appropriate template to render the Your Tickets section.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param \WC_Order $order The WooCommerce order object.
+	 */
+	public function include_your_tickets( $order ): void {
+		// Bail if the order is not a valid WC_Order.
+		if ( ! $order instanceof \WC_Order ) {
+			return;
+		}
+
+		// Bail if the order ID is not valid.
+		$order_id = $order->get_id();
+		if ( empty( $order_id ) ) {
+			return;
+		}
+
+		$attendees = $this->get_attendees_by_id( $order->get_id() );
+
+		// Bail if there are no attendees.
+		if ( empty( $attendees ) ) {
+			return;
+		}
+
+		// Sort the Attendees by ID.
+		$attendee_ids = array_column( $attendees, 'attendee_id' );
+		array_multisort( $attendee_ids, SORT_ASC, $attendees );
+
+		$template_args = [
+			'provider'      => $this,
+			'provider_id'   => $this->class_name,
+			'order'         => $order,
+			'order_id'      => $order->get_id(),
+			'is_tec_active' => tec_tickets_tec_events_is_active(),
+			'attendees'     => $attendees,
+		];
+
+		tribe( 'tickets.editor.template' )->template( 'components/attendees-list/attendees', $template_args, true );
+	}
+
+	/**
+	 * Get the active order post_type name.
+	 *
+	 * @since 5.9.1
+	 *
+	 * @return string
+	 */
+	public function get_active_order_post_type_name() {
+		if ( ! class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil', false ) ) {
+			return $this->order_object;
+		}
+
+		// Without table usage return the old Object Order.
+		if ( ! OrderUtil::custom_orders_table_usage_is_enabled() ) {
+			return $this->order_object;
+		}
+
+		// Check if WooCommerce HPOS is enabled, if yes return the HPOS post_type.
+		return $this->order_object_hpos;
+	}
+
+	/**
+	 * Get the attendee order meta data using proper WooCommerce methods.
+	 *
+	 * @param array|bool|string $meta The original meta data.
+	 * @param int               $order_id The order ID.
+	 * @param int               $ticket_id The ticket ID.
+	 * @param string            $meta_key The meta key.
+	 *
+	 * @return array|bool|string The modified or original meta data.
+	 */
+	public function get_proper_attendee_order_meta_data(
+		$meta,
+		int $order_id,
+		int $ticket_id,
+		string $meta_key
+	) {
+		if ( ! empty( $meta ) ) {
+			return $meta;
+		}
+
+		$order = wc_get_order( $order_id );
+		if ( ! $order ) {
+			return $meta;
+		}
+
+		return $order->get_meta( $meta_key );
+	}
+
+	/**
+	 * Check to see if WooCommerce HPOS is enabled.
+	 *
+	 * @since 5.9.3
+	 *
+	 * @return bool
+	 */
+	public function is_hpos_enabled(): bool {
+		if ( ! class_exists( '\Automattic\WooCommerce\Utilities\OrderUtil', false ) ) {
+			return false;
+		}
+		return OrderUtil::custom_orders_table_usage_is_enabled();
 	}
 }

@@ -15,7 +15,7 @@ include 'bps-widget.php';
 include 'bps-xprofile.php';
 
 
-add_action ('plugins_loaded', 'bps_translate');
+add_action ('init', 'bps_translate');
 function bps_translate ()
 {
 	load_plugin_textdomain ('bp-profile-search');

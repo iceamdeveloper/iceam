@@ -2,7 +2,7 @@
 /**
  * Product Bundles DB update functions
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.0.0
  */
 

@@ -8,6 +8,8 @@
 
 namespace Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
 
+use Automattic\WooCommerce\Internal\DataStores\Orders\DataSynchronizer;
+use Automattic\WooCommerce\Utilities\OrderUtil;
 use Sensei_WC_Paid_Courses\Course_Enrolment_Providers;
 use Sensei_WC_Paid_Courses\Courses;
 
@@ -16,8 +18,7 @@ use Sensei_WC_Paid_Courses\Courses;
  *
  * @since 2.0.0
  */
-class WooCommerce_Simple
-	implements \Sensei_Course_Enrolment_Provider_Interface, \Sensei_Course_Enrolment_Provider_Debug_Interface {
+class WooCommerce_Simple implements \Sensei_Course_Enrolment_Provider_Interface, \Sensei_Course_Enrolment_Provider_Debug_Interface {
 	/**
 	 * Singleton instance.
 	 *
@@ -55,16 +56,30 @@ class WooCommerce_Simple
 	 */
 	public function init() {
 		// Setting the priority to `5` so that this more lightweight check runs before subscriptions and memberships.
-		\add_filter( 'sensei_is_legacy_enrolled', [ $this, 'maybe_allow_legacy_manual_enrolment' ], 5, 3 );
+		add_filter( 'sensei_is_legacy_enrolled', [ $this, 'maybe_allow_legacy_manual_enrolment' ], 5, 3 );
 
 		// Order lifecycle hooks to listen to.
-		\add_action( 'woocommerce_order_status_changed', [ $this, 'maybe_trigger_order_change' ], 10, 4 );
-		\add_action( 'trashed_post', [ $this, 'trash_post' ] );
-		\add_action( 'untrashed_post', [ $this, 'untrash_post' ] );
+		add_action( 'woocommerce_order_status_changed', [ $this, 'maybe_trigger_order_change' ], 10, 4 );
 
-		// Adds support for deleting directly or for disabled `EMPTY_TRASH_DAYS`.
-		\add_action( 'before_delete_post', [ $this, 'before_delete_order' ], 1 );
-		\add_action( 'deleted_post', [ $this, 'after_delete_order' ] );
+		// When using custom order tables with no post sync, we need to use the order hooks.
+		// Otherwise, we use the post hooks.
+		if (
+			OrderUtil::custom_orders_table_usage_is_enabled()
+			&& ! wc_get_container()->get( DataSynchronizer::class )->data_sync_is_enabled()
+		) {
+			add_action( 'woocommerce_trash_order', [ $this, 'trash_post' ] );
+			add_action( 'woocommerce_untrash_order', [ $this, 'untrash_post' ] ); // Hook only available for custom order tables.
+
+			add_action( 'woocommerce_before_delete_order', [ $this, 'before_delete_order' ], 1 );
+			add_action( 'woocommerce_delete_order', [ $this, 'after_delete_order' ] );
+		} else {
+			add_action( 'trashed_post', [ $this, 'trash_post' ] );
+			add_action( 'untrashed_post', [ $this, 'untrash_post' ] );
+
+			// Adds support for deleting directly or for disabled `EMPTY_TRASH_DAYS`.
+			add_action( 'before_delete_post', [ $this, 'before_delete_order' ], 1 );
+			add_action( 'deleted_post', [ $this, 'after_delete_order' ] );
+		}
 	}
 
 	/**
@@ -109,7 +124,7 @@ class WooCommerce_Simple
 	public function is_enrolled( $user_id, $course_id ) {
 		$products    = $this->get_course_simple_products( $course_id );
 		$product_ids = array_map(
-			function( \WC_Product $product ) {
+			function ( \WC_Product $product ) {
 				return $product->get_id();
 			},
 			$products
@@ -147,7 +162,7 @@ class WooCommerce_Simple
 	 * @param bool $is_trashed If order trashed.
 	 */
 	private function maybe_trigger_order_trash( $order_id, $is_trashed ) {
-		if ( ! in_array( \get_post_type( $order_id ), \wc_get_order_types( 'view-orders' ), true ) ) {
+		if ( ! OrderUtil::is_order( $order_id, wc_get_order_types( 'view-orders' ) ) ) {
 			return;
 		}
 
@@ -235,15 +250,15 @@ class WooCommerce_Simple
 	 */
 	public function before_delete_order( $order_id ) {
 		if (
-			! in_array( \get_post_type( $order_id ), \wc_get_order_types( 'view-orders' ), true )
-			|| 'trash' === \get_post_status( $order_id )
+			! OrderUtil::is_order( $order_id, wc_get_order_types( 'view-orders' ) )
 		) {
-			// Bail if this isn't an order being deleted or if the post status was trash before deleting.
+			// Bail if this isn't an order being deleted...
 			return;
 		}
 
-		$order = \wc_get_order( $order_id );
-		if ( ! $order ) {
+		$order = wc_get_order( $order_id );
+		if ( ! $order || 'trash' === $order->get_status() ) {
+			// ...or if the post status was trash before deleting.
 			return;
 		}
 
@@ -415,12 +430,12 @@ class WooCommerce_Simple
 	/**
 	 * Check if the order has a product.
 	 *
-	 * @param \WC_Order $order       Order object.
-	 * @param int[]     $product_ids Product post IDs.
+	 * @param \WC_Order|WC_Order_Refund $order       Order / refunded order object.
+	 * @param int[]                     $product_ids Product post IDs.
 	 *
 	 * @return bool
 	 */
-	private function order_has_product( \WC_Order $order, $product_ids ) {
+	private function order_has_product( $order, $product_ids ) {
 		foreach ( $order->get_items() as $item ) {
 			if (
 				in_array( $item->get_product_id(), $product_ids, true )
@@ -474,7 +489,7 @@ class WooCommerce_Simple
 		$products = $this->get_course_simple_products( $course_id );
 
 		$product_ids = array_map(
-			function( \WC_Product $product ) {
+			function ( \WC_Product $product ) {
 				return $product->get_id();
 			},
 			$products

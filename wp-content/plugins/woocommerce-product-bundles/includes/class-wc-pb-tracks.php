@@ -2,7 +2,7 @@
 /**
  * WC_PB_Tracks class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.18.6
  */
 

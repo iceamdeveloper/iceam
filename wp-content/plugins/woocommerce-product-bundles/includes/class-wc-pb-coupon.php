@@ -2,7 +2,7 @@
 /**
  * WC_PB_Coupon class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.8.0
  */
 

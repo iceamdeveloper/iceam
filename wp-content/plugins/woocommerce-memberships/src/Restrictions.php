@@ -17,14 +17,14 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships;
 
 use SkyVerge\WooCommerce\Memberships\Helpers\Strings_Helper;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -1293,7 +1293,7 @@ class Restrictions {
 	 * @param array $args optional arguments used in filters
 	 * @return int[] array of product IDs
 	 */
-	public function get_products_that_grant_discount( $restricted_shop_content, $args = array() ) {
+	public function get_products_that_grant_discount( $restricted_shop_content, $args = [] ) {
 
 		$discount_access_products = [];
 
@@ -1303,7 +1303,7 @@ class Restrictions {
 			$object = $restricted_shop_content; // post or term: if it's an integer we must assume post ID
 		}
 
-		if ( is_numeric( $object ) || ( $object instanceof \WP_Post && 'product' === $object->post_type ) ) {
+		if ( is_numeric( $object ) || ( $object instanceof \WP_Post && in_array( $object->post_type, ['product', 'product_variation'], true ) ) ) {
 
 			$product_id               = is_numeric( $object ) ? $object : $object->ID;
 			$rules_handler            = wc_memberships()->get_rules_instance();

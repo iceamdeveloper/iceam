@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit50e3e4090c69709295e41ecd67475a8d
+class ComposerStaticInit1ad04e73f8befdd1cea1780900820b29
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -36,21 +36,36 @@ class ComposerStaticInit50e3e4090c69709295e41ecd67475a8d
         'TEC\\Tickets_Plus\\Commerce\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Hooks.php',
         'TEC\\Tickets_Plus\\Commerce\\Order' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Order.php',
         'TEC\\Tickets_Plus\\Commerce\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Commerce/Provider.php',
+        'TEC\\Tickets_Plus\\Emails\\Email\\Components' => __DIR__ . '/../..' . '/src/Tickets_Plus/Emails/Email/Components.php',
         'TEC\\Tickets_Plus\\Emails\\Email\\RSVP' => __DIR__ . '/../..' . '/src/Tickets_Plus/Emails/Email/RSVP.php',
         'TEC\\Tickets_Plus\\Emails\\Email\\Ticket' => __DIR__ . '/../..' . '/src/Tickets_Plus/Emails/Email/Ticket.php',
         'TEC\\Tickets_Plus\\Emails\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Emails/Hooks.php',
         'TEC\\Tickets_Plus\\Emails\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Emails/Provider.php',
         'TEC\\Tickets_Plus\\Emails\\Settings' => __DIR__ . '/../..' . '/src/Tickets_Plus/Emails/Settings.php',
+        'TEC\\Tickets_Plus\\Flexible_Tickets\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Flexible_Tickets/Provider.php',
+        'TEC\\Tickets_Plus\\Flexible_Tickets\\Series_Passes' => __DIR__ . '/../..' . '/src/Tickets_Plus/Flexible_Tickets/Series_Passes.php',
+        'TEC\\Tickets_Plus\\Flexible_Tickets\\WooCommerce' => __DIR__ . '/../..' . '/src/Tickets_Plus/Flexible_Tickets/WooCommerce.php',
         'TEC\\Tickets_Plus\\Hooks' => __DIR__ . '/../..' . '/src/Tickets_Plus/Hooks.php',
+        'TEC\\Tickets_Plus\\Integrations\\Controller' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Controller.php',
+        'TEC\\Tickets_Plus\\Integrations\\Event_Tickets\\Site_Health\\Controller' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Event_Tickets/Site_Health/Controller.php',
+        'TEC\\Tickets_Plus\\Integrations\\Event_Tickets\\Site_Health\\Event_Tickets_Plus_Subsection' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Event_Tickets/Site_Health/Event_Tickets_Plus_Subsection.php',
+        'TEC\\Tickets_Plus\\Integrations\\Integration_Abstract' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Integration_Abstract.php',
+        'TEC\\Tickets_Plus\\Integrations\\Tickets_Wallet_Plus\\Controller' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Tickets_Wallet_Plus/Controller.php',
+        'TEC\\Tickets_Plus\\Integrations\\Tickets_Wallet_Plus\\Passes\\Apple_Wallet\\Attendee_Registration_Fields_Data' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Tickets_Wallet_Plus/Passes/Apple_Wallet/Attendee_Registration_Fields_Data.php',
+        'TEC\\Tickets_Plus\\Integrations\\Tickets_Wallet_Plus\\Passes\\Apple_Wallet\\Attendee_Registration_Fields_Setting' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Tickets_Wallet_Plus/Passes/Apple_Wallet/Attendee_Registration_Fields_Setting.php',
+        'TEC\\Tickets_Plus\\Integrations\\Tickets_Wallet_Plus\\Passes\\Apple_Wallet\\Settings' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Tickets_Wallet_Plus/Passes/Apple_Wallet/Settings.php',
+        'TEC\\Tickets_Plus\\Integrations\\Tickets_Wallet_Plus\\Passes\\Pdf' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Tickets_Wallet_Plus/Passes/Pdf.php',
+        'TEC\\Tickets_Plus\\Integrations\\Tickets_Wallet_Plus\\Passes\\Pdf\\Attendee_Registration_Fields_Setting' => __DIR__ . '/../..' . '/src/Tickets_Plus/Integrations/Tickets_Wallet_Plus/Passes/Pdf/Attendee_Registration_Fields_Setting.php',
         'TEC\\Tickets_Plus\\Provider' => __DIR__ . '/../..' . '/src/Tickets_Plus/Provider.php',
+        'TEC\\Tickets_Plus\\Ticket_Cache_Controller' => __DIR__ . '/../..' . '/src/Tickets_Plus/Ticket_Cache_Controller.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit50e3e4090c69709295e41ecd67475a8d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit50e3e4090c69709295e41ecd67475a8d::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit50e3e4090c69709295e41ecd67475a8d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit1ad04e73f8befdd1cea1780900820b29::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit1ad04e73f8befdd1cea1780900820b29::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit1ad04e73f8befdd1cea1780900820b29::$classMap;
 
         }, null, ClassLoader::class);
     }

@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -260,6 +260,28 @@ class WC_Memberships_Membership_Plans {
 
 
 	/**
+	 * Returns membership plans' public statuses.
+	 *
+	 * This may be used in some instances where it's necessary to display plan content publicly, such as the Member Directory shortcode when listing members of a plan.
+	 *
+	 * @since 1.26.1
+	 *
+	 * @return string[] array of public statuses
+	 */
+	public function get_membership_plans_public_statuses() : array {
+
+		/**
+		 * Filters membership plans' public statuses.
+		 *
+		 * @since 1.26.1
+		 *
+		 * @param string[] $statuses array of private statuses (by default only published status)
+		 */
+		return (array) apply_filters( 'wc_memberships_membership_plan_public_statuses', ['publish'] );
+	}
+
+
+	/**
 	 * Returns membership plans' possible access methods.
 	 *
 	 * @since 1.7.0
@@ -298,7 +320,7 @@ class WC_Memberships_Membership_Plans {
 			/* translators: Specify the length of a membership */
 			'specific'  => __( 'Specific length', 'woocommerce-memberships' ),
 			/* translators: Membership set to expire in a specified date */
-			'fixed'     => __( 'Fixed dates', 'woocommerce-memberships' )
+			'fixed'     => __( 'Fixed dates', 'woocommerce-memberships' ),
 		);
 
 		return true !== $with_labels ? array_keys( $access_length_types ) : $access_length_types;
@@ -351,7 +373,7 @@ class WC_Memberships_Membership_Plans {
 
 		$available_plans  = array();
 		$membership_plans = $this->get_membership_plans( array(
-			'post_status' => array( 'publish', 'private', 'future', 'draft', 'pending' )
+			'post_status' => array( 'publish', 'private', 'future', 'draft', 'pending' ),
 		) );
 
 		if ( ! empty( $membership_plans ) ) {

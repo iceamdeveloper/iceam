@@ -2,7 +2,7 @@
 /**
  * WC_PB_Stripe_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.6.1
  */
 

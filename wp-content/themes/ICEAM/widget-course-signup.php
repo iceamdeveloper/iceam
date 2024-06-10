@@ -91,7 +91,7 @@
 					<?php } ?>
 					view other <a href="/courses/">ICEAM Courses.</a></p>
 				</div>
-			<?
+			<?php
 			}
 		}
 		

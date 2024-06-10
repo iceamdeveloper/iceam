@@ -17,8 +17,8 @@
 
 namespace TEC\Tickets_Plus;
 
-use \tad_DI52_ServiceProvider;
 use Tribe__Template;
+use Tribe__Tickets__Commerce__Orders_Tabbed_View;
 
 /**
  * Class Hooks.
@@ -27,7 +27,7 @@ use Tribe__Template;
  *
  * @package TEC\Tickets_Plus
  */
-class Hooks extends tad_DI52_ServiceProvider {
+class Hooks extends \TEC\Common\Contracts\Service_Provider {
 
 	/**
 	 * Binds and sets up implementations.
@@ -45,6 +45,7 @@ class Hooks extends tad_DI52_ServiceProvider {
 	 * @since 5.3.0
 	 */
 	protected function add_actions() {
+		add_action( 'tribe_tickets_attendees_page_inside', tribe_callback( Tribe__Tickets__Commerce__Orders_Tabbed_View::class, 'render' ) );
 	}
 
 	/**
@@ -56,6 +57,11 @@ class Hooks extends tad_DI52_ServiceProvider {
 		add_filter( 'tribe_template_path_list', [ $this, 'filter_template_path_list' ], 15, 2 );
 		add_filter( 'tribe_template_origin_namespace_map', [ $this, 'filter_add_template_origin_namespace' ], 15, 3 );
 		add_filter( 'tec_tickets_commerce_settings_top_level', [ $this, 'filter_tc_settings' ] );
+
+		$this->container->register_on_action(
+			'tec_tickets_cache_controller_registered',
+			Ticket_Cache_Controller::class
+		);
 	}
 
 	/**

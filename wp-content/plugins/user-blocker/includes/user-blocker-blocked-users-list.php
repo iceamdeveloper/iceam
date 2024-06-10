@@ -948,7 +948,7 @@ if ( ! function_exists( 'ublk_block_user_list_page' ) ) {
 							if ( 1 == $no_data ) {
 								?>
 								<tr>
-									<td colspan="9" style="text-align:center"><?php esc_html_e( 'No records Found.', 'user-blocker' ); ?></td>
+									<td colspan="10" style="text-align:center"><?php esc_html_e( 'No records Found.', 'user-blocker' ); ?></td>
 								</tr>
 								<?php
 							}
@@ -1229,7 +1229,7 @@ if ( ! function_exists( 'ublk_block_user_list_page' ) ) {
 						} else {
 							?>
 							<tr>
-								<td colspan="11" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
+								<td colspan="12" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
 							</tr>
 							<?php
 						}
@@ -1528,7 +1528,7 @@ if ( ! function_exists( 'ublk_datewise_block_user_list_page' ) ) {
 							if ( 1 == $no_data ) {
 								?>
 								<tr>
-									<td colspan="3" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
+									<td colspan="4" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
 								</tr>
 								<?php
 							}
@@ -1680,7 +1680,7 @@ if ( ! function_exists( 'ublk_datewise_block_user_list_page' ) ) {
 						} else {
 							?>
 							<tr>
-								<td colspan="7" style="text-align:center">
+								<td colspan="8" style="text-align:center">
 									<?php esc_html_e( 'No Record Found.', 'user-blocker' ); ?>
 								</td>
 							</tr>
@@ -1951,7 +1951,7 @@ if ( ! function_exists( 'ublk_permanent_block_user_list_page' ) ) {
 							if ( 1 == $no_data ) {
 								?>
 								<tr>
-									<td colspan="2" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
+									<td colspan="3" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
 								</tr>
 								<?php
 							}
@@ -2083,7 +2083,7 @@ if ( ! function_exists( 'ublk_permanent_block_user_list_page' ) ) {
 						} else {
 							?>
 							<tr>
-								<td colspan="6" style="text-align:center">
+								<td colspan="7" style="text-align:center">
 									<?php esc_html_e( 'No records Found.', 'user-blocker' ); ?>
 								</td>
 							</tr>
@@ -2418,7 +2418,7 @@ if ( ! function_exists( 'ublk_all_type_block_user_list_page' ) ) {
 							if ( 1 == $no_data ) {
 								?>
 								<tr>
-									<td colspan="3" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
+									<td colspan="4" style="text-align:center"><?php esc_html_e( 'No records found.', 'user-blocker' ); ?></td>
 								</tr>
 								<?php
 							}
@@ -2549,7 +2549,7 @@ if ( ! function_exists( 'ublk_all_type_block_user_list_page' ) ) {
 								$sr_no++;
 							}
 						} else {
-							echo '<tr><td colspan="7" style="text-align:center">' . esc_html__( 'No records found.', 'user-blocker' ) . '</td></tr>';
+							echo '<tr><td colspan="8" style="text-align:center">' . esc_html__( 'No records found.', 'user-blocker' ) . '</td></tr>';
 						}
 						?>
 					</tbody>

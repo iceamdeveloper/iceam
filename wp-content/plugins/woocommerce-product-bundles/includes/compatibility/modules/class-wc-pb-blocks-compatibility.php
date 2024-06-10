@@ -2,7 +2,7 @@
 /**
  * WC_PB_Blocks_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.15.0
  */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WooCommerce Blocks Compatibility.
+ * Woo Blocks Compatibility.
  *
  * @version 6.15.0
  */

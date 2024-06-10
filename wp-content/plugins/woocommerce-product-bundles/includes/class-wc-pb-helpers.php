@@ -2,7 +2,7 @@
 /**
  * WC_PB_Helpers class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.0.0
  */
 

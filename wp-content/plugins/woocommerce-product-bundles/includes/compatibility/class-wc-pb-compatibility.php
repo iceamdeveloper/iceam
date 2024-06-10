@@ -2,7 +2,7 @@
 /**
  * WC_PB_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.6.4
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles compatibility with other WC extensions.
  *
  * @class    WC_PB_Compatibility
- * @version  6.18.2
+ * @version  7.0.0
  */
 class WC_PB_Compatibility {
 
@@ -73,7 +73,7 @@ class WC_PB_Compatibility {
 	 * @since 5.0.0
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Foul!', 'woocommerce-product-bundles' ), '5.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Foul!', 'woocommerce-product-bundles' ), '5.0.0' );
 	}
 
 	/**
@@ -82,7 +82,7 @@ class WC_PB_Compatibility {
 	 * @since 5.0.0
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Foul!', 'woocommerce-product-bundles' ), '5.0.0' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Foul!', 'woocommerce-product-bundles' ), '5.0.0' );
 	}
 
 	/**
@@ -92,8 +92,8 @@ class WC_PB_Compatibility {
 
 		// Define dependencies.
 		$this->required = array(
-			'cp'     => '8.4.0',
-			'pao'    => '6.0.0',
+			'cp'     => '9.0.0',
+			'pao'    => '6.7.0',
 			'topatc' => '1.0.3',
 			'bd'     => '1.3.1',
 			'blocks' => '7.2.0',
@@ -120,6 +120,9 @@ class WC_PB_Compatibility {
 
 		// Declare HPOS compatibility.
 		add_action( 'before_woocommerce_init', array( $this, 'declare_hpos_compatibility' ) );
+
+		// Declare Blocks compatibility.
+		add_action( 'before_woocommerce_init', array( $this, 'declare_blocks_compatibility' ) );
 
 		// Load modules.
 		add_action( 'plugins_loaded', array( $this, 'module_includes' ), 100 );
@@ -149,6 +152,20 @@ class WC_PB_Compatibility {
 		}
 
 		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'custom_order_tables', WC_PB()->plugin_basename(), true );
+	}
+
+	/**
+	 * Declare cart/checkout Blocks compatibility.
+	 *
+	 * @since 6.22.4
+	 */
+	public function declare_blocks_compatibility() {
+
+		if ( ! class_exists( 'Automattic\WooCommerce\Utilities\FeaturesUtil' ) ) {
+			return;
+		}
+
+		\Automattic\WooCommerce\Utilities\FeaturesUtil::declare_compatibility( 'cart_checkout_blocks', WC_PB()->plugin_basename(), true );
 	}
 
 	/**
@@ -389,8 +406,8 @@ class WC_PB_Compatibility {
 			if ( version_compare( WC_PB()->plugin_version( true, WC_CP()->version ), $required_version ) < 0 ) {
 
 				$extension      = __( 'Composite Products', 'woocommerce-product-bundles' );
-				$extension_full = __( 'WooCommerce Composite Products', 'woocommerce-product-bundles' );
-				$extension_url  = 'https://woocommerce.com/products/composite-products/';
+				$extension_full = __( 'Woo Composite Products', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://woo.com/products/composite-products/';
 				/* translators: %1$s: Plugin name, %2$s: Plugin URL, %3$s: Plugin name full, %4$s: Plugin version */
 				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
 
@@ -404,8 +421,8 @@ class WC_PB_Compatibility {
 			if ( version_compare( WC_PRODUCT_ADDONS_VERSION, $required_version ) < 0 ) {
 
 				$extension      = __( 'Product Add-Ons', 'woocommerce-product-bundles' );
-				$extension_full = __( 'WooCommerce Product Add-Ons', 'woocommerce-product-bundles' );
-				$extension_url  = 'https://woocommerce.com/products/product-add-ons/';
+				$extension_full = __( 'Woo Product Add-Ons', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://woo.com/products/product-add-ons/';
 				/* translators: %1$s: Plugin name, %2$s: Plugin URL, %3$s: Plugin name full, %4$s: Plugin version */
 				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
 
@@ -418,8 +435,8 @@ class WC_PB_Compatibility {
 			$required_version = $this->required[ 'blocks' ];
 			if ( class_exists( 'Automattic\WooCommerce\Blocks\Package' ) && version_compare( \Automattic\WooCommerce\Blocks\Package::get_version(), $this->required[ 'blocks' ] ) < 0 ) {
 
-				$plugin      = __( 'WooCommerce Blocks', 'woocommerce-product-bundles' );
-				$plugin_url  = 'https://woocommerce.com/products/woocommerce-gutenberg-products-block/';
+				$plugin      = __( 'Woo Blocks', 'woocommerce-product-bundles' );
+				$plugin_url  = 'https://woo.com/products/woocommerce-gutenberg-products-block/';
 				/* translators: %1$s: Plugin name, %2$s: Plugin URL, %3$s: Plugin name full, %4$s: Plugin version */
 				$notice      = sprintf( __( 'The installed version of <strong>%1$s</strong> does not support <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $plugin, $plugin_url, $plugin, $required_version );
 
@@ -477,8 +494,8 @@ class WC_PB_Compatibility {
 			$required_version = $this->required[ 'mmq' ];
 			if ( version_compare( WC_MIN_MAX_QUANTITIES, $required_version ) < 0 ) {
 				$extension      = __( 'Min/Max Quantities', 'woocommerce-product-bundles' );
-				$extension_full = __( 'WooCommerce Min/Max Quantities', 'woocommerce-product-bundles' );
-				$extension_url  = 'https://woocommerce.com/products/minmax-quantities/';
+				$extension_full = __( 'Woo Min/Max Quantities', 'woocommerce-product-bundles' );
+				$extension_url  = 'https://woo.com/products/minmax-quantities/';
 				/* translators: %1$s: Extension, %2$s: Extension URL, %3$s: Extension full name, %4$s: Required version. */
 				$notice         = sprintf( __( 'The installed version of <strong>%1$s</strong> is not supported by <strong>Product Bundles</strong>. Please update <a href="%2$s" target="_blank">%3$s</a> to version <strong>%4$s</strong> or higher.', 'woocommerce-product-bundles' ), $extension, $extension_url, $extension_full, $required_version );
 

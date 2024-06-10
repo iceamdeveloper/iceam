@@ -276,6 +276,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		add_filter( 'tribe_tickets_cart_urls', [ $this, 'add_cart_url' ] );
 		add_filter( 'tribe_tickets_checkout_urls', [ $this, 'add_checkout_url' ] );
 		add_action( 'tribe_tickets_ticket_moved', [ $this, 'create_order_for_moved_ticket' ], 10, 6 );
+
+		// Cache invalidation.
+		add_filter( 'tec_cache_listener_save_post_types', [ $this, 'filter_cache_listener_save_post_types' ] );
+
+		add_action( 'edd_order_receipt_order_details', [ $this, 'include_your_tickets' ] );
 	}
 
 	/**
@@ -552,7 +557,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		do_action( 'tribe_tickets_plus_edd_before_generate_tickets', $order_id );
 
 		// Bail if we already generated the info for this order
-		$done = get_post_meta( $order_id, $this->order_has_tickets, true );
+		$done = edd_get_payment_meta( $order_id, $this->order_has_tickets );
 
 		if ( ! empty( $done ) ) {
 			return;
@@ -832,6 +837,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				'post_content' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => tribe_get_request_var( 'menu_order', -1 ),
+				'meta_input' => [
+						'_type' => $raw_data['ticket_type'] ?? 'default',
+				]
 			];
 
 			$ticket->ID = wp_insert_post( $args );
@@ -845,6 +853,9 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 				'post_content' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => $ticket->menu_order,
+				'meta_input' => [
+						'_type' => $raw_data['ticket_type'] ?? 'default',
+				]
 			];
 
 			$ticket->ID = wp_update_post( $args );
@@ -876,7 +887,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		$data = wp_parse_args( $data, $defaults );
 
 		// Sanitize Mode
-		$data['mode'] = filter_var( $data['mode'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH );
+		$data['mode'] = tec_sanitize_string( $data['mode'] );
 
 		// Fetch the Global stock Instance for this Event
 		/**
@@ -887,7 +898,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		// Only need to do this if we haven't already set one - they shouldn't be able to edit it from here otherwise
 		if ( ! $event_stock->is_enabled() ) {
 			if ( isset( $data['event_capacity'] ) ) {
-				$data['event_capacity'] = trim( filter_var( $data['event_capacity'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH ) );
+				$data['event_capacity'] = trim( tec_sanitize_string( $data['event_capacity'] ) );
 
 
 				// If empty we need to modify to -1
@@ -1342,6 +1353,11 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 			return null;
 		}
 
+		$cached = wp_cache_get( (int) $ticket_id, 'tec_tickets' );
+		if ( $cached && is_array( $cached ) ) {
+			return new Tribe__Tickets__Ticket_Object( $cached );
+		}
+
 		$return = new Tribe__Tickets__Ticket_Object();
 
 		$purchased_statuses = tribe( 'tickets.status' )->get_statuses_by_action( 'count_completed', 'edd' );
@@ -1400,6 +1416,10 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		 * @param int    $ticket_id
 		 */
 		$ticket = apply_filters( 'tribe_tickets_plus_edd_get_ticket', $return, $post_id, $ticket_id );
+
+		if ( $ticket instanceof Tribe__Tickets__Ticket_Object ) {
+			wp_cache_set( (int) $ticket->ID, $ticket->to_array(), 'tec_tickets' );
+		}
 
 		return $ticket;
 	}
@@ -1742,12 +1762,31 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	 * It is hacky, but we'll aim to resolve this issue when we end-of-life our legacy ticket plugins
 	 * OR write around it in a future major release
 	 *
-	 * @param int  $attendee_id
-	 * @param bool $qr true if from QR checkin process (NOTE: this is a param-less parameter for backward compatibility)
+	 * @since 3.1.2
+	 * @since 5.9.2 Add the `tec_tickets_attendee_checkin` filter to override the checkin process.
 	 *
-	 * @return bool
+	 * @param int  $attendee_id The ID of the attendee that's being checked in.
+	 * @param bool     $qr       true if from QR checkin process (NOTE: this is a param-less parameter for backward compatibility)
+	 * @param int|null $event_id The ID of the ticket-able post the Attendee is being checked into.
+	 *
+	 * @return bool Whether the Attendee was checked in or not.
 	 */
-	public function checkin( $attendee_id, $qr = false ) {
+	public function checkin( $attendee_id, $qr = false, $event_id = null ) {
+		/**
+		 * Allows filtering the Attendee check-in action before the default logic does it.
+		 * Returning a non-null value from this filter will prevent the default logic from running.
+		 *
+		 * @since 5.9.2
+		 *
+		 * @param int      $attendee_id The post ID of the Attendee being checked-in.
+		 * @param int|null $event_id    The ID of the ticket-able post the Attendee is being checked into.
+		 * @param bool     $qr          Whether the Attendee is being checked in via QR code or not.
+		 */
+		$checkin = apply_filters( 'tec_tickets_attendee_checkin', null, (int) $attendee_id, (int) $event_id, (bool) $qr );
+		if ( $checkin !== null ) {
+			return (bool) $checkin;
+		}
+
 		update_post_meta( $attendee_id, $this->checkin_key, 1 );
 
 		if ( func_num_args() > 1 && $qr = func_get_arg( 1 ) ) {
@@ -1959,23 +1998,31 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 	/**
 	 * Insert a link to the report.
 	 *
-	 * @param int $post_id
+	 * @since 5.9.0 Added $url_only parameter.
+	 *
+	 * @param int $post_id The post ID.
+	 * @param bool $url_only Whether to return the URL only.
 	 *
 	 * @return string
 	 */
-	public function get_event_reports_link( $post_id ) {
+	public function get_event_reports_link( $post_id, $url_only = false ) {
 		$ticket_ids = $this->get_tickets_ids( $post_id );
 		if ( empty( $ticket_ids ) ) {
 			return '';
 		}
 
 		$term = get_term_by( 'name', 'Ticket', 'download_category' );
+		$url  = admin_url( 'edit.php?view=downloads&post_type=download&page=edd-reports&category=' . $term->term_id . '&event=' . $post_id );
+
+		if ( $url_only ) {
+			return $url;
+		}
 
 		ob_start();
 		?>
 
         <small>
-            <a href="<?php echo esc_url( admin_url( 'edit.php?view=downloads&post_type=download&page=edd-reports&category=' . $term->term_id . '&event=' . $post_id ) ); ?>"
+            <a href="<?php echo esc_url( $url ); ?>"
                id="eddtickets_event_reports"><?php esc_html_e( 'Event sales report', 'event-tickets-plus' ); ?></a>
         </small>
 
@@ -2675,5 +2722,68 @@ class Tribe__Tickets_Plus__Commerce__EDD__Main extends Tribe__Tickets_Plus__Tick
 		 */
 		return (bool) apply_filters( 'tribe_tickets_manual_attendee_allow_email_resend', $allow_email_resend, $ticket, $attendee );
 
+	}
+
+	/**
+	 * Filters the list of post types that should trigger a cache invalidation on `save_post` to add
+	 * all the ones modeling Easy Digital Downloads' Tickets, Attendees and Orders.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param string[] $post_types The list of post types that should trigger a cache invalidation on `save_post`.
+	 *
+	 * @return string[] The filtered list of post types that should trigger a cache invalidation on `save_post`.
+	 */
+	public function filter_cache_listener_save_post_types( array $post_types = [] ): array {
+		$post_types[] = $this->ticket_object;
+		$post_types[] = $this->attendee_object;
+		$post_types[] = $this->order_object;
+
+		return $post_types;
+	}
+
+	/**
+	 * Includes the "Your Tickets" template for the confirmation page.
+	 *
+	 * This method initializes the Tribe__Template instance, fetches the attendees by the order ID,
+	 * and then calls the appropriate template to render the Your Tickets section.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param \EDD\Orders\Order $order Current order.
+	 */
+	public function include_your_tickets( $order ): void {
+		// Bail if $order is not an instance of \EDD\Orders\Order.
+		if ( ! $order instanceof \EDD\Orders\Order ) {
+			return;
+		}
+
+		// Bail if the order ID is not valid.
+		$order_id = $order->id;
+		if ( empty( $order_id ) ) {
+			return;
+		}
+
+		$attendees = $this->get_attendees_by_order_id( $order_id );
+
+		// Bail if there are no attendees.
+		if ( empty( $attendees ) ) {
+			return;
+		}
+
+		// Sort the Attendees by ID.
+		$attendee_ids = array_column( $attendees, 'attendee_id' );
+		array_multisort( $attendee_ids, SORT_ASC, $attendees );
+
+		$template_args = [
+			'provider'      => $this,
+			'provider_id'   => $this->class_name,
+			'order'         => $order,
+			'order_id'      => $order_id,
+			'is_tec_active' => tec_tickets_tec_events_is_active(),
+			'attendees'     => $attendees,
+		];
+
+		tribe( 'tickets.editor.template' )->template( 'components/attendees-list/attendees', $template_args, true );
 	}
 }

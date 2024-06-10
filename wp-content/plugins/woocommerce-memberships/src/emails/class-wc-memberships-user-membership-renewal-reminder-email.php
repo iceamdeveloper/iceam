@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -70,20 +70,18 @@ class WC_Memberships_User_Membership_Renewal_Reminder_Email extends \WC_Membersh
 	/**
 	 * Triggers the Membership Renewal Reminder email.
 	 *
-	 *@since 1.7.0
+	 * @since 1.7.0
 	 *
 	 * @param int $user_membership_id User Membership ID
 	 */
 	public function trigger( $user_membership_id ) {
 
 		// This email should be sent only to inactive plan members.
-		// Ie. they shouldn't have started a new membership for the same plan,
-		// after the old one expired, for which this email is meant for
-		$is_inactive_plan_member = false;
+		// If the user has renewed or applied for a membership for the same plan after the old one expired, they shouldn't receive this email.
+		$is_active_plan_member = false;
 
 		// set the email object, recipient and parse merge tags
-		if (    is_numeric( $user_membership_id )
-		     && ( $this->object = wc_memberships_get_user_membership( $user_membership_id ) ) ) {
+		if ( is_numeric( $user_membership_id ) && ( $this->object = wc_memberships_get_user_membership( $user_membership_id ) ) ) {
 
 			$member_id = $this->object->get_user_id();
 
@@ -91,7 +89,7 @@ class WC_Memberships_User_Membership_Renewal_Reminder_Email extends \WC_Membersh
 				$this->recipient = $member->user_email;
 			}
 
-			$is_inactive_plan_member = ! wc_memberships_is_user_active_or_delayed_member( $member_id, $this->object->get_plan_id() );
+			$is_active_plan_member = wc_memberships_is_user_active_or_delayed_member( $member_id, $this->object->get_plan_id() );
 
 			$this->body = $this->object instanceof \WC_Memberships_User_Membership ? $this->object->get_plan()->get_email_content( $this->id ) : '';
 
@@ -99,9 +97,9 @@ class WC_Memberships_User_Membership_Renewal_Reminder_Email extends \WC_Membersh
 		}
 
 		// sanity checks
-		if (    ! $is_inactive_plan_member
+		if (    $is_active_plan_member
 		     || ! $this->object instanceof \WC_Memberships_User_Membership
-		     || ! $this->body
+		     || ! $this->get_body()
 		     || ! $this->is_enabled()
 		     || ! $this->get_recipient()
 		     || ! $this->object->is_expired()

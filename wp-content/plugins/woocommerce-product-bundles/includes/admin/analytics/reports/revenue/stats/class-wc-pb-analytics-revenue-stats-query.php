@@ -3,7 +3,7 @@
  * REST API Reports Stats Query
  * Handles requests to the '/reports/bundles/stats' endpoint.
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.9.0
  */
 

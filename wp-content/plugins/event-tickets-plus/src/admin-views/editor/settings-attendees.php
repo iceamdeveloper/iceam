@@ -1,4 +1,11 @@
 <?php
+/**
+ * The attendees list checkbox for the settings section.
+ *
+ * @since 5.9.0 Show the post type dynamically.
+ *
+ * @version 5.9.0
+ */
 
 /** @var \Tribe__Editor $editor */
 $editor = tribe( 'editor' );
@@ -10,10 +17,10 @@ if ( $editor->is_events_using_blocks() ) {
 
 $post_id = get_the_ID();
 
-// Get value from metadata
-$show_attendees   = get_post_meta( $post_id, Tribe__Tickets_Plus__Attendees_List::HIDE_META_KEY, true );
-// Sets the inverted value
-$show_attendees   = ! empty( $show_attendees );
+// Get value from metadata.
+$show_attendees = get_post_meta( $post_id, Tribe__Tickets_Plus__Attendees_List::HIDE_META_KEY, true );
+// Sets the inverted value.
+$show_attendees = ! empty( $show_attendees );
 
 /**
  * Filters the default value for showing attendees on event page if no meta field saved
@@ -24,11 +31,19 @@ if ( ! metadata_exists( 'post', $post_id, Tribe__Tickets_Plus__Attendees_List::H
 	$show_attendees = apply_filters( 'tribe_tickets_plus_default_show_attendees_value', $show_attendees );
 }
 
+$post_type_object = get_post_type_object( get_post_type( $post_id ) );
+
+$show_attendees_label = sprintf(
+	/* translators: %s is the post type label */
+	__( 'Show attendees list on %s page', 'event-tickets-plus' ),
+	$post_type_object->labels->singular_name
+);
+
 // Add checkbox for attendee display
 ?>
 <p>
 	<label>
-		<span class="tribe-strong-label"><?php esc_html_e( 'Show attendees list on event page', 'event-tickets-plus' ); ?></span>
+		<span class="tribe-strong-label"><?php echo esc_html( $show_attendees_label ); ?></span>
 		<input
 			type="checkbox"
 			id="tribe_show_attendees"

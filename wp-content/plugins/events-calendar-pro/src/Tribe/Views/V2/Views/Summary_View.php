@@ -14,8 +14,11 @@ use Tribe__Date_Utils as Dates;
 use Tribe\Events\Views\V2\Views\List_View;
 use Tribe\Utils\Date_I18n;
 use Tribe\Utils\Date_I18n_Immutable;
+use Tribe\Events\Views\V2\Views\Traits\With_Noindex;
 
 class Summary_View extends List_View {
+	use With_Noindex;
+
 	/**
 	 * Statically accessible slug for this view.
 	 *
@@ -175,9 +178,6 @@ class Summary_View extends List_View {
 		$is_multiday_start              = false !== $event->multiday && $formatted_group_date === $formatted_start_date_beginning;
 		$is_multiday_end                = false !== $event->multiday && $formatted_group_date === $formatted_end_date_ending;
 		$is_all_day                     = $event->all_day;
-
-
-
 
 		// @TODO: Decouple the hard dependency with Event Tickets and replace with a filter.
 		$counts = class_exists( 'Tribe__Tickets__Tickets' ) ? \Tribe__Tickets__Tickets::get_ticket_counts( $event->ID ) : [];
@@ -434,6 +434,5 @@ class Summary_View extends List_View {
 	 */
 	public function get_rewrite_slugs(): array {
 		return  [ static::get_view_slug(), translate( static::get_view_slug(), 'tribe-events-calendar-pro' ) ];
-
 	}
 }

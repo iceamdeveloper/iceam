@@ -77,7 +77,7 @@ function bps_call_template ($template, $args = array ())
 		$path = str_replace (WP_CONTENT_DIR, '', $located);
 		echo "<!--\n";
 		echo "path $path\n";
-		echo "args "; print_r ($args);
+		echo "args "; bps_print ($args);
 		echo "-->\n";
 	}
 
@@ -112,8 +112,8 @@ function bps_call_form_template ($form, $location)
 		$path = str_replace (WP_CONTENT_DIR, '', $located);
 		echo "<!--\n";
 		echo "path $path\n";
-		echo "args "; print_r ($args);
-		echo "options "; print_r ($options);
+		echo "args "; bps_print ($args);
+		echo "options "; bps_print ($options);
 		echo "-->\n";
 	}
 

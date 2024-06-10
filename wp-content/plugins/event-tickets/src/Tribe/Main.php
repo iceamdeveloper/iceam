@@ -8,7 +8,7 @@ class Tribe__Tickets__Main {
 	/**
 	 * Current version of this plugin
 	 */
-	const VERSION = '5.5.11.1';
+	const VERSION = '5.9.0';
 
 	/**
 	 * Used to store the version history.
@@ -25,10 +25,12 @@ class Tribe__Tickets__Main {
 	public $latest_version_slug = 'latest_event_tickets_version';
 
 	/**
-	* Min Version of WordPress
-	*
-	* @since 4.10
-	*/
+	 * Min Version of WordPress.
+	 *
+	 * @since 4.10
+	 *
+	 * @var string
+	 */
 	protected $min_wordpress = '4.9';
 
 	/**
@@ -43,7 +45,7 @@ class Tribe__Tickets__Main {
 	*
 	* @since 4.10
 	*/
-	protected $min_tec_version = '6.0.10-dev';
+	protected $min_tec_version = '6.3.0-dev';
 
 	/**
 	 * Name of the provider
@@ -68,6 +70,11 @@ class Tribe__Tickets__Main {
 	 * @var string
 	 */
 	public $plugin_url;
+
+	/**
+	 * @var string
+	 */
+	public $plugin_slug;
 
 	/**
 	 * @var Tribe__Tickets__Legacy_Provider_Support
@@ -98,6 +105,11 @@ class Tribe__Tickets__Main {
 	 * @var Tribe__Admin__Activation_Page
 	 */
 	protected $activation_page;
+
+	/**
+	 * @var Tribe__Tickets__Plugin_Register
+	 */
+	protected $registered;
 
 	/**
 	 * @var bool Prevent autoload initialization
@@ -153,6 +165,8 @@ class Tribe__Tickets__Main {
 			$dir_prefix = basename( dirname( dirname( EVENT_TICKETS_DIR ) ) ) . '/vendor/';
 		}
 
+		add_filter( 'tribe_events_integrations_should_load_freemius', '__return_false' );
+
 		$this->plugin_url = trailingslashit( plugins_url( $dir_prefix . $this->plugin_dir ) );
 
 		$this->maybe_set_common_lib_info();
@@ -160,6 +174,8 @@ class Tribe__Tickets__Main {
 		add_action( 'plugins_loaded', [ $this, 'maybe_bail_if_old_tec_is_present' ], -1 );
 		add_action( 'plugins_loaded', [ $this, 'maybe_bail_if_invalid_wp_or_php' ], -1 );
 		add_action( 'plugins_loaded', [ $this, 'plugins_loaded' ], 0 );
+
+
 		register_activation_hook( EVENT_TICKETS_MAIN_PLUGIN_FILE, [ $this, 'on_activation' ] );
 		register_deactivation_hook( EVENT_TICKETS_MAIN_PLUGIN_FILE, [ $this, 'on_deactivation' ] );
 	}
@@ -331,6 +347,8 @@ class Tribe__Tickets__Main {
 		 */
 		$this->init_autoloading();
 
+		add_filter( 'tec_common_parent_plugin_file', [ $this, 'include_parent_plugin_path_to_common' ] );
+
 		// Start Up Common.
 		Tribe__Main::instance();
 
@@ -341,14 +359,27 @@ class Tribe__Tickets__Main {
 	}
 
 	/**
+	 * Adds our main plugin file to the list of paths.
+	 *
+	 * @since 6.1.0
+	 *
+	 *
+	 * @param array<string> $paths The paths to TCMN parent plugins.
+	 *
+	 * @return array<string>
+	 */
+	public function include_parent_plugin_path_to_common( $paths ): array {
+		$paths[] = EVENT_TICKETS_MAIN_PLUGIN_FILE;
+
+		return $paths;
+	}
+
+	/**
 	 * Load Text Domain on tribe_common_loaded as it requires common
 	 *
 	 * @since 4.10
 	 */
 	public function bootstrap() {
-		// Initialize the Service Provider for Tickets.
-		tribe_register_provider( 'Tribe__Tickets__Service_Provider' );
-
 		$this->hooks();
 
 		$this->register_active_plugin();
@@ -379,6 +410,9 @@ class Tribe__Tickets__Main {
 	public function bind_implementations() {
 		tribe_singleton( 'tickets.main', $this );
 
+		// Initialize the Service Provider for Tickets.
+		tribe_register_provider( Tribe__Tickets__Service_Provider::class );
+
 		// Tickets Commerce providers.
 		tribe_register_provider( TEC\Tickets\Provider::class );
 
@@ -402,7 +436,7 @@ class Tribe__Tickets__Main {
 		tribe_register_provider( 'Tribe__Tickets__Editor__REST__V1__Service_Provider' );
 
 		// Blocks editor
-		tribe_register_provider( 'Tribe__Tickets__Editor__Provider' );
+		tribe_register_provider( TEC\Tickets\Blocks\Controller::class );
 
 		// Privacy
 		tribe_singleton( 'tickets.privacy', 'Tribe__Tickets__Privacy', [ 'hook' ] );
@@ -745,9 +779,6 @@ class Tribe__Tickets__Main {
 	 * Hooked to the init action
 	 */
 	public function init() {
-		// Start the integrations manager.
-		Tribe__Tickets__Integrations__Manager::instance()->load_integrations();
-
 		// Provide continued support for legacy ticketing modules.
 		$this->legacy_provider_support = new Tribe__Tickets__Legacy_Provider_Support;
 		$this->settings_tab();
@@ -884,18 +915,32 @@ class Tribe__Tickets__Main {
 	 *
 	 * Expects to fire during 'tribe_tickets_attendees_page_inside', ie
 	 * before the attendee screen is rendered.
+	 *
+	 * @since 4.2.4
+	 * @since 5.8.2 Add the `$event_id` parameter.
+	 *
+	 * @param int|bool $event_id The post ID to set up attendance totals for.
 	 */
-	public function setup_attendance_totals() {
-		$this->attendance_totals()->integrate_with_attendee_screen();
+	public function setup_attendance_totals( $event_id = null ) {
+		$this->attendance_totals( $event_id )->integrate_with_attendee_screen();
 	}
 
 	/**
-	 * @return Tribe__Tickets__Attendance_Totals
+	 * Returns the attendance totals object.
+	 *
+	 * @since 4.2.4
+	 * @since 5.8.2 Added the `$event_id` parameter.
+	 *
+	 * @param int|null $event_id The post ID to set up attendance totals for.
+	 *
+	 * @return Tribe__Tickets__Attendance_Totals The attendance totals object.
 	 */
-	public function attendance_totals() {
+	public function attendance_totals( $event_id = null ) {
 		if ( empty( $this->attendance_totals ) ) {
 			$this->attendance_totals = new Tribe__Tickets__Attendance_Totals;
 		}
+
+		$this->attendance_totals->set_event_id( $event_id );
 
 		return $this->attendance_totals;
 	}

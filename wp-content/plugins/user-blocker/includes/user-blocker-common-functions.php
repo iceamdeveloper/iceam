@@ -137,7 +137,7 @@ if ( ! function_exists( 'ublk_enqueue_style_script' ) ) {
 		$screen = get_current_screen();
 		?>
 		<script type="text/javascript">
-			var adminURL = '<?php echo admin_url(); ?>';
+			var adminURL = '<?php echo esc_attr( admin_url() ); ?>';
 		</script> 
 		<?php
 		$plugin_data     = get_plugin_data( UB_PLUGIN_DIR . '/user_blocker.php', $markup = true, $translate = true );
@@ -153,13 +153,13 @@ if ( ! function_exists( 'ublk_enqueue_style_script' ) ) {
 		}
 
 		if ( ( isset( $_GET['page'] ) && ( 'all_type_blocked_user_list' == $_GET['page'] || 'permanent_blocked_user_list' == $_GET['page'] || 'datewise_blocked_user_list' == $_GET['page'] || 'blocked_user_list' == $_GET['page'] || 'block_user' == $_GET['page'] || 'block_user_date' == $_GET['page'] || 'block_user_permenant' == $_GET['page'] || 'welcome_block_user' == $_GET['page'] || 'user_blocker_settings' == $_GET['page'] ) ) || 'plugins' == $screen->id ) {
-			wp_register_script( 'timepicker-addon', UB_PLUGIN_URL . '/script/jquery-ui-timepicker-addon.js', array('jquery','jquery-ui-core','jquery-ui-datepicker'), '1.6.3', false );
+			wp_register_script( 'timepicker-addon', UB_PLUGIN_URL . '/script/jquery-ui-timepicker-addon.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-datepicker' ), '1.6.3', false );
 			wp_enqueue_script( 'timepicker-addon' );
-			wp_register_script( 'timepicker', UB_PLUGIN_URL . '/script/jquery.timepicker.js', array('jquery','jquery-ui-core','jquery-ui-datepicker'), '1.14.0', false );
+			wp_register_script( 'timepicker', UB_PLUGIN_URL . '/script/jquery.timepicker.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-datepicker' ), '1.14.0', false );
 			wp_enqueue_script( 'timepicker' );
-			wp_register_script( 'datepair', UB_PLUGIN_URL . '/script/datepair.js', array('jquery','jquery-ui-core','jquery-ui-datepicker'), '0.4.17', false );
+			wp_register_script( 'datepair', UB_PLUGIN_URL . '/script/datepair.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-datepicker' ), '0.4.17', false );
 			wp_enqueue_script( 'datepair' );
-			wp_register_script( 'admin_script', UB_PLUGIN_URL . '/script/admin_script.js', array('jquery','jquery-ui-core','jquery-ui-datepicker'), '1.5.6', false );
+			wp_register_script( 'admin_script', UB_PLUGIN_URL . '/script/admin_script.js', array( 'jquery', 'jquery-ui-core', 'jquery-ui-datepicker' ), '1.5.6', false );
 			wp_enqueue_script( 'admin_script' );
 
 			wp_register_style( 'timepicker', UB_PLUGIN_URL . '/css/jquery.timepicker.css', array(), '1.14.0', false );
@@ -928,7 +928,7 @@ if ( ! function_exists( 'ublk_search_field' ) ) {
 			?>
 			>
 				<input type="hidden" value="<?php echo esc_attr( $tab ); ?>" name="page" />
-				<input type="text" id="txtUsername" value="<?php echo esc_attr( $txt_username ); ?>" placeholder="<?php esc_attr_e( 'Username or Email or First name', 'user-blocker' ); ?>" name="txtUsername" />
+				<input type="text" id="txtUsername" value="<?php echo esc_attr( $txt_username ); ?>" placeholder="<?php esc_attr_e( 'Username or Email or Name', 'user-blocker' ); ?>" name="txtUsername" />
 				<input id="filter_action" class="button" type="submit" value="<?php esc_html_e( 'Search', 'user-blocker' ); ?>" name="filter_action">
 				<a class="button" href="<?php echo '?page=' . esc_attr( $tab ); ?>" style="margin-left: 10px;"><?php esc_html_e( 'Reset', 'user-blocker' ); ?></a>
 			</div>
@@ -958,7 +958,7 @@ if ( ! function_exists( 'ublk_user_search_field' ) ) {
 			?>
 			>
 				<input type="hidden" value="<?php echo esc_attr( $tab ); ?>" name="page" />
-				<input type="text" id="txtUsername" value="<?php echo esc_attr( $txt_username ); ?>" placeholder="<?php esc_attr_e( 'Username or Email or First name', 'user-blocker' ); ?>" name="txtUsername" />
+				<input type="text" id="txtUsername" value="<?php echo esc_attr( $txt_username ); ?>" placeholder="<?php esc_attr_e( 'Username or Email or Name', 'user-blocker' ); ?>" name="txtUsername" />
 				<input id="filter_action" class="button" type="submit" value="<?php esc_html_e( 'Search', 'user-blocker' ); ?>" name="filter_action">
 				<a class="button" href="<?php echo '?page=' . esc_attr( $tab ) . '&resetsearch=1'; ?>" style="margin-left: 10px;"><?php esc_html_e( 'Reset', 'user-blocker' ); ?></a>
 			</div>

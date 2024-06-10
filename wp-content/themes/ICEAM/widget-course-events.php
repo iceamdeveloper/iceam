@@ -32,18 +32,18 @@
         setup_postdata( $post_obj );
         
         // this is dependent on Post Connector
-        $post_link_manager = new SP_Post_Link_Manager();
+        // $post_link_manager = new SP_Post_Link_Manager();
         
-        // this gives a list of post connections where this post is the parent
-        $connections = $post_link_manager->get_children( 'events-to-courses', $post_obj->ID);
+        // // this gives a list of post connections where this post is the parent
+        // $connections = $post_link_manager->get_children( 'events-to-courses', $post_obj->ID);
         
-        // use those connections to find the children the parent is connected to
-        $childs = array();
-        foreach($connections as $key => $value){
-            if(get_post_meta($key,'sp_parent',true) == $post_obj->ID){
-                $childs[] = get_post_meta($key,'sp_child',true);
-            }
-        }
+        // // use those connections to find the children the parent is connected to
+        // $childs = array();
+        // foreach($connections as $key => $value){
+        //     if(get_post_meta($key,'sp_parent',true) == $post_obj->ID){
+        //         $childs[] = get_post_meta($key,'sp_child',true);
+        //     }
+        // }
         
         if(!$childs){
             return;

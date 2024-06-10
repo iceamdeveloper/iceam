@@ -2,8 +2,8 @@
 namespace Aelia\WC;
 if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
-require_once('lib/classes/base/plugin/aelia-plugin.php');
-require_once('lib/classes/definitions/definitions.php');
+require_once __DIR__ . '/lib/classes/base/plugin/aelia-plugin.php';
+require_once __DIR__ . '/lib/classes/definitions/definitions.php';
 
 use Aelia\WC\AFC\Settings;
 use Aelia\WC\AFC\Messages;
@@ -15,7 +15,7 @@ use Aelia\WC\Integrations\Freemius\Freemius_Plugin_Integration;
  * Aelia Foundation Classes for WooCommerce.
  **/
 class WC_AeliaFoundationClasses extends Aelia_Plugin {
-	public static $version = '2.4.4.230503';
+	public static $version = '2.4.15.230905';
 
 	public static $plugin_slug = Definitions::PLUGIN_SLUG;
 	public static $text_domain = Definitions::TEXT_DOMAIN;
@@ -30,7 +30,7 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 
 	public static function factory() {
 		// Load Composer autoloader
-		require_once(__DIR__ . '/vendor/autoload.php');
+		require_once __DIR__ . '/vendor/autoload.php';
 
 		$settings_controller = new Settings(self::$text_domain);
 		$messages_controller = new Messages(self::$text_domain);
@@ -49,8 +49,8 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 	public function __construct($settings_controller,
 															$messages_controller) {
 		// Load Composer autoloader
-		require_once(__DIR__ . '/vendor/autoload.php');
-		require_once('lib/wc-core-aux-functions.php');
+		require_once __DIR__ . '/vendor/autoload.php';
+		require_once __DIR__ . '/lib/wc-core-aux-functions.php';
 
 		parent::__construct($settings_controller, $messages_controller);
 
@@ -59,6 +59,33 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 		// @since 2.1.8.210518
 		Freemius_Plugin_Integration::init();
 		
+	}
+
+	/**
+	 * Initializes the components that handle background tasks. These must be initialised
+	 * whether the integration is active or not, as they can perform operations such as
+	 * cleanups upon deactivation.
+	 *
+	 * @return void
+	 * @since 2.4.9.230616
+	 */
+	protected function init_background_components(): void {
+		// Initialise the task scheduler
+		// @since 2.4.9.230616
+		$queue = \Aelia\WC\AFC\Scheduler\Queues\Action_Scheduler_Queue::instance(
+			new \Aelia\WC\AFC\Scheduler\Queues\Queue_Settings([
+				'logger_instance' => $this->get_logger(),
+				'debug_mode' => $this->debug_mode(),
+			])
+		);
+
+		\Aelia\WC\AFC\Scheduler\Task_Scheduler::init(
+			new \Aelia\WC\AFC\Scheduler\Task_Scheduler_Settings([
+				'queue' => $queue,
+				'logger_instance' => $this->get_logger(),
+				'debug_mode' => $this->debug_mode(),
+			])
+		);
 	}
 
 	/**
@@ -388,6 +415,10 @@ class WC_AeliaFoundationClasses extends Aelia_Plugin {
 				}
 			}
 		}
+
+		// Load the components that perform operations in the background
+		// @since 2.4.9.230616
+		$this->init_background_components();
 	}
 
 	/**

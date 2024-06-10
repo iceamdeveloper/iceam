@@ -17,7 +17,7 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
@@ -26,7 +26,7 @@ use SkyVerge\WooCommerce\Memberships\Frontend\Profile_Fields as Profile_Fields_F
 use SkyVerge\WooCommerce\Memberships\Helpers\Strings_Helper;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields\Profile_Field_Definition;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -83,12 +83,13 @@ class WC_Memberships_AJAX {
 		add_filter( 'woocommerce_json_search_found_products', array( $this, 'filter_json_search_found_products' ) );
 
 		// batch jobs handling
-		add_action( 'wp_ajax_wc_memberships_get_batch_job',                      array( $this, 'get_batch_job' ) );
-		add_action( 'wp_ajax_wc_memberships_remove_batch_job',                   array( $this, 'remove_batch_job' ) );
-		add_action( 'wp_ajax_wc_memberships_grant_retroactive_access',           array( $this, 'grant_retroactive_access' ) );
-		add_action( 'wp_ajax_wc_memberships_reschedule_user_memberships_events', array( $this, 'reschedule_user_memberships_events' ) );
-		add_action( 'wp_ajax_wc_memberships_export_user_memberships',            array( $this, 'export_user_memberships' ) );
-		add_action( 'wp_ajax_wc_memberships_import_user_memberships',            array( $this, 'import_user_memberships' ) );
+		add_action( 'wp_ajax_wc_memberships_get_batch_job',                      [ $this, 'get_batch_job' ] );
+		add_action( 'wp_ajax_wc_memberships_remove_batch_job',                   [ $this, 'remove_batch_job' ] );
+		add_action( 'wp_ajax_wc_memberships_grant_retroactive_access',           [ $this, 'grant_retroactive_access' ] );
+		add_action( 'wp_ajax_wc_memberships_reschedule_user_memberships_events', [ $this, 'reschedule_user_memberships_events' ] );
+		// import/export user memberships
+		add_action( 'wp_ajax_wc_memberships_export_user_memberships',            [ $this, 'export_user_memberships' ] );
+		add_action( 'wp_ajax_wc_memberships_import_user_memberships',            [ $this, 'import_user_memberships' ] );
 
 		// fetch product variation profile fields html
 		add_action( 'wp_ajax_wc_memberships_get_variation_profile_fields', [ $this, 'get_product_profile_fields' ] );
@@ -982,14 +983,16 @@ class WC_Memberships_AJAX {
 		if ( ! empty( $access_product_ids ) ) {
 
 			// get orders that contain an access granting product (or variation) to the given plan
-			$product_ids = Strings_Helper::esc_sql_in_ids( $access_product_ids );
-			$order_ids   = $wpdb->get_col(  "
-				SELECT DISTINCT posts.ID
+			$product_ids  = Strings_Helper::esc_sql_in_ids( $access_product_ids );
+			$orders_table = Framework\SV_WC_Order_Compatibility::get_orders_table();
+			$order_id_col = Framework\SV_WC_Plugin_Compatibility::is_hpos_enabled() ? 'id' : 'ID';
+			$order_ids    = $wpdb->get_col(  "
+				SELECT DISTINCT orders.{$order_id_col}
 				FROM {$wpdb->prefix}woocommerce_order_itemmeta AS order_item_meta,
 				     {$wpdb->prefix}woocommerce_order_items AS order_items,
-				     {$wpdb->prefix}posts AS posts
+				     $orders_table AS orders
 				WHERE order_items.order_item_id = order_item_meta.order_item_id
-				AND order_items.order_id = posts.ID
+				AND order_items.order_id = orders.{$order_id_col}
 				AND ( ( order_item_meta.meta_key LIKE '_product_id'   AND order_item_meta.meta_value IN ({$product_ids}) )
 				 OR   ( order_item_meta.meta_key LIKE '_variation_id' AND order_item_meta.meta_value IN ({$product_ids}) ) )
 			" );
@@ -1073,6 +1076,8 @@ class WC_Memberships_AJAX {
 					'include_profile_fields' => isset( $export_args['include_profile_fields'] ) && 'yes' === $export_args['include_profile_fields'],
 					'include_meta_data'      => isset( $export_args['include_meta'] ) && 'yes' === $export_args['include_meta'],
 					'fields_delimiter'       => ! empty( $export_args['fields_delimiter'] ) ? $export_args['fields_delimiter'] : 'comma',
+					'date_format'            => ! empty( $export_args['date_format'] ) ? $export_args['date_format'] : '',
+					'custom_date_format'     => ! empty( $export_args['custom_date_format'] ) ? $export_args['custom_date_format'] : '',
 				] ) );
 
 			} catch ( Framework\SV_WC_Plugin_Exception $e ) {
@@ -1117,6 +1122,8 @@ class WC_Memberships_AJAX {
 					'timezone'                   => ! empty( $_POST['timezone'] )                 ? $_POST['timezone']                             : wc_timezone_string(),
 					'default_start_date'         => ! empty( $_POST['default_start_date'] )       ? $_POST['default_start_date']                   : date( 'Y-m-d', current_time( 'timestamp' ) ),
 					'fields_delimiter'           => ! empty( $_POST['fields_delimiter'] )         ? $_POST['fields_delimiter']                     : 'comma',
+					'date_format'                => ! empty( $_POST['date_format'] )              ? $_POST['date_format']                          : '',
+					'custom_date_format'         => ! empty( $_POST['custom_date_format'] )       ? $_POST['custom_date_format']                   : '',
 				) ) );
 
 			} catch ( Framework\SV_WC_Plugin_Exception $e ) {

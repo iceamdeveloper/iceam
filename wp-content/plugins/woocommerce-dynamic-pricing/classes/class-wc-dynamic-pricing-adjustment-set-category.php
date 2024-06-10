@@ -3,8 +3,7 @@
 class WC_Dynamic_Pricing_Adjustment_Set_Category extends WC_Dynamic_Pricing_Adjustment_Set {
 
 	public $targets;
-	public $is_valid_rule = false;
-	public $is_valid_for_user = false;
+	public bool $is_valid_rule     = false;
 
 	public function __construct( $set_id, $set_data ) {
 		parent::__construct( $set_id, $set_data );
@@ -15,7 +14,7 @@ class WC_Dynamic_Pricing_Adjustment_Set_Category extends WC_Dynamic_Pricing_Adju
 			$targets = $set_data['targets'];
 		} else {
 			//Backwards compatibility for v 1.x, target the collected quantities.
-			$targets = isset( $set_data['collector']['args']['cats'] ) ? $set_data['collector']['args']['cats'] : false;
+			$targets = $set_data['collector']['args']['cats'] ?? false;
 		}
 
 		$this->targets = apply_filters( 'wc_dynamic_pricing_get_adjustment_set_targets', $targets, $this );
@@ -25,13 +24,7 @@ class WC_Dynamic_Pricing_Adjustment_Set_Category extends WC_Dynamic_Pricing_Adju
 			$this->is_valid_rule = false;
 		}
 
-
-		add_action( 'init', array( $this, 'on_init' ), 0 );
 		add_action( 'wc_dynamic_pricing_counter_updated', array( $this, 'check_is_valid_rule' ) );
-	}
-
-	public function on_init() {
-		$this->is_valid_for_user = $this->is_valid_for_user();
 	}
 
 	public function check_is_valid_rule() {
@@ -42,14 +35,11 @@ class WC_Dynamic_Pricing_Adjustment_Set_Category extends WC_Dynamic_Pricing_Adju
 		}
 	}
 
-
 	/**
 	 * @return WC_Dynamic_Pricing_Collector_Category
 	 */
-	public function get_collector_object() {
+	public function get_collector_object(): WC_Dynamic_Pricing_Collector_Category {
 		$collector_obj = apply_filters( 'wc_dynamic_pricing_get_collector_object', 'WC_Dynamic_Pricing_Collector_Category', 'category' );
-
 		return new $collector_obj( $this->set_data['collector'] );
 	}
-
 }

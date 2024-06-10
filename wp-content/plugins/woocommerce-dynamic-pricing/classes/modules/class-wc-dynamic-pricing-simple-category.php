@@ -5,34 +5,30 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 	private static $instance;
 
 	public static function instance() {
-		if ( self::$instance == null ) {
+		if ( empty( self::$instance ) ) {
 			self::$instance = new WC_Dynamic_Pricing_Simple_Category( 'simple_category' );
 		}
 
 		return self::$instance;
 	}
 
-	public $available_advanced_rulesets = array();
-
-	public function __construct( $module_id ) {
-		parent::__construct( $module_id );
-	}
+	public array $available_advanced_rulesets = array();
 
 	public function initialize_rules() {
 		$pricing_rule_sets = get_option( '_s_category_pricing_rules', array() );
 
-		if ( is_array( $pricing_rule_sets ) && sizeof( $pricing_rule_sets ) > 0 ) {
+		if ( is_array( $pricing_rule_sets ) && count( $pricing_rule_sets ) > 0 ) {
 			foreach ( $pricing_rule_sets as $set_id => $pricing_rule_set ) {
 				$execute_rules      = false;
 				$conditions_met     = 0;
-				$pricing_conditions = $pricing_rule_set['conditions'] ?? [];
-				if ( is_array( $pricing_conditions ) && sizeof( $pricing_conditions ) > 0 ) {
+				$pricing_conditions = $pricing_rule_set['conditions'] ?? array();
+				if ( is_array( $pricing_conditions ) && count( $pricing_conditions ) > 0 ) {
 					foreach ( $pricing_conditions as $condition ) {
 						$conditions_met += $this->handle_condition( $condition );
 					}
-					if ( $pricing_rule_set['conditions_type'] == 'all' ) {
+					if ( $pricing_rule_set['conditions_type'] === 'all' ) {
 						$execute_rules = $conditions_met == count( $pricing_conditions );
-					} elseif ( $pricing_rule_set['conditions_type'] == 'any' ) {
+					} elseif ( $pricing_rule_set['conditions_type'] === 'any' ) {
 						$execute_rules = $conditions_met > 0;
 					}
 				} else {
@@ -47,9 +43,8 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 		}
 
 		$pricing_rule_sets = get_option( '_a_category_pricing_rules', array() );
-		if ( is_array( $pricing_rule_sets ) && sizeof( $pricing_rule_sets ) > 0 ) {
+		if ( is_array( $pricing_rule_sets ) && count( $pricing_rule_sets ) > 0 ) {
 			foreach ( $pricing_rule_sets as $set_id => $pricing_rule_set ) {
-
 
 				$execute_rules      = false;
 				$conditions_met     = 0;
@@ -59,8 +54,8 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 						$conditions_met += $this->handle_condition( $condition );
 					}
 					if ( $pricing_rule_set['conditions_type'] == 'all' ) {
-						$execute_rules = $conditions_met == count( $pricing_conditions );
-					} elseif ( $pricing_rule_set['conditions_type'] == 'any' ) {
+						$execute_rules = $conditions_met === count( $pricing_conditions );
+					} elseif ( $pricing_rule_set['conditions_type'] === 'any' ) {
 						$execute_rules = $conditions_met > 0;
 					}
 				} else {
@@ -100,8 +95,6 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 
 				$_product            = $cart_item['data'];
 				$price_adjusted      = false;
-				$applied_rule        = false;
-				$applied_rule_set    = false;
 				$applied_rule_set_id = null;
 
 				foreach ( $this->available_rulesets as $set_id => $pricing_rule_set ) {
@@ -119,14 +112,12 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 
 						if ( ! $price_adjusted || $temp < $price_adjusted ) {
 							$price_adjusted      = $temp;
-							$applied_rule        = $rule;
-							$applied_rule_set    = $pricing_rule_set;
 							$applied_rule_set_id = $set_id;
 						}
 					}
 				}
 
-				if ( $price_adjusted !== false && floatval( $original_price ) != floatval( $price_adjusted ) ) {
+				if ( $price_adjusted !== false && floatval( $original_price ) !== floatval( $price_adjusted ) ) {
 					WC_Dynamic_Pricing::apply_cart_item_adjustment( $cart_item_key, $original_price, $price_adjusted, $this->module_id, $applied_rule_set_id );
 				}
 			}
@@ -139,7 +130,6 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 			return false;
 		}
 
-
 		$cat_id = is_array( $cat_id ) ? $cat_id : array( $cat_id );
 
 		$process_discounts = false;
@@ -150,15 +140,13 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 			}
 		}
 
-
 		return apply_filters( 'woocommerce_dynamic_pricing_is_applied_to', $process_discounts, $_product, $this->module_id, $this, $cat_id );
 	}
 
 	private function get_adjusted_price( $cart_item, $rule, $price ) {
-		$result = false;
 
 		$amount = apply_filters( 'woocommerce_dynamic_pricing_get_rule_amount', trim( $rule['amount'] ), $rule, null, $this );
-		if ( $amount === null || $amount === "" || ! is_numeric( $amount ) ) {
+		if ( $amount === null || $amount === '' || ! is_numeric( $amount ) ) {
 			return false;
 		}
 		$amount = floatval( $amount );
@@ -188,7 +176,7 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 
 				if ( isset( $cart_item['addons_price_before_calc'] ) ) {
 					$addons_total = floatval( $price ) - floatval( $cart_item['addons_price_before_calc'] );
-					$amount       += $addons_total;
+					$amount      += $addons_total;
 				}
 
 				$result = round( $amount, (int) $num_decimals );
@@ -198,7 +186,6 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 				break;
 		}
 
-
 		return $result;
 	}
 
@@ -207,17 +194,17 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 		switch ( $condition['type'] ) {
 			case 'apply_to':
 				if ( is_array( $condition['args'] ) && isset( $condition['args']['applies_to'] ) ) {
-					if ( $condition['args']['applies_to'] == 'everyone' ) {
+					if ( $condition['args']['applies_to'] === 'everyone' ) {
 						$result = 1;
-					} elseif ( $condition['args']['applies_to'] == 'unauthenticated' ) {
+					} elseif ( $condition['args']['applies_to'] === 'unauthenticated' ) {
 						if ( ! is_user_logged_in() ) {
 							$result = 1;
 						}
-					} elseif ( $condition['args']['applies_to'] == 'authenticated' ) {
+					} elseif ( $condition['args']['applies_to'] === 'authenticated' ) {
 						if ( is_user_logged_in() ) {
 							$result = 1;
 						}
-					} elseif ( $condition['args']['applies_to'] == 'roles' && isset( $condition['args']['roles'] ) && is_array( $condition['args']['roles'] ) ) {
+					} elseif ( $condition['args']['applies_to'] === 'roles' && isset( $condition['args']['roles'] ) && is_array( $condition['args']['roles'] ) ) {
 						if ( is_user_logged_in() ) {
 							foreach ( $condition['args']['roles'] as $role ) {
 								if ( current_user_can( $role ) ) {
@@ -297,5 +284,4 @@ class WC_Dynamic_Pricing_Simple_Category extends WC_Dynamic_Pricing_Simple_Base 
 
 		return $working_price;
 	}
-
 }

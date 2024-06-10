@@ -2,8 +2,9 @@
 /**
  * Product Bundles template functions
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.11.0
+ * @version  6.22.0
  */
 
 // Exit if accessed directly.
@@ -16,6 +17,20 @@ if ( ! defined( 'ABSPATH' ) ) {
 | Single-product.
 |--------------------------------------------------------------------------
 */
+
+/**
+ * Checks whether this product is rendered using a legacy template; an indication that a classic theme is in use.
+ * Although a legacy PHP template might be in use with a block theme (via the "Legacy PHP Product Block", the extension does not account for this scenario when gating template features.
+ *
+ * @since  6.22.0
+ *
+ * @param  WC_Product  $product
+ * @return boolean
+ */
+function wc_pb_has_legacy_product_template( $product ) {
+	$is_block_theme = WC_PB_Core_Compatibility::wc_current_theme_is_fse_theme();
+	return (bool) apply_filters( 'woocommerce_bundle_has_legacy_product_template', $is_block_theme === false, $product );
+}
 
 /**
  * Add-to-cart template for Product Bundles. Handles the 'Form location > After summary' case.
@@ -116,14 +131,15 @@ function wc_pb_template_add_to_cart_wrap( $product ) {
 	$form_data = $product->get_bundle_form_data();
 
 	wc_get_template( 'single-product/add-to-cart/bundle-add-to-cart-wrap.php', array(
-		'is_purchasable'     => $is_purchasable,
-		'purchasable_notice' => $purchasable_notice,
-		'availability_html'  => wc_get_stock_html( $product ),
-		'bundle_form_data'   => $form_data,
-		'product'            => $product,
-		'product_id'         => $product->get_id(),
+		'is_purchasable'          => $is_purchasable,
+		'purchasable_notice'      => $purchasable_notice,
+		'availability_html'       => wc_get_stock_html( $product ),
+		'bundle_form_data'        => $form_data,
+		'product'                 => $product,
+		'product_id'              => $product->get_id(),
+		'is_block_editor_request' => WC_PB_Core_Compatibility::is_block_editor_api_request(),
 		// Back-compat:
-		'bundle_price_data'  => $form_data,
+		'bundle_price_data'       => $form_data,
 	), false, WC_PB()->plugin_path() . '/templates/' );
 }
 
@@ -135,7 +151,7 @@ function wc_pb_template_add_to_cart_button( $bundle = false ) {
 	if ( isset( $_GET[ 'update-bundle' ] ) ) {
 		$updating_cart_key = wc_clean( $_GET[ 'update-bundle' ] );
 		if ( isset( WC()->cart->cart_contents[ $updating_cart_key ] ) ) {
-			echo '<input type="hidden" name="update-bundle" value="' . $updating_cart_key . '" />';
+			echo '<input type="hidden" name="update-bundle" value="' . esc_attr( $updating_cart_key ) . '" />';
 		}
 	}
 
@@ -143,8 +159,21 @@ function wc_pb_template_add_to_cart_button( $bundle = false ) {
 		return;
 	}
 
+	$button_class = implode(
+		' ',
+		array_filter(
+			array(
+				'single_add_to_cart_button',
+				'bundle_add_to_cart_button',
+				'button',
+				'alt',
+				wc_pb_wp_theme_get_element_class_name( 'button' ),
+			)
+		)
+	);
+
 	wc_get_template( 'single-product/add-to-cart/bundle-quantity-input.php', array(), false, WC_PB()->plugin_path() . '/templates/' );
-	wc_get_template( 'single-product/add-to-cart/bundle-button.php', array(), false, WC_PB()->plugin_path() . '/templates/' );
+	wc_get_template( 'single-product/add-to-cart/bundle-button.php', array( 'button_class' => $button_class ), false, WC_PB()->plugin_path() . '/templates/' );
 }
 
 /**
@@ -270,7 +299,8 @@ function wc_pb_template_bundled_item_details_wrapper_open( $bundled_item, $bundl
 		WC_PB()->display->incr_grid_layout_pos( $bundled_item );
 	}
 
-	echo '<' . $el . ' class="' . implode( ' ' , $classes ) . '"' . $style . ' >';
+	// phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
+	echo '<' . $el . ' class="' . esc_attr( implode( ' ', $classes ) ) . '"' . $style . ' >';
 }
 
 /**
@@ -367,7 +397,7 @@ function wc_pb_template_bundled_item_details_wrapper_close( $bundled_item, $bund
 		$el = 'li';
 	}
 
-	echo '</' . $el . '>';
+	echo '</' . $el . '>'; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
 }
 
 /**
@@ -595,8 +625,8 @@ function wc_pb_template_before_bundled_items( $bundle ) {
 		?><table cellspacing="0" class="<?php echo esc_attr( implode( ' ', $table_classes ) ); ?>">
 			<thead>
 				<th class="bundled_item_col bundled_item_images_head"></th>
-				<th class="bundled_item_col bundled_item_details_head"><?php _e( 'Product', 'woocommerce-product-bundles' ); ?></th>
-				<th class="bundled_item_col bundled_item_qty_head"><?php _e( 'Quantity', 'woocommerce-product-bundles' ); ?></th>
+				<th class="bundled_item_col bundled_item_details_head"><?php esc_html_e( 'Product', 'woocommerce-product-bundles' ); ?></th>
+				<th class="bundled_item_col bundled_item_qty_head"><?php esc_html_e( 'Quantity', 'woocommerce-product-bundles' ); ?></th>
 			</thead>
 			<tbody><?php
 
@@ -661,6 +691,8 @@ function wc_pb_template_bundled_item_attributes( $product ) {
  *
  * ...then wrap the dropdown in a hidden div and show the single attribute value description before it.
  *
+ * @version 7.0.0
+ *
  * @param  array  $args
  */
 function wc_pb_template_bundled_variation_attribute_options( $args ) {
@@ -698,7 +730,7 @@ function wc_pb_template_bundled_variation_attribute_options( $args ) {
 
 			foreach ( $terms as $term ) {
 				if ( $term->slug === sanitize_title( $selected_option ) ) {
-					$variation_attribute_value = esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name ) );
+					$variation_attribute_value = esc_html( apply_filters( 'woocommerce_variation_option_name', $term->name, $term, $variation_attribute_name, $bundled_item->product ) );
 					break;
 				}
 			}
@@ -714,7 +746,7 @@ function wc_pb_template_bundled_variation_attribute_options( $args ) {
 				}
 
 				if ( $singular_found ) {
-					$variation_attribute_value = esc_html( apply_filters( 'woocommerce_variation_option_name', $option ) );
+					$variation_attribute_value = esc_html( apply_filters( 'woocommerce_variation_option_name', $option, null, $variation_attribute_name, $bundled_item->product ) );
 					break;
 				}
 			}
@@ -754,4 +786,20 @@ function wc_pb_template_bundled_variation_attribute_options( $args ) {
 	}
 
 	return $html;
+}
+
+
+if ( ! function_exists( 'wc_pb_wp_theme_get_element_class_name' ) ) {
+
+	/**
+	 * Compatibility wrapper for getting the element-based block class.
+	 *
+	 * @since 6.19.0
+	 *
+	 * @param  string  $element
+	 * @return string
+	 */
+	function wc_pb_wp_theme_get_element_class_name( $element ) {
+		return WC_PB_Core_Compatibility::wc_current_theme_is_fse_theme() && function_exists( 'wc_wp_theme_get_element_class_name' ) ? wc_wp_theme_get_element_class_name( $element ) : '';
+	}
 }

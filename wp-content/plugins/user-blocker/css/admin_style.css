@@ -1,11 +1,13 @@
 /* General setting for this plugin only */
 .aligntextcenter {
     text-align: center !important;
+    width: 50px;
 }
 #username {
     float: left;
     width: 100%;
     table-layout: auto;
+    table-layout: fixed;
 }
 #username table.fixed {
     clear: none !important;
@@ -30,6 +32,7 @@
     padding-top: 5px;
     border: 1px solid #e1e1e1;
     line-height: 2;
+    padding-left: 10px;
 }
 .tbl-timing td {
     padding-bottom: 0;
@@ -186,7 +189,8 @@
     width:100%;
 }
 .view_block_table.form-table.tbl-timing td {
-    padding: 10px 0;
+    padding: 10px;
+    text-align: center;
 }
 .view_block_table.form-table.tbl-timing {
     background: none repeat scroll 0 0 #f8f8f8;
@@ -205,9 +209,12 @@ a.view_block_data:focus {
     background: #C11B17;
     color: #ffffff;
     padding: 3px 7px;
+    clear: both;
+    display: block;
 }
 .check-column {
     width: 25px;
+    vertical-align: middle !important;
 }
 .blk-date {
     width: 180px;
@@ -457,7 +464,7 @@ ul.plugins_list {
     min-width: 100px;
 }
 .success_msg {
-    color: green;
+    color: #008000;
 }
 .sub_row > input {
     height: 37px;
@@ -698,12 +705,12 @@ ul.plugins_list {
     position: relative;
 }
 .search_box #frmExport div.actions {
-    position: relative;
+    position: relative !important;
 }
 .user_blocking_button {
     background-color: #4CAF50; /* Green */
     border: none;
-    color: white;
+    color: #FFF;
     padding: 8px 16px;
     text-align: center;
     text-decoration: none;
@@ -716,41 +723,41 @@ ul.plugins_list {
 }
 .user_blocking_button:focus{
     border: none;
-    color: white;
+    color: #FFF;
 }
 .user_blocking_button1 {
-    color: white;
+    color: #FFF;
     background-color: #4CAF50;
     border:3px solid #4CAF50;
 }
 .user_blocking_button1:hover {
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    color: white;
+    color: #FFF;
     border:3px solid #4CAF50;
 }
 .user_blocking_button2 {
-    color: white;
+    color: #FFF;
     background-color: #0085ba;
 }
 .user_blocking_button2:hover {
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    color: white;
+    color: #FFF;
 }
 .user_blocking_button3 {
-    color: white;
+    color: #FFF;
     background-color: #365899;
 }
 .user_blocking_button3:hover {
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    color: white;
+    color: #FFF;
 }
 .user_blocking_button4 {
-    color: white;
+    color: #FFF;
     background-color: rgb(66, 184, 221);
 }
 .user_blocking_button4:hover {
     box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    color: white;
+    color: #FFF;
 }
 .user_blocking_promo-close {
     float:right;
@@ -758,7 +765,28 @@ ul.plugins_list {
     margin: 5px 10px 0px 0px;
 }
 .user_blocking_promo-close:hover {
-    color: red;
+    color: #ff0000;
+}
+.ui-datepicker .ui-datepicker-buttonpane button.ui-datepicker-current {
+    font-weight: bold;
+    opacity: 1;
+}
+.ui-datepicker .ui-datepicker-title{
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+#username td, #username th {
+    /* padding: 8px 4px !important; */
+    width: 12% !important;
+    vertical-align: middle;
+    text-align: start !important;
+}
+.ui_tpicker_time_label, .ui_tpicker_hour_label, .ui_tpicker_minute_label, .ui_tpicker_second_label{
+    line-height: 1.0em !important;
+}
+.aligntextcenter a:focus, .cover_form table a:focus {
+    box-shadow: none;
 }
 @media screen and (max-width: 1200px) {
     
@@ -868,4 +896,29 @@ form#frmSearch {
 }
 .search_box .ublk_actions {
     margin-bottom: 10px;
+}
+
+#username tr,#role tr{
+	word-break: break-word;
+}   
+
+@media screen and (min-width: 768px) and (max-width: 1600px) {
+    .blk-date {
+	    width: 95px;
+    }
+    .th-username {
+	    width: 95px;
+    }
+    .th-name {
+        width: 100px;
+    }
+    .th-email {
+        width: 150PX;
+    }
+    .cover_form {
+    	width: calc(85% - 20px);
+    }
+    .td-admin-sidebar {
+        width: 15%;
+    }
 }

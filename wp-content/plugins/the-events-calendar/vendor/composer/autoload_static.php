@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit08fb3bf4047c748cad763844dbdb1120
+class ComposerStaticInit8310c40c261593b84cd1e8117c8ec3a1
 {
     public static $prefixLengthsPsr4 = array (
         'T' => 
@@ -27,6 +27,14 @@ class ComposerStaticInit08fb3bf4047c748cad763844dbdb1120
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
+        'TEC\\Events\\Block_Templates\\Archive_Events\\Archive_Block_Template' => __DIR__ . '/../..' . '/src/Events/Block_Templates/Archive_Events/Archive_Block_Template.php',
+        'TEC\\Events\\Block_Templates\\Block_Template_Contract' => __DIR__ . '/../..' . '/src/Events/Block_Templates/Block_Template_Contract.php',
+        'TEC\\Events\\Block_Templates\\Controller' => __DIR__ . '/../..' . '/src/Events/Block_Templates/Controller.php',
+        'TEC\\Events\\Block_Templates\\Single_Event\\Single_Block_Template' => __DIR__ . '/../..' . '/src/Events/Block_Templates/Single_Event/Single_Block_Template.php',
+        'TEC\\Events\\Blocks\\Archive_Events\\Block' => __DIR__ . '/../..' . '/src/Events/Blocks/Archive_Events/Block.php',
+        'TEC\\Events\\Blocks\\Controller' => __DIR__ . '/../..' . '/src/Events/Blocks/Controller.php',
+        'TEC\\Events\\Blocks\\Single_Event\\Block' => __DIR__ . '/../..' . '/src/Events/Blocks/Single_Event/Block.php',
+        'TEC\\Events\\Configuration\\Provider' => __DIR__ . '/../..' . '/src/Events/Configuration/Provider.php',
         'TEC\\Events\\Custom_Tables\\V1\\Activation' => __DIR__ . '/../..' . '/src/Events/Custom_Tables/V1/Activation.php',
         'TEC\\Events\\Custom_Tables\\V1\\Events\\Event_Cleaner\\Event_Cleaner' => __DIR__ . '/../..' . '/src/Events/Custom_Tables/V1/Events/Event_Cleaner/Event_Cleaner.php',
         'TEC\\Events\\Custom_Tables\\V1\\Events\\Event_Cleaner\\Provider' => __DIR__ . '/../..' . '/src/Events/Custom_Tables/V1/Events/Event_Cleaner/Provider.php',
@@ -142,20 +150,37 @@ class ComposerStaticInit08fb3bf4047c748cad763844dbdb1120
         'TEC\\Events\\Custom_Tables\\V1\\WP_Query\\Redirection_Schema' => __DIR__ . '/../..' . '/src/Events/Custom_Tables/V1/WP_Query/Redirection_Schema.php',
         'TEC\\Events\\Custom_Tables\\V1\\WP_Query\\Repository\\Custom_Tables_Query_Filters' => __DIR__ . '/../..' . '/src/Events/Custom_Tables/V1/WP_Query/Repository/Custom_Tables_Query_Filters.php',
         'TEC\\Events\\Custom_Tables\\V1\\WP_Query\\Repository\\Query_Replace' => __DIR__ . '/../..' . '/src/Events/Custom_Tables/V1/WP_Query/Repository/Query_Replace.php',
-        'TEC\\Events\\Editor\\Full_Site\\Hooks' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Hooks.php',
-        'TEC\\Events\\Editor\\Full_Site\\Provider' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Provider.php',
-        'TEC\\Events\\Editor\\Full_Site\\Templates' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Templates.php',
+        'TEC\\Events\\Editor\\Full_Site\\Archive_Block_Template' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Archive_Block_Template.php',
+        'TEC\\Events\\Editor\\Full_Site\\Block_Template_Contract' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Block_Template_Contract.php',
+        'TEC\\Events\\Editor\\Full_Site\\Controller' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Controller.php',
+        'TEC\\Events\\Editor\\Full_Site\\Single_Block_Template' => __DIR__ . '/../..' . '/src/Events/Editor/Full_Site/Single_Block_Template.php',
         'TEC\\Events\\Installer\\Provider' => __DIR__ . '/../..' . '/src/Events/Installer/Provider.php',
         'TEC\\Events\\Integrations\\Integration_Abstract' => __DIR__ . '/../..' . '/src/Events/Integrations/Integration_Abstract.php',
         'TEC\\Events\\Integrations\\Plugins\\Colbri_Page_Builder\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Colbri_Page_Builder/Provider.php',
         'TEC\\Events\\Integrations\\Plugins\\Elementor\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Elementor/Provider.php',
-        'TEC\\Events\\Integrations\\Plugins\\Plugin_Integration' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Plugin_Integration.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\Email\\RSVP' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/Email/RSVP.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\Email\\Ticket' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/Email/Ticket.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\Emails' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/Emails.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\Hooks' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/Hooks.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\JSON_LD\\Event_Data' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/JSON_LD/Event_Data.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/Provider.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Emails\\Template' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Emails/Template.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Provider.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Site_Health\\Controller' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Site_Health/Controller.php',
+        'TEC\\Events\\Integrations\\Plugins\\Event_Tickets\\Site_Health\\Subsection' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Event_Tickets/Site_Health/Subsection.php',
         'TEC\\Events\\Integrations\\Plugins\\Rank_Math\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Rank_Math/Provider.php',
+        'TEC\\Events\\Integrations\\Plugins\\Tickets_Wallet_Plus\\Controller' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Tickets_Wallet_Plus/Controller.php',
+        'TEC\\Events\\Integrations\\Plugins\\Tickets_Wallet_Plus\\Passes\\Apple_Wallet\\Event_Modifier' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Tickets_Wallet_Plus/Passes/Apple_Wallet/Event_Modifier.php',
+        'TEC\\Events\\Integrations\\Plugins\\Tickets_Wallet_Plus\\Passes\\Pdf' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/Tickets_Wallet_Plus/Passes/Pdf.php',
         'TEC\\Events\\Integrations\\Plugins\\WordPress_SEO\\Events_Schema' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/WordPress_SEO/Events_Schema.php',
         'TEC\\Events\\Integrations\\Plugins\\WordPress_SEO\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Plugins/WordPress_SEO/Provider.php',
         'TEC\\Events\\Integrations\\Provider' => __DIR__ . '/../..' . '/src/Events/Integrations/Provider.php',
-        'TEC\\Events\\Integrations\\Themes\\Theme_Integration' => __DIR__ . '/../..' . '/src/Events/Integrations/Themes/Theme_Integration.php',
         'TEC\\Events\\Legacy\\Views\\V1\\Provider' => __DIR__ . '/../..' . '/src/Events/Legacy/Views/V1/Provider.php',
+        'TEC\\Events\\SEO\\Controller' => __DIR__ . '/../..' . '/src/Events/SEO/Controller.php',
+        'TEC\\Events\\Site_Health\\Info_Section' => __DIR__ . '/../..' . '/src/Events/Site_Health/Info_Section.php',
+        'TEC\\Events\\Site_Health\\Provider' => __DIR__ . '/../..' . '/src/Events/Site_Health/Provider.php',
+        'TEC\\Events\\Telemetry\\Provider' => __DIR__ . '/../..' . '/src/Events/Telemetry/Provider.php',
+        'TEC\\Events\\Telemetry\\Telemetry' => __DIR__ . '/../..' . '/src/Events/Telemetry/Telemetry.php',
         'Tribe\\Events\\Admin\\Filter_Bar\\Provider' => __DIR__ . '/../..' . '/src/Tribe/Admin/Filter_Bar/Provider.php',
         'Tribe\\Events\\Admin\\Notice\\Full_Site_Editor' => __DIR__ . '/../..' . '/src/Tribe/Admin/Notice/Full_Site_Editor.php',
         'Tribe\\Events\\Admin\\Notice\\Install_Event_Tickets' => __DIR__ . '/../..' . '/src/Tribe/Admin/Notice/Install_Event_Tickets.php',
@@ -169,7 +194,6 @@ class ComposerStaticInit08fb3bf4047c748cad763844dbdb1120
         'Tribe\\Events\\Aggregator\\Processes\\Batch_Imports' => __DIR__ . '/../..' . '/src/Tribe/Aggregator/Processes/Batch_Imports.php',
         'Tribe\\Events\\Aggregator\\Record\\Batch_Queue' => __DIR__ . '/../..' . '/src/Tribe/Aggregator/Record/Batch_Queue.php',
         'Tribe\\Events\\Collections\\Lazy_Post_Collection' => __DIR__ . '/../..' . '/src/Tribe/Collections/Lazy_Post_Collection.php',
-        'Tribe\\Events\\Editor\\Blocks\\Archive_Events' => __DIR__ . '/../..' . '/src/Tribe/Editor/Blocks/Archive_Events.php',
         'Tribe\\Events\\Editor\\Hooks' => __DIR__ . '/../..' . '/src/Tribe/Editor/Hooks.php',
         'Tribe\\Events\\Editor\\Objects\\Editor_Object_Interface' => __DIR__ . '/../..' . '/src/Tribe/Editor/Objects/Editor_Object_Interface.php',
         'Tribe\\Events\\Editor\\Objects\\Event' => __DIR__ . '/../..' . '/src/Tribe/Editor/Objects/Event.php',
@@ -260,6 +284,7 @@ class ComposerStaticInit08fb3bf4047c748cad763844dbdb1120
         'Tribe\\Events\\Views\\V2\\Views\\Traits\\Json_Ld_Data' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Traits/Json_Ld_Data.php',
         'Tribe\\Events\\Views\\V2\\Views\\Traits\\List_Behavior' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Traits/List_Behavior.php',
         'Tribe\\Events\\Views\\V2\\Views\\Traits\\With_Fast_Forward_Link' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Traits/With_Fast_Forward_Link.php',
+        'Tribe\\Events\\Views\\V2\\Views\\Traits\\With_Noindex' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Traits/With_Noindex.php',
         'Tribe\\Events\\Views\\V2\\Views\\Traits\\iCal_Data' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Traits/iCal_Data.php',
         'Tribe\\Events\\Views\\V2\\Views\\Widgets\\Widget_List_View' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Widgets/Widget_List_View.php',
         'Tribe\\Events\\Views\\V2\\Views\\Widgets\\Widget_View' => __DIR__ . '/../..' . '/src/Tribe/Views/V2/Views/Widgets/Widget_View.php',
@@ -289,9 +314,9 @@ class ComposerStaticInit08fb3bf4047c748cad763844dbdb1120
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit08fb3bf4047c748cad763844dbdb1120::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit08fb3bf4047c748cad763844dbdb1120::$prefixDirsPsr4;
-            $loader->classMap = ComposerStaticInit08fb3bf4047c748cad763844dbdb1120::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInit8310c40c261593b84cd1e8117c8ec3a1::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInit8310c40c261593b84cd1e8117c8ec3a1::$prefixDirsPsr4;
+            $loader->classMap = ComposerStaticInit8310c40c261593b84cd1e8117c8ec3a1::$classMap;
 
         }, null, ClassLoader::class);
     }

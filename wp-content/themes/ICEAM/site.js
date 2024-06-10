@@ -3,7 +3,6 @@ jQuery(document).ready(function(){
 	
 	setTimeout(function(){
 		$('a[href*="/product"]').each(function() {
-			console.log($(this).html());
 			$(this).replaceWith($(this).html());
 		});
 	}, 10); // even a delay of 0 works, but doesn't work with NO delay.
@@ -13,25 +12,27 @@ jQuery(document).ready(function(){
 	$(".video iframe").attr("id","ytvideo");
 	
 	var isiOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-	var isVideoStarted = false;
 	
     var tag = document.createElement('script');
     tag.src = "https://www.youtube.com/iframe_api";
     var firstScriptTag = document.getElementsByTagName('script')[0];
     firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+	var player;
     
 	
     window.onYouTubeIframeAPIReady = function() {
-        var player = new YT.Player('ytvideo', {
+        player = new YT.Player('ytvideo', {
             events: {
                 'onReady': onPlayerReady,
                 'onStateChange': onPlayerStateChange
             }
         });
     };
+
+	$(".video").prepend("<div class='yt-screen'></div>");
+	$(".video").prepend("<div class='block-watch-on-yt-button'></div>");
 	
 	function onPlayerReady(event) {
-		$(".video").prepend("<div class='yt-screen'></div>");
 		setVideoScreenSize();
 		
 		if ($(".video").width() > 700) {
@@ -39,16 +40,12 @@ jQuery(document).ready(function(){
 		}
 		
 		$(".yt-screen").on("click", function(){
-			/*if (isiOS && !isVideoStarted) {
-				return;
-			}*/
-			
+			$(".yt-screen").css("height", $(".video").height() - 45 + "px");
 			if (event.target.getPlayerState() == YT.PlayerState.PAUSED || event.target.getPlayerState() == YT.PlayerState.CUED) {
 				event.target.playVideo();
 			} else if(event.target.getPlayerState() == YT.PlayerState.PLAYING){
 				event.target.pauseVideo();
 			}
-			$(".yt-screen").css("height", $(".video").height() - 45 + "px");
 		});
     }
 	
@@ -57,21 +54,12 @@ jQuery(document).ready(function(){
 	function setVideoScreenSize(){
 		$(".yt-screen").css("height", $(".video").height() + "px");
 		$(".yt-screen").css("width", $(".video").width() + "px");
-		
-		/*
-		if (isiOS && !isVideoStarted) {
-			$(".yt-screen").css({"height": "25%", "bottom": "0px", "top": "auto"});
-		} else if(isiOS && isVideoStarted){
-			$(".yt-screen").css({"height":$(".video").height() - 45 + "px", "bottom": "auto", "top": "0px"});
-		}*/
 	}
-
+	
 	function onPlayerStateChange(event) {
 		
 		if (event.data == YT.PlayerState.BUFFERING) {
 			console.log("Buffering");
-			isVideoStarted = true;
-			setVideoScreenSize();
 	    }
 		
 	    if (event.data == YT.PlayerState.PAUSED) {
@@ -84,6 +72,10 @@ jQuery(document).ready(function(){
 	
 	    if (event.data == YT.PlayerState.ENDED) {
 			console.log("Ended");
+	    }
+
+	    if (event.data == -1) {
+			console.log("UNSTARTED");
 	    }
 	}
     
@@ -135,15 +127,10 @@ jQuery(document).ready(function(){
 		}
 	});
 
-	console.log('here');
 	$(".video iframe, .course-video iframe").each(function(){
-		//$(document).on("contextmenu", function(){return false;});
-		var yturi = "https://www.youtube.com/embed/" + ytv($("#ytv").data("yturi")) + "?autohide=1&modestbranding=1&rel=0&showinfo=0&enablejsapi=1";
-		console.log("yturi: " + yturi);
-		
-		console.log(ytv($("#ytv").data("yturi")));
+		// add youtube embed to document
+		var yturi = "https://www.youtube-nocookie.com/embed/" + ytv($("#ytv").data("yturi")) + "?autoplay=0&rel=0&controls=1&enablejsapi=1";
 		$(this).attr("src",yturi);
-		
 		$("body").fitVids();
 	});
 	

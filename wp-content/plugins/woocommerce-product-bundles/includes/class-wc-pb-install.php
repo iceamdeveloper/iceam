@@ -2,7 +2,7 @@
 /**
  * WC_PB_Install class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.0.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles installation and updating tasks.
  *
  * @class    WC_PB_Install
- * @version  6.18.3
+ * @version  7.0.0
  */
 class WC_PB_Install {
 
@@ -119,6 +119,9 @@ class WC_PB_Install {
 	 * @return boolean
 	 */
 	private static function must_install() {
+		if ( is_null( self::$current_version ) ) {
+			return true;
+		}
 		return version_compare( self::$current_version, WC_PB()->plugin_version(), '<' );
 	}
 
@@ -482,7 +485,7 @@ class WC_PB_Install {
 	protected static function maybe_prepare_db_for_upgrade() {
 
 		// Fix db index for 6.10.0 till 6.11.0.
-		if ( version_compare( self::$current_version, '6.10.0' ) > -1 && version_compare( '6.11.0', self::$current_version ) > -1 ) {
+		if ( ! is_null( self::$current_version ) && version_compare( self::$current_version, '6.10.0' ) > -1 && version_compare( '6.11.0', self::$current_version ) > -1 ) {
 			global $wpdb;
 			$wpdb->query( "ALTER TABLE `{$wpdb->prefix}wc_order_bundle_lookup` DROP KEY `bundle_id`" );
 		}

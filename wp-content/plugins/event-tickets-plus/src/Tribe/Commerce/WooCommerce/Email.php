@@ -164,10 +164,16 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Email extends WC_Email {
 	/**
 	 * Retrieve the full HTML for the tickets email
 	 *
+	 * @since 5.9.1 Added check to make sure object is not empty.
+	 *
 	 * @return string
 	 */
 	public function get_content_html() {
 		$wootickets = Tribe__Tickets_Plus__Commerce__WooCommerce__Main::get_instance();
+
+		if ( empty( $this->object ) ) {
+			return $wootickets->generate_tickets_email_content( [] );
+		}
 
 		$attendees = method_exists( $this->object, 'get_id' )
 			? $wootickets->get_attendees_by_id( $this->object->get_id() ) // WC 3.x

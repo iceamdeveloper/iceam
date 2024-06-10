@@ -2,7 +2,7 @@
 /**
  * WC_PB_MMI_Cart class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.4.0
  */
 

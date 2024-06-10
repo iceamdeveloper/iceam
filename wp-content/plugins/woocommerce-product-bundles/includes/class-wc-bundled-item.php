@@ -2,7 +2,7 @@
 /**
  * WC_Bundled_Item class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.2.0
  */
 
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * The bunded item class is a product container that initializes and holds pricing, availability and variation/attribute-related data for a bundled product.
  *
  * @class    WC_Bundled_Item
- * @version  6.17.2
+ * @version  7.0.0
  */
 class WC_Bundled_Item {
 
@@ -64,10 +64,64 @@ class WC_Bundled_Item {
 	private $visibility;
 
 	/**
+	 * Visibility of the bundled item in the single product template.
+	 * @var string
+	 */
+	private $single_product_visibility;
+
+	/**
+	 * Visibility of the bundled item in the cart template.
+	 * @var string
+	 */
+	private $cart_visibility;
+
+	/**
+	 * Visibility of the bundled item in the order template.
+	 * @var string
+	 */
+	private $order_visibility;
+
+	/**
 	 * Price visibility of the bundled item in the single product, cart and order templates.
 	 * @var array
 	 */
 	private $price_visibility;
+
+	/**
+	 * Price visibility of the bundled item in the single product template.
+	 * @var string
+	 */
+	private $single_product_price_visibility;
+
+	/**
+	 * Price visibility of the bundled item in the cart template.
+	 * @var string
+	 */
+	private $cart_price_visibility;
+
+	/**
+	 * Price visibility of the bundled item in the order template.
+	 * @var string
+	 */
+	private $order_price_visibility;
+
+	/**
+	 * Whether the bundled item has attributes.
+	 * @var boolean
+	 */
+	private $has_attributes;
+
+	/**
+	 * Whether the bundled item has dimensions.
+	 * @var boolean
+	 */
+	private $has_dimensions;
+
+	/**
+	 * Whether the bundled item has weight.
+	 * @var boolean
+	 */
+	private $has_weight;
 
 	/**
 	 * Optional status of the bundled item.
@@ -104,6 +158,42 @@ class WC_Bundled_Item {
 	 * @var string
 	 */
 	private $shipped_individually;
+
+	/**
+	 * Whether the bundled product's title is overridden.
+	 * @var string
+	 */
+	private $override_title;
+
+	/**
+	 * Whether the bundled product's description is overridden.
+	 * @var string
+	 */
+	private $override_description;
+
+	/**
+	 * Whether the bundled product's variations are overridden.
+	 * @var string
+	 */
+	private $override_variations;
+
+	/**
+	 * Whether the bundled product's default variation attributes are overridden.
+	 * @var string
+	 */
+	private $override_default_variation_attributes;
+
+	/**
+	 * Whether the bundled product can be purchased.
+	 * @var boolean
+	 */
+	private $purchasable;
+
+	/**
+	 * Whether the bundled product is Sold Individually.
+	 * @var boolean
+	 */
+	private $sold_individually;
 
 	/**
 	 * Bundled item price & recurring price discount when the bundled item is priced individually.
@@ -205,6 +295,18 @@ class WC_Bundled_Item {
 	 * @var boolean
 	 */
 	private $block_child_filtering = false;
+
+	/**
+	 * Whether in the process of renewing a subscribed Bundle.
+	 * @var boolean
+	 */
+	public $is_subscription_renewal;
+
+	/**
+	 * Composited cart item.
+	 * @var array
+	 */
+	public $composited_cart_item;
 
 	/**
 	 * __construct method.

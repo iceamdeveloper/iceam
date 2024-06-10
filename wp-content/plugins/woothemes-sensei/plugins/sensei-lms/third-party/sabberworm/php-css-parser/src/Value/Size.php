@@ -6,7 +6,10 @@ use Sensei\ThirdParty\Sabberworm\CSS\OutputFormat;
 use Sensei\ThirdParty\Sabberworm\CSS\Parsing\ParserState;
 use Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedEOFException;
 use Sensei\ThirdParty\Sabberworm\CSS\Parsing\UnexpectedTokenException;
-class Size extends \Sensei\ThirdParty\Sabberworm\CSS\Value\PrimitiveValue
+/**
+ * A `Size` consists of a numeric `size` value and a unit.
+ */
+class Size extends PrimitiveValue
 {
     /**
      * vh/vw/vm(ax)/vmin/rem are absolute insofar as they don’t scale to the immediate parent (only the viewport)
@@ -21,7 +24,7 @@ class Size extends \Sensei\ThirdParty\Sabberworm\CSS\Value\PrimitiveValue
     /**
      * @var array<int, string>
      */
-    const NON_SIZE_UNITS = ['deg', 'grad', 'rad', 's', 'ms', 'turns', 'Hz', 'kHz'];
+    const NON_SIZE_UNITS = ['deg', 'grad', 'rad', 's', 'ms', 'turn', 'Hz', 'kHz'];
     /**
      * @var array<int, array<string, string>>|null
      */
@@ -59,15 +62,23 @@ class Size extends \Sensei\ThirdParty\Sabberworm\CSS\Value\PrimitiveValue
      * @throws UnexpectedEOFException
      * @throws UnexpectedTokenException
      */
-    public static function parse(\Sensei\ThirdParty\Sabberworm\CSS\Parsing\ParserState $oParserState, $bIsColorComponent = \false)
+    public static function parse(ParserState $oParserState, $bIsColorComponent = \false)
     {
         $sSize = '';
         if ($oParserState->comes('-')) {
             $sSize .= $oParserState->consume('-');
         }
-        while (\is_numeric($oParserState->peek()) || $oParserState->comes('.')) {
+        while (\is_numeric($oParserState->peek()) || $oParserState->comes('.') || $oParserState->comes('e', \true)) {
             if ($oParserState->comes('.')) {
                 $sSize .= $oParserState->consume('.');
+            } elseif ($oParserState->comes('e', \true)) {
+                $sLookahead = $oParserState->peek(1, 1);
+                if (\is_numeric($sLookahead) || $sLookahead === '+' || $sLookahead === '-') {
+                    $sSize .= $oParserState->consume(2);
+                } else {
+                    break;
+                    // Reached the unit part of the number like "em" or "ex"
+                }
             } else {
                 $sSize .= $oParserState->consume(1);
             }
@@ -83,7 +94,7 @@ class Size extends \Sensei\ThirdParty\Sabberworm\CSS\Value\PrimitiveValue
                 }
             }
         }
-        return new \Sensei\ThirdParty\Sabberworm\CSS\Value\Size((float) $sSize, $sUnit, $bIsColorComponent, $oParserState->currentLine());
+        return new Size((float) $sSize, $sUnit, $bIsColorComponent, $oParserState->currentLine());
     }
     /**
      * @return array<int, array<string, string>>
@@ -170,12 +181,12 @@ class Size extends \Sensei\ThirdParty\Sabberworm\CSS\Value\PrimitiveValue
      */
     public function __toString()
     {
-        return $this->render(new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat());
+        return $this->render(new OutputFormat());
     }
     /**
      * @return string
      */
-    public function render(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oOutputFormat)
+    public function render(OutputFormat $oOutputFormat)
     {
         $l = \localeconv();
         $sPoint = \preg_quote($l['decimal_point'], '/');

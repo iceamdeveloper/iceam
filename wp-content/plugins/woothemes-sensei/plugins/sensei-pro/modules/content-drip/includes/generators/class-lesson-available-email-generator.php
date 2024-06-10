@@ -58,7 +58,12 @@ class Lesson_Available_Email_Generator extends Email_Generators_Abstract {
 	 * @return void
 	 */
 	public function init() {
-		add_action( 'sensei_pro_content_drip_email_send', [ $this, 'lesson_available_drip_mail_to_student' ], 10, 2 );
+		// Support for older versions of Sensei.
+		if ( method_exists( $this, 'maybe_add_action' ) ) {
+			$this->maybe_add_action( 'sensei_pro_content_drip_email_send', [ $this, 'lesson_available_drip_mail_to_student' ], 10, 2 );
+		} else {
+			add_action( 'sensei_pro_content_drip_email_send', [ $this, 'lesson_available_drip_mail_to_student' ], 10, 2 );
+		}
 	}
 
 	/**
@@ -100,7 +105,7 @@ class Lesson_Available_Email_Generator extends Email_Generators_Abstract {
 						'student:id'          => $student_id,
 						'student:displayname' => $student->display_name,
 						'lesson:id'           => $lesson,
-						'lesson:name'         => get_the_title( $lesson ),
+						'lesson:name'         => html_entity_decode( get_the_title( $lesson ) ),
 						'lesson:url'          => esc_url( get_permalink( $lesson ) ),
 						'date:dtext'          => __( 'today', 'sensei-pro' ),
 					],

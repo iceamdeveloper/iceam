@@ -17,12 +17,12 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -99,7 +99,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param array $csv_headers associative array
-		 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance instance of the export class
+		 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance instance of the export class
 		 * @param null|\stdClass $job optional import or export job
 		 */
 		return (array) apply_filters( 'wc_memberships_csv_export_user_memberships_headers', $headers, $this, $job );
@@ -122,7 +122,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param string $enclosure default double quote `"`
-		 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance instance of the export class
+		 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance instance of the export class
 		 * @param \stdClass $job export job
 		 */
 		return (string) apply_filters( 'wc_memberships_csv_export_enclosure', parent::get_csv_enclosure(), $this, $job );
@@ -147,7 +147,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param bool $dates_in_utc default false
-		 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance instance of the export class
+		 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance instance of the export class
 		 * @param \stdClass $job export job
 		 */
 		$use_utc = (bool) apply_filters( 'wc_memberships_csv_export_user_memberships_dates_in_utc', false, $this, $job );
@@ -175,7 +175,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param string $file_name file name
-		 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance instance of the export class
+		 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance instance of the export class
 		 */
 		$file_name = apply_filters( 'wc_memberships_csv_export_user_memberships_file_name', $file_name, $this );
 
@@ -197,6 +197,28 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 		$exports_path = trailingslashit( $upload_dir['basedir'] ) . $this->exports_dir;
 
 		return "{$exports_path}/{$file_name}";
+	}
+
+
+	/**
+	 * Returns the temporary export file path available only for the batch session.
+	 *
+	 * @uses wp_tempnam()
+	 *
+	 * @since 1.25.1
+	 *
+	 * @param string $file_name
+	 * @return string
+	 */
+	private function get_tmp_file_path( string $file_name = '' ) : string {
+
+		$tmp_file = wp_tempnam( $file_name );
+
+		if ( file_exists( $tmp_file ) ) {
+			unlink( $tmp_file );
+		}
+
+		return $tmp_file;
 	}
 
 
@@ -229,21 +251,24 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 	public function create_job( $attrs ) {
 
 		// makes the current export job file name unique for the current user
-		$file_id   = md5( http_build_query( wp_parse_args( $attrs, array( 'user_id' => get_current_user_id() ) ) ) );
-		$file_name = $this->get_file_name( $file_id );
-		$file_path = $this->get_file_path( $file_name );
-		$file_url  = $this->get_file_url( $file_name );
+		$file_id	   = md5( http_build_query( wp_parse_args( $attrs, array( 'user_id' => get_current_user_id() ) ) ) );
+		$file_name	   = $this->get_file_name( $file_id );
+		$file_path	   = $this->get_file_path( $file_name );
+		$file_url	   = $this->get_file_url( $file_name );
+		$tmp_file_path = $this->get_tmp_file_path( $file_name );
 
 		// given that it could be filtered, we need to ensure there's a valid file name produced
 		if ( '' === $file_name ) {
 			throw new Framework\SV_WC_Plugin_Exception( esc_html__( "No valid filename given for export file, can't export memberships.", 'woocommerce-memberships' ) );
 		}
 
-		$job = parent::create_job( wp_parse_args( $attrs, [
+		$attrs = wp_parse_args( $attrs, [
+			'date_format'            => '',
 			'file_name'              => $file_name,
 			'file_path'              => $file_path,
 			'file_url'               => $file_url,
 			'fields_delimiter'       => 'comma',
+			'tmp_file_path'          => $tmp_file_path,
 			'include_profile_fields' => false,
 			'include_meta_data'      => false,
 			'results'                => (object) [
@@ -252,7 +277,19 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 				'processed' => 0,
 				'html'      => '',
 			],
-		] ) );
+		] );
+
+		if ( empty( $attrs['date_format'] ) || ! is_string( $attrs['date_format'] ) ) {
+			$attrs['date_format'] = '';
+		} elseif ( 'custom' === $attrs['date_format'] ) {
+			if ( isset( $attrs['custom_date_format'] ) && is_string( $attrs['custom_date_format'] ) ) {
+				$attrs['date_format'] = $attrs['custom_date_format'];
+			} else {
+				$attrs['date_format'] = '';
+			}
+		}
+
+		$job = parent::create_job( $attrs );
 
 		if ( $job ) {
 
@@ -284,7 +321,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 			 * @since 1.6.0
 			 *
 			 * @param bool $enable_bom true to add the BOM, false otherwise (default)
-			 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance an instance of the export class
+			 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance an instance of the export class
 			 */
 			if ( true === (bool) apply_filters( 'wc_memberships_csv_export_enable_bom', false, $this ) ) {
 				fwrite( $file_handle, chr(0xEF) . chr(0xBB) . chr(0xBF) );
@@ -326,6 +363,11 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 
 		if ( ! $this->start_time ) {
 			$this->start_time = time();
+		}
+
+		if( file_exists( $job->tmp_file_path ) ) {
+
+			unlink( $job->tmp_file_path );
 		}
 
 		// indicate that the job has started processing
@@ -377,6 +419,13 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 				if ( $processed_memberships >= $items_per_batch || $this->time_exceeded() || $this->memory_exceeded() ) {
 					break;
 				}
+			}
+
+			if ( file_exists( $job->tmp_file_path ) ) {
+
+				file_put_contents( $job->file_path, file_get_contents( $job->tmp_file_path ), FILE_APPEND );
+
+				unlink( $job->tmp_file_path );
 			}
 
 			$job->progress  += $processed_memberships;
@@ -441,7 +490,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 		 * @since 1.6.0
 		 *
 		 * @param null|\WC_Memberships_User_Membership $user_membership User Membership being exported
-		 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance the instance of the export class
+		 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance the instance of the export class
 		 * @param \stdClass $job current export job
 		 */
 		$user_membership = apply_filters( 'wc_memberships_before_csv_export_user_membership', wc_memberships_get_user_membership( $user_membership_id ), $this, $job );
@@ -495,6 +544,25 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 							$value = is_string( $role ) ? $role : '';
 						break;
 
+						case 'member_last_active' :
+
+							$value = '';
+
+							if ( $last_active = $user_membership->get_last_active_date() ) {
+
+								try {
+
+									$last_active->setTimezone( new DateTimeZone( $this->get_csv_timezone( $job ) ) );
+
+									$value = $last_active->format( $job->date_format ?: 'Y-m-d' ); // the `wc_last_active` timestamp is only precise down to midnight anyway
+
+								} catch ( Exception $exception ) {
+									// defaults to empty string
+								}
+							}
+
+						break;
+
 						case 'membership_plan_id' :
 							$value = $membership_plan->get_id();
 						break;
@@ -524,11 +592,11 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 						break;
 
 						case 'member_since' :
-							$value = 'UTC' === $this->get_csv_timezone( $job ) ? $user_membership->get_start_date() : $user_membership->get_local_start_date();
+							$value = 'UTC' === $this->get_csv_timezone( $job ) ? $user_membership->get_start_date( $job->date_format ?: 'mysql' ) : $user_membership->get_local_start_date( $job->date_format ?: 'mysql' );
 						break;
 
 						case 'membership_expiration' :
-							$value = 'UTC' === $this->get_csv_timezone( $job ) ? $user_membership->get_end_date()   : $user_membership->get_local_end_date();
+							$value = 'UTC' === $this->get_csv_timezone( $job ) ? $user_membership->get_end_date( $job->date_format ?: 'mysql' )   : $user_membership->get_local_end_date( $job->date_format ?: 'mysql' );
 						break;
 
 						case 'user_membership_meta' :
@@ -559,14 +627,11 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 								if ( $job && ! empty( $job->include_profile_fields ) && ! empty( $profile_field = $user_membership->get_profile_field( $column_name ) ) ) {
 
 									if ( Profile_Fields::TYPE_FILE === $profile_field->get_definition()->get_type() ) {
-
 										// the column should contain the attachment ID
 										$value = $profile_field->get_value();
 									} else {
-
 										$value = $profile_field->get_formatted_value();
 									}
-
 								}
 
 							// check if the column is a URL column for a file profile field
@@ -576,7 +641,6 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 								if ( $job && ! empty( $job->include_profile_fields ) && ! empty( $profile_field = $user_membership->get_profile_field( str_replace( '(url)', '', $column_name ) ) ) ) {
 
 									if ( Profile_Fields::TYPE_FILE === $profile_field->get_definition()->get_type() ) {
-
 										// the column should contain the attachment URL
 										$value = $profile_field->get_formatted_value();
 									}
@@ -620,7 +684,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 				if ( ! empty( $user_membership_csv_row_data ) && ! empty( $job->file_path ) ) {
 
 					// open the file to append data ('a' is for 'append')
-					$file_handle = @fopen( $job->file_path, 'a' );
+					$file_handle = @fopen( $job->tmp_file_path, 'a' );
 
 					if ( false === $file_handle || ! is_writable( $job->file_path ) ) {
 
@@ -645,7 +709,7 @@ class WC_Memberships_CSV_Export_User_Memberships extends \WC_Memberships_Job_Han
 					 * @since 1.6.0
 					 *
 					 * @param \WC_Memberships_User_Membership $user_membership User Membership being exported
-					 * @param \WC_Memberships_CSV_Export_User_Memberships_Background_Job $export_instance the instance of the export class
+					 * @param \WC_Memberships_CSV_Export_User_Memberships $export_instance the instance of the export class
 					 * @param \stdClass $job current export job
 					 */
 					do_action( 'wc_memberships_after_csv_export_user_membership', $user_membership, $this, $job );

@@ -168,9 +168,13 @@ $cost  = tribe_get_formatted_cost( $event_id );
 					} else {
 						do_action( 'tribe_events_single_event_after_the_meta' );
 						// Display the currency selector widget with currencies as buttons
-						?><div id="top"><?php
-						echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
-						?></div><?php
+						?>
+						<!-- <div id="top"> -->
+							<?php
+						// echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
+						?>
+					<!-- </div> -->
+					<?php
 					} ?>
 				</div>
 			<?php } ?>

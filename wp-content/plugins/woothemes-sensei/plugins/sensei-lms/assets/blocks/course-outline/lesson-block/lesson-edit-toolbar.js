@@ -1,13 +1,7 @@
 /**
  * WordPress dependencies
  */
-import {
-	Button,
-	ExternalLink,
-	Spinner,
-	Toolbar,
-	ToolbarItem,
-} from '@wordpress/components';
+import { Button, Spinner, Toolbar, ToolbarItem } from '@wordpress/components';
 import { useDispatch, useSelect } from '@wordpress/data';
 import { store as editPostStore } from '@wordpress/edit-post';
 import { store as editorStore } from '@wordpress/editor';
@@ -27,13 +21,12 @@ const getLessonURL = ( lessonId ) => `post.php?post=${ lessonId }&action=edit`;
  * @param {number} props.lessonId The lesson ID.
  */
 export const EditLessonLink = ( { lessonId } ) => (
-	<ExternalLink
+	<a
 		href={ getLessonURL( lessonId ) }
-		target="lesson"
 		className="wp-block-sensei-lms-course-outline-lesson__edit"
 	>
 		{ __( 'Edit lesson', 'sensei-lms' ) }
-	</ExternalLink>
+	</a>
 );
 
 /**
@@ -63,7 +56,11 @@ const LessonEditToolbar = ( { lessonId, lessonTitle } ) => {
 
 	// Component for the "Save and edit lesson" button.
 	const savePostLink = (
-		<ToolbarItem as={ Button } onClick={ savePost }>
+		<ToolbarItem
+			as={ Button }
+			onClick={ savePost }
+			className="wp-block-sensei-lms-course-outline-lesson__save"
+		>
 			{ __( 'Save to edit lesson', 'sensei-lms' ) }
 		</ToolbarItem>
 	);

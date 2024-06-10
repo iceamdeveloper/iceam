@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    1.0.0
  */
 
@@ -17,7 +17,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Loads admin scripts, includes admin classes and adds admin hooks.
  *
  * @class    WC_PB_Admin
- * @version  6.17.4
+ * @version  7.0.2
  */
 class WC_PB_Admin {
 
@@ -26,7 +26,7 @@ class WC_PB_Admin {
 	 *
 	 * @var string
 	 */
-	private static $bundled_selectsw_version = '1.2.1';
+	private static $bundled_selectsw_version = '1.2.2';
 
 	/**
 	 * Setup Admin class.
@@ -46,6 +46,8 @@ class WC_PB_Admin {
 
 		// Enqueue scripts.
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_scripts' ), 11 );
+		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'admin_onboarding_task_product_type_resources' ), 9 );
+
 
 		// Add template override scan path in tracking info.
 		add_filter( 'woocommerce_template_overrides_scan_paths', array( __CLASS__, 'template_scan_path' ) );
@@ -57,7 +59,7 @@ class WC_PB_Admin {
 		add_filter( 'woocommerce_admin_reports', array( __CLASS__, 'add_insufficient_stock_report_tab' ) );
 		add_action( 'admin_print_styles', array( __CLASS__, 'maybe_add_insufficient_stock_report_notice' ) );
 
-		// Add body class for WP 5.3 compatibility.
+		// Add body class for WP 5.3 and 5.5 compatibility.
 		add_filter( 'admin_body_class', array( __CLASS__, 'include_admin_body_class' ) );
 	}
 
@@ -199,12 +201,22 @@ class WC_PB_Admin {
 	 */
 	public static function include_admin_body_class( $classes ) {
 
-		if ( strpos( $classes, 'sw-wp-version-gte-53' ) !== false ) {
-			return $classes;
+		if ( strpos( $classes, 'sw-wp-version-gte-53' ) === false
+		     && strpos( $classes, 'sw-wp-version-gte-55' ) === false
+		) {
+			if ( WC_PB_Core_Compatibility::is_wp_version_gte( '5.3' ) ) {
+				$classes .= ' sw-wp-version-gte-53';
+			}
+
+			if ( WC_PB_Core_Compatibility::is_wp_version_gte( '5.5' ) ) {
+				$classes .= ' sw-wp-version-gte-55';
+			}
 		}
 
-		if ( WC_PB_Core_Compatibility::is_wp_version_gte( '5.3' ) ) {
-			$classes .= ' sw-wp-version-gte-53';
+		if ( strpos( $classes, 'sw-wc-version-gte-82' ) === false ) {
+			if ( WC_PB_Core_Compatibility::is_wc_version_gte( '8.2' ) ) {
+				$classes .= ' sw-wc-version-gte-82';
+			}
 		}
 
 		return $classes;
@@ -217,7 +229,7 @@ class WC_PB_Admin {
 	 */
 	public static function add_privacy_policy_guide_content() {
 		if ( function_exists( 'wp_add_privacy_policy_content' ) ) {
-			wp_add_privacy_policy_content( 'WooCommerce Product Bundles', self::get_privacy_policy_guide_message() );
+			wp_add_privacy_policy_content( 'Woo Product Bundles', self::get_privacy_policy_guide_message() );
 		}
 	}
 
@@ -234,7 +246,7 @@ class WC_PB_Admin {
 		wp_register_style( 'wc-pb-admin-css', WC_PB()->plugin_url() . '/assets/css/admin/admin.css', array(), WC_PB()->version );
 		wp_style_add_data( 'wc-pb-admin-css', 'rtl', 'replace' );
 
-		wp_register_style( 'wc-pb-admin-product-css', WC_PB()->plugin_url() . '/assets/css/admin/meta-boxes-product.css', array( 'woocommerce_admin_styles' ), WC_PB()->version );
+		wp_register_style( 'wc-pb-admin-product-css', WC_PB()->plugin_url() . '/assets/css/admin/meta-boxes-product.css', array( 'woocommerce_admin_styles', 'sw-admin-css-select' ), WC_PB()->version );
 		wp_style_add_data( 'wc-pb-admin-product-css', 'rtl', 'replace' );
 
 		wp_register_style( 'wc-pb-admin-edit-order-css', WC_PB()->plugin_url() . '/assets/css/admin/meta-boxes-order.css', array( 'woocommerce_admin_styles' ), WC_PB()->version );
@@ -250,7 +262,7 @@ class WC_PB_Admin {
 		 * Enqueue styles.
 		 */
 		if ( in_array( $screen_id, array( 'edit-product', 'product' ) ) ) {
-			wp_enqueue_style( 'wc-pb-admin-product-css', 'sw-admin-css-select' );
+			wp_enqueue_style( 'wc-pb-admin-product-css' );
 		} elseif ( in_array( $screen_id, array( 'shop_order', 'edit-shop_order', 'shop_subscription', 'edit-shop_subscription', 'woocommerce_page_wc-orders' ) ) ) {
 			wp_enqueue_style( 'wc-pb-admin-edit-order-css' );
 		}
@@ -323,6 +335,38 @@ class WC_PB_Admin {
 	}
 
 	/**
+	 * Enqueue scripts for the product type on the onboarding task list.
+	 *
+	 * @since 7.0.2
+	 *
+	 * @return void
+	 */
+	public static function admin_onboarding_task_product_type_resources() {
+		$suffix            = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
+		$script_path       = '/assets/dist/admin/onboarding-task-product-type' . $suffix . '.js';
+		$script_asset_path = WC_PB_ABSPATH . 'assets/dist/admin/onboarding-task-product-type.asset.php';
+		$script_asset      = file_exists( $script_asset_path )
+			? require $script_asset_path
+			: array(
+				'dependencies' => array(),
+				'version'      => WC_PB()->plugin_version()
+			);
+		$script_url        = WC_PB()->plugin_url() . $script_path;
+
+		wp_register_script(
+			'wc-product-bundles-admin-product-type',
+			$script_url,
+			$script_asset[ 'dependencies' ],
+			$script_asset[ 'version' ],
+			true
+		);
+
+		if ( class_exists( 'Automattic\WooCommerce\Admin\PageController' ) && Automattic\WooCommerce\Admin\PageController::is_admin_page() ) {
+			wp_enqueue_script( 'wc-product-bundles-admin-product-type' );
+		}
+	}
+
+	/**
 	 * Support scanning for template overrides in extension.
 	 *
 	 * @param  array  $paths
@@ -330,7 +374,7 @@ class WC_PB_Admin {
 	 */
 	public static function template_scan_path( $paths ) {
 
-		$paths[ 'WooCommerce Product Bundles' ] = WC_PB()->plugin_path() . '/templates/';
+		$paths[ 'Woo Product Bundles' ] = WC_PB()->plugin_path() . '/templates/';
 
 		return $paths;
 	}

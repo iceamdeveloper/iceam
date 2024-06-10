@@ -16,7 +16,7 @@ class Sensei_Compat_Admin {
 	 * Initialize admin actions and filters.
 	 */
 	public static function init() {
-		add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 4 );
+		add_filter( 'plugin_row_meta', array( __CLASS__, 'plugin_row_meta' ), 10, 3 );
 		add_filter( 'install_plugins_search', array( __CLASS__, 'load_plugin_information' ) );
 		add_filter( 'sensei_admin_notices', [ __CLASS__, 'wccom_connect_notice' ] );
 		add_filter( 'sensei_admin_notices', [ __CLASS__, 'woocommerce_notice' ] );
@@ -155,12 +155,10 @@ class Sensei_Compat_Admin {
 	 *                              author URI, and plugin URI.
 	 * @param string   $plugin_file Path to the plugin file relative to the plugins directory.
 	 * @param array    $plugin_data An array of plugin data.
-	 * @param string   $status      Status of the plugin. Defaults are 'All', 'Active',
-	 *                              'Inactive', 'Recently Activated', 'Upgrade', 'Must-Use',
-	 *                              'Drop-ins', 'Search'.
+	 *
 	 * @return string[]
 	 */
-	public static function plugin_row_meta( $plugin_meta, $plugin_file, $plugin_data, $status ) {
+	public static function plugin_row_meta( $plugin_meta, $plugin_file, $plugin_data ) {
 		if ( ! in_array( $plugin_file, [ 'woothemes-sensei/woothemes-sensei.php', 'sensei/woothemes-sensei.php' ], true ) ) {
 			return $plugin_meta;
 		}

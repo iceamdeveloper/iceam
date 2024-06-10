@@ -25,7 +25,7 @@
 			<?php
 			echo esc_html( sprintf(
 				_x(
-					'A unique identifying code for each %s type you\'re selling',
+					'A unique identifying code for each %s you\'re selling',
 					'WooCommerce SKU',
 					'event-tickets-plus'
 				),

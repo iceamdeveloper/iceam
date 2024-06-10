@@ -26,7 +26,7 @@ function bps_set_request ()
 			$_REQUEST['bps_directory'] = bps_current_page ();
 			setcookie ($cookie, http_build_query ($_REQUEST), 0, COOKIEPATH);
 
-			list (, $errors) = bps_get_form_fields ($_REQUEST[BPS_FORM]);
+			list (, $errors) = bps_get_form_fields ((int)$_REQUEST[BPS_FORM]);
 			if ($errors)  _bps_redirect_on_errors ($errors);
 		}
 		else
@@ -43,6 +43,7 @@ function bps_set_request ()
 function bps_get_request2 ($type, $form=0)		// published interface, 20190324
 {
 	static $saved_request = array ();
+	$form = (int)$form;
 	if (isset ($saved_request["$type-$form"]))  return $saved_request["$type-$form"];
 
 	$request = _bps_clean_request ();
@@ -70,7 +71,7 @@ function bps_get_request2 ($type, $form=0)		// published interface, 20190324
 	{
 		echo "<!--\n";
 		echo "type $type, $form\n";
-		echo "request "; print_r ($request);
+		echo "request "; bps_print ($request);
 		echo "-->\n";
 	}
 
@@ -115,7 +116,7 @@ function bps_clean ($request)		// $request[BPS_FORM] is set and != 'clear'
 {
 	$clean = array ();
 
-	$form = $request[BPS_FORM];
+	$form = (int)$request[BPS_FORM];
 	$meta = bps_meta ($form);
 
 	$hidden_filters = bps_get_hidden_filters ();
@@ -362,8 +363,23 @@ function bps_reverse_key0 ($key)
 	return $reverse;
 }
 
+function bps_print ($data)
+{
+	if (!is_array ($data))  return;
+
+	echo "Array\n(\n";
+	foreach ($data as $key => $value)
+	{
+		$value = esc_html($value);
+		echo "    [$key] => $value\n";
+	}
+	echo ")\n";
+}
+
 function bps_debug ()
 {
+	if (is_admin ())  return false;
+
 	$cookie = apply_filters ('bps_cookie_name', 'bps_debug');
 	return isset ($_REQUEST['bps_debug'])? true: isset ($_COOKIE[$cookie]);
 }

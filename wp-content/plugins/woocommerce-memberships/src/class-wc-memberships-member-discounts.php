@@ -17,12 +17,12 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 use SkyVerge\WooCommerce\Memberships\Helpers\Strings_Helper;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -159,9 +159,14 @@ class WC_Memberships_Member_Discounts {
 	 */
 	private function is_wp_admin_ajax() {
 
-		// check if any of the enhanced search product actions are being done.
 		if ( is_admin() ) {
 
+			// quick editing the product may cause to apply a member discount price if the admin is eligible
+			if ( ! empty( $_REQUEST['woocommerce_quick_edit'] ) ) {
+				return true;
+			}
+
+			// check if any of the enhanced search product actions are being done
 			/* @see WC_AJAX::add_ajax_events() */
 			$search_products = array(
 				'json_search_products',

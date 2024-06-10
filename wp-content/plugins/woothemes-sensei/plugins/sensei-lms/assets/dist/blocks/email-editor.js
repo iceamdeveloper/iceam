@@ -73,8 +73,11 @@ e=p(50189),r=p(92694),t=p(92819),(0,r.addFilter)("blocks.registerBlockType","sen
    *
    * @param {Object} settings Block settings.
    */
-function(r){var o=(0,e/* ["default"] */.Z)({},r.supports?r.supports:{});// Remove font family setting.
-return((0,t.has)(r,"supports.typography.fontFamily")||(0,t.has)(r,"supports.typography.__experimentalFontFamily"))&&(o.typography=(0,e/* ["default"] */.Z)((0,e/* ["default"] */.Z)({},o.typography),{},{__experimentalFontFamily:!1,fontFamily:!1})),// Remove alignWide setting.
-(0,t.has)(r,"supports.alignWide")&&(o.alignWide=!1),// Remove wide from align options.
+function(r){var o=(0,e/* ["default"] */.Z)({},r.supports?r.supports:{});
+// Remove font family setting.
+return((0,t.has)(r,"supports.typography.fontFamily")||(0,t.has)(r,"supports.typography.__experimentalFontFamily"))&&(o.typography=(0,e/* ["default"] */.Z)((0,e/* ["default"] */.Z)({},o.typography),{},{__experimentalFontFamily:!1,fontFamily:!1})),
+// Remove alignWide setting.
+(0,t.has)(r,"supports.alignWide")&&(o.alignWide=!1),
+// Remove wide from align options.
 (0,t.has)(r,"supports.align.length")&&(o.align=o.align.filter((function(e){return"wide"!==e}))),(0,e/* ["default"] */.Z)((0,e/* ["default"] */.Z)({},r),{},{supports:o})}),10)})
 /******/();

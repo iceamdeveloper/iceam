@@ -35,14 +35,12 @@ class WCS_Cart_Renewal {
 		// Remove order action buttons from the My Account page
 		add_filter( 'woocommerce_my_account_my_orders_actions', array( &$this, 'filter_my_account_my_orders_actions' ), 10, 2 );
 
-		// When a failed renewal order is paid for via checkout, make sure WC_Checkout::create_order() preserves its "failed" status until it is paid
-		add_filter( 'woocommerce_default_order_status', array( &$this, 'maybe_preserve_order_status' ) );
-
 		// When a failed/pending renewal order is paid for via checkout, ensure a new order isn't created due to mismatched cart hashes
 		add_filter( 'woocommerce_create_order', array( &$this, 'update_cart_hash' ), 10, 1 );
+		add_filter( 'woocommerce_order_has_status', array( &$this, 'set_renewal_order_cart_hash_on_block_checkout' ), 10, 3 );
 
 		// When a user is prevented from paying for a failed/pending renewal order because they aren't logged in, redirect them back after login
-		add_filter( 'woocommerce_login_redirect', array( &$this, 'maybe_redirect_after_login' ), 10, 1 );
+		add_filter( 'woocommerce_login_redirect', array( &$this, 'maybe_redirect_after_login' ), 10, 2 );
 
 		// Once we have finished updating the renewal order on checkout, update the session cart so the cart changes are honoured.
 		add_action( 'woocommerce_checkout_order_processed', array( &$this, 'update_session_cart_after_updating_renewal_order' ), 10 );
@@ -93,11 +91,7 @@ class WCS_Cart_Renewal {
 			add_action( 'woocommerce_checkout_update_order_meta', array( &$this, 'set_order_item_id' ), 10, 2 );
 
 			// After order meta is saved, get the order line item ID for the renewal so we can update it later
-			if ( version_compare( \Automattic\WooCommerce\Blocks\Package::get_version(), '7.2.0', '>=' ) ) {
-				add_action( 'woocommerce_store_api_checkout_update_order_meta', array( &$this, 'set_order_item_id' ) );
-			} else {
-				add_action( 'woocommerce_blocks_checkout_update_order_meta', array( &$this, 'set_order_item_id' ) );
-			}
+			add_action( 'woocommerce_store_api_checkout_update_order_meta', array( &$this, 'set_order_item_id' ) );
 
 			// Don't display cart item key meta stored above on the Edit Order screen
 			add_action( 'woocommerce_hidden_order_itemmeta', array( &$this, 'hidden_order_itemmeta' ), 10 );
@@ -416,6 +410,10 @@ class WCS_Cart_Renewal {
 	 * Restore renewal flag when cart is reset and modify Product object with renewal order related info
 	 *
 	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v2.0
+	 *
+	 * @param array  $cart_item_session_data Cart item session data.
+	 * @param array  $cart_item              Cart item data.
+	 * @param string $key                    Cart item key.
 	 */
 	public function get_cart_item_from_session( $cart_item_session_data, $cart_item, $key ) {
 
@@ -429,7 +427,29 @@ class WCS_Cart_Renewal {
 
 			if ( $subscription ) {
 				$subscription_items = $subscription->get_items();
-				$item_to_renew      = $subscription_items[ $cart_item_session_data[ $this->cart_item_key ]['line_item_id'] ];
+				$item_to_renew      = [];
+
+				/**
+				 * Find the subscription or order line item that represents this cart item.
+				 *
+				 * If cart item data correctly records a valid line item ID, use that to find the line item.
+				 * Otherwise, use the cart item key stored in line item meta.
+				 */
+				if ( isset( $subscription_items[ $cart_item_session_data[ $this->cart_item_key ]['line_item_id'] ] ) ) {
+					$item_to_renew = $subscription_items[ $cart_item_session_data[ $this->cart_item_key ]['line_item_id'] ];
+				} else {
+					foreach ( $subscription_items as $item ) {
+						if ( $item->get_meta( '_cart_item_key_' . $this->cart_item_key, true ) === $key ) {
+							$item_to_renew = $item;
+							break;
+						}
+					}
+				}
+
+				// If we can't find the item to renew, return the cart item session data as is.
+				if ( empty( $item_to_renew ) ) {
+					return $cart_item_session_data;
+				}
 
 				$price = $item_to_renew['line_subtotal'];
 
@@ -633,33 +653,6 @@ class WCS_Cart_Renewal {
 		}
 
 		return $actions;
-	}
-
-	/**
-	 * When a failed renewal order is being paid for via checkout, make sure WC_Checkout::create_order() preserves its
-	 * status as 'failed' until it is paid. By default, it will always set it to 'pending', but we need it left as 'failed'
-	 * so that we can correctly identify the status change in @see self::maybe_change_subscription_status().
-	 *
-	 * @param string Default order status for orders paid for via checkout. Default 'pending'
-	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v2.0
-	 */
-	public function maybe_preserve_order_status( $order_status ) {
-
-		if ( null !== WC()->session && 'failed' !== $order_status ) {
-
-			$order_id = absint( WC()->session->order_awaiting_payment );
-
-			// Guard against infinite loops in WC 3.0+ where default order staus is set in WC_Abstract_Order::__construct()
-			remove_filter( 'woocommerce_default_order_status', array( &$this, __FUNCTION__ ), 10 );
-
-			if ( $order_id > 0 && ( $order = wc_get_order( $order_id ) ) && wcs_order_contains_renewal( $order ) && $order->has_status( 'failed' ) ) {
-				$order_status = 'failed';
-			}
-
-			add_filter( 'woocommerce_default_order_status', array( &$this, __FUNCTION__ ) );
-		}
-
-		return $order_status;
 	}
 
 	/**
@@ -946,7 +939,7 @@ class WCS_Cart_Renewal {
 	 */
 	public function product_addons_adjust_price( $adjust_price, $cart_item ) {
 
-		if ( true === $adjust_price && isset( $cart_item[ $this->cart_item_key ] ) ) {
+		if ( true === $adjust_price && isset( $cart_item[ $this->cart_item_key ] ) && $this->should_honor_subscription_prices( $cart_item ) ) {
 			$adjust_price = false;
 		}
 
@@ -979,10 +972,19 @@ class WCS_Cart_Renewal {
 	 * order items haven't changed by checking for a cart hash on the order, so we need to set
 	 * that here. @see WC_Checkout::create_order()
 	 *
+	 * @param WC_Order|int $order The order object or order ID.
+	 *
 	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v2.0.14
 	 */
-	protected function set_cart_hash( $order_id ) {
-		$order = wc_get_order( $order_id );
+	protected function set_cart_hash( $order ) {
+
+		if ( ! is_a( $order, 'WC_Abstract_Order' ) ) {
+			$order = wc_get_order( $order );
+
+			if ( ! $order ) {
+				return;
+			}
+		}
 
 		// Use cart hash generator introduced in WooCommerce 3.6
 		if ( is_callable( array( WC()->cart, 'get_cart_hash' ) ) ) {
@@ -991,7 +993,8 @@ class WCS_Cart_Renewal {
 			$cart_hash = md5( json_encode( wc_clean( WC()->cart->get_cart_for_session() ) ) . WC()->cart->total );
 		}
 
-		wcs_set_objects_property( $order, 'cart_hash', $cart_hash );
+		$order->set_cart_hash( $cart_hash );
+		$order->save();
 	}
 
 	/**
@@ -1025,16 +1028,23 @@ class WCS_Cart_Renewal {
 	/**
 	 * Redirect back to pay for an order after successfully logging in.
 	 *
-	 * @param string | redirect URL after successful login
+	 * @param string  The redirect URL after successful login.
+	 * @param WP_User The newly logged in user object.
 	 * @return string
 	 * @since  1.0.0 - Migrated from WooCommerce Subscriptions v2.1.0
 	 */
-	function maybe_redirect_after_login( $redirect ) {
-		if ( isset( $_GET['wcs_redirect'], $_GET['wcs_redirect_id'] ) && 'pay_for_order' == $_GET['wcs_redirect'] ) {
+	public function maybe_redirect_after_login( $redirect, $user = null ) {
+		/**
+		 * Nonce verification is not needed here as it was already checked during the log-in process, see WC_Form_Handler::process_login().
+		 */
+		if ( isset( $_GET['wcs_redirect'], $_GET['wcs_redirect_id'] ) && 'pay_for_order' === $_GET['wcs_redirect'] ) { // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 			$order = wc_get_order( $_GET['wcs_redirect_id'] );
 
-			if ( $order ) {
+			if ( $order && $order->get_user_id() && user_can( $user, 'pay_for_order', $order->get_id() ) ) {
 				$redirect = $order->get_checkout_payment_url();
+			} else {
+				// Remove the wcs_redirect query args if the user doesn't have permission to pay for the order.
+				$redirect = remove_query_arg( array( 'wcs_redirect', 'wcs_redirect_id' ), $redirect );
 			}
 		}
 
@@ -1350,7 +1360,7 @@ class WCS_Cart_Renewal {
 	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v2.4.3
 	 */
 	public function setup_discounts( $order ) {
-		$order_discount = $order->get_total_discount();
+		$order_discount = $order->get_total_discount( ! $order->get_prices_include_tax() );
 		$coupon_items   = $order->get_items( 'coupon' );
 
 		if ( empty( $order_discount ) && empty( $coupon_items ) ) {
@@ -1487,7 +1497,7 @@ class WCS_Cart_Renewal {
 
 
 	/**
-	 * Deteremines if the cart should honor the granfathered subscription/order line item total.
+	 * Determines if the cart should honor the grandfathered subscription/order line item total.
 	 *
 	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v3.0.10
 	 *
@@ -1581,6 +1591,45 @@ class WCS_Cart_Renewal {
 	 */
 	public function validate_current_user( $order ) {
 		return current_user_can( 'pay_for_order', $order->get_id() );
+	}
+
+	/**
+	 * Sets the order cart hash when paying for a renewal order via the Block Checkout.
+	 *
+	 * This function is hooked onto the 'woocommerce_order_has_status' filter, is only applied during REST API requests, only applies to the
+	 * 'checkout-draft' status (which only Block Checkout orders use) and to renewal orders that are currently being paid for in the cart.
+	 * All other order statuses, orders and scenarios remain unaffected by this function.
+	 *
+	 * This function is necessary to override the default logic in @see DraftOrderTrait::is_valid_draft_order().
+	 * This function behaves similarly to @see WCS_Cart_Renewal::update_cart_hash() for the standard checkout and is hooked onto the 'woocommerce_create_order' filter.
+	 *
+	 * @param bool     $has_status Whether the order has the status.
+	 * @param WC_Order $order      The order.
+	 * @param string   $status     The status to check.
+	 *
+	 * @return bool Whether the order has the status. Unchanged by this function.
+	 */
+	public function set_renewal_order_cart_hash_on_block_checkout( $has_status, $order, $status ) {
+		/**
+		 * We only need to update the order's cart hash when the has_status() check is for 'checkout-draft' (indicating
+		 * this is the status check in DraftOrderTrait::is_valid_draft_order()) and the order doesn't have that status. Orders
+		 * which already have the checkout-draft status don't need to be updated to bypass the checkout block logic.
+		 */
+		if ( $has_status || 'checkout-draft' !== $status ) {
+			return $has_status;
+		}
+
+		// If the order being validated is the order in the cart, then we need to update the cart hash so it can be resumed.
+		if ( $order && $order->get_id() === (int) WC()->session->get( 'store_api_draft_order', 0 ) ) {
+			$cart_order = $this->get_order();
+
+			if ( $cart_order && $cart_order->get_id() === $order->get_id() ) {
+				// Note: We need to pass the order object so the order instance WooCommerce uses will have the updated hash.
+				$this->set_cart_hash( $order );
+			}
+		}
+
+		return $has_status;
 	}
 
 	/* Deprecated */
@@ -1757,5 +1806,36 @@ class WCS_Cart_Renewal {
 				}
 			}
 		}
+	}
+
+	/**
+	 * When a failed renewal order is being paid for via checkout, make sure WC_Checkout::create_order() preserves its
+	 * status as 'failed' until it is paid. By default, it will always set it to 'pending', but we need it left as 'failed'
+	 * so that we can correctly identify the status change in @see self::maybe_change_subscription_status().
+	 *
+	 * @param string Default order status for orders paid for via checkout. Default 'pending'
+	 * @since 1.0.0 - Migrated from WooCommerce Subscriptions v2.0
+	 *
+	 * @deprecated 6.3.0
+	 */
+	public function maybe_preserve_order_status( $order_status ) {
+		wcs_deprecated_function( __METHOD__, '6.3.0' );
+		if ( null !== WC()->session && 'failed' !== $order_status ) {
+
+			$order_id = absint( WC()->session->order_awaiting_payment );
+
+			// Guard against infinite loops in WC 3.0+ where default order staus is set in WC_Abstract_Order::__construct()
+			remove_filter( 'woocommerce_default_order_status', array( &$this, __FUNCTION__ ), 10 );
+
+			$order = $order_id > 0 ? wc_get_order( $order_id ) : null;
+
+			if ( $order && wcs_order_contains_renewal( $order ) && $order->has_status( 'failed' ) ) {
+				$order_status = 'failed';
+			}
+
+			add_filter( 'woocommerce_default_order_status', array( &$this, __FUNCTION__ ) );
+		}
+
+		return $order_status;
 	}
 }

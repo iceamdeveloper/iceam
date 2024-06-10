@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 /**
  * Implements a base class to store definitions for the plugin.
@@ -102,6 +102,10 @@ class Definitions {
 	const ERR_SITE_DOES_NOT_EXIST = 6009;
 	const ERR_SITE_NOT_ACTIVE = 6010;
 
+	// Task Scheduler - Return codes
+	// @since 2.4.9.230616
+	const ERR_INVALID_SCHEDULED_TASK = 9004;
+
 	// Shortcodes
 	// @since 2.1.8.210518
 	const ERR_SHORTCODE_NOT_VALID = 3001;
@@ -114,4 +118,9 @@ class Definitions {
 	const OPT_LICENCE_INFO_PREFIX = 'aelia_plugin_licence_key_';
 
 	// Transients
+
+	// Scheduled tasks
+	// Default task interval, in seconds
+	// @since 2.4.9.230616
+	const DEFAULT_SCHEDULED_TASK_INTERVAL = 3600;
 }

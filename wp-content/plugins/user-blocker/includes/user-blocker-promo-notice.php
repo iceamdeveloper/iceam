@@ -38,19 +38,24 @@ if ( ! function_exists( 'ublk_promo' ) ) {
 	 * Show the promo.
 	 */
 	function ublk_promo() {
-        ?>
-        <div class="notice notice-success" id="user_blocking_promo" style="min-height:120px">
-            <a class="user_blocking_promo-close" href="javascript:" aria-label="Dismiss this Notice">
-                <span class="dashicons dashicons-dismiss"></span> <?php esc_html_e('Dismiss','user-blocker'); ?>
-            </a>
-            <img src="<?php echo esc_url( UB_PLUGIN_URL ); ?>/images/logo-200.png" style="float:left; margin:10px 20px 10px 10px" width="100" />
-            <p style="font-size:16px"><?php echo esc_html__( 'We are glad you like', 'user-blocker' ) . ' <strong>' . esc_html__( 'User Blocker', 'user-blocker' ) . '</strong> ' . esc_html__( 'plugin and have been using it since the past few days. It is time to take the next step.', 'user-blocker' ); ?></p>
-            <p>
-                <a class="user_blocking_button user_blocking_button2" target="_blank" href="https://wordpress.org/support/plugin/user-blocker/reviews/?filter=5"><?php esc_html_e( 'Rate it', 'user-blocker' ); echo " 5★'s"; ?></a>
-                <a class="user_blocking_button user_blocking_button3" target="_blank" href="https://www.facebook.com/SolwinInfotech/"><?php esc_html_e( 'Like Us on Facebook', 'user-blocker' ); ?></a>
-                <a class="user_blocking_button user_blocking_button4" target="_blank" href="https://twitter.com/home?status=<?php esc_html_e( 'I use #userblocker to secure my #WordPress site from spam users.','user-blocker' ); ?>"><?php esc_html_e( 'Tweet about User Blocker ', 'user-blocker' ); ?></a>
-            </p>
-        </div>
-        <?php
+		?>
+		<div class="notice notice-success" id="user_blocking_promo" style="min-height:120px">
+			<a class="user_blocking_promo-close" href="javascript:" aria-label="Dismiss this Notice">
+				<span class="dashicons dashicons-dismiss"></span> <?php esc_html_e( 'Dismiss', 'user-blocker' ); ?>
+			</a>
+			<img src="<?php echo esc_url( UB_PLUGIN_URL ); ?>/images/logo-200.png" style="float:left; margin:10px 20px 10px 10px" width="100" />
+			<p style="font-size:16px"><?php echo esc_html__( 'We are glad you like', 'user-blocker' ) . ' <strong>' . esc_html__( 'User Blocker', 'user-blocker' ) . '</strong> ' . esc_html__( 'plugin and have been using it since the past few days. It is time to take the next step.', 'user-blocker' ); ?></p>
+			<p>
+				<a class="user_blocking_button user_blocking_button2" target="_blank" href="https://wordpress.org/support/plugin/user-blocker/reviews/?filter=5">
+				<?php
+				esc_html_e( 'Rate it', 'user-blocker' );
+				echo " 5★'s";
+				?>
+				</a>
+				<a class="user_blocking_button user_blocking_button3" target="_blank" href="https://www.facebook.com/SolwinInfotech/"><?php esc_html_e( 'Like Us on Facebook', 'user-blocker' ); ?></a>
+				<a class="user_blocking_button user_blocking_button4" target="_blank" href="https://twitter.com/home?status=<?php esc_html_e( 'I use #userblocker to secure my #WordPress site from spam users.', 'user-blocker' ); ?>"><?php esc_html_e( 'Tweet about User Blocker ', 'user-blocker' ); ?></a>
+			</p>
+		</div>
+		<?php
 	}
 }

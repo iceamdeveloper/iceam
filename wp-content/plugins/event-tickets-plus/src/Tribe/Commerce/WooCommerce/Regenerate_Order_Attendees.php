@@ -105,6 +105,7 @@ class Regenerate_Order_Attendees {
 	 * Handle regenerating of attendees for an order.
 	 *
 	 * @since 5.2.7
+	 * @since 5.9.1 Updated logic to new WooCommerce HPOS requirement.
 	 *
 	 * @param \Tribe__Tickets_Plus__Commerce__WooCommerce__Main $commerce_woo The Event Tickets Plus commerce provider for WooCommerce.
 	 * @param \WC_Order                                         $order        The WooCommerce order object.
@@ -116,7 +117,8 @@ class Regenerate_Order_Attendees {
 		$this->remove_existing_attendees_by_order( $order_id );
 
 		// Remove the flag from the order meta that indicates the attendee is already generated.
-		update_post_meta( $order_id, $commerce_woo->order_has_tickets, 0 );
+		$order->update_meta_data( $commerce_woo->order_has_tickets, 0 );
+		$order->save_meta_data();
 
 		$commerce_woo->generate_tickets( $order_id );
 
@@ -193,7 +195,7 @@ class Regenerate_Order_Attendees {
 		$bulk_action = tribe_get_request_var( 'bulk_action', false );
 
 		// Bail out if not on shop order list page.
-		if ( 'edit.php' !== $pagenow || 'shop_order' !== $post_type || ! $bulk_action ) {
+		if ( 'edit.php' !== $pagenow || ( 'shop_order' !== $post_type && 'shop_order_placehold' !== $post_type ) || ! $bulk_action ) {
 			return;
 		}
 

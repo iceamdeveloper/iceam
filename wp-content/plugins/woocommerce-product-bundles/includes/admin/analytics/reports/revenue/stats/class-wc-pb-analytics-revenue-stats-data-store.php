@@ -2,7 +2,7 @@
 /**
  * REST API Reports Stats data store
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.9.0
  */
 
@@ -18,7 +18,7 @@ use Automattic\WooCommerce\Admin\API\Reports\SqlQuery;
 /**
  * WC_PB_Analytics_Revenue_Stats_Data_Store class.
  *
- * @version 6.9.0
+ * @version 7.0.0
  */
 class WC_PB_Analytics_Revenue_Stats_Data_Store extends WC_PB_Analytics_Revenue_Data_Store {
 
@@ -173,7 +173,7 @@ class WC_PB_Analytics_Revenue_Stats_Data_Store extends WC_PB_Analytics_Revenue_D
 
 			$this->interval_query->add_sql_clause( 'order_by', $this->get_sql_clause( 'order_by' ) );
 			$this->interval_query->add_sql_clause( 'limit', $this->get_sql_clause( 'limit' ) );
-			$this->interval_query->add_sql_clause( 'select', ", MAX(${table_name}.date_created) AS datetime_anchor" );
+			$this->interval_query->add_sql_clause( 'select', ", MAX($table_name.date_created) AS datetime_anchor" );
 			if ( '' !== $selections ) {
 				$this->interval_query->add_sql_clause( 'select', ', ' . $selections );
 			}

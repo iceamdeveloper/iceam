@@ -191,7 +191,7 @@ class View {
 		$ticket  = null;
 
 		if ( 0 < $post_id ) {
-			$tickets = \Tribe__Tickets__Tickets::get_all_event_tickets( $post_id );
+			$tickets = \Tribe__Tickets__Tickets::get_all_event_tickets( $post_id, 'manual-attendees' );
 		}
 
 		$multiple_tickets = 1 < count( $tickets );
@@ -256,7 +256,7 @@ class View {
 		}
 
 		// Check the logic of the provider if email sending is allowed to occur.
-		$allow_resending_email = $provider->allow_resending_email( $ticket_post, $attendee );
+		$allow_resending_email = $provider && $provider->allow_resending_email( $ticket_post, $attendee );
 
 		/**
 		 * This filter allows the admin to control the re-send email option when an attendee's email is updated.

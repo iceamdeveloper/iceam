@@ -10,8 +10,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 ?>
-<!-- wp:paragraph {"placeholder":"<?php esc_html_e( 'Use the Tasklist block as a way of keeping track of assignments and activities in a lesson.', 'sensei-pro' ); ?>"} -->
-<p></p>
+<!-- wp:paragraph {"placeholder":"<?php esc_html_e( 'Use the Tasklist block as a way of keeping track of assignments and activities in a lesson.', 'sensei-pro' ); ?>","className":"sensei-content-description"} -->
+<p class="sensei-content-description"></p>
 <!-- /wp:paragraph -->
 
 <!-- wp:sensei-pro/task-list -->
@@ -44,7 +44,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 		<!-- wp:sensei-lms/button-view-quiz {"inContainer":true} -->
 		<div class="wp-block-sensei-lms-button-view-quiz is-style-default sensei-buttons-container__button-block wp-block-sensei-lms-button-view-quiz__wrapper">
 			<div class="wp-block-sensei-lms-button-view-quiz is-style-default wp-block-sensei-button wp-block-button has-text-align-left">
-				<button class="wp-block-button__link"><?php esc_html_e( 'View Quiz', 'sensei-pro' ); ?></button>
+				<button class="wp-block-button__link"><?php esc_html_e( 'Take Quiz', 'sensei-pro' ); ?></button>
 			</div>
 		</div>
 		<!-- /wp:sensei-lms/button-view-quiz -->

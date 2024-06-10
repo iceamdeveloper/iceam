@@ -1,5 +1,6 @@
 <?php if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
+use Aelia\WC\Definitions;
 use Aelia\WC\Settings;
 
 if(!function_exists('get_raw_number')) {
@@ -480,5 +481,20 @@ if(!function_exists('aelia_is_hpos_feature_enabled')) {
 		}
 
 		return $hpos_enabled;
+	}
+}
+
+if(!function_exists('aelia_get_task_scheduler')) {
+	/**
+	 * Returns the instance of the task scheduler used by the Aelia plugins.
+	 *
+	 * @return Aelia\WC\AFC\Scheduler\Task_Scheduler
+	 * @since 2.4.9.230616
+	 */
+	function aelia_get_task_scheduler():  Aelia\WC\AFC\Scheduler\Task_Scheduler {
+		if(!did_action('aelia_task_scheduler_initialized')) {
+			wc_doing_it_wrong(__FUNCTION__, __('The Aelia Task Scheduler is not avaialble before aelia_task_scheduler_initialized action.', Definitions::TEXT_DOMAIN), '2.4.8.230524');
+		}
+		return \Aelia\WC\AFC\Scheduler\Task_Scheduler::instance();
 	}
 }

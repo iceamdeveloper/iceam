@@ -2,7 +2,6 @@
 
 namespace Tribe\Tickets\Plus\Attendee_Registration;
 
-use tad_DI52_ServiceProvider;
 use Tribe\Tickets\Plus\Attendee_Registration\IAC\Hooks;
 use Tribe\Tickets\Plus\Attendee_Registration\IAC\Ticket_Settings;
 
@@ -13,7 +12,7 @@ use Tribe\Tickets\Plus\Attendee_Registration\IAC\Ticket_Settings;
  *
  * @since   5.1.0
  */
-class Service_Provider extends tad_DI52_ServiceProvider {
+class Service_Provider extends \TEC\Common\Contracts\Service_Provider {
 	/**
 	 * Register the provider singletons.
 	 *
@@ -110,6 +109,7 @@ class Service_Provider extends tad_DI52_ServiceProvider {
 
 		// Handle getting the IAC setting for tickets.
 		// add_filter( 'tribe_tickets_rsvp_get_ticket', $this->container->callback( 'tickets-plus.attendee-registration.iac.hooks', 'add_iac_to_ticket_object' ), 10, 2 );
+		add_filter( 'tec_tickets_commerce_get_ticket_legacy', $this->container->callback( 'tickets-plus.attendee-registration.iac.hooks', 'add_iac_to_ticket_object' ), 10, 2 );
 		add_filter( 'tribe_tickets_tpp_get_ticket', $this->container->callback( 'tickets-plus.attendee-registration.iac.hooks', 'add_iac_to_ticket_object' ), 10, 2 );
 		add_filter( 'tribe_tickets_plus_edd_get_ticket', $this->container->callback( 'tickets-plus.attendee-registration.iac.hooks', 'add_iac_to_ticket_object' ), 10, 2 );
 		add_filter( 'tribe_tickets_plus_woo_get_ticket', $this->container->callback( 'tickets-plus.attendee-registration.iac.hooks', 'add_iac_to_ticket_object' ), 10, 2 );

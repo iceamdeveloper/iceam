@@ -8,6 +8,9 @@ use TEC\Tickets\Commerce\Status\Status_Handler;
 use TEC\Tickets\Commerce\Status\Status_Interface;
 use TEC\Tickets\Commerce\Utils\Value;
 use Tribe__Tickets__Global_Stock as Event_Stock;
+use Tribe__Utils__Array as Arr;
+use Tribe__Date_Utils as Date_Utils;
+use Tribe__Tickets__Ticket_Object as Ticket_Object;
 
 /**
  * Class Ticket.
@@ -124,6 +127,14 @@ class Ticket {
 	 * @var string
 	 */
 	public static $status_count_meta_key_prefix = '_tec_tc_ticket_status_count';
+	/**
+	 * The meta key that holds the ticket type.
+	 *
+	 * @since 5.6.7
+	 *
+	 * @var string
+	 */
+	public static $type_meta_key = '_type';
 
 	/**
 	 * Stores the instance of the template engine that we will use for rendering the elements.
@@ -133,6 +144,42 @@ class Ticket {
 	 * @var \Tribe__Template
 	 */
 	protected $template;
+
+	/**
+	 * The meta key that holds if the sale price option is enabled or not in the product editor.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @var string
+	 */
+	public static $sale_price_checked_key = '_sale_price_checked';
+
+	/**
+	 * The meta key that holds the ticket sale price.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @var string
+	 */
+	public static $sale_price_key = '_sale_price';
+
+	/**
+	 * The meta key that holds the ticket sale price start date.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @var string
+	 */
+	public static $sale_price_start_date_key = '_sale_price_start_date';
+
+	/**
+	 * The meta key that holds the ticket sale price end date.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @var string
+	 */
+	public static $sale_price_end_date_key = '_sale_price_end_date';
 
 	/**
 	 * Gets the template instance used to setup the rendering html.
@@ -281,9 +328,20 @@ class Ticket {
 	 *
 	 * @param int|\WP_Post $ticket_id
 	 *
-	 * @return null|\Tribe__Tickets__Ticket_Object
+	 * @return null|Ticket_Object
 	 */
 	public function get_ticket( $ticket_id ) {
+		$ticket_id = $ticket_id instanceof \WP_Post ? $ticket_id->ID : $ticket_id;
+
+		if ( ! is_numeric( $ticket_id ) ) {
+			return null;
+		}
+
+		$cached = wp_cache_get( (int) $ticket_id, 'tec_tickets' );
+		if ( $cached && is_array( $cached ) ) {
+			return new Ticket_Object( $cached );
+		}
+
 		$product = get_post( $ticket_id );
 
 		if ( ! $product ) {
@@ -296,14 +354,16 @@ class Ticket {
 
 		$event_id = get_post_meta( $ticket_id, static::$event_relation_meta_key, true );
 
-		$return = new \Tribe__Tickets__Ticket_Object();
+		$return = new Ticket_Object();
 
 		$return->description      = $product->post_excerpt;
 		$return->ID               = $ticket_id;
 		$return->name             = $product->post_title;
 		$return->menu_order       = $product->menu_order;
 		$return->post_type        = $product->post_type;
-		$return->price            = get_post_meta( $ticket_id, '_price', true );
+		$return->on_sale          = $this->is_on_sale( $return );
+		$return->price            = $this->get_price( $return );
+		$return->regular_price    = $this->get_regular_price( $return->ID );
 		$return->value            = Value::create( $return->price );
 		$return->provider_class   = Module::class;
 		$return->admin_link       = '';
@@ -356,7 +416,13 @@ class Ticket {
 		 * @param int    $post_id
 		 * @param int    $ticket_id
 		 */
-		return apply_filters( 'tec_tickets_commerce_get_ticket_legacy', $return, $event_id, $ticket_id );
+		$ticket = apply_filters( 'tec_tickets_commerce_get_ticket_legacy', $return, $event_id, $ticket_id );
+
+		if ( $ticket instanceof Ticket_Object ) {
+			wp_cache_set( (int) $ticket->ID, $ticket->to_array(), 'tec_tickets' );
+		}
+
+		return $ticket;
 	}
 
 	/**
@@ -454,6 +520,9 @@ class Ticket {
 				'post_excerpt' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => tribe_get_request_var( 'menu_order', - 1 ),
+				'meta_input' => [
+					'_type' => $raw_data['ticket_type'] ?? 'default',
+				]
 			);
 
 			$ticket->ID = wp_insert_post( $args );
@@ -467,6 +536,9 @@ class Ticket {
 				'post_excerpt' => $ticket->description,
 				'post_title'   => $ticket->name,
 				'menu_order'   => $ticket->menu_order,
+				'meta_input' => [
+					'_type' => $raw_data['ticket_type'] ?? 'default',
+				]
 			);
 
 			$ticket->ID = wp_update_post( $args );
@@ -491,6 +563,7 @@ class Ticket {
 		}
 
 		update_post_meta( $ticket->ID, '_price', $ticket->price );
+		update_post_meta( $ticket->ID, '_type', $ticket->type() ?? 'default' );
 
 		$ticket_data = \Tribe__Utils__Array::get( $raw_data, 'tribe-ticket', array() );
 		tribe( Module::class )->update_capacity( $ticket, $ticket_data, $save_type );
@@ -515,8 +588,8 @@ class Ticket {
 				$sku = $raw_data['ticket_sku'];
 			} else {
 				$post_author            = get_post( $ticket->ID )->post_author;
-				$str                    = $raw_data['ticket_name'];
-				$str                    = tribe_strtoupper( $str );
+				$ticket_name            = $raw_data['ticket_name'] ?? $ticket->name;
+				$str                    = tribe_strtoupper( $ticket_name );
 				$sku                    = "{$ticket->ID}-{$post_author}-" . str_replace( ' ', '-', $str );
 				$raw_data['ticket_sku'] = $sku;
 			}
@@ -532,7 +605,7 @@ class Ticket {
 		// Only need to do this if we haven't already set one - they shouldn't be able to edit it from here otherwise
 		if ( ! $event_stock->is_enabled() ) {
 			if ( isset( $data['event_capacity'] ) ) {
-				$data['event_capacity'] = trim( filter_var( $data['event_capacity'], FILTER_SANITIZE_STRING, FILTER_FLAG_STRIP_HIGH ) );
+				$data['event_capacity'] = trim( tec_sanitize_string( $data['event_capacity'] ) );
 
 				// If empty we need to modify to -1
 				if ( '' === $data['event_capacity'] ) {
@@ -655,13 +728,15 @@ class Ticket {
 			update_post_meta( $ticket->ID, $tickets_handler->key_capacity, $data['capacity'] );
 		}
 
+		$this->process_sale_price_data( $ticket, $raw_data );
+
 		/**
 		 * Generic action fired after saving a ticket (by type)
 		 *
 		 * @since 5.2.0
 		 *
 		 * @param int                            $post_id  Post ID of post the ticket is tied to
-		 * @param \Tribe__Tickets__Ticket_Object $ticket   Ticket that was just saved
+		 * @param Ticket_Object $ticket   Ticket that was just saved
 		 * @param array                          $raw_data Ticket data
 		 * @param string                         $class    Commerce engine class
 		 */
@@ -672,10 +747,10 @@ class Ticket {
 		 *
 		 * @since 5.2.0
 		 *
-		 * @param int                            $post_id  Post ID of post the ticket is tied to
-		 * @param \Tribe__Tickets__Ticket_Object $ticket   Ticket that was just saved
-		 * @param array                          $raw_data Ticket data
-		 * @param string                         $class    Commerce engine class
+		 * @param int           $post_id  Post ID of post the ticket is tied to
+		 * @param Ticket_Object $ticket   Ticket that was just saved
+		 * @param array         $raw_data Ticket data
+		 * @param string        $class    Commerce engine class
 		 */
 		do_action( 'tec_tickets_commerce_after_save_ticket', $post_id, $ticket, $raw_data, static::class );
 
@@ -686,10 +761,10 @@ class Ticket {
 		 *
 		 * @since 5.2.0
 		 *
-		 * @param int                            $post_id  Post ID of post the ticket is tied to
-		 * @param \Tribe__Tickets__Ticket_Object $ticket   Ticket that was just saved
-		 * @param array                          $raw_data Ticket data
-		 * @param string                         $class    Commerce engine class
+		 * @param int           $post_id  Post ID of post the ticket is tied to
+		 * @param Ticket_Object $ticket   Ticket that was just saved
+		 * @param array         $raw_data Ticket data
+		 * @param string        $class    Commerce engine class
 		 */
 		do_action( "event_tickets_after_{$save_type}_ticket", $post_id, $ticket, $raw_data, static::class );
 
@@ -700,10 +775,10 @@ class Ticket {
 		 *
 		 * @since 5.2.0
 		 *
-		 * @param int                            $post_id  Post ID of post the ticket is tied to
-		 * @param \Tribe__Tickets__Ticket_Object $ticket   Ticket that was just saved
-		 * @param array                          $raw_data Ticket data
-		 * @param string                         $class    Commerce engine class
+		 * @param int           $post_id  Post ID of post the ticket is tied to
+		 * @param Ticket_Object $ticket Ticket that was just saved
+		 * @param array         $raw_data Ticket data
+		 * @param string        $class    Commerce engine class
 		 */
 		do_action( 'event_tickets_after_save_ticket', $post_id, $ticket, $raw_data, static::class );
 
@@ -748,7 +823,7 @@ class Ticket {
 		}
 
 		// Try to kill the actual ticket/attendee post
-		$delete = wp_delete_post( $ticket_id, true );
+		$delete = wp_trash_post( $ticket_id );
 		if ( is_wp_error( $delete ) || ! isset( $delete->ID ) ) {
 			return false;
 		}
@@ -827,16 +902,26 @@ class Ticket {
 	 * @return int The new sales amount.
 	 */
 	public function increase_ticket_sales_by( $ticket_id, $quantity = 1, $shared_capacity = false, $global_stock = null ) {
-		// Adjust sales.
-		$sales = (int) get_post_meta( $ticket_id,  static::$sales_meta_key, true ) + $quantity;
 
-		update_post_meta( $ticket_id,  static::$sales_meta_key, $sales );
+		$original_total_sales = (int) get_post_meta(
+			$ticket_id,
+			static::$sales_meta_key,
+			true
+		);
+
+		$updated_total_sales = $quantity + $original_total_sales;
+
+		update_post_meta(
+			$ticket_id,
+			static::$sales_meta_key,
+			$updated_total_sales
+		);
 
 		if (  'own' !== $shared_capacity && $global_stock instanceof \Tribe__Tickets__Global_Stock ) {
 			$this->update_global_stock( $global_stock, $quantity );
 		}
 
-		return $sales;
+		return $updated_total_sales;
 	}
 
 	/**
@@ -888,23 +973,35 @@ class Ticket {
 			return;
 		}
 
-		return $ticket->get_value();
+		$ticket_object = $this->get_ticket( $product );
+
+		return $ticket_object->on_sale ? $ticket->get_sale_price_value() : $ticket->get_price_value();
 	}
 
 	/**
 	 * Returns the ticket price html template
 	 *
 	 * @since 5.1.9
+	 * @since 5.9.0 Updated sale price template arguments.
 	 *
-	 * @param int|object    $product
-	 * @param array|boolean $attendee
+	 * @param int|object    $product The ticket post ID or object.
+	 * @param array|boolean $attendee The attendee data.
 	 *
 	 * @return string
 	 */
 	public function get_price_html( $product, $attendee = false ) {
-		$value = $this->get_price_value( $product );
+		$value  = $this->get_price_value( $product );
+		$ticket = $this->get_ticket( $product );
 
-		return $this->get_template()->template( 'price', [ 'price' => $value ], false );
+		return $this->get_template()->template(
+			'price',
+			[
+				'on_sale'       => $ticket->on_sale,
+				'price'         => $value,
+				'regular_price' => Value::create( $this->get_regular_price( $product ) ),
+			],
+			false
+		);
 	}
 
 	/**
@@ -923,6 +1020,7 @@ class Ticket {
 	/**
 	 * Update attendee data for moved attendees.
 	 *
+	 * @since 5.6.7 removed the use of `$this->decrease_ticket_sales_by` as the move method already takes care of stock.
 	 * @since 5.5.9
 	 *
 	 * @param int $ticket_id                The ticket which has been moved.
@@ -946,9 +1044,14 @@ class Ticket {
 
 		$attendee_data = $attendee->save();
 
-		if ( $attendee_data ) {
-			$this->decrease_ticket_sales_by( $src_ticket_type_id, 1 );
-		}
+		// Update the ticket stock data.
+		$this->increase_ticket_stock_by( $src_ticket_type_id, 1 );
+		$this->decrease_ticket_stock_by( $tgt_ticket_type_id, 1 );
+
+		// Sync shared capacity.
+		/** @var \Tribe__Tickets__Tickets_Handler $handler */
+		$handler = tribe( 'tickets.handler' );
+		$handler->sync_shared_capacity( $src_event_id, tribe_tickets_get_capacity( $src_event_id ) );
 	}
 
 	/**
@@ -964,5 +1067,203 @@ class Ticket {
 	public function increase_ticket_stock_by( $ticket_id, $quantity = 1 ) {
 		$stock = (int) get_post_meta( $ticket_id,  static::$stock_meta_key, true ) + $quantity;
 		return update_post_meta( $ticket_id,  static::$stock_meta_key, $stock );
+	}
+
+	/**
+	 * Decrease the ticket stock.
+	 *
+	 * @since 5.8.3
+	 *
+	 * @param int $ticket_id int The ticket post ID.
+	 * @param int $quantity  int The quantity to decrease the ticket stock by.
+	 *
+	 * @return bool|int
+	 */
+	public function decrease_ticket_stock_by( int $ticket_id, int $quantity = 1 ) {
+		$stock = (int) get_post_meta( $ticket_id, static::$stock_meta_key, true ) - $quantity;
+		$stock = max( 0, $stock );
+
+		return update_post_meta( $ticket_id, static::$stock_meta_key, $stock );
+	}
+
+	/**
+	 * Process the sale price data.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param Ticket_Object       $ticket   The ticket post object.
+	 * @param array<string,mixed> $raw_data The raw data from the request.
+	 *
+	 * @return void
+	 */
+	public function process_sale_price_data( Ticket_Object $ticket, array $raw_data ): void {
+		$sale_price_enabled = tribe_is_truthy( Arr::get( $raw_data, 'ticket_add_sale_price', false ) );
+		update_post_meta( $ticket->ID, static::$sale_price_checked_key, $sale_price_enabled );
+
+		if ( ! $sale_price_enabled ) {
+			$this->remove_sale_price_data( $ticket );
+			return;
+		}
+
+		$sale_price    = Arr::get( $raw_data, 'ticket_sale_price', false );
+		$regular_price = Arr::get( $raw_data, 'ticket_price', false );
+
+		if ( empty( $sale_price ) || $sale_price >= $regular_price ) {
+			$this->remove_sale_price_data( $ticket );
+			return;
+		}
+
+		update_post_meta( $ticket->ID, static::$sale_price_key, Value::create( $sale_price ) );
+
+		$this->process_sale_price_dates( $ticket, $raw_data );
+	}
+
+	/**
+	 * Process the sale price dates.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param Ticket_Object       $ticket   The ticket post object.
+	 * @param array<string,mixed> $raw_data The raw data from the request.
+	 *
+	 * @return void
+	 */
+	public function process_sale_price_dates( Ticket_Object $ticket, array $raw_data ): void {
+		if ( isset( $raw_data['ticket_sale_start_date'] ) ) {
+			$start_date = Date_Utils::maybe_format_from_datepicker( $raw_data['ticket_sale_start_date'] );
+			$start_date = empty( $start_date ) ? '' : gmdate( Date_Utils::DBDATEFORMAT, strtotime( $start_date ) );
+			update_post_meta( $ticket->ID, static::$sale_price_start_date_key, $start_date );
+		}
+
+		if ( isset( $raw_data['ticket_sale_end_date'] ) ) {
+			$end_date = Date_Utils::maybe_format_from_datepicker( $raw_data['ticket_sale_end_date'] );
+			$end_date = empty( $end_date ) ? '' : gmdate( Date_Utils::DBDATEFORMAT, strtotime( $end_date ) );
+			update_post_meta( $ticket->ID, static::$sale_price_end_date_key, $end_date );
+		}
+	}
+
+	/**
+	 * Remove the sale price data.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param Ticket_Object $ticket The ticket post object.
+	 *
+	 * @return void
+	 */
+	public function remove_sale_price_data( Ticket_Object $ticket ): void {
+		$keys = [
+			static::$sale_price_checked_key,
+			static::$sale_price_key,
+			static::$sale_price_start_date_key,
+			static::$sale_price_end_date_key,
+		];
+
+		foreach ( $keys as $key ) {
+			delete_post_meta( $ticket->ID, $key );
+		}
+	}
+
+	/**
+	 * Check if a ticket is on sale.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param Ticket_Object $ticket The ticket object.
+	 *
+	 * @return bool Whether the ticket is on sale.
+	 */
+	public function is_on_sale( Ticket_Object $ticket ): bool {
+		$sale_checked = get_post_meta( $ticket->ID, static::$sale_price_checked_key, true );
+
+		if ( ! $sale_checked ) {
+			return false;
+		}
+
+		$sale_price = get_post_meta( $ticket->ID, static::$sale_price_key, true );
+
+		if ( empty( $sale_price ) ) {
+			return false;
+		}
+
+		$start_date = get_post_meta( $ticket->ID, static::$sale_price_start_date_key, true );
+		$end_date   = get_post_meta( $ticket->ID, static::$sale_price_end_date_key, true );
+
+		if ( empty( $start_date ) && empty( $end_date ) ) {
+			return true;
+		}
+
+		// Using the ticket's date helper to ensure the timezone for events are handled correctly.
+		$start = $ticket->get_date( $start_date );
+		$end   = $ticket->get_date( $end_date );
+		$now   = $ticket->get_date( 'today' );
+
+		// If the sale has no end date and the start date is in the past, the sale is on.
+		if ( $start <= $now && empty( $end ) ) {
+			return true;
+		}
+
+		return $now >= $start && $now <= $end;
+	}
+
+	/**
+	 * Get the price of a ticket.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param Ticket_Object $ticket The ticket object.
+	 *
+	 * @return string The price of the ticket.
+	 */
+	public function get_price( Ticket_Object $ticket ): string {
+		if ( $ticket->on_sale ) {
+			return $this->get_sale_price( $ticket->ID );
+		}
+		return $this->get_regular_price( $ticket->ID );
+	}
+
+	/**
+	 * Get the sale price of a ticket.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param int $ticket_id The ticket post ID.
+	 *
+	 * @return string The sale price of the ticket.
+	 */
+	public function get_sale_price( int $ticket_id ): string {
+		$sale_price = get_post_meta( $ticket_id, static::$sale_price_key, true );
+		return $sale_price instanceof Value ? $sale_price->get_string() : '';
+	}
+
+	/**
+	 * Get the regular price of a ticket.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param int $ticket_id The ticket post ID.
+	 *
+	 * @return string The regular price of the ticket.
+	 */
+	public function get_regular_price( int $ticket_id ): string {
+		return get_post_meta( $ticket_id, '_price', true );
+	}
+
+	/**
+	 * Get the sale price details for a ticket.
+	 *
+	 * @since 5.9.0
+	 *
+	 * @param int $ticket_id The ticket post ID.
+	 *
+	 * @return array<string,string> The sale price details.
+	 */
+	public function get_sale_price_details( int $ticket_id ): array {
+		return [
+			'enabled'    => get_post_meta( $ticket_id, static::$sale_price_checked_key, true ),
+			'sale_price' => $this->get_sale_price( $ticket_id ),
+			'start_date' => get_post_meta( $ticket_id, static::$sale_price_start_date_key, true ),
+			'end_date'   => get_post_meta( $ticket_id, static::$sale_price_end_date_key, true ),
+		];
 	}
 }

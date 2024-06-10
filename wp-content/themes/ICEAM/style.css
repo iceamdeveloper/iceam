@@ -381,6 +381,10 @@ ul.nav li.current-menu-item>a {
     color: #f36557 !important;
 }
 
+span.lesson-length {
+    display: none;
+}
+
 header nav#navigation h3 {
     display: none;
 }
@@ -1480,7 +1484,20 @@ body.page-id-67 .callout.staff {
     z-index: 1000;
     top: 0;
     left: 0;
+    right: 0;
 }
+
+.block-watch-on-yt-button {
+    background-color: transparent;
+    position: absolute;
+    z-index: 1000;
+    right: 0;
+    bottom: 0;
+    height: 40px;
+    width: 120px;
+    cursor: not-allowed;
+}
+
 
 .entry img,
 img.thumbnail,

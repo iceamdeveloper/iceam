@@ -3,9 +3,9 @@
 Contributors: theeventscalendar, borkweb, bordoni, brianjessee, aguseo, camwynsp, GeoffBel, jentheo, leahkoerper, lucatume, neillmcshea, vicskf, zbtirrell, juanfra
 Tags: events, calendar, event, venue, organizer, dates, date, google maps, conference, workshop, concert, meeting, seminar, summit, class, the events calendar, widget, pro
 Donate link: https://evnt.is/29
-Requires at least: 5.8.6
-Stable tag: 6.0.12.1
-Tested up to: 6.2.1
+Requires at least: 6.2.0
+Stable tag: 6.3.2
+Tested up to: 6.4.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -214,6 +214,133 @@ Remember to always make a backup of your database and files before updating!
 
 == Changelog ==
 
+= [6.3.2] 2024-03-20 =
+
+* Feature - Adding Site Editor Single Venue template for use in themes that support Site Editor. [ECP-1620]
+* Fix - Site Editor themes did not properly display the venue Google Map. This has been resolved in ECP-1620. [TEC-4938]
+* Fix - Site Editor themes did not properly display venue details such as their addresses. This has been resolved in ECP-1620. [ECP-1534]
+* Fix - When Events Calendar Pro is active the admin menu does not highlight the correct items when viewing a post type index. [ECP-1682]
+* Language - 0 new strings added, 0 updated, 0 fuzzied, and 1 obsoleted
+
+= [6.3.1.1] 2024-02-22 =
+
+* Security - Improved the Shortcode around Events display of data to ensure data is only visible to users who have the correct permissions.
+* Language - 1 new strings added, 0 updated, 0 fuzzied, and 0 obsoleted
+
+= [6.3.1] 2024-01-24 =
+
+* Version - Events Calendar PRO 6.3.1 is only compatible with The Events Calendar 6.3.1 and higher
+* Fix - Ensure the Recurring Event Description field that has been deprecated and removed no longer shows on the Event edit screen. [ECP-1582]
+* Fix - Handles a post ID to a recurring event when doing a delete with the ORM like so `tribe_events()->where('id', 123 )->delete();`. Previously it would convert to an occurrence and not delete the whole recurring event. [TEC-4935]
+* Fix - Updating validation error reporting API. [TECENG-46]
+* Fix - WPML translation metabox was failing to load on the Edit Events page when Events Pro was active. [ECP-1629]
+* Fix - Fix PHP 8.2 deprecation errors `PHP Deprecated:  strip_tags(): Passing null to parameter #1 ($string) of type string is deprecated in /.../wp-admin/admin-header.php on line 36`. [ECP-1603]
+* Fix - Prevent a potential fatal with the Featured Venue Widget if the selected venue has been deleted. [ECP-1644]
+* Tweak - Added filters: `tec_events_pro_custom_tables_v1_series_occurrent_list_columns`, `tec_events_pro_custom_tables_v1_add_to_series_available_events`, `tec_events_pro_show_recurrence_description`
+* Tweak - Added actions: `tec_events_pro_custom_tables_v1_series_occurrent_list_column_{$column_name}`, `tec_events_pro_custom_tables_v1_series_relationships_after`
+* Tweak - Removed actions: `tribe_log`
+* Language - 2 new strings added, 56 updated, 1 fuzzied, and 1 obsoleted
+
+= [6.3.0] 2024-01-22 =
+
+* Feature - New Ticket type when using with Event Tickets for Series Posts.
+* Feature - Series Passes show on Series frontend page.
+* Feature - Series Passes show on frontend for events in Series.
+* Feature - Attendees and Orders pages for Series with passes.
+* Feature - New Attached Ticket Types column on the Series admin list of events.
+* Feature - Migration path to custom tables for sites with recurring events with tickets.
+* Tweak - Updating to be compatible with the new Trash Old Events frequency option structure in The Events Calendar. [ECP-1604]
+* Tweak - Added filters: `tec_events_pro_custom_tables_v1_series_occurrent_list_columns`, `tec_events_pro_custom_tables_v1_add_to_series_available_events`
+* Tweak - Added actions: `tec_events_pro_custom_tables_v1_series_occurrent_list_column_{$column_name}`, `tec_events_pro_custom_tables_v1_series_relationships_after`
+* Language - 0 new strings added, 9 updated, 0 fuzzied, and 0 obsoleted
+
+= [6.2.4] 2023-11-14 =
+
+* Fix - WPML permalink resolution was failing to retain the `lang` query param in some edge cases, namely on single posts with Pro activated. [TEC-4798]
+* Fix - Added legacy compatibility for `tribe_get_recurrence_start_dates()` to function with the Custom Tables feature. [ECP-1422]
+* Fix - Resolved several `Deprecated: Creation of dynamic property` warnings on: `\TEC\Events_Pro\Custom_Tables\V1\Duplicate\Duplicate::$url`, `\TEC\Events\Custom_Tables\V1\Models\Validators\Validator::$error_message` and `\Tribe__Events__Pro__PUE::$pue_instance` [BTRIA-2088]
+* Tweak - Added filters: `tec_events_pro_recurrence_get_start_dates`
+* Language - 0 new strings added, 64 updated, 0 fuzzied, and 0 obsoleted
+
+= [6.2.3.1] 2023-11-09 =
+
+* Fix - Ensure Recurring Events are saved correctly on WordPress version 6.4. [ECP-1614]
+
+= [6.2.3] 2023-10-19 =
+
+* Tweak - Remove the Tickets/RSVPs options from Series. [ECP-1587]
+* Fix - Organizer and venue views were not paginating to the past events due to a `past` flag getting lost during context switching. [ECP-1591]
+* Tweak - Updated recurrence pattern warning text when tickets are already attached. [ECP-1529]
+* Language - 1 new strings added, 0 updated, 0 fuzzied, and 1 obsoleted
+
+= [6.2.2] 2023-10-03 =
+
+* Version - Events Calendar PRO 6.2.2 is only compatible with The Events Calendar 6.2.3 and higher
+* Fix - Handle some issues with incorrect application of noindex meta tags. [TEC-4717]
+* Tweak - Updated focus state for relevant elements to have default outline ensuring improved accessibility and consistent browser behavior. [TEC-4888]
+* Tweak - Changed views: `v2/components/multi-venue/suffix`, `v2/widgets/shortcodes/components/after`, `v2/widgets/shortcodes/components/before`
+* Language - 0 new strings added, 7 updated, 0 fuzzied, and 0 obsoleted
+
+= [6.2.1.1] 2023-09-28 =
+
+* Fix - Don't trigger `register_tec_telemetry_plugins()` from ECP [TEC-4920]
+
+= [6.2.1] 2023-09-05 =
+
+* Fix - In scenarios where the `wp_posts` table was larger than the base provisional ID (1000000), during activation of ECP the provisional ID could get rolled back to a lower value, causing conflicts with legitimate post IDs and provisional IDs. [ECP-1565]
+* Fix - Fixes a `Return value of TEC\Events_Pro\Custom_Tables\V1\Traits\With_Event_RecurrenceTest::add_off_pattern_flag_to_rule() must be of the type array, string returned` fatal from a return type definition. This was occurring in edge cases, where recurrence data was likely invalid to begin with. [ECP-1566]
+* Fix - Do not delete edited Series following deletion of last Event in it. [ECP-1560]
+* Fix - After a 6.0 migration, some recurring events with date instances that were marked as `same-time` would show wrong times in classic editor. This edge case should be resolved now. The underlying data was correct but the interface support was no longer handling `same-time` dates. [ECP-1511]
+* Fix - Modify output of additional fields for Event Automator to provide consistent output and prevent infinite growth of fields in Zapier. [EVA-103]
+* Tweak - Removed 'Series' post type from the list of available post types under "Tickets > Settings" in Event Tickets. [ECP-1568]
+* Tweak - Support the `post__not_recurring` query argument in CT1 queries to exclude Recurring Events from the results. [ET-1812]
+
+= [6.2.0] 2023-08-15 =
+
+* Version - Events Calendar PRO 6.2.0 is only compatible with The Events Calendar 6.2.0 and higher
+* Feature - Add multi-venue support. [ECP-1540]
+* Feature - Adding a new category taxonomy for Organizers and Venues.
+* Feature - Include settings to hide the Event Organizer Email and Phone for the Organizer single page and Event single page. [ECP-1551]
+* Feature - Enhanced featured image and meta layout for Organizer and Venue pages.
+* Fix - Specifying post slugs for venues and organizers within shortcodes will now find posts as expected. [ECP-1540]
+* Tweak - Added filters: `tec_events_pro_linked_post_taxonomy_singular_label_without_linked_post`, `tec_events_pro_linked_post_taxonomy_{$slug}_singular_label_without_linked_post`, `tec_events_pro_linked_post_taxonomy_plural_label_without_linked_post`, `tec_events_pro_linked_post_taxonomy_{$slug}_plural_label_without_linked_post`, `tec_events_pro_linked_post_taxonomy_rewrite_slug_singular`, `tec_events_pro_linked_post_taxonomy_{$slug}_rewrite_slug_singular`, `tec_events_pro_linked_post_taxonomy_rewrite_slug_plural`, `tec_events_pro_linked_post_taxonomy_{$slug}_rewrite_slug_plural`, `tec_events_pro_linked_post_taxonomy_linked_post_type`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type`, `tec_events_pro_linked_post_taxonomy_linked_post_type_rewrite_slug_singular`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_rewrite_slug_singular`, `tec_events_pro_linked_post_taxonomy_linked_post_type_rewrite_slug_plural`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_rewrite_slug_plural`, `tec_events_pro_linked_post_taxonomy_linked_post_type_view_slug`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_view_slug`, `tec_events_pro_linked_post_taxonomy_linked_post_type_label_singular`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_label_singular`, `tec_events_pro_linked_post_taxonomy_linked_post_type_label_singular_lowercase`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_label_singular_lowercase`, `tec_events_pro_linked_post_taxonomy_linked_post_type_label_plural`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_label_plural`, `tec_events_pro_linked_post_taxonomy_linked_post_type_label_plural_lowercase`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_label_plural_lowercase`, `tec_events_pro_linked_post_taxonomy_linked_post_type_repository`, `tec_events_pro_linked_post_taxonomy_{$slug}_linked_post_type_repository`, `tec_events_pro_linked_post_taxonomy_{$slug}_configuration`, `tec_events_pro_linked_post_taxonomy_{$slug}_labels`, `tec_events_pro_{$slug}_visibility_get_setting_options`, `tec_events_pro_{$slug}_visibility_get_setting_definition`, `tec_events_pro_{$slug}_visibility_is_visible`, `tec_events_pro_{$slug}_visibility_is_visible:{$area}`, `tec_events_pro_{$slug}_visibility_is_visible:{$area}:{$post}`* Tweak - Changed views: `pro/widgets/modules/single-event`, `v2/map`, `v2/map/event-cards/event-card/event/venue`, `v2/organizer/meta`, `v2/organizer/meta/content`, `v2/organizer/meta/details`, `v2/organizer/meta/details/email`, `v2/organizer/meta/details/phone`, `v2/photo`, `v2/summary`, `v2/venue/meta`, `v2/venue/meta/details`, `v2/week/mobile-events/day/event/venue`, `v2/widgets/widget-events-list/event/venue`
+* Language - 35 new strings added, 55 updated, 0 fuzzied, and 0 obsoleted
+
+= [6.1.2] 2023-08-10 =
+
+* Version - Events Calendar Pro 6.1.2 is only compatible with The Events Calendar 6.1.4 and higher.
+* Version - The minimum supported version of WordPress is now 6.1.0
+* Fix - In some scenarios our pagination and various view actions would fail due to 403 errors on the REST endpoints, because of failing nonce checks, likely due to cache. Updating the way we handle nonces to avoid some scenarios the wrong nonce could be cached. [TEC-4814]
+* Fix - Ensure the block editor includes support for user-defined custom CSS classes. [TEC-4724]
+* Fix - Optimize queries related to condensing recurring events when the `Condense events in Series` setting is enabled. [ECP-1517]
+* Tweak - Correct passing null to `json_decode()` for PHP 8.1 compatibility. [ECP-1557]
+* Tweak - Changed views: `blocks/additional-fields/checkbox`, `blocks/additional-fields/dropdown`, `blocks/additional-fields/radio`, `blocks/additional-fields/text`, `blocks/additional-fields/textarea`, `blocks/additional-fields/url`, `blocks/related-events`, `v2/map`, `v2/photo`, `v2/summary`, `v2/week`, `v2/widgets/widget-countdown`, `v2/widgets/widget-featured-venue`
+* Language - 9 new strings added, 50 updated, 2 fuzzied, and 6 obsoleted.
+
+= [6.1.1] 2023-07-13 =
+
+* Fix - Performance improvements on Week view when a lot of Future and Past events were found. [ECP-50]
+* Fix - Preventing duplicated queries on views that contain Occurrences of a Series [ECP-50]
+* Feat - Add the `tec_events_pro_custom_tables_v1_event_relationship_updated` and `tec_events_pro_custom_tables_v1_series_relationships_updated` filters to allow developers to hook into the event and series relationship update process. [ET-1486]
+* Fix - Now occurrences that land on the same date for an event, will retain their sequence number and URL when new occurrences are added. The event sequence no longer relies on the order of occurrences. [ECP-1489]
+* Fix - Ensure the Event Time is displayed correctly for Multi-day events in the Summary view. [ECP-1072]
+* Fix - Recurring Events count in telemetry. [ECP-1520]
+* Tweak - Fire the `tec_events_pro_custom_tables_v1_fully_activated` action when the Custom Tables v1 component is activated. [ET-1486]
+* Tweak - Added actions: `tec_events_pro_custom_tables_v1_fully_activated`, `tec_events_pro_custom_tables_v1_event_relationship_updated`, `tec_events_pro_custom_tables_v1_series_relationships_updated`
+* Tweak - Changed views: `v2/summary/date-group/date-tag`
+* Language - 0 new strings added, 31 updated, 1 fuzzied, and 0 obsoleted
+
+= [6.1.0] 2023-06-14 =
+
+* Version - Events Calendar PRO 6.1.0 is only compatible with The Events Calendar 6.1.0 and higher
+* Feature - Replace Freemius with Telemetry - an in-house info system. [TEC-4700]
+* Feature - Add plugin info to Site Health admin page. [TEC-4701]
+* Fix - Ensure all the strings in the add event page are translatable. [ECP-1453]
+* Fix - Ensure the `Use in Block Editor` option under `Events → Settings → Additional Fields` works as expected. [ECP-1481]
+* Fix - Removing our eager schema updates. This was causing a number of `ALTER` statements being run redundantly. No longer utilizes cache/transient for the last run check as it is not dependable. [TEC-4797]
+* Tweak - Updates title tags on events pages, to be more unique and search specific, taking on formats like "Summary of Events from February 2, 2017 - February 3, 2019". [TEC-4692]\
+* Language - 4 new strings added, 96 updated, 0 fuzzied, and 1 obsoleted
+
 = [6.0.12.1] 2023-05-18 =
 
 * Fix - Fix the state bug causing a large number of XHR requests that were being made in the block editor. [TEC-4805]
@@ -252,7 +379,7 @@ Remember to always make a backup of your database and files before updating!
 * Fix - During an update that splits a recurring event, in cases where there is a "Never Ends" limit it will now carry over to the right side of the split instead of setting an explicit "After X" limit. [ECP-1285]
 * Fix - Ensure full support for the translation of Series in WPML context. [ECP-1429]
 * Fix - Ensure post list displays correctly after quick edit of Events. [ECP-1261]
-* Fix - Fixes an issue after certain types of event updates, gutenberg would display "Changes you made may not be saved" alert. This was do to the post state being considered dirty when ID's changed in the response. [ECP-1452]
+* Fix - Fixes an issue after certain types of event updates, Gutenberg would display "Changes you made may not be saved" alert. This was do to the post state being considered dirty when ID's changed in the response. [ECP-1452]
 * Fix - In the admin sometimes link strings will be null in the `get_edit_post_link` hook callback. This will fix a fatal that was happening when string type was expected. [BTRIA-1689]
 * Fix - Language switcher link for Recurring Event Occurrences when using WPML. [ECP-1471]
 * Fix - Reload the Blocks Editor when breaking out an Event to avoid incoherent state. [ECP-1386]
@@ -520,7 +647,7 @@ Remember to always make a backup of your database and files before updating!
 = [5.12.1] 2022-02-15 =
 
 * Version - Events Calendar PRO 5.12.1 is only compatible with The Events Calendar 5.14.0 and higher.
-* Tweak - Remove the `wp.editor.InnerBlocks` gutenberg component in favor of `wp.blockEditor.InnerBlocks` which was deprecated since version 5.3. [ECP-1052]
+* Tweak - Remove the `wp.editor.InnerBlocks` Gutenberg component in favor of `wp.blockEditor.InnerBlocks` which was deprecated since version 5.3. [ECP-1052]
 * Tweak - Compatibility with the Common Abstract for editor blocks registration.
 * Fix - Major performance improvements gain from preventing improper load of Geolocation classes when not needed.
 * Fix - Prevent infinite loops in events manager when other plugins build the post. [ECP-1048]

@@ -5,6 +5,7 @@ namespace TEC\Tickets\Commerce;
 use TEC\Tickets\Commerce;
 use TEC\Tickets\Commerce\Status\Completed;
 use Tribe__Utils__Array as Arr;
+use TEC\Tickets\Commerce\Communication\Email as Email_Communication;
 
 /**
  * Class Tickets Provider class for Tickets Commerce
@@ -30,6 +31,8 @@ class Module extends \Tribe__Tickets__Tickets {
 		$this->ticket_object = Ticket::POSTTYPE;
 
 		$this->event_key = Attendee::$event_relation_meta_key;
+
+		$this->attendee_event_key = Attendee::$event_relation_meta_key;
 
 		$this->checkin_key = Attendee::$checked_in_meta_key;
 
@@ -83,7 +86,7 @@ class Module extends \Tribe__Tickets__Tickets {
 	 *
 	 * @var string
 	 */
-	const ATTENDEE_PRODUCT_KEY = '_tec_tickets_commerce_product';
+	const ATTENDEE_PRODUCT_KEY = '_tec_tickets_commerce_ticket';
 
 	/**
 	 * Meta key that relates Attendees and Orders.
@@ -231,13 +234,6 @@ class Module extends \Tribe__Tickets__Tickets {
 		if ( $this->is_loaded ) {
 			return false;
 		}
-
-//		add_filter( 'post_updated_messages', [ $this, 'updated_messages' ] );
-
-//		add_action( 'init', tribe_callback( 'tickets.commerce.paypal.orders.report', 'hook' ) );
-//		add_action( 'tribe_tickets_attendees_page_inside', tribe_callback( 'tickets.commerce.paypal.orders.tabbed-view', 'render' ) );
-//		add_filter( 'tribe_tickets_stock_message_available_quantity', tribe_callback( 'tickets.commerce.paypal.orders.sales', 'filter_available' ), 10, 4 );
-//		add_action( 'admin_init', tribe_callback( 'tickets.commerce.paypal.oversell.request', 'handle' ) );```
 	}
 
 	/**
@@ -374,7 +370,7 @@ class Module extends \Tribe__Tickets__Tickets {
 			$ticket_id = func_get_arg( 1 );
 		}
 
-		/** @var Tribe__Tickets__Attendee_Repository $repository */
+		/** @var \Tribe__Tickets__Attendee_Repository $repository */
 		$repository = tribe_attendees( $this->orm_provider );
 
 		$repository->by( 'parent', $order_id );
@@ -557,6 +553,7 @@ class Module extends \Tribe__Tickets__Tickets {
 	 * Gets an individual ticket.
 	 *
 	 * @since 5.1.9
+	 * @since 5.6.7 Set some provider-invariant ticket properties.
 	 *
 	 * @param int|\WP_Post $post_id
 	 * @param int|\WP_Post $ticket_id
@@ -564,7 +561,17 @@ class Module extends \Tribe__Tickets__Tickets {
 	 * @return null|\Tribe__Tickets__Ticket_Object
 	 */
 	public function get_ticket( $post_id, $ticket_id ) {
-		return tribe( Ticket::class )->get_ticket( $ticket_id );
+		$ticket = tribe( Ticket::class )->get_ticket( $ticket_id );
+
+		if ( ! $ticket instanceof \Tribe__Tickets__Ticket_Object ) {
+			return null;
+		}
+
+		// Set provider-invariant ticket properties.
+		$ticket_type  = get_post_meta( $ticket_id, '_type', true ) ?: 'default';
+		$ticket->type = $ticket_type;
+
+		return $ticket;
 	}
 
 	/**
@@ -810,4 +817,14 @@ class Module extends \Tribe__Tickets__Tickets {
 		return $attendee;
 	}
 
+	/**
+	 * Update the email sent counter for attendee by increasing it +1.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @param int $attendee_id The attendee ID.
+	 */
+	public function update_ticket_sent_counter( $attendee_id ) {
+		tribe( Email_Communication::class )->update_ticket_sent_counter( $attendee_id );
+	}
 }

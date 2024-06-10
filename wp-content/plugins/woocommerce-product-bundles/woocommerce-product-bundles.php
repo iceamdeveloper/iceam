@@ -1,11 +1,11 @@
 <?php
 /**
-* Plugin Name: WooCommerce Product Bundles
-* Plugin URI: https://woocommerce.com/products/product-bundles/
+* Plugin Name: Woo Product Bundles
+* Plugin URI: https://woo.com/products/product-bundles/
 * Description: Offer product bundles, bulk discount packages, and assembled products.
-* Version: 6.18.6
-* Author: WooCommerce
-* Author URI: https://somewherewarm.com/
+* Version: 7.0.2
+* Author: Woo
+* Author URI: https://woo.com/
 *
 * Woo: 18716:fbca839929aaddc78797a5b511c14da9
 *
@@ -15,10 +15,12 @@
 * Requires PHP: 7.0
 *
 * Requires at least: 4.4
-* Tested up to: 6.0
+* Tested up to: 6.5
 *
 * WC requires at least: 3.9
-* WC tested up to: 7.7
+* WC tested up to: 8.6
+*
+* Requires Plugins: woocommerce
 *
 * License: GNU General Public License v3.0
 * License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -33,11 +35,11 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Main plugin class.
  *
  * @class    WC_Bundles
- * @version  6.18.6
+ * @version  7.0.2
  */
 class WC_Bundles {
 
-	public $version  = '6.18.6';
+	public $version  = '7.0.2';
 	public $required = '3.9.0';
 
 	/**
@@ -47,6 +49,14 @@ class WC_Bundles {
 	 * @since 4.11.4
 	 */
 	protected static $_instance = null;
+
+	/**
+	 * Product data object.
+	 * @var WC_PB_Product_Data
+	 *
+	 * @since 7.0.0
+	 */
+	public $product_data;
 
 	/**
 	 * Main WC_Bundles instance. Ensures only one instance of WC_Bundles is loaded or can be loaded - @see 'WC_PB()'.
@@ -68,7 +78,7 @@ class WC_Bundles {
 	 * @since 4.11.4
 	 */
 	public function __clone() {
-		_doing_it_wrong( __FUNCTION__, __( 'Foul!', 'woocommerce-product-bundles' ), '4.11.4' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Foul!', 'woocommerce-product-bundles' ), '4.11.4' );
 	}
 
 	/**
@@ -77,7 +87,7 @@ class WC_Bundles {
 	 * @since 4.11.4
 	 */
 	public function __wakeup() {
-		_doing_it_wrong( __FUNCTION__, __( 'Foul!', 'woocommerce-product-bundles' ), '4.11.4' );
+		_doing_it_wrong( __FUNCTION__, esc_html__( 'Foul!', 'woocommerce-product-bundles' ), '4.11.4' );
 	}
 
 	/**
@@ -184,7 +194,7 @@ class WC_Bundles {
 		// WC version sanity check.
 		if ( ! function_exists( 'WC' ) || version_compare( WC()->version, $this->required ) < 0 ) {
 			/* translators: Version */
-			$notice = sprintf( __( 'WooCommerce Product Bundles requires at least WooCommerce <strong>%s</strong>.', 'woocommerce-product-bundles' ), $this->required );
+			$notice = sprintf( __( 'Woo Product Bundles requires at least WooCommerce <strong>%s</strong>.', 'woocommerce-product-bundles' ), $this->required );
 			require_once( WC_PB_ABSPATH . 'includes/admin/class-wc-pb-admin-notices.php' );
 			WC_PB_Admin_Notices::add_notice( $notice, 'error' );
 			return false;
@@ -193,7 +203,7 @@ class WC_Bundles {
 		// PHP version check.
 		if ( ! function_exists( 'phpversion' ) || version_compare( phpversion(), '7.0.0', '<' ) ) {
 			/* translators: %1$s: Version %, %2$s: Update PHP doc URL */
-			$notice = sprintf( __( 'WooCommerce Product Bundles requires at least PHP <strong>%1$s</strong>. Learn <a href="%2$s">how to update PHP</a>.', 'woocommerce-product-bundles' ), '7.0.0', $this->get_resource_url( 'update-php' ) );
+			$notice = sprintf( __( 'Woo Product Bundles requires at least PHP <strong>%1$s</strong>. Learn <a href="%2$s">how to update PHP</a>.', 'woocommerce-product-bundles' ), '7.0.0', $this->get_resource_url( 'update-php' ) );
 			require_once( WC_PB_ABSPATH . 'includes/admin/class-wc-pb-admin-notices.php' );
 			WC_PB_Admin_Notices::add_notice( $notice, 'error' );
 			return false;
@@ -223,7 +233,7 @@ class WC_Bundles {
 	public function define_constants() {
 
 		$this->maybe_define_constant( 'WC_PB_VERSION', $this->version );
-		$this->maybe_define_constant( 'WC_PB_SUPPORT_URL', 'https://woocommerce.com/my-account/marketplace-ticket-form/' );
+		$this->maybe_define_constant( 'WC_PB_SUPPORT_URL', 'https://woo.com/my-account/marketplace-ticket-form/' );
 		$this->maybe_define_constant( 'WC_PB_ABSPATH', trailingslashit( plugin_dir_path( __FILE__ ) ) );
 
 		/*
@@ -279,6 +289,11 @@ class WC_Bundles {
 	 * Includes.
 	 */
 	public function includes() {
+
+		// Product data.
+		require_once( WC_PB_ABSPATH . 'includes/class-wc-pb-product-data.php' );
+
+		$this->product_data = WC_PB_Product_Data::instance();
 
 		// Extensions compatibility functions and hooks.
 		require_once( WC_PB_ABSPATH . 'includes/compatibility/class-wc-pb-compatibility.php' );
@@ -393,23 +408,23 @@ class WC_Bundles {
 		$resource = false;
 
 		if ( 'pricing-options' === $handle ) {
-			$resource = 'https://woocommerce.com/document/bundles/bundles-configuration/#pricing';
+			$resource = 'https://woo.com/document/bundles/bundles-configuration/#pricing';
 		} elseif ( 'shipping-options' === $handle ) {
-			$resource = 'https://woocommerce.com/document/bundles/bundles-configuration/#shipping';
+			$resource = 'https://woo.com/document/bundles/bundles-configuration/#shipping';
 		} elseif ( 'update-php' === $handle ) {
-			$resource = 'https://woocommerce.com/document/how-to-update-your-php-version/';
+			$resource = 'https://woo.com/document/how-to-update-your-php-version/';
 		} elseif ( 'docs-contents' === $handle ) {
-			$resource = 'https://woocommerce.com/document/bundles/';
+			$resource = 'https://woo.com/document/bundles/';
 		} elseif ( 'max-input-vars' === $handle ) {
-			$resource = 'https://woocommerce.com/document/bundles/bundles-faq/#faq_bundled_items_dont_save';
+			$resource = 'https://woo.com/document/bundles/bundles-faq/#faq_bundled_items_dont_save';
 		} elseif ( 'updating' === $handle ) {
-			$resource = 'https://woocommerce.com/document/how-to-update-woocommerce/';
+			$resource = 'https://woo.com/document/how-to-update-woocommerce/';
 		} elseif ( 'min-max' === $handle ) {
 			$resource = 'https://wordpress.org/plugins/product-bundles-minmax-items-for-woocommerce/';
 		} elseif ( 'bulk-discounts' === $handle ) {
 			$resource = 'https://wordpress.org/plugins/product-bundles-bulk-discounts-for-woocommerce/';
 		} elseif ( 'analytics-revenue' === $handle ) {
-			$resource = 'https://woocommerce.com/document/bundles/bundles-configuration/#pb-analytics';
+			$resource = 'https://woo.com/document/bundles/bundles-configuration/#pb-analytics';
 		} elseif ( 'ticket-form' === $handle ) {
 			$resource = WC_PB_SUPPORT_URL;
 		}

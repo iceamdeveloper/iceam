@@ -1,6 +1,12 @@
 <?php
+/**
+ * @license MIT
+ *
+ * Modified using Strauss.
+ * @see https://github.com/BrianHenryIE/strauss
+ */
 
-namespace Psr\Log;
+namespace TEC\Common\Psr\Log;
 
 /**
  * This is a simple Logger implementation that other Loggers can inherit from.

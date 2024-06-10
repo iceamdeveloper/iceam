@@ -51,6 +51,15 @@ $user_has_rsvp              = $rsvp->get_attendees_count_going_for_user( $event_
 $tribe_my_tickets_have_meta = false;
 
 /**
+ * Use this filter to hide the Attendees List Optout
+ *
+ * @since 4.9
+ *
+ * @param bool
+ */
+$hide_attendee_list_optout = apply_filters( 'tribe_tickets_plus_hide_attendees_list_optout', false, $event_id );
+
+/**
  * This filter allows the admin to control the re-send email option when an attendee's email is updated.
  *
  * @since 5.0.3
@@ -94,7 +103,7 @@ if (
 
 $post_type_singular = $post_type ? $post_type->labels->singular_name : _x( 'Post', 'fallback post type singular name', 'event-tickets' );
 
-$is_event_page = class_exists( 'Tribe__Events__Main' ) && Tribe__Events__Main::POSTTYPE === $event->post_type;
+$is_event_page = is_singular( 'tribe_events' ) || is_singular( 'tribe_event_series' );
 ?>
 <div id="tribe-events-content" class="tribe-events-single">
 	<p class="tribe-back">
@@ -121,13 +130,13 @@ $is_event_page = class_exists( 'Tribe__Events__Main' ) && Tribe__Events__Main::P
 	<?php tribe_the_notices() ?>
 
 	<div
-		class="tribe-tickets__tickets-page-wrapper"
+		class="event-tickets tribe-tickets__tickets-page-wrapper tribe-common"
 		data-post-id="<?php echo esc_attr( $event_id ); ?>"
 		data-provider="<?php echo esc_attr( $provider ); ?>"
 		data-attendee-resend-email="<?php echo esc_attr( $allow_resending_email ); ?>"
 	>
 
-		<form method="post" autocomplete="off">
+		<form method="post" autocomplete="off" class="tribe-tickets__form">
 
 			<?php $template->template( 'tickets/orders-rsvp' ); ?>
 
@@ -158,13 +167,14 @@ $is_event_page = class_exists( 'Tribe__Events__Main' ) && Tribe__Events__Main::P
 					$view->has_ticket_attendees( $event_id, get_current_user_id() )
 					&& $tribe_my_tickets_have_meta
 				)
+				|| ! $hide_attendee_list_optout
 			) : ?>
 				<div class="tribe-submit-tickets-form">
 					<button
 						type="submit"
 						name="process-tickets"
 						value="1"
-						class="button alt"
+						class="button alt tribe-common-c-btn tribe-common-c-btn--small"
 					>
 						<?php echo sprintf( esc_html__( 'Update %s', 'event-tickets' ), $view->get_description_rsvp_ticket( $event_id, get_current_user_id() ) ); ?>
 					</button>

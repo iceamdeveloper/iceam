@@ -4,6 +4,7 @@ namespace Sensei\ThirdParty\Sabberworm\CSS\Property;
 
 use Sensei\ThirdParty\Sabberworm\CSS\Comment\Comment;
 use Sensei\ThirdParty\Sabberworm\CSS\OutputFormat;
+use Sensei\ThirdParty\Sabberworm\CSS\Value\CSSString;
 /**
  * Class representing an `@charset` rule.
  *
@@ -12,12 +13,12 @@ use Sensei\ThirdParty\Sabberworm\CSS\OutputFormat;
  * - May only appear at the very top of a Document’s contents.
  * - Must not appear more than once.
  */
-class Charset implements \Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule
+class Charset implements AtRule
 {
     /**
-     * @var string
+     * @var CSSString
      */
-    private $sCharset;
+    private $oCharset;
     /**
      * @var int
      */
@@ -27,12 +28,12 @@ class Charset implements \Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule
      */
     protected $aComments;
     /**
-     * @param string $sCharset
+     * @param CSSString $oCharset
      * @param int $iLineNo
      */
-    public function __construct($sCharset, $iLineNo = 0)
+    public function __construct(CSSString $oCharset, $iLineNo = 0)
     {
-        $this->sCharset = $sCharset;
+        $this->oCharset = $oCharset;
         $this->iLineNo = $iLineNo;
         $this->aComments = [];
     }
@@ -44,34 +45,35 @@ class Charset implements \Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule
         return $this->iLineNo;
     }
     /**
-     * @param string $sCharset
+     * @param string|CSSString $oCharset
      *
      * @return void
      */
     public function setCharset($sCharset)
     {
-        $this->sCharset = $sCharset;
+        $sCharset = $sCharset instanceof CSSString ? $sCharset : new CSSString($sCharset);
+        $this->oCharset = $sCharset;
     }
     /**
      * @return string
      */
     public function getCharset()
     {
-        return $this->sCharset;
+        return $this->oCharset->getString();
     }
     /**
      * @return string
      */
     public function __toString()
     {
-        return $this->render(new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat());
+        return $this->render(new OutputFormat());
     }
     /**
      * @return string
      */
-    public function render(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oOutputFormat)
+    public function render(OutputFormat $oOutputFormat)
     {
-        return "@charset {$this->sCharset->render($oOutputFormat)};";
+        return "{$oOutputFormat->comments($this)}@charset {$this->oCharset->render($oOutputFormat)};";
     }
     /**
      * @return string
@@ -85,7 +87,7 @@ class Charset implements \Sensei\ThirdParty\Sabberworm\CSS\Property\AtRule
      */
     public function atRuleArgs()
     {
-        return $this->sCharset;
+        return $this->oCharset;
     }
     /**
      * @param array<array-key, Comment> $aComments

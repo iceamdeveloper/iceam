@@ -64,6 +64,14 @@ abstract class Updater extends Base_Class {
 	protected $logger;
 
 	/**
+	 * The instance of the integration with the Product Addons plugin.
+	 *
+	 * @var Aelia\WC\WC_AeliaFoundationClasses
+	 * @since 2.4.12.230803
+	 */
+	protected $_afc;
+
+	/**
 	 * Constructor.
 	 *
 	 * @param array products_to_update An array of products (plugins, themes) whose
@@ -242,7 +250,7 @@ abstract class Updater extends Base_Class {
 	 * @param array args An array of arguments to be passed to the update server.
 	 * @return string The URL to call to check for updates.
 	 */
-	protected abstract function get_api_call_url(array $args);
+	abstract protected function get_api_call_url(array $args);
 
 	/**
 	 * Checks for updates for the specified product. This method must be implemented
@@ -250,7 +258,7 @@ abstract class Updater extends Base_Class {
 	 *
 	 * @param object product A product (plugin, theme) descriptor.
 	 */
-	protected abstract function check_for_product_updates($product);
+	abstract protected function check_for_product_updates($product);
 
 	/**
 	 * Checks for updates for the registered products.

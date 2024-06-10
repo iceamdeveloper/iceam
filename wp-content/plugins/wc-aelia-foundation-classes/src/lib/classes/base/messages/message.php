@@ -1,6 +1,6 @@
 <?php
 namespace Aelia\WC;
-if(!defined('ABSPATH')) exit; // Exit if accessed directly
+if(!defined('ABSPATH')) { exit; } // Exit if accessed directly
 
 if(!class_exists('Aelia\WC\Message')) {
 	/**
@@ -14,6 +14,8 @@ if(!class_exists('Aelia\WC\Message')) {
 		public $sender_id;
 		public $sender_name;
 		public $permissions;
+		// @since 2.4.12.230803
+		public $message_header;
 
 		/**
 		 * Message headers display on top of message lists.

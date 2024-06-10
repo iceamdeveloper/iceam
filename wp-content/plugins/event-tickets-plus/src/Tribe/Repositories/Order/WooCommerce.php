@@ -35,7 +35,7 @@ class WooCommerce extends Order {
 		$this->attendee_provider = tribe( 'tickets-plus.commerce.woo' );
 
 		// Set the order post type.
-		$this->default_args['post_type'] = $this->attendee_provider->order_object;
+		$this->default_args['post_type'] = $this->attendee_provider->get_active_order_post_type_name();
 	}
 
 	/**

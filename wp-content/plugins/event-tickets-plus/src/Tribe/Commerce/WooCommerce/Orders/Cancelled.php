@@ -1,6 +1,5 @@
 <?php
 
-
 class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Cancelled {
 
 	/**
@@ -86,57 +85,48 @@ class Tribe__Tickets_Plus__Commerce__WooCommerce__Orders__Cancelled {
 	}
 
 	protected function real_get_count() {
-		/** @var \wpdb $wpdb */
+		$result                  = $this->get_cancelled_order_query();
+		$cancelled_tickets_count = is_null( $result ) ? 0 : intval( $result );
+
+		return $cancelled_tickets_count;
+	}
+
+	/**
+	 * Constructs and executes the SQL query to fetch the total quantity of cancelled tickets.
+	 * This is due to the WooCommerce ORM being unable to lookup orders by Product ID efficiently.
+	 * The query used depends on whether HPOS is enabled or not.
+	 *
+	 * @return string|null The sum of quantities for cancelled tickets, or null if no tickets are found.
+	 *
+	 * @global wpdb $wpdb WordPress database abstraction object.
+	 */
+	protected function get_cancelled_order_query() {
 		global $wpdb;
 
-		$wc_order_itemmeta_table = $wpdb->prefix . 'woocommerce_order_itemmeta';
-		$wc_order_items_table    = $wpdb->prefix . 'woocommerce_order_items';
-
-		// get the orders associated to the ticket
-		$order_item_ids = $wpdb->get_col(
-			"SELECT order_item_id FROM {$wc_order_itemmeta_table} WHERE meta_key = '_product_id' AND meta_value = {$this->ticket_id}"
-		);
-
-		if ( empty( $order_item_ids ) ) {
-			return 0;
+		if ( ! tribe( 'tickets-plus.commerce.woo' )->is_hpos_enabled() ) {
+			// HPOS is disabled.
+			$query = "SELECT COALESCE(SUM(qty_meta.meta_value), 0)
+				FROM {$wpdb->prefix}woocommerce_order_itemmeta AS woim
+				INNER JOIN {$wpdb->prefix}woocommerce_order_items AS woi ON woim.order_item_id = woi.order_item_id
+				INNER JOIN {$wpdb->prefix}posts AS p ON p.ID = woi.order_id
+				LEFT JOIN {$wpdb->prefix}woocommerce_order_itemmeta AS qty_meta ON woim.order_item_id = qty_meta.order_item_id AND qty_meta.meta_key = '_qty'
+				WHERE woim.meta_key IN ('_product_id', '_variation_id')
+				AND p.post_status = %s
+				AND woim.meta_value = %d";
+		} else {
+			// HPOS is enabled.
+			$query = "SELECT COALESCE(SUM(opl.product_qty), 0)
+				FROM {$wpdb->prefix}wc_order_product_lookup opl
+				INNER JOIN {$wpdb->prefix}wc_orders o ON opl.order_id = o.id
+				WHERE o.type = 'shop_order'
+				AND o.status = %s
+				AND opl.product_id = %d";
 		}
 
-		$order_item_ids_interval = implode( ',', $order_item_ids );
-		$order_ids               = $wpdb->get_results(
-			"SELECT order_id, order_item_id  FROM {$wc_order_items_table} WHERE order_item_id IN ({$order_item_ids_interval})"
-		);
+		$sql = $wpdb->prepare( $query, 'wc-cancelled', intval( $this->ticket_id ) );
 
-		if ( empty( $order_ids ) ) {
-			return 0;
-		}
-
-		// keep cancelled orders
-		$order_post_ids_interval  = implode( ',', wp_list_pluck( $order_ids, 'order_id' ) );
-		$cancelled_order_post_ids = $wpdb->get_col(
-			"SELECT ID FROM {$wpdb->posts} WHERE ID in ({$order_post_ids_interval}) AND post_status = 'wc-cancelled'"
-		);
-
-		if ( empty( $cancelled_order_post_ids ) ) {
-			return 0;
-		}
-
-		// get each cancelled order qty
-		$cancelled_order_item_ids = array();
-		foreach ( $order_ids as $order_id ) {
-			if ( in_array( $order_id->order_id, $cancelled_order_post_ids ) ) {
-				$cancelled_order_item_ids[] = $order_id->order_item_id;
-			}
-		}
-
-		if ( empty( $cancelled_order_item_ids ) ) {
-			return 0;
-		}
-
-		$cancelled_order_item_ids_interval = implode( ',', $cancelled_order_item_ids );
-		$cancelled_qty                     = $wpdb->get_var(
-			"SELECT SUM(meta_value) FROM {$wc_order_itemmeta_table} WHERE order_item_id IN ({$cancelled_order_item_ids_interval}) AND meta_key = '_qty'"
-		);
-
-		return empty( $cancelled_qty ) ? 0 : $cancelled_qty;
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.NotPrepared
+		return $wpdb->get_var( $sql );
 	}
+
 }

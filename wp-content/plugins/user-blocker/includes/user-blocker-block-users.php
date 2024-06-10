@@ -47,7 +47,20 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 		$block_time_array = array();
 		$reocrd_id        = array();
 
-		$txt_sun_from = $txt_sun_to = $txt_mon_from = $txt_mon_to = $txt_tue_from = $txt_tue_to = $txt_wed_from = $txt_wed_to = $txt_thu_from = $txt_thu_to = $txt_fri_from = $txt_fri_to = $txt_sat_from = $txt_sat_to = '';
+		$txt_sun_from = '';
+		$txt_sun_to   = '';
+		$txt_mon_from = '';
+		$txt_mon_to   = '';
+		$txt_tue_from = '';
+		$txt_tue_to   = '';
+		$txt_wed_from = '';
+		$txt_wed_to   = '';
+		$txt_thu_from = '';
+		$txt_thu_to   = '';
+		$txt_fri_from = '';
+		$txt_fri_to   = '';
+		$txt_sat_from = '';
+		$txt_sat_to   = '';
 
 		if ( '' != ublk_get_data( 'paged' ) ) {
 			$display_users = 1;
@@ -62,7 +75,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 			}
 		}
 
-		$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ): $orderby;
+		$orderby = ( isset( $_GET['orderby'] ) && '' != $_GET['orderby'] ) ? sanitize_text_field( wp_unslash( $_GET['orderby'] ) ) : $orderby;
 		$order   = ( isset( $_GET['order'] ) && '' != $_GET['order'] ) ? sanitize_text_field( wp_unslash( $_GET['order'] ) ) : $order;
 
 		$offset    = ( $paged - 1 ) * $records_per_page;
@@ -399,7 +412,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 											$user_datas      .= ', ' . $GLOBALS['wp_roles']->roles[ $multi_users_role ]['name'];
 											$multi_users_role = ltrim( $user_datas, ', ' );
 											$msg              = esc_html__( 'Blocking time for ', 'user-blocker' ) . $multi_users_role . esc_html__( ' is successfully updated.', 'user-blocker' );
-											$roles_data       = $wpdb->get_results( $wpdb->prepare( "SELECT * from $wpdb->usermeta WHERE meta_key = 'wp_capabilities' AND meta_value = 'a:1:{s: %d : %s \";b:1;}'", strlen( $multi_users_role ), $multi_users_role ) );
+											$roles_data       = $wpdb->get_results( $wpdb->prepare( "SELECT user_id from $wpdb->usermeta WHERE meta_key = 'wp_capabilities' AND meta_value = 'a:1:{s: %d : %s \";b:1;}'", strlen( $multi_users_role ), $multi_users_role ) );
 											foreach ( $roles_data as $role_date ) {
 												$sessions = WP_Session_Tokens::get_instance( $role_date->user_id );
 												$sessions->destroy_all();
@@ -417,7 +430,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 											update_user_meta( $user_id, 'block_day', $block_time_array );
 											$block_msg_day = $default_msg;
 											$block_url_day = '';
-											$role_name	   = '';
+											$role_name     = '';
 											if ( isset( $_POST['block_msg_day'] ) && '' != $_POST['block_msg_day'] ) {
 												$block_msg_day = sanitize_textarea_field( wp_unslash( $_POST['block_msg_day'] ) );
 											}
@@ -429,7 +442,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 											$user_info  = get_userdata( $user_id );
 											$role_name .= ', ' . $user_info->user_login;
 											$msg_class  = 'updated';
-											$msg        = esc_html__( 'Blocking time for ', 'user-blocker' ) . ltrim( $role_name, ',' ) . esc_html__( ' is successfully updated.', 'user-blocker' );
+											$msg        = esc_html__( 'Username wise time blocking is successfully added.', 'user-blocker' );
 											$sessions   = WP_Session_Tokens::get_instance( $user_id );
 											$sessions->destroy_all();
 											$txt_sun_from  = $txt_sun_to = $txt_mon_from = $txt_mon_to = $txt_tue_from = $txt_tue_to = $txt_wed_from = $txt_wed_to = $txt_thu_from = $txt_thu_to = $txt_thu_to = $txt_fri_from = $txt_fri_to = $txt_sat_from = $txt_sat_to = '';
@@ -452,7 +465,11 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 							if ( 'role' == $cmb_user_by ) {
 								// If user by is role.
 								if ( isset( $_POST['chkUserRole'] ) ) {
-									$reocrd_id     = (array) $_POST['chkUserRole'];
+									if ( is_array( $_POST['chkUserRole'] ) ) {
+										$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+									} else {
+										$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+									}
 									$reocrd_id     = ublk_recursive_sanitize_text_field( $reocrd_id );
 									$block_msg_day = $default_msg;
 									$block_url_day = '';
@@ -479,7 +496,21 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 											// Update all users of this role end.
 											$msg_class     = 'updated';
 											$msg           = esc_html__( 'Role wise time blocking is successfully added.', 'user-blocker' );
-											$txt_sun_from  = $txt_sun_to = $txt_mon_from = $txt_mon_to = $txt_tue_from = $txt_tue_to = $txt_wed_from = $txt_wed_to = $txt_thu_from = $txt_thu_to = $txt_thu_to = $txt_fri_from = $txt_fri_to = $txt_sat_from = $txt_sat_to = '';
+											$txt_sun_from  = '';
+											$txt_sun_to    = '';
+											$txt_mon_from  = '';
+											$txt_mon_to    = '';
+											$txt_tue_from  = '';
+											$txt_tue_to    = '';
+											$txt_wed_from  = '';
+											$txt_wed_to    = '';
+											$txt_thu_from  = '';
+											$txt_thu_to    = '';
+											$txt_thu_to    = '';
+											$txt_fri_from  = '';
+											$txt_fri_to    = '';
+											$txt_sat_from  = '';
+											$txt_sat_to    = '';
 											$cmb_user_by   = '';
 											$block_msg_day = $default_msg;
 											$block_url_day = '';
@@ -494,7 +525,11 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 							} elseif ( 'username' == $cmb_user_by ) {
 								// If user by is username.
 								if ( isset( $_POST['chkUserUsername'] ) ) {
-									$reocrd_id     = (array) $_POST['chkUserUsername'];
+									if ( is_array( $_POST['chkUserUsername'] ) ) {
+										$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+									} else {
+										$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+									}
 									$reocrd_id     = ublk_recursive_sanitize_text_field( $reocrd_id );
 									$block_msg_day = $default_msg;
 									$block_url_day = '';
@@ -505,6 +540,12 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 										$block_url_day = sanitize_url( wp_unslash( $_POST['block_url_day'] ) );
 									}
 									if ( preg_match( $pattern, $block_msg_day ) ) {
+										if ( is_array( $_POST['chkUserUsername'] ) ) {
+											$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+										} else {
+											$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+										}
+										$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 										$msg_class = 'error';
 										$msg       = esc_html__( "You're breaking our security!! Please Enter Valid Message.", 'user-blocker' );
 									} else {
@@ -515,7 +556,21 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 										}
 										$msg_class     = 'updated';
 										$msg           = esc_html__( 'Username wise time blocking is successfully added.', 'user-blocker' );
-										$txt_sun_from  = $txt_sun_to = $txt_mon_from = $txt_mon_to = $txt_tue_from = $txt_tue_to = $txt_wed_from = $txt_wed_to = $txt_thu_from = $txt_thu_to = $txt_thu_to = $txt_fri_from = $txt_fri_to = $txt_sat_from = $txt_sat_to = '';
+										$txt_sun_from  = '';
+										$txt_sun_to    = '';
+										$txt_mon_from  = '';
+										$txt_mon_to    = '';
+										$txt_tue_from  = '';
+										$txt_tue_to    = '';
+										$txt_wed_from  = '';
+										$txt_wed_to    = '';
+										$txt_thu_from  = '';
+										$txt_thu_to    = '';
+										$txt_thu_to    = '';
+										$txt_fri_from  = '';
+										$txt_fri_to    = '';
+										$txt_sat_from  = '';
+										$txt_sat_to    = '';
 										$cmb_user_by   = '';
 										$block_msg_day = '';
 										$block_url_day = '';
@@ -527,8 +582,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 									$block_url_day = sanitize_url( wp_unslash( $_POST['block_url_day'] ) );
 								}
 							}
-							$btn_val   = esc_html__( 'Block User', 'user-blocker' );
-							$reocrd_id = array();
+							$btn_val = esc_html__( 'Block User', 'user-blocker' );
 						}
 					} else {
 						$msg_class   = 'error';
@@ -536,12 +590,20 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 						$get_cmb_val = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 						if ( 'role' == $get_cmb_val ) {
 							if ( isset( $_POST['chkUserRole'] ) ) {
-								$reocrd_id = (array) $_POST['chkUserRole'];
+								if ( is_array( $_POST['chkUserRole'] ) ) {
+									$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+								} else {
+									$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+								}
 								$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							}
 						} elseif ( 'username' == $get_cmb_val ) {
 							if ( isset( $_POST['chkUserUsername'] ) ) {
-								$reocrd_id = (array) $_POST['chkUserUsername'];
+								if ( is_array( $_POST['chkUserUsername'] ) ) {
+									$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+								} else {
+									$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+								}
 								$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							}
 						}
@@ -552,12 +614,20 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 					$get_cmb_val = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 					if ( 'role' == $get_cmb_val ) {
 						if ( isset( $_POST['chkUserRole'] ) ) {
-							$reocrd_id = (array) $_POST['chkUserRole'];
+							if ( is_array( $_POST['chkUserRole'] ) ) {
+								$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+							} else {
+								$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+							}
 							$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 						}
 					} elseif ( 'username' == $get_cmb_val ) {
 						if ( isset( $_POST['chkUserUsername'] ) ) {
-							$reocrd_id = (array) $_POST['chkUserUsername'];
+							if ( is_array( $_POST['chkUserUsername'] ) ) {
+								$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+							} else {
+								$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+							}
 							$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 						}
 					}
@@ -568,12 +638,20 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 				$get_cmb_val = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 				if ( 'role' == $get_cmb_val ) {
 					if ( isset( $_POST['chkUserRole'] ) ) {
-						$reocrd_id = (array) $_POST['chkUserRole'];
+						if ( is_array( $_POST['chkUserRole'] ) ) {
+							$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+						} else {
+							$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+						}
 						$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 					}
 				} elseif ( 'username' == $get_cmb_val ) {
 					if ( isset( $_POST['chkUserUsername'] ) ) {
-						$reocrd_id = (array) $_POST['chkUserUsername'];
+						if ( is_array( $_POST['chkUserUsername'] ) ) {
+							$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+						} else {
+							$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+						}
 						$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 					}
 				}
@@ -740,7 +818,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 								<th class="user-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="th-time aligntextcenter"><?php esc_html_e( 'Block Time', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action aligntextcenter"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</thead>
@@ -750,7 +828,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 								<th class="user-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="th-time aligntextcenter"><?php esc_html_e( 'Block Time', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action aligntextcenter"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</tfoot>
@@ -759,8 +837,14 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 							$chk_user_role = array();
 							$is_checked    = '';
 							if ( isset( $reocrd_id ) && count( $reocrd_id ) > 0 ) {
-								$chk_user_role = $reocrd_id;
+								if ( isset( $_REQUEST['action'] ) && 'edit' == $_REQUEST['action'] ) {
+									$chk_user_role = isset( $_REQUEST['role'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_REQUEST['role'] ) ) ) : '';
+								} else {
+									$chk_user_role = $reocrd_id;
+								}
 							}
+							$chk_multi_role = $chk_user_role;
+
 							if ( $get_roles ) {
 								foreach ( $get_roles as $key => $value ) {
 									if ( 0 == $sr_no % 2 ) {
@@ -844,7 +928,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 																		echo esc_html( ublk_time_to_twelve_hour( $from_time ) );
 																	}
 																	if ( '' != $from_time && '' != $to_time ) {
-																		esc_html_e( ' to ', 'user-blocker' ) . esc_html( ublk_time_to_twelve_hour( $to_time ) );
+																		echo esc_html_e( ' to ', 'user-blocker' ) . esc_html( ublk_time_to_twelve_hour( $to_time ) );
 																	}
 																} else {
 																	esc_html_e( 'not set', 'user-blocker' );
@@ -895,7 +979,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 																	if ( '' == $from_time ) {
 																		esc_html_e( 'not set', 'user-blocker' );
 																	} else {
-																		esc_html_e( ' to ', 'user-blocker' ) . esc_html( ublk_time_to_twelve_hour( $to_time ) );
+																		echo esc_html_e( ' to ', 'user-blocker' ) . esc_html( ublk_time_to_twelve_hour( $to_time ) );
 																	}
 																	if ( '' != $from_time && '' != $to_time ) {
 																		echo esc_html( ' to ' . ublk_time_to_twelve_hour( $to_time ) );
@@ -1000,7 +1084,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 								<th class="th-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="th-time aligntextcenter"><?php esc_html_e( 'Block Time', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action aligntextcenter"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</thead>
@@ -1038,7 +1122,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 								<th class="th-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="th-time aligntextcenter"><?php esc_html_e( 'Block Time', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</tfoot>
@@ -1047,7 +1131,11 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 							$chk_user_role = array();
 							$is_checked    = '';
 							if ( isset( $reocrd_id ) && count( $reocrd_id ) > 0 ) {
-								$chk_user_role = $reocrd_id;
+								if ( isset( $_REQUEST['action'] ) && 'edit' == $_REQUEST['action'] ) {
+									$chk_user_role = isset( $_REQUEST['username'] ) ? explode( ',', sanitize_text_field( wp_unslash( $_REQUEST['username'] ) ) ) : '';
+								} else {
+									$chk_user_role = $reocrd_id;
+								}
 							}
 							if ( $get_users ) {
 								$d = 1;
@@ -1093,7 +1181,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 									</tr>
 									<?php if ( 'y' == $exists_block_day ) { ?>
 										<tr class="view_block_data_tr" id="view_block_data_<?php echo esc_attr( $d ); ?>">
-											<td colspan="8">
+											<td colspan="10">
 												<table class="view_block_table form-table tbl-timing">
 													<thead>
 														<tr>
@@ -1260,7 +1348,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 					$role_name = '';
 					if ( isset( $_GET['role'] ) && '' != $_GET['role'] ) {
 						if ( $GLOBALS['wp_roles']->is_role( sanitize_text_field( wp_unslash( $_GET['role'] ) ) ) ) {
-							$role_name = ' ' . esc_html__( 'For', 'user-blocker' ) . ' <span style="text-transform: capitalize;">' . str_replace( '_', ' ', sanitize_text_field( wp_unslash( $_GET['role'] ) ) ). '</span>';
+							$role_name = ' ' . esc_html__( 'For', 'user-blocker' ) . ' <span style="text-transform: capitalize;">' . str_replace( '_', ' ', sanitize_text_field( wp_unslash( $_GET['role'] ) ) ) . '</span>';
 						}
 					}
 					if ( isset( $_GET['username'] ) && '' != $_GET['username'] ) {
@@ -1271,12 +1359,32 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 					}
 					// Time List.
 					?>
+					<?php
+					if ( ( isset( $chk_user_role ) && count( $chk_user_role ) > 1 ) || count( $chk_multi_role ) > 1 ) {
+						$txt_sun_from = '';
+						$txt_sun_to   = '';
+						$txt_mon_from = '';
+						$txt_mon_to   = '';
+						$txt_tue_from = '';
+						$txt_tue_to   = '';
+						$txt_wed_from = '';
+						$txt_wed_to   = '';
+						$txt_thu_from = '';
+						$txt_thu_to   = '';
+						$txt_thu_to   = '';
+						$txt_fri_from = '';
+						$txt_fri_to   = '';
+						$txt_sat_from = '';
+						$txt_sat_to   = '';
+					}
+
+					?>
 					<table class="form-table tbl-timing">
 						<tr class="tr_head">
 							<td style="border: 0;" colspan="20">
 								<h3 class="block_msg_title">
 									<?php
-									esc_html_e( 'Block Time ', 'user-blocker' );
+									esc_html_e( 'Block Time', 'user-blocker' );
 									if ( isset( $curr_edit_msg ) && '' != $curr_edit_msg ) {
 										?>
 										<span><?php echo esc_html( $curr_edit_msg ); ?></span>
@@ -1349,7 +1457,7 @@ if ( ! function_exists( 'ublk_block_user_page' ) ) {
 						</div><br>
 						<div class="block_url_div" style="margin: 20px 0 0 0;clear: both;float: left">
 
-							<label for="Block User Redirection" style="font-weight: 600;"><?php esc_html_e('Enter Redirection URL: ','user-blocker'); ?></label>
+							<label for="Block User Redirection" style="font-weight: 600;"><?php esc_html_e( 'Enter Redirection URL: ', 'user-blocker' ); ?></label>
 							<input type="url" name="block_url_day" value="<?php echo esc_url( stripslashes( $block_url_day ) ); ?>" id="block_url_day">
 
 						</div>
@@ -1397,7 +1505,7 @@ if ( ! function_exists( 'ublk_welcome_page' ) ) {
 						<i class='dashicons dashicons-admin-users gb-dashicons-admin-users'></i>
 						<div class='ublk_50_inner'>
 							<label><?php esc_html_e( 'User Details', 'user-blocker' ); ?></label>
-							<label><?php esc_html_e( 'Name and Email Address', 'user-blocker' ) ; ?></label>
+							<label><?php esc_html_e( 'Name and Email Address', 'user-blocker' ); ?></label>
 						</div>
 					</div>
 					<div class='ublk_50'>
@@ -1559,15 +1667,15 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 		}
 		if ( isset( $_POST['sbtSaveDate'] ) && isset( $_POST['_wp_block_by_date_nonce'] ) && wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['_wp_block_by_date_nonce'] ) ), '_wp_block_by_date_action' ) ) {
 			$get_username = '';
-			$get_role = '';
-			if(isset( $_POST['username'] )) {
+			$get_role     = '';
+			if ( isset( $_POST['username'] ) ) {
 				$get_username = sanitize_textarea_field( wp_unslash( $_POST['username'] ) );
 			}
-			if(isset( $_POST['role'] )) {
+			if ( isset( $_POST['role'] ) ) {
 				$get_role = sanitize_textarea_field( wp_unslash( $_POST['role'] ) );
 			}
-			$frmdate      = isset( $_POST['frmdate'] ) ? sanitize_text_field( wp_unslash( $_POST['frmdate'] ) ) : '';
-			$todate       = isset( $_POST['todate'] ) ? sanitize_text_field( wp_unslash( $_POST['todate'] ) ) : '';
+			$frmdate = isset( $_POST['frmdate'] ) ? sanitize_text_field( wp_unslash( $_POST['frmdate'] ) ) : '';
+			$todate  = isset( $_POST['todate'] ) ? sanitize_text_field( wp_unslash( $_POST['todate'] ) ) : '';
 			// Check if username is selected in dd.
 			if ( isset( $_POST['cmbUserBy'] ) && 'role' == $_POST['cmbUserBy'] ) {
 				$is_display_role = 1;
@@ -1630,7 +1738,7 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 						$block_date['todate']  = sanitize_text_field( wp_unslash( $_POST['todate'] ) );
 						$block_msg_date        = $default_msg;
 						$block_url_date        = '';
-						$role_name        	   = '';
+						$role_name             = '';
 						$pattern               = '/[\-=+$@\t\r]/';
 						if ( '' != $_POST['block_msg_date'] ) {
 							$block_msg_date = sanitize_textarea_field( wp_unslash( $_POST['block_msg_date'] ) );
@@ -1666,7 +1774,11 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 					$cmb_user_by = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 					if ( 'role' == $cmb_user_by ) {
 						if ( isset( $_POST['chkUserRole'] ) ) {
-							$reocrd_id      = (array) $_POST['chkUserRole'];
+							if ( is_array( $_POST['chkUserRole'] ) ) {
+								$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+							} else {
+								$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+							}
 							$reocrd_id      = ublk_recursive_sanitize_text_field( $reocrd_id );
 							$block_msg_date = $default_msg;
 							$block_url_date = '';
@@ -1710,7 +1822,11 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 						}
 					} elseif ( 'username' == $cmb_user_by ) {
 						if ( isset( $_POST['chkUserUsername'] ) ) {
-							$reocrd_id = (array) $_POST['chkUserUsername'];
+							if ( is_array( $_POST['chkUserUsername'] ) ) {
+								$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+							} else {
+								$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+							}
 							$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							$pattern   = '/[\-=+$@\t\r]/';
 							if ( '' != $_POST['block_msg_date'] ) {
@@ -1757,12 +1873,20 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 				$get_cmb_val    = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 				if ( 'role' == $get_cmb_val ) {
 					if ( isset( $_POST['chkUserRole'] ) ) {
-						$reocrd_id = (array) $_POST['chkUserRole'];
+						if ( is_array( $_POST['chkUserRole'] ) ) {
+							$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+						} else {
+							$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+						}
 						$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 					}
 				} elseif ( 'username' == $get_cmb_val ) {
 					if ( isset( $_POST['chkUserUsername'] ) ) {
-						$reocrd_id = (array) $_POST['chkUserUsername'];
+						if ( is_array( $_POST['chkUserUsername'] ) ) {
+							$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+						} else {
+							$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+						}
 						$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 					}
 				}
@@ -1924,7 +2048,7 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 								<th class="user-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="blk-date"><?php esc_html_e( 'Block Date', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</thead>
@@ -1934,7 +2058,7 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 								<th class="user-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="blk-date"><?php esc_html_e( 'Block Date', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</tfoot>
@@ -2049,7 +2173,7 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 								<th class="th-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="blk-date"><?php esc_html_e( 'Block Date', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</thead>
@@ -2087,7 +2211,7 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 								<th class="th-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="blk-date"><?php esc_html_e( 'Block Date', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-url aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</tfoot>
@@ -2209,14 +2333,14 @@ if ( ! function_exists( 'ublk_block_user_date_page' ) ) {
 						<div class="block_msg_note_div">
 							<?php
 							echo '<b>' . esc_html__( 'Note', 'user-blocker' ) . '</b>: ';
-							esc_html_e( "If you will not set message, default message will be ", 'user-blocker' );
+							esc_html_e( 'If you will not set message, default message will be ', 'user-blocker' );
 							echo "'<b>" . esc_html( $default_msg ) . "</b>'";
 							?>
 						</div>
 						<br>
 						<div class="block_url_div" style="margin: 20px 0 0 0;clear: both;float: left">
 
-							<label for="Block User Redirection" style="font-weight: 600;"> <?php esc_html_e('Enter Redirection URL: ','user-blocker'); ?> </label>
+							<label for="Block User Redirection" style="font-weight: 600;"> <?php esc_html_e( 'Enter Redirection URL: ', 'user-blocker' ); ?> </label>
 							<input type="url" name="block_url_date" value="<?php echo esc_url( stripslashes( $block_url_date ) ); ?>" id="block_url_date">
 
 						</div>
@@ -2274,7 +2398,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 		$block_msg_permenant = '';
 		$block_url_permenant = '';
 
-		$default_msg = esc_html__( 'You are permanently Blocked.', 'user-blocker' );
+		$default_msg = esc_html__( 'You are permanently blocked.', 'user-blocker' );
 		if ( '' != ublk_get_data( 'paged' ) ) {
 			$display_users = 1;
 			$paged         = ublk_get_data( 'paged', 1 );
@@ -2314,7 +2438,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 					$block_url_permenant = get_option( $user_role . '_block_url_permenant' );
 					$user_datas         .= ', ' . $GLOBALS['wp_roles']->roles[ $user_role ]['name'];
 					$user_role           = ltrim( $user_datas, ', ' );
-					$curr_edit_msg       = esc_html__('Update for role: ','user-blocker') . $user_role;
+					$curr_edit_msg       = esc_html__( 'Update for role: ', 'user-blocker' ) . $user_role;
 				} else {
 					$msg_class = 'error';
 					$msg       = esc_html__( 'Role', 'user-blocker' ) . ' ' . $user_role . ' ' . esc_html__( 'is not exist.', 'user-blocker' );
@@ -2371,7 +2495,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 				$user_roles        = explode( ',', $get_role );
 				$multi_users_roles = get_users( array( 'role__in' => $user_roles ) );
 				$pattern           = '/[\-=+$@\t\r]/';
-				$role_name ='';
+				$role_name         = '';
 				if ( '' != $get_role ) {
 					foreach ( $user_roles as $multi_users_role ) {
 						$old_block_msg_permenant = get_option( $multi_users_role . '_block_msg_permenant' );
@@ -2435,7 +2559,11 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 				$cmb_user_by = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 				if ( 'role' == $cmb_user_by ) {
 					if ( isset( $_POST['chkUserRole'] ) ) {
-						$reocrd_id           = (array) $_POST['chkUserRole'];
+						if ( is_array( $_POST['chkUserRole'] ) ) {
+							$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+						} else {
+							$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+						}
 						$reocrd_id           = ublk_recursive_sanitize_text_field( $reocrd_id );
 						$block_msg_permenant = $default_msg;
 						$block_url_permenant = '';
@@ -2474,19 +2602,31 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 						$get_cmb_val         = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 						if ( 'role' == $get_cmb_val ) {
 							if ( isset( $_POST['chkUserRole'] ) ) {
-								$reocrd_id = (array) $_POST['chkUserRole'];
+								if ( is_array( $_POST['chkUserRole'] ) ) {
+									$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+								} else {
+									$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+								}
 								$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							}
 						} elseif ( 'username' == $get_cmb_val ) {
 							if ( isset( $_POST['chkUserUsername'] ) ) {
-								$reocrd_id = (array) $_POST['chkUserUsername'];
+								if ( is_array( $_POST['chkUserUsername'] ) ) {
+									$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+								} else {
+									$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+								}
 								$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							}
 						}
 					}
 				} elseif ( 'username' == $cmb_user_by ) {
 					if ( isset( $_POST['chkUserUsername'] ) ) {
-						$reocrd_id           = (array) $_POST['chkUserUsername'];
+						if ( is_array( $_POST['chkUserUsername'] ) ) {
+							$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+						} else {
+							$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+						}
 						$reocrd_id           = ublk_recursive_sanitize_text_field( $reocrd_id );
 						$block_msg_permenant = $default_msg;
 						$block_url_permenant = '';
@@ -2520,12 +2660,20 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 						$get_cmb_val         = sanitize_text_field( wp_unslash( $_POST['cmbUserBy'] ) );
 						if ( 'role' == $get_cmb_val ) {
 							if ( isset( $_POST['chkUserRole'] ) ) {
-								$reocrd_id = (array) $_POST['chkUserRole'];
+								if ( is_array( $_POST['chkUserRole'] ) ) {
+									$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserRole'] ) );
+								} else {
+									$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserRole'] ) );
+								}
 								$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							}
 						} elseif ( 'username' == $get_cmb_val ) {
 							if ( isset( $_POST['chkUserUsername'] ) ) {
-								$reocrd_id = (array) $_POST['chkUserUsername'];
+								if ( is_array( $_POST['chkUserUsername'] ) ) {
+									$reocrd_id = array_map( 'sanitize_text_field', wp_unslash( $_POST['chkUserUsername'] ) );
+								} else {
+									$reocrd_id = sanitize_text_field( wp_unslash( $_POST['chkUserUsername'] ) );
+								}
 								$reocrd_id = ublk_recursive_sanitize_text_field( $reocrd_id );
 							}
 						}
@@ -2675,7 +2823,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 								<th class="user-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Status', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</thead>
@@ -2685,7 +2833,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 								<th class="user-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Status', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
 						</tfoot>
@@ -2795,7 +2943,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 								</th>
 								<th class="th-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Status', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
@@ -2833,7 +2981,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 								</th>
 								<th class="th-role"><?php esc_html_e( 'Role', 'user-blocker' ); ?></th>
 								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block Message', 'user-blocker' ); ?></th>
-								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Block URL', 'user-blocker' ); ?></th>
+								<th class="blk-msg aligntextcenter"><?php esc_html_e( 'Redirection URL', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Status', 'user-blocker' ); ?></th>
 								<th class="tbl-action"><?php esc_html_e( 'Action', 'user-blocker' ); ?></th>
 							</tr>
@@ -2848,7 +2996,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 							if ( $get_users ) {
 								$d = 1;
 								foreach ( $get_users as $user ) {
-									$p_txt_username = isset( $_GET['txtUsername'] ) ? sanitize_text_field( wp_unslash( $_GET['txtUsername'] ) ): '';
+									$p_txt_username = isset( $_GET['txtUsername'] ) ? sanitize_text_field( wp_unslash( $_GET['txtUsername'] ) ) : '';
 									$p_srole        = isset( $_GET['srole'] ) ? sanitize_text_field( wp_unslash( $_GET['srole'] ) ) : '';
 									$p_paged        = isset( $_GET['paged'] ) ? sanitize_text_field( wp_unslash( $_GET['paged'] ) ) : '';
 
@@ -2915,7 +3063,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 					$role_name = '';
 					if ( isset( $_GET['role'] ) && '' != $_GET['role'] ) {
 						if ( $GLOBALS['wp_roles']->is_role( sanitize_text_field( wp_unslash( $_GET['role'] ) ) ) ) {
-							$role_name = ' ' . esc_html__( 'For', 'user-blocker' ) . ' <span style="text-transform: capitalize;">' . str_replace( '_', ' ', sanitize_text_field( wp_unslash( $_GET['role'] ) ) ). '</span>';
+							$role_name = ' ' . esc_html__( 'For', 'user-blocker' ) . ' <span style="text-transform: capitalize;">' . str_replace( '_', ' ', sanitize_text_field( wp_unslash( $_GET['role'] ) ) ) . '</span>';
 						}
 					}
 					if ( isset( $_GET['username'] ) && '' != $_GET['username'] ) {
@@ -2949,7 +3097,7 @@ if ( ! function_exists( 'ublk_block_user_permenant_page' ) ) {
 						<br>
 						<div class="block_url_div" style="margin: 20px 0 0 0;clear: both;float: left">
 
-							<label for="Block User Redirection" style="font-weight: 600;"> <?php esc_html_e('Enter Redirection URL: ','user-blocker'); ?> </label>
+							<label for="Block User Redirection" style="font-weight: 600;"> <?php esc_html_e( 'Enter Redirection URL: ', 'user-blocker' ); ?> </label>
 							<input type="url" name="block_url_permenant" value="<?php echo esc_url( stripslashes( $block_url_permenant ) ); ?>" id="block_url_permenant">
 
 						</div>

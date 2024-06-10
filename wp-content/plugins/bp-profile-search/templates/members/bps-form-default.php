@@ -79,7 +79,7 @@ if (!empty ($options['theme']))
 	$accordion = 'bps_accordion_'. $F->unique_id;
 	if ($F->errors)  $options['collapsible'] = 'No';
 	wp_enqueue_script ('jquery-ui-accordion');
-	wp_enqueue_style ('jquery-ui-theme', 'https://code.jquery.com/ui/1.12.1/themes/'. $options['theme']. '/jquery-ui.min.css');
+	wp_enqueue_style ('jquery-ui-theme', 'https://code.jquery.com/ui/1.13.2/themes/'. $options['theme']. '/jquery-ui.min.css');
 ?>
 <script>
 	jQuery(function ($) {

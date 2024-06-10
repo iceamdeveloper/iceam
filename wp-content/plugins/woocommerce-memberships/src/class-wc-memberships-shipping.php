@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -133,6 +133,7 @@ class WC_Memberships_Shipping {
 			$allowed    = ! empty( $allowed ) ? (array) $allowed : [];
 			$disallowed = $method->get_option( 'disallowed_membership_plans' );
 			$disallowed = ! empty( $disallowed ) ? (array) $disallowed : [];
+			$min_price  = $method->get_option( 'min_amount' );
 
 			// first, if we need a membership, start with disabling this rate, maybe enable it
 			if ( 'membership' === $method->requires ) {
@@ -142,7 +143,14 @@ class WC_Memberships_Shipping {
 				foreach( $allowed as $plan_id ) {
 
 					if ( wc_memberships_is_user_active_member( $user_id, $plan_id ) ) {
+
 						$available = true;
+
+						// honor any minimum price requirement, if set
+						if ( ! empty( $min_price ) && (float) $min_price > 0 && ( $cart = WC()->cart ) ) {
+							$available = $cart->get_cart_contents_total() >= $min_price;
+						}
+
 						break;
 					}
 				}

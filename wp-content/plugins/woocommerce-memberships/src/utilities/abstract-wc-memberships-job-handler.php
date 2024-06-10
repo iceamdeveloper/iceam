@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -306,10 +306,10 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 	 *
 	 * @since 1.10.0
 	 *
-	 * @param string $timezone
+	 * @param mixed $timezone
 	 * @return bool
 	 */
-	protected function is_timezone( $timezone ) {
+	protected function is_timezone( $timezone ) : bool {
 		return is_string( $timezone ) && '' !== $timezone && in_array( $timezone, timezone_identifiers_list(), true );
 	}
 
@@ -324,31 +324,59 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 	 * @since 1.10.0
 	 *
 	 * @param string|int $date a date as timestamp or string format
-	 * @param string $timezone timezone to use to convert the date from, defaults to site timezone
+	 * @param string|mixed $source_timezone timezone to use to convert the date from, defaults to site timezone
+	 * @param string|mixed $source_format optional date format to parse the date with, defaults to null to auto-detect (cannot be applied to timestamps)
 	 * @return string datetime string in UTC
 	 */
-	protected function parse_date_mysql( $date, $timezone = '' ) {
+	protected function parse_date_mysql( $date, $source_timezone = null, $source_format = null ) : string {
 
 		// fallback to site timezone
-		if ( ! $this->is_timezone( $timezone ) ) {
-			$timezone = wc_timezone_string();
+		if ( ! $this->is_timezone( $source_timezone ) ) {
+			$source_timezone = wc_timezone_string();
 		}
 
 		// get the date
 		if ( is_numeric( $date ) ) {
-			$src_date = date( 'Y-m-d H:i:s', (int) $date );
+
+			$source_date = date( 'Y-m-d H:i:s', (int) $date );
+
 		} else {
-			$src_date = date( 'Y-m-d H:i:s', strtotime( $date ) );
-		}
 
-		if ( ! empty( $src_date ) ) {
-
-			// no need to adjust date, it's already in UTC
-			if ( 'UTC' === $timezone ) {
+			if ( is_string( $source_format ) && '' !== trim( $source_format ) ) {
 
 				try {
 
-					$datetime = new \DateTime( $src_date, new \DateTimeZone( $timezone ) );
+					// should be assumed UTC if no timezone is provided in the datetime string and format
+					$parsed_date = \DateTime::createFromFormat( $source_format, $date );
+
+					if ( false === $parsed_date ) {
+						throw new \Exception( sprintf( 'Could not create a valid date object from string "%1$s" with format "%2$s".', $date, $source_format ) );
+					}
+
+					$source_date = $parsed_date->format( 'Y-m-d H:i:s' );
+
+				} catch ( \Exception $e ) {
+
+					// in case of DateTime errors, just attempt to parse date as fallback, but issue an error
+					trigger_error( sprintf( 'Failed to parse date "%1$s" with format "%2$s": %3$s', $date, $source_format, $e->getMessage() ), E_USER_WARNING );
+
+					$source_date = date( 'Y-m-d H:i:s', strtotime( $date ) );
+				}
+
+			} else {
+
+				$source_date = date( 'Y-m-d H:i:s', strtotime( $date ) );
+			}
+		}
+
+		if ( ! empty( $source_date ) ) {
+
+			// no need to adjust date, it's already in UTC
+			if ( 'UTC' === $source_timezone ) {
+
+				try {
+
+					$datetime = new \DateTime( $source_date, new \DateTimeZone( $source_timezone ) );
 					$utc_date = date( 'Y-m-d H:i:s', $datetime->format( 'U' ) );
 
 				} catch ( \Exception $e ) {
@@ -356,14 +384,14 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 					// in case of DateTime errors, just return the date as is but issue an error
 					trigger_error( sprintf( 'Failed to parse date "%1$s": %2$s', $date, $e->getMessage() ), E_USER_WARNING );
 
-					$utc_date = $src_date;
+					$utc_date = $source_date;
 				}
 
 			} else {
 
 				try {
 
-					$from_date = new \DateTime( $src_date, new \DateTimeZone( $timezone ) );
+					$from_date = new \DateTime( $source_date, new \DateTimeZone( $source_timezone ) );
 					$to_date   = new \DateTimeZone( 'UTC' );
 					$offset    = $to_date->getOffset( $from_date );
 
@@ -397,7 +425,7 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 	 */
 	protected function get_csv_headers( $job = null ) {
 
-		$headers = array(
+		$headers = [
 			'user_membership_id'    => 'user_membership_id',
 			'user_id'               => 'user_id',
 			'user_name'             => 'user_name',
@@ -405,6 +433,7 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 			'member_last_name'      => 'member_last_name',
 			'member_email'          => 'member_email',
 			'member_role'           => 'member_role',
+			'member_last_active'    => 'member_last_active',
 			'membership_plan_id'    => 'membership_plan_id',
 			'membership_plan'       => 'membership_plan',
 			'membership_plan_slug'  => 'membership_plan_slug',
@@ -414,7 +443,7 @@ abstract class WC_Memberships_Job_Handler extends Framework\SV_WP_Background_Job
 			'order_id'              => 'order_id',
 			'member_since'          => 'member_since',
 			'membership_expiration' => 'membership_expiration',
-		);
+		];
 
 		return $headers;
 	}

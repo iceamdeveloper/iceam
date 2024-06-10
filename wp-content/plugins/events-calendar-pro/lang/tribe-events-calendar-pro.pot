@@ -1,16 +1,16 @@
-# Copyright (C) 2023 The Events Calendar
+# Copyright (C) 2024 The Events Calendar
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: The Events Calendar Pro 6.0.12\n"
+"Project-Id-Version: The Events Calendar Pro 6.3.1.1\n"
 "Report-Msgid-Bugs-To: https://evnt.is/191x\n"
 "Last-Translator: \n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2023-05-01T14:26:34+00:00\n"
-"PO-Revision-Date: 2023-05-01 14:26\n"
+"POT-Creation-Date: 2024-02-22T11:02:55-08:00\n"
+"PO-Revision-Date: 2024-02-22 19:03\n"
 "X-Generator: WP-CLI 2.7.1\n"
 "X-Domain: tribe-events-calendar-pro\n"
 
@@ -23,9 +23,9 @@ msgid "The Events Calendar Pro, a premium add-on to the open source The Events C
 msgstr ""
 
 #. Author of the plugin
-#: events-calendar-pro.php:176
-#: events-calendar-pro.php:177
-#: src/Tribe/Integrations/Elementor/Service_Provider.php:129
+#: events-calendar-pro.php:173
+#: events-calendar-pro.php:174
+#: src/Tribe/Integrations/Elementor/Service_Provider.php:133
 msgid "The Events Calendar"
 msgstr ""
 
@@ -33,11 +33,11 @@ msgstr ""
 msgid "https://evnt.is/20"
 msgstr ""
 
-#: events-calendar-pro.php:56
+#: events-calendar-pro.php:53
 msgid "Events Calendar Pro"
 msgstr ""
 
-#: events-calendar-pro.php:174
+#: events-calendar-pro.php:171
 msgid "To begin using Events Calendar Pro, please install the latest version of"
 msgstr ""
 
@@ -57,11 +57,8 @@ msgstr ""
 #: src/admin-views/event-meta-options.php:3
 #: src/Tribe/Editor.php:212
 #: src/Tribe/Editor.php:250
-#: src/Tribe/Main.php:671
+#: src/Tribe/Main.php:675
 #: src/modules/blocks/additional-fields/elements/settings/template.js:31
-#: src/resources/js/app/data.js:7963
-#: src/resources/js/app/elements.js:16519
-#: src/resources/js/app/main.js:2327
 msgid "Additional Fields"
 msgstr ""
 
@@ -152,115 +149,93 @@ msgstr ""
 msgid "Delete"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:13
-msgid "Event Series:"
+#. translators: %s is a placeholder for the singular event label e.g. "Event".
+#: src/admin-views/event-recurrence.php:15
+msgid "Recurring %s:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:16
+#: src/admin-views/event-recurrence.php:18
 msgctxt "Begins the line indicating when a recurrence time starts"
 msgid "At"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:17
+#: src/admin-views/event-recurrence.php:19
 msgctxt "custom recurrence time separator"
 msgid "to"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:18
+#: src/admin-views/event-recurrence.php:20
 msgctxt "custom recurrence time/date separator"
 msgid "the"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:35
+#: src/admin-views/event-recurrence.php:44
 msgid "Are you sure you want to remove this recurrence?"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:36
+#: src/admin-views/event-recurrence.php:45
 msgid "Are you sure you want to delete this exclusion?"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:83
+#: src/admin-views/event-recurrence.php:92
 msgid "Delete This"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:97
-#: src/admin-views/event-recurrence.php:443
+#: src/admin-views/event-recurrence.php:110
+#: src/admin-views/event-recurrence.php:519
 #: src/modules/elements/series-ends/template.js:69
-#: src/resources/js/app/elements.js:14170
-#: src/resources/js/app/main.js:5240
 msgid "event"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:98
-#: src/admin-views/event-recurrence.php:444
+#: src/admin-views/event-recurrence.php:111
+#: src/admin-views/event-recurrence.php:520
 #: src/modules/elements/series-ends/template.js:68
-#: src/resources/js/app/elements.js:14170
-#: src/resources/js/app/main.js:5240
 msgid "events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:102
-#: src/admin-views/event-recurrence.php:163
-#: src/admin-views/event-recurrence.php:448
-#: src/admin-views/event-recurrence.php:513
+#: src/admin-views/event-recurrence.php:118
+#: src/admin-views/event-recurrence.php:204
+#: src/admin-views/event-recurrence.php:527
+#: src/admin-views/event-recurrence.php:614
 #: src/admin-views/recurrence/months.php:101
 #: src/admin-views/recurrence/years.php:157
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:65
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:131
 #: src/modules/custom-tables-v1/data/shared/constants.js:8
-#: src/resources/js/custom-tables-v1/app/blocks.js:1313
-#: src/resources/js/custom-tables-v1/app/ct1.js:591
-#: src/resources/js/custom-tables-v1/app/data.js:1212
-#: src/resources/js/custom-tables-v1/app/dialog.js:1365
-#: src/resources/js/custom-tables-v1/app/elements.js:333
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1365
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1675
 msgid "day"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:102
-#: src/admin-views/event-recurrence.php:448
+#: src/admin-views/event-recurrence.php:119
+#: src/admin-views/event-recurrence.php:528
 #: src/modules/data/blocks/exception/options.js:12
-#: src/resources/js/app/data.js:6301
-#: src/resources/js/app/elements.js:11328
-#: src/resources/js/app/main.js:2067
 msgid "Daily"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:104
-#: src/admin-views/event-recurrence.php:450
+#: src/admin-views/event-recurrence.php:124
+#: src/admin-views/event-recurrence.php:533
 #: src/modules/data/blocks/exception/options.js:13
-#: src/resources/js/app/data.js:6304
-#: src/resources/js/app/elements.js:11331
-#: src/resources/js/app/main.js:2070
 msgid "Weekly"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:106
-#: src/admin-views/event-recurrence.php:452
+#: src/admin-views/event-recurrence.php:129
+#: src/admin-views/event-recurrence.php:538
 #: src/modules/data/blocks/exception/options.js:14
-#: src/resources/js/app/data.js:6307
-#: src/resources/js/app/elements.js:11334
-#: src/resources/js/app/main.js:2073
 msgid "Monthly"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:108
-#: src/admin-views/event-recurrence.php:454
+#: src/admin-views/event-recurrence.php:134
+#: src/admin-views/event-recurrence.php:543
 #: src/modules/data/blocks/exception/options.js:15
-#: src/resources/js/app/data.js:6310
-#: src/resources/js/app/elements.js:11337
-#: src/resources/js/app/main.js:2076
 msgid "Yearly"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:110
-#: src/admin-views/event-recurrence.php:456
+#: src/admin-views/event-recurrence.php:139
+#: src/admin-views/event-recurrence.php:548
 msgid "Once"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:127
-#: src/admin-views/event-recurrence.php:473
+#: src/admin-views/event-recurrence.php:159
+#: src/admin-views/event-recurrence.php:568
 #: src/admin-views/recurrence/months.php:13
 #: src/admin-views/recurrence/years.php:74
 #: src/Tribe/Integrations/Elementor/Controls/Groups/Event_Query.php:129
@@ -268,18 +243,11 @@ msgstr ""
 #: src/modules/data/blocks/recurring/constants.js:39
 #: src/modules/elements/on-date-picker/template.js:31
 #: src/modules/elements/on-day-of-week/template.js:41
-#: src/resources/js/app/data.js:599
-#: src/resources/js/app/elements.js:599
-#: src/resources/js/app/elements.js:14665
-#: src/resources/js/app/elements.js:16299
-#: src/resources/js/app/main.js:1020
-#: src/resources/js/app/main.js:5687
-#: src/resources/js/app/main.js:7150
 msgid "On"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:141
-#: src/admin-views/event-recurrence.php:486
+#: src/admin-views/event-recurrence.php:176
+#: src/admin-views/event-recurrence.php:584
 #: src/admin-views/recurrence/years.php:12
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:18
 #: src/modules/custom-tables-v1/elements/every-frequency/template.js:28
@@ -292,225 +260,170 @@ msgstr ""
 #: src/modules/elements/recurring-field/singular.js:24
 #: src/modules/elements/recurring-field/weekly.js:25
 #: src/modules/elements/recurring-field/yearly.js:26
-#: src/resources/js/app/elements.js:13162
-#: src/resources/js/app/elements.js:13214
-#: src/resources/js/app/elements.js:13275
-#: src/resources/js/app/elements.js:13336
-#: src/resources/js/app/elements.js:13497
-#: src/resources/js/app/elements.js:13562
-#: src/resources/js/app/elements.js:13612
-#: src/resources/js/app/elements.js:13682
-#: src/resources/js/app/elements.js:13752
-#: src/resources/js/app/main.js:4181
-#: src/resources/js/app/main.js:4225
-#: src/resources/js/app/main.js:4277
-#: src/resources/js/app/main.js:4329
-#: src/resources/js/app/main.js:4560
-#: src/resources/js/app/main.js:4617
-#: src/resources/js/app/main.js:4660
-#: src/resources/js/app/main.js:4719
-#: src/resources/js/app/main.js:4778
 msgid "Every"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:167
-#: src/admin-views/event-recurrence.php:517
+#: src/admin-views/event-recurrence.php:211
+#: src/admin-views/event-recurrence.php:621
 #: src/modules/custom-tables-v1/data/shared/constants.js:13
-#: src/resources/js/custom-tables-v1/app/blocks.js:1317
-#: src/resources/js/custom-tables-v1/app/ct1.js:595
-#: src/resources/js/custom-tables-v1/app/data.js:1216
-#: src/resources/js/custom-tables-v1/app/dialog.js:1369
-#: src/resources/js/custom-tables-v1/app/elements.js:337
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1369
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1679
 msgid "days"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:174
-#: src/admin-views/event-recurrence.php:523
-#: src/Tribe/Main.php:1636
-#: src/Tribe/Rewrite/Provider.php:159
+#: src/admin-views/event-recurrence.php:224
+#: src/admin-views/event-recurrence.php:630
+#: src/Tribe/Main.php:1640
+#: src/Tribe/Rewrite/Provider.php:162
 #: src/modules/custom-tables-v1/data/shared/constants.js:9
-#: src/resources/js/custom-tables-v1/app/blocks.js:1314
-#: src/resources/js/custom-tables-v1/app/ct1.js:592
-#: src/resources/js/custom-tables-v1/app/data.js:1213
-#: src/resources/js/custom-tables-v1/app/dialog.js:1366
-#: src/resources/js/custom-tables-v1/app/elements.js:334
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1366
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1676
 msgid "week"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:178
-#: src/admin-views/event-recurrence.php:527
+#: src/admin-views/event-recurrence.php:231
+#: src/admin-views/event-recurrence.php:637
 #: src/modules/custom-tables-v1/data/shared/constants.js:14
-#: src/resources/js/custom-tables-v1/app/blocks.js:1318
-#: src/resources/js/custom-tables-v1/app/ct1.js:596
-#: src/resources/js/custom-tables-v1/app/data.js:1217
-#: src/resources/js/custom-tables-v1/app/dialog.js:1370
-#: src/resources/js/custom-tables-v1/app/elements.js:338
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1370
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1680
 msgid "weeks"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:185
-#: src/admin-views/event-recurrence.php:533
+#: src/admin-views/event-recurrence.php:244
+#: src/admin-views/event-recurrence.php:646
 #: src/modules/custom-tables-v1/data/shared/constants.js:10
-#: src/resources/js/custom-tables-v1/app/blocks.js:1315
-#: src/resources/js/custom-tables-v1/app/ct1.js:593
-#: src/resources/js/custom-tables-v1/app/data.js:1214
-#: src/resources/js/custom-tables-v1/app/dialog.js:1367
-#: src/resources/js/custom-tables-v1/app/elements.js:335
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1367
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1677
 msgid "month"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:189
-#: src/admin-views/event-recurrence.php:537
+#: src/admin-views/event-recurrence.php:251
+#: src/admin-views/event-recurrence.php:653
 #: src/modules/custom-tables-v1/data/shared/constants.js:15
-#: src/resources/js/custom-tables-v1/app/blocks.js:1319
-#: src/resources/js/custom-tables-v1/app/ct1.js:597
-#: src/resources/js/custom-tables-v1/app/data.js:1218
-#: src/resources/js/custom-tables-v1/app/dialog.js:1371
-#: src/resources/js/custom-tables-v1/app/elements.js:339
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1371
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1681
 msgid "months"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:241
+#: src/admin-views/event-recurrence.php:306
 msgid "the same time:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:242
+#: src/admin-views/event-recurrence.php:307
 msgid "a different time:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:271
-#: src/admin-views/event-recurrence.php:587
+#: src/admin-views/event-recurrence.php:339
+#: src/admin-views/event-recurrence.php:715
 msgid "Series ends"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:280
-#: src/admin-views/event-recurrence.php:597
+#: src/admin-views/event-recurrence.php:348
+#: src/admin-views/event-recurrence.php:725
 #: src/modules/elements/single-to-date-time-picker/template.js:48
-#: src/resources/js/app/elements.js:15242
-#: src/resources/js/app/main.js:6207
 msgid "on"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:281
-#: src/admin-views/event-recurrence.php:598
+#: src/admin-views/event-recurrence.php:349
+#: src/admin-views/event-recurrence.php:726
 msgid "after"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:282
-#: src/admin-views/event-recurrence.php:599
+#: src/admin-views/event-recurrence.php:350
+#: src/admin-views/event-recurrence.php:727
 msgid "never"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:299
+#: src/admin-views/event-recurrence.php:367
 msgid "Series ends on this date"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:315
-#: src/admin-views/event-recurrence.php:325
-#: src/admin-views/event-recurrence.php:631
-#: src/admin-views/event-recurrence.php:644
-msgctxt "occurence count text"
+#: src/admin-views/event-recurrence.php:383
+#: src/admin-views/event-recurrence.php:398
+#: src/admin-views/event-recurrence.php:759
+#: src/admin-views/event-recurrence.php:777
+msgctxt "occurrence count text"
 msgid "events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:318
-#: src/admin-views/event-recurrence.php:634
+#: src/admin-views/event-recurrence.php:386
+#: src/admin-views/event-recurrence.php:762
 msgid "You must select a recurrence end date"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:333
-#: src/admin-views/event-recurrence.php:659
+#: src/admin-views/event-recurrence.php:409
+#: src/admin-views/event-recurrence.php:793
 msgid "Show Details"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:334
-#: src/admin-views/event-recurrence.php:660
+#: src/admin-views/event-recurrence.php:410
+#: src/admin-views/event-recurrence.php:794
 msgid "Hide Details"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:343
+#: src/admin-views/event-recurrence.php:419
 msgid "Schedule multiple events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:346
+#: src/admin-views/event-recurrence.php:422
 msgid "Add more events"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:377
+#: src/admin-views/event-recurrence.php:453
 msgid "Recurring Events Active"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:398
+#: src/admin-views/event-recurrence.php:474
 msgid "Event will not occur:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:498
+#: src/admin-views/event-recurrence.php:596
 msgid "1"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:499
+#: src/admin-views/event-recurrence.php:597
 msgid "2"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:500
+#: src/admin-views/event-recurrence.php:598
 msgid "3"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:501
+#: src/admin-views/event-recurrence.php:599
 msgid "4"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:502
+#: src/admin-views/event-recurrence.php:600
 msgid "5"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:503
+#: src/admin-views/event-recurrence.php:601
 msgid "6"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:504
+#: src/admin-views/event-recurrence.php:602
 msgid "7"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:505
+#: src/admin-views/event-recurrence.php:603
 msgid "8"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:506
+#: src/admin-views/event-recurrence.php:604
 msgid "9"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:507
+#: src/admin-views/event-recurrence.php:605
 msgid "10"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:645
+#: src/admin-views/event-recurrence.php:779
 msgid "Frequency of recurring event must be a number"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:667
+#: src/admin-views/event-recurrence.php:801
 msgid "Add Exclusion"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:673
+#: src/admin-views/event-recurrence.php:809
 msgid "Recurrence Description:"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:675
+#: src/admin-views/event-recurrence.php:814
 msgid "Recurrence Description"
 msgstr ""
 
-#: src/admin-views/event-recurrence.php:678
+#: src/admin-views/event-recurrence.php:822
 msgid "Use this field if you want to override the auto-generated descriptions of event recurrence"
 msgstr ""
 
@@ -532,8 +445,6 @@ msgstr ""
 
 #: src/admin-views/manager/create-new-event.php:46
 #: src/modules/elements/month-picker/element.js:71
-#: src/resources/js/app/elements.js:15750
-#: src/resources/js/app/main.js:6666
 msgid "Add"
 msgstr ""
 
@@ -653,11 +564,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:149
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:57
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:123
-#: src/Tribe/Recurrence/Meta.php:1744
+#: src/Tribe/Recurrence/Meta.php:1756
 #: src/modules/data/blocks/recurring/constants.js:69
-#: src/resources/js/app/data.js:622
-#: src/resources/js/app/elements.js:622
-#: src/resources/js/app/main.js:1047
 msgid "Monday"
 msgstr ""
 
@@ -666,11 +574,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:150
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:58
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:124
-#: src/Tribe/Recurrence/Meta.php:1745
+#: src/Tribe/Recurrence/Meta.php:1757
 #: src/modules/data/blocks/recurring/constants.js:70
-#: src/resources/js/app/data.js:623
-#: src/resources/js/app/elements.js:623
-#: src/resources/js/app/main.js:1048
 msgid "Tuesday"
 msgstr ""
 
@@ -679,11 +584,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:151
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:59
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:125
-#: src/Tribe/Recurrence/Meta.php:1746
+#: src/Tribe/Recurrence/Meta.php:1758
 #: src/modules/data/blocks/recurring/constants.js:71
-#: src/resources/js/app/data.js:624
-#: src/resources/js/app/elements.js:624
-#: src/resources/js/app/main.js:1049
 msgid "Wednesday"
 msgstr ""
 
@@ -692,11 +594,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:152
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:60
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:126
-#: src/Tribe/Recurrence/Meta.php:1747
+#: src/Tribe/Recurrence/Meta.php:1759
 #: src/modules/data/blocks/recurring/constants.js:72
-#: src/resources/js/app/data.js:625
-#: src/resources/js/app/elements.js:625
-#: src/resources/js/app/main.js:1050
 msgid "Thursday"
 msgstr ""
 
@@ -705,11 +604,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:153
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:61
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:127
-#: src/Tribe/Recurrence/Meta.php:1748
+#: src/Tribe/Recurrence/Meta.php:1760
 #: src/modules/data/blocks/recurring/constants.js:73
-#: src/resources/js/app/data.js:626
-#: src/resources/js/app/elements.js:626
-#: src/resources/js/app/main.js:1051
 msgid "Friday"
 msgstr ""
 
@@ -718,11 +614,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:154
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:62
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:128
-#: src/Tribe/Recurrence/Meta.php:1749
+#: src/Tribe/Recurrence/Meta.php:1761
 #: src/modules/data/blocks/recurring/constants.js:74
-#: src/resources/js/app/data.js:627
-#: src/resources/js/app/elements.js:627
-#: src/resources/js/app/main.js:1052
 msgid "Saturday"
 msgstr ""
 
@@ -731,11 +624,8 @@ msgstr ""
 #: src/admin-views/recurrence/years.php:155
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/months.php:63
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/years.php:129
-#: src/Tribe/Recurrence/Meta.php:1750
+#: src/Tribe/Recurrence/Meta.php:1762
 #: src/modules/data/blocks/recurring/constants.js:68
-#: src/resources/js/app/data.js:621
-#: src/resources/js/app/elements.js:621
-#: src/resources/js/app/main.js:1046
 msgid "Sunday"
 msgstr ""
 
@@ -807,6 +697,29 @@ msgstr ""
 msgid "Which month will the event recur in?"
 msgstr ""
 
+#: src/admin-views/series-metabox/events-list/title.php:18
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/series-event-relationship.php:74
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/series-event-relationship.php:84
+#: src/Tribe/APM_Filters/APM_Filters.php:96
+#: src/Tribe/Recurrence/Meta.php:299
+#: src/views/v2/day/event/recurring.php:31
+#: src/views/v2/list/event/recurring.php:31
+#: src/views/v2/map/event-cards/event-card/event/date-time/recurring.php:25
+#: src/views/v2/map/event-cards/event-card/tooltip/date-time/recurring.php:25
+#: src/views/v2/month/calendar-event/multiday/recurring.php:32
+#: src/views/v2/month/calendar-event/recurring.php:31
+#: src/views/v2/month/calendar-event/tooltip/recurring.php:31
+#: src/views/v2/month/mobile-event/recurring.php:31
+#: src/views/v2/photo/event/date-time/recurring.php:31
+#: src/views/v2/summary/date-group/event/date/recurring.php:31
+#: src/views/v2/week/grid-body/events-day/event/date/recurring.php:27
+#: src/views/v2/week/grid-body/events-day/event/tooltip/date/recurring.php:31
+#: src/views/v2/week/grid-body/multiday-events-day/multiday-event/bar/recurring.php:27
+#: src/views/v2/week/grid-body/multiday-events-day/multiday-event/hidden/link/recurring.php:27
+#: src/views/v2/week/mobile-events/day/event/date/recurring.php:31
+msgid "Recurring"
+msgstr ""
+
 #: src/admin-views/tribe-options-defaults.php:13
 #: src/admin-views/tribe-options-defaults.php:21
 msgid "No Default"
@@ -817,7 +730,7 @@ msgid "Select a State"
 msgstr ""
 
 #: src/admin-views/tribe-options-defaults.php:42
-#: src/Tribe/Main.php:669
+#: src/Tribe/Main.php:673
 msgid "Default Content"
 msgstr ""
 
@@ -919,6 +832,7 @@ msgid "Use Default View"
 msgstr ""
 
 #: src/admin-views/tribe-options-mobile.php:37
+#: src/Events_Pro/Site_Health/Info_Section.php:133
 msgid "Default mobile view"
 msgstr ""
 
@@ -1165,41 +1079,41 @@ msgstr ""
 msgid "This %1$s is part of a %2$sSeries%3$s with %4$d total %5$s through %6$s."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:157
+#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:162
 msgctxt "Event admin list duplicate link aria label."
 msgid "Duplicate event"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:178
+#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:183
 msgctxt "Event admin duplicate link label."
 msgid "Duplicate"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:197
+#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:202
 msgctxt "Admin referer error message."
 msgid "The provided nonce is not valid."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:202
+#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:207
 msgctxt "Admin referer error message."
 msgid "The event is not valid."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:632
+#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:637
 msgctxt "An error raised in the context of duplicating an event."
 msgid "The post ID is missing from the request."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:637
+#: src/Events_Pro/Custom_Tables/V1/Duplicate/Duplicate.php:642
 msgctxt "An error raised in the context of duplicating an event."
 msgid "A valid event could not be found."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Block/Provider.php:146
+#: src/Events_Pro/Custom_Tables/V1/Editors/Block/Provider.php:144
 msgid "Repeat This Event"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Block/Provider.php:147
+#: src/Events_Pro/Custom_Tables/V1/Editors/Block/Provider.php:145
 msgid "Add More"
 msgstr ""
 
@@ -1209,7 +1123,7 @@ msgid "Create or Find a Series"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:74
-msgid "No events are associated with this series yet."
+msgid "No events are associated with this Series yet."
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:169
@@ -1219,68 +1133,35 @@ msgid "Title"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:170
-#: src/Events_Pro/Custom_Tables/V1/Series/Admin_List.php:44
-#: src/Tribe/APM_Filters/APM_Filters.php:71
-msgid "Start Date"
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:171
 msgid "Actions"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:261
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:264
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:273
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:276
 msgid "Upcoming"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:269
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:272
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:281
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:284
 msgid "All"
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Occurrences_List.php:337
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/series-event-relationship.php:74
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/series-event-relationship.php:84
-#: src/Tribe/APM_Filters/APM_Filters.php:96
-#: src/Tribe/Recurrence/Meta.php:299
-#: src/views/v2/day/event/recurring.php:31
-#: src/views/v2/list/event/recurring.php:31
-#: src/views/v2/map/event-cards/event-card/event/date-time/recurring.php:25
-#: src/views/v2/map/event-cards/event-card/tooltip/date-time/recurring.php:25
-#: src/views/v2/month/calendar-event/multiday/recurring.php:32
-#: src/views/v2/month/calendar-event/recurring.php:31
-#: src/views/v2/month/calendar-event/tooltip/recurring.php:31
-#: src/views/v2/month/mobile-event/recurring.php:31
-#: src/views/v2/photo/event/date-time/recurring.php:31
-#: src/views/v2/summary/date-group/event/date/recurring.php:31
-#: src/views/v2/week/grid-body/events-day/event/date/recurring.php:27
-#: src/views/v2/week/grid-body/events-day/event/tooltip/date/recurring.php:31
-#: src/views/v2/week/grid-body/multiday-events-day/multiday-event/bar/recurring.php:27
-#: src/views/v2/week/grid-body/multiday-events-day/multiday-event/hidden/link/recurring.php:27
-#: src/views/v2/week/mobile-events/day/event/date/recurring.php:31
-msgid "Recurring"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/custom-recurrence-months-before-label.php:6
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/year-same-day-select-before-label.php:6
 #: src/modules/custom-tables-v1/elements/on-day-of-month-picker/element.js:27
 #: src/modules/elements/on-day-of-month-picker/template.js:29
-#: src/resources/js/app/elements.js:14903
-#: src/resources/js/app/main.js:5902
-#: src/resources/js/custom-tables-v1/app/ct1.js:3951
-#: src/resources/js/custom-tables-v1/app/elements.js:843
 msgid "On the"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/event-series-relationship.php:17
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/event-series-relationship.php:19
 msgid "Assign event to series"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/event-series-relationship.php:32
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/event-series-relationship.php:34
 msgid "Create: <%= term %> (Draft)"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/event-series-relationship.php:59
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/event-series-relationship.php:66
 msgid "Edit series"
 msgstr ""
 
@@ -1326,12 +1207,11 @@ msgstr ""
 
 #. translators: %1$s: event (plural), %2$s: ticket (plural), %3$s: RSVP (plural).
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/recurrence-not-supported-with-tickets.php:26
-msgid "%2$s and %3$s are not yet supported on recurring %1$s."
+msgid "Recurrence patterns are not yet supported for %1$s with %2$s or %3$s."
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Classic/partials/recurrence-not-supported-with-tickets.php:35
 #: src/modules/custom-tables-v1/blocks/recurrence/hooks.js:34
-#: src/resources/js/custom-tables-v1/app/blocks.js:215
 msgid "Read about our plans for future features."
 msgstr ""
 
@@ -1375,15 +1255,15 @@ msgstr ""
 msgid "Show Series title on event pages and calendar views"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Provider.php:189
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Provider.php:194
 msgid "Series options"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Provider.php:207
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Provider.php:212
 msgid "Add events to Series"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Provider.php:215
+#: src/Events_Pro/Custom_Tables/V1/Editors/Classic/Provider.php:220
 msgid "Events in this Series"
 msgstr ""
 
@@ -1397,86 +1277,84 @@ msgctxt "custom recurrence time/date separator"
 msgid "on the"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Event.php:127
+#: src/Events_Pro/Custom_Tables/V1/Editors/Event.php:133
 #: src/Tribe/Integrations/Elementor/Controls/Groups/Event_Query.php:234
 #: src/modules/elements/series-ends/template.js:124
-#: src/resources/js/app/elements.js:14214
-#: src/resources/js/app/main.js:5281
 msgid "Ends"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:142
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:145
 msgctxt "The prompt displayed to the user when trying to trash a Series related to 1 Recurring Event."
 msgid "This Series cannot be trashed because it contains one or more recurring events. Trash the associated recurring event(s) or assign them to another Series."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:149
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:152
 msgctxt "The prompt displayed to the user when trying to trash a Series related to 2 or more Recurring Events."
 msgid "The following Series cannot be trashed because they contain one or more recurring events. Trash the associated recurring event(s) or assign them to another Series."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:158
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:161
 msgctxt "The prompt displayed to the user when trying to delete a Series related to 1 Recurring Event."
 msgid "This Series cannot be deleted because it contains one or more recurring events. Delete the associated recurring event(s) or assign them to another Series."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:165
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:168
 msgctxt "The prompt displayed to the user when trying to delete a Series related to 2 or more Recurring Events."
 msgid "The following Series cannot be deleted because they contain one or more recurring events. Delete the associated recurring event(s) or assign them to another Series."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:174
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:177
 msgctxt "The acknowledgment button text."
 msgid "Okay"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:175
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:178
 msgctxt "The tooltip shown when hovering the close control."
 msgid "Close"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:231
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:337
-msgid "Edit Recurring %1$s"
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:232
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:338
-msgid "Trash Recurring %1$s"
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:233
-#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:339
-msgid "Ok"
-msgstr ""
-
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:234
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:340
-msgid "All %1$s"
+msgid "Edit Recurring %1$s"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:235
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:341
-msgid "This and following %1$s"
+msgid "Trash Recurring %1$s"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:236
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:342
-msgid "This %1$s"
+msgid "Ok"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:237
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:343
-msgid "Convert this occurrence to a single %1$s."
+msgid "All %1$s"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:238
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:344
-msgid "all day"
+msgid "This and following %1$s"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:239
 #: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:345
+msgid "This %1$s"
+msgstr ""
+
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:240
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:346
+msgid "Convert this occurrence to a single %1$s."
+msgstr ""
+
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:241
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:347
+msgid "all day"
+msgstr ""
+
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:242
+#: src/Events_Pro/Custom_Tables/V1/Editors/Provider.php:348
 msgid "These changes will affect this %1$s and all following %2$s"
 msgstr ""
 
@@ -2377,8 +2255,6 @@ msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Gettext.php:102
 #: src/modules/elements/exception-add-field/element.js:16
-#: src/resources/js/app/elements.js:19278
-#: src/resources/js/app/main.js:3701
 msgid "Add Exception"
 msgstr ""
 
@@ -2386,19 +2262,19 @@ msgstr ""
 msgid "Are you sure you want to delete this exception?"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:244
+#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:259
 msgid "Condense events in Series"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:245
+#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:260
 msgid "Show only the next event in each Series (only affects list-style views)."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:248
+#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:263
 msgid "Front-end Condense Events Series toggle"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:250
+#: src/Events_Pro/Custom_Tables/V1/Legacy_Compat/Provider.php:265
 msgid "Allow users to limit list-style views to only show the next event in each Series."
 msgstr ""
 
@@ -2450,6 +2326,11 @@ msgstr ""
 msgid "Your site is now using the upgraded recurring events system. See the report below to learn how your events may have been adjusted during the migration process. Go ahead and %1$scheck out your events%2$s or %3$sview your calendar.%2$s"
 msgstr ""
 
+#: src/Events_Pro/Custom_Tables/V1/Series/Admin_List.php:44
+#: src/Tribe/APM_Filters/APM_Filters.php:71
+msgid "Start Date"
+msgstr ""
+
 #: src/Events_Pro/Custom_Tables/V1/Series/Admin_List.php:45
 msgid "Events"
 msgstr ""
@@ -2489,6 +2370,7 @@ msgid "No %s found in Trash"
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Series/Post_Type.php:133
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:158
 msgid "%s published."
 msgstr ""
 
@@ -2505,6 +2387,8 @@ msgid "%s scheduled."
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Series/Post_Type.php:137
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:152
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:155
 msgid "%s updated."
 msgstr ""
 
@@ -2538,69 +2422,60 @@ msgctxt "Lowercase plural name of the Series post type"
 msgid "series"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:118
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:120
 msgid "View Series"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:125
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:134
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:127
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:136
 msgid "Preview Series"
 msgstr ""
 
 #. translators: Publish box date string. 1: Date, 2: Time.
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:139
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:141
 msgid "%1$s at %2$s"
 msgstr ""
 
 #. translators: Publish box date format, see https://www.php.net/manual/datetime.format.php
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:141
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:143
 msgctxt "publish box date format"
 msgid "M j, Y"
 msgstr ""
 
 #. translators: Publish box time format, see https://www.php.net/manual/datetime.format.php
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:143
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:145
 msgctxt "publish box time format"
 msgid "H:i"
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:148
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:151
-msgid "Series updated."
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:149
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:153
 msgid "Custom field updated."
 msgstr ""
 
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:150
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:154
 msgid "Custom field deleted."
 msgstr ""
 
 #. translators: %s: Date and time of the revision.
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:153
-msgid "Series restored to revision from %s."
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:154
-msgid "Series published."
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:155
-msgid "Series saved."
-msgstr ""
-
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:156
-msgid "Series submitted."
-msgstr ""
-
-#. translators: %s: Scheduled date for the post.
-#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:158
-msgid "Series scheduled for: %s."
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:157
+msgid "%s restored to revision from %s."
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:159
-msgid "Series draft updated."
+msgid "%s saved."
+msgstr ""
+
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:160
+msgid "%s submitted."
+msgstr ""
+
+#. translators: %s: Scheduled date for the post.
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:162
+msgid "%s scheduled for: %s."
+msgstr ""
+
+#: src/Events_Pro/Custom_Tables/V1/Series/Providers/Modifications.php:163
+msgid "%s draft updated."
 msgstr ""
 
 #: src/Events_Pro/Custom_Tables/V1/Templates/Single_Event_Modifications.php:97
@@ -2651,6 +2526,170 @@ msgstr ""
 #: src/Events_Pro/Custom_Tables/V1/Updates/Transient_Occurrence_Redirector.php:191
 msgctxt "The label of the confirm button in the Occurrence redirect dialog."
 msgid "Okay"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1074
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1079
+msgid "%1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1084
+msgid "Search %1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1089
+msgid "All %1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1094
+msgid "Parent %1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1099
+msgid "Parent %1$s %2$s:"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1104
+msgid "Edit %1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1109
+msgid "Update %1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1114
+msgid "Add New %1$s %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1119
+msgid "New %1$s %2$s Name"
+msgstr ""
+
+#. Translators: %s: Linked Post Type singular label.
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1125
+msgid "%1$s %2$s Link"
+msgstr ""
+
+#. Translators: %s: Linked Post Type singular label.
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1131
+msgid "A link to a particular %1$s %2$s."
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1373
+msgctxt "Breadcrumb for the Archive of the Linked Post type by a given taxonomy"
+msgid "By %1$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1430
+msgctxt "Content title for the Taxonomy View"
+msgid "%1$s from this %3$s of %2$s"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Contracts/Taxonomy_Abstract.php:1747
+msgid "No %1$s."
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Email_Visibility_Modifier.php:29
+#: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:465
+#: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:1533
+msgid "Email"
+msgstr ""
+
+#. translators: %1$s: Event label singular.
+#: src/Events_Pro/Linked_Posts/Organizer/Email_Visibility_Modifier.php:47
+msgctxt "Label for the event archive email visibility setting"
+msgid "Show email on %1$s single"
+msgstr ""
+
+#. translators: %1$s: Organizer label singular.
+#: src/Events_Pro/Linked_Posts/Organizer/Email_Visibility_Modifier.php:55
+msgctxt "Label for the organizer single email visibility setting"
+msgid "Show email on %1$s single"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Phone_Visibility_Modifier.php:29
+msgid "Phone number"
+msgstr ""
+
+#. translators: %1$s: Event label singular.
+#: src/Events_Pro/Linked_Posts/Organizer/Phone_Visibility_Modifier.php:47
+msgctxt "Label for the event single phone number visibility setting"
+msgid "Show phone number on %1$s single"
+msgstr ""
+
+#. translators: %1$s: Organizer label singular.
+#: src/Events_Pro/Linked_Posts/Organizer/Phone_Visibility_Modifier.php:55
+msgctxt "Label for the organizer single phone number visibility setting"
+msgid "Show phone number on %1$s single"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Settings.php:30
+msgctxt "Header for the organizer settings section header"
+msgid "Organizers"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Taxonomy/Category.php:49
+msgctxt "Singular name of Organizer Category, without the Linked Post label"
+msgid "Category"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Taxonomy/Category.php:56
+msgctxt "Plural name of Organizer Category, without the Linked Post label"
+msgid "Categories"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Taxonomy/Category.php:66
+msgctxt "Singular name of Organizer Category, without the Linked Post label, for rewrite purposes."
+msgid "category"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Organizer/Taxonomy/Category.php:78
+msgctxt "Plural name of Organizer Category, without the Linked Post label, for rewrite purposes."
+msgid "categories"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Thumbnail_Inclusion.php:63
+msgid "We recommend a 16:9 aspect ratio for featured images."
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Venue/Controller.php:188
+msgid "This setting applies to all of the venues added to the event."
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Venue/Taxonomy/Category.php:49
+msgctxt "Singular name of Venue Category, without the Linked Post label"
+msgid "Category"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Venue/Taxonomy/Category.php:56
+msgctxt "Plural name of Venue Category, without the Linked Post label"
+msgid "Categories"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Venue/Taxonomy/Category.php:66
+msgctxt "Singular name of Venue Category, without the Linked Post label, for rewrite purposes."
+msgid "category"
+msgstr ""
+
+#: src/Events_Pro/Linked_Posts/Venue/Taxonomy/Category.php:78
+msgctxt "Plural name of Venue Category, without the Linked Post label, for rewrite purposes."
+msgid "categories"
+msgstr ""
+
+#: src/Events_Pro/Site_Health/Info_Section.php:78
+msgid "The Events Calendar PRO"
+msgstr ""
+
+#: src/Events_Pro/Site_Health/Info_Section.php:79
+msgid "This section contains information on the Events Calendar PRO Plugin."
+msgstr ""
+
+#: src/Events_Pro/Site_Health/Info_Section.php:122
+msgid "Unique recurring count"
+msgstr ""
+
+#: src/Events_Pro/Site_Health/Info_Section.php:142
+msgid "Custom field count"
 msgstr ""
 
 #: src/functions/php-min-version.php:51
@@ -2980,19 +3019,12 @@ msgstr ""
 #: src/Tribe/Custom_Meta.php:150
 #: src/modules/custom-tables-v1/elements/hooks/month-tag/index.js:43
 #: src/modules/elements/month-picker/month-tag/element.js:32
-#: src/resources/js/app/elements.js:15678
-#: src/resources/js/app/main.js:6600
-#: src/resources/js/custom-tables-v1/app/ct1.js:4230
-#: src/resources/js/custom-tables-v1/app/elements.js:1122
 msgid "Remove"
 msgstr ""
 
 #: src/Tribe/Editor/Blocks/Additional_Field.php:164
-#: src/Tribe/Recurrence/Meta.php:1799
+#: src/Tribe/Recurrence/Meta.php:1811
 #: src/modules/blocks/additional-fields/utils.js:100
-#: src/resources/js/app/data.js:8992
-#: src/resources/js/app/elements.js:17548
-#: src/resources/js/app/main.js:3293
 msgid " and "
 msgstr ""
 
@@ -3002,9 +3034,6 @@ msgstr ""
 #: src/modules/blocks/related-events/index.js:22
 #: src/modules/blocks/related-events/index.js:38
 #: src/modules/blocks/related-events/template.js:28
-#: src/resources/js/app/main.js:7935
-#: src/resources/js/app/main.js:8176
-#: src/resources/js/app/main.js:8187
 msgid "Related Events"
 msgstr ""
 
@@ -3016,123 +3045,123 @@ msgstr ""
 msgid "Add Rule"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:115
-#: src/Tribe/Geo_Loc.php:582
-#: src/Tribe/Rewrite/Provider.php:161
+#: src/Tribe/Geo_Loc.php:121
+#: src/Tribe/Geo_Loc.php:588
+#: src/Tribe/Rewrite/Provider.php:164
 msgid "map"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:147
+#: src/Tribe/Geo_Loc.php:153
 msgid "Distance"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:193
+#: src/Tribe/Geo_Loc.php:199
 msgid "Map view search distance limit"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:195
+#: src/Tribe/Geo_Loc.php:201
 msgid "Set the distance that the location search covers (find events within X distance units of location search input)."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:202
+#: src/Tribe/Geo_Loc.php:208
 msgid "Distance unit"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:208
+#: src/Tribe/Geo_Loc.php:214
 #: src/Tribe/Geo_Loc_Filter.php:23
-#: src/Tribe/Views/V2/Views/Map_View.php:490
+#: src/Tribe/Views/V2/Views/Map_View.php:563
 msgid "Miles"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:209
+#: src/Tribe/Geo_Loc.php:215
 #: src/Tribe/Geo_Loc_Filter.php:26
-#: src/Tribe/Views/V2/Views/Map_View.php:486
+#: src/Tribe/Views/V2/Views/Map_View.php:559
 msgid "Kilometers"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:224
+#: src/Tribe/Geo_Loc.php:230
 msgid "Hide location search"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:225
+#: src/Tribe/Geo_Loc.php:231
 msgid "Removes location search field from the Events Bar on all views."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:324
+#: src/Tribe/Geo_Loc.php:330
 #: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:495
 msgid "Map"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:362
+#: src/Tribe/Geo_Loc.php:368
 msgid "Venue Overwrite Coordinates"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:393
+#: src/Tribe/Geo_Loc.php:399
 msgid "Near"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:394
+#: src/Tribe/Geo_Loc.php:400
 #: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:492
 #: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:1728
 msgid "Location"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:419
+#: src/Tribe/Geo_Loc.php:425
 msgid "Use latitude + longitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:430
+#: src/Tribe/Geo_Loc.php:436
 msgid "Latitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:431
+#: src/Tribe/Geo_Loc.php:437
 msgid "Longitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:451
+#: src/Tribe/Geo_Loc.php:457
 msgid "Enter a custom Google Maps API key"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:452
+#: src/Tribe/Geo_Loc.php:458
 msgid "for latitude and longitude to be auto-generated; otherwise, you'll only be able to enter the values manually."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:759
+#: src/Tribe/Geo_Loc.php:765
 msgid "The latitude and longitude for your venue could not be fetched. The Google Maps API daily query limit has been reached!. %1$s "
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:763
+#: src/Tribe/Geo_Loc.php:769
 msgid "Enter your API Key"
 msgstr ""
 
 #. translators: 1: Error response text, 2: URL
-#: src/Tribe/Geo_Loc.php:1310
+#: src/Tribe/Geo_Loc.php:1316
 msgctxt "debug geodata"
 msgid "Geocode request failed (%1$s - %2$s)"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1338
+#: src/Tribe/Geo_Loc.php:1344
 msgid "There was an error while trying to fix the Venues geolocation information: %s"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1385
+#: src/Tribe/Geo_Loc.php:1391
 msgid "Fix venues data"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1439
+#: src/Tribe/Geo_Loc.php:1445
 msgid "You have venues for which we don't have geolocation information. <a href='%s'>Click here to generate it</a>."
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1474
+#: src/Tribe/Geo_Loc.php:1480
 msgid "Fixed geolocation data for %d venues"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1612
+#: src/Tribe/Geo_Loc.php:1618
 msgctxt "The text of the link that will take the user to the Venue edit screen."
 msgid "update the venue address or use latitude & longitude"
 msgstr ""
 
-#: src/Tribe/Geo_Loc.php:1622
+#: src/Tribe/Geo_Loc.php:1628
 msgctxt "The text of the link that will trigger an attempt to fix the Venues geolocation information."
 msgid "try again"
 msgstr ""
@@ -3205,9 +3234,6 @@ msgstr ""
 #: src/Tribe/Integrations/Elementor/Controls/Groups/Event_Query.php:126
 #: src/Tribe/Integrations/Elementor/Controls/Groups/Event_Query.php:240
 #: src/modules/data/blocks/recurring/constants.js:40
-#: src/resources/js/app/data.js:600
-#: src/resources/js/app/elements.js:600
-#: src/resources/js/app/main.js:1021
 msgid "After"
 msgstr ""
 
@@ -4016,9 +4042,6 @@ msgstr ""
 
 #: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_List.php:425
 #: src/modules/data/blocks/recurring/constants.js:19
-#: src/resources/js/app/data.js:585
-#: src/resources/js/app/elements.js:585
-#: src/resources/js/app/main.js:1004
 msgid "Month"
 msgstr ""
 
@@ -4081,11 +4104,6 @@ msgstr ""
 msgid "Name"
 msgstr ""
 
-#: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:465
-#: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:1533
-msgid "Email"
-msgstr ""
-
 #: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:507
 msgid "Custom Content"
 msgstr ""
@@ -4131,7 +4149,6 @@ msgstr ""
 
 #: src/Tribe/Integrations/Elementor/Widgets/Widget_Event_Single_Legacy.php:756
 #: src/modules/blocks/recurrence-description/template.js:14
-#: src/resources/js/app/main.js:7781
 msgid "Recurring Event"
 msgstr ""
 
@@ -4218,184 +4235,192 @@ msgstr ""
 msgid "Zoom Dial-in Info"
 msgstr ""
 
-#: src/Tribe/Main.php:411
-#: src/Tribe/Views/V2/Template/Title.php:56
+#: src/Tribe/Main.php:415
+#: src/Tribe/Views/V2/Template/Title.php:60
 msgid "All %1$s for %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:417
-#: src/Tribe/Views/V2/Template/Title.php:74
+#: src/Tribe/Main.php:421
+#: src/Tribe/Views/V2/Template/Title.php:78
 msgid "%1$s for week of %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:486
+#: src/Tribe/Main.php:490
 msgctxt "debug recurrence"
 msgid "Unknown"
 msgstr ""
 
-#: src/Tribe/Main.php:504
+#: src/Tribe/Main.php:508
 msgctxt "debug recurrence"
 msgid "invalid date"
 msgstr ""
 
-#: src/Tribe/Main.php:535
-#: src/Tribe/Main.php:548
+#: src/Tribe/Main.php:539
+#: src/Tribe/Main.php:552
 msgctxt "debug recurrence"
 msgid "incorrect slug"
 msgstr ""
 
 #. Translators: 1: Error message, 2: URL
-#: src/Tribe/Main.php:572
+#: src/Tribe/Main.php:576
 msgctxt "debug recurrence"
 msgid "Invalid instance of a recurring event was requested (%1$s) redirecting to %2$s"
 msgstr ""
 
-#: src/Tribe/Main.php:706
+#: src/Tribe/Main.php:709
 msgid "Hide related events"
 msgstr ""
 
-#: src/Tribe/Main.php:707
+#: src/Tribe/Main.php:710
 msgid "Remove related events from the single event view (with classic editor)"
 msgstr ""
 
-#: src/Tribe/Main.php:719
+#: src/Tribe/Main.php:722
 msgid "Hide weekends on Week View"
 msgstr ""
 
-#: src/Tribe/Main.php:720
+#: src/Tribe/Main.php:723
 msgid "Check this to only show weekdays on Week View. This also affects the Events by Week widget."
 msgstr ""
 
-#: src/Tribe/Main.php:732
+#: src/Tribe/Main.php:735
 msgid "Enable the Before HTML (below) on shortcodes."
 msgstr ""
 
-#: src/Tribe/Main.php:733
+#: src/Tribe/Main.php:736
 msgid "Check this to show the Before HTML from the text area below on events displayed via shortcode."
 msgstr ""
 
-#: src/Tribe/Main.php:745
+#: src/Tribe/Main.php:748
 msgid "Enable the After HTML (below) on shortcodes."
 msgstr ""
 
-#: src/Tribe/Main.php:746
+#: src/Tribe/Main.php:749
 msgid "Check this to show the After HTML from the text area below on events displayed via shortcode."
 msgstr ""
 
-#: src/Tribe/Main.php:760
+#: src/Tribe/Main.php:763
 msgid "Week day format"
 msgstr ""
 
-#: src/Tribe/Main.php:807
+#: src/Tribe/Main.php:765
+msgid "Enter the format to use for week days. Used when showing days of the week in Week view. Example: %1$s"
+msgstr ""
+
+#: src/Tribe/Main.php:781
+msgid "The first four fields accept the date format options available to the PHP %1$s function. <a href=\"%2$s\" target=\"_blank\">Learn how to make your own date format here</a>."
+msgstr ""
+
+#: src/Tribe/Main.php:811
 msgid "Thanks for buying Events Calendar PRO! From all of us at The Events Calendar, we sincerely appreciate it. If you're looking for help with Events Calendar PRO, you've come to the right place. We are committed to helping make your calendar be spectacular... and hope the resources provided below will help get you there."
 msgstr ""
 
-#: src/Tribe/Main.php:819
+#: src/Tribe/Main.php:823
 msgid "If this is your first time using The Events Calendar Pro, you're in for a treat and are already well on your way to creating a first event. Here are some basics we've found helpful for users jumping into it for the first time:"
 msgstr ""
 
-#: src/Tribe/Main.php:822
+#: src/Tribe/Main.php:826
 msgid "%sOur New User Primer%s was designed for folks in your exact position. Featuring both step-by-step videos and written walkthroughs that feature accompanying screenshots, the primer aims to take you from zero to hero in no time."
 msgstr ""
 
-#: src/Tribe/Main.php:824
+#: src/Tribe/Main.php:828
 msgid "%sInstallation/Setup FAQs%s from our support page can help give an overview of what the plugin can and cannot do. This section of the FAQs may be helpful as it aims to address any basic install questions not addressed by the new user primer."
 msgstr ""
 
-#: src/Tribe/Main.php:826
+#: src/Tribe/Main.php:830
 msgid "Take care of your license key. Though not required to create your first event, you'll want to get it in place as soon as possible to guarantee your access to support and upgrades. %sHere's how to find your license key%s, if you don't have it handy."
 msgstr ""
 
-#: src/Tribe/Main.php:828
+#: src/Tribe/Main.php:832
 msgid "Otherwise, if you're feeling adventurous, you can get started by heading to the Events menu and adding your first event."
 msgstr ""
 
-#: src/Tribe/Main.php:841
+#: src/Tribe/Main.php:845
 msgid "Written documentation can only take things so far...sometimes, you need help from a real person. This is where our %ssupport forums%s come into play."
 msgstr ""
 
-#: src/Tribe/Main.php:842
+#: src/Tribe/Main.php:846
 msgid "Users who have purchased an Events Calendar PRO license are granted total access to our %spremium support forums%s. Unlike at the %sWordPress.org support forum%s, where our involvement is limited to identifying and patching bugs, we have a dedicated support team for PRO users. We're on the PRO forums daily throughout the business week, and no thread should go more than 24-hours without a response."
 msgstr ""
 
-#: src/Tribe/Main.php:843
+#: src/Tribe/Main.php:847
 msgid "Our number one goal is helping you succeed, and to whatever extent possible, we'll help troubleshoot and guide your customizations or tweaks. While we won't build your site for you, and we can't guarantee we'll be able to get you 100% integrated with every theme or plugin out there, we'll do all we can to point you in the right direction and to make you -- and your client, as is often more importantly the case -- satisfied."
 msgstr ""
 
-#: src/Tribe/Main.php:844
+#: src/Tribe/Main.php:848
 msgid "Before posting a new thread, please do a search to make sure your issue hasn't already been addressed. When posting please make sure to provide as much detail about the problem as you can (with screenshots or screencasts if feasible), and make sure that you've identified whether a plugin / theme conflict could be at play in your initial message."
 msgstr ""
 
-#: src/Tribe/Main.php:1096
+#: src/Tribe/Main.php:1100
 msgid "Settings"
 msgstr ""
 
-#: src/Tribe/Main.php:1124
+#: src/Tribe/Main.php:1128
 msgid "Venue updated. <a href=\"%s\">View venue</a>"
 msgstr ""
 
 #. translators: %s: date and time of the revision
-#: src/Tribe/Main.php:1126
+#: src/Tribe/Main.php:1130
 msgid "Venue published. <a href=\"%s\">View venue</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1127
+#: src/Tribe/Main.php:1131
 msgid "Venue submitted. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1129
+#: src/Tribe/Main.php:1133
 msgid "Venue scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview venue</a>"
 msgstr ""
 
 #. translators: Publish box date format, see http://php.net/date
-#: src/Tribe/Main.php:1131
-#: src/Tribe/Main.php:1141
+#: src/Tribe/Main.php:1135
+#: src/Tribe/Main.php:1145
 msgid "M j, Y @ G:i"
 msgstr ""
 
-#: src/Tribe/Main.php:1133
+#: src/Tribe/Main.php:1137
 msgid "Venue draft updated. <a target=\"_blank\" href=\"%s\">Preview venue</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1135
+#: src/Tribe/Main.php:1139
 msgid "Organizer updated. <a href=\"%s\">View organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1136
+#: src/Tribe/Main.php:1140
 msgid "Organizer published. <a href=\"%s\">View organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1137
+#: src/Tribe/Main.php:1141
 msgid "Organizer submitted. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1139
+#: src/Tribe/Main.php:1143
 msgid "Organizer scheduled for: <strong>%1$s</strong>. <a target=\"_blank\" href=\"%2$s\">Preview organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1143
+#: src/Tribe/Main.php:1147
 msgid "Organizer draft updated. <a target=\"_blank\" href=\"%s\">Preview organizer</a>"
 msgstr ""
 
-#: src/Tribe/Main.php:1198
+#: src/Tribe/Main.php:1202
 msgid "Support"
 msgstr ""
 
-#: src/Tribe/Main.php:1200
+#: src/Tribe/Main.php:1204
 msgid "View All Add-Ons"
 msgstr ""
 
-#: src/Tribe/Main.php:1532
+#: src/Tribe/Main.php:1536
 msgid "Events Calendar PRO"
 msgstr ""
 
-#: src/Tribe/Main.php:1635
-#: src/Tribe/Rewrite/Provider.php:158
+#: src/Tribe/Main.php:1639
+#: src/Tribe/Rewrite/Provider.php:161
 msgid "all"
 msgstr ""
 
-#: src/Tribe/Main.php:1637
-#: src/Tribe/Rewrite/Provider.php:160
+#: src/Tribe/Main.php:1641
+#: src/Tribe/Rewrite/Provider.php:163
 msgid "photo"
 msgstr ""
 
@@ -4405,8 +4430,6 @@ msgstr ""
 
 #: src/Tribe/Recurrence/Meta.php:165
 #: src/modules/data/status/sagas.js:29
-#: src/resources/js/app/data.js:17603
-#: src/resources/js/app/main.js:8280
 msgid "You are currently editing all events in a recurring series."
 msgstr ""
 
@@ -4498,260 +4521,221 @@ msgstr ""
 msgid "Yearly custom recurrences cannot have a dash set as the day to occur on."
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1413
+#: src/Tribe/Recurrence/Meta.php:1425
 msgctxt "placeholder used where the true day of the day is determined dynamically"
 msgid "day"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1430
-#: src/Tribe/Recurrence/Meta.php:1449
+#: src/Tribe/Recurrence/Meta.php:1442
+#: src/Tribe/Recurrence/Meta.php:1461
 msgctxt "Used when displaying the word \"day\" in \"the last day\" or \"the first day\""
 msgid "day"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1431
+#: src/Tribe/Recurrence/Meta.php:1443
 msgctxt "Used when displaying the word \"days\" in e.g. \"every 3 days\""
 msgid "days"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1432
+#: src/Tribe/Recurrence/Meta.php:1444
 msgctxt "Used when displaying the word \"week\" in \"the last week\" or \"the first week\""
 msgid "week"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1433
+#: src/Tribe/Recurrence/Meta.php:1445
 msgctxt "Used when displaying the word \"weeks\" in e.g. \"every 3 weeks\""
 msgid "weeks"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1434
+#: src/Tribe/Recurrence/Meta.php:1446
 msgctxt "Used when displaying the word \"month\" in e.g. \"every month\""
 msgid "month"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1435
+#: src/Tribe/Recurrence/Meta.php:1447
 msgctxt "Used when displaying the word \"months\" in e.g. \"every 3 months\""
 msgid "months"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1436
+#: src/Tribe/Recurrence/Meta.php:1448
 msgctxt "Used when displaying the word \"year\" in e.g. \"every year\""
 msgid "year"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1437
+#: src/Tribe/Recurrence/Meta.php:1449
 msgctxt "Used when displaying the word \"years\" in e.g. \"every 2 years\""
 msgid "years"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1439
+#: src/Tribe/Recurrence/Meta.php:1451
 msgctxt "Joins the last item in a list of items (i.e. the \"and\" in Monday, Tuesday, and Wednesday)"
 msgid "and"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1440
+#: src/Tribe/Recurrence/Meta.php:1452
 msgctxt "Placeholder text for a day of the week (or days of the week) before the user has selected any"
 msgid "[day]"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1441
+#: src/Tribe/Recurrence/Meta.php:1453
 msgctxt "Placeholder text for a month (or months) before the user has selected any"
 msgid "[month]"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1442
+#: src/Tribe/Recurrence/Meta.php:1454
 msgctxt "Describes a day of the month (e.g. \"day 5\" or \"day 27\")"
 msgid "day %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1443
+#: src/Tribe/Recurrence/Meta.php:1455
 msgctxt "Used when displaying: \"the first Monday\" or \"the first day\""
 msgid "the first %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1444
+#: src/Tribe/Recurrence/Meta.php:1456
 msgctxt "Used when displaying: \"the second Monday\" or \"the second day\""
 msgid "the second %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1445
+#: src/Tribe/Recurrence/Meta.php:1457
 msgctxt "Used when displaying: \"the third Monday\" or \"the third day\""
 msgid "the third %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1446
+#: src/Tribe/Recurrence/Meta.php:1458
 msgctxt "Used when displaying: \"the fourth Monday\" or \"the fourth day\""
 msgid "the fourth %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1447
+#: src/Tribe/Recurrence/Meta.php:1459
 msgctxt "Used when displaying: \"the fifth Monday\" or \"the fifth day\""
 msgid "the fifth %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1448
+#: src/Tribe/Recurrence/Meta.php:1460
 msgctxt "Used when displaying: \"the last Monday\" or \"the last day\""
 msgid "the last %1$s"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1676
+#: src/Tribe/Recurrence/Meta.php:1688
 msgctxt "An unspecified end date"
 msgid "an unspecified date"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1757
+#: src/Tribe/Recurrence/Meta.php:1769
 msgid ", and"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1759
+#: src/Tribe/Recurrence/Meta.php:1771
 msgid "and"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1761
+#: src/Tribe/Recurrence/Meta.php:1773
 msgid ","
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1779
+#: src/Tribe/Recurrence/Meta.php:1791
 #: src/modules/data/blocks/recurring/constants.js:169
-#: src/resources/js/app/data.js:701
-#: src/resources/js/app/elements.js:701
-#: src/resources/js/app/main.js:1130
 msgid "January"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1780
+#: src/Tribe/Recurrence/Meta.php:1792
 #: src/modules/data/blocks/recurring/constants.js:170
-#: src/resources/js/app/data.js:702
-#: src/resources/js/app/elements.js:702
-#: src/resources/js/app/main.js:1131
 msgid "February"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1781
+#: src/Tribe/Recurrence/Meta.php:1793
 #: src/modules/data/blocks/recurring/constants.js:171
-#: src/resources/js/app/data.js:703
-#: src/resources/js/app/elements.js:703
-#: src/resources/js/app/main.js:1132
 msgid "March"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1782
+#: src/Tribe/Recurrence/Meta.php:1794
 #: src/modules/data/blocks/recurring/constants.js:172
-#: src/resources/js/app/data.js:704
-#: src/resources/js/app/elements.js:704
-#: src/resources/js/app/main.js:1133
 msgid "April"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1783
+#: src/Tribe/Recurrence/Meta.php:1795
 #: src/modules/data/blocks/recurring/constants.js:173
 #: src/modules/data/blocks/recurring/constants.js:186
-#: src/resources/js/app/data.js:705
-#: src/resources/js/app/data.js:717
-#: src/resources/js/app/elements.js:705
-#: src/resources/js/app/elements.js:717
-#: src/resources/js/app/main.js:1134
-#: src/resources/js/app/main.js:1146
 msgid "May"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1784
+#: src/Tribe/Recurrence/Meta.php:1796
 #: src/modules/data/blocks/recurring/constants.js:174
-#: src/resources/js/app/data.js:706
-#: src/resources/js/app/elements.js:706
-#: src/resources/js/app/main.js:1135
 msgid "June"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1785
+#: src/Tribe/Recurrence/Meta.php:1797
 #: src/modules/data/blocks/recurring/constants.js:175
-#: src/resources/js/app/data.js:707
-#: src/resources/js/app/elements.js:707
-#: src/resources/js/app/main.js:1136
 msgid "July"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1786
+#: src/Tribe/Recurrence/Meta.php:1798
 #: src/modules/data/blocks/recurring/constants.js:176
-#: src/resources/js/app/data.js:708
-#: src/resources/js/app/elements.js:708
-#: src/resources/js/app/main.js:1137
 msgid "August"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1787
+#: src/Tribe/Recurrence/Meta.php:1799
 #: src/modules/data/blocks/recurring/constants.js:177
-#: src/resources/js/app/data.js:709
-#: src/resources/js/app/elements.js:709
-#: src/resources/js/app/main.js:1138
 msgid "September"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1788
+#: src/Tribe/Recurrence/Meta.php:1800
 #: src/modules/data/blocks/recurring/constants.js:178
-#: src/resources/js/app/data.js:710
-#: src/resources/js/app/elements.js:710
-#: src/resources/js/app/main.js:1139
 msgid "October"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1789
+#: src/Tribe/Recurrence/Meta.php:1801
 #: src/modules/data/blocks/recurring/constants.js:179
-#: src/resources/js/app/data.js:711
-#: src/resources/js/app/elements.js:711
-#: src/resources/js/app/main.js:1140
 msgid "November"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1790
+#: src/Tribe/Recurrence/Meta.php:1802
 #: src/modules/data/blocks/recurring/constants.js:180
-#: src/resources/js/app/data.js:712
-#: src/resources/js/app/elements.js:712
-#: src/resources/js/app/main.js:1141
 msgid "December"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1797
+#: src/Tribe/Recurrence/Meta.php:1809
 msgid ", and "
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1801
+#: src/Tribe/Recurrence/Meta.php:1813
 msgid ", "
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1830
+#: src/Tribe/Recurrence/Meta.php:1842
 msgid "Create recurring events in advance for"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1831
+#: src/Tribe/Recurrence/Meta.php:1843
 msgid "Recurring events will be created this far in advance"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1839
+#: src/Tribe/Recurrence/Meta.php:1851
 msgid "Clean up recurring events after"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1840
+#: src/Tribe/Recurrence/Meta.php:1852
 msgid "Automatically remove recurring event instances older than this"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1853
+#: src/Tribe/Recurrence/Meta.php:1865
 msgid "Recurring event instances"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1854
+#: src/Tribe/Recurrence/Meta.php:1866
 msgid "Show only the first instance of each recurring event (only affects list-style views)."
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1860
+#: src/Tribe/Recurrence/Meta.php:1872
 msgid "Front-end recurring event instances toggle"
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1861
+#: src/Tribe/Recurrence/Meta.php:1873
 msgid "Allow users to decide whether to show all instances of a recurring event on list-style views."
 msgstr ""
 
-#: src/Tribe/Recurrence/Meta.php:1884
+#: src/Tribe/Recurrence/Meta.php:1896
 msgid " months"
 msgstr ""
 
@@ -5336,6 +5320,11 @@ msgstr ""
 msgid "Recurrence meta should not be empty."
 msgstr ""
 
+#. translators: %1$s and %2$s are the opening and closing paragraph tags, respectively
+#: src/Tribe/Shortcodes/Inline/Parser.php:197
+msgid "%1$sYou must log in to access this content.%2$s"
+msgstr ""
+
 #: src/Tribe/Views/V2/Customizer/Section/Events_Bar.php:80
 msgctxt "The View Selector background color setting label."
 msgid "View Dropdown Background Color"
@@ -5377,12 +5366,12 @@ msgstr ""
 msgid "Google Maps API response is missing some data."
 msgstr ""
 
-#: src/Tribe/Views/V2/Hooks.php:834
+#: src/Tribe/Views/V2/Hooks.php:906
 msgctxt "The default text label for the \"today\" button on the Week View."
 msgid "This Week"
 msgstr ""
 
-#: src/Tribe/Views/V2/Hooks.php:854
+#: src/Tribe/Views/V2/Hooks.php:926
 msgctxt "The default text for the 'today' button's title and aria-label on the Week View."
 msgid "Click to select the current week"
 msgstr ""
@@ -5421,11 +5410,21 @@ msgctxt "The archive for events, \"/organizer/\" URL string component."
 msgid "organizer"
 msgstr ""
 
-#: src/Tribe/Views/V2/Service_Provider.php:37
+#: src/Tribe/Views/V2/Rewrite.php:61
+msgctxt "The archive for events for multiple venue, \"/venues/\" URL string component."
+msgid "venues"
+msgstr ""
+
+#: src/Tribe/Views/V2/Rewrite.php:68
+msgctxt "The archive for events for multiple organizers, \"/organizers/\" URL string component."
+msgid "organizers"
+msgstr ""
+
+#: src/Tribe/Views/V2/Service_Provider.php:40
 msgid "Summary"
 msgstr ""
 
-#: src/Tribe/Views/V2/Service_Provider.php:37
+#: src/Tribe/Views/V2/Service_Provider.php:40
 msgid "summary"
 msgstr ""
 
@@ -5435,32 +5434,61 @@ msgctxt "featured events title"
 msgid "Featured %s"
 msgstr ""
 
-#: src/Tribe/Views/V2/Views/Map_View.php:84
+#: src/Tribe/Views/V2/Template/Title.php:93
+msgid "Display of %1$s from %2$s"
+msgstr ""
+
+#: src/Tribe/Views/V2/Template/Title.php:100
+msgid "Summary of %1$s from %2$s"
+msgstr ""
+
+#: src/Tribe/Views/V2/Template/Title.php:107
+msgid "Map of %1$s from %2$s"
+msgstr ""
+
+#: src/Tribe/Views/V2/Views/Map_View.php:97
 msgctxt "The text label for the Map View."
 msgid "Map"
 msgstr ""
 
-#: src/Tribe/Views/V2/Views/Organizer_View.php:108
-msgctxt "The text label for the Organizer View."
-msgid "Organizer"
+#. Translators: %1$s is the lowercase pluralized label for events.
+#: src/Tribe/Views/V2/Views/Map_View.php:112
+msgctxt "Label for link to map view."
+msgid "View %1s on a map."
 msgstr ""
 
-#: src/Tribe/Views/V2/Views/Photo_View.php:62
+#. Translators: %1$s is the lowercase pluralized label for events.
+#: src/Tribe/Views/V2/Views/Organizer_View.php:125
+msgctxt "Label for link to map view."
+msgid "View %1s."
+msgstr ""
+
+#: src/Tribe/Views/V2/Views/Organizer_View.php:526
+msgctxt "Content title for the View, displays right above the date selector on the Organizer View."
+msgid "%1$s from this %2$s"
+msgstr ""
+
+#: src/Tribe/Views/V2/Views/Photo_View.php:67
 msgctxt "The text label for the Photo View."
 msgid "Photo"
 msgstr ""
 
-#: src/Tribe/Views/V2/Views/Summary_View.php:53
+#: src/Tribe/Views/V2/Views/Summary_View.php:56
 msgctxt "The text label for the Summary View."
 msgid "Summary"
 msgstr ""
 
-#: src/Tribe/Views/V2/Views/Venue_View.php:111
+#: src/Tribe/Views/V2/Views/Venue_View.php:115
 msgctxt "The text label for the Venue View."
 msgid "Venue"
 msgstr ""
 
-#: src/Tribe/Views/V2/Views/Week_View.php:109
+#: src/Tribe/Views/V2/Views/Venue_View.php:515
+msgctxt "Content title for the View, displays right above the date selector on the Venue View."
+msgid "%1$s at this %2$s"
+msgstr ""
+
+#: src/Tribe/Views/V2/Views/Week_View.php:113
 msgctxt "The text label for the Week View."
 msgid "Week"
 msgstr ""
@@ -5470,7 +5498,7 @@ msgid "View More"
 msgstr ""
 
 #. Translators: 1: lowercase plural event term 2: venue name
-#: src/Tribe/Views/V2/Views/Widgets/Venue_View.php:94
+#: src/Tribe/Views/V2/Views/Widgets/Venue_View.php:103
 msgid "View more %1$s at %2$s."
 msgstr ""
 
@@ -5750,9 +5778,14 @@ msgstr ""
 msgid "&larr; Back to %s"
 msgstr ""
 
-#: src/views/pro/widgets/modules/single-event.php:203
+#: src/views/pro/widgets/modules/single-event.php:216
 msgctxt "list separator for final two elements"
 msgid "and"
+msgstr ""
+
+#: src/views/v2/components/multi-venue/suffix.php:27
+msgctxt "Venue count suffix"
+msgid "+%d more"
 msgstr ""
 
 #: src/views/v2/location/form-field.php:20
@@ -5764,7 +5797,7 @@ msgstr ""
 msgid "In a location"
 msgstr ""
 
-#: src/views/v2/map.php:49
+#: src/views/v2/map.php:46
 #: src/views/v2/photo.php:49
 #: src/views/v2/summary.php:48
 #: src/views/v2/week.php:54
@@ -5828,9 +5861,9 @@ msgstr ""
 msgid "Featured"
 msgstr ""
 
-#: src/views/v2/map/event-cards/event-card/event/venue.php:24
+#: src/views/v2/map/event-cards/event-card/event/venue.php:26
 #: src/views/v2/map/event-cards/event-card/tooltip/venue.php:24
-#: src/views/v2/week/mobile-events/day/event/venue.php:20
+#: src/views/v2/week/mobile-events/day/event/venue.php:23
 msgctxt "Address separator"
 msgid ", "
 msgstr ""
@@ -6103,196 +6136,98 @@ msgid "Recurring"
 msgstr ""
 
 #: src/modules/blocks/additional-fields/checkbox/settings/template.js:28
-#: src/resources/js/app/data.js:8681
-#: src/resources/js/app/elements.js:17237
-#: src/resources/js/app/main.js:2998
 msgid "Custom Dividers"
 msgstr ""
 
 #: src/modules/blocks/additional-fields/checkbox/settings/template.js:30
-#: src/resources/js/app/data.js:8683
-#: src/resources/js/app/elements.js:17239
-#: src/resources/js/app/main.js:3000
 msgid "List divider"
 msgstr ""
 
 #: src/modules/blocks/additional-fields/checkbox/settings/template.js:36
-#: src/resources/js/app/data.js:8688
-#: src/resources/js/app/elements.js:17244
-#: src/resources/js/app/main.js:3005
 msgid "List ender"
 msgstr ""
 
 #: src/modules/blocks/additional-fields/elements/field-container/element.js:37
-#: src/resources/js/app/data.js:8154
-#: src/resources/js/app/elements.js:16710
-#: src/resources/js/app/main.js:2504
 msgid "Add %1$s"
 msgstr ""
 
 #: src/modules/blocks/additional-fields/elements/settings/template.js:23
-#: src/resources/js/app/data.js:7958
-#: src/resources/js/app/elements.js:16514
-#: src/resources/js/app/main.js:2322
 msgid "%1$s Settings"
 msgstr ""
 
 #: src/modules/blocks/additional-fields/elements/settings/template.js:26
-#: src/resources/js/app/data.js:7959
-#: src/resources/js/app/elements.js:16515
-#: src/resources/js/app/main.js:2323
 msgid "Adjust this block’s options under Events → Settings → "
 msgstr ""
 
 #: src/modules/blocks/additional-fields/utils.js:70
-#: src/resources/js/app/data.js:8967
-#: src/resources/js/app/elements.js:17523
-#: src/resources/js/app/main.js:3269
 msgid "Additional Field"
 msgstr ""
 
 #: src/modules/blocks/recurrence-description/template.js:80
-#: src/resources/js/app/main.js:7820
 msgid "see all"
 msgstr ""
 
 #: src/modules/blocks/recurrence-exception/template.js:33
-#: src/resources/js/app/main.js:7493
 msgid "Exceptions"
 msgstr ""
 
 #: src/modules/blocks/related-events/index.js:23
-#: src/resources/js/app/main.js:8177
 msgid "Show other events with the same event categories and/or tags."
 msgstr ""
 
 #: src/modules/blocks/related-events/template.js:91
-#: src/resources/js/app/main.js:7992
 msgid "This block displays related events based on the tags and categories you select. Please add tags and categories to display related events, and be sure you have more events for these tags and categories."
 msgstr ""
 
 #: src/modules/blocks/related-events/template.js:146
-#: src/resources/js/app/main.js:8054
 msgid "Related Events Settings"
 msgstr ""
 
 #: src/modules/blocks/related-events/template.js:148
-#: src/resources/js/app/main.js:8056
 msgid "Display Images"
 msgstr ""
 
 #: src/modules/custom-tables-v1/blocks/recurrence/hooks.js:26
-#: src/resources/js/custom-tables-v1/app/blocks.js:210
 msgid "Recurrence patterns are not yet supported for events with tickets or RSVPs."
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:11
-#: src/resources/js/custom-tables-v1/app/blocks.js:1316
-#: src/resources/js/custom-tables-v1/app/ct1.js:594
-#: src/resources/js/custom-tables-v1/app/data.js:1215
-#: src/resources/js/custom-tables-v1/app/dialog.js:1368
-#: src/resources/js/custom-tables-v1/app/elements.js:336
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1368
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1678
 msgid "year"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:16
-#: src/resources/js/custom-tables-v1/app/blocks.js:1320
-#: src/resources/js/custom-tables-v1/app/ct1.js:598
-#: src/resources/js/custom-tables-v1/app/data.js:1219
-#: src/resources/js/custom-tables-v1/app/dialog.js:1372
-#: src/resources/js/custom-tables-v1/app/elements.js:340
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1372
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1682
 msgid "years"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:18
-#: src/resources/js/custom-tables-v1/app/blocks.js:1321
-#: src/resources/js/custom-tables-v1/app/ct1.js:599
-#: src/resources/js/custom-tables-v1/app/data.js:1220
-#: src/resources/js/custom-tables-v1/app/dialog.js:1373
-#: src/resources/js/custom-tables-v1/app/elements.js:341
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1373
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1683
 msgid "once"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:19
-#: src/resources/js/custom-tables-v1/app/blocks.js:1322
-#: src/resources/js/custom-tables-v1/app/ct1.js:600
-#: src/resources/js/custom-tables-v1/app/data.js:1221
-#: src/resources/js/custom-tables-v1/app/dialog.js:1374
-#: src/resources/js/custom-tables-v1/app/elements.js:342
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1374
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1684
 msgid "daily"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:20
-#: src/resources/js/custom-tables-v1/app/blocks.js:1323
-#: src/resources/js/custom-tables-v1/app/ct1.js:601
-#: src/resources/js/custom-tables-v1/app/data.js:1222
-#: src/resources/js/custom-tables-v1/app/dialog.js:1375
-#: src/resources/js/custom-tables-v1/app/elements.js:343
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1375
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1685
 msgid "weekly"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:21
-#: src/resources/js/custom-tables-v1/app/blocks.js:1324
-#: src/resources/js/custom-tables-v1/app/ct1.js:602
-#: src/resources/js/custom-tables-v1/app/data.js:1223
-#: src/resources/js/custom-tables-v1/app/dialog.js:1376
-#: src/resources/js/custom-tables-v1/app/elements.js:344
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1376
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1686
 msgid "monthly"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:22
-#: src/resources/js/custom-tables-v1/app/blocks.js:1325
-#: src/resources/js/custom-tables-v1/app/ct1.js:603
-#: src/resources/js/custom-tables-v1/app/data.js:1224
-#: src/resources/js/custom-tables-v1/app/dialog.js:1377
-#: src/resources/js/custom-tables-v1/app/elements.js:345
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1377
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1687
 msgid "yearly"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:24
-#: src/resources/js/custom-tables-v1/app/blocks.js:1326
-#: src/resources/js/custom-tables-v1/app/ct1.js:604
-#: src/resources/js/custom-tables-v1/app/data.js:1225
-#: src/resources/js/custom-tables-v1/app/dialog.js:1378
-#: src/resources/js/custom-tables-v1/app/elements.js:346
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1378
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1688
 msgid "weekly (custom)"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:25
-#: src/resources/js/custom-tables-v1/app/blocks.js:1327
-#: src/resources/js/custom-tables-v1/app/ct1.js:605
-#: src/resources/js/custom-tables-v1/app/data.js:1226
-#: src/resources/js/custom-tables-v1/app/dialog.js:1379
-#: src/resources/js/custom-tables-v1/app/elements.js:347
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1379
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1689
 msgid "monthly (custom)"
 msgstr ""
 
 #: src/modules/custom-tables-v1/data/shared/constants.js:26
-#: src/resources/js/custom-tables-v1/app/blocks.js:1328
-#: src/resources/js/custom-tables-v1/app/ct1.js:606
-#: src/resources/js/custom-tables-v1/app/data.js:1227
-#: src/resources/js/custom-tables-v1/app/dialog.js:1380
-#: src/resources/js/custom-tables-v1/app/elements.js:348
-#: src/resources/js/custom-tables-v1/app/occurrence-redirect.js:1380
-#: src/resources/js/custom-tables-v1/app/series-metabox.js:1690
 msgid "yearly (custom)"
 msgstr ""
 
@@ -6301,7 +6236,6 @@ msgstr ""
 #: src/modules/custom-tables-v1/elements/hooks/exception-field/singular.js:8
 #: src/modules/custom-tables-v1/elements/hooks/exception-field/weekly.js:18
 #: src/modules/custom-tables-v1/elements/hooks/exception-field/yearly.js:18
-#: src/resources/js/custom-tables-v1/app/elements.js:534
 msgid "Not"
 msgstr ""
 
@@ -6328,334 +6262,197 @@ msgid "starting %s"
 msgstr ""
 
 #: src/modules/custom-tables-v1/plugins/duplicate/template.js:22
-#: src/resources/js/custom-tables-v1/app/plugins.js:128
 msgid "Duplicate"
 msgstr ""
 
 #: src/modules/data/blocks/exception/options.js:16
-#: src/resources/js/app/data.js:6313
-#: src/resources/js/app/elements.js:11340
-#: src/resources/js/app/main.js:2079
 msgid "Single Exception"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:17
 #: src/modules/data/blocks/recurring/constants.js:54
-#: src/resources/js/app/data.js:583
-#: src/resources/js/app/data.js:610
-#: src/resources/js/app/elements.js:583
-#: src/resources/js/app/elements.js:610
-#: src/resources/js/app/main.js:1002
-#: src/resources/js/app/main.js:1033
 msgid "Day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:18
-#: src/resources/js/app/data.js:584
-#: src/resources/js/app/elements.js:584
-#: src/resources/js/app/main.js:1003
 msgid "Week"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:20
-#: src/resources/js/app/data.js:586
-#: src/resources/js/app/elements.js:586
-#: src/resources/js/app/main.js:1005
 msgid "Year"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:22
-#: src/resources/js/app/data.js:587
-#: src/resources/js/app/elements.js:587
-#: src/resources/js/app/main.js:1006
 msgid "Days"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:23
-#: src/resources/js/app/data.js:588
-#: src/resources/js/app/elements.js:588
-#: src/resources/js/app/main.js:1007
 msgid "Weeks"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:24
-#: src/resources/js/app/data.js:589
-#: src/resources/js/app/elements.js:589
-#: src/resources/js/app/main.js:1008
 msgid "Months"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:25
-#: src/resources/js/app/data.js:590
-#: src/resources/js/app/elements.js:590
-#: src/resources/js/app/main.js:1009
 msgid "Years"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:27
-#: src/resources/js/app/data.js:591
-#: src/resources/js/app/elements.js:591
-#: src/resources/js/app/main.js:1010
 msgid "Single Recurrence"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:41
-#: src/resources/js/app/data.js:601
-#: src/resources/js/app/elements.js:601
-#: src/resources/js/app/main.js:1022
 msgid "Never"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:76
-#: src/resources/js/app/data.js:628
-#: src/resources/js/app/elements.js:628
-#: src/resources/js/app/main.js:1053
 msgctxt "The first-letter abbreviation for Sunday"
 msgid "S"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:77
-#: src/resources/js/app/data.js:629
-#: src/resources/js/app/elements.js:629
-#: src/resources/js/app/main.js:1054
 msgctxt "The first-letter abbreviation for Monday"
 msgid "M"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:78
-#: src/resources/js/app/data.js:630
-#: src/resources/js/app/elements.js:630
-#: src/resources/js/app/main.js:1055
 msgctxt "The first-letter abbreviation for Tuesday"
 msgid "T"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:79
-#: src/resources/js/app/data.js:631
-#: src/resources/js/app/elements.js:631
-#: src/resources/js/app/main.js:1056
 msgctxt "The first-letter abbreviation for Wednesday"
 msgid "W"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:80
-#: src/resources/js/app/data.js:632
-#: src/resources/js/app/elements.js:632
-#: src/resources/js/app/main.js:1057
 msgctxt "The first-letter abbreviation for Thursday"
 msgid "T"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:81
-#: src/resources/js/app/data.js:633
-#: src/resources/js/app/elements.js:633
-#: src/resources/js/app/main.js:1058
 msgctxt "The first-letter abbreviation for Friday"
 msgid "F"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:82
-#: src/resources/js/app/data.js:634
-#: src/resources/js/app/elements.js:634
-#: src/resources/js/app/main.js:1059
 msgctxt "The first-letter abbreviation for Saturday"
 msgid "S"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:136
-#: src/resources/js/app/data.js:672
-#: src/resources/js/app/elements.js:672
-#: src/resources/js/app/main.js:1099
 msgid "First"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:137
-#: src/resources/js/app/data.js:673
-#: src/resources/js/app/elements.js:673
-#: src/resources/js/app/main.js:1100
 msgid "Second"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:138
-#: src/resources/js/app/data.js:674
-#: src/resources/js/app/elements.js:674
-#: src/resources/js/app/main.js:1101
 msgid "Third"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:139
-#: src/resources/js/app/data.js:675
-#: src/resources/js/app/elements.js:675
-#: src/resources/js/app/main.js:1102
 msgid "Fourth"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:140
-#: src/resources/js/app/data.js:676
-#: src/resources/js/app/elements.js:676
-#: src/resources/js/app/main.js:1103
 msgid "Fifth"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:141
-#: src/resources/js/app/data.js:677
-#: src/resources/js/app/elements.js:677
-#: src/resources/js/app/main.js:1104
 msgid "Last"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:182
-#: src/resources/js/app/data.js:713
-#: src/resources/js/app/elements.js:713
-#: src/resources/js/app/main.js:1142
 msgid "Jan"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:183
-#: src/resources/js/app/data.js:714
-#: src/resources/js/app/elements.js:714
-#: src/resources/js/app/main.js:1143
 msgid "Feb"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:184
-#: src/resources/js/app/data.js:715
-#: src/resources/js/app/elements.js:715
-#: src/resources/js/app/main.js:1144
 msgid "Mar"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:185
-#: src/resources/js/app/data.js:716
-#: src/resources/js/app/elements.js:716
-#: src/resources/js/app/main.js:1145
 msgid "Apr"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:187
-#: src/resources/js/app/data.js:718
-#: src/resources/js/app/elements.js:718
-#: src/resources/js/app/main.js:1147
 msgid "Jun"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:188
-#: src/resources/js/app/data.js:719
-#: src/resources/js/app/elements.js:719
-#: src/resources/js/app/main.js:1148
 msgid "Jul"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:189
-#: src/resources/js/app/data.js:720
-#: src/resources/js/app/elements.js:720
-#: src/resources/js/app/main.js:1149
 msgid "Aug"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:190
-#: src/resources/js/app/data.js:721
-#: src/resources/js/app/elements.js:721
-#: src/resources/js/app/main.js:1150
 msgid "Sep"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:191
-#: src/resources/js/app/data.js:722
-#: src/resources/js/app/elements.js:722
-#: src/resources/js/app/main.js:1151
 msgid "Oct"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:192
-#: src/resources/js/app/data.js:723
-#: src/resources/js/app/elements.js:723
-#: src/resources/js/app/main.js:1152
 msgid "Nov"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:193
-#: src/resources/js/app/data.js:724
-#: src/resources/js/app/elements.js:724
-#: src/resources/js/app/main.js:1153
 msgid "Dec"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:224
-#: src/resources/js/app/data.js:750
-#: src/resources/js/app/elements.js:750
-#: src/resources/js/app/main.js:1181
 msgid "Next day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:225
-#: src/resources/js/app/data.js:751
-#: src/resources/js/app/elements.js:751
-#: src/resources/js/app/main.js:1182
 msgid "2nd day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:226
-#: src/resources/js/app/data.js:752
-#: src/resources/js/app/elements.js:752
-#: src/resources/js/app/main.js:1183
 msgid "3rd day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:227
-#: src/resources/js/app/data.js:753
-#: src/resources/js/app/elements.js:753
-#: src/resources/js/app/main.js:1184
 msgid "4th day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:228
-#: src/resources/js/app/data.js:754
-#: src/resources/js/app/elements.js:754
-#: src/resources/js/app/main.js:1185
 msgid "5th day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:229
-#: src/resources/js/app/data.js:755
-#: src/resources/js/app/elements.js:755
-#: src/resources/js/app/main.js:1186
 msgid "6th day"
 msgstr ""
 
 #: src/modules/data/blocks/recurring/constants.js:230
-#: src/resources/js/app/data.js:756
-#: src/resources/js/app/elements.js:756
-#: src/resources/js/app/main.js:1187
 msgid "7th day"
 msgstr ""
 
 #: src/modules/data/status/sagas.js:30
 #: src/modules/data/status/sagas.js:96
-#: src/resources/js/app/data.js:17604
-#: src/resources/js/app/data.js:17669
-#: src/resources/js/app/main.js:8281
-#: src/resources/js/app/main.js:8343
 msgid "%d instance"
 msgid_plural "%d instances"
 msgstr[0] ""
 msgstr[1] ""
 
 #: src/modules/data/status/sagas.js:31
-#: src/resources/js/app/data.js:17605
-#: src/resources/js/app/main.js:8282
 msgid "of this event have been created through %s."
 msgstr ""
 
 #: src/modules/data/status/sagas.js:106
-#: src/resources/js/app/data.js:17677
-#: src/resources/js/app/main.js:8352
 msgid "Recurring event instances are still being created…"
 msgstr ""
 
 #: src/modules/elements/day-of-month-picker/element.js:54
-#: src/resources/js/app/elements.js:14859
-#: src/resources/js/app/main.js:5860
 msgid "of the month"
 msgstr ""
 
@@ -6663,59 +6460,35 @@ msgstr ""
 #: src/modules/elements/exception-field/monthly.js:49
 #: src/modules/elements/exception-field/weekly.js:49
 #: src/modules/elements/exception-field/yearly.js:58
-#: src/resources/js/app/elements.js:13168
-#: src/resources/js/app/elements.js:13230
-#: src/resources/js/app/elements.js:13291
-#: src/resources/js/app/elements.js:13359
-#: src/resources/js/app/main.js:4185
-#: src/resources/js/app/main.js:4238
-#: src/resources/js/app/main.js:4290
-#: src/resources/js/app/main.js:4348
 msgid "Exception ends"
 msgstr ""
 
 #: src/modules/elements/exception-field/singular.js:23
-#: src/resources/js/app/elements.js:13117
-#: src/resources/js/app/main.js:4142
 msgid "A"
 msgstr ""
 
 #: src/modules/elements/from-time-range-picker/template.js:68
-#: src/resources/js/app/elements.js:15470
-#: src/resources/js/app/main.js:6413
 msgid "From"
 msgstr ""
 
 #: src/modules/elements/from-time-range-picker/template.js:73
-#: src/resources/js/app/elements.js:15471
-#: src/resources/js/app/main.js:6414
 msgid "to"
 msgstr ""
 
 #: src/modules/elements/in-month/template.js:27
-#: src/resources/js/app/elements.js:15829
-#: src/resources/js/app/main.js:6738
 msgid "In"
 msgstr ""
 
 #: src/modules/elements/multi-day-checkbox/element.js:37
-#: src/resources/js/app/elements.js:14071
-#: src/resources/js/app/main.js:5155
 msgid "Multi-day"
 msgstr ""
 
 #: src/modules/elements/recurring-to-date-time-picker/template.js:33
 #: src/modules/elements/single-to-date-time-picker/template.js:37
-#: src/resources/js/app/elements.js:15055
-#: src/resources/js/app/elements.js:15233
-#: src/resources/js/app/main.js:6039
-#: src/resources/js/app/main.js:6198
 msgid "To"
 msgstr ""
 
 #: src/modules/elements/recurring-to-date-time-picker/template.js:45
-#: src/resources/js/app/elements.js:15065
-#: src/resources/js/app/main.js:6049
 msgid "on the"
 msgstr ""
 
@@ -6736,11 +6509,9 @@ msgid "Displays a list of upcoming events at a specific venue."
 msgstr ""
 
 #: src/modules/widgets/mini-calendar/index.js:20
-#: src/resources/js/app/widgets.js:501
 msgid "Mini Calendar"
 msgstr ""
 
 #: src/modules/widgets/mini-calendar/index.js:21
-#: src/resources/js/app/widgets.js:502
 msgid "Displays this month’s events."
 msgstr ""

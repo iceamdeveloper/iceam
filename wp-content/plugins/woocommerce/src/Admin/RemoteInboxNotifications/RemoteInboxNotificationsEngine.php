@@ -10,13 +10,14 @@ defined( 'ABSPATH' ) || exit;
 use Automattic\WooCommerce\Admin\PluginsProvider\PluginsProvider;
 use Automattic\WooCommerce\Internal\Admin\Onboarding\OnboardingProfile;
 use Automattic\WooCommerce\Admin\Notes\Note;
+use Automattic\WooCommerce\Admin\RemoteSpecs\RemoteSpecsEngine;
 
 /**
  * Remote Inbox Notifications engine.
  * This goes through the specs and runs (creates admin notes) for those
  * specs that are able to be triggered.
  */
-class RemoteInboxNotificationsEngine {
+class RemoteInboxNotificationsEngine extends RemoteSpecsEngine {
 	const STORED_STATE_OPTION_NAME = 'wc_remote_inbox_notifications_stored_state';
 	const WCA_UPDATED_OPTION_NAME  = 'wc_remote_inbox_notifications_wca_updated';
 
@@ -40,19 +41,20 @@ class RemoteInboxNotificationsEngine {
 
 		// Hook into WCA updated. This is hooked up here rather than in
 		// on_admin_init because that runs too late to hook into the action.
+		add_action( 'woocommerce_run_on_woocommerce_admin_updated', array( __CLASS__, 'run_on_woocommerce_admin_updated' ) );
 		add_action(
 			'woocommerce_updated',
 			function() {
 				$next_hook = WC()->queue()->get_next(
 					'woocommerce_run_on_woocommerce_admin_updated',
-					array( __CLASS__, 'run_on_woocommerce_admin_updated' ),
+					array(),
 					'woocommerce-remote-inbox-engine'
 				);
 				if ( null === $next_hook ) {
 					WC()->queue()->schedule_single(
 						time(),
 						'woocommerce_run_on_woocommerce_admin_updated',
-						array( __CLASS__, 'run_on_woocommerce_admin_updated' ),
+						array(),
 						'woocommerce-remote-inbox-engine'
 					);
 				}
@@ -111,14 +113,22 @@ class RemoteInboxNotificationsEngine {
 	public static function run() {
 		$specs = DataSourcePoller::get_instance()->get_specs_from_data_sources();
 
-		if ( $specs === false || count( $specs ) === 0 ) {
+		if ( false === $specs || ! is_countable( $specs ) || count( $specs ) === 0 ) {
 			return;
 		}
 
 		$stored_state = self::get_stored_state();
+		$errors       = array();
 
 		foreach ( $specs as $spec ) {
-			SpecRunner::run_spec( $spec, $stored_state );
+			$error = SpecRunner::run_spec( $spec, $stored_state );
+			if ( isset( $error ) ) {
+				$errors[] = $error;
+			}
+		}
+
+		if ( count( $errors ) > 0 ) {
+			self::log_errors( $errors );
 		}
 	}
 
@@ -205,9 +215,19 @@ class RemoteInboxNotificationsEngine {
 				break;
 			}
 
+			$localized_actions = SpecRunner::get_actions( $spec );
+
+			// Manually copy the action id from the db to the localized action, since they were not being provided.
+			foreach ( $localized_actions as $localized_action ) {
+				$action = $note_from_db->get_action( $localized_action->name );
+				if ( $action ) {
+					$localized_action->id = $action->id;
+				}
+			}
+
 			$note_from_db->set_title( $locale->title );
 			$note_from_db->set_content( $locale->content );
-			$note_from_db->set_actions( SpecRunner::get_actions( $spec ) );
+			$note_from_db->set_actions( $localized_actions );
 		}
 
 		return $note_from_db;

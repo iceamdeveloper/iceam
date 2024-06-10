@@ -4,7 +4,7 @@
  *
  * Class for parameter-based Bundles Stock Report querying
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.9.0
  */
 

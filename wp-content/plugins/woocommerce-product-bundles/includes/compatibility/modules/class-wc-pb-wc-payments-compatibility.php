@@ -2,7 +2,7 @@
 /**
  * WC_PB_WC_Payments_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.13.1
  */
 
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WooCommerce Payments Integration.
+ * Woo Payments Integration.
  *
  * @version  6.13.1
  */

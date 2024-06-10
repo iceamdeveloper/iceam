@@ -2,7 +2,7 @@
 /**
  * WC_PB_Min_Max_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.6.0
  */
 
@@ -14,7 +14,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Min/Max Quantities Compatibility.
  *
- * @version  6.18.5
+ * @version  7.0.0
  */
 class WC_PB_Min_Max_Compatibility {
 
@@ -275,7 +275,7 @@ class WC_PB_Min_Max_Compatibility {
 	 */
 	public static function save_quantity_input_args( $data, $product ) {
 
-		if ( is_object( self::$bundled_item ) || isset( $product->wc_mmq_bundled_item ) ) {
+		if ( is_object( self::$bundled_item ) || ! is_null( WC_PB()->product_data->get( $product, 'wc_mmq_bundled_item' ) ) ) {
 			self::$unfiltered_args = $data;
 		} else {
 			self::$unfiltered_args = false;
@@ -321,8 +321,15 @@ class WC_PB_Min_Max_Compatibility {
 			} elseif ( isset( $data[ 'input_value' ] ) ) {
 				$input_qty = absint( $data[ 'input_value' ] );
 			}
+			
+			if ( is_a( $product, 'WC_Product' ) ) {
+				$mmq_bundled_item = WC_PB()->product_data->get( $product, 'wc_mmq_bundled_item' );
+			} else {
+				// See self::bundled_variation_data(), which calls this function with 'false' as the product.
+				$mmq_bundled_item = null;
+			}
 
-			if ( ! isset( $product->wc_mmq_bundled_item ) ) {
+			if ( is_null( $mmq_bundled_item ) ) {
 				// Single product page context.
 				if ( isset( $data[ 'group_of' ] ) ) {
 					$group_of_qty = $data[ 'group_of' ];
@@ -338,7 +345,7 @@ class WC_PB_Min_Max_Compatibility {
 
 			} else {
 				// Cart context.
-				$group_of_qty = self::get_bundled_item_group_of_qty( $product->wc_mmq_bundled_item ) * $product->container_quantity;
+				$group_of_qty = self::get_bundled_item_group_of_qty( $mmq_bundled_item ) * WC_PB()->product_data->get( $product, 'container_quantity' );
 
 				if ( $group_of_qty ) {
 					$min_qty = WC_Min_Max_Quantities::adjust_min_quantity( $min_qty, $group_of_qty );
@@ -440,8 +447,8 @@ class WC_PB_Min_Max_Compatibility {
 				$bundle = $bundle_container_item[ 'data' ];
 
 				if ( 'bundle' === $bundle->get_type() && $bundled_item = $bundle->get_bundled_item( $cart_item[ 'bundled_item_id' ] ) ) {
-					$product->wc_mmq_bundled_item = $bundled_item;
-					$product->container_quantity  = $bundle_container_item[ 'quantity' ];
+					WC_PB()->product_data->set( $product, 'wc_mmq_bundled_item', $bundled_item );
+					WC_PB()->product_data->set( $product, 'container_quantity', $bundle_container_item[ 'quantity' ] );
 				}
 			}
 		}

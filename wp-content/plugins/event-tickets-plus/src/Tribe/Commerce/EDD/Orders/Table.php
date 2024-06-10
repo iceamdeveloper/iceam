@@ -425,6 +425,7 @@ class Tribe__Tickets_Plus__Commerce__EDD__Orders__Table extends WP_List_Table {
 					'value' => $post_id,
 				),
 			),
+			'orderby'       => [ 'date' => 'DESC', 'ID' => 'DESC' ]
 		);
 
 		$orders = array();

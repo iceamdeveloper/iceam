@@ -2,11 +2,11 @@
 Tags: woocommerce, multi-currency, multiple currency, caching
 Donate link: https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=F8ND89AA8B8QJ
 Requires at least: 4.0
-Tested up to: 6.2.9
+Tested up to: 6.3.9
 License: GPLv3
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
 WC requires at least: 3.0
-WC tested up to: 7.7
+WC tested up to: 8.1
 
 Implements a workaround to allow plugins to work with caching systems that don't support dynamic cache.
 
@@ -32,6 +32,20 @@ The Cache Handler plugin can work around the limitations of rigid caching system
 5. Clear all the caching systems you are using (plugins, Nginx, Varnish, CloudFlare, etc). This is important, as it will allow the Cache Handler to add its scripts to your pages, and ensure that the correct content is served.
 
 == Changelog ==
+
+= 1.2.2.230905 =
+* Updated supported WooCommerce versions.
+
+= 1.2.1.230809 =
+* Updated supported WooCommerce versions.
+* Updated supported WordPress versions.
+
+= 1.2.0.230705 =
+* Declared compatibility with the HPOS feature.
+* Updated supported WooCommerce versions.
+
+= 1.1.3.230524 =
+* Updated supported WooCommerce versions.
 
 = 1.1.2.230503 =
 * Updated supported WooCommerce versions.

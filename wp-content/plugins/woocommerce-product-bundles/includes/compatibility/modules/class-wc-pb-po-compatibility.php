@@ -2,7 +2,7 @@
 /**
  * WC_PB_PO_Compatibility class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    4.11.4
  */
 

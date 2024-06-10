@@ -3,7 +3,7 @@
         'name' => 'the-events-calendar/events-pro',
         'pretty_version' => 'dev-master',
         'version' => 'dev-master',
-        'reference' => '6bd775972a9c7da8d586bb197930a5cd48a7d455',
+        'reference' => '906f7f5d6973aa8c95c2a7c48d87de9f06b546b1',
         'type' => 'wordpress-plugin',
         'install_path' => __DIR__ . '/../../',
         'aliases' => array(),
@@ -22,7 +22,7 @@
         'the-events-calendar/events-pro' => array(
             'pretty_version' => 'dev-master',
             'version' => 'dev-master',
-            'reference' => '6bd775972a9c7da8d586bb197930a5cd48a7d455',
+            'reference' => '906f7f5d6973aa8c95c2a7c48d87de9f06b546b1',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../../',
             'aliases' => array(),

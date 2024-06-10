@@ -338,7 +338,7 @@
 		box-sizing: border-box;
 		color: #fff;
 		content: '\f132';
-		font-family: 'dashicons';
+		font-family: 'dashicons', sans-serif;
 		font-size: 10px;
 		font-weight: 400;
 		height: 14px;
@@ -566,6 +566,14 @@
 			width: auto;
 		}
 
+.tribe-common button.tribe-common-c-btn--small:hover, .tribe-common input[type="button"].tribe-common-c-btn--small:hover, .tribe-common input[type="submit"].tribe-common-c-btn--small:hover, .tribe-common a.tribe-common-c-btn--small:hover {
+				padding: 11px 14px;
+			}
+
+.tribe-common button.tribe-common-c-btn--small:disabled, .tribe-common input[type="button"].tribe-common-c-btn--small:disabled, .tribe-common input[type="submit"].tribe-common-c-btn--small:disabled, .tribe-common a.tribe-common-c-btn--small:disabled {
+				padding: 11px 14px;
+			}
+
 /* -----------------------------------------------------------------------------
 	 *
 	 * Button: Link
@@ -632,6 +640,38 @@
 .tribe-common button.tribe-common-c-btn-link:disabled, .tribe-common input[type="button"].tribe-common-c-btn-link:disabled, .tribe-common input[type="submit"].tribe-common-c-btn-link:disabled, .tribe-common a.tribe-common-c-btn-link:disabled {
 				color: var(--tec-color-accent-primary-background);
 			}
+
+.tribe-common .tec-tickets__attendees-list-wrapper, .event-tickets .tec-tickets__attendees-list-wrapper {
+		margin-top: var(--tec-spacer-8);
+	}
+
+.tribe-common .tec-tickets__attendees-list, .event-tickets .tec-tickets__attendees-list {
+		background-color: var(--tec-color-background);
+		margin-top: var(--tec-spacer-3);
+	}
+
+.tribe-common .tec-tickets__attendees-list-item, .event-tickets .tec-tickets__attendees-list-item {
+		align-items: center;
+		border-left: 1px solid var(--tec-color-border-secondary);
+		border-right: 1px solid var(--tec-color-border-secondary);
+		border-top: 1px solid var(--tec-color-border-secondary);
+		container-type: inline-size;
+		display: flex;
+		flex-direction: column;
+		grid-gap: var(--tec-spacer-1);
+		gap: var(--tec-spacer-1);
+		margin: 0;
+		padding: var(--tec-spacer-4);
+	}
+
+.tribe-common .tec-tickets__attendees-list-item:last-child, .event-tickets .tec-tickets__attendees-list-item:last-child {
+			border-bottom: 1px solid var(--tec-color-border-secondary);
+		}
+
+.tribe-common .tec-tickets__attendees-list-item-attendee-details, .event-tickets .tec-tickets__attendees-list-item-attendee-details {
+		align-self: center;
+		flex-grow: 1;
+	}
 
 body.page-tribe-attendee-registration * {
 		-moz-osx-font-smoothing: grayscale;
@@ -954,6 +994,10 @@ body.page-tribe-attendee-registration.tribe-theme-twentytwenty .entry-content .t
 				background-color: transparent;
 				width: auto
 		}
+
+.tribe-common .tec-tickets__attendees-list-item, .event-tickets .tec-tickets__attendees-list-item {
+			flex-direction: row
+	}
 
 body.page-tribe-attendee-registration header.entry-header,
 	body.page-tribe-attendee-registration header.entry-meta,

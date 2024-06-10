@@ -2,7 +2,7 @@
 /**
  * WC_PB_Admin_Analytics class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.9.0
  */
 

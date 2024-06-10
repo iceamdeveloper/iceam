@@ -10,10 +10,10 @@ use Sensei\ThirdParty\Sabberworm\CSS\RuleSet\DeclarationBlock;
 use Sensei\ThirdParty\Sabberworm\CSS\RuleSet\RuleSet;
 use Sensei\ThirdParty\Sabberworm\CSS\Value\Value;
 /**
- * The root `CSSList` of a parsed file. Contains all top-level CSS contents, mostly declaration blocks,
- * but also any at-rules encountered.
+ * This class represents the root of a parsed CSS file. It contains all top-level CSS contents: mostly declaration
+ * blocks, but also any at-rules encountered (`Import` and `Charset`).
  */
-class Document extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList
+class Document extends CSSBlockList
 {
     /**
      * @param int $iLineNo
@@ -27,14 +27,15 @@ class Document extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList
      *
      * @throws SourceException
      */
-    public static function parse(\Sensei\ThirdParty\Sabberworm\CSS\Parsing\ParserState $oParserState)
+    public static function parse(ParserState $oParserState)
     {
-        $oDocument = new \Sensei\ThirdParty\Sabberworm\CSS\CSSList\Document($oParserState->currentLine());
-        \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSList::parseList($oParserState, $oDocument);
+        $oDocument = new Document($oParserState->currentLine());
+        CSSList::parseList($oParserState, $oDocument);
         return $oDocument;
     }
     /**
-     * Gets all `DeclarationBlock` objects recursively.
+     * Gets all `DeclarationBlock` objects recursively, no matter how deeply nested the selectors are.
+     * Aliased as `getAllSelectors()`.
      *
      * @return array<int, DeclarationBlock>
      */
@@ -57,7 +58,7 @@ class Document extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList
         return $this->getAllDeclarationBlocks();
     }
     /**
-     * Returns all `RuleSet` objects found recursively in the tree.
+     * Returns all `RuleSet` objects recursively found in the tree, no matter how deeply nested the rule sets are.
      *
      * @return array<int, RuleSet>
      */
@@ -69,7 +70,7 @@ class Document extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList
         return $aResult;
     }
     /**
-     * Returns all `Value` objects found recursively in the tree.
+     * Returns all `Value` objects found recursively in `Rule`s in the tree.
      *
      * @param CSSList|RuleSet|string $mElement
      *        the `CSSList` or `RuleSet` to start the search from (defaults to the whole document).
@@ -95,7 +96,7 @@ class Document extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList
         return $aResult;
     }
     /**
-     * Returns all `Selector` objects found recursively in the tree.
+     * Returns all `Selector` objects with the requested specificity found recursively in the tree.
      *
      * Note that this does not yield the full `DeclarationBlock` that the selector belongs to
      * (and, currently, there is no way to get to that).
@@ -144,12 +145,12 @@ class Document extends \Sensei\ThirdParty\Sabberworm\CSS\CSSList\CSSBlockList
      *
      * @return string
      */
-    public function render(\Sensei\ThirdParty\Sabberworm\CSS\OutputFormat $oOutputFormat = null)
+    public function render(OutputFormat $oOutputFormat = null)
     {
         if ($oOutputFormat === null) {
-            $oOutputFormat = new \Sensei\ThirdParty\Sabberworm\CSS\OutputFormat();
+            $oOutputFormat = new OutputFormat();
         }
-        return parent::render($oOutputFormat);
+        return $oOutputFormat->comments($this) . $this->renderListContents($oOutputFormat);
     }
     /**
      * @return bool

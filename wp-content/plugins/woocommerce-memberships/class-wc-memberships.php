@@ -17,11 +17,12 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\Memberships\Shortcodes;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 use SkyVerge\WooCommerce\Memberships\Profile_Fields;
 
 defined( 'ABSPATH' ) or exit;
@@ -37,10 +38,13 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 
 
 	/** plugin version number */
-	const VERSION = '1.24.0';
+	const VERSION = '1.26.5';
 
 	/** @var \WC_Memberships single instance of this plugin */
 	protected static $instance;
+
+	/** @var bool internal flag when user inactivity query is being performed */
+	private static bool $doing_user_inactivity_query = false;
 
 	/** plugin id */
 	const PLUGIN_ID = 'memberships';
@@ -105,8 +109,15 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 			self::PLUGIN_ID,
 			self::VERSION,
 			[
-				'text_domain'  => 'woocommerce-memberships',
-				'dependencies' => [
+				'text_domain'        => 'woocommerce-memberships',
+				'supported_features' => [
+					'hpos'   => true,
+					'blocks' => [
+						'cart'     => true,
+						'checkout' => true,
+					],
+				],
+				'dependencies'       => [
 					'php_extensions' => [
 						'dom',
 						'mbstring',
@@ -142,10 +153,15 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 		add_filter( 'woocommerce_locate_template',      array( $this, 'locate_template' ), 20, 3 );
 		add_filter( 'woocommerce_locate_core_template', array( $this, 'locate_template' ), 20, 3 );
 
+		// @TODO: Move privacy handling methods and hooks below to own class {unfulvio 2024-02-22}
+
 		// GDPR handling: remove user memberships when erasing personal data
 		add_filter( 'wp_privacy_personal_data_erasers',   array( $this, 'register_personal_data_eraser' ) );
 		// GDPR handling: export user memberships personal data upon request
 		add_filter( 'wp_privacy_personal_data_exporters', array( $this, 'register_personal_data_exporter' ), 6 );
+		// GDPR handling: keep active user memberships if the "Retain inactive accounts" WooCommerce privacy setting is used
+		add_filter( 'woocommerce_delete_inactive_account_roles', [ $this, 'flag_active_member_user_exclusion_from_query' ], 1000 );
+		add_action( 'pre_get_users', [ $this, 'retain_active_members_from_erasure' ] );
 	}
 
 
@@ -350,9 +366,9 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 		require_once( $this->get_plugin_path() . '/src/Shortcodes.php' );
 
 		/** @deprecated remove legacy class aliases when the plugin has fully migrated to namespaces */
-		class_alias(\SkyVerge\WooCommerce\Memberships\Shortcodes::class, 'WC_Memberships_Shortcodes');
+		class_alias( Shortcodes::class, 'WC_Memberships_Shortcodes' );
 
-		\SkyVerge\WooCommerce\Memberships\Shortcodes::initialize();
+		Shortcodes::initialize();
 
 		// load front end
 		$this->frontend = $this->load_class( '/src/frontend/class-wc-memberships-frontend.php', 'WC_Memberships_Frontend' );
@@ -828,7 +844,7 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 				case 'directory-shortcode' :
 					$migrated_free_add_ons_notices[ $free_add_on_installed ] = sprintf(
 						/* translators: Placeholders: %1$s - opening <strong> HTML tag, %2$s - closing </strong> HTML tag */
-						__( '%1$sHeads up!%2$s We\'ve merged the Directory Shortcode add-on into Memberships, so you no longer need this add-on to display a member directory. This add-on has been deactivated and can be safely removed from your plugin list.', 'woocommerce-memberships' ),
+						__( '%1$sHeads up!%2$s We\'ve merged the Directory Shortcode add-on into Memberships, so you no longer need this add-on to display a Member Directory. This add-on has been deactivated and can be safely removed from your plugin list.', 'woocommerce-memberships' ),
 						'<strong>', '</strong>'
 					);
 				break;
@@ -863,6 +879,24 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 				'notice_class'            => 'notice-info',
 				'always_show_on_settings' => false,
 			] );
+		}
+
+		// inform merchants about implications of having a Member Directory output
+		if ( $this->is_member_directory_enabled() ) {
+
+			$this->get_admin_notice_handler()->add_admin_notice(
+				/* translators: Placeholders: %1$s - "WooCommerce Memberships" plugin name in <strong> HTML tags, %2$s - opening <a> HTML tag, %3$s - closing </a> HTML tag */
+				sprintf( __( '%1$s: The Member Directory block and shortcode are enabled and ready to use. You can add the shortcode or the block to a post or a page to display members of your published plans. Make sure you have %2$sread the documentation%3$s about this feature.', 'woocommerce-memberships' ),
+					'<strong>' . $this->get_plugin_name() . '</strong>',
+					'<a href="https://woo.com/document/woocommerce-memberships-directory-shortcode/" target="_blank">', '</a>'
+				),
+				'wc-memberships-members-directory-enabled',
+				[
+					'dismissible'             => true,
+					'notice_class'            => 'notice-info',
+					'always_show_on_settings' => false,
+				]
+			);
 		}
 	}
 
@@ -963,6 +997,19 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 		       && ( 'memberships' === $_GET['tab']
 		            // ...OR the plugin's email settings pages
 		            || ( 'email' === $_GET['tab'] && isset( $_GET['section'] ) && Framework\SV_WC_Helper::str_starts_with( $_GET['section'], 'wc_memberships' ) ) );
+	}
+
+
+	/**
+	 * Checks if the Member Directory is available.
+	 *
+	 * @since 1.26.1
+	 *
+	 * @return bool
+	 */
+	public function is_member_directory_enabled() : bool {
+
+		return get_option( 'wc_memberships_enable_member_directory', 'no' ) === 'yes';
 	}
 
 
@@ -1238,7 +1285,7 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 			'start-date'      => array(
 				'name'  => __( 'Start Date (UTC)', 'woocommerce-memberships' ),
 				'value' => $user_membership->get_start_date( 'mysql' ),
-			)
+			),
 		);
 
 		if ( $end_date = $user_membership->get_end_date( 'mysql' ) ) {
@@ -1271,6 +1318,69 @@ class WC_Memberships extends Framework\SV_WC_Plugin  {
 		 * @param \WC_Memberships_User_Membership $user_membership user membership being exported
 		 */
 		return (array) apply_filters( 'wc_memberships_privacy_export_user_membership_personal_data', $personal_data, $user_membership );
+	}
+
+
+	/**
+	 * Sets an internal flag to indicate that a user inactivity query is being performed.
+	 *
+	 * @since 1.23.3-dev.1
+	 *
+	 * @internal
+	 *
+	 * @param mixed|array $user_roles
+	 * @return mixed|array
+	 */
+	public function flag_active_member_user_exclusion_from_query( $user_roles ) {
+
+		self::$doing_user_inactivity_query = true;
+
+		return $user_roles;
+	}
+
+
+	/**
+	 * Retains active members when inactive user erasure queries are being run.
+	 *
+	 * @since 1.23.3-dev.1
+	 *
+	 * @internal
+	 *
+	 * @param \WP_User_Query|mixed $user_query
+	 * @return void
+	 */
+	public function retain_active_members_from_erasure( $user_query ) {
+
+		if ( ! self::$doing_user_inactivity_query || ! $user_query instanceof \WP_User_Query ) {
+			return;
+		}
+
+		/** @var WP_Post[] $active_user_memberships_posts */
+		$active_user_memberships_posts = get_posts( [
+			'post_type'      => 'wc_user_membership',
+			'status'         => ['wcm-active', 'wcm-paused', 'wcm-complimentary', 'wcm-delayed'],
+			'limit'          => -1,
+			'author__not_in' => (array) $user_query->get( 'exclude' ),
+		] );
+
+		$active_member_user_ids = [];
+
+		foreach ( $active_user_memberships_posts as $active_user_membership ) {
+			$active_member_user_ids[] = (int) $active_user_membership->post_author;
+		}
+
+		$active_member_user_ids = array_unique( $active_member_user_ids );
+
+		if ( empty( $active_member_user_ids ) ) {
+			return;
+		}
+
+		$user_query->set( 'exclude', array_merge(
+			(array) $user_query->get( 'exclude' ),
+			$active_member_user_ids
+		) );
+
+		self::$doing_user_inactivity_query = false;
 	}
 
 

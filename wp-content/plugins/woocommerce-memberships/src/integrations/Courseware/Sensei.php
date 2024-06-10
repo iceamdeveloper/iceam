@@ -17,14 +17,14 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships\Integrations\Courseware;
 
 use SkyVerge\WooCommerce\Memberships\Integrations\Courseware;
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -238,27 +238,6 @@ class Sensei extends Courseware {
 		}
 
 		return $courses;
-	}
-
-
-	/**
-	 * Gets the temporary current user ID.
-	 *
-	 * @internal
-	 * @deprecated since 1.22.4
-	 *
-	 * @TODO remove this deprecated method by August 2022 or version 2.0.0 {unfulvio 2021-08-2022}
-	 *
-	 * @since 1.22.0
-	 *
-	 * @param null $user_id
-	 * @return int|null
-	 */
-	public function use_temporary_current_user_id( $user_id = null ) {
-
-		wc_deprecated_function( __METHOD__, '1.22.4', 'wp_set_current_user()' );
-
-		return $user_id;
 	}
 
 

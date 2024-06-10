@@ -3,7 +3,7 @@
  * WC_PB_Give_Products_Compatibility class
  *
  * @author   Rodrigo Primo <rodrigo@automattic.com>
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    5.1.2
  */
 
@@ -13,7 +13,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * WooCommerce Give Products Integration.
+ * Woo Give Products Integration.
  *
  * @version 6.15.0
  */

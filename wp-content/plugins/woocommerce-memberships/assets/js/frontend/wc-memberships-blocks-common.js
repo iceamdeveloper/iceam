@@ -1,3 +1,6 @@
+/**
+ * @deprecated do not extend this file, will be removed in future versions
+ */
 jQuery(function ($) {
 	var wc_memberships_common = window.wc_memberships_blocks_common || {};
 
@@ -48,7 +51,7 @@ jQuery(function ($) {
 			updateQueryString('search', args.search);
 			updateQueryString('plan', args.plan);
 			updateQueryString('status', args.status);
-			updateQueryString('page', args.page == 1 ? null : args.page);
+			updateQueryString('page', parseInt(args.page, 10) === 1 ? null : parseInt(args.page, 10));
 		};
 
 		// Get memberships data
@@ -56,7 +59,7 @@ jQuery(function ($) {
 			updateDirectoryQueryParams(args.requestData);
 			$.get({
 				url: wc_memberships_common.restUrl + (args.endPoint || ''),
-				data: args.requestData || {},
+				data: args.requestData || { wc_memberships_block: true },
 				beforeSend: function (xhr) {
 					xhr.setRequestHeader('X-WP-Nonce', wc_memberships_common.restNonce);
 				},
@@ -106,11 +109,13 @@ jQuery(function ($) {
 				requestData.search = searchInput;
 			}
 
+			requestData.wc_memberships_block = args.wc_memberships_block = true;
+
 			// set the current page if provided
 			if (args.requestData && args.requestData.page) {
 				$directory
 					.find('.wcm-pagination-wrapper')
-					.attr('data-current-page', args.requestData.page);
+					.data('current-page', args.requestData.page);
 			}
 
 			$directory.find('.wmc-loader').show();
@@ -118,8 +123,9 @@ jQuery(function ($) {
 			const membershipData = {
 				endPoint: 'wc/v4/memberships/members',
 				requestData: {
-					_includes: 'customer_data',
+					customer_data: true,
 					per_page: directorySettings.perPage,
+					wc_memberships_block: true,
 					...requestData,
 				},
 				callBack: (response, textStatus, request) => {
@@ -141,10 +147,14 @@ jQuery(function ($) {
 							$directory.find('.wcm-directory-list-wrapper').html('<div class="directory-placeholder-box"><p>' + message + '</p></div>');
 						}
 					}
+
 					const totalMembers = request.getResponseHeader('x-wp-total');
 					const totalPages = request.getResponseHeader('x-wp-totalpages');
+
 					addPagination($directory, totalPages);
+
 					setupPagination($directory);
+
 					$directory.find('.wmc-loader').hide();
 				},
 			};
@@ -153,14 +163,13 @@ jQuery(function ($) {
 
 		// Add Pagination settings
 		const addPagination = ($directory, totalPages) => {
-			const currentPage = $directory
-				.find('.wcm-pagination-wrapper')
-				.attr('data-current-page');
+			const currentPage = parseInt($directory.find('.wcm-pagination-wrapper').data('current-page'), 10);
 
-			$directory
-				.find('.wcm-pagination-wrapper')
-				.attr('data-total-pages', totalPages);
-			if (0 == totalPages) {
+			totalPages = parseInt(totalPages.toString(), 10);
+
+			$directory.find('.wcm-pagination-wrapper').data('total-pages', totalPages);
+
+			if (0 === totalPages) {
 				$directory.find('.wcm-pagination-wrapper').hide();
 				return;
 			} else {
@@ -173,7 +182,7 @@ jQuery(function ($) {
 				$directory.find('.wcm-pagination-wrapper .next').show();
 			}
 
-			if (1 == currentPage) {
+			if (1 === currentPage) {
 				$directory.find('.wcm-pagination-wrapper .previous').hide();
 			} else {
 				$directory.find('.wcm-pagination-wrapper .previous').show();
@@ -183,33 +192,30 @@ jQuery(function ($) {
 		// Setup pagination
 		const setupPagination = ($directory) => {
 			$directory
-				.find('.wcm-pagination-wrapper .wcm-pagination')
-				.off('click')
-				.on('click', (e) => {
-					const currentPage = $directory
-						.find('.wcm-pagination-wrapper')
-						.attr('data-current-page');
-					const totalPages = $directory
-						.find('.wcm-pagination-wrapper')
-						.attr('data-total-pages');
-					//next btn clicked
+				.find('.wcm-pagination-wrapper .wcm-pagination').off('click').on('click', (e) => {
+					const currentPage = parseInt($directory.find('.wcm-pagination-wrapper').data('current-page').toString(), 10);
+					const totalPages  = parseInt($directory.find('.wcm-pagination-wrapper').data('total-pages').toString(), 10);
+
 					e.preventDefault();
+
+					// next button clicked
 					if (e.currentTarget.classList.contains('next')) {
 						if (currentPage < totalPages) {
-							let nextPage = parseInt(currentPage) + 1;
-							$directory
-								.find('.wcm-pagination-wrapper')
-								.attr('data-current-page', nextPage);
+							let nextPage = currentPage + 1;
+
+							$directory.find('.wcm-pagination-wrapper').data('current-page', nextPage);
+
 							setupDirectory($directory, { requestData: { page: nextPage } });
 						}
 					}
-					//previous btn clicked
+
+					// previous button clicked
 					if (e.currentTarget.classList.contains('previous')) {
 						if (currentPage > 1) {
-							let previousPage = parseInt(currentPage) - 1;
-							$directory
-								.find('.wcm-pagination-wrapper')
-								.attr('data-current-page', previousPage);
+							let previousPage = currentPage - 1;
+
+							$directory.find('.wcm-pagination-wrapper').data('current-page', previousPage);
+
 							setupDirectory($directory, {
 								requestData: { page: previousPage },
 							});
@@ -229,7 +235,7 @@ jQuery(function ($) {
 			return fields;
 		};
 
-		// Get Member directory Item layout
+		// get Member Directory item layout
 		const getDirectoryItem = (args = {}) => {
 			const {
 				customer_data: customer,
@@ -307,7 +313,7 @@ jQuery(function ($) {
 			if ((page = getQueryParameter('page'))) {
 				$directory
 					.find('.wcm-pagination-wrapper')
-					.attr('data-current-page', page);
+					.data('current-page', page);
 				args['requestData'] = { page: page };
 			}
 

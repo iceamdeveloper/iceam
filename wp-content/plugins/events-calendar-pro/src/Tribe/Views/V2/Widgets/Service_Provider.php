@@ -9,6 +9,8 @@
 
 namespace Tribe\Events\Pro\Views\V2\Widgets;
 
+use TEC\Common\Contracts\Service_Provider as Provider_Contract;
+
 /**
  * Class Service_Provider
  *
@@ -16,7 +18,8 @@ namespace Tribe\Events\Pro\Views\V2\Widgets;
  *
  * @package Tribe\Events\Pro\Views\V2\Widgets
  */
-class Service_Provider extends \tad_DI52_ServiceProvider {
+class Service_Provider extends Provider_Contract {
+
 	/**
 	 * Binds and sets up implementations.
 	 *
@@ -59,7 +62,7 @@ class Service_Provider extends \tad_DI52_ServiceProvider {
 		$hooks = new Hooks( $this->container );
 		$hooks->register();
 
-		// Allow Hooks to be removed, by having the them registered to the container.
+		// Allow Hooks to be removed, by having them registered to the container.
 		$this->container->singleton( Hooks::class, $hooks );
 		$this->container->singleton( 'pro.views.v2.widgets.hooks', $hooks );
 

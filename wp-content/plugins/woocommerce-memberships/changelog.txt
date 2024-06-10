@@ -1,5 +1,51 @@
 *** WooCommerce Memberships Changelog ***
 
+2024.04.02 - version 1.26.5
+ * Fix - Address PHP 8.2+ notices when viewing Import/Export and Profile Fields admin screens
+ * Fix - Ensure that the `{products}` merge tag is correctly replaced when using exclusively product variations for discount rules
+ * Fix - When free shipping is granted to a member, ensure that any set minimum order amount is correctly enforced
+
+2024.03.20 - version 1.26.4
+ * Tweak - Add a last activity column to the memberships exported data
+ * Tweak - Allow specifying custom date formats when importing or exporting memberships
+ * Fix - Correctly set member roles for memberships created from the admin screen when member roles are enabled
+ * Fix - Make sure that users with active memberships aren't accidentally deleted if the "Retain inactive accounts" privacy setting is used
+ * Fix - Ensure that content excerpts are shown if the restriction mode allows for excerpts but the admin has set the corresponding restriction message to empty
+ * Fix - Ensure the Member Directory block can consistently paginate user memberships
+
+2024.02.26 - version 1.26.3
+ * Tweak - The `{products}` merge tag can be used also in the "Member discount login message" to display products that may grant access to plans with member discounts
+ * Tweak - Display a more accurate member last active information in the User Memberships admin screens to match WooCommerce customer last active timestamp
+ * Fix - Prevent table alias missing notice from showing when visiting the comments page in admin
+ * Fix - Profile field labels should override the field name when set and displayed to the member
+ * Fix - When increasing the specific delay access of a Member Content block via the corresponding number input, ensure that the delay access increment can go beyond 10 units without error
+ * Fix - Do not apply member discounts while quick-editing a product if the admin is eligible
+ * Fix - Profile field labels should override the field name when set and displayed to the member in the Members Area
+ * Dev - Apply `the_excerpt` filter to the excerpt of restricted content
+
+2024.02.14 - version 1.26.2
+ * Fix - Check for public plans instead of private plans when outputting shortcodes while the `plans` attribute is used
+
+2024.02.07 - version 1.26.1
+ * Fix - Do not show members belonging to plans with private statuses in the Member Directory block or shortcode output
+ * Fix - Allow dynamic properties in `WC_Memberships_Emails` to avoid PHP notices with recent versions of PHP
+ * Dev - Add filters to tweak the plan statuses considered public
+
+2024.01.24 - version 1.26.0
+ * Feature - Add compatibility with the cart and checkout blocks
+ * Fix - Ensure that the Member Directory block output is visible also to non-admins
+
+2023.12.06 - version 1.25.2
+ * Fix - Do not return all subscriptions when manually linking a subscription to a membership
+
+2023.11.17 - version 1.25.1
+ * Tweak - Improve performance of memberships export functionality
+ * Misc - Add admin notices to help merchants reverting to the cart or checkout shortcodes if the corresponding blocks are used instead
+
+2023.06.28 - version 1.25.0
+ * Fix - Include "Additional Content" when rendering Memberships emails
+ * Misc - Add compatibility for WooCommerce High Performance Order Storage (HPOS)
+
 2022.11.30 - version 1.24.0
  * Misc - Require PHP 7.4 and WordPress 5.6
  * Localization - Add Brazilian Portuguese translation, courtesy Renato Fiuza
@@ -61,7 +107,7 @@
  * Dev - Improve compatibility with WooCommerce Product Bundles
 
 2021.03.30 - version 1.21.7
- * Fix - Ensure that the member directory shortcode can correctly query memberships of given statuses
+ * Fix - Ensure that the Member Directory shortcode can correctly query memberships of given statuses
  * Fix - Fix a conflict with Variable products and Profile Fields that prevented adding them to cart
 
 2021.03.18 - version 1.21.6

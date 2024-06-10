@@ -17,11 +17,11 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -70,9 +70,9 @@ class WC_Memberships_User_Memberships {
 		add_action( 'woocommerce_order_status_refunded', array( $this, 'handle_order_refunded' ) );
 
 		// prevent User Membership notes (ie. comments on user memberships posts) from showing where not supposed to
-		add_filter( 'comments_clauses',   array( $this, 'exclude_membership_notes_from_queries' ) );
-		add_action( 'comment_feed_join',  array( $this, 'exclude_membership_notes_from_feed_join' ) );
-		add_action( 'comment_feed_where', array( $this, 'exclude_membership_notes_from_feed_where' ) );
+		add_filter( 'comments_clauses',   [ $this, 'exclude_membership_notes_from_queries' ] );
+		add_action( 'comment_feed_join',  [ $this, 'exclude_membership_notes_from_feed_join' ] );
+		add_action( 'comment_feed_where', [ $this, 'exclude_membership_notes_from_feed_where' ] );
 		add_filter( 'wp_count_comments',  [ $this, 'exclude_membership_notes_from_comments_count' ], 999, 2 );
 
 		// expiration events handling
@@ -1563,7 +1563,7 @@ class WC_Memberships_User_Memberships {
 			 *
 			 * @since 1.3.8
 			 *
-			 * @param \WC_Memberships_Membership_Plan $membership_plan the plan that user was granted access to.
+			 * @param \WC_Memberships_Membership_Plan|\WC_Memberships_Integration_Subscriptions_Membership_Plan|false|null $membership_plan the plan that user was granted access to -- this may be false if it has not been associated with a plan just yet, for example in some admin contexts
 			 * @param array $args
 			 * @param array $args array of contextual arguments {
 			 *     @type int $user_id the user ID the membership is assigned to.
@@ -1571,14 +1571,24 @@ class WC_Memberships_User_Memberships {
 			 *     @type bool $is_update whether this is a post update or a newly created membership.
 			 * }
 			 */
-			do_action( 'wc_memberships_user_membership_saved', $user_membership->get_plan(), array(
+			do_action( 'wc_memberships_user_membership_saved', $user_membership->get_plan(), [
 				'user_id'            => $user_membership->get_user_id(),
 				'user_membership_id' => $user_membership->get_id(),
 				'is_update'          => $update,
-			) );
+			] );
 
 			if ( $user = get_user_by( 'id', $user_membership->get_user_id() ) ) {
-				$this->update_member_user_role( $user->ID );
+
+				$from = $to = '';
+
+				// this ensures that members created in admin will have the correct role assigned instead of both
+				if ( 'yes' === get_option( 'wc_memberships_assign_user_roles_to_members', 'no' ) ) {
+					$active = $user_membership->is_active();
+					$from   = $this->get_default_user_role( $user, $active ? 'inactive' : 'active'   );
+					$to     = $this->get_default_user_role( $user, $active ? 'active'   : 'inactive' );
+				}
+
+				$this->update_member_user_role( $user->ID, $from, $to );
 			}
 
 			$this->prune_object_caches( $user_membership );
@@ -1693,7 +1703,7 @@ class WC_Memberships_User_Memberships {
 	 */
 	public function handle_order_trashed( $order_id ) {
 
-		$this->handle_order_cancellation( $order_id, __( 'Membership cancelled because the associated order was trashed.', 'woocommerce-memberships' ) );
+		$this->handle_order_cancellation( (int) $order_id, __( 'Membership cancelled because the associated order was trashed.', 'woocommerce-memberships' ) );
 	}
 
 
@@ -1708,7 +1718,7 @@ class WC_Memberships_User_Memberships {
 	 */
 	public function handle_order_refunded( $order_id ) {
 
-		$this->handle_order_cancellation( $order_id, __( 'Membership cancelled because the associated order was refunded.', 'woocommerce-memberships' ) );
+		$this->handle_order_cancellation( (int) $order_id, __( 'Membership cancelled because the associated order was refunded.', 'woocommerce-memberships' ) );
 	}
 
 
@@ -1719,10 +1729,11 @@ class WC_Memberships_User_Memberships {
 	 *
 	 * @param int $order_id order ID associated to the User Membership
 	 * @param string $note cancellation message
+	 * @return void
 	 */
-	private function handle_order_cancellation( $order_id, $note ) {
+	private function handle_order_cancellation( int $order_id, string $note ) : void {
 
-		if ( 'shop_order' !== get_post_type( $order_id ) ) {
+		if ( ! Framework\SV_WC_Order_Compatibility::is_order( $order_id ) ) {
 			return;
 		}
 
@@ -1762,10 +1773,22 @@ class WC_Memberships_User_Memberships {
 		}
 
 		if ( $clauses['where'] ) {
-			$clauses['where'] .= ' AND ';
-		}
 
-		$clauses['where'] .= " $wpdb->posts.post_type <> 'wc_user_membership' ";
+			// this accounts for WC introducing a table alias in the where clause to exclude product reviews
+			if ( false !== strpos( $clauses['where'], "wp_posts_to_exclude_reviews.post_type NOT IN ('product')" ) ) {
+
+				$clauses['where'] = str_replace( "wp_posts_to_exclude_reviews.post_type NOT IN ('product')", "wp_posts_to_exclude_reviews.post_type NOT IN ('product', 'wc_user_membership')", $clauses['where'] );
+
+			} else {
+
+				$clauses['where'] .= " AND ";
+				$clauses['where'] .= " $wpdb->posts.post_type <> 'wc_user_membership' ";
+			}
+
+		} else {
+
+			$clauses['where'] .= " $wpdb->posts.post_type <> 'wc_user_membership' ";
+		}
 
 		return $clauses;
 	}

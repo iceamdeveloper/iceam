@@ -60,18 +60,25 @@ tribe.tickets.table = {};
 	};
 
 	obj.toggle_sortable = function() {
-		const $table = $( document.getElementById( 'tribe_ticket_list_table' ) )
-			.find( '.tribe-tickets-editor-table-tickets-body' );
+		const tables = document.querySelectorAll( '#tribetickets .tribe_ticket_list_table' );
 
-		if ( window.matchMedia( '( min-width: 786px )' ).matches ) {
-			if ( ! $table.hasClass( 'ui-sortable' ) ) {
-				obj.make_sortable( $table );
-			} else {
-				$table.sortable( 'enable' );
-			}
-		} else if ( $table.hasClass( 'ui-sortable' ) ) {
-			$table.sortable( 'disable' );
+		if ( tables.length === 0 ) {
+			return;
 		}
+
+		Array.from( tables ).forEach( function( table ) {
+			const $tableBody = $( table ).find( '.tribe-tickets-editor-table-tickets-body' );
+
+			if ( window.matchMedia( '( min-width: 786px )' ).matches ) {
+				if ( ! $tableBody.hasClass( 'ui-sortable' ) ) {
+					obj.make_sortable( $tableBody );
+				} else {
+					$tableBody.sortable( 'enable' );
+				}
+			} else if ( $tableBody.hasClass( 'ui-sortable' ) ) {
+				$tableBody.sortable( 'disable' );
+			}
+		} );
 	};
 
 	$( function() {

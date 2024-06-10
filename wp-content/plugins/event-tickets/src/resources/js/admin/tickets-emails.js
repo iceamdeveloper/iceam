@@ -40,8 +40,12 @@ tribe.tickets.emails = {};
 		hiddenElement: '.tribe-common-a11y-hidden',
 		formCurrentEmail: 'tec_tickets_emails_current_section',
 		formHeaderImageUrl: 'tec-tickets-emails-header-image-url',
+		formHeaderImageAlignment: 'tec-tickets-emails-header-image-alignment',
 		formTicketBgColorName: 'tec-tickets-emails-ticket-bg-color',
 		formHeaderBgColorName: 'tec-tickets-emails-header-bg-color',
+		formFooterContent: 'tec-tickets-emails-footer-content',
+		formFooterCredit: 'tec-tickets-emails-footer-credit',
+		formQrCodes: 'tec-tickets-emails-ticket-include-qr-codes',
 	};
 
 	/**
@@ -70,6 +74,18 @@ tribe.tickets.emails = {};
 			'tribeDialogCloseEmailsPreviewModal.tribeTickets',
 			obj.modalClose,
 		);
+	};
+
+	/**
+	 * Binds events for the modal content container.
+	 *
+	 * @since 5.6.0
+	 * @param  {Event}  event    event object for 'afterAjaxSuccess.tribeTicketsAdmin' event.
+	 * @param  {jqXHR}  jqXHR    Request object.
+	 * @param  {Object} settings Settings that this request was made with.
+	 */
+	obj.bindModalEvents = ( event, jqXHR, settings ) => { // eslint-disable-line no-unused-vars
+
 	};
 
 	/**
@@ -135,31 +151,74 @@ tribe.tickets.emails = {};
 	 */
 	obj.getSettingsContext = function() {
 		const context = {};
-		// @todo @juanfra: Get individual email settings and send them as context (once we have the settings per page).
-
-		// Get email.
-		// Get alignment.
-
-		// @todo @juanfra: check if the elements are found in the DOM.
-		const ticketBgColor = $document
-			.find( 'input[name=' + obj.selectors.formTicketBgColorName + ']' ).val();
-
-		context.ticketBgColor = ticketBgColor;
-
-		const headerBgColor = $document
-			.find( 'input[name=' + obj.selectors.formHeaderBgColorName + ']' ).val();
-
-		context.headerBgColor = headerBgColor;
-
-		const headerImageUrl = $document
-			.find( 'input[name=' + obj.selectors.formHeaderImageUrl + ']' ).val();
-
-		context.headerImageUrl = headerImageUrl;
+		const tinyMCE = window.tinyMCE || undefined;
 
 		const currentEmail = $document
 			.find( 'input[name=' + obj.selectors.formCurrentEmail + ']' ).val();
 
 		context.currentEmail = currentEmail;
+
+		if ( currentEmail ) {
+			const fieldReducer = ( ctx, el, fieldPrefix ) => {
+				// eslint-disable-next-line template-curly-spacing
+				const name = el.name.replace( `${fieldPrefix}-`, '' )
+					// From `tec_tickets_emails_current_section-some-field' to `someField`.
+					.replace( /-([a-z])/g, (g) => g[1].toUpperCase() ).replace( /\[]$/, '' ); // eslint-disable-line space-in-parens, computed-property-spacing, max-len
+				ctx[ name ] = el.type === 'checkbox' ? el.checked : el.value;
+				return ctx;
+			};
+
+			// This flag will be set by the RSVP type of email.
+			context.useTicketEmail = false;
+
+			// Include the generic ticket context.
+			const ticketOptionPrefix = 'tec-tickets-emails-ticket';
+			Array.from( $document.find( 'input[name^=' + ticketOptionPrefix + ']' ) )
+				.reduce( ( ctx, el ) => fieldReducer( ctx, el, ticketOptionPrefix ), context );
+
+			// Dynamically fetch the specific email type fields from the inputs. Override the context.
+			const currentEmailOptionPrefix = currentEmail.replace( /_/g, '-' );
+			Array.from( $document.find( 'input[name^=' + currentEmailOptionPrefix + ']' ) )
+				.reduce( ( ctx, el ) => fieldReducer( ctx, el, currentEmailOptionPrefix ), context ); // eslint-disable-line max-len
+
+			// Fetch additional content from the editor.
+			context.addContent = tinyMCE !== undefined
+				? tinyMCE.get( currentEmailOptionPrefix + '-additional-content' ).getContent()
+				: '';
+		} else {
+			const ticketBgColor = $document
+				.find( 'input[name=' + obj.selectors.formTicketBgColorName + ']' ).val();
+
+			context.ticketBgColor = ticketBgColor;
+
+			const headerBgColor = $document
+				.find( 'input[name=' + obj.selectors.formHeaderBgColorName + ']' ).val();
+
+			context.headerBgColor = headerBgColor;
+
+			const headerImageUrl = $document
+				.find( 'input[name=' + obj.selectors.formHeaderImageUrl + ']' ).val();
+
+			context.headerImageUrl = headerImageUrl;
+
+			const headerImageAlignment = $document
+				.find( 'select[name=' + obj.selectors.formHeaderImageAlignment + ']' ).val();
+
+			context.headerImageAlignment = headerImageAlignment;
+
+			const footerCredit = $document
+				.find( 'input[name=' + obj.selectors.formFooterCredit + ']' ).is( ':checked' );
+
+			context.footerCredit = footerCredit;
+
+			// fetch footer content from the editor.
+			context.footerContent = tinyMCE !== undefined ? tinyMCE.get( obj.selectors.formFooterContent ).getContent() : ''; // eslint-disable-line max-len
+
+			// If we're in the main Emails settings, we show the all options.
+			context.eventLinks = true;
+			context.qrCodes = true;
+			context.arFields = true;
+		}
 
 		return context;
 	};

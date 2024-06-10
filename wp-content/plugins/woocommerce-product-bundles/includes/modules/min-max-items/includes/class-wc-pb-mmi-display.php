@@ -2,7 +2,7 @@
 /**
  * WC_PB_MMI_Display class
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.4.0
  */
 
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Display-related functions and filters.
  *
  * @class    WC_PB_MMI_Display
- * @version  6.6.0
+ * @version  6.22.6
  */
 class WC_PB_MMI_Display {
 
@@ -25,8 +25,11 @@ class WC_PB_MMI_Display {
 	public static function init() {
 
 		// Validation script.
-		add_action( 'woocommerce_bundle_add_to_cart', array( __CLASS__, 'enqueue_script' ) );
-		add_action( 'woocommerce_composite_add_to_cart', array( __CLASS__, 'enqueue_script' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_script' ) );
+
+		// Add the MMI script as a dependency to the main Bundle/Composite script to ensure that `on` handlers are added before any `trigger` actions of the main script.
+		add_filter( 'woocommerce_pb_script_dependencies', array( __CLASS__, 'add_script_dependency' ) );
+		add_filter( 'woocommerce_composite_script_dependencies', array( __CLASS__, 'add_script_dependency' ) );
 
 		// Add min/max data to template for use by validation script.
 		add_filter( 'woocommerce_bundle_price_data', array( __CLASS__, 'script_data' ), 10, 2 );
@@ -45,8 +48,8 @@ class WC_PB_MMI_Display {
 
 		$suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-		wp_register_script( 'wc-pb-min-max-items-add-to-cart', WC_PB()->plugin_url() . '/assets/js/frontend/add-to-cart-bundle-min-max-items' . $suffix . '.js', array( 'wc-add-to-cart-bundle' ), WC_PB()->version );
-		wp_enqueue_script( 'wc-pb-min-max-items-add-to-cart' );
+		wp_register_script( 'wc-pb-min-max-items-add-to-cart', WC_PB()->plugin_url() . '/assets/js/frontend/add-to-cart-bundle-min-max-items' . $suffix . '.js', array( 'jquery', 'wc-add-to-cart-variation' ), WC_PB()->version, true );
+		wp_script_add_data( 'wc-pb-min-max-items-add-to-cart', 'strategy', 'defer' );
 
 		$params = array(
 			'i18n_min_zero_max_qty_error_singular' => __( 'Please choose an item.', 'woocommerce-product-bundles' ),
@@ -70,6 +73,17 @@ class WC_PB_MMI_Display {
 		);
 
 		wp_localize_script( 'wc-pb-min-max-items-add-to-cart', 'wc_pb_min_max_items_params', $params );
+	}
+
+	/**
+	 * Add the MMI script as a dependency to the main Bundle/Composite script.
+	 *
+	 * @param array $dependencies
+	 *
+	 */
+	public static function add_script_dependency( $dependencies ) {
+		$dependencies[] = 'wc-pb-min-max-items-add-to-cart';
+		return $dependencies;
 	}
 
 	/**

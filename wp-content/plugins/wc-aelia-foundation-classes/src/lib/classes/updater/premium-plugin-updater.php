@@ -509,7 +509,7 @@ class Premium_Plugin_Updater extends Updater {
 
 		try {
 			// Invoke the remote API to check for updates
-			$update_checker = \Puc_v4_Factory::buildUpdateChecker(
+			$update_checker = \YahnisElsts\PluginUpdateChecker\v5\PucFactory::buildUpdateChecker( // NOSONAR
 					$api_call_url,
 					$main_plugin_file,
 					$plugin_slug_for_update_check

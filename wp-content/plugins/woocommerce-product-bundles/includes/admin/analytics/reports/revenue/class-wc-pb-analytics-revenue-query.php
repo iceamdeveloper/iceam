@@ -4,7 +4,7 @@
  *
  * Class for parameter-based Products Stats Report querying
  *
- * @package  WooCommerce Product Bundles
+ * @package  Woo Product Bundles
  * @since    6.9.0
  */
 

@@ -17,13 +17,13 @@
  * needs please refer to https://docs.woocommerce.com/document/woocommerce-memberships/ for more information.
  *
  * @author    SkyVerge
- * @copyright Copyright (c) 2014-2022, SkyVerge, Inc. (info@skyverge.com)
+ * @copyright Copyright (c) 2014-2024, SkyVerge, Inc. (info@skyverge.com)
  * @license   http://www.gnu.org/licenses/gpl-3.0.html GNU General Public License v3.0
  */
 
 namespace SkyVerge\WooCommerce\Memberships;
 
-use SkyVerge\WooCommerce\PluginFramework\v5_10_13 as Framework;
+use SkyVerge\WooCommerce\PluginFramework\v5_12_1 as Framework;
 
 defined( 'ABSPATH' ) or exit;
 
@@ -45,13 +45,16 @@ class Shortcodes {
 	public static function initialize() {
 
 		$shortcodes = [
-			'wcm_directory'          => __CLASS__ . '::directory',
-			'wcm_restrict'           => __CLASS__ . '::restrict',
-			'wcm_nonmember'          => __CLASS__ . '::nonmember',
-			'wcm_content_restricted' => __CLASS__ . '::content_restricted',
-			'wcm_discounted_product' => __CLASS__ . '::has_product_discount',
-			'wcm_product_discount'   => __CLASS__ . '::get_product_discount',
+			'wcm_restrict'           => __CLASS__ . '::restrict',             /** @see Shortcodes::restrict() */
+			'wcm_nonmember'          => __CLASS__ . '::nonmember',            /** @see Shortcodes::nonmember() */
+			'wcm_content_restricted' => __CLASS__ . '::content_restricted',   /** @see Shortcodes::content_restricted() */
+			'wcm_discounted_product' => __CLASS__ . '::has_product_discount', /** @see Shortcodes::has_product_discount() */
+			'wcm_product_discount'   => __CLASS__ . '::get_product_discount', /** @see Shortcodes::get_product_discount() */
 		];
+
+		if ( wc_memberships()->is_member_directory_enabled() ) {
+			$shortcodes['wcm_directory'] = __CLASS__ . '::directory'; /** @see Shortcodes::directory() */
+		}
 
 		foreach ( $shortcodes as $shortcode => $function ) {
 
@@ -341,7 +344,7 @@ class Shortcodes {
 
 
 	/**
-	 * Outputs a members directory.
+	 * Outputs the Member Directory.
 	 *
 	 * Shortcode: [wcm_directory]
 	 * Usage: [wcm_directory plans="{string}" status="{string}" per_page="{int}" bios="{string}" avatars="{string}" avatar_size="{int}"]
@@ -364,6 +367,11 @@ class Shortcodes {
 	 */
 	public static function directory( $atts ) : string {
 		global $paged;
+
+		// sanity check: bail if the directory is not enabled
+		if ( ! wc_memberships()->is_member_directory_enabled() ) {
+			return '';
+		}
 
 		$atts = shortcode_atts( [
 			'plans'       => 'any',
@@ -450,7 +458,7 @@ class Shortcodes {
 		global $wpdb;
 
 		$members     = [];
-		$members_raw = $wpdb->get_results( self::prepare_members_directory_query( $atts ), ARRAY_A );
+		$members_raw = $wpdb->get_results( self::prepare_member_directory_query( $atts ), ARRAY_A );
 
 		foreach( $members_raw as $member ) {
 			if ( array_key_exists( $member['post_author'], $members ) ) {
@@ -479,7 +487,7 @@ class Shortcodes {
 	 * @param array $atts shortcode attributes
 	 * @return string the SQL query
 	 */
-	private static function prepare_members_directory_query( array $atts ) : string {
+	private static function prepare_member_directory_query( array $atts ) : string {
 		global $wpdb;
 
 		// build the basic SQL to find all authors of a user membership
@@ -518,21 +526,35 @@ class Shortcodes {
 		if ( 'any' !== $atts['plans'] ) {
 
 			$plans_list  = array_map( 'trim', explode( ',', $atts['plans'] ) );
-			$plans_where = [];
+			$plans_where = ["{$wpdb->posts}.post_parent = 0"];
 
-			foreach ( $plans_list as $plan_slug ) {
+			foreach ( $plans_list as $plan_slug_or_id ) {
 
-				$plan = wc_memberships_get_membership_plan( $plan_slug );
+				$plan = wc_memberships_get_membership_plan( $plan_slug_or_id );
 
-				// be sure the plan slug is a valid one
-				if ( $plan instanceof \WC_Memberships_Membership_Plan ) {
+				// be sure the plan slug is a valid one (exclude drafts as well)
+				if ( $plan instanceof \WC_Memberships_Membership_Plan && $plan->is_public() ) {
 					$plans_where[] = $wpdb->prepare( "{$wpdb->posts}.post_parent = '%s'", $plan->get_id() );
 				}
 			}
 
 			// add a condition for all plans
-			if ( ! empty( $plans_where ) ) {
-				$sql .= " AND (" . implode( ' OR ', $plans_where ) . ")";
+			$sql .= " AND (" . implode( ' OR ', $plans_where ) . ")";
+
+		} else {
+
+			$public_plan_statuses = [];
+
+			// wrap all plan statuses in single quotes
+			foreach ( wc_memberships()->get_plans_instance()->get_membership_plans_public_statuses() as $status ) {
+				$public_plan_statuses[] = "'{$status}'";
+			}
+
+			$public_plan_statuses = implode( ', ', $public_plan_statuses );
+
+			// exclude membership plan posts having a "private" status
+			if ( ! empty( $public_plan_statuses ) ) {
+				$sql .= " AND {$wpdb->posts}.post_parent IN ( SELECT ID FROM {$wpdb->posts} WHERE post_type = 'wc_membership_plan' AND post_status IN ( {$public_plan_statuses} ) )";
 			}
 		}
 
@@ -561,12 +583,12 @@ class Shortcodes {
 
 			case 'product_id' :
 
-				// we accept both 'id' or 'product_id' as long as they're set by the user (non null)
-				if ( isset( $atts['id'] ) && null !== $atts['id'] ) {
+				// we accept both 'id' or 'product_id' as long as they're set by the user (non-null)
+				if ( ! empty( $atts['id'] ) ) {
 					$product_id = is_numeric( $atts['id'] ) ? (int) $atts['id'] : $default;
-				} elseif ( isset( $atts['product_id'] ) && null !== $atts['product_id'] ) {
+				} elseif ( ! empty( $atts['product_id'] ) ) {
 					$product_id = is_numeric( $atts['product_id'] ) ? (int) $atts['product_id'] : $default;
-				} elseif( $product instanceof \WP_Product ) {
+				} elseif( $product instanceof \WC_Product ) {
 					$product_id = $product->get_id();
 				} elseif ( $post instanceof \WP_Post ) {
 					$product_id = (int) $post->ID;
@@ -608,7 +630,8 @@ class Shortcodes {
 
 						$plan = wc_memberships_get_membership_plan( $plan_id_or_slug );
 
-						if ( $plan ) {
+						// exclude plans having private status
+						if ( $plan instanceof \WC_Memberships_Membership_Plan && $plan->is_public() ) {
 							$plan_ids[] = $plan->get_id();
 						}
 					}

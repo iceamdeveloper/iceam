@@ -7,6 +7,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Tribe__Tickets_Plus__Tickets_View {
 
 	/**
+	 * Variable to hold template object.
+	 *
+	 * @var null|Tribe__Template
+	 */
+	private $template;
+
+	/**
+	 * Gets the Event Tickets template instance used to setup the rendering html.
+	 *
+	 * @since 5.8.0
+	 *
+	 * @return Tribe__Template The template object.
+	 */
+	public function get_template(): Tribe__Template {
+		if ( empty( $this->template ) ) {
+			$this->template = new Tribe__Template();
+			$this->template->set_template_origin( Tribe__Tickets__Main::instance() );
+			$this->template->set_template_folder( 'src/views' );
+			$this->template->set_template_context_extract( true );
+			$this->template->set_template_folder_lookup( true );
+		}
+
+		return $this->template;
+	}
+
+	/**
 	 * Get (and instantiate, if necessary) the instance of the class
 	 *
 	 * @static
@@ -39,8 +65,8 @@ class Tribe__Tickets_Plus__Tickets_View {
 		add_filter( 'tribe_tickets_template_paths', [ $myself, 'add_template_path' ] );
 		add_action( 'tribe_tickets_orders_rsvp_item', [ $myself, 'add_meta_to_rsvp' ], 10, 2 );
 		add_action( 'tribe_tickets_orders_before_submit', [ $myself, 'output_ticket_order_form' ] );
-		add_action( 'event_tickets_user_details_rsvp', [ $myself, 'output_attendee_list_checkbox' ], 10, 2 );
-		add_action( 'event_tickets_user_details_tickets', [ $myself, 'output_attendee_list_checkbox' ], 10, 2 );
+		add_action( 'tec_tickets_my_tickets_after_rsvps_list', [ $myself, 'output_attendee_list_checkbox' ], 10, 2 );
+		add_action( 'tec_tickets_my_tickets_after_tickets_list', [ $myself, 'output_attendee_list_checkbox' ], 10, 2 );
 
 		return $myself;
 	}
@@ -437,9 +463,50 @@ class Tribe__Tickets_Plus__Tickets_View {
 	/**
 	 * Outputs tickets form
 	 *
+	 * @since 5.9.0 Updated to pass titles by template data.
+	 *
 	 */
 	public function output_ticket_order_form() {
-		tribe_tickets_get_template_part( 'tickets-plus/orders-tickets' );
+		$view      = Tribe__Tickets__Tickets_View::instance();
+		$post_id   = get_the_ID();
+		$post      = get_post( $post_id );
+		$post_type = get_post_type_object( $post->post_type );
+		$user_id   = get_current_user_id();
+
+		if ( ! $view->has_ticket_attendees( $post_id, $user_id ) ) {
+			return;
+		}
+
+		$orders = $view->get_event_attendees_by_order( $post_id, $user_id );
+
+		$post_type_singular = $post_type ? $post_type->labels->singular_name : _x( 'Post', 'fallback post type singular name', 'event-tickets-plus' );
+		$default_title      = sprintf(
+		// Translators: 1: post type singular name, 2: ticket label plural.
+			__( '%1$s %2$s', 'event-tickets-plus' ),
+			$post_type_singular,
+			tribe_get_ticket_label_plural( 'orders_tickets_heading' )
+		);
+
+		$titles = [
+			'default' => $default_title,
+		];
+
+		/**
+		 * Filter the titles for the ticket types on the My Tickets page.
+		 *
+		 * @since 5.9.0
+		 *
+		 * @param array<string,string> $titles List of titles by ticket type slug.
+		 */
+		$titles = apply_filters( 'tec_tickets_plus_my_tickets_order_list_ticket_type_titles', $titles, $post_id );
+
+		$template = $this->get_template();
+		$template->template( 'tickets/my-tickets', [
+			'titles'  => $titles,
+			'post_id' => $post_id,
+			'orders'  => $orders,
+			'post'    => $post,
+		] );
 	}
 
 	/**
@@ -455,7 +522,7 @@ class Tribe__Tickets_Plus__Tickets_View {
 			'first_attendee' => $first_attendee,
 		];
 
-		if ( doing_action( 'event_tickets_user_details_rsvp' ) ) {
+		if ( doing_action( 'tec_tickets_my_tickets_after_rsvps_list' ) ) {
 			$template_part = 'tickets-plus/attendee-list-checkbox-rsvp';
 		} else {
 			$template_part = 'tickets-plus/attendee-list-checkbox-tickets';
