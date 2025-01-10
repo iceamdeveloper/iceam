@@ -1,0 +1,198 @@
+.angelleye_micro_account_body { 
+    padding: 10px;
+    border: 1px solid #d1c6c6;
+    border-radius: 15px;
+    display: block;
+}
+.width460 {
+    width: 460px;
+}
+.angelleye_multi_account_left {
+    max-width: 60%;
+    float: left;
+    width: 688px;
+}
+
+.angelleye_multi_account_right {
+    max-width: 475px;
+    float: left;
+    padding: 10px;
+    border: 1px solid #d1c6c6;
+    border-radius: 15px;
+    display: block;
+    margin-top: 0px;
+    margin-left: 10px;
+    width: 37%;
+}
+.angelleye_multi_global_commission_right {
+    max-width: 475px;
+    float: left;
+    padding: 10px;
+    border: 1px solid #d1c6c6;
+    border-radius: 15px;
+    display: block;
+    margin-top: 0px;
+    margin-left: 10px;
+    width: 37%;
+    margin-bottom: 20px;
+}
+.angelleye_multi_global_commission_right label.commission {
+    width: 215px;
+}
+.angelleye_multi_global_commission_right input.commission {
+    width: 190px !important;
+}
+.angelleye_pfwma_tips {
+    list-style: circle;
+    margin: 0 0 0 12px;
+}
+
+#woocommerce_paypal_express_api_condition_value { 
+    height: 34px;
+    line-height: 1;
+    width: 196px;
+}
+
+.notice.notice-success.angelleye-notice {
+    padding: 0 !important;
+    margin: 5px 0 10px;
+    background: #FFF;
+    overflow: hidden;
+    -webkit-border-radius: 6px;
+    border-radius: 6px;
+    -webkit-box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+    box-shadow: 0 1px 1px 0 rgba(0, 0, 0, 0.05);
+    position: relative;
+    z-index: 1;
+    min-height: 80px;
+    display: table; /* The magic ingredient! */
+    font: 13px "Open Sans", sans-serif;
+}
+.angelleye-notice > div {
+    display: table-cell;
+    vertical-align: middle;
+    cursor: default;
+    line-height: 1.5;
+}
+.angelleye-notice-logo-push {
+    background-repeat: no-repeat;
+    background-position: 50% 50%;
+}
+.angelleye-notice-logo-push span {
+    display: block;
+    margin: 0px 10px 0px 10px;
+}
+.notice.notice-success.angelleye-notice {
+    font: 13px "Open Sans", sans-serif;
+    line-height: normal;
+}
+.angelleye-notice-message {
+    color: #23282D;
+    font-size: 13px;
+    font-weight: normal;
+    line-height: 20px;
+    padding: 3px 5px;
+    -webkit-font-smoothing: antialiased;
+    width: 100%;
+}
+.angelleye-notice-message h3 {
+    margin: 4px 0px !important;
+}
+.angelleye-notice-message-inner {
+    margin-bottom: 10px;
+}
+.angelleye-notice-message p {
+    margin: 3px 0px !important;
+    padding: 0px;
+}
+.angelleye-notice-action {
+    padding-top: 5px;
+}
+.angelleye-notice-cta {
+    border-left: 1px solid #E5E5E5;
+    background: #F8F8F8;
+    padding: 0 30px;
+    position: relative;
+    white-space: nowrap;
+}
+.wp-core-ui .angelleye-notice-cta button,
+.wp-core-ui .angelleye-notice-cta .button-primary:active {
+    vertical-align: middle;
+}
+.angelleye-notice-dismiss {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    color: #C5C5C5;
+    -webkit-font-smoothing: antialiased;
+}
+select.smart_forwarding_field {
+    width: 195px !important;
+}
+.updater-dismissible {
+    padding-right: 38px;
+    position: relative;
+}
+
+.angelleye_tag {
+    display: -webkit-inline-box;
+    display: inline-flex;
+    line-height: 1.8em;
+    color: #777;
+    background: #e5e5e5;
+    border-radius: 4px;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    margin: -.25em 0;
+    cursor: inherit !important;
+    white-space: nowrap;
+    max-width: 100%;
+    margin-top: 10px;
+}
+
+.angelleye_tag > span {
+    margin: 0 1em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+#angelleye_paypal_marketing_table table.fixed {
+    border-right: none;
+}
+fieldset.pfwma_section_ui {
+    border: 1px solid #d1c6c6;
+    padding: inherit;
+    margin: inherit;
+}
+fieldset.pfwma_section_ui legend {
+    font-weight: 600;
+}
+.woocommerce-help-tip.pfwma-help {
+    vertical-align: baseline;
+}
+.angelleye_multi_account_left fieldset label {
+    display: block !important;
+}
+.angelleye_multi_account_left table.form-table th label {
+    min-width: 200px;
+}
+td a.angelleye_smart_commission_delete {
+    color: #a00;
+    cursor: pointer;
+}
+
+@media screen and (max-width: 782px) {
+    .angelleye_multi_account_left {
+        max-width: 100% !important;
+        width: 100%;
+
+    } 
+    .micro_account_fields {
+        max-width: 100% !important;
+        width: 100%;
+    }
+    .angelleye_multi_account_right {
+        max-width: 100% !important;
+        width: 95%;
+        margin-left: 0px;
+    }
+}

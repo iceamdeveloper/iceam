@@ -351,17 +351,19 @@ li.tribe-events-nav-next {
 }
 
 @media(max-width: 768px) {
-
     .event-content,
     .event-sidebar {
         width: 100% !important;
     }
 }
 
-/* show Calendar nav as inactive on single venue page */
-body.single-tribe_venue li#menu-item-125 a {
-    color: #fff !important;
+@media(min-width: 768px) {
+    /* show Calendar nav as inactive on single venue page */
+    body.single-tribe_venue li#menu-item-125 a {
+        color: #fff !important;
+    }
 }
+
 
 body.page-template-page-course-category li#menu-item-122 a,
 body.single-course li#menu-item-122 a,
@@ -415,6 +417,12 @@ h3.nav-toggle a {
     box-shadow: -5px 0px 12px -3px rgba(153, 153, 153, 1);
     min-height: 800px;
     padding: 0px 10px;
+}
+
+@media (max-width: 768px){
+    #inner-wrapper {
+        min-height: 1700px;
+    }
 }
 
 .widget {
@@ -2005,6 +2013,7 @@ div#field_1_contains_wrap {
 
     #navigation ul.nav ul.sub-menu {
         background: #fff;
+        width: 13em;
     }
 
     #navigation ul.cart a.cart-contents+ul,

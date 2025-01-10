@@ -371,7 +371,7 @@ function apply_signup_coupons() {
 	// if there is a subscription, find out if it has student discount or diplomate discount category
 	$apply_coupon = false;
     $items = $woocommerce->cart->get_cart();
-    $total = floatval( preg_replace( '#[^\d.]#', '', $woocommerce->cart->get_cart_total() ) );
+    $total = $woocommerce->cart->get_cart_contents_total();
     //echo "<p>the total: $total</p>";
     
     

@@ -148,7 +148,7 @@ $cost  = tribe_get_formatted_cost( $event_id );
 							
 							// Display the currency selector widget with currencies as buttons
 							?><div id="top"><?php
-							echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
+							// echo do_shortcode('[aelia_currency_selector_widget title="Change Currency" widget_type="buttons"]');
 							?></div><?php
 						
 						// else tell the user he/she is inelligible
